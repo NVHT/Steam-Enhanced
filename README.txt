@@ -25,7 +25,7 @@ can leave stale scripts or stylesheets behind.
 OVERVIEW
 
 - Steam Enhanced branding: the theme's logo on the Steam menu button, the startup
-  screen, the sign-in window and the loading spinners.
+  screen, the account chooser, the sign-in window and the loading spinners.
 - Navigation rail, consolidated root menu, title-bar library search, and header
   quick actions. Restart Steam and Reload UI appear above Exit in the Steam menu.
 - Library Home hero stage with a glass tray for What's New, Favorites, and
