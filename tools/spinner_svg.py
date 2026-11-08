@@ -2,7 +2,8 @@
 
 Usage:
   python3 spinner_svg.py <THEME_DIR>
-      Rewrite --se-spinner-image in features/spinner/spinner.css in place.
+      Rewrite --se-spinner-image in features/spinner/spinner.css in place, with the theme's
+      mark (branding/mark.png) on the tile.
 
 The tail is one arc stroked in the accent color and faded by a luminance mask. The mask is
 built from 45-degree wedges, each an opaque gray gradient running along its arc chord. Each
@@ -26,6 +27,7 @@ STEP = 45        # wedge size
 OVERLAP = 2      # degrees each wedge reaches under the previous one
 FAR = 70         # wedge corner radius, well past the ring
 SPIN = '1.2s'
+MARK = 54        # mark size on the 60-unit tile (the mark brings its own rim)
 
 
 def point(deg, r):
@@ -76,7 +78,7 @@ def build(logo_href):
         f'<circle cx="{hx:.2f}" cy="{hy:.2f}" r="7" fill="{ACCENT}" fill-opacity=".25"/>'
         f'<circle cx="{hx:.2f}" cy="{hy:.2f}" r="4.2" fill="{HEAD}"/></g>'
         f'<circle cx="{C}" cy="{C}" r="30" fill="{TILE}"/>'
-        f'<image x="32" y="32" width="32" height="32" href="{logo_href}"/></svg>'
+        f'<image x="{C - MARK / 2:g}" y="{C - MARK / 2:g}" width="{MARK}" height="{MARK}" href="{logo_href}"/></svg>'
     )
 
 
@@ -84,8 +86,8 @@ def main(theme):
     css_path = Path(theme) / 'features' / 'spinner' / 'spinner.css'
     css = css_path.read_text(encoding='utf-8')
     token = re.search(r'(--se-spinner-image: url\("data:image/svg\+xml;base64,)([A-Za-z0-9+/=]+)("\))', css)
-    old = base64.b64decode(token.group(2)).decode('utf-8')
-    logo = re.search(r'<image [^>]*href="([^"]+)"', old).group(1)
+    mark = (Path(theme) / 'branding' / 'mark.png').read_bytes()
+    logo = 'data:image/png;base64,' + base64.b64encode(mark).decode('ascii')
     encoded = base64.b64encode(build(logo).encode('utf-8')).decode('ascii')
     css_path.write_text(css[: token.start(2)] + encoded + css[token.end(2):], encoding='utf-8')
 
