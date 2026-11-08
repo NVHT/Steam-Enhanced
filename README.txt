@@ -44,6 +44,8 @@ OVERVIEW
   Friends & Chat windows.
 - Restyled Steam Settings, App Properties, Millennium Settings popup, and
   Millennium Library Manager modal.
+- About Steam rebuilt with the theme's brand panel and Steam's details as
+  tiles: click a tile to copy it, or Copy all for bug reports.
 - Master-detail Downloads view with live progress telemetry.
 - Custom startup progress strip, configurable startup backgrounds, and unified
   loading spinners.

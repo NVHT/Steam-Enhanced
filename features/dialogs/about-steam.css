@@ -1,0 +1,257 @@
+/*
+ * About Steam, as built by features/dialogs/about-steam.js: the theme's brand panel on the left,
+ * Steam's facts as copyable tiles on the right, Copy all and Steam's Close at the foot.
+ * Applies only once the script has built the layout ([data-se-about]); until then
+ * utility-dialogs.css styles the stock dialog.
+ *
+ * Grid on DialogContent_InnerWidth (500 × 300 window):
+ *   [ brand ][ main ............... ]
+ *   [ brand ][ copy all ][ footer  ]
+ * AboutSteamDialog FFIKUQ7BGKw6vO1voazlr, DialogHeader _3QhXBKJwISpG-AmpbOQgLQ,
+ * DialogBodyText _32eeZuly3nnz3cMXdSgyj9.
+ */
+.DialogContent.FFIKUQ7BGKw6vO1voazlr[data-se-about]:not(#se-none) {
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+[data-se-about] > .DialogContent_InnerWidth:not(#se-none) {
+  display: grid !important;
+  grid-template-columns: 164px minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: 100%;
+}
+
+[data-se-about] ._3QhXBKJwISpG-AmpbOQgLQ:not(#se-none),
+[data-se-about] ._32eeZuly3nnz3cMXdSgyj9:not(#se-none) {
+  display: none !important;
+}
+
+/* Brand panel */
+.se-about-brand {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 14px 16px;
+  text-align: center;
+  background:
+    radial-gradient(140px 140px at 50% 30%, var(--se-accent-tint, rgba(124, 196, 255, .14)), transparent 70%),
+    var(--se-bg, #171a20);
+  box-shadow: inset -1px 0 0 var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.se-about-logo {
+  width: 84px;
+  height: 84px;
+  flex: none;
+  background: var(--se-brand-logo) center / contain no-repeat;
+}
+
+.se-about-name {
+  font: 800 16px/20px var(--se-font);
+  letter-spacing: -.01em;
+  color: var(--se-text-strong, #fff);
+}
+
+.se-about-name-steam {
+  font-weight: 600;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.se-about-version {
+  margin-top: -6px;
+  font: 600 12px/16px var(--se-font);
+  color: var(--se-accent, #7cc4ff);
+}
+
+.se-about-tagline {
+  margin-top: auto;
+  font: 500 11px/15px var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+/* Facts */
+.se-about-main {
+  grid-column: 2 / 4;
+  grid-row: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px 0;
+}
+
+.se-about-title {
+  font: 700 15px/20px var(--se-font);
+  letter-spacing: -.01em;
+  color: var(--se-text, #e6e8eb);
+}
+
+.se-about-hero,
+.se-about-tile {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  color: var(--se-text, #e6e8eb);
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow .15s ease, background-color .15s ease;
+}
+
+.se-about-hero {
+  flex: none;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border-radius: var(--se-radius-md, 10px);
+  background: linear-gradient(120deg, var(--se-accent-surface, #24384b), var(--se-sidebar, #1d2128) 75%);
+  box-shadow: inset 0 0 0 1px rgba(124, 196, 255, .22);
+}
+
+.se-about-hero:hover,
+.se-about-hero[data-copied] {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong, rgba(124, 196, 255, .55));
+}
+
+.se-about-hero-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.se-about-hero-value {
+  font: 800 17px/20px var(--se-font);
+  letter-spacing: -.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-strong, #fff);
+}
+
+.se-about-hint {
+  flex: none;
+  font: 600 9px/1 var(--se-font);
+  color: var(--se-accent, #7cc4ff);
+}
+
+.se-about-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.se-about-tile {
+  height: 46px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-bg, #171a20);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.se-about-tile:hover {
+  background: var(--se-field, #15181d);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line, rgba(124, 196, 255, .3));
+}
+
+.se-about-label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 600 9px/11px var(--se-font);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--se-text-faint, #6f7984);
+}
+
+.se-about-hero .se-about-label {
+  color: var(--se-text-muted, #98a2ad);
+  letter-spacing: .1em;
+}
+
+.se-about-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+
+.se-about-value {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 700 12px/15px var(--se-font);
+}
+
+.se-about-value[data-accent] {
+  color: var(--se-running, #6cc24a);
+}
+
+.se-about-sub {
+  flex: none;
+  font: 500 9px/11px var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+[data-copied] > .se-about-row .se-about-sub {
+  color: var(--se-accent, #7cc4ff);
+}
+
+/* Foot: Copy all beside Steam's own Close */
+.se-about-copyall {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  margin: 0 8px 14px 0;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-surface-2, #262c35);
+  color: var(--se-text, #e6e8eb);
+  font: 600 12px/1 var(--se-font);
+  cursor: pointer;
+}
+
+.se-about-copyall:hover {
+  background: var(--se-hover, #2c3440);
+}
+
+.se-about-copyall svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+[data-se-about] .DialogFooter:not(#se-none) {
+  grid-column: 3;
+  grid-row: 2;
+  align-self: center;
+  margin: 0 !important;
+  padding: 0 18px 14px 0 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-about-hero,
+  .se-about-tile {
+    transition: none;
+  }
+}
