@@ -1,0 +1,395 @@
+/*
+ * Game page spotlights.
+ *
+ * The cards Steam puts above a game's activity: the "New DLC … has been added" notice,
+ * the Post-Game Summary strip and the Available Content (DLC rollup) carousel, plus the
+ * pink "DLC" corner ribbon on DLC art, and the hover cards over screenshots and DLC. Steam's
+ * purple borders, gradients and hairline X buttons become the theme's cards, labels, chips,
+ * popovers and round buttons.
+ *
+ * Class sources (Steam client steamui/sp.js):
+ *   29158 PageableContainer — HeaderPageControls ._2o5c89vAnrXN8C60QTSMqO,
+ *         PageClickContainer .bsNegRKT1Hbv4tqHrOk9-, PageableCloseButton ._2dB1oJFsqNThak1cFya2-q
+ *   3443  Spotlight — SpotlightSimpleTextBox ._1rjqv6aCi9t7H-prIq99fk, SpotlightDLC .ut0YcLYGAoSTz2Dnjw9U1,
+ *         Icon .gtlfC4VRhQqlmAmTFDl1N, HideButton .R2VdUtWzknAHBOsdRzG_d
+ *   68854 Post-Game Summary — GamePlaySummaryContainer ._1OMmVJHDgNwOt0Wqn0hrf9,
+ *         GamePlaySummaryHeader .P_gQ8X-yCsgXeXpP68KS0, SummaryCarouselContainer ._2MKO5j24KqDdD-92hH5FXi,
+ *         EventHeaderBlock ._3ugJ_KPVlOd9oeYm-fYC_w, EventDaySeparator ._284XbL-B7aHiK4XgyI2DPS,
+ *         TypeSeparator ._1ms0i1dxwTqiqcXV59nenw, SummaryScreenshot ._22q2XMkRbHZD96i_GXOaHh
+ *   74351 DLC rollup — Rollup ._2UySYiE8fUGGugkHVm1Qb, Contents ._2kqz-bSlDu-I49_cV_wicB,
+ *         CarouselItem ._78Pwybe-fHVYEkQFFlpA5, CarouselImage ._3gB_gMsbWHUGn5Rqwe6KeC,
+ *         CarouselDescription ._1XMxxg4Tf-bnjlvGWtSdmP, CarouselHeader ._3hubFyqcbN0Tp93ajVPHLl,
+ *         CarouselBody ._1M3piztNHu7tsD7h8OgpuI, ViewAllRow ._1yEoLSbdr6RwEzqpyKLR4m, ViewAll ._3m6qdpFN3Mop0iw9ZE3RRa
+ *   79120 DLC art — DLCArt ._2bF7XkQZA1M7jTj6txLFp-, Banner .ZvLzhhMhwBLr1gcbVh52G
+ *
+ * Uses `:not(#se-none)` to outrank Steam's nested module selectors without `!important`.
+ */
+
+:root {
+  /* Corner chip on DLC art: download arrow + "DLC", in the theme's chip colours */
+  --se-dlc-badge: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 56 22'%3E%3Crect x='.5' y='.5' width='55' height='21' rx='10.5' fill='%230c0e12' fill-opacity='.78' stroke='%23fff' stroke-opacity='.12'/%3E%3Ccircle cx='11' cy='11' r='6.5' fill='%237cc4ff'/%3E%3Cpath d='M11 7.6v6.2M8.4 11.4 11 14l2.6-2.6' fill='none' stroke='%230f1115' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='22' y='15.2' fill='%23e6e8eb' font-family='Segoe UI,Arial,sans-serif' font-size='10.5' font-weight='700' letter-spacing='.9'%3EDLC%3C/text%3E%3C/svg%3E");
+}
+
+/* ── Shared: the X on Steam's pageable headers, as the theme's round button ── */
+
+.bsNegRKT1Hbv4tqHrOk9- ._2dB1oJFsqNThak1cFya2-q:not(#se-none) {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--se-surface-2, #262c35);
+  color: var(--se-text-muted, #98a2ad);
+  opacity: 1;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.bsNegRKT1Hbv4tqHrOk9- ._2dB1oJFsqNThak1cFya2-q:hover:not(#se-none) {
+  background: var(--se-hover, #2c3440);
+  color: var(--se-text-strong, #fff);
+}
+
+.bsNegRKT1Hbv4tqHrOk9- ._2dB1oJFsqNThak1cFya2-q svg:not(#se-none) {
+  width: 12px;
+  height: 12px;
+}
+
+.bsNegRKT1Hbv4tqHrOk9- ._2dB1oJFsqNThak1cFya2-q svg :is(line, path):not(#se-none) {
+  stroke: currentColor;
+  stroke-width: 24px;
+}
+
+/* ── New DLC notice: a theme card with an accent info tile, not a pink bar ── */
+
+.ut0YcLYGAoSTz2Dnjw9U1._1rjqv6aCi9t7H-prIq99fk:not(#se-none) {
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 14px 52px 14px 16px;
+  border: 0;
+  border-image: none;
+  border-radius: var(--se-radius-lg, 14px);
+  background: var(--se-surface, #1f242b);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  font: 500 13.5px/20px var(--se-font);
+  color: var(--se-text-dim, #b8c0c8);
+  transition: background-color .15s ease;
+}
+
+.ut0YcLYGAoSTz2Dnjw9U1._1rjqv6aCi9t7H-prIq99fk:hover:not(#se-none) {
+  background: var(--se-surface-2, #262c35);
+}
+
+.ut0YcLYGAoSTz2Dnjw9U1 .gtlfC4VRhQqlmAmTFDl1N:not(#se-none) {
+  flex: none;
+  align-self: center;
+  box-sizing: border-box;
+  width: var(--se-tile-sm, 30px);
+  height: var(--se-tile-sm, 30px);
+  margin: 0;
+  padding: 7px;
+  border-radius: 50%;
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+  color: var(--se-accent, #7cc4ff);
+  fill: currentColor;
+}
+
+.ut0YcLYGAoSTz2Dnjw9U1 .R2VdUtWzknAHBOsdRzG_d:not(#se-none) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  top: 50%;
+  inset-inline-end: 12px;
+  width: var(--se-control-h-sm, 28px);
+  height: var(--se-control-h-sm, 28px);
+  padding: 9px;
+  border-radius: 50%;
+  color: var(--se-text-faint, #6f7984);
+  transform: translateY(-50%);
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.ut0YcLYGAoSTz2Dnjw9U1 .R2VdUtWzknAHBOsdRzG_d:hover:not(#se-none) {
+  background: var(--se-hover, #2c3440);
+  color: var(--se-text-strong, #fff);
+}
+
+.ut0YcLYGAoSTz2Dnjw9U1 .R2VdUtWzknAHBOsdRzG_d svg:not(#se-none) {
+  width: 100%;
+  height: 100%;
+}
+
+.ut0YcLYGAoSTz2Dnjw9U1 .R2VdUtWzknAHBOsdRzG_d .SVGIcon_X_Line line:not(#se-none),
+.ut0YcLYGAoSTz2Dnjw9U1 .R2VdUtWzknAHBOsdRzG_d:hover .SVGIcon_X_Line line:not(#se-none) {
+  stroke: currentColor;
+}
+
+/* ── Post-Game Summary: a theme card; screenshots grouped by day in a recessed well ── */
+
+/* Steam makes each spotlight `width: 100%`; border-box keeps the padding inside that width,
+   so the card lines up with the section cards below. */
+._1OMmVJHDgNwOt0Wqn0hrf9:not(#se-none) {
+  box-sizing: border-box;
+  max-width: 100%;
+  position: relative;
+  margin-bottom: 16px;
+  padding: 14px 16px 16px;
+  overflow: hidden;
+  border-radius: var(--se-radius-lg, 14px);
+  background: var(--se-surface, #1f242b);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+._1OMmVJHDgNwOt0Wqn0hrf9 ._2o5c89vAnrXN8C60QTSMqO:not(#se-none) {
+  align-items: center;
+  min-height: 30px;
+  margin-bottom: 12px;
+  padding: 0 !important; /* Steam sets it inline */
+}
+
+._1OMmVJHDgNwOt0Wqn0hrf9 .P_gQ8X-yCsgXeXpP68KS0:not(#se-none) {
+  padding-inline-start: 2px;
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  letter-spacing: var(--se-label-spacing, .1em);
+  color: var(--se-label-color, #6f7984);
+}
+
+/* Heights follow the content (Steam fixes them at 170px / 90px) */
+._1OMmVJHDgNwOt0Wqn0hrf9 :is(._2MKO5j24KqDdD-92hH5FXi, ._1iO7MC6rgUjbDf49AE6hCm):not(#se-none) {
+  height: auto;
+}
+
+._1OMmVJHDgNwOt0Wqn0hrf9 ._2MKO5j24KqDdD-92hH5FXi:not(#se-none) {
+  padding: 12px 0 14px;
+  overflow: hidden;
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-bg, #171a20);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+._1OMmVJHDgNwOt0Wqn0hrf9 ._2MKO5j24KqDdD-92hH5FXi::after {
+  content: none;
+}
+
+/*
+ * Every item renders its own header row, blank after the first of a day; it keeps a fixed
+ * height so the items of a day line up under their date.
+ */
+._1OMmVJHDgNwOt0Wqn0hrf9 ._3ugJ_KPVlOd9oeYm-fYC_w:not(#se-none) {
+  flex: none;
+  height: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  margin-bottom: 10px;
+  font: 700 13px/20px var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+._1OMmVJHDgNwOt0Wqn0hrf9 ._284XbL-B7aHiK4XgyI2DPS:not(#se-none) {
+  flex: none;
+  width: 1px;
+  margin: 30px 28px 6px;
+  background: var(--se-track, #3a424d);
+}
+
+._1OMmVJHDgNwOt0Wqn0hrf9 ._1ms0i1dxwTqiqcXV59nenw:not(._1I8mXP1uH7vUUbbc6_-nHR):not(#se-none) {
+  background: var(--se-track, #3a424d);
+}
+
+._1OMmVJHDgNwOt0Wqn0hrf9 ._22q2XMkRbHZD96i_GXOaHh:not(#se-none) {
+  overflow: hidden;
+  border-radius: var(--se-radius-sm, 8px);
+  box-shadow: var(--se-shadow-card, 0 10px 24px -12px rgba(0, 0, 0, .8)), inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  transition: transform .15s ease;
+}
+
+._1OMmVJHDgNwOt0Wqn0hrf9 ._22q2XMkRbHZD96i_GXOaHh:hover:not(#se-none) {
+  transform: translateY(-2px);
+}
+
+._1OMmVJHDgNwOt0Wqn0hrf9 ._22q2XMkRbHZD96i_GXOaHh img:not(#se-none) {
+  border-radius: inherit;
+}
+
+/* ── Available Content: flat inside its section card; DLC art as theme tiles ── */
+
+._2UySYiE8fUGGugkHVm1Qb:not(#se-none) {
+  margin-bottom: 0;
+}
+
+._2UySYiE8fUGGugkHVm1Qb ._2kqz-bSlDu-I49_cV_wicB:not(#se-none) {
+  padding: 0;
+  border: 0;
+  border-image: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+._2UySYiE8fUGGugkHVm1Qb ._2o5c89vAnrXN8C60QTSMqO:not(#se-none) {
+  align-items: center;
+  min-height: 30px;
+  margin-bottom: 10px;
+}
+
+._2UySYiE8fUGGugkHVm1Qb ._78Pwybe-fHVYEkQFFlpA5:not(#se-none) {
+  border-radius: var(--se-radius-md, 10px);
+  outline: none;
+  text-decoration: none;
+}
+
+._2UySYiE8fUGGugkHVm1Qb ._3gB_gMsbWHUGn5Rqwe6KeC:not(#se-none) {
+  overflow: hidden;
+  border-radius: var(--se-radius-sm, 8px);
+  box-shadow: var(--se-shadow-card, 0 10px 24px -12px rgba(0, 0, 0, .8)), inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  transition: transform .15s ease;
+}
+
+._2UySYiE8fUGGugkHVm1Qb ._78Pwybe-fHVYEkQFFlpA5:hover ._3gB_gMsbWHUGn5Rqwe6KeC:not(#se-none) {
+  transform: translateY(-2px);
+}
+
+._2UySYiE8fUGGugkHVm1Qb ._1XMxxg4Tf-bnjlvGWtSdmP:not(#se-none) {
+  margin-top: 2px;
+  margin-inline-start: 18px;
+}
+
+._2UySYiE8fUGGugkHVm1Qb ._3hubFyqcbN0Tp93ajVPHLl:not(#se-none) {
+  margin-bottom: 4px;
+  text-overflow: ellipsis;
+  font: 700 14px/20px var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+._2UySYiE8fUGGugkHVm1Qb ._78Pwybe-fHVYEkQFFlpA5:hover ._3hubFyqcbN0Tp93ajVPHLl:not(#se-none) {
+  color: var(--se-text-strong, #fff);
+}
+
+._2UySYiE8fUGGugkHVm1Qb ._1M3piztNHu7tsD7h8OgpuI:not(#se-none) {
+  font: 500 13px/19px var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._2UySYiE8fUGGugkHVm1Qb ._1yEoLSbdr6RwEzqpyKLR4m:not(#se-none) {
+  margin: 12px 2px 0 0;
+}
+
+/* "View all in store": the game page's text link (as "View all friends who play", .se-fr-all) */
+._2UySYiE8fUGGugkHVm1Qb ._3m6qdpFN3Mop0iw9ZE3RRa:not(#se-none) {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  font: 600 13px/18px var(--se-font);
+  color: var(--se-accent, #7cc4ff);
+  transition: none;
+}
+
+._2UySYiE8fUGGugkHVm1Qb ._3m6qdpFN3Mop0iw9ZE3RRa:is(:hover, :focus-visible):not(#se-none) {
+  background: none;
+  color: var(--se-text-strong, #fff);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  outline: none;
+}
+
+/* ── DLC art: the pink corner ribbon becomes a small chip ── */
+
+._2bF7XkQZA1M7jTj6txLFp- .ZvLzhhMhwBLr1gcbVh52G:not(#se-none) {
+  content: var(--se-dlc-badge);
+  top: 8px;
+  inset-inline: 8px auto;
+  width: 56px;
+  height: 22px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .55));
+  pointer-events: none;
+}
+
+/* ── Hover cards (screenshots, DLC): the theme's popover instead of Steam's gray gradient ── */
+
+/*
+ * AppDetailsHover ._38FqIwZQKW6BlRyzN66pi6, Background .rYBZBWnNW6m-N9vX0Chce (module 45050);
+ * screenshot hover Hover ._2EMM516bLA2dC0r3OreZnv, Screenshot ._2pHz57SGRWZSR3oEmPPKK_, then an
+ * unclassed caption and date (module 84009). `isolation` keeps Steam's z-index:-3 background
+ * inside the card.
+ */
+._38FqIwZQKW6BlRyzN66pi6:not(#se-none) {
+  isolation: isolate;
+  overflow: hidden;
+  padding: 8px;
+  border-radius: var(--se-radius-lg, 14px);
+  box-shadow: var(--se-shadow-pop, 0 18px 40px -10px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .07));
+  color: var(--se-text, #e6e8eb);
+}
+
+._38FqIwZQKW6BlRyzN66pi6 .rYBZBWnNW6m-N9vX0Chce:not(#se-none) {
+  background: var(--se-surface, #1f242b);
+}
+
+._2EMM516bLA2dC0r3OreZnv:not(#se-none) {
+  gap: 8px;
+  font: 500 13px/1.45 var(--se-font);
+}
+
+._2EMM516bLA2dC0r3OreZnv ._2pHz57SGRWZSR3oEmPPKK_:not(#se-none) {
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-bg-ink, #0f1115);
+}
+
+._2EMM516bLA2dC0r3OreZnv > div:not(#se-none) {
+  padding: 0 4px;
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+/* The date */
+._2EMM516bLA2dC0r3OreZnv > div:last-child:not(#se-none) {
+  padding-bottom: 2px;
+  font: 600 12.5px/18px var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+/* Share on a screenshot: a small frosted chip, shown on hover (ScreenshotShareIcon .gOv9M_tdWa0CEJbaLhOKY) */
+._3JNo1hUKCpMJiJSM2dD5Kq .gOv9M_tdWa0CEJbaLhOKY:not(#se-none) {
+  top: 6px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  padding: 6px;
+  border-radius: 50%;
+  background: rgba(12, 14, 18, .78);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12), 0 4px 10px -4px rgba(0, 0, 0, .8);
+  backdrop-filter: blur(6px);
+  color: var(--se-text, #e6e8eb);
+  filter: none;
+  opacity: 0;
+  transition: opacity .15s ease, background-color .15s ease;
+}
+
+._3JNo1hUKCpMJiJSM2dD5Kq:is(:hover, :focus-within) .gOv9M_tdWa0CEJbaLhOKY:not(#se-none) {
+  opacity: 1;
+}
+
+._3JNo1hUKCpMJiJSM2dD5Kq .gOv9M_tdWa0CEJbaLhOKY:hover:not(#se-none) {
+  background: var(--se-accent, #7cc4ff);
+  box-shadow: none;
+  color: var(--se-bg-ink, #0f1115);
+}
+
+._3JNo1hUKCpMJiJSM2dD5Kq .gOv9M_tdWa0CEJbaLhOKY svg:not(#se-none) {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  color: inherit;
+}
+
+._3JNo1hUKCpMJiJSM2dD5Kq .gOv9M_tdWa0CEJbaLhOKY svg :is(path, rect, line, polyline, polygon)[stroke]:not([stroke="none"]):not(#se-none) {
+  stroke: currentColor;
+}

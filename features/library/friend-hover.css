@@ -1,0 +1,132 @@
+/*
+ * Friends playing hover: Steam's popup over the friends icon of a game in the library list
+ * (FriendStatusHover / FriendStatusHoverRow, tagged by features/library/friend-hover.js). Loaded in
+ * every window, as Steam can draw the popup in a window of its own.
+ *
+ * A "Playing now" label over one row per friend, each a round
+ * avatar with the running-green ring (as on the game page's friends), the name in white and
+ * the game in green. Steam's status stripe and frames are dropped.
+ */
+/* The card: Steam's tooltip around the hover, or the hover itself when it has none */
+[data-se-fh-host]:not(#se-none) {
+  box-sizing: border-box;
+  padding: 8px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md, 10px) !important;
+  background: var(--se-surface, #1f242b) !important;
+  box-shadow: var(--se-shadow-pop) !important;
+}
+
+/* A popup window of its own: the window is the card, its corners stay square */
+html[data-se-fh-window]:not(#se-none),
+html[data-se-fh-window] body:not(#se-none) {
+  background: var(--se-surface, #1f242b) !important;
+}
+
+html[data-se-fh-window] [data-se-fh-host]:not(#se-none) {
+  border-radius: 0 !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06)) !important;
+}
+
+[data-se-fh]:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 200px;
+  max-width: 300px;
+  margin: 0;
+}
+
+[data-se-fh]::before {
+  content: 'Playing now';
+  padding: 2px 6px 6px;
+  font: var(--se-label-font, 700 11px/14px "Motiva Sans", Arial, sans-serif);
+  letter-spacing: var(--se-label-spacing, .1em);
+  text-transform: uppercase;
+  color: var(--se-label-color, #6f7984);
+}
+
+[data-se-fh-row]:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 6px;
+  border: 0;
+  border-radius: var(--se-radius-sm, 8px);
+  background: none;
+  box-shadow: none;
+}
+
+[data-se-fh-row] + [data-se-fh-row]:not(#se-none) {
+  box-shadow: 0 -1px 0 var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+[data-se-fh-row] *:not(#se-none) {
+  border: 0;
+  box-shadow: none;
+  background-color: transparent;
+}
+
+/* Wrappers around the avatar and labels give up Steam's fixed boxes */
+[data-se-fh-row] > *:not(#se-none) {
+  flex: none;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+[data-se-fh-row] > :has([data-se-fh-name]):not(#se-none) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  overflow: hidden;
+}
+
+[data-se-fh-row] :has(> [data-se-fh-av]):not(#se-none) {
+  position: static;
+  display: flex;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+}
+
+[data-se-fh-av]:not(#se-none) {
+  position: static;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  outline: 2px solid var(--se-running, #6cc24a);
+  outline-offset: 2px;
+}
+
+[data-se-fh-deco]:not(#se-none) {
+  display: none !important;
+}
+
+[data-se-fh-name]:not(#se-none),
+[data-se-fh-game]:not(#se-none) {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: none;
+}
+
+[data-se-fh-name]:not(#se-none) {
+  font: 600 13px/1.3 var(--se-font, "Motiva Sans", Arial, sans-serif);
+  color: var(--se-text-strong, #fff);
+}
+
+[data-se-fh-game]:not(#se-none) {
+  font: 500 12px/1.3 var(--se-font, "Motiva Sans", Arial, sans-serif);
+  color: var(--se-running, #6cc24a);
+}

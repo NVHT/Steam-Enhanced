@@ -1,0 +1,154 @@
+/*
+ * Library Home card and carousel refinements.
+ *
+ * Aligns shelf cover edges, deduplicates adjacent What's New date labels, and
+ * expands cover action buttons (`Play` / `Install` / `Stream`) across card
+ * footers on hover. Paired with `features/home/home-polish.js`.
+ */
+/* What's New: a date repeated from the card before is hidden, its line kept */
+._2rlKqvybYupc-uk64cdQ8D,
+._1xu4iu0Qa3cGcIr-rZAsVb {
+  /* EventTime (both card layouts) */
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+:is(._2rlKqvybYupc-uk64cdQ8D, ._1xu4iu0Qa3cGcIr-rZAsVb)[data-se-repeat] {
+  visibility: hidden;
+}
+
+/* Shelf covers start on the shelf's edge (the script measures the stray gap) */
+.V7RuDNUxhxoBRaiGWbk3B [data-se-shifted] {
+  margin-inline-start: calc(-1 * var(--se-cover-shift, 0px)) !important;
+}
+
+/*
+ * Cover action buttons, placed from the cover's measured edges (features/home/home-polish.js).
+ * :not(#se-none) only lifts these rules above the general cover-button rules in library.css.
+ */
+._3AjoLnMNKxYmNTGTJCLfgs[data-se-cover-btn]:not(#se-none) {
+  inset-inline-start: calc(var(--se-cl, 0px) + 10px) !important;
+  bottom: calc(var(--se-cb, 0px) + 10px) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Hovering the cover: the bar spans the cover, 10 px from each side */
+._3AjoLnMNKxYmNTGTJCLfgs[data-se-cover-btn]:not(#se-none)[data-se-hot]:not(._1aml4h4CSJbtrNbX4brUYs),
+._3AjoLnMNKxYmNTGTJCLfgs[data-se-cover-btn]:not(#se-none):hover:not(._1aml4h4CSJbtrNbX4brUYs) {
+  width: calc(var(--se-cw, 56px) - 20px) !important;
+  height: 38px !important;
+  background: var(--se-accent, #7cc4ff) !important;
+  box-shadow: 0 8px 20px -8px var(--se-accent-strong, rgba(124, 196, 255, .55)) !important;
+  color: var(--se-bg-ink, #0f1115) !important;
+}
+
+._3AjoLnMNKxYmNTGTJCLfgs[data-se-cover-btn]:not(#se-none)._1_Bo2Ied5s2Od4YKYTOsau:is([data-se-hot], :hover):not(._1aml4h4CSJbtrNbX4brUYs) {
+  background: var(--se-play, #3a8a22) !important;
+  box-shadow: 0 8px 20px -8px rgba(80, 180, 50, .6) !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+._3AjoLnMNKxYmNTGTJCLfgs[data-se-cover-btn]:not(#se-none):is([data-se-hot], :hover)::before {
+  order: 2;
+  font: 700 14px/1 var(--se-font, "Motiva Sans"), sans-serif;
+  white-space: nowrap;
+}
+
+._3AjoLnMNKxYmNTGTJCLfgs[data-se-cover-btn]:not(#se-none)._3yGiLsl__NlNYprnB7rt14:is([data-se-hot], :hover)::before {
+  content: "Install";
+}
+
+._3AjoLnMNKxYmNTGTJCLfgs[data-se-cover-btn]:not(#se-none)._2PhYbL3_EgtG5edPuoTVtq:is([data-se-hot], :hover)::before {
+  content: "Update";
+}
+
+._3AjoLnMNKxYmNTGTJCLfgs[data-se-cover-btn]:not(#se-none)._1_Bo2Ied5s2Od4YKYTOsau:is([data-se-hot], :hover)::before {
+  content: "Play";
+}
+
+/* The boxes Steam keeps hidden around a cover button until hover / focus */
+[data-se-btnbox] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
+/*
+ * The Install icon on uninstalled covers (UninstalledIcon)
+ * Steam shows it at 20% opacity, hides it while the cover is hovered and shows it only
+ * under the pointer. It now behaves like the cover button on the card: a frosted 36 px
+ * icon button in the corner at rest, widening into "Install" (or "Stream") on hover.
+ */
+._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none) {
+  position: absolute !important;
+  inset-inline-start: calc(var(--se-cl, 0px) + 10px) !important;
+  bottom: calc(var(--se-cb, 0px) + 10px) !important;
+  top: auto !important;
+  box-sizing: border-box;
+  width: 36px !important;
+  max-width: none !important;
+  height: 36px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-md, 10px) !important;
+  /* No backdrop blur: drawn once per cover, a blur each made shelves scroll heavily */
+  background: rgba(12, 14, 18, .8) !important;
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .12) !important;
+  color: var(--se-text, #e6e8eb) !important;
+  opacity: 1 !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  overflow: hidden;
+  z-index: 14;
+  cursor: pointer;
+  transition: width .15s ease, background .15s, box-shadow .15s !important;
+}
+
+._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none) svg {
+  flex: 0 0 auto;
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  fill: currentColor;
+  color: inherit;
+}
+
+._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none) svg line,
+._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none) svg polyline,
+._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none) svg path {
+  stroke: currentColor;
+}
+
+/* Hovering the cover */
+._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none):is([data-se-hot], :hover),
+.WYgDg9NyCcMIVuMyZ_NBC:hover ._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none) {
+  width: calc(var(--se-cw, 56px) - 20px) !important;
+  height: 38px !important;
+  background: var(--se-accent, #7cc4ff) !important;
+  box-shadow: 0 8px 20px -8px var(--se-accent-strong, rgba(124, 196, 255, .55)) !important;
+  color: var(--se-bg-ink, #0f1115) !important;
+}
+
+._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none):is([data-se-hot], :hover)::after,
+.WYgDg9NyCcMIVuMyZ_NBC:hover ._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none)::after {
+  content: "Install";
+  font: 700 14px/1 var(--se-font, "Motiva Sans"), sans-serif;
+  white-space: nowrap;
+}
+
+._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn][data-se-act="stream"]:not(#se-none):is([data-se-hot], :hover)::after,
+.WYgDg9NyCcMIVuMyZ_NBC:hover ._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn][data-se-act="stream"]:not(#se-none)::after {
+  content: "Stream";
+}
+
+/*
+ * The Install icon ignores the pointer, so native "Install" tooltip stays away; a click
+ * on the bar is passed to it by features/home/home-polish.js
+ */
+._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none) {
+  pointer-events: none !important;
+}

@@ -1,0 +1,1190 @@
+/*
+ * Startup loading screen, background themes, and step progress strip.
+ *
+ * Scoped to `html[data-se-startup]`. Implements the selectable startup
+ * backgrounds (`library`, `hero`, `mosaic`, `wall`, `plain`, `dots`, `steam`),
+ * central spinner housing, user pill, and 4-step startup progress bar. Paired
+ * with `features/startup/startup.js`.
+ */
+:root {
+  --se-steam-logo: url("data:image/png;base64,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");
+}
+
+/* Also features/startup/sign-in.css */
+/* The background */
+/*
+ * Steam's drifting wall is replaced by the theme's layer (unless the setting is "steam"). Its
+ * FadeIn animation starts at opacity 0, so the host is held visible.
+ */
+html[data-se-startup]:not([data-se-startup-bg="steam"]) [data-se-startup-host]._3MJTdOkAxu5hiJ565avrpz {
+  background-image: none !important;
+  background-color: var(--se-bg) !important;
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/*
+ * Before startup.js runs, Steam's wall is already hidden (unless the setting is "steam", which
+ * the script marks), so the window doesn't flash Steam's look while the script loads.
+ */
+html:not([data-se-startup-bg="steam"]) ._3MJTdOkAxu5hiJ565avrpz {
+  background-image: none !important;
+  background-color: var(--se-bg) !important;
+}
+
+html[data-se-startup] .se-startup-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--se-bg);
+  pointer-events: none;
+}
+
+/* The shade that keeps the window's middle and foot calm over any background. */
+html[data-se-startup] .se-startup-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 34% 30% at 50% 26%, rgba(23, 26, 32, .85), rgba(23, 26, 32, .35) 85%), linear-gradient(180deg, rgba(23, 26, 32, .2), var(--se-bg) 80%);
+}
+
+/*
+ * Mosaic: the wall's own image cut into 2:3 tiles, each breathing on its own rhythm,
+ * while the image behind them drifts slowly from corner to corner as native wall does.
+ * background-attachment: fixed keeps the image continuous across the tiles; the drift runs
+ * on every tile with the same timing, so it stays one picture.
+ */
+html[data-se-startup] .se-startup-mosaic {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-content: start;
+  gap: 6px;
+  padding: 6px;
+}
+
+html[data-se-startup] .se-startup-mosaic > span {
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  background: var(--se-startup-wall) 0 100% / 160% auto fixed, var(--se-surface);
+  opacity: .22;
+  animation: se-startup-tile var(--se-tile-dur, 9s) ease-in-out var(--se-tile-delay, 0s) infinite, se-startup-drift 60s linear infinite alternate;
+}
+
+@keyframes se-startup-tile {
+  0%,
+  100% {
+    opacity: .22;
+  }
+  45%,
+  55% {
+    opacity: .75;
+  }
+}
+
+@keyframes se-startup-drift {
+  from {
+    background-position: 0 100%;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+
+/*
+ * Hero: your recent games' hero art, three slides on a 27 s cycle. Each fades in, holds
+ * 9 s while it slowly zooms and pans, then crossfades into the next. startup.js paints each
+ * slide with the art's addresses in turn and a crop of Steam's wall beneath them.
+ */
+html[data-se-startup] .se-startup-slide {
+  position: absolute;
+  inset: -20px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  opacity: 0;
+  animation: se-startup-hero 27s linear infinite;
+}
+
+html[data-se-startup] .se-startup-slide:nth-child(2) {
+  animation-delay: -18s;
+}
+
+html[data-se-startup] .se-startup-slide:nth-child(3) {
+  animation-delay: -9s;
+}
+
+@keyframes se-startup-hero {
+  0% {
+    opacity: 0;
+    transform: scale(1.04) translateX(0);
+  }
+  6% {
+    opacity: 1;
+  }
+  33% {
+    opacity: 1;
+  }
+  39% {
+    opacity: 0;
+    transform: scale(1.14) translateX(-24px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.14) translateX(-24px);
+  }
+}
+
+/*
+ * Lighter than the other backgrounds' shade, so the art shows: dark only behind the middle
+ * and at the foot.
+ */
+html[data-se-startup] .se-startup-bg[data-kind="hero"]::after {
+  background: radial-gradient(ellipse 38% 42% at 50% 44%, rgba(23, 26, 32, .6), rgba(23, 26, 32, .12) 90%), linear-gradient(180deg, rgba(23, 26, 32, .35), transparent 25%, transparent 55%, rgba(23, 26, 32, .92));
+}
+
+/* Wall: Steam's picture, still, blurred and dimmed */
+html[data-se-startup] .se-startup-bg[data-kind="wall"]::before {
+  content: "";
+  position: absolute;
+  inset: -24px;
+  background: var(--se-startup-wall) center / cover;
+  filter: blur(10px) saturate(.8);
+  opacity: .38;
+}
+
+/* Plain: the theme's ground with a faint accent glow behind the spinner */
+html[data-se-startup] .se-startup-bg[data-kind="plain"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 45% 38% at 50% 22%, rgba(124, 196, 255, .10), transparent 70%);
+}
+
+/* Dots: a fine grid that fades out toward the foot */
+html[data-se-startup] .se-startup-bg[data-kind="dots"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, .13) 1px, transparent 1.5px) 0 0 / 14px 14px;
+  -webkit-mask-image: linear-gradient(180deg, #000 10%, transparent 85%);
+  mask-image: linear-gradient(180deg, #000 10%, transparent 85%);
+}
+
+/*
+ * Library wireframe background (default): renders a low-contrast structural
+ * silhouette of the navigation rail, game list, hero stage, shelf tray, and
+ * friends dock.
+ */
+.se-sl {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  background: #12161c;
+  opacity: .55;
+  filter: saturate(.75) blur(.6px);
+}
+
+.se-sl s,
+.se-sl u,
+.se-sl b,
+.se-sl i {
+  display: block;
+  text-decoration: none;
+  font-style: normal;
+}
+
+.se-sl-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.se-sl-lines s {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(190, 225, 255, .38);
+}
+
+/* The rail */
+.se-sl-rail {
+  flex: none;
+  width: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding-top: 12px;
+  background: #0f1217;
+}
+
+.se-sl-rail i {
+  width: 24px;
+  height: 22px;
+  border-radius: 7px;
+  background: rgba(124, 196, 255, .12);
+}
+
+.se-sl-rail i:first-child {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  margin-bottom: 6px;
+  background: rgba(124, 196, 255, .2);
+}
+
+.se-sl-rail i:nth-child(2) {
+  background: rgba(124, 196, 255, .3);
+  box-shadow: inset 2px 0 0 #7cc4ff;
+}
+
+/* The page frame and its header */
+.se-sl-frame {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px 0 0 0;
+  background: #171a20;
+  overflow: hidden;
+  box-shadow: inset 1px 1px 0 rgba(124, 196, 255, .08);
+}
+
+.se-sl-head {
+  flex: none;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 10px;
+}
+
+.se-sl-head i {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: rgba(124, 196, 255, .12);
+}
+
+.se-sl-head .se-sl-me {
+  border-radius: 50%;
+}
+
+.se-sl-bell::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: -2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #7cc4ff;
+  box-shadow: 0 0 6px #7cc4ff;
+  animation: se-sl-blink 2.4s ease-in-out infinite;
+}
+
+@keyframes se-sl-blink {
+  50% {
+    opacity: .3;
+  }
+}
+
+.se-sl-search {
+  margin-right: auto;
+  width: 150px;
+  max-width: 30%;
+  height: 20px;
+  border-radius: 999px;
+  background: rgba(124, 196, 255, .08);
+  box-shadow: inset 0 0 0 1px rgba(124, 196, 255, .12);
+}
+
+.se-sl-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+/* The game list */
+.se-sl-list {
+  flex: none;
+  width: 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 8px 8px 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.se-sl-seg {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  margin-bottom: 4px;
+  border-radius: 7px;
+  background: rgba(124, 196, 255, .07);
+}
+
+.se-sl-seg i {
+  flex: 1;
+  height: 12px;
+  border-radius: 4px;
+}
+
+.se-sl-seg i:first-child {
+  background: rgba(124, 196, 255, .3);
+}
+
+.se-sl-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  border-radius: 5px;
+}
+
+.se-sl-row b {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: rgba(124, 196, 255, .22);
+}
+
+.se-sl-row s {
+  height: 5px;
+  max-width: 100%;
+  border-radius: 3px;
+  background: rgba(124, 196, 255, .2);
+}
+
+.se-sl-row[data-sel] {
+  background: rgba(124, 196, 255, .16);
+  box-shadow: inset 0 0 0 1px rgba(124, 196, 255, .25);
+}
+
+/* Library Home: the stage */
+.se-sl-home {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px 0 0 0;
+  overflow: hidden;
+  background: #141922;
+}
+
+.se-sl-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Eight games, 4.5 s each (36 s round), the strip's tile lit for the game showing */
+.se-sl-hero {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: se-sl-hero 36s linear infinite;
+}
+
+@keyframes se-sl-hero {
+  0% {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+  3%,
+  12.5% {
+    opacity: 1;
+  }
+  15.5%,
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.se-sl-hero:nth-child(1) {
+  background: radial-gradient(ellipse 60% 70% at 30% 40%, #3a6aa0, transparent 70%), repeating-linear-gradient(30deg, rgba(124,196,255,.05) 0 2px, transparent 2px 10px), linear-gradient(160deg, #14243a, #0d131d);
+}
+
+.se-sl-hero:nth-child(2) {
+  background: radial-gradient(ellipse 60% 70% at 70% 30%, #2a5284, transparent 70%), repeating-linear-gradient(50deg, rgba(124,196,255,.05) 0 2px, transparent 2px 11px), linear-gradient(160deg, #0f1b2c, #0d131d);
+}
+
+.se-sl-hero:nth-child(3) {
+  background: radial-gradient(ellipse 60% 70% at 50% 20%, #4a7fb8, transparent 70%), repeating-linear-gradient(70deg, rgba(124,196,255,.05) 0 2px, transparent 2px 12px), linear-gradient(160deg, #16263c, #0d131d);
+}
+
+.se-sl-hero:nth-child(4) {
+  background: radial-gradient(ellipse 60% 70% at 20% 60%, #24466e, transparent 70%), repeating-linear-gradient(90deg, rgba(124,196,255,.05) 0 2px, transparent 2px 13px), linear-gradient(160deg, #101a28, #0d131d);
+}
+
+.se-sl-hero:nth-child(5) {
+  background: radial-gradient(ellipse 60% 70% at 80% 50%, #3f78b4, transparent 70%), repeating-linear-gradient(110deg, rgba(124,196,255,.05) 0 2px, transparent 2px 14px), linear-gradient(160deg, #132238, #0d131d);
+}
+
+.se-sl-hero:nth-child(6) {
+  background: radial-gradient(ellipse 60% 70% at 40% 30%, #2e5a8e, transparent 70%), repeating-linear-gradient(130deg, rgba(124,196,255,.05) 0 2px, transparent 2px 15px), linear-gradient(160deg, #0e1828, #0d131d);
+}
+
+.se-sl-hero:nth-child(7) {
+  background: radial-gradient(ellipse 60% 70% at 65% 45%, #5089c4, transparent 70%), repeating-linear-gradient(150deg, rgba(124,196,255,.05) 0 2px, transparent 2px 16px), linear-gradient(160deg, #182a40, #0d131d);
+}
+
+.se-sl-hero:nth-child(8) {
+  background: radial-gradient(ellipse 60% 70% at 35% 25%, #26507e, transparent 70%), repeating-linear-gradient(170deg, rgba(124,196,255,.05) 0 2px, transparent 2px 17px), linear-gradient(160deg, #0f1a29, #0d131d);
+}
+
+.se-sl-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(20,25,34,.2), transparent 40%, rgba(20,25,34,.75) 70%), linear-gradient(180deg, transparent 50%, #141922);
+}
+
+.se-sl-logo {
+  position: absolute;
+  left: 16px;
+  top: 40px;
+  width: 110px;
+  height: 38px;
+  background: linear-gradient(90deg, rgba(214,236,255,.85) 0 60%, transparent 60%) 0 4px / 100% 12px no-repeat, linear-gradient(90deg, rgba(214,236,255,.6) 0 85%, transparent 85%) 0 22px / 100% 9px no-repeat;
+  animation: se-sl-fade 4.5s ease-in-out infinite;
+}
+
+@keyframes se-sl-fade {
+  0% {
+    opacity: 0;
+  }
+  12%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.se-sl-info {
+  position: absolute;
+  right: 10px;
+  top: 14px;
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: se-sl-fade 4.5s ease-in-out infinite;
+}
+
+.se-sl-info > s {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(214, 236, 255, .35);
+}
+
+.se-sl-chips {
+  display: flex;
+  gap: 4px;
+}
+
+.se-sl-chips i {
+  width: 40px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(124,196,255,.2);
+  box-shadow: inset 0 0 0 1px rgba(124,196,255,.3);
+}
+
+.se-sl-chips i + i {
+  width: 30px;
+}
+
+.se-sl-stats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.se-sl-stats s {
+  width: 24px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(214, 236, 255, .6);
+}
+
+.se-sl-stats u {
+  width: 36px;
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #7cc4ff 65%, rgba(124,196,255,.2) 65%);
+}
+
+.se-sl-play {
+  display: flex;
+  gap: 5px;
+  margin-top: 3px;
+}
+
+.se-sl-play b {
+  width: 58px;
+  height: 20px;
+  border-radius: 6px;
+  background: #4f8cc8;
+  animation: se-sl-pulse 4s ease-out infinite;
+}
+
+.se-sl-play i {
+  width: 46px;
+  height: 20px;
+  border-radius: 6px;
+  background: rgba(124,196,255,.15);
+  box-shadow: inset 0 0 0 1px rgba(124,196,255,.3);
+}
+
+@keyframes se-sl-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(124,196,255,.6);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 8px rgba(124,196,255,0);
+  }
+}
+
+.se-sl-strip {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 6px;
+  display: flex;
+  gap: 5px;
+}
+
+.se-sl-strip span {
+  flex: 1;
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+  background: linear-gradient(160deg, #2c5280, #162a44);
+  box-shadow: inset 0 0 0 1px rgba(124,196,255,.2);
+  opacity: .6;
+  animation: se-sl-pick 36s step-end infinite;
+}
+
+@keyframes se-sl-pick {
+  0% {
+    opacity: 1;
+    box-shadow: inset 0 0 0 1.5px #9fd2ff, 0 0 10px rgba(124,196,255,.5);
+  }
+  12.5%,
+  100% {
+    opacity: .6;
+    box-shadow: inset 0 0 0 1px rgba(124,196,255,.2);
+  }
+}
+
+/* Library Home: the glass tray (What's New · Favorites · Collections) */
+.se-sl-tray {
+  flex: none;
+  height: 108px;
+  margin: 4px 12px 10px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr;
+  gap: 1px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(124,196,255,.1);
+  box-shadow: inset 0 0 0 1px rgba(124,196,255,.16);
+}
+
+.se-sl-col {
+  position: relative;
+  min-width: 0;
+  padding: 8px;
+  overflow: hidden;
+  background: rgba(23, 30, 42, .92);
+}
+
+.se-sl-news {
+  display: flex;
+  gap: 6px;
+}
+
+.se-sl-card {
+  flex: none;
+  width: 54px;
+  border-radius: 5px;
+  background: linear-gradient(160deg, #2c5280, #162a44);
+  box-shadow: inset 0 0 0 1px rgba(124,196,255,.22);
+}
+
+.se-sl-heads {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent);
+  mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent);
+}
+
+.se-sl-heads > div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  animation: se-sl-up 16s linear infinite;
+}
+
+@keyframes se-sl-up {
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+.se-sl-favs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-content: start;
+  gap: 5px;
+}
+
+.se-sl-favs > span {
+  position: relative;
+  height: 22px;
+  border-radius: 4px;
+  background: linear-gradient(110deg, rgba(124,196,255,.08) 30%, rgba(160,215,255,.22) 50%, rgba(124,196,255,.08) 70%) 0 0 / 300% 100%, rgba(36,66,106,.6);
+  box-shadow: inset 0 0 0 1px rgba(124,196,255,.16);
+  animation: se-sl-shim 3s linear infinite;
+}
+
+@keyframes se-sl-shim {
+  from {
+    background-position: 150% 0, 0 0;
+  }
+  to {
+    background-position: -150% 0, 0 0;
+  }
+}
+
+.se-sl-favs s {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 16px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(214,236,255,.4);
+}
+
+.se-sl-cols {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.se-sl-cols > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px;
+  border-radius: 6px;
+  background: rgba(124,196,255,.06);
+}
+
+.se-sl-fan {
+  position: relative;
+  flex: none;
+  width: 34px;
+  height: 20px;
+}
+
+.se-sl-fan i {
+  position: absolute;
+  left: 10px;
+  top: 0;
+  width: 13px;
+  height: 19px;
+  border-radius: 2px;
+  background: linear-gradient(160deg, #3a6aa0, #1a3150);
+  box-shadow: 0 0 0 1px #171e2a;
+  transform-origin: 50% 100%;
+}
+
+.se-sl-fan i:nth-child(1) {
+  transform: rotate(-16deg);
+}
+
+.se-sl-fan i:nth-child(3) {
+  transform: rotate(16deg);
+}
+
+/* The friends list */
+.se-sl-friends {
+  flex: none;
+  width: 112px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 8px 8px 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-left: 1px solid rgba(124,196,255,.08);
+}
+
+.se-sl-self {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  margin-bottom: 3px;
+  border-radius: 7px;
+  background: rgba(124,196,255,.08);
+}
+
+.se-sl-self b {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #3a6aa0, #1a3150);
+  box-shadow: 0 0 0 1.5px #7cc4ff;
+}
+
+.se-sl-self s {
+  width: 44px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(214,236,255,.45);
+}
+
+.se-sl-grp {
+  flex: none;
+  width: 26px;
+  height: 3px;
+  margin: 3px 0 0 2px;
+  border-radius: 2px;
+  background: rgba(124,196,255,.35);
+}
+
+.se-sl-fd {
+  --c: #7cc4ff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.se-sl-fd[data-st="game"] {
+  --c: #cfeaff;
+}
+
+.se-sl-fd[data-st="away"] {
+  --c: #4f7fae;
+}
+
+.se-sl-fd[data-st="off"] {
+  --c: #3a4656;
+  opacity: .55;
+}
+
+.se-sl-fd b {
+  position: relative;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #2e507a, #172a42);
+  box-shadow: 0 0 0 1.5px var(--c);
+}
+
+.se-sl-fd[data-st="game"] b::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(207,234,255,.55);
+  animation: se-sl-ping 2.6s ease-out infinite;
+  animation-delay: inherit;
+}
+
+@keyframes se-sl-ping {
+  from {
+    opacity: 1;
+    transform: scale(.8);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* Over it: scanlines and a slow sheen, and the shade that keeps the middle calm */
+.se-sl-scan {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(180deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px);
+}
+
+.se-sl-sheen {
+  position: absolute;
+  top: -50%;
+  bottom: -50%;
+  left: -260px;
+  width: 180px;
+  background: linear-gradient(90deg, transparent, rgba(190,225,255,.1), transparent);
+  transform: rotate(18deg);
+  animation: se-sl-sheen 11s ease-in-out infinite;
+}
+
+@keyframes se-sl-sheen {
+  0%,
+  30% {
+    left: -260px;
+  }
+  80%,
+  100% {
+    left: calc(100% + 120px);
+  }
+}
+
+html[data-se-startup] .se-startup-bg[data-kind="library"]::after {
+  background: radial-gradient(ellipse 45% 55% at 50% 45%, rgba(18,22,28,.7), rgba(18,22,28,.25) 80%), radial-gradient(ellipse 34% 40% at 50% 44%, rgba(13,19,29,.5), transparent 90%), radial-gradient(ellipse 80% 90% at 50% 50%, transparent 60%, rgba(8,12,18,.55));
+}
+
+/* The status screen */
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 {
+  font-family: var(--se-font);
+}
+
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2._2ngG3CCc-g0zyXymxnDnM0,
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._2ngG3CCc-g0zyXymxnDnM0 {
+  background: transparent !important;
+}
+
+/* A top-aligned column, leaving the foot to the strip. */
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._3sa1NXudhvcc1U7HrlLdNQ:not(#se-none),
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2._3sa1NXudhvcc1U7HrlLdNQ:not(#se-none) {
+  justify-content: flex-start;
+  padding: 56px 24px 132px;
+  box-sizing: border-box;
+}
+
+/* The spinner: Steam's image sits in a round tile, ringed by an accent arc. */
+html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v {
+  position: relative;
+  padding-top: 0;
+}
+
+html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v > img {
+  width: 42px !important;
+  height: 42px !important;
+  margin: 11px 0 18px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--se-surface);
+  box-shadow: 0 0 0 11px var(--se-bg);
+  object-fit: contain;
+  /*
+   * Steam's image is an animation that turns the logo into its own spinning ring; with the
+   * theme's ring around it that would be two spinners, so its still first frame is used.
+   */
+  content: var(--se-steam-logo);
+}
+
+html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 64px;
+  height: 64px;
+  margin-left: -32px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 5px solid rgba(255, 255, 255, .08);
+  border-top-color: var(--se-accent);
+  animation: se-startup-spin 1.1s linear infinite;
+  z-index: 1;
+}
+
+html[data-se-startup][data-se-startup-phase="off"] ._3CN5DkgNMvdtT9fJhNOj_v::before {
+  border-top-color: var(--se-text-muted);
+  animation-duration: 2.4s;
+}
+
+html[data-se-startup][data-se-startup-phase="off"] ._3CN5DkgNMvdtT9fJhNOj_v > img {
+  opacity: .7;
+}
+
+@keyframes se-startup-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The status line */
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._3rAIymq-pEYFB9bIdm-Aoz {
+  gap: 0;
+}
+
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._234vZnlQxRbmkpJ5Qq82Mc {
+  color: var(--se-text);
+  font: 700 19px/24px var(--se-font);
+  letter-spacing: -.01em;
+  text-shadow: none;
+}
+
+/* Native progress bar: the strip carries the percentage. */
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._191qxA6UisOKSvaq9gM4W6 {
+  display: none !important;
+}
+
+/* The account, as a pill */
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._6Z2AOU-R-8aK7KZevey0W:not(#se-none) {
+  height: 30px;
+  box-sizing: border-box;
+  margin-top: 14px;
+  padding: 0 12px 0 4px;
+  gap: 8px;
+  border-radius: 999px;
+  background: rgba(31, 36, 43, .7);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._3YzgVE15q0lUY1uAwRQm1U > img {
+  width: 22px !important;
+  height: 22px !important;
+  display: block;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--se-bg), 0 0 0 3.5px #6b7480;
+}
+
+html[data-se-startup][data-se-startup-phase="lib"] ._1TR3CCCdSmI-0MXucYBuP2 ._3YzgVE15q0lUY1uAwRQm1U > img {
+  box-shadow: 0 0 0 2px var(--se-bg), 0 0 0 3.5px var(--se-online);
+}
+
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._2tyxJwWA7FRwarLgRU2dWa {
+  color: var(--se-text-dim);
+  font: 600 12.5px/16px var(--se-font);
+}
+
+html[data-se-startup][data-se-startup-phase="off"] ._1TR3CCCdSmI-0MXucYBuP2 ._6Z2AOU-R-8aK7KZevey0W {
+  opacity: .5;
+}
+
+/* The strip */
+html[data-se-startup] .se-startup-strip {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 4px;
+  border-radius: 16px;
+  background: var(--se-surface);
+  box-shadow: var(--se-shadow-pop);
+  font-family: var(--se-font);
+  pointer-events: none;
+  transition: opacity .3s;
+}
+
+html[data-se-startup][data-se-startup-phase="off"] .se-startup-strip {
+  opacity: .4;
+}
+
+html[data-se-startup] .se-startup-cell {
+  min-width: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  transition: background-color .25s, box-shadow .25s;
+}
+
+html[data-se-startup] .se-startup-cell[data-state="current"] {
+  background: rgba(124, 196, 255, .08);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+}
+
+html[data-se-startup] .se-startup-cell-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 22px;
+}
+
+html[data-se-startup] .se-startup-icon {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .06);
+  position: relative;
+}
+
+html[data-se-startup] .se-startup-icon::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-startup-glyph) center / contain no-repeat;
+  mask: var(--se-startup-glyph) center / contain no-repeat;
+}
+
+html[data-se-startup] .se-startup-cell[data-step="net"] {
+  --se-startup-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-opacity='.32' d='M12 4C7.6 4 3.6 5.7.6 8.5l2.1 2.1A13 13 0 0 1 12 7c3.6 0 6.9 1.4 9.3 3.6l2.1-2.1A16 16 0 0 0 12 4z'/%3E%3Cpath d='M12 10c-2.6 0-4.9 1-6.7 2.6l2.1 2.1A6.6 6.6 0 0 1 12 13c1.8 0 3.4.7 4.6 1.7l2.1-2.1A9.6 9.6 0 0 0 12 10zm0 6a3 3 0 0 0-2.4 1.2L12 20l2.4-2.8A3 3 0 0 0 12 16z'/%3E%3C/svg%3E");
+}
+
+html[data-se-startup] .se-startup-cell[data-step="server"] {
+  --se-startup-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill-opacity='.32' x='3' y='3' width='18' height='8' rx='2'/%3E%3Crect x='3' y='13' width='18' height='8' rx='2'/%3E%3Ccircle fill-opacity='.9' cx='7' cy='7' r='1.3'/%3E%3C/svg%3E");
+}
+
+html[data-se-startup] .se-startup-cell[data-step="lib"] {
+  --se-startup-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='3' width='5' height='18' rx='1.5'/%3E%3Crect fill-opacity='.32' x='10' y='3' width='5' height='18' rx='1.5'/%3E%3Crect x='16.2' y='4' width='5' height='17' rx='1.5' transform='rotate(-12 18.7 12.5)'/%3E%3C/svg%3E");
+}
+
+html[data-se-startup] .se-startup-cell[data-state="current"] .se-startup-icon {
+  background: var(--se-accent-tint);
+}
+
+html[data-se-startup] .se-startup-cell[data-state="current"] .se-startup-icon::before {
+  background: var(--se-accent);
+}
+
+html[data-se-startup] .se-startup-cell[data-state="done"] .se-startup-icon {
+  background: rgba(108, 194, 74, .14);
+}
+
+html[data-se-startup] .se-startup-cell[data-state="done"] .se-startup-icon::before {
+  background: var(--se-running);
+}
+
+html[data-se-startup] .se-startup-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--se-text-muted);
+  font: 700 10.5px/14px var(--se-font);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+html[data-se-startup] .se-startup-tick {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  visibility: hidden;
+  background: var(--se-running);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6.4 11.6 2.8 8l1.1-1.1 2.5 2.5 5.7-5.7 1.1 1.1z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6.4 11.6 2.8 8l1.1-1.1 2.5 2.5 5.7-5.7 1.1 1.1z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+html[data-se-startup] .se-startup-cell[data-state="done"] .se-startup-tick {
+  visibility: visible;
+}
+
+html[data-se-startup] .se-startup-value {
+  margin: 8px 0 9px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--se-text);
+  font: 800 17px/22px var(--se-font);
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-se-startup] .se-startup-cell[data-state="current"] .se-startup-value {
+  color: var(--se-accent);
+}
+
+html[data-se-startup] .se-startup-cell[data-state="waiting"] .se-startup-value {
+  color: #6f7984;
+}
+
+html[data-se-startup] .se-startup-bar {
+  position: relative;
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--se-track);
+}
+
+html[data-se-startup] .se-startup-bar > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  border-radius: inherit;
+  background: var(--se-accent);
+  transition: width .4s ease;
+}
+
+html[data-se-startup] .se-startup-cell[data-state="done"] .se-startup-bar > span {
+  background: var(--se-running);
+}
+
+/* Steps with no number to show: a segment slides along the track. */
+html[data-se-startup] .se-startup-cell[data-sliding="true"] .se-startup-bar > span {
+  width: 38% !important;
+  transition: none;
+  animation: se-startup-indet 1.3s ease-in-out infinite;
+}
+
+@keyframes se-startup-indet {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(264%);
+  }
+}
+
+/* Narrow windows, reduced motion */
+@media (max-width: 460px) {
+  html[data-se-startup] .se-startup-cell {
+    padding: 10px;
+  }
+  html[data-se-startup] .se-startup-value {
+    font-size: 14px;
+  }
+  html[data-se-startup] .se-startup-icon {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-se-startup] .se-startup-slide {
+    animation: none;
+  }
+  html[data-se-startup] .se-startup-slide:first-child {
+    opacity: 1;
+  }
+  html[data-se-startup] .se-startup-mosaic > span {
+    animation: none;
+    opacity: .3;
+  }
+  .se-sl *,
+  .se-sl-sheen {
+    animation: none !important;
+  }
+  .se-sl-hero:first-child,
+  .se-sl-logo,
+  .se-sl-info {
+    opacity: 1;
+  }
+  .se-sl-sheen {
+    display: none;
+  }
+  html[data-se-startup] .se-startup-cell[data-sliding="true"] .se-startup-bar > span {
+    animation: none;
+    transform: none;
+    opacity: .5;
+  }
+  html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v::before {
+    animation-duration: 3s;
+  }
+}

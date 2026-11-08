@@ -1,0 +1,651 @@
+/*
+ * In-game overlay shell (SP Overlay windows).
+ *
+ * Restyles Steam's desktop overlay in the Steam Enhanced look while keeping
+ * its native layout: the top section (clock, logo, Back to Game) and the
+ * toolbar stay where Steam puts them, in whichever toolbar location the
+ * client is set to. The top-left column gains a game card and Achievements
+ * and Friends sections (built by `overlay.js`).
+ *
+ * Every rule is gated on `html[data-se-ov]`, which `overlay.js` sets while
+ * `--se-overlay` is not `off`. Keyboard-only and pinned-preview states keep
+ * Steam's own presentation.
+ *
+ * Overlay buttons are DialogButtons, so the global `button.DialogButton:not(#se-none)`
+ * skin in `features/dialogs/dialogs.css` (specificity 1,1,1) would win; button
+ * rules here carry `:not(#se-none)` to outrank it.
+ */
+html[data-se-ov] {
+  --se-ov-ink: 15, 17, 21;
+  --se-ov-bar-bg: rgba(29, 33, 40, 0.94);
+  --se-ov-btn: 44px;
+}
+
+/* ---------- Backdrop ---------- */
+
+html[data-se-ov] ._3b_pllMxcr_an1aQ5goWvB:not(._2hcWZXLXQaKJxwEEsiUibw) {
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    rgba(var(--se-ov-ink), calc(var(--se-overlay-dim, 0.9) * 0.72)),
+    rgba(var(--se-ov-ink), var(--se-overlay-dim, 0.9))
+  ) !important;
+  box-shadow: inset 0 0 240px 20px rgba(var(--se-ov-ink), 0.85) !important;
+  font-family: var(--se-font), 'Motiva Sans', sans-serif !important;
+}
+
+/* ---------- Top section: game card (top left) ---------- */
+
+/* Steam caps the top section at 1920px and centres it; on wider screens that
+   pushed the card inward. Span the full width so it sits in the corner. */
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ {
+  max-width: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 28px 32px 0 !important;
+}
+
+/* Steam's time-stats column, top to bottom (set with `order`):
+     -2 clock row, -1 date          native
+      0 `.se-ov-card`               logo + playtime (overlay.js)
+      2 other native rows           network status, time trial, ...
+      3 `.se-ov-back`, 4 Exit game  buttons
+      5 `.se-ov-overview`           Achievements + Friends (overlay.js)
+   Steam's own "this session" line gives way to the card's stat. */
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .vCykYvbW9JAoUuOZK3L8M {
+  align-self: flex-start !important;
+  width: 560px !important;
+  max-width: calc(100vw - 80px) !important;
+  display: flex !important;
+  flex-flow: row wrap !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .vCykYvbW9JAoUuOZK3L8M > :not(.se-ov-card, .se-ov-back, .se-ov-overview) {
+  flex: 1 0 100% !important;
+  order: 2 !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .vCykYvbW9JAoUuOZK3L8M > ._3YTmrWKcB8D-K9XYuAiR09:nth-child(1 of ._3YTmrWKcB8D-K9XYuAiR09) {
+  display: none !important;
+}
+
+/* Clock and date, above the logo. */
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .vCykYvbW9JAoUuOZK3L8M > .Snc8nF7w027y6b7Pt3ch0 {
+  order: -2 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .vCykYvbW9JAoUuOZK3L8M > ._2tSzhkf_Zg2yKYhOs79Cid {
+  order: -1 !important;
+  margin: -6px 0 0 !important;
+  font: 500 15px/20px var(--se-font), 'Motiva Sans', sans-serif !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .Snc8nF7w027y6b7Pt3ch0 ._2gQ69IwRa_DeSORPxG5wu0 {
+  font: 600 40px/1.1 var(--se-font), 'Motiva Sans', sans-serif !important;
+  letter-spacing: -0.02em !important;
+  color: var(--se-text-strong, #fff) !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .Snc8nF7w027y6b7Pt3ch0 ._2JXN-pm6i69fgKpTh6s9TS {
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .vCykYvbW9JAoUuOZK3L8M ._3YTmrWKcB8D-K9XYuAiR09,
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .vCykYvbW9JAoUuOZK3L8M ._1QRGzYZlQ54Eg7j_SjklDd {
+  font: 500 13px/18px var(--se-font), 'Motiva Sans', sans-serif !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .vCykYvbW9JAoUuOZK3L8M ._1pESmYOjS2Hv9u_1C73d4S {
+  font: 600 13px/18px var(--se-font), 'Motiva Sans', sans-serif !important;
+  color: var(--se-gold-text, #f3cf86) !important;
+}
+
+/* Steam's centred logo moves into the card. */
+html[data-se-ov][data-se-ov-logo] .fi6UDkxJq66MLo2z9wabQ ._3KwfoP3QLtY80hx0gtZBZ4 > * {
+  visibility: hidden !important;
+}
+
+html[data-se-ov] .se-ov-card {
+  order: 0;
+  flex: 1 0 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+  margin: 14px 0;
+  font-family: var(--se-font), 'Motiva Sans', sans-serif;
+  user-select: none;
+}
+
+.se-ov-logo {
+  display: block;
+  max-width: 300px;
+  max-height: 150px;
+  object-fit: contain;
+  object-position: left center;
+  filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.6));
+}
+
+.se-ov-name {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--se-text-strong, #fff);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-ov-logo[hidden],
+.se-ov-name[hidden] {
+  display: none;
+}
+
+.se-ov-stats {
+  display: flex;
+  align-items: stretch;
+}
+
+.se-ov-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-inline: 34px;
+  box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.12);
+}
+
+.se-ov-stat:first-child {
+  padding-inline-start: 0;
+  box-shadow: none;
+}
+
+.se-ov-stat-label {
+  color: #a9b6c4;
+  font: 700 14px/18px var(--se-font), 'Motiva Sans', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.se-ov-stat-value {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.se-ov-stat-value b {
+  color: var(--se-text-strong, #fff);
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.se-ov-stat-value small {
+  color: var(--se-text-dim, #b8c0c8);
+  font-size: 19px;
+  font-weight: 500;
+}
+
+/* Buttons in the theme's button style: Back to game (ours) is the primary
+   accent button, Exit game (Steam's) a standard one. Same tokens as the
+   global DialogButton skin in `features/dialogs/dialogs.css`. */
+html[data-se-ov] .se-ov-back {
+  order: 3;
+  height: var(--se-control-h, 34px);
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-accent, #7cc4ff);
+  color: var(--se-bg-ink, #0f1115);
+  font: 600 13px/1 var(--se-font), 'Motiva Sans', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.15s ease-out;
+}
+
+html[data-se-ov] .se-ov-back:hover {
+  background: #9ad2ff;
+}
+
+html[data-se-ov] .se-ov-back:active {
+  background: var(--se-accent, #7cc4ff);
+}
+
+html[data-se-ov] .se-ov-back:focus-visible {
+  outline: 2px solid var(--se-accent, #7cc4ff);
+  outline-offset: 2px;
+}
+
+.se-ov-back svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .BoygotvcKo4DC4dSix8G3:not(#se-none) {
+  flex: 0 0 auto !important;
+  order: 4 !important;
+  width: auto !important;
+  height: var(--se-control-h, 34px) !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
+  background: var(--se-surface-2, #262c35) !important;
+  box-shadow: none !important;
+  color: var(--se-text, #e6e8eb) !important;
+  filter: none !important;
+  font: 600 13px/1 var(--se-font), 'Motiva Sans', sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  transition: background-color 0.15s ease-out, color 0.15s ease-out !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .BoygotvcKo4DC4dSix8G3:not(#se-none):hover {
+  background: var(--se-hover, #2c3440) !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .BoygotvcKo4DC4dSix8G3:not(#se-none):active {
+  background: var(--se-selected, #33404f) !important;
+}
+
+/* ---------- Top section: Achievements and Friends ---------- */
+
+/* Flat sections (no card) under the buttons, built by `overlay.js`. */
+html[data-se-ov] .se-ov-overview {
+  order: 5;
+  flex: 1 0 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-top: 16px;
+  font-family: var(--se-font), 'Motiva Sans', sans-serif;
+  user-select: none;
+}
+
+.se-ov-sec[hidden] {
+  display: none;
+}
+
+.se-ov-sec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 22px;
+  margin-bottom: 10px;
+}
+
+.se-ov-sec-label {
+  color: #a9b6c4;
+  font: 700 13px/18px var(--se-font), 'Motiva Sans', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+html[data-se-ov] .se-ov-sec-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  margin: 0 -6px 0 0;
+  padding: 0 4px 0 8px;
+  border: 0;
+  border-radius: var(--se-radius-xs, 4px);
+  background: transparent;
+  color: var(--se-text-muted, #98a2ad);
+  font: 600 13px/1 var(--se-font), 'Motiva Sans', sans-serif;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background-color 0.15s ease-out, color 0.15s ease-out;
+}
+
+html[data-se-ov] .se-ov-sec-link:hover {
+  background: var(--se-hover, #2c3440);
+  color: var(--se-text-strong, #fff);
+}
+
+html[data-se-ov] .se-ov-sec-link:focus-visible {
+  outline: 2px solid var(--se-accent, #7cc4ff);
+  outline-offset: 1px;
+}
+
+.se-ov-sec-link svg {
+  width: 14px;
+  height: 14px;
+}
+
+.se-ov-bar {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.se-ov-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--se-accent, #7cc4ff);
+}
+
+.se-ov-ach-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.se-ov-ach {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.se-ov-ach-icon {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--se-radius-sm, 8px);
+  object-fit: cover;
+  background: var(--se-surface-2, #262c35);
+}
+
+.se-ov-ach-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.se-ov-ach-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.se-ov-ach-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--se-text, #e6e8eb);
+  font: 600 14px/18px var(--se-font), 'Motiva Sans', sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-ov-ach-count {
+  flex: 0 0 auto;
+  color: var(--se-text-muted, #98a2ad);
+  font: 500 12px/16px var(--se-font), 'Motiva Sans', sans-serif;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.se-ov-avatars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 4px;
+}
+
+/* Friend avatars as in the theme's friends list: round, with a status ring
+   (green in game, blue online, dashed when away, gray and faded offline).
+   Clicking one opens the chat. */
+html[data-se-ov] .se-ov-avatar {
+  --se-ov-ring: var(--se-border-strong, #4a525e);
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--se-surface-2, #262c35);
+  box-shadow: 0 0 0 2px rgb(var(--se-ov-ink)), 0 0 0 3.5px var(--se-ov-ring);
+  cursor: pointer;
+  transition: box-shadow 0.15s ease-out;
+}
+
+html[data-se-ov] .se-ov-avatar[data-status='online'] {
+  --se-ov-ring: var(--se-online, #4cb4ff);
+}
+
+html[data-se-ov] .se-ov-avatar[data-status='ingame'] {
+  --se-ov-ring: var(--se-running, #6cc24a);
+}
+
+html[data-se-ov] .se-ov-avatar[data-away] {
+  box-shadow: none;
+  outline: 2px dashed var(--se-ov-ring);
+  outline-offset: 2px;
+}
+
+html[data-se-ov] .se-ov-avatar[data-status='online'][data-away] {
+  --se-ov-ring: color-mix(in srgb, var(--se-online, #4cb4ff) 50%, transparent);
+}
+
+.se-ov-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: filter 0.15s ease-out, opacity 0.15s ease-out;
+}
+
+.se-ov-avatar[data-status='offline'] img {
+  filter: grayscale(0.6);
+  opacity: 0.6;
+}
+
+html[data-se-ov] .se-ov-avatar:hover img {
+  filter: none;
+  opacity: 1;
+}
+
+html[data-se-ov] .se-ov-avatar[data-steamid]:hover {
+  box-shadow: 0 0 0 2px rgb(var(--se-ov-ink)), 0 0 0 3.5px var(--se-ov-ring), 0 0 0 7px var(--se-hover, #2c3440);
+}
+
+html[data-se-ov] .se-ov-avatar[data-away]:hover {
+  box-shadow: none;
+}
+
+html[data-se-ov] .se-ov-avatar:focus-visible {
+  outline: 2px solid var(--se-accent, #7cc4ff);
+  outline-offset: 5px;
+}
+
+html[data-se-ov] .se-ov-avatar-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--se-text-dim, #b8c0c8);
+  font: 600 12px/1 var(--se-font), 'Motiva Sans', sans-serif;
+  cursor: default;
+}
+
+/* ---------- Top section: Back to Game ---------- */
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ ._2uM3ouyTdzAtXR3ffa7oRg {
+  align-self: flex-start !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ ._2LJMRr1_5XUK4wlt7YMyPi {
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 8px 8px 8px 18px !important;
+  border-radius: var(--se-radius-lg, 14px) !important;
+  background: var(--se-ov-bar-bg) !important;
+  box-shadow: var(--se-shadow-pop) !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .rgGY_YRY-LejoDAvFmRTZ {
+  max-width: none !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ ._3mi5HRDMAPghEFc-zYaLdB {
+  font: 700 20px/26px var(--se-font), 'Motiva Sans', sans-serif !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ ._2EuLvYoO3iAtbpE0XEao8d {
+  font: 500 13px/18px var(--se-font), 'Motiva Sans', sans-serif !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .mh8m9p4PBg_Qrev1bfTzc:not(#se-none) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md, 10px) !important;
+  background: var(--se-surface-2, #262c35) !important;
+  box-shadow: none !important;
+  color: var(--se-text, #e6e8eb) !important;
+  transition: background-color 0.12s ease, color 0.12s ease !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .mh8m9p4PBg_Qrev1bfTzc:not(#se-none):hover {
+  background: var(--se-hover, #2c3440) !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .mh8m9p4PBg_Qrev1bfTzc:not(#se-none) > svg {
+  height: 18px !important;
+  margin: 0 !important;
+}
+
+/* ---------- Toolbar ---------- */
+
+/* The native strip becomes one rounded bar; `gap` replaces per-button margins
+   so the same rules work for the bottom, top, left and right locations. */
+html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV .fbu3l7kPiBeb3EKCjIb8n {
+  height: auto !important;
+  gap: 6px !important;
+  padding: 7px !important;
+  border-radius: 18px !important;
+  background: var(--se-ov-bar-bg) !important;
+  box-shadow: var(--se-shadow-pop) !important;
+}
+
+html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV ._3ZLaTxSHxeGcoKlIy_-Z0L:not(#se-none) {
+  position: relative !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md, 10px) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--se-text-dim, #b8c0c8) !important;
+  transition: background-color 0.12s ease, color 0.12s ease !important;
+}
+
+html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV:not(._1xInQb2gVGxBqTwFBdXoFW):not(._2yjI56d0zadVmPZgDjq2nM) ._3ZLaTxSHxeGcoKlIy_-Z0L:not(#se-none) {
+  width: var(--se-ov-btn) !important;
+  height: var(--se-ov-btn) !important;
+}
+
+html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV ._3ZLaTxSHxeGcoKlIy_-Z0L:not(#se-none):hover {
+  background: var(--se-hover, #2c3440) !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV ._3ZLaTxSHxeGcoKlIy_-Z0L._1BXjK5v8XI_SEhGola5ftn:not(#se-none),
+html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV ._3ZLaTxSHxeGcoKlIy_-Z0L._1BXjK5v8XI_SEhGola5ftn:not(#se-none):hover {
+  background: var(--se-selected, #33404f) !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+/* Open widget marker: a dot under the icon in a horizontal bar… */
+html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV ._3ZLaTxSHxeGcoKlIy_-Z0L._1BXjK5v8XI_SEhGola5ftn:not(#se-none)::after {
+  content: '' !important;
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 4px !important;
+  width: 14px !important;
+  height: 3px !important;
+  margin-left: -7px !important;
+  border-radius: 2px !important;
+  background: var(--se-accent, #7cc4ff) !important;
+  pointer-events: none !important;
+}
+
+/* …and a bar on the inner edge in a vertical (list view) one. */
+html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV._1xInQb2gVGxBqTwFBdXoFW ._3ZLaTxSHxeGcoKlIy_-Z0L._1BXjK5v8XI_SEhGola5ftn:not(#se-none)::after,
+html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV._2yjI56d0zadVmPZgDjq2nM ._3ZLaTxSHxeGcoKlIy_-Z0L._1BXjK5v8XI_SEhGola5ftn:not(#se-none)::after {
+  left: 0 !important;
+  top: 50% !important;
+  bottom: auto !important;
+  width: 3px !important;
+  height: 16px !important;
+  margin: -8px 0 0 !important;
+}
+
+html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV._2yjI56d0zadVmPZgDjq2nM ._3ZLaTxSHxeGcoKlIy_-Z0L._1BXjK5v8XI_SEhGola5ftn:not(#se-none)::after {
+  left: auto !important;
+  right: 0 !important;
+}
+
+html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV ._3ZLaTxSHxeGcoKlIy_-Z0L:not(#se-none):disabled {
+  opacity: 0.4 !important;
+  background: transparent !important;
+}
+
+html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV .ZTbww2QfIllvCwVHmpixE {
+  font: 600 13px/18px var(--se-font), 'Motiva Sans', sans-serif !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+/* ---------- Timeline hint bubble ---------- */
+
+html[data-se-ov] ._2Pb44QTSnDyc5GLNnVtegN ._2vsDU46uDOtqK3-Kv9HFyo {
+  border-radius: var(--se-radius-lg, 14px) !important;
+  background: var(--se-surface, #1f242b) !important;
+  box-shadow: var(--se-shadow-pop) !important;
+  font-family: var(--se-font), 'Motiva Sans', sans-serif !important;
+}
+
+html[data-se-ov] ._2Pb44QTSnDyc5GLNnVtegN ._2MX8QwL5Xjaa7uGP7hNIbc {
+  background: var(--se-surface, #1f242b) !important;
+}
+
+html[data-se-ov] ._2Pb44QTSnDyc5GLNnVtegN ._1mk11sO1ogSUnfwd3ZeLPj {
+  color: var(--se-accent, #7cc4ff) !important;
+  font: var(--se-label-font, 700 11px/14px sans-serif) !important;
+  letter-spacing: var(--se-label-spacing, 0.1em) !important;
+}
+
+html[data-se-ov] ._2Pb44QTSnDyc5GLNnVtegN ._12O3GqaItkBTeRAofUqlI9 {
+  color: var(--se-text-muted, #98a2ad) !important;
+}

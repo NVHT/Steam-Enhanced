@@ -1,0 +1,1727 @@
+/*
+ * Library Home hero stage and three-column bottom shelf tray.
+ *
+ * Scoped to `[data-se-hs]` (managed by `features/home/home-stage.js`). Places
+ * the selected recent game on a full-bleed hero stage with container-query
+ * typography, stats, and an 8-game selector strip, above a glass tray housing
+ * What's New, Favorites, and Collections side by side.
+ */
+/* The grid */
+[data-se-hs]:not(#se-none) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-flow: row;
+  align-content: start;
+  position: relative;
+  isolation: isolate;
+  padding: 0 0 24px !important;
+  overflow-x: clip;
+}
+
+[data-se-hs][data-se-hs-n="3"]:not(#se-none) {
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1.3fr) minmax(0, .95fr);
+}
+
+[data-se-hs][data-se-hs-n="2"]:not(#se-none) {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+}
+
+/* Steam's wrappers between the grid and its rows */
+[data-se-hs-flat]:not(#se-none) {
+  display: contents !important;
+}
+
+/* The stage and the tray are the whole page: no scrolling, no space after the tray */
+[data-se-hs][data-se-hs-lock]:not(#se-none) {
+  padding-bottom: 0 !important;
+}
+
+[data-se-hs-scroll-lock]:not(#se-none) {
+  overflow-y: hidden !important;
+}
+
+html[data-se-hs-scroll-lock],
+html[data-se-hs-scroll-lock] > body[data-se-hs-scroll-lock] {
+  overflow: hidden !important;
+}
+
+/*
+ * Never native home under the stage: a Library Home Steam has just drawn, and a row it
+ * adds to one, stay out of sight until home-stage.js has placed them (normally before the
+ * frame is painted, so this only covers a frame the script misses). [data-se-hs-on] is set
+ * on the window while the stage is in use.
+ */
+html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
+[data-se-hs] > :not([data-se-hs-sec]):not([data-se-hs-flat]):not(.se-hs-stage):not(.se-hs-tray),
+[data-se-hs] [data-se-hs-flat] > :not([data-se-hs-sec]):not([data-se-hs-flat]) {
+  visibility: hidden !important;
+}
+
+[data-se-hs] > .se-hs-stage {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+[data-se-hs] > .se-hs-tray {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+[data-se-hs-sec]:not(#se-none) {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+
+[data-se-hs-col]:not(#se-none) {
+  grid-row: 2;
+}
+
+[data-se-hs-col="1"]:not(#se-none) {
+  grid-column: 1;
+}
+
+[data-se-hs-col="2"]:not(#se-none) {
+  grid-column: 2;
+}
+
+[data-se-hs-col="3"]:not(#se-none) {
+  grid-column: 3;
+}
+
+/* Everything else: full width, below the tray, on the page's sides */
+[data-se-hs-sec]:not([data-se-hs-col]):not(#se-none) {
+  grid-column: 1 / -1;
+  margin-top: 22px;
+  padding-inline: 20px !important;
+}
+
+[data-se-hs-sec="recent"]:not(#se-none),
+[data-se-hs-sec="playnext"]:not(#se-none),
+[data-se-hs-sec="add"]:not(#se-none),
+[data-se-hs-lock] > [data-se-hs-sec]:not([data-se-hs-col]):not(#se-none),
+[data-se-hs-lock] [data-se-hs-flat] > [data-se-hs-sec]:not([data-se-hs-col]):not(#se-none) {
+  display: none !important;
+}
+
+/* The stage */
+/*
+ * The game's block grows with the stage. Sizes are clamped between their
+ * size on a ~1400 px stage and their size on a 2400 px one, in container units (cqw, cqh),
+ * so a big window gets a big logo, big buttons and big cards rather than a small cluster.
+ * The stage's height is set by home-stage.js, so it can be a size container.
+ */
+.se-hs-stage {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  height: var(--se-hs-h, 520px);
+  min-height: 340px;
+  container: se-hs-stage / size;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  /*
+   * The sides match the tray's (24 px), so the strip's cards line up with it; the game's
+   * text keep their own indent (.se-hs-body)
+   */
+  padding: 28px 24px clamp(14px, 1cqw, 24px);
+  color: var(--se-text, #e6e8eb);
+  font-family: var(--se-font);
+}
+
+/* The art: the whole first view, running on behind the tray, fading into the page */
+.se-hs-art {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--se-hs-vh, 100%);
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--se-bg, #171a20);
+}
+
+.se-hs-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.1s ease;
+}
+
+.se-hs-layer[data-on] {
+  opacity: 1;
+}
+
+.se-hs-hero {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  transform: scale(1.04);
+}
+
+/* A slow push-in on the art that is showing */
+.se-hs-layer[data-on] .se-hs-hero {
+  animation: se-hs-push 26s ease-in-out infinite alternate;
+}
+
+@keyframes se-hs-push {
+  to {
+    transform: scale(1.13) translate(-2%, -1.2%);
+  }
+}
+
+/*
+ * The grade: a warm light in the corner, the left side darkened for text content, a vignette,
+ * and the foot fading into the page's ground
+ */
+.se-hs-grade {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 45% at 88% 6%, rgba(255, 196, 150, .16), transparent 70%), linear-gradient(90deg, rgba(0, 0, 0, .72) 0%, rgba(0, 0, 0, .32) 38%, rgba(0, 0, 0, 0) 62%), radial-gradient(ellipse 85% 75% at 50% 40%, transparent 45%, rgba(0, 0, 0, .5) 100%), linear-gradient(180deg, rgba(0, 0, 0, .35) 0%, rgba(0, 0, 0, 0) 14%, rgba(0, 0, 0, 0) 46%, rgba(10, 12, 16, .78) 84%, var(--se-bg, #171a20) 100%);
+}
+
+/* Toward the tray the art settles into the page's ground, so the shelves read cleanly over it */
+.se-hs-grade::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(14, 16, 21, 0) calc(var(--se-hs-h, 60%) - 260px), rgba(14, 16, 21, .62) calc(var(--se-hs-h, 60%) - 40px), rgba(14, 16, 21, .9) calc(var(--se-hs-h, 60%) + 90px), var(--se-bg, #171a20) 100%);
+}
+
+/* Film grain, still (an animated one costs a repaint of the whole view every frame) */
+.se-hs-grade::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .07;
+  mix-blend-mode: overlay;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 240px 240px;
+}
+
+/* Text content */
+.se-hs-body {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(32px, 4cqw, 120px);
+  min-width: 0;
+  padding-inline: calc(clamp(36px, 3.3cqw, 80px) - 24px);
+}
+
+.se-hs-title {
+  display: flex;
+  align-items: flex-end;
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: 72px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+/* The logo opens the game page: it lifts a little under the pointer */
+.se-hs-title .se-hs-logo,
+.se-hs-title .se-hs-name {
+  transition: transform .25s cubic-bezier(.2, .8, .2, 1), filter .25s;
+  transform-origin: left bottom;
+}
+
+.se-hs-title:hover .se-hs-logo {
+  transform: scale(1.025);
+  filter: drop-shadow(0 6px 24px rgba(0, 0, 0, .55)) brightness(1.08);
+}
+
+.se-hs-title:hover .se-hs-name {
+  transform: scale(1.025);
+}
+
+.se-hs-title:focus-visible {
+  outline: 2px solid var(--se-accent, #7cc4ff);
+  outline-offset: 6px;
+}
+
+/* The right side: description, stats, buttons, over a soft dark pool so bright art stays readable */
+.se-hs-side {
+  position: relative;
+  isolation: isolate;
+  flex: 0 1 clamp(420px, 38cqw, 780px);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(14px, min(1.1cqw, 2.4cqh), 26px);
+}
+
+.se-hs-side::before {
+  content: "";
+  position: absolute;
+  inset: -130px -140px -70px -110px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(8, 10, 14, .8) 0%, rgba(8, 10, 14, .74) 55%, rgba(8, 10, 14, .42) 80%, rgba(8, 10, 14, 0) 100%);
+}
+
+.se-hs-desc {
+  margin: 0;
+  font-size: clamp(14px, .82cqw, 19px);
+  line-height: 1.5;
+  color: #e1e6eb;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .9), 0 1px 14px rgba(0, 0, 0, .7);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.se-hs-desc[hidden],
+.se-hs-by[hidden] {
+  display: none;
+}
+
+/* Developer · year, then the reviews and players chips, on one line */
+.se-hs-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px clamp(8px, .5cqw, 12px);
+  margin-bottom: calc(-1 * clamp(2px, .2cqw, 6px));
+}
+
+.se-hs-top .se-hs-by {
+  margin: 0 clamp(4px, .3cqw, 8px) 0 0;
+}
+
+.se-hs-chips {
+  display: contents;
+}
+
+.se-hs-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: clamp(24px, 1.5cqw, 32px);
+  padding: 0 clamp(9px, .6cqw, 13px);
+  border-radius: 999px;
+  font: 700 clamp(11.5px, .66cqw, 15px)/1 var(--se-font);
+  white-space: nowrap;
+}
+
+.se-hs-chip[data-reviews="good"] {
+  background: rgba(102, 192, 244, .16);
+  box-shadow: inset 0 0 0 1px rgba(102, 192, 244, .38);
+  color: #8fd0f7;
+}
+
+.se-hs-chip[data-reviews="mixed"] {
+  background: rgba(201, 169, 93, .16);
+  box-shadow: inset 0 0 0 1px rgba(201, 169, 93, .4);
+  color: #e0c47e;
+}
+
+.se-hs-chip[data-reviews="bad"] {
+  background: rgba(224, 115, 90, .16);
+  box-shadow: inset 0 0 0 1px rgba(224, 115, 90, .4);
+  color: #f0957f;
+}
+
+.se-hs-chip[data-live] {
+  background: rgba(111, 209, 111, .14);
+  box-shadow: inset 0 0 0 1px rgba(111, 209, 111, .32);
+  color: #9be29b;
+}
+
+.se-hs-chip[data-live] i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6fd16f;
+  box-shadow: 0 0 6px rgba(111, 209, 111, .8);
+}
+
+/* Play, then hours and achievements beside it */
+.se-hs-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px clamp(22px, 1.8cqw, 40px);
+  margin-top: clamp(2px, .3cqw, 8px);
+}
+
+/* Who made it · the year it came out, over the description */
+.se-hs-by {
+  margin-bottom: calc(-1 * clamp(6px, .5cqw, 14px));
+  font: 700 clamp(11px, .62cqw, 14px)/1.3 var(--se-font);
+  letter-spacing: var(--se-label-spacing, .1em);
+  text-transform: uppercase;
+  color: #d0d7de;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .9), 0 1px 10px rgba(0, 0, 0, .7);
+}
+
+.se-hs-logo {
+  display: block;
+  width: auto;
+  height: auto;
+  min-height: clamp(100px, min(9cqw, 22cqh), 220px);
+  max-width: clamp(420px, 42cqw, 1000px);
+  max-height: clamp(150px, min(14cqw, 34cqh), 340px);
+  object-fit: contain;
+  object-position: left bottom;
+  filter: drop-shadow(0 6px 24px rgba(0, 0, 0, .55));
+}
+
+.se-hs-logo[hidden] {
+  display: none;
+}
+
+.se-hs-name {
+  font: 800 clamp(56px, min(4.6cqw, 11cqh), 110px)/1 var(--se-font);
+  letter-spacing: -.02em;
+  color: var(--se-text-strong, #fff);
+  text-shadow: 0 6px 40px rgba(0, 0, 0, .7);
+}
+
+.se-hs-title[data-logo="yes"] .se-hs-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  /* Still read out by screen readers */
+}
+
+/* The stats as big numbers: hours played, achievements with a bar */
+.se-hs-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px clamp(28px, 2.2cqw, 52px);
+}
+
+.se-hs-stat {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, .35cqw, 8px);
+}
+
+.se-hs-stat b {
+  font: 800 clamp(20px, min(1.35cqw, 3.8cqh), 32px)/1 var(--se-font);
+  color: var(--se-text-strong, #fff);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, .55);
+  white-space: nowrap;
+}
+
+.se-hs-stat small {
+  font-size: .55em;
+  font-weight: 600;
+  color: #d0d7de;
+}
+
+.se-hs-stat em {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-style: normal;
+  font-size: clamp(12px, .75cqw, 18px);
+  color: #d0d7de;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .9), 0 1px 10px rgba(0, 0, 0, .6);
+}
+
+.se-hs-stat[data-perfect] b {
+  color: var(--se-gold-text, #f3cf86);
+}
+
+.se-hs-achbar {
+  display: block;
+  flex: 0 0 auto;
+  width: clamp(60px, 4cqw, 110px);
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, .18);
+  overflow: hidden;
+}
+
+.se-hs-achbar > span {
+  display: block;
+  height: 100%;
+  background: var(--se-accent, #7cc4ff);
+  border-radius: inherit;
+}
+
+.se-hs-stat[data-perfect] .se-hs-achbar > span {
+  background: var(--se-gold-text, #f3cf86);
+}
+
+/* The buttons: PLAY as on the game page, Game page as glass */
+.se-hs-actions {
+  display: flex;
+  gap: clamp(12px, .75cqw, 18px);
+}
+
+.se-hs-actions button {
+  height: clamp(46px, min(3.1cqw, 7.5cqh), 72px);
+  border: 0;
+  border-radius: clamp(10px, .67cqw, 16px);
+  font-family: var(--se-font);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(10px, .67cqw, 16px);
+}
+
+.se-hs-actions button:focus-visible,
+.se-hs-thumb:focus-visible {
+  outline: 2px solid var(--se-accent, #7cc4ff);
+  outline-offset: 3px;
+}
+
+.se-hs-play {
+  padding: 0 clamp(36px, 2.7cqw, 64px);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--se-play, #3a8a22) 72%, #b6f07a 28%), var(--se-play, #3f9420));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 14px 34px -12px rgba(80, 180, 50, .8);
+  color: var(--se-text-strong, #fff);
+  font-size: clamp(16px, 1.08cqw, 26px);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.se-hs-play:hover {
+  filter: brightness(1.08);
+}
+
+.se-hs-play[data-kind="install"] {
+  background: var(--se-accent, #7cc4ff);
+  box-shadow: 0 14px 34px -12px var(--se-accent-strong, rgba(124, 196, 255, .55));
+  color: var(--se-bg-ink, #0f1115);
+}
+
+.se-hs-play svg {
+  width: clamp(15px, 1cqw, 24px);
+  height: clamp(15px, 1cqw, 24px);
+}
+
+/*
+ * The strip: the recent games as cards across the stage, name and date over the art;
+ * the one showing ringed and lifted, its timer filling
+ */
+.se-hs-strip {
+  /* Cards shown; read by home-stage.js so the cycle stays on visible cards */
+  --se-hs-cols: 8;
+  display: grid;
+  grid-template-columns: repeat(var(--se-hs-cols), minmax(0, 1fr));
+  gap: clamp(10px, .75cqw, 18px);
+  margin-top: clamp(22px, min(2cqw, 3.6cqh), 48px);
+}
+
+.se-hs-strip[hidden] {
+  display: none;
+}
+
+/* Narrow stages show fewer, readable cards (~120px+) rather than eight slivers */
+@container se-hs-stage (width < 1100px) {
+  .se-hs-strip { --se-hs-cols: 6; }
+  .se-hs-thumb:nth-child(n + 7) { display: none; }
+}
+
+@container se-hs-stage (width < 860px) {
+  .se-hs-strip { --se-hs-cols: 4; }
+  .se-hs-thumb:nth-child(n + 5) { display: none; }
+}
+
+@container se-hs-stage (width < 600px) {
+  .se-hs-strip { --se-hs-cols: 3; }
+  .se-hs-thumb:nth-child(n + 4) { display: none; }
+}
+
+.se-hs-thumb {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: clamp(10px, .6cqw, 14px);
+  background: none;
+  text-align: start;
+  font-family: var(--se-font);
+  cursor: pointer;
+}
+
+.se-hs-pic {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: clamp(70px, min(6.2cqw, 15cqh), 150px);
+  border-radius: inherit;
+  overflow: hidden;
+  background: var(--se-surface, #1f242b);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .14);
+  opacity: .7;
+  transition: transform .3s cubic-bezier(.2, .8, .2, 1), box-shadow .3s, opacity .3s;
+}
+
+.se-hs-thumbimg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.se-hs-thumb:hover .se-hs-pic {
+  opacity: .92;
+}
+
+.se-hs-thumb[data-on] .se-hs-pic {
+  opacity: 1;
+  transform: translateY(-4px);
+  box-shadow: 0 0 0 clamp(2px, .13cqw, 3px) var(--se-text-strong, #fff), 0 24px 40px -16px rgba(0, 0, 0, .9);
+}
+
+.se-hs-thumblabel {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 26% clamp(9px, .6cqw, 15px) clamp(7px, .55cqw, 13px);
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, .82));
+  pointer-events: none;
+}
+
+.se-hs-thumbname {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(12px, .72cqw, 17px);
+  font-weight: 700;
+  color: var(--se-text-strong, #fff);
+}
+
+.se-hs-thumbdate {
+  font-size: clamp(10.5px, .56cqw, 14px);
+  font-weight: 500;
+  color: #c9d0d7;
+}
+
+.se-hs-prog {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+  height: clamp(3px, .17cqw, 4px);
+  width: 100%;
+  background: var(--se-text-strong, #fff);
+  box-shadow: 0 -1px 0 rgba(0, 0, 0, .3);
+  /*
+   * Slides in from the left (the image clips it) instead of growing in width: moved on
+   * the GPU, no layout each frame, and never rescaled, so its edges stay crisp
+   */
+  transform: translateX(-100%);
+  animation: se-hs-fill var(--se-hs-cycle, 9s) linear forwards;
+}
+
+@keyframes se-hs-fill {
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* The tray: What's New · Favorites · Collections on one glass */
+.se-hs-tray {
+  position: relative;
+  z-index: 1;
+  margin: 0 24px 22px;
+  border-radius: 18px;
+  background: rgba(16, 18, 23, .8);
+  backdrop-filter: blur(12px) saturate(1.15);
+  /* Lighter: the art behind it animates */
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), 0 30px 60px -30px rgba(0, 0, 0, .85);
+  pointer-events: none;
+}
+
+.se-hs-tray[hidden] {
+  display: none;
+}
+
+[data-se-hs-col]:not(#se-none) {
+  align-self: stretch;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 0 22px !important;
+  padding: 16px 18px 14px !important;
+  box-sizing: border-box;
+  /* Each row stays in its own column (room is left above and below for hover lifts) */
+  clip-path: inset(-16px 0 -16px 0);
+}
+
+[data-se-hs-col="1"]:not(#se-none) {
+  margin-inline-start: 24px !important;
+}
+
+[data-se-hs-last]:not(#se-none) {
+  margin-inline-end: 24px !important;
+}
+
+[data-se-hs-col]:not([data-se-hs-col="1"]):not(#se-none) {
+  border-inline-start: 1px solid rgba(255, 255, 255, .08) !important;
+}
+
+/* What's New in the tray: no ground of its own, and clipped to its column */
+[data-se-hs-sec="news"]:not(#se-none),
+[data-se-hs-sec="news"] ._17uEBe5Ri8TMsnfELvs8-N:not(#se-none) {
+  /* UpdatesContainer */
+  background: transparent !important;
+}
+
+[data-se-hs-sec="news"] ._17uEBe5Ri8TMsnfELvs8-N:not(#se-none) {
+  padding-inline: 0 !important;
+}
+
+._17uEBe5Ri8TMsnfELvs8-N[data-se-hs-sec="news"]:not(#se-none),
+[data-se-hs-sec="news"] ._17uEBe5Ri8TMsnfELvs8-N:not(#se-none) {
+  clip-path: inset(-12px 0 -12px 0) !important;
+}
+
+._17uEBe5Ri8TMsnfELvs8-N[data-se-hs-sec="news"]:not(#se-none) {
+  padding: 16px 18px 14px !important;
+}
+
+/* Headings in the tray: a size down from the page's, so three fit side by side */
+[data-se-hs-col] :is(.fyxt0H7Cwfirf9908slPp, ._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv-, ._23SnllqT_AqZ1C_QHcNQ4Z .tfg3_RdonFKIGYRd12bKl):not(#se-none) {
+  /* WhatsNewHeaderText, shelf name */
+  font-size: 17px !important;
+}
+
+/* What's New as a list */
+[data-se-hs-sec="news"]:not(#se-none) {
+  display: flex !important;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Steam's cards stay laid out (so their images load) but out of sight, under the list */
+[data-se-hs-carousel]:not(#se-none) {
+  position: absolute !important;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 100% !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -1;
+  overflow: hidden !important;
+}
+
+/* Paging arrows have nothing to page through: the list scrolls */
+[data-se-hs-sec="news"] .bsNegRKT1Hbv4tqHrOk9-:not(#se-none) {
+  display: none !important;
+}
+
+/* PageClickContainer */
+.se-hs-nhead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 32px;
+  margin-bottom: 8px;
+}
+
+.se-hs-nh {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--se-text, #e6e8eb);
+}
+
+.se-hs-ncount {
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--se-text-muted, #98a2ad);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* A narrow column lets the filter drop under the heading */
+.se-hs-nhead {
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 6px;
+  font-family: var(--se-font);
+}
+
+.se-hs-nhead .se-hs-hall {
+  margin: 0 0 0 auto;
+}
+
+.se-hs-news {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 150px;
+  container-type: inline-size;
+}
+
+/* The card and the headlines share the column; both fill its height */
+.se-hs-news > .se-hs-feat,
+.se-hs-news > .se-hs-heads {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.se-hs-feat {
+  left: 0;
+  width: calc(51% - 8px);
+}
+
+.se-hs-heads {
+  right: 0;
+  width: calc(49% - 8px);
+}
+
+/* The artwork and caption share a frame without overlapping. */
+.se-hs-feat {
+  display: block;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid var(--se-hairline, rgba(255, 255, 255, .08));
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-surface, #1f242b);
+  box-shadow: var(--se-shadow-card);
+  color: var(--se-text-strong, #fff);
+  font-family: var(--se-font);
+  text-align: start;
+  cursor: pointer;
+}
+
+.se-hs-feat:focus-visible {
+  outline: 2px solid var(--se-accent, #7cc4ff);
+  outline-offset: 2px;
+}
+
+/* Use the extra space around the full image for the badge and excerpt. */
+.se-hs-fpreview {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.se-hs-fheader,
+.se-hs-fcaption {
+  flex: 1 0 auto;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 8px 12px;
+}
+
+.se-hs-fimg {
+  display: block;
+  flex: 0 1 auto;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  object-fit: contain;
+}
+
+/* Official posts without artwork get a Steam wordmark panel. */
+.se-hs-fsteam:not([hidden]) {
+  flex: 2 1 72px;
+  display: grid;
+  place-items: center;
+  min-height: 30px;
+  background: radial-gradient(ellipse at 65% 85%, #24517c, #142337 65%, #111822);
+  color: #e5f4ff;
+  font: 800 clamp(19px, 6cqw, 42px)/1 var(--se-font);
+  letter-spacing: .18em;
+}
+
+.se-hs-feat:hover .se-hs-fpreview {
+  background-color: var(--se-hover, #2c3440);
+}
+
+.se-hs-feat[hidden] {
+  display: none;
+}
+
+.se-hs-fkind {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--se-chip, rgba(12, 14, 18, .6));
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.se-hs-feat[hidden] + .se-hs-heads {
+  width: 100%;
+}
+
+.se-hs-fexcerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  color: var(--se-text-dim, #b8c0c8);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* The headlines: date · game over a one-line title; the one in the card is lit */
+.se-hs-heads {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: auto;
+  scrollbar-color: auto;
+}
+
+.se-hs-heads > * {
+  flex: 0 0 auto;
+}
+
+/* A day's headlines under one divider, which stays at the top while they scroll by */
+.se-hs-hday {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 6px 10px 4px;
+  background: linear-gradient(180deg, rgba(18, 20, 25, .96) 70%, rgba(18, 20, 25, 0));
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  letter-spacing: var(--se-label-spacing, .1em);
+  text-transform: uppercase;
+  color: var(--se-text-faint, #6f7984);
+}
+
+.se-hs-hday:not(:first-child) {
+  margin-top: 6px;
+}
+
+/* More below: the last line fades out until the list reaches its end */
+.se-hs-heads[data-more="yes"]:not([data-end="yes"]) {
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 36px), transparent);
+  mask-image: linear-gradient(180deg, #000 calc(100% - 36px), transparent);
+}
+
+.se-hs-hline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--se-radius-sm, 8px);
+  background: transparent;
+  color: var(--se-text, #e6e8eb);
+  font-family: var(--se-font);
+  text-align: start;
+  cursor: pointer;
+}
+
+.se-hs-hline[hidden],
+.se-hs-hall[hidden] {
+  display: none;
+}
+
+.se-hs-hline[data-on] {
+  background: rgba(255, 255, 255, .07);
+}
+
+.se-hs-hline:focus-visible,
+.se-hs-hall:focus-visible {
+  outline: 2px solid var(--se-accent, #7cc4ff);
+  outline-offset: -2px;
+}
+
+.se-hs-hmeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font: 600 12px/16px var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.se-hs-hmeta img {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  border-radius: 4px;
+}
+
+.se-hs-hmeta span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-hs-htitle {
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-hs-hall {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--se-radius-sm, 8px);
+  background: transparent;
+  color: var(--se-accent, #7cc4ff);
+  font: 600 12.5px var(--se-font);
+  cursor: pointer;
+}
+
+.se-hs-hall:hover {
+  color: var(--se-text-strong, #fff);
+}
+
+/* Match the Game Page links on hover and keyboard focus. */
+.se-hs-nhead .se-hs-hall:is(:hover, :focus-visible),
+.se-hs-hall:is([data-all], [data-foot]):is(:hover, :focus-visible) {
+  color: var(--se-text-strong, #fff);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* A narrow column keeps the card alone */
+@container (max-width: 400px) {
+  .se-hs-news > .se-hs-feat {
+    width: 100%;
+  }
+  .se-hs-news > .se-hs-heads {
+    display: none;
+  }
+}
+
+/* Favorites and Collections View, drawn by the theme */
+/* Steam's shelf stays mounted but out of sight; the theme's panel takes its place */
+[data-se-hs-own] > :not(.se-hs-own):not(#se-none) {
+  display: none !important;
+}
+
+[data-se-hs-own]:not(#se-none) {
+  display: flex !important;
+  flex-direction: column;
+}
+
+.se-hs-own {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  color: var(--se-text, #e6e8eb);
+  font-family: var(--se-font);
+}
+
+.se-hs-ohead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  margin-bottom: 8px;
+}
+
+.se-hs-empty {
+  padding: 10px 2px;
+  font-size: 13px;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+/*
+ * What's New's filter: the funnel and the types chosen, in its heading (or on its own line when
+ * Steam's heading shows); lit while some types are left out
+ */
+.se-hs-pickbtn.se-hs-nfilter {
+  width: auto;
+  gap: 6px;
+  padding: 0 10px;
+  font: 600 12px var(--se-font);
+}
+
+.se-hs-pickbtn.se-hs-nfilter svg {
+  width: 13px;
+  height: 13px;
+}
+
+.se-hs-pickbtn.se-hs-nfilter[data-on] {
+  color: var(--se-accent, #7cc4ff);
+  background: var(--se-accent-surface, #24384b);
+}
+
+.se-hs-nhead .se-hs-nfilter {
+  margin-left: auto;
+}
+
+.se-hs-nhead .se-hs-nfilter + .se-hs-hall {
+  margin-left: 4px;
+}
+
+.se-hs-nfilter[data-bar] {
+  align-self: flex-start;
+  margin: 0 0 10px;
+}
+
+/* The sliders button: choose what Favorites and Collections show */
+.se-hs-pickbtn {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-surface-2, #262c35);
+  color: var(--se-text-muted, #98a2ad);
+  cursor: pointer;
+}
+
+.se-hs-pickbtn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.se-hs-pickbtn:hover,
+.se-hs-pickbtn[aria-expanded="true"] {
+  color: var(--se-text-strong, #fff);
+  background: var(--se-selected, #33404f);
+}
+
+.se-hs-pickbtn:focus-visible {
+  outline: 2px solid var(--se-accent, #7cc4ff);
+  outline-offset: 2px;
+}
+
+.se-hs-own .se-hs-pickbtn {
+  margin-left: auto;
+}
+
+/* The list to tick, over the page by its button */
+.se-hs-pick {
+  position: fixed;
+  z-index: 10000;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-lg, 14px);
+  background: rgba(22, 25, 31, .97);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1), 0 24px 60px -12px rgba(0, 0, 0, .9);
+  color: var(--se-text, #e6e8eb);
+  font-family: var(--se-font);
+}
+
+.se-hs-pk-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.se-hs-pk-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.se-hs-pk-x {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--se-text-muted, #98a2ad);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.se-hs-pk-x:hover {
+  background: rgba(255, 255, 255, .08);
+  color: var(--se-text-strong, #fff);
+}
+
+.se-hs-pk-search {
+  height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-surface-2, #262c35);
+  color: var(--se-text, #e6e8eb);
+  font: 500 13px var(--se-font);
+  outline: none;
+}
+
+.se-hs-pk-search:focus {
+  box-shadow: 0 0 0 2px var(--se-accent-strong, rgba(124, 196, 255, .55));
+}
+
+.se-hs-pk-list {
+  max-height: min(360px, 52vh);
+  margin: 8px -4px 0;
+  padding: 0 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, .18) transparent;
+}
+
+.se-hs-pk-group {
+  padding: 10px 6px 4px;
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  letter-spacing: var(--se-label-spacing, .1em);
+  text-transform: uppercase;
+  color: var(--se-text-faint, #6f7984);
+}
+
+.se-hs-pk-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 4px 6px;
+  border-radius: var(--se-radius-sm, 8px);
+  cursor: pointer;
+}
+
+.se-hs-pk-row:hover {
+  background: rgba(255, 255, 255, .06);
+}
+
+.se-hs-pk-row input {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--se-accent, #7cc4ff);
+  cursor: pointer;
+}
+
+.se-hs-pk-pic {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 33px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--se-surface-2, #262c35);
+}
+
+.se-hs-pk-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.se-hs-pk-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.se-hs-pk-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-hs-pk-sub {
+  font-size: 11.5px;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.se-hs-pk-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.se-hs-pk-count {
+  flex: 1;
+  font-size: 12px;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.se-hs-pk-foot .se-hs-hall {
+  margin: 0;
+  padding-inline: 8px;
+}
+
+.se-hs-pk-foot .se-hs-hall:disabled {
+  color: var(--se-text-faint, #6f7984);
+  cursor: default;
+}
+
+.se-hs-pk-done {
+  height: 30px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-accent, #7cc4ff);
+  color: var(--se-bg-ink, #0f1115);
+  font: 700 12.5px var(--se-font);
+  cursor: pointer;
+}
+
+.se-hs-pk-done:hover {
+  filter: brightness(1.08);
+}
+
+/* Favorites: wide capsules, 3 × 2 */
+.se-hs-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /*
+   * Rows set by home-stage.js: as many as the games need and the tray holds, each up to a
+   * little taller than a capsule
+   */
+  grid-template-rows: repeat(var(--se-hs-frows, 2), minmax(0, var(--se-hs-frowh, 1fr)));
+  align-content: start;
+  gap: 10px;
+}
+
+.se-hs-tile {
+  position: relative;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-md, 10px);
+  overflow: hidden;
+  background: var(--se-surface, #1f242b);
+  box-shadow: 0 10px 22px -12px rgba(0, 0, 0, .9), inset 0 0 0 1px rgba(255, 255, 255, .08);
+  color: var(--se-text-strong, #fff);
+  font-family: var(--se-font);
+  text-align: start;
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s;
+}
+
+.se-hs-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px -12px rgba(0, 0, 0, .9);
+}
+
+/* The ring inside the tile, so the column's edge never cuts it */
+.se-hs-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px var(--se-accent, #7cc4ff);
+  opacity: 0;
+  transition: opacity .15s;
+  pointer-events: none;
+}
+
+.se-hs-tile:hover::after {
+  opacity: 1;
+}
+
+.se-hs-tile:focus-visible {
+  outline: 2px solid var(--se-accent, #7cc4ff);
+  outline-offset: 2px;
+}
+
+.se-hs-timg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.se-hs-tshade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 42%, rgba(0, 0, 0, .82) 100%);
+}
+
+.se-hs-tfoot {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 8px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.se-hs-tname {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .7);
+}
+
+.se-hs-thrs {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #c9d0d7;
+}
+
+.se-hs-tplay {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-play, #3a8a22);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 14px -6px rgba(80, 180, 50, .7);
+  opacity: 0;
+  transform: scale(.9);
+  transition: opacity .15s, transform .15s;
+}
+
+.se-hs-tplay svg {
+  width: 12px;
+  height: 12px;
+}
+
+.se-hs-tile:hover .se-hs-tplay,
+.se-hs-tile:focus-visible .se-hs-tplay {
+  opacity: 1;
+  transform: none;
+}
+
+.se-hs-tplay:hover {
+  filter: brightness(1.12);
+}
+
+.se-hs-tmore {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12, 14, 18, .74);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.se-hs-tile[hidden] {
+  display: none;
+}
+
+.se-hs-tile[data-more] .se-hs-tfoot,
+.se-hs-tile[data-more] .se-hs-tplay,
+.se-hs-tile:not([data-more]) .se-hs-tmore {
+  display: none;
+}
+
+/*
+ * Collections: name and count on the left, three
+ * whole covers fanned on the right. --se-hs-ch (a card's height) is set by home-stage.js.
+ */
+.se-hs-coll .se-hs-hall {
+  margin: 0;
+}
+
+.se-hs-clist-box {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 120px;
+}
+
+.se-hs-cgrid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--se-hs-ccols, 2), minmax(0, 1fr));
+  grid-auto-rows: var(--se-hs-ch, 104px);
+  align-content: start;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.se-hs-ccard {
+  container-type: inline-size;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0 0 0 14px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #1f242b, #191d23);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07);
+  color: var(--se-text, #e6e8eb);
+  font-family: var(--se-font);
+  text-align: start;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.se-hs-ccard[hidden] {
+  display: none;
+}
+
+.se-hs-ccard:hover {
+  background: linear-gradient(135deg, #252b33, #1e232a);
+}
+
+.se-hs-ccard:focus-visible {
+  outline: 2px solid var(--se-accent, #7cc4ff);
+  outline-offset: -2px;
+}
+
+/* The hover ring, inside the card so the column's edge never cuts it */
+.se-hs-ccard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px var(--se-accent, #7cc4ff);
+  opacity: 0;
+  transition: opacity .15s;
+  pointer-events: none;
+}
+
+.se-hs-ccard:hover::after {
+  opacity: 1;
+}
+
+.se-hs-ctext {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.se-hs-cname {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-hs-csub {
+  font-size: 11.5px;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+/* The fan: the most recent cover in front, the next two tilted behind it */
+.se-hs-ctext,
+.se-hs-cfan {
+  /* Covers: two thirds of the card's height, but in a narrow card no wider than its fan's share */
+  --cov-h: min(calc(var(--se-hs-ch, 104px) * .68), 30cqw);
+  --cov-w: calc(var(--cov-h) * 2 / 3);
+}
+
+.se-hs-cfan {
+  position: relative;
+  flex: 0 0 auto;
+  width: calc(var(--cov-w) * 2 + 4px);
+  height: 100%;
+  margin-right: 8px;
+}
+
+.se-hs-fcov {
+  position: absolute;
+  top: calc((var(--se-hs-ch, 104px) - var(--cov-h)) / 2 + 4px);
+  width: var(--cov-w);
+  height: var(--cov-h);
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--se-surface-2, #262c35);
+  box-shadow: 0 8px 16px -6px rgba(0, 0, 0, .9), inset 0 0 0 1px rgba(255, 255, 255, .12);
+  transition: transform .25s cubic-bezier(.2, .8, .2, 1);
+}
+
+.se-hs-fcov.m {
+  left: calc(var(--cov-w) / 2);
+  top: calc((var(--se-hs-ch, 104px) - var(--cov-h)) / 2 - 2px);
+  z-index: 3;
+}
+
+.se-hs-fcov.l {
+  left: calc(var(--cov-w) * .08);
+  z-index: 1;
+  transform: rotate(-12deg);
+}
+
+.se-hs-fcov.r {
+  left: calc(var(--cov-w) * .9);
+  z-index: 2;
+  transform: rotate(12deg);
+}
+
+.se-hs-ccard:hover .se-hs-fcov.m {
+  transform: translateY(-3px);
+}
+
+.se-hs-ccard:hover .se-hs-fcov.l {
+  transform: rotate(-17deg) translateX(-3px);
+}
+
+.se-hs-ccard:hover .se-hs-fcov.r {
+  transform: rotate(17deg) translateX(3px);
+}
+
+.se-hs-fimg2 {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* "+N": the rest, on a plain card */
+.se-hs-ccard[data-cmore] {
+  justify-content: center;
+  padding: 0;
+}
+
+.se-hs-cmore {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--se-text-strong, #fff);
+}
+
+/*
+ * Favorites and Collections View: covers from the left, evenly spaced
+ * Steam spreads a shelf's covers across its width; in the tray's narrower columns that left
+ * wide gaps. The covers now start at the left edge with the theme's 16 px between them.
+ */
+[data-se-hs-col] ._1VMQWnw-9FBp-MVXUbWfS_:not(#se-none) {
+  /* ChildrenContainer */
+  justify-content: flex-start !important;
+  justify-items: start !important;
+  gap: 16px !important;
+}
+
+[data-se-hs-col] ._1VMQWnw-9FBp-MVXUbWfS_ > *:not(#se-none) {
+  margin-inline: 0 !important;
+}
+
+/*
+ * Collections View: each tile sits in a slot wider than itself, which left the gaps; the
+ * slots now fit their tile
+ */
+[data-se-hs-sec="coll"] ._1VMQWnw-9FBp-MVXUbWfS_ > *:not(#se-none),
+[data-se-hs-sec="coll"] ._1VMQWnw-9FBp-MVXUbWfS_ *:has(> ._3IWn-2rn7x98o5fDd0rAxb):not(#se-none) {
+  /* Slots holding a Collection tile */
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+}
+
+/* Narrow windows (under 1100 px): the tray's rows stack, each on its own glass */
+/*
+ * Set by features/home/home-stage.js from the window's width (not a media query, so the
+ * tiny size a minimized window reports never flips the layout)
+ */
+[data-se-hs][data-se-hs-narrow][data-se-hs-n]:not(#se-none) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+[data-se-hs][data-se-hs-narrow] > .se-hs-tray {
+  display: none;
+}
+
+[data-se-hs][data-se-hs-narrow] [data-se-hs-col]:not(#se-none) {
+  grid-row: auto;
+  grid-column: 1 / -1 !important;
+  margin: 0 20px 14px !important;
+  border-inline-start: 0 !important;
+  border-radius: var(--se-radius-lg, 14px);
+  background: rgba(8, 10, 14, .52) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1);
+}
+
+[data-se-hs][data-se-hs-narrow] .se-hs-stage {
+  padding: 20px 20px 22px;
+}
+
+[data-se-hs][data-se-hs-narrow] .se-hs-body {
+  padding-inline: 2px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+[data-se-hs][data-se-hs-narrow] .se-hs-side {
+  flex-basis: auto;
+  max-width: 620px;
+}
+
+[data-se-hs][data-se-hs-narrow] .se-hs-name {
+  font-size: 46px;
+}
+
+[data-se-hs][data-se-hs-narrow] .se-hs-logo {
+  min-height: 80px;
+  max-height: 130px;
+  max-width: 70vw;
+}
+
+[data-se-hs][data-se-hs-narrow] .se-hs-pic {
+  height: 72px;
+}
+
+[data-se-hs][data-se-hs-narrow] .se-hs-thumbdate {
+  display: none;
+}
+
+/* Reduced motion: the stage holds still */
+@media (prefers-reduced-motion: reduce) {
+  .se-hs-layer,
+  .se-hs-pic {
+    transition: none;
+  }
+  .se-hs-layer[data-on] .se-hs-hero {
+    animation: none;
+  }
+  .se-hs-prog {
+    display: none;
+  }
+}

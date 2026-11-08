@@ -1,0 +1,516 @@
+/*
+ * Left sidebar virtualized game list rows and collection group headers.
+ *
+ * Preserves Steam's fixed 26px virtualized row height while restyling status
+ * indicators, active selection bars, collapsible collection headers, and inline
+ * download progress bars (`--se-dl-pct`). Paired with
+ * `features/library/game-list.js`.
+ */
+/* Rows */
+._2-O4ZG0KrnSrzISHBKctFQ {
+  position: relative;
+  margin: 0 8px;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
+  box-shadow: none !important;
+  color: var(--se-text, #e6e8eb);
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ:is(:hover, ._3cMVyOc-9F9Jvp3uKF7_xj):not(#se-none) {
+  background: var(--se-hover, #2c3440);
+  color: var(--se-text-strong, #fff);
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ ._1vO6BoiVslZgs1kqDGdUs8:not(#se-none) {
+  position: relative;
+  gap: 10px;
+  min-height: 26px;
+  padding: 0 10px;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ .ga1hyw11cdBVodrCAidPF:not(#se-none) {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+/* Names: installed games bright, the rest quiet */
+._2-O4ZG0KrnSrzISHBKctFQ._2ws8DONH9fxQjPXEmRpujE:not(#se-none),
+._2-O4ZG0KrnSrzISHBKctFQ._2ws8DONH9fxQjPXEmRpujE:not(#se-none) span {
+  color: var(--se-text, #e6e8eb);
+  font-weight: 600;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ._5YTBr7WwIfzVU_3nUtAph:not(#se-none) {
+  color: var(--se-text-faint, #6f7984);
+  font-weight: 500;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ._5YTBr7WwIfzVU_3nUtAph:is(:hover, ._3cMVyOc-9F9Jvp3uKF7_xj):not(#se-none) {
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ._5YTBr7WwIfzVU_3nUtAph .ga1hyw11cdBVodrCAidPF {
+  opacity: .45;
+  filter: saturate(.4);
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ._5YTBr7WwIfzVU_3nUtAph:is(:hover, ._3cMVyOc-9F9Jvp3uKF7_xj) .ga1hyw11cdBVodrCAidPF {
+  opacity: .75;
+}
+
+/*
+ * Status icons (tools, wrong OS, cloud error, friends playing) sit at the row's end, after
+ * the name, so the game's icon stays clean.
+ * StatusIcon _2-J2nMJ1zmDok8-jqXlf1e, FriendIsPlaying cNZ3wORgnf1KSNhI2eE2M.
+ */
+._2-O4ZG0KrnSrzISHBKctFQ ._1vO6BoiVslZgs1kqDGdUs8 ._2-J2nMJ1zmDok8-jqXlf1e:not(#se-none) {
+  order: 3;
+  width: auto;
+  height: auto;
+  margin: 0 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ ._1vO6BoiVslZgs1kqDGdUs8 ._2-J2nMJ1zmDok8-jqXlf1e:empty {
+  margin-inline-start: -10px;
+  /* No gap kept for an empty column */
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ ._2-J2nMJ1zmDok8-jqXlf1e svg {
+  width: 14px;
+  height: 14px;
+  opacity: .7;
+}
+
+/*
+ * Friends playing: a small two-person glyph in the running green at the row's end. The box
+ * stays 18 px so Steam's hover (who is playing) is easy to reach.
+ */
+._2-O4ZG0KrnSrzISHBKctFQ .cNZ3wORgnf1KSNhI2eE2M:not(#se-none) {
+  position: static;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--se-radius-xs, 4px);
+  background: none;
+  box-shadow: none;
+  color: var(--se-running, #6cc24a);
+  opacity: .85;
+  transition: opacity .15s ease, background-color .15s ease;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ .cNZ3wORgnf1KSNhI2eE2M::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-friends) center / contain no-repeat;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ .cNZ3wORgnf1KSNhI2eE2M:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--se-running, #6cc24a) 16%, transparent);
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ .cNZ3wORgnf1KSNhI2eE2M > * {
+  display: none;
+}
+
+/*
+ * Row status (.se-gl-status, features/library/game-list.js): icon only, in the same 18 px slot
+ * as the friends glyph and after it; hovering shows Steam's words as a tooltip.
+ *   downloading: a progress ring (--se-dl-pct) around a down arrow, in the accent
+ *   queued:      a clock, in the accent, quieter
+ *   running:     a play triangle on a soft green tile that breathes
+ */
+._2-O4ZG0KrnSrzISHBKctFQ .se-gl-status[data-se-state]:not(#se-none) {
+  /* Above the selected row's white text color on its spans */
+  position: relative;
+  flex: none;
+  order: 2;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--se-radius-xs, 4px);
+  color: var(--se-accent, #7cc4ff);
+}
+
+/* On a row without Steam's status column, the icon still keeps to the row's end */
+._2-O4ZG0KrnSrzISHBKctFQ ._1vO6BoiVslZgs1kqDGdUs8 > .se-gl-status[data-se-state]:not(#se-none) {
+  order: 3;
+  margin-inline-start: auto;
+}
+
+.se-gl-status::before,
+.se-gl-status::after {
+  content: '';
+  grid-area: 1 / 1;
+  pointer-events: none;
+}
+
+.se-gl-status[data-se-state="downloading"]::before {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: conic-gradient(currentColor var(--se-dl-pct, 0%), rgba(255, 255, 255, .14) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+}
+
+.se-gl-status[data-se-state="downloading"]::after {
+  width: 10px;
+  height: 10px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5v13M6.5 12.5 12 18l5.5-5.5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.se-gl-status[data-se-state="queued"] {
+  opacity: .75;
+}
+
+.se-gl-status[data-se-state="queued"]::before {
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ .se-gl-status[data-se-state="running"]:not(#se-none) {
+  color: var(--se-running, #6cc24a);
+  background: color-mix(in srgb, var(--se-running, #6cc24a) 18%, transparent);
+  animation: se-running-breathe 2.4s ease-in-out infinite;
+}
+
+.se-gl-status[data-se-state="running"]::before {
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 7.2v9.6a.8.8 0 0 0 1.22.68l7.6-4.8a.8.8 0 0 0 0-1.36l-7.6-4.8A.8.8 0 0 0 9 7.2z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.se-gl-status:hover {
+  opacity: 1;
+}
+
+.se-gl-status:not([data-se-state="running"]):hover {
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+@keyframes se-running-breathe {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--se-running, #6cc24a) 35%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--se-running, #6cc24a) 0%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-gl-status[data-se-state="running"] {
+    animation: none;
+  }
+}
+
+/* Selected game: the accent tint and a bar on the list's edge */
+._1UBpAXP408Ez_L_mXhW5Q9._2-O4ZG0KrnSrzISHBKctFQ:not(#se-none),
+._1UBpAXP408Ez_L_mXhW5Q9 ._2-O4ZG0KrnSrzISHBKctFQ:not(#se-none) {
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+  box-shadow: none !important;
+  color: var(--se-text-strong, #fff);
+}
+
+._1UBpAXP408Ez_L_mXhW5Q9._2-O4ZG0KrnSrzISHBKctFQ:not(#se-none) span,
+._1UBpAXP408Ez_L_mXhW5Q9 ._2-O4ZG0KrnSrzISHBKctFQ:not(#se-none) span {
+  color: var(--se-text-strong, #fff);
+}
+
+._1UBpAXP408Ez_L_mXhW5Q9._2-O4ZG0KrnSrzISHBKctFQ::before,
+._1UBpAXP408Ez_L_mXhW5Q9 ._2-O4ZG0KrnSrzISHBKctFQ::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: -8px;
+  top: 5px;
+  bottom: 5px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--se-accent, #7cc4ff);
+  pointer-events: none;
+}
+
+/* Right-click menu open on a row */
+._3km84Vscc0uS91f0RN_30C._2-O4ZG0KrnSrzISHBKctFQ:not(#se-none) {
+  background: var(--se-selected, #33404f);
+}
+
+._3km84Vscc0uS91f0RN_30C ._1vO6BoiVslZgs1kqDGdUs8:not(#se-none) {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Collection headers */
+._2sYIghGVXJr6tsQVvcryy8:not(#se-none) {
+  align-items: center;
+  gap: 8px;
+  margin: 0 8px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--se-radius-sm, 8px);
+  background: none;
+  box-shadow: none;
+  color: var(--se-label-color, #6f7984);
+}
+
+._2sYIghGVXJr6tsQVvcryy8:not(#se-none):hover {
+  background: var(--se-hover, #2c3440);
+}
+
+._2sYIghGVXJr6tsQVvcryy8:is(.sXMOsx8OIRalBMxO9yFY5, ._1dcGFHhye9BeEOg7CkFNQG):not(#se-none) {
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+}
+
+/* The collapse toggle: a chevron that turns when the group is closed */
+._2sYIghGVXJr6tsQVvcryy8 ._3SFRZYIb9Y2q7YsVtB3YKb:not(#se-none) {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  display: flex;
+}
+
+._2sYIghGVXJr6tsQVvcryy8 ._3SFRZYIb9Y2q7YsVtB3YKb > svg {
+  display: none;
+}
+
+._2sYIghGVXJr6tsQVvcryy8 ._3SFRZYIb9Y2q7YsVtB3YKb::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  transition: transform .15s ease;
+}
+
+._2sYIghGVXJr6tsQVvcryy8 ._3SFRZYIb9Y2q7YsVtB3YKb._2hFLgYbxE-5r06ns3QN334::before {
+  transform: rotate(-90deg);
+}
+
+._2sYIghGVXJr6tsQVvcryy8 ._3SFRZYIb9Y2q7YsVtB3YKb:hover {
+  color: var(--se-text, #e6e8eb);
+}
+
+._2sYIghGVXJr6tsQVvcryy8 ._3cV3O8FnPQqpJO5kIMUlLX:not(#se-none) {
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  color: inherit;
+}
+
+._2sYIghGVXJr6tsQVvcryy8 ._2mZ8LlvoUiyeEUtIWuTri:not(#se-none) {
+  height: auto;
+  font: var(--se-label-font, 700 11px/14px "Motiva Sans", Arial, sans-serif);
+  letter-spacing: var(--se-label-spacing, .1em);
+  text-transform: uppercase;
+  color: var(--se-label-color, #6f7984);
+}
+
+._2sYIghGVXJr6tsQVvcryy8 ._3cV3O8FnPQqpJO5kIMUlLX:hover ._2mZ8LlvoUiyeEUtIWuTri:not(#se-none),
+._2sYIghGVXJr6tsQVvcryy8:is(.sXMOsx8OIRalBMxO9yFY5, ._1dcGFHhye9BeEOg7CkFNQG) ._2mZ8LlvoUiyeEUtIWuTri:not(#se-none) {
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+/*
+ * The count at the header's end, without Steam's brackets (data-se-count, set by
+ * features/library/game-list.js): the same quiet number as the Friends list's section headers
+ * (features/friends/friends.css).
+ */
+._2sYIghGVXJr6tsQVvcryy8 ._29uten9Yy8q-n7woDEOXVF:not(#se-none) {
+  order: 2;
+  flex: none;
+  height: auto;
+  margin: 0 0 0 auto;
+  opacity: 1;
+  font: 700 11px/14px var(--se-font, "Motiva Sans", Arial, sans-serif);
+  letter-spacing: 0;
+  color: var(--se-text-faint, #6f7984);
+}
+
+._2sYIghGVXJr6tsQVvcryy8 ._29uten9Yy8q-n7woDEOXVF[data-se-count]:not(#se-none) {
+  font-size: 0;
+}
+
+._2sYIghGVXJr6tsQVvcryy8 ._29uten9Yy8q-n7woDEOXVF[data-se-count]::after {
+  content: attr(data-se-count);
+  margin: 0;
+  padding: 0;
+  background: none;
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-faint, #6f7984);
+}
+
+._2sYIghGVXJr6tsQVvcryy8 ._1PxXcZNpN0cCxbnjEoTdYT {
+  display: none;
+}
+
+/*
+ * A game downloading
+ * Steam writes "Name - 1% (310.2 Mbps)"; the name keeps the row, Steam's label moves into the
+ * status icon's tooltip, and a thin bar under the row fills to the percentage
+ * (--se-dl-pct, set by features/library/game-list.js). GameListEntryLabels -BsLCHlCHg50lwvxnBWt1,
+ * DownloadDash _2RggXvVkWMDvvxFegjtKso, DownloadProgress _3uk3F1BmAJQR6rl1TPcaif,
+ * AppIconDownloading _2kzMb_F7UTOEdecAFftN-l, DownloadProgressSVG f6-7-5CWFxNqF2BycKWlb.
+ */
+._2-O4ZG0KrnSrzISHBKctFQ .-BsLCHlCHg50lwvxnBWt1 {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ .-BsLCHlCHg50lwvxnBWt1 ._2SXJM0PeFEi3gbC7V3S5pE {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ .-BsLCHlCHg50lwvxnBWt1 ._2RggXvVkWMDvvxFegjtKso {
+  display: none !important;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ .-BsLCHlCHg50lwvxnBWt1 ._3uk3F1BmAJQR6rl1TPcaif:not(#se-none) {
+  display: none !important;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ ._1vO6BoiVslZgs1kqDGdUs8[style*="--se-dl-pct"]::after {
+  content: "";
+  position: absolute;
+  left: 40px;
+  right: 10px;
+  bottom: 2px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--se-accent, #7cc4ff) var(--se-dl-pct, 0%), rgba(255, 255, 255, .08) 0);
+  pointer-events: none;
+}
+
+/*
+ * Steam wraps the icon of a game that downloads or waits in the queue in a round frame with
+ * its own progress ring and a margin; here it stays the same rounded square as every other
+ * icon, in the same place, and the row's bar and text carry the progress
+ */
+._2-O4ZG0KrnSrzISHBKctFQ ._2kzMb_F7UTOEdecAFftN-l:not(#se-none),
+._2-O4ZG0KrnSrzISHBKctFQ ._1vO6BoiVslZgs1kqDGdUs8 > div:not(._2-J2nMJ1zmDok8-jqXlf1e):has(> .ga1hyw11cdBVodrCAidPF):not(#se-none) {
+  position: relative !important;
+  flex: 0 0 20px !important;
+  box-sizing: border-box !important;
+  width: 20px !important;
+  min-width: 0 !important;
+  height: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 5px !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  overflow: hidden !important;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ ._2kzMb_F7UTOEdecAFftN-l svg,
+._2-O4ZG0KrnSrzISHBKctFQ ._1vO6BoiVslZgs1kqDGdUs8 > div:not(._2-J2nMJ1zmDok8-jqXlf1e):has(> .ga1hyw11cdBVodrCAidPF) > svg {
+  display: none !important;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ ._2kzMb_F7UTOEdecAFftN-l .ga1hyw11cdBVodrCAidPF:not(#se-none) {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  border-radius: 5px !important;
+  overflow: hidden;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ ._2kzMb_F7UTOEdecAFftN-l .ga1hyw11cdBVodrCAidPF img:not(#se-none) {
+  position: static !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  /* At the box's top left, where an ordinary row's icon sits */
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+/*
+ * A downloading or queued row takes the inset, fills and icon size of the others from
+ * features/navigation/sidebar-icons.css (it carries Updating where they carry Installed or Uninstalled);
+ * its entry keeps no margin or fill of its own
+ */
+._2-O4ZG0KrnSrzISHBKctFQ ._1vO6BoiVslZgs1kqDGdUs8:has(> ._2kzMb_F7UTOEdecAFftN-l):not(#se-none) {
+  margin-inline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/*
+ * When such a row is selected, Steam also gives its name and status their own lighter
+ * box; the row's tint is enough
+ */
+._2-O4ZG0KrnSrzISHBKctFQ .-BsLCHlCHg50lwvxnBWt1:not(#se-none),
+._2-O4ZG0KrnSrzISHBKctFQ .-BsLCHlCHg50lwvxnBWt1 :is(._2SXJM0PeFEi3gbC7V3S5pE, ._3uk3F1BmAJQR6rl1TPcaif, span):not(#se-none) {
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+/*
+ * Steam paints a downloading or queued row with its own blue fill; the row stays as quiet as
+ * the others, lit only on hover or when selected
+ */
+._2-O4ZG0KrnSrzISHBKctFQ._1LVQp3h_vGOZ8TuDUEge0k:not(:hover):not(._3cMVyOc-9F9Jvp3uKF7_xj):not(._1UBpAXP408Ez_L_mXhW5Q9):not(._3km84Vscc0uS91f0RN_30C):not(._1UBpAXP408Ez_L_mXhW5Q9 *):not(#se-none) {
+  background-color: transparent !important;
+  /* Not the shorthand: it would undo the inset's padding-box clip */
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ._1LVQp3h_vGOZ8TuDUEge0k:is(:hover, ._3cMVyOc-9F9Jvp3uKF7_xj, ._1UBpAXP408Ez_L_mXhW5Q9):not(#se-none) {
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* The queued game name matches its blue status icon. */
+._2-O4ZG0KrnSrzISHBKctFQ._1LVQp3h_vGOZ8TuDUEge0k:not(._1UBpAXP408Ez_L_mXhW5Q9) ._2SXJM0PeFEi3gbC7V3S5pE:not(#se-none) {
+  color: var(--se-accent, #7cc4ff) !important;
+}
+
+/* Running games use the same inset, icon alignment, and row surface as other games. */
+._2-O4ZG0KrnSrzISHBKctFQ._10GdoB3tQXXGFToQ3yY_SK:not(#se-none) {
+  background-image: none !important;
+}
+
+._2-O4ZG0KrnSrzISHBKctFQ._10GdoB3tQXXGFToQ3yY_SK ._1vO6BoiVslZgs1kqDGdUs8:not(#se-none) {
+  margin: 0 !important;
+  padding-inline: 10px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}

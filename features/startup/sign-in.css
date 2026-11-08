@@ -1,0 +1,752 @@
+/*
+ * Startup sign-in form, QR code scanner tab, and account chooser styles.
+ *
+ * Scoped to `html[data-se-login]` and `CachedUsers` account switcher lists.
+ * Styles the tabbed Password / QR Code sign-in card (`[data-se-si]`) and the
+ * circular avatar account selector. Paired with `features/startup/startup.js`.
+ */
+/*
+ * The background
+ * startup.css draws it; the shade moves to where each screen's content sits.
+ */
+html[data-se-login="signin"] .se-startup-bg::after,
+html[data-se-login="other"] .se-startup-bg::after {
+  background: radial-gradient(ellipse 34% 44% at 50% 48%, rgba(23, 26, 32, .8), rgba(23, 26, 32, .2) 90%), linear-gradient(180deg, transparent 55%, rgba(23, 26, 32, .7));
+}
+
+html[data-se-login="chooser"] .se-startup-bg::after {
+  background: radial-gradient(ellipse 40% 40% at 50% 46%, rgba(23, 26, 32, .7), rgba(23, 26, 32, .2) 90%), linear-gradient(180deg, transparent 60%, rgba(23, 26, 32, .75));
+}
+
+/* Sign in */
+/* The column: logo, title, card, links, centered. */
+[data-se-si="column"]:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: auto;
+  box-sizing: border-box;
+  padding: 20px 24px 16px;
+  background: transparent;
+  font-family: var(--se-font);
+}
+
+/* Steam's logo and wordmark become the startup's round tile, with the title beside it. */
+[data-se-si="logo"]:not(#se-none) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+[data-se-si="wordmark"]:not(#se-none) {
+  display: none;
+}
+
+[data-se-si="logo"]::before {
+  content: "";
+  flex: none;
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 3px solid var(--se-accent-line);
+  background: var(--se-steam-logo) center / 16px no-repeat, var(--se-surface);
+  box-shadow: inset 0 0 0 4px var(--se-bg);
+}
+
+[data-se-si="logo"]::after {
+  content: "Sign in to Steam";
+  color: var(--se-text);
+  font: 700 18px/24px var(--se-font);
+  letter-spacing: -.01em;
+}
+
+/* Back to the account chooser: a small button in the window's corner. */
+[data-se-si="back"]:not(#se-none) {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 5;
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-muted);
+  cursor: pointer;
+}
+
+[data-se-si="back"]:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+[data-se-si="back"]:not(#se-none) svg {
+  width: 14px;
+  height: 14px;
+  color: inherit;
+}
+
+/* The card: Steam's row holding the form and the QR code. */
+[data-se-si="card"]:not(#se-none) {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: stretch;
+  width: min(380px, 100%);
+  box-sizing: border-box;
+  margin: 16px 0 0;
+  padding: 4px;
+  border-radius: 16px;
+  background: var(--se-surface);
+  box-shadow: var(--se-shadow-pop);
+}
+
+/* The switch */
+.se-signin-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--se-field);
+}
+
+.se-signin-tab {
+  flex: 1;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: transparent;
+  color: var(--se-text-muted);
+  font: 600 12.5px var(--se-font);
+  cursor: pointer;
+  transition: background-color .15s, color .15s;
+}
+
+.se-signin-tab:hover {
+  color: var(--se-text);
+}
+
+.se-signin-tab[aria-selected="true"] {
+  background: var(--se-accent-surface);
+  color: var(--se-accent);
+}
+
+.se-signin-tab:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--se-accent-strong);
+}
+
+.se-signin-tab svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+/* One side at a time, the same height either way so the card doesn't jump. */
+[data-se-signin-tab="password"] > [data-se-si="qr"],
+[data-se-signin-tab="qr"] > [data-se-si="form"] {
+  display: none !important;
+}
+
+[data-se-signin-tab] > [data-se-si="form"]:not(#se-none),
+[data-se-signin-tab] > [data-se-si="qr"]:not(#se-none) {
+  min-height: 242px;
+  box-sizing: border-box;
+}
+
+/* The password side */
+[data-se-si="form"]:not(#se-none) {
+  display: grid;
+  flex: none;
+  grid-template-columns: 1fr;
+  align-content: start;
+  gap: 10px;
+  padding: 14px 16px 6px;
+}
+
+[data-se-si="field"]:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+[data-se-si="label"]:not(#se-none) {
+  margin: 0;
+  color: var(--se-text-muted) !important;
+  font: 700 10.5px/14px var(--se-font) !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+[data-se-si="input"]:not(#se-none) {
+  width: 100%;
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  outline: none;
+  background: var(--se-field) !important;
+  color: var(--se-text) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+  font: 500 14px var(--se-font);
+  transition: box-shadow .15s;
+}
+
+[data-se-si="input"]:not(#se-none):hover {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14);
+}
+
+[data-se-si="input"]:not(#se-none):focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent), 0 0 0 3px var(--se-accent-tint);
+}
+
+[data-se-si="remember"]:not(#se-none) {
+  display: flex;
+  color: var(--se-text-dim);
+  font: 400 13px var(--se-font);
+}
+
+[data-se-si="remember"] > * {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+}
+
+[data-se-si="remember"] label:not(#se-none) {
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+[data-se-si="check"]:not(#se-none) {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-check);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14);
+  outline: none;
+}
+
+[data-se-si="check"][aria-checked="true"]:not(#se-none) {
+  background: var(--se-accent);
+  box-shadow: none;
+}
+
+[data-se-si="check"]:focus-visible {
+  box-shadow: 0 0 0 3px var(--se-accent-tint);
+}
+
+[data-se-si="check"] > * {
+  display: flex;
+  width: 12px;
+  height: 12px;
+  color: var(--se-bg-ink);
+}
+
+[data-se-si="check"] svg {
+  width: 100%;
+  height: 100%;
+}
+
+[data-se-si="check"] svg * {
+  stroke: var(--se-bg-ink) !important;
+}
+
+[data-se-si="submit"]:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-top: 2px;
+}
+
+[data-se-si="button"]:not(#se-none) {
+  position: relative;
+  width: 100%;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-accent);
+  color: var(--se-bg-ink);
+  font: 700 14px var(--se-font);
+  box-shadow: none;
+  cursor: pointer;
+}
+
+[data-se-si="button"]:not(#se-none):hover:not(:disabled) {
+  background: #9ad2ff;
+}
+
+[data-se-si="button"]:not(#se-none):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--se-accent-strong);
+}
+
+[data-se-si="button"]:not(#se-none):disabled {
+  background: var(--se-accent-tint);
+  color: color-mix(in srgb, var(--se-accent) 45%, transparent);
+  cursor: default;
+}
+
+[data-se-si="error"]:not(#se-none) {
+  color: var(--se-danger-text);
+  font: 500 12px/14px var(--se-font);
+  text-align: center;
+}
+
+/* The QR side: the code on a white tile, a blue line sweeping down it. */
+[data-se-si="qr"]:not(#se-none) {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 12px;
+}
+
+[data-se-si="qr"] > * {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* The switch already says QR code; the label is only needed when the code sits beside the form. */
+[data-se-signin-tab] [data-se-si="qr-label"] {
+  display: none;
+}
+
+[data-se-si="qr-label"]:not(#se-none) {
+  color: var(--se-accent) !important;
+  font: 700 11px/14px var(--se-font) !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+[data-se-si="qr-tile"]:not(#se-none) {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* Steam's code draws its own white frame; a slimmer one, rounded like the tile. */
+[data-se-si="qr-code"]:not(#se-none) {
+  display: block;
+  width: 136px;
+  height: 136px;
+  border-style: solid;
+  border-color: #fff;
+  border-width: 10px;
+  border-radius: 12px;
+}
+
+[data-se-si="qr-tile"]::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--se-accent);
+  box-shadow: 0 0 12px 2px color-mix(in srgb, var(--se-accent) 60%, transparent);
+  pointer-events: none;
+  z-index: 2;
+  animation: se-signin-scan 3.2s ease-in-out infinite;
+}
+
+/* No sweep while Steam shows its own state over the code (loading, scanned, expired). */
+[data-se-si="qr-tile"][data-se-si-busy]::after {
+  display: none;
+}
+
+@keyframes se-signin-scan {
+  0%,
+  100% {
+    top: 14px;
+  }
+  50% {
+    top: calc(100% - 16px);
+  }
+}
+
+[data-se-si="qr-help"]:not(#se-none) {
+  display: block;
+  max-width: 280px;
+  padding: 0;
+  color: var(--se-text-dim);
+  font: 400 12px/16px var(--se-font);
+  text-align: center;
+}
+
+[data-se-si="qr-help"] * {
+  padding: 0 !important;
+}
+
+[data-se-si="qr-help"] a:not(#se-none) {
+  color: var(--se-accent);
+  font: inherit;
+  text-decoration: none;
+}
+
+[data-se-si="qr-help"] a:hover {
+  color: #a8d8ff;
+}
+
+/* The links under the card: help · no account? create one */
+[data-se-si="footer"]:not(#se-none) {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px 18px;
+  margin-top: 14px;
+  padding: 0;
+  color: var(--se-text-muted);
+  font: 600 12px var(--se-font);
+}
+
+[data-se-si="help"]:not(#se-none) {
+  color: var(--se-text-dim);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+[data-se-si="help"]:hover {
+  color: var(--se-text-strong);
+}
+
+[data-se-si="create"]:not(#se-none) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+}
+
+[data-se-si="footer"] > * + [data-se-si="create"]::before {
+  content: "·";
+  margin-right: 13px;
+  color: var(--se-track);
+}
+
+[data-se-si="create-prompt"]:not(#se-none) {
+  color: var(--se-text-muted);
+  font: inherit;
+}
+
+[data-se-si="create-link"]:not(#se-none) {
+  color: var(--se-accent);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+[data-se-si="create-link"]:hover {
+  color: #a8d8ff;
+}
+
+/* Accounts: "Who's playing?" and Change account */
+/*
+ * The startup window's frame around the list. Everything is top-aligned and compact so the
+ * list and the switch at the foot always fit the window.
+ */
+html[data-se-login="chooser"] ._27A5ub1QLLIMmgywKVMg4z:not(#se-none) {
+  gap: 0;
+  padding-inline: 24px;
+  background: none;
+  font-family: var(--se-font);
+}
+
+html[data-se-login="chooser"] ._27A5ub1QLLIMmgywKVMg4z ._29VQq5eE-j95L-SafIOc1T:not(#se-none) {
+  justify-content: flex-start;
+  align-items: center;
+  padding: 28px 0 24px;
+}
+
+/* Steam's wordmark, small and quiet above the title. */
+html[data-se-login="chooser"] ._27A5ub1QLLIMmgywKVMg4z ._2E_ejdBSC79L4iDC4FAMHY:not(#se-none) {
+  flex: none;
+  width: 73px;
+  height: 22px;
+  opacity: .55;
+}
+
+html[data-se-login="chooser"] ._27A5ub1QLLIMmgywKVMg4z ._1Tsmp8q3Beodvix_OSedxk:not(#se-none) {
+  flex: 1 0 auto;
+  align-self: stretch;
+  align-items: center;
+  margin: 0;
+  background: none;
+}
+
+html[data-se-login="chooser"] ._27A5ub1QLLIMmgywKVMg4z ._2OLQBEFErC3eaxHeD7--LU:not(#se-none) {
+  padding: 12px 0 0;
+  color: var(--se-text);
+  font: 800 28px/34px var(--se-font);
+  letter-spacing: -.015em;
+}
+
+html[data-se-login="chooser"] ._1cpxSyGwDz13Qlo95Kbo5H:not(#se-none) {
+  flex: 1 0 auto;
+  align-self: stretch;
+  margin-top: 28px;
+}
+
+html[data-se-login="chooser"] ._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.-M9HbGeKVWXVykt0Zmw4n:not(#se-none) {
+  margin-top: auto;
+}
+
+/* Over the hero art, the title and names get a soft shadow so they read on any picture. */
+html[data-se-startup-bg="hero"][data-se-login="chooser"] ._2OLQBEFErC3eaxHeD7--LU,
+html[data-se-startup-bg="hero"][data-se-login="chooser"] ._3ywfzCGY59FNeDwi9wBXUv,
+html[data-se-startup-bg="hero"][data-se-login="chooser"] ._2E_ejdBSC79L4iDC4FAMHY {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .6);
+}
+
+html[data-se-startup-bg="hero"] ._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.-M9HbGeKVWXVykt0Zmw4n:not(#se-none) {
+  background: rgba(23, 26, 32, .7);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* The list, wherever it appears */
+._1cpxSyGwDz13Qlo95Kbo5H:not(#se-none) {
+  gap: 28px;
+  overflow: visible;
+  font-family: var(--se-font);
+}
+
+._1cpxSyGwDz13Qlo95Kbo5H ._3_UJISaXYkHIzh4veFFlVT .MQo3fYnDGRxXsAJDgXZ_J:not(#se-none) {
+  margin: 0;
+  color: var(--se-text);
+  font: 800 28px/34px var(--se-font);
+  letter-spacing: -.015em;
+  text-align: center;
+}
+
+._1cpxSyGwDz13Qlo95Kbo5H ._3_UJISaXYkHIzh4veFFlVT .B4i0JkS5Gn4YOH_8Qr-H-:not(#se-none) {
+  color: var(--se-text-muted);
+  font: 400 14px/20px var(--se-font);
+  text-align: center;
+}
+
+._1cpxSyGwDz13Qlo95Kbo5H ._1rFuHnL8fa-9b2nm_ZMF4L:not(#se-none) {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px 32px;
+  padding: 0;
+}
+
+/* Each account: a round avatar inside the startup's ring, its name under it. */
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6:not(#se-none) {
+  flex: 0 0 136px;
+  gap: 0;
+  padding: 8px 0 0;
+  border: 0;
+  outline: none;
+  transform: none;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._1q5iGs9FEBhJcXc2mY3HPG:not(#se-none) {
+  position: relative;
+  flex: none;
+  width: 104px;
+  height: 104px;
+  box-sizing: border-box;
+  margin: 0 0 16px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--se-surface);
+  box-shadow: none;
+  transform: none;
+}
+
+/* Clipped a little inside the edge, so square images with a frame (Steam's "?") read round. */
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._1q5iGs9FEBhJcXc2mY3HPG > img:not(#se-none) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  clip-path: circle(46.5%);
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._1q5iGs9FEBhJcXc2mY3HPG::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, .08);
+  pointer-events: none;
+  transition: border-color .2s;
+}
+
+/* Pointing at an account spins the ring; the keyboard's or the menu's choice holds it still. */
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6:is(:hover, :focus-visible, .gpfocus, ._1Bj4ekFS3Y3McdYpme6WhO) ._1q5iGs9FEBhJcXc2mY3HPG::before {
+  border-color: var(--se-accent-line);
+  border-top-color: var(--se-accent);
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6:hover ._1q5iGs9FEBhJcXc2mY3HPG::before {
+  animation: se-signin-ring 1.1s linear infinite;
+}
+
+@keyframes se-signin-ring {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Add account: an empty disc with Steam's plus, drawn at the theme's icon weight. */
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6._1vFy9XM83l2YQ2QjmWl1CK ._1q5iGs9FEBhJcXc2mY3HPG:not(#se-none) {
+  margin-block: 0 16px;
+  background: rgba(31, 36, 43, .8);
+  color: var(--se-text-muted);
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6._1vFy9XM83l2YQ2QjmWl1CK ._1q5iGs9FEBhJcXc2mY3HPG svg:not(#se-none) {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 34%;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6._1vFy9XM83l2YQ2QjmWl1CK:hover ._1q5iGs9FEBhJcXc2mY3HPG {
+  color: var(--se-accent);
+}
+
+/*
+ * The name always shows; the account name under it appears on hover (as in Steam), so a name
+ * that is the same as the account name isn't doubled.
+ */
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._3ywfzCGY59FNeDwi9wBXUv:not(#se-none) {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._3ywfzCGY59FNeDwi9wBXUv._1TlEvP30mzqbqbKluifFEN:not(#se-none) {
+  margin: 0;
+  opacity: 1;
+  color: var(--se-text);
+  font: 700 15px/20px var(--se-font);
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._3ywfzCGY59FNeDwi9wBXUv.cG5NAvF5GI4xApThQ-oON:not(#se-none) {
+  min-height: 16px;
+  margin-top: 2px;
+  color: var(--se-text-muted);
+  font: 400 12px/16px var(--se-font);
+}
+
+/*
+ * The ⋯ menu (Remove account): a small solid button sitting on the ring at the lower right,
+ * shown only while the account is pointed at or the button has the keyboard.
+ */
+._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none) {
+  inset: 79px auto auto 79px;
+  z-index: 1;
+  flex: none !important;
+  box-sizing: border-box !important;
+  width: 26px !important;
+  min-width: 0 !important;
+  max-width: 26px !important;
+  height: 26px !important;
+  min-height: 0 !important;
+  max-height: 26px !important;
+  aspect-ratio: 1;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 0 !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: 0 0 0 3px var(--se-bg), 0 4px 10px -2px rgba(0, 0, 0, .6) !important;
+  color: var(--se-text) !important;
+  opacity: 0 !important;
+  transition: opacity .15s, background-color .15s !important;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV:is(:hover, ._1Bj4ekFS3Y3McdYpme6WhO) ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none),
+._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none):focus-visible {
+  opacity: 1 !important;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none):is(:hover, :focus-visible) {
+  background: var(--se-accent) !important;
+  color: var(--se-bg-ink) !important;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L ._3bvVUTxEPL3cm065bRRLEg ._1ytPahj2hONDeZYLCN7eEu:not(#se-none) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L ._3bvVUTxEPL3cm065bRRLEg ._1ytPahj2hONDeZYLCN7eEu svg:not(#se-none) {
+  width: 14px;
+  height: 14px;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L ._3bvVUTxEPL3cm065bRRLEg ._1ytPahj2hONDeZYLCN7eEu svg * {
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* "Ask which account to use each time": a pill. */
+._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.-M9HbGeKVWXVykt0Zmw4n:not(#se-none) {
+  flex: none;
+  align-self: center;
+  margin-top: 0;
+  padding: 6px 8px 6px 16px;
+  border-radius: 999px;
+  background: rgba(31, 36, 43, .85);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07);
+  color: var(--se-text-dim);
+  font: 400 13px var(--se-font);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  [data-se-si="qr-tile"]::after {
+    animation: none;
+    display: none;
+  }
+  ._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6:hover ._1q5iGs9FEBhJcXc2mY3HPG::before {
+    animation: none;
+  }
+}

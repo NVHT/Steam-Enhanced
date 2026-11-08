@@ -1,0 +1,425 @@
+/*
+ * Segmented sort control and shelf header layout.
+ *
+ * Styles the `A-Z / Recent / Hours / More` segmented sort control injected by
+ * `features/library/sort-segments.js`, formats shelf header title pickers and
+ * item counts, and styles shelf arrangement mode.
+ */
+[data-se-sortseg] {
+  gap: 2px !important;
+  background: var(--se-surface, #1f242b);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  align-items: center !important;
+}
+
+[data-se-sortseg] ._1ljKTq3H58WbDZGNPfM0TY {
+  /* The "SORT BY" label: the buttons say it */
+  display: none !important;
+}
+
+.se-sortseg {
+  display: flex;
+  gap: 2px;
+}
+
+.se-sortseg-btn,
+[data-se-sortseg] .DialogDropDown {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+  font: 600 12.5px/28px var(--se-font, "Motiva Sans"), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+
+.se-sortseg-btn:hover,
+[data-se-sortseg] .DialogDropDown:hover {
+  background: rgba(255, 255, 255, .05) !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.se-sortseg-btn[aria-checked="true"],
+[data-se-sortseg="other"] .DialogDropDown {
+  background: var(--se-selected, #33404f) !important;
+  color: var(--se-text-strong, #fff) !important;
+  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, .5) !important;
+}
+
+.se-sortseg-btn:focus-visible {
+  outline: 2px solid var(--se-accent, #7cc4ff);
+  outline-offset: 1px;
+}
+
+/*
+ * The fourth segment is native dropdown: while A–Z / Recent / Hours is active it
+ * reads "More ⌄"; for any other sort it shows that sort's name, highlighted.
+ */
+[data-se-sortseg="main"] .DialogDropDown_CurrentDisplay {
+  font-size: 0 !important;
+}
+
+[data-se-sortseg="main"] .DialogDropDown_CurrentDisplay::before {
+  content: var(--se-more, "More");
+}
+
+/*
+ * , the control sits at the right end of a shelf header,
+ * after the divider line and before the page arrows (flex order only; Steam's
+ * element order is untouched), and a size up.
+ */
+._23SnllqT_AqZ1C_QHcNQ4Z > ._1PhK8scyztOxjJwWUpkiLJ {
+  order: 1;
+}
+
+/* Rule */
+._23SnllqT_AqZ1C_QHcNQ4Z > [data-se-sortseg] {
+  order: 2;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z > ._29NTOneobxPjUfxHUk9N8Y {
+  order: 3;
+}
+
+/* PageButtons */
+._23SnllqT_AqZ1C_QHcNQ4Z > ._3sz4Ldugm_cV_JaHOErVR8 {
+  order: 4;
+}
+
+/* Collapser */
+._23SnllqT_AqZ1C_QHcNQ4Z > ._1OGfHXv6ksR1Ub-OuLN2NB {
+  order: 5;
+}
+
+/* DragHandle (hidden) */
+[data-se-sortseg] {
+  padding: 2px !important;
+  border-radius: var(--se-radius-md, 10px);
+}
+
+.se-sortseg-btn,
+[data-se-sortseg] .DialogDropDown {
+  height: 30px !important;
+  padding: 0 14px !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
+  font-size: 13px !important;
+  line-height: 30px !important;
+}
+
+[data-se-sortseg] .DialogDropDown_CurrentDisplay {
+  line-height: 30px !important;
+}
+
+[data-se-sortseg="main"] .DialogDropDown_CurrentDisplay::before {
+  font-size: 13.5px;
+}
+
+[data-se-sortseg] .DialogDropDown {
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+[data-se-sortseg] .DialogDropDown_CurrentDisplay {
+  display: flex !important;
+  align-items: center;
+  height: 32px;
+  padding: 0 !important;
+}
+
+/*
+ * Spacing: "More" and its chevron sit together (Steam and the older theme rule
+ * left a wide gap); every segment has the same 14 px sides.
+ */
+[data-se-sortseg] .DialogDropDown {
+  gap: 6px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+[data-se-sortseg] .DialogDropDown_CurrentDisplay {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+
+[data-se-sortseg] .DialogDropDown_Arrow {
+  position: static !important;
+  flex: 0 0 auto;
+  width: 10px !important;
+  height: 10px !important;
+  margin: 1px 0 0 !important;
+  padding: 0 !important;
+}
+
+/*
+ * Shelf header
+ * A bold name that opens the shelf picker, no line at rest, a light toolbar on the right.
+ */
+._23SnllqT_AqZ1C_QHcNQ4Z {
+  gap: 16px !important;
+  min-height: 48px;
+}
+
+/*
+ * Name: 20 px bold, with "· 8" and a small chevron, as one clickable picker. The text
+ * sits in Steam's inner dropdown box, which sets its own thin weight, so every part of
+ * the picker is set here.
+ */
+._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv- {
+  height: 36px;
+  margin-inline-start: -10px !important;
+  padding: 0 10px !important;
+  border-radius: var(--se-radius-md, 10px) !important;
+  align-items: center !important;
+  transition: background .15s;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv-:hover {
+  background: var(--se-surface-2, #262c35) !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv- ._DialogInputContainer,
+._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv- .DialogDropDown_CurrentDisplay,
+._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv- .tfg3_RdonFKIGYRd12bKl,
+._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv- .DialogInputLabelGroup {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font: 700 20px/1 var(--se-font, "Motiva Sans"), sans-serif !important;
+  letter-spacing: -.01em !important;
+  color: var(--se-text, #e6e8eb) !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* The count as quiet text, "· 8", instead of a pill */
+._23SnllqT_AqZ1C_QHcNQ4Z [data-se-count]::after {
+  content: "· " attr(data-se-count) !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  line-height: 20px !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z [data-se-count] {
+  top: 0 !important;
+  margin-inline-start: 0 !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv- .DialogDropDown_Arrow {
+  display: flex !important;
+  align-items: center;
+  width: 14px !important;
+  height: 14px !important;
+  margin-inline-start: 2px !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv- .DialogDropDown_Arrow svg {
+  width: 14px !important;
+  height: 14px !important;
+  fill: var(--se-text-muted, #98a2ad) !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv-:hover .DialogDropDown_Arrow svg {
+  fill: var(--se-text, #e6e8eb) !important;
+}
+
+/*
+ * No line at rest: the gap separates the name from the toolbar. The line appears only
+ * on hover, as the slim drag bar with its grip.
+ */
+._23SnllqT_AqZ1C_QHcNQ4Z:not(:hover) > ._1PhK8scyztOxjJwWUpkiLJ {
+  background: transparent !important;
+}
+
+/* Toolbar: plain tabs, only the active one filled, no box around them */
+._23SnllqT_AqZ1C_QHcNQ4Z > [data-se-sortseg] {
+  margin-inline-start: 0 !important;
+  padding: 0 !important;
+  gap: 2px !important;
+  background: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z .se-sortseg-btn,
+._23SnllqT_AqZ1C_QHcNQ4Z [data-se-sortseg] .DialogDropDown {
+  height: 28px !important;
+  padding: 0 12px !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
+  font-size: 13px !important;
+  line-height: 28px !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z [data-se-sortseg] .DialogDropDown_CurrentDisplay {
+  height: 28px;
+  line-height: 28px !important;
+}
+
+/*
+ * "More" is a small "⋯" button while A–Z / Recent / Hours is active; for any other sort
+ * it shows that sort's name, filled, as before.
+ */
+._23SnllqT_AqZ1C_QHcNQ4Z [data-se-sortseg="main"] .DialogDropDown {
+  width: 28px !important;
+  padding: 0 !important;
+  justify-content: center;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%2398a2ad'%3E%3Ccircle cx='5' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='19' cy='12' r='1.8'/%3E%3C/svg%3E") center / 16px 16px no-repeat !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z [data-se-sortseg="main"] .DialogDropDown:hover {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%23e6e8eb'%3E%3Ccircle cx='5' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='19' cy='12' r='1.8'/%3E%3C/svg%3E") center / 16px 16px no-repeat, rgba(255, 255, 255, .05) !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z [data-se-sortseg="main"] .DialogDropDown > * {
+  display: none !important;
+}
+
+/* A faint divider, then the round page arrows at 28 px */
+._23SnllqT_AqZ1C_QHcNQ4Z > ._29NTOneobxPjUfxHUk9N8Y {
+  /* PageButtons */
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  margin-inline-start: -4px !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z > ._29NTOneobxPjUfxHUk9N8Y::before {
+  content: "";
+  width: 1px;
+  height: 18px;
+  margin-inline-end: 6px;
+  background: rgba(255, 255, 255, .1);
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z ._29NTOneobxPjUfxHUk9N8Y ._3uMa3icVa3JTCGQKPeUikO,
+._23SnllqT_AqZ1C_QHcNQ4Z ._29NTOneobxPjUfxHUk9N8Y ._2kWWyBO7w_F76NB8sBw86c {
+  width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 7px !important;
+}
+
+/* Shelf reordering: keep the rows legible and hide controls that cannot be used here. */
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt {
+  box-sizing: border-box;
+  min-height: 56px !important;
+  gap: 8px !important;
+  padding: 8px 14px !important;
+  border: 1px solid var(--se-hairline, rgba(255, 255, 255, .06)) !important;
+  border-radius: var(--se-radius-md, 10px) !important;
+  background: var(--se-surface, #1f242b) !important;
+  transition: background .15s, border-color .15s;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt:hover {
+  background: var(--se-surface-2, #262c35) !important;
+  border-color: rgba(255, 255, 255, .12) !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > ._30PVtUudUBJBzac0vEncl_,
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > [data-se-sortseg] {
+  display: none !important;
+}
+
+/* Steam's delete control remains clickable; replace only its drawn icon. */
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > button:has(> svg):not(._1YdRdM9TZ_3Xolwv9aVEv-, ._3sz4Ldugm_cV_JaHOErVR8, ._29NTOneobxPjUfxHUk9N8Y, ._1OGfHXv6ksR1Ub-OuLN2NB),
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > div:has(> svg):not(._1YdRdM9TZ_3Xolwv9aVEv-, ._3sz4Ldugm_cV_JaHOErVR8, ._29NTOneobxPjUfxHUk9N8Y, ._1OGfHXv6ksR1Ub-OuLN2NB) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex: 0 0 32px;
+  width: 32px !important;
+  height: 32px !important;
+  margin: 0 0 0 auto !important;
+  padding: 0 !important;
+  order: 3;
+  border-radius: var(--se-radius-sm, 8px);
+  color: var(--se-text-muted, #98a2ad);
+  cursor: pointer;
+  background: transparent;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > button:has(> svg):not(._1YdRdM9TZ_3Xolwv9aVEv-, ._3sz4Ldugm_cV_JaHOErVR8, ._29NTOneobxPjUfxHUk9N8Y, ._1OGfHXv6ksR1Ub-OuLN2NB):hover,
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > div:has(> svg):not(._1YdRdM9TZ_3Xolwv9aVEv-, ._3sz4Ldugm_cV_JaHOErVR8, ._29NTOneobxPjUfxHUk9N8Y, ._1OGfHXv6ksR1Ub-OuLN2NB):hover {
+  color: var(--se-text, #e6e8eb);
+  background: var(--se-hover, #2c3440);
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > :is(button, div):has(> svg):not(._1YdRdM9TZ_3Xolwv9aVEv-, ._3sz4Ldugm_cV_JaHOErVR8, ._29NTOneobxPjUfxHUk9N8Y, ._1OGfHXv6ksR1Ub-OuLN2NB) > svg {
+  width: 16px !important;
+  height: 16px !important;
+  opacity: 0;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > button:has(> svg):not(._1YdRdM9TZ_3Xolwv9aVEv-, ._3sz4Ldugm_cV_JaHOErVR8, ._29NTOneobxPjUfxHUk9N8Y, ._1OGfHXv6ksR1Ub-OuLN2NB)::before,
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > div:has(> svg):not(._1YdRdM9TZ_3Xolwv9aVEv-, ._3sz4Ldugm_cV_JaHOErVR8, ._29NTOneobxPjUfxHUk9N8Y, ._1OGfHXv6ksR1Ub-OuLN2NB)::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%20d%3D%22M5.5%208h13l-1%2010.8a1.5%201.5%200%200%201-1.5%201.4H8a1.5%201.5%200%200%201-1.5-1.4z%22%2F%3E%3Cpath%20d%3D%22M4%206.5h16M9%206.5l.8-2h4.4l.8%202M5.5%208l1%2010.8A1.5%201.5%200%200%200%208%2020.2h8a1.5%201.5%200%200%200%201.5-1.4l1-10.8M10%2011v5.5m4-5.5v5.5%22%2F%3E%3C%2Fsvg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%20d%3D%22M5.5%208h13l-1%2010.8a1.5%201.5%200%200%201-1.5%201.4H8a1.5%201.5%200%200%201-1.5-1.4z%22%2F%3E%3Cpath%20d%3D%22M4%206.5h16M9%206.5l.8-2h4.4l.8%202M5.5%208l1%2010.8A1.5%201.5%200%200%200%208%2020.2h8a1.5%201.5%200%200%200%201.5-1.4l1-10.8M10%2011v5.5m4-5.5v5.5%22%2F%3E%3C%2Fsvg%3E") center / contain no-repeat;
+  pointer-events: none;
+}
+
+/* Arrangement mode: a compact heading and a visible grip on each native drag row. */
+[data-se-reorder-heading] {
+  display: grid !important;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center !important;
+  min-height: 64px;
+  margin-bottom: 16px;
+  text-align: start !important;
+}
+
+[data-se-reorder-heading]::before {
+  content: "Arrange shelves";
+  grid-column: 1;
+  grid-row: 1;
+  font: 700 20px/1.3 var(--se-font, "Motiva Sans"), sans-serif;
+  color: var(--se-text, #e6e8eb);
+}
+
+[data-se-reorder-heading]::after {
+  content: "Drag to reorder your shelves.";
+  grid-column: 1;
+  grid-row: 2;
+  font: 400 13px/1.4 var(--se-font, "Motiva Sans"), sans-serif;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+[data-se-reorder-heading] > * {
+  grid-column: 2;
+  grid-row: 1 / 3;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt::before {
+  content: "";
+  flex: 0 0 18px;
+  width: 18px;
+  height: 22px;
+  margin-inline-end: 8px;
+  background: var(--se-text-muted, #98a2ad);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 22'%3E%3Cg fill='black'%3E%3Ccircle cx='5' cy='4' r='1.6'/%3E%3Ccircle cx='13' cy='4' r='1.6'/%3E%3Ccircle cx='5' cy='11' r='1.6'/%3E%3Ccircle cx='13' cy='11' r='1.6'/%3E%3Ccircle cx='5' cy='18' r='1.6'/%3E%3Ccircle cx='13' cy='18' r='1.6'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 22'%3E%3Cg fill='black'%3E%3Ccircle cx='5' cy='4' r='1.6'/%3E%3Ccircle cx='13' cy='4' r='1.6'/%3E%3Ccircle cx='5' cy='11' r='1.6'/%3E%3Ccircle cx='13' cy='11' r='1.6'/%3E%3Ccircle cx='5' cy='18' r='1.6'/%3E%3Ccircle cx='13' cy='18' r='1.6'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+  pointer-events: none;
+  order: -1;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > ._1PhK8scyztOxjJwWUpkiLJ {
+  flex: 1 1 auto;
+  background: none !important;
+}

@@ -1,0 +1,3950 @@
+/*
+ * Utility windows and secondary client dialogs.
+ *
+ * Styles Players, Game Servers, Recordings & Screenshots (Media Manager),
+ * Add a Non-Steam Game, Activate a Product, System Report, System Information,
+ * About Steam, Back Up / Restore, Mark as Private, Marketing Messages, Game
+ * Launching, Cloud Conflict, Friends & Chat utility popups, Game Info, Remote
+ * Play pairing, Shutdown, and the Steam Input Controller Configurator frame.
+ *
+ * Uses `:not(#se-none)` where ID-level specificity is required to override
+ * deeply nested native CSS module selectors without `!important`.
+ */
+/* Header: the theme's plain title, as in Settings and the other dialogs */
+.u-Qbw_um9KIbq019Iid1E .DialogHeader:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 .DialogHeader:not(#se-none),
+._1tQy-wDVMFDobGfNObgSHR .DialogHeader:not(#se-none),
+._2siQZCB9yAOkiG8N-zRZEe .DialogHeader:not(#se-none),
+._2TAQYpbxatDYN3Ex76KX5u .DialogHeader:not(#se-none),
+._3v2Gg_GCpLHpHQDLFQ7cvI .DialogHeader:not(#se-none),
+.YmQ9vcw08n7STkTEQLiYW .DialogHeader:not(#se-none) {
+  display: block !important;
+  margin: 0 0 6px !important;
+  padding: 0 !important;
+  text-align: start !important;
+  font: 700 22px/28px var(--se-font) !important;
+  letter-spacing: -.01em !important;
+  text-transform: none !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+/* The line under the title */
+.u-Qbw_um9KIbq019Iid1E ._2YQGbvgjzxYmACl2lUK0mG:not(#se-none),
+._1tQy-wDVMFDobGfNObgSHR .Xdr35d96Gm9KXkUcxmFnK:not(#se-none) {
+  margin: 0 0 18px !important;
+  padding: 0 !important;
+  font: 400 13.5px/1.5 var(--se-font) !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+/* Footers: buttons to the right, Close/Cancel quiet, the main action in the accent color */
+.u-Qbw_um9KIbq019Iid1E .DialogFooter:not(#se-none),
+._1tQy-wDVMFDobGfNObgSHR .DialogFooter:not(#se-none),
+._2TAQYpbxatDYN3Ex76KX5u .DialogFooter:not(#se-none),
+._3v2Gg_GCpLHpHQDLFQ7cvI .DialogFooter:not(#se-none),
+.FFIKUQ7BGKw6vO1voazlr .DialogFooter:not(#se-none),
+.YmQ9vcw08n7STkTEQLiYW .DialogFooter:not(#se-none),
+._2siQZCB9yAOkiG8N-zRZEe .DialogFooter:not(#se-none) {
+  padding-top: 16px !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E button.DialogButton:not(#se-none),
+._1tQy-wDVMFDobGfNObgSHR button.DialogButton:not(#se-none),
+._2TAQYpbxatDYN3Ex76KX5u button.DialogButton:not(#se-none),
+._3v2Gg_GCpLHpHQDLFQ7cvI button.DialogButton:not(#se-none),
+.FFIKUQ7BGKw6vO1voazlr button.DialogButton:not(#se-none),
+.YmQ9vcw08n7STkTEQLiYW button.DialogButton:not(#se-none),
+._2siQZCB9yAOkiG8N-zRZEe button.DialogButton:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 button.DialogButton:not(#se-none) {
+  height: var(--se-control-h, 34px) !important;
+  min-height: var(--se-control-h, 34px) !important;
+  padding: 0 18px !important;
+  line-height: var(--se-control-h, 34px) !important;
+}
+
+/* Shared: the recessed container, its header row and its rows */
+/* Players list, server list, Add a Non-Steam Game list */
+.u-Qbw_um9KIbq019Iid1E ._1pbQVchAJ7LcA5eIIGV-EN:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._2_4_nZy-T2C3pHa81tGH76:not(#se-none) {
+  margin: 0 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg, 14px) !important;
+  overflow: hidden;
+  background: var(--se-bg, #171a20) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06)) !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._20evaxvMeG8jMJ31t-5-L5:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._2cIK-w-zexbpzoh8jWH-tn:not(#se-none) {
+  box-sizing: border-box;
+  min-height: 38px;
+  padding: 0 6px !important;
+  align-items: center;
+  background: transparent !important;
+  border-bottom: 1px solid var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+/* Header labels: uppercase label, faint; the sorted column brighter with an accent caret */
+.u-Qbw_um9KIbq019Iid1E ._2I8M7g9rIxbeCZoFpl6_as:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._3mOBJyckqa4Zt5FoB_dBhZ:not(#se-none) {
+  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
+  letter-spacing: var(--se-label-spacing, .1em) !important;
+  text-transform: uppercase !important;
+  color: var(--se-label-color, #6f7984) !important;
+  transition: color .15s ease-out;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._2I8M7g9rIxbeCZoFpl6_as:not(#se-none):hover,
+._2rxrVvbku0AC8Qbequ4-z9 ._3mOBJyckqa4Zt5FoB_dBhZ:not(#se-none):hover {
+  color: var(--se-text-dim, #b8c0c8) !important;
+}
+
+:is(.u-Qbw_um9KIbq019Iid1E ._2VJwnBYoIWLWhunHyjXDUD._1USi1mEv6zVuMeiEKJBQew, .u-Qbw_um9KIbq019Iid1E ._1USi1mEv6zVuMeiEKJBQew ._2I8M7g9rIxbeCZoFpl6_as, ._2rxrVvbku0AC8Qbequ4-z9 .YqWIL4IWbXSsejmllz4iL, ._2rxrVvbku0AC8Qbequ4-z9 .YqWIL4IWbXSsejmllz4iL ._3mOBJyckqa4Zt5FoB_dBhZ):not(#se-none) {
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E svg.ohzxWXowFiTaMNCOdtRNh:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 svg._11USeacMygE1MnaISNLUjP:not(#se-none) {
+  width: 10px !important;
+  height: 10px !important;
+  margin-inline-start: 6px !important;
+  color: var(--se-accent, #7cc4ff) !important;
+  fill: currentColor !important;
+}
+
+/* Column resizers: a 1px divider that shows only while the header is under the pointer */
+.u-Qbw_um9KIbq019Iid1E ._3ZJ6gL7WvTh8sUOWVhLqe1:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._1XAm7DWwrTa6XnYYJ5kxAK:not(#se-none) {
+  top: 25% !important;
+  height: 50% !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: inset -1px 0 0 var(--se-hairline, rgba(255, 255, 255, .06));
+  transition: box-shadow .15s ease-out;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._3ZJ6gL7WvTh8sUOWVhLqe1 span,
+._2rxrVvbku0AC8Qbequ4-z9 ._1XAm7DWwrTa6XnYYJ5kxAK span {
+  border: 0 !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._20evaxvMeG8jMJ31t-5-L5:hover ._3ZJ6gL7WvTh8sUOWVhLqe1:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._2cIK-w-zexbpzoh8jWH-tn:hover ._1XAm7DWwrTa6XnYYJ5kxAK:not(#se-none) {
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, .16);
+}
+
+/* Empty lists: a faint icon over a quiet line, in the middle of the container */
+.u-Qbw_um9KIbq019Iid1E ._2cgN-Vb3W5DAcPXDg4HRNB:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._3uDXkXFyL7ipng8MUUHmcq:not(#se-none) {
+  flex: 1 1 auto;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 160px;
+  margin: 0 !important;
+  padding: 32px 24px !important;
+  text-align: center;
+  font: 500 13.5px/1.5 var(--se-font) !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._2cgN-Vb3W5DAcPXDg4HRNB::before,
+._2rxrVvbku0AC8Qbequ4-z9 ._3uDXkXFyL7ipng8MUUHmcq::before {
+  content: '';
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--se-dlg-empty) center / 26px 26px no-repeat, var(--se-surface, #1f242b);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.u-Qbw_um9KIbq019Iid1E {
+  --se-dlg-empty: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f7984' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='8' r='3.5' fill='%236f7984' fill-opacity='.32' stroke='none'/%3E%3Ccircle cx='9' cy='8' r='3.5'/%3E%3Cpath d='M3 19.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5'/%3E%3Cpath d='M15.5 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2 .7 3.5 2.6 3.5 5.2'/%3E%3C/svg%3E");
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 {
+  --se-dlg-empty: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f7984' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='7' rx='2' fill='%236f7984' fill-opacity='.32' stroke='none'/%3E%3Crect x='3' y='4' width='18' height='7' rx='2'/%3E%3Crect x='3' y='13' width='18' height='7' rx='2'/%3E%3Cpath d='M7 7.5h.01M7 16.5h.01M11 7.5h6M11 16.5h6'/%3E%3C/svg%3E");
+}
+
+/* The server well holds the empty line as its only child: fill it so the line can center */
+._2rxrVvbku0AC8Qbequ4-z9 ._2_4_nZy-T2C3pHa81tGH76 [role="rowgroup"]:has(> ._3uDXkXFyL7ipng8MUUHmcq) {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Players */
+.u-Qbw_um9KIbq019Iid1E ._3kjELHPFlI9SV9QYNi_TaH:not(#se-none) {
+  padding: 4px 0;
+  background: transparent;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._3kjELHPFlI9SV9QYNi_TaH [role="row"] {
+  box-sizing: border-box;
+  min-height: 48px;
+  margin: 1px 6px;
+  align-items: center;
+  border-radius: var(--se-radius-sm, 8px);
+  transition: background-color .15s ease-out;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._3kjELHPFlI9SV9QYNi_TaH [role="row"]:hover {
+  background: var(--se-hover, #2c3440);
+}
+
+.u-Qbw_um9KIbq019Iid1E ._3kjELHPFlI9SV9QYNi_TaH [role="cell"] {
+  padding-inline: 12px;
+  font: 500 13px/1.35 var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.u-Qbw_um9KIbq019Iid1E ._1N2zM_9rkWAnULKER9yxLN:not(#se-none) {
+  gap: 10px;
+  font: 600 13.5px var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+.u-Qbw_um9KIbq019Iid1E ._1N2zM_9rkWAnULKER9yxLN img {
+  border-radius: 50%;
+}
+
+.u-Qbw_um9KIbq019Iid1E button._2Dz7_wdqfJvQIcXt7Gy-XG:not(#se-none) {
+  height: var(--se-control-h-sm, 28px) !important;
+  min-height: 0 !important;
+  padding: 0 12px !important;
+  border-radius: 999px !important;
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14)) !important;
+  color: var(--se-accent, #7cc4ff) !important;
+  font: 700 12px/28px var(--se-font) !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E button._2Dz7_wdqfJvQIcXt7Gy-XG:not(#se-none):hover {
+  background: var(--se-accent, #7cc4ff) !important;
+  color: var(--se-bg-ink, #0f1115) !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._1Z8gkDy_OHZvAsWnkIu7MN:not(#se-none) {
+  font: 600 12px var(--se-font);
+  color: var(--se-text-faint, #6f7984);
+}
+
+.u-Qbw_um9KIbq019Iid1E ._1Z8gkDy_OHZvAsWnkIu7MN._1T0DLB9syB7_oU6GXuNbv2 {
+  color: var(--se-danger-text, #ffb0b3);
+}
+
+/*
+ * Game Servers
+ * TopControlsCtr _2X_ZpO2X_CIOIEfml3ZTcX, SwitchTabButton _1jEPp-_Fn1YtGfHenAZ7fT, Selected
+ * L3t04yaV4NIy6qhVIquGp, SearchButton _2KYMMVVayBKt9_rEg88mBZ (SearchActive B0KOfNkg7hq7nxHumDWOJ,
+ * NewSearchButton _3pbT219wBus5oyCafaW8dR), ServerList _2_4_nZy-T2C3pHa81tGH76, SelectColumnsButton
+ * _3mCrTKGesl-jD-k-buQ13_, ServerRow c8HfPY9sQZdSZtTna_qYB, SelectedRow _3vedM8he3cvXOGRug4HKZE,
+ * ServerRowContents _3MUXEF0e040pVLXsjVSJ0o, FilterOptionsCtr _1EKWPcG8fTbIjt4XH51i5B (Collapsed
+ * _1ezaeFk0i2IVfJTyujGL3-), DropdownLabel iLldOGWO4DAcPXfvvZtrU, BottomControlsRow
+ * _341mdPDkZV7JkbIxGBREsd, ConnectButton _21aBXrQ2uW4XxfgS8OM8Z-, AddFavoriteButton
+ * Lm4rP-OZQvm74XsUuD544, CurrentFiltersSummaryText _9Ah3c27-EWzVbXgRoFZz6,
+ * ToggleShowFilterDetailsButton _30Bn7zCGRm9mu2m62-VXOF.
+ */
+._2rxrVvbku0AC8Qbequ4-z9 ._2X_ZpO2X_CIOIEfml3ZTcX:not(#se-none) {
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* Tabs as chips */
+._2rxrVvbku0AC8Qbequ4-z9 button._1jEPp-_Fn1YtGfHenAZ7fT:not(#se-none) {
+  gap: 8px !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06)) !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+  font: 600 13px var(--se-font) !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 button._1jEPp-_Fn1YtGfHenAZ7fT:not(#se-none):hover {
+  background: var(--se-hover, #2c3440) !important;
+  color: var(--se-text-strong, #fff) !important;
+  box-shadow: none !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 button._1jEPp-_Fn1YtGfHenAZ7fT.L3t04yaV4NIy6qhVIquGp:not(#se-none) {
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14)) !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent-line, rgba(124, 196, 255, .3)) !important;
+  color: var(--se-text-strong, #fff) !important;
+  font-weight: 700 !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 button.DialogButton svg:not(#se-none) {
+  width: 15px !important;
+  height: 15px !important;
+  color: currentColor !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 button._1jEPp-_Fn1YtGfHenAZ7fT.L3t04yaV4NIy6qhVIquGp svg:not(#se-none) {
+  color: var(--se-accent, #7cc4ff) !important;
+}
+
+/* The game picker */
+._2rxrVvbku0AC8Qbequ4-z9 ._2X_ZpO2X_CIOIEfml3ZTcX .DialogDropDown:not(#se-none) {
+  height: var(--se-control-h, 34px) !important;
+  min-height: 0 !important;
+  padding: 0 12px 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
+  background: var(--se-surface-2, #262c35) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06)) !important;
+  color: var(--se-text, #e6e8eb) !important;
+  font: 500 13px var(--se-font) !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._2X_ZpO2X_CIOIEfml3ZTcX .DialogDropDown:not(#se-none):hover {
+  background: var(--se-hover, #2c3440) !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._2X_ZpO2X_CIOIEfml3ZTcX .DialogDropDown svg {
+  width: 12px !important;
+  height: 12px !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+  fill: currentColor;
+}
+
+/* Search / stop / refresh: a square tile; accent while searching or when filters changed */
+._2rxrVvbku0AC8Qbequ4-z9 button._2KYMMVVayBKt9_rEg88mBZ:not(#se-none) {
+  flex: 0 0 var(--se-control-h, 34px);
+  width: var(--se-control-h, 34px) !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  justify-content: center;
+  border-radius: var(--se-radius-sm, 8px) !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 button._2KYMMVVayBKt9_rEg88mBZ:is(.B0KOfNkg7hq7nxHumDWOJ, ._3pbT219wBus5oyCafaW8dR):not(#se-none) {
+  background: var(--se-accent, #7cc4ff) !important;
+  color: var(--se-bg-ink, #0f1115) !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 button._2KYMMVVayBKt9_rEg88mBZ:is(.B0KOfNkg7hq7nxHumDWOJ, ._3pbT219wBus5oyCafaW8dR) svg:not(#se-none) {
+  color: var(--se-bg-ink, #0f1115) !important;
+}
+
+/* The list */
+._2rxrVvbku0AC8Qbequ4-z9 ._2_4_nZy-T2C3pHa81tGH76:not(#se-none) {
+  margin-top: 14px !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._2_4_nZy-T2C3pHa81tGH76 [role="rowgroup"] {
+  padding: 4px 0;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._2_4_nZy-T2C3pHa81tGH76 ::-webkit-scrollbar {
+  width: 10px !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._3mCrTKGesl-jD-k-buQ13_:not(#se-none) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px !important;
+  height: 26px !important;
+  padding: 0 !important;
+  margin: 0 4px 0 auto !important;
+  border-radius: var(--se-radius-sm, 8px);
+  background: transparent !important;
+  color: var(--se-text-muted, #98a2ad);
+  transition: background-color .15s ease-out, color .15s ease-out !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._3mCrTKGesl-jD-k-buQ13_:not(#se-none):hover {
+  background: var(--se-hover, #2c3440) !important;
+  color: var(--se-text-strong, #fff);
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 .c8HfPY9sQZdSZtTna_qYB:not(#se-none) {
+  box-sizing: border-box;
+  margin: 1px 6px;
+  border-radius: var(--se-radius-sm, 8px);
+  color: var(--se-text-dim, #b8c0c8);
+  font: 500 13px var(--se-font);
+  transition: background-color .12s ease-out;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 .c8HfPY9sQZdSZtTna_qYB:not(#se-none):hover {
+  background: var(--se-hover, #2c3440);
+  color: var(--se-text-strong, #fff);
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._3vedM8he3cvXOGRug4HKZE:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._3vedM8he3cvXOGRug4HKZE:not(#se-none):hover {
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+  box-shadow: inset 0 0 0 1px var(--se-accent-line, rgba(124, 196, 255, .3));
+  color: var(--se-text-strong, #fff);
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._3MUXEF0e040pVLXsjVSJ0o:not(#se-none) {
+  padding: 7px 4px;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._2GEwuCDW8CeZyS7UOQ0aF6:not(#se-none) {
+  font-weight: 600;
+  color: var(--se-text, #e6e8eb);
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._1pXbhY3ndY31TdmpZ_Tjit:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._1O1MWIrSkR8SeWkMvGeNs:not(#se-none) {
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._3UnYc6mcRJafdtQhz6_Vrr:not(#se-none) {
+  color: var(--se-running, #6cc24a);
+  font-weight: 700;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._3JL6lzo7TbWETFdPMhsRZN svg:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._12IW24hzcd5JHhO-S6zH22 svg:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._2O6m8U2N2S2aJKBf3H0Zxn svg:not(#se-none) {
+  width: 16px !important;
+  height: 16px !important;
+  color: var(--se-text-muted, #98a2ad);
+  opacity: .85;
+}
+
+/* The row's radio: the theme's ring, filled accent when it is the selected server */
+._2rxrVvbku0AC8Qbequ4-z9 ._2fSU9jBJhQxuu2JzRjAFI7 .DialogRoundCheckboxField_OuterCircle {
+  box-sizing: border-box;
+  width: 15px !important;
+  height: 15px !important;
+  border: 2px solid var(--se-border-strong, #4a525e) !important;
+  border-radius: 50% !important;
+  background: none !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._3vedM8he3cvXOGRug4HKZE ._2fSU9jBJhQxuu2JzRjAFI7 .DialogRoundCheckboxField_OuterCircle {
+  border-color: var(--se-accent, #7cc4ff) !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._2fSU9jBJhQxuu2JzRjAFI7 .DialogRoundCheckboxField_InnerCircle {
+  background: var(--se-accent, #7cc4ff) !important;
+  border-radius: 50% !important;
+}
+
+/* Filters: a card above the bottom row */
+._2rxrVvbku0AC8Qbequ4-z9 ._1EKWPcG8fTbIjt4XH51i5B:not(#se-none) {
+  box-sizing: border-box;
+  margin: 0 0 12px;
+  padding: 14px 18px !important;
+  gap: 24px !important;
+  border-radius: var(--se-radius-lg, 14px);
+  background: var(--se-surface-2, #262c35);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  transition: height .3s ease-in-out, opacity .3s ease-in-out, padding .3s ease-in-out, margin .3s ease-in-out !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._1EKWPcG8fTbIjt4XH51i5B._1ezaeFk0i2IVfJTyujGL3-:not(#se-none) {
+  margin: 0;
+  padding-block: 0 !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 .iLldOGWO4DAcPXfvvZtrU:not(#se-none) {
+  display: block;
+  margin: 0 0 6px;
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  letter-spacing: var(--se-label-spacing, .1em);
+  text-transform: uppercase;
+  color: var(--se-label-color, #6f7984);
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._1EKWPcG8fTbIjt4XH51i5B .DialogDropDown:not(#se-none) {
+  height: var(--se-control-h, 34px) !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
+  background: var(--se-field, #15181d) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06)) !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 .wEGw5DGwuG9ietThudkhS:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: center !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 .wEGw5DGwuG9ietThudkhS .DialogCheckbox_Container:not(#se-none) {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  font: 500 13px var(--se-font);
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 .DialogDropDown_CurrentDisplay:not(#se-none) {
+  font: 500 13px var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+/* Bottom row */
+._2rxrVvbku0AC8Qbequ4-z9 ._341mdPDkZV7JkbIxGBREsd:not(#se-none) {
+  height: auto;
+  align-items: center;
+  padding-bottom: 4px;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 button._30Bn7zCGRm9mu2m62-VXOF:not(#se-none) {
+  background: transparent !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06)) !important;
+  color: var(--se-text-dim, #b8c0c8) !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 button._30Bn7zCGRm9mu2m62-VXOF:not(#se-none):hover,
+._2rxrVvbku0AC8Qbequ4-z9 button._30Bn7zCGRm9mu2m62-VXOF.L3t04yaV4NIy6qhVIquGp:not(#se-none) {
+  background: var(--se-hover, #2c3440) !important;
+  color: var(--se-text-strong, #fff) !important;
+  box-shadow: none !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._9Ah3c27-EWzVbXgRoFZz6:not(#se-none) {
+  font: 500 12.5px/1.4 var(--se-font);
+  color: var(--se-text-faint, #6f7984);
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 button.Lm4rP-OZQvm74XsUuD544:not(#se-none) {
+  width: var(--se-control-h, 34px) !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin-right: 4px !important;
+  flex: 0 0 var(--se-control-h, 34px);
+  justify-content: center;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._21aBXrQ2uW4XxfgS8OM8Z-:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._3LG-3vN_Ah87zDdfpLPGD-:not(#se-none) {
+  min-width: 120px !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._21aBXrQ2uW4XxfgS8OM8Z-:not(.Disabled):not(:disabled):not(#se-none) {
+  background: var(--se-accent, #7cc4ff) !important;
+  color: var(--se-bg-ink, #0f1115) !important;
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 ._21aBXrQ2uW4XxfgS8OM8Z-:not(.Disabled):not(:disabled):not(#se-none):hover {
+  background: #9ad2ff !important;
+}
+
+/*
+ * Recordings & Screenshots (the media manager)
+ * TopList _1f9_BgoyE1cjqyeKD8dh9u, StickyHeader YzIcpcz4oFx-nndxro5jE, TopListTitle hXJt8CFzzitOG3moJEGg-,
+ * TopListButtonRow _30e-kSx-yfm4pjA0_ysT3n, DesktopBottomGlass _162CJAH8jPwIYGGg5Q2YIc,
+ * ButtonBox _28eIRmQ229ntDIyQXTn3Ub (Interactable _32Lfwcdolc3ByZWItfR3ni, Square _1qOXVgKq89avM0v873Oo9t,
+ * Disabled _36CGU2t5Vavx0_9dwem6kb, Primary _2kVw_wgJd5TfnNePlpwmN, Secondary QE3sHW9puNTAjiRDY71Xy),
+ * Text _2X6Uf9dpYzWmrq3hGfefrI, IconButton _2T45kYJmyvQWyxytQeohuY, Active _3JYigpIF46lZDATkhxHZmZ,
+ * IconButtonIcon OshLau78NSt9yYd3ifber, Combobox zeGUOeW3Cat4UJGCGwXPZ, ComboboxSelector
+ * _2tKr_CSDskG6HFUPMfBQrc, Option G3_eozBlouid6uYGgY2Lf, ExplainerBox QFVXM_1rWs04OyJDUaCom,
+ * Explainer _1yTI8Tgt40Qr-TGHTgv2Pr, Header _1IqRO2Wvm5hGR3L_Y2x_r1, HeaderSmall _2a5sFsHTsMbjwFP7WH4QIB,
+ * NewCallout PNDAt1rt4GBfwzzelpFO0, Divider _2z545OkOmT3z-TvUBbkNl0, SingleLineExplainerBox
+ * ZbZfWM6GR8CRUK_9Z41Ri, PhaseFilterTag _3aw8rnUVmbcILzeqlj7uuP; list items (module 513) ListItem
+ * _2-7fqz03LhYHKEBI-HwIPq, Selected Fr_79JIzXJtvETKwGQWVy, CheckboxContainer _3yu2_I6JERouGkz0YLwnuX;
+ * list view (module 521) PhaseListContainer _2OsQkIMNf9Cnl4xfBXMApr, PhaseGridItem uCBCZOATxD3vzPCGUgDEp,
+ * InputFilter _36KTbApKz0VLY9Q6lGt4aH, FilterOptionButton _1rhLTraGkRDOPJslCL3i9C (Selected
+ * _2_K-vDkSsSw6FxrfZL-ScT). The header's height is set by Steam's script, so it stays 60 px + the row.
+ */
+._1f9_BgoyE1cjqyeKD8dh9u:not(#se-none) {
+  background: var(--se-bg, #171a20);
+  min-height: 100vh;
+}
+
+._1f9_BgoyE1cjqyeKD8dh9u .YzIcpcz4oFx-nndxro5jE:not(#se-none) {
+  width: calc(100vw - 56px);
+  padding: 0 28px;
+  border: 0;
+  border-image: none;
+  background: linear-gradient(to bottom, var(--se-bg, #171a20) 72%, transparent);
+  box-shadow: none;
+}
+
+._1f9_BgoyE1cjqyeKD8dh9u .YzIcpcz4oFx-nndxro5jE .hXJt8CFzzitOG3moJEGg-:not(#se-none) {
+  height: 30px;
+  padding: 18px 0 12px;
+  font: 700 20px/30px var(--se-font);
+  letter-spacing: -.01em;
+  text-transform: none;
+  color: var(--se-text, #e6e8eb);
+}
+
+._1f9_BgoyE1cjqyeKD8dh9u ._30e-kSx-yfm4pjA0_ysT3n:not(#se-none) {
+  align-items: center;
+}
+
+._1f9_BgoyE1cjqyeKD8dh9u ._162CJAH8jPwIYGGg5Q2YIc:not(#se-none) {
+  border: 0;
+  border-image: none;
+  box-shadow: none;
+  background: linear-gradient(to bottom, transparent, var(--se-bg, #171a20) 70%);
+}
+
+/* Buttons: the theme's 34 px controls */
+._28eIRmQ229ntDIyQXTn3Ub:not(#se-none) {
+  box-sizing: border-box;
+  height: var(--se-control-h, 34px);
+  min-width: 0;
+  padding: 0 14px;
+  gap: 8px;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-surface-2, #262c35);
+  box-shadow: none;
+  font: 600 13px var(--se-font);
+  color: var(--se-text, #e6e8eb);
+  transition: background-color .15s ease-out, color .15s ease-out;
+}
+
+._28eIRmQ229ntDIyQXTn3Ub._1qOXVgKq89avM0v873Oo9t:not(#se-none) {
+  width: var(--se-control-h, 34px);
+  padding: 0;
+  justify-content: center;
+}
+
+._28eIRmQ229ntDIyQXTn3Ub.QE3sHW9puNTAjiRDY71Xy:not(#se-none) {
+  background: var(--se-surface-2, #262c35);
+  box-shadow: none;
+}
+
+._28eIRmQ229ntDIyQXTn3Ub._32Lfwcdolc3ByZWItfR3ni.QE3sHW9puNTAjiRDY71Xy:not(#se-none):is(:hover, .gpfocus) {
+  background: var(--se-hover, #2c3440);
+  color: var(--se-text-strong, #fff);
+  box-shadow: none;
+}
+
+._28eIRmQ229ntDIyQXTn3Ub._32Lfwcdolc3ByZWItfR3ni.QE3sHW9puNTAjiRDY71Xy:not(#se-none):is(:hover, .gpfocus) :is(._2X6Uf9dpYzWmrq3hGfefrI, svg) {
+  color: var(--se-text-strong, #fff);
+  fill: currentColor;
+}
+
+._28eIRmQ229ntDIyQXTn3Ub._32Lfwcdolc3ByZWItfR3ni.QE3sHW9puNTAjiRDY71Xy:not(#se-none):active {
+  background: var(--se-selected, #33404f);
+}
+
+._28eIRmQ229ntDIyQXTn3Ub.QE3sHW9puNTAjiRDY71Xy._36CGU2t5Vavx0_9dwem6kb:not(#se-none) {
+  background: rgba(255, 255, 255, .04);
+  opacity: 1;
+}
+
+._28eIRmQ229ntDIyQXTn3Ub._36CGU2t5Vavx0_9dwem6kb:not(#se-none) :is(svg, ._2X6Uf9dpYzWmrq3hGfefrI) {
+  color: rgba(255, 255, 255, .25);
+  fill: currentColor;
+}
+
+._28eIRmQ229ntDIyQXTn3Ub._2kVw_wgJd5TfnNePlpwmN:not(#se-none) {
+  background: var(--se-accent, #7cc4ff);
+  color: var(--se-bg-ink, #0f1115);
+}
+
+._28eIRmQ229ntDIyQXTn3Ub._2kVw_wgJd5TfnNePlpwmN:not(#se-none) :is(._2X6Uf9dpYzWmrq3hGfefrI, svg) {
+  color: var(--se-bg-ink, #0f1115);
+  fill: currentColor;
+}
+
+._28eIRmQ229ntDIyQXTn3Ub._32Lfwcdolc3ByZWItfR3ni._2kVw_wgJd5TfnNePlpwmN:not(#se-none):is(:hover, .gpfocus, :active) {
+  background: #9ad2ff;
+  box-shadow: none;
+}
+
+._28eIRmQ229ntDIyQXTn3Ub ._2X6Uf9dpYzWmrq3hGfefrI:not(#se-none) {
+  font: 600 13px var(--se-font);
+  color: inherit;
+}
+
+._28eIRmQ229ntDIyQXTn3Ub svg:not(#se-none) {
+  width: 15px;
+  height: 15px;
+  color: var(--se-text-dim, #b8c0c8);
+  fill: currentColor;
+}
+
+/* Grid / list / gear: the active view in the accent color */
+._2T45kYJmyvQWyxytQeohuY .OshLau78NSt9yYd3ifber:not(#se-none) {
+  width: 17px;
+  height: 17px;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._2T45kYJmyvQWyxytQeohuY._3JYigpIF46lZDATkhxHZmZ:not(#se-none),
+._2T45kYJmyvQWyxytQeohuY._3JYigpIF46lZDATkhxHZmZ:not(#se-none):is(:hover, :active) {
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+  box-shadow: inset 0 0 0 1px var(--se-accent-line, rgba(124, 196, 255, .3));
+}
+
+._2T45kYJmyvQWyxytQeohuY._3JYigpIF46lZDATkhxHZmZ .OshLau78NSt9yYd3ifber:not(#se-none) {
+  color: var(--se-accent, #7cc4ff);
+}
+
+/* "All Games - Most Recent" and "All Media" */
+.zeGUOeW3Cat4UJGCGwXPZ:not(#se-none) {
+  gap: 10px;
+  padding: 0 12px 0 14px;
+}
+
+.zeGUOeW3Cat4UJGCGwXPZ svg:not(#se-none) {
+  width: 11px;
+  height: 11px;
+  margin-inline-start: 0;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._2tKr_CSDskG6HFUPMfBQrc:not(#se-none) {
+  padding: 6px;
+  font: 500 13px var(--se-font);
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+._2tKr_CSDskG6HFUPMfBQrc .G3_eozBlouid6uYGgY2Lf:not(#se-none) {
+  padding: 7px 12px;
+  border-radius: var(--se-radius-sm, 8px);
+}
+
+._2tKr_CSDskG6HFUPMfBQrc .G3_eozBlouid6uYGgY2Lf:not(#se-none):is(:hover, .gpfocus) {
+  background: var(--se-selected, #33404f);
+  color: var(--se-text-strong, #fff);
+}
+
+/*
+ * Its search field (SearchBar _3GbHFVMCkeB-Dv1uphs9Xo, InputContainer _3rd-7k8MaTd-1s1N1zlrbG, Input
+ * _2tNpad3vtsqKJArP-xArfx): Steam wraps it in a black, 75% opaque box with its own border;
+ * only the theme's field is left, full width, with the rows under it
+ */
+._3GbHFVMCkeB-Dv1uphs9Xo:not(#se-none) {
+  margin: 0 0 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  opacity: 1;
+}
+
+._3GbHFVMCkeB-Dv1uphs9Xo ._3rd-7k8MaTd-1s1N1zlrbG ._2tNpad3vtsqKJArP-xArfx:not(#se-none) {
+  width: 100%;
+  height: var(--se-control-h, 34px) !important;
+  padding-inline: 12px 40px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
+  background: var(--se-field, #15181d) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06)) !important;
+  font: 500 13px var(--se-font) !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+._3GbHFVMCkeB-Dv1uphs9Xo ._3rd-7k8MaTd-1s1N1zlrbG ._2tNpad3vtsqKJArP-xArfx:not(#se-none):focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong, rgba(124, 196, 255, .55)), 0 0 0 3px var(--se-accent-tint, rgba(124, 196, 255, .14)) !important;
+}
+
+._3GbHFVMCkeB-Dv1uphs9Xo ._3rd-7k8MaTd-1s1N1zlrbG input::placeholder {
+  color: var(--se-text-faint, #6f7984) !important;
+}
+
+._3GbHFVMCkeB-Dv1uphs9Xo .DialogInput_ClearAction:not(#se-none) {
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._17HUNixDThgFwFsLEDJ12K:not(#se-none) {
+  margin: 0;
+  padding: 6px 12px;
+  font: 500 13px/1.4 var(--se-font);
+  color: var(--se-text-faint, #6f7984);
+}
+
+._29AJUo6aKT93gX24N5WFj_:not(#se-none) {
+  border-radius: var(--se-radius-lg, 14px) !important;
+  overflow: hidden;
+  background: var(--se-surface, #1f242b) !important;
+  box-shadow: var(--se-shadow-pop, 0 18px 40px -10px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .07)) !important;
+}
+
+._3aw8rnUVmbcILzeqlj7uuP:not(#se-none) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 600 12.5px var(--se-font);
+  color: var(--se-accent, #7cc4ff);
+}
+
+/* The empty page: one centered card */
+.QFVXM_1rWs04OyJDUaCom:not(#se-none) {
+  box-sizing: border-box;
+  max-width: 620px;
+  height: auto;
+  margin: 24px auto 0;
+  padding: 36px 40px 32px;
+  border-radius: var(--se-radius-lg, 14px);
+  background: var(--se-surface, #1f242b);
+  box-shadow: var(--se-shadow-hero, 0 20px 50px -20px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .06));
+}
+
+.QFVXM_1rWs04OyJDUaCom ._1yTI8Tgt40Qr-TGHTgv2Pr:not(#se-none) {
+  gap: 16px;
+  font: 400 14px/1.55 var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.QFVXM_1rWs04OyJDUaCom ._1yTI8Tgt40Qr-TGHTgv2Pr ._1IqRO2Wvm5hGR3L_Y2x_r1:not(#se-none) {
+  width: auto;
+  font: 700 20px/1.3 var(--se-font);
+  letter-spacing: -.01em;
+  color: var(--se-text, #e6e8eb);
+}
+
+.QFVXM_1rWs04OyJDUaCom ._1yTI8Tgt40Qr-TGHTgv2Pr ._2a5sFsHTsMbjwFP7WH4QIB:not(#se-none) {
+  width: auto;
+  font: 700 15px/1.3 var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+.QFVXM_1rWs04OyJDUaCom ._1yTI8Tgt40Qr-TGHTgv2Pr ._2a5sFsHTsMbjwFP7WH4QIB .PNDAt1rt4GBfwzzelpFO0:not(#se-none) {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+  font: 700 11px/16px var(--se-font);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--se-accent, #7cc4ff);
+}
+
+.QFVXM_1rWs04OyJDUaCom ._2z545OkOmT3z-TvUBbkNl0:not(#se-none) {
+  width: 100%;
+  margin: 8px 0;
+  background: var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.QFVXM_1rWs04OyJDUaCom ._1yTI8Tgt40Qr-TGHTgv2Pr ._3lQ6uJAk5S4F955Aft4385:not(#se-none) {
+  margin-top: 6px;
+}
+
+.QFVXM_1rWs04OyJDUaCom ._1yTI8Tgt40Qr-TGHTgv2Pr ._3-MC3Pot0krX8hkZy-TOhK:not(#se-none) {
+  padding: 0 22px;
+  font-size: 13.5px;
+}
+
+/* Keyboard keys named in the tip ("F12") as key caps */
+.QFVXM_1rWs04OyJDUaCom ._1yTI8Tgt40Qr-TGHTgv2Pr > div > span {
+  display: inline-block;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: var(--se-surface-2, #262c35);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(255, 255, 255, .08);
+  font: 700 12px/20px var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+.ZbZfWM6GR8CRUK_9Z41Ri:not(#se-none) {
+  font: 500 13.5px/1.5 var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+/* Items: rounded, an accent ring when selected */
+._2-7fqz03LhYHKEBI-HwIPq:not(#se-none) {
+  border-radius: var(--se-radius-md, 10px);
+}
+
+._2-7fqz03LhYHKEBI-HwIPq > img:first-child,
+._2-7fqz03LhYHKEBI-HwIPq > div:first-child {
+  border-radius: calc(var(--se-radius-md, 10px) - 2px);
+}
+
+._2-7fqz03LhYHKEBI-HwIPq ._2O8WzGuYXGvm9x_zZbK1va {
+  border-radius: calc(var(--se-radius-md, 10px) - 2px);
+}
+
+._2-7fqz03LhYHKEBI-HwIPq.Fr_79JIzXJtvETKwGQWVy:not(#se-none) {
+  border-color: var(--se-accent, #7cc4ff);
+  filter: none;
+  box-shadow: 0 0 0 3px var(--se-accent-tint, rgba(124, 196, 255, .14));
+}
+
+._2-7fqz03LhYHKEBI-HwIPq.gpfocus:not(:hover):not(#se-none) {
+  border-color: var(--se-accent-strong, rgba(124, 196, 255, .55));
+}
+
+._2-7fqz03LhYHKEBI-HwIPq ._3yu2_I6JERouGkz0YLwnuX:not(#se-none) {
+  border-radius: var(--se-radius-xs, 4px);
+  background: var(--se-chip, rgba(12, 14, 18, .55));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18);
+}
+
+._2-7fqz03LhYHKEBI-HwIPq ._3yu2_I6JERouGkz0YLwnuX ._1u3MRQ0ABDU4GSI-cGGiQ5:not(#se-none) {
+  stroke: var(--se-accent, #7cc4ff);
+}
+
+/* List view */
+._2OsQkIMNf9Cnl4xfBXMApr:not(#se-none) {
+  background: var(--se-bg, #171a20);
+}
+
+.uCBCZOATxD3vzPCGUgDEp:not(#se-none) {
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-surface, #1f242b);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+._36KTbApKz0VLY9Q6lGt4aH:not(#se-none) {
+  height: var(--se-control-h, 34px);
+  padding: 0 10px;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-field, #15181d);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  color: var(--se-text-faint, #6f7984);
+}
+
+._36KTbApKz0VLY9Q6lGt4aH:not(#se-none):focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong, rgba(124, 196, 255, .55)), 0 0 0 3px var(--se-accent-tint, rgba(124, 196, 255, .14));
+}
+
+._36KTbApKz0VLY9Q6lGt4aH input:not(#se-none) {
+  font: 500 13px var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+._36KTbApKz0VLY9Q6lGt4aH input::placeholder {
+  color: var(--se-text-faint, #6f7984) !important;
+}
+
+._1rhLTraGkRDOPJslCL3i9C:not(#se-none) {
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-surface-2, #262c35);
+}
+
+._1rhLTraGkRDOPJslCL3i9C:not(#se-none):is(:hover, ._2_K-vDkSsSw6FxrfZL-ScT) {
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+  border-color: var(--se-accent-line, rgba(124, 196, 255, .3));
+}
+
+/*
+ * Add a Non-Steam Game
+ * AddNonSteamGameDialogContent zhaKeChn9HPNSMtk0ami_, DialogHeader tNxx1aWqxj_f-V3j864Rg,
+ * DialogBodyText Xdr35d96Gm9KXkUcxmFnK, Header _3m0MnUo45wjLOfNLpZ-3KH, Checkbox f3L-gWeCGaYVMycozN4-G,
+ * AppName _1kVk1iZQs3Blqmz6k0qeFV, ExePath _1LM_TWL_05e13S1LS9wHao, GameList _1e6tjguQEHdYIehM9aRmO5,
+ * GameRow _1cXzMrhKqoTeIK_bPpNLIC, IconContainer _1lI4JF6IbYhApR8FbMR8Nr, Footer kOsdHFGVApmVzmcTgOixo,
+ * Arrow _22hYbsRuIIJj7Fcm97dEOE. The header row and the list read as a single container.
+ */
+.zhaKeChn9HPNSMtk0ami_ ._3m0MnUo45wjLOfNLpZ-3KH:not(#se-none) {
+  box-sizing: border-box;
+  min-height: 40px;
+  margin-top: 12px;
+  padding: 0 6px;
+  align-items: center;
+  border: 0;
+  border-radius: var(--se-radius-lg, 14px) var(--se-radius-lg, 14px) 0 0;
+  background: var(--se-bg, #171a20);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.zhaKeChn9HPNSMtk0ami_ ._3m0MnUo45wjLOfNLpZ-3KH ._1kVk1iZQs3Blqmz6k0qeFV:not(#se-none),
+.zhaKeChn9HPNSMtk0ami_ ._3m0MnUo45wjLOfNLpZ-3KH ._1LM_TWL_05e13S1LS9wHao:not(#se-none) {
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  letter-spacing: var(--se-label-spacing, .1em);
+  color: var(--se-label-color, #6f7984);
+  transition: color .15s ease-out;
+}
+
+.zhaKeChn9HPNSMtk0ami_ ._3m0MnUo45wjLOfNLpZ-3KH ._1kVk1iZQs3Blqmz6k0qeFV:not(#se-none):hover,
+.zhaKeChn9HPNSMtk0ami_ ._3m0MnUo45wjLOfNLpZ-3KH ._1LM_TWL_05e13S1LS9wHao:not(#se-none):hover {
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+.zhaKeChn9HPNSMtk0ami_ ._3m0MnUo45wjLOfNLpZ-3KH ._1kVk1iZQs3Blqmz6k0qeFV:has(._22hYbsRuIIJj7Fcm97dEOE),
+.zhaKeChn9HPNSMtk0ami_ ._3m0MnUo45wjLOfNLpZ-3KH ._1LM_TWL_05e13S1LS9wHao:has(._22hYbsRuIIJj7Fcm97dEOE) {
+  color: var(--se-text, #e6e8eb);
+}
+
+.zhaKeChn9HPNSMtk0ami_ ._22hYbsRuIIJj7Fcm97dEOE:not(#se-none) {
+  width: 10px;
+  height: 10px;
+  color: var(--se-accent, #7cc4ff);
+  fill: currentColor;
+}
+
+.zhaKeChn9HPNSMtk0ami_ ._1e6tjguQEHdYIehM9aRmO5:not(#se-none) {
+  padding: 4px 0;
+  border: 0;
+  border-radius: 0 0 var(--se-radius-lg, 14px) var(--se-radius-lg, 14px);
+  background: var(--se-bg, #171a20);
+  box-shadow: inset 1px 0 0 var(--se-hairline, rgba(255, 255, 255, .06)), inset -1px 0 0 var(--se-hairline, rgba(255, 255, 255, .06)), inset 0 -1px 0 var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.zhaKeChn9HPNSMtk0ami_ ._1cXzMrhKqoTeIK_bPpNLIC:not(#se-none) {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  min-height: 42px;
+  margin: 1px 6px;
+  padding: 0;
+  border-radius: var(--se-radius-sm, 8px);
+  transition: background-color .12s ease-out;
+}
+
+.zhaKeChn9HPNSMtk0ami_ ._1cXzMrhKqoTeIK_bPpNLIC:not(#se-none):hover {
+  background: var(--se-hover, #2c3440);
+}
+
+.zhaKeChn9HPNSMtk0ami_ ._1cXzMrhKqoTeIK_bPpNLIC:has(.DialogCheckbox.Active):not(#se-none) {
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+  box-shadow: inset 0 0 0 1px var(--se-accent-line, rgba(124, 196, 255, .3));
+}
+
+.zhaKeChn9HPNSMtk0ami_ ._1cXzMrhKqoTeIK_bPpNLIC .f3L-gWeCGaYVMycozN4-G.DialogCheckbox:not(#se-none) {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin: 0 12px 0 10px;
+  padding: 0;
+  border: 0;
+}
+
+.zhaKeChn9HPNSMtk0ami_ ._1cXzMrhKqoTeIK_bPpNLIC ._1lI4JF6IbYhApR8FbMR8Nr img {
+  border-radius: 6px;
+}
+
+.zhaKeChn9HPNSMtk0ami_ ._1cXzMrhKqoTeIK_bPpNLIC ._1kVk1iZQs3Blqmz6k0qeFV:not(#se-none) {
+  font: 600 13.5px var(--se-font);
+  color: var(--se-text, #e6e8eb);
+  text-overflow: ellipsis;
+}
+
+.zhaKeChn9HPNSMtk0ami_ ._1cXzMrhKqoTeIK_bPpNLIC ._1LM_TWL_05e13S1LS9wHao:not(#se-none) {
+  font: 400 12px var(--se-font);
+  font-style: normal;
+  opacity: 1;
+  color: var(--se-text-faint, #6f7984);
+  text-overflow: ellipsis;
+}
+
+.zhaKeChn9HPNSMtk0ami_ ._1cXzMrhKqoTeIK_bPpNLIC:hover ._1LM_TWL_05e13S1LS9wHao:not(#se-none) {
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.zhaKeChn9HPNSMtk0ami_ .kOsdHFGVApmVzmcTgOixo:not(#se-none) {
+  padding-top: 16px;
+}
+
+/*
+ * Activate a Product
+ * HeaderContainer _2IWpfqj8UL5hUs7n-pxnUy (also.DialogHeader), InfoIconContainer _3sqYFYR9Cl3T6Iy-0a3EJ2,
+ * CodeInput _2JbjuHCSB0QxUPIMEQbqAi, ProductActivationInfoContainerDesktop _2V8QeCkR06XqFUJO_GDTVP,
+ * InfoBody _1fFighONx9alttArw-qWFo, InfoExampleHeader _3kLa_RUiNSrm_Nr6tz7blu, InfoExample
+ * _2sEmBD0BnXW-eo2PlLcaLV, SSAContainer _3m3ry1aX6zf5f8KT9_7RU5, ResultBody _1aSkOCX_EmlK4A7z7HBIj,
+ * ProductName _2yUw38WTqPyZaPo3WENI46.
+ */
+._2siQZCB9yAOkiG8N-zRZEe ._2V8QeCkR06XqFUJO_GDTVP:not(#se-none) {
+  padding: 0 0 18px;
+}
+
+._2siQZCB9yAOkiG8N-zRZEe ._1fFighONx9alttArw-qWFo:not(#se-none) {
+  margin-bottom: 14px;
+  font: 400 13.5px/1.55 var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+/* The example codes in a recessed container, monospaced */
+._2siQZCB9yAOkiG8N-zRZEe ._3kLa_RUiNSrm_Nr6tz7blu:not(#se-none) {
+  margin: 0;
+  padding: 12px 16px 6px;
+  border-radius: var(--se-radius-md, 10px) var(--se-radius-md, 10px) 0 0;
+  background: var(--se-bg, #171a20);
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  letter-spacing: var(--se-label-spacing, .1em);
+  color: var(--se-label-color, #6f7984);
+}
+
+._2siQZCB9yAOkiG8N-zRZEe ._2sEmBD0BnXW-eo2PlLcaLV:not(#se-none) {
+  padding: 2px 16px;
+  background: var(--se-bg, #171a20);
+  font: 500 12.5px/1.6 Consolas, "Cascadia Mono", "SF Mono", monospace;
+  letter-spacing: .04em;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._2siQZCB9yAOkiG8N-zRZEe ._2sEmBD0BnXW-eo2PlLcaLV:last-child {
+  padding-bottom: 12px;
+  border-radius: 0 0 var(--se-radius-md, 10px) var(--se-radius-md, 10px);
+}
+
+._2siQZCB9yAOkiG8N-zRZEe ._3sqYFYR9Cl3T6Iy-0a3EJ2:not(#se-none) {
+  margin-inline-start: auto;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._2siQZCB9yAOkiG8N-zRZEe ._2IWpfqj8UL5hUs7n-pxnUy.DialogHeader:not(#se-none) {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+}
+
+/* The code field: tall, monospaced and spaced like a key */
+._2siQZCB9yAOkiG8N-zRZEe :is(._2JbjuHCSB0QxUPIMEQbqAi, ._2JbjuHCSB0QxUPIMEQbqAi .DialogTextInputBase, input._2JbjuHCSB0QxUPIMEQbqAi):not(#se-none) {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+._2siQZCB9yAOkiG8N-zRZEe :is(._2JbjuHCSB0QxUPIMEQbqAi .DialogTextInputBase, input._2JbjuHCSB0QxUPIMEQbqAi, ._2JbjuHCSB0QxUPIMEQbqAi.DialogTextInputBase):not(#se-none) {
+  height: 46px !important;
+  border-radius: var(--se-radius-md, 10px) !important;
+  font: 600 16px Consolas, "Cascadia Mono", "SF Mono", monospace !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase;
+}
+
+._2siQZCB9yAOkiG8N-zRZEe ._3m3ry1aX6zf5f8KT9_7RU5:not(#se-none) {
+  border-radius: var(--se-radius-md, 10px);
+  overflow: hidden;
+  background: var(--se-field, #15181d);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+._2siQZCB9yAOkiG8N-zRZEe ._2yUw38WTqPyZaPo3WENI46:not(#se-none) {
+  font-weight: 700;
+  color: var(--se-text, #e6e8eb);
+}
+
+/* System Report, System Information */
+._2TAQYpbxatDYN3Ex76KX5u .DialogBodyText:not(#se-none),
+._3v2Gg_GCpLHpHQDLFQ7cvI .DialogBodyText:not(#se-none) {
+  margin-bottom: 14px;
+  font: 400 13.5px/1.5 var(--se-font) !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+._2TAQYpbxatDYN3Ex76KX5u ._7jaC6UFFrvcKq2UlJr1Pb .Cw--cBWy7v1Ey1JF0VkBN:not(#se-none),
+._3v2Gg_GCpLHpHQDLFQ7cvI ._3f3VJUtyLXUf_JDFE-BaQ6:not(#se-none) {
+  background: var(--se-bg, #171a20) !important;
+  border-radius: var(--se-radius-lg, 14px) !important;
+}
+
+/* System Information: each section as its own block with a label and rows on 1px dividers */
+._3v2Gg_GCpLHpHQDLFQ7cvI .RRhNQ2haTbK9z71YoH2R3:not(#se-none) {
+  padding: 2px 0 10px;
+  border-bottom: 1px solid var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+._3v2Gg_GCpLHpHQDLFQ7cvI .RRhNQ2haTbK9z71YoH2R3:last-child {
+  border-bottom: 0;
+}
+
+._3v2Gg_GCpLHpHQDLFQ7cvI ._3f3VJUtyLXUf_JDFE-BaQ6 h3:not(#se-none) {
+  color: var(--se-accent, #7cc4ff) !important;
+  opacity: .85;
+}
+
+/*
+ * About Steam
+ * A fixed 500 × 300 window whose DialogContent centres its content (Steam: display: flex;
+ * align-items: center), so anything taller is cut at the top. Laid out to fit: the title
+ * with Steam's logo as a plain glyph, the five facts as a two-column list in a recessed container
+ * (label muted on the left, value on the right, a 1px divider between rows), Close at the foot.
+ * The facts are loose text between <br>s in one DialogBodyText: with the <br>s taken out of
+ * the flow, a two-column grid pairs each label span with the value text after it.
+ * AboutSteamDialog FFIKUQ7BGKw6vO1voazlr, DialogHeader _3QhXBKJwISpG-AmpbOQgLQ, SteamLogoIcon
+ * Tz7ae7SsFpdVaMYJhMCpc, DialogBodyText _32eeZuly3nnz3cMXdSgyj9, DialogBodyLabel _2yhBdvNsgdBGL_UjfmTDGH.
+ */
+.DialogContent.FFIKUQ7BGKw6vO1voazlr:not(#se-none) {
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 16px 20px 14px !important;
+  overflow-y: auto;
+}
+
+.FFIKUQ7BGKw6vO1voazlr > .DialogContent_InnerWidth:not(#se-none) {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  min-height: 0;
+}
+
+.FFIKUQ7BGKw6vO1voazlr ._3QhXBKJwISpG-AmpbOQgLQ:not(#se-none) {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  font: 700 18px/24px var(--se-font) !important;
+  letter-spacing: -.01em !important;
+  text-transform: none !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.FFIKUQ7BGKw6vO1voazlr .Tz7ae7SsFpdVaMYJhMCpc:not(#se-none) {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  color: var(--se-text, #e6e8eb);
+}
+
+.FFIKUQ7BGKw6vO1voazlr ._32eeZuly3nnz3cMXdSgyj9:not(#se-none) {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  grid-auto-rows: 26px;
+  align-items: center;
+  column-gap: 14px;
+  margin: 0;
+  padding: 4px 14px !important;
+  overflow: hidden;
+  border-radius: var(--se-radius-lg, 14px);
+  background: repeating-linear-gradient(to bottom, transparent 0 25px, var(--se-hairline, rgba(255, 255, 255, .06)) 25px 26px) 0 0 / 100% calc(100% - 26px) no-repeat content-box, var(--se-bg, #171a20);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  white-space: nowrap;
+  font: 500 13px/26px var(--se-font) !important;
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text, #e6e8eb) !important;
+  user-select: text;
+}
+
+.FFIKUQ7BGKw6vO1voazlr ._32eeZuly3nnz3cMXdSgyj9 > br {
+  display: none;
+}
+
+.FFIKUQ7BGKw6vO1voazlr ._2yhBdvNsgdBGL_UjfmTDGH:not(#se-none) {
+  font: 500 12.5px/26px var(--se-font) !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+.FFIKUQ7BGKw6vO1voazlr .DialogFooter:not(#se-none) {
+  margin-top: auto;
+  padding-top: 12px !important;
+}
+
+.FFIKUQ7BGKw6vO1voazlr button.DialogButton:not(#se-none):not(#se-p2) {
+  height: 32px !important;
+  min-height: 32px !important;
+  line-height: 32px !important;
+}
+
+/*
+ * Back Up / Restore
+ * BackupAppsIndicator _24O5i9aa5PKJmbP0tL_Jbf, BackupAppsBar _1cpd2EVhu3enwXF7ZaEIuE, Checkmark
+ * AdaZjNmjZyFjebARyeD3d, Exclamation Mtfia7HxpGXdeOeMWobSm, ResultMessage _1MhH8GEfbC2CockG6DE_4,
+ * Error _3WuW55JICXrYcPUy-vqMIL, Success n7a6ADEuosAef3zl_uaWA, BackupAppInput _3h_6VENNNeSv1LxRpIP263.
+ */
+.YmQ9vcw08n7STkTEQLiYW ._3h_6VENNNeSv1LxRpIP263:not(#se-none) {
+  flex: 1 1 auto;
+}
+
+.YmQ9vcw08n7STkTEQLiYW ._2Nmi6ONpGvLOgRE87Ky2MA:not(#se-none) {
+  font: 400 13.5px/1.5 var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.YmQ9vcw08n7STkTEQLiYW ._24O5i9aa5PKJmbP0tL_Jbf:not(#se-none) {
+  min-height: 6px;
+  height: 6px;
+  margin: 12px 0 6px;
+  border-radius: 999px;
+  background: var(--se-track, #3a424d);
+}
+
+.YmQ9vcw08n7STkTEQLiYW ._1cpd2EVhu3enwXF7ZaEIuE:not(#se-none) {
+  border-radius: 999px;
+  background: var(--se-accent, #7cc4ff);
+  transition: width .3s ease-out;
+}
+
+.YmQ9vcw08n7STkTEQLiYW ._1MhH8GEfbC2CockG6DE_4:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-surface-2, #262c35);
+  font: 500 13.5px/1.45 var(--se-font);
+}
+
+.YmQ9vcw08n7STkTEQLiYW .n7a6ADEuosAef3zl_uaWA:not(#se-none) {
+  background: color-mix(in srgb, var(--se-running) 14%, transparent);
+  color: var(--se-text, #e6e8eb);
+}
+
+.YmQ9vcw08n7STkTEQLiYW ._3WuW55JICXrYcPUy-vqMIL:not(#se-none) {
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent);
+  color: var(--se-danger-text, #ffb0b3);
+}
+
+.YmQ9vcw08n7STkTEQLiYW .AdaZjNmjZyFjebARyeD3d:not(#se-none) {
+  color: var(--se-running, #6cc24a);
+}
+
+.YmQ9vcw08n7STkTEQLiYW .Mtfia7HxpGXdeOeMWobSm:not(#se-none) {
+  color: var(--se-danger, #e5737a);
+}
+
+/*
+ * Mark as Private
+ * A generic confirmation whose title carries Steam's eye glyph in a 28 px box set inline
+ * (style="width: 28px;... margin-inline-end: 12px"): left as a glyph, in the muted text color.
+ */
+.DialogHeader > div[style*="margin-inline-end: 12px"][style*="28px"] {
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.DialogHeader > div[style*="margin-inline-end: 12px"][style*="28px"] svg {
+  color: currentColor;
+}
+
+/*
+ * Steam announcements (Next Fest and other pop-ups)
+ * MarketingMessagesDialog _31Kkeb6BIUOVu8QL-dgtY- (a DialogContent), BrowserViewHost
+ * _2JQwVCR2d_haTggP2MFPQ4 (the store page inside is styled by compatibility/webkit.css), FooterControls
+ * _1dkScx4uNaRq0A1SAI6ai4, Legal _1XA-6q1B-Vz1kXj_29FB_c, ButtonWrapper _3ifn-9ut3Fg6Dzn2Qnw3ru.
+ */
+._31Kkeb6BIUOVu8QL-dgtY-.DialogContent:not(#se-none) {
+  padding: 36px 0 12px;
+  background: var(--se-bg, #171a20);
+}
+
+._31Kkeb6BIUOVu8QL-dgtY- ._2JQwVCR2d_haTggP2MFPQ4:not(#se-none) {
+  background: var(--se-bg, #171a20);
+}
+
+._31Kkeb6BIUOVu8QL-dgtY- ._1dkScx4uNaRq0A1SAI6ai4:not(#se-none) {
+  gap: 16px;
+  padding: 12px 12px 0 20px;
+  border-top: 1px solid var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+._31Kkeb6BIUOVu8QL-dgtY- ._1XA-6q1B-Vz1kXj_29FB_c:not(#se-none) {
+  font: 500 11px/1.45 var(--se-font);
+  color: var(--se-text-faint, #6f7984);
+}
+
+/*
+ * Secondary client modals: Game Launching, Media Viewer, Share/Export,
+ * Uninstall, Cloud Conflict, Friends & Chat utility popups, Game Info,
+ * Pending Gifts, Remote Play pairing, Shutdown, Linux Runtime, and Steam Input.
+ */
+/*
+ * Game launching
+ * GameLaunchingDialog._2KQRlxOL0nH2Mx4tAGxQQr (a DialogContent), Layout._1ONMa3won-P2Oau-Pa97x8, LeftColumn
+ * .A9SsSJPmvetUueLvpmCXH, RightColumn._33mJBJCDyePXKN8r7nj9ln, PortraitContainer._3_yzjqgSqhrEs9sL3hOHTq, Launching
+ * ._2Ylu2Lki0Y2s452Fh--tiE, GameName._20PFwr9na9AT4Lz00IdtVQ, StatusWrapper._2FC4Z3YksGBXT7NA421gI8, OpenSteamButton._1_1gXneI2QlOdyXMqiCZJx.
+ */
+._2KQRlxOL0nH2Mx4tAGxQQr.DialogContent:not(#se-none) {
+  padding: 28px 24px 22px;
+  background: var(--se-surface, #1f242b);
+}
+
+._1ONMa3won-P2Oau-Pa97x8:not(#se-none) {
+  gap: 22px;
+  margin: 0;
+}
+
+._3_yzjqgSqhrEs9sL3hOHTq:not(#se-none) {
+  overflow: hidden;
+  border-radius: var(--se-radius-md, 10px);
+  box-shadow: var(--se-shadow-card, 0 10px 24px -12px rgba(0, 0, 0, .8)), 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+._3_yzjqgSqhrEs9sL3hOHTq img {
+  border-radius: var(--se-radius-md, 10px);
+}
+
+._33mJBJCDyePXKN8r7nj9ln:not(#se-none) {
+  padding: 4px 0 2px;
+}
+
+._2Ylu2Lki0Y2s452Fh--tiE:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  letter-spacing: var(--se-label-spacing, .1em);
+  text-transform: uppercase;
+  color: var(--se-running, #6cc24a);
+}
+
+/* A pulsing dot before "Starting…" */
+._2Ylu2Lki0Y2s452Fh--tiE::before {
+  content: '';
+  flex: 0 0 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--se-running, #6cc24a);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--se-running) 22%, transparent);
+  animation: se-launch-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes se-launch-pulse {
+  50% {
+    opacity: .35;
+  }
+}
+
+._20PFwr9na9AT4Lz00IdtVQ:not(#se-none) {
+  margin-top: 6px;
+  font: 700 26px/1.2 var(--se-font);
+  letter-spacing: -.015em;
+  color: var(--se-text, #e6e8eb);
+}
+
+._2FC4Z3YksGBXT7NA421gI8:not(#se-none) {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-bg, #171a20);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  font: 500 13px/1.45 var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+button._1_1gXneI2QlOdyXMqiCZJx.DialogButton:not(#se-none) {
+  align-self: flex-start;
+  width: auto;
+  margin-top: auto;
+  padding: 0 18px !important;
+  height: var(--se-control-h, 34px);
+}
+
+/*
+ * Recordings, clips and screenshots: the viewer
+ * Opened item (module 513): OpenedItemContainer._2t5RH3SYMHXzW78YdwI5kt, FocusedClip.UJBbMi55kmyA6ZDu_OVUX,
+ * OpenedItemHeaderControls._1soaJ_tJyDE-AlbL1YwWcE, BackLabel._2dU9SCYnAxjOss_afiRpoP, ChangeItem._2PT6bYHtDfOFR4vyjivTCX,
+ * ChangeItemLabel._3DVxYgiAlYMv4C-lg3f9n1, Disabled._2nCOSJ2LPGbykmiktC4LdG, ClipActions._3AMYcN2Tmd6V0BdzsCLKkY, AppName
+ * ._3McijuNU4rzhT_J0BnrLBR, ListItemTooltipBase._1JVxK7k1dVGT-XnDTUFrIC, ErrorScreenshot._35iX6Ylrzw0fN8AHhcIlGF,
+ * DurationText.UJn_t5bdfyjDFBCTAl2bL, DurationTextClip.QEtut6idRi4IYhRbxOROH, ExportProgressSpinner
+ * ._3XehQcwTenAh0XGipNxncv. Player and timeline (module 160): VideoPlayerContainer
+ * .isyHTP860Su66qLXg8c4A, TimelineContainer._1_YoWzrZ_hm7zSlMPkJNdp, Fullscreen._2AkpJqt7oh9v0PNxn4G-um.
+ * Playback controls (module 137): TimeBar._2aFXTdFAuB6AG0djmC0Tgs, TimeDash._1tHdnwPDwf9Ruy_aBd5ueC, RangeSelection
+ * ._3NpnL-zVjl5f2Th32M5WZF, AddMarkerCtn.HYloJyr41RFbSFoc8RY3w, ShareButton._3Rk61GMptJMR1oaiUCjLyL, CreateClipButton
+ * ._3p8vRsHaLo4SSI96We1Y0n, DeleteButton.O5IopE9S2tZ4CgKGn9YWh, LowDiskSpaceButton._1ZNUWXUmSkXGZA8kb3zrBx,
+ * MoreSpecific._1JjlCEet0U46IH_bumoD0j, ShareLastButton._3JpeT-sLJfkIxA1v9nI7UJ, RecordingIconTooltip
+ * .JB3vz2k1En56vQbe0XtOZ, AddMarkerTooltip._2ytunPfeSrGLnjLfJzcZYH, VolumeSlider.pKqdj8AMVbHjzLei06ytQ,
+ * ShowVideoButton._1kE66Y7S_fX1KQnFf5SG3s. Timeline (module 145): TimelineScrollContainer
+ * .II0EI3Ol8DvWt7FQfsNbx. Hover thumbnails (module 158): ImageContainer._16W4iNZCkRy5g-01USxzcp,
+ * TooltipChildren._2T0U4DTFWI5h9xaeZagxLF, TooltipImage._1xD6jfVHbDjGwO77Svhkcv, StateDescription
+ * .u04UCICvObTJ4FUr9RQen, NoRecordedContent._2oSbwmF9lRWp2wTpQ2BTcr. Screenshot view (module 523):
+ * FocusedScreenshot._2xbbxjuyZwP-TorZLyGdo6, Caption._3-jI6bR_mj4JCTwXNFFuuL, UGCMetadata._1LC5K3PfjAt0YKGgKsQ_W0.
+ */
+.isyHTP860Su66qLXg8c4A:not(#se-none) {
+  overflow: hidden;
+  border-radius: var(--se-radius-lg, 14px);
+  background: #000;
+  box-shadow: var(--se-shadow-hero, 0 20px 50px -20px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .06));
+}
+
+._1_YoWzrZ_hm7zSlMPkJNdp._2AkpJqt7oh9v0PNxn4G-um:not(#se-none) {
+  background: color-mix(in srgb, var(--se-bg, #171a20) 82%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+._2xbbxjuyZwP-TorZLyGdo6:not(#se-none),
+._2xbbxjuyZwP-TorZLyGdo6 img {
+  border-radius: var(--se-radius-lg, 14px);
+}
+
+._3-jI6bR_mj4JCTwXNFFuuL:not(#se-none) {
+  font: 500 14px/1.45 var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+._1LC5K3PfjAt0YKGgKsQ_W0:not(#se-none) {
+  font: 500 12.5px var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+/* Header: back, the game's name, prev / next */
+._1soaJ_tJyDE-AlbL1YwWcE:not(#se-none) {
+  gap: 10px;
+  padding: 12px 0;
+}
+
+._2dU9SCYnAxjOss_afiRpoP:not(#se-none) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--se-control-h, 34px);
+  padding: 0 14px 0 8px;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-surface-2, #262c35);
+  font: 600 13px var(--se-font);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--se-text-dim, #b8c0c8);
+  transition: background-color .15s ease-out, color .15s ease-out;
+}
+
+._2dU9SCYnAxjOss_afiRpoP:not(#se-none):hover {
+  background: var(--se-hover, #2c3440);
+  color: var(--se-text-strong, #fff);
+}
+
+._2dU9SCYnAxjOss_afiRpoP svg:not(#se-none) {
+  width: 18px;
+  height: 18px;
+}
+
+._3McijuNU4rzhT_J0BnrLBR:not(#se-none) {
+  font: 600 13px var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._2PT6bYHtDfOFR4vyjivTCX:not(#se-none) {
+  background: var(--se-surface-2, #262c35);
+  box-shadow: var(--se-shadow-pop, 0 18px 40px -10px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .07));
+}
+
+._2PT6bYHtDfOFR4vyjivTCX:not(#se-none):hover {
+  background: var(--se-hover, #2c3440);
+  filter: none;
+}
+
+._2PT6bYHtDfOFR4vyjivTCX ._3DVxYgiAlYMv4C-lg3f9n1:not(#se-none) {
+  color: var(--se-text, #e6e8eb);
+}
+
+._2PT6bYHtDfOFR4vyjivTCX._2nCOSJ2LPGbykmiktC4LdG ._3DVxYgiAlYMv4C-lg3f9n1:not(#se-none) {
+  color: var(--se-text-faint, #6f7984);
+}
+
+/* Buttons over the player: the theme's hover, not Steam's white flash */
+.UJBbMi55kmyA6ZDu_OVUX .DialogButton:not(#se-none) {
+  height: var(--se-control-h, 34px);
+  padding: 0 16px;
+  gap: 8px;
+}
+
+.UJBbMi55kmyA6ZDu_OVUX .DialogButton:not(#se-none):hover,
+:is(._3p8vRsHaLo4SSI96We1Y0n, ._3Rk61GMptJMR1oaiUCjLyL, ._1ZNUWXUmSkXGZA8kb3zrBx)._1JjlCEet0U46IH_bumoD0j:not(#se-none):is(:hover, .gpfocus),
+button.O5IopE9S2tZ4CgKGn9YWh._1JjlCEet0U46IH_bumoD0j:not(#se-none):hover {
+  background: var(--se-hover, #2c3440);
+  color: var(--se-text-strong, #fff);
+}
+
+:is(._3p8vRsHaLo4SSI96We1Y0n, ._3Rk61GMptJMR1oaiUCjLyL, ._1ZNUWXUmSkXGZA8kb3zrBx, .O5IopE9S2tZ4CgKGn9YWh)._1JjlCEet0U46IH_bumoD0j:not(#se-none):is(:hover, .gpfocus) svg {
+  color: var(--se-text-strong, #fff);
+}
+
+._3Rk61GMptJMR1oaiUCjLyL:not(#se-none) {
+  height: var(--se-control-h, 34px);
+  padding: 0 16px;
+  gap: 8px;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-surface-2, #262c35);
+  font: 600 13px var(--se-font);
+}
+
+._3Rk61GMptJMR1oaiUCjLyL:not(#se-none):hover {
+  background: var(--se-hover, #2c3440);
+  color: var(--se-text-strong, #fff);
+}
+
+._3AMYcN2Tmd6V0BdzsCLKkY .DialogButton:not(#se-none) {
+  height: var(--se-control-h, 34px);
+}
+
+/* "Share the last 30 s": a clip action, so the clip gold, as a theme button */
+._3JpeT-sLJfkIxA1v9nI7UJ.DialogButton:not(#se-none) {
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-gold, #f0c060) !important;
+  color: var(--se-bg-ink, #0f1115) !important;
+  font-weight: 700;
+}
+
+._3JpeT-sLJfkIxA1v9nI7UJ.DialogButton:not(#se-none):hover {
+  background: color-mix(in srgb, var(--se-gold) 80%, #fff) !important;
+}
+
+._2aFXTdFAuB6AG0djmC0Tgs:not(#se-none) {
+  font: 500 13px var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._2aFXTdFAuB6AG0djmC0Tgs ._1tHdnwPDwf9Ruy_aBd5ueC:not(#se-none) {
+  color: var(--se-text-faint, #6f7984);
+}
+
+._3NpnL-zVjl5f2Th32M5WZF:not(#se-none) {
+  color: var(--se-gold, #f0c060);
+}
+
+.HYloJyr41RFbSFoc8RY3w:not(#se-none):hover svg {
+  color: var(--se-accent, #7cc4ff);
+}
+
+._1kE66Y7S_fX1KQnFf5SG3s:not(#se-none) {
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  letter-spacing: var(--se-label-spacing, .1em);
+  color: var(--se-text-faint, #6f7984);
+}
+
+._1kE66Y7S_fX1KQnFf5SG3s:not(#se-none):hover {
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+.pKqdj8AMVbHjzLei06ytQ .SliderTrack {
+  --left-track-color: var(--se-accent, #7cc4ff) !important;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--se-track, #3a424d) !important;
+}
+
+.pKqdj8AMVbHjzLei06ytQ .SliderHandle {
+  background: var(--se-text, #e6e8eb) !important;
+}
+
+/* Tooltips over the player and the timeline: the theme's tooltip */
+.JB3vz2k1En56vQbe0XtOZ:not(#se-none),
+._2ytunPfeSrGLnjLfJzcZYH:not(#se-none),
+._1JVxK7k1dVGT-XnDTUFrIC:not(#se-none) {
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-hover, #2c3440);
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, .8), inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  font: 500 12.5px/1.45 var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+._1JVxK7k1dVGT-XnDTUFrIC:not(#se-none) {
+  padding: 10px 12px;
+}
+
+._16W4iNZCkRy5g-01USxzcp:not(#se-none),
+._1xD6jfVHbDjGwO77Svhkcv:not(#se-none) {
+  border-radius: var(--se-radius-md, 10px) var(--se-radius-md, 10px) 0 0;
+  background: var(--se-surface, #1f242b);
+  overflow: hidden;
+}
+
+._2T0U4DTFWI5h9xaeZagxLF:not(#se-none) {
+  border-radius: 0 0 var(--se-radius-md, 10px) var(--se-radius-md, 10px);
+  background: var(--se-surface, #1f242b);
+}
+
+.u04UCICvObTJ4FUr9RQen:not(#se-none) {
+  background: var(--se-surface-2, #262c35);
+  box-shadow: none;
+  text-shadow: none;
+  font: 600 12.5px var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._2oSbwmF9lRWp2wTpQ2BTcr:not(#se-none) {
+  background: var(--se-bg, #171a20);
+  box-shadow: none;
+  text-shadow: none;
+  font: 600 13px var(--se-font);
+  color: var(--se-text-faint, #6f7984);
+}
+
+.II0EI3Ol8DvWt7FQfsNbx::-webkit-scrollbar {
+  background-color: var(--se-field, #15181d) !important;
+  box-shadow: none !important;
+}
+
+.II0EI3Ol8DvWt7FQfsNbx::-webkit-scrollbar-thumb {
+  background-color: var(--se-surface-2, #262c35) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06)) !important;
+}
+
+/* Grid items: lengths in the theme's colors (recordings accent, clips gold) */
+.UJn_t5bdfyjDFBCTAl2bL:not(#se-none) {
+  color: var(--se-accent, #7cc4ff);
+}
+
+.QEtut6idRi4IYhRbxOROH:not(#se-none) {
+  color: var(--se-gold, #f0c060);
+}
+
+._35iX6Ylrzw0fN8AHhcIlGF:not(#se-none) {
+  background: var(--se-surface-2, #262c35);
+  color: var(--se-text-muted, #98a2ad);
+  font: 500 13px var(--se-font);
+}
+
+._3XehQcwTenAh0XGipNxncv:not(#se-none) {
+  color: var(--se-accent, #7cc4ff);
+}
+
+/* The recording window's header (GameRecordingDesktopDialog._31mERWUrF91Uak-RvHfMZw, GameName._3AnDtJ8z1JvdFSj3zCKLt9) */
+._31mERWUrF91Uak-RvHfMZw ._3AnDtJ8z1JvdFSj3zCKLt9:not(#se-none) {
+  font: 600 12.5px var(--se-font);
+  color: var(--se-text-faint, #6f7984);
+}
+
+/*
+ * Share and export
+ * Share screenshot: ShareScreenshotDialog._3VEppdkXPehWVeTfx69Umz, CaptionTextArea.qFjVwKFidyZdbmIhaENhV,
+ * RadioButtonGroup._1BSXpAMT-4rVQY0bODPkns, CloudStorageMessage._2_qlCGMjaj9ByEtraNefWR, UploadingText
+ * .nUy9Bx1r6N0MkTMv-8S-Z. Exporting a clip: ClipProgressDialog.I_4EhtTcr8YQty9AlQuwT, Title._3RlWwNWej-R9g1gIqfVMw4, Error
+ * ._1FdKZFl0MA0Yiq1II7eHmz. Share sheet (module 531): ShareSheet.tyP_D79lbTe9kJwFOIjfB, SectionTitle._3m0ZwHamVLhTf2xS8xoMfy, Warning
+ * ._1rMJzvsvlZLBG67mVqqJ06, SaveClipSpan._3H0CiPqY3V1kLmbMTkJxpl, ChatDivider._3tCPe9E8xrwDbIdktZTyEm, ChatLabel._vNe74s39St1jszCfGwTg,
+ * Chat._2FSFfo_7hsy-5sb7I_zgDK, AllChats._21ckpGxToF7rFhJLW3pJcB, Name._2QqVCcyVVVEGRxITfnEGBa, AllChatsMenu._2FUmWtFyO-djtMKkN50SdM, NoResults
+ * ._1M2aWrjYfBSvkYsVCiobTi, ExportProgressContainer.mlIHpcNI1sen2mSK800yW, Description._29cmBsMjR846fLyIOMlE85,
+ * DescriptionWarning._2ErvkxcxGxrAZLXYCluwU1, DescriptionSmall._3PikOUj6rjKDv2ainh4NcC.
+ */
+.qFjVwKFidyZdbmIhaENhV:not(#se-none) {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 84px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-field, #15181d);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  font: 400 14px/1.45 var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+.qFjVwKFidyZdbmIhaENhV:not(#se-none):focus {
+  background: var(--se-field, #15181d);
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong, rgba(124, 196, 255, .55)), 0 0 0 3px var(--se-accent-tint, rgba(124, 196, 255, .14));
+}
+
+.qFjVwKFidyZdbmIhaENhV::placeholder {
+  font-style: normal;
+  color: var(--se-text-faint, #6f7984);
+}
+
+._1BSXpAMT-4rVQY0bODPkns:not(#se-none) {
+  padding: 8px 12px;
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-surface-2, #262c35);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+._2_qlCGMjaj9ByEtraNefWR:not(#se-none),
+._3PikOUj6rjKDv2ainh4NcC:not(#se-none) {
+  font: 500 12px/1.45 var(--se-font);
+  font-style: normal;
+  color: var(--se-text-faint, #6f7984);
+}
+
+.nUy9Bx1r6N0MkTMv-8S-Z:not(#se-none) {
+  font: 500 13.5px var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.I_4EhtTcr8YQty9AlQuwT ._3RlWwNWej-R9g1gIqfVMw4:not(#se-none) {
+  font: 700 20px/1.3 var(--se-font);
+  letter-spacing: -.01em;
+  color: var(--se-text, #e6e8eb);
+}
+
+.I_4EhtTcr8YQty9AlQuwT ._1FdKZFl0MA0Yiq1II7eHmz:not(#se-none) {
+  padding: 10px 12px;
+  border-radius: var(--se-radius-md, 10px);
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent);
+  font: 500 13px/1.45 var(--se-font);
+  color: var(--se-danger-text, #ffb0b3);
+}
+
+.tyP_D79lbTe9kJwFOIjfB ._3m0ZwHamVLhTf2xS8xoMfy:not(#se-none),
+.tyP_D79lbTe9kJwFOIjfB ._vNe74s39St1jszCfGwTg:not(#se-none) {
+  padding: 8px 12px 4px;
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  letter-spacing: var(--se-label-spacing, .1em);
+  text-transform: uppercase;
+  color: var(--se-label-color, #6f7984);
+}
+
+.tyP_D79lbTe9kJwFOIjfB ._1rMJzvsvlZLBG67mVqqJ06:not(#se-none),
+.tyP_D79lbTe9kJwFOIjfB ._3H0CiPqY3V1kLmbMTkJxpl:not(#se-none),
+._2ErvkxcxGxrAZLXYCluwU1:not(#se-none) {
+  font-style: normal;
+  color: var(--se-gold-text, #f3cf86);
+}
+
+.tyP_D79lbTe9kJwFOIjfB ._3tCPe9E8xrwDbIdktZTyEm:not(#se-none) {
+  margin: 6px 8px;
+  background: var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.tyP_D79lbTe9kJwFOIjfB ._2FSFfo_7hsy-5sb7I_zgDK:not(#se-none),
+.tyP_D79lbTe9kJwFOIjfB ._21ckpGxToF7rFhJLW3pJcB:not(#se-none) {
+  border-radius: var(--se-radius-sm, 8px);
+}
+
+.tyP_D79lbTe9kJwFOIjfB ._2FSFfo_7hsy-5sb7I_zgDK:not(#se-none):hover,
+.tyP_D79lbTe9kJwFOIjfB ._21ckpGxToF7rFhJLW3pJcB:not(#se-none):hover {
+  background: var(--se-hover, #2c3440);
+}
+
+.tyP_D79lbTe9kJwFOIjfB ._2QqVCcyVVVEGRxITfnEGBa:not(#se-none) {
+  font: 500 11.5px/16px var(--se-font);
+  text-overflow: ellipsis;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+/* Share actions (Share on Steam, Copy, Save, Send to Phone): icon and label on one line, icon muted */
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:not(#se-none) {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: var(--se-text-muted, #98a2ad);
+  color: var(--se-text-muted, #98a2ad);
+  transition: fill .15s ease, color .15s ease;
+}
+
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F:hover svg:not(#se-none) {
+  fill: var(--se-text-strong, #fff);
+  color: var(--se-text-strong, #fff);
+}
+
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F .ClMFKNRa-xf68P6vWjMT1:not(#se-none) {
+  margin: 0;
+}
+
+/*
+ * Share actions: the theme's dual-tone icons (outline over a 32% fill) in place of Steam's
+ * solid ones. Steam's icons carry no class, so each is recognised by the start of its first
+ * path and its <svg> becomes a box painting the theme icon through a mask; its own paths are
+ * hidden. An icon not listed here keeps Steam's drawing.
+ */
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M18 3C15.0333 3"]):not(#se-none),
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M24 4H4V24H8V8H24V4Z"]):not(#se-none),
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M29 23V27H7V23H2V32H34V23H29Z"]):not(#se-none),
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M7 2V34H29V2H7Z"]):not(#se-none),
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M1.97998 13.26V30.03"]):not(#se-none),
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M12.69 32.75C10.8228"]):not(#se-none) {
+  background: currentColor;
+  -webkit-mask: var(--se-share-icon) center / contain no-repeat;
+  mask: var(--se-share-icon) center / contain no-repeat;
+}
+
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M18 3C15.0333 3"]) > *,
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M24 4H4V24H8V8H24V4Z"]) > *,
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M29 23V27H7V23H2V32H34V23H29Z"]) > *,
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M7 2V34H29V2H7Z"]) > *,
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M1.97998 13.26V30.03"]) > *,
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M12.69 32.75C10.8228"]) > * {
+  visibility: hidden;
+}
+
+/* globe */
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M18 3C15.0333 3"]) {
+  --se-share-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3C/g%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 3c-2.5 2.6-3.8 5.6-3.8 9s1.3 6.4 3.8 9c2.5-2.6 3.8-5.6 3.8-9S14.5 5.6 12 3zM3.5 9h17M3.5 15h17'/%3E%3C/svg%3E");
+}
+
+/* copy */
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M24 4H4V24H8V8H24V4Z"]) {
+  --se-share-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Crect x='9' y='9' width='11.5' height='11.5' rx='2'/%3E%3C/g%3E%3Crect x='9' y='9' width='11.5' height='11.5' rx='2'/%3E%3Cpath d='M15 9V5.5a2 2 0 0 0-2-2H5.5a2 2 0 0 0-2 2V13a2 2 0 0 0 2 2H9'/%3E%3C/svg%3E");
+}
+
+/* save */
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M29 23V27H7V23H2V32H34V23H29Z"]) {
+  --se-share-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3z'/%3E%3C/g%3E%3Cpath d='M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3M12 3.5v10.5M8 10l4 4 4-4'/%3E%3C/svg%3E");
+}
+
+/* phone */
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M7 2V34H29V2H7Z"]) {
+  --se-share-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Crect x='6.5' y='2.5' width='11' height='19' rx='2.5'/%3E%3C/g%3E%3Crect x='6.5' y='2.5' width='11' height='19' rx='2.5'/%3E%3Cpath d='M11 18h2'/%3E%3C/svg%3E");
+}
+
+/* mail */
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M1.97998 13.26V30.03"]) {
+  --se-share-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Crect x='3' y='5.5' width='18' height='13' rx='2'/%3E%3C/g%3E%3Crect x='3' y='5.5' width='18' height='13' rx='2'/%3E%3Cpath d='M3.5 7.5 12 13l8.5-5.5'/%3E%3C/svg%3E");
+}
+
+/* link */
+.tyP_D79lbTe9kJwFOIjfB .QoydG3cy0VecZ1qgKRn8F svg:has(> path[d^="M12.69 32.75C10.8228"]) {
+  --se-share-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M14.5 9.5l-5 5'/%3E%3C/g%3E%3Cpath d='M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1'/%3E%3C/svg%3E");
+}
+
+/*
+ * Share to a chat: round avatars like the rest of the theme (Steam's were squares with an
+ * offline frame), and "All chats" as a round tile of the same size.
+ * ChatRow ._2ANTnUmu_A2yhRrUTTof_Z, Chat ._2FSFfo_7hsy-5sb7I_zgDK, AllChats ._21ckpGxToF7rFhJLW3pJcB,
+ * AllChatsIcon ._1QmdAaG62bFb3oavlpm8eA; the first child of a chat holds the avatar.
+ */
+.tyP_D79lbTe9kJwFOIjfB ._2ANTnUmu_A2yhRrUTTof_Z:not(#se-none) {
+  gap: 2px;
+  margin: 2px 4px 4px;
+}
+
+.tyP_D79lbTe9kJwFOIjfB ._2ANTnUmu_A2yhRrUTTof_Z :is(._2FSFfo_7hsy-5sb7I_zgDK, ._21ckpGxToF7rFhJLW3pJcB):not(#se-none) {
+  align-items: center;
+  gap: 6px;
+  min-width: 64px;
+  max-width: 64px;
+  padding: 8px 6px;
+  border-radius: var(--se-radius-md, 10px);
+}
+
+.tyP_D79lbTe9kJwFOIjfB ._2ANTnUmu_A2yhRrUTTof_Z ._2FSFfo_7hsy-5sb7I_zgDK > :first-child:not(#se-none) {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--se-surface-2, #262c35);
+}
+
+.tyP_D79lbTe9kJwFOIjfB ._2ANTnUmu_A2yhRrUTTof_Z ._2FSFfo_7hsy-5sb7I_zgDK > :first-child :is(div, img):not(#se-none) {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.tyP_D79lbTe9kJwFOIjfB ._2ANTnUmu_A2yhRrUTTof_Z ._2FSFfo_7hsy-5sb7I_zgDK > :first-child img:not(#se-none) {
+  object-fit: cover;
+}
+
+.tyP_D79lbTe9kJwFOIjfB ._2ANTnUmu_A2yhRrUTTof_Z ._1QmdAaG62bFb3oavlpm8eA:not(#se-none) {
+  box-sizing: border-box;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 11px;
+  border-radius: 50%;
+  background: var(--se-surface-2, #262c35);
+  fill: var(--se-text-muted, #98a2ad);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.tyP_D79lbTe9kJwFOIjfB ._2ANTnUmu_A2yhRrUTTof_Z ._21ckpGxToF7rFhJLW3pJcB:hover ._1QmdAaG62bFb3oavlpm8eA:not(#se-none) {
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+  fill: var(--se-accent, #7cc4ff);
+  color: var(--se-accent, #7cc4ff);
+}
+
+.tyP_D79lbTe9kJwFOIjfB ._2ANTnUmu_A2yhRrUTTof_Z :is(._2FSFfo_7hsy-5sb7I_zgDK, ._21ckpGxToF7rFhJLW3pJcB):hover ._2QqVCcyVVVEGRxITfnEGBa:not(#se-none) {
+  color: var(--se-text-strong, #fff);
+}
+
+._2FUmWtFyO-djtMKkN50SdM input:not(#se-none) {
+  height: var(--se-control-h, 34px);
+  padding: 0 12px;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-field, #15181d);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  font: 500 13px var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+/*
+ * "All chats" menu: a list like the theme's friend rows. Each chat a round 32px avatar (Steam's
+ * square, frame and status bar go; a group's tiled avatars are cropped to the circle) beside
+ * one line of name; the menu wraps its rows instead of standing a fixed 490px tall.
+ */
+._2FUmWtFyO-djtMKkN50SdM:not(#se-none) {
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+  width: 280px;
+  height: auto;
+  max-height: min(490px, 70vh);
+  padding: 0 0 6px;
+  overflow-y: auto;
+}
+
+._2FUmWtFyO-djtMKkN50SdM input:not(#se-none) {
+  flex: none;
+  margin: 8px 8px 6px;
+}
+
+._2FUmWtFyO-djtMKkN50SdM ._2FSFfo_7hsy-5sb7I_zgDK:not(#se-none) {
+  position: relative;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  min-height: 0;
+  margin: 0 6px;
+  padding: 6px 10px;
+  border-radius: var(--se-radius-sm, 8px);
+}
+
+._2FUmWtFyO-djtMKkN50SdM ._2FSFfo_7hsy-5sb7I_zgDK > :first-child:not(#se-none) {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--se-surface-2, #262c35);
+}
+
+._2FUmWtFyO-djtMKkN50SdM ._2FSFfo_7hsy-5sb7I_zgDK > :first-child :is(div, img):not(#se-none) {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+._2FUmWtFyO-djtMKkN50SdM ._2FSFfo_7hsy-5sb7I_zgDK > :first-child img:not(#se-none) {
+  object-fit: cover;
+}
+
+/* A group's tiled avatars: keep their grid, just inside the circle */
+._2FUmWtFyO-djtMKkN50SdM ._2FSFfo_7hsy-5sb7I_zgDK > :first-child :has(> img + img):not(#se-none) {
+  display: flex !important;
+}
+
+._2FUmWtFyO-djtMKkN50SdM ._2FSFfo_7hsy-5sb7I_zgDK > :first-child :has(> img + img) > img:not(#se-none) {
+  flex: 1 1 0;
+  width: auto !important;
+}
+
+._2FUmWtFyO-djtMKkN50SdM ._2FSFfo_7hsy-5sb7I_zgDK ._2QqVCcyVVVEGRxITfnEGBa:not(#se-none) {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 600 13.5px/20px var(--se-font);
+  text-align: start;
+  color: var(--se-text, #e6e8eb);
+}
+
+._2FUmWtFyO-djtMKkN50SdM ._2FSFfo_7hsy-5sb7I_zgDK:is(:hover, :focus, .gpfocus) ._2QqVCcyVVVEGRxITfnEGBa:not(#se-none) {
+  color: var(--se-text-strong, #fff);
+}
+
+._2FUmWtFyO-djtMKkN50SdM ._2FSFfo_7hsy-5sb7I_zgDK::before {
+  display: none;
+}
+
+._2FUmWtFyO-djtMKkN50SdM ._2FSFfo_7hsy-5sb7I_zgDK:is(:hover, :focus, .gpfocus):not(#se-none) {
+  outline: none;
+  background: var(--se-hover, #2c3440);
+}
+
+._2FUmWtFyO-djtMKkN50SdM ._1M2aWrjYfBSvkYsVCiobTi:not(#se-none) {
+  margin: 6px 16px;
+  font: 500 13px/1.4 var(--se-font);
+  font-style: normal;
+  color: var(--se-text-faint, #6f7984);
+}
+
+._29cmBsMjR846fLyIOMlE85:not(#se-none) {
+  font: 400 13.5px/1.5 var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+/* Uninstall dialog: UninstallDialog ._7au1m_-ZIF7Hx_rCvrDfI, UninstallingText ._24I3SrKur3IMEKCeyiBdq7, UninstallError ._2n_P7MWsN2y6PwS2a957_c */
+._24I3SrKur3IMEKCeyiBdq7:not(#se-none) {
+  font: 500 14px/1.5 var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._2n_P7MWsN2y6PwS2a957_c:not(#se-none) {
+  padding: 12px 14px;
+  border-radius: var(--se-radius-md, 10px);
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent);
+  font: 500 13.5px/1.45 var(--se-font);
+  color: var(--se-danger-text, #ffb0b3);
+}
+
+/*
+ * Cloud conflict: two save cards, the chosen one in the accent color
+ * CloudConflictModalContent._3Ps1lrmF9DEtl8yxP0uGBq, CloudConflictWarning._2iPYW8hgDS1bbDGnczOHaF,
+ * CloudConflictText._2ZX5NfzNFe7KKDLW3pZXr_, TitleWarning._3vc5HYX7AEVTqXRYl2gm8, TitleWarningIcon
+ * ._2xmJKd5MIQ6qNPl_twwE88, DialogChoiceRow._1e3aAVJv0Hy_mDBocob-ja, DialogChoiceButton._1NanE3eExGghMdycVIVR8b
+ * (a DialogButton), Active._2hegSJLw7cDEDv9fKZj8xS, RadioButton._2SNqCkeOL0u8yOzul4tJuI, ConflictChoiceIcon
+ * ._2SbOuj7do6GDVx6yx3PEMx, ConflictChoiceText._1sNmtuAc90YB98QPbF17Vj, Title._369FNQtjKZj4k1RgMk_upt, LastModified
+ * ._3CKEaM8le_xVqysDq9s4d3, Newer._1AaLsxciE3FzXo_l304mHP, DialogChoiceDescription._3x3S4u9jmm15kFmdepiK_S, ChoiceNote
+ * ._3p0kE_Jb2xRNIU6GaoczV5, FooterNote._1kIuOs3seBtfIZzSu2g2l7, ContinueButton._3IEn9eGUda2XUf9FQ8lWTl, CancelButton._1prk5lEqWwwqifHEBqYCpr.
+ */
+._2xmJKd5MIQ6qNPl_twwE88:not(#se-none) {
+  width: 22px;
+  height: 22px;
+  margin-right: 10px;
+  color: var(--se-gold, #f0c060);
+}
+
+._3vc5HYX7AEVTqXRYl2gm8:not(#se-none) {
+  align-items: center;
+}
+
+.DialogBodyText._2iPYW8hgDS1bbDGnczOHaF:not(#se-none) {
+  font: 600 14px/1.5 var(--se-font) !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+._2ZX5NfzNFe7KKDLW3pZXr_:not(#se-none) {
+  font: 400 13.5px/1.55 var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._1e3aAVJv0Hy_mDBocob-ja:not(#se-none) {
+  height: auto;
+  margin-bottom: 8px;
+}
+
+._1e3aAVJv0Hy_mDBocob-ja button._1NanE3eExGghMdycVIVR8b.DialogButton:not(#se-none) {
+  height: auto !important;
+  min-height: 72px !important;
+  margin: 0 !important;
+  padding: 12px 16px 12px 4px !important;
+  align-items: center;
+  text-align: start;
+  border-radius: var(--se-radius-lg, 14px) !important;
+  background: var(--se-surface-2, #262c35) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06)) !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+._1e3aAVJv0Hy_mDBocob-ja button._1NanE3eExGghMdycVIVR8b.DialogButton:not(#se-none):hover {
+  background: var(--se-hover, #2c3440) !important;
+}
+
+._1e3aAVJv0Hy_mDBocob-ja button._1NanE3eExGghMdycVIVR8b._2hegSJLw7cDEDv9fKZj8xS.DialogButton:not(#se-none) {
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14)) !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent-line, rgba(124, 196, 255, .3)) !important;
+}
+
+._2SNqCkeOL0u8yOzul4tJuI:not(#se-none) {
+  box-sizing: border-box;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--se-border-strong, #4a525e);
+  border-radius: 50%;
+  background: none;
+  box-shadow: none;
+}
+
+._2hegSJLw7cDEDv9fKZj8xS ._2SNqCkeOL0u8yOzul4tJuI:not(#se-none),
+._2hegSJLw7cDEDv9fKZj8xS ._2SNqCkeOL0u8yOzul4tJuI:not(#se-none):hover {
+  border-color: var(--se-accent, #7cc4ff);
+  background: radial-gradient(circle, var(--se-accent, #7cc4ff) 0 4px, transparent 4.5px);
+  box-shadow: none;
+}
+
+._2SbOuj7do6GDVx6yx3PEMx:not(#se-none) {
+  width: 26px;
+  height: 26px;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._2hegSJLw7cDEDv9fKZj8xS ._2SbOuj7do6GDVx6yx3PEMx:not(#se-none) {
+  color: var(--se-accent, #7cc4ff);
+}
+
+._1sNmtuAc90YB98QPbF17Vj ._369FNQtjKZj4k1RgMk_upt:not(#se-none) {
+  margin: 0 0 3px;
+  font: 700 15px/1.3 var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+._1sNmtuAc90YB98QPbF17Vj ._3CKEaM8le_xVqysDq9s4d3:not(#se-none) {
+  font: 500 12.5px/1.4 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._3Ps1lrmF9DEtl8yxP0uGBq ._3x3S4u9jmm15kFmdepiK_S ._1AaLsxciE3FzXo_l304mHP:not(#se-none) {
+  margin-inline-start: 6px;
+  color: var(--se-running, #6cc24a);
+  font-weight: 700;
+}
+
+._3p0kE_Jb2xRNIU6GaoczV5:not(#se-none),
+._1kIuOs3seBtfIZzSu2g2l7:not(#se-none) {
+  font: 500 12.5px/1.45 var(--se-font);
+  color: var(--se-text-faint, #6f7984);
+}
+
+._3Ps1lrmF9DEtl8yxP0uGBq ._3IEn9eGUda2XUf9FQ8lWTl:not(#se-none),
+._3Ps1lrmF9DEtl8yxP0uGBq ._1prk5lEqWwwqifHEBqYCpr:not(#se-none) {
+  height: var(--se-control-h, 34px) !important;
+}
+
+/*
+ * Friends & Chat: the small dialogs
+ * (Friends settings and group settings are paged settings dialogs, styled by features/settings/settings.css.)
+ * Create group chat / invite friends: Steam's friend picker (FriendPicker, FriendPicker_Suggestions,
+ * FriendPicker_SuggestedFriend, FriendPicker_ChosenFriend, DialogListBuilderInput); add nickname
+ * (Dialog_EditNickName); new / manage friend category (nicknameInput, nicknameError); the invite link
+ * (InviteFriendToChatDialog_LinkInput). Global class names, not hashed.
+ */
+/*
+ * The picker's field: Steam wraps label and box in one DialogListBuilderInput group, so the
+ * field look goes on the inner box (_DialogInputContainer) only; the group stays clear and
+ * the label sits above the box, as in every other dialog
+ */
+.FriendPicker .DialogListBuilderInput:not(#se-none) {
+  min-height: 0;
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.FriendPicker .DialogListBuilderInput > label {
+  display: block;
+}
+
+.FriendPicker .DialogListBuilderInput .DialogLabel:not(#se-none) {
+  margin: 0 0 8px !important;
+}
+
+.FriendPicker .DialogListBuilderInput ._DialogInputContainer:not(#se-none) {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  margin: 0 !important;
+  padding: 4px 6px !important;
+  cursor: text;
+}
+
+.FriendPicker .DialogListBuilderInput .DialogListBuilderInput_List {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.FriendPicker .DialogListBuilderInput .DialogListBuilderInput_ListItem {
+  display: flex;
+  margin: 0 !important;
+}
+
+.FriendPicker .DialogListBuilderInput .DialogListBuilderInput_Input:not(#se-none) {
+  flex: 1;
+  min-width: 80px;
+  max-width: none;
+  height: 30px;
+  margin: 0 !important;
+  padding: 0 6px !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  font: 500 14px var(--se-font) !important;
+  color: var(--se-text, #e6e8eb) !important;
+  font-style: normal !important;
+}
+
+.FriendPicker .DialogListBuilderInput .DialogListBuilderInput_Input::placeholder {
+  color: var(--se-text-faint, #6f7984);
+  font-style: normal;
+}
+
+/* The chosen friends: accent chips */
+.FriendPicker_ChosenFriend:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 8px 0 11px;
+  border-radius: 999px;
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+  box-shadow: inset 0 0 0 1px var(--se-accent-line, rgba(124, 196, 255, .3));
+  line-height: 28px;
+  transition: background-color .15s ease;
+}
+
+.FriendPicker_ChosenFriend:not(#se-none):hover {
+  background: color-mix(in srgb, var(--se-accent) 24%, transparent);
+}
+
+.FriendPicker_ChosenFriend span:not(#se-none) {
+  max-width: 140px;
+  font: 600 12.5px/28px var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+.FriendPicker_ChosenFriend .SVGIcon_X_Line:not(#se-none) {
+  width: 9px;
+  height: 9px;
+  margin: 0;
+  flex: none;
+}
+
+.FriendPicker_ChosenFriend .SVGIcon_X_Line line {
+  stroke: var(--se-accent, #7cc4ff) !important;
+}
+
+.FriendPicker_ChosenFriend:hover .SVGIcon_X_Line line {
+  stroke: var(--se-text-strong, #fff) !important;
+}
+
+/*
+ * The friends to pick from: a sunken, rounded list (Steam's FriendPickerFriendList; older
+ * builds call it FriendPicker_Suggestions) with the friends list's rows
+ */
+.FriendPickerFriendList:not(#se-none),
+.FriendPicker_Suggestions:not(#se-none) {
+  overflow: hidden;
+  padding: 4px;
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-bg, #171a20);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.FriendPickerFriendList .insetShadow,
+.FriendPicker_Suggestions .insetShadow {
+  display: none !important;
+}
+
+.FriendPickerScrollPanel:not(#se-none) {
+  padding: 0 !important;
+  scrollbar-width: none;
+}
+
+.FriendPickerScrollPanel::-webkit-scrollbar {
+  width: 0 !important;
+  display: none;
+}
+
+.FriendPicker_SuggestedFriend:not(#se-none) {
+  margin: 0 0 2px;
+  border-radius: var(--se-radius-sm, 8px);
+  cursor: pointer;
+}
+
+.FriendPicker_SuggestedFriend:not(#se-none):is(.Hover, :hover),
+.FriendPicker_Focus .FriendPicker_SuggestedFriend.Focus:not(#se-none) {
+  background: var(--se-hover, #2c3440) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend {
+  --se-pk-ring: var(--se-border-strong, #4a525e);
+}
+
+.FriendPicker_SuggestedFriend .friend:not(#se-none) {
+  display: flex !important;
+  align-items: center;
+  height: auto !important;
+  min-height: 44px;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: 4px 10px !important;
+  background: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+.FriendPicker_SuggestedFriend .friend.online {
+  --se-pk-ring: var(--se-online, #4cb4ff);
+}
+
+.FriendPicker_SuggestedFriend .friend.awayOrSnooze {
+  --se-pk-ring: color-mix(in srgb, var(--se-online) 50%, transparent);
+}
+
+.FriendPicker_SuggestedFriend .friend.ingame {
+  --se-pk-ring: var(--se-running, #6cc24a);
+}
+
+.FriendPicker_SuggestedFriend .friend :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g /* avatarHolder */):not(#se-none) {
+  flex: none;
+  position: relative;
+  width: 30px !important;
+  height: 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  overflow: visible !important;
+  transform: none !important;
+}
+
+.FriendPicker_SuggestedFriend .friend .avatarHolder :is(img.avatar, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none),
+.FriendPicker_SuggestedFriend .friend .nibodjvvrm86uCfnnAn4g :is(img.avatar, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none) {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px var(--se-bg, #171a20), 0 0 0 3.5px var(--se-pk-ring) !important;
+}
+
+.FriendPicker_SuggestedFriend:is(.Hover, :hover, .Focus) .friend .avatarHolder :is(img.avatar, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none),
+.FriendPicker_SuggestedFriend:is(.Hover, :hover, .Focus) .friend .nibodjvvrm86uCfnnAn4g :is(img.avatar, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none) {
+  box-shadow: 0 0 0 2px var(--se-hover, #2c3440), 0 0 0 3.5px var(--se-pk-ring) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend.offline .avatarHolder :is(img.avatar, ._3h-QRJGxnVOIExtHD1R0f2),
+.FriendPicker_SuggestedFriend .friend.offline .nibodjvvrm86uCfnnAn4g :is(img.avatar, ._3h-QRJGxnVOIExtHD1R0f2) {
+  filter: grayscale(.6);
+  opacity: .6;
+}
+
+.FriendPicker_SuggestedFriend .friend :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g) :is(.avatarStatus, .avatarFrame, ._3xUpb5DWXPFNcHHIcv-9pe /* avatarStatus */, .X_mJE4BYV5StDPwZhSiAu /* avatarFrame */) {
+  display: none !important;
+}
+
+.FriendPicker_SuggestedFriend .friend .labelHolder:not(#se-none) {
+  height: auto !important;
+  margin: 0 0 0 12px !important;
+  padding: 0 !important;
+  min-width: 0;
+}
+
+.FriendPicker_SuggestedFriend .friend .nOdcT-MoOaXGePXLyPe0H /* playerName */ {
+  font: 600 13.5px/1.3 var(--se-font) !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend.offline .nOdcT-MoOaXGePXLyPe0H {
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend ._3sxE7F1LV2IcSX68YsH9dI /* richPresenceContainer */ {
+  margin: 0 !important;
+}
+
+.FriendPicker_SuggestedFriend .friend :is(._2Ri005Wg_uXDTa71kdRbcN /* richPresenceLabel */, ._1cB0qtF0paHWWyj1XNcnbG /* gameName */) {
+  margin: 0 !important;
+  padding: 0 !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  font: 500 12px/1.3 var(--se-font) !important;
+  color: var(--se-text-faint, #6f7984) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend.online ._2Ri005Wg_uXDTa71kdRbcN,
+.FriendPicker_SuggestedFriend .friend.online ._1cB0qtF0paHWWyj1XNcnbG {
+  color: var(--se-online, #4cb4ff) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend.awayOrSnooze ._2Ri005Wg_uXDTa71kdRbcN,
+.FriendPicker_SuggestedFriend .friend.awayOrSnooze ._1cB0qtF0paHWWyj1XNcnbG {
+  color: color-mix(in srgb, var(--se-online) 70%, transparent) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend.ingame ._2Ri005Wg_uXDTa71kdRbcN,
+.FriendPicker_SuggestedFriend .friend.ingame ._1cB0qtF0paHWWyj1XNcnbG {
+  color: var(--se-running, #6cc24a) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend .ContextMenuButton {
+  display: none !important;
+}
+
+/*
+ * Invite to Group Chat: the group under the title (its avatar and name on one line), the
+ * link field with Copy, the expiry picker on the right, and an "OR" rule before the picker
+ */
+.ChatRoomGroupInviteDialog .DialogHeader .displayRow:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.ChatRoomGroupInviteDialog .DialogHeaderSubtitle:not(#se-none),
+.InviteToVoiceHeader .DialogHeaderSubtitle:not(#se-none) {
+  margin: 0;
+  font: 600 15px/1.3 var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-accent, #7cc4ff) !important;
+}
+
+.ChatRoomGroupInviteDialog .DialogHeader .ChatRoomGroupAvatar:not(#se-none),
+.ChatRoomGroupInviteDialog .DialogHeader .ChatRoomMultiFriendAvatar:not(#se-none) {
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-surface-2, #262c35);
+  box-shadow: none;
+}
+
+/*
+ * A group of friends' avatars (unsaved group chats): two fill the tile side by side, three
+ * put the first on the left; Steam leaves two of them in the top half of an empty square
+ */
+.ChatRoomMultiFriendAvatar.With2Items .MultiAvatar,
+.ChatRoomMultiFriendAvatar.With3Items .MultiAvatar.Index0 {
+  height: 100% !important;
+  object-fit: cover;
+}
+
+.ChatRoomMultiFriendAvatar.With3Items .MultiAvatar.Index2 {
+  inset-inline-start: auto !important;
+  inset-inline-end: 0 !important;
+  bottom: 0 !important;
+  top: auto !important;
+}
+
+.ChatRoomMultiFriendAvatar .MultiAvatar {
+  object-fit: cover;
+}
+
+.inviteLinkContainer .DialogInputLabelGroup:not(#se-none) {
+  margin: 18px 0 0;
+}
+
+.inviteLinkContainer .DialogInput_Wrapper._DialogLayout:not(#se-none) {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+}
+
+.inviteLinkContainer .DialogInput_Wrapper._DialogLayout .displayRow:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inviteLinkContainer .DialogInputLabelGroup .DialogInput:not(#se-none) {
+  flex: 1 1 auto;
+  margin: 0 !important;
+  line-height: normal;
+}
+
+.inviteLinkContainer .DialogButton.DialogInput_CopyAction:not(#se-none) {
+  flex: 0 0 auto;
+  min-width: 96px;
+  margin: 0 !important;
+  background: var(--se-accent, #7cc4ff) !important;
+  color: var(--se-bg-ink, #0f1115) !important;
+}
+
+.inviteLinkContainer .DialogButton.DialogInput_CopyAction:not(#se-none):hover {
+  background: #9ad2ff !important;
+  color: var(--se-bg-ink, #0f1115) !important;
+}
+
+.expireLinkInContainer:not(#se-none) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 10px 0 0;
+}
+
+.expireLinkInContainer .DialogLabel:not(#se-none) {
+  margin: 0 !important;
+  white-space: nowrap;
+}
+
+.expireLinkInContainer > :not(.DialogLabel) {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0 !important;
+}
+
+.inviteLinkContainer .DialogDropDown._DialogInputContainer:not(#se-none),
+.expireLinkInContainer .DialogDropDown._DialogInputContainer:not(#se-none) {
+  position: relative;
+  flex: 0 0 auto;
+  width: auto !important;
+  min-width: 150px;
+  height: var(--se-control-h-sm, 28px);
+  margin: 0 !important;
+  padding: 0 30px 0 12px !important;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
+  background: var(--se-surface-2, #262c35) !important;
+  box-shadow: none !important;
+  font: 600 13px var(--se-font) !important;
+  color: var(--se-text, #e6e8eb) !important;
+  text-align: start;
+}
+
+.inviteLinkContainer .DialogDropDown._DialogInputContainer:not(#se-none):hover,
+.expireLinkInContainer .DialogDropDown._DialogInputContainer:not(#se-none):hover {
+  background: var(--se-hover, #2c3440) !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+.inviteLinkContainer .DialogDropDown_Arrow:not(#se-none),
+.expireLinkInContainer .DialogDropDown_Arrow:not(#se-none) {
+  top: 50% !important;
+  inset-inline-end: 8px !important;
+  width: 14px !important;
+  height: 14px !important;
+  transform: translateY(-50%);
+}
+
+.OrSeparator:not(#se-none) {
+  gap: 14px;
+  margin: 22px 0 18px;
+}
+
+.OrSeparator .HBar:not(#se-none) {
+  height: 1px;
+  background: var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.OrSeparator .OrSeparatorLabel:not(#se-none) {
+  margin: 0;
+  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
+  letter-spacing: var(--se-label-spacing, .1em) !important;
+  color: var(--se-label-color, #6f7984) !important;
+}
+
+/*
+ * Notifications for a group chat: the chat's name in the accent color under the title, the
+ * channel table as the theme's rows, "Settings" as a link
+ */
+.ChatRoomNotificationSettingsDialog .whiteText:not(#se-none) {
+  color: var(--se-accent, #7cc4ff) !important;
+}
+
+.ChatRoomNotificationSettingsDialog .notificationsChannelHeader:not(#se-none) {
+  padding: 0 12px 6px;
+  border: 0;
+}
+
+.ChatRoomNotificationSettingsDialog .NotificationChannelNameLabel:not(#se-none),
+.ChatRoomNotificationSettingsDialog .OverrideChannelLabel:not(#se-none) {
+  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
+  letter-spacing: var(--se-label-spacing, .1em) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color, #6f7984) !important;
+}
+
+/* The level picker: native dropdown at full width, no second box behind it */
+.ChatRoomNotificationSettingsDialog .notificationRow:not(#se-none) {
+  margin: 0 0 10px;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.ChatRoomNotificationSettingsDialog .notificationRow > * {
+  flex: 1;
+  min-width: 0;
+  margin: 0 !important;
+}
+
+.ChatRoomNotificationSettingsDialog .notificationGeneralHeader .DialogLabel:not(#se-none) {
+  margin: 0 0 8px !important;
+}
+
+/*
+ * "Display an indicator…": the option as one of the theme's rows (label left, switch right);
+ * Steam's glowing gold dot becomes the blue unread dot of the friends list, before the label
+ */
+.ChatRoomNotificationSettingsDialog .indicatorOptionContainer:not(#se-none) {
+  position: relative;
+}
+
+.ChatRoomNotificationSettingsDialog .indicatorOption.DialogToggleField:not(#se-none) {
+  min-height: 48px;
+  margin: 0 !important;
+  padding: 8px 12px 8px 30px !important;
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-surface-2, #262c35) !important;
+}
+
+.ChatRoomNotificationSettingsDialog .indicatorOptionContainer .DialogToggle_Label:not(#se-none) {
+  padding: 0 !important;
+}
+
+.ChatRoomNotificationSettingsDialog .indicatorOptionContainer .ChatUnreadMessageIndicator:not(#se-none) {
+  position: absolute !important;
+  top: 50% !important;
+  bottom: auto !important;
+  inset-inline-start: 12px !important;
+  left: 12px;
+  width: 8px !important;
+  height: 8px !important;
+  margin: -4px 0 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  pointer-events: none;
+}
+
+.ChatRoomNotificationSettingsDialog .indicatorOptionContainer .chatUnreadCircle:not(#se-none) {
+  position: static !important;
+  display: block;
+  width: 8px !important;
+  height: 8px !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  background: var(--se-accent, #7cc4ff) !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+.ChatRoomNotificationSettingsDialog .indicatorOptionContainer .ChatUnreadMessageIndicator.Hidden {
+  opacity: 0 !important;
+}
+
+.ChatRoomNotificationSettingsDialog .DialogHBar:not(#se-none) {
+  height: 1px;
+  margin: 16px 0;
+  background: var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.ChatRoomNotificationSettingsDialog .textLink:not(#se-none),
+.FriendNotificationsDialog .textLink:not(#se-none) {
+  color: var(--se-accent, #7cc4ff) !important;
+  text-decoration: none !important;
+  border: 0 !important;
+  cursor: pointer;
+}
+
+.ChatRoomNotificationSettingsDialog .textLink:not(#se-none):hover,
+.FriendNotificationsDialog .textLink:not(#se-none):hover {
+  text-decoration: underline !important;
+}
+
+/*
+ * Friend Notifications: the friend as a round avatar with its status ring; the options as a
+ * card of rows (a header row of uppercase label, then each option with its two ticks)
+ */
+.FriendNotificationsDialog .friend {
+  --se-pk-ring: var(--se-border-strong, #4a525e);
+}
+
+.FriendNotificationsDialog .friend:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0 20px;
+  padding: 0;
+  background: none !important;
+}
+
+.FriendNotificationsDialog .friend.online {
+  --se-pk-ring: var(--se-online, #4cb4ff);
+}
+
+.FriendNotificationsDialog .friend.awayOrSnooze {
+  --se-pk-ring: color-mix(in srgb, var(--se-online) 50%, transparent);
+}
+
+.FriendNotificationsDialog .friend.ingame {
+  --se-pk-ring: var(--se-running, #6cc24a);
+}
+
+.FriendNotificationsDialog .friend :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g /* avatarHolder */):not(#se-none) {
+  flex: none;
+  width: 56px !important;
+  height: 56px !important;
+  padding: 0 !important;
+  border-radius: 50%;
+  overflow: visible !important;
+}
+
+.FriendNotificationsDialog .friend .avatarHolder :is(img, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none),
+.FriendNotificationsDialog .friend .nibodjvvrm86uCfnnAn4g :is(img, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none) {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  object-fit: cover;
+  box-shadow: 0 0 0 3px var(--se-surface, #1f242b), 0 0 0 5px var(--se-pk-ring) !important;
+}
+
+.FriendNotificationsDialog .friend :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g) :is(.avatarStatus, .avatarFrame, ._3xUpb5DWXPFNcHHIcv-9pe /* avatarStatus */, .X_mJE4BYV5StDPwZhSiAu /* avatarFrame */) {
+  display: none !important;
+}
+
+.FriendNotificationsDialog .friend .labelHolder:not(#se-none) {
+  margin: 0 !important;
+  font: 700 17px/1.3 var(--se-font) !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.FriendNotificationsDialog .friend .labelHolder .playerNickname,
+.FriendNotificationsDialog .friend .labelHolder .playerNicknameBracket {
+  font-weight: 500;
+  color: var(--se-text-faint, #6f7984) !important;
+}
+
+.FriendNotificationsDialog .DialogBodyText:not(#se-none) {
+  margin: 0 0 18px !important;
+}
+
+.FriendNotificationsDialog .useDefaultsCheckBox:not(#se-none) {
+  margin: 0 0 16px;
+  font: 500 14px var(--se-font) !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.FriendNotificationsDialog .SettingsGroup:not(#se-none) {
+  overflow: hidden;
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-surface-2, #262c35);
+}
+
+.FriendsSettingsNotificationRow:not(#se-none) {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 6px 16px;
+  background: none;
+  font: 500 14px var(--se-font) !important;
+  color: var(--se-text, #e6e8eb);
+}
+
+.FriendsSettingsNotificationRow + .FriendsSettingsNotificationRow:not(.FriendsSettingsNotificationRow_Header) {
+  box-shadow: inset 0 1px 0 var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.FriendsSettingsNotificationRow.FriendsSettingsNotificationRow_Header:not(#se-none) {
+  min-height: 36px;
+  background: rgba(0, 0, 0, .14);
+}
+
+.FriendsSettingsNotificationRow_Header .FriendsSettingsNotificationRow_Label:not(#se-none),
+.FriendsSettingsNotificationRow_Header .FriendsSettingsNotificationRow_Checkbox:not(#se-none) {
+  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
+  letter-spacing: var(--se-label-spacing, .1em) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color, #6f7984) !important;
+}
+
+.FriendsSettingsNotificationRow .FriendsSettingsNotificationRow_Label:not(#se-none) {
+  flex: 1 1 50%;
+  min-width: 0;
+}
+
+.FriendsSettingsNotificationRow .FriendsSettingsNotificationRow_Checkbox:not(#se-none) {
+  flex: 1 1 25%;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.FriendsSettingsNotificationRow_Checkbox .DialogCheckbox_Container:not(#se-none) {
+  margin: 0 !important;
+}
+
+.DialogBody.useDefaults .FriendsSettingsNotificationRow:not(.FriendsSettingsNotificationRow_Header) {
+  opacity: .5;
+}
+
+.DialogBody.useDefaults .FriendsSettingsNotificationRow:not(.FriendsSettingsNotificationRow_Header) .FriendsSettingsNotificationRow_Label {
+  color: var(--se-text-dim, #b8c0c8) !important;
+}
+
+.Dialog_EditNickName .friend .avatarMedium:not(#se-none) {
+  border: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px var(--se-surface, #1f242b), 0 0 0 4px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.Dialog_EditNickName .friend .avatarMedium img {
+  border-radius: 50%;
+}
+
+.Dialog_EditNickName .friend .labelHolder .nickNamedAs:not(#se-none) {
+  font: 500 12.5px var(--se-font);
+  color: var(--se-text-faint, #6f7984);
+}
+
+.Dialog_EditNickName .friend .DialogTextInputBase:not(#se-none) {
+  min-height: 40px;
+  padding-inline: 12px !important;
+  font: 600 18px var(--se-font) !important;
+}
+
+.Dialog_EditNickName .friend:is(.online, .ingame) .DialogTextInputBase:not(#se-none) {
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.nicknameError:not(#se-none) {
+  margin: 14px 0;
+  padding: 10px 12px;
+  border-radius: var(--se-radius-md, 10px);
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent);
+  font: 500 13px var(--se-font);
+  color: var(--se-danger-text, #ffb0b3);
+}
+
+input.InviteFriendToChatDialog_LinkInput:not(#se-none) {
+  font: 500 13px Consolas, "Cascadia Mono", "SF Mono", monospace !important;
+  letter-spacing: .02em;
+}
+
+.DialogHighlight:not(#se-none) {
+  color: var(--se-accent, #7cc4ff);
+}
+
+/*
+ * Steam's OFF / ON toggles (DialogToggleField)
+ * Friends & Chat options (unread indicator, push-to-talk, group permissions…) use a pair of
+ * OFF / ON boxes in bright blue: drawn as the theme's switch (the Settings window's), a
+ * 38 x 22 track, blue with a dark knob when on. Steam's two options stay in the DOM and the
+ * whole control keeps its click; text content are hidden.
+ */
+.DialogToggleField._DialogInputContainer:not(.GamepadMode *):not(#se-none) {
+  align-items: center;
+  gap: 16px;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggle_Label:not(#se-none) {
+  font: 500 14px/1.4 var(--se-font) !important;
+  color: var(--se-text, #e6e8eb) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggle_Description:not(#se-none) {
+  padding-top: 2px;
+  font: 400 12.5px/1.45 var(--se-font) !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_Control:not(#se-none) {
+  position: relative;
+  flex: none;
+  align-self: center;
+  width: 38px;
+  height: 22px;
+  margin: 0 !important;
+  padding: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--se-track, #3a424d) !important;
+  color: transparent !important;
+  line-height: 22px;
+  font-size: 0 !important;
+  transition: background-color .15s ease-out, box-shadow .15s ease-out;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_Control:hover {
+  box-shadow: 0 0 0 3px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.DialogToggleField:not(.GamepadMode *):focus-visible .DialogToggleField_Control {
+  box-shadow: 0 0 0 3px var(--se-accent-tint, rgba(124, 196, 255, .14));
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_OptionPanel:not(#se-none) {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_Option:not(#se-none) {
+  flex: 1;
+  width: auto;
+  background: none !important;
+  color: transparent !important;
+  font-size: 0 !important;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_Control::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--se-text-muted, #98a2ad);
+  pointer-events: none;
+  transition: transform .15s ease-out, background-color .15s ease-out;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_Control:has(.DialogToggleField_Option.On.Active):not(#se-none) {
+  background: var(--se-accent, #7cc4ff) !important;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_Control:has(.DialogToggleField_Option.On.Active):not(#se-none)::after {
+  background: var(--se-bg-ink, #0f1115);
+  transform: translateX(16px);
+}
+
+.DialogToggleField.Disabled:not(.GamepadMode *) .DialogToggleField_Control {
+  opacity: .4;
+  cursor: default;
+}
+
+.DialogToggleField.Disabled:not(.GamepadMode *) .DialogToggleField_Control:hover {
+  box-shadow: none;
+}
+
+/*
+ * Leave voice chat? (CloseActiveVoiceWindowConfirmation)
+ * The example of the voice bar, the dashed ring around its leave button and the "you can
+ * leave from here" note in the theme's colors.
+ */
+.CloseActiveVoiceWindowConfirmation .furtherDetails:not(#se-none) {
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+  font: 500 13px/1.45 var(--se-font);
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+.CloseActiveVoiceWindowConfirmation .activeVoiceDetails:not(#se-none) {
+  font: 500 14px/1.5 var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+.CloseActiveVoiceWindowConfirmation .circleHighlight:not(#se-none) {
+  border: 1.5px dashed var(--se-danger, #e5737a);
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  inset-inline-end: 4px;
+}
+
+.CloseActiveVoiceWindowConfirmation .exitIconExample {
+  color: var(--se-danger, #e5737a);
+}
+
+.CloseActiveVoiceWindowConfirmation .exitIconExample :is(.ExitDoor, .Arrow polyline) {
+  stroke: currentColor !important;
+}
+
+.CloseActiveVoiceWindowConfirmation .dontShowConfirmation:not(#se-none) {
+  align-items: center;
+  gap: 8px;
+  font: 500 13.5px var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.CloseActiveVoiceWindowConfirmation .dontShowConfirmation:hover {
+  color: var(--se-text, #e6e8eb);
+}
+
+.CloseActiveVoiceWindowConfirmation .dontShowConfirmation .DialogCheckbox:not(#se-none) {
+  margin: 0 !important;
+}
+
+/*
+ * Group chat settings (Friends & Chat)
+ * native two-column dialog (module 72945: Container _2VY6HOZ…, Nav xSTLmzyl…, NavTitle
+ * uyoPtKbi…, NavItems MWzjHR-u…, NavItem _2YV0m3IR…, Active _1DfstUr4…, Content _3mf9BBKx…;
+ * module 86360: DialogTitle e600t61O…, DialogContent _3t8HxXdv…; module 36308: LeaveButton
+ * _1NqKTWvx…), drawn like the theme's Settings window: a sidebar of 34 px pages with the
+ * current one tinted, the page on the card color with a plain title, Leave in red.
+ */
+._2VY6HOZXxO2AsBaLssl0Uy:not(.GamepadMode *) {
+  max-width: 100%;
+  font-family: var(--se-font);
+}
+
+.xSTLmzylFJdIfak7ZdhuA:not(.GamepadMode *) {
+  box-sizing: border-box;
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  padding: 22px 14px 14px !important;
+  background: var(--se-sidebar, #1d2128) !important;
+  box-shadow: inset -1px 0 0 var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.xSTLmzylFJdIfak7ZdhuA .uyoPtKbi4K01XGuYF5-C_ {
+  /* NavTitle */
+  margin: 0 0 14px !important;
+  padding: 0 10px;
+  font: 700 18px/24px var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.xSTLmzylFJdIfak7ZdhuA .MWzjHR-uqa-svGrdXYfUl {
+  gap: 2px;
+}
+
+/* NavItems */
+.xSTLmzylFJdIfak7ZdhuA .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV {
+  /* NavItem */
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 34px;
+  margin: 0 !important;
+  padding: 0 10px;
+  border-radius: var(--se-radius-sm, 8px);
+  font: 500 13.5px var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text-dim, #b8c0c8) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background-color .15s ease-out, color .15s ease-out;
+}
+
+.xSTLmzylFJdIfak7ZdhuA .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV:is(:hover, .gpfocus):not(._1DfstUr4tIt3Jdt7Mrxfxo) {
+  background: var(--se-hover, #2c3440) !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+.xSTLmzylFJdIfak7ZdhuA .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV._1DfstUr4tIt3Jdt7Mrxfxo {
+  /* Active */
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14)) !important;
+  color: var(--se-text, #e6e8eb) !important;
+  font-weight: 600 !important;
+}
+
+/* Leave Group Chat: a red row at the foot of the sidebar */
+._1NqKTWvxtFgflRlqLTtv7e:not(.GamepadMode *) {
+  gap: 8px;
+  height: 34px;
+  margin: 0 !important;
+  padding: 0 10px;
+  border-radius: var(--se-radius-sm, 8px);
+  font: 600 13px var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-danger, #e5737a) !important;
+  transition: background-color .15s ease-out;
+}
+
+._1NqKTWvxtFgflRlqLTtv7e:not(.GamepadMode *):is(:hover, .gpfocus) {
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent) !important;
+  color: var(--se-danger-text, #ffb0b3) !important;
+}
+
+._1NqKTWvxtFgflRlqLTtv7e svg {
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  flex: none;
+}
+
+._1NqKTWvxtFgflRlqLTtv7e g {
+  stroke: currentColor !important;
+}
+
+/* The page */
+._3mf9BBKxhIVdrt6nIWBt4x:not(.GamepadMode *) {
+  min-width: 0;
+  background: var(--se-surface, #1f242b) !important;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ:not(.GamepadMode *) {
+  padding: 28px 30px 24px !important;
+  margin: 0 !important;
+  scrollbar-width: none;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ::-webkit-scrollbar {
+  width: 0 !important;
+  display: none;
+}
+
+.e600t61ObcLA11pIZAVb9:not(.GamepadMode *) {
+  /* DialogTitle */
+  margin: 0 0 18px !important;
+  font: 700 22px/28px var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ .DialogBodyText,
+._3t8HxXdv4QoWO7f3awdiCQ .DialogBody {
+  font: 400 14px/1.55 var(--se-font) !important;
+  color: var(--se-text-dim, #b8c0c8) !important;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ .DialogBodyText ul {
+  margin: 10px 0 20px;
+  padding-inline-start: 4px;
+  list-style: none;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ .DialogBodyText li {
+  position: relative;
+  margin: 0 0 6px;
+  padding-inline-start: 20px;
+  color: var(--se-text, #e6e8eb);
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ .DialogBodyText li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 2px;
+  top: .45em;
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid var(--se-accent, #7cc4ff);
+  border-bottom: 2px solid var(--se-accent, #7cc4ff);
+  transform: rotate(-45deg);
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ .DialogBody .DialogInputLabelGroup {
+  margin-bottom: 16px;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ button.DialogButton:not(#se-none) {
+  min-height: var(--se-control-h, 34px);
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ .ErrorWhileSaving {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: var(--se-radius-md, 10px);
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent);
+  font: 500 13px var(--se-font);
+  color: var(--se-danger-text, #ffb0b3);
+}
+
+/* Leave Group Chat page: the question, then Leave in red */
+._3t8HxXdv4QoWO7f3awdiCQ > div:not([class]) {
+  font: 500 14px/1.5 var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ > div:not([class]) > button.DialogButton:not(#se-none) {
+  display: block;
+  width: auto;
+  min-width: 140px;
+  margin-top: 16px;
+  background: color-mix(in srgb, var(--se-danger) 18%, transparent) !important;
+  color: var(--se-danger-text, #ffb0b3) !important;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ > div:not([class]) > button.DialogButton:not(#se-none):hover {
+  background: var(--se-danger, #e5737a) !important;
+  color: #fff !important;
+}
+
+/* Invite links: the table as rows in a card, the date in uppercase label, Delete as a quiet red button */
+.InviteLinksTable:not(#se-none) {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-surface-2, #262c35);
+}
+
+.InviteLinksTable th:not(#se-none) {
+  height: 36px;
+  padding: 0 14px;
+  text-align: start;
+  background: rgba(0, 0, 0, .14);
+  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
+  letter-spacing: var(--se-label-spacing, .1em) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color, #6f7984) !important;
+}
+
+.InviteLinksTable td:not(#se-none) {
+  padding: 8px 14px;
+  border: 0;
+  font: 500 13px var(--se-font);
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+.InviteLinksTable tbody tr + tr td {
+  box-shadow: inset 0 1px 0 var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.InviteLinksTable tbody tr:not(#se-none) {
+  background: none !important;
+}
+
+.InviteLinksTable .inviteURLLink:not(#se-none) {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--se-control-h-sm, 28px);
+  margin: 0 !important;
+  font: 500 13px Consolas, "Cascadia Mono", "SF Mono", monospace !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.InviteLinksTable .dateCell:not(#se-none) {
+  font-variant-numeric: tabular-nums;
+  text-transform: none;
+  color: var(--se-text-muted, #98a2ad);
+  white-space: nowrap;
+}
+
+.InviteLinksTable .buttonCell:not(#se-none) {
+  text-align: end;
+}
+
+.InviteLinksTable .buttonCell button.DialogButton:not(#se-none) {
+  min-height: var(--se-control-h-sm, 28px);
+  width: auto;
+  padding: 0 14px;
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent) !important;
+  color: var(--se-danger-text, #ffb0b3) !important;
+}
+
+.InviteLinksTable .buttonCell button.DialogButton:not(#se-none):hover {
+  background: var(--se-danger, #e5737a) !important;
+  color: #fff !important;
+}
+
+/*
+ * The close button of in-window dialogs (ModalPosition_Dismiss)
+ * Steam's 14 px "x" on a textured square: the theme's 30 px tile, gray at rest, lit on hover.
+ */
+.ModalPosition_Dismiss .closeButton:not(#se-none) {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-tile-sm, 30px);
+  height: var(--se-tile-sm, 30px);
+  padding: 0;
+  border-radius: var(--se-radius-sm, 8px);
+  background: transparent none !important;
+  box-shadow: none !important;
+  opacity: 1;
+  color: var(--se-text-muted, #98a2ad);
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.ModalPosition_Dismiss .closeButton:not(#se-none):hover {
+  background: var(--se-hover, #2c3440) !important;
+  color: var(--se-text-strong, #fff);
+}
+
+.ModalPosition_Dismiss .closeButton > svg {
+  display: none !important;
+}
+
+.ModalPosition_Dismiss .closeButton::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-close-sm) center / 14px 14px no-repeat;
+  mask: var(--se-icon-close-sm) center / 14px 14px no-repeat;
+}
+
+/*
+ * Game Info (players and friends on your server)
+ * GameInfoDialogContents._1J28NGrw629-j5cVtncv_, PlayersList._3HOjFOu8W2UHP4m6q7OorG, FriendsList._1FQ0ez0uS2BdoZGsI5hQ6G,
+ * Header.vATYv4EBNodEsN_HqvfJT, Details._3s0LVYddVEc1fa7aGrAd9C, PingFailed._3LzQqDpZIP3tQp8AORI8Ep.
+ */
+._3HOjFOu8W2UHP4m6q7OorG:not(#se-none),
+._1FQ0ez0uS2BdoZGsI5hQ6G:not(#se-none) {
+  overflow: hidden;
+  padding: 4px 6px;
+  border-radius: var(--se-radius-lg, 14px);
+  background: var(--se-bg, #171a20);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+._3HOjFOu8W2UHP4m6q7OorG .vATYv4EBNodEsN_HqvfJT:not(#se-none),
+._1FQ0ez0uS2BdoZGsI5hQ6G .vATYv4EBNodEsN_HqvfJT:not(#se-none) {
+  padding: 10px 8px 6px;
+  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
+  letter-spacing: var(--se-label-spacing, .1em) !important;
+  text-transform: uppercase !important;
+  color: var(--se-label-color, #6f7984) !important;
+}
+
+._3HOjFOu8W2UHP4m6q7OorG ._3s0LVYddVEc1fa7aGrAd9C:not(#se-none),
+._1FQ0ez0uS2BdoZGsI5hQ6G ._3s0LVYddVEc1fa7aGrAd9C:not(#se-none) {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--se-hairline, rgba(255, 255, 255, .06));
+  font: 500 13px var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+._3LzQqDpZIP3tQp8AORI8Ep:not(#se-none) {
+  color: var(--se-danger-text, #ffb0b3);
+}
+
+/*
+ * Pending gifts: a store page in a dialog, framed like the announcements
+ * PendingGiftsDialog._1I9_2lGTsH32GiBEXyePrp, BrowserViewHost._26k_TTAZxn5E9toMQvauz7.
+ */
+._1I9_2lGTsH32GiBEXyePrp.DialogContent:not(#se-none) {
+  padding: 36px 0 0;
+  background: var(--se-bg, #171a20);
+}
+
+._26k_TTAZxn5E9toMQvauz7:not(#se-none) {
+  background: var(--se-bg, #171a20);
+}
+
+/*
+ * Remote Play: the PIN, authorize / spectate prompts, pairing
+ * SegmentedCharacterInput._1gzkmmy_XA39rp9MtxJfZJ (Input._3xcXqLVteTNHmk-gh9W65d, Danger._3lEvxoIfUV21o8WAfErUcA, Disabled
+ * ._4WrcvilhO29CHFM0pqglW), ErrorText._1E9uclIRw_L0pOLMZ_iy0a, SpectatePermissionToggle._2OEHcYnHqO4xH2-GmADNaW,
+ * PairingPopup._1YEkwA6LdSf-burHZ56Tet, ModalImage._3eEmTVBpnuykohYaNCdzAF, Description._3bxBp2g6blvd6BCKYnz0gh.
+ */
+._1gzkmmy_XA39rp9MtxJfZJ:not(#se-none) {
+  gap: 12px;
+  padding: 14px 20px;
+  border: 0;
+  border-radius: var(--se-radius-lg, 14px);
+  background: var(--se-field, #15181d);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+._1gzkmmy_XA39rp9MtxJfZJ:not(#se-none):focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong, rgba(124, 196, 255, .55)), 0 0 0 3px var(--se-accent-tint, rgba(124, 196, 255, .14));
+}
+
+._1gzkmmy_XA39rp9MtxJfZJ._3lEvxoIfUV21o8WAfErUcA:not(#se-none) {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-danger) 70%, transparent), 0 0 0 3px color-mix(in srgb, var(--se-danger) 16%, transparent);
+}
+
+._1gzkmmy_XA39rp9MtxJfZJ._4WrcvilhO29CHFM0pqglW:not(#se-none) {
+  opacity: .55;
+}
+
+._1gzkmmy_XA39rp9MtxJfZJ ._3xcXqLVteTNHmk-gh9W65d:not(#se-none) {
+  border-bottom: 2px solid var(--se-border-strong, #4a525e);
+  font: 700 26px var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text, #e6e8eb);
+  caret-color: var(--se-accent, #7cc4ff);
+}
+
+._1gzkmmy_XA39rp9MtxJfZJ ._3xcXqLVteTNHmk-gh9W65d:not(#se-none):focus {
+  border-bottom-color: var(--se-accent, #7cc4ff);
+}
+
+._1E9uclIRw_L0pOLMZ_iy0a._1E9uclIRw_L0pOLMZ_iy0a:not(#se-none) {
+  font: 500 13px var(--se-font);
+  color: var(--se-danger-text, #ffb0b3);
+}
+
+._3eEmTVBpnuykohYaNCdzAF svg:not(#se-none) {
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._3bxBp2g6blvd6BCKYnz0gh:not(#se-none) {
+  font: 400 14px/1.5 var(--se-font);
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+/*
+ * Shutdown ("Waiting for <game> to shut down…", "Shutting down Steam…")
+ * Steam opens it as a fixed 600×240 popup holding its large (92px) spinner, a line of text
+ * and two buttons; with dialog padding that overflows and the buttons get cut off. The
+ * content is laid out as one centred column with a smaller spinner so all of it fits,
+ * even when a long game name wraps.
+ * ShutdownDialog ._3StXNL1HvLIJMUxfaFLdX- (the dialog box itself in a popup, its wrapper in
+ * a modal), Body ._2Se5JD_UkWeIyaZiXXmxDD, Buttons ._29slAFSSeZuzwWblDDcahS,
+ * Button ._2RbfG_Cx096a1vnHitlOtg; spinner LoadingWrapper ._2wAKy-0ZkO_vhbiQCP9MgE.
+ */
+._3StXNL1HvLIJMUxfaFLdX- {
+  --se-shutdown-spinner: 56px;
+}
+
+:is(._3StXNL1HvLIJMUxfaFLdX-.DialogContent, ._3StXNL1HvLIJMUxfaFLdX- > .DialogContent):not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  padding: 18px 28px 20px !important;
+}
+
+:is(._3StXNL1HvLIJMUxfaFLdX-.DialogContent, ._3StXNL1HvLIJMUxfaFLdX- > .DialogContent) > .DialogContent_InnerWidth:not(#se-none) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+._3StXNL1HvLIJMUxfaFLdX- ._2Se5JD_UkWeIyaZiXXmxDD:not(#se-none) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center;
+  font: 500 14px/20px var(--se-font);
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+._3StXNL1HvLIJMUxfaFLdX- ._2Se5JD_UkWeIyaZiXXmxDD .SteamLogoThrobber:not(#se-none) {
+  width: var(--se-shutdown-spinner, 56px) !important;
+  height: var(--se-shutdown-spinner, 56px) !important;
+  margin: 0 !important;
+}
+
+._3StXNL1HvLIJMUxfaFLdX- ._2Se5JD_UkWeIyaZiXXmxDD .SteamLogoThrobber > *:not(.se-spinner):not(#se-none),
+._3StXNL1HvLIJMUxfaFLdX- ._2Se5JD_UkWeIyaZiXXmxDD .SteamLogoThrobber img:not(#se-none) {
+  display: block;
+  flex: none;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* The message: at most two lines, so the buttons never leave the window */
+._3StXNL1HvLIJMUxfaFLdX- ._2Se5JD_UkWeIyaZiXXmxDD > :not(._29slAFSSeZuzwWblDDcahS, ._2RbfG_Cx096a1vnHitlOtg, :has(.SteamLogoThrobber)):not(#se-none) {
+  display: -webkit-box;
+  max-width: 100%;
+  margin: 0 !important;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+  font: inherit !important;
+  color: inherit !important;
+}
+
+._3StXNL1HvLIJMUxfaFLdX- ._29slAFSSeZuzwWblDDcahS:not(#se-none) {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  margin: 2px 0 0 !important;
+}
+
+._3StXNL1HvLIJMUxfaFLdX- ._2RbfG_Cx096a1vnHitlOtg:not(#se-none) {
+  flex: none;
+  width: auto !important;
+  min-width: 112px !important;
+  height: var(--se-control-h, 34px) !important;
+  margin: 0 !important;
+  padding: 0 18px !important;
+}
+
+/*
+ * Steam Runtime system info, licenses (Linux)
+ * SteamRuntimeSystemInfoDialogContent.q5OA-x6LcVkvtLCGp-8JC, TextContainer
+ * .YvsXGGpc_ep7jT-hmQxZe, Text._3ff2d75A8KI0jL0j2vZUAw, LicensesDialog._1wvG6Xu0RaAGmTuBxIDE1s, LicenseText._2xERUX8eLmvYpGy3DV5IFq,
+ * LanguageBetaTag._24BN2A3khkLXilnwdxCSHL.
+ */
+.q5OA-x6LcVkvtLCGp-8JC .YvsXGGpc_ep7jT-hmQxZe:not(#se-none) {
+  box-sizing: border-box;
+  padding: 14px 18px;
+  border-radius: var(--se-radius-lg, 14px);
+  background: var(--se-bg, #171a20) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.q5OA-x6LcVkvtLCGp-8JC .YvsXGGpc_ep7jT-hmQxZe ._3ff2d75A8KI0jL0j2vZUAw:not(#se-none) {
+  font: 400 12.5px/1.6 Consolas, "Cascadia Mono", "SF Mono", monospace !important;
+  color: var(--se-text-dim, #b8c0c8) !important;
+}
+
+._1wvG6Xu0RaAGmTuBxIDE1s ._2xERUX8eLmvYpGy3DV5IFq:not(#se-none) {
+  font: 400 13px/1.55 var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._24BN2A3khkLXilnwdxCSHL:not(#se-none) {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--se-gold-surface, rgba(240, 192, 96, .16));
+  font: 700 11px/16px var(--se-font);
+  letter-spacing: .06em;
+  color: var(--se-gold-text, #f3cf86);
+}
+
+/*
+ * Controller configurator (Steam Input)
+ * Its frame in the theme's grounds and controls; the binding editor inside keeps Steam's layout.
+ * ControllerConfiguratorMain.APY6jDS50MNUPuX38IgC0, TopSection._20sN9G_C5kZ9GO_mVUuWTD, BottomSection
+ * ._3RsRfCOW7Do0JNHcEs2nqX, ControllerSelectionContainer.TYpuuReNb2qPgvjWhRNpL,
+ * ControllerSelectionOptions._3rsQRA6-lR_jrdiuv3ARnf, ControllerSelectionOption
+ * .tNl7CupYn5jcZaRWX6PU0, CurrentSelection._1DMzCviYCYOj6lKga1y_vt, YourControllerLabel
+ * .TA5dR9XJAWRyQcgS4_una, CommunityConfigsCallout._1xfC8oO6JVNnioU1NPTN9s, ErrorMsgButton
+ * .q_6vIMfTLjN8LibKa-cXz, ConfigurationName._2IlcVo9eEhKl7iybZ09tOS, ConfigurationDescription
+ * ._6wAebKulOPCal1hTcnWM-, Creator._2j7kLVQ6grd7T5eCqlIGpJ, SupportTitle._32f4mUbAzCnRxr-yFIrsQW, SupportLabel
+ * ._2fNrpCE_Xp5xNOpejG5Krs, QuickSettingsHeader._3gVR5OLNO_2dJFPrZk0TG2; interstitials (module 366):
+ * ConfiguratorInterstitialContainer._3FS5uBh6SB9gq4vjbnKa4G, ContainerInner.IbaDJeXoUV46mwyWeP42O,
+ * DialogStyle._3BeKk1O8jsZ3W8XtvhB-ci, ControlLabel.tGJeFkznK3-BCMgr4GSHi, ConfigButtonContainer.nggdu5y4G6UWA-8U8zRNx.
+ */
+.APY6jDS50MNUPuX38IgC0:not(#se-none) {
+  background-color: var(--se-bg, #171a20);
+}
+
+._20sN9G_C5kZ9GO_mVUuWTD:not(#se-none) {
+  background-color: var(--se-sidebar, #1d2128);
+  box-shadow: inset 0 -1px 0 var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+._3RsRfCOW7Do0JNHcEs2nqX:not(#se-none) {
+  background-color: var(--se-bg, #171a20);
+}
+
+.TYpuuReNb2qPgvjWhRNpL:not(#se-none),
+._3rsQRA6-lR_jrdiuv3ARnf:not(#se-none) {
+  background: var(--se-sidebar, #1d2128);
+}
+
+._3rsQRA6-lR_jrdiuv3ARnf:not(#se-none) {
+  gap: 4px;
+  padding: 6px 0;
+}
+
+._3rsQRA6-lR_jrdiuv3ARnf .tNl7CupYn5jcZaRWX6PU0:not(#se-none) {
+  border-radius: var(--se-radius-sm, 8px);
+  color: var(--se-text-muted, #98a2ad);
+  transition: background-color .15s ease-out, color .15s ease-out;
+}
+
+._3rsQRA6-lR_jrdiuv3ARnf .tNl7CupYn5jcZaRWX6PU0:not(#se-none):hover {
+  background: var(--se-hover, #2c3440);
+  color: var(--se-text-strong, #fff);
+}
+
+._3rsQRA6-lR_jrdiuv3ARnf .tNl7CupYn5jcZaRWX6PU0._1DMzCviYCYOj6lKga1y_vt:not(#se-none) {
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+  box-shadow: inset 0 0 0 1px var(--se-accent-line, rgba(124, 196, 255, .3));
+  color: var(--se-text-strong, #fff);
+}
+
+.TA5dR9XJAWRyQcgS4_una:not(#se-none) {
+  border-radius: 999px;
+  background: var(--se-accent, #7cc4ff);
+  color: var(--se-bg-ink, #0f1115);
+  font-weight: 700;
+}
+
+._1xfC8oO6JVNnioU1NPTN9s:not(#se-none) {
+  padding: 8px 12px;
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-surface-2, #262c35);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  font: 500 12.5px/1.45 var(--se-font);
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+.q_6vIMfTLjN8LibKa-cXz:not(#se-none) {
+  padding: 4px 10px;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-danger, #e5737a);
+  color: var(--se-bg-ink, #0f1115);
+  font-weight: 700;
+}
+
+._2IlcVo9eEhKl7iybZ09tOS:not(#se-none) {
+  font: 700 16px/1.3 var(--se-font);
+  color: var(--se-text, #e6e8eb);
+}
+
+._6wAebKulOPCal1hTcnWM-:not(#se-none),
+._2j7kLVQ6grd7T5eCqlIGpJ:not(#se-none),
+._2fNrpCE_Xp5xNOpejG5Krs:not(#se-none) {
+  font-family: var(--se-font);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+._32f4mUbAzCnRxr-yFIrsQW:not(#se-none),
+._3gVR5OLNO_2dJFPrZk0TG2:not(#se-none) {
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  letter-spacing: var(--se-label-spacing, .1em);
+  text-transform: uppercase;
+  color: var(--se-label-color, #6f7984);
+}
+
+.DesktopUI ._3FS5uBh6SB9gq4vjbnKa4G:not(#se-none) {
+  background: var(--se-bg, #171a20);
+}
+
+.IbaDJeXoUV46mwyWeP42O._3BeKk1O8jsZ3W8XtvhB-ci:not(#se-none) {
+  border: 0;
+  border-radius: var(--se-radius-lg, 14px);
+  background-color: var(--se-surface, #1f242b);
+  box-shadow: var(--se-shadow-pop, 0 18px 40px -10px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .07));
+}
+
+.tGJeFkznK3-BCMgr4GSHi:not(#se-none) {
+  border-radius: 999px;
+  background-color: var(--se-surface-2, #262c35);
+  color: var(--se-text, #e6e8eb);
+  font-weight: 600;
+}
+
+.nggdu5y4G6UWA-8U8zRNx:not(#se-none) {
+  border-radius: var(--se-radius-md, 10px);
+  background-color: var(--se-sidebar, #1d2128);
+}
+
+._3FS5uBh6SB9gq4vjbnKa4G .DialogButton.OKButton:not(#se-none) {
+  background: var(--se-accent, #7cc4ff) !important;
+  color: var(--se-bg-ink, #0f1115) !important;
+}
+
+/*
+ * Write / edit review dialog (module 79918, inside Steam's generic confirm dialog).
+ * The yes/no question row is styled with the game page's review prompt (game-page.css);
+ * here: the game name, the instructions and their links, the text box as the theme's field,
+ * and the visibility / options row.
+ * WriteReviewContainer ._10bN3WMeG0xP9KCqsxx7ea, Header ._27mfPohuGzwxwaotA5Pk9, RatingContainer
+ * ._2SAb6geDpe6toA1GaP0GjH, FormContainer .sK8bmf5vWULFzqtbyJO59, DescribeGame ._2ZLbGVyFKH8FPnr3myxQ_0,
+ * ReviewTextArea ._392iEmqj65Eac9ealm4Pmi, WebLink .C1Doboj64HjGC_c3pKswu, ReviewSettingsContainer
+ * ._2DV7tR-w5VYscyCku6T-Ta, ReviewSettingsRow ._11okUat0uKxVKkTJ_c6M08, ReviewSettingsChecks
+ * ._3ntbowo6E0C1X796jwjZNs, VisibilityMenu ._2r_L15rUTJhrj9LgTXhXFk, Error .ZJkUnK19mQotF9Zz1aLpk.
+ */
+/*
+ * Steam opens it "full size" (DialogContentFullSize), which stretched the dialog across the
+ * window with the form on the left; the dialog now wraps the form.
+ */
+.DialogContent:has(._10bN3WMeG0xP9KCqsxx7ea):not(#se-none) {
+  width: min(760px, calc(100vw - 48px)) !important;
+  max-width: min(760px, calc(100vw - 48px)) !important;
+  min-width: 0 !important;
+}
+
+.ModalPosition_Content:has(._10bN3WMeG0xP9KCqsxx7ea):not(#se-none) {
+  width: auto !important;
+  max-width: calc(100vw - 48px) !important;
+}
+
+.DialogContent:has(._10bN3WMeG0xP9KCqsxx7ea) .DialogContent_InnerWidth:not(#se-none) {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea:not(#se-none) {
+  width: 100%;
+  font: 500 13.5px/1.5 var(--se-font);
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._27mfPohuGzwxwaotA5Pk9:not(#se-none) {
+  margin-bottom: 10px;
+  font: 700 17px/24px var(--se-font);
+  color: var(--se-text-strong, #fff);
+}
+
+/* The question: outlined, so the Yes / No pills (surface-2) stand out on it */
+._10bN3WMeG0xP9KCqsxx7ea ._2SAb6geDpe6toA1GaP0GjH:not(#se-none) {
+  padding: 12px 12px 12px 14px !important;
+  border-radius: var(--se-radius-md, 10px);
+  background: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._2ZLbGVyFKH8FPnr3myxQ_0:not(#se-none) {
+  margin: 16px 0 10px;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+/* Links ("Rules and Guidelines", "Formatting Help"): the theme's text links */
+._10bN3WMeG0xP9KCqsxx7ea a:not(#se-none) {
+  font-weight: 600;
+  color: var(--se-accent, #7cc4ff);
+  text-decoration: none;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea a:is(:hover, :focus-visible):not(#se-none) {
+  color: var(--se-text-strong, #fff);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  outline: none;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._392iEmqj65Eac9ealm4Pmi:not(#se-none) {
+  display: block;
+  width: 100%;
+  min-height: 120px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-field, #15181d);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  font: 400 14px/1.5 var(--se-font);
+  color: var(--se-text, #e6e8eb);
+  transition: box-shadow .15s ease-out;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._392iEmqj65Eac9ealm4Pmi:hover:not(:focus):not(#se-none) {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14);
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._392iEmqj65Eac9ealm4Pmi:focus:not(#se-none) {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong, rgba(124, 196, 255, .55)), 0 0 0 3px var(--se-accent-tint, rgba(124, 196, 255, .14));
+}
+
+._10bN3WMeG0xP9KCqsxx7ea .C1Doboj64HjGC_c3pKswu:not(#se-none) {
+  display: block;
+  float: none;
+  width: fit-content;
+  margin: 8px 0 0 auto;
+  font: 600 12.5px/18px var(--se-font);
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._2DV7tR-w5VYscyCku6T-Ta:not(#se-none) {
+  margin-top: 16px;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._11okUat0uKxVKkTJ_c6M08:not(#se-none) {
+  align-items: flex-start;
+  gap: 10px 14px;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._11okUat0uKxVKkTJ_c6M08 > span:not(#se-none) {
+  margin: 0;
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  line-height: var(--se-control-h, 34px);
+  letter-spacing: var(--se-label-spacing, .1em);
+  text-transform: uppercase;
+  color: var(--se-label-color, #6f7984);
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._3ntbowo6E0C1X796jwjZNs:not(#se-none) {
+  gap: 4px;
+  margin-top: 2px;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._3ntbowo6E0C1X796jwjZNs .DialogCheckbox_Container:not(#se-none),
+._10bN3WMeG0xP9KCqsxx7ea ._3ntbowo6E0C1X796jwjZNs :is(._2sbh8IdfnVytSlMaw49hRb, .GpDzIS6KXIEbHY0uOjeu-, ._1iOA81hI0sXkxzZ9V8GksY):not(#se-none) {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text, #e6e8eb);
+}
+
+._10bN3WMeG0xP9KCqsxx7ea .ZJkUnK19mQotF9Zz1aLpk:not(#se-none) {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--se-radius-md, 10px);
+  background: color-mix(in srgb, var(--se-danger, #e5737a) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-danger, #e5737a) 35%, transparent);
+  font: 500 13px/1.45 var(--se-font);
+  color: var(--se-danger-text, #ffb0b3);
+}
+
+/*
+ * Game note window (gamenotes chunk + module 10325 / 76627): the editor as the theme's field,
+ * the formatting toolbar's active state in the accent, and the trash / Close buttons as
+ * regular theme buttons instead of half-transparent glyphs.
+ * NoteEditorArea ._1AL7l2CN6z-vuLfp1iCLa, EditorInput ._1Ve4VFO2EEkeNZdel_Asky, NoteActions
+ * ._1fu6xumTI1nCY5wc6FG_N2, CloseWindowButton .vKXl-xWkUZL5iNvaT5mzW, Toolbar .gdKTXjvFuMeVN2qa6o8EL,
+ * CommandButton ._1dEi5qzSDdPOzoOQXYbNLN, Toggled ._1Iw5xoXQXfmRjgjWTKbm_G.
+ */
+._1AL7l2CN6z-vuLfp1iCLa:not(#se-none) {
+  margin: 0 0 18px;
+  color: var(--se-text, #e6e8eb);
+}
+
+._1Ve4VFO2EEkeNZdel_Asky:not(#se-none) {
+  border-radius: var(--se-radius-md, 10px);
+  background: var(--se-field, #15181d);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  font: 400 14px/1.55 var(--se-font);
+  transition: box-shadow .15s ease-out;
+}
+
+/* Focus: an inset ring only; an outer glow is clipped by the window's scroll area */
+._1Ve4VFO2EEkeNZdel_Asky:focus-within:not(#se-none) {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong, rgba(124, 196, 255, .55));
+}
+
+._1Ve4VFO2EEkeNZdel_Asky > .ProseMirror:not(#se-none) {
+  padding: 14px 16px 64px;
+}
+
+._1Ve4VFO2EEkeNZdel_Asky a:not(#se-none) {
+  border-bottom: 0;
+  color: var(--se-accent, #7cc4ff);
+}
+
+._1Ve4VFO2EEkeNZdel_Asky a:hover:not(#se-none) {
+  border-bottom: 0;
+  color: var(--se-text-strong, #fff);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.gdKTXjvFuMeVN2qa6o8EL:not(#se-none) {
+  padding: 4px 0 14px;
+}
+
+/*
+ * Toolbar rows (module 76627: ToolbarRowOverflowContainer .nXEH21nf47u2OH7BjQKei, ToolbarRow
+ * .LCeIT0gmFTY8fdfaVgk4j, Gap ._19z0fjj7o0n9vAjVjvYZNU): Steam scrolls an overflowing row
+ * sideways with no visible scrollbar, so the last buttons were cut off. They wrap instead,
+ * and the buttons are one compact size.
+ */
+.gdKTXjvFuMeVN2qa6o8EL .nXEH21nf47u2OH7BjQKei:not(#se-none) {
+  overflow: visible;
+  margin-top: 6px;
+}
+
+.gdKTXjvFuMeVN2qa6o8EL .LCeIT0gmFTY8fdfaVgk4j:not(#se-none) {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 4px;
+  width: auto;
+}
+
+.gdKTXjvFuMeVN2qa6o8EL .LCeIT0gmFTY8fdfaVgk4j ._19z0fjj7o0n9vAjVjvYZNU:not(#se-none) {
+  width: 8px;
+}
+
+.gdKTXjvFuMeVN2qa6o8EL button.DialogButton._1dEi5qzSDdPOzoOQXYbNLN:not(#se-none) {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.gdKTXjvFuMeVN2qa6o8EL button.DialogButton._1dEi5qzSDdPOzoOQXYbNLN .SVGIcon_Button:not(#se-none) {
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+button.DialogButton._1dEi5qzSDdPOzoOQXYbNLN._1Iw5xoXQXfmRjgjWTKbm_G:not(#se-none) {
+  outline: 0;
+  background: var(--se-accent-surface, #24384b) !important;
+  color: var(--se-accent, #7cc4ff) !important;
+}
+
+._1AL7l2CN6z-vuLfp1iCLa ._1fu6xumTI1nCY5wc6FG_N2:not(#se-none) {
+  inset-inline-end: 10px;
+  bottom: 10px;
+  gap: 8px;
+}
+
+._1AL7l2CN6z-vuLfp1iCLa ._1fu6xumTI1nCY5wc6FG_N2 .DialogButton:not(#se-none) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px;
+  margin: 0;
+  padding: 0 !important;
+  opacity: 1;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+._1AL7l2CN6z-vuLfp1iCLa ._1fu6xumTI1nCY5wc6FG_N2 .DialogButton:hover:not(#se-none) {
+  opacity: 1;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+._1AL7l2CN6z-vuLfp1iCLa ._1fu6xumTI1nCY5wc6FG_N2 .DialogButton svg:not(#se-none) {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+._1AL7l2CN6z-vuLfp1iCLa ._1fu6xumTI1nCY5wc6FG_N2 .vKXl-xWkUZL5iNvaT5mzW:not(#se-none) {
+  width: auto;
+  margin: 0;
+  padding: 0 14px !important;
+  color: var(--se-text, #e6e8eb) !important;
+  font: 700 12.5px/32px var(--se-font);
+}

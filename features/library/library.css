@@ -1,0 +1,1371 @@
+/*
+ * Library shelves, game covers, What's New carousels, and sort badges.
+ *
+ * Styles `LibraryItemBox` 3D cover cards, `FriendsBar` summary pills and avatar
+ * stacks, Showcase headers and drag handles, What's New event capsules, Recent
+ * Games feature cards, and `LibraryItemBoxSubscript` sort badges.
+ */
+/* Collection pages: same dark ground as Library Home */
+._198BXmMkKpjGgrrvy8rZLr,
+/* OuterContainer: a collection's page */ ._2sNr7PFYcJZWNkEMCDVVPR,
+/* OuterContainer: a dynamic/edited collection */ .u1xD3KJEgksF_J_5TLZzO {
+  /* ScrollContainer: All Collections */
+  background: var(--se-bg, #171a20) !important;
+}
+
+/* AppGridSectionHeader: the sticky title bar takes the same ground */
+._3bWISeqP3H2j6YJnFwVEwu::after {
+  background: var(--se-bg, #171a20) !important;
+}
+
+/*
+ * Its title ("Recent", "2018", "Over 100 hours" …) in the theme's uppercase label, with a 1px divider
+ * (AppGridSectionLabel _2hvQbTq62AjXQS4tZqVepi, Rule _3pJqXMYgfG8Emi3vn6e2WV)
+ */
+._3bWISeqP3H2j6YJnFwVEwu ._2hvQbTq62AjXQS4tZqVepi:not(#se-none) {
+  font: var(--se-label-font, 700 11px/14px "Motiva Sans", Arial, sans-serif);
+  letter-spacing: var(--se-label-spacing, .1em);
+  text-transform: uppercase;
+  color: var(--se-text-dim, #b8c0c8);
+}
+
+._3bWISeqP3H2j6YJnFwVEwu ._3pJqXMYgfG8Emi3vn6e2WV:not(#se-none) {
+  margin-inline-start: 12px;
+  background: var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+/* Collection tiles on All Collections */
+._3IWn-2rn7x98o5fDd0rAxb {
+  /* Collection */
+  background: var(--se-surface, #1f242b) !important;
+  border-radius: var(--se-radius-lg, 14px) !important;
+}
+
+/*
+ * Covers everywhere (LibraryItemBox)
+ * Rounded and clipped, so Steam's shine layer and its 3D hover tilt stay inside
+ * the corners; on hover a thin accent ring joins native lift.
+ */
+.WYgDg9NyCcMIVuMyZ_NBC {
+  border-radius: var(--se-radius-md, 10px) !important;
+  overflow: hidden;
+}
+
+._54PuCatl_tYG836TOs4Mv .WYgDg9NyCcMIVuMyZ_NBC:hover,
+/* HoversEnabled LibraryItemBox */ ._54PuCatl_tYG836TOs4Mv .WYgDg9NyCcMIVuMyZ_NBC._2YsY_x7hLyKlUqjX9bhn0R {
+  /* ShowAsHovered */
+  box-shadow: 0 0 0 2px var(--se-accent, #7cc4ff), 0 18px 30px -12px rgba(0, 0, 0, .85) !important;
+}
+
+/*
+ * Friends playing on a cover (FriendsBar.SummaryView)
+ * Steam's 6 px lime dot and thin "3" become the theme's pill: a frosted chip with the
+ * running-green dot (as in the game list and the play bar) and the count in bold.
+ * The same pill marks friends on a collection's cards (.se-friends-pill, features/library/collections.js).
+ * FriendsBar _3dncOt2dhpnFYQn-WYQ3Mb, SummaryView _1To_QGbZaU8E2oNA55J2Ye,
+ * SummaryLeader _2SZ70N1VfFNqP4yDeNTajH, SummaryCount _1CA44fHFH68DkHIPoniGpz.
+ */
+._3dncOt2dhpnFYQn-WYQ3Mb._1To_QGbZaU8E2oNA55J2Ye:not(#se-none),
+.se-friends-pill {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+  padding: 0 7px 0 6px;
+  border-radius: 999px;
+  /* No backdrop blur: drawn once per cover, a blur each made shelves scroll heavily */
+  background: var(--se-chip-hover, rgba(12, 14, 18, .75));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+}
+
+._3dncOt2dhpnFYQn-WYQ3Mb._1To_QGbZaU8E2oNA55J2Ye {
+  margin-bottom: 2px;
+}
+
+._3dncOt2dhpnFYQn-WYQ3Mb ._2SZ70N1VfFNqP4yDeNTajH:not(#se-none),
+.se-friends-pill > i {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--se-running, #6cc24a);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--se-running) 25%, transparent);
+}
+
+._3dncOt2dhpnFYQn-WYQ3Mb ._1CA44fHFH68DkHIPoniGpz:not(#se-none),
+.se-friends-pill > b {
+  padding: 0;
+  font: 700 11px/1 var(--se-font, "Motiva Sans"), sans-serif;
+  text-shadow: none;
+  color: var(--se-text, #e6e8eb);
+}
+
+/*
+ * Friends playing as avatars on a cover (FriendsBar.IconsView)
+ * Steam's square avatars with a green bar under each and a gray "+10" box become a small
+ * face pile: round avatars with the running-green ring (as in the hover card and the game
+ * page's Friends section), overlapping, and the rest as a frosted round chip.
+ * (The hover card's own row,.PortraitHover, is styled in features/dialogs/dialogs.css.)
+ */
+._3dncOt2dhpnFYQn-WYQ3Mb._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu):not(#se-none) {
+  gap: 0;
+  /*
+   * Inside the cover's bottom corner: Steam hangs the row 18 px below the cover, where the
+   * rounded, clipped covers and the shelf cut it off
+   */
+  top: auto;
+  bottom: 10px;
+  inset-inline-end: 10px;
+  margin: 0;
+  padding-inline-start: 6px;
+  transform: none;
+}
+
+/* On a collection's cards, above the name strip */
+[data-se-cpage="collection"] ._3dncOt2dhpnFYQn-WYQ3Mb._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu):not(#se-none) {
+  bottom: 48px;
+}
+
+._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu) > * {
+  margin: 0 0 0 -6px !important;
+}
+
+._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu) ._1_sHcxv9rQdANehiviVZR4:not(#se-none),
+._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu) .nibodjvvrm86uCfnnAn4g:not(#se-none) {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  transform: none;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(12, 14, 18, .85), 0 0 0 3.5px var(--se-running, #6cc24a), 0 4px 10px -2px rgba(0, 0, 0, .6);
+}
+
+._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu) ._3pbKzT087jaL2EeQO1qsaR,
+._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu) ._3xUpb5DWXPFNcHHIcv-9pe,
+._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu) .avatarStatus,
+._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu) .AvatarStatus,
+._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu) ._1_sHcxv9rQdANehiviVZR4 > div:empty,
+._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu) .nibodjvvrm86uCfnnAn4g > div:empty {
+  display: none !important;
+}
+
+._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu) ._3qaudpkfSKoxlwfA-deQLX:not(#se-none),
+._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu) ._3h-QRJGxnVOIExtHD1R0f2:not(#se-none),
+._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu) ._3qaudpkfSKoxlwfA-deQLX img,
+._1WWmQqppYq8c44A7nTMKUq:not(._301ftk7pLtiYAWjjxEG0Gu) ._3h-QRJGxnVOIExtHD1R0f2 img {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: none;
+  object-fit: cover;
+}
+
+._3dncOt2dhpnFYQn-WYQ3Mb ._2JYwpg3-WbCSXH-w5h-zL_:not(._301ftk7pLtiYAWjjxEG0Gu):not(#se-none) {
+  box-sizing: border-box;
+  min-width: 24px;
+  width: auto;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* No backdrop blur: drawn once per cover, a blur each made shelves scroll heavily */
+  background: rgba(12, 14, 18, .85);
+  box-shadow: 0 0 0 2px rgba(12, 14, 18, .85), inset 0 0 0 1px rgba(255, 255, 255, .1);
+  font: 700 10.5px/1 var(--se-font, "Motiva Sans"), sans-serif;
+  color: var(--se-text, #e6e8eb);
+}
+
+/* Library Home shelves (Steam calls them "Showcases") */
+._23SnllqT_AqZ1C_QHcNQ4Z {
+  /* ShowcaseHeader */
+  gap: 10px;
+  margin-bottom: 12px !important;
+  padding-inline-start: 4px !important;
+}
+
+/* Shelf name ("Favorites ⌄"): the CollectionDropDown and its label */
+._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv-,
+._23SnllqT_AqZ1C_QHcNQ4Z .tfg3_RdonFKIGYRd12bKl {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+  color: var(--se-text, #e6e8eb) !important;
+  text-transform: none !important;
+}
+
+._1YdRdM9TZ_3Xolwv9aVEv- {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  padding: 2px 8px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+._1YdRdM9TZ_3Xolwv9aVEv-:hover {
+  background: var(--se-hover, #2c3440) !important;
+}
+
+/* Count next to the name: drawn as a badge (features/navigation/sidebar-icons.js marks it) */
+._23SnllqT_AqZ1C_QHcNQ4Z .Hbe3LLzP-c2kpERi6rU4n,
+._23SnllqT_AqZ1C_QHcNQ4Z ._2qm05e8tWSAb-_fAHytQCP {
+  letter-spacing: 0 !important;
+  font-weight: 600 !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z [data-se-count] {
+  font-size: 0 !important;
+}
+
+/* The count's text ("· 8") is drawn by features/library/sort-segments.css. */
+._23SnllqT_AqZ1C_QHcNQ4Z [data-se-count]::after {
+  display: inline-block;
+}
+
+/* Rule: a 1px divider that still grows into Steam's drag handle on hover */
+._1PhK8scyztOxjJwWUpkiLJ {
+  /* Rule */
+  height: 1px !important;
+  border-radius: 999px;
+  background-color: var(--se-hairline, rgba(255, 255, 255, .06)) !important;
+}
+
+/*
+ * On hover Steam grows the rule into a 17 px slab and shows its drag handle at the
+ * middle of the whole header, which lands off-center on the rule. Instead the rule
+ * becomes a slim 10 px pill with a dotted grip at its own center; Steam's handle hides.
+ */
+._23SnllqT_AqZ1C_QHcNQ4Z:not(._32LI4zWUnYi5k50-LHnhdN *):hover ._1PhK8scyztOxjJwWUpkiLJ {
+  height: 10px !important;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='8'%3E%3Cg fill='%2398a2ad'%3E%3Ccircle cx='3' cy='2' r='1.3'/%3E%3Ccircle cx='9' cy='2' r='1.3'/%3E%3Ccircle cx='15' cy='2' r='1.3'/%3E%3Ccircle cx='21' cy='2' r='1.3'/%3E%3Ccircle cx='3' cy='6' r='1.3'/%3E%3Ccircle cx='9' cy='6' r='1.3'/%3E%3Ccircle cx='15' cy='6' r='1.3'/%3E%3Ccircle cx='21' cy='6' r='1.3'/%3E%3C/g%3E%3C/svg%3E") center / 22px 8px no-repeat, var(--se-surface-2, #262c35) !important;
+  cursor: grab;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z ._1OGfHXv6ksR1Ub-OuLN2NB {
+  /* DragHandle */
+  display: none !important;
+}
+
+/* "SORT BY" label and its dropdown (shelves and collection pages) */
+:is(._30PVtUudUBJBzac0vEncl_, ._1tBzypb5E2AwNuBuVns9Hl) ._1ljKTq3H58WbDZGNPfM0TY,
+/* SortingDropDownLabel */ ._30PVtUudUBJBzac0vEncl_ {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+  white-space: nowrap;
+}
+
+._30PVtUudUBJBzac0vEncl_,
+._1tBzypb5E2AwNuBuVns9Hl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+._30PVtUudUBJBzac0vEncl_ .DialogDropDown,
+._1tBzypb5E2AwNuBuVns9Hl .DialogDropDown {
+  white-space: nowrap;
+  min-width: 0 !important;
+  height: 28px;
+  padding: 0 10px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
+  background: var(--se-surface-2, #262c35) !important;
+  color: var(--se-text, #e6e8eb) !important;
+  box-shadow: none !important;
+  font-size: 12.5px !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  display: inline-flex;
+  align-items: center;
+}
+
+._30PVtUudUBJBzac0vEncl_ .DialogDropDown:hover,
+._1tBzypb5E2AwNuBuVns9Hl .DialogDropDown:hover {
+  background: var(--se-hover, #2c3440) !important;
+}
+
+/* Page arrows: round buttons */
+._3uMa3icVa3JTCGQKPeUikO,
+._2kWWyBO7w_F76NB8sBw86c,
+._14b-hQsLwSwYcELtknxCUX,
+._3IIEUTw03Vm3Mk54jlnUaT {
+  /* PageLeft, PageRight */
+  width: 30px !important;
+  height: 30px !important;
+  margin-inline-end: 6px !important;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  opacity: 1 !important;
+  font-size: 16px !important;
+}
+
+._3uMa3icVa3JTCGQKPeUikO:hover,
+._2kWWyBO7w_F76NB8sBw86c:hover,
+._14b-hQsLwSwYcELtknxCUX:hover,
+._3IIEUTw03Vm3Mk54jlnUaT:hover {
+  background: var(--se-hover, #2c3440);
+}
+
+:is(._3uMa3icVa3JTCGQKPeUikO, ._2kWWyBO7w_F76NB8sBw86c, ._14b-hQsLwSwYcELtknxCUX, ._3IIEUTw03Vm3Mk54jlnUaT):is(._1MNhU5EYdeegJRmQ51prWb, ._16nHYucq6xgfe67DrVWLCI) {
+  /* Disabled */
+  opacity: .35 !important;
+}
+
+/* "Add shelf" */
+._2aw5aUUo3lrK6wxJb4_ms5 {
+  /* AddShowcase */
+  border-radius: 999px !important;
+  padding: 4px 14px !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+._2aw5aUUo3lrK6wxJb4_ms5:hover {
+  background: var(--se-surface-2, #262c35) !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+/* What's New */
+/*
+ * UpdatesContainer: drop Steam's gray band and use the hero's 20 px sides, so What's
+ * New lines up with the shelves below it.
+ */
+._17uEBe5Ri8TMsnfELvs8-N {
+  background: var(--se-bg, #171a20) !important;
+  padding-inline: 20px !important;
+}
+
+/* Center the initial What's New loader within the entire panel. */
+._17uEBe5Ri8TMsnfELvs8-N:has(> :only-child > .SteamLogoThrobber):not(#se-none) {
+  padding: 0 !important;
+}
+
+._17uEBe5Ri8TMsnfELvs8-N > :only-child:has(> .SteamLogoThrobber):not(#se-none) {
+  position: absolute;
+  inset: 0;
+  display: grid !important;
+  place-items: center;
+}
+
+._17uEBe5Ri8TMsnfELvs8-N > :only-child > .SteamLogoThrobber:not(#se-none) {
+  margin: 0 !important;
+}
+
+._3Sb2o_mQ30IDRh0C72QUUu {
+  /* LibraryHome: shelves on the same 20 px sides */
+  padding-inline: 20px !important;
+}
+
+.fyxt0H7Cwfirf9908slPp {
+  /* WhatsNewHeaderText */
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+  text-transform: none !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.SPz0ipLqfF1oAO7tdrkdY,
+._3Yd9bnm5cESPzqV_j5-WJt {
+  /* Event image: row capsule, carousel */
+  border-radius: var(--se-radius-md, 10px) !important;
+  overflow: hidden;
+  box-shadow: var(--se-shadow-card);
+}
+
+/* The game the news is about: a small pill under each card */
+._3_xMyCJAh_Dv99KgZ54P3j,
+._2hemZcvJgBSV9YvlToW1Zv {
+  /* GameIconAndName */
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px 2px 3px !important;
+  border-radius: 999px !important;
+  background: var(--se-surface-2, #262c35) !important;
+}
+
+._3_xMyCJAh_Dv99KgZ54P3j img,
+._2hemZcvJgBSV9YvlToW1Zv img {
+  border-radius: 50%;
+}
+
+._3dK60Ya3ww6Thx2YIo7sQP,
+._31PRXu-HgAvTQn0NZKvF_L {
+  /* ScrollLeft, ScrollRight */
+  border-radius: 50% !important;
+}
+
+/* Recent Games and other game carousels */
+._3YYQ98HSj-wh5uljwl12bW,
+._1esfEVxhqNfh8fzr_kEGKa {
+  /* BasicGameCarouselItem, RecentGame */
+  border-radius: var(--se-radius-md, 10px) !important;
+}
+
+._1HIFNGSxh4-jOhPiDynR4C,
+._2XftMcBO9aY7VXCivzuW7- {
+  /* …MediaContainer */
+  border-radius: var(--se-radius-md, 10px) !important;
+  overflow: hidden;
+}
+
+/* Let the hovered Recent Games cover and its shared outer ring extend beyond the media container. */
+._1esfEVxhqNfh8fzr_kEGKa ._2XftMcBO9aY7VXCivzuW7- {
+  overflow: visible !important;
+}
+
+._1esfEVxhqNfh8fzr_kEGKa .WYgDg9NyCcMIVuMyZ_NBC:hover,
+._1esfEVxhqNfh8fzr_kEGKa .WYgDg9NyCcMIVuMyZ_NBC._2YsY_x7hLyKlUqjX9bhn0R {
+  box-shadow: 0 0 0 2px var(--se-accent, #7cc4ff), 0 18px 30px -12px rgba(0, 0, 0, .85) !important;
+}
+
+/* Downloads page: features/downloads/downloads.css */
+/* Home polish */
+/* What's New: the date strip becomes a small frosted pill on the image */
+._3OSZu24hLN7YKjqGi7I2Xp {
+  /* EventTimeSpan */
+  bottom: 8px !important;
+  inset-inline-end: 8px !important;
+  padding: 3px 10px !important;
+  border-radius: 999px;
+  background: rgba(12, 14, 18, .82) !important;
+  /* Solid fill: no per-card backdrop blur */
+  color: var(--se-text, #e6e8eb) !important;
+  font-size: 11.5px !important;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* What's New cards lift on hover, like the covers */
+._3YO5BpDmZERh_G8kaWbaSJ {
+  /* PartnerEventRowCapsule */
+  overflow: visible !important;
+  transition: transform .15s ease;
+}
+
+._3YO5BpDmZERh_G8kaWbaSJ:hover {
+  transform: translateY(-3px);
+}
+
+._3YO5BpDmZERh_G8kaWbaSJ .SPz0ipLqfF1oAO7tdrkdY {
+  /* MainImageContainer */
+  transition: box-shadow .15s ease;
+}
+
+._3YO5BpDmZERh_G8kaWbaSJ:hover .SPz0ipLqfF1oAO7tdrkdY {
+  box-shadow: 0 0 0 2px var(--se-accent, #7cc4ff), 0 18px 30px -12px rgba(0, 0, 0, .85) !important;
+}
+
+._3YO5BpDmZERh_G8kaWbaSJ:hover .DVBcpUzJ0x6kaRMfug0OJ {
+  /* TextTitle */
+  color: var(--se-text-strong, #fff) !important;
+}
+
+/* Shelf arrows: Steam's icon fills the button, so size it inside the round button */
+._3uMa3icVa3JTCGQKPeUikO,
+._2kWWyBO7w_F76NB8sBw86c,
+._14b-hQsLwSwYcELtknxCUX,
+._3IIEUTw03Vm3Mk54jlnUaT {
+  /* PageLeft, PageRight */
+  box-sizing: border-box;
+  padding: 8px !important;
+  background: var(--se-surface-2, #262c35) !important;
+  color: var(--se-text, #e6e8eb);
+  line-height: 0;
+}
+
+._3uMa3icVa3JTCGQKPeUikO svg,
+._2kWWyBO7w_F76NB8sBw86c svg,
+._14b-hQsLwSwYcELtknxCUX svg,
+._3IIEUTw03Vm3Mk54jlnUaT svg {
+  width: 14px !important;
+  height: 14px !important;
+  max-width: 14px;
+  max-height: 14px;
+}
+
+/* NEW (and coming soon) on covers: a small frosted pill instead of the bright tab */
+.N8aJrSpxQ6II4CY_aFdYI {
+  /* AppPortraitBanner */
+  margin-top: 8px !important;
+  padding: 2px 9px !important;
+  border-radius: 999px;
+  background: rgba(12, 14, 18, .84) !important;
+  /* Solid fill: no per-cover backdrop blur */
+  box-shadow: none !important;
+  color: var(--se-accent, #7cc4ff) !important;
+  font-size: 10.5px !important;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.N8aJrSpxQ6II4CY_aFdYI.QTJZotuAt67vK7Sa2Wjus {
+  /* ComingSoonBanner */
+  color: var(--se-text-dim, #b8c0c8) !important;
+}
+
+/* The wide first Recent Games card: its playtime footer as dark glass */
+._2d1hSvdpY5L2-GN1EnUb9Z {
+  /* RecentGameFooter */
+  background: rgba(12, 14, 18, .72) !important;
+  backdrop-filter: blur(12px);
+}
+
+._2d1hSvdpY5L2-GN1EnUb9Z .RhmvOTLHkomDhCTDX9hLA {
+  /* FooterBlurImageContainer: the glass replaces it */
+  opacity: 0 !important;
+}
+
+._3bkuozxKIatrWG3aeisthc._2zIRlEsAfHhI-_3bZ3X60z {
+  /* PlaytimeDetails Header */
+  color: var(--se-text-muted, #98a2ad) !important;
+  font-size: 11px !important;
+  font-weight: 700;
+  letter-spacing: .08em !important;
+}
+
+._3bkuozxKIatrWG3aeisthc:is(.ma8y_VgPze1mscYhW6-oS, ._3JWBBEulYkYmDLJr485oex) {
+  /* PlayedTotal, PlayedRecent */
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+._3AjoLnMNKxYmNTGTJCLfgs {
+  /* LibraryItemActionButton (the play / download button on a card) */
+  border-radius: var(--se-radius-sm, 8px) !important;
+}
+
+/* Even spacing down the home page: the same gap between every section */
+._17uEBe5Ri8TMsnfELvs8-N {
+  /* UpdatesContainer (What's New) */
+  padding-top: 16px !important;
+}
+
+.V7RuDNUxhxoBRaiGWbk3B {
+  /* Showcase (shelf) */
+  padding-top: 0 !important;
+  margin-bottom: 24px;
+}
+
+/*
+ * Sort by: one pill, not a box inside a box
+ * Steam tints the current value and the arrow separately; the theme's pill already
+ * gives the whole control its ground, so both go clear and the arrow becomes a small chevron.
+ */
+._30PVtUudUBJBzac0vEncl_ .DialogDropDown_CurrentDisplay,
+._1tBzypb5E2AwNuBuVns9Hl .DialogDropDown_CurrentDisplay {
+  padding: 0 !important;
+  background: none !important;
+  border-radius: 0 !important;
+}
+
+._30PVtUudUBJBzac0vEncl_ .DialogDropDown_Arrow,
+._1tBzypb5E2AwNuBuVns9Hl .DialogDropDown_Arrow {
+  width: 10px !important;
+  height: 10px !important;
+  padding: 0 !important;
+  margin-inline-start: 8px;
+  background: none !important;
+  display: flex;
+  align-items: center;
+}
+
+._30PVtUudUBJBzac0vEncl_ .DialogDropDown_Arrow svg,
+._1tBzypb5E2AwNuBuVns9Hl .DialogDropDown_Arrow svg {
+  width: 10px;
+  height: 10px;
+  fill: var(--se-text-muted, #98a2ad) !important;
+}
+
+/*
+ * Labels on covers when a shelf is sorted (LibraryItemBoxSubscript)
+ * "22% Complete", "488.4 hours", "Oct 14", "C: 85.55 GB", Metacritic scores. Steam hangs
+ * them half off the cover's bottom edge, where the rounded, clipped cover cut them in half.
+ * They now sit fully inside the cover, 8 px above its edge, as frosted pills;
+ * the bottom margin gives back the space so the shelf keeps its height.
+ */
+._1LJqx_qFOC8199RBQO5kU8 {
+  margin-top: -30px !important;
+  margin-bottom: 10px !important;
+  padding: 2px 10px !important;
+  border-radius: 999px !important;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .6) !important;
+  font-size: 11.5px !important;
+  line-height: 16px !important;
+  font-weight: 600 !important;
+  white-space: nowrap;
+}
+
+._1LJqx_qFOC8199RBQO5kU8:not(._1KR40mXc7Z4Dss99aBDbyN, ._1H3NRDhuiZh5xH5jZsiI38, ._3lWVD8RYypVvbk60T5Vqcs, .YMFWNw7ysEz2lagC8pW5N, ._2DHhHuQVbivzEpsIvhaAys, ._2-196-NjaMB6Mbhh7xGpXB) {
+  /* No backdrop blur: drawn once per cover, a blur each made shelves scroll heavily */
+  background: rgba(12, 14, 18, .8) !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+/* Metacritic (MCGreen/Orange/Red) and Steam review colors stay, as solid pills with dark text */
+._1LJqx_qFOC8199RBQO5kU8:is(._1KR40mXc7Z4Dss99aBDbyN, ._1H3NRDhuiZh5xH5jZsiI38, ._3lWVD8RYypVvbk60T5Vqcs) {
+  min-width: 34px;
+  color: var(--se-bg-ink, #0f1115) !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+}
+
+/* The label Steam gives its completion icon ("100% Complete"): gold, like the hero's perfect-game chip */
+._1LJqx_qFOC8199RBQO5kU8:has(svg, img) {
+  /* CompletedGroups */
+  color: var(--se-gold-text, #f3cf86) !important;
+}
+
+/*
+ * Steam's medal (CompletionAwardStack / CompletionAward) is sized from --award-base;
+ * setting that keeps the medal's own 2:3 box, so it sits beside the text, not over it
+ */
+._1LJqx_qFOC8199RBQO5kU8:has(svg, img) {
+  padding-inline-start: 6px !important;
+}
+
+._1LJqx_qFOC8199RBQO5kU8:has(svg, img) ._2EZqJBCxzsAuIxcN4FeHLr {
+  --award-base: 16px !important;
+  flex: 0 0 auto;
+}
+
+/*
+ * The count badge beside "Favorites" sat below the name: Steam aligns that
+ * row to the top (CollectionDropDown), so center it and let the badge box hug its pill.
+ */
+._1YdRdM9TZ_3Xolwv9aVEv- ._DialogInputContainer,
+._1YdRdM9TZ_3Xolwv9aVEv- {
+  align-items: center !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z [data-se-count] {
+  /*
+   * The badge sits inline in the name's line. With its text at size 0 it
+   * lined up with the bottom of "Favorites"; a fixed 20 px box set on the line's
+   * middle centers it on the name instead.
+   */
+  display: inline-flex !important;
+  align-items: center;
+  align-self: center;
+  height: 20px;
+  line-height: 20px !important;
+  vertical-align: middle !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  position: relative;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z [data-se-count]::after {
+  vertical-align: top !important;
+}
+
+/*
+ * Matched by content (a label holding an icon) rather than by Steam's
+ * CompletedGroups class, whose name changed in the 21 Oct client build.
+ * the completion medal, whatever wraps it. In some Steam builds it is placed
+ * on its own layer and drawn far larger than --award-base, covering "100%". Every
+ * wrapper is put back in line, the medal is held to 12 × 18 px, and the pill clips.
+ */
+._1LJqx_qFOC8199RBQO5kU8:has(svg, img) {
+  /*
+   * Block-level flex: an inline box ignores the negative top margin that lifts the
+   * label onto the cover, and it slipped below, where the cover's clip hid it
+   */
+  display: flex !important;
+  width: fit-content !important;
+  margin-inline: auto !important;
+  align-items: center !important;
+  gap: 5px !important;
+  overflow: hidden !important;
+}
+
+._1LJqx_qFOC8199RBQO5kU8:has(svg, img) *:has(svg, img),
+._1LJqx_qFOC8199RBQO5kU8:has(svg, img) svg,
+._1LJqx_qFOC8199RBQO5kU8:has(svg, img) img {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  max-height: 18px !important;
+}
+
+._1LJqx_qFOC8199RBQO5kU8:has(svg, img) *:has(svg, img) {
+  display: inline-flex !important;
+  align-items: center !important;
+  width: auto !important;
+  height: 18px !important;
+  min-width: 0 !important;
+}
+
+._1LJqx_qFOC8199RBQO5kU8:has(svg, img) svg,
+._1LJqx_qFOC8199RBQO5kU8:has(svg, img) img {
+  width: 12px !important;
+  height: 18px !important;
+}
+
+/* Two medals (base game and DLC) overlap slightly, as Steam intends */
+._1LJqx_qFOC8199RBQO5kU8:has(svg, img) ._2c-xpzS0W1WUVgT3vTqNDB + ._2c-xpzS0W1WUVgT3vTqNDB {
+  margin-left: -4px !important;
+}
+
+/*
+ * One left and right edge for the whole home
+ * Hero, stat tiles and What's New start 20 px in. Shelves started further in:
+ * Showcase has an invisible 2 px border (shown dashed only while reordering),
+ * ShowcaseHeader pads 4 px plus a 1 px border, and ChildrenContainer (the covers)
+ * has 8 px margins. All go to 0, so headers and covers line up with the hero.
+ */
+.V7RuDNUxhxoBRaiGWbk3B:not(._1HgDLE-DG3HVYV4bVvKdAJ *, ._3oXyqYCk5syor0ZiuqyboQ *, ._2Ho8z58cxQIJljp55uGkdt *) {
+  border-inline-width: 0 !important;
+  padding-inline: 0 !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z:not(._2Ho8z58cxQIJljp55uGkdt) {
+  /* ShowcaseHeader, unless reordering */
+  padding-inline: 0 !important;
+  border-inline-width: 0 !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv-,
+._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv- ._DialogInputContainer,
+._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv- .DialogDropDown_CurrentDisplay {
+  margin-inline-start: 0 !important;
+  padding-inline-start: 0 !important;
+}
+
+.V7RuDNUxhxoBRaiGWbk3B ._1VMQWnw-9FBp-MVXUbWfS_ {
+  /* ChildrenContainer: the covers */
+  margin-inline: 0 !important;
+}
+
+/* "Add shelf" row lines up too */
+._3SkuN_ykQuWGF94fclHdhJ {
+  padding-inline: 0 !important;
+}
+
+/*
+ * What's New: the card row scrolled under the container's right padding, so the last
+ * card ran past the hero's right edge. Clip at the same 20 px edge (a little room
+ * is left above and below for the hover lift and ring).
+ */
+._17uEBe5Ri8TMsnfELvs8-N {
+  clip-path: inset(-12px 20px -12px -12px);
+}
+
+._1-skwOMFU54o8vsHS7-ZDu {
+  /* NewUpdates (the scrolling row) */
+  margin-inline: 0 !important;
+}
+
+/*
+ * What's New's arrows come from Steam's "pageable" header (PageLeft/PageRight of
+ * module 29158), now in the same round-button rules as the shelf arrows above.
+ */
+.bsNegRKT1Hbv4tqHrOk9- {
+  /* PageClickContainer */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bsNegRKT1Hbv4tqHrOk9- ._14b-hQsLwSwYcELtknxCUX,
+.bsNegRKT1Hbv4tqHrOk9- ._3IIEUTw03Vm3Mk54jlnUaT {
+  display: flex !important;
+  margin-inline-end: 0 !important;
+}
+
+/*
+ * What's New card options
+ * The button in a card's corner on hover (EventOptions) that opens Remove / Show Less /
+ * Show More: a frosted round "⋯" like the date pills, instead of the 15 px gray square.
+ */
+._2-p7shAZYrRijpaTU9bAFR {
+  top: 8px !important;
+  inset-inline-end: 8px !important;
+  padding: 0 !important;
+}
+
+._2-p7shAZYrRijpaTU9bAFR > div {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='4'%3E%3Cg fill='%23e6e8eb'%3E%3Ccircle cx='2' cy='2' r='1.6'/%3E%3Ccircle cx='7' cy='2' r='1.6'/%3E%3Ccircle cx='12' cy='2' r='1.6'/%3E%3C/g%3E%3C/svg%3E") center / 14px 4px no-repeat, rgba(12, 14, 18, .82) !important;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .1);
+}
+
+._2-p7shAZYrRijpaTU9bAFR:hover > div {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='4'%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='2' cy='2' r='1.6'/%3E%3Ccircle cx='7' cy='2' r='1.6'/%3E%3Ccircle cx='12' cy='2' r='1.6'/%3E%3C/g%3E%3C/svg%3E") center / 14px 4px no-repeat, var(--se-accent-surface, #24384b) !important;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .7), inset 0 0 0 1px var(--se-accent, #7cc4ff);
+}
+
+/*
+ * Shelf collapse button (Collapser), e.g. at the end of "Collections View": the same
+ * 30 px round button as the page arrows, with its chevrons centered (Steam offsets them
+ * with fixed margins).
+ */
+._23SnllqT_AqZ1C_QHcNQ4Z ._3sz4Ldugm_cV_JaHOErVR8 {
+  box-sizing: border-box;
+  width: 30px !important;
+  height: 30px !important;
+  margin-inline-start: 10px !important;
+  border-radius: 50% !important;
+  background: var(--se-surface-2, #262c35) !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z ._3sz4Ldugm_cV_JaHOErVR8:hover {
+  background: var(--se-hover, #2c3440) !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z ._3sz4Ldugm_cV_JaHOErVR8 svg {
+  width: 14px !important;
+  height: 14px !important;
+  margin: 0 !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z ._3sz4Ldugm_cV_JaHOErVR8 polyline {
+  stroke: var(--se-text-dim, #b8c0c8) !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z ._3sz4Ldugm_cV_JaHOErVR8:hover polyline {
+  stroke: var(--se-text-strong, #fff) !important;
+}
+
+/*
+ * The game pill under a What's New card stays inside its card: long names end
+ * in "…" instead of running into the next card; the icon is a clean circle.
+ */
+._3_xMyCJAh_Dv99KgZ54P3j,
+._2hemZcvJgBSV9YvlToW1Zv {
+  box-sizing: border-box;
+  max-width: 100% !important;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 400 !important;
+}
+
+._3_xMyCJAh_Dv99KgZ54P3j ._28IqrZIgxpqkUQyhdaLDUN,
+._2hemZcvJgBSV9YvlToW1Zv ._28IqrZIgxpqkUQyhdaLDUN {
+  /* GameName */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--se-text-dim, #b8c0c8) !important;
+}
+
+._3_xMyCJAh_Dv99KgZ54P3j:hover,
+._2hemZcvJgBSV9YvlToW1Zv:hover {
+  background: var(--se-hover, #2c3440) !important;
+}
+
+._3_xMyCJAh_Dv99KgZ54P3j:hover ._28IqrZIgxpqkUQyhdaLDUN,
+._2hemZcvJgBSV9YvlToW1Zv:hover ._28IqrZIgxpqkUQyhdaLDUN {
+  color: var(--se-text-strong, #fff) !important;
+}
+
+._3tdftHFf8tvdJW34S-KwjR {
+  /* GameIcon */
+  flex: 0 0 auto;
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  overflow: hidden;
+}
+
+._3tdftHFf8tvdJW34S-KwjR img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/*
+ * What's New header, matching the shelf headers
+ * The name in Steam's pageable header (HeaderPageControls / Name) at 20 px bold, and the
+ * settings gear (SettingsButton) as a quiet 28 px round button beside it.
+ */
+._17uEBe5Ri8TMsnfELvs8-N ._2o5c89vAnrXN8C60QTSMqO {
+  /* HeaderPageControls */
+  align-items: center !important;
+  gap: 4px;
+  min-height: 48px;
+}
+
+._17uEBe5Ri8TMsnfELvs8-N ._2hfibYuzyMOQ0sj2egsHh0 {
+  /* Name */
+  font: 700 20px/1 var(--se-font, "Motiva Sans"), sans-serif !important;
+  letter-spacing: -.01em !important;
+  color: var(--se-text, #e6e8eb) !important;
+  text-transform: none !important;
+}
+
+._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC {
+  /* SettingsButton */
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 28px !important;
+  height: 28px !important;
+  margin: 0 0 0 6px !important;
+  border-radius: 50%;
+  background: transparent;
+  transition: background .15s;
+}
+
+._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC:hover {
+  background: var(--se-surface-2, #262c35);
+}
+
+._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC svg {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC svg path,
+._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC svg circle,
+._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC svg polyline {
+  fill: var(--se-text-muted, #98a2ad);
+}
+
+._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC:hover svg path,
+._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC:hover svg circle,
+._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC:hover svg polyline {
+  fill: var(--se-text, #e6e8eb) !important;
+}
+
+._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC:hover svg {
+  transform: rotate(45deg);
+}
+
+/*
+ * "Add shelf" as a dashed full-width row
+ * AddShowcaseRow: Steam's faint side rules go; the AddShowcase button spans the row as a
+ * dashed, rounded slot that fills with the accent on hover.
+ */
+._3SkuN_ykQuWGF94fclHdhJ {
+  margin: 0 0 24px !important;
+  padding: 0 !important;
+}
+
+._3SkuN_ykQuWGF94fclHdhJ > ._1PhK8scyztOxjJwWUpkiLJ,
+._3SkuN_ykQuWGF94fclHdhJ > ._1fD3LfL2EuzDHoKxB5ts7,
+._3SkuN_ykQuWGF94fclHdhJ > .XTpoZLWc4Qj5P6VF4s1_X {
+  /* Rule, RuleRight, RuleLeft */
+  display: none !important;
+}
+
+._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5 {
+  /* AddShowcase */
+  flex: 1 1 auto;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  border: 1px dashed rgba(255, 255, 255, .12);
+  border-radius: var(--se-radius-lg, 14px) !important;
+  background: transparent !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+  font-size: 13.5px;
+  font-weight: 600;
+  opacity: 1 !important;
+  transition: background .15s, border-color .15s, color .15s;
+}
+
+._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5:hover,
+._3SkuN_ykQuWGF94fclHdhJ._3dQDoCmoAJqOiOK7oAJIKM ._2aw5aUUo3lrK6wxJb4_ms5 {
+  /* ButtonHovered */
+  border-color: var(--se-accent-strong, rgba(124, 196, 255, .55));
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14)) !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5 svg {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+}
+
+._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5 svg line,
+._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5 svg circle {
+  stroke: currentColor !important;
+}
+
+._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5._1MNhU5EYdeegJRmQ51prWb {
+  /* Disabled */
+  opacity: .4 !important;
+  cursor: default;
+}
+
+/* Recent Games and Play Next details */
+/*
+ * Date labels over the cards ("Yesterday", "This week"): Steam's 1px divider-thin type
+ * becomes the same small muted label as What's New's dates.
+ */
+._1ANYFgwMyPpwJjIndAdGSr,
+._1NfcbH4-VtKb4Li2YePACD {
+  /* AddedDate (Recent Games, Play Next) */
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+/* Play Next's line under its title */
+._1kdinbVqPuXSbJRQa_pAuw,
+._2VByWZ91DPPVmK_PDiHEmq {
+  /* PlayNextSubHead, PlayNextCarouselSubHeading */
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+/*
+ * The wide first Recent Games card: art and footer as one card. hid the blurred
+ * copy of the art Steam puts behind the footer, so the footer floated on bare
+ * background with a gap above it; the blur is back under a dark glass, the art's own
+ * corners are square inside the rounded card, and the play button is the theme's.
+ */
+.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 {
+  /* LibraryItemBox.Landscape */
+  border-radius: var(--se-radius-md, 10px) !important;
+  overflow: hidden !important;
+  background: var(--se-field, #15181d) !important;
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 img,
+.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 img {
+  border-radius: 0 !important;
+}
+
+._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z {
+  /* RecentGameFooter */
+  background: rgba(12, 14, 18, .58) !important;
+  backdrop-filter: none;
+  box-shadow: inset 0 1px 0 var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z .RhmvOTLHkomDhCTDX9hLA {
+  /* FooterBlurImageContainer */
+  opacity: 1 !important;
+}
+
+._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z ._3bkuozxKIatrWG3aeisthc {
+  /* PlaytimeDetails */
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+}
+
+:is(.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ~ *, .xp7A-08Y404Of3FBHqX32) ._3AjoLnMNKxYmNTGTJCLfgs {
+  /* LibraryItemActionButton.Landscape */
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: var(--se-radius-md, 10px) !important;
+  box-shadow: 0 6px 18px -8px rgba(80, 180, 50, .55) !important;
+}
+
+:is(.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ~ *, .xp7A-08Y404Of3FBHqX32) ._3AjoLnMNKxYmNTGTJCLfgs._1_Bo2Ied5s2Od4YKYTOsau {
+  /* …Play */
+  background: var(--se-play, #3a8a22) !important;
+}
+
+:is(.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ~ *, .xp7A-08Y404Of3FBHqX32) ._3AjoLnMNKxYmNTGTJCLfgs._1_Bo2Ied5s2Od4YKYTOsau:hover {
+  background: #44a028 !important;
+}
+
+:is(.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ~ *, .xp7A-08Y404Of3FBHqX32) ._3AjoLnMNKxYmNTGTJCLfgs svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Collections view tiles: features/library/collections.css. */
+/*
+ * The wide Recent Games card's art fills the whole card. Steam pins it to the
+ * top only (PortraitImage.Landscape: bottom: inherit), so it ended short of the footer
+ * and left a dark band; pinned to both edges and cropped to fill, the footer's glass
+ * now sits over the bottom of the art.
+ */
+._2IYf7aM4eYQ2Oh-ntmzHbm._3VOR2AeYATx3qSE0I-Pm-5 {
+  /* PortraitImage.Landscape */
+  top: 0 !important;
+  bottom: 0 !important;
+  height: 100% !important;
+}
+
+._2IYf7aM4eYQ2Oh-ntmzHbm._3VOR2AeYATx3qSE0I-Pm-5 img,
+img._2IYf7aM4eYQ2Oh-ntmzHbm._3VOR2AeYATx3qSE0I-Pm-5 {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  /*
+   * Filling the taller card zooms the art; Steam's capsules put the logo on the left,
+   * so the crop keeps the left edge (logo whole) and trims scenery on the right
+   */
+  object-position: 4% 30% !important;
+}
+
+/*
+ * Wide Recent Games card: footer text centered on the Play button
+ * A fixed 76 px footer with the 44 px button 16 px in from its corner, and the playtime
+ * lines centered beside it.
+ */
+._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z {
+  /* RecentGameFooter */
+  height: 76px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z > ._3bkuozxKIatrWG3aeisthc {
+  /* PlaytimeDetails (the box; its lines carry the same class) */
+  position: relative;
+  z-index: 1;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 16px 0 76px !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  line-height: 1.35 !important;
+}
+
+:is(.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5, .xp7A-08Y404Of3FBHqX32) ._3AjoLnMNKxYmNTGTJCLfgs {
+  inset-inline-start: 16px !important;
+  bottom: 16px !important;
+}
+
+/*
+ * Cover NEW badge and action button
+ * Steam gives the action button its "Landscape" class on every cover, and does not always
+ * put it inside the cover's card, so a cover's button is any action button that is not
+ * the wide Recent Games card's (inside FeaturedCapsule, or a Landscape card). Hovering
+ * the cover means hovering its card or the card's parent.
+ */
+/* NEW (and Coming soon): a small chip in the top-left corner with a glowing dot */
+._2jj5TjFhHD1lvxMlpJYek6 {
+  /* AppPortraitBannerContainer */
+  top: 10px !important;
+  left: 10px !important;
+  width: auto !important;
+  justify-content: flex-start !important;
+}
+
+._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI {
+  /* AppPortraitBanner */
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center;
+  border-radius: 999px !important;
+  text-transform: uppercase;
+}
+
+._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--se-accent, #7cc4ff);
+  box-shadow: 0 0 8px var(--se-accent, #7cc4ff);
+}
+
+._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI.QTJZotuAt67vK7Sa2Wjus::before {
+  background: var(--se-text-muted, #98a2ad);
+  box-shadow: none;
+}
+
+/* The button at rest: a frosted 36 px icon button inside the bottom-left corner */
+._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not(._2mDBhx6RW__a_uRpmFziSW) {
+  position: absolute !important;
+  inset-inline-start: 10px !important;
+  bottom: 10px !important;
+  top: auto !important;
+  width: 36px !important;
+  height: 36px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-md, 10px) !important;
+  /* No backdrop blur: drawn once per cover, a blur each made shelves scroll heavily */
+  background: rgba(12, 14, 18, .8) !important;
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .12) !important;
+  color: var(--se-text, #e6e8eb);
+  opacity: 1 !important;
+  transform: none !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  overflow: hidden;
+  z-index: 14;
+  transition: width .15s ease, background .15s, box-shadow .15s;
+}
+
+._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not(._2mDBhx6RW__a_uRpmFziSW) svg {
+  flex: 0 0 auto;
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  fill: currentColor !important;
+  transform: none !important;
+}
+
+._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not(._2mDBhx6RW__a_uRpmFziSW) svg line,
+._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not(._2mDBhx6RW__a_uRpmFziSW) svg polyline,
+._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not(._2mDBhx6RW__a_uRpmFziSW) svg path {
+  stroke: currentColor;
+}
+
+._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs)::after {
+  display: none !important;
+}
+
+/*
+ * On hover of the cover: the button widens across the card with its label inside
+ * (Install / Update in blue, Play in the theme green)
+ */
+.WYgDg9NyCcMIVuMyZ_NBC:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
+.WYgDg9NyCcMIVuMyZ_NBC:hover ~ * ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
+:has(> .WYgDg9NyCcMIVuMyZ_NBC):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
+._1esfEVxhqNfh8fzr_kEGKa:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
+._31TK9DDDCRTzSsZCPgqtxX:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
+:has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
+._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs):hover {
+  width: calc(100% - 20px) !important;
+  height: 38px !important;
+  background: var(--se-accent, #7cc4ff) !important;
+  box-shadow: 0 8px 20px -8px var(--se-accent-strong, rgba(124, 196, 255, .55)) !important;
+  color: var(--se-bg-ink, #0f1115);
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs),
+.WYgDg9NyCcMIVuMyZ_NBC:hover ~ * ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs),
+:has(> .WYgDg9NyCcMIVuMyZ_NBC):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs),
+._1esfEVxhqNfh8fzr_kEGKa:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs),
+._31TK9DDDCRTzSsZCPgqtxX:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs),
+:has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs),
+._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs):hover {
+  background: var(--se-play, #3a8a22) !important;
+  box-shadow: 0 8px 20px -8px rgba(80, 180, 50, .6) !important;
+  color: var(--se-text-strong, #fff);
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
+.WYgDg9NyCcMIVuMyZ_NBC:hover ~ * ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
+:has(> .WYgDg9NyCcMIVuMyZ_NBC):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
+._1esfEVxhqNfh8fzr_kEGKa:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
+._31TK9DDDCRTzSsZCPgqtxX:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
+:has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
+._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):hover::before {
+  order: 2;
+  font: 700 14px/1 var(--se-font, "Motiva Sans"), sans-serif;
+  white-space: nowrap;
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14::before,
+.WYgDg9NyCcMIVuMyZ_NBC:hover ~ * ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14::before,
+:has(> .WYgDg9NyCcMIVuMyZ_NBC):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14::before,
+._1esfEVxhqNfh8fzr_kEGKa:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14::before,
+._31TK9DDDCRTzSsZCPgqtxX:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14::before,
+:has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14::before,
+._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14:hover::before {
+  content: var(--se-act-install, "Install");
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq::before,
+.WYgDg9NyCcMIVuMyZ_NBC:hover ~ * ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq::before,
+:has(> .WYgDg9NyCcMIVuMyZ_NBC):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq::before,
+._1esfEVxhqNfh8fzr_kEGKa:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq::before,
+._31TK9DDDCRTzSsZCPgqtxX:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq::before,
+:has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq::before,
+._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq:hover::before {
+  content: var(--se-act-update, "Update");
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau::before,
+.WYgDg9NyCcMIVuMyZ_NBC:hover ~ * ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau::before,
+:has(> .WYgDg9NyCcMIVuMyZ_NBC):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau::before,
+._1esfEVxhqNfh8fzr_kEGKa:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau::before,
+._31TK9DDDCRTzSsZCPgqtxX:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau::before,
+:has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau::before,
+._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:hover::before {
+  content: var(--se-act-play, "Play");
+}
+
+/* The two lines inside it carry Steam's box rules too (width, negative margins): reset */
+._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z > ._3bkuozxKIatrWG3aeisthc ._3bkuozxKIatrWG3aeisthc {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.35 !important;
+}
+
+/*
+ * Steam's focus label beside the cover button (CarouselItemLabel, the gray
+ * "Install" box) goes: the label now sits inside the button. The cover button's box
+ * can start a few pixels left of the cover, so the button is set a little further in.
+ */
+._1CmuxC6KBmGPJ77aSRQfEq {
+  /* CarouselItemLabel */
+  display: none !important;
+}
+
+._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW) {
+  inset-inline-start: 14px !important;
+  bottom: 12px !important;
+}
+
+/*
+ * NEW's text stays inside its chip. Steam caps the banner at 90% of its
+ * container's width; with the container now hugging the chip, that cap squeezed the chip
+ * to 90% of its own text, which then ran out past the right edge.
+ */
+._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI {
+  max-width: none !important;
+  width: max-content !important;
+  white-space: nowrap;
+  box-sizing: border-box !important;
+}
+
+/*
+ * NEW matches the labels a sort puts on covers ("5.2 hours"): the same dark
+ * frosted pill, same type and shadow; no outline, no dot. Coming soon is the same pill
+ * with dimmer text.
+ */
+._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI {
+  height: auto !important;
+  padding: 2px 10px !important;
+  gap: 0 !important;
+  background: rgba(12, 14, 18, .75) !important;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .6) !important;
+  color: var(--se-text, #e6e8eb) !important;
+  font: 600 11.5px/16px var(--se-font, "Motiva Sans"), sans-serif !important;
+  letter-spacing: .04em !important;
+}
+
+._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI::before {
+  display: none !important;
+}
+
+._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI.QTJZotuAt67vK7Sa2Wjus {
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .6) !important;
+  color: var(--se-text-dim, #b8c0c8) !important;
+}

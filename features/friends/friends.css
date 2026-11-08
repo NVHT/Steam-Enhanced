@@ -1,0 +1,2151 @@
+/*
+ * Friends list panel styles (standalone Friends window and Library dock).
+ *
+ * Styles the self-persona header, toolbar icon tiles, expandable search input,
+ * Favorites grid, collapsible game/status groups, friend request rows, and
+ * group chat rows. Paired with `features/friends/friends-list.js`.
+ */
+/*
+ * Group headers ("AION 2 (3)", "COUNTER-STRIKE 2 (6)"): like the Library's
+ * collection headers; features/navigation/sidebar-icons.js turns the "(3)" into a badge.
+ */
+.friendGroup .groupName {
+  margin-top: 6px !important;
+  padding: 4px 8px !important;
+  border-radius: var(--se-radius-sm, 8px);
+  text-transform: uppercase;
+  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
+  letter-spacing: var(--se-label-spacing, .1em) !important;
+  color: var(--se-label-color, #6f7984) !important;
+}
+
+.friendGroup .groupName:hover {
+  background: var(--se-hover, #2c3440);
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.friendGroup .groupName [data-se-count] {
+  font-size: 0 !important;
+  opacity: 1 !important;
+  /* Steam fades the count out on expanded groups */
+  transform: none !important;
+}
+
+.friendGroup .groupName [data-se-count]::after {
+  content: attr(data-se-count);
+  display: inline-block;
+  margin-inline-start: 6px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--se-surface-2, #262c35);
+  color: var(--se-text-dim, #b8c0c8);
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 17px;
+  letter-spacing: 0;
+}
+
+.friendGroup .groupName .groupIcon img,
+.friendGroup .groupName img {
+  border-radius: var(--se-radius-xs, 4px);
+}
+
+/* Friend rows: rounded avatars, hover as an inset pill */
+.friendGroup .friend {
+  margin: 2px 6px !important;
+  padding-inline-start: 8px !important;
+  border-radius: var(--se-radius-sm, 8px);
+}
+
+.friendGroup .friend:hover {
+  background: var(--se-hover, #2c3440) !important;
+}
+
+.friend .avatarHolder,
+.friend .avatarHolder .avatar,
+.friend .avatarHolder img {
+  border-radius: var(--se-radius-sm, 8px) !important;
+}
+
+.friend .avatarHolder {
+  overflow: hidden;
+}
+
+/* Favorite friends at the top */
+.quickAccessFriends .friend .avatarHolder,
+.quickAccessFriends .friend .avatarHolder img {
+  border-radius: var(--se-radius-md, 10px) !important;
+}
+
+.quickAccessFriends .friend:hover {
+  background: var(--se-hover, #2c3440) !important;
+  border-radius: var(--se-radius-md, 10px);
+}
+
+/* Section titles (FAVORITES, ONLINE…) */
+.friendsListSectionTitle {
+  background: transparent !important;
+  font-size: 11px !important;
+  font-weight: 700;
+  letter-spacing: .08em !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+/*
+ * Steam's friends list, styled like the theme's panel
+ * The same in the Friends window and in the Library's dock (features/friends/friends-dock.css only
+ * places it there). native markup: the list (.friendlist) with your status, favorites,
+ * the Friends bar, the groups and friends, and group chats; the name lines use Steam's
+ * persona-label classes (nOdcT… player name, _1cB0q… status/game, _2Ri00… rich presence).
+ * Nothing is moved; features/friends/friends-list.js adds data-se-count (a group's count) and
+ * data-se-who (who is in a game). GamepadMode (Big Picture) is left as Steam draws it.
+ */
+.friendlist:not(.GamepadMode),
+.friendlist:not(.GamepadMode) .FriendsListContent,
+.friendlist:not(.GamepadMode) .friendlistListContainer,
+.friendlist:not(.GamepadMode) .listContentContainer,
+.friendlist:not(.GamepadMode) .friendListHeaderContainer,
+.friendlist:not(.GamepadMode) .FriendsListChatSection {
+  background: var(--se-sidebar, #1d2128) !important;
+}
+
+.friendlist:not(.GamepadMode) {
+  font-family: var(--se-font, "Motiva Sans", Arial, sans-serif);
+}
+
+/* Scrolls with the wheel, keys or a drag, without a scrollbar */
+.friendlist:not(.GamepadMode),
+.friendlist:not(.GamepadMode) * {
+  scrollbar-width: none !important;
+}
+
+.friendlist:not(.GamepadMode) ::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+/*
+ * Banners over the list, marked [data-se-banner] by features/friends/friends-list.js:
+ * - connection ("Disconnected", "Reconnecting…"): Steam's blue gradient strip becomes a slim
+ *   red notice card with a status dot;
+ * - invite ("Invite anyone to play"): Steam's teal strip becomes an accent action row in the
+ *   theme's label type.
+ * Only paint, type and spacing change; Steam keeps the layout inside them and their clicks.
+ */
+[data-se-banner="connection"]:not(#se-none) {
+  box-sizing: border-box;
+  height: auto !important;
+  min-height: 32px;
+  margin: 8px 12px 0 !important;
+  padding: 6px 12px 6px 28px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
+  background:
+    radial-gradient(circle 4px at 14px 50%, var(--se-danger, #e5737a) 92%, transparent),
+    color-mix(in srgb, var(--se-danger, #e5737a) 12%, var(--se-surface, #1f242b)) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-danger, #e5737a) 30%, transparent) !important;
+  font: 600 12px/20px var(--se-font, "Motiva Sans"), sans-serif !important;
+  letter-spacing: .01em !important;
+  text-align: start !important;
+  text-shadow: none !important;
+  color: var(--se-danger-text, #ffb0b3) !important;
+}
+
+[data-se-banner="connection"]::before,
+[data-se-banner="connection"]::after {
+  background-image: none !important;
+}
+
+[data-se-banner="connection"] * {
+  font: inherit !important;
+  text-shadow: none !important;
+  color: inherit !important;
+}
+
+[data-se-banner="invite"]:not(#se-none) {
+  box-sizing: border-box;
+  margin: 8px 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md, 10px) !important;
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14)) !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent-line, rgba(124, 196, 255, .3)) !important;
+  color: var(--se-accent, #7cc4ff) !important;
+  cursor: pointer;
+  transition: background-color .15s ease-out, color .15s ease-out;
+}
+
+[data-se-banner="invite"]:not(#se-none):hover {
+  background: color-mix(in srgb, var(--se-accent, #7cc4ff) 22%, transparent) !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+[data-se-banner="invite"] :not(svg, svg *) {
+  background: none !important;
+  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
+  letter-spacing: var(--se-label-spacing, .1em) !important;
+  text-shadow: none !important;
+  color: inherit !important;
+}
+
+[data-se-banner="invite"] svg {
+  color: inherit;
+  opacity: .9;
+}
+
+/* Your status */
+.friendlist:not(.GamepadMode) .friendListHeaderContainer {
+  min-height: 0 !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid var(--se-hairline, rgba(255, 255, 255, .06)) !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer {
+  position: relative;
+  background: none !important;
+  border: 0 !important;
+  padding: 12px 24px 12px 14px !important;
+}
+
+.friendlist:not(.GamepadMode) .statusHeaderGlow {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .AvatarAndUser {
+  align-items: center;
+  padding: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserAvatar,
+.friendlist:not(.GamepadMode) .currentUserAvatar .avatarHolder {
+  width: 36px !important;
+  height: 36px !important;
+  margin-right: 3px;
+}
+
+.friendlist:not(.GamepadMode) .currentUserAvatar:hover {
+  transform: none;
+  filter: brightness(1.1);
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer .labelHolder {
+  margin: 0 0 0 8px !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer .nOdcT-MoOaXGePXLyPe0H {
+  font: 700 14px/1.3 var(--se-font, "Motiva Sans"), sans-serif !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer ._3sxE7F1LV2IcSX68YsH9dI {
+  margin: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer ._2Ri005Wg_uXDTa71kdRbcN {
+  margin: 0 !important;
+  font: 600 12px/1.3 var(--se-font, "Motiva Sans"), sans-serif !important;
+  color: var(--se-online, #4cb4ff) !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer.ingame ._2Ri005Wg_uXDTa71kdRbcN {
+  color: var(--se-running, #6cc24a) !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer.offline ._2Ri005Wg_uXDTa71kdRbcN {
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer .ContextMenuButton {
+  opacity: .7;
+  margin: 0 !important;
+  padding: 0 0 0 2px !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer .ContextMenuButton svg {
+  width: 12px !important;
+  height: 12px !important;
+  margin-top: 3px !important;
+  fill: currentColor;
+}
+
+/*
+ * Buttons (settings, search, friend requests, add a friend, collapse): the theme's
+ * 30 px tiles with its duotone icons (a soft fill under the line), drawn as masks so
+ * they follow the tile's color; native glyphs stay in the DOM, hidden
+ */
+.friendlist:not(.GamepadMode) {
+  --se-fd-ico-search: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Ccircle%20cx%3D%2211%22%20cy%3D%2211%22%20r%3D%226.5%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2211%22%20cy%3D%2211%22%20r%3D%226.5%22%2F%3E%3Cpath%20d%3D%22M20%2020l-4.2-4.2%22%2F%3E%3C%2Fsvg%3E");
+  --se-fd-ico-add: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Ccircle%20cx%3D%229.5%22%20cy%3D%228%22%20r%3D%223.5%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%229.5%22%20cy%3D%228%22%20r%3D%223.5%22%2F%3E%3Cpath%20d%3D%22M3%2020c.8-3.4%203.4-5.2%206.5-5.2s5.7%201.8%206.5%205.2M19.5%208.5v6M16.5%2011.5h6%22%2F%3E%3C%2Fsvg%3E");
+  --se-fd-ico-requests: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Ccircle%20cx%3D%229.5%22%20cy%3D%228%22%20r%3D%223.5%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%229.5%22%20cy%3D%228%22%20r%3D%223.5%22%2F%3E%3Cpath%20d%3D%22M3%2020c.8-3.4%203.4-5.2%206.5-5.2s5.7%201.8%206.5%205.2M22%206l-4.5%204.5M17.5%206.5v4h4%22%2F%3E%3C%2Fsvg%3E");
+  --se-fd-ico-collapse: var(--se-icon-collapse);
+  --se-fd-ico-settings: var(--se-icon-settings);
+}
+
+.friendlist:not(.GamepadMode) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton) {
+  position: relative;
+  flex: none;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 30px !important;
+  height: 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm, 8px);
+  background: none;
+  opacity: 1 !important;
+  transform: none !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+  cursor: pointer;
+}
+
+.friendlist:not(.GamepadMode) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton):hover {
+  background: var(--se-hover, #2c3440) !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+.friendlist:not(.GamepadMode) .friendRequestButton.friendRequestViewActive {
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14)) !important;
+  color: var(--se-accent, #7cc4ff) !important;
+}
+
+.friendlist:not(.GamepadMode) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton) > svg {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton)::before {
+  content: "";
+  width: 20px;
+  height: 20px;
+  background: currentColor;
+  -webkit-mask: var(--se-fd-ico) center / 20px 20px no-repeat;
+  mask: var(--se-fd-ico) center / 20px 20px no-repeat;
+}
+
+.friendlist:not(.GamepadMode) .friendSettingsButton {
+  --se-fd-ico: var(--se-fd-ico-settings);
+}
+
+.friendlist:not(.GamepadMode) .TabSearchButton .searchIconButton {
+  --se-fd-ico: var(--se-fd-ico-search);
+}
+
+.friendlist:not(.GamepadMode) .friendRequestButton {
+  --se-fd-ico: var(--se-fd-ico-requests);
+}
+
+.friendlist:not(.GamepadMode) .addFriendButton {
+  --se-fd-ico: var(--se-fd-ico-add);
+}
+
+/*
+ * The Friends window's collapse button (Steam's friendListButton friendCollapseButton): without
+ * its own icon the mask above would paint a solid square
+ */
+.friendlist:not(.GamepadMode) .friendCollapseButton {
+  --se-fd-ico: var(--se-fd-ico-collapse);
+}
+
+.friendlist:not(.GamepadMode) .friendCollapseButton svg {
+  display: none !important;
+}
+
+/* A friend request count: a small red pill on the tile's corner */
+.friendlist:not(.GamepadMode) .friendRequestButton .requestsNumber {
+  position: absolute !important;
+  top: -3px !important;
+  right: -4px !important;
+  left: auto !important;
+  box-sizing: border-box;
+  min-width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  border-radius: 999px !important;
+  background: var(--se-danger, #e5737a) !important;
+  box-shadow: 0 0 0 2px var(--se-sidebar, #1d2128);
+  font: 800 10px/16px var(--se-font, "Motiva Sans"), sans-serif !important;
+  letter-spacing: 0 !important;
+  color: #fff !important;
+  text-align: center;
+  transform: none !important;
+  z-index: 1;
+}
+
+/* The "Friends" bar: a small label, its buttons at the end */
+.friendlist:not(.GamepadMode) .quickAccessFriends.emptyQuickAccess {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab {
+  display: flex !important;
+  align-items: center;
+  height: 34px !important;
+  margin: 6px 8px 0 !important;
+  padding: 0 0 0 8px !important;
+  border-radius: var(--se-radius-sm, 8px);
+  background: none !important;
+  box-shadow: none !important;
+  font: var(--se-label-font, 700 11px/14px "Motiva Sans", Arial, sans-serif) !important;
+  letter-spacing: var(--se-label-spacing, .1em) !important;
+  color: var(--se-label-color, #6f7984) !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .tabLabel {
+  flex: none;
+  color: inherit !important;
+  line-height: 34px;
+}
+
+.friendlist:not(.GamepadMode) .friendsTabButtonsContainer {
+  display: flex !important;
+  align-items: center;
+  gap: 2px;
+  height: 34px !important;
+  padding: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .friendsTabButtonsContainer .TabSearchButton {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+  height: 34px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  opacity: 1 !important;
+}
+
+.friendlist:not(.GamepadMode) .friendsTabButtonsContainer a {
+  display: flex;
+}
+
+/*
+ * Searching: the bar becomes the theme's field (the Library's title-bar search): one rounded
+ * box with a blue focus ring, a magnifier at the start, upright placeholder, and the clear
+ * button as a small tile. Steam's gray backing, the input's inset shadow and its own
+ * magnifier image go; the label leaves the row instead of only fading out
+ */
+.friendlist:not(.GamepadMode) .socialListTab.TabSearchActive {
+  padding: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab.TabSearchActive .tabLabel {
+  display: none !important;
+}
+
+/* While searching the field has the whole row, as the bar's other buttons step aside */
+.friendlist:not(.GamepadMode) .socialListTab.TabSearchActive .friendsTabButtonsContainer > :not(.TabSearchButton) {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab.TabSearchActive .friendsTabButtonsContainer {
+  flex: 1;
+  min-width: 0;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab.TabSearchActive .TabSearchButton {
+  flex: 1;
+  min-width: 0;
+  cursor: text;
+}
+
+.friendlist:not(.GamepadMode) .TabSearchActive .TabSearchButton .searchIconButton {
+  width: 0 !important;
+  min-width: 0 !important;
+  opacity: 0 !important;
+  overflow: hidden;
+}
+
+.friendlist:not(.GamepadMode) .tabSearchTransitionGroup,
+.friendlist:not(.GamepadMode) .tabSearchTransition {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+
+.friendlist:not(.GamepadMode) .socialSearchContainer {
+  flex: 1;
+  min-width: 0;
+  background: none !important;
+}
+
+.friendlist:not(.GamepadMode) .socialSearchContainer .socialInputContainer {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .inputContainer {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 0 4px 0 10px;
+  border-radius: var(--se-radius-sm, 8px) !important;
+  overflow: hidden;
+  background: var(--se-field, #15181d);
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .inputContainer:focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong, rgba(124, 196, 255, .55)), 0 0 0 3px var(--se-accent-tint, rgba(124, 196, 255, .14));
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .inputContainer::before {
+  content: "";
+  flex: none;
+  width: 15px;
+  height: 15px;
+  background: var(--se-text-muted, #98a2ad);
+  -webkit-mask: var(--se-fd-ico-search) center / 15px 15px no-repeat;
+  mask: var(--se-fd-ico-search) center / 15px 15px no-repeat;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab input.friendSearchInput {
+  flex: 1;
+  min-width: 0;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text, #e6e8eb) !important;
+  font: 500 13px var(--se-font, "Motiva Sans"), sans-serif !important;
+  text-transform: none;
+  letter-spacing: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab input.friendSearchInput::placeholder {
+  font-style: normal !important;
+  color: var(--se-text-faint, #6f7984) !important;
+  opacity: 1;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .friendSearchClear {
+  position: static !important;
+  flex: none;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .06);
+  color: var(--se-text-muted, #98a2ad);
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: none !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .friendSearchClear:hover {
+  background: var(--se-hover, #2c3440);
+  color: var(--se-text-strong, #fff);
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .friendSearchClear > svg {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .friendSearchClear::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-close-sm) center / 12px 12px no-repeat;
+  mask: var(--se-icon-close-sm) center / 12px 12px no-repeat;
+}
+
+/*
+ * Favorites: avatars with their status ring in a grid, the name under each,
+ * the game being played as a small icon on the avatar's corner
+ */
+.friendlist:not(.GamepadMode) .quickAccessFriends:not(.emptyQuickAccess) {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  gap: 4px 2px;
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 10px 8px 4px !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .favoriteElement {
+  height: auto !important;
+  min-width: 0;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .friend.quickAccessFriend {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 8px 2px 6px !important;
+  border-radius: var(--se-radius-sm, 8px);
+  justify-content: center;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .friend.quickAccessFriend:hover {
+  background: var(--se-hover, #2c3440) !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriend > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  width: 100%;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .friend .avatarHolder {
+  display: block !important;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .friend .avatarHolder img.avatar {
+  opacity: 1 !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .friend.awayOrSnooze .avatarHolder img.avatar {
+  opacity: .75 !important;
+}
+
+.friendlist:not(.GamepadMode) .FavoriteFriend_GameIcon {
+  position: absolute !important;
+  right: -5px !important;
+  bottom: -4px !important;
+  left: auto !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 5px;
+  background: var(--se-surface-2, #262c35) !important;
+  box-shadow: 0 0 0 2px var(--se-sidebar, #1d2128);
+  z-index: 2;
+}
+
+.friendlist:not(.GamepadMode) .FavoriteFriend_GameIcon img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 5px !important;
+  box-shadow: none !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .SnoozeContainer {
+  top: -6px !important;
+  left: -6px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: scale(.8);
+  transform-origin: top left;
+}
+
+.friendlist:not(.GamepadMode) .playerNameQuickAccessContainer {
+  justify-content: center;
+  width: 100% !important;
+  min-width: 0;
+  opacity: 1 !important;
+}
+
+.friendlist:not(.GamepadMode) .friend.quickAccessFriend .playerNameQuickAccessContainer .playerName {
+  width: auto !important;
+  max-width: 100%;
+  margin: 0 !important;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  font: 600 11.5px/14px var(--se-font, "Motiva Sans"), sans-serif !important;
+  color: var(--se-text-dim, #b8c0c8) !important;
+  text-align: center;
+}
+
+.friendlist:not(.GamepadMode) .friend.quickAccessFriend.online .playerName {
+  color: var(--se-online, #4cb4ff) !important;
+}
+
+.friendlist:not(.GamepadMode) .friend.quickAccessFriend.awayOrSnooze .playerName {
+  color: color-mix(in srgb, var(--se-online) 70%, transparent) !important;
+}
+
+.friendlist:not(.GamepadMode) .friend.quickAccessFriend.ingame .playerName {
+  color: var(--se-running, #6cc24a) !important;
+}
+
+.friendlist:not(.GamepadMode) .friend.quickAccessFriend.offline .playerName {
+  color: var(--se-text-faint, #6f7984) !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .ChatUnreadMessageIndicator .chatUnreadCircle {
+  right: 4px !important;
+  bottom: auto !important;
+  top: 4px;
+  box-shadow: 0 0 0 2px var(--se-sidebar, #1d2128) !important;
+}
+
+/* The list */
+.friendlist:not(.GamepadMode) .listContentContainer {
+  padding: 4px 8px 16px;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup {
+  margin: 0 !important;
+  border: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup .groupHeaderContainer {
+  display: flex;
+  align-items: center;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup .groupName hr {
+  display: none !important;
+}
+
+/* The chevron: right when closed, down when open */
+.friendlist:not(.GamepadMode) .friendGroup .ExpandPlusMinus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px !important;
+  min-width: 14px !important;
+  height: 14px !important;
+  margin: 0 !important;
+  opacity: 1 !important;
+  transform: none !important;
+  color: inherit !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup .ExpandPlusMinus svg {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup .ExpandPlusMinus::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  margin-top: -3px;
+  border-right: 1.75px solid currentColor;
+  border-bottom: 1.75px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform .15s ease, margin .15s ease;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup .groupName.Collapsed .ExpandPlusMinus::before {
+  margin: 0 0 0 -3px;
+  transform: rotate(-45deg);
+}
+
+/*
+ * Section headers (Online, Offline, requests, your categories, In-Game): small labels,
+ * the chevron first and the count at the end
+ */
+.friendlist:not(.GamepadMode) .friendGroup:is(:not(.gameGroup), .OtherGamesGroup) .groupName {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  margin: 10px 0 2px !important;
+  padding: 0 8px !important;
+  border-radius: var(--se-radius-sm, 8px);
+  background: none;
+  font: var(--se-label-font, 700 11px/14px "Motiva Sans", Arial, sans-serif) !important;
+  letter-spacing: var(--se-label-spacing, .1em) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color, #6f7984) !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup.friendRequests .groupName {
+  color: var(--se-warning, #f2c94c) !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup:is(:not(.gameGroup), .OtherGamesGroup) .groupName:hover {
+  background: var(--se-hover, #2c3440);
+}
+
+.friendlist:not(.GamepadMode) .OtherGamesGroup .gameGroupContainer {
+  display: contents !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup:is(:not(.gameGroup), .OtherGamesGroup) .groupName .groupIcon {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  border-radius: 4px;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup:is(:not(.gameGroup), .OtherGamesGroup) .groupName .groupCount {
+  margin-inline-start: auto !important;
+  opacity: 1 !important;
+  transform: none !important;
+  font: 700 11px/14px var(--se-font, "Motiva Sans"), sans-serif !important;
+  color: var(--se-text-faint, #6f7984) !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup:is(:not(.gameGroup), .OtherGamesGroup) .groupName .groupCount[data-se-count] {
+  font-size: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup:is(:not(.gameGroup), .OtherGamesGroup) .groupName .groupCount[data-se-count]::after {
+  margin: 0;
+  padding: 0;
+  background: none;
+  font-size: 11px;
+  line-height: 14px;
+  letter-spacing: 0;
+  color: var(--se-text-faint, #6f7984);
+}
+
+/* A game: one row with its icon, a green count, its name and who's in it */
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) > .groupName {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: 34px minmax(0, 1fr) 14px;
+  column-gap: 12px;
+  align-items: center;
+  align-content: center;
+  min-height: 52px;
+  margin: 2px 0 0 !important;
+  padding: 8px 10px !important;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-sm, 8px);
+  white-space: normal !important;
+  overflow: visible !important;
+  font: 700 13.5px/1.3 var(--se-font, "Motiva Sans"), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text, #e6e8eb) !important;
+  cursor: pointer;
+}
+
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) > .groupName:hover {
+  background: var(--se-hover, #2c3440);
+}
+
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) > .groupName:not(.Collapsed) {
+  background: var(--se-surface, #1f242b);
+}
+
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) .gameGroupContainer {
+  display: contents !important;
+}
+
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) .groupName .groupIcon {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: 34px !important;
+  height: 34px !important;
+  margin: 0 !important;
+  border-radius: 9px !important;
+  object-fit: cover;
+  background: var(--se-surface-2, #262c35);
+  box-shadow: none !important;
+}
+
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) .groupName .ExpandPlusMinus {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  color: var(--se-text-faint, #6f7984) !important;
+}
+
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) .groupName .groupCount {
+  position: absolute;
+  left: 31px;
+  top: 50%;
+  margin: 5px 0 0 !important;
+  opacity: 1 !important;
+  transform: none !important;
+  font-size: 0 !important;
+  line-height: 0;
+}
+
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) .groupName .groupCount::after {
+  content: attr(data-se-count);
+  display: block;
+  box-sizing: border-box;
+  min-width: 16px;
+  height: 16px;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  border-radius: 999px;
+  background: var(--se-running, #6cc24a) !important;
+  box-shadow: 0 0 0 2px var(--se-sidebar, #1d2128);
+  font: 800 10px/16px var(--se-font, "Motiva Sans"), sans-serif !important;
+  letter-spacing: 0;
+  color: var(--se-bg-ink, #0f1115) !important;
+  text-align: center;
+}
+
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) .groupName .groupCount:not([data-se-count])::after {
+  display: none;
+}
+
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) .groupName.Collapsed .groupCount::after {
+  box-shadow: 0 0 0 2px var(--se-sidebar, #1d2128);
+}
+
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) .groupName:not(.Collapsed) .groupCount::after {
+  box-shadow: 0 0 0 2px var(--se-surface, #1f242b);
+}
+
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) .groupName[data-se-who]::after {
+  content: attr(data-se-who);
+  grid-column: 2;
+  grid-row: 2;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 500 12px/1.3 var(--se-font, "Motiva Sans"), sans-serif;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+/* …and the friends in it on a thread line */
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) > .friendsContainer:not(.groupCollapsed) {
+  margin: 2px 0 6px 26px;
+  padding-left: 8px;
+  border-left: 1px solid var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) .friend {
+  min-height: 38px;
+  padding-inline-start: 10px !important;
+}
+
+.friendlist:not(.GamepadMode) .SteamPlayerGroupLines {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup .SteamPlayerGroupFooter {
+  height: auto !important;
+  margin: 0 0 4px !important;
+  padding: 2px 10px !important;
+  align-items: center;
+}
+
+.friendlist:not(.GamepadMode) .SteamPlayerGroupFooterCount {
+  width: auto !important;
+  border: 0 !important;
+  transform: none !important;
+}
+
+.friendlist:not(.GamepadMode) .SteamPlayerGroupFooterCount .count {
+  display: block !important;
+  margin: 0 !important;
+  font: 700 11px/14px var(--se-font, "Motiva Sans"), sans-serif !important;
+  color: var(--se-running, #6cc24a) !important;
+}
+
+.friendlist:not(.GamepadMode) .SteamPlayerGroupFooterLabel {
+  margin-inline-start: 6px !important;
+  padding: 0 !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  font: 500 12px/14px var(--se-font, "Motiva Sans"), sans-serif !important;
+  color: var(--se-text-faint, #6f7984) !important;
+}
+
+/* A friend: round avatar with its status ring (green in game, blue online, gray offline) */
+.friendlist:not(.GamepadMode) .friendGroup .friend {
+  height: auto !important;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding-block: 4px !important;
+  margin: 0 !important;
+  padding-inline: 10px !important;
+  align-items: center;
+  border-radius: var(--se-radius-sm, 8px);
+  background: none;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup .friend:is(:hover, .Friend_ContextMenuActive) {
+  background: var(--se-hover, #2c3440) !important;
+}
+
+.friendlist:not(.GamepadMode) .friend {
+  --se-fd-ring: var(--se-border-strong, #4a525e);
+}
+
+.friendlist:not(.GamepadMode) .friend.online,
+.friendlist:not(.GamepadMode) .currentUserContainer.online {
+  --se-fd-ring: var(--se-online, #4cb4ff);
+}
+
+.friendlist:not(.GamepadMode) .friend.awayOrSnooze,
+.friendlist:not(.GamepadMode) .currentUserContainer.awayOrSnooze {
+  --se-fd-ring: color-mix(in srgb, var(--se-online) 50%, transparent);
+}
+
+.friendlist:not(.GamepadMode) .friend.ingame,
+.friendlist:not(.GamepadMode) .currentUserContainer.ingame {
+  --se-fd-ring: var(--se-running, #6cc24a);
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer {
+  --se-fd-ring: var(--se-border-strong, #4a525e);
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer:is(.online, .awayOrSnooze, .ingame) {
+  --se-fd-ring: var(--se-online, #4cb4ff);
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer.ingame {
+  --se-fd-ring: var(--se-running, #6cc24a);
+}
+
+.friendlist:not(.GamepadMode) .friend .avatarHolder,
+.friendlist:not(.GamepadMode) .currentUserAvatar .avatarHolder {
+  flex: none;
+  position: relative;
+  width: 30px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border-radius: 50% !important;
+  transform: none !important;
+}
+
+.friendlist:not(.GamepadMode) .gameGroup:not(.OtherGamesGroup) .friend .avatarHolder {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserAvatar .avatarHolder {
+  width: 36px !important;
+  height: 36px !important;
+}
+
+.friendlist:not(.GamepadMode) .friend .avatarHolder img.avatar,
+.friendlist:not(.GamepadMode) .currentUserAvatar .avatarHolder img.avatar,
+.friendlist:not(.GamepadMode) .friend .avatarHolder .avatar,
+.friendlist:not(.GamepadMode) .currentUserAvatar .avatarHolder .avatar {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px var(--se-sidebar, #1d2128), 0 0 0 3.5px var(--se-fd-ring) !important;
+}
+
+/* Away and snoozing use the same dashed status rings as the game page. */
+.friendlist:not(.GamepadMode) :is(.friend, .currentUserContainer).awayOrSnooze .avatarHolder :is(img.avatar, .avatar) {
+  box-shadow: none !important;
+  outline: 2px dashed var(--se-online, #4cb4ff) !important;
+  outline-offset: 2px;
+}
+
+.friendlist:not(.GamepadMode) :is(.friend, .currentUserContainer).awayOrSnooze.ingame .avatarHolder :is(img.avatar, .avatar) {
+  outline-color: var(--se-running, #6cc24a) !important;
+}
+
+.friendlist:not(.GamepadMode) .friend.offline .avatarHolder img.avatar {
+  filter: grayscale(.6) !important;
+  opacity: .6;
+}
+
+.friendlist:not(.GamepadMode) .friend.offline:hover .avatarHolder img.avatar {
+  filter: none !important;
+  opacity: 1;
+}
+
+.friendlist:not(.GamepadMode) .friend .avatarHolder .avatarStatus,
+.friendlist:not(.GamepadMode) .currentUserAvatar .avatarHolder .avatarStatus,
+.friendlist:not(.GamepadMode) .friend .avatarHolder .avatarFrame,
+.friendlist:not(.GamepadMode) .currentUserAvatar .avatarHolder .avatarFrame {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .friend .labelHolder {
+  height: auto !important;
+  margin: 0 0 0 11px !important;
+  padding: 0 !important;
+  align-self: center;
+}
+
+.friendlist:not(.GamepadMode) .friend .nOdcT-MoOaXGePXLyPe0H {
+  font: 600 13.5px/1.3 var(--se-font, "Motiva Sans"), sans-serif !important;
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.friendlist:not(.GamepadMode) .friend.offline .nOdcT-MoOaXGePXLyPe0H {
+  color: var(--se-text-faint, #6f7984) !important;
+}
+
+.friendlist:not(.GamepadMode) .friend ._3sxE7F1LV2IcSX68YsH9dI {
+  margin: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .friend ._2Ri005Wg_uXDTa71kdRbcN {
+  margin: 0 !important;
+  padding: 0 !important;
+  font: 500 12px/1.3 var(--se-font, "Motiva Sans"), sans-serif !important;
+  color: var(--se-text-faint, #6f7984) !important;
+}
+
+.friendlist:not(.GamepadMode) .friend.online ._2Ri005Wg_uXDTa71kdRbcN {
+  color: var(--se-online, #4cb4ff) !important;
+}
+
+.friendlist:not(.GamepadMode) .friend.awayOrSnooze ._2Ri005Wg_uXDTa71kdRbcN {
+  color: color-mix(in srgb, var(--se-online) 70%, transparent) !important;
+}
+
+.friendlist:not(.GamepadMode) .friend.ingame ._2Ri005Wg_uXDTa71kdRbcN {
+  color: var(--se-running, #6cc24a) !important;
+}
+
+/* In-Game (games with one friend): the game's icon before the friend */
+.friendlist:not(.GamepadMode) .friend .FriendInGameIcon {
+  --se-friend-game-icon-size: 22px;
+  flex: none;
+  width: var(--se-friend-game-icon-size) !important;
+  height: var(--se-friend-game-icon-size) !important;
+  margin: 0 10px 0 0 !important;
+  background: none !important;
+}
+
+.friendlist:not(.GamepadMode) .friend .FriendInGameIcon img {
+  width: var(--se-friend-game-icon-size) !important;
+  height: var(--se-friend-game-icon-size) !important;
+  margin: 0 !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+/* Give the native N/A placeholder the same slot as game artwork. */
+.friendlist:not(.GamepadMode) .friendGroup .friend .FriendInGameIcon:not(:has(img[src]:not([src=""]))) {
+  display: grid !important;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 6px !important;
+  background: var(--se-surface-2, #262c35) !important;
+  font-size: 0 !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup .friend .FriendInGameIcon:not(:has(img[src]:not([src=""]))) > * {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup .friend .FriendInGameIcon:not(:has(img[src]:not([src=""])))::before {
+  content: "";
+  width: var(--se-friend-game-icon-size);
+  height: var(--se-friend-game-icon-size);
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='2 2.5 20 20' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='7' width='18' height='11' rx='4'/%3E%3Cpath d='M8 11v3m-1.5-1.5h3m6-1h.01m3 2h.01'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/*
+ * Friend requests (the requests button's view): the panel's section header with the back
+ * arrow as a tile; each request a friend row with its mutual friends, accept and ignore as
+ * 30 px tiles (green or red once chosen: Steam's.bright); Confirm and Ignore All as the
+ * theme's buttons, Confirm in the accent color once something is chosen (Steam's.dim
+ * until then). Steam's elements and clicks are untouched.
+ */
+.friendlist:not(.GamepadMode) {
+  --se-fd-ico-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+  --se-fd-ico-x: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E");
+  --se-fd-ico-back: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5M11 6l-6 6 6 6'/%3E%3C/svg%3E");
+}
+
+.friendlist:not(.GamepadMode) .friendGroup:is(.friendRequests, .friendOutgoingRequests) {
+  position: relative;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup:is(.friendRequests, .friendOutgoingRequests) .groupHeaderContainer > .groupName,
+.friendlist:not(.GamepadMode) .friendGroup:is(.friendRequests, .friendOutgoingRequests) .groupHeaderContainer > .groupName * {
+  color: var(--se-label-color, #6f7984) !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup:is(.friendRequests, .friendOutgoingRequests) .groupHeaderContainer > .groupName {
+  display: flex !important;
+  align-items: center;
+  min-height: 34px;
+  margin: 6px 8px 2px !important;
+  padding: 0 52px 0 8px !important;
+  box-sizing: border-box;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup:is(.friendRequests, .friendOutgoingRequests) .groupHeaderContainer > .groupName:hover {
+  background: none !important;
+}
+
+/* The header holds only the chevron, the label and the count pill (Steam's other count copies go) */
+.friendlist:not(.GamepadMode) .friendGroup:is(.friendRequests, .friendOutgoingRequests) .groupHeaderContainer > .groupName > :not(.ExpandPlusMinus, [data-se-count], .groupIcon) {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup:is(.friendRequests, .friendOutgoingRequests) .groupHeaderContainer > :not(.groupName) {
+  display: none !important;
+}
+
+/* The pending count: the red pill of the requests button in the Friends bar */
+.friendlist:not(.GamepadMode) .friendGroup:is(.friendRequests, .friendOutgoingRequests) .groupHeaderContainer > .groupName .groupCount {
+  margin-inline-start: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .friendGroup.friendRequests .groupHeaderContainer > .groupName [data-se-count]::after {
+  display: inline-block !important;
+  box-sizing: border-box;
+  min-width: 18px;
+  height: 18px;
+  margin-inline-start: 8px !important;
+  padding: 0 6px !important;
+  border-radius: 999px !important;
+  background: var(--se-danger, #e5737a) !important;
+  font: 800 10.5px/18px var(--se-font, "Motiva Sans"), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-align: center;
+  color: #fff !important;
+}
+
+/* Each request: a friend row, the buttons at its end */
+.friendlist:not(.GamepadMode) .friendInviteContainer {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px;
+  margin: 0 8px !important;
+  padding: 0 4px 0 0;
+  border-radius: var(--se-radius-sm, 8px);
+}
+
+.friendlist:not(.GamepadMode) .friendInviteContainer:hover {
+  background: var(--se-hover, #2c3440);
+}
+
+.friendlist:not(.GamepadMode) .friendInviteContainer > div:has(> .friend) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.friendlist:not(.GamepadMode) .friendInviteContainer .friend {
+  margin: 0 !important;
+  background: none !important;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.friendlist:not(.GamepadMode) .friendInviteContainer .friend.dim {
+  filter: none !important;
+  opacity: .45;
+}
+
+.friendlist:not(.GamepadMode) .friendInviteContainer .nOdcT-MoOaXGePXLyPe0H /* playerName */ {
+  color: var(--se-text, #e6e8eb) !important;
+}
+
+.friendlist:not(.GamepadMode) .friendInviteContainer :is(.inviteLabel, ._2Ri005Wg_uXDTa71kdRbcN /* richPresenceLabel */) {
+  -webkit-mask: none !important;
+  mask: none !important;
+  font: 500 12px/1.3 var(--se-font, "Motiva Sans"), sans-serif !important;
+  color: var(--se-text-faint, #6f7984) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.friendlist:not(.GamepadMode) .friendInviteContainer .mutualFriendNumber {
+  margin-inline-end: .25em;
+  font-weight: 700;
+  color: var(--se-online, #4cb4ff) !important;
+}
+
+/* A request isn't a friend yet: its avatar shows in full, with a neutral ring */
+.friendlist:not(.GamepadMode) .friendInviteContainer .friend .avatarHolder img.avatar {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.friendlist:not(.GamepadMode) .friendInviteButtons {
+  flex: none;
+  display: flex !important;
+  align-items: center;
+  gap: 2px;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .friendInviteButton {
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-tile-sm, 30px) !important;
+  height: var(--se-tile-sm, 30px) !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.friendlist:not(.GamepadMode) .friendInviteButton > svg {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .friendInviteButton::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: var(--se-fd-ico-x) center / contain no-repeat;
+  mask: var(--se-fd-ico-x) center / contain no-repeat;
+}
+
+.friendlist:not(.GamepadMode) .friendInviteButton.acceptFriendInvite::before {
+  -webkit-mask-image: var(--se-fd-ico-check);
+  mask-image: var(--se-fd-ico-check);
+}
+
+.friendlist:not(.GamepadMode) .friendInviteButton.acceptFriendInvite:hover {
+  background: color-mix(in srgb, var(--se-running) 14%, transparent) !important;
+  color: var(--se-running, #6cc24a) !important;
+}
+
+.friendlist:not(.GamepadMode) .friendInviteButton.declineFriendInvite:hover {
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent) !important;
+  color: var(--se-danger, #e5737a) !important;
+}
+
+.friendlist:not(.GamepadMode) .friendInviteButton.acceptFriendInvite.bright {
+  background: color-mix(in srgb, var(--se-running) 20%, transparent) !important;
+  color: var(--se-running, #6cc24a) !important;
+}
+
+.friendlist:not(.GamepadMode) .friendInviteButton.declineFriendInvite.bright {
+  background: color-mix(in srgb, var(--se-danger) 20%, transparent) !important;
+  color: var(--se-danger, #e5737a) !important;
+}
+
+/* Confirm / Ignore All */
+.friendlist:not(.GamepadMode) .confirmInviteRequestContainer {
+  padding: 10px 12px 12px !important;
+}
+
+.friendlist:not(.GamepadMode) .confirmInviteRequestActions {
+  display: flex !important;
+  gap: 8px;
+  margin: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .confirmInviteRequestContainer .confirmInviteButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--se-control-h, 34px);
+  margin: 0 !important;
+  padding: 0 12px !important;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-surface-2, #262c35) !important;
+  font: 600 13px var(--se-font, "Motiva Sans"), sans-serif !important;
+  color: var(--se-text, #e6e8eb) !important;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.friendlist:not(.GamepadMode) .confirmInviteRequestContainer .confirmInviteButton:hover {
+  background: var(--se-hover, #2c3440) !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+.friendlist:not(.GamepadMode) .confirmInviteRequestContainer .confirmInviteButton.confirmInvites:not(.dim) {
+  background: var(--se-accent, #7cc4ff) !important;
+  color: var(--se-bg-ink, #0f1115) !important;
+}
+
+.friendlist:not(.GamepadMode) .confirmInviteRequestContainer .confirmInviteButton.confirmInvites:not(.dim):hover {
+  filter: brightness(1.08);
+}
+
+.friendlist:not(.GamepadMode) .confirmInviteRequestContainer .confirmInviteButton.confirmInvites.dim {
+  background: rgba(255, 255, 255, .04) !important;
+  color: var(--se-text-faint, #6f7984) !important;
+  cursor: default;
+}
+
+/* Back to the friends list: a tile at the header's end */
+.friendlist:not(.GamepadMode) .confirmInviteRequestContainer .cancelAddFriends {
+  position: absolute !important;
+  top: 8px !important;
+  right: 12px !important;
+  inset-inline-end: 12px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-tile-sm, 30px) !important;
+  height: var(--se-tile-sm, 30px) !important;
+  border-radius: var(--se-radius-sm, 8px);
+  color: var(--se-text-muted, #98a2ad);
+  cursor: pointer;
+  z-index: 2;
+}
+
+.friendlist:not(.GamepadMode) .confirmInviteRequestContainer .cancelAddFriends:hover {
+  background: var(--se-hover, #2c3440);
+  color: var(--se-text-strong, #fff);
+}
+
+.friendlist:not(.GamepadMode) .confirmInviteRequestContainer .cancelAddFriends > svg {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .confirmInviteRequestContainer .cancelAddFriends::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: var(--se-fd-ico-back) center / contain no-repeat;
+  mask: var(--se-fd-ico-back) center / contain no-repeat;
+}
+
+/*
+ * Group chats: the section header of the other groups (one chevron, the label,
+ * the count) with "new group chat" as an icon tile; each chat a row like a friend's, a
+ * rounded-square avatar, the name and its last message (data-se-sub, features/friends/friends-list.js),
+ * a blue dot for unread (an "@" pill when you are mentioned), and a green strip with who is
+ * in voice. Steam's elements keep their jobs: the chevron collapses, the bar resizes, a row
+ * opens its chat, right-click its menu.
+ */
+.friendlist:not(.GamepadMode) {
+  --se-fd-ico-chev: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E");
+  --se-fd-ico-newchat: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Cpath%20d%3D%22M4%206.5A2.5%202.5%200%200%201%206.5%204h11A2.5%202.5%200%200%201%2020%206.5v8a2.5%202.5%200%200%201-2.5%202.5H10l-4.5%203.5V17A2.5%202.5%200%200%201%204%2014.5z%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M4%206.5A2.5%202.5%200%200%201%206.5%204h11A2.5%202.5%200%200%201%2020%206.5v8a2.5%202.5%200%200%201-2.5%202.5H10l-4.5%203.5V17A2.5%202.5%200%200%201%204%2014.5z%22%2F%3E%3Cpath%20d%3D%22M12%207.5v6M9%2010.5h6%22%2F%3E%3C%2Fsvg%3E");
+  --se-fd-ico-voice: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M11%205L6%209H3v6h3l5%204z%22%2F%3E%3Cpath%20d%3D%22M15.5%208.5a5%205%200%200%201%200%207M18.5%205.5a9%209%200%200%201%200%2013%22%2F%3E%3C%2Fsvg%3E");
+}
+
+.friendlist:not(.GamepadMode) .FriendsListChatSection {
+  border-top: 1px solid var(--se-hairline, rgba(255, 255, 255, .06));
+}
+
+.friendlist:not(.GamepadMode) .friendsListSectionTitle.chatSectionTitle {
+  position: relative;
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  height: 30px !important;
+  margin: 8px 8px 2px;
+  padding: 0 2px 0 8px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm, 8px);
+  background: none !important;
+  font: var(--se-label-font, 700 11px/14px "Motiva Sans", Arial, sans-serif) !important;
+  letter-spacing: var(--se-label-spacing, .1em) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color, #6f7984) !important;
+}
+
+.friendlist:not(.GamepadMode) .friendsListSectionTitle.chatSectionTitle:hover {
+  background: var(--se-hover, #2c3440) !important;
+}
+
+.friendlist:not(.GamepadMode) .chatSectionTitle .ToggleGroupChatList {
+  order: 0;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px !important;
+  height: 14px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  color: inherit;
+}
+
+.friendlist:not(.GamepadMode) .chatSectionTitle .ToggleGroupChatList > svg {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .chatSectionTitle .ToggleGroupChatList::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: var(--se-fd-ico-chev) center / 14px 14px no-repeat;
+  mask: var(--se-fd-ico-chev) center / 14px 14px no-repeat;
+  transition: transform .15s ease;
+}
+
+.friendlist:not(.GamepadMode) .FriendsListChatSection.Collapsed .chatSectionTitle .ToggleGroupChatList::before {
+  transform: rotate(-90deg);
+}
+
+.friendlist:not(.GamepadMode) .chatSectionTitle .voiceRoomDragBar {
+  order: 1;
+  flex: 1;
+  min-width: 0;
+  display: flex !important;
+  align-items: center;
+  height: 100% !important;
+}
+
+.friendlist:not(.GamepadMode) .chatSectionTitle .groupChatSectionTitle {
+  padding: 0 !important;
+  font: inherit !important;
+  letter-spacing: inherit !important;
+  line-height: 14px !important;
+  color: inherit !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.friendlist:not(.GamepadMode) .chatSectionTitle .voiceRoomDragBar[data-se-count]::after {
+  content: attr(data-se-count);
+  margin-inline-start: auto;
+  padding-inline-end: 6px;
+  font: 700 11px/14px var(--se-font, "Motiva Sans"), sans-serif;
+  letter-spacing: 0;
+  color: var(--se-label-color, #6f7984);
+}
+
+.friendlist:not(.GamepadMode) .chatSectionTitle .createChatRoomButton {
+  order: 2;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0;
+  border-radius: 7px;
+  background: none !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+  cursor: pointer;
+}
+
+.friendlist:not(.GamepadMode) .chatSectionTitle .createChatRoomButton:hover {
+  background: rgba(255, 255, 255, .08) !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+.friendlist:not(.GamepadMode) .chatSectionTitle .createChatRoomButton > svg {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .chatSectionTitle .createChatRoomButton::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: var(--se-fd-ico-newchat) center / 18px 18px no-repeat;
+  mask: var(--se-fd-ico-newchat) center / 18px 18px no-repeat;
+}
+
+/* Unread while the list is collapsed: a blue dot after the chevron */
+.friendlist:not(.GamepadMode) .chatSectionTitle > .ChatUnreadMessageIndicator {
+  width: auto !important;
+  height: auto !important;
+  background: none !important;
+  box-shadow: none !important;
+  position: absolute !important;
+  top: 6px !important;
+  left: 17px !important;
+  inset-inline-start: 17px !important;
+  margin: 0 !important;
+  z-index: 1;
+}
+
+.friendlist:not(.GamepadMode) .chatSectionTitle > .ChatUnreadMessageIndicator .chatUnreadCircle {
+  width: 7px !important;
+  height: 7px !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 50%;
+  background: var(--se-accent, #7cc4ff) !important;
+  box-shadow: 0 0 0 2px var(--se-sidebar, #1d2128);
+  font-size: 0 !important;
+  color: transparent !important;
+}
+
+.friendlist:not(.GamepadMode) .chatRoomListContainer {
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomList {
+  padding: 0 0 10px !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem {
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm, 8px);
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem_header {
+  position: relative;
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  gap: 11px;
+  min-height: 46px;
+  padding: 6px 8px !important;
+  border-radius: var(--se-radius-sm, 8px);
+  background: none !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem_header:hover {
+  background: var(--se-hover, #2c3440) !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem :is(.ChatRoomGroupAvatar, .ChatRoomMultiFriendAvatar.Small) {
+  flex: none;
+  align-self: center;
+  margin: 0 !important;
+  width: 32px !important;
+  height: 32px !important;
+  border: 0 !important;
+  border-radius: 9px !important;
+  overflow: hidden;
+  box-shadow: none !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem_header:has(.membersInVoice) > .ChatRoomGroupAvatar,
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem_header:has(.membersInVoice) > .ChatRoomMultiFriendAvatar {
+  align-self: flex-start;
+  margin-top: 1px !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .ChatRoomGroupAvatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  border-radius: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .ChatRoomGroupAvatar:not(.HasAvatar) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--se-surface-2, #262c35) !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .ChatRoomGroupAvatar_initials {
+  font: 700 12px var(--se-font, "Motiva Sans"), sans-serif !important;
+  color: var(--se-text-dim, #b8c0c8) !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .groupNameStatusContainer {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .groupNameStatusContainer .displayRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .groupNameStatusContainer .chatRoomName {
+  min-width: 0;
+  margin: 0 !important;
+  font: 600 13.5px/1.3 var(--se-font, "Motiva Sans"), sans-serif !important;
+  color: var(--se-text, #e6e8eb) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem_header:has(.ChatUnreadMessageIndicator) .chatRoomName {
+  font-weight: 700 !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .groupNameStatusContainer[data-se-sub]::after {
+  content: attr(data-se-sub);
+  order: 1;
+  font: 500 12px/1.35 var(--se-font, "Motiva Sans"), sans-serif;
+  color: var(--se-text-faint, #6f7984);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem_header:has(.ChatUnreadMessageIndicator) .groupNameStatusContainer[data-se-sub]::after {
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .ContextMenuButton {
+  flex: none;
+  opacity: 0;
+  margin: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem_header:hover .ContextMenuButton {
+  opacity: .7;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .ContextMenuButton svg {
+  width: 12px !important;
+  height: 12px !important;
+  fill: currentColor;
+}
+
+/* Unread: a blue dot at the row's end; a mention: an "@" pill */
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .ChatUnreadMessageIndicator {
+  position: static !important;
+  flex: none;
+  order: 3;
+  align-self: center;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 2px 0 0 !important;
+  display: flex;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .ChatUnreadMessageIndicator .chatUnreadCircle {
+  width: 8px !important;
+  height: 8px !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background: var(--se-accent, #7cc4ff) !important;
+  box-shadow: none !important;
+  font-size: 0 !important;
+  color: transparent !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .ChatUnreadMessageIndicator.UnreadMention .chatUnreadCircle {
+  width: auto !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  padding: 0 5px !important;
+  box-sizing: border-box;
+  border-radius: 999px !important;
+  font: 800 11px/18px var(--se-font, "Motiva Sans"), sans-serif !important;
+  color: #0f1115 !important;
+  text-align: center;
+}
+
+/* Who is in voice: a green strip under the name */
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .membersInVoice {
+  order: 2;
+  display: flex !important;
+  align-items: center;
+  flex-wrap: nowrap !important;
+  gap: 8px;
+  height: 26px;
+  min-height: 0 !important;
+  margin: 5px 0 0 !important;
+  padding: 0 4px 0 8px;
+  border-radius: var(--se-radius-sm, 8px);
+  background: color-mix(in srgb, var(--se-running) 10%, transparent);
+  color: var(--se-running, #6cc24a);
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .membersInVoice .voiceChannelIcon {
+  flex: none;
+  display: flex;
+  width: 13px;
+  height: 13px;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .membersInVoice .voiceChannelIcon > svg {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .membersInVoice .voiceChannelIcon::before {
+  content: "";
+  width: 13px;
+  height: 13px;
+  background: currentColor;
+  -webkit-mask: var(--se-fd-ico-voice) center / 13px 13px no-repeat;
+  mask: var(--se-fd-ico-voice) center / 13px 13px no-repeat;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .membersInVoice[data-se-voice]::after {
+  content: attr(data-se-voice);
+  order: 1;
+  flex: 1;
+  min-width: 0;
+  font: 600 12px var(--se-font, "Motiva Sans"), sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .membersInVoice .voiceChatGroup {
+  order: 2;
+  flex: none;
+  display: flex;
+  align-items: center;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .membersInVoice .voiceFriendAvatar {
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 0 0 -6px !important;
+  border-radius: 50% !important;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px var(--se-sidebar, #1d2128), 0 0 0 3px var(--se-running, #6cc24a);
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .membersInVoice .voiceFriendAvatar:first-child {
+  margin-left: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .membersInVoice .voiceFriendAvatar img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50%;
+}
+
+/* Show the chat's channels: a small tile with one chevron */
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .openGroupButton {
+  flex: none;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  order: 4;
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+  border-radius: 6px !important;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .openGroupButton:hover {
+  background: rgba(255, 255, 255, .08) !important;
+  color: var(--se-text-strong, #fff);
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .openGroupButton > svg {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .openGroupButton::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  transform: rotate(-90deg);
+  transition: transform .15s ease;
+  -webkit-mask: var(--se-fd-ico-chev) center / 14px 14px no-repeat;
+  mask: var(--se-fd-ico-chev) center / 14px 14px no-repeat;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem.ShowAllChannels .openGroupButton::before {
+  transform: none;
+}
+
+/* The channels, when shown: rows indented under the chat's name */
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel {
+  margin: 0 0 2px 51px !important;
+  padding: 0 8px !important;
+  border-radius: var(--se-radius-sm, 8px);
+  background: none !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel:hover {
+  background: var(--se-hover, #2c3440) !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel.ActiveVoiceChannel {
+  background: color-mix(in srgb, var(--se-running) 10%, transparent) !important;
+  color: var(--se-running, #6cc24a);
+}
+
+/*
+ * The Friends window: its window buttons share the header's top-right corner, so your
+ * status keeps clear of them and the settings button sits below them
+ */
+:is(html, body).friendsui-container .friendlist:not(.GamepadMode) .currentUserContainer {
+  padding-inline-end: 110px !important;
+}
+
+:is(html, body).friendsui-container .friendlist:not(.GamepadMode) .friendListHeaderContainer {
+  min-height: 72px !important;
+}
+
+:is(html, body).friendsui-container .friendlist:not(.GamepadMode) .currentUserContainer {
+  padding-block: 18px !important;
+}
+
+:is(html, body).friendsui-container .friendlist:not(.GamepadMode) .friendListButtons {
+  top: auto !important;
+  bottom: 8px;
+  inset-inline-end: 8px !important;
+  align-items: center;
+}
+
+/*
+ * The Friends & Chat window's collapse button: at the start of the chat's tab strip, centered on the
+ * tabs (the 52 px strip of features/friends/chat.css), the same spot as the open button once the list is
+ * collapsed, so the toggle doesn't move. It sits just past the list's edge, in the strip.
+ */
+:is(html, body).friendsui-container .friendlist:not(.GamepadMode) .friendListHeaderContainer:has(> .friendListCollapse) {
+  position: relative;
+  overflow: visible !important;
+}
+
+:is(html, body).friendsui-container .friendlist:not(.GamepadMode) .friendListCollapse {
+  position: absolute !important;
+  top: 11px !important;
+  right: auto !important;
+  inset-inline-start: calc(100% + 10px) !important;
+  inset-inline-end: auto !important;
+  width: var(--se-tile-sm, 30px) !important;
+  height: var(--se-tile-sm, 30px) !important;
+  margin: 0 !important;
+  z-index: 20;
+}
+
+/* The header, favorites and the Friends bar keep their height; only the list below scrolls */
+.friendlist:not(.GamepadMode) .FriendsListContent > .friendListHeaderContainer,
+.friendlist:not(.GamepadMode) .FriendsListContent > .quickAccessFriends,
+.friendlist:not(.GamepadMode) .FriendsListContent > .socialTabSearchContainer {
+  flex-shrink: 0 !important;
+}
+
+/* Native tooltip hitboxes for Friends & Chat controls. */
+.se-chat-tooltip-host {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.se-chat-tooltip-host > *,
+.se-chat-tooltip-hitbox {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * Unread chats: Steam's gold "1 Unread Message" bar over the list becomes the theme's accent
+ * pill (the chat log's jump bar), and a friend's gold message count in "Unread Messages"
+ * becomes the blue count pill of the chat tabs, centered at the row's end
+ */
+.friendlist:not(.GamepadMode) .unreadMessageViolator {
+  inset-inline: auto !important;
+  left: 50% !important;
+  right: auto !important;
+  width: auto !important;
+  max-width: calc(100% - 24px);
+  box-sizing: border-box;
+  margin: 8px 0 0 !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: var(--se-accent, #7cc4ff) !important;
+  box-shadow: var(--se-shadow-card, 0 10px 24px -12px rgba(0, 0, 0, .8)), 0 0 0 3px var(--se-sidebar, #1d2128) !important;
+  font: 700 12px/28px var(--se-font, "Motiva Sans"), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--se-bg-ink, #0f1115) !important;
+  transform: translateX(-50%);
+  transition: filter .15s ease;
+}
+
+.friendlist:not(.GamepadMode) .unreadMessageViolator:hover {
+  filter: brightness(1.08) !important;
+}
+
+.friendlist:not(.GamepadMode) :is(.unread-messages-anim-appear, .unread-messages-anim-enter).unreadMessageViolator {
+  transform: translate(-50%, -12px);
+}
+
+.friendlist:not(.GamepadMode) :is(.unread-messages-anim-appear-active, .unread-messages-anim-enter-active).unreadMessageViolator {
+  transform: translateX(-50%);
+}
+
+.friendlist:not(.GamepadMode) .unread-messages-anim-exit-active.unreadMessageViolator {
+  transform: translate(-50%, -12px);
+}
+
+.friendlist:not(.GamepadMode) .unreadFriend {
+  align-items: center;
+}
+
+.friendlist:not(.GamepadMode) .unreadFriend .friend {
+  padding-inline-end: 40px !important;
+}
+
+.friendlist:not(.GamepadMode) .unreadFriend .FriendMessageCount {
+  position: absolute !important;
+  top: 50% !important;
+  inset-inline-end: 12px !important;
+  box-sizing: border-box;
+  min-width: 18px;
+  height: 18px;
+  margin: -9px 0 0 !important;
+  padding: 0 5px !important;
+  border-radius: 999px !important;
+  background: var(--se-accent, #7cc4ff) !important;
+  box-shadow: none !important;
+  animation: none !important;
+  font: 800 10.5px/18px var(--se-font, "Motiva Sans"), sans-serif !important;
+  letter-spacing: 0;
+  color: var(--se-bg-ink, #0f1115) !important;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* A mention: the same pill in the theme's red */
+.friendlist:not(.GamepadMode) .unreadFriend .FriendMessageCount.HasUnreadMention {
+  background: var(--se-danger, #e5737a) !important;
+  color: #fff !important;
+}
+
+
+/*
+ * Status icons beside a friend's name (friends list, chats, hover card): the device icons and
+ * the snooze "ZZZ" in the theme's dual-tone style (outline over a 32% fill), in the friend's
+ * status color.
+ * PersonaStatusIcon .KxAI_M9gWx3OnKSshHOs6 (+ MobilePhoneIcon ._1iRFj5lJrMqMnRb3GZYPSw,
+ * SteamDeckIcon ._2oLqcfqHHKKAK0WfzjXMg_, VRIcon ._368tz9TSOLGiG2mNMLScMz; Big Picture has no
+ * class of its own), each holding an SVGIcon_* <svg>. Steam's <svg> becomes a box painting the
+ * theme icon through a mask; its own drawing is hidden.
+ */
+.KxAI_M9gWx3OnKSshHOs6:not(.GamepadMode *):not(#se-none) {
+  --se-status-icon-color: var(--se-text-faint, #6f7984);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0 0 0 4px;
+  color: var(--se-status-icon-color);
+}
+
+.KxAI_M9gWx3OnKSshHOs6.online:not(.GamepadMode *):not(#se-none) {
+  --se-status-icon-color: var(--se-online, #4cb4ff);
+}
+
+.KxAI_M9gWx3OnKSshHOs6.ingame:not(.GamepadMode *):not(#se-none) {
+  --se-status-icon-color: var(--se-running, #6cc24a);
+}
+
+.KxAI_M9gWx3OnKSshHOs6.watchingbroadcast:not(.GamepadMode *):not(#se-none) {
+  --se-status-icon-color: #9c8fd4;
+}
+
+.KxAI_M9gWx3OnKSshHOs6.awayOrSnooze:not(.GamepadMode *):not(#se-none) {
+  color: color-mix(in srgb, var(--se-status-icon-color) 70%, transparent);
+}
+
+.KxAI_M9gWx3OnKSshHOs6:not(.GamepadMode *) :is(.SVGIcon_MobilePhone, .SVGIcon_BigPicture, .SVGIcon_SteamDeck, .SVGIcon_VRIcon):not(#se-none) {
+  display: block;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: var(--se-status-icon) center / contain no-repeat;
+  mask: var(--se-status-icon) center / contain no-repeat;
+}
+
+.KxAI_M9gWx3OnKSshHOs6:not(.GamepadMode *) :is(.SVGIcon_MobilePhone, .SVGIcon_BigPicture, .SVGIcon_SteamDeck, .SVGIcon_VRIcon) > * {
+  visibility: hidden;
+}
+
+.KxAI_M9gWx3OnKSshHOs6 .SVGIcon_MobilePhone {
+  --se-status-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Crect x='6.5' y='2.5' width='11' height='19' rx='2.5'/%3E%3C/g%3E%3Crect x='6.5' y='2.5' width='11' height='19' rx='2.5'/%3E%3Cpath d='M11 18h2'/%3E%3C/svg%3E");
+}
+
+.KxAI_M9gWx3OnKSshHOs6 .SVGIcon_BigPicture {
+  --se-status-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M17.32 5H6.68a4 4 0 0 0-3.98 3.59l-.02.15C2.6 9.42 2 14.46 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.41-1.41A2 2 0 0 1 9.83 16h4.34a2 2 0 0 1 1.41.59L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.55-.6-6.58-.69-7.26l-.02-.15A4 4 0 0 0 17.32 5z'/%3E%3C/g%3E%3Cpath d='M17.32 5H6.68a4 4 0 0 0-3.98 3.59l-.02.15C2.6 9.42 2 14.46 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.41-1.41A2 2 0 0 1 9.83 16h4.34a2 2 0 0 1 1.41.59L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.55-.6-6.58-.69-7.26l-.02-.15A4 4 0 0 0 17.32 5z'/%3E%3Cpath d='M6 11h4M8 9v4M15 12h.01M18 10h.01'/%3E%3C/svg%3E");
+}
+
+.KxAI_M9gWx3OnKSshHOs6 .SVGIcon_SteamDeck {
+  --se-status-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Crect x='2' y='6.5' width='20' height='11' rx='3'/%3E%3C/g%3E%3Crect x='2' y='6.5' width='20' height='11' rx='3'/%3E%3Crect x='7.5' y='9' width='9' height='6' rx='1'/%3E%3Cpath d='M4.5 10.5h.01M19.5 13.5h.01'/%3E%3C/svg%3E");
+}
+
+.KxAI_M9gWx3OnKSshHOs6 .SVGIcon_VRIcon {
+  --se-status-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M4 7h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4l-2-2.5h-4L8 17H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z'/%3E%3C/g%3E%3Cpath d='M4 7h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4l-2-2.5h-4L8 17H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z'/%3E%3C/svg%3E");
+}
+
+/*
+ * Snooze (SnoozeContainer ._1DsumfIa3MlkzUV9EXY5W9, its three Z letters ._2n0EiKMGRP-r_BI5tDtttu;
+ * Medium ._1iYPlsChibPe7Ga9B3c5Wm, Large ._3BESV4eFnr4EnaSaJSdk6T): a dual-tone moon in the
+ * status color that breathes gently while Steam animates it, instead of three glowing Zs.
+ */
+._1DsumfIa3MlkzUV9EXY5W9:not(.GamepadMode *):not(#se-none) {
+  --se-snooze-size: 14px;
+  --se-status-icon-color: var(--se-online, #4cb4ff);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  width: var(--se-snooze-size);
+  height: var(--se-snooze-size);
+  margin-inline-start: 4px;
+  color: color-mix(in srgb, var(--se-status-icon-color) 80%, transparent);
+}
+
+._1DsumfIa3MlkzUV9EXY5W9._1iYPlsChibPe7Ga9B3c5Wm:not(.GamepadMode *):not(#se-none) {
+  --se-snooze-size: 16px;
+}
+
+._1DsumfIa3MlkzUV9EXY5W9._3BESV4eFnr4EnaSaJSdk6T:not(.GamepadMode *):not(#se-none) {
+  --se-snooze-size: 20px;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, .6));
+}
+
+._1DsumfIa3MlkzUV9EXY5W9.in-game:not(.GamepadMode *):not(#se-none) {
+  --se-status-icon-color: var(--se-running, #6cc24a);
+}
+
+._1DsumfIa3MlkzUV9EXY5W9.watchingbroadcast:not(.GamepadMode *):not(#se-none) {
+  --se-status-icon-color: #9c8fd4;
+}
+
+._1DsumfIa3MlkzUV9EXY5W9:not(.GamepadMode *) ._2n0EiKMGRP-r_BI5tDtttu:not(#se-none) {
+  display: none;
+}
+
+._1DsumfIa3MlkzUV9EXY5W9:not(.GamepadMode *)::before {
+  content: '';
+  width: 100%;
+  height: 100%;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z'/%3E%3C/g%3E%3Cpath d='M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z'/%3E%3Cpath d='M15 3.5h3l-3 3.5h3'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z'/%3E%3C/g%3E%3Cpath d='M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z'/%3E%3Cpath d='M15 3.5h3l-3 3.5h3'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+._1DsumfIa3MlkzUV9EXY5W9._2rXc7hLg6bohWZ-JpRcYEB:not(.GamepadMode *)::before {
+  animation: se-snooze-breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes se-snooze-breathe {
+  50% { opacity: .55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ._1DsumfIa3MlkzUV9EXY5W9._2rXc7hLg6bohWZ-JpRcYEB::before {
+    animation: none;
+  }
+}

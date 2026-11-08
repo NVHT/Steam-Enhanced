@@ -1,0 +1,103 @@
+/* Theme font: Xmind Regular from Google Fonts; offline, an installed Xmind, then Motiva Sans */
+@import url("https://fonts.googleapis.com/css2?family=Xmind:wght@400&display=swap");
+
+/* Global design tokens and user-configurable feature flags. */
+:root {
+  /* Surface hierarchy (darkest to lightest) */
+  --se-bg: #171a20;
+  --se-sidebar: #1d2128;
+  --se-surface: #1f242b;
+  --se-surface-2: #262c35;
+  --se-hover: #2c3440;
+  --se-selected: #33404f;
+  --se-hairline: rgba(255, 255, 255, .06);
+  --se-track: #3a424d;
+  --se-border-strong: #4a525e;
+  --se-field: #15181d;
+  --se-check: rgba(255, 255, 255, .07);
+  --se-chip: rgba(12, 14, 18, .55);
+  --se-chip-hover: rgba(12, 14, 18, .75);
+
+  /* Typography colors */
+  --se-text: #e6e8eb;
+  --se-text-muted: #98a2ad;
+  --se-text-dim: #b8c0c8;
+  --se-text-faint: #6f7984;
+  --se-text-strong: #fff;
+  --se-bg-ink: #0f1115;
+
+  /* Semantic & status accents */
+  --se-accent: #7cc4ff;
+  --se-accent-surface: #24384b;
+  --se-gold: #f0c060;
+  --se-gold-text: #f3cf86;
+  --se-gold-surface: rgba(240, 192, 96, .16);
+  --se-running: #6cc24a;
+  --se-online: #4cb4ff;
+  --se-offline: #6b7480;
+  --se-accent-tint: rgba(124, 196, 255, .14);
+  --se-accent-line: rgba(124, 196, 255, .3);
+  --se-accent-strong: rgba(124, 196, 255, .55);
+  --se-danger: #e5737a;
+  --se-danger-text: #ffb0b3;
+  --se-play: #3a8a22;
+
+  /* Achievement rarity tiers, by global unlock rate */
+  --se-tier-legendary: #f0c060;
+  --se-tier-epic: #b98cff;
+  --se-tier-rare: #5fb2ff;
+  --se-tier-uncommon: #7bc46a;
+  --se-tier-common: #8d97a2;
+
+  /* Radii, sizing, and elevation */
+  --se-radius-xs: 4px;
+  --se-radius-sm: 8px;
+  --se-radius-md: 10px;
+  --se-radius-lg: 14px;
+  --se-control-h: 34px;
+  --se-control-h-sm: 28px;
+  --se-tile: 40px;
+  --se-tile-sm: 30px;
+  --se-tile-icon: 20px;
+  /* Friends dock width, shared with the game page's left column */
+  --se-fd-w: 350px;
+  /* Library game list width: fixed, the same as the Friends dock */
+  --se-list-w: var(--se-fd-w);
+  --se-fd-rail: 60px;
+  --se-shadow-card: 0 10px 24px -12px rgba(0, 0, 0, .8);
+  --se-shadow-pop: 0 18px 40px -10px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .07);
+  --se-shadow-hero: 0 20px 50px -20px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .06);
+
+  /* Typography */
+  --se-font: "Xmind", "Motiva Sans", Arial, sans-serif;
+  --se-label-font: 700 11px/14px var(--se-font);
+  --se-label-spacing: .1em;
+  --se-label-color: var(--se-text-faint, #6f7984);
+
+  /* Startup background: library | hero | mosaic | wall | plain | dots | steam */
+  --se-startup-background: library;
+
+  /* Loading spinner style: sweep | deck | flip | stack | ring | steam */
+  --se-spinner: sweep;
+
+  /* Library Home stage configuration */
+  --se-home-stage: on;
+  --se-home-stage-cycle: 9;
+  --se-home-stage-tray: 30;
+
+  /* In-game overlay restyle: on | off; backdrop dim: 0-1 */
+  --se-overlay: on;
+  --se-overlay-dim: 0.9;
+
+  /* Shared SVG mask data URIs */
+  --se-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  --se-icon-close-sm: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E");
+  --se-icon-collapse: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Cpath%20d%3D%22M14%204.5h3a3.5%203.5%200%200%201%203.5%203.5v8a3.5%203.5%200%200%201-3.5%203.5h-3z%22%2F%3E%3C%2Fg%3E%3Crect%20x%3D%223.5%22%20y%3D%224.5%22%20width%3D%2217%22%20height%3D%2215%22%20rx%3D%223.5%22%2F%3E%3Cpath%20d%3D%22M14%204.5v15M7.5%209.5l2.5%202.5-2.5%202.5%22%2F%3E%3C%2Fsvg%3E");
+  --se-icon-emoji-hover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='%23e6e8eb' fill-opacity='.28'/%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='%23e6e8eb' stroke-width='1.8'/%3E%3Cpath d='M8.4 14.1a4.3 4.3 0 0 0 7.2 0' fill='none' stroke='%23e6e8eb' stroke-width='1.8' stroke-linecap='round'/%3E%3Ccircle cx='9.2' cy='9.9' r='1.25' fill='%23e6e8eb'/%3E%3Ccircle cx='14.8' cy='9.9' r='1.25' fill='%23e6e8eb'/%3E%3C/svg%3E");
+  --se-icon-emoji: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='%2398a2ad' fill-opacity='.28'/%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='%2398a2ad' stroke-width='1.8'/%3E%3Cpath d='M8.4 14.1a4.3 4.3 0 0 0 7.2 0' fill='none' stroke='%2398a2ad' stroke-width='1.8' stroke-linecap='round'/%3E%3Ccircle cx='9.2' cy='9.9' r='1.25' fill='%2398a2ad'/%3E%3Ccircle cx='14.8' cy='9.9' r='1.25' fill='%2398a2ad'/%3E%3C/svg%3E");
+  --se-icon-friends: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='9' cy='8.5' r='3.5'/%3E%3C/g%3E%3Ccircle cx='9' cy='8.5' r='3.5'/%3E%3Cpath d='M2.5 19.5c.9-3.3 3.4-5 6.5-5s5.6 1.7 6.5 5'/%3E%3Ccircle cx='17' cy='9' r='2.7'/%3E%3Cpath d='M17 14.3c2.3.1 3.9 1.7 4.6 4.7'/%3E%3C/svg%3E");
+  --se-icon-props-action: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%237cc4ff%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5%22/%3E%3C/svg%3E");
+  --se-icon-settings-tune: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round'%3E%3Cpath d='M4 7h9M17 7h3M4 17h3M11 17h9'/%3E%3Ccircle cx='15' cy='7' r='2.4' fill='%23000' fill-opacity='.32'/%3E%3Ccircle cx='9' cy='17' r='2.4' fill='%23000' fill-opacity='.32'/%3E%3C/svg%3E");
+  --se-icon-settings: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Cpath%20d%3D%22M12.22%202h-.44a2%202%200%200%200-2%202v.18a2%202%200%200%201-1%201.73l-.43.25a2%202%200%200%201-2%200l-.15-.08a2%202%200%200%200-2.73.73l-.22.38a2%202%200%200%200%20.73%202.73l.15.1a2%202%200%200%201%201%201.72v.51a2%202%200%200%201-1%201.74l-.15.09a2%202%200%200%200-.73%202.73l.22.38a2%202%200%200%200%202.73.73l.15-.08a2%202%200%200%201%202%200l.43.25a2%202%200%200%201%201%201.73V20a2%202%200%200%200%202%202h.44a2%202%200%200%200%202-2v-.18a2%202%200%200%201%201-1.73l.43-.25a2%202%200%200%201%202%200l.15.08a2%202%200%200%200%202.73-.73l.22-.39a2%202%200%200%200-.73-2.73l-.15-.08a2%202%200%200%201-1-1.74v-.5a2%202%200%200%201%201-1.74l.15-.09a2%202%200%200%200%20.73-2.73l-.22-.38a2%202%200%200%200-2.73-.73l-.15.08a2%202%200%200%201-2%200l-.43-.25a2%202%200%200%201-1-1.73V4a2%202%200%200%200-2-2z%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M12.22%202h-.44a2%202%200%200%200-2%202v.18a2%202%200%200%201-1%201.73l-.43.25a2%202%200%200%201-2%200l-.15-.08a2%202%200%200%200-2.73.73l-.22.38a2%202%200%200%200%20.73%202.73l.15.1a2%202%200%200%201%201%201.72v.51a2%202%200%200%201-1%201.74l-.15.09a2%202%200%200%200-.73%202.73l.22.38a2%202%200%200%200%202.73.73l.15-.08a2%202%200%200%201%202%200l.43.25a2%202%200%200%201%201%201.73V20a2%202%200%200%200%202%202h.44a2%202%200%200%200%202-2v-.18a2%202%200%200%201%201-1.73l.43-.25a2%202%200%200%201%202%200l.15.08a2%202%200%200%200%202.73-.73l.22-.39a2%202%200%200%200-.73-2.73l-.15-.08a2%202%200%200%201-1-1.74v-.5a2%202%200%200%201%201-1.74l.15-.09a2%202%200%200%200%20.73-2.73l-.22-.38a2%202%200%200%200-2.73-.73l-.15.08a2%202%200%200%201-2%200l-.43-.25a2%202%200%200%201-1-1.73V4a2%202%200%200%200-2-2z%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%223%22%2F%3E%3C%2Fsvg%3E");
+  --se-icon-stat-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E");
+}
