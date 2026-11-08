@@ -760,35 +760,24 @@ html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-but
   visibility: hidden;
 }
 
-/* The Steam menu button wears the theme's logo; it brightens a touch on hover or while open. */
+/* The Steam menu button wears the theme's logo as a duotone icon in the rail's grey; white on hover. */
 html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-button[data-se-icon="steam"]:not(#se-none) {
   position: relative;
 }
 
 html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-button[data-se-icon="steam"]:not(#se-none)::after {
   content: "";
-  /* header-actions.css hides every .se-menu-icon::after with !important; the logo needs it back */
+  /* header-actions.css hides every .se-menu-icon::after with !important; the icon needs it back */
   display: block !important;
   position: absolute;
   inset: 0;
   margin: auto;
-  width: 30px;
-  height: 30px;
-  background: var(--se-brand-logo) center / contain no-repeat;
+  width: 22px;
+  height: 22px;
+  background-color: currentColor;
+  -webkit-mask: var(--se-brand-icon) center / contain no-repeat;
+  mask: var(--se-brand-icon) center / contain no-repeat;
   pointer-events: none;
-  transition: transform .15s ease, filter .15s ease;
-}
-
-html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-button[data-se-icon="steam"]:not(#se-none):hover::after,
-html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo [data-se-menu-open].se-native-header-button[data-se-icon="steam"]:not(#se-none)::after {
-  transform: scale(1.06);
-  filter: brightness(1.12);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-button[data-se-icon="steam"]:not(#se-none)::after {
-    transition: none;
-  }
 }
 
 html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo ._3Z3ohQ8-1NKnCZkbS6fvy:not(#se-none) {
