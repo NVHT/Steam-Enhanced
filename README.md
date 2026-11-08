@@ -16,21 +16,35 @@ Steam Enhanced rebuilds the Steam client from the Library out: a navigation rail
 ## Highlights
 
 ### A Library that feels like home
+<p align="center"><img src="branding/showcase/home.jpg" alt="Library Home with the hero stage, glass tray and Friends dock" width="100%"></p>
+
 - **Hero Home stage.** Your recently played games fill the screen with full-bleed artwork, the game's logo, and a glass tray for What's New, Favorites and Collections.
 - **Collections done properly.** One unified view for a collection and for All Collections, with grid/list switching and summary banners.
 - **Drag and drop that shows you where things land.** Dragging a game picks up a compact game chip, dims the row it came from, and lights up Steam's drop zones as cards under the pointer.
 
+<p align="center"><img src="branding/showcase/collections.jpg" alt="All Collections as a grid of fanned cover stacks" width="100%"></p>
+
+
 ### Game pages worth opening
+<p align="center"><img src="branding/showcase/game-page.jpg" alt="Game page with the stats bar, post-game summary and a gold Mastered achievements banner" width="100%"></p>
+
 - **Two independent columns** with full-width achievement rows, complete DLC grids, friend activity tabs and media carousels.
 - **HowLongToBeat built in.** Custom progress bars show how far you are through Main Story, Main + Extras and Completionist (with the HLTB for Millennium plugin).
 - **Achievement rarity tiers.** Every achievement is ranked Legendary, Epic, Rare, Uncommon or Common by global unlock rate, with sparkles, an aura and the tier's initial on its icon. Finish a game and the progress banner turns into a gold **Mastered** banner.
 
 ### Friends, always in reach
+<p align="center"><img src="branding/showcase/friends-chat.jpg" alt="Friends dock with a native chat flyout open beside it" width="100%"></p>
+
 - **Friends dock** on the right of the window. Collapse it to a slim 60px rail of avatars and the games your friends are playing.
 - **Native chat flyouts.** Click a friend and their real Steam chat opens beside the dock. Library, Store and Community share the same tabs, and the Store and Community pages host the flyout without spawning another taskbar window.
 - **Smarter header.** Left-click the Friends button to toggle the dock, right-click for Steam's standalone Friends & Chat window.
 
 ### Everything else, finished to match
+<p align="center">
+  <img src="branding/showcase/downloads.jpg" alt="Downloads with live network and disk telemetry" width="49%">
+  <img src="branding/showcase/startup.jpg" alt="Startup screen with the Network, Steam and Library progress strip" width="49%">
+</p>
+
 - **Navigation rail** with a consolidated root menu, title-bar library search and header quick actions. Restart Steam and Reload UI sit right above Exit.
 - **Downloads** as a master-detail view with live progress telemetry.
 - **Notifications** grouped by day under a summary card, opened by hovering the bell. The account menu has profile actions, Do Not Disturb and Online Status.
@@ -40,6 +54,8 @@ Steam Enhanced rebuilds the Steam client from the Library out: a navigation rail
 - **Branding throughout.** The Steam Enhanced logo on the Steam menu button, the startup screen, the account chooser, the sign-in window and the loading spinners.
 
 ### An in-game overlay that matches
+<p align="center"><img src="branding/showcase/overlay.jpg" alt="In-game overlay with the game card, achievements and friends" width="100%"></p>
+
 Steam's overlay layout stays where Steam puts it, in any toolbar position, list view included. On top of it:
 - **A game card** in the top-left corner: the clock and date, the game's logo, playtime this session, in total and over the last two weeks, plus Back to Game and Exit Game.
 - **Achievements and Friends at a glance.** Unlocked / total, the ones closest to unlocking or your latest unlocks, and friends in-game now or played recently. Click the Achievements header to open Steam's Achievements widget, or an avatar to chat.
