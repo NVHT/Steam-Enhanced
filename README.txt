@@ -24,6 +24,8 @@ can leave stale scripts or stylesheets behind.
 
 OVERVIEW
 
+- Steam Enhanced branding: the theme's logo on the Steam menu button, the startup
+  screen, the sign-in window and the loading spinners.
 - Navigation rail, consolidated root menu, title-bar library search, and header
   quick actions. Restart Steam and Reload UI appear above Exit in the Steam menu.
 - Library Home hero stage with a glass tray for What's New, Favorites, and
@@ -114,11 +116,11 @@ live on `:root` in `shared/tokens.css`. Restart Steam after editing tokens.
   `steam`    Unmodified native Steam login background.
 
 `--se-spinner` (default: `sweep`)
-  `sweep`    Conic arc with a glowing lead dot around the Steam mark.
+  `sweep`    Conic arc with a glowing lead dot around the Steam Enhanced mark.
   `deck`     Three game covers shuffling front-to-back.
   `flip`     Two-sided card flipping through recent game covers.
   `stack`    Four game covers dropping onto a stack.
-  `ring`     Solid accent arc around the Steam mark.
+  `ring`     Solid accent arc around the Steam Enhanced mark.
   `steam`    Unmodified native Steam throbber.
   (Spinners smaller than 40px automatically fall back to `sweep`.)
 
@@ -144,6 +146,7 @@ DIRECTORY LAYOUT
   shared/         Core runtime (`SE`), design tokens, icon masks, scrollbars.
   features/       Feature scripts and stylesheets grouped by client surface.
   compatibility/  Standalone styles for webview contexts (`webkit.css`).
+  branding/       Logo sources and the Millennium store header and splash images.
   tools/          CSS module hash indexer and rehash utility (`classmap.py`).
 
 MAINTENANCE & TROUBLESHOOTING

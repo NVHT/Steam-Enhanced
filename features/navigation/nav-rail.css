@@ -756,6 +756,37 @@ html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-but
   height: 20px !important;
   flex-basis: 20px;
   color: inherit;
+  /* Keeps its space (the menu still anchors to the button) but the theme's logo is drawn instead */
+  visibility: hidden;
+}
+
+/* The Steam menu button wears the theme's logo; it brightens a touch on hover or while open. */
+html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-button[data-se-icon="steam"]:not(#se-none) {
+  position: relative;
+}
+
+html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-button[data-se-icon="steam"]:not(#se-none)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 28px;
+  height: 28px;
+  background: var(--se-brand-logo) center / contain no-repeat;
+  pointer-events: none;
+  transition: transform .15s ease, filter .15s ease;
+}
+
+html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-button[data-se-icon="steam"]:not(#se-none):hover::after,
+html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo [data-se-menu-open].se-native-header-button[data-se-icon="steam"]:not(#se-none)::after {
+  transform: scale(1.06);
+  filter: brightness(1.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-button[data-se-icon="steam"]:not(#se-none)::after {
+    transition: none;
+  }
 }
 
 html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo ._3Z3ohQ8-1NKnCZkbS6fvy:not(#se-none) {

@@ -31,7 +31,7 @@ html:not([data-se-spinner-kind="steam"]) img[src*="steam_spinner.png"] {
  * `rotate` property. A picture's animation runs on the main thread, so it stuttered whenever
  * the page was busy loading, which is exactly when a spinner shows; a rotated element runs
  * on the compositor and stays smooth. Sizes are fractions of the box (radius 48 units):
- * ring 37-43, head at 8, tile 30, logo 32 wide.
+ * ring 37-43, head at 8, tile 30, mark 56 wide.
  */
 html:not([data-se-spinner-kind="steam"]) .SteamLogoThrobber:not([data-se-spinner]):has(.SVGIcon_Throbber) {
   position: relative;
@@ -54,11 +54,11 @@ html:not([data-se-spinner-kind="steam"]) .SteamLogoThrobber:not([data-se-spinner
   pointer-events: none;
 }
 
-/* Still: the faint track, the round tile and Steam's logo */
+/* Still: the faint track, the round tile and the theme's mark */
 html:not([data-se-spinner-kind="steam"]) .SteamLogoThrobber:not([data-se-spinner]):has(.SVGIcon_Throbber)::after {
   z-index: 1;
   background:
-    var(--se-steam-logo, none) center / 33.3% no-repeat,
+    var(--se-brand-mark, none) center / 56% no-repeat,
     radial-gradient(closest-side, var(--se-surface, #1f242b) calc(62.5% - .5px), transparent 62.5%),
     radial-gradient(closest-side, transparent calc(77.1% - .5px), rgba(255, 255, 255, .07) 77.1% 89.6%, transparent calc(89.6% + .5px));
 }
@@ -140,7 +140,7 @@ html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v[data-se-spinner]::before {
   box-shadow: 0 8px 16px -6px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .1);
 }
 
-/* Steam's logo on a small round badge at the corner */
+/* The theme's mark on a small round badge at the corner */
 .se-spin-badge {
   position: absolute;
   right: 6px;
@@ -149,13 +149,13 @@ html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v[data-se-spinner]::before {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background: var(--se-steam-logo) center / 15px no-repeat, var(--se-surface, #1f242b);
+  background: var(--se-brand-mark) center / 22px no-repeat, var(--se-surface, #1f242b);
   box-shadow: 0 0 0 3px var(--se-bg, #171a20);
 }
 
 /*
  * Sweep: a blue arc with a fading tail sweeps around a faint track, led by a bright
- * dot, around Steam's logo on a round tile. Needs no art, and reads at any size.
+ * dot, around the theme's mark on a round tile. Needs no art, and reads at any size.
  */
 .se-spinner[data-kind="sweep"] .se-spin-stage {
   inset: 4px auto auto 10px;
@@ -191,7 +191,7 @@ html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v[data-se-spinner]::before {
   inset: 17px auto auto 23px;
   width: 50px;
   height: 50px;
-  background-size: 26px;
+  background-size: 44px;
   box-shadow: none;
 }
 
@@ -354,7 +354,7 @@ html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v[data-se-spinner]::before {
   }
 }
 
-/* Ring: a blue arc turning around Steam's logo (also every spinner too small for covers) */
+/* Ring: a blue arc turning around the theme's mark (also every spinner too small for covers) */
 .se-spinner[data-kind="ring"] .se-spin-stage {
   inset: 10px auto auto 16px;
   width: 64px;
@@ -370,7 +370,7 @@ html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v[data-se-spinner]::before {
   inset: 21px auto auto 27px;
   width: 42px;
   height: 42px;
-  background-size: 20px;
+  background-size: 36px;
   box-shadow: none;
 }
 
