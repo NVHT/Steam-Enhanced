@@ -9,77 +9,142 @@
   A Millennium theme for the Steam desktop client by <strong>NVHT</strong>.
 </p>
 
+<p align="center">
+  <img alt="Millennium: theme" src="https://img.shields.io/badge/Millennium-theme-7cc4ff?style=flat-square&labelColor=171a20">
+  <img alt="version: 1.92.10" src="https://img.shields.io/badge/version-1.92.10-f0c060?style=flat-square&labelColor=171a20">
+  <img alt="platform: Steam desktop" src="https://img.shields.io/badge/platform-Steam%20desktop-33404f?style=flat-square&labelColor=171a20">
+</p>
+
+<p align="center">
+  <a href="#highlights">Highlights</a> ·
+  <a href="#install">Install</a> ·
+  <a href="#make-it-yours">Make it yours</a> ·
+  <a href="#troubleshooting">Troubleshooting</a>
+</p>
+
 ---
 
-Steam Enhanced rebuilds the Steam client from the Library out: a navigation rail, a cinematic Home stage, two-column game pages with HowLongToBeat and achievement rarity, a Friends dock that never leaves the window, and a restyled in-game overlay. Steam's own interface still runs underneath. Its state, data and behaviour are untouched, so everything keeps working the way Steam intends. It just looks and feels the way it always should have.
+Steam Enhanced rebuilds the Steam client from the Library out: a navigation rail, a cinematic Home stage, two-column game pages with HowLongToBeat and achievement rarity, a Friends dock that never leaves the window, and a restyled in-game overlay. Steam's own interface still runs underneath, with its state, data and behaviour untouched, so everything keeps working the way Steam intends. It just looks and feels the way it always should have.
 
 ## Highlights
 
-### A Library that feels like home
-<p align="center"><img src="branding/showcase/home.jpg" alt="Library Home with the hero stage, glass tray and Friends dock" width="100%"></p>
+<table>
+<tr>
+<td width="58%"><img src="branding/showcase/home.jpg" alt="A Library that feels like home"></td>
+<td>
+<h3>A Library that feels like home</h3>
+<ul>
+<li><b>Hero Home stage.</b> Your recently played games fill the screen with full-bleed art, the game's logo, its rating and your playtime.</li>
+<li><b>Glass tray</b> for What's New, Favorites and Collections, always one glance away.</li>
+<li><b>Recent games strip</b> to jump between what you're playing.</li>
+</ul>
+</td>
+</tr>
+<tr>
+<td>
+<h3>Game pages worth opening</h3>
+<ul>
+<li><b>Two independent columns</b> with full-width achievement rows, complete DLC grids, friend activity and media carousels.</li>
+<li><b>HowLongToBeat built in.</b> Main Story, Main + Extras and Completionist as progress bars (with the HLTB for Millennium plugin).</li>
+<li><b>Achievement rarity tiers.</b> Legendary, Epic, Rare, Uncommon and Common by global unlock rate. Finish a game and the banner turns gold: <b>Mastered</b>.</li>
+</ul>
+</td>
+<td width="58%"><img src="branding/showcase/game-page.jpg" alt="Game pages worth opening"></td>
+</tr>
+<tr>
+<td width="58%"><img src="branding/showcase/collections.jpg" alt="Collections, done properly"></td>
+<td>
+<h3>Collections, done properly</h3>
+<ul>
+<li><b>One unified view</b> for a single collection and for All Collections.</li>
+<li><b>Grid or list</b>, with summary banners for counts and installs.</li>
+<li><b>Drag and drop that shows where things land.</b> A compact game chip follows the pointer and drop zones light up as cards.</li>
+</ul>
+</td>
+</tr>
+<tr>
+<td>
+<h3>Friends, always in reach</h3>
+<ul>
+<li><b>Friends dock</b> on the right, grouped by the game your friends are playing. Collapse it to a slim 60px rail.</li>
+<li><b>Native chat flyouts.</b> Click a friend and their real Steam chat opens beside the dock, shared across Library, Store and Community.</li>
+<li><b>Smarter header.</b> Left-click Friends to toggle the dock, right-click for Steam's standalone window.</li>
+</ul>
+</td>
+<td width="58%"><img src="branding/showcase/friends-chat.jpg" alt="Friends, always in reach"></td>
+</tr>
+<tr>
+<td width="58%"><img src="branding/showcase/downloads.jpg" alt="Downloads you can actually read"></td>
+<td>
+<h3>Downloads you can actually read</h3>
+<ul>
+<li><b>Master-detail view</b> with the current download front and centre.</li>
+<li><b>Live telemetry.</b> Network, peak and disk speed with a running graph.</li>
+<li><b>Up Next</b> queue right underneath.</li>
+</ul>
+</td>
+</tr>
+<tr>
+<td>
+<h3>An in-game overlay that matches</h3>
+<ul>
+<li><b>Game card</b> in the corner: clock, the game's logo, playtime this session, in total and over two weeks, plus Back to Game and Exit.</li>
+<li><b>Achievements and friends at a glance</b>, closest unlocks or latest ones, and friends in-game now or played recently.</li>
+<li><b>One rounded toolbar</b> and theme chrome on every widget window. Steam's own layout stays exactly where Steam puts it.</li>
+</ul>
+</td>
+<td width="58%"><img src="branding/showcase/overlay.jpg" alt="An in-game overlay that matches"></td>
+</tr>
+<tr>
+<td width="58%"><img src="branding/showcase/startup.jpg" alt="Startup with a sense of progress"></td>
+<td>
+<h3>Startup with a sense of progress</h3>
+<ul>
+<li><b>Step-by-step strip</b>: Network, Steam, Library, so you know what Steam is waiting on.</li>
+<li><b>Seven startup backgrounds</b> and a family of loading spinners to pick from.</li>
+<li><b>Steam Enhanced branding</b> on the startup screen, account chooser, sign-in, spinners and the Steam menu button.</li>
+</ul>
+</td>
+</tr>
+<tr>
+<td>
+<h3>About Steam, rebuilt</h3>
+<ul>
+<li><b>Brand panel</b> with the theme's logo and version beside Steam's details.</li>
+<li><b>Click any tile to copy it</b>, or <b>Copy all</b> for a bug report in one click.</li>
+<li>Values come straight from Steam, so they're always current and in your language.</li>
+</ul>
+</td>
+<td width="58%"><img src="branding/showcase/about.jpg" alt="About Steam, rebuilt"></td>
+</tr>
+</table>
 
-- **Hero Home stage.** Your recently played games fill the screen with full-bleed artwork, the game's logo, and a glass tray for What's New, Favorites and Collections.
-- **Collections done properly.** One unified view for a collection and for All Collections, with grid/list switching and summary banners.
-- **Drag and drop that shows you where things land.** Dragging a game picks up a compact game chip, dims the row it came from, and lights up Steam's drop zones as cards under the pointer.
-
-<p align="center"><img src="branding/showcase/collections.jpg" alt="All Collections as a grid of fanned cover stacks" width="100%"></p>
-
-
-### Game pages worth opening
-<p align="center"><img src="branding/showcase/game-page.jpg" alt="Game page with the stats bar, post-game summary and a gold Mastered achievements banner" width="100%"></p>
-
-- **Two independent columns** with full-width achievement rows, complete DLC grids, friend activity tabs and media carousels.
-- **HowLongToBeat built in.** Custom progress bars show how far you are through Main Story, Main + Extras and Completionist (with the HLTB for Millennium plugin).
-- **Achievement rarity tiers.** Every achievement is ranked Legendary, Epic, Rare, Uncommon or Common by global unlock rate, with sparkles, an aura and the tier's initial on its icon. Finish a game and the progress banner turns into a gold **Mastered** banner.
-
-### Friends, always in reach
-<p align="center"><img src="branding/showcase/friends-chat.jpg" alt="Friends dock with a native chat flyout open beside it" width="100%"></p>
-
-- **Friends dock** on the right of the window. Collapse it to a slim 60px rail of avatars and the games your friends are playing.
-- **Native chat flyouts.** Click a friend and their real Steam chat opens beside the dock. Library, Store and Community share the same tabs, and the Store and Community pages host the flyout without spawning another taskbar window.
-- **Smarter header.** Left-click the Friends button to toggle the dock, right-click for Steam's standalone Friends & Chat window.
-
-### Everything else, finished to match
-<p align="center">
-  <img src="branding/showcase/downloads.jpg" alt="Downloads with live network and disk telemetry" width="49%">
-  <img src="branding/showcase/startup.jpg" alt="Startup screen with the Network, Steam and Library progress strip" width="49%">
-</p>
+### And everywhere else
 
 - **Navigation rail** with a consolidated root menu, title-bar library search and header quick actions. Restart Steam and Reload UI sit right above Exit.
-- **Downloads** as a master-detail view with live progress telemetry.
 - **Notifications** grouped by day under a summary card, opened by hovering the bell. The account menu has profile actions, Do Not Disturb and Online Status.
-- **Settings and dialogs.** Steam Settings, App Properties, the Millennium Settings popup and the Millennium Library Manager all restyled.
-- **About Steam, rebuilt.** A brand panel beside Steam's details as tiles. Click a tile to copy it, or Copy all for a bug report in one click.
-- **Startup.** A step-by-step progress strip (Network, Steam, Library), seven startup backgrounds and a family of loading spinners.
-- **Branding throughout.** The Steam Enhanced logo on the Steam menu button, the startup screen, the account chooser, the sign-in window and the loading spinners.
-
-### An in-game overlay that matches
-<p align="center"><img src="branding/showcase/overlay.jpg" alt="In-game overlay with the game card, achievements and friends" width="100%"></p>
-
-Steam's overlay layout stays where Steam puts it, in any toolbar position, list view included. On top of it:
-- **A game card** in the top-left corner: the clock and date, the game's logo, playtime this session, in total and over the last two weeks, plus Back to Game and Exit Game.
-- **Achievements and Friends at a glance.** Unlocked / total, the ones closest to unlocking or your latest unlocks, and friends in-game now or played recently. Click the Achievements header to open Steam's Achievements widget, or an avatar to chat.
-- **One rounded toolbar** with an accent line on open widgets, the theme's colours and type on every control, and a softer, theme-tinted backdrop.
-- **Widget windows** (Game Overview, Achievements, Guides and more) get the theme's window chrome, and Game Overview sections become cards.
+- **Settings and dialogs**: Steam Settings, App Properties, the Millennium Settings popup and the Millennium Library Manager, all restyled.
 
 ## Install
 
-**You need:** the Steam desktop client and [Millennium](https://steambrew.app) with theme JavaScript enabled.<br>
-**Optional:** HLTB for Millennium, for completion times. Keep the plugin enabled; its *Show in Library* option can be off, because Steam Enhanced reads its data directly.
+| You need | Optional |
+| --- | --- |
+| The Steam desktop client and [Millennium](https://steambrew.app), with theme JavaScript enabled. | **HLTB for Millennium**, for completion times. Keep it enabled; its *Show in Library* option can be off, because Steam Enhanced reads its data directly. |
 
 1. Exit Steam completely.
-2. Extract the release into `<Steam>/steamui/skins/`, so the manifest sits at
-   `<Steam>/steamui/skins/Steam-Enhanced/skin.json`.
+2. Extract the release into `<Steam>/steamui/skins/`, so the manifest sits at `<Steam>/steamui/skins/Steam-Enhanced/skin.json`.
 3. Launch Steam, open **Millennium → Themes** and select **Steam Enhanced**.
 4. Enable theme JavaScript and restart Steam.
 
+> [!TIP]
 > **Updating?** With Steam closed, remove (or back up) the old `Steam-Enhanced` folder before extracting the new release. Merging folders can leave stale scripts and stylesheets behind.
 
 ## Make it yours
 
 Every colour, radius, elevation, control height and feature switch lives on `:root` in **`shared/tokens.css`**. Edit a value and restart Steam.
 
-### Startup background: `--se-startup-background`
+<details>
+<summary><b>Startup background</b> · <code>--se-startup-background</code></summary>
 
 | Value | Look |
 | --- | --- |
@@ -91,7 +156,10 @@ Every colour, radius, elevation, control height and feature switch lives on `:ro
 | `dots` | A fading dot matrix over the base background. |
 | `steam` | Steam's own login background, untouched. |
 
-### Loading spinner: `--se-spinner`
+</details>
+
+<details>
+<summary><b>Loading spinner</b> · <code>--se-spinner</code></summary>
 
 | Value | Look |
 | --- | --- |
@@ -104,7 +172,10 @@ Every colour, radius, elevation, control height and feature switch lives on `:ro
 
 Spinners smaller than 40px fall back to `sweep`.
 
-### Home stage and overlay
+</details>
+
+<details>
+<summary><b>Home stage and overlay</b></summary>
 
 | Token | Default | What it does |
 | --- | --- | --- |
@@ -114,14 +185,34 @@ Spinners smaller than 40px fall back to `sweep`.
 | `--se-overlay` | `on` | `off` restores Steam's default in-game overlay look. |
 | `--se-overlay-dim` | `0.9` | How dark the backdrop behind the overlay is (0–1). |
 
+</details>
+
 ## Troubleshooting
 
-- **Theme missing from Millennium?** Check that `skin.json` sits at `steamui/skins/Steam-Enhanced/skin.json`.
-- **Interactive features missing?** Turn on theme JavaScript in Millennium's settings.
-- **Something broke after a Steam update?** Steam may have rotated its CSS module class names. Rehash them with:
-  ```
-  python3 tools/classmap.py rehash <path-to-extracted-steamui> .
-  ```
+<details>
+<summary><b>The theme is missing from Millennium</b></summary>
+
+Check that `skin.json` sits at `steamui/skins/Steam-Enhanced/skin.json`.
+
+</details>
+
+<details>
+<summary><b>Interactive features are missing</b></summary>
+
+Turn on theme JavaScript in Millennium's settings, then restart Steam.
+
+</details>
+
+<details>
+<summary><b>Something broke after a Steam update</b></summary>
+
+Steam may have rotated its CSS module class names. Rehash them with:
+
+```
+python3 tools/classmap.py rehash <path-to-extracted-steamui> .
+```
+
+</details>
 
 ## What's inside
 
@@ -131,9 +222,13 @@ Spinners smaller than 40px fall back to `sweep`.
 | `shared/` | Core runtime (`SE`), design tokens, icon masks, scrollbars. |
 | `features/` | Feature scripts and stylesheets, grouped by part of the client. |
 | `compatibility/` | Standalone styles for web views (`webkit.css`). |
-| `branding/` | Logo sources, and the header and splash images for the Millennium store. |
+| `branding/` | Logo sources, the Millennium store header and splash, and these showcase images. |
 | `tools/` | CSS class-name indexer and rehash utility (`classmap.py`), and the spinner image builder (`spinner_svg.py`). |
 
 ---
 
-<p align="center">Made by <strong>NVHT</strong> · Steam Enhanced is an unofficial theme and is not affiliated with Valve.</p>
+<p align="center">
+  <img src="branding/logo.png" alt="" width="48"><br>
+  Made by <strong>NVHT</strong><br>
+  <sub>Steam Enhanced is an unofficial theme and is not affiliated with Valve.</sub>
+</p>
