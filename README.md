@@ -11,7 +11,7 @@
 
 <p align="center">
   <img alt="Millennium: theme" src="https://img.shields.io/badge/Millennium-theme-7cc4ff?style=flat-square&labelColor=171a20">
-  <img alt="version: 1.92.10" src="https://img.shields.io/badge/version-1.92.10-f0c060?style=flat-square&labelColor=171a20">
+  <img alt="version: 1.92.11" src="https://img.shields.io/badge/version-1.92.11-f0c060?style=flat-square&labelColor=171a20">
   <img alt="platform: Steam desktop" src="https://img.shields.io/badge/platform-Steam%20desktop-33404f?style=flat-square&labelColor=171a20">
 </p>
 
@@ -25,6 +25,8 @@
 ---
 
 Steam Enhanced rebuilds the Steam client from the Library out: a navigation rail, a cinematic Home stage, two-column game pages with HowLongToBeat and achievement rarity, a Friends dock that never leaves the window, and a restyled in-game overlay. Steam's own interface still runs underneath, with its state, data and behaviour untouched, so everything keeps working the way Steam intends. It just looks and feels the way it always should have.
+
+> Scenes are illustrated with placeholder games and friends.
 
 ## Highlights
 

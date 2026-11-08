@@ -15,7 +15,7 @@
   const BODY = '._32eeZuly3nnz3cMXdSgyj9';
   const LABEL = '._2yhBdvNsgdBGL_UjfmTDGH';
   const BUILT = 'data-se-about';
-  const FALLBACK_VERSION = '1.92.10';
+  const FALLBACK_VERSION = '1.92.11';
   const AUTHOR = 'NVHT';
   const TAGLINE = 'The Steam you always wanted.';
   const COPIED_MS = 1400;
