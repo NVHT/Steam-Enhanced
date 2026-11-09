@@ -187,7 +187,7 @@ Spinners smaller than 40px fall back to `sweep`.
 | `--se-home-stage-tray` | `30` | Minimum share of the window height kept for the glass tray, in percent (0–70). |
 | `--se-overlay` | `on` | `off` restores Steam's default in-game overlay look. |
 | `--se-overlay-dim` | `0.9` | How dark the backdrop behind the overlay is (0–1). |
-| `--se-toasts` | `on` | `off` restores Steam's own desktop notification toasts. Press **Ctrl+Shift+T** in Steam to preview every kind. |
+| `--se-toasts` | `on` | `off` restores Steam's own desktop notification toasts. |
 
 </details>
 

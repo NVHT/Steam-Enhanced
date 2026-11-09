@@ -20,9 +20,8 @@
   const { run, esc, mark, unmark, rarity } = SE;
   const root = document.documentElement;
 
-  // In Steam's toast windows this reads and plays Steam's toasts. Anywhere else (the main
-  // window) it only plays previews, for the toast tester (features/toasts/toast-tester.js).
-  const IN_TOAST_WINDOW = /^notificationtoasts_/.test(window.name || document.title || '');
+  // Reads and plays Steam's toasts; skin.json injects it only into Steam's toast windows.
+  if (!/^notificationtoasts_/.test(window.name || document.title || '')) return;
 
   /* ---------- Config ---------- */
 
@@ -447,7 +446,6 @@
 
   async function enrichAchievement(m) {
     if (m.kind !== 'ach' || !m.appid) return;
-    if (m.preview && (Number.isFinite(m.pct) || m.mastered)) return; // the tester gave its own
     const all = await achievements(m.appid);
     if (!all.length || m.done) return;
     const name = m.title.toLowerCase();
@@ -668,8 +666,7 @@
 
   const alive = w => !!w && run(() => !w.closed) === true;
 
-  // The shared context, or this window for previews in the main window.
-  const home = () => (IN_TOAST_WINDOW ? shared() : window);
+  const home = () => shared();
 
   /*
    * Made from the shared context's own constructors, so the hub outlives whichever toast
@@ -791,7 +788,7 @@
       src,
       win: window,
       born: now,
-      deadline: info.preview || !info.ms ? Infinity : now + info.ms,
+      deadline: !info.ms ? Infinity : now + info.ms,
       done: false,
       stale: false,
       released: false,
@@ -810,53 +807,6 @@
     enrichAchievement(e);
     notify();
     return e;
-  }
-
-  /*
-   * Plays a Stage toast from a description instead of a Steam toast (the toast tester).
-   * spec: { kind, title, text, icon, shot, appid, accountId, pct, ms, buttons: [labels],
-   * mastered: { total, counts } }. Buttons and clicks only finish the preview.
-   */
-  function preview(spec = {}) {
-    if (!document.body) return null;
-    register();
-    const kind = KINDS[spec.kind] ? spec.kind : 'system';
-    const k = KINDS[kind];
-    const e = add({ preview: true }, null, {
-      kind,
-      label: k.label,
-      accent: k.accent,
-      ms: spec.ms ?? k.ms,
-      pri: !!k.pri,
-      artKind: k.art,
-      glyph: k.icon,
-      play: !!k.play,
-      title: spec.title || k.label,
-      text: spec.text || '',
-      icon: spec.icon || '',
-      shot: spec.shot || '',
-      buttons: (spec.buttons || []).map(label => ({ label, el: null })),
-      click: null,
-      dismiss: null,
-      appid: Number(spec.appid) || 0,
-      achId: '',
-      accountId: Number(spec.accountId) || 0,
-      pct: Number.isFinite(spec.pct) ? spec.pct : NaN,
-      mastered: spec.mastered || null,
-      preview: true,
-    });
-    return e.id;
-  }
-
-  // Ends every toast now, without the close animation (the tester's Clear).
-  function clearAll() {
-    const h = hub();
-    for (const e of h.entries) e.done = true;
-    h.active = 0;
-    h.open = false;
-    h.closing = false;
-    teardown();
-    notify();
   }
 
   const history = []; // the last toasts finished, and why (for why())
@@ -895,7 +845,7 @@
     const up = h.open || h.closing;
     for (const e of h.entries) {
       if (e.win !== window || !e.done || e.released) continue;
-      if (IN_TOAST_WINDOW && isStage() && up) continue; // dismissing it would close the stage
+      if (isStage() && up) continue; // dismissing it would close the stage
       e.released = true;
       unmark(e.src, SRC_ATTR);
       if (e.dismiss && e.src?.isConnected) {
@@ -907,7 +857,6 @@
       const e = h.entries[i];
       if (!e.done || !(e.released || !alive(e.win))) continue;
       h.entries.splice(i, 1);
-      if (e.preview && e.win === window) byKey.delete(e.key);
     }
   }
 
@@ -958,11 +907,11 @@
     } else {
       teardown();
     }
-    if (IN_TOAST_WINDOW) guard(h);
+    guard(h);
     release(h);
 
     // Get to the bottom centre once a toast from this window is queued, ready to take over.
-    if (IN_TOAST_WINDOW && !ready() && !preparing && byKeyHasLive()) prepare();
+    if (!ready() && !preparing && byKeyHasLive()) prepare();
   }
 
   const byKeyHasLive = () => [...byKey.values()].some(e => !e.done);
@@ -987,17 +936,17 @@
     if (h.pausedAt) return;
     const now = Date.now();
     for (const e of byKey.values()) {
-      if (!e.done && !e.preview && now - e.born > (e.steamMs || STALE_MAX_MS) + GUARD_MS) finish(e, 'guard');
+      if (!e.done && now - e.born > (e.steamMs || STALE_MAX_MS) + GUARD_MS) finish(e, 'guard');
     }
   }
 
   /* ---------- Placement readiness ---------- */
 
   let preparing = false;
-  let prepared = !IN_TOAST_WINDOW;
+  let prepared = false;
   // Ready to be the stage: at the bottom centre, with a toast of its own still up.
   const ready = () =>
-    prepared && !!document.body && (!IN_TOAST_WINDOW || [...byKey.values()].some(e => !e.released));
+    prepared && !!document.body && [...byKey.values()].some(e => !e.released);
 
   async function prepare() {
     preparing = true;
@@ -1381,7 +1330,6 @@
   }
 
   async function place() {
-    if (!IN_TOAST_WINDOW) return; // a preview in the main window sits at its bottom centre (CSS)
     try {
       await moveWindow();
     } finally {
@@ -1479,7 +1427,6 @@
     };
   };
   const watchPlace = () => {
-    if (!IN_TOAST_WINDOW) return;
     placeGuard ||= guardLoop();
     placeGuard.refresh();
   };
@@ -1602,7 +1549,7 @@
 
     // Toasts Steam dropped: the one playing finishes on its own timer, queued ones are kept a while.
     for (const [k, m] of byKey) {
-      if (m.preview || live.has(k)) continue;
+      if (live.has(k)) continue;
       if (!m.done && !m.stale) {
         m.stale = true;
         m.rev++;
@@ -1676,7 +1623,7 @@
   function onPageHide() {
     const h = hub();
     // Steam closed it on its own timer (the theme hadn't dismissed it): Steam doesn't wait.
-    const own = [...byKey.values()].filter(e => !e.preview);
+    const own = [...byKey.values()];
     if (!dismissedByUs && own.length) {
       const first = Math.min(...own.map(e => e.born));
       h.steamCloses.push({ window: window.name, after: Date.now() - first, steamMs: own[0].steamMs, held: own.some(e => held(e.key)) });
@@ -1689,7 +1636,7 @@
     if (h.stage === window) h.stage = null;
     const others = h.wins.filter(alive);
     // The last toast window: nothing is left to show the queue, so it ends here.
-    if (!others.length && IN_TOAST_WINDOW) {
+    if (!others.length) {
       h.entries.splice(0);
       Object.assign(h, { active: 0, open: false, closing: false, pausedAt: 0 });
     }
@@ -1697,7 +1644,7 @@
   }
 
   function start() {
-    if (!enabled() || !IN_TOAST_WINDOW) return;
+    if (!enabled()) return;
     register();
     // A toast that can't be read is shown as Steam drew it, once reading it has been given up.
     setTimeout(() => unmark(root, WAIT_ATTR), ADOPT_TIMEOUT_MS + 500);
@@ -1717,14 +1664,14 @@
    * A new toast window shows nothing until its toast is read (or reading is given up), so
    * Steam's own toast never flashes in its corner first.
    */
-  if (IN_TOAST_WINDOW && enabled()) mark(root, WAIT_ATTR);
+  if (enabled()) mark(root, WAIT_ATTR);
 
   if (document.body) start();
   else addEventListener('DOMContentLoaded', start, { once: true });
 
   // Where the window is, where it should be, and what Steam offers to move it (for why()).
   function placement() {
-    const own = [...byKey.values()].filter(e => !e.preview);
+    const own = [...byKey.values()];
     const src = own.find(e => !e.done)?.src || own[0]?.src;
     const popup = src && run(() => SE.fromProps(src, FIBER_DEPTH, p => ('registerPopup' in p && p.popup ? p.popup : undefined)));
     const members = o => {
@@ -1777,7 +1724,7 @@
       windows: h.wins.map(w => ({ name: name(w), alive: alive(w), ready: !!run(() => w.__seToasts?.ready?.()) })),
       timerHeld: h.timerHeld,
       steamCloses: [...h.steamCloses],
-      heldHere: [...byKey.values()].filter(e => !e.preview).map(e => ({ title: e.title, steamMs: e.steamMs, held: held(e.key) })),
+      heldHere: [...byKey.values()].map(e => ({ title: e.title, steamMs: e.steamMs, held: held(e.key) })),
       active: h.active,
       slot: h.slot,
       elapsed: h.active ? elapsed(h) : 0,
@@ -1789,8 +1736,6 @@
 
   window.__seToasts = {
     version: '1.95.9',
-    preview,
-    clearAll,
     kinds: Object.keys(KINDS),
     probe,
     wake,
