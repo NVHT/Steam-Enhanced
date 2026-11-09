@@ -733,27 +733,61 @@
   let steamRect = null;    // where and how big Steam made the window
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   async function applyMove(i, t) {
-    run(() => window.resizeTo(t.w, t.h));
     await Promise.resolve(run(() => MOVERS[i].move(t))).catch(() => {});
   }
 
   /*
-   * Steam sizes its toast window to its own toast and can undo a resize. Each way is tried until
-   * the size holds: the standard API, then Steam's ResizeTo in physical pixels (the same ratio
-   * as MoveTo), then in CSS pixels. Whichever holds is remembered.
+   * Steam sizes its toast window to its own toast and undoes a standard resize. Its ResizeTo
+   * holds, but applies the display scale itself (asked for 544 it gives 816 at 150%): the first
+   * resize is measured and that ratio divided out, as for MoveTo, and shared with later toasts.
    */
   const sized = t => Math.abs(window.innerWidth - t.w) <= 4 && Math.abs(window.innerHeight - t.h) <= 4;
+  const getSizeRatio = () => run(() => shared().__seToastSizeRatio) || null;
+  const setSizeRatio = r => run(() => { shared().__seToastSizeRatio = r; });
+  async function resized(from, t, ms = 900) {
+    for (const end = Date.now() + ms; Date.now() < end; ) {
+      await sleep(50);
+      if (sized(t) || Math.abs(window.innerWidth - from.w) > 4 || Math.abs(window.innerHeight - from.h) > 4) {
+        await sleep(60);
+        return;
+      }
+    }
+  }
   const SIZERS = [
-    { name: 'window.resizeTo', size: t => window.resizeTo(t.w, t.h) },
     {
-      name: 'ResizeTo(px)',
+      name: 'SteamClient ResizeTo',
       steam: true,
-      size: t => {
-        const r = getRatio() || { x: 1 / dpr(), y: 1 / dpr() };
-        scWindow().ResizeTo(Math.round(t.w / r.x), Math.round(t.h / r.y), false);
+      async size(t) {
+        const W = scWindow();
+        const known = getSizeRatio();
+        const from = { w: window.innerWidth, h: window.innerHeight };
+        if (known) {
+          W.ResizeTo(Math.round(t.w / known.x), Math.round(t.h / known.y), false);
+          return resized(from, t);
+        }
+        W.ResizeTo(t.w, t.h, false);
+        await resized(from, t);
+        if (sized(t)) {
+          setSizeRatio({ x: 1, y: 1 });
+          return undefined;
+        }
+        const r = { x: window.innerWidth / t.w, y: window.innerHeight / t.h };
+        if (!sane(r.x) || !sane(r.y) || (Math.abs(r.x - 1) < 0.02 && Math.abs(r.y - 1) < 0.02)) return undefined;
+        const again = { w: window.innerWidth, h: window.innerHeight };
+        W.ResizeTo(Math.round(t.w / r.x), Math.round(t.h / r.y), false);
+        await resized(again, t);
+        if (sized(t)) setSizeRatio(r);
+        return undefined;
       },
     },
-    { name: 'ResizeTo(css, scaled)', steam: true, size: t => scWindow().ResizeTo(t.w, t.h, true) },
+    {
+      name: 'window.resizeTo',
+      size(t) {
+        const from = { w: window.innerWidth, h: window.innerHeight };
+        window.resizeTo(t.w, t.h);
+        return resized(from, t, 600);
+      },
+    },
   ];
   let sizer = -1;
   const sizeAttempts = [];
@@ -762,8 +796,7 @@
     const order = sizer >= 0 ? [sizer] : SIZERS.map((_, i) => i);
     for (const i of order) {
       if (SIZERS[i].steam && typeof scWindow()?.ResizeTo !== 'function') continue;
-      run(SIZERS[i].size, t);
-      for (let k = 0; k < 12 && !sized(t); k++) await sleep(50);
+      await Promise.resolve(run(() => SIZERS[i].size(t))).catch(() => {});
       sizeAttempts.push({ sizer: SIZERS[i].name, w: window.innerWidth, h: window.innerHeight });
       if (sized(t)) {
         sizer = i;
@@ -837,7 +870,12 @@
     mover = -2;
     // Couldn't land it: put the window back as Steam had it (size and spot), so it stays on
     // screen in Steam's corner and the tray scales down to fit.
-    run(() => window.resizeTo(steamRect.w, steamRect.h));
+    const sr = getSizeRatio();
+    if (sr && typeof scWindow()?.ResizeTo === 'function') {
+      run(() => scWindow().ResizeTo(Math.round(steamRect.w / sr.x), Math.round(steamRect.h / sr.y), false));
+    } else {
+      run(() => window.resizeTo(steamRect.w, steamRect.h));
+    }
     const r = getRatio();
     if (r && typeof scWindow()?.MoveTo === 'function') {
       run(() => scWindow().MoveTo(Math.round(steamRect.x / r.x), Math.round(steamRect.y / r.y), 1));
@@ -1047,6 +1085,7 @@
       attempts,
       sizer: SIZERS[sizer]?.name || sizer,
       sizeAttempts,
+      sizeRatio: getSizeRatio(),
       steamRect,
       ratio: getRatio(),
       got: { x: window.screenX, y: window.screenY, w: window.outerWidth, h: window.outerHeight, iw: window.innerWidth, ih: window.innerHeight, dpr: window.devicePixelRatio },
@@ -1075,7 +1114,7 @@
   }
 
   window.__seToasts = {
-    version: '1.93.9',
+    version: '1.93.10',
     probe,
     // Why nothing (or something) is on the stage: the last scan, and what each toast read as.
     history: () => history.slice(),
