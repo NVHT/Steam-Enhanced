@@ -148,9 +148,17 @@
   const FIBER_DEPTH = 24;
   const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v) && !v.$$typeof && !v.nodeType;
 
-  // The toast an element belongs to: the `notification` prop of the component that stacks it.
-  const toastIn = p => (isObj(p.notification) && ('toastIndex' in p || 'toastCount' in p) ? p : undefined);
-  const keyOf = el => (el && el !== document.body ? run(() => SE.fromProps(el, FIBER_DEPTH, toastIn))?.notification || null : null);
+  /*
+   * The toast an element belongs to: the `notification` prop of the component that stacks it.
+   * It may be an object or a plain id, so models are kept in a Map (not a WeakMap) by that value.
+   */
+  const NO_ID = Object.freeze({ noId: true });
+  const toastIn = p => ('notification' in p && ('toastIndex' in p || 'toastCount' in p) ? p : undefined);
+  const keyOf = el => {
+    if (!el || el === document.body) return null;
+    const stack = run(() => SE.fromProps(el, FIBER_DEPTH, toastIn));
+    return stack ? (stack.notification ?? NO_ID) : null;
+  };
 
   // Props of the first component below `src` that matches.
   const below = (src, test) => run(() => SE.findDown(src, test, 800)) || null;
@@ -499,9 +507,9 @@
   let activeId = 0;
   let closing = false;
   const models = [];                  // in play order
-  const byKey = new WeakMap();        // Steam notification (or group) → model
+  const byKey = new Map();           // Steam notification (object or id) → model
   const pendingKeys = new Map();      // unreadable so far → first seen
-  const skipped = new WeakSet();      // gave up: left native
+  const skipped = new Set();         // gave up: left native
 
   const active = () => models.find(m => m.id === activeId) || null;
   const pending = () => models.filter(m => !m.done);
@@ -767,14 +775,17 @@
 
   /* ---------- Scanning Steam's toasts ---------- */
 
+  let lastScan = null; // for __seToasts.why()
+
   function scan() {
     if (!document.body) return;
     const live = new Map();
     for (const el of document.body.querySelectorAll('*')) {
       if (dock?.contains(el)) continue;
       const key = keyOf(el);
-      if (key && !live.has(key)) live.set(key, el); // document order: the first hit is the toast's root
+      if (key !== null && !live.has(key)) live.set(key, el); // document order: the first hit is the toast's root
     }
+    lastScan = { at: new Date().toISOString(), elements: document.body.getElementsByTagName('*').length, toasts: live.size, read: [] };
 
     const now = Date.now();
     noteUnreadable(live, now);
@@ -787,6 +798,7 @@
       }
       if (m) continue; // finished; Steam just hasn't removed it yet
       const info = describe(key, src);
+      lastScan.read.push({ kind: info.kind, title: info.title, text: info.text, template: !!templateOf(src) });
       if (info.title) {
         pendingKeys.delete(key);
         add(key, src, info);
@@ -807,6 +819,9 @@
       }
       if (m.id !== activeId && now - m.born > STALE_MAX_MS) finish(m);
     }
+
+    // Finished toasts are forgotten once Steam has removed them too (never replayed before that).
+    for (const [k, m] of byKey) if (m.done && !live.has(k)) byKey.delete(k);
 
     // Steam's own drawing goes out of sight only while every toast it has is on the stage.
     const all = live.size > 0 && [...live.keys()].every(k => byKey.has(k));
@@ -895,7 +910,10 @@
   }
 
   window.__seToasts = {
+    version: '1.93.3',
     probe,
+    // Why nothing (or something) is on the stage: the last scan, and what each toast read as.
+    why: () => ({ enabled: enabled(), lastScan, models: models.length, skipped: skipped.size, pending: pendingKeys.size }),
     dump() {
       return models.map(m => ({
         id: m.id,
