@@ -1711,7 +1711,7 @@
   }
 
   window.__seToasts = {
-    version: '1.95.3',
+    version: '1.95.4',
     preview,
     clearAll,
     kinds: Object.keys(KINDS),
