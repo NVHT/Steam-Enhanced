@@ -11,7 +11,7 @@
 
 <p align="center">
   <img alt="Millennium: theme" src="https://img.shields.io/badge/Millennium-theme-7cc4ff?style=flat-square&labelColor=171a20">
-  <img alt="version: 1.93.8" src="https://img.shields.io/badge/version-1.93.8-f0c060?style=flat-square&labelColor=171a20">
+  <img alt="version: 1.93.9" src="https://img.shields.io/badge/version-1.93.9-f0c060?style=flat-square&labelColor=171a20">
   <img alt="platform: Steam desktop" src="https://img.shields.io/badge/platform-Steam%20desktop-33404f?style=flat-square&labelColor=171a20">
 </p>
 
