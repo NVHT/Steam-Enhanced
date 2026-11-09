@@ -9,8 +9,8 @@
 /* The grid */
 [data-se-hs]:not(#se-none) {
   /* Soft text over the art, and the tray's glass (no theme tokens for these yet) */
-  --se-hs-on-art: #d0d7de;
-  --se-hs-glass: rgba(16, 18, 23, .8);
+  --se-hs-on-art: var(--se-on-art);
+  --se-hs-glass: var(--se-glass);
   display: grid !important;
   grid-template-columns: minmax(0, 1fr);
   grid-auto-flow: row;
@@ -139,7 +139,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
    * text keep their own indent (.se-hs-body)
    */
   padding: 28px 24px clamp(14px, 1cqw, 24px);
-  color: var(--se-text, #e6e8eb);
+  color: var(--se-text);
   font-family: var(--se-font);
 }
 
@@ -153,7 +153,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   overflow: hidden;
   z-index: -1;
   pointer-events: none;
-  background: var(--se-bg, #171a20);
+  background: var(--se-bg);
 }
 
 .se-hs-layer {
@@ -197,7 +197,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 .se-hs-grade {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 50% 45% at 88% 6%, rgba(255, 196, 150, .16), transparent 70%), linear-gradient(90deg, rgba(0, 0, 0, .72) 0%, rgba(0, 0, 0, .32) 38%, rgba(0, 0, 0, 0) 62%), radial-gradient(ellipse 85% 75% at 50% 40%, transparent 45%, rgba(0, 0, 0, .5) 100%), linear-gradient(180deg, rgba(0, 0, 0, .35) 0%, rgba(0, 0, 0, 0) 14%, rgba(0, 0, 0, 0) 46%, rgba(10, 12, 16, .78) 84%, var(--se-bg, #171a20) 100%);
+  background: radial-gradient(ellipse 50% 45% at 88% 6%, rgba(255, 196, 150, .16), transparent 70%), linear-gradient(90deg, rgba(0, 0, 0, .72) 0%, rgba(0, 0, 0, .32) 38%, rgba(0, 0, 0, 0) 62%), radial-gradient(ellipse 85% 75% at 50% 40%, transparent 45%, rgba(0, 0, 0, .5) 100%), linear-gradient(180deg, rgba(0, 0, 0, .35) 0%, rgba(0, 0, 0, 0) 14%, rgba(0, 0, 0, 0) 46%, rgba(10, 12, 16, .78) 84%, var(--se-bg) 100%);
 }
 
 /* Toward the tray the art settles into the page's ground, so the shelves read cleanly over it */
@@ -205,7 +205,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(14, 16, 21, 0) calc(var(--se-hs-h, 60%) - 260px), rgba(14, 16, 21, .62) calc(var(--se-hs-h, 60%) - 40px), rgba(14, 16, 21, .9) calc(var(--se-hs-h, 60%) + 90px), var(--se-bg, #171a20) 100%);
+  background: linear-gradient(180deg, rgba(14, 16, 21, 0) calc(var(--se-hs-h, 60%) - 260px), rgba(14, 16, 21, .62) calc(var(--se-hs-h, 60%) - 40px), rgba(14, 16, 21, .9) calc(var(--se-hs-h, 60%) + 90px), var(--se-bg) 100%);
 }
 
 /* Film grain, still (an animated one costs a repaint of the whole view every frame) */
@@ -361,7 +361,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 .se-hs-by {
   margin-bottom: calc(-1 * clamp(6px, .5cqw, 14px));
   font: 700 clamp(11px, .62cqw, 14px)/1.3 var(--se-font);
-  letter-spacing: var(--se-label-spacing, .1em);
+  letter-spacing: var(--se-label-spacing);
   text-transform: uppercase;
   color: var(--se-hs-on-art);
   text-shadow: 0 1px 3px rgba(0, 0, 0, .9), 0 1px 10px rgba(0, 0, 0, .7);
@@ -386,7 +386,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 .se-hs-name {
   font: 800 clamp(56px, min(4.6cqw, 11cqh), 110px)/1 var(--se-font);
   letter-spacing: -.02em;
-  color: var(--se-text-strong, #fff);
+  color: var(--se-text-strong);
   text-shadow: 0 6px 40px rgba(0, 0, 0, .7);
 }
 
@@ -414,7 +414,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 
 .se-hs-stat b {
   font: 800 clamp(20px, min(1.35cqw, 3.8cqh), 32px)/1 var(--se-font);
-  color: var(--se-text-strong, #fff);
+  color: var(--se-text-strong);
   text-shadow: 0 2px 18px rgba(0, 0, 0, .55);
   white-space: nowrap;
 }
@@ -436,7 +436,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 }
 
 .se-hs-stat[data-perfect] b {
-  color: var(--se-gold-text, #f3cf86);
+  color: var(--se-gold-text);
 }
 
 .se-hs-achbar {
@@ -452,12 +452,12 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 .se-hs-achbar > span {
   display: block;
   height: 100%;
-  background: var(--se-accent, #7cc4ff);
+  background: var(--se-accent);
   border-radius: inherit;
 }
 
 .se-hs-stat[data-perfect] .se-hs-achbar > span {
-  background: var(--se-gold-text, #f3cf86);
+  background: var(--se-gold-text);
 }
 
 /* The buttons: PLAY as on the game page, Game page as glass */
@@ -485,9 +485,9 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 
 .se-hs-play {
   padding: 0 clamp(36px, 2.7cqw, 64px);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--se-play, #3a8a22) 72%, #b6f07a 28%), var(--se-play, #3f9420));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--se-play) 72%, #b6f07a 28%), var(--se-play));
   box-shadow: inset 0 1px 0 var(--se-white-25), 0 14px 34px -12px var(--se-play-glow);
-  color: var(--se-text-strong, #fff);
+  color: var(--se-text-strong);
   font-size: clamp(16px, 1.08cqw, 26px);
   font-weight: 700;
   letter-spacing: .06em;
@@ -499,9 +499,9 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 }
 
 .se-hs-play[data-kind="install"] {
-  background: var(--se-accent, #7cc4ff);
-  box-shadow: 0 14px 34px -12px var(--se-accent-strong, rgba(124, 196, 255, .55));
-  color: var(--se-bg-ink, #0f1115);
+  background: var(--se-accent);
+  box-shadow: 0 14px 34px -12px var(--se-accent-strong);
+  color: var(--se-bg-ink);
 }
 
 .se-hs-play svg {
@@ -561,7 +561,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   height: clamp(70px, min(6.2cqw, 15cqh), 150px);
   border-radius: inherit;
   overflow: hidden;
-  background: var(--se-surface, #1f242b);
+  background: var(--se-surface);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, .14);
   opacity: .7;
   transition: transform .3s var(--se-ease), box-shadow .3s, opacity .3s;
@@ -581,7 +581,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 .se-hs-thumb[data-on] .se-hs-pic {
   opacity: 1;
   transform: translateY(-4px);
-  box-shadow: 0 0 0 clamp(2px, .13cqw, 3px) var(--se-text-strong, #fff), 0 24px 40px -16px rgba(0, 0, 0, .9);
+  box-shadow: 0 0 0 clamp(2px, .13cqw, 3px) var(--se-text-strong), 0 24px 40px -16px rgba(0, 0, 0, .9);
 }
 
 .se-hs-thumblabel {
@@ -601,7 +601,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   white-space: nowrap;
   font-size: clamp(12px, .72cqw, 17px);
   font-weight: 700;
-  color: var(--se-text-strong, #fff);
+  color: var(--se-text-strong);
 }
 
 .se-hs-thumbdate {
@@ -617,7 +617,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   z-index: 1;
   height: clamp(3px, .17cqw, 4px);
   width: 100%;
-  background: var(--se-text-strong, #fff);
+  background: var(--se-text-strong);
   box-shadow: 0 -1px 0 rgba(0, 0, 0, .3);
   /*
    * Slides in from the left (the image clips it) instead of growing in width: moved on
@@ -728,14 +728,14 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   font-size: 17px;
   font-weight: 700;
   letter-spacing: -.01em;
-  color: var(--se-text, #e6e8eb);
+  color: var(--se-text);
 }
 
 .se-hs-ncount {
   min-width: 0;
   font-size: 13px;
   font-weight: 600;
-  color: var(--se-text-muted, #98a2ad);
+  color: var(--se-text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -776,11 +776,11 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   box-sizing: border-box;
   overflow: hidden;
   padding: 0;
-  border: 1px solid var(--se-hairline, rgba(255, 255, 255, .08));
-  border-radius: var(--se-radius-md, 10px);
-  background: var(--se-surface, #1f242b);
+  border: 1px solid var(--se-hairline);
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface);
   box-shadow: var(--se-shadow-card);
-  color: var(--se-text-strong, #fff);
+  color: var(--se-text-strong);
   font-family: var(--se-font);
   text-align: start;
   cursor: pointer;
@@ -830,7 +830,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 }
 
 .se-hs-feat:hover .se-hs-fpreview {
-  background-color: var(--se-hover, #2c3440);
+  background-color: var(--se-hover);
 }
 
 .se-hs-feat[hidden] {
@@ -840,7 +840,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 .se-hs-fkind {
   padding: 3px 9px;
   border-radius: var(--se-radius-pill);
-  background: var(--se-chip, rgba(12, 14, 18, .6));
+  background: var(--se-chip);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .06em;
@@ -857,7 +857,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   -webkit-box-orient: vertical;
   overflow: hidden;
   overflow-wrap: anywhere;
-  color: var(--se-text-dim, #b8c0c8);
+  color: var(--se-text-dim);
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
@@ -885,10 +885,10 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   z-index: 1;
   padding: 6px 10px 4px;
   background: linear-gradient(180deg, rgba(18, 20, 25, .96) 70%, rgba(18, 20, 25, 0));
-  font: var(--se-label-font, 700 11px/14px var(--se-font));
-  letter-spacing: var(--se-label-spacing, .1em);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
   text-transform: uppercase;
-  color: var(--se-text-faint, #6f7984);
+  color: var(--se-text-faint);
 }
 
 .se-hs-hday:not(:first-child) {
@@ -907,9 +907,9 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   gap: 4px;
   padding: 8px 10px;
   border: 0;
-  border-radius: var(--se-radius-sm, 8px);
+  border-radius: var(--se-radius-sm);
   background: transparent;
-  color: var(--se-text, #e6e8eb);
+  color: var(--se-text);
   font-family: var(--se-font);
   text-align: start;
   cursor: pointer;
@@ -935,7 +935,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   gap: 6px;
   min-width: 0;
   font: 600 12px/16px var(--se-font);
-  color: var(--se-text-muted, #98a2ad);
+  color: var(--se-text-muted);
 }
 
 .se-hs-hmeta img {
@@ -965,21 +965,21 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   align-self: flex-start;
   padding: 6px 10px;
   border: 0;
-  border-radius: var(--se-radius-sm, 8px);
+  border-radius: var(--se-radius-sm);
   background: transparent;
-  color: var(--se-accent, #7cc4ff);
+  color: var(--se-accent);
   font: 600 12.5px var(--se-font);
   cursor: pointer;
 }
 
 .se-hs-hall:hover {
-  color: var(--se-text-strong, #fff);
+  color: var(--se-text-strong);
 }
 
 /* Match the Game Page links on hover and keyboard focus. */
 .se-hs-nhead .se-hs-hall:is(:hover, :focus-visible),
 .se-hs-hall:is([data-all], [data-foot]):is(:hover, :focus-visible) {
-  color: var(--se-text-strong, #fff);
+  color: var(--se-text-strong);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -1010,7 +1010,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   display: flex;
   flex-direction: column;
   min-height: 0;
-  color: var(--se-text, #e6e8eb);
+  color: var(--se-text);
   font-family: var(--se-font);
 }
 
@@ -1025,7 +1025,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 .se-hs-empty {
   padding: 10px 2px;
   font-size: 13px;
-  color: var(--se-text-muted, #98a2ad);
+  color: var(--se-text-muted);
 }
 
 /*
@@ -1045,8 +1045,8 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 }
 
 .se-hs-pickbtn.se-hs-nfilter[data-on] {
-  color: var(--se-accent, #7cc4ff);
-  background: var(--se-accent-surface, #24384b);
+  color: var(--se-accent);
+  background: var(--se-accent-surface);
 }
 
 .se-hs-nhead .se-hs-nfilter {
@@ -1072,9 +1072,9 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   justify-content: center;
   padding: 0;
   border: 0;
-  border-radius: var(--se-radius-sm, 8px);
-  background: var(--se-surface-2, #262c35);
-  color: var(--se-text-muted, #98a2ad);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  color: var(--se-text-muted);
   cursor: pointer;
 }
 
@@ -1085,8 +1085,8 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 
 .se-hs-pickbtn:hover,
 .se-hs-pickbtn[aria-expanded="true"] {
-  color: var(--se-text-strong, #fff);
-  background: var(--se-selected, #33404f);
+  color: var(--se-text-strong);
+  background: var(--se-selected);
 }
 
 .se-hs-pickbtn:focus-visible,
@@ -1110,10 +1110,10 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   flex-direction: column;
   padding: 12px;
   box-sizing: border-box;
-  border-radius: var(--se-radius-lg, 14px);
+  border-radius: var(--se-radius-lg);
   background: rgba(22, 25, 31, .97);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1), 0 24px 60px -12px rgba(0, 0, 0, .9);
-  color: var(--se-text, #e6e8eb);
+  color: var(--se-text);
   font-family: var(--se-font);
 }
 
@@ -1137,7 +1137,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   border: 0;
   border-radius: var(--se-radius-sm);
   background: transparent;
-  color: var(--se-text-muted, #98a2ad);
+  color: var(--se-text-muted);
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
@@ -1145,22 +1145,22 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 
 .se-hs-pk-x:hover {
   background: rgba(255, 255, 255, .08);
-  color: var(--se-text-strong, #fff);
+  color: var(--se-text-strong);
 }
 
 .se-hs-pk-search {
   height: 34px;
   padding: 0 12px;
   border: 0;
-  border-radius: var(--se-radius-sm, 8px);
-  background: var(--se-surface-2, #262c35);
-  color: var(--se-text, #e6e8eb);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  color: var(--se-text);
   font: 500 13px var(--se-font);
   outline: none;
 }
 
 .se-hs-pk-search:focus {
-  box-shadow: 0 0 0 2px var(--se-accent-strong, rgba(124, 196, 255, .55));
+  box-shadow: 0 0 0 2px var(--se-accent-strong);
 }
 
 .se-hs-pk-list {
@@ -1175,10 +1175,10 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 
 .se-hs-pk-group {
   padding: 10px 6px 4px;
-  font: var(--se-label-font, 700 11px/14px var(--se-font));
-  letter-spacing: var(--se-label-spacing, .1em);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
   text-transform: uppercase;
-  color: var(--se-text-faint, #6f7984);
+  color: var(--se-text-faint);
 }
 
 .se-hs-pk-row {
@@ -1187,7 +1187,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   gap: 10px;
   min-height: 40px;
   padding: 4px 6px;
-  border-radius: var(--se-radius-sm, 8px);
+  border-radius: var(--se-radius-sm);
   cursor: pointer;
 }
 
@@ -1200,7 +1200,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   width: 16px;
   height: 16px;
   margin: 0;
-  accent-color: var(--se-accent, #7cc4ff);
+  accent-color: var(--se-accent);
   cursor: pointer;
 }
 
@@ -1210,7 +1210,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   height: 33px;
   border-radius: 3px;
   overflow: hidden;
-  background: var(--se-surface-2, #262c35);
+  background: var(--se-surface-2);
 }
 
 .se-hs-pk-img {
@@ -1238,7 +1238,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 
 .se-hs-pk-sub {
   font-size: 11.5px;
-  color: var(--se-text-muted, #98a2ad);
+  color: var(--se-text-muted);
 }
 
 .se-hs-pk-foot {
@@ -1253,7 +1253,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 .se-hs-pk-count {
   flex: 1;
   font-size: 12px;
-  color: var(--se-text-muted, #98a2ad);
+  color: var(--se-text-muted);
 }
 
 .se-hs-pk-foot .se-hs-hall {
@@ -1262,7 +1262,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 }
 
 .se-hs-pk-foot .se-hs-hall:disabled {
-  color: var(--se-text-faint, #6f7984);
+  color: var(--se-text-faint);
   cursor: default;
 }
 
@@ -1270,9 +1270,9 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   height: 30px;
   padding: 0 14px;
   border: 0;
-  border-radius: var(--se-radius-sm, 8px);
-  background: var(--se-accent, #7cc4ff);
-  color: var(--se-bg-ink, #0f1115);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-accent);
+  color: var(--se-bg-ink);
   font: 700 12.5px var(--se-font);
   cursor: pointer;
 }
@@ -1301,11 +1301,11 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   min-height: 0;
   padding: 0;
   border: 0;
-  border-radius: var(--se-radius-md, 10px);
+  border-radius: var(--se-radius-md);
   overflow: hidden;
-  background: var(--se-surface, #1f242b);
+  background: var(--se-surface);
   box-shadow: 0 10px 22px -12px rgba(0, 0, 0, .9), inset 0 0 0 1px rgba(255, 255, 255, .08);
-  color: var(--se-text-strong, #fff);
+  color: var(--se-text-strong);
   font-family: var(--se-font);
   text-align: start;
   cursor: pointer;
@@ -1324,7 +1324,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   inset: 0;
   z-index: 2;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 2px var(--se-accent, #7cc4ff);
+  box-shadow: inset 0 0 0 2px var(--se-accent);
   opacity: 0;
   transition: opacity var(--se-dur) ease-out;
   pointer-events: none;
@@ -1387,8 +1387,8 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   top: 8px;
   width: 30px;
   height: 30px;
-  border-radius: var(--se-radius-sm, 8px);
-  background: var(--se-play, #3a8a22);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-play);
   color: #fff;
   display: flex;
   align-items: center;
@@ -1472,7 +1472,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   border-radius: var(--se-radius-ml);
   background: linear-gradient(135deg, var(--se-surface), #191d23);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07);
-  color: var(--se-text, #e6e8eb);
+  color: var(--se-text);
   font-family: var(--se-font);
   text-align: start;
   cursor: pointer;
@@ -1498,7 +1498,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   inset: 0;
   z-index: 4;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 2px var(--se-accent, #7cc4ff);
+  box-shadow: inset 0 0 0 2px var(--se-accent);
   opacity: 0;
   transition: opacity var(--se-dur) ease-out;
   pointer-events: none;
@@ -1528,7 +1528,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 
 .se-hs-csub {
   font-size: 11.5px;
-  color: var(--se-text-muted, #98a2ad);
+  color: var(--se-text-muted);
 }
 
 /* The fan: the most recent cover in front, the next two tilted behind it */
@@ -1554,7 +1554,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   height: var(--cov-h);
   border-radius: var(--se-radius-xs);
   overflow: hidden;
-  background: var(--se-surface-2, #262c35);
+  background: var(--se-surface-2);
   box-shadow: 0 8px 16px -6px rgba(0, 0, 0, .9), inset 0 0 0 1px rgba(255, 255, 255, .12);
   transition: transform .25s var(--se-ease);
 }
@@ -1605,7 +1605,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 .se-hs-cmore {
   font-size: 22px;
   font-weight: 800;
-  color: var(--se-text-strong, #fff);
+  color: var(--se-text-strong);
 }
 
 /*
@@ -1655,7 +1655,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   grid-column: 1 / -1 !important;
   margin: 0 20px 14px !important;
   border-inline-start: 0 !important;
-  border-radius: var(--se-radius-lg, 14px);
+  border-radius: var(--se-radius-lg);
   background: rgba(8, 10, 14, .52) !important;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1);
 }

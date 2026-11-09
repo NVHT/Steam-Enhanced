@@ -30,11 +30,11 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 /* ---------- Dock and tray ---------- */
 
 #se-tst {
-  --c: var(--se-accent, #7cc4ff);
+  --c: var(--se-accent);
   /* Kind colours with no theme token yet (shared with the notification menu) */
-  --se-tst-violet: #b08cff;
-  --se-tst-teal: #5fd4c4;
-  --se-tst-pink: #ff8fb8;
+  --se-tst-violet: var(--se-kind-violet);
+  --se-tst-teal: var(--se-kind-teal);
+  --se-tst-pink: var(--se-kind-pink);
   position: fixed;
   left: 0;
   right: 0;
@@ -46,8 +46,8 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   /* Set by toasts.js only when the window can't be made big enough for the tray. */
   transform: scale(var(--se-tst-scale, 1));
   transform-origin: 50% 100%;
-  color: var(--se-text, #e6e8eb);
-  font-family: var(--se-font, "Motiva Sans", Arial, sans-serif);
+  color: var(--se-text);
+  font-family: var(--se-font);
 }
 
 #se-tst[data-placing] {
@@ -123,21 +123,21 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 /* ---------- Accents: kind, then rarity tier ---------- */
 
-#se-tst[data-accent="msg"], #se-tst [data-accent="msg"] { --c: var(--se-accent, #7cc4ff); }
-#se-tst[data-accent="on"], #se-tst [data-accent="on"] { --c: var(--se-online, #4cb4ff); }
-#se-tst[data-accent="play"], #se-tst [data-accent="play"] { --c: var(--se-running, #6cc24a); }
+#se-tst[data-accent="msg"], #se-tst [data-accent="msg"] { --c: var(--se-accent); }
+#se-tst[data-accent="on"], #se-tst [data-accent="on"] { --c: var(--se-online); }
+#se-tst[data-accent="play"], #se-tst [data-accent="play"] { --c: var(--se-running); }
 #se-tst[data-accent="inv"], #se-tst [data-accent="inv"] { --c: var(--se-tst-violet); }
-#se-tst[data-accent="ach"], #se-tst [data-accent="ach"] { --c: var(--se-gold-text, #f3cf86); }
+#se-tst[data-accent="ach"], #se-tst [data-accent="ach"] { --c: var(--se-gold-text); }
 #se-tst[data-accent="dl"], #se-tst [data-accent="dl"] { --c: var(--se-tst-teal); }
 #se-tst[data-accent="shop"], #se-tst [data-accent="shop"] { --c: var(--se-tst-pink); }
-#se-tst[data-accent="sys"], #se-tst [data-accent="sys"] { --c: var(--se-text-dim, #b8c0c8); }
-#se-tst[data-accent="err"], #se-tst [data-accent="err"] { --c: var(--se-danger-text, #ffb0b3); }
+#se-tst[data-accent="sys"], #se-tst [data-accent="sys"] { --c: var(--se-text-dim); }
+#se-tst[data-accent="err"], #se-tst [data-accent="err"] { --c: var(--se-danger-text); }
 
-#se-tst [data-se-tier="legendary"] { --c: var(--se-tier-legendary, #f0c060); --se-tst-aura: 0 0 18px 4px; --se-tst-gl: 34%; }
-#se-tst [data-se-tier="epic"] { --c: var(--se-tier-epic, #b98cff); --se-tst-aura: 0 0 14px 2px; --se-tst-gl: 26%; }
-#se-tst [data-se-tier="rare"] { --c: var(--se-tier-rare, #5fb2ff); --se-tst-aura: 0 0 10px 1px; --se-tst-gl: 20%; }
-#se-tst [data-se-tier="uncommon"] { --c: var(--se-tier-uncommon, #7bc46a); --se-tst-aura: 0 0 6px 0; --se-tst-gl: 14%; }
-#se-tst [data-se-tier="common"] { --c: var(--se-tier-common, #8d97a2); --se-tst-aura: 0 0 5px 0; --se-tst-gl: 8%; }
+#se-tst [data-se-tier="legendary"] { --c: var(--se-tier-legendary); --se-tst-aura: 0 0 18px 4px; --se-tst-gl: 34%; }
+#se-tst [data-se-tier="epic"] { --c: var(--se-tier-epic); --se-tst-aura: 0 0 14px 2px; --se-tst-gl: 26%; }
+#se-tst [data-se-tier="rare"] { --c: var(--se-tier-rare); --se-tst-aura: 0 0 10px 1px; --se-tst-gl: 20%; }
+#se-tst [data-se-tier="uncommon"] { --c: var(--se-tier-uncommon); --se-tst-aura: 0 0 6px 0; --se-tst-gl: 14%; }
+#se-tst [data-se-tier="common"] { --c: var(--se-tier-common); --se-tst-aura: 0 0 5px 0; --se-tst-gl: 8%; }
 
 .se-tst-tray[data-se-tier="legendary"] {
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent), 0 0 28px -10px color-mix(in srgb, var(--c) 40%, transparent), 0 6px 18px -6px rgba(0, 0, 0, .75);
@@ -155,7 +155,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   border-radius: 13px;
   overflow: hidden;
   isolation: isolate;
-  background: var(--se-bg, #171a20);
+  background: var(--se-bg);
 }
 
 .se-tst-layer {
@@ -177,7 +177,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   inset: 0;
   z-index: -2;
   overflow: hidden;
-  background: var(--se-surface, #1f242b);
+  background: var(--se-surface);
 }
 
 /* ---------- Ambient ground: toasts with no art ---------- */
@@ -259,8 +259,8 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   stroke: rgba(152, 162, 173, .35);
 }
 
-.se-tst-wf-fr[data-st="game"] { stroke: color-mix(in srgb, var(--se-running, #6cc24a) 75%, transparent); }
-.se-tst-wf-fr[data-st="on"] { stroke: color-mix(in srgb, var(--se-online, #4cb4ff) 75%, transparent); }
+.se-tst-wf-fr[data-st="game"] { stroke: color-mix(in srgb, var(--se-running) 75%, transparent); }
+.se-tst-wf-fr[data-st="on"] { stroke: color-mix(in srgb, var(--se-online) 75%, transparent); }
 
 .se-tst-wf-fr:not([data-st="off"]) {
   transform-box: fill-box;
@@ -298,7 +298,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 .se-tst-thumb:not(:has(img)) {
   background:
     radial-gradient(ellipse 80% 120% at 85% 20%, color-mix(in srgb, var(--c) 45%, transparent), transparent 70%),
-    var(--se-sidebar, #1d2128);
+    var(--se-sidebar);
 }
 
 
@@ -352,7 +352,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 .se-tst-layer[data-accent="err"] .se-tst-grade {
   background:
-    linear-gradient(90deg, rgba(0, 0, 0, .8), rgba(40, 8, 10, .5) 50%, color-mix(in srgb, var(--se-danger, #e5737a) 12%, transparent)),
+    linear-gradient(90deg, rgba(0, 0, 0, .8), rgba(40, 8, 10, .5) 50%, color-mix(in srgb, var(--se-danger) 12%, transparent)),
     radial-gradient(ellipse 90% 95% at 50% 45%, transparent 50%, rgba(0, 0, 0, .45) 100%);
 }
 
@@ -414,12 +414,12 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 /* Presence: an outline round the avatar, a gap of the tray's glass between. */
 .se-tst-tile[data-presence] {
-  --se-tst-status: var(--se-online, #4cb4ff);
+  --se-tst-status: var(--se-online);
   box-shadow: 0 0 0 2px rgba(16, 18, 23, .9), 0 0 0 4px var(--se-tst-status), 0 10px 22px -8px rgba(0, 0, 0, .85);
 }
 
 .se-tst-tile[data-presence="ingame"] {
-  --se-tst-status: var(--se-running, #6cc24a);
+  --se-tst-status: var(--se-running);
 }
 
 .se-tst-tile-img {
@@ -431,7 +431,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 /* Achievement icon: the tier's aura and color, as on the game page. */
 .se-tst-layer[data-se-tier] .se-tst-tile {
-  background: color-mix(in srgb, var(--c) 22%, var(--se-surface, #1f242b));
+  background: color-mix(in srgb, var(--c) 22%, var(--se-surface));
   box-shadow: var(--se-tst-aura) color-mix(in srgb, var(--c) 60%, transparent), inset 0 0 0 1px rgba(255, 255, 255, .08);
 }
 
@@ -446,7 +446,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   position: absolute;
   right: 4px;
   bottom: 3px;
-  font: 800 13px/1 var(--se-font, inherit);
+  font: 800 13px/1 var(--se-font);
   color: var(--c);
   text-shadow: 0 0 3px #0b0d10, 0 1px 2px #0b0d10;
 }
@@ -479,7 +479,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 .se-tst-ey {
-  font: 700 10.5px/13px var(--se-font, inherit);
+  font: 700 10.5px/13px var(--se-font);
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--c);
@@ -487,8 +487,8 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 .se-tst-tt {
-  font: 800 19px/23px var(--se-font, inherit);
-  color: var(--se-text-strong, #fff);
+  font: 800 19px/23px var(--se-font);
+  color: var(--se-text-strong);
   text-shadow: 0 2px 14px rgba(0, 0, 0, .6);
   white-space: nowrap;
   overflow: hidden;
@@ -496,7 +496,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 .se-tst-ds {
-  font: 400 13px/17px var(--se-font, inherit);
+  font: 400 13px/17px var(--se-font);
   color: #d0d7de;
   text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
   white-space: nowrap;
@@ -516,8 +516,8 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 .se-tst-chips i {
   padding: 0 6px;
   border-radius: var(--se-radius-sm);
-  background: var(--se-chip, rgba(12, 14, 18, .55));
-  font: 700 11px/18px var(--se-font, inherit);
+  background: var(--se-chip);
+  font: 700 11px/18px var(--se-font);
   font-style: normal;
   color: var(--c);
 }
@@ -542,7 +542,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   padding: 0 16px;
   border: 0;
   border-radius: var(--se-radius-md);
-  font: 700 13px/36px var(--se-font, inherit);
+  font: 700 13px/36px var(--se-font);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -568,23 +568,23 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 .se-tst-btn-play {
   padding: 0 20px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--se-play, #3a8a22) 72%, #b6f07a 28%), var(--se-play, #3f9420));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--se-play) 72%, #b6f07a 28%), var(--se-play));
   box-shadow: inset 0 1px 0 var(--se-white-25), 0 12px 26px -10px var(--se-play-glow);
-  color: var(--se-text-strong, #fff);
+  color: var(--se-text-strong);
   letter-spacing: .06em;
   text-transform: uppercase;
 }
 
 .se-tst-btn-acc {
-  background: var(--se-accent, #7cc4ff);
-  box-shadow: 0 12px 26px -12px var(--se-accent-strong, rgba(124, 196, 255, .55));
-  color: var(--se-bg-ink, #0f1115);
+  background: var(--se-accent);
+  box-shadow: 0 12px 26px -12px var(--se-accent-strong);
+  color: var(--se-bg-ink);
 }
 
 .se-tst-btn-glass {
   background: var(--se-white-10);
   box-shadow: inset 0 0 0 1px var(--se-white-14);
-  color: var(--se-text-strong, #fff);
+  color: var(--se-text-strong);
 }
 
 .se-tst-stat {
@@ -596,7 +596,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 .se-tst-stat b {
-  font: 800 26px/1 var(--se-font, inherit);
+  font: 800 26px/1 var(--se-font);
   /* The tier's color, lifted toward white so even Common's grey reads on bright art. */
   color: color-mix(in srgb, var(--c) 62%, #fff);
   /* A tight dark edge first, so the number holds on bright art; then the soft lift. */
@@ -615,7 +615,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   background: color-mix(in srgb, var(--c) 18%, rgba(12, 14, 18, .78));
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent);
   color: var(--c);
-  font: 600 11.5px/14px var(--se-font, inherit);
+  font: 600 11.5px/14px var(--se-font);
   font-style: normal;
 }
 
@@ -720,7 +720,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   position: absolute;
   width: 13px;
   height: 13px;
-  color: var(--se-text-strong, #fff);
+  color: var(--se-text-strong);
   opacity: 0;
   transition: opacity var(--se-dur) ease-out;
 }
@@ -771,7 +771,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   padding: 0;
   border: 0;
   border-radius: var(--se-radius-sm);
-  background: color-mix(in srgb, var(--c) 30%, var(--se-surface, #1f242b));
+  background: color-mix(in srgb, var(--c) 30%, var(--se-surface));
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
   cursor: pointer;
   transition: transform .25s cubic-bezier(.3, 1.4, .6, 1), box-shadow .2s;
@@ -822,8 +822,8 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 .se-tst-pos {
   margin-left: auto;
-  font: 700 11.5px/1 var(--se-font, inherit);
-  color: var(--se-text-muted, #98a2ad);
+  font: 700 11.5px/1 var(--se-font);
+  color: var(--se-text-muted);
 }
 
 /* ---------- Reduced motion: fades only (the close still ends, so the tray still clears) ---------- */
