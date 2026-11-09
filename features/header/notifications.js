@@ -86,7 +86,7 @@
 
   const annotateNotificationItems = list => {
     let prevDayKey = null;
-    list.forEach((item, index) => {
+    const dayStarts = list.map(item => {
       const group = SE.fromProps(item, 3, p =>
         p.group && Array.isArray(p.group.notifications) ? p.group : undefined
       );
@@ -100,21 +100,15 @@
           : null;
       const currentKey = date ? computeDayKey(date) : prevDayKey;
 
-      if (date && currentKey !== prevDayKey) {
-        SE.mark(item, 'data-se-day', formatDayLabel(date));
-      } else {
-        SE.unmark(item, 'data-se-day');
-      }
-
+      const startsDay = !!date && currentKey !== prevDayKey;
+      SE.attr(item, 'data-se-day', startsDay ? formatDayLabel(date) : null);
       prevDayKey = currentKey;
-      if (!list[index + 1]) SE.mark(item, 'data-se-last');
-      else SE.unmark(item, 'data-se-last');
+      return startsDay;
     });
 
+    // The last card of each day (the one before a new day's first, and the very last).
     list.forEach((item, index) => {
-      const next = list[index + 1];
-      if (next?.hasAttribute('data-se-day')) SE.mark(item, 'data-se-last');
-      else if (next) SE.unmark(item, 'data-se-last');
+      SE.attr(item, 'data-se-last', index === list.length - 1 || dayStarts[index + 1] ? '' : null);
     });
   };
 

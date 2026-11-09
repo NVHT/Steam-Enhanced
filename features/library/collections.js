@@ -11,6 +11,8 @@
   : (init) => addEventListener('se-core', () => init(window.__se), { once: true })
 )((SE) => {
   const { C, run, isInstalled, navigate, findDown, coverURLs } = SE;
+  /* A grid's games are re-read at most this often (friends playing, install state) */
+  const GAMES_TTL = 3500;
   window.__steamEnhancedCollections?.destroy();
 
   const PAGE = C.OuterContainer_Container;
@@ -66,21 +68,24 @@
     sFriends: 'Friends',
   };
 
-  function host() {
-    for (const o of SE.owners()) {
-      try {
-        if (o.appStore && o.collectionStore) return o;
-      } catch (_) {}
-    }
-    return null;
-  }
+  const collectionStore = () => SE.global('collectionStore');
+
+  /*
+   * The grid's games, read from its props. The fiber search is cheap next to reading every
+   * game, so the games are cached per childSections array (Steam replaces it on change) and
+   * refreshed after GAMES_TTL for the live values (friends playing, achievements).
+   */
+  const gamesCache = new WeakMap();
 
   function gridGames(page) {
     const ctl = page.querySelector(`.${GRIDCTL}`);
     if (!ctl) return null;
     const p = findDown(ctl, (q) => Array.isArray(q.childSections), 4000);
     if (p) {
-      return {
+      const cached = gamesCache.get(p.childSections);
+      if (cached && cached.sort === p.eSortBy && performance.now() - cached.at < GAMES_TTL) return cached;
+      const grid = {
+        at: performance.now(),
         sort: p.eSortBy,
         games: p.childSections.flatMap((sec) =>
           (sec.children || [])
@@ -93,22 +98,31 @@
             }))
         ),
       };
+      grid.sig = signature(grid.sort, grid.games);
+      gamesCache.set(p.childSections, grid);
+      return grid;
     }
     const up = SE.fromProps(ctl, 12, (q) => (Array.isArray(q.appOverviews) ? q.appOverviews : null));
     return up ? { sort: 0, games: up.map((app) => ({ app, friends: 0, section: '' })) } : null;
   }
 
+  /* Steam's eSortBy values that get a column of their own in the list */
   const SORT = {
     achievements: 2,
-    hours: 4,
-    lastPlayed: 5,
     release: 6,
     added: 7,
-    size: 8,
     metacritic: 9,
     friends: 10,
-    reviews: 11,
   };
+
+  const signature = (sort, games) =>
+    `${sort}|` +
+    games
+      .map(
+        (g) =>
+          `${g.app.appid}:${g.section}:${isInstalled(g.app) ? 1 : 0}:${g.app.minutes_playtime_forever || 0}:${g.app.rt_last_time_played || 0}:${g.friends}:${g.ach}`
+      )
+      .join(',');
 
   const fullDate = (t) =>
     t
@@ -143,16 +157,12 @@
 
   function collectionOf(page) {
     const id = SE.fromProps(page, 12, (q) => (typeof q.strCollectionId === 'string' ? q.strCollectionId : null));
-    const o = host();
-    return {
-      id,
-      coll: id && o ? run(() => o.collectionStore.GetCollection(id)) : null,
-    };
+    const store = id && collectionStore();
+    return { id, coll: store ? run(() => store.GetCollection(id)) : null };
   }
 
   function userCollections() {
-    const o = host();
-    const list = run(() => o.collectionStore.userCollections) || [];
+    const list = run(() => collectionStore().userCollections) || [];
     return list.filter((c) => c && c.id !== 'uncategorized' && (c.bIsEditable || (c.visibleApps || []).length));
   }
 
@@ -170,7 +180,7 @@
     img.draggable = false;
     img.setAttribute('data-se-art-wait', '');
     img.addEventListener('load', () => img.removeAttribute('data-se-art-wait'));
-    const urls = coverURLs(app, host()?.appStore);
+    const urls = coverURLs(app);
     let i = 0;
     img.onerror = () => {
       if (i < urls.length) {
@@ -259,8 +269,11 @@
   }
 
   const viewKey = (kind) => `se-view-${kind}`;
+  /* View forced for a moment (New collection needs the grid's tile), by kind */
+  const forcedView = new Map();
 
   function getView(kind) {
+    if (forcedView.has(kind)) return forcedView.get(kind);
     try {
       return localStorage.getItem(viewKey(kind)) === 'list' ? 'list' : 'grid';
     } catch (_) {
@@ -359,6 +372,7 @@
       list = el('div', 'se-clist');
       list.dataset.kind = kind;
       list.addEventListener('click', onListClick);
+      list.addEventListener('keydown', onListKey);
       anchor.insertAdjacentElement('afterend', list);
     } else if (list.previousElementSibling !== anchor) {
       anchor.insertAdjacentElement('afterend', list);
@@ -372,7 +386,11 @@
     list.appendChild(head);
 
     if (!rows.length) list.appendChild(el('div', 'se-clist-empty', COPY.none));
-    for (const r of rows) list.appendChild(r);
+    for (const r of rows) {
+      r.tabIndex = 0;
+      r.setAttribute('role', 'button');
+      list.appendChild(r);
+    }
     return list;
   }
 
@@ -399,6 +417,13 @@
     return b;
   }
 
+  /* Rows act like buttons: Enter or Space on the row itself opens it (its buttons handle their own) */
+  function onListKey(e) {
+    if ((e.key !== 'Enter' && e.key !== ' ') || !e.target.classList.contains('se-clist-row')) return;
+    e.preventDefault();
+    onListClick(e);
+  }
+
   function onListClick(e) {
     const btn = e.target.closest('.se-cl-btn');
     const row = e.target.closest('.se-clist-row');
@@ -415,6 +440,26 @@
     }
     if (row.dataset.app) navigate(`/library/app/${row.dataset.app}`);
     else if (row.dataset.coll) navigate(`/library/collection/${encodeURIComponent(row.dataset.coll)}`);
+  }
+
+  /* The theme's controls width, for Steam's sort bar beside it; measured after layout, never in update() */
+  const ctrlWidths = new ResizeObserver((entries) => {
+    for (const { target, contentRect } of entries) {
+      SE.cssVar(target.closest(`.${PAGE}`), '--se-cb-ctrl-w', `${Math.round(contentRect.width)}px`);
+    }
+  });
+  const observedCtrls = new Set();
+
+  function observeCtrlWidth(ctrl) {
+    if (observedCtrls.has(ctrl)) return;
+    for (const old of observedCtrls) {
+      if (!old.isConnected) {
+        ctrlWidths.unobserve(old);
+        observedCtrls.delete(old);
+      }
+    }
+    observedCtrls.add(ctrl);
+    ctrlWidths.observe(ctrl);
   }
 
   function decorateCollectionCards(page, games) {
@@ -482,13 +527,10 @@
       artApps: mostPlayed(apps, 1),
     });
     viewSwitch(ctrl, 'collection');
+    observeCtrlWidth(ctrl);
 
-    const w = `${Math.round(ctrl.offsetWidth || 0)}px`;
-    if (page.style.getPropertyValue('--se-cb-ctrl-w') !== w) {
-      page.style.setProperty('--se-cb-ctrl-w', w);
-    }
-
-    decorateCollectionCards(page, games);
+    /* The cards are hidden in List view */
+    if (view !== 'list') decorateCollectionCards(page, games);
 
     const ctl = page.querySelector(`.${GRIDCTL}`);
     if (!ctl) return;
@@ -509,15 +551,7 @@
           }[sort]
         : null;
 
-    const sig =
-      `${sort}|` +
-      games
-        .map(
-          (g) =>
-            `${g.app.appid}:${g.section}:${isInstalled(g.app) ? 1 : 0}:${g.app.minutes_playtime_forever || 0}:${g.app.rt_last_time_played || 0}:${g.friends}:${g.ach}`
-        )
-        .join(',') +
-      `|${COPY.name}`;
+    const sig = grid?.sig || signature(sort, games);
 
     if (existing && existing.dataset.sig === sig && existing.previousElementSibling === ctl) return;
 
@@ -677,7 +711,7 @@
     }[allState.sort];
     info.sort((a, b) => (b.c.id === 'favorite') - (a.c.id === 'favorite') || cmp(a, b));
 
-    const sig = info.map((i) => `${i.c.id}:${i.games}:${i.installed}:${i.last}`).join(',') + `|${COPY.name}`;
+    const sig = info.map((i) => `${i.c.id}:${i.games}:${i.installed}:${i.last}`).join(',');
     if (existing && existing.dataset.sig === sig && existing.previousElementSibling === grid) return;
 
     const rows = info.map(({ c, games, installed, last, top }) => {
@@ -730,10 +764,13 @@
       return false;
     };
     if (getView('collections') !== 'list' || click()) return;
+    /* Held in Grid until the tile is clicked, so an update in between can't switch back */
+    forcedView.set('collections', 'grid');
     SE.mark(scroll, 'data-se-view', 'grid');
     let tries = 0;
     const again = () => {
       if (click() || ++tries > 20) {
+        forcedView.delete('collections');
         SE.mark(scroll, 'data-se-view', getView('collections'));
         return;
       }
@@ -746,6 +783,7 @@
   let watcher = null;
 
   function update() {
+    if (frame) cancelAnimationFrame(frame);
     frame = 0;
     try {
       for (const page of document.querySelectorAll(`.${PAGE}`)) updateCollection(page);
@@ -754,14 +792,14 @@
       console.warn('[Steam Enhanced] collections', e);
     }
     watcher?.takeRecords();
-    timer.refresh();
   }
 
   function schedule() {
     if (!frame) frame = requestAnimationFrame(update);
   }
 
-  watcher = SE.watch(schedule, { ignore: SE.inside(SE.SIDE) });
+  /* Core batches to a frame; throttled, as a collection grid re-renders often */
+  watcher = SE.watch(update, { ignore: SE.inSide, throttle: 250 });
   const timer = SE.poll(schedule, 4000, { active: () => SE.visible('[data-se-view="list"]') });
   schedule();
 
@@ -770,6 +808,10 @@
       watcher?.disconnect();
       timer?.disconnect();
       if (frame) cancelAnimationFrame(frame);
+      ctrlWidths.disconnect();
+      observedCtrls.clear();
+      forcedView.clear();
+      for (const page of document.querySelectorAll(`.${PAGE}`)) SE.cssVar(page, '--se-cb-ctrl-w', null);
       document
         .querySelectorAll(
           '.se-cb-art, .se-cb-icon, .se-cb-eyebrow, .se-cb-stats, .se-cb-ctrl, .se-clist, .se-cc-strip, .se-cc-badges'

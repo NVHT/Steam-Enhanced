@@ -2,11 +2,10 @@
  * Friends playing hover: tag the parts of Steam's popup over a game's friends icon in the
  * library list so features/library/friend-hover.css can draw it in the theme's style.
  *
- * FriendStatusHover / FriendStatusHoverRow live in the game-list CSS module beside
- * FriendIsPlaying, but are not in the class map. The module is found by FriendIsPlaying's
- * hash, then required for its exports (its source is parsed when requiring fails). An export
- * holds the hash and Steam's global name ("_2iiN… FriendStatusHover"); the hash is kept. The
- * result is cached on Steam's webpack require, so every window shares one lookup.
+ * Steam gives the popup and its rows global class names (FriendStatusHover /
+ * FriendStatusHoverRow) beside their hashed ones, so those are matched first. The hashed
+ * names are a fallback, read once from the game-list CSS module (found by FriendIsPlaying's
+ * hash) through SE.findModule and shared across windows on Steam's webpack require.
  *
  * Loaded in every window: Steam can draw the popup in a window of its own, where only this
  * file (and core.js) runs.
@@ -17,10 +16,10 @@
 
   /* Versioned: an older build cached the export with both class names */
   const CACHE_KEY = '__seFriendHoverClasses2';
-  const RETRY_MIN_MS = 2000;
-  const RETRY_MAX_MS = 60000;
-  const GLOBAL = { hover: 'FriendStatusHover', row: 'FriendStatusHoverRow' };
+  const GLOBAL_HOVER = '.FriendStatusHover';
+  const GLOBAL_ROW = '.FriendStatusHoverRow';
   const TOOLTIP_HOST_SELECTOR = `.${C.ToolTipCustom}, .${C.TextToolTip}`;
+  const CLIENT_CHROME = `.${C.AppIconDownloading_Container}, .${C.FocusNavigationRoot_TitleBarControls}`;
   const ATTRS = [
     'data-se-fh',
     'data-se-fh-host',
@@ -31,61 +30,33 @@
     'data-se-fh-deco',
   ];
 
-  let classes = null;
-  let lastTry = -Infinity;
-  let retryMs = RETRY_MIN_MS;
-
   /* "_2iiN7AYnLFTRFRiuipiYJz FriendStatusHover" → "_2iiN7AYnLFTRFRiuipiYJz" */
   const firstClass = value => (typeof value === 'string' ? value.trim().split(/\s+/)[0] || null : null);
 
   const readHash = (src, name) =>
     new RegExp(`\\\\?["']?\\b${name}\\\\?["']?\\s*:\\s*\\\\?["']([\\w-]+)`).exec(src)?.[1] || null;
 
-  const lookup = req => {
-    if (req[CACHE_KEY]) return req[CACHE_KEY];
-    for (const [id, factory] of Object.entries(req.m || {})) {
-      let src;
-      try {
-        src = Function.prototype.toString.call(factory);
-      } catch (_) {
-        continue;
-      }
-      if (!src.includes(C.FriendIsPlaying) && !src.includes('FriendStatusHoverRow')) continue;
-
-      let hover = null;
-      let row = null;
-      try {
-        const mod = req(id);
-        for (const exp of [mod, mod?.default]) {
-          if (typeof exp?.FriendStatusHover === 'string') {
-            hover = firstClass(exp.FriendStatusHover);
-            row = firstClass(exp.FriendStatusHoverRow);
-            break;
-          }
-        }
-      } catch (_) {}
-      hover ||= readHash(src, 'FriendStatusHover');
-      row ||= readHash(src, 'FriendStatusHoverRow');
-      if (hover && row) {
-        req[CACHE_KEY] = { hover, row };
-        return req[CACHE_KEY];
-      }
-    }
-    return null;
+  const fromModule = (src, id, req) => {
+    if (!src.includes(C.FriendIsPlaying) && !src.includes('FriendStatusHoverRow')) return null;
+    let hover = null;
+    let row = null;
+    try {
+      const mod = req(id);
+      const exp = [mod, mod?.default].find(e => typeof e?.FriendStatusHover === 'string');
+      hover = firstClass(exp?.FriendStatusHover);
+      row = firstClass(exp?.FriendStatusHoverRow);
+    } catch (_) {}
+    hover ||= readHash(src, 'FriendStatusHover');
+    row ||= readHash(src, 'FriendStatusHoverRow');
+    if (!hover || !row) return null;
+    req[CACHE_KEY] = { hover, row };
+    return req[CACHE_KEY];
   };
 
-  const resolve = () => {
-    if (classes) return classes;
-    const now = performance.now();
-    if (now - lastTry < retryMs) return null;
-    lastTry = now;
-    for (const req of SE.requires()) {
-      classes = lookup(req);
-      if (classes) return classes;
-    }
-    /* Backs off while the library's module is not loaded */
-    retryMs = Math.min(retryMs * 2, RETRY_MAX_MS);
-    return null;
+  /* Hashed classes: another window's lookup first, then one cached module scan */
+  const hashed = () => {
+    for (const req of SE.requires()) if (req[CACHE_KEY]) return req[CACHE_KEY];
+    return SE.findModule('friend-hover-classes', fromModule);
   };
 
   /* Elements that hold their own text, in document order */
@@ -120,26 +91,36 @@
 
   /* The popup has a window to itself when nothing else of the client is drawn in it */
   const ownsWindow = hover =>
-    !document.querySelector(`.${C.AppIconDownloading_Container}, .${C.FocusNavigationRoot_TitleBarControls}`) &&
-    hover.getBoundingClientRect().width >= innerWidth * 0.6;
+    !document.querySelector(CLIENT_CHROME) && hover.getBoundingClientRect().width >= innerWidth * 0.6;
 
-  const update = () => {
-    const hovers = document.body ? [...document.querySelectorAll('[data-se-fh]')] : [];
-    /* Steam also gives both elements a global class name, matched as well */
-    const cls = resolve();
-    const hoverSelector = cls ? `.${cls.hover}, .${GLOBAL.hover}` : `.${GLOBAL.hover}`;
-    const rowSelector = cls ? `.${cls.row}, .${GLOBAL.row}` : `.${GLOBAL.row}`;
-    for (const hover of document.querySelectorAll(hoverSelector)) {
-      if (!hovers.includes(hover)) hovers.push(hover);
-      SE.mark(hover, 'data-se-fh');
-      SE.mark(hover.closest(TOOLTIP_HOST_SELECTOR) || hover, 'data-se-fh-host');
-      for (const row of hover.querySelectorAll(rowSelector)) tagRow(row);
+  const findHovers = () => {
+    const found = [...document.querySelectorAll(GLOBAL_HOVER)];
+    if (found.length) return { hovers: found, row: GLOBAL_ROW };
+    /*
+     * Only scan for the hashed names where a popup can be: inside a tooltip, or in a window of
+     * its own. Context menus and toasts never pay for the scan.
+     */
+    if (!document.querySelector(TOOLTIP_HOST_SELECTOR) && document.querySelector(CLIENT_CHROME)) {
+      return { hovers: [], row: GLOBAL_ROW };
     }
-    const solo = hovers.some(hover => hover.isConnected && ownsWindow(hover));
-    SE.attr(document.documentElement, 'data-se-fh-window', solo ? '' : null);
+    const cls = hashed();
+    return cls
+      ? { hovers: [...document.querySelectorAll(`.${cls.hover}`)], row: `.${cls.row}, ${GLOBAL_ROW}` }
+      : { hovers: [], row: GLOBAL_ROW };
   };
 
-  const watcher = SE.watch(update);
+  const update = () => {
+    if (!document.body) return;
+    const { hovers, row } = findHovers();
+    for (const hover of hovers) {
+      SE.mark(hover, 'data-se-fh');
+      SE.mark(hover.closest(TOOLTIP_HOST_SELECTOR) || hover, 'data-se-fh-host');
+      for (const el of hover.querySelectorAll(row)) tagRow(el);
+    }
+    SE.attr(document.documentElement, 'data-se-fh-window', hovers.some(ownsWindow) ? '' : null);
+  };
+
+  const watcher = SE.watch(update, { throttle: 100 });
   update();
 
   window.__steamEnhancedFriendHover = {

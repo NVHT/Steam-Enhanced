@@ -222,21 +222,8 @@
   // A plain URL from a template prop (Steam passes either a URL or an element).
   const urlOf = v => (typeof v === 'string' && /^(https?:|\/|data:image\/(?!gif))/.test(v) ? v : '');
 
-  const contextGlobal = name => {
-    for (const win of SE.owners()) {
-      const v = run(() => win[name]);
-      if (v) return v;
-    }
-    return null;
-  };
-
-  const steamClient = () => {
-    for (const win of SE.owners()) {
-      const sc = run(() => win.SteamClient);
-      if (typeof sc?.Apps?.GetMyAchievementsForApp === 'function') return sc;
-    }
-    return window.SteamClient || null;
-  };
+  const steamClient = () =>
+    SE.global('SteamClient', sc => typeof sc?.Apps?.GetMyAchievementsForApp === 'function') || window.SteamClient || null;
 
   /* ---------- Reading a Steam toast ---------- */
 
@@ -318,7 +305,7 @@
 
   // The longest name of a game in your library that the text mentions.
   function appByName(text) {
-    const apps = run(() => contextGlobal('appStore')?.allApps) || [];
+    const apps = run(() => SE.appStore()?.allApps) || [];
     let best = null;
     for (const a of apps) {
       const name = a?.display_name;
@@ -405,11 +392,13 @@
     if (typeof dismiss === 'function') setTimeout(() => run(dismiss), Math.max(0, born + ms - Date.now()));
   }
 
+  const inDock = SE.inside('#se-tst');
+
   // Newly drawn toasts, seen at once (not throttled) so the duration changes before Steam reads it.
   function onEarlyMutation(records) {
     for (const r of records) {
       for (const n of r.addedNodes) {
-        if (n.nodeType !== 1 || dock?.contains(n)) continue;
+        if (n.nodeType !== 1 || inDock(n)) continue;
         holdTimer(keyOf(n));
         for (const el of n.querySelectorAll?.('*') || []) {
           const key = keyOf(el);
@@ -537,6 +526,8 @@
     const host = run(() => window.opener) || window;
     const cache = run(() => (host.__seMiniProfiles ||= new Map())) || new Map();
     if (!cache.has(accountId)) {
+      // Shared by every toast window for the session: keep the 50 most recent friends.
+      if (cache.size >= 50) cache.delete(cache.keys().next().value);
       cache.set(
         accountId,
         fetch(`https://steamcommunity.com/miniprofile/${accountId}/json`, { credentials: 'include' })
@@ -578,7 +569,7 @@
    * toast's color: the selection moves down the list, the bottom cards light in turn, friends'
    * status rings breathe, the hero panel glows, and a light passes over it all.
    */
-  const AMBIENT_HTML = (() => {
+  const AMBIENT_SVG = (() => {
     const list = [62, 44, 70, 38, 54, 48, 60].map((w, i) => `<rect class="se-tst-wf-line" x="42" y="${30 + i * 11}" width="${w}" height="2" rx="1"/>`).join('');
     const rail = [0, 1, 2, 3].map(i => `<rect class="se-tst-wf-ln${i === 0 ? ' se-tst-wf-on' : ''}" x="12" y="${14 + i * 16}" width="10" height="10" rx="3"/>`).join('');
     const cards = [0, 1, 2].map(i => `<rect class="se-tst-wf-ln se-tst-wf-card" style="--i:${i}" x="${148 + i * 57}" y="96" width="51" height="40" rx="5"/>`).join('');
@@ -594,14 +585,21 @@
       '<rect class="se-tst-wf-ln" x="40" y="12" width="86" height="10" rx="3"/>' + list +
       '<rect class="se-tst-wf-sel" x="42" y="30" width="70" height="2" rx="1"/>' +
       '<rect class="se-tst-wf-ln" x="142" y="12" width="168" height="78" rx="6"/>' +
-      '<ellipse class="se-tst-wf-glow" cx="226" cy="50" rx="44" ry="22"/>' +
+      // A soft-edged gradient rather than a blur filter, which re-rasterised every frame.
+      '<radialGradient id="se-tst-glow-ID"><stop class="se-tst-wf-glow-stop" offset="0" stop-opacity=".4"/>' +
+      '<stop class="se-tst-wf-glow-stop" offset=".45" stop-opacity=".28"/><stop class="se-tst-wf-glow-stop" offset="1" stop-opacity="0"/></radialGradient>' +
+      '<ellipse class="se-tst-wf-glow" cx="226" cy="50" rx="66" ry="44" fill="url(#se-tst-glow-ID)"/>' +
       cards + friends +
       '</svg><i class="se-tst-wf-light"></i>'
     );
   })();
+  // Each ground gets its own gradient id: url(#…) resolves to the document's first match,
+  // which would paint every layer in the first layer's colour.
+  let ambientSeq = 0;
+  const ambientHTML = () => AMBIENT_SVG.replaceAll('se-tst-glow-ID', `se-tst-glow-${++ambientSeq}`);
 
   const artURLs = m => {
-    const hero = m.appid && m.artKind !== 'ambient' ? SE.heroURLs(m.appid, contextGlobal('appStore')) : [];
+    const hero = m.appid && m.artKind !== 'ambient' ? SE.heroURLs(m.appid, SE.appStore()) : [];
     if (m.artKind === 'image' && m.shot) return [m.shot, ...hero];
     if (m.artKind === 'app' || m.artKind === 'image') return hero;
     return [];
@@ -724,10 +722,11 @@
   }
 
   let syncQueued = false;
+  let syncTimer = 0;
   function wake() {
     if (syncQueued) return;
     syncQueued = true;
-    setTimeout(sync, 0);
+    syncTimer = setTimeout(sync, 0);
   }
 
   /*
@@ -1049,7 +1048,7 @@
     const ambient = () => {
       art.replaceChildren();
       art.dataset.ambient = '';
-      art.insertAdjacentHTML('beforeend', AMBIENT_HTML);
+      art.insertAdjacentHTML('beforeend', ambientHTML());
     };
     // No game art: the avatar as a glow (friends, achievements), else the ambient ground.
     const fallback = () => {
@@ -1170,14 +1169,15 @@
     SE.attr(tray, 'data-accent', cur?.accent || null);
     const i = waiting.indexOf(cur);
     SE.attr(tray, 'data-queue', waiting.length > 1 && !h.closing ? '' : null);
-    pos.textContent = i >= 0 && waiting.length > 1 ? `${i + 1} of ${waiting.length}` : '';
+    const where = i >= 0 && waiting.length > 1 ? `${i + 1} of ${waiting.length}` : '';
+    if (pos.textContent !== where) pos.textContent = where;
     return undefined;
   }
 
   // This window stops drawing the stage (another took over, or the queue is empty).
   function teardown() {
-    cancelAnimationFrame(guardFrame);
-    guardFrame = 0;
+    placeGuard?.disconnect();
+    placeGuard = null;
     if (!dock) return;
     dock.remove();
     dock = tray = stage = strip = pos = null;
@@ -1437,17 +1437,16 @@
 
   /*
    * Steam re-stacks its toast windows whenever one comes or goes, moving the stage back to its
-   * corner. Checked every frame while the tray is up: the moment the window is off its spot the
+   * corner. Checked every 250 ms while the tray is up (and on resize): the moment the window is off its spot the
    * tray is hidden, the window is moved back, and the tray shows again. If Steam keeps winning
    * (more than FIGHTS_MAX moves in 10 s), the tray shows where Steam put it rather than vanish.
    */
   const FIGHTS_MAX = 10;
-  let guardFrame = 0;
+  let placeGuard = null;
   let fixing = false;
   let fights = [];
+  const guarding = () => isStage() && !!tray?.hasAttribute('data-show') && mover >= 0 && !!target;
   function guardPlace() {
-    guardFrame = 0;
-    if (!isStage() || !tray?.hasAttribute('data-show') || mover < 0 || !target) return;
     if (!fixing && (!landed(target) || (sizer >= 0 && !sized(target)))) {
       const now = Date.now();
       fights = fights.filter(t => now - t < 10000);
@@ -1464,10 +1463,11 @@
           });
       }
     }
-    guardFrame = requestAnimationFrame(guardPlace);
   }
   const watchPlace = () => {
-    if (!guardFrame && IN_TOAST_WINDOW) guardFrame = requestAnimationFrame(guardPlace);
+    if (!IN_TOAST_WINDOW) return;
+    placeGuard ||= SE.poll(guardPlace, 250, { active: guarding });
+    placeGuard.refresh();
   };
 
   let replaceTimer = 0;
@@ -1551,7 +1551,7 @@
     if (!document.body) return;
     const live = new Map();
     for (const el of document.body.querySelectorAll('*')) {
-      if (dock?.contains(el)) continue;
+      if (inDock(el)) continue;
       const key = keyOf(el);
       if (key !== null && !live.has(key)) live.set(key, el); // document order: the first hit is the toast's root
     }
@@ -1687,10 +1687,10 @@
     register();
     // A toast that can't be read is shown as Steam drew it, once reading it has been given up.
     setTimeout(() => unmark(root, WAIT_ATTR), ADOPT_TIMEOUT_MS + 500);
-    early = new MutationObserver(onEarlyMutation);
-    early.observe(document.body, { childList: true, subtree: true });
+    early = SE.watch(onEarlyMutation, { records: true, ignore: inDock });
     for (const el of document.body.querySelectorAll('*')) holdTimer(keyOf(el));
-    watcher = SE.watch(step, { throttle: 60, characterData: true });
+    // The dock's own drawing is ignored: render() writes to it, and must not wake scan() again.
+    watcher = SE.watch(step, { throttle: 60, characterData: true, ignore: inDock });
     // Steam can fill a toast in without a DOM mutation the observer sees (images, late props),
     // and the stage needs its housekeeping while toasts are queued.
     poller = SE.poll(step, 400, { active: busy });
@@ -1740,7 +1740,7 @@
   // What React has above the window's text: component names and prop names, level by level.
   function probe() {
     const hosts = [...document.body.querySelectorAll('*')]
-      .filter(el => !dock?.contains(el) && [...el.childNodes].some(n => n.nodeType === 3 && n.data.trim()))
+      .filter(el => !inDock(el) && [...el.childNodes].some(n => n.nodeType === 3 && n.data.trim()))
       .slice(0, 4);
     return hosts.map(el => {
       const chain = [];
@@ -1808,6 +1808,7 @@
       poller?.disconnect();
       early?.disconnect();
       clearTimeout(replaceTimer);
+      clearTimeout(syncTimer);
       removeEventListener('resize', onWindowResize);
       removeEventListener('pagehide', onPageHide);
       const h = hub();
@@ -1817,7 +1818,6 @@
       for (const el of document.querySelectorAll(`[${SRC_ATTR}]`)) unmark(el, SRC_ATTR);
       unmark(root, ON_ATTR);
       unmark(root, WAIT_ATTR);
-      cancelAnimationFrame(guardFrame);
       teardown();
       delete window.__seToasts;
     },

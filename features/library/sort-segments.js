@@ -13,7 +13,6 @@
     az: 'A–Z',
     recent: 'Recent',
     hours: 'Hours',
-    more: 'More',
   };
 
   const readSortState = host => {
@@ -106,7 +105,7 @@
     for (const seg of SEGMENTS) {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'se-sortseg-btn';
+      btn.className = 'se-seg-btn';
       btn.dataset.seg = seg.key;
       btn.textContent = COPY[seg.key];
       btn.title = state.options[seg.index].label;
@@ -122,7 +121,6 @@
 
     state.dd.parentElement.insertBefore(group, state.dd);
     host.dataset.seSortseg = '';
-    host.style.setProperty('--se-more', JSON.stringify(COPY.more));
     mountedHosts.set(host, group);
   };
 
@@ -145,6 +143,19 @@
 
   const markedReorderRows = new Set();
 
+  /* Steam's own word for "Done" (any locale), with the English one as a fallback */
+  let doneLabels = null;
+  const doneWords = () => {
+    if (doneLabels) return doneLabels;
+    doneLabels = new Set(['Done']);
+    const localize = SE.global('LocalizeString', fn => typeof fn === 'function');
+    for (const token of ['#Button_Done', '#Done']) {
+      const word = SE.run(localize, token);
+      if (typeof word === 'string' && word && word !== token) doneLabels.add(word.trim());
+    }
+    return doneLabels;
+  };
+
   const syncReorderHeader = () => {
     const headers = [...document.querySelectorAll(`.${C.ShowcaseHeader}.${C.Reordering}`)];
     for (const row of markedReorderRows) {
@@ -157,8 +168,9 @@
 
     let root = headers[0].parentElement;
     while (root && root !== document.body) {
+      const words = doneWords();
       const doneBtn = [...root.querySelectorAll('button, [role="button"], .DialogButton')].find(
-        el => el.textContent.trim() === 'Done' && !el.closest(`.${C.ShowcaseHeader}`)
+        el => words.has(el.textContent.trim()) && !el.closest(`.${C.ShowcaseHeader}`)
       );
       if (doneBtn) {
         const row = doneBtn.parentElement;
@@ -172,11 +184,9 @@
     }
   };
 
-  let frame = 0;
   let observer;
 
   const update = () => {
-    frame = 0;
     syncReorderHeader();
     for (const [host, group] of mountedHosts) {
       if (!host.isConnected || !group.isConnected) {
@@ -192,15 +202,11 @@
     }
   };
 
-  const schedule = () => {
-    if (!frame) frame = requestAnimationFrame(update);
-  };
-
   const start = () => {
     document.addEventListener('pointerdown', onTriggerPointerDown, true);
     document.addEventListener('click', onTriggerClick, true);
-    observer = SE.watch(schedule, { characterData: true, sync: true });
-    schedule();
+    observer = SE.watch(update, { characterData: true });
+    update();
   };
 
   window.__steamEnhancedSortSegments = {
@@ -209,11 +215,9 @@
       document.removeEventListener('click', onTriggerClick, true);
       closingClick = null;
       observer?.disconnect();
-      if (frame) cancelAnimationFrame(frame);
       for (const [host, group] of mountedHosts) {
         group.remove();
         delete host.dataset.seSortseg;
-        host.style.removeProperty('--se-more');
       }
       mountedHosts.clear();
       for (const row of markedReorderRows) {

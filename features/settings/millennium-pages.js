@@ -1,8 +1,9 @@
 /*
  * Millennium Settings page enhancements.
  *
- * Runs in both Millennium Settings surfaces alongside settings.js (which tags
- * [data-se-mill-page] on the active page content container):
+ * Driven by settings.js: it tags [data-se-mill-page] on the active page and calls
+ * hooks.before / hooks.after from inside its own pass, so there is no second observer.
+ * - Rows (in settings.js's pass): the theme in use, initials, the plugin table and save bar.
  * - Themes: adds an installed count + search bar, applies skin.json header_image
  *   previews, and exposes a "Theme settings" shortcut on the active theme.
  * - Plugins: adds an All / On / Off segmented filter and search input.
@@ -16,16 +17,18 @@
   ? (init) => init(window.__se)
   : (init) => addEventListener('se-core', () => init(window.__se), { once: true })
 )((SE) => {
-  const { C, run, attr: setAttr } = SE;
+  const { C, run, esc, attr: setAttr } = SE;
   window.__steamEnhancedMillPages?.destroy();
 
   const CONTENT = `.${C.PagedSettingsDialog_PageContent}`;
-  const made = new Set();
+  const ROOT = '.MillenniumSettings';
+  // Added elements carry this mark, so cleanup finds them without a Set that keeps old nodes alive.
+  const OWN = 'data-se-own';
   const make = (tag, cls, html) => {
     const el = document.createElement(tag);
     if (cls) el.className = cls;
     if (html) el.innerHTML = html;
-    made.add(el);
+    el.setAttribute(OWN, 'mill');
     return el;
   };
   const text = (el) => (el?.textContent || '').replace(/\s+/g, ' ').trim();
@@ -182,7 +185,130 @@
     });
   }
 
+  /*
+   * Rows, from inside settings.js's pass: `before` runs ahead of its card steps (and returns the
+   * page's sub-line), `after` once the cards are drawn; `api` reaches settings.js's pre-labels.
+   */
+  function isActiveTheme(field) {
+    const p = SE.fromProps(field, 6, (q) => (q.theme && 'activeTheme' in q ? q : undefined));
+    if (p) {
+      return Boolean(p.activeTheme && (p.theme?.data?.name === p.activeTheme || p.theme?.native === p.activeTheme));
+    }
+    return Boolean(field.querySelector(`.${C.FieldIcon} svg`));
+  }
+
+  const isOn = (field) => Boolean(field.querySelector(`.${C.Toggle}.${C.On}`));
+
+  function before(content, key, api) {
+    if (key === 'themes') {
+      for (const f of content.querySelectorAll(THEME)) {
+        setAttr(f, 'data-se-active', isActiveTheme(f) ? '' : null);
+        const lab = f.querySelector('.MillenniumThemes_ThemeLabel');
+        const name = text(lab?.firstChild) || text(lab);
+        const initial = name ? [...name.replace(/^[^\p{L}\p{N}]+/u, '')][0]?.toLocaleUpperCase() || null : null;
+        setAttr(f, 'data-se-initial', initial);
+        if (lab) setAttr(lab, 'data-se-initial', initial);
+        api.pre(f, null);
+      }
+      return null;
+    }
+    if (key === 'plugins') {
+      const fields = [...content.querySelectorAll(PLUGIN)];
+      if (!fields.length) return null;
+      fields.forEach((f, i) => api.pre(f, i ? null : 'Plugin'));
+      const on = fields.filter(isOn).length;
+      let bytes = 0;
+      for (const f of fields) {
+        const n = api.bytesOf(text(f.querySelector('.MillenniumPlugins_Metrics span')));
+        if (n > 0) bytes += n;
+      }
+      return `${fields.length} installed · ${on} on` + (bytes ? ` · ${api.fmtBytes(bytes)} in use` : '');
+    }
+    return null;
+  }
+
+  function pluginTable(content) {
+    content.querySelectorAll(PLUGIN).forEach((f, i) => {
+      const chips = [...f.querySelectorAll('.MillenniumPlugins_Metrics span')];
+      const mem = text(chips[0]) || '—';
+      const cpu = (text(chips[1]) || '').replace(/\s*CPU$/i, '') || '—';
+      let cells = f.querySelector(':scope > .se-pm');
+      if (!cells) {
+        cells = make('div', 'se-pm', '<span data-col="Memory"></span><span data-col="CPU"></span>');
+        cells.setAttribute('aria-hidden', 'true');
+      }
+      if (f.lastElementChild !== cells) f.appendChild(cells);
+      const [m, c] = cells.children;
+      if (m.textContent !== mem) m.textContent = mem;
+      if (c.textContent !== cpu) c.textContent = cpu;
+      setAttr(cells, 'data-head', i === 0 ? '' : null);
+      setAttr(cells, 'data-off', chips.length ? null : '');
+      setAttr(f, 'data-se-on', isOn(f) ? 'yes' : 'no');
+    });
+  }
+
+  // Millennium's own Save is hidden; this bar at the list's foot says what saving will do.
+  function saveBar(content) {
+    let bar = content.querySelector('.se-mill-save');
+    const save = content.querySelector('.MillenniumButtonsSection [data-button-type="save"]');
+    const section = save?.closest('.MillenniumButtonsSection');
+    if (!save || !section) {
+      bar?.remove();
+      return;
+    }
+    let count = 0;
+    for (let f = SE.fiber(save); f; f = f.return) {
+      const st = f.stateNode?.state;
+      if (st && Array.isArray(st.updatedPlugins)) {
+        count = st.updatedPlugins.length;
+        break;
+      }
+    }
+    if (!bar) {
+      bar = make('div', 'se-mill-save', '<span></span><button type="button">Save &amp; reload Steam</button>');
+      bar.querySelector('button').addEventListener('click', () => {
+        content.querySelector('.MillenniumButtonsSection [data-button-type="save"]')?.click();
+      });
+    }
+    const rowsList = content.querySelectorAll(PLUGIN);
+    const anchor = rowsList[rowsList.length - 1] || section;
+    if (bar.previousElementSibling !== anchor) anchor.after(bar);
+    const words =
+      count > 1
+        ? `${count} changes take effect after you save and reload Steam.`
+        : count === 1
+          ? '1 change takes effect after you save and reload Steam.'
+          : 'Your changes take effect after you save and reload Steam.';
+    const span = bar.querySelector('span');
+    if (span.textContent !== words) span.textContent = words;
+    bar.hidden = save.disabled || save.matches('.Disabled, [aria-disabled="true"]');
+  }
+
+  function after(content, key) {
+    if (key === 'plugins') {
+      pluginTable(content);
+      saveBar(content);
+    }
+    if (key === 'themes') {
+      const fields = [...content.querySelectorAll(THEME)];
+      const rest = fields.filter((f) => !f.hasAttribute('data-se-active'));
+      fields.filter((f) => f.hasAttribute('data-se-active')).forEach((f) => setAttr(f, 'data-se-c', 'f l'));
+      rest.forEach((f, i) =>
+        setAttr(f, 'data-se-c', [i === 0 && 'f', i === rest.length - 1 && 'l'].filter(Boolean).join(' ') || 'm')
+      );
+    }
+    schedule();
+  }
+
+  // Every realm Millennium's code might live in. Walking the fibers is costly and ffi() asks on
+  // each call (the Quick CSS poll every 3 s), so the list is kept for 5 s unless a window closed.
+  let realmCache = null;
+
   function realms() {
+    const now = performance.now();
+    if (realmCache && now < realmCache.until && realmCache.list.every((w) => !run(() => w.closed))) {
+      return realmCache.list;
+    }
     const out = [];
     const add = (w) => {
       if (w && !out.includes(w)) out.push(w);
@@ -203,6 +329,7 @@
         }
       }
     }
+    for (const w of run(() => bridge()?.windows?.()) || []) add(w);
     const queue = [...out, window, ...SE.owners()];
     const seen = [];
     while (queue.length && seen.length < 16) {
@@ -217,17 +344,12 @@
         } catch (_) {}
       }
     }
+    realmCache = { list: out, until: now + 5000 };
     return out;
   }
 
-  function bridge() {
-    for (const w of [window, ...SE.owners()]) {
-      try {
-        if (w.__seMillBridge) return w.__seMillBridge;
-      } catch (_) {}
-    }
-    return null;
-  }
+  // The main window's millennium-window.js hands each Millennium popup this bridge.
+  const bridge = () => SE.global('__seMillBridge');
 
   const BINDER = 'MILLENNIUM_PRIVATE_INTERNAL_FOREIGN_FUNCTION_INTERFACE_DO_NOT_USE';
 
@@ -262,11 +384,13 @@
     };
   }
 
-  const timeout = (promise, ms = 6000) =>
-    Promise.race([
-      promise,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('No answer from Millennium')), ms)),
-    ]);
+  const timeout = (promise, ms = 6000) => {
+    let timer = 0;
+    const expiry = new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error('No answer from Millennium')), ms);
+    });
+    return Promise.race([promise, expiry]).finally(() => clearTimeout(timer));
+  };
 
   async function ffi(name, args = []) {
     const tries = [];
@@ -324,8 +448,6 @@
     if (typeof fn === 'function') run(fn);
   }
 
-  const escHtml = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
-
   function highlight(css) {
     let out = '';
     let depth = 0;
@@ -333,9 +455,9 @@
     const re = /\/\*[\s\S]*?(?:\*\/|$)|"(?:\\.|[^"\\\n])*"?|'(?:\\.|[^'\\\n])*'?|[{}:;]|[^{}:;"'/]+|\//g;
     for (const [t] of css.matchAll(re)) {
       if (t.startsWith('/*')) {
-        out += `<span class="c">${escHtml(t)}</span>`;
+        out += `<span class="c">${esc(t)}</span>`;
       } else if (t[0] === '"' || t[0] === "'") {
-        out += `<span class="v">${escHtml(t)}</span>`;
+        out += `<span class="v">${esc(t)}</span>`;
       } else if (t === '{') {
         depth++;
         inValue = false;
@@ -351,7 +473,7 @@
         inValue = true;
         out += '<span class="u">:</span>';
       } else {
-        out += `<span class="${depth === 0 || t === ':' ? 's' : inValue ? 'v' : 'p'}">${escHtml(t)}</span>`;
+        out += `<span class="${depth === 0 || t === ':' ? 's' : inValue ? 'v' : 'p'}">${esc(t)}</span>`;
       }
     }
     return `${out}\n`;
@@ -496,14 +618,19 @@
 
     const sw = root.querySelector('.se-msw');
     sw.addEventListener('click', () => watchToggle()?.click());
+    // Edits made in another editor only apply while Millennium watches the file, so only then
+    // is there anything new to read back.
     const poll = SE.poll(
       () => {
         if (document.activeElement !== ta && ta.value === saved) load();
       },
       3000,
-      { active: () => root.isConnected }
+      { active: () => root.isConnected && watching() }
     );
-    addEventListener('focus', load);
+    const onFocus = () => {
+      if (root.isConnected) load();
+    };
+    addEventListener('focus', onFocus);
     load();
 
     return {
@@ -515,13 +642,14 @@
       destroy() {
         poll?.disconnect?.();
         clearTimeout(saveTimer);
-        removeEventListener('focus', load);
+        removeEventListener('focus', onFocus);
       },
     };
   }
 
   const watchToggle = () =>
     document.querySelector(`${CONTENT}[data-se-mill-page="quickcss"] .DialogBody .${C.Toggle}`);
+  const watching = () => Boolean(watchToggle()?.classList.contains(C.On));
   const openWindowButton = () =>
     [...document.querySelectorAll(`${CONTENT}[data-se-mill-page="quickcss"] .DialogBody .DialogButton:not(.se-qc-open)`)].pop();
 
@@ -544,22 +672,30 @@
     if (open.parentElement !== body) body.append(open);
 
     const toggle = watchToggle();
-    const on = Boolean(toggle?.classList.contains(C.On));
+    const on = watching();
     setAttr(qc.sw, 'aria-checked', on ? 'true' : 'false');
     setAttr(qc.sw, 'data-on', on ? '' : null);
     setAttr(qc.sw.parentElement, 'hidden', toggle ? null : '');
-    fill(qc.root, content);
+    fillHeight(qc.root, content, '--se-fill-h', 260);
   }
 
-  function fill(el, content) {
+  // Sizes `el` (through the custom property `name`) to reach the page's bottom padding, minus
+  // `reserve` px for what sits under it. Runs in the rAF pass, after settings.js's writes.
+  function fillHeight(el, content, name, min, reserve = 0) {
     const box = content.getBoundingClientRect();
     const foot =
       Math.min(box.top + content.clientTop + content.clientHeight, innerHeight) -
       (parseFloat(getComputedStyle(content).paddingBottom) || 0);
-    const h = `${Math.max(260, Math.floor(foot - el.getBoundingClientRect().top + (content.scrollTop || 0)))}px`;
-    if (el.style.getPropertyValue('--se-fill-h') !== h) {
-      el.style.setProperty('--se-fill-h', h);
-    }
+    const h = Math.max(min, Math.floor(foot - reserve - el.getBoundingClientRect().top + (content.scrollTop || 0)));
+    SE.cssVar(el, name, `${h}px`);
+  }
+
+  // The open log reaches the bottom of the window, above its line-count foot.
+  function logsHeight(content) {
+    const textEl = content.querySelector('.MillenniumLogs_Text');
+    if (!textEl) return;
+    const foot = textEl.parentElement?.querySelector(':scope > .se-logs-foot');
+    fillHeight(textEl, content, '--se-logs-h', 240, Math.max(0, (foot?.offsetHeight || 0) - 14) + 2);
   }
 
   function logViewer(content) {
@@ -679,7 +815,7 @@
     if (!foot) foot = make('div', 'se-logs-foot');
     if (box.lastElementChild !== foot) box.append(foot);
 
-    const n = (st.searchQuery ? st.searchedLogs : st.selectedLog.logs)?.length || 0;
+    const n = (st.searchQuery ? st.searchedLogs : st.selectedLog?.logs)?.length || 0;
     const words = `${n.toLocaleString()} ${n === 1 ? 'line' : 'lines'}`;
     if (foot.textContent !== words) foot.textContent = words;
   }
@@ -715,92 +851,105 @@
     );
   }
 
-  const OWN = {
+  // What each page adds, removed when the window moves to another page.
+  const PAGE_OWN = {
     themes: '.se-mtool[data-for="themes"], .se-theme-settings',
-    plugins: '.se-mtool[data-for="plugins"]',
+    plugins: '.se-mtool[data-for="plugins"], .se-pm, .se-mill-save',
     quickcss: '.se-qc, .se-qc-open',
     logs: '.se-logs-src, .se-logs-level, .se-logs-foot, .se-logs-empty',
   };
-  const MARKS = {
+  const PAGE_MARKS = {
+    themes: ['data-se-active', 'data-se-initial', 'data-se-hide', 'data-se-thumb'],
+    plugins: ['data-se-on', 'data-se-hide'],
     quickcss: ['data-se-qc'],
-    general: ['data-se-general'],
-    logs: ['data-se-level', 'data-se-lock'],
+    general: ['data-se-general', 'data-se-about'],
+    logs: ['data-se-level'],
   };
+  const PAGE_VARS = { themes: ['--se-thumb'], logs: ['--se-logs-h'] };
+  const ALL_MARKS = [...new Set(Object.values(PAGE_MARKS).flat())];
+
+  // data-se-lock sits on the page's scrolling ancestors, which may be outside .MillenniumSettings.
+  function unlock() {
+    document.querySelectorAll('[data-se-lock]').forEach((el) => el.removeAttribute('data-se-lock'));
+  }
+
+  function leave(key, root) {
+    if (!key) return;
+    if (key === 'quickcss' && qc) {
+      qc.destroy();
+      qc = null;
+    }
+    if (key === 'logs') unlock();
+    const scope = root || document;
+    if (PAGE_OWN[key]) scope.querySelectorAll(PAGE_OWN[key]).forEach((el) => el.remove());
+    const marks = PAGE_MARKS[key] || [];
+    const vars = PAGE_VARS[key] || [];
+    if (!marks.length) return;
+    for (const el of scope.querySelectorAll(marks.map((m) => `[${m}]`).join(','))) {
+      for (const m of marks) el.removeAttribute(m);
+      for (const v of vars) el.style.removeProperty(v);
+    }
+  }
 
   let frame = 0;
-  let observer = null;
   let lastKey = null;
 
   function update() {
     frame = 0;
-    const content = document.querySelector(`.MillenniumSettings ${CONTENT}[data-se-mill-page]`);
+    const content = document.querySelector(`${ROOT} ${CONTENT}[data-se-mill-page]`);
     const key = content?.getAttribute('data-se-mill-page') || null;
     if (key !== lastKey) {
+      leave(lastKey, content?.closest(ROOT));
       lastKey = key;
       themeQuery = '';
       pluginQuery = '';
       pluginMode = 'all';
       logLevel = 'all';
-      if (key !== 'quickcss' && qc) {
-        qc.destroy();
-        qc.root.remove();
-        qc = null;
-      }
-    }
-    for (const [page, sel] of Object.entries(OWN)) {
-      if (page !== key) document.querySelectorAll(sel).forEach((el) => el.remove());
-    }
-    for (const [page, attrs] of Object.entries(MARKS)) {
-      if (page !== key) {
-        for (const attr of attrs) {
-          document.querySelectorAll(`[${attr}]`).forEach((el) => el.removeAttribute(attr));
-        }
-      }
     }
     if (!content) return;
-    const steps = { themes, plugins, quickcss: quickCss, logs, general, updates }[key];
+    const step = { themes, plugins, quickcss: quickCss, logs, general, updates }[key];
     try {
-      steps?.(content);
+      step?.(content);
+      if (key === 'logs') logsHeight(content);
     } catch (e) {
       console.warn('[Steam Enhanced] Millennium page:', key, e);
     }
-    observer?.takeRecords();
   }
 
   function schedule() {
     if (!frame) frame = requestAnimationFrame(update);
   }
 
+  // Millennium's own Quick CSS editor window: tag <html> instead of an html:has() rule that every
+  // window would evaluate on every change. A live collection makes the check a length read.
+  const editors = document.getElementsByClassName('MillenniumQuickCss_CodeEditor');
+  const tagEditor = () => setAttr(document.documentElement, 'data-se-qce', editors.length ? '' : null);
+  let editorWatch = null;
+
   function start() {
-    observer = SE.watch(schedule, { attributes: ['class', 'data-se-mill-page', 'data-se-on'] });
+    tagEditor();
+    editorWatch = SE.watch(tagEditor, { throttle: 250 });
     addEventListener('resize', schedule);
     schedule();
   }
 
   window.__steamEnhancedMillPages = {
+    hooks: { before, after },
     destroy() {
-      observer?.disconnect();
+      editorWatch?.disconnect();
       if (frame) cancelAnimationFrame(frame);
       qc?.destroy();
       qc = null;
-      for (const el of made) el.remove();
-      document
-        .querySelectorAll(
-          '[data-se-hide], [data-se-thumb], [data-se-about], [data-se-general], [data-se-qc], [data-se-level], [data-se-lock]'
-        )
-        .forEach((el) => {
-          for (const a of [
-            'data-se-hide',
-            'data-se-thumb',
-            'data-se-about',
-            'data-se-general',
-            'data-se-qc',
-            'data-se-level',
-            'data-se-lock',
-          ]) {
-            el.removeAttribute(a);
-          }
-        });
+      document.querySelectorAll(`[${OWN}="mill"]`).forEach((el) => el.remove());
+      const sel = ALL_MARKS.map((m) => `[${m}]`).join(',');
+      for (const root of document.querySelectorAll(ROOT)) {
+        for (const el of root.querySelectorAll(sel)) {
+          for (const m of ALL_MARKS) el.removeAttribute(m);
+          for (const v of Object.values(PAGE_VARS).flat()) el.style.removeProperty(v);
+        }
+      }
+      unlock();
+      document.documentElement.removeAttribute('data-se-qce');
       removeEventListener('resize', schedule);
       delete window.__steamEnhancedMillPages;
     },

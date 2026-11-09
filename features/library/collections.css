@@ -9,6 +9,10 @@
 [data-se-cpage] {
   --se-cb-h: 250px;
   --se-cb-pad: 34px;
+  /* Metacritic's own score colors (tokens.css has none yet) */
+  --se-mc-good: #00ce7a;
+  --se-mc-mixed: #ffbd3f;
+  --se-mc-bad: #ff6874;
 }
 
 ._2q70uOe6xM3-c5XIVfBLe6[data-se-cpage]:not(#se-none) {
@@ -84,7 +88,7 @@
   bottom: 22px;
   width: 86px;
   height: 86px;
-  border-radius: 18px;
+  border-radius: var(--se-radius-xl, 18px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -218,49 +222,12 @@
   padding-top: 8px;
 }
 
-/* Segmented controls (view switch, Your collections' sort), like the sort bar */
-.se-seg {
-  display: inline-flex;
-  gap: 2px;
-  padding: 2px;
-  border-radius: var(--se-radius-md, 10px);
-  background: var(--se-surface, #1f242b);
-  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
-}
-
-.se-seg-btn {
-  height: 30px;
-  min-width: 34px;
-  padding: 0 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  border: 0;
-  border-radius: var(--se-radius-sm, 8px);
-  background: transparent;
-  color: var(--se-text-muted, #98a2ad);
-  font: 600 12.5px/1 var(--se-font, "Motiva Sans"), sans-serif;
-  cursor: pointer;
-  transition: background .15s, color .15s;
-}
-
-.se-seg-btn:hover {
-  background: rgba(255, 255, 255, .05);
-  color: var(--se-text, #e6e8eb);
-}
-
-.se-seg-btn[aria-checked="true"] {
-  background: var(--se-selected, #33404f);
-  color: var(--se-text-strong, #fff);
-  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, .5);
-}
-
-.se-seg-btn:focus-visible,
+/* Segmented controls (.se-seg: view switch, Your collections' sort): features/library/sort-segments.css */
 .se-cb-new:focus-visible,
-.se-cl-btn:focus-visible {
-  outline: 2px solid var(--se-accent, #7cc4ff);
-  outline-offset: 1px;
+.se-cl-btn:focus-visible,
+.se-clist-row:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-cb-filter {
@@ -379,7 +346,7 @@
   box-sizing: border-box;
   height: 20px;
   padding: 0 8px;
-  border-radius: 999px;
+  border-radius: var(--se-radius-pill, 999px);
   /* No backdrop blur: drawn once per cover, a blur each made shelves scroll heavily */
   background: var(--se-chip-hover, rgba(12, 14, 18, .75));
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
@@ -391,7 +358,7 @@
  * Friends playing: the theme's pill (features/library/library.css), here in the card's corner; native
  * pill at the cover's foot would sit under the strip
  */
-[data-se-cpage="collection"] .WYgDg9NyCcMIVuMyZ_NBC:has(> .se-cc-badges) ._3dncOt2dhpnFYQn-WYQ3Mb._1To_QGbZaU8E2oNA55J2Ye {
+[data-se-cpage="collection"] .WYgDg9NyCcMIVuMyZ_NBC._3ANruIVwRSgaU7L1eWRnf8 ._3dncOt2dhpnFYQn-WYQ3Mb._1To_QGbZaU8E2oNA55J2Ye {
   display: none !important;
 }
 
@@ -407,7 +374,7 @@
 .se-cl-mc {
   min-width: 26px;
   padding: 0 6px;
-  border-radius: 999px;
+  border-radius: var(--se-radius-pill, 999px);
   box-sizing: border-box;
   text-align: center;
   font: 800 11.5px/18px var(--se-font, "Motiva Sans"), sans-serif;
@@ -415,15 +382,15 @@
 }
 
 :is(.se-cc-hours, .se-cl-mc)[data-mc="good"] {
-  background: #00ce7a;
+  background: var(--se-mc-good);
 }
 
 :is(.se-cc-hours, .se-cl-mc)[data-mc="mixed"] {
-  background: #ffbd3f;
+  background: var(--se-mc-mixed);
 }
 
 :is(.se-cc-hours, .se-cl-mc)[data-mc="bad"] {
-  background: #ff6874;
+  background: var(--se-mc-bad);
 }
 
 .se-cl-mc {
@@ -432,7 +399,7 @@
 
 /* The cover's Install / Play button sits above the strip */
 [data-se-cpage="collection"] :is(._8YrRmy_c6O0FCxFT8gjqo, ._3AjoLnMNKxYmNTGTJCLfgs)[data-se-cover-btn]:not(#se-none) {
-  bottom: calc(var(--se-cb, 0px) + 46px) !important;
+  bottom: 46px !important;
 }
 
 /* Grid: Your collections' tiles as cards */
@@ -443,7 +410,7 @@
 }
 
 ._3IWn-2rn7x98o5fDd0rAxb:not(._2_dwxMdH27kBf-gQ3Wrk7z):not(#se-none):is(:hover, :focus) {
-  box-shadow: 0 0 0 2px var(--se-accent, #7cc4ff), 0 18px 30px -12px rgba(0, 0, 0, .85);
+  box-shadow: var(--se-shadow-ring);
 }
 
 ._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5:not(#se-none) {
@@ -504,12 +471,12 @@
   width: 33%;
   margin: 0;
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--se-radius-sm, 8px);
   overflow: hidden;
   filter: none;
   transform-origin: 50% 120%;
   box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .9), 0 0 0 1px rgba(255, 255, 255, .08);
-  transition: transform .2s ease;
+  transition: transform var(--se-dur-slow, .25s) var(--se-ease);
 }
 
 ._3IWn-2rn7x98o5fDd0rAxb ._2zbkblS0wKex2zlrf1kmkQ:nth-child(n+4) {
@@ -635,7 +602,7 @@
   bottom: auto;
   right: 8px;
   border-radius: var(--se-radius-xs, 4px);
-  background-color: rgba(12, 14, 18, .72);
+  background-color: var(--se-chip-hover, rgba(12, 14, 18, .75));
 }
 
 /* New collection */
@@ -719,7 +686,7 @@
   padding-bottom: 8px;
   border-top: 1px solid var(--se-hairline, rgba(255, 255, 255, .06));
   cursor: pointer;
-  transition: background .12s;
+  transition: background var(--se-dur, .15s) ease-out;
 }
 
 .se-clist-row:hover {
@@ -842,7 +809,7 @@
   width: 36px;
   height: 52px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: var(--se-radius-sm, 8px);
 }
 
 .se-clist-row[data-installed="false"] .se-cl-cover {
@@ -891,14 +858,14 @@
 
 .se-cl-btn.se-cl-play {
   background: var(--se-play, #3a8a22);
-  color: #fff;
+  color: var(--se-text-strong, #fff);
 }
 
 .se-cl-btn.se-cl-play:hover {
-  background: #46a02a;
+  background: var(--se-play-hover, #44a028);
 }
 
 /* Match the Library cover hover ring in collection game grids. */
 .WYgDg9NyCcMIVuMyZ_NBC._3ANruIVwRSgaU7L1eWRnf8:is(:hover, ._2YsY_x7hLyKlUqjX9bhn0R) {
-  box-shadow: 0 0 0 2px var(--se-accent, #7cc4ff), 0 18px 30px -12px rgba(0, 0, 0, .85) !important;
+  box-shadow: var(--se-shadow-ring) !important;
 }

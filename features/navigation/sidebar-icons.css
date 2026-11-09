@@ -1,20 +1,26 @@
 /*
- * Classic sidebar 7-button toolbar and game list row base styles.
- *
- * Distributes Home, Collections, Games, Search, Recent, Ready to Play, and
- * Filters across a single toolbar row and defines base inset pill styling for
- * virtualized game list entries. Paired with
- * `features/navigation/sidebar-icons.js`.
+ * Classic sidebar 7-button toolbar: Home, Collections, Games, Search, Recent, Ready to Play
+ * and Filters across a single row (features/navigation/sidebar-icons.js). Each slot is
+ * (available width - six 6 px gaps) / seven. The game list's rows and headers are styled by
+ * features/library/game-list.css.
  */
 .se-sidebar-icons {
   position: relative;
   box-sizing: border-box;
+  padding-top: 48px;
 }
 
+.se-sidebar-tip {
+  position: relative;
+}
+
+/* Home and Collections: slots 1-2 */
 .se-sidebar-icons ._2TKEazUUS3TlniZfpc8OOe {
   position: absolute;
   top: 6px;
   left: 6px;
+  width: calc((100% - 48px) * 2 / 7 + 6px) !important;
+  height: 36px !important;
   padding: 0;
   background: none;
   box-shadow: none;
@@ -29,17 +35,11 @@
 
 .se-sidebar-icons ._2TKEazUUS3TlniZfpc8OOe a {
   width: 100%;
-  height: 32px;
-  min-height: 32px;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-image: none;
 }
 
-.se-sidebar-icons ._3AhYljPF4e4E8LaBt-FoY0 a > div:not(:first-child) {
+.se-sidebar-icons ._3AhYljPF4e4E8LaBt-FoY0 a > div:not(:first-child),
+.se-sidebar-icons ._3AhYljPF4e4E8LaBt-FoY0 ._1ooROmAgkhoBH_o65yl9dJ,
+.se-sidebar-icons .uE7Pj4tb2n3_Bx4vjEX0a {
   display: none;
 }
 
@@ -50,217 +50,44 @@
   min-height: 0;
 }
 
+/* Games picker: slot 3 */
 .se-sidebar-icons ._2WgQEFvIzJw_SHNGbjtRFU {
   position: absolute;
   top: 6px;
   left: calc(6px + (100% - 6px) * 2 / 7);
   width: calc((100% - 48px) / 7);
-  height: 32px;
+  height: 36px !important;
 }
 
 .se-sidebar-icons ._2PF_m-I5yte3WnQhpcz8RC {
   position: relative;
   width: 100%;
-  padding: 0;
-  justify-content: center;
 }
 
 .se-sidebar-icons ._2PF_m-I5yte3WnQhpcz8RC > * {
   display: none;
 }
 
-.se-sidebar-icons ._2PF_m-I5yte3WnQhpcz8RC::before,
-.se-sidebar-icons .se-sidebar-search::before {
-  content: '';
-  width: 14px;
-  height: 14px;
-  background: currentColor;
-  -webkit-mask: var(--se-sidebar-icon) center / contain no-repeat;
+.se-sidebar-icons ._2PF_m-I5yte3WnQhpcz8RC > .se-header-tooltip-host {
+  display: block;
 }
 
-.se-sidebar-icons .uE7Pj4tb2n3_Bx4vjEX0a {
-  display: none;
-}
-
-.se-sidebar-icons ._36r2az6roul_Oej7D4BMI6 {
-  position: absolute;
-  top: 6px;
-  left: calc(6px + (100% - 6px) * 4 / 7);
-  width: calc((100% - 48px) * 2 / 7 + 6px);
-  height: 32px;
-  margin: 0;
-}
-
-.se-sidebar-icons ._3mzKdQXht__YHo6PX1LmB6 {
-  height: 32px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Preserve the extra native platform filter on Linux/macOS within its slot. */
-.se-sidebar-icons ._3mzKdQXht__YHo6PX1LmB6 svg {
-  width: 14px;
-  height: 14px;
-  transform: none;
-  margin: 0;
-}
-
-.se-sidebar-icons ._20QAC4WMXm8qFE8waUT5oo {
-  margin: 0 6px;
-  padding: 0;
-  min-height: 0;
-  height: 0;
-  overflow: visible;
-  background: none;
-}
-
-.se-sidebar-icons ._12vo5L1hsNGdao6_ssuirS {
-  display: none;
-}
-
-.se-sidebar-icons.se-sidebar-search-open ._20QAC4WMXm8qFE8waUT5oo {
-  height: 38px;
-  min-height: 38px;
-}
-
-.se-sidebar-icons.se-sidebar-search-open ._12vo5L1hsNGdao6_ssuirS {
-  display: flex;
-}
-
-.se-sidebar-icons .vCCmYvn9yQ_V8CpKupllU {
-  position: static;
-  width: 0;
-  min-width: 0;
-}
-
-.se-sidebar-icons ._1TxHdzOt3OD9ikR3xIseKe {
-  position: absolute;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  padding: 0;
-}
-
-.se-sidebar-icons ._1TxHdzOt3OD9ikR3xIseKe svg {
-  width: 14px;
-  height: 14px;
-}
-
+/* Search: slot 4 */
 .se-sidebar-icons .se-sidebar-search {
   position: absolute;
   top: 6px;
   left: calc(6px + (100% - 6px) * 3 / 7);
   width: calc((100% - 48px) / 7);
-  height: 32px;
-  padding: 0;
-  border: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.se-sidebar-icons :is(._2TKEazUUS3TlniZfpc8OOe a, ._2PF_m-I5yte3WnQhpcz8RC, ._3mzKdQXht__YHo6PX1LmB6, ._1TxHdzOt3OD9ikR3xIseKe, .se-sidebar-search) {
-  background-color: var(--se-surface-2, #262c35);
-  box-sizing: border-box;
-}
-
-.se-sidebar-icons :is(._2TKEazUUS3TlniZfpc8OOe a, ._2PF_m-I5yte3WnQhpcz8RC, ._3mzKdQXht__YHo6PX1LmB6, ._1TxHdzOt3OD9ikR3xIseKe, .se-sidebar-search):hover {
-  background-color: var(--se-hover, #2c3440);
-}
-
-.se-sidebar-icons ._1QFFkxM5hw-43miIiylbwq,
-.se-sidebar-icons .se-sidebar-search[aria-expanded=true] {
-  color: var(--se-accent, #7cc4ff);
-  background-color: var(--se-accent-surface, #24384b);
-}
-
-.se-sidebar-tip {
-  position: relative;
-}
-
-.se-sidebar-icons ._3pSPluBgf0NeR1kkCLWMhR.eNLOx4LVceeMwRvTVWh3 {
-  color: var(--se-accent, #7cc4ff);
-  background: var(--se-accent-surface, #24384b);
-}
-
-.se-sidebar-icons ._1ooROmAgkhoBH_o65yl9dJ {
-  width: 14px;
-  height: 14px;
-  margin: 0;
-  padding: 0;
-}
-
-.se-sidebar-icons ._1ooROmAgkhoBH_o65yl9dJ svg {
-  width: 14px;
-  height: 14px;
-}
-
-.se-sidebar-icons .nC-pL16iUnIRcaj1UVnwq {
-  width: 14px;
-  height: 14px;
-  padding: 0;
-  margin: 0;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2px;
-}
-
-.se-sidebar-icons ._2tyaVs9BpqcW068aaOrO56 {
-  width: 6px;
-  height: 6px;
-  margin: 0;
-  background: currentColor;
-}
-
-.se-sidebar-icons .xeuK3OqQYpIbPs1mCIS0k {
-  height: 32px;
-}
-
-.se-sidebar-icons ._2PF_m-I5yte3WnQhpcz8RC > .se-header-tooltip-host {
-  display: block;
-}
-
-.se-sidebar-icons ._3AhYljPF4e4E8LaBt-FoY0 ._1ooROmAgkhoBH_o65yl9dJ {
-  display: none;
-}
-
-.se-sidebar-icons .nC-pL16iUnIRcaj1UVnwq {
-  grid-template-rows: repeat(2, 1fr);
-}
-
-/* Native Steam control rules require these explicit dimensions and states. */
-.se-sidebar-icons {
-  padding-top: 48px;
-}
-
-.se-sidebar-icons ._2TKEazUUS3TlniZfpc8OOe {
-  width: calc((100% - 48px) * 2 / 7 + 6px) !important;
+/* Recent and Ready to play: slots 5-6 */
+.se-sidebar-icons ._36r2az6roul_Oej7D4BMI6 {
+  position: absolute;
+  top: 6px;
+  left: calc(6px + (100% - 6px) * 4 / 7);
+  width: calc((100% - 48px) * 2 / 7 + 6px);
   height: 36px !important;
-}
-
-.se-sidebar-icons :is(._2TKEazUUS3TlniZfpc8OOe a, ._2PF_m-I5yte3WnQhpcz8RC, ._3mzKdQXht__YHo6PX1LmB6, ._1TxHdzOt3OD9ikR3xIseKe, .se-sidebar-search) {
-  height: 36px !important;
-  min-height: 36px !important;
-  max-height: 36px !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: var(--se-surface-2, #262c35) !important;
-  color: var(--se-text-dim, #b8c0c8);
-  border-radius: var(--se-radius-sm, 8px) !important;
-  transition: background-color .15s ease, color .15s ease;
-}
-
-.se-sidebar-icons ._2WgQEFvIzJw_SHNGbjtRFU,
-.se-sidebar-icons ._36r2az6roul_Oej7D4BMI6,
-.se-sidebar-icons .xeuK3OqQYpIbPs1mCIS0k {
-  height: 36px !important;
+  margin: 0;
 }
 
 .se-sidebar-icons ._1PgAonvorr0o_NMxNKiDFU {
@@ -276,6 +103,36 @@
   max-width: none !important;
 }
 
+/*
+ * Filters: slot 7. It uses the search container as its containing block (12 px narrower),
+ * so it is placed from that box's right edge.
+ */
+.se-sidebar-icons ._1TxHdzOt3OD9ikR3xIseKe {
+  position: absolute;
+  top: -42px !important;
+  right: 0 !important;
+  width: calc((100% - 36px) / 7) !important;
+}
+
+.se-sidebar-icons .xeuK3OqQYpIbPs1mCIS0k {
+  height: 36px !important;
+}
+
+/* The search row: collapsed until the Search slot opens it */
+.se-sidebar-icons ._20QAC4WMXm8qFE8waUT5oo {
+  margin: 0 6px;
+  padding: 0;
+  min-height: 0;
+  height: 0;
+  overflow: visible;
+  background: none;
+}
+
+.se-sidebar-icons.se-sidebar-search-open ._20QAC4WMXm8qFE8waUT5oo {
+  height: 38px;
+  min-height: 38px;
+}
+
 .se-sidebar-icons ._20QAC4WMXm8qFE8waUT5oo ._12vo5L1hsNGdao6_ssuirS {
   display: none !important;
 }
@@ -284,8 +141,28 @@
   display: flex !important;
 }
 
-.se-sidebar-icons ._1TxHdzOt3OD9ikR3xIseKe {
-  top: -42px !important;
+.se-sidebar-icons .vCCmYvn9yQ_V8CpKupllU {
+  position: static;
+  width: 0;
+  min-width: 0;
+}
+
+/* Every slot: one tile with a 16 px duotone icon (--se-sidebar-icon) in place of Steam's */
+.se-sidebar-icons :is(._2TKEazUUS3TlniZfpc8OOe a, ._2PF_m-I5yte3WnQhpcz8RC, ._3mzKdQXht__YHo6PX1LmB6, ._1TxHdzOt3OD9ikR3xIseKe, .se-sidebar-search) {
+  box-sizing: border-box;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--se-surface-2, #262c35) !important;
+  color: var(--se-text-dim, #b8c0c8);
+  border-radius: var(--se-radius-sm, 8px) !important;
+  transition: background-color var(--se-dur, .15s) ease-out, color var(--se-dur, .15s) ease-out;
 }
 
 .se-sidebar-icons :is(._2TKEazUUS3TlniZfpc8OOe a, ._2PF_m-I5yte3WnQhpcz8RC, ._3mzKdQXht__YHo6PX1LmB6, ._1TxHdzOt3OD9ikR3xIseKe, .se-sidebar-search):hover {
@@ -293,7 +170,13 @@
   color: var(--se-text-strong, #fff);
 }
 
-.se-sidebar-icons :is(a.eNLOx4LVceeMwRvTVWh3, ._3mzKdQXht__YHo6PX1LmB6._1QFFkxM5hw-43miIiylbwq, ._1TxHdzOt3OD9ikR3xIseKe._2rILnoW6swWh4_9TDWWc31, .se-sidebar-search[aria-expanded=true]) {
+.se-sidebar-icons .se-sidebar-search:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-sidebar-icons :is(a.eNLOx4LVceeMwRvTVWh3, ._3mzKdQXht__YHo6PX1LmB6._1QFFkxM5hw-43miIiylbwq, ._1TxHdzOt3OD9ikR3xIseKe._2rILnoW6swWh4_9TDWWc31, .se-sidebar-search[aria-expanded=true]),
+.se-sidebar-icons ._3pSPluBgf0NeR1kkCLWMhR.eNLOx4LVceeMwRvTVWh3 {
   background: var(--se-accent-surface, #24384b) !important;
   color: var(--se-accent, #7cc4ff) !important;
 }
@@ -311,6 +194,17 @@
 .se-sidebar-icons :is(._2TKEazUUS3TlniZfpc8OOe a, ._3mzKdQXht__YHo6PX1LmB6, ._1TxHdzOt3OD9ikR3xIseKe) svg,
 .se-sidebar-icons .nC-pL16iUnIRcaj1UVnwq {
   display: none !important;
+}
+
+.se-sidebar-icons ._1ooROmAgkhoBH_o65yl9dJ,
+.se-sidebar-icons ._1ooROmAgkhoBH_o65yl9dJ svg {
+  width: 14px;
+  height: 14px;
+}
+
+.se-sidebar-icons ._1ooROmAgkhoBH_o65yl9dJ {
+  margin: 0;
+  padding: 0;
 }
 
 .se-sidebar-icons ._3AhYljPF4e4E8LaBt-FoY0 a {
@@ -349,15 +243,6 @@
 }
 
 /*
- * The last control uses the search container as its containing block (12px narrower).
- * All seven boxes use (available width - six gaps) / seven.
- */
-.se-sidebar-icons ._1TxHdzOt3OD9ikR3xIseKe {
-  width: calc((100% - 36px) / 7) !important;
-  right: 0 !important;
-}
-
-/*
  * The native Games picker requests bMatchWidth against its now-compact trigger.
  * This class is specific to that picker, including when rendered in a portal.
  */
@@ -383,138 +268,8 @@
   overflow: auto;
 }
 
-/*
- * Library game list
- * Rows keep Steam's heights (the list is virtualized and positions rows itself);
- * only corners, icons and the collection headers change.
- */
-.GameListEntryContainer {
-  border-radius: var(--se-radius-sm, 8px);
-}
-
-.GameListEntryContainer > * {
-  border-radius: inherit;
-}
-
-.GameListEntryContainer img {
-  border-radius: var(--se-radius-xs, 4px);
-}
-
-/* Collection headers: tracked uppercase label, count as a badge. */
-.SectionHeaderContent {
-  font-weight: 700;
-  letter-spacing: .08em;
-}
-
-.SectionHeaderContent [data-se-count] {
-  font-size: 0 !important;
-}
-
-.SectionHeaderContent [data-se-count]::after {
-  content: attr(data-se-count);
-  display: inline-block;
-  padding: 0 7px;
-  border-radius: 999px;
-  background: var(--se-surface-2, #262c35);
-  color: var(--se-text-dim, #b8c0c8);
-  font-size: 10.5px;
-  font-weight: 700;
-  line-height: 17px;
-  letter-spacing: 0;
-  vertical-align: 1px;
-}
-
-/*
- * Row states. Steam marks them on the game row's.Container, which also carries
- * Installed or Uninstalled (a downloading or queued game carries Updating instead); those
- * classes are what identify a game row, so the
- * rules hold wherever.GameListEntryContainer sits relative to it.
- */
-.Container:is(.Installed, .Uninstalled, .Updating, .Running):hover:not(.Selected) {
-  background-color: var(--se-hover, #2c3440) !important;
-}
-
-.Container:is(.Installed, .Uninstalled, .Updating, .Running).Selected {
-  background-color: var(--se-selected, #33404f) !important;
-  background-image: none !important;
-  color: var(--se-text-strong, #fff) !important;
-  font-weight: 600;
-}
-
-.Container:is(.Installed, .Uninstalled, .Updating, .Running).Selected *:not(.DownloadProgress) {
-  color: var(--se-text-strong, #fff) !important;
-}
-
-.Container.Uninstalled img {
-  opacity: .55;
-}
-
-/*
- * Collection header rows (.Container.CollapseIconParent): same shape and fills as
- * game rows, replacing Steam's bright square bar on the selected collection.
- */
-.Container.CollapseIconParent:hover:not(.Selected) {
-  background-color: var(--se-hover, #2c3440) !important;
-}
-
-.Container.CollapseIconParent.Selected {
-  background-color: var(--se-selected, #33404f) !important;
-  background-image: none !important;
-  color: var(--se-text-strong, #fff) !important;
-}
-
-.Container.CollapseIconParent.Selected .SectionHeaderContent {
-  color: var(--se-text-strong, #fff) !important;
-}
-
-.Container.CollapseIconParent.Selected [data-se-count]::after {
-  background: rgba(255, 255, 255, .14);
-  color: var(--se-text-strong, #fff);
-}
-
-/*
- * Sidebar row surface and inset pill highlights.
- * Preserves native virtualized row height offsets while applying a transparent
- * horizontal border with `background-clip: padding-box` for inset selection pills.
- */
+/* The list column's surface */
 ._3x1HklzyDs4TEjACrRO2tB {
   background: var(--se-sidebar, #1d2128) !important;
   background-image: none !important;
-}
-
-/* A transparent side border insets the fill without changing the row's width. */
-.Container:is(.Installed, .Uninstalled, .Updating, .Running),
-.Container.CollapseIconParent {
-  box-sizing: border-box !important;
-  border-inline: 6px solid transparent !important;
-  background-clip: padding-box !important;
-  /* Measured from the border's outer edge, so the visible fill keeps --se-radius-sm */
-  border-radius: calc(var(--se-radius-sm, 8px) + 6px) !important;
-}
-
-.Container:is(.Installed, .Uninstalled, .Updating, .Running) img {
-  width: 18px !important;
-  height: 18px !important;
-  border-radius: var(--se-radius-xs, 4px);
-  object-fit: cover;
-}
-
-.Container.Installed:not(.Selected) {
-  color: var(--se-text, #e6e8eb);
-}
-
-.SectionHeaderContent {
-  display: flex !important;
-  align-items: center;
-  flex: 1 1 auto;
-  min-width: 0;
-  padding-inline-end: 4px;
-}
-
-.SectionHeaderContent [data-se-count]::after {
-  margin-inline-start: 0;
-}
-
-.SectionHeaderContent [data-se-count] {
-  margin-inline-start: auto !important;
 }

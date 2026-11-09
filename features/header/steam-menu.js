@@ -34,9 +34,8 @@
   let originalCreate;
   let wrappedCreate;
   let timer;
-  let popupTimer;
+  let popupPoll;
   let observer;
-  let frame = 0;
   let steamButton;
   let hoverButton;
   let hoverCloseTimer;
@@ -44,7 +43,6 @@
   let mainPointer;
   let popupsIdle = false;
   let renameDialogOpener;
-  let nextScan = 0;
 
   // Known webpack module IDs and export keys for fast-path resolution.
   const KNOWN_MODULES = {
@@ -134,27 +132,17 @@
     };
   }
 
-  function resolveFromSource(req) {
-    let menusId;
-    let submenuId;
-    let registryId;
+  // The webpack module whose source holds every needle (one cached scan per key, in core).
+  const moduleWith = (key, ...needles) =>
+    SE.findModule(`steam-menu:${key}`, (src, id, req) => needles.every((n) => src.includes(n)) && { id, req });
 
-    for (const id of Object.keys(req.m || {})) {
-      const src = sourceOf(req, id);
-      if (menusId === undefined && src.includes('"Menus"') && src.includes('disabledItemClass') && src.includes('parentalFeature')) {
-        menusId = id;
-      } else if (submenuId === undefined && src.includes('OnSubMenuMouseEnter') && src.includes('bInGamepadUI')) {
-        submenuId = id;
-      } else if (registryId === undefined && src.includes('m_mapManagers') && src.includes('GetContextMenuManagerFromWindow')) {
-        registryId = id;
-      }
-      if (menusId !== undefined && submenuId !== undefined && registryId !== undefined) break;
-    }
+  function resolveFromSource() {
+    const menusMod = moduleWith('menus', '"Menus"', 'disabledItemClass', 'parentalFeature');
+    const submenuMod = moduleWith('submenu', 'OnSubMenuMouseEnter', 'bInGamepadUI');
+    const registryMod = moduleWith('registry', 'm_mapManagers', 'GetContextMenuManagerFromWindow');
+    if (!menusMod || !submenuMod || !registryMod) return null;
 
-    if (menusId === undefined || submenuId === undefined || registryId === undefined) {
-      return null;
-    }
-
+    const { req, id: menusId } = menusMod;
     const src = sourceOf(req, menusId);
     const exported = exportNames(src);
     const imports = importsOf(src);
@@ -183,12 +171,12 @@
       if (!menuStyles && isStyles(m)) menuStyles = m;
     }
 
-    const subSrc = sourceOf(req, submenuId);
+    const subSrc = sourceOf(submenuMod.req, submenuMod.id);
     const subNames = exportNames(subSrc);
-    const subMod = req(submenuId);
+    const subMod = submenuMod.req(submenuMod.id);
     const sub = /([\w$]+)\s*=\s*\(?\s*([\w$]+)\s*\)?\s*=>\s*\{\s*const\s+([\w$]+)\s*=\s*\(\s*0\s*,\s*[\w$.]+\s*\)\s*\(\s*\)\s*;?\s*return\s*\(\s*0\s*,\s*[\w$.]+\s*\)\s*\(\s*[\w$]+\s*,\s*\{\s*\.\.\.\s*\2\s*,\s*bInGamepadUI\s*:\s*\3\s*\}/.exec(subSrc);
     const SubMenu = sub && subMod[subNames[sub[1]]];
-    const registry = Object.values(req(registryId) || {}).find((v) => v && typeof v.GetContextMenuManager === 'function');
+    const registry = Object.values(registryMod.req(registryMod.id) || {}).find((v) => v && typeof v.GetContextMenuManager === 'function');
 
     const resolved = {
       React,
@@ -224,15 +212,11 @@
         if (found) return found;
       } catch (_) {}
     }
-    if (performance.now() < nextScan) return undefined;
-    nextScan = performance.now() + 10000;
-    for (const req of SE.requires()) {
-      try {
-        const found = resolveFromSource(req);
-        if (found) return found;
-      } catch (_) {}
+    try {
+      return resolveFromSource() || undefined;
+    } catch (_) {
+      return undefined;
     }
-    return undefined;
   }
 
   function contextManager(fiber) {
@@ -253,8 +237,9 @@
     return undefined;
   }
 
+  // The root menu's config sits a few levels above its button; 60 is a generous cap.
   function configuration(node) {
-    for (let fiber = SE.fiber(node); fiber; fiber = fiber.return) {
+    for (let fiber = SE.fiber(node), depth = 0; fiber && depth < 60; fiber = fiber.return, depth++) {
       const props = fiber.memoizedProps;
       if (props?.title?.endsWith?.(' Root Menu') && (props.menuContent || props.menuItems)) {
         return {
@@ -298,6 +283,34 @@
     return text.replace(/\u2026/g, '...').replace(/\s+/g, ' ').trim();
   }
 
+  /*
+   * Menu rows are told apart by Steam's own wording for the label's localization token, so
+   * this works in any client language; the English patterns stay as the fallback for a build
+   * whose tokens differ. Unknown tokens come back as the token itself and are skipped.
+   */
+  const MENU_TOKENS = {
+    state: ['#PersonaStateOnline', '#PersonaStateAway', '#PersonaStateInvisible', '#PersonaStateOffline',
+      '#Menu_Online', '#Menu_Away', '#Menu_Invisible', '#Menu_Offline'],
+    unwanted: ['#Menu_ViewFriendsList', '#Menu_FriendsList', '#Menu_AddFriend', '#Menu_AddAFriend'],
+    editName: ['#Menu_ChangeProfileName', '#Menu_EditProfileName', '#Menu_ChangePersonaName'],
+    profile: ['#Menu_ViewMyProfile', '#Menu_ViewProfile', '#AccountMenu_ViewProfile'],
+    account: ['#Menu_ChangeAccount', '#AccountMenu_ChangeAccount'],
+  };
+  const localizedLabels = new Map();
+  function labelsFor(group) {
+    let set = localizedLabels.get(group);
+    if (!set) {
+      set = new Set();
+      for (const token of MENU_TOKENS[group]) {
+        const text = SE.run(() => api.localize(token));
+        if (typeof text === 'string' && text && !text.startsWith('#')) set.add(normalizeMenuLabel(text).toLowerCase());
+      }
+      localizedLabels.set(group, set);
+    }
+    return set;
+  }
+  const isLabel = (group, label, english) => labelsFor(group).has(label.toLowerCase()) || english.test(label);
+
   function trimAccountStatus(root) {
     if (!root) return;
     const itemClass = api.menuStyles.MenuItem.split(' ')[0];
@@ -308,10 +321,10 @@
 
     for (const item of root.querySelectorAll(`.${itemClass}, hr`)) {
       const label = normalizeMenuLabel(item.textContent);
-      const stateChoice = /^(?:Online|Away|Invisible|Offline)$/i.test(label);
-      const unwanted = /^(?:View Friends List(?:\s*\(|$)|Add a Friend(?:\.\.\.|$))/i.test(label);
+      const stateChoice = isLabel('state', label, /^(?:Online|Away|Invisible|Offline)$/i);
+      const unwanted = isLabel('unwanted', label.replace(/\s*\(\d+\)$/, ''), /^(?:View Friends List(?:\s*\(|$)|Add a Friend(?:\.\.\.|$))/i);
       const separator = item.tagName === 'HR' || (separatorClass && item.classList.contains(separatorClass));
-      const editName = /^Edit Profile Name(?:\s*\/\s*Avatar)?(?:\.\.\.)?$/i.test(label);
+      const editName = isLabel('editName', label, /^Edit Profile Name(?:\s*\/\s*Avatar)?(?:\.\.\.)?$/i);
       const excluded = mode === 'edit' ? !editName : choicesOnly ? !stateChoice : stateChoice || editName;
 
       if (unwanted || excluded || (separator && !hasStatus)) {
@@ -348,9 +361,10 @@
     const read = () => Boolean(nativeFriendStore()?.GetUserDoNotDisturb());
     const [checked, setChecked] = api.React.useState(read);
 
+    // Steam offers no change event for it: re-read while the menu is open (paused when hidden).
     api.React.useEffect(() => {
-      const id = setInterval(() => setChecked(read()), 250);
-      return () => clearInterval(id);
+      const poll = SE.poll(() => setChecked(read()), 250);
+      return () => poll.disconnect();
     }, []);
 
     return api.React.createElement(
@@ -384,50 +398,32 @@
   }
 
   function resolveRenameDialog() {
-    if (renameDialogOpener) return renameDialogOpener;
-    for (const req of SE.requires()) {
-      const ids = ['57249', ...Object.keys(req.m || {}).filter((id) => id !== '57249')];
-      for (const id of ids) {
-        const source = sourceOf(req, id);
-        const marker = source.indexOf('"ChangePersonaDialog"');
-        if (marker < 0 || !source.includes('Dialog_ChangePersonaName')) continue;
-        const declaration = source.slice(source.lastIndexOf('function ', marker), marker);
-        const local = /^function\s+([\w$]+)\s*\(/.exec(declaration)?.[1];
-        try {
-          const exports = req(id);
-          const key = local && exportNames(source)[local];
-          const candidates = [key && exports[key], ...Object.values(exports || {})];
-          for (const candidate of candidates) {
-            if (typeof candidate !== 'function') continue;
-            const body = Function.prototype.toString.call(candidate);
-            if (body.length < 2000 && body.includes('"ChangePersonaDialog"')) {
-              renameDialogOpener = candidate;
-              return renameDialogOpener;
-            }
-          }
-        } catch (_) {}
-      }
-    }
-    return null;
+    renameDialogOpener ||= SE.findModule('steam-menu:rename-dialog', (source, id, req) => {
+      const marker = source.indexOf('"ChangePersonaDialog"');
+      if (marker < 0 || !source.includes('Dialog_ChangePersonaName')) return null;
+      const declaration = source.slice(source.lastIndexOf('function ', marker), marker);
+      const local = /^function\s+([\w$]+)\s*\(/.exec(declaration)?.[1];
+      const exports = req(id);
+      const key = local && exportNames(source)[local];
+      return [key && exports[key], ...Object.values(exports || {})].find(
+        (candidate) =>
+          typeof candidate === 'function' &&
+          Function.prototype.toString.call(candidate).length < 2000 &&
+          Function.prototype.toString.call(candidate).includes('"ChangePersonaDialog"')
+      );
+    });
+    return renameDialogOpener;
   }
 
   function findNativeRenameMenu() {
-    for (const req of SE.requires()) {
-      for (const id of ['57249', ...Object.keys(req.m || {}).filter((k) => k !== '57249')]) {
-        const source = sourceOf(req, id);
-        if (!source.includes('Dialog_ChangePersonaName') || !source.includes('setPersonaNameEresultCallback')) continue;
-        try {
-          const menu = Object.values(req(id) || {}).find(
-            (value) =>
-              typeof value === 'function' &&
-              Function.prototype.toString.call(value).includes('setPersonaNameEresultCallback') &&
-              Function.prototype.toString.call(value).includes('ownerWindow')
-          );
-          if (menu) return menu;
-        } catch (_) {}
-      }
-    }
-    return null;
+    return SE.findModule('steam-menu:rename-menu', (source, id, req) => {
+      if (!source.includes('Dialog_ChangePersonaName') || !source.includes('setPersonaNameEresultCallback')) return null;
+      return Object.values(req(id) || {}).find((value) => {
+        if (typeof value !== 'function') return false;
+        const body = Function.prototype.toString.call(value);
+        return body.includes('setPersonaNameEresultCallback') && body.includes('ownerWindow');
+      });
+    });
   }
 
   function findRenameController(value, seen = new Set(), depth = 0) {
@@ -581,13 +577,13 @@
   function placeAvatarSection(section) {
     if (!section) return;
     const parent = section.parentElement;
-    const target =
+    const [group, english] =
       section.getAttribute('data-se-avatar-section') === 'edit'
-        ? /^View My Profile$/i
-        : /^Change Account(?:\.\.\.|\u2026)?$/i;
+        ? ['profile', /^View My Profile$/i]
+        : ['account', /^Change Account(?:\.\.\.)?$/i];
     const itemClass = api.menuStyles.MenuItem.split(' ')[0];
     const row = [...parent.querySelectorAll(`.${itemClass}`)].find(
-      (item) => !item.closest('[data-se-avatar-section]') && target.test(normalizeMenuLabel(item.textContent))
+      (item) => !item.closest('[data-se-avatar-section]') && isLabel(group, normalizeMenuLabel(item.textContent), english)
     );
     if (!row) return;
 
@@ -1092,6 +1088,17 @@
       : { bOverlapHorizontal: true, bOverlapVertical: false, bPreferPopLeft: false, bPreferPopTop: false, bGrowToElementWidth: false };
   }
 
+  // One hidden anchor per button, shared by every menu instance Steam makes for it.
+  const anchors = new Map();
+  function menuAnchor(button, steam) {
+    let anchor = anchors.get(button);
+    if (!anchor) {
+      anchor = createMenuAnchor(button, steam);
+      anchors.set(button, anchor);
+    }
+    return anchor;
+  }
+
   function createMenuAnchor(button, steam) {
     const anchor = document.createElement('span');
     anchor.setAttribute('aria-hidden', 'true');
@@ -1216,7 +1223,7 @@
 
     const position = instance.position;
     const originalAnchor = position?.element;
-    const anchor = position && button ? createMenuAnchor(button, steam) : null;
+    const anchor = position && button ? menuAnchor(button, steam) : null;
     if (anchor) position.element = anchor;
 
     const ownShow = Object.getOwnPropertyDescriptor(instance, 'Show');
@@ -1224,7 +1231,9 @@
     const show = function (...args) {
       applyPlacement(this);
       refreshPosition(this);
-      return originalShow.apply(this, args);
+      const result = originalShow.apply(this, args);
+      popupPoll?.refresh(); // wake the popup housekeeping now rather than on its idle beat
+      return result;
     };
     instance.Show = show;
 
@@ -1261,8 +1270,45 @@
     });
   }
 
+  // Puts back what patchInstance() changed (when its button is gone, or on destroy).
+  function unpatchInstance(instance, saved) {
+    patched.delete(instance);
+    if (Object.getOwnPropertyDescriptor(instance, 'ReactElement')?.get !== saved.getter) return;
+    if (instance.TakeFocus === saved.takeFocus) {
+      if (saved.ownTakeFocus) Object.defineProperty(instance, 'TakeFocus', saved.ownTakeFocus);
+      else delete instance.TakeFocus;
+    }
+    if (instance.Show === saved.show) {
+      if (saved.ownShow) Object.defineProperty(instance, 'Show', saved.ownShow);
+      else delete instance.Show;
+    }
+    if (saved.position?.element === saved.anchor) {
+      saved.position.element = saved.originalAnchor;
+    }
+    for (const [key, original] of saved.savedPlacement) {
+      if (instance.options[key] !== saved.placement[key]) continue;
+      if (original.present) instance.options[key] = original.value;
+      else delete instance.options[key];
+    }
+    if (saved.own) Object.defineProperty(instance, 'ReactElement', saved.own);
+    else delete instance.ReactElement;
+  }
+
+  // Menus whose button Steam has re-rendered away: unpatched (update() patches the live ones
+  // again), so neither `patched` nor the anchors grow over a session.
+  function pruneDetached() {
+    for (const [instance, saved] of patched) {
+      if (saved.button && !saved.button.isConnected && !instance.visible) unpatchInstance(instance, saved);
+    }
+    for (const [button, anchor] of anchors) {
+      if (button.isConnected) continue;
+      anchor.remove();
+      anchors.delete(button);
+    }
+  }
+
   function update() {
-    frame = 0;
+    pruneDetached();
     const entries = configurations();
     steamButton = entries.get('Steam')?.node;
     bindHoverButton();
@@ -1278,10 +1324,6 @@
     patchSidebarMenus();
   }
 
-  function schedule() {
-    if (!frame) frame = requestAnimationFrame(update);
-  }
-
   function start() {
     document.addEventListener('mousemove', onMainMouseMove);
     document.addEventListener('click', openMillenniumWindow, true);
@@ -1289,8 +1331,7 @@
     // Restrict synchronous MutationObserver passes to the titlebar and navigation rail
     // so deep Library or game-page mutations do not trigger React fiber walks.
     const MENU_AREA = `.${C.TopBar}, .${C.FocusNavigationRoot_TitleBarControls}, .${C.RootMenuBar}, .${C.SuperNavBar}, .se-sidebar-icons, .se-header-actions, .se-menu-icon`;
-    observer = SE.watch(schedule, {
-      sync: true,
+    observer = SE.watch(update, {
       ignore: (node) => {
         const el = node.nodeType === 1 ? node : node.parentElement;
         if (!el || !steamButton?.isConnected) return false;
@@ -1307,14 +1348,15 @@
       }
     }, 250);
     update();
-    popupTimer = setInterval(inspectPopups, 200);
+    // Every 200 ms while a menu is open (and once more after it closes), idle otherwise.
+    popupPoll = SE.poll(inspectPopups, 200, { active: () => anyMenuOpen() || !popupsIdle });
     inspectPopups();
   }
 
   window.__steamEnhancedSteamMenu = {
     destroy() {
       clearInterval(timer);
-      clearInterval(popupTimer);
+      popupPoll?.disconnect();
       cancelHoverClose();
       document.removeEventListener('mousemove', onMainMouseMove);
       for (const node of sideButtons.values()) {
@@ -1335,7 +1377,6 @@
       avatarLayouts.clear();
       restorePopups();
       observer?.disconnect();
-      if (frame) cancelAnimationFrame(frame);
       removeEventListener('DOMContentLoaded', start);
 
       if (manager?.CreateContextMenuInstance === wrappedCreate) {
@@ -1348,28 +1389,9 @@
       }
       sidebarManagers.clear();
 
-      for (const [instance, saved] of patched) {
-        if (Object.getOwnPropertyDescriptor(instance, 'ReactElement')?.get !== saved.getter) continue;
-        if (instance.TakeFocus === saved.takeFocus) {
-          if (saved.ownTakeFocus) Object.defineProperty(instance, 'TakeFocus', saved.ownTakeFocus);
-          else delete instance.TakeFocus;
-        }
-        if (instance.Show === saved.show) {
-          if (saved.ownShow) Object.defineProperty(instance, 'Show', saved.ownShow);
-          else delete instance.Show;
-        }
-        if (saved.position?.element === saved.anchor) {
-          saved.position.element = saved.originalAnchor;
-        }
-        saved.anchor?.remove();
-        for (const [key, original] of saved.savedPlacement) {
-          if (instance.options[key] !== saved.placement[key]) continue;
-          if (original.present) instance.options[key] = original.value;
-          else delete instance.options[key];
-        }
-        if (saved.own) Object.defineProperty(instance, 'ReactElement', saved.own);
-        else delete instance.ReactElement;
-      }
+      for (const [instance, saved] of patched) unpatchInstance(instance, saved);
+      for (const anchor of anchors.values()) anchor.remove();
+      anchors.clear();
       for (const node of document.querySelectorAll('[data-se-menu-open]')) {
         node.removeAttribute('data-se-menu-open');
       }

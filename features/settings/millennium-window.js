@@ -16,8 +16,7 @@
   window.__seMillenniumWindow?.destroy();
 
   let popup;
-  let popupScan;
-  let pendingManager = false;
+  let popupScan = null;
   let failure = '';
   let errorNotice = null;
 
@@ -36,7 +35,9 @@
     const box = document.createElement('div');
     box.setAttribute('role', 'alert');
     box.style.cssText =
-      'position:fixed;top:70px;right:24px;z-index:2147483647;max-width:480px;padding:18px;border:1px solid #738599;border-radius:12px;background:#202833;color:#fff;font:14px/1.5 Arial,sans-serif';
+      'position:fixed;top:70px;right:24px;z-index:var(--se-z-max);max-width:480px;padding:18px;' +
+      'border-radius:var(--se-radius-ml);background:var(--se-surface);box-shadow:var(--se-shadow-pop);' +
+      'color:var(--se-text);font:var(--se-fs-lg)/1.5 var(--se-font)';
     const text = document.createElement('div');
     text.textContent = `Millennium popup: ${failure || 'Popup runtime unavailable.'}`;
     const close = document.createElement('button');
@@ -141,8 +142,16 @@
     } catch (_) {}
   }
 
+  // Walking the fibers for every realm is costly and ffi()/core() ask on each call, so the list
+  // is kept for 2 s unless one of its windows has closed.
+  let windowCache = null;
+
   const millBridge = {
     windows() {
+      const now = performance.now();
+      if (windowCache && now < windowCache.until && windowCache.list.every((w) => !SE.run(() => w.closed))) {
+        return windowCache.list;
+      }
       const out = [window, ...SE.owners()];
       const root = document.querySelector('#root, [data-reactroot]') || document.body.firstElementChild;
       for (let f = SE.fiber(root), n = 0; f && n < 4000; f = f.return, n++) {
@@ -161,6 +170,7 @@
           } catch (_) {}
         }
       }
+      windowCache = { list: out, until: now + 2000 };
       return out;
     },
     ffi(name, args = []) {
@@ -301,10 +311,6 @@
       if (!dialogHosts.size) installDialogHosts();
       releasePopupNavigation();
     }
-    if (pendingManager) {
-      pendingManager = false;
-      millBridge.openLibraryManager();
-    }
   }
 
   function stopPopupTracking() {
@@ -442,59 +448,61 @@
     guardedNavigation.clear();
   }
 
-  function findRuntime(requireManager = true) {
-    let React;
-    let manager;
-    let modalManagers;
-    for (const req of SE.requires()) {
-      const inspect = (exp) => {
-        const values = [exp];
-        try {
-          values.push(...Object.values(exp || {}));
-        } catch (_) {}
-        for (const value of values) {
-          if (
-            !React &&
-            value &&
-            typeof value.createElement === 'function' &&
-            typeof value.cloneElement === 'function' &&
-            typeof value.useState === 'function'
-          ) {
-            React = value;
-          }
-          if (!manager) {
-            try {
-              const registry = value?.m_mapModalManager;
-              const candidate = registry?.get(window);
-              if (typeof candidate?.ShowLegacyPopupModal === 'function') {
-                manager = candidate;
-                modalManagers = registry;
-              }
-            } catch (_) {}
-          }
-        }
-      };
+  const isReact = (value) =>
+    Boolean(value) &&
+    typeof value.createElement === 'function' &&
+    typeof value.cloneElement === 'function' &&
+    typeof value.useState === 'function';
 
-      for (const module of Object.values(req.c || {})) inspect(module?.exports);
-      for (const [id, factory] of Object.entries(req.m || {})) {
-        if (React && (manager || !requireManager)) break;
-        let source;
-        try {
-          source = Function.prototype.toString.call(factory);
-        } catch (_) {
-          continue;
-        }
-        const possibleManager = !manager && source.includes('Stomping CModalManager');
-        const possibleReact =
-          !React && source.includes('createElement') && source.includes('useState') && source.includes('Fragment');
-        if (possibleManager || possibleReact) {
-          try {
-            inspect(req(id));
-          } catch (_) {}
-        }
-      }
-      if (React && (manager || !requireManager)) break;
+  // The registry of modal managers that has one for this window able to open legacy popups.
+  const managerRegistry = (value) => {
+    try {
+      const registry = value?.m_mapModalManager;
+      return typeof registry?.get(window)?.ShowLegacyPopupModal === 'function' ? registry : null;
+    } catch (_) {
+      return null;
     }
+  };
+
+  // A module's export, or the first of its named exports, that passes `test`.
+  const fromExports = (exp, test) => {
+    if (!exp) return null;
+    const hit = SE.run(() => test(exp));
+    if (hit) return hit === true ? exp : hit;
+    for (const value of SE.run(() => Object.values(exp)) || []) {
+      const found = SE.run(() => test(value));
+      if (found) return found === true ? value : found;
+    }
+    return null;
+  };
+
+  // Loaded modules first (cheap), then a one-time source scan cached by core's findModule.
+  const fromModules = (key, needle, test) => {
+    for (const req of SE.requires()) {
+      for (const module of Object.values(req.c || {})) {
+        const hit = fromExports(module?.exports, test);
+        if (hit) return hit;
+      }
+    }
+    return SE.findModule(key, (src, id, req) => needle(src) && fromExports(req(id), test));
+  };
+
+  // Found once per window: React and the modal managers never change after the client loads.
+  let runtimeParts = null;
+
+  function findRuntime(requireManager = true) {
+    let React = runtimeParts?.React || SE.global('SP_REACT', isReact);
+    React ||= fromModules(
+      'se-mill-react',
+      (src) => src.includes('createElement') && src.includes('useState') && src.includes('Fragment'),
+      isReact
+    );
+    let modalManagers = runtimeParts?.modalManagers;
+    if (React && requireManager && !modalManagers) {
+      modalManagers = fromModules('se-mill-modal', (src) => src.includes('Stomping CModalManager'), managerRegistry);
+    }
+    if (React) runtimeParts = { React, modalManagers };
+    const manager = modalManagers?.get(window);
 
     if (!React || (requireManager && !manager)) {
       failure = !React ? 'Steam React runtime was not found.' : 'Registered Library popup manager was not found.';
@@ -518,7 +526,7 @@
     };
   }
 
-  function openDirect(beforeOpen, target) {
+  function openDirect(beforeOpen) {
     if (popup) {
       scanPopupDocuments();
       if (!popupDocuments.size) {
@@ -532,7 +540,6 @@
     }
     if (popup) {
       beforeOpen?.();
-      if (target === 'library') pendingManager = true;
       scanPopupDocuments();
       for (const doc of popupDocuments) {
         try {
@@ -584,8 +591,9 @@
         };
         result.ClosedPromise.then(clearPopup, clearPopup);
       }
-      pendingManager = target === 'library';
       scanPopupDocuments();
+      // A plain interval: the main window is often hidden (opened from the tray) while the popup
+      // is up, and a visibility-aware poll would stop wiring the popup's tabs.
       popupScan = setInterval(scanPopupDocuments, 250);
       return true;
     } catch (error) {
@@ -597,13 +605,25 @@
     }
   }
 
+  // Re-installs the guards only when one is missing or was replaced (Millennium re-registering
+  // its route, the main window instance appearing); otherwise the check runs every 5 s.
+  function guardsNeeded() {
+    if (!guardedRoutes.size || !guardedNavigation.size) return true;
+    const main = SE.mainWindow();
+    if (main && typeof main.Navigate === 'function' && !guardedNavigation.has(main)) return true;
+    for (const entry of guardedRoutes.keys()) if (entry.component !== PopupOnlySettings) return true;
+    for (const [store, { wrapped }] of guardedNavigation) if (store.Navigate !== wrapped) return true;
+    return false;
+  }
+
   installRouteGuards();
-  const routeGuardPoll = SE.poll(installRouteGuards, 500);
+  const routeGuardPoll = SE.poll(installRouteGuards, 500, { active: guardsNeeded, idle: 5000 });
 
   window.__seMillenniumWindow = {
     openDirect,
     showError,
     openLibraryManager: (target) => millBridge.openLibraryManager(target),
+    windows: () => millBridge.windows(),
     destroy() {
       destroyed = true;
       routeGuardPoll.disconnect();

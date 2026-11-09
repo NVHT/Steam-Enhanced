@@ -8,6 +8,9 @@
  */
 /* The grid */
 [data-se-hs]:not(#se-none) {
+  /* Soft text over the art, and the tray's glass (no theme tokens for these yet) */
+  --se-hs-on-art: #d0d7de;
+  --se-hs-glass: rgba(16, 18, 23, .8);
   display: grid !important;
   grid-template-columns: minmax(0, 1fr);
   grid-auto-flow: row;
@@ -49,9 +52,10 @@ html[data-se-hs-scroll-lock] > body[data-se-hs-scroll-lock] {
  * Never native home under the stage: a Library Home Steam has just drawn, and a row it
  * adds to one, stay out of sight until home-stage.js has placed them (normally before the
  * frame is painted, so this only covers a frame the script misses). [data-se-hs-on] is set
- * on the window while the stage is in use.
+ * on the window while the stage is in use. A new Home is caught from .LibraryHome and what
+ * follows it, which needs no document-wide :has().
  */
-html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
+html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 [data-se-hs] > :not([data-se-hs-sec]):not([data-se-hs-flat]):not(.se-hs-stage):not(.se-hs-tray),
 [data-se-hs] [data-se-hs-flat] > :not([data-se-hs-sec]):not([data-se-hs-flat]) {
   visibility: hidden !important;
@@ -75,6 +79,15 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 
 [data-se-hs-col]:not(#se-none) {
   grid-row: 2;
+  align-self: stretch;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 0 22px !important;
+  padding: 16px 18px 14px !important;
+  box-sizing: border-box;
+  /* Each row stays in its own column (room is left above and below for hover lifts) */
+  clip-path: inset(-16px 0 -16px 0);
 }
 
 [data-se-hs-col="1"]:not(#se-none) {
@@ -162,9 +175,13 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   transform: scale(1.04);
 }
 
-/* A slow push-in on the art that is showing */
+/* A slow push-in on the art that is showing; held while the stage is out of sight */
 .se-hs-layer[data-on] .se-hs-hero {
   animation: se-hs-push 26s ease-in-out infinite alternate;
+}
+
+.se-hs-stage[data-se-hs-idle] .se-hs-hero {
+  animation-play-state: paused;
 }
 
 @keyframes se-hs-push {
@@ -219,7 +236,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   min-height: 72px;
   padding: 0;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--se-radius-ml);
   background: none;
   color: inherit;
   font: inherit;
@@ -230,7 +247,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 /* The logo opens the game page: it lifts a little under the pointer */
 .se-hs-title .se-hs-logo,
 .se-hs-title .se-hs-name {
-  transition: transform .25s cubic-bezier(.2, .8, .2, 1), filter .25s;
+  transition: transform .25s var(--se-ease), filter .25s;
   transform-origin: left bottom;
 }
 
@@ -244,8 +261,8 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 }
 
 .se-hs-title:focus-visible {
-  outline: 2px solid var(--se-accent, #7cc4ff);
-  outline-offset: 6px;
+  outline: var(--se-focus-outline);
+  outline-offset: 6px; /* clear of the logo's drop shadow */
 }
 
 /* The right side: description, stats, buttons, over a soft dark pool so bright art stays readable */
@@ -273,7 +290,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   margin: 0;
   font-size: clamp(14px, .82cqw, 19px);
   line-height: 1.5;
-  color: #e1e6eb;
+  color: var(--se-text);
   text-shadow: 0 1px 3px rgba(0, 0, 0, .9), 0 1px 14px rgba(0, 0, 0, .7);
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -309,41 +326,26 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   gap: 6px;
   height: clamp(24px, 1.5cqw, 32px);
   padding: 0 clamp(9px, .6cqw, 13px);
-  border-radius: 999px;
+  border-radius: var(--se-radius-pill);
   font: 700 clamp(11.5px, .66cqw, 15px)/1 var(--se-font);
   white-space: nowrap;
+  /* One recipe, tinted by the chip's status colour */
+  --chip: var(--se-online);
+  background: color-mix(in srgb, var(--chip) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chip) 38%, transparent);
+  color: color-mix(in srgb, var(--chip) 60%, #fff);
 }
 
-.se-hs-chip[data-reviews="good"] {
-  background: rgba(102, 192, 244, .16);
-  box-shadow: inset 0 0 0 1px rgba(102, 192, 244, .38);
-  color: #8fd0f7;
-}
-
-.se-hs-chip[data-reviews="mixed"] {
-  background: rgba(201, 169, 93, .16);
-  box-shadow: inset 0 0 0 1px rgba(201, 169, 93, .4);
-  color: #e0c47e;
-}
-
-.se-hs-chip[data-reviews="bad"] {
-  background: rgba(224, 115, 90, .16);
-  box-shadow: inset 0 0 0 1px rgba(224, 115, 90, .4);
-  color: #f0957f;
-}
-
-.se-hs-chip[data-live] {
-  background: rgba(111, 209, 111, .14);
-  box-shadow: inset 0 0 0 1px rgba(111, 209, 111, .32);
-  color: #9be29b;
-}
+.se-hs-chip[data-reviews="mixed"] { --chip: var(--se-warning); }
+.se-hs-chip[data-reviews="bad"] { --chip: var(--se-danger); }
+.se-hs-chip[data-live] { --chip: var(--se-running); }
 
 .se-hs-chip[data-live] i {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #6fd16f;
-  box-shadow: 0 0 6px rgba(111, 209, 111, .8);
+  background: var(--chip);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--chip) 80%, transparent);
 }
 
 /* Play, then hours and achievements beside it */
@@ -361,7 +363,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   font: 700 clamp(11px, .62cqw, 14px)/1.3 var(--se-font);
   letter-spacing: var(--se-label-spacing, .1em);
   text-transform: uppercase;
-  color: #d0d7de;
+  color: var(--se-hs-on-art);
   text-shadow: 0 1px 3px rgba(0, 0, 0, .9), 0 1px 10px rgba(0, 0, 0, .7);
 }
 
@@ -420,7 +422,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 .se-hs-stat small {
   font-size: .55em;
   font-weight: 600;
-  color: #d0d7de;
+  color: var(--se-hs-on-art);
 }
 
 .se-hs-stat em {
@@ -429,7 +431,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   gap: 8px;
   font-style: normal;
   font-size: clamp(12px, .75cqw, 18px);
-  color: #d0d7de;
+  color: var(--se-hs-on-art);
   text-shadow: 0 1px 3px rgba(0, 0, 0, .9), 0 1px 10px rgba(0, 0, 0, .6);
 }
 
@@ -477,14 +479,14 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 
 .se-hs-actions button:focus-visible,
 .se-hs-thumb:focus-visible {
-  outline: 2px solid var(--se-accent, #7cc4ff);
-  outline-offset: 3px;
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-hs-play {
   padding: 0 clamp(36px, 2.7cqw, 64px);
   background: linear-gradient(180deg, color-mix(in srgb, var(--se-play, #3a8a22) 72%, #b6f07a 28%), var(--se-play, #3f9420));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 14px 34px -12px rgba(80, 180, 50, .8);
+  box-shadow: inset 0 1px 0 var(--se-white-25), 0 14px 34px -12px var(--se-play-glow);
   color: var(--se-text-strong, #fff);
   font-size: clamp(16px, 1.08cqw, 26px);
   font-weight: 700;
@@ -562,7 +564,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   background: var(--se-surface, #1f242b);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, .14);
   opacity: .7;
-  transition: transform .3s cubic-bezier(.2, .8, .2, 1), box-shadow .3s, opacity .3s;
+  transition: transform .3s var(--se-ease), box-shadow .3s, opacity .3s;
 }
 
 .se-hs-thumbimg {
@@ -605,7 +607,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 .se-hs-thumbdate {
   font-size: clamp(10.5px, .56cqw, 14px);
   font-weight: 500;
-  color: #c9d0d7;
+  color: var(--se-hs-on-art);
 }
 
 .se-hs-prog {
@@ -636,8 +638,8 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   position: relative;
   z-index: 1;
   margin: 0 24px 22px;
-  border-radius: 18px;
-  background: rgba(16, 18, 23, .8);
+  border-radius: var(--se-radius-xl);
+  background: var(--se-hs-glass);
   backdrop-filter: blur(12px) saturate(1.15);
   /* Lighter: the art behind it animates */
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), 0 30px 60px -30px rgba(0, 0, 0, .85);
@@ -646,18 +648,6 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 
 .se-hs-tray[hidden] {
   display: none;
-}
-
-[data-se-hs-col]:not(#se-none) {
-  align-self: stretch;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  margin: 0 0 22px !important;
-  padding: 16px 18px 14px !important;
-  box-sizing: border-box;
-  /* Each row stays in its own column (room is left above and below for hover lifts) */
-  clip-path: inset(-16px 0 -16px 0);
 }
 
 [data-se-hs-col="1"]:not(#se-none) {
@@ -726,10 +716,12 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 /* PageClickContainer */
 .se-hs-nhead {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap; /* a narrow column lets the filter drop under the heading */
+  gap: 6px 8px;
   min-height: 32px;
   margin-bottom: 8px;
+  font-family: var(--se-font);
 }
 
 .se-hs-nh {
@@ -747,14 +739,6 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-/* A narrow column lets the filter drop under the heading */
-.se-hs-nhead {
-  align-items: center;
-  flex-wrap: wrap;
-  row-gap: 6px;
-  font-family: var(--se-font);
 }
 
 .se-hs-nhead .se-hs-hall {
@@ -803,8 +787,8 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 }
 
 .se-hs-feat:focus-visible {
-  outline: 2px solid var(--se-accent, #7cc4ff);
-  outline-offset: 2px;
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 /* Use the extra space around the full image for the badge and excerpt. */
@@ -855,7 +839,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 
 .se-hs-fkind {
   padding: 3px 9px;
-  border-radius: 999px;
+  border-radius: var(--se-radius-pill);
   background: var(--se-chip, rgba(12, 14, 18, .6));
   font-size: 11px;
   font-weight: 700;
@@ -888,8 +872,6 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-width: auto;
-  scrollbar-color: auto;
 }
 
 .se-hs-heads > * {
@@ -933,7 +915,6 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   cursor: pointer;
 }
 
-.se-hs-hline[hidden],
 .se-hs-hall[hidden] {
   display: none;
 }
@@ -944,8 +925,8 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 
 .se-hs-hline:focus-visible,
 .se-hs-hall:focus-visible {
-  outline: 2px solid var(--se-accent, #7cc4ff);
-  outline-offset: -2px;
+  outline: var(--se-focus-outline);
+  outline-offset: -2px; /* inside the scrolling list, which clips */
 }
 
 .se-hs-hmeta {
@@ -961,7 +942,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   width: 16px;
   height: 16px;
   flex: 0 0 auto;
-  border-radius: 4px;
+  border-radius: var(--se-radius-xs);
 }
 
 .se-hs-hmeta span {
@@ -1108,9 +1089,11 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   background: var(--se-selected, #33404f);
 }
 
-.se-hs-pickbtn:focus-visible {
-  outline: 2px solid var(--se-accent, #7cc4ff);
-  outline-offset: 2px;
+.se-hs-pickbtn:focus-visible,
+.se-hs-pk-x:focus-visible,
+.se-hs-pk-done:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-hs-own .se-hs-pickbtn {
@@ -1120,7 +1103,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 /* The list to tick, over the page by its button */
 .se-hs-pick {
   position: fixed;
-  z-index: 10000;
+  z-index: var(--se-z-toast);
   width: 340px;
   max-width: calc(100vw - 24px);
   display: flex;
@@ -1152,7 +1135,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   height: 28px;
   padding: 0;
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--se-radius-sm);
   background: transparent;
   color: var(--se-text-muted, #98a2ad);
   font-size: 20px;
@@ -1326,7 +1309,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   font-family: var(--se-font);
   text-align: start;
   cursor: pointer;
-  transition: transform .2s ease, box-shadow .2s;
+  transition: transform var(--se-dur-slow) var(--se-ease), box-shadow var(--se-dur) ease-out;
 }
 
 .se-hs-tile:hover {
@@ -1343,7 +1326,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   border-radius: inherit;
   box-shadow: inset 0 0 0 2px var(--se-accent, #7cc4ff);
   opacity: 0;
-  transition: opacity .15s;
+  transition: opacity var(--se-dur) ease-out;
   pointer-events: none;
 }
 
@@ -1352,8 +1335,8 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 }
 
 .se-hs-tile:focus-visible {
-  outline: 2px solid var(--se-accent, #7cc4ff);
-  outline-offset: 2px;
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-hs-timg {
@@ -1395,7 +1378,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   flex: 0 0 auto;
   font-size: 11.5px;
   font-weight: 600;
-  color: #c9d0d7;
+  color: var(--se-hs-on-art);
 }
 
 .se-hs-tplay {
@@ -1410,10 +1393,10 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 14px -6px rgba(80, 180, 50, .7);
+  box-shadow: 0 6px 14px -6px var(--se-play-glow);
   opacity: 0;
   transform: scale(.9);
-  transition: opacity .15s, transform .15s;
+  transition: opacity var(--se-dur) ease-out, transform var(--se-dur) ease-out;
 }
 
 .se-hs-tplay svg {
@@ -1486,14 +1469,13 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   min-width: 0;
   padding: 0 0 0 14px;
   border: 0;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #1f242b, #191d23);
+  border-radius: var(--se-radius-ml);
+  background: linear-gradient(135deg, var(--se-surface), #191d23);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07);
   color: var(--se-text, #e6e8eb);
   font-family: var(--se-font);
   text-align: start;
   cursor: pointer;
-  transition: background .2s;
 }
 
 .se-hs-ccard[hidden] {
@@ -1505,8 +1487,8 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
 }
 
 .se-hs-ccard:focus-visible {
-  outline: 2px solid var(--se-accent, #7cc4ff);
-  outline-offset: -2px;
+  outline: var(--se-focus-outline);
+  outline-offset: -2px; /* the grid clips */
 }
 
 /* The hover ring, inside the card so the column's edge never cuts it */
@@ -1518,7 +1500,7 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   border-radius: inherit;
   box-shadow: inset 0 0 0 2px var(--se-accent, #7cc4ff);
   opacity: 0;
-  transition: opacity .15s;
+  transition: opacity var(--se-dur) ease-out;
   pointer-events: none;
 }
 
@@ -1570,11 +1552,11 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   top: calc((var(--se-hs-ch, 104px) - var(--cov-h)) / 2 + 4px);
   width: var(--cov-w);
   height: var(--cov-h);
-  border-radius: 5px;
+  border-radius: var(--se-radius-xs);
   overflow: hidden;
   background: var(--se-surface-2, #262c35);
   box-shadow: 0 8px 16px -6px rgba(0, 0, 0, .9), inset 0 0 0 1px rgba(255, 255, 255, .12);
-  transition: transform .25s cubic-bezier(.2, .8, .2, 1);
+  transition: transform .25s var(--se-ease);
 }
 
 .se-hs-fcov.m {
@@ -1655,10 +1637,10 @@ html[data-se-hs-on] :has(> .LibraryHome):not([data-se-hs]) > *,
   flex: 0 0 auto !important;
 }
 
-/* Narrow windows (under 1100 px): the tray's rows stack, each on its own glass */
 /*
- * Set by features/home/home-stage.js from the window's width (not a media query, so the
- * tiny size a minimized window reports never flips the layout)
+ * Narrow windows (under 1100 px): the tray's rows stack, each on its own glass. Set by
+ * features/home/home-stage.js from a (max-width: 1100px) media query, applied only while the
+ * window is usable (a minimized window's tiny size never flips the layout).
  */
 [data-se-hs][data-se-hs-narrow][data-se-hs-n]:not(#se-none) {
   grid-template-columns: minmax(0, 1fr);

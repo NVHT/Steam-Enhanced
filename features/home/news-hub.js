@@ -1,7 +1,7 @@
 /* Demand-paged News Hub feed for Library Home What's New carousel. */
 (window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
   const { C } = SE;
-  if (window.__steamEnhancedNewsHub?.version === '1.7.4') return;
+  if (window.__steamEnhancedNewsHub?.version === '1.7.5') return;
   window.__steamEnhancedNewsHub?.destroy?.();
 
   const WINDOW_SECONDS = 7 * 24 * 60 * 60;
@@ -12,7 +12,7 @@
   const CONTAINER_SELECTOR = `.${C.UpdatesContainer}`;
 
   const state = (window.__steamEnhancedNewsHub = {
-    version: '1.7.4',
+    version: '1.7.5',
     events: new Map(),
     documents: new Map(),
     feeds: [],
@@ -34,12 +34,11 @@
   let owner;
   let eventStore;
   let partnerStore;
-  let initTimer;
+  let initPoll;
   let refreshTimer;
   let observer;
   let nativeHost;
   let nativeComponent;
-  let queuedFrame = 0;
 
   const nowSeconds = () => Math.floor(Date.now() / 1000);
 
@@ -82,8 +81,10 @@
     );
   }
 
+  // A new array makes Steam's observers re-render What's New (and re-ask our wrappers).
   function notifyEventStore() {
-    eventStore.m_vecHomeBestEventsForUser = [...eventStore.m_vecHomeBestEventsForUser];
+    const list = eventStore?.m_vecHomeBestEventsForUser;
+    if (Array.isArray(list)) eventStore.m_vecHomeBestEventsForUser = [...list];
   }
 
   function patchNativeCap() {
@@ -104,8 +105,9 @@
     const visited = new Set();
     if (uncapComponentInNodes(preferred, visited)) return;
 
+    // Last resort, every fiber above every node of Home: at most every 10 s.
     const now = performance.now();
-    if (now - lastFullScanAt < 2000) return;
+    if (now - lastFullScanAt < 10000) return;
     lastFullScanAt = now;
     uncapComponentInNodes(scope.querySelectorAll('*'), visited);
   }
@@ -171,14 +173,10 @@
     }
   }
 
-  function schedule() {
-    if (!queuedFrame) {
-      queuedFrame = requestAnimationFrame(() => {
-        queuedFrame = 0;
-        patchNativeCap();
-        pruneEmptyCards();
-      });
-    }
+  function onMutate() {
+    if (!homeScope()) return;
+    patchNativeCap();
+    pruneEmptyCards();
   }
 
   async function fetchFeedPage(feed) {
@@ -257,12 +255,13 @@
     }
     state.busy = true;
     state.error = false;
-    patchNativeCap();
-    notifyEventStore();
 
     const canContinue = () => !state.stopped && (initial || (isUserActive() && isScrolledNearEnd()));
 
     try {
+      // Inside the try: a throw here must still clear `busy` in finally.
+      patchNativeCap();
+      notifyEventStore();
       for (const feed of state.feeds) {
         while (
           !feed.done &&
@@ -342,9 +341,9 @@
 
   function tryInit() {
     if (state.stopped || !document.body || !document.querySelector('.LibraryHome')) return;
-    for (const candidate of [window, window.opener, window.parent]) {
+    for (const candidate of SE.owners()) {
       try {
-        if (candidate?.appStore && candidate.libraryEventStore && candidate.partnerEventStore) {
+        if (candidate.appStore && candidate.libraryEventStore && candidate.partnerEventStore) {
           owner = candidate;
           break;
         }
@@ -363,7 +362,7 @@
       return;
     }
 
-    clearInterval(initTimer);
+    initPoll?.disconnect();
     originals.news = eventStore.GetLibraryHomeBestEventsForUser;
     originals.takeovers = eventStore.GetTakeOverEvents;
     originals.status = eventStore.GetWhatsNewEvents;
@@ -387,12 +386,13 @@
     eventStore.GetTakeOverEvents = wrappers.takeovers;
     eventStore.GetWhatsNewEvents = wrappers.status;
 
-    observer = SE.watch(schedule, { sync: true });
+    observer = SE.watch(onMutate, { ignore: SE.inSide });
     for (const type of ['scroll', 'wheel', 'keydown']) {
       document.addEventListener(type, onUserActivity, true);
     }
 
     refreshTimer = setInterval(() => {
+      if (!homeScope()) return; // nothing to refresh off Home; the next visit rebuilds anyway
       notifyEventStore();
       patchNativeCap();
       const area = findScrollArea();
@@ -406,11 +406,10 @@
 
   state.destroy = () => {
     state.stopped = true;
-    clearInterval(initTimer);
+    initPoll?.disconnect();
     clearInterval(refreshTimer);
     clearTimeout(emptyTimer);
     observer?.disconnect();
-    if (queuedFrame) cancelAnimationFrame(queuedFrame);
     for (const type of ['scroll', 'wheel', 'keydown']) {
       document.removeEventListener(type, onUserActivity, true);
     }
@@ -432,6 +431,7 @@
     delete window.__steamEnhancedNewsHub;
   };
 
-  initTimer = setInterval(tryInit, 1000);
+  // Until Home is first opened: a visibility-aware poll that idles at core's slow rate.
+  initPoll = SE.poll(tryInit, 1000, { active: () => !!document.querySelector('.LibraryHome') });
   tryInit();
 });

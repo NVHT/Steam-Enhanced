@@ -14,51 +14,47 @@
   ? (init) => init(window.__se)
   : (init) => addEventListener('se-core', () => init(window.__se), { once: true })
 )((SE) => {
-  const { C, esc, mark, unmark, fiber: fiberOf, props: propsOf, fromProps } = SE;
+  const { C, esc, mark, unmark, fiber: fiberOf, props: propsOf, fromProps, cssVar: setVar } = SE;
   window.__steamEnhancedGamePage?.destroy();
 
   let observer;
   let frame = 0;
   let hltb;
-  const made = new Set();
+  /*
+   * Class names of everything this module inserts. destroy() finds the nodes by class, so
+   * nothing here holds a node after Steam unmounts it (a Set of nodes kept whole detached
+   * sections and their fibers alive).
+   */
+  const ownClasses = new Set(['se-ach-fx', 'se-ach-clone']);
 
   const srcOf = (img) => img.currentSrc || img.getAttribute('src') || '';
-  const setVar = (el, name, value) => {
-    if (el.style.getPropertyValue(name) !== value) {
-      el.style.setProperty(name, value);
-    }
-  };
   const own = (tag, className) => {
     const el = document.createElement(tag);
     el.className = className;
-    made.add(el);
+    ownClasses.add(className.split(' ')[0]);
     return el;
   };
-  const drop = (el) => {
-    if (el) {
-      el.remove();
-      made.delete(el);
-    }
-  };
+  const drop = (el) => el?.remove();
 
   function parseCount(text) {
     const m = String(text || '').match(/(\d[\d,.]*)\s*\/\s*(\d[\d,.]*)/);
     return m ? [parseInt(m[1].replace(/\D/g, ''), 10), Math.max(1, parseInt(m[2].replace(/\D/g, ''), 10))] : null;
   }
 
-  function when(rt) {
+  // Formatters are costly to build; one of each, created on first use.
+  const formatters = new Map();
+  const formatTime = (rt, opts) => {
+    const key = JSON.stringify(opts);
     try {
-      return new Intl.DateTimeFormat(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-      }).format(new Date(rt * 1000));
+      if (!formatters.has(key)) formatters.set(key, new Intl.DateTimeFormat(undefined, opts));
+      return formatters.get(key).format(new Date(rt * 1000));
     } catch (_) {
       return '';
     }
-  }
+  };
+  const DAY = { year: 'numeric', month: 'short', day: 'numeric' };
+  const when = (rt) => formatTime(rt, { ...DAY, hour: 'numeric', minute: 'numeric' });
+  const day = (rt) => formatTime(rt, DAY);
 
   function sharedParent(a, b, stop) {
     while (a.parentElement && a.parentElement !== stop && !a.parentElement.contains(b)) {
@@ -70,7 +66,8 @@
 
   function placePopup(pop, anchor) {
     const doc = anchor.ownerDocument;
-    doc.body.appendChild(pop);
+    // Re-appending an existing child is still a body mutation (and a full update pass).
+    if (pop.parentNode !== doc.body) doc.body.appendChild(pop);
     const r = anchor.getBoundingClientRect();
     const t = pop.getBoundingClientRect();
     const vw = doc.documentElement.clientWidth;
@@ -81,15 +78,8 @@
     pop.dataset.on = '';
   }
 
-  function steamClient() {
-    for (const get of [() => window, () => window.opener, () => window.parent, () => window.top]) {
-      try {
-        const sc = get()?.SteamClient;
-        if (typeof sc?.Apps?.GetMyAchievementsForApp === 'function') return sc;
-      } catch (_) {}
-    }
-    return null;
-  }
+  const steamClient = () =>
+    SE.global('SteamClient', (sc) => typeof sc?.Apps?.GetMyAchievementsForApp === 'function');
 
   const CONTAINER = `.${C.ColumnContainer_Container}`;
   const COLUMNS = `:scope > .${C.ColumnContainer}`;
@@ -148,6 +138,8 @@
   const ROW = 1;
   const GAP = 16;
   let sizer;
+  let fitQueued = 0;
+  const sized = new Set();
 
   function pieces(c) {
     const out = [];
@@ -167,6 +159,7 @@
   }
 
   function fit() {
+    fitQueued = 0;
     const c = document.querySelector(CONTAINER);
     if (!c) return;
     // Batch DOM geometry reads before writing custom properties to avoid layout thrashing.
@@ -176,15 +169,25 @@
     }
   }
 
+  // Sizes change only through the ResizeObserver (it also reports each piece once on observe).
   function placeSpans(c) {
-    if (!sizer) sizer = new ResizeObserver(() => requestAnimationFrame(fit));
+    if (!sizer) {
+      sizer = new ResizeObserver(() => {
+        if (!fitQueued) fitQueued = requestAnimationFrame(fit);
+      });
+    }
+    for (const el of sized) {
+      if (!el.isConnected) {
+        sizer.unobserve(el);
+        sized.delete(el);
+      }
+    }
     for (const el of pieces(c)) {
-      if (!el.__seSized) {
-        el.__seSized = true;
+      if (!sized.has(el)) {
+        sized.add(el);
         sizer.observe(el);
       }
     }
-    fit();
   }
 
   function layout() {
@@ -243,10 +246,7 @@
     mark(el, 'data-se-tier', t.id);
     if (a.locked) mark(el, 'data-se-tier-locked');
     else unmark(el, 'data-se-tier-locked');
-    const node = tierFx(t, a.locked);
-    // Our own icons are rebuilt wholesale; only effects placed inside Steam's nodes need tracking for destroy().
-    if (!el.classList.contains('se-ach-ico')) made.add(node);
-    el.appendChild(node);
+    el.appendChild(tierFx(t, a.locked));
   }
 
   function toAch(a, locked, prog) {
@@ -316,8 +316,8 @@
       return l.map((a) => toAch(a, locked, p.progress?.achievements));
     });
 
-  const appIdOf = (row) =>
-    fromProps(row, 120, (p) =>
+  const fiberAppId = (el) =>
+    fromProps(el, 120, (p) =>
       [
         p.overview?.appid,
         p.appid,
@@ -329,9 +329,23 @@
         p.appDetails?.unAppID,
         p.appOverview?.appid,
       ].find((v) => typeof v === 'number' && v > 0)
-    ) ||
-    +(location.href.match(/\/app\/(\d+)/) || [])[1] ||
-    0;
+    );
+
+  /*
+   * A 120-deep fiber walk per card on every pass adds up, so the answer is kept per element
+   * for as long as the route names the same app (switching games changes the route; React
+   * may reuse the same nodes for the next game).
+   */
+  const appIds = new WeakMap();
+  const appIdOf = (el) => {
+    const route = location.href;
+    const routeId = +(route.match(/\/app\/(\d+)/) || [])[1] || 0;
+    const hit = appIds.get(el);
+    if (routeId && hit?.route === route) return hit.id;
+    const id = fiberAppId(el) || routeId;
+    if (routeId) appIds.set(el, { route, id });
+    return id;
+  };
 
   // One fetch of the player's achievements per app, shared by the icon rows and the banner.
   // Re-fetched when the card's "x/y" label changes (a new unlock).
@@ -384,13 +398,17 @@
     };
   }
 
+  const ASKED_MAX = 40;
+
   function achData(appid, key) {
     const sc = steamClient();
     if (!appid || !sc) return null;
     const had = asked.get(appid);
     if (had && had.key === key) return had.data;
     const entry = { key, data: had?.data || null };
+    asked.delete(appid);
     asked.set(appid, entry);
+    if (asked.size > ASKED_MAX) asked.delete(asked.keys().next().value);
 
     Promise.resolve(sc.Apps.GetMyAchievementsForApp(String(appid)))
       .then((r) => {
@@ -470,10 +488,7 @@
       }
       let mine = achRows.get(row);
       if (!list?.length) {
-        if (mine) {
-          drop(mine);
-          achRows.delete(row);
-        }
+        if (mine) dropAchRow(row, mine);
         unmark(row, 'data-se-replaced');
         continue;
       }
@@ -497,11 +512,14 @@
       fillAchRow(mine);
     }
     for (const [row, mine] of achRows) {
-      if (!live.has(row) || !row.isConnected) {
-        drop(mine);
-        achRows.delete(row);
-      }
+      if (!live.has(row) || !row.isConnected) dropAchRow(row, mine);
     }
+  }
+
+  function dropAchRow(row, mine) {
+    achSizer?.unobserve(mine);
+    drop(mine);
+    achRows.delete(row);
   }
 
   /* ---------- Progress banner ---------- */
@@ -516,16 +534,6 @@
     const k = Math.min(1, Math.max(0, t)) ** 3;
     return `rgb(${BLUE.map((b, i) => Math.round(b + (GOLD[i] - b) * k)).join(', ')})`;
   };
-
-  function day(rt) {
-    try {
-      return new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: 'numeric' }).format(
-        new Date(rt * 1000)
-      );
-    } catch (_) {
-      return '';
-    }
-  }
 
   function listOf(parts) {
     try {
@@ -721,7 +729,7 @@
       muteAll = () => {
         for (const h of tipHosts) muteHost(h);
       };
-      document.addEventListener('mouseout', muteAll, true);
+      // pointerout precedes the compat mouse events, so one listener re-mutes before either enter.
       document.addEventListener('pointerout', muteAll, true);
     }
   }
@@ -756,6 +764,7 @@
         tile.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
         tile.querySelectorAll('[data-se-tip], [data-se-fr-pic]').forEach((el) => {
           el.removeAttribute('data-se-tip');
+          el.removeAttribute('data-se-fr-pic');
         });
         const img = tile.querySelector('img');
         if (img) {
@@ -770,7 +779,6 @@
         const a = toAch({ ...x, name: x.strName, description: x.strDescription, icon_achieved: x.strImage }, false, null);
         if (typeof x.rtUnlocked === 'number') a.rt = x.rtUnlocked;
         tile.__seAch = a;
-        made.add(tile);
         grid.insertBefore(tile, rest);
       }
     }
@@ -1145,7 +1153,7 @@
     b.setAttribute('aria-label', d.strName || '');
     b.toggleAttribute('data-owned', d.rtPurchaseDate > 0);
     const added =
-      d.rtPurchaseDate > 0 ? `Added ${when(d.rtPurchaseDate).replace(/,?\s*\d{1,2}:\d{2}.*$/, '')}` : '';
+      d.rtPurchaseDate > 0 ? `Added ${day(d.rtPurchaseDate)}` : '';
     b.addEventListener('mouseenter', () => showLabel(b, d.strName || '', added));
     b.addEventListener('mouseleave', hideLabel);
 
@@ -1322,13 +1330,8 @@
     }));
   }
 
-  function shotTime(t) {
-    const d = new Date(t * 1000);
-    return `${d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · ${d.toLocaleTimeString(
-      undefined,
-      { hour: 'numeric', minute: '2-digit' }
-    )}`;
-  }
+  const shotTime = (t) =>
+    `${formatTime(t, { month: 'short', day: 'numeric' })} · ${formatTime(t, { hour: 'numeric', minute: '2-digit' })}`;
 
   const stampText = (car) => (car.querySelector(SHOT_STAMP)?.textContent || '').trim();
   const stampShort = (car) => stampText(car).replace(/^[^:：]*[:：]\s*/, '');
@@ -1352,41 +1355,53 @@
     return i >= 0 ? i : box.__seActive || 0;
   }
 
-  function fillMain(box, shots, i) {
-    const img = box.querySelector('.se-shot-main img');
-    const urls = (shots[i]?.urls || []).filter((u) => !img.__seBad.has(u));
-    img.__seUrls = shots;
-    img.__seIdx = i;
+  /*
+   * Shows the first candidate URL that hasn't failed. Once a picture is up, a better candidate
+   * is preloaded off-screen and swapped in only if it loads, so the frame never blanks.
+   */
+  function showBest(img, urls) {
+    img.__seUrls = urls;
+    const ok = urls.filter((u) => !img.__seBad.has(u));
     const cur = img.getAttribute('src');
-    if (!urls.length) {
+    if (!ok.length) {
       if (cur) img.removeAttribute('src');
       return;
     }
-    if (img.__seFor !== i || !urls.includes(cur)) {
-      img.__seFor = i;
+    const best = ok[0];
+    if (!ok.includes(cur)) {
       img.__seTrying = '';
-      img.src = urls[0];
+      img.src = best;
       return;
     }
-    if (cur === urls[0] || img.__seTrying === urls[0] || !img.complete || !img.naturalWidth) return;
-    const best = urls[0];
+    if (cur === best || img.__seTrying === best || !img.complete || !img.naturalWidth) return;
     img.__seTrying = best;
     const probe = new Image();
     probe.onload = () => {
-      if (img.isConnected && img.__seFor === i) img.src = best;
+      if (img.isConnected && img.__seUrls.includes(best)) img.src = best;
     };
     probe.onerror = () => {
       img.__seBad.add(best);
       img.__seTrying = '';
-      fillMain(box, shots, img.__seIdx);
+      showBest(img, img.__seUrls);
     };
     probe.src = best;
+  }
+
+  function trackFailures(img) {
+    img.__seBad = new Set();
+    img.__seUrls = [];
+    img.addEventListener('error', () => {
+      img.__seBad.add(img.getAttribute('src'));
+      img.removeAttribute('src');
+      showBest(img, img.__seUrls);
+    });
   }
 
   function syncViewer(car, box, shots) {
     const i = Math.min(shots.length - 1, activeShot(car, box));
     box.__seActive = i;
-    fillMain(box, shots, i);
+    box.__seShots = shots;
+    showBest(box.querySelector('.se-shot-main img'), shots[i]?.urls || []);
     const text = `${i + 1} / ${shots.length}`;
     const count = box.querySelector('.se-shot-count');
     if (count.textContent !== text) count.textContent = text;
@@ -1405,40 +1420,7 @@
   }
 
   function fillShots(box, shots) {
-    box.querySelectorAll('.se-shot img').forEach((img, i) => {
-      if (Array.isArray(shots[0])) {
-        img.__seUrls = shots;
-      } else if (shots[i]) {
-        img.__seUrls = shots.map((x) => x.urls);
-      }
-      const urls = (img.__seUrls?.[i] || []).filter((u) => !img.__seBad.has(u));
-      const cur = img.getAttribute('src');
-      if (!urls.length) {
-        if (cur) img.removeAttribute('src');
-        return;
-      }
-      if (!cur || !urls.includes(cur)) {
-        img.src = urls[0];
-        return;
-      }
-      const best = urls[0];
-      if (best === cur || img.__seTrying === best) return;
-      if (!img.complete || !img.naturalWidth) {
-        img.src = best;
-        return;
-      }
-      img.__seTrying = best;
-      const probe = new Image();
-      probe.onload = () => {
-        if (img.isConnected) img.src = best;
-      };
-      probe.onerror = () => {
-        img.__seBad.add(best);
-        img.__seTrying = '';
-        fillShots(box, img.__seUrls || []);
-      };
-      probe.src = best;
-    });
+    box.querySelectorAll('.se-shot img').forEach((img, i) => showBest(img, shots[i]?.urls || []));
   }
 
   function buildCarousel(car, shots) {
@@ -1447,21 +1429,7 @@
       '<button type="button" class="se-shot-main"><img alt="" decoding="async"><span class="se-shot-count"></span></button>' +
       `<div class="se-shot-strip">${shots.map((x, i) => `<button type="button" class="se-shot" data-i="${i}"><img alt="" loading="lazy" decoding="async"></button>`).join('')}</div>`;
 
-    const main = box.querySelector('.se-shot-main img');
-    main.__seBad = new Set();
-    main.addEventListener('error', () => {
-      main.__seBad.add(main.getAttribute('src'));
-      main.removeAttribute('src');
-      fillMain(box, main.__seUrls || [], main.__seIdx || 0);
-    });
-    box.querySelectorAll('.se-shot img').forEach((img) => {
-      img.__seBad = new Set();
-      img.addEventListener('error', () => {
-        img.__seBad.add(img.getAttribute('src'));
-        img.removeAttribute('src');
-        fillShots(box, img.__seUrls || []);
-      });
-    });
+    box.querySelectorAll('img').forEach(trackFailures);
 
     box.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1475,7 +1443,7 @@
       box.__seActive = i;
       const t = car.querySelectorAll(SHOT_THUMB)[i];
       if (t && !t.matches(SHOT_ON)) t.click();
-      syncViewer(car, box, main.__seUrls || []);
+      syncViewer(car, box, box.__seShots || []);
     });
     return box;
   }
@@ -1497,7 +1465,7 @@
   function gameName(car) {
     const appid = fromProps(car, 10, (p) => p.event?.appid || undefined);
     try {
-      return (appid && window.appStore?.GetAppOverviewByAppID(appid)?.display_name) || '';
+      return (appid && SE.appStore()?.GetAppOverviewByAppID(appid)?.display_name) || '';
     } catch (_) {
       return '';
     }
@@ -1534,6 +1502,7 @@
   let shotRetry = 0;
   let shotTries = 0;
 
+  // Up to 30 retries (15 s) while some screenshot has no URL yet; the budget refills once all load.
   function retryShots() {
     if (shotRetry || shotTries > 30) return;
     shotTries++;
@@ -1592,16 +1561,16 @@
     return true;
   }
 
+  // Splits the comments into pages that fit the box; returns the pages and each comment's height.
   function commentPages(box, list) {
-    list.forEach((c) => {
-      unmark(c, 'data-se-pg-off');
-      mark(c, 'data-se-pg');
-    });
+    list.forEach((c) => mark(c, 'data-se-pg', 'on'));
     const room = box.clientHeight;
     const pages = [];
+    const heights = new Map();
     let used = room + 1;
     for (const c of list) {
       const h = c.offsetHeight;
+      heights.set(c, h);
       if (used + h > room && (pages.length === 0 || pages[pages.length - 1].length)) {
         pages.push([]);
         used = 0;
@@ -1609,8 +1578,12 @@
       pages[pages.length - 1].push(c);
       used += h;
     }
-    return pages.length ? pages : [[]];
+    return { pages: pages.length ? pages : [[]], heights };
   }
+
+  // Off-page comments are display:none, so they measure 0 on the next pass.
+  const commentKey = (box, list, heightOf, page) =>
+    `${list.length}|${box.clientHeight}|${box.clientWidth}|${list.map(heightOf).join(',')}|${page}`;
 
   function placeShotComments(wrap) {
     const more = wrap.querySelector(MORE_COMMENTS);
@@ -1650,23 +1623,14 @@
     const tEl = head.querySelector('.se-cm-title');
     if (tEl.textContent !== title) tEl.textContent = title;
 
-    const key = `${list.length}|${box.clientHeight}|${box.clientWidth}|${list.map((c) => c.offsetHeight || 0).join(',')}|${wrap.__sePage || 0}`;
-    if (wrap.__seCmKey === key) return;
+    if (wrap.__seCmKey === commentKey(box, list, (c) => c.offsetHeight || 0, wrap.__sePage || 0)) return;
 
-    const pages = commentPages(box, list);
+    const { pages, heights } = commentPages(box, list);
     const page = Math.min(pages.length - 1, Math.max(0, wrap.__sePage || 0));
     wrap.__sePage = page;
-    pages.forEach((pg, i) =>
-      pg.forEach((c) => {
-        if (i === page) {
-          unmark(c, 'data-se-pg-off');
-        } else {
-          mark(c, 'data-se-pg-off');
-          unmark(c, 'data-se-pg');
-        }
-      })
-    );
-    wrap.__seCmKey = `${list.length}|${box.clientHeight}|${box.clientWidth}|${list.map((c) => c.offsetHeight || 0).join(',')}|${page}`;
+    const onPage = new Set(pages[page]);
+    for (const c of list) mark(c, 'data-se-pg', onPage.has(c) ? 'on' : 'off');
+    wrap.__seCmKey = commentKey(box, list, (c) => (onPage.has(c) ? heights.get(c) || 0 : 0), page);
 
     const tabs = head.querySelector('.se-cm-tabs');
     const html =
@@ -1684,6 +1648,7 @@
   }
 
   function placeFeedShots() {
+    let missing = false;
     for (const car of document.querySelectorAll(`[data-se-sec="activity"] ${SHOT_CAR}`)) {
       const shots = shotsOf(car);
       if (!shots.length) continue;
@@ -1711,10 +1676,12 @@
         shots.map((x) => ({ ...x, urls: [...x.urls].reverse() }))
       );
       syncViewer(car, box, shots);
-      if (shots.some((x) => !x.urls.length)) retryShots();
+      if (shots.some((x) => !x.urls.length)) missing = true;
       mark(car, 'data-se-shots', 'many');
       placeShotSide(car);
     }
+    if (missing) retryShots();
+    else shotTries = 0;
   }
 
   function placeFeedAvatars() {
@@ -1869,8 +1836,9 @@
       for (let n = bar.parentElement, i = 0; n && i < 4; n = n.parentElement, i++) {
         const fn = propsOf(n)?.onMouseEnter;
         if (typeof fn === 'function' && !fn.__se) {
+          // Steam fills the bar on hover; a stand-in event wakes it once without a real pointer.
           try {
-            fn({});
+            fn({ type: 'mouseenter', target: n, currentTarget: n, preventDefault() {}, stopPropagation() {} });
           } catch (_) {}
           break;
         }
@@ -1934,10 +1902,27 @@
     return a.width > 0 && overlap >= a.width * 0.5;
   }
 
+  // Scroll events arrive many times a frame: keep the latest scroller and place once per frame.
+  let scrolled = null;
+  let scrollFrame = 0;
+  const topFor = new WeakMap();
+
   function onAnyScroll(e) {
-    const t = e.target === document ? document.scrollingElement : e.target;
+    scrolled = e.target === document ? document.scrollingElement : e.target;
+    if (!scrollFrame) scrollFrame = requestAnimationFrame(placeScrolled);
+  }
+
+  function placeScrolled() {
+    scrollFrame = 0;
+    const t = scrolled;
+    scrolled = null;
     if (!(t instanceof Element) || t.clientHeight < innerHeight * 0.6 || t.scrollHeight - t.clientHeight < 50) return;
     if (t.closest(SE.SIDE)) return;
+    const known = topFor.get(t);
+    if (known?.isConnected && known.__seSc === t) {
+      placeTop(known);
+      return;
+    }
     let best = null;
     let bestSteps = 7;
     for (const btn of document.querySelectorAll(TOP_BTN)) {
@@ -1953,6 +1938,7 @@
     }
     if (!best) return;
     best.__seSc = t;
+    topFor.set(t, best);
     placeTop(best);
   }
 
@@ -1962,14 +1948,16 @@
 
   function placeScrollTop() {
     for (const btn of document.querySelectorAll(TOP_BTN)) {
-      mark(btn, 'data-se-top');
       const w = btn.parentElement;
-      if (
-        w &&
-        !w.matches(`:is(.${C.ScrollToTopButtonPosition}, .ScrollToTopButtonPosition)`) &&
-        getComputedStyle(w).position === 'static'
-      ) {
-        mark(w, 'data-se-top-host');
+      // One computed-style read per wrapper, not one per pass.
+      if (w && !w.__seTopChecked) {
+        w.__seTopChecked = true;
+        if (
+          !w.matches(`:is(.${C.ScrollToTopButtonPosition}, .ScrollToTopButtonPosition)`) &&
+          getComputedStyle(w).position === 'static'
+        ) {
+          mark(w, 'data-se-top-host');
+        }
       }
       placeTop(btn);
     }
@@ -2265,45 +2253,67 @@
     sizeLogo(img);
   }
 
+  /*
+   * [step, sections]: a step with sections runs only while one of those cards is on the page
+   * (or it still holds nodes to clean up). One query lists the cards for the whole pass.
+   */
+  const FEED = ['activity'];
   const STEPS = [
-    sizeLogos,
-    layout,
-    placeAchRings,
-    placeAchBanner,
-    placeAchIcons,
-    placeAchFeatured,
-    placeHeadingLinks,
-    placeFriends,
-    placeLeftCards,
-    placeDlcAll,
-    placeBadge,
-    placeHideCommunity,
-    placeEmoDot,
-    placeRatings,
-    placeScrollTop,
-    placeFeedAchAll,
-    placeFeedShots,
-    placeFeedEvents,
-    placeNewsLink,
-    placeReviewPrompt,
-    placePlayBarIcons,
-    placeStatKinds,
-    placeMoreNames,
-    placeLabels,
+    [sizeLogos],
+    [layout],
+    [placeAchRings],
+    [placeAchBanner, ['achievements'], () => banners.size],
+    [placeAchIcons, ['achievements'], () => achRows.size],
+    [placeAchFeatured, ['achievements', 'activity'], () => tipHosts.size],
+    [placeHeadingLinks, LINKED],
+    [placeFriends, ['friends']],
+    [placeLeftCards, LEFT_CARDS],
+    [placeDlcAll, ['dlc']],
+    [placeBadge, ['cards']],
+    [placeHideCommunity],
+    [placeEmoDot, FEED],
+    [placeRatings],
+    [placeScrollTop],
+    [placeFeedAchAll, FEED],
+    [placeFeedShots, FEED],
+    [placeFeedEvents, FEED],
+    [placeNewsLink, FEED],
+    [placeReviewPrompt],
+    [placePlayBarIcons],
+    [placeStatKinds],
+    [placeMoreNames],
+    [placeLabels],
   ];
 
   const ON_PAGE = `.${C.AppDetailsMain}, ${CONTAINER}, ${RIGHT_CONTROLS}`;
   let wasOnPage = true;
 
+  function run(step) {
+    try {
+      step();
+    } catch (_) {}
+  }
+
   function update() {
+    if (frame) cancelAnimationFrame(frame);
     frame = 0;
     const onPage = Boolean(document.querySelector(ON_PAGE));
-    const steps = onPage || wasOnPage ? STEPS : [placeScrollTop];
+    const cleanup = wasOnPage;
     wasOnPage = onPage;
-    for (const step of steps) {
-      try {
-        step();
-      } catch (_) {}
+    if (!onPage && !cleanup) {
+      run(placeScrollTop);
+      return;
+    }
+    let present = null;
+    for (const [step, secs, holds] of STEPS) {
+      if (secs && onPage) {
+        if (!present) {
+          present = new Set();
+          for (const el of document.querySelectorAll('[data-se-sec]')) present.add(el.dataset.seSec);
+        }
+        if (!secs.some((k) => present.has(k)) && !holds?.()) continue;
+      }
+      run(step);
     }
   }
 
@@ -2315,14 +2325,30 @@
     const integration = window.__steamEnhancedHltb;
     if (!integration) return;
     hltb?.destroy();
-    hltb = integration.createCard({ C, esc, mark, unmark, fromProps, appIdOf, own, drop, schedule });
+    hltb = integration.createCard({
+      C,
+      esc,
+      mark,
+      unmark,
+      fromProps,
+      appIdOf,
+      appStore: SE.appStore,
+      own,
+      drop,
+      schedule,
+    });
     schedule();
   }
 
   function start() {
     addEventListener('se-hltb-ready', attachHltb);
     attachHltb();
-    observer = SE.watch(update, { attributes: ['class'], ignore: SE.inside(SE.SIDE) });
+    // Our own popups live in <body>: showing one must not trigger a pass.
+    observer = SE.watch(update, {
+      attributes: ['class'],
+      throttle: 50,
+      ignore: SE.inside(`${SE.SIDE}, .se-ach-tip, .se-tip-label`),
+    });
     document.addEventListener('load', onLogoLoad, true);
     document.addEventListener('error', onLogoLoad, true);
     document.addEventListener('click', onEmoClick, true);
@@ -2365,7 +2391,6 @@
     'data-se-rv-text',
     'data-se-rv-hours',
     'data-se-rv-btn',
-    'data-se-top',
     'data-se-rate-bar',
     'data-se-rate',
     'data-se-rated',
@@ -2374,7 +2399,6 @@
     'data-se-shot-side',
     'data-se-side',
     'data-se-reply',
-    'data-se-pg-off',
     'data-se-pg',
     'data-se-top-host',
     'data-se-clist',
@@ -2392,11 +2416,8 @@
       observer?.disconnect();
       sizer?.disconnect();
       achSizer?.disconnect();
-      if (muteAll) {
-        document.removeEventListener('mouseout', muteAll, true);
-        document.removeEventListener('pointerout', muteAll, true);
-      }
-      if (frame) cancelAnimationFrame(frame);
+      if (muteAll) document.removeEventListener('pointerout', muteAll, true);
+      for (const id of [frame, fitQueued, scrollFrame]) if (id) cancelAnimationFrame(id);
       clearTimeout(shotRetry);
       document.removeEventListener('click', onEmoClick, true);
       document.removeEventListener('click', onCommentPill, true);
@@ -2407,16 +2428,13 @@
         el.style.removeProperty('--se-top-x');
         el.style.removeProperty('--se-top-y');
       });
-      for (const el of made) el.remove();
-      made.clear();
+      document.querySelectorAll([...ownClasses].map((c) => `.${c}`).join(', ')).forEach((el) => el.remove());
       for (const name of ATTRS) {
         document.querySelectorAll(`[${name}]`).forEach((el) => el.removeAttribute(name));
       }
       document.querySelectorAll('.se-assoc-collapsed').forEach((el) => el.classList.remove('se-assoc-collapsed'));
-      document.querySelectorAll('[style*="--se-span"]').forEach((el) => {
-        el.style.removeProperty('--se-span');
-        delete el.__seSized;
-      });
+      document.querySelectorAll('[style*="--se-span"]').forEach((el) => el.style.removeProperty('--se-span'));
+      sized.clear();
       document.querySelectorAll('[style*="--se-pct"]').forEach((el) => el.style.removeProperty('--se-pct'));
       removeEventListener('DOMContentLoaded', start);
       delete window.__steamEnhancedGamePage;

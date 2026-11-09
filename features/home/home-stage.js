@@ -33,47 +33,49 @@
   const NEWS_GAME = `.${C.ArrowWrapper_GameIconAndName}, .${C.BasicHomeUpdates_GameIconAndName}`;
   const NEWS_HEADING = `.${C.WhatsNewHeaderText}`;
 
-  const token = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  const enabled = () => token('--se-home-stage') !== 'off';
+  /*
+   * The --se-home-stage* settings, read at most every 2 s: each getComputedStyle read can force
+   * a style recalc, and layout() runs often.
+   */
+  let settings = null;
+  let settingsAt = -Infinity;
+  function setting(name) {
+    if (!settings || performance.now() - settingsAt > 2000) {
+      const cs = getComputedStyle(document.documentElement);
+      settings = Object.fromEntries(
+        ['--se-home-stage', '--se-home-stage-cycle', '--se-home-stage-tray'].map((k) => [k, cs.getPropertyValue(k).trim()])
+      );
+      settingsAt = performance.now();
+    }
+    return settings[name];
+  }
+  const enabled = () => setting('--se-home-stage') !== 'off';
   const cycleSeconds = () => {
-    const n = parseFloat(token('--se-home-stage-cycle'));
+    const n = parseFloat(setting('--se-home-stage-cycle'));
     return Number.isFinite(n) ? Math.max(0, n) : 9;
   };
   const trayShare = () => {
-    const n = parseFloat(token('--se-home-stage-tray'));
+    const n = parseFloat(setting('--se-home-stage-tray'));
     return Number.isFinite(n) ? Math.min(70, Math.max(0, n)) : 30;
   };
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
-  function host() {
-    for (const o of SE.owners()) {
-      try {
-        if (o.appStore?.allApps) return o;
-      } catch (_) {}
-    }
-    return null;
-  }
-
-  function client() {
-    for (const o of SE.owners()) {
-      try {
-        if (o.SteamClient?.Apps) return o.SteamClient;
-      } catch (_) {}
-    }
-    return window.SteamClient;
-  }
+  const appStore = () => SE.global('appStore', (s) => !!s.allApps);
+  const collectionStore = () => SE.global('collectionStore');
+  const partnerEventStore = () => SE.global('partnerEventStore');
+  const client = () => SE.global('SteamClient', (sc) => !!sc.Apps) || window.SteamClient;
 
   let recentCache = { at: 0, list: [] };
 
   function recentApps() {
     if (Date.now() - recentCache.at < 5000) return recentCache.list;
-    const o = host();
+    const store = appStore();
     let list = [];
-    if (o) {
-      const hidden = (id) => run(() => o.collectionStore.BIsHidden(id)) || false;
+    if (store) {
+      const hidden = (id) => run(() => collectionStore().BIsHidden(id)) || false;
       list =
         run(() =>
-          o.appStore.allApps
+          store.allApps
             .filter(
               (a) =>
                 a &&
@@ -92,52 +94,74 @@
 
   const CDN = (id) => `https://shared.steamstatic.com/store_item_assets/steam/apps/${id}`;
 
-  function artURLs(app, kind) {
-    const s = host()?.appStore;
-    const list = [];
-    const add = (v) => {
-      if (Array.isArray(v)) list.push(...v.filter(Boolean));
-      else if (typeof v === 'string' && v) list.push(v);
-    };
-    if (s && app.rt_custom_image_mtime) {
-      add(run(() => (kind === 'hero' ? s.GetCustomHeroImageURLs(app) : s.GetCustomLogoImageURLs(app))));
-    }
-    const file = kind === 'hero' ? 'library_hero.jpg' : 'logo.png';
-    list.push(`/assets/${app.appid}/${file}`, `${CDN(app.appid)}/${file}`);
-    if (kind === 'hero') {
-      list.push(`/assets/${app.appid}/header.jpg`, `${CDN(app.appid)}/header.jpg`);
-    }
-    return [...new Set(list)];
+  const heroURLs = (app) => SE.heroURLs(app.appid, appStore());
+
+  function logoURLs(app) {
+    const s = appStore();
+    const custom = s && app.rt_custom_image_mtime ? run(() => s.GetCustomLogoImageURLs(app)) : null;
+    return [
+      ...new Set([
+        ...(Array.isArray(custom) ? custom.filter(Boolean) : []),
+        `/assets/${app.appid}/logo.png`,
+        `${CDN(app.appid)}/logo.png`,
+      ]),
+    ];
   }
 
   /*
-   * Art tries a local copy first, then the CDN. Until one copy has loaded the image is marked
-   * data-se-art-wait and drawn as nothing (shared/images.css): a failed copy, and the wait
-   * while the next loads, otherwise show the browser's broken-image icon.
+   * Art works through its copies (local first, then the CDN): the ones still to try ride in
+   * data-urls. Until one has loaded the image is marked data-se-art-wait and drawn as nothing
+   * (shared/images.css), so a failed copy never shows the broken-image icon. One chain for
+   * both kinds of image: built ones listen themselves (they can fail before they're attached),
+   * innerHTML-built ones are caught by their panel's capture listeners.
    */
   const ART_WAIT = 'data-se-art-wait';
+  const artFailed = new WeakMap(); // img → called once its last copy has failed
 
-  function artImg(app, kind, cls, onFail) {
+  /* load doesn't bubble: caught on the way down, beside onImgError */
+  function onImgLoad(e) {
+    if (e.target instanceof HTMLImageElement) e.target.removeAttribute(ART_WAIT);
+  }
+
+  function onImgError(e) {
+    const img = e.target;
+    if (!(img instanceof HTMLImageElement) || !img.dataset.urls) return;
+    const rest = JSON.parse(img.dataset.urls);
+    if (rest.length) {
+      img.dataset.urls = JSON.stringify(rest.slice(1));
+      img.src = rest[0];
+    } else {
+      delete img.dataset.urls;
+      img.hidden = true;
+      artFailed.get(img)?.();
+    }
+  }
+
+  function artImg(urls, cls, onFail) {
     const img = document.createElement('img');
     img.className = cls;
     img.alt = '';
     img.draggable = false;
     img.decoding = 'async';
     img.setAttribute(ART_WAIT, '');
-    img.addEventListener('load', () => img.removeAttribute(ART_WAIT));
-    const urls = artURLs(app, kind);
-    let i = 0;
-    img.onerror = () => {
-      if (i < urls.length) {
-        img.src = urls[i++];
-      } else {
-        img.onerror = null;
-        img.hidden = true;
-        onFail?.();
-      }
-    };
-    img.src = urls[i++];
+    img.dataset.urls = JSON.stringify(urls.slice(1));
+    img.addEventListener('load', onImgLoad);
+    img.addEventListener('error', onImgError);
+    if (onFail) artFailed.set(img, onFail);
+    img.src = urls[0];
     return img;
+  }
+
+  const imgTag = (urls, cls) =>
+    `<img class="${cls}" alt="" draggable="false" loading="lazy" ${ART_WAIT} src="${SE.esc(urls[0])}" data-urls="${SE.esc(JSON.stringify(urls.slice(1)))}">`;
+
+  // innerHTML only when the markup changed (compared with what was last written, not with the
+  // browser's serialisation of it, which never matches attribute-only or SVG markup).
+  const written = new WeakMap();
+  function setHTML(el, html) {
+    if (written.get(el) === html) return;
+    written.set(el, html);
+    el.innerHTML = html;
   }
 
   const achievements = new Map();
@@ -352,8 +376,7 @@
     apps.forEach((app, i) => {
       const layer = document.createElement('div');
       layer.className = 'se-hs-layer';
-      layer.appendChild(artImg(app, 'hero', 'se-hs-hero'));
-      art.insertBefore(layer, grade);
+      art.insertBefore(layer, grade); // its art loads when it's next up (ensureLayerArt)
 
       const b = document.createElement('button');
       b.type = 'button';
@@ -363,7 +386,7 @@
 
       const pic = document.createElement('span');
       pic.className = 'se-hs-pic';
-      pic.appendChild(artImg(app, 'hero', 'se-hs-thumbimg'));
+      pic.appendChild(artImg(heroURLs(app), 'se-hs-thumbimg'));
 
       const label = document.createElement('span');
       label.className = 'se-hs-thumblabel';
@@ -386,7 +409,7 @@
     let entry = logos.get(app.appid);
     if (!entry) {
       entry = { ok: true };
-      entry.img = artImg(app, 'logo', 'se-hs-logo', () => {
+      entry.img = artImg(logoURLs(app), 'se-hs-logo', () => {
         entry.ok = false;
         if (apps[selected]?.appid === app.appid) paintGame();
       });
@@ -426,8 +449,7 @@
       );
     }
     const meta = stage.querySelector('.se-hs-meta');
-    const html = parts.join('');
-    if (meta.innerHTML !== html) meta.innerHTML = html;
+    setHTML(meta, parts.join(''));
 
     const chips = [];
     if (info?.pct != null) {
@@ -437,9 +459,7 @@
     if (now != null && now > 0) {
       chips.push(`<span class="se-hs-chip" data-live><i></i>${SE.esc(compact(now))} playing now</span>`);
     }
-    const chipBox = stage.querySelector('.se-hs-chips');
-    const chipHtml = chips.join('');
-    if (chipBox.innerHTML !== chipHtml) chipBox.innerHTML = chipHtml;
+    setHTML(stage.querySelector('.se-hs-chips'), chips.join(''));
 
     const desc = stage.querySelector('.se-hs-desc');
     const text = info?.text || '';
@@ -453,15 +473,26 @@
 
     const play = stage.querySelector('.se-hs-play');
     const installed = isInstalled(app);
-    const playHtml = installed ? `${ICON_PLAY}<span>Play</span>` : `${ICON_INSTALL}<span>Install</span>`;
-    if (play.innerHTML !== playHtml) play.innerHTML = playHtml;
+    setHTML(play, installed ? `${ICON_PLAY}<span>Play</span>` : `${ICON_INSTALL}<span>Install</span>`);
     SE.mark(play, 'data-kind', installed ? 'play' : 'install');
+  }
+
+  /*
+   * Only the art on show and the next in the cycle are loaded: eight full-size heroes decoded
+   * at once cost a lot of memory for layers nobody sees.
+   */
+  function ensureLayerArt(layer, app) {
+    if (layer && app && !layer.firstChild) layer.appendChild(artImg(heroURLs(app), 'se-hs-hero'));
   }
 
   function select(i) {
     if (!stage || !apps.length) return;
     selected = Math.max(0, Math.min(apps.length - 1, i || 0));
-    stage.querySelectorAll('.se-hs-layer').forEach((l, n) => l.toggleAttribute('data-on', n === selected));
+    const layers = stage.querySelectorAll('.se-hs-layer');
+    const next = (selected + 1) % apps.length;
+    ensureLayerArt(layers[selected], apps[selected]);
+    ensureLayerArt(layers[next], apps[next]);
+    layers.forEach((l, n) => l.toggleAttribute('data-on', n === selected));
     stage.querySelectorAll('.se-hs-thumb').forEach((t, n) => {
       const on = n === selected;
       t.toggleAttribute('data-on', on);
@@ -495,9 +526,12 @@
     if (!seconds || reducedMotion.matches) return;
     stage?.style.setProperty('--se-hs-cycle', `${seconds}s`);
     cycleTimer = setInterval(() => {
-      if (hovering || document.visibilityState !== 'visible' || !stage?.isConnected) return;
+      if (!stage?.isConnected) return;
+      // Out of sight (another page over Home, or the window hidden): the art's push-in pauses too.
+      const idle = document.visibilityState !== 'visible' || !SE.visible(stage);
+      SE.attr(stage, 'data-se-hs-idle', idle ? '' : null);
       const shown = stripCount();
-      if (shown < 2 || !SE.visible(stage)) return;
+      if (idle || hovering || shown < 2) return;
       select((selected + 1) % shown);
     }, seconds * 1000);
   }
@@ -542,8 +576,15 @@
 
   const isEvent = (v) => v && typeof v === 'object' && (v.GID !== undefined || v.AnnouncementGID !== undefined);
 
+  // A card's event, found once per layout pass (title, time, kind and item all need it).
+  let cardEvents = new Map();
+  function eventOf(card) {
+    if (!cardEvents.has(card)) cardEvents.set(card, SE.fromProps(card, 14, (p) => (isEvent(p.event) ? p.event : null)) || null);
+    return cardEvents.get(card);
+  }
+
   function eventTitle(card) {
-    const ev = SE.fromProps(card, 14, (p) => (isEvent(p.event) ? p.event : null));
+    const ev = eventOf(card);
     if (!ev) return '';
     const lang = language();
     const name =
@@ -555,7 +596,7 @@
   }
 
   function eventTime(card) {
-    const ev = SE.fromProps(card, 14, (p) => (isEvent(p.event) ? p.event : null));
+    const ev = eventOf(card);
     if (!ev) return 0;
     const t = run(() => ev.GetStartTimeAndDateUnixSeconds()) ?? ev.startTime ?? ev.rtime32_start_time ?? ev.start_time;
     return typeof t === 'number' && t > 0 ? t : 0;
@@ -620,7 +661,7 @@
   }
 
   function eventKind(card, title, game) {
-    const ev = SE.fromProps(card, 14, (p) => (isEvent(p.event) ? p.event : null));
+    const ev = eventOf(card);
     const clan = run(() => ev.clanSteamID.GetAccountID()) ?? run(() => ev.clan_account_id);
     if (steamSource(ev?.appid, clan) || /^steam( blog| news( hub)?| official)?$/i.test(game || '')) return 'steam';
     const t = Number(ev?.type ?? ev?.event_type);
@@ -672,7 +713,7 @@
   function newsItem(card) {
     const game = card.querySelector(NEWS_GAME);
     const title = eventTitle(card) || shownTitle(card);
-    const event = SE.fromProps(card, 14, (p) => (isEvent(p.event) ? p.event : null));
+    const event = eventOf(card);
     const clan = run(() => event.clanSteamID.GetAccountID()) ?? event?.clan_account_id;
     const source = steamSource(event?.appid, clan);
     const name = source?.name || game?.textContent.trim() || '';
@@ -740,7 +781,7 @@
 
   async function resolveOfficialEvent({ url, game }) {
     const link = officialEventLink(url, game);
-    const store = host()?.partnerEventStore;
+    const store = partnerEventStore();
     if (!link || !store) return null;
     const { appid, clan, eventid, announcement } = link;
     const cached = eventid
@@ -848,7 +889,7 @@
   }
 
   async function steamNativeNews(source) {
-    const store = host()?.partnerEventStore;
+    const store = partnerEventStore();
     // The pageable method reads the clan through GetAccountID when no app is supplied.
     const clan = source.app ? undefined : { GetAccountID: () => source.clan };
     const path = source.app ? `app/${source.app}` : `group/${source.clan}`;
@@ -965,14 +1006,6 @@
     if (!area?.isConnected) return;
     area.scrollLeft = area.scrollWidth;
     area.dispatchEvent(new Event('scroll'));
-  }
-
-  function fitHeads() {
-    if (!newsHeads) return;
-    newsHeads.querySelectorAll('.se-hs-hline[hidden]').forEach((b) => {
-      b.hidden = false;
-    });
-    SE.mark(newsHeads, 'data-more', newsHeads.scrollHeight > newsHeads.clientHeight + 2 ? 'yes' : 'no');
   }
 
   function ensureNewsElements(row, ownHeading) {
@@ -1143,11 +1176,10 @@
       paintFeature();
     }
     newsHeads.querySelector('[data-foot]').hidden = ownHeading;
-    fitHeads();
   }
 
   function wideURLs(app) {
-    const s = host()?.appStore;
+    const s = appStore();
     const list = [];
     const add = (v) => {
       if (Array.isArray(v)) list.push(...v.filter(Boolean));
@@ -1169,28 +1201,6 @@
     return [...new Set(list)];
   }
 
-  const imgTag = (urls, cls) =>
-    `<img class="${cls}" alt="" draggable="false" loading="lazy" ${ART_WAIT} src="${SE.esc(urls[0])}" data-urls="${SE.esc(JSON.stringify(urls.slice(1)))}">`;
-
-  /* load doesn't bubble: caught on the way down, beside onImgError */
-  function onImgLoad(e) {
-    if (e.target instanceof HTMLImageElement) e.target.removeAttribute(ART_WAIT);
-  }
-
-  function onImgError(e) {
-    const img = e.target;
-    if (!(img instanceof HTMLImageElement) || !img.dataset.urls) return;
-    const rest = JSON.parse(img.dataset.urls);
-    if (rest.length) {
-      img.dataset.urls = JSON.stringify(rest.slice(1));
-      img.src = rest[0];
-    } else {
-      delete img.dataset.urls;
-      img.hidden = true;
-    }
-  }
-
-  const collectionStore = () => host()?.collectionStore;
   const collectionApps = (id) => {
     const c = run(() => collectionStore().GetCollection(id));
     return c ? run(() => [...c.visibleApps]) || [] : null;
@@ -1215,7 +1225,7 @@
   }
 
   function appById(id) {
-    const s = host()?.appStore;
+    const s = appStore();
     return (
       run(() => s.GetAppOverviewByAppID(Number(id))) ||
       run(() => s.allApps.find((a) => String(a.appid) === String(id))) ||
@@ -1225,7 +1235,7 @@
 
   const libraryGames = () =>
     run(() =>
-      host().appStore.allApps.filter(
+      appStore().allApps.filter(
         (a) => a && (a.app_type === 1 || a.app_type === 1073741824) && a.visible_in_game_list !== false
       )
     ) || [];
@@ -1395,7 +1405,7 @@
           id: String(a.appid),
           name: a.display_name,
           sub: hoursText(a),
-          img: coverURLs(a, host()?.appStore),
+          img: coverURLs(a, appStore()),
         });
         const extra = (readPick('se-home-fav-pick') || [])
           .filter((id) => !ids.has(id))
@@ -1525,7 +1535,7 @@
     const colApps = id ? collectionApps(id) : null;
     if (!colApps) {
       dropOwn(row);
-      return;
+      return null;
     }
     favCollection = id;
     const entry = ownPanel(row, 'se-hs-fav', (el) => {
@@ -1589,10 +1599,16 @@
           )
           .join('') || `<span class="se-hs-empty">${picks ? 'No games chosen' : 'No favorites yet'}</span>`;
     }
+    return entry;
+  }
 
+  // A grid's size, read in layout()'s measuring pass.
+  const boxOf = (grid) => ({ W: grid?.clientWidth || 0, H: grid?.clientHeight || 0 });
+
+  // As many rows of capsules as the games need and the tray holds (writes only).
+  function fitFav(entry, { W, H }) {
+    const grid = entry.el.querySelector('.se-hs-grid');
     const tiles = [...grid.querySelectorAll('.se-hs-tile')];
-    const W = grid.clientWidth;
-    const H = grid.clientHeight;
     const GAP = 10;
     const natural = (W - GAP * 2) / 3 / (460 / 215);
     const room = W > 0 && H > 0 ? Math.max(1, Math.floor((H + GAP) / (natural * 0.85 + GAP))) : 2;
@@ -1605,12 +1621,8 @@
           ? '1fr'
           : `${Math.floor(Math.min(natural * 1.15, (H - GAP * (rows - 1)) / rows))}px`;
 
-    if (grid.style.getPropertyValue('--se-hs-frows') !== String(rows)) {
-      grid.style.setProperty('--se-hs-frows', String(rows));
-    }
-    if (grid.style.getPropertyValue('--se-hs-frowh') !== rowH) {
-      grid.style.setProperty('--se-hs-frowh', rowH);
-    }
+    SE.cssVar(grid, '--se-hs-frows', String(rows));
+    SE.cssVar(grid, '--se-hs-frowh', rowH);
 
     const over = tiles.length > fit;
     const show = over ? fit : tiles.length;
@@ -1640,11 +1652,25 @@
       .sort((a, b) => String(a.displayName || a.id).localeCompare(String(b.displayName || b.id)));
   }
 
+  // The `n` most recently played of a collection, in one pass (no copy-and-sort of the whole set).
+  function recentOf(apps, n) {
+    const top = [];
+    for (const app of apps) {
+      const t = app?.rt_last_time_played || 0;
+      if (top.length === n && t <= (top[n - 1].rt_last_time_played || 0)) continue;
+      let i = top.length;
+      while (i > 0 && (top[i - 1].rt_last_time_played || 0) < t) i--;
+      top.splice(i, 0, app);
+      if (top.length > n) top.pop();
+    }
+    return top;
+  }
+
   function paintColl(row) {
     let list = collectionStore() ? userCollections() : null;
     if (!list) {
       dropOwn(row);
-      return;
+      return null;
     }
     const entry = ownPanel(row, 'se-hs-coll', (el) => {
       el.innerHTML =
@@ -1677,14 +1703,12 @@
       list = list.filter((c) => want.has(String(c.id)));
     }
     const rows = list.map((c) => {
-      const colApps = (run(() => [...c.visibleApps]) || [])
-        .slice()
-        .sort((a, b) => (b.rt_last_time_played || 0) - (a.rt_last_time_played || 0));
+      const colApps = run(() => c.visibleApps) || [];
       return {
         id: c.id,
         name: c.displayName || c.strName || c.id,
-        count: colApps.length,
-        covers: colApps.slice(0, 3),
+        count: run(() => colApps.length) || 0,
+        covers: run(() => recentOf(colApps, 3)) || [],
       };
     });
 
@@ -1696,7 +1720,7 @@
     if (entry.sig !== sig) {
       entry.sig = sig;
       entry.el.querySelector('.se-hs-ncount').textContent = picks ? `· ${rows.length} of ${total}` : `· ${rows.length}`;
-      const store = host()?.appStore;
+      const store = appStore();
       grid.innerHTML =
         rows
           .map((r) => {
@@ -1714,11 +1738,14 @@
         '<button type="button" class="se-hs-ccard" data-cmore hidden><span class="se-hs-cmore"></span></button>' +
         (rows.length ? '' : `<span class="se-hs-empty">${picks ? 'No collections chosen' : 'No collections yet'}</span>`);
     }
+    return entry;
+  }
 
+  // Columns and card height for the room the tray gives, a "+N" card for the rest (writes only).
+  function fitColl(entry, { W, H }) {
+    const grid = entry.el.querySelector('.se-hs-cgrid');
     const tiles = [...grid.querySelectorAll('[data-coll]')];
     const moreTile = grid.querySelector('[data-cmore]');
-    const W = grid.clientWidth;
-    const H = grid.clientHeight;
     const GAP = 10;
     const cols = W >= 600 ? 3 : W < 300 ? 1 : 2;
     let fit = tiles.length;
@@ -1733,12 +1760,8 @@
       fit = cols * room;
     }
 
-    if (grid.style.getPropertyValue('--se-hs-ccols') !== String(cols)) {
-      grid.style.setProperty('--se-hs-ccols', String(cols));
-    }
-    if (grid.style.getPropertyValue('--se-hs-ch') !== `${cardH}px`) {
-      grid.style.setProperty('--se-hs-ch', `${cardH}px`);
-    }
+    SE.cssVar(grid, '--se-hs-ccols', String(cols));
+    SE.cssVar(grid, '--se-hs-ch', `${cardH}px`);
 
     const over = tiles.length > fit && fit > 1;
     const show = over ? fit - 1 : Math.min(tiles.length, fit);
@@ -1938,13 +1961,34 @@
     return { flat, rows };
   }
 
-  function applyStageDimensions(trayRows, kinds) {
+  // Reads only: the room under the header, and the tallest tray panel's least height.
+  function measureStage(trayRows, kinds) {
     const view = scroller?.clientHeight || innerHeight;
     const top =
       scope.getBoundingClientRect().top -
       (scroller?.getBoundingClientRect?.().top || 0) +
       (scroller?.scrollTop || 0);
-    const measured = Math.max(420, Math.round(view - Math.max(0, top)) - HEADROOM);
+    const ownHeight = (r) => {
+      const cs = getComputedStyle(r);
+      const panel = r.querySelector(':scope > .se-hs-own');
+      const parts = panel ? [...panel.children] : [...r.children];
+      const least = (c) =>
+        c.classList.contains('se-hs-clist-box')
+          ? 150
+          : c.classList.contains('se-hs-grid')
+            ? Math.round(2 * ((c.clientWidth - 20) / 3 / (460 / 215)) + 10)
+            : c.offsetHeight;
+      const inner = parts.reduce((h, c) => h + least(c), 0) + (panel ? 8 : 14);
+      return inner + (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+    };
+    return {
+      measured: Math.max(420, Math.round(view - Math.max(0, top)) - HEADROOM),
+      content: trayRows.length ? Math.max(...trayRows.filter((r) => kinds.get(r) !== 'news').map(ownHeight), 0) : 0,
+    };
+  }
+
+  // Writes only, from measureStage()'s numbers.
+  function applyStageDimensions({ measured, content }, trayRows) {
     const now = performance.now();
 
     if (!appliedVh || measured === appliedVh) {
@@ -1962,33 +2006,13 @@
 
     const vh = appliedVh;
     const want = Math.round((vh * trayShare()) / 100);
-    const ownHeight = (r) => {
-      const cs = getComputedStyle(r);
-      const panel = r.querySelector(':scope > .se-hs-own');
-      const parts = panel ? [...panel.children] : [...r.children];
-      const least = (c) =>
-        c.classList.contains('se-hs-clist-box')
-          ? 150
-          : c.classList.contains('se-hs-grid')
-            ? Math.round(2 * ((c.clientWidth - 20) / 3 / (460 / 215)) + 10)
-            : c.offsetHeight;
-      const inner = parts.reduce((h, c) => h + least(c), 0) + (panel ? 8 : 14);
-      return inner + (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
-    };
-
-    const content = trayRows.length
-      ? Math.max(...trayRows.filter((r) => kinds.get(r) !== 'news').map(ownHeight), 0)
-      : 0;
     const trayBox = trayRows.length && !isNarrow ? Math.min(Math.max(want, content, 220), vh - 340 - 22) : 0;
     const px = trayBox ? `${trayBox}px` : '';
     if (tray.style.height !== px) tray.style.height = px;
     const trayH = trayBox ? trayBox + 22 : 0;
 
-    const set = (k, v) => {
-      if (stage.style.getPropertyValue(k) !== v) stage.style.setProperty(k, v);
-    };
-    set('--se-hs-vh', `${vh}px`);
-    set('--se-hs-h', `${Math.max(340, isNarrow ? Math.round(vh * 0.7) : vh - trayH)}px`);
+    SE.cssVar(stage, '--se-hs-vh', `${vh}px`);
+    SE.cssVar(stage, '--se-hs-h', `${Math.max(340, isNarrow ? Math.round(vh * 0.7) : vh - trayH)}px`);
 
     const lock = !isNarrow && trayRows.length > 0 && vh - trayH >= 340;
     if (lock) {
@@ -2002,6 +2026,7 @@
 
   function layout() {
     if (scope && !usable()) return;
+    cardEvents = new Map();
     const lib = document.querySelector('.LibraryHome');
     const home = lib?.parentElement;
     if (!home) {
@@ -2070,6 +2095,7 @@
     }
 
     const favRow = trayRows.find((r) => kinds.get(r) === 'fav');
+    let favEntry = null;
     if (favRow) {
       const shelf = favRow.matches(SHELF) ? favRow : favRow.querySelector(SHELF);
       const id = (shelf && shelfId(shelf)) || (shelf && isFavorites(shelf) ? 'favorite' : null);
@@ -2077,11 +2103,11 @@
         id === 'favorite'
           ? 'Favorites'
           : (shelf?.querySelector(SHELF_HEADER)?.textContent || '').replace(/[·•].*$/, '').trim();
-      paintFav(favRow, id, title);
+      favEntry = paintFav(favRow, id, title);
     }
 
     const collRow = trayRows.find((r) => kinds.get(r) === 'coll');
-    if (collRow) paintColl(collRow);
+    const collEntry = collRow ? paintColl(collRow) : null;
 
     const sig = apps.map((a) => a.appid).join(',');
     if (sig !== appsSig) {
@@ -2100,7 +2126,17 @@
       if (!cycleTimer) restartCycle();
     }
     setOn(true);
-    applyStageDimensions(trayRows, kinds);
+
+    // Every measurement of the pass at once (one layout), then the writes that depend on them.
+    const favBox = favEntry && boxOf(favEntry.el.querySelector('.se-hs-grid'));
+    const collBox = collEntry && boxOf(collEntry.el.querySelector('.se-hs-cgrid'));
+    const headsMore = newsHeads?.isConnected ? newsHeads.scrollHeight > newsHeads.clientHeight + 2 : null;
+    const dims = measureStage(trayRows, kinds);
+
+    if (favEntry) fitFav(favEntry, favBox);
+    if (collEntry) fitColl(collEntry, collBox);
+    if (headsMore !== null) SE.mark(newsHeads, 'data-more', headsMore ? 'yes' : 'no');
+    applyStageDimensions(dims, trayRows);
     fitStrip();
   }
 

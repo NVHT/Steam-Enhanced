@@ -100,16 +100,23 @@
   padding: 0 14px 14px !important;
 }
 
+/* The uppercase label: sidebar groups, section labels and the search results' head */
+._18QCu-7MTzd51UpVbYysDy[data-se-label]::before,
+._1Hye7o1wYIfc9TE9QKRW4T[data-se-label]::before,
+.CFTLX2wIKOK3hNV-fS7_V [data-se-sec]:not(#se-none),
+.se-settings-results-head {
+  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
+  letter-spacing: var(--se-label-spacing, .1em) !important;
+  text-transform: uppercase !important;
+  color: var(--se-label-color, #6f7984) !important;
+}
+
 ._18QCu-7MTzd51UpVbYysDy[data-se-label]::before,
 ._1Hye7o1wYIfc9TE9QKRW4T[data-se-label]::before {
   /* Group labels */
   content: attr(data-se-label);
   display: block;
   padding: 0 10px 4px;
-  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
-  letter-spacing: var(--se-label-spacing, .1em) !important;
-  text-transform: uppercase;
-  color: var(--se-label-color, #6f7984) !important;
 }
 
 ._1Hye7o1wYIfc9TE9QKRW4T {
@@ -355,10 +362,6 @@
   padding: 0 4px !important;
   height: auto !important;
   min-height: 0 !important;
-  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
-  letter-spacing: var(--se-label-spacing, .1em) !important;
-  text-transform: uppercase !important;
-  color: var(--se-text-faint, #6f7984) !important;
   background: none !important;
   border: 0 !important;
 }
@@ -532,12 +535,16 @@
  * Row icons: a 34px tile on the left. native field icons (Steam Guard, controllers,
  * Remote Play devices) and the ones features/settings/settings.js adds (data-se-row) share it.
  */
-.CFTLX2wIKOK3hNV-fS7_V [data-se-c]:is([data-se-row], :has(._2DM37juowId1V_DScp3l4._2sj0iYB2llhya3q15q0xiX)):not(#se-none) {
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c]:is([data-se-row], :has(._2DM37juowId1V_DScp3l4._2sj0iYB2llhya3q15q0xiX)):not(#se-none),
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c][data-se-ctl]:not(#se-none),
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c][data-se-licon]:not(#se-none) {
   padding-left: 66px !important;
 }
 
 .CFTLX2wIKOK3hNV-fS7_V [data-se-c][data-se-row]::before,
-.CFTLX2wIKOK3hNV-fS7_V [data-se-c]:has(._2DM37juowId1V_DScp3l4._2sj0iYB2llhya3q15q0xiX)::before {
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c]:has(._2DM37juowId1V_DScp3l4._2sj0iYB2llhya3q15q0xiX)::before,
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c][data-se-ctl]::before,
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c][data-se-licon]::before {
   content: '';
   position: absolute;
   left: 18px;
@@ -1068,8 +1075,7 @@
   flex-basis: 320px;
 }
 
-.CFTLX2wIKOK3hNV-fS7_V [data-se-c] ._1aw7cA3mAZfWt8idAlVJWi:has(.SliderControlPanelGroup) > ._2o2fXzn99OddeqZMjbDuxQ,
-.CFTLX2wIKOK3hNV-fS7_V [data-se-c] ._1aw7cA3mAZfWt8idAlVJWi .SliderControlPanelGroup {
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c] ._1aw7cA3mAZfWt8idAlVJWi:has(.SliderControlPanelGroup) > ._2o2fXzn99OddeqZMjbDuxQ {
   width: 100% !important;
   min-width: 0 !important;
 }
@@ -1121,29 +1127,11 @@
 
 /*
  * Connected controllers (Steam Controller, XInput…): Steam draws their icon inside the
- * name, so it gets the same 34px tile as every other row; the connection ("USB",
+ * name (features/settings/settings.js marks the row [data-se-ctl]), so it gets the same 34px
+ * tile as every other row (see Row icons); the connection ("USB",
  * "Steam Controller Puck") reads as a quiet detail beside Details.
  */
-.CFTLX2wIKOK3hNV-fS7_V [data-se-c]:has(:is(.JASigq2q1TdofKTOw7MQt, ._3IdIX2_eZXnDrm2wqIpTSQ, ._28B5PnW21FOp5fzffM9K6) > ._30lE6NZfqKKk3ozfL--IYQ):not(#se-none) {
-  padding-left: 66px !important;
-}
-
-.CFTLX2wIKOK3hNV-fS7_V [data-se-c]:has(:is(.JASigq2q1TdofKTOw7MQt, ._3IdIX2_eZXnDrm2wqIpTSQ, ._28B5PnW21FOp5fzffM9K6) > ._30lE6NZfqKKk3ozfL--IYQ)::before {
-  content: '';
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  width: 34px;
-  height: 34px;
-  margin-top: -17px;
-  border-radius: var(--se-radius-sm, 8px);
-  background: var(--se-surface-2, #262c35);
-}
-
-.CFTLX2wIKOK3hNV-fS7_V [data-se-c]:has(:is(.JASigq2q1TdofKTOw7MQt, ._3IdIX2_eZXnDrm2wqIpTSQ, ._28B5PnW21FOp5fzffM9K6) > ._30lE6NZfqKKk3ozfL--IYQ) ._2tALpM7z8naXJ35Pp5fNAG,
-.CFTLX2wIKOK3hNV-fS7_V [data-se-c]:has(:is(.JASigq2q1TdofKTOw7MQt, ._3IdIX2_eZXnDrm2wqIpTSQ, ._28B5PnW21FOp5fzffM9K6) > ._30lE6NZfqKKk3ozfL--IYQ) ._2VcTlXFC64Jtg9gvtT6cmY,
-.CFTLX2wIKOK3hNV-fS7_V [data-se-c]:has(:is(.JASigq2q1TdofKTOw7MQt, ._3IdIX2_eZXnDrm2wqIpTSQ, ._28B5PnW21FOp5fzffM9K6) > ._30lE6NZfqKKk3ozfL--IYQ) ._3jMlJm4PQCA8SfNlUR99Fo,
-.CFTLX2wIKOK3hNV-fS7_V [data-se-c]:has(:is(.JASigq2q1TdofKTOw7MQt, ._3IdIX2_eZXnDrm2wqIpTSQ, ._28B5PnW21FOp5fzffM9K6) > ._30lE6NZfqKKk3ozfL--IYQ) :is(.JASigq2q1TdofKTOw7MQt, ._3IdIX2_eZXnDrm2wqIpTSQ, ._28B5PnW21FOp5fzffM9K6) {
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c][data-se-ctl] :is(._2tALpM7z8naXJ35Pp5fNAG, ._2VcTlXFC64Jtg9gvtT6cmY, ._3jMlJm4PQCA8SfNlUR99Fo, .JASigq2q1TdofKTOw7MQt, ._3IdIX2_eZXnDrm2wqIpTSQ, ._28B5PnW21FOp5fzffM9K6) {
   position: static !important;
 }
 
@@ -1215,23 +1203,7 @@
   background: var(--se-text-strong, #fff);
 }
 
-/* Icons Steam puts inside the label (first controller row) join the tile column. */
-.CFTLX2wIKOK3hNV-fS7_V [data-se-c][data-se-licon]:not(#se-none) {
-  padding-left: 66px !important;
-}
-
-.CFTLX2wIKOK3hNV-fS7_V [data-se-c][data-se-licon]::before {
-  content: '';
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  width: 34px;
-  height: 34px;
-  margin-top: -17px;
-  border-radius: var(--se-radius-sm, 8px);
-  background: var(--se-surface-2, #262c35);
-}
-
+/* Icons Steam puts inside the label (first controller row) join the tile column (see Row icons). */
 .CFTLX2wIKOK3hNV-fS7_V [data-se-licon-el] {
   position: absolute !important;
   left: 26.5px;
@@ -1312,16 +1284,8 @@
   gap: 12px !important;
 }
 
-.CFTLX2wIKOK3hNV-fS7_V .SliderControlPanelGroup > ._32UKkQuhmS8Wq50hS4B1-m,
-.CFTLX2wIKOK3hNV-fS7_V .SliderControlPanelGroup > ._11I0_AlsB40ak50752rsuy {
-  order: 3;
-}
-
-.CFTLX2wIKOK3hNV-fS7_V ._1aw7cA3mAZfWt8idAlVJWi:has(.SliderControlPanelGroup) ._32UKkQuhmS8Wq50hS4B1-m,
-.CFTLX2wIKOK3hNV-fS7_V ._1aw7cA3mAZfWt8idAlVJWi:has(.SliderControlPanelGroup) ._11I0_AlsB40ak50752rsuy {
-  order: 3;
-}
-
+.CFTLX2wIKOK3hNV-fS7_V .SliderControlPanelGroup > :is(._32UKkQuhmS8Wq50hS4B1-m, ._11I0_AlsB40ak50752rsuy),
+.CFTLX2wIKOK3hNV-fS7_V ._1aw7cA3mAZfWt8idAlVJWi:has(.SliderControlPanelGroup) :is(._32UKkQuhmS8Wq50hS4B1-m, ._11I0_AlsB40ak50752rsuy),
 .CFTLX2wIKOK3hNV-fS7_V ._2o2fXzn99OddeqZMjbDuxQ:has(> .SliderControlPanelGroup) > :not(.SliderControlPanelGroup) {
   order: 3;
 }
@@ -1567,7 +1531,7 @@
  * Family: the "Steam Families" intro and its button become one header card (row 1 of
  * the panel); anything else in the panel (Family View…) runs full width below it.
  */
-.CFTLX2wIKOK3hNV-fS7_V :has(> .WIVHxIb79kMHNG7iA_Q9H):not(#se-none) {
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family]:not(#se-none) {
   position: relative;
   display: grid !important;
   grid-template-columns: 22px 52px 18px minmax(0, 1fr) 18px auto 22px;
@@ -1587,7 +1551,7 @@
   mask: none !important;
 }
 
-.CFTLX2wIKOK3hNV-fS7_V :has(> .WIVHxIb79kMHNG7iA_Q9H)::after {
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family]::after {
   content: '';
   grid-column: 1 / -1;
   grid-row: 1;
@@ -1598,7 +1562,7 @@
   box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
 }
 
-.CFTLX2wIKOK3hNV-fS7_V :has(> .WIVHxIb79kMHNG7iA_Q9H)::before {
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family]::before {
   content: '';
   grid-column: 2;
   grid-row: 1;
@@ -1610,13 +1574,13 @@
   background: var(--se-accent-tint, rgba(124, 196, 255, .14)) var(--se-ic-family-accent) center / 26px 26px no-repeat;
 }
 
-.CFTLX2wIKOK3hNV-fS7_V :has(> .WIVHxIb79kMHNG7iA_Q9H) > * {
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family] > * {
   grid-column: 1 / -1;
   position: relative;
   z-index: 1;
 }
 
-.CFTLX2wIKOK3hNV-fS7_V :has(> .WIVHxIb79kMHNG7iA_Q9H) > :first-child:not(.WIVHxIb79kMHNG7iA_Q9H) {
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family] > :first-child:not(.WIVHxIb79kMHNG7iA_Q9H) {
   grid-column: 4;
   grid-row: 1;
   padding: 22px 0 !important;
@@ -1625,7 +1589,7 @@
   color: var(--se-text-muted, #98a2ad) !important;
 }
 
-.CFTLX2wIKOK3hNV-fS7_V :has(> .WIVHxIb79kMHNG7iA_Q9H) > :first-child[data-se-head]::before {
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family] > :first-child[data-se-head]::before {
   content: attr(data-se-head);
   display: block;
   margin-bottom: 4px;
@@ -1633,7 +1597,7 @@
   color: var(--se-text-strong, #fff);
 }
 
-.CFTLX2wIKOK3hNV-fS7_V :has(> .WIVHxIb79kMHNG7iA_Q9H) a {
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family] a {
   color: var(--se-accent, #7cc4ff) !important;
 }
 
@@ -1916,7 +1880,7 @@
   letter-spacing: 0 !important;
 }
 
-.CFTLX2wIKOK3hNV-fS7_V :has(> ._1LvKJs5FKB30xbur_XL2DL):not(#se-none) {
+.CFTLX2wIKOK3hNV-fS7_V [data-se-drive]:not(#se-none) {
   /* The row holding DriveUsage and the "…" button */
   display: flex !important;
   align-items: flex-start !important;
@@ -2483,7 +2447,7 @@
  * their button — the library's 220px minimum pushed them past the popup's edge.
  */
 html[data-se-settings] ._1ZpBQtDqcKBbfIIv01Vs1R:not(#se-none),
-._1ZpBQtDqcKBbfIIv01Vs1R:not(:has(._1ZtpSq62fy_8W-_0pMn5cu:nth-child(4))):not(#se-none) {
+html:is([data-se-props], [data-se-mill]) ._1ZpBQtDqcKBbfIIv01Vs1R:not(:has(._1ZtpSq62fy_8W-_0pMn5cu:nth-child(4))):not(#se-none) {
   min-width: 0 !important;
   max-width: 100% !important;
   box-sizing: border-box !important;
@@ -2532,10 +2496,6 @@ html[data-se-settings] ._1ZpBQtDqcKBbfIIv01Vs1R:not(#se-none),
 
 .se-settings-results-head {
   padding: 4px 8px 4px;
-  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
-  letter-spacing: var(--se-label-spacing, .1em) !important;
-  text-transform: uppercase;
-  color: var(--se-label-color, #6f7984) !important;
 }
 
 .se-settings-result {
@@ -2567,6 +2527,14 @@ html[data-se-settings] ._1ZpBQtDqcKBbfIIv01Vs1R:not(#se-none),
 .se-settings-result:hover,
 .se-settings-result[data-se-cur] {
   background: var(--se-hover, #2c3440);
+}
+
+/* Keyboard focus on the controls this theme adds (results, copy, Workshop's empty state) */
+.se-settings-result:focus-visible,
+.se-copy:focus-visible,
+.se-ws-btn:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-settings-result[data-se-cur] .se-settings-result-page {
@@ -2705,7 +2673,7 @@ html[data-se-settings] ._1ZpBQtDqcKBbfIIv01Vs1R:not(#se-none),
   background: var(--se-accent, #7cc4ff);
 }
 
-._1-vlriAtKYDViAEunue4VO._2DpXjzK3WWsOtUWUrcuOG7::after {
+html:is([data-se-settings], [data-se-props], [data-se-mill]) ._1-vlriAtKYDViAEunue4VO._2DpXjzK3WWsOtUWUrcuOG7::after {
   content: '';
   position: absolute;
   left: -14px;

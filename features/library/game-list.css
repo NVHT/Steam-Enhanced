@@ -1,5 +1,6 @@
 /*
- * Left sidebar virtualized game list rows and collection group headers.
+ * Left sidebar virtualized game list rows and collection group headers: the one owner of
+ * their styling.
  *
  * Preserves Steam's fixed 26px virtualized row height while restyling status
  * indicators, active selection bars, collapsible collection headers, and inline
@@ -33,7 +34,7 @@
   width: 20px;
   height: 20px;
   margin: 0;
-  border-radius: 5px;
+  border-radius: var(--se-radius-xs, 4px);
   object-fit: cover;
 }
 
@@ -106,7 +107,7 @@
   box-shadow: none;
   color: var(--se-running, #6cc24a);
   opacity: .85;
-  transition: opacity .15s ease, background-color .15s ease;
+  transition: opacity var(--se-dur, .15s) ease-out, background-color var(--se-dur, .15s) ease-out;
 }
 
 ._2-O4ZG0KrnSrzISHBKctFQ .cNZ3wORgnf1KSNhI2eE2M::before {
@@ -163,7 +164,7 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: conic-gradient(currentColor var(--se-dl-pct, 0%), rgba(255, 255, 255, .14) 0);
+  background: conic-gradient(currentColor var(--se-dl-pct, 0%), var(--se-white-14, rgba(255, 255, 255, .14)) 0);
   -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
 }
 
@@ -188,6 +189,15 @@
 ._2-O4ZG0KrnSrzISHBKctFQ .se-gl-status[data-se-state="running"]:not(#se-none) {
   color: var(--se-running, #6cc24a);
   background: color-mix(in srgb, var(--se-running, #6cc24a) 18%, transparent);
+}
+
+/* The breathing halo: a ring on its own layer, pulsed with opacity and scale only */
+.se-gl-status[data-se-state="running"]::after {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--se-running, #6cc24a) 30%, transparent);
+  opacity: 0;
   animation: se-running-breathe 2.4s ease-in-out infinite;
 }
 
@@ -208,24 +218,26 @@
 
 @keyframes se-running-breathe {
   0%, 100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--se-running, #6cc24a) 35%, transparent);
+    opacity: 0;
+    transform: scale(.75);
   }
 
   50% {
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--se-running, #6cc24a) 0%, transparent);
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .se-gl-status[data-se-state="running"] {
+  .se-gl-status[data-se-state="running"]::after {
     animation: none;
   }
 }
 
-/* Selected game: the accent tint and a bar on the list's edge */
+/* Selected game: the selected fill (as .Container.Selected below) and a bar on the list's edge */
 ._1UBpAXP408Ez_L_mXhW5Q9._2-O4ZG0KrnSrzISHBKctFQ:not(#se-none),
 ._1UBpAXP408Ez_L_mXhW5Q9 ._2-O4ZG0KrnSrzISHBKctFQ:not(#se-none) {
-  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+  background: var(--se-selected, #33404f);
   box-shadow: none !important;
   color: var(--se-text-strong, #fff);
 }
@@ -298,7 +310,7 @@
   height: 14px;
   background: currentColor;
   -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
-  transition: transform .15s ease;
+  transition: transform var(--se-dur, .15s) ease-out;
 }
 
 ._2sYIghGVXJr6tsQVvcryy8 ._3SFRZYIb9Y2q7YsVtB3YKb._2hFLgYbxE-5r06ns3QN334::before {
@@ -389,10 +401,7 @@
   white-space: nowrap;
 }
 
-._2-O4ZG0KrnSrzISHBKctFQ .-BsLCHlCHg50lwvxnBWt1 ._2RggXvVkWMDvvxFegjtKso {
-  display: none !important;
-}
-
+._2-O4ZG0KrnSrzISHBKctFQ .-BsLCHlCHg50lwvxnBWt1 ._2RggXvVkWMDvvxFegjtKso,
 ._2-O4ZG0KrnSrzISHBKctFQ .-BsLCHlCHg50lwvxnBWt1 ._3uk3F1BmAJQR6rl1TPcaif:not(#se-none) {
   display: none !important;
 }
@@ -404,7 +413,7 @@
   right: 10px;
   bottom: 2px;
   height: 2px;
-  border-radius: 999px;
+  border-radius: var(--se-radius-pill, 999px);
   background: linear-gradient(90deg, var(--se-accent, #7cc4ff) var(--se-dl-pct, 0%), rgba(255, 255, 255, .08) 0);
   pointer-events: none;
 }
@@ -425,7 +434,7 @@
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
-  border-radius: 5px !important;
+  border-radius: var(--se-radius-xs, 4px) !important;
   outline: 0 !important;
   box-shadow: none !important;
   transform: none !important;
@@ -443,7 +452,7 @@
   width: 20px !important;
   height: 20px !important;
   margin: 0 !important;
-  border-radius: 5px !important;
+  border-radius: var(--se-radius-xs, 4px) !important;
   overflow: hidden;
   opacity: 1 !important;
   filter: none !important;
@@ -456,14 +465,14 @@
   height: 18px !important;
   margin: 0 !important;
   /* At the box's top left, where an ordinary row's icon sits */
-  border-radius: 4px;
+  border-radius: var(--se-radius-xs, 4px);
   object-fit: cover;
 }
 
 /*
- * A downloading or queued row takes the inset, fills and icon size of the others from
- * features/navigation/sidebar-icons.css (it carries Updating where they carry Installed or Uninstalled);
- * its entry keeps no margin or fill of its own
+ * A downloading or queued row takes the inset, fills and icon size of the others (below; it
+ * carries Updating where they carry Installed or Uninstalled); its entry keeps no margin or
+ * fill of its own
  */
 ._2-O4ZG0KrnSrzISHBKctFQ ._1vO6BoiVslZgs1kqDGdUs8:has(> ._2kzMb_F7UTOEdecAFftN-l):not(#se-none) {
   margin-inline: 0 !important;
@@ -513,4 +522,104 @@
   padding-inline: 10px !important;
   background: transparent !important;
   box-shadow: none !important;
+}
+
+/*
+ * Rows by Steam's global classes. Steam marks a game row's .Container with Installed or
+ * Uninstalled (a downloading or queued game carries Updating instead); those classes are what
+ * identify a game row, so the rules hold wherever .GameListEntryContainer sits relative to it.
+ * Rows keep Steam's heights (the list is virtualized and positions rows itself).
+ */
+.GameListEntryContainer {
+  border-radius: var(--se-radius-sm, 8px);
+}
+
+.GameListEntryContainer > * {
+  border-radius: inherit;
+}
+
+.GameListEntryContainer img {
+  border-radius: var(--se-radius-xs, 4px);
+}
+
+/* A transparent side border insets the fill without changing the row's width */
+.Container:is(.Installed, .Uninstalled, .Updating, .Running),
+.Container.CollapseIconParent {
+  box-sizing: border-box !important;
+  border-inline: 6px solid transparent !important;
+  background-clip: padding-box !important;
+  /* Measured from the border's outer edge, so the visible fill keeps --se-radius-sm */
+  border-radius: calc(var(--se-radius-sm, 8px) + 6px) !important;
+}
+
+.Container:is(.Installed, .Uninstalled, .Updating, .Running):hover:not(.Selected),
+.Container.CollapseIconParent:hover:not(.Selected) {
+  background-color: var(--se-hover, #2c3440) !important;
+}
+
+.Container:is(.Installed, .Uninstalled, .Updating, .Running).Selected,
+.Container.CollapseIconParent.Selected {
+  background-color: var(--se-selected, #33404f) !important;
+  background-image: none !important;
+  color: var(--se-text-strong, #fff) !important;
+}
+
+.Container:is(.Installed, .Uninstalled, .Updating, .Running).Selected {
+  font-weight: 600;
+}
+
+.Container:is(.Installed, .Uninstalled, .Updating, .Running).Selected *:not(.DownloadProgress),
+.Container.CollapseIconParent.Selected .SectionHeaderContent {
+  color: var(--se-text-strong, #fff) !important;
+}
+
+.Container:is(.Installed, .Uninstalled, .Updating, .Running) img {
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: var(--se-radius-xs, 4px);
+  object-fit: cover;
+}
+
+.Container.Uninstalled img {
+  opacity: .55;
+}
+
+.Container.Installed:not(.Selected) {
+  color: var(--se-text, #e6e8eb);
+}
+
+/* Collection headers: tracked uppercase label, count as a badge */
+.SectionHeaderContent {
+  display: flex !important;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-inline-end: 4px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.SectionHeaderContent [data-se-count] {
+  margin-inline-start: auto !important;
+  font-size: 0 !important;
+}
+
+.SectionHeaderContent [data-se-count]::after {
+  content: attr(data-se-count);
+  display: inline-block;
+  margin-inline-start: 0;
+  padding: 0 7px;
+  border-radius: var(--se-radius-pill, 999px);
+  background: var(--se-surface-2, #262c35);
+  color: var(--se-text-dim, #b8c0c8);
+  font-size: var(--se-fs-2xs, 10.5px);
+  font-weight: 700;
+  line-height: 17px;
+  letter-spacing: 0;
+  vertical-align: 1px;
+}
+
+.Container.CollapseIconParent.Selected [data-se-count]::after {
+  background: var(--se-white-14, rgba(255, 255, 255, .14));
+  color: var(--se-text-strong, #fff);
 }

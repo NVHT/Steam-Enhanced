@@ -1,10 +1,10 @@
 /*
  * Stage toasts (features/toasts/toasts.js), in Steam's notificationtoasts_ window.
  *
- * A miniature Library Home stage: the glass tray (.se-hs-tray), hero art with the stage's
- * grade and slow push-in (.se-hs-hero, .se-hs-grade), stage-sized numbers and the green
- * PLAY (.se-hs-stat, .se-hs-play), the sweep spinner as the countdown, and a strip of the
- * toasts waiting (.se-hs-strip). Achievements carry the game page's rarity tiers.
+ * A miniature Library Home stage, drawn in the Home stage's style (home-stage.css): a glass
+ * tray, hero art under the stage's grade with a slow push-in, stage-sized numbers and the
+ * green PLAY, the sweep spinner as the countdown, and a strip of the toasts waiting.
+ * Achievements carry the game page's rarity tiers.
  */
 
 /* ---------- Steam's own toasts: out of sight once they're on the stage ---------- */
@@ -31,11 +31,15 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 #se-tst {
   --c: var(--se-accent, #7cc4ff);
+  /* Kind colours with no theme token yet (shared with the notification menu) */
+  --se-tst-violet: #b08cff;
+  --se-tst-teal: #5fd4c4;
+  --se-tst-pink: #ff8fb8;
   position: fixed;
   left: 0;
   right: 0;
   bottom: var(--se-tst-bottom, 24px);
-  z-index: 2147483000;
+  z-index: var(--se-z-max);
   display: flex;
   justify-content: center;
   pointer-events: none;
@@ -51,14 +55,13 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 .se-tst-tray {
-  --c: var(--se-accent, #7cc4ff);
   position: relative;
   width: 420px; /* BASE_W in toasts.js */
   box-sizing: border-box;
   padding: 6px;
-  border-radius: 18px;
+  border-radius: var(--se-radius-xl);
+  /* No backdrop blur: the toast window is transparent, so there is nothing behind to blur */
   background: rgba(16, 18, 23, .82);
-  backdrop-filter: blur(12px) saturate(1.15);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), 0 6px 18px -6px rgba(0, 0, 0, .75);
   pointer-events: auto;
   transition: box-shadow .4s ease;
@@ -123,10 +126,10 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 #se-tst[data-accent="msg"], #se-tst [data-accent="msg"] { --c: var(--se-accent, #7cc4ff); }
 #se-tst[data-accent="on"], #se-tst [data-accent="on"] { --c: var(--se-online, #4cb4ff); }
 #se-tst[data-accent="play"], #se-tst [data-accent="play"] { --c: var(--se-running, #6cc24a); }
-#se-tst[data-accent="inv"], #se-tst [data-accent="inv"] { --c: #b08cff; }
+#se-tst[data-accent="inv"], #se-tst [data-accent="inv"] { --c: var(--se-tst-violet); }
 #se-tst[data-accent="ach"], #se-tst [data-accent="ach"] { --c: var(--se-gold-text, #f3cf86); }
-#se-tst[data-accent="dl"], #se-tst [data-accent="dl"] { --c: #5fd4c4; }
-#se-tst[data-accent="shop"], #se-tst [data-accent="shop"] { --c: #ff8fb8; }
+#se-tst[data-accent="dl"], #se-tst [data-accent="dl"] { --c: var(--se-tst-teal); }
+#se-tst[data-accent="shop"], #se-tst [data-accent="shop"] { --c: var(--se-tst-pink); }
 #se-tst[data-accent="sys"], #se-tst [data-accent="sys"] { --c: var(--se-text-dim, #b8c0c8); }
 #se-tst[data-accent="err"], #se-tst [data-accent="err"] { --c: var(--se-danger-text, #ffb0b3); }
 
@@ -223,9 +226,11 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 /* The hero panel's glow, where the splash has the mark. */
+.se-tst-wf-glow-stop {
+  stop-color: var(--c);
+}
+
 .se-tst-wf-glow {
-  fill: color-mix(in srgb, var(--c) 40%, transparent);
-  filter: blur(14px);
   transform-box: fill-box;
   transform-origin: center;
   animation: se-tst-wf-breathe 4s ease-in-out infinite alternate;
@@ -272,14 +277,16 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 /* A light passing over the whole wireframe. */
 .se-tst-wf-light {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 40%, color-mix(in srgb, var(--c) 14%, transparent) 50%, transparent 60%) 0 0 / 250% 100%;
-  animation: se-tst-wf-pass 5s linear infinite;
+  inset: 0 auto 0 0;
+  width: 250%;
+  background: linear-gradient(105deg, transparent 40%, color-mix(in srgb, var(--c) 14%, transparent) 50%, transparent 60%);
+  animation: se-tst-pass 5s linear infinite;
 }
 
-@keyframes se-tst-wf-pass {
-  from { background-position: 150% 0; }
-  to { background-position: -50% 0; }
+/* The light's sweep, moved on the GPU (the same path background-position 150% → -50% took) */
+@keyframes se-tst-pass {
+  from { transform: translateX(-90%); }
+  to { transform: translateX(30%); }
 }
 
 /* Only the toast on stage moves. */
@@ -353,15 +360,11 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 .se-tst-layer[data-on][data-se-tier="legendary"]::after {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: 0 auto 0 0;
+  width: 250%;
   pointer-events: none;
-  background: linear-gradient(105deg, transparent 40%, rgba(255, 230, 170, .14) 50%, transparent 60%) 0 0 / 250% 100%;
-  animation: se-tst-shine 4.5s linear infinite;
-}
-
-@keyframes se-tst-shine {
-  from { background-position: 150% 0; }
-  to { background-position: -50% 0; }
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 230, 170, .14) 50%, transparent 60%);
+  animation: se-tst-pass 4.5s linear infinite;
 }
 
 /* ---------- Content ---------- */
@@ -378,7 +381,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 .se-tst-ct > * {
   opacity: 0;
   transform: translateY(10px);
-  transition: opacity .3s ease, transform .45s cubic-bezier(.2, .8, .2, 1);
+  transition: opacity .3s ease, transform .45s var(--se-ease);
 }
 
 .se-tst-layer[data-on] .se-tst-ct > * {
@@ -395,11 +398,11 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   flex: none;
   width: 52px;
   height: 52px;
-  border-radius: 12px;
+  border-radius: var(--se-radius-ml);
   display: grid;
   place-items: center;
-  background: rgba(16, 18, 23, .62);
-  backdrop-filter: blur(8px);
+  /* Opaque enough to hold on the art without a nested backdrop blur */
+  background: rgba(16, 18, 23, .78);
   color: var(--c);
   box-shadow: 0 10px 22px -8px rgba(0, 0, 0, .85), inset 0 0 0 1px rgba(255, 255, 255, .14);
 }
@@ -512,7 +515,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 .se-tst-chips i {
   padding: 0 6px;
-  border-radius: 6px;
+  border-radius: var(--se-radius-sm);
   background: var(--se-chip, rgba(12, 14, 18, .55));
   font: 700 11px/18px var(--se-font, inherit);
   font-style: normal;
@@ -538,7 +541,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   max-width: 150px;
   padding: 0 16px;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--se-radius-md);
   font: 700 13px/36px var(--se-font, inherit);
   white-space: nowrap;
   overflow: hidden;
@@ -553,8 +556,8 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 .se-tst-btn:focus-visible,
 .se-tst-sweep:focus-visible,
 .se-tst-thumb:focus-visible {
-  outline: 2px solid var(--se-accent, #7cc4ff);
-  outline-offset: 2px;
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-tst-btn:disabled {
@@ -566,7 +569,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 .se-tst-btn-play {
   padding: 0 20px;
   background: linear-gradient(180deg, color-mix(in srgb, var(--se-play, #3a8a22) 72%, #b6f07a 28%), var(--se-play, #3f9420));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 12px 26px -10px rgba(80, 180, 50, .8);
+  box-shadow: inset 0 1px 0 var(--se-white-25), 0 12px 26px -10px var(--se-play-glow);
   color: var(--se-text-strong, #fff);
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -579,13 +582,13 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 .se-tst-btn-glass {
-  background: rgba(255, 255, 255, .1);
-  backdrop-filter: blur(8px);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14);
+  background: var(--se-white-10);
+  box-shadow: inset 0 0 0 1px var(--se-white-14);
   color: var(--se-text-strong, #fff);
 }
 
 .se-tst-stat {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -608,7 +611,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 .se-tst-pill {
   padding: 2px 9px;
-  border-radius: 999px;
+  border-radius: var(--se-radius-pill);
   background: color-mix(in srgb, var(--c) 18%, rgba(12, 14, 18, .78));
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent);
   color: var(--c);
@@ -617,10 +620,6 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 /* A soft dark pool right behind the stat, so it holds on any art. */
-.se-tst-stat {
-  position: relative;
-}
-
 .se-tst-stat::before {
   content: "";
   position: absolute;
@@ -643,8 +642,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgba(16, 18, 23, .62);
-  backdrop-filter: blur(6px);
+  background: rgba(16, 18, 23, .78);
   color: var(--c);
   cursor: pointer;
 }
@@ -715,7 +713,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   height: 7px;
   border-radius: 50%;
   background: var(--c);
-  transition: opacity .15s;
+  transition: opacity var(--se-dur) ease-out;
 }
 
 .se-tst-x {
@@ -724,7 +722,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   height: 13px;
   color: var(--se-text-strong, #fff);
   opacity: 0;
-  transition: opacity .15s;
+  transition: opacity var(--se-dur) ease-out;
 }
 
 .se-tst-sweep:is(:hover, :focus-visible) .se-tst-kdot { opacity: 0; }
@@ -757,7 +755,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 .se-tst-tray[data-queue] .se-tst-strip {
   display: flex;
-  animation: se-tst-strip .35s cubic-bezier(.2, .8, .2, 1) both;
+  animation: se-tst-strip .35s var(--se-ease) both;
 }
 
 @keyframes se-tst-strip {
@@ -772,7 +770,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   height: 24px;
   padding: 0;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--se-radius-sm);
   background: color-mix(in srgb, var(--c) 30%, var(--se-surface, #1f242b));
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
   cursor: pointer;
@@ -862,120 +860,4 @@ html[data-se-tst-wait] body > :not(#se-tst) {
     transform: none;
     transition-delay: 0s !important;
   }
-}
-
-/* ---------- Toast tester (features/toasts/toast-tester.js, main window) ---------- */
-
-.se-tt {
-  position: fixed;
-  left: calc(var(--se-rail-width, 60px) + 16px);
-  bottom: 16px;
-  z-index: 2147483001;
-  width: 320px;
-  max-height: min(640px, calc(100vh - 96px));
-  display: flex;
-  flex-direction: column;
-  border-radius: var(--se-radius-lg, 14px);
-  background: var(--se-bg, #171a20);
-  box-shadow: var(--se-shadow-pop, 0 18px 40px -10px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .07));
-  color: var(--se-text, #e6e8eb);
-  font-family: var(--se-font, "Motiva Sans", Arial, sans-serif);
-  overflow: hidden;
-}
-
-.se-tt-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 10px 10px 16px;
-  box-shadow: inset 0 -1px 0 var(--se-hairline, rgba(255, 255, 255, .06));
-}
-
-.se-tt-head b {
-  font: 700 15px/20px var(--se-font, inherit);
-  color: var(--se-text-strong, #fff);
-}
-
-.se-tt-head span {
-  font: 600 11.5px/1 var(--se-font, inherit);
-  color: var(--se-text-muted, #98a2ad);
-}
-
-.se-tt-x {
-  margin-left: auto;
-  width: 28px;
-  height: 28px;
-  border: 0;
-  border-radius: var(--se-radius-sm, 8px);
-  background: transparent;
-  color: var(--se-text-muted, #98a2ad);
-  font: 400 20px/28px var(--se-font, inherit);
-  cursor: pointer;
-}
-
-.se-tt-x:hover {
-  background: var(--se-hover, #2c3440);
-  color: var(--se-text-strong, #fff);
-}
-
-.se-tt-body {
-  overflow-y: auto;
-  padding: 6px 16px 12px;
-}
-
-.se-tt-group h3 {
-  margin: 12px 0 8px;
-  font: var(--se-label-font, 700 11px/14px var(--se-font));
-  letter-spacing: var(--se-label-spacing, .1em);
-  text-transform: uppercase;
-  color: var(--se-text-muted, #98a2ad);
-}
-
-.se-tt-btns {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.se-tt-btn {
-  height: var(--se-control-h-sm, 28px);
-  padding: 0 11px;
-  border: 0;
-  border-radius: var(--se-radius-sm, 8px);
-  background: var(--se-surface, #1f242b);
-  color: var(--se-text, #e6e8eb);
-  font: 600 12.5px/1 var(--se-font, inherit);
-  cursor: pointer;
-  transition: background-color .15s ease-out;
-}
-
-.se-tt-btn:hover {
-  background: var(--se-hover, #2c3440);
-}
-
-.se-tt-btn:focus-visible,
-.se-tt-x:focus-visible {
-  outline: 2px solid var(--se-accent, #7cc4ff);
-  outline-offset: 2px;
-}
-
-.se-tt-foot {
-  display: flex;
-  gap: 8px;
-  padding: 12px 16px;
-  box-shadow: inset 0 1px 0 var(--se-hairline, rgba(255, 255, 255, .06));
-}
-
-.se-tt-foot .se-tt-btn {
-  flex: 1;
-  height: var(--se-control-h, 34px);
-}
-
-.se-tt-primary {
-  background: var(--se-accent, #7cc4ff);
-  color: var(--se-bg-ink, #0f1115);
-}
-
-.se-tt-primary:hover {
-  background: color-mix(in srgb, var(--se-accent, #7cc4ff) 85%, #fff);
 }

@@ -5,11 +5,13 @@
  * stacks, Showcase headers and drag handles, What's New event capsules, Recent
  * Games feature cards, and `LibraryItemBoxSubscript` sort badges.
  */
-/* Collection pages: same dark ground as Library Home */
+/*
+ * Collection pages: same dark ground as Library Home (a collection's page, a
+ * dynamic/edited collection, and All Collections' ScrollContainer)
+ */
 ._198BXmMkKpjGgrrvy8rZLr,
-/* OuterContainer: a collection's page */ ._2sNr7PFYcJZWNkEMCDVVPR,
-/* OuterContainer: a dynamic/edited collection */ .u1xD3KJEgksF_J_5TLZzO {
-  /* ScrollContainer: All Collections */
+._2sNr7PFYcJZWNkEMCDVVPR,
+.u1xD3KJEgksF_J_5TLZzO {
   background: var(--se-bg, #171a20) !important;
 }
 
@@ -54,7 +56,7 @@
 ._54PuCatl_tYG836TOs4Mv .WYgDg9NyCcMIVuMyZ_NBC:hover,
 /* HoversEnabled LibraryItemBox */ ._54PuCatl_tYG836TOs4Mv .WYgDg9NyCcMIVuMyZ_NBC._2YsY_x7hLyKlUqjX9bhn0R {
   /* ShowAsHovered */
-  box-shadow: 0 0 0 2px var(--se-accent, #7cc4ff), 0 18px 30px -12px rgba(0, 0, 0, .85) !important;
+  box-shadow: var(--se-shadow-ring) !important;
 }
 
 /*
@@ -73,7 +75,7 @@
   gap: 5px;
   height: 20px;
   padding: 0 7px 0 6px;
-  border-radius: 999px;
+  border-radius: var(--se-radius-pill, 999px);
   /* No backdrop blur: drawn once per cover, a blur each made shelves scroll heavily */
   background: var(--se-chip-hover, rgba(12, 14, 18, .75));
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
@@ -169,13 +171,13 @@
   width: auto;
   height: 24px;
   padding: 0 6px;
-  border-radius: 999px;
+  border-radius: var(--se-radius-pill, 999px);
   display: flex;
   align-items: center;
   justify-content: center;
   /* No backdrop blur: drawn once per cover, a blur each made shelves scroll heavily */
-  background: rgba(12, 14, 18, .85);
-  box-shadow: 0 0 0 2px rgba(12, 14, 18, .85), inset 0 0 0 1px rgba(255, 255, 255, .1);
+  background: var(--se-chip-hover, rgba(12, 14, 18, .75));
+  box-shadow: 0 0 0 2px rgba(12, 14, 18, .85), inset 0 0 0 1px var(--se-white-10, rgba(255, 255, 255, .1));
   font: 700 10.5px/1 var(--se-font, "Motiva Sans"), sans-serif;
   color: var(--se-text, #e6e8eb);
 }
@@ -220,20 +222,34 @@
   font-weight: 600 !important;
 }
 
+/*
+ * The badge sits inline in the name's line. With its text at size 0 it lined up with the
+ * bottom of "Favorites"; a fixed 20 px box set on the line's middle centers it on the name.
+ * The count's text ("· 8") is drawn by features/library/sort-segments.css.
+ */
 ._23SnllqT_AqZ1C_QHcNQ4Z [data-se-count] {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  align-self: center;
+  height: 20px;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
   font-size: 0 !important;
+  line-height: 20px !important;
+  vertical-align: middle !important;
 }
 
-/* The count's text ("· 8") is drawn by features/library/sort-segments.css. */
 ._23SnllqT_AqZ1C_QHcNQ4Z [data-se-count]::after {
   display: inline-block;
+  vertical-align: top !important;
 }
 
 /* Rule: a 1px divider that still grows into Steam's drag handle on hover */
 ._1PhK8scyztOxjJwWUpkiLJ {
   /* Rule */
   height: 1px !important;
-  border-radius: 999px;
+  border-radius: var(--se-radius-pill, 999px);
   background-color: var(--se-hairline, rgba(255, 255, 255, .06)) !important;
 }
 
@@ -294,20 +310,24 @@
   background: var(--se-hover, #2c3440) !important;
 }
 
-/* Page arrows: round buttons */
+/* Page arrows (PageLeft, PageRight): round buttons; Steam's icon is sized inside them */
 ._3uMa3icVa3JTCGQKPeUikO,
 ._2kWWyBO7w_F76NB8sBw86c,
 ._14b-hQsLwSwYcELtknxCUX,
 ._3IIEUTw03Vm3Mk54jlnUaT {
-  /* PageLeft, PageRight */
+  box-sizing: border-box;
   width: 30px !important;
   height: 30px !important;
   margin-inline-end: 6px !important;
+  padding: 8px !important;
   border-radius: 50%;
   align-items: center;
   justify-content: center;
+  background: var(--se-surface-2, #262c35) !important;
+  color: var(--se-text, #e6e8eb);
   opacity: 1 !important;
   font-size: 16px !important;
+  line-height: 0;
 }
 
 ._3uMa3icVa3JTCGQKPeUikO:hover,
@@ -325,7 +345,7 @@
 /* "Add shelf" */
 ._2aw5aUUo3lrK6wxJb4_ms5 {
   /* AddShowcase */
-  border-radius: 999px !important;
+  border-radius: var(--se-radius-pill, 999px) !important;
   padding: 4px 14px !important;
   color: var(--se-text-muted, #98a2ad) !important;
 }
@@ -341,8 +361,16 @@
  * New lines up with the shelves below it.
  */
 ._17uEBe5Ri8TMsnfELvs8-N {
-  background: var(--se-bg, #171a20) !important;
   padding-inline: 20px !important;
+  /* Even spacing down the home page: the same gap between every section */
+  padding-top: 16px !important;
+  background: var(--se-bg, #171a20) !important;
+  /*
+   * The card row scrolled under the container's right padding, so the last card ran past
+   * the hero's right edge. Clip at the same 20 px edge (a little room is left above and
+   * below for the hover lift and ring).
+   */
+  clip-path: inset(-12px 20px -12px -12px);
 }
 
 /* Center the initial What's New loader within the entire panel. */
@@ -391,7 +419,7 @@
   align-items: center;
   gap: 6px;
   padding: 2px 10px 2px 3px !important;
-  border-radius: 999px !important;
+  border-radius: var(--se-radius-pill, 999px) !important;
   background: var(--se-surface-2, #262c35) !important;
 }
 
@@ -427,7 +455,7 @@
 
 ._1esfEVxhqNfh8fzr_kEGKa .WYgDg9NyCcMIVuMyZ_NBC:hover,
 ._1esfEVxhqNfh8fzr_kEGKa .WYgDg9NyCcMIVuMyZ_NBC._2YsY_x7hLyKlUqjX9bhn0R {
-  box-shadow: 0 0 0 2px var(--se-accent, #7cc4ff), 0 18px 30px -12px rgba(0, 0, 0, .85) !important;
+  box-shadow: var(--se-shadow-ring) !important;
 }
 
 /* Downloads page: features/downloads/downloads.css */
@@ -438,8 +466,8 @@
   bottom: 8px !important;
   inset-inline-end: 8px !important;
   padding: 3px 10px !important;
-  border-radius: 999px;
-  background: rgba(12, 14, 18, .82) !important;
+  border-radius: var(--se-radius-pill, 999px);
+  background: var(--se-chip-hover, rgba(12, 14, 18, .75)) !important;
   /* Solid fill: no per-card backdrop blur */
   color: var(--se-text, #e6e8eb) !important;
   font-size: 11.5px !important;
@@ -451,7 +479,7 @@
 ._3YO5BpDmZERh_G8kaWbaSJ {
   /* PartnerEventRowCapsule */
   overflow: visible !important;
-  transition: transform .15s ease;
+  transition: transform var(--se-dur, .15s) ease-out;
 }
 
 ._3YO5BpDmZERh_G8kaWbaSJ:hover {
@@ -460,29 +488,16 @@
 
 ._3YO5BpDmZERh_G8kaWbaSJ .SPz0ipLqfF1oAO7tdrkdY {
   /* MainImageContainer */
-  transition: box-shadow .15s ease;
+  transition: box-shadow var(--se-dur, .15s) ease-out;
 }
 
 ._3YO5BpDmZERh_G8kaWbaSJ:hover .SPz0ipLqfF1oAO7tdrkdY {
-  box-shadow: 0 0 0 2px var(--se-accent, #7cc4ff), 0 18px 30px -12px rgba(0, 0, 0, .85) !important;
+  box-shadow: var(--se-shadow-ring) !important;
 }
 
 ._3YO5BpDmZERh_G8kaWbaSJ:hover .DVBcpUzJ0x6kaRMfug0OJ {
   /* TextTitle */
   color: var(--se-text-strong, #fff) !important;
-}
-
-/* Shelf arrows: Steam's icon fills the button, so size it inside the round button */
-._3uMa3icVa3JTCGQKPeUikO,
-._2kWWyBO7w_F76NB8sBw86c,
-._14b-hQsLwSwYcELtknxCUX,
-._3IIEUTw03Vm3Mk54jlnUaT {
-  /* PageLeft, PageRight */
-  box-sizing: border-box;
-  padding: 8px !important;
-  background: var(--se-surface-2, #262c35) !important;
-  color: var(--se-text, #e6e8eb);
-  line-height: 0;
 }
 
 ._3uMa3icVa3JTCGQKPeUikO svg,
@@ -493,38 +508,6 @@
   height: 14px !important;
   max-width: 14px;
   max-height: 14px;
-}
-
-/* NEW (and coming soon) on covers: a small frosted pill instead of the bright tab */
-.N8aJrSpxQ6II4CY_aFdYI {
-  /* AppPortraitBanner */
-  margin-top: 8px !important;
-  padding: 2px 9px !important;
-  border-radius: 999px;
-  background: rgba(12, 14, 18, .84) !important;
-  /* Solid fill: no per-cover backdrop blur */
-  box-shadow: none !important;
-  color: var(--se-accent, #7cc4ff) !important;
-  font-size: 10.5px !important;
-  font-weight: 700;
-  letter-spacing: .08em;
-}
-
-.N8aJrSpxQ6II4CY_aFdYI.QTJZotuAt67vK7Sa2Wjus {
-  /* ComingSoonBanner */
-  color: var(--se-text-dim, #b8c0c8) !important;
-}
-
-/* The wide first Recent Games card: its playtime footer as dark glass */
-._2d1hSvdpY5L2-GN1EnUb9Z {
-  /* RecentGameFooter */
-  background: rgba(12, 14, 18, .72) !important;
-  backdrop-filter: blur(12px);
-}
-
-._2d1hSvdpY5L2-GN1EnUb9Z .RhmvOTLHkomDhCTDX9hLA {
-  /* FooterBlurImageContainer: the glass replaces it */
-  opacity: 0 !important;
 }
 
 ._3bkuozxKIatrWG3aeisthc._2zIRlEsAfHhI-_3bZ3X60z {
@@ -543,12 +526,6 @@
 ._3AjoLnMNKxYmNTGTJCLfgs {
   /* LibraryItemActionButton (the play / download button on a card) */
   border-radius: var(--se-radius-sm, 8px) !important;
-}
-
-/* Even spacing down the home page: the same gap between every section */
-._17uEBe5Ri8TMsnfELvs8-N {
-  /* UpdatesContainer (What's New) */
-  padding-top: 16px !important;
 }
 
 .V7RuDNUxhxoBRaiGWbk3B {
@@ -598,7 +575,7 @@
   margin-top: -30px !important;
   margin-bottom: 10px !important;
   padding: 2px 10px !important;
-  border-radius: 999px !important;
+  border-radius: var(--se-radius-pill, 999px) !important;
   box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .6) !important;
   font-size: 11.5px !important;
   line-height: 16px !important;
@@ -608,7 +585,7 @@
 
 ._1LJqx_qFOC8199RBQO5kU8:not(._1KR40mXc7Z4Dss99aBDbyN, ._1H3NRDhuiZh5xH5jZsiI38, ._3lWVD8RYypVvbk60T5Vqcs, .YMFWNw7ysEz2lagC8pW5N, ._2DHhHuQVbivzEpsIvhaAys, ._2-196-NjaMB6Mbhh7xGpXB) {
   /* No backdrop blur: drawn once per cover, a blur each made shelves scroll heavily */
-  background: rgba(12, 14, 18, .8) !important;
+  background: var(--se-chip-hover, rgba(12, 14, 18, .75)) !important;
   color: var(--se-text, #e6e8eb) !important;
 }
 
@@ -620,9 +597,23 @@
   text-align: center !important;
 }
 
-/* The label Steam gives its completion icon ("100% Complete"): gold, like the hero's perfect-game chip */
+/*
+ * The label Steam gives its completion icon ("100% Complete"): gold, like the hero's
+ * perfect-game chip. Matched by content (a label holding an icon) rather than by Steam's
+ * CompletedGroups class, whose name changed in the 21 Oct client build. In some builds the
+ * medal is placed on its own layer and drawn far larger than --award-base, covering "100%":
+ * every wrapper is put back in line, the medal is held to 12 × 18 px, and the pill clips.
+ * Block-level flex: an inline box ignores the negative top margin that lifts the label onto
+ * the cover, and it slipped below, where the cover's clip hid it.
+ */
 ._1LJqx_qFOC8199RBQO5kU8:has(svg, img) {
-  /* CompletedGroups */
+  display: flex !important;
+  width: fit-content !important;
+  margin-inline: auto !important;
+  padding-inline-start: 6px !important;
+  align-items: center !important;
+  gap: 5px !important;
+  overflow: hidden !important;
   color: var(--se-gold-text, #f3cf86) !important;
 }
 
@@ -630,10 +621,6 @@
  * Steam's medal (CompletionAwardStack / CompletionAward) is sized from --award-base;
  * setting that keeps the medal's own 2:3 box, so it sits beside the text, not over it
  */
-._1LJqx_qFOC8199RBQO5kU8:has(svg, img) {
-  padding-inline-start: 6px !important;
-}
-
 ._1LJqx_qFOC8199RBQO5kU8:has(svg, img) ._2EZqJBCxzsAuIxcN4FeHLr {
   --award-base: 16px !important;
   flex: 0 0 auto;
@@ -646,47 +633,6 @@
 ._1YdRdM9TZ_3Xolwv9aVEv- ._DialogInputContainer,
 ._1YdRdM9TZ_3Xolwv9aVEv- {
   align-items: center !important;
-}
-
-._23SnllqT_AqZ1C_QHcNQ4Z [data-se-count] {
-  /*
-   * The badge sits inline in the name's line. With its text at size 0 it
-   * lined up with the bottom of "Favorites"; a fixed 20 px box set on the line's
-   * middle centers it on the name instead.
-   */
-  display: inline-flex !important;
-  align-items: center;
-  align-self: center;
-  height: 20px;
-  line-height: 20px !important;
-  vertical-align: middle !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  position: relative;
-}
-
-._23SnllqT_AqZ1C_QHcNQ4Z [data-se-count]::after {
-  vertical-align: top !important;
-}
-
-/*
- * Matched by content (a label holding an icon) rather than by Steam's
- * CompletedGroups class, whose name changed in the 21 Oct client build.
- * the completion medal, whatever wraps it. In some Steam builds it is placed
- * on its own layer and drawn far larger than --award-base, covering "100%". Every
- * wrapper is put back in line, the medal is held to 12 × 18 px, and the pill clips.
- */
-._1LJqx_qFOC8199RBQO5kU8:has(svg, img) {
-  /*
-   * Block-level flex: an inline box ignores the negative top margin that lifts the
-   * label onto the cover, and it slipped below, where the cover's clip hid it
-   */
-  display: flex !important;
-  width: fit-content !important;
-  margin-inline: auto !important;
-  align-items: center !important;
-  gap: 5px !important;
-  overflow: hidden !important;
 }
 
 ._1LJqx_qFOC8199RBQO5kU8:has(svg, img) *:has(svg, img),
@@ -755,15 +701,6 @@
   padding-inline: 0 !important;
 }
 
-/*
- * What's New: the card row scrolled under the container's right padding, so the last
- * card ran past the hero's right edge. Clip at the same 20 px edge (a little room
- * is left above and below for the hover lift and ring).
- */
-._17uEBe5Ri8TMsnfELvs8-N {
-  clip-path: inset(-12px 20px -12px -12px);
-}
-
 ._1-skwOMFU54o8vsHS7-ZDu {
   /* NewUpdates (the scrolling row) */
   margin-inline: 0 !important;
@@ -801,8 +738,8 @@
   width: 28px !important;
   height: 28px !important;
   border-radius: 50%;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='4'%3E%3Cg fill='%23e6e8eb'%3E%3Ccircle cx='2' cy='2' r='1.6'/%3E%3Ccircle cx='7' cy='2' r='1.6'/%3E%3Ccircle cx='12' cy='2' r='1.6'/%3E%3C/g%3E%3C/svg%3E") center / 14px 4px no-repeat, rgba(12, 14, 18, .82) !important;
-  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .1);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='4'%3E%3Cg fill='%23e6e8eb'%3E%3Ccircle cx='2' cy='2' r='1.6'/%3E%3Ccircle cx='7' cy='2' r='1.6'/%3E%3Ccircle cx='12' cy='2' r='1.6'/%3E%3C/g%3E%3C/svg%3E") center / 14px 4px no-repeat, var(--se-chip-hover, rgba(12, 14, 18, .75)) !important;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .7), inset 0 0 0 1px var(--se-white-10, rgba(255, 255, 255, .1));
 }
 
 ._2-p7shAZYrRijpaTU9bAFR:hover > div {
@@ -925,7 +862,7 @@
   margin: 0 0 0 6px !important;
   border-radius: 50%;
   background: transparent;
-  transition: background .15s;
+  transition: background var(--se-dur, .15s) ease-out;
 }
 
 ._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC:hover {
@@ -985,7 +922,7 @@
   font-size: 13.5px;
   font-weight: 600;
   opacity: 1 !important;
-  transition: background .15s, border-color .15s, color .15s;
+  transition: background var(--se-dur, .15s) ease-out, border-color var(--se-dur, .15s) ease-out, color var(--se-dur, .15s) ease-out;
 }
 
 ._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5:hover,
@@ -1052,7 +989,6 @@
   background: var(--se-field, #15181d) !important;
 }
 
-.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 img,
 .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 img {
   border-radius: 0 !important;
 }
@@ -1060,7 +996,6 @@
 ._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z {
   /* RecentGameFooter */
   background: rgba(12, 14, 18, .58) !important;
-  backdrop-filter: none;
   box-shadow: inset 0 1px 0 var(--se-hairline, rgba(255, 255, 255, .06));
 }
 
@@ -1080,7 +1015,7 @@
   width: 44px !important;
   height: 44px !important;
   border-radius: var(--se-radius-md, 10px) !important;
-  box-shadow: 0 6px 18px -8px rgba(80, 180, 50, .55) !important;
+  box-shadow: 0 6px 18px -8px var(--se-play-glow, rgba(80, 180, 50, .55)) !important;
 }
 
 :is(.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ~ *, .xp7A-08Y404Of3FBHqX32) ._3AjoLnMNKxYmNTGTJCLfgs._1_Bo2Ied5s2Od4YKYTOsau {
@@ -1089,7 +1024,7 @@
 }
 
 :is(.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ~ *, .xp7A-08Y404Of3FBHqX32) ._3AjoLnMNKxYmNTGTJCLfgs._1_Bo2Ied5s2Od4YKYTOsau:hover {
-  background: #44a028 !important;
+  background: var(--se-play-hover, #44a028) !important;
 }
 
 :is(.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ~ *, .xp7A-08Y404Of3FBHqX32) ._3AjoLnMNKxYmNTGTJCLfgs svg {
@@ -1138,7 +1073,7 @@ img._2IYf7aM4eYQ2Oh-ntmzHbm._3VOR2AeYATx3qSE0I-Pm-5 {
 ._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z > ._3bkuozxKIatrWG3aeisthc {
   /* PlaytimeDetails (the box; its lines carry the same class) */
   position: relative;
-  z-index: 1;
+  z-index: var(--se-z-raised, 1);
   width: auto !important;
   margin: 0 !important;
   padding: 0 16px 0 76px !important;
@@ -1170,28 +1105,37 @@ img._2IYf7aM4eYQ2Oh-ntmzHbm._3VOR2AeYATx3qSE0I-Pm-5 {
   justify-content: flex-start !important;
 }
 
+/*
+ * AppPortraitBanner: matches the labels a sort puts on covers ("5.2 hours"): the same dark
+ * pill, type and shadow; Coming soon is the same pill with dimmer text. Steam caps the banner
+ * at 90% of its container, which now hugs the chip, so the cap is lifted or the text overflows.
+ */
 ._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI {
-  /* AppPortraitBanner */
-  margin: 0 !important;
+  box-sizing: border-box !important;
   display: inline-flex !important;
   align-items: center;
-  border-radius: 999px !important;
+  width: max-content !important;
+  max-width: none !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 2px 10px !important;
+  gap: 0 !important;
+  border-radius: var(--se-radius-pill, 999px) !important;
+  background: var(--se-chip-hover, rgba(12, 14, 18, .75)) !important;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .6) !important;
+  color: var(--se-text, #e6e8eb) !important;
+  font: 600 11.5px/16px var(--se-font, "Motiva Sans"), sans-serif !important;
+  letter-spacing: .04em !important;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 ._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI::before {
-  content: "";
-  flex: 0 0 auto;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--se-accent, #7cc4ff);
-  box-shadow: 0 0 8px var(--se-accent, #7cc4ff);
+  display: none !important;
 }
 
-._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI.QTJZotuAt67vK7Sa2Wjus::before {
-  background: var(--se-text-muted, #98a2ad);
-  box-shadow: none;
+._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI.QTJZotuAt67vK7Sa2Wjus {
+  color: var(--se-text-dim, #b8c0c8) !important;
 }
 
 /* The button at rest: a frosted 36 px icon button inside the bottom-left corner */
@@ -1205,7 +1149,7 @@ img._2IYf7aM4eYQ2Oh-ntmzHbm._3VOR2AeYATx3qSE0I-Pm-5 {
   margin: 0 !important;
   border-radius: var(--se-radius-md, 10px) !important;
   /* No backdrop blur: drawn once per cover, a blur each made shelves scroll heavily */
-  background: rgba(12, 14, 18, .8) !important;
+  background: var(--se-chip-hover, rgba(12, 14, 18, .75)) !important;
   box-shadow: 0 6px 16px -6px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .12) !important;
   color: var(--se-text, #e6e8eb);
   opacity: 1 !important;
@@ -1216,7 +1160,7 @@ img._2IYf7aM4eYQ2Oh-ntmzHbm._3VOR2AeYATx3qSE0I-Pm-5 {
   gap: 8px;
   overflow: hidden;
   z-index: 14;
-  transition: width .15s ease, background .15s, box-shadow .15s;
+  transition: width var(--se-dur, .15s) ease-out, background var(--se-dur, .15s) ease-out, box-shadow var(--se-dur, .15s) ease-out;
 }
 
 ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not(._2mDBhx6RW__a_uRpmFziSW) svg {
@@ -1240,14 +1184,11 @@ img._2IYf7aM4eYQ2Oh-ntmzHbm._3VOR2AeYATx3qSE0I-Pm-5 {
 
 /*
  * On hover of the cover: the button widens across the card with its label inside
- * (Install / Update in blue, Play in the theme green)
+ * (Install / Update in blue, Play in the theme green). "Hover of the cover" is any of the
+ * :is() triggers; the button itself is any cover action button not yet marked by
+ * features/home/home-polish.js ([data-se-cover-btn]).
  */
-.WYgDg9NyCcMIVuMyZ_NBC:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
-.WYgDg9NyCcMIVuMyZ_NBC:hover ~ * ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
-:has(> .WYgDg9NyCcMIVuMyZ_NBC):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
-._1esfEVxhqNfh8fzr_kEGKa:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
-._31TK9DDDCRTzSsZCPgqtxX:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
-:has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
+:is(.WYgDg9NyCcMIVuMyZ_NBC:hover, .WYgDg9NyCcMIVuMyZ_NBC:hover ~ *, :has(> .WYgDg9NyCcMIVuMyZ_NBC):hover, ._1esfEVxhqNfh8fzr_kEGKa:hover, ._31TK9DDDCRTzSsZCPgqtxX:hover, :has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover) ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
 ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs):hover {
   width: calc(100% - 20px) !important;
   height: 38px !important;
@@ -1256,58 +1197,33 @@ img._2IYf7aM4eYQ2Oh-ntmzHbm._3VOR2AeYATx3qSE0I-Pm-5 {
   color: var(--se-bg-ink, #0f1115);
 }
 
-.WYgDg9NyCcMIVuMyZ_NBC:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs),
-.WYgDg9NyCcMIVuMyZ_NBC:hover ~ * ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs),
-:has(> .WYgDg9NyCcMIVuMyZ_NBC):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs),
-._1esfEVxhqNfh8fzr_kEGKa:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs),
-._31TK9DDDCRTzSsZCPgqtxX:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs),
-:has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs),
+:is(.WYgDg9NyCcMIVuMyZ_NBC:hover, .WYgDg9NyCcMIVuMyZ_NBC:hover ~ *, :has(> .WYgDg9NyCcMIVuMyZ_NBC):hover, ._1esfEVxhqNfh8fzr_kEGKa:hover, ._31TK9DDDCRTzSsZCPgqtxX:hover, :has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover) ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs),
 ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:not(._1aml4h4CSJbtrNbX4brUYs):hover {
   background: var(--se-play, #3a8a22) !important;
-  box-shadow: 0 8px 20px -8px rgba(80, 180, 50, .6) !important;
+  box-shadow: 0 8px 20px -8px var(--se-play-glow, rgba(80, 180, 50, .55)) !important;
   color: var(--se-text-strong, #fff);
 }
 
-.WYgDg9NyCcMIVuMyZ_NBC:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
-.WYgDg9NyCcMIVuMyZ_NBC:hover ~ * ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
-:has(> .WYgDg9NyCcMIVuMyZ_NBC):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
-._1esfEVxhqNfh8fzr_kEGKa:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
-._31TK9DDDCRTzSsZCPgqtxX:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
-:has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
+:is(.WYgDg9NyCcMIVuMyZ_NBC:hover, .WYgDg9NyCcMIVuMyZ_NBC:hover ~ *, :has(> .WYgDg9NyCcMIVuMyZ_NBC):hover, ._1esfEVxhqNfh8fzr_kEGKa:hover, ._31TK9DDDCRTzSsZCPgqtxX:hover, :has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover) ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
 ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):hover::before {
   order: 2;
   font: 700 14px/1 var(--se-font, "Motiva Sans"), sans-serif;
   white-space: nowrap;
 }
 
-.WYgDg9NyCcMIVuMyZ_NBC:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14::before,
-.WYgDg9NyCcMIVuMyZ_NBC:hover ~ * ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14::before,
-:has(> .WYgDg9NyCcMIVuMyZ_NBC):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14::before,
-._1esfEVxhqNfh8fzr_kEGKa:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14::before,
-._31TK9DDDCRTzSsZCPgqtxX:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14::before,
-:has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14::before,
+:is(.WYgDg9NyCcMIVuMyZ_NBC:hover, .WYgDg9NyCcMIVuMyZ_NBC:hover ~ *, :has(> .WYgDg9NyCcMIVuMyZ_NBC):hover, ._1esfEVxhqNfh8fzr_kEGKa:hover, ._31TK9DDDCRTzSsZCPgqtxX:hover, :has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover) ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14::before,
 ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._3yGiLsl__NlNYprnB7rt14:hover::before {
-  content: var(--se-act-install, "Install");
+  content: "Install";
 }
 
-.WYgDg9NyCcMIVuMyZ_NBC:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq::before,
-.WYgDg9NyCcMIVuMyZ_NBC:hover ~ * ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq::before,
-:has(> .WYgDg9NyCcMIVuMyZ_NBC):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq::before,
-._1esfEVxhqNfh8fzr_kEGKa:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq::before,
-._31TK9DDDCRTzSsZCPgqtxX:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq::before,
-:has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq::before,
+:is(.WYgDg9NyCcMIVuMyZ_NBC:hover, .WYgDg9NyCcMIVuMyZ_NBC:hover ~ *, :has(> .WYgDg9NyCcMIVuMyZ_NBC):hover, ._1esfEVxhqNfh8fzr_kEGKa:hover, ._31TK9DDDCRTzSsZCPgqtxX:hover, :has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover) ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq::before,
 ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._2PhYbL3_EgtG5edPuoTVtq:hover::before {
-  content: var(--se-act-update, "Update");
+  content: "Update";
 }
 
-.WYgDg9NyCcMIVuMyZ_NBC:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau::before,
-.WYgDg9NyCcMIVuMyZ_NBC:hover ~ * ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau::before,
-:has(> .WYgDg9NyCcMIVuMyZ_NBC):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau::before,
-._1esfEVxhqNfh8fzr_kEGKa:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau::before,
-._31TK9DDDCRTzSsZCPgqtxX:hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau::before,
-:has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau::before,
+:is(.WYgDg9NyCcMIVuMyZ_NBC:hover, .WYgDg9NyCcMIVuMyZ_NBC:hover ~ *, :has(> .WYgDg9NyCcMIVuMyZ_NBC):hover, ._1esfEVxhqNfh8fzr_kEGKa:hover, ._31TK9DDDCRTzSsZCPgqtxX:hover, :has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover) ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau::before,
 ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])._1_Bo2Ied5s2Od4YKYTOsau:hover::before {
-  content: var(--se-act-play, "Play");
+  content: "Play";
 }
 
 /* The two lines inside it carry Steam's box rules too (width, negative margins): reset */
@@ -1331,41 +1247,4 @@ img._2IYf7aM4eYQ2Oh-ntmzHbm._3VOR2AeYATx3qSE0I-Pm-5 {
 ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW) {
   inset-inline-start: 14px !important;
   bottom: 12px !important;
-}
-
-/*
- * NEW's text stays inside its chip. Steam caps the banner at 90% of its
- * container's width; with the container now hugging the chip, that cap squeezed the chip
- * to 90% of its own text, which then ran out past the right edge.
- */
-._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI {
-  max-width: none !important;
-  width: max-content !important;
-  white-space: nowrap;
-  box-sizing: border-box !important;
-}
-
-/*
- * NEW matches the labels a sort puts on covers ("5.2 hours"): the same dark
- * frosted pill, same type and shadow; no outline, no dot. Coming soon is the same pill
- * with dimmer text.
- */
-._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI {
-  height: auto !important;
-  padding: 2px 10px !important;
-  gap: 0 !important;
-  background: rgba(12, 14, 18, .75) !important;
-  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .6) !important;
-  color: var(--se-text, #e6e8eb) !important;
-  font: 600 11.5px/16px var(--se-font, "Motiva Sans"), sans-serif !important;
-  letter-spacing: .04em !important;
-}
-
-._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI::before {
-  display: none !important;
-}
-
-._2jj5TjFhHD1lvxMlpJYek6 .N8aJrSpxQ6II4CY_aFdYI.QTJZotuAt67vK7Sa2Wjus {
-  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .6) !important;
-  color: var(--se-text-dim, #b8c0c8) !important;
 }

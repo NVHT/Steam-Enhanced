@@ -1,6 +1,6 @@
 /* Navigation rail routing, extra rail shortcuts, title-bar library search, and game-list toggle. */
 (window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  const { C, railMode, owners, mainWindow, navigate: goLibrary } = SE;
+  const { C, railMode, mainWindow, navigate: goLibrary } = SE;
   window.__steamEnhancedRailNav?.destroy?.();
 
   const SEARCH_INPUT = `.${C.GameListHomeAndSearch_Container} .${C.ContainerHide_Container} input`;
@@ -8,6 +8,8 @@
   const FILTER_PANEL = `.${C.AdvancedSearchContainer} .${C.AdvancedSearchPane}`;
   const SELECTED = C.Selected;
   const GAME_ROW = `.${C.GameListHomeAndSearch_Container} .Container:is(.Installed, .Uninstalled)`;
+  /* Virtualized rows and collection headers: their hover/selection churn never matters here */
+  const LIST_ROWS = SE.inside(`.${C.AppIconDownloading_Container}, .${C.HoverOverlay_Container}`);
 
   const visibleFilterPanel = () => {
     const pane = document.querySelector(FILTER_PANEL);
@@ -102,17 +104,10 @@
     }
   }
 
-  function resolveBrowserManager() {
-    for (const win of owners()) {
-      try {
-        if (win.MainWindowBrowserManager) return win.MainWindowBrowserManager;
-      } catch (_) {}
-    }
-    return null;
-  }
+  const browserManager = () => SE.global('MainWindowBrowserManager');
 
   function currentBrowserURL() {
-    const manager = resolveBrowserManager();
+    const manager = browserManager();
     try {
       return manager?.m_URLRequested || manager?.m_URL || '';
     } catch (_) {
@@ -121,7 +116,7 @@
   }
 
   function openExternalURL(url) {
-    const manager = resolveBrowserManager();
+    const manager = browserManager();
     try {
       if (manager && typeof manager.ShowURL === 'function') {
         manager.ShowURL(url);
@@ -146,18 +141,42 @@
     else if (target.url) openExternalURL(target.url);
   }
 
+  /*
+   * Runs `callback` once the library's list is mounted, navigating there first if needed.
+   * One wait at a time: a later call replaces the pending callback (callbacks read live state
+   * when they run), so fast typing neither re-navigates nor applies a stale value.
+   */
+  let mountWait = null;
+
   function whenLibraryMounted(callback) {
     if (document.querySelector(SEARCH_INPUT)) {
       callback();
       return;
     }
+    if (mountWait) {
+      mountWait.callback = callback;
+      return;
+    }
     navigateToLibraryRoute('/library/home');
-    let attempts = 0;
+    mountWait = { callback, attempts: 0, timer: 0 };
     const pollMount = () => {
-      if (document.querySelector(SEARCH_INPUT)) callback();
-      else if (++attempts < 60) setTimeout(pollMount, 50);
+      const wait = mountWait;
+      if (!wait) return;
+      if (document.querySelector(SEARCH_INPUT)) {
+        mountWait = null;
+        wait.callback();
+      } else if (++wait.attempts < 60) {
+        wait.timer = setTimeout(pollMount, 50);
+      } else {
+        mountWait = null;
+      }
     };
-    setTimeout(pollMount, 50);
+    mountWait.timer = setTimeout(pollMount, 50);
+  }
+
+  function cancelMountWait() {
+    if (mountWait) clearTimeout(mountWait.timer);
+    mountWait = null;
   }
 
   function findRetainedPopupMenu(fiber) {
@@ -300,11 +319,12 @@
       lastTypedAt = performance.now();
       searchBar.classList.toggle('se-has-text', !!value);
       if (window.__steamEnhancedDownloads?.library) {
+        cancelMountWait();
         window.__steamEnhancedDownloads.searchGames(value);
         return;
       }
       whenLibraryMounted(() => {
-        setNativeSearchValue(value);
+        setNativeSearchValue(searchInput.value);
         retainSearchFocus();
         requestAnimationFrame(retainSearchFocus);
         setTimeout(retainSearchFocus, 120);
@@ -388,34 +408,35 @@
   const LIST_SELECTOR = `.${C.GameListHomeAndSearch_Container}`;
   const HIDE_KEY = 'se-list-hidden';
   const VIEW_COUNT_KEY = 'se-view-count';
+  /* The game-type menu's last total, mirrored to storage for the next start */
+  let lastViewCount = null;
 
   let listToggleBtn;
   // Scroll-to-top tile beside Recent / Ready to play; shown once the game list is scrolled.
   const TOP_THRESHOLD = 120;
   let topBtn;
   let topScroller = null;
+  /* Until measured: the rail's width, plus the fixed list width (--se-list-w) */
   let listLeft = 60;
-  let listRight = 332;
+  let listRight = 410;
 
-  const isListHidden = () => {
+  /* Read once; updates go to memory and storage together */
+  let listHidden = (() => {
     try {
       return localStorage.getItem(HIDE_KEY) === '1';
     } catch (_) {
       return false;
     }
-  };
+  })();
+
+  const isListHidden = () => listHidden;
 
   const setListHidden = hidden => {
+    listHidden = hidden;
     try {
       localStorage.setItem(HIDE_KEY, hidden ? '1' : '0');
     } catch (_) {}
   };
-
-  function setCssVar(name, value, el = document.body) {
-    if (el && el.style.getPropertyValue(name) !== value) {
-      el.style.setProperty(name, value);
-    }
-  }
 
   // The list's width is fixed in CSS (--se-list-w, shared/tokens.css); only its edges are tracked.
   const setTopVisible = on => topBtn?.toggleAttribute('data-se-on', !!on);
@@ -431,8 +452,8 @@
 
   const applyListEdgeVars = () => {
     for (const el of [listToggleBtn, topBtn, document.querySelector('.se-sidebar-icons')]) {
-      setCssVar('--se-list-left', `${listLeft}px`, el);
-      setCssVar('--se-list-right', `${listRight}px`, el);
+      SE.cssVar(el, '--se-list-left', `${listLeft}px`);
+      SE.cssVar(el, '--se-list-right', `${listRight}px`);
     }
   };
 
@@ -440,40 +461,23 @@
 
   function totalLibraryGameCount() {
     if (Date.now() - countCache.at < 5000) return countCache.count;
-    let count = null;
-    for (const win of owners()) {
-      try {
-        if (!win.appStore?.allApps) continue;
-        const isHidden = id => {
-          try {
-            return win.collectionStore.BIsHidden(id);
-          } catch (_) {
-            return false;
-          }
-        };
-        count = win.appStore.allApps.filter(
+    const apps = SE.global('appStore', store => Array.isArray(store.allApps))?.allApps;
+    const collections = SE.global('collectionStore');
+    const isHidden = id => !!SE.run(() => collections.BIsHidden(id));
+    const count = apps
+      ? apps.filter(
           app =>
             (app.app_type === 1 || app.app_type === 1073741824) &&
             app.visible_in_game_list !== false &&
             !isHidden(app.appid)
-        ).length;
-        break;
-      } catch (_) {}
-    }
+        ).length
+      : null;
     countCache = { at: Date.now(), count };
     return count;
   }
 
-  function resolveSelfPersona() {
-    for (const win of owners()) {
-      try {
-        const persona =
-          win.g_FriendsUIApp?.FriendStore?.self?.persona || win.friendStore?.self?.persona;
-        if (persona) return persona;
-      } catch (_) {}
-    }
-    return null;
-  }
+  const resolveSelfPersona = () =>
+    SE.global('g_FriendsUIApp')?.FriendStore?.self?.persona || SE.global('friendStore')?.self?.persona || null;
 
   function syncAccountStatus() {
     const account = document.querySelector(`.${C.FocusNavigationRoot_TitleBarControls} .${C.AccountMenu}`);
@@ -516,9 +520,8 @@
       listRight = Math.round(rect.right);
     }
 
-    for (const prop of ['--se-list-left', '--se-list-right']) {
-      document.body.style.removeProperty(prop);
-    }
+    SE.cssVar(document.body, '--se-list-left', null);
+    SE.cssVar(document.body, '--se-list-right', null);
     if (isVisible !== document.body.hasAttribute('data-se-list')) {
       document.body.toggleAttribute('data-se-list', isVisible);
     }
@@ -536,12 +539,13 @@
         .trim()
         .toLowerCase();
 
-      if (count === null) {
+      if (count === null && lastViewCount === null) {
         try {
           const cached = localStorage.getItem(VIEW_COUNT_KEY);
-          if (cached) count = Number(cached);
+          if (cached) lastViewCount = Number(cached);
         } catch (_) {}
       }
+      if (count === null) count = lastViewCount;
       if (count === null && /^(all )?games$/.test(viewLabel)) {
         count = totalLibraryGameCount();
       }
@@ -588,8 +592,8 @@
       setTopVisible(false);
     }
 
-    listToggleBtn.setAttribute('aria-label', hidden ? 'Show game list' : 'Hide game list');
-    listToggleBtn.setAttribute('aria-pressed', String(hidden));
+    SE.mark(listToggleBtn, 'aria-label', hidden ? 'Show game list' : 'Hide game list');
+    SE.mark(listToggleBtn, 'aria-pressed', String(hidden));
     applyListEdgeVars();
   }
 
@@ -638,7 +642,7 @@
     if (!container) {
       container = tip;
       container.style.setProperty('position', 'fixed', 'important');
-      container.style.setProperty('z-index', '1000', 'important');
+      container.style.setProperty('z-index', 'var(--se-z-popover, 1000)', 'important');
     }
 
     const anchorRect = anchor.getBoundingClientRect();
@@ -687,9 +691,7 @@
     }
   }
 
-  function inspectGameTypeMenu() {
-    const menu = document.querySelector(`.${C.DropDown}`);
-    if (!menu) return;
+  function inspectGameTypeMenu(menu) {
     let total = 0;
     let hasActive = false;
     for (const row of menu.querySelectorAll(`.${C.Row}`)) {
@@ -703,7 +705,8 @@
         hasActive = true;
       }
     }
-    if (hasActive) {
+    if (hasActive && total !== lastViewCount) {
+      lastViewCount = total;
       try {
         localStorage.setItem(VIEW_COUNT_KEY, String(total));
       } catch (_) {}
@@ -712,9 +715,16 @@
   }
 
   function observeTooltips() {
+    /*
+     * Records from the list rows are dropped by `ignore`; class changes are kept for the
+     * game-type menu's checkboxes, which are inspected only when a record touches the menu.
+     */
     tipObserver = SE.watch(
       records => {
-        if (document.querySelector(`.${C.DropDown}`)) inspectGameTypeMenu();
+        const menu = document.querySelector(`.${C.DropDown}`);
+        if (menu && records.some(({ target }) => menu.contains(target) || target.contains(menu))) {
+          inspectGameTypeMenu(menu);
+        }
         for (const record of records) {
           for (const node of record.addedNodes) {
             if (!(node instanceof Element)) continue;
@@ -728,7 +738,7 @@
           }
         }
       },
-      { attributes: ['class'], records: true }
+      { attributes: ['class'], records: true, ignore: LIST_ROWS }
     );
     document.addEventListener('mouseover', onMouseOver, true);
   }
@@ -755,6 +765,7 @@
   }
 
   function update() {
+    if (frame) cancelAnimationFrame(frame);
     frame = 0;
     if (!railMode()) {
       cleanup(false);
@@ -812,7 +823,8 @@
   }
 
   function start() {
-    observer = SE.watch(schedule, { attributes: ['class'], sync: true });
+    /* Core already batches to a frame; rows' hover/selection classes are ignored */
+    observer = SE.watch(update, { attributes: ['class'], throttle: 100, ignore: LIST_ROWS });
     document.addEventListener('keydown', onGlobalKeyDown, true);
     addEventListener('resize', schedule);
     document.addEventListener('scroll', onListScroll, { capture: true, passive: true });
@@ -826,6 +838,7 @@
       observer?.disconnect();
       timer?.disconnect();
       if (frame) cancelAnimationFrame(frame);
+      cancelMountWait();
       listResizeObserver?.disconnect();
       removeEventListener('resize', schedule);
       document.removeEventListener('scroll', onListScroll, { capture: true });

@@ -67,6 +67,7 @@
     ['Logs', 'mlogs', 'What Millennium and its plugins report', 'logs'],
   ];
   const MILL_BY_NAME = new Map(MILL_PAGES.map((p) => [p[0].toLowerCase(), p]));
+  const MILL_BY_KEY = new Map(MILL_PAGES.map((p) => [p[3], p]));
   const MILL_GROUPS = ['Customize', 'Maintain'];
   const GROUPS = ['Account', 'Steam', 'Devices & media'];
 
@@ -98,6 +99,8 @@
   const text = (el) => (el?.textContent || '').replace(/\s+/g, ' ').trim();
   const fieldLabel = (n) => text(n.querySelector?.(LABEL));
   const KEY_RE = /^(?:(?:shift|ctrl|control|alt|cmd|win)\s*\+\s*)*(?:f\d{1,2}|tab|space|insert|delete|home|end|page ?(?:up|down)|key ?pad.*|num.*|[a-z0-9]|none|[^\s]+\s*\+\s*[^\s]+)$/i;
+  // Steam draws a connected controller's icon inside its name (no CSS-module key in core's map).
+  const CONTROLLER_ICON = ':is(.JASigq2q1TdofKTOw7MQt, ._3IdIX2_eZXnDrm2wqIpTSQ, ._28B5PnW21FOp5fzffM9K6) > ._30lE6NZfqKKk3ozfL--IYQ';
   const TILE_SUBS = {
     'add a non-steam game': 'Shortcuts to other programs',
     'activate a product': 'Enter a product code',
@@ -348,8 +351,25 @@
   let hitTries = 0;
   let cursor = 0;
 
-  const isSteamSettings = (list) =>
-    [...list.querySelectorAll(ITEM)].some((i) => /^(account|konto|compte|cuenta|conta)$/i.test(text(i)));
+  /*
+   * Steam Settings in any language: first by its pages' identifiers when React exposes them,
+   * then by the Account page's name (a few languages), then by size (no other paged dialog
+   * comes close to its 19 pages). Only asked once Millennium and Properties are ruled out.
+   */
+  const STEAM_PAGE_ID = /^(?:\/?settings\/)?account$/i;
+  const STEAM_ACCOUNT = /^(account|konto|compte|cuenta|conta)$/i;
+  const steamLists = new WeakMap();
+
+  function isSteamSettings(list, items) {
+    if (steamLists.has(list)) return steamLists.get(list);
+    const pages = fromProps(list, 10, (p) => (Array.isArray(p.pages) ? p.pages : undefined));
+    const byId = pages?.some((page) =>
+      [page?.identifier, page?.route, page?.key, page?.name].some((v) => typeof v === 'string' && STEAM_PAGE_ID.test(v))
+    );
+    const steam = Boolean(byId) || items.some((i) => STEAM_ACCOUNT.test(pageNameOf(i))) || items.length >= 14;
+    if (items.length) steamLists.set(list, steam);
+    return steam;
+  }
 
   function sizeWindow(size = SIZE) {
     const win = window.SteamClient?.Window;
@@ -560,7 +580,7 @@
       [...list.querySelectorAll(SEP)].forEach((sep, i) => setAttr(sep, 'data-se-label', GROUPS[i + 1] || null));
       const byIndex = items.length === PAGES.length;
       items.forEach((item, i) => {
-        const page = BY_NAME.get(text(item.querySelector(TEXT) || item).toLowerCase()) || (byIndex ? PAGES[i] : null);
+        const page = BY_NAME.get(pageNameOf(item).toLowerCase()) || (byIndex ? PAGES[i] : null);
         setAttr(item, 'data-se-icon', page ? page[1] : null);
       });
     }
@@ -653,9 +673,7 @@
       setAttr(label, 'data-se-secsub', null);
       setAttr(host, 'data-se-seg', '');
       const w = group.offsetWidth;
-      if (w && label.style.getPropertyValue('--se-seg-w') !== `${w}px`) {
-        label.style.setProperty('--se-seg-w', `${w}px`);
-      }
+      if (w) SE.cssVar(label, '--se-seg-w', `${w}px`);
     }
   }
 
@@ -764,30 +782,13 @@
       for (const b of field.querySelectorAll('button.DialogButton')) {
         setAttr(b, 'data-se-kbd', KEY_RE.test(text(b)) && text(b).length <= 18 ? '' : null);
       }
+      setAttr(field, 'data-se-ctl', field.querySelector(CONTROLLER_ICON) ? '' : null);
     }
 
     [...content.querySelectorAll(`.${C.ActionSection} button.DialogButton`)].forEach((b, i) => {
       setAttr(b, 'data-se-sub', TILE_SUBS[text(b).toLowerCase()] || null);
       setAttr(b, 'data-se-tile', ['add', 'tag', 'storeic'][i] || null);
     });
-
-    for (const el of [content, ...content.querySelectorAll('*')]) {
-      if (el.scrollWidth - el.clientWidth < 2) continue;
-      const ox = getComputedStyle(el).overflowX;
-      if (ox === 'auto' || ox === 'scroll') setAttr(el, 'data-se-noxs', '');
-    }
-
-    for (const el of content.querySelectorAll('div, span')) {
-      if (el.childElementCount || !/^(email|e-mail)$/i.test(text(el))) continue;
-      let n = el;
-      for (let i = 0; i < 10 && n && n !== content; i++, n = n.parentElement) {
-        const cs = getComputedStyle(n);
-        if (cs.position === 'sticky' || cs.position === 'fixed') {
-          setAttr(n, 'data-se-sticky', '');
-          break;
-        }
-      }
-    }
 
     const sort = content.querySelector(`.${C.AppHeader} .${C.LibraryImageBackgroundGlow_SortingDropDown}`);
     if (sort) {
@@ -803,19 +804,62 @@
 
     const drive = content.querySelector(`.${C.DriveDropdownControl}`);
     const usage = content.querySelector(`.${C.DriveUsage}`)?.parentElement;
+    markOnly(content, 'data-se-drive', usage);
     if (drive && usage && !usage.contains(drive)) {
       const cur = parseFloat(usage.style.getPropertyValue('--se-join')) || 0;
       const gap = usage.getBoundingClientRect().top - drive.getBoundingClientRect().bottom;
       const want = Math.round(cur - gap);
-      if (Math.abs(gap) > 0.5 && want <= 0 && want > -80) {
-        usage.style.setProperty('--se-join', `${want}px`);
-      }
+      if (Math.abs(gap) > 0.5 && want <= 0 && want > -80) SE.cssVar(usage, '--se-join', `${want}px`);
     }
 
-    const family = content.querySelector(`.${C.TrySteamFamiliesButtonContainer}`)?.parentElement?.firstElementChild;
+    const familyBox = content.querySelector(`.${C.TrySteamFamiliesButtonContainer}`)?.parentElement;
+    markOnly(content, 'data-se-family', familyBox);
+    const family = familyBox?.firstElementChild;
     if (family && !family.matches(`.${C.TrySteamFamiliesButtonContainer}`)) {
       setAttr(family, 'data-se-head', /steam families/i.test(text(family)) ? 'Steam Families' : null);
     }
+  }
+
+  // Marks `el` (if any) and clears the mark from every other element under `root`.
+  function markOnly(root, name, el) {
+    root.querySelectorAll(`[${name}]`).forEach((n) => n !== el && n.removeAttribute(name));
+    if (el) setAttr(el, name, '');
+  }
+
+  /*
+   * Sideways scrollers and Steam's sticky "Email" header (Notifications) are found from computed
+   * styles. Reading them forces layout, so it runs at most every 300 ms, all reads before writes,
+   * instead of inside every mutation pass.
+   */
+  let scanTimer = 0;
+
+  function scheduleScan() {
+    if (!scanTimer) scanTimer = setTimeout(layoutScan, 300);
+  }
+
+  function layoutScan() {
+    scanTimer = 0;
+    const content = document.querySelector(CONTENT);
+    if (!content) return;
+    const scrollers = [];
+    for (const el of [content, ...content.querySelectorAll('*')]) {
+      if (el.hasAttribute('data-se-noxs') || el.scrollWidth - el.clientWidth < 2) continue;
+      const ox = getComputedStyle(el).overflowX;
+      if (ox === 'auto' || ox === 'scroll') scrollers.push(el);
+    }
+    const sticky = [];
+    for (const el of content.querySelectorAll('div, span')) {
+      if (el.childElementCount || !/^(email|e-mail)$/i.test(text(el))) continue;
+      for (let n = el, i = 0; i < 10 && n && n !== content; i++, n = n.parentElement) {
+        const { position } = getComputedStyle(n);
+        if (position === 'sticky' || position === 'fixed') {
+          sticky.push(n);
+          break;
+        }
+      }
+    }
+    scrollers.forEach((el) => setAttr(el, 'data-se-noxs', ''));
+    sticky.forEach((el) => setAttr(el, 'data-se-sticky', ''));
   }
 
   const PROPS_ROOT = `:is(.${C.AppProperties}, .AppProperties)`;
@@ -858,12 +902,14 @@
 
   const PRE_FOR = new WeakMap();
   const ROW_FOR = new WeakMap();
-  const made = new Set();
+  // Elements this module adds carry this mark, so destroy() finds them without a Set that keeps
+  // every replaced node alive.
+  const OWN = 'data-se-own';
 
   const own = (tag, cls) => {
     const el = document.createElement(tag);
     el.className = cls;
-    made.add(el);
+    el.setAttribute(OWN, 'settings');
     return el;
   };
 
@@ -1140,6 +1186,7 @@
   }
 
   let propsCover;
+  let propsApp = null;
 
   function clearPropsCover() {
     if (!propsCover) return;
@@ -1150,14 +1197,22 @@
     propsCover = null;
   }
 
-  function propsSidebar(list, content) {
-    list.querySelectorAll(ITEM).forEach((item) =>
-      setAttr(item, 'data-se-icon', PROPS_NAMES[norm(pageNameOf(item))]?.[0] || null)
-    );
-    const title = document.querySelector(TITLE);
-    if (!title) return;
-    setAttr(title, 'data-se-ptitle', '');
+  function resetProps() {
+    clearPropsCover();
+    propsApp = null;
+  }
 
+  /*
+   * The game a Properties window is for, with the Library store that knows it. Resolving it
+   * walks the fiber chain (and, without an id, every app's name), so the answer is kept for the
+   * title element; a partial answer is retried every 2 s rather than on every mutation.
+   */
+  function propsTarget(title, content) {
+    const name = text(title);
+    const now = performance.now();
+    if (propsApp?.title === title && propsApp.name === name && (propsApp.app || now < propsApp.retry)) {
+      return propsApp;
+    }
     // Properties is portaled into a separate document by the main Steam UI.
     // The React root can still reach the Library store when window.opener is absent.
     const windows = SE.owners();
@@ -1178,20 +1233,33 @@
       (p) => p.details?.unAppID || p.overview?.appid);
     appid ||= Number(overview?.appid || pageAppId);
     if (!appid) {
-      const name = text(title);
       const matches = new Set(stores.flatMap((store) => SE.run(() =>
         store.allApps.filter((app) => app.display_name === name).map((app) => Number(app.appid))
       ) || []));
       if (matches.size === 1) [appid] = matches;
     }
-    const store = stores.find((candidate) => SE.run(() => candidate.GetAppOverviewByAppID(appid))) || stores[0];
-    const app = SE.run(() => store?.GetAppOverviewByAppID(appid)) ||
-      (Number(overview?.appid) === appid ? overview : null);
-    if (!Number.isSafeInteger(appid) || appid <= 0) {
+    const valid = Number.isSafeInteger(appid) && appid > 0;
+    const store = valid ? stores.find((candidate) => SE.run(() => candidate.GetAppOverviewByAppID(appid))) || stores[0] : null;
+    const app = valid
+      ? SE.run(() => store?.GetAppOverviewByAppID(appid)) || (Number(overview?.appid) === appid ? overview : null)
+      : null;
+    propsApp = { title, name, appid: valid ? appid : 0, store, app, retry: now + 2000 };
+    return propsApp;
+  }
+
+  function propsSidebar(list, content) {
+    list.querySelectorAll(ITEM).forEach((item) =>
+      setAttr(item, 'data-se-icon', PROPS_NAMES[norm(pageNameOf(item))]?.[0] || null)
+    );
+    const title = document.querySelector(TITLE);
+    if (!title) return;
+    setAttr(title, 'data-se-ptitle', '');
+
+    const { appid, store, app } = propsTarget(title, content);
+    if (!appid) {
       clearPropsCover();
       return;
     }
-
     const urls = SE.coverURLs(app || { appid }, store);
     const filename = app?.library_capsule_filename;
     if (filename) {
@@ -1203,7 +1271,7 @@
     const sources = [...new Set(urls.map((url) => /^\/(assets|customimages)\//.test(url)
       ? `https://steamloopback.host${url}`
       : url))];
-    const key = JSON.stringify(sources);
+    const key = sources.join('\n');
     if (propsCover?.title === title && propsCover.key === key) return;
 
     clearPropsCover();
@@ -1223,24 +1291,40 @@
     loadNext();
   }
 
-  function page(content, list, steam) {
+  /*
+   * millennium-pages.js decorates Millennium's pages from inside this pass (hooks.before runs
+   * ahead of the card steps, hooks.after once they are done), so its marks and ours are written
+   * once per pass and never undo each other.
+   */
+  const millApi = {
+    pre: (el, label) => (label ? PRE_FOR.set(el, label) : PRE_FOR.delete(el)),
+    bytesOf,
+    fmtBytes,
+  };
+
+  function millHook(name, content, key) {
+    const fn = window.__steamEnhancedMillPages?.hooks?.[name];
+    if (typeof fn !== 'function') return null;
+    try {
+      return fn(content, key, millApi);
+    } catch (e) {
+      console.warn('[Steam Enhanced] Millennium:', e);
+      return null;
+    }
+  }
+
+  function page(content, list, steam, mill) {
     const header = content.querySelector('.DialogHeader');
     const active = list?.querySelector(`${ITEM}.${ACTIVE}`);
     let sub = null;
     if (steam && header && active && !header.querySelector('button')) {
-      const name = text(active.querySelector(TEXT) || active).toLowerCase();
-      sub = BY_NAME.get(name)?.[2] || null;
+      sub = BY_NAME.get(pageNameOf(active).toLowerCase())?.[2] || null;
     }
-    const mill = !steam && Boolean(list?.closest('.MillenniumSettings'));
-    const millPage = mill && active ? millPageOf(active, [...list.querySelectorAll(ITEM)]) : null;
+    const millKey = mill && active ? millPageOf(active, [...list.querySelectorAll(ITEM)])?.[3] || null : null;
     if (mill) {
-      setAttr(content, 'data-se-mill-page', millPage?.[3] || null);
-      if (header && !header.querySelector('button')) sub = millPage?.[2] || null;
-      try {
-        sub = millBefore(content, millPage?.[3]) || sub;
-      } catch (e) {
-        console.warn('[Steam Enhanced] Millennium:', e);
-      }
+      setAttr(content, 'data-se-mill-page', millKey);
+      if (header && !header.querySelector('button')) sub = MILL_BY_KEY.get(millKey)?.[2] || null;
+      sub = millHook('before', content, millKey) || sub;
     }
     if (header && !document.documentElement.hasAttribute('data-se-props')) {
       setAttr(header, 'data-se-sub', sub);
@@ -1252,199 +1336,44 @@
         console.warn('[Steam Enhanced] settings:', step.name, e);
       }
     }
-    if (mill) {
-      try {
-        millAfter(content, millPage?.[3]);
-      } catch (e) {
-        console.warn('[Steam Enhanced] Millennium:', e);
-      }
-    }
+    if (mill) millHook('after', content, millKey);
+    scheduleScan();
   }
 
-  const MILL_THEME = '.MillenniumThemes_ThemeItem';
-  const MILL_PLUGIN = '.MillenniumPlugins_PluginField';
+  const PROPS_PAGES = ['installed files', 'local files', 'game versions & betas', 'betas', 'dlc', 'workshop', 'customization'];
 
-  function isActiveTheme(field) {
-    const p = fromProps(field, 6, (q) => (q.theme && 'activeTheme' in q ? q : undefined));
-    if (p) {
-      return Boolean(p.activeTheme && (p.theme?.data?.name === p.activeTheme || p.theme?.native === p.activeTheme));
-    }
-    return Boolean(field.querySelector(`.${C.FieldIcon} svg`));
-  }
-
-  function millBefore(content, key) {
-    if (key === 'themes') {
-      const fields = [...content.querySelectorAll(MILL_THEME)];
-      const rest = fields.filter((f) => !isActiveTheme(f));
-      fields.forEach((f) => {
-        setAttr(f, 'data-se-active', rest.includes(f) ? null : '');
-        const name =
-          text(f.querySelector('.MillenniumThemes_ThemeLabel')?.firstChild) ||
-          text(f.querySelector('.MillenniumThemes_ThemeLabel'));
-        const initial = name ? [...name.replace(/^[^\p{L}\p{N}]+/u, '')][0]?.toLocaleUpperCase() || null : null;
-        setAttr(f, 'data-se-initial', initial);
-        const lab = f.querySelector('.MillenniumThemes_ThemeLabel');
-        if (lab) setAttr(lab, 'data-se-initial', initial);
-        PRE_FOR.delete(f);
-      });
-      return null;
-    }
-    if (key === 'plugins') {
-      const fields = [...content.querySelectorAll(MILL_PLUGIN)];
-      if (!fields.length) return null;
-      fields.forEach((f, i) => {
-        if (i) PRE_FOR.delete(f);
-        else PRE_FOR.set(f, 'Plugin');
-      });
-      const on = fields.filter((f) => f.querySelector(`.${C.Toggle}.${C.On}`)).length;
-      let bytes = 0;
-      for (const f of fields) {
-        const first = f.querySelector('.MillenniumPlugins_Metrics span');
-        const m = /([\d.]+)\s*(KB|MB|GB)/i.exec(text(first));
-        if (m) {
-          bytes += parseFloat(m[1]) * 1024 ** (['KB', 'MB', 'GB'].indexOf(m[2].toUpperCase()) + 1);
-        }
-      }
-      return `${fields.length} installed · ${on} on` + (bytes ? ` · ${fmtBytes(bytes)} in use` : '');
-    }
-    return null;
-  }
-
-  function logsHeight(content, key) {
-    const textEl = key === 'logs' ? content.querySelector('.MillenniumLogs_Text') : null;
-    if (!textEl) return;
-    const box = content.getBoundingClientRect();
-    const foot =
-      Math.min(box.top + content.clientTop + content.clientHeight, innerHeight) -
-      (parseFloat(getComputedStyle(content).paddingBottom) || 0);
-    const below = Math.max(0, (textEl.parentElement?.querySelector(':scope > .se-logs-foot')?.offsetHeight || 0) - 14);
-    const h = `${Math.max(240, Math.floor(foot - below - textEl.getBoundingClientRect().top + (content.scrollTop || 0)) - 2)}px`;
-    if (textEl.style.getPropertyValue('--se-logs-h') !== h) {
-      textEl.style.setProperty('--se-logs-h', h);
-    }
-  }
-
-  function pluginTable(content) {
-    content.querySelectorAll(MILL_PLUGIN).forEach((f, i) => {
-      const chips = [...f.querySelectorAll('.MillenniumPlugins_Metrics span')];
-      const mem = text(chips[0]) || '—';
-      const cpu = (text(chips[1]) || '').replace(/\s*CPU$/i, '') || '—';
-      let cells = f.querySelector(':scope > .se-pm');
-      if (!cells) {
-        cells = own('div', 'se-pm');
-        cells.innerHTML = '<span data-col="Memory"></span><span data-col="CPU"></span>';
-        cells.setAttribute('aria-hidden', 'true');
-      }
-      if (cells.parentElement !== f || f.lastElementChild !== cells) f.appendChild(cells);
-      const [m, c] = cells.children;
-      if (m.textContent !== mem) m.textContent = mem;
-      if (c.textContent !== cpu) c.textContent = cpu;
-      setAttr(cells, 'data-head', i === 0 ? '' : null);
-      setAttr(cells, 'data-off', chips.length ? null : '');
-      setAttr(f, 'data-se-on', f.querySelector(`.${C.Toggle}.${C.On}`) ? 'yes' : 'no');
-    });
-  }
-
-  function millAfter(content, key) {
-    try {
-      logsHeight(content, key);
-    } catch (_) {}
-    if (key === 'plugins') {
-      try {
-        pluginTable(content);
-      } catch (e) {
-        console.warn('[Steam Enhanced] Millennium:', e);
-      }
-    }
-    if (key === 'themes') {
-      const fields = [...content.querySelectorAll(MILL_THEME)];
-      const rest = fields.filter((f) => !f.hasAttribute('data-se-active'));
-      fields.filter((f) => f.hasAttribute('data-se-active')).forEach((f) => setAttr(f, 'data-se-c', 'f l'));
-      rest.forEach((f, i) =>
-        setAttr(f, 'data-se-c', [i === 0 && 'f', i === rest.length - 1 && 'l'].filter(Boolean).join(' ') || 'm')
-      );
-    }
-
-    let bar = content.querySelector(':scope .se-mill-save');
-    if (key !== 'plugins') {
-      bar?.remove();
-      return;
-    }
-    const save = content.querySelector('.MillenniumButtonsSection [data-button-type="save"]');
-    const section = save?.closest('.MillenniumButtonsSection');
-    if (!save || !section) {
-      bar?.remove();
-      return;
-    }
-
-    let count = 0;
-    for (let f = SE.fiber(save); f; f = f.return) {
-      const st = f.stateNode?.state;
-      if (st && Array.isArray(st.updatedPlugins)) {
-        count = st.updatedPlugins.length;
-        break;
-      }
-    }
-    if (!bar) {
-      bar = own('div', 'se-mill-save');
-      bar.innerHTML = '<span></span><button type="button">Save &amp; reload Steam</button>';
-      bar.querySelector('button').addEventListener('click', () => {
-        content.querySelector('.MillenniumButtonsSection [data-button-type="save"]')?.click();
-      });
-    }
-    const rowsList = [...content.querySelectorAll(MILL_PLUGIN)];
-    const anchor = rowsList[rowsList.length - 1] || section;
-    if (bar.previousElementSibling !== anchor) anchor.after(bar);
-    const pending = !save.disabled && !save.matches('.Disabled, [aria-disabled="true"]');
-    const words =
-      count > 1
-        ? `${count} changes take effect after you save and reload Steam.`
-        : count === 1
-          ? '1 change takes effect after you save and reload Steam.'
-          : 'Your changes take effect after you save and reload Steam.';
-    const span = bar.querySelector('span');
-    if (span.textContent !== words) span.textContent = words;
-    bar.hidden = !pending;
+  function isPropsDialog(items, content) {
+    return (
+      Boolean(document.querySelector(PROPS_ROOT)) ||
+      items.filter((i) => PROPS_PAGES.includes(norm(pageNameOf(i)))).length >= 2 ||
+      Boolean(content && fromProps(content.querySelector('.DialogBody') || content, 8, (p) => p.details?.unAppID))
+    );
   }
 
   function update() {
     frame = 0;
     const list = document.querySelector(LIST);
+    const root = document.documentElement;
     if (!list) {
-      clearPropsCover();
-      setAttr(document.documentElement, 'data-se-mill', null);
+      resetProps();
+      setAttr(root, 'data-se-mill', null);
       return;
     }
-    const steam = isSteamSettings(list);
-    const mill = !steam && Boolean(list.closest('.MillenniumSettings'));
-    setAttr(document.documentElement, 'data-se-settings', steam ? '' : null);
-    setAttr(document.documentElement, 'data-se-mill', mill ? '' : null);
+    const items = [...list.querySelectorAll(ITEM)];
+    const content = document.querySelector(CONTENT);
+    const mill = Boolean(list.closest('.MillenniumSettings'));
+    const isProps = !mill && isPropsDialog(items, content);
+    const steam = !mill && !isProps && isSteamSettings(list, items);
+    setAttr(root, 'data-se-settings', steam ? '' : null);
+    setAttr(root, 'data-se-mill', mill ? '' : null);
+    setAttr(root, 'data-se-props', isProps ? '' : null);
     observer?.takeRecords();
     sidebar(list, steam, mill);
-
-    const content = document.querySelector(CONTENT);
-    const names = pageItems().map((i) => norm(pageNameOf(i)));
-    const isProps =
-      !steam &&
-      (Boolean(document.querySelector(PROPS_ROOT)) ||
-        names.filter((n) =>
-          [
-            'installed files',
-            'local files',
-            'game versions & betas',
-            'betas',
-            'dlc',
-            'workshop',
-            'customization',
-          ].includes(n)
-        ).length >= 2 ||
-        Boolean(content && fromProps(content.querySelector('.DialogBody') || content, 8, (p) => p.details?.unAppID)));
-    setAttr(document.documentElement, 'data-se-props', isProps ? '' : null);
 
     if (isProps) {
       propsSidebar(list, content);
     } else {
-      clearPropsCover();
+      resetProps();
     }
     if (content && isProps) {
       try {
@@ -1453,7 +1382,7 @@
         console.warn('[Steam Enhanced] properties:', e);
       }
     }
-    if (content) page(content, list, steam);
+    if (content) page(content, list, steam, mill);
     if (content && steam) {
       try {
         learn(content, list);
@@ -1505,20 +1434,48 @@
   }
 
   function start() {
-    observer = SE.watch(onMutate, { attributes: ['class'], sync: true });
+    // Sync: the cards and labels must be in place before Steam's re-render paints. The main
+    // window's high-traffic chrome (top bar, game list, friends dock) never holds a dialog.
+    observer = SE.watch(onMutate, { attributes: ['class'], sync: true, ignore: SE.inSide });
     document.addEventListener('visibilitychange', onVisibility);
     addEventListener('resize', schedule);
     schedule();
   }
 
+  // Everything update() marks lives in the dialog (or on <html>), so destroy() can undo it there
+  // without touching other modules' marks of the same name elsewhere.
+  const MARKS = [
+    'art', 'big', 'c', 'cloud', 'cloudrow', 'count', 'cover', 'ctl', 'cur', 'danger', 'drive', 'family',
+    'filtering', 'good', 'head', 'hit', 'icon', 'k', 'kbd', 'label', 'launch', 'licon', 'licon-el', 'mill-page',
+    'miss', 'name', 'nickname-preview', 'notice', 'noxs', 'paccent', 'pfirst', 'pre', 'pre-text', 'primary',
+    'psub', 'ptext', 'ptitle', 'rest', 'row', 'sec', 'secsub', 'seg', 'seglabel', 'size', 'sortlabel', 'sticky',
+    'sub', 'sval', 'tile', 'title', 'v', 'v2', 'ws-empty',
+  ].map((m) => `data-se-${m}`);
+  const VARS = ['--se-seg-w', '--se-join'];
+
+  function unmarkAll() {
+    const sel = MARKS.map((m) => `[${m}]`).join(',');
+    for (const root of document.querySelectorAll(`${LIST}, ${CONTENT}, ${TITLE}`)) {
+      for (const el of [root, ...root.querySelectorAll(sel)]) {
+        for (const m of MARKS) el.removeAttribute(m);
+        for (const v of VARS) el.style.removeProperty(v);
+      }
+    }
+    for (const m of ['data-se-settings', 'data-se-mill', 'data-se-props']) document.documentElement.removeAttribute(m);
+  }
+
   window.__steamEnhancedSettings = {
+    refresh: schedule,
     destroy() {
       observer?.disconnect();
       if (frame) cancelAnimationFrame(frame);
+      if (syncReset) cancelAnimationFrame(syncReset);
+      clearTimeout(scanTimer);
       search?.remove();
       results?.remove();
-      clearPropsCover();
-      for (const el of made) el.remove();
+      resetProps();
+      document.querySelectorAll(`[${OWN}="settings"]`).forEach((el) => el.remove());
+      unmarkAll();
       document.removeEventListener('visibilitychange', onVisibility);
       removeEventListener('resize', schedule);
       delete window.__steamEnhancedSettings;

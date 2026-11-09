@@ -1,9 +1,9 @@
 /* Proxy bottom-bar actions into the header / navigation rail while keeping native components mounted. */
 (window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
   const { C } = SE;
-  if (window.__steamEnhancedHeaderActions?.version === '1.90.13') return;
+  if (window.__steamEnhancedHeaderActions?.version === '1.90.14') return;
   window.__steamEnhancedHeaderActions?.destroy?.();
-  const state = (window.__steamEnhancedHeaderActions = { version: '1.90.13' });
+  const state = (window.__steamEnhancedHeaderActions = { version: '1.90.14' });
 
   const ANNOUNCEMENT_SELECTOR = `.${C.AnnouncementsButton}:not(.se-header-action):not(.se-native-header-button), .AnnouncementsButton:not(.se-header-action):not(.se-native-header-button)`;
   const PROXY_ACTIONS = [
@@ -25,14 +25,14 @@
   let frame = 0;
   let group;
   let styleReference;
-  let resizeObserver;
   let referenceObserver;
-  let measureReference;
   let downloadObserver;
   let downloadSource;
   let homeReference;
   let homeResizeObserver;
-  let measuredAt = 0;
+  let stripObserver;
+  let stripKey = '';
+  const stripLists = new Set();
 
   function setBodyProperty(property, value) {
     if (!savedVariables.has(property)) {
@@ -166,14 +166,44 @@
     SE.mark(entry.button, 'data-se-progress', String(Math.round(value)));
   }
 
+  // The game list showing or collapsing resizes its header: watched instead of every class change.
+  function observeLibraryLists(lists) {
+    stripObserver ||= window.ResizeObserver ? new window.ResizeObserver(schedule) : null;
+    for (const node of stripLists) {
+      if (!node.isConnected) {
+        stripObserver?.unobserve(node);
+        stripLists.delete(node);
+      }
+    }
+    for (const node of lists) {
+      if (stripLists.has(node)) continue;
+      stripObserver?.observe(node);
+      stripLists.add(node);
+    }
+  }
+
   function matchLibraryStrip() {
-    const visible = [...document.querySelectorAll(`.${C.GameListHomeAndSearch_Container}`)].some(
-      node => node.getBoundingClientRect().height > 0
-    );
+    const lists = [...document.querySelectorAll(`.${C.GameListHomeAndSearch_Container}`)];
+    observeLibraryLists(lists);
+    const visible = lists.some(node => node.getBoundingClientRect().height > 0);
     if (document.body.classList.contains('se-hide-library-strip') !== visible) {
       document.body.classList.toggle('se-hide-library-strip', visible);
     }
-    if (!visible) return;
+    for (const divider of coloredDividers) {
+      if (!divider.isConnected) coloredDividers.delete(divider);
+    }
+    if (!visible) {
+      stripKey = '';
+      return;
+    }
+
+    // The hit-test probe below forces layout: run it only when the header's edge, the window
+    // width or the set of dividers has changed.
+    const header = document.querySelector(`.${C.TopBar}`);
+    const edge = header ? Math.round(header.getBoundingClientRect().bottom) : 0;
+    const key = `${edge}|${innerWidth}|${coloredDividers.size}`;
+    if (key === stripKey) return;
+    stripKey = key;
 
     const candidates = new Set();
     const dividerClass = window.__steamEnhancedNativeTooltips?.resolve()?.libraryDivider;
@@ -183,9 +213,7 @@
       }
     }
 
-    const header = document.querySelector(`.${C.TopBar}`);
     if (header && document.elementsFromPoint) {
-      const edge = header.getBoundingClientRect().bottom;
       for (const fraction of [0.25, 0.5, 0.75]) {
         for (const node of document.elementsFromPoint(innerWidth * fraction, edge + 1)) {
           const rect = node.getBoundingClientRect();
@@ -210,6 +238,7 @@
       }
       coloredDividers.add(divider);
     }
+    stripKey = `${edge}|${innerWidth}|${coloredDividers.size}`;
   }
 
   function applyNativeButtonClasses(element) {
@@ -222,35 +251,16 @@
     if (missing.length) element.classList.add(...missing);
   }
 
+  /*
+   * The live Announcements button lends its text colour to the theme's header buttons, and the
+   * header's surface goes to Friends Panel. (Sizes come from the Steam/Home button instead.)
+   */
   function matchReference(announcement) {
-    if (!window.getComputedStyle) return;
-    if (styleReference === announcement) {
-      if (performance.now() - measuredAt > 1000) measureReference?.();
-      return;
-    }
+    if (styleReference === announcement) return;
     styleReference = announcement;
-    resizeObserver?.disconnect();
     referenceObserver?.disconnect();
 
     const measure = () => {
-      measuredAt = performance.now();
-      const style = window.getComputedStyle(announcement);
-      const icon = announcement.querySelector('svg');
-      const iconStyle = icon && window.getComputedStyle(icon);
-      const pixels = value => Number.parseFloat(value) || 0;
-      const computeSize = axis => {
-        const edges = axis === 'width' ? ['Left', 'Right'] : ['Top', 'Bottom'];
-        const extra =
-          style.boxSizing === 'border-box'
-            ? 0
-            : edges.reduce(
-                (sum, edge) =>
-                  sum + pixels(style['padding' + edge]) + pixels(style['border' + edge + 'Width']),
-                0
-              );
-        return pixels(style[axis]) + extra;
-      };
-
       let headerSurface = '#171d25';
       for (let header = document.querySelector(`.${C.TopBar}`); header; header = header.parentElement) {
         const color = window.getComputedStyle(header).backgroundColor;
@@ -262,40 +272,22 @@
         }
       }
 
-      const values = {
-        'header-surface': headerSurface,
-        width: `${computeSize('width')}px`,
-        height: `${computeSize('height')}px`,
-        padding: style.padding,
-        color: style.color,
-        background: style.backgroundColor,
-        'icon-width': iconStyle?.width || '16px',
-        'icon-height': iconStyle?.height || '16px',
-      };
-      for (const [key, value] of Object.entries(values)) {
-        setBodyProperty(`--se-announcement-${key}`, value);
-      }
+      setBodyProperty('--se-announcement-header-surface', headerSurface);
+      setBodyProperty('--se-announcement-color', getComputedStyle(announcement).color);
     };
 
-    measureReference = measure;
     measure();
-    referenceObserver = new MutationObserver(() => {
-      measure();
-      schedule();
-    });
-    referenceObserver.observe(announcement, {
-      attributes: true,
-      attributeFilter: ['class', 'style'],
-      childList: true,
-      subtree: true,
-    });
-    if (window.ResizeObserver) {
-      resizeObserver = new window.ResizeObserver(measure);
-      resizeObserver.observe(announcement);
-    }
+    referenceObserver = new MutationObserver(measure);
+    referenceObserver.observe(announcement, { attributes: true, attributeFilter: ['class', 'style'] });
+  }
+
+  function pruneDisconnected(map) {
+    for (const element of map.keys()) if (!element.isConnected) map.delete(element);
   }
 
   function decorateMenuIcons() {
+    pruneDisconnected(decorated);
+    pruneDisconnected(styled);
     const rootItems = document.querySelectorAll?.(`.${C.RootMenuBar} .${C.RootMenuButton}`) || [];
     const navItems =
       document.querySelectorAll?.(
@@ -552,9 +544,14 @@
     if (!frame) frame = requestAnimationFrame(update);
   }
 
+  /*
+   * Structure only: no `class` or text watching (both widened the shared observer to every
+   * hover and every counter in the window). Download text is followed by downloadObserver,
+   * the Announcements button by referenceObserver, layout changes by the ResizeObservers.
+   */
   function start() {
     addEventListener('resize', schedule);
-    observer = SE.watch(schedule, { attributes: ['class'], characterData: true, sync: true });
+    observer = SE.watch(update, { throttle: 200 });
     update();
   }
 
@@ -563,7 +560,8 @@
     coloredDividers.clear();
     observer?.disconnect();
     homeResizeObserver?.disconnect();
-    resizeObserver?.disconnect();
+    stripObserver?.disconnect();
+    stripLists.clear();
     referenceObserver?.disconnect();
     downloadObserver?.disconnect();
     if (frame) cancelAnimationFrame(frame);

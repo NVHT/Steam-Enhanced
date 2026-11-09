@@ -12,7 +12,7 @@
 /* The row being dragged stays in place, dimmed, so the gap reads as "this one is moving" */
 html[data-se-gamedrag] [data-se-dragsource] {
   opacity: .4;
-  transition: opacity .15s ease-out;
+  transition: opacity var(--se-dur, .15s) ease-out;
 }
 
 /* ---------- Steam's zones: out of sight and out of the page's flow ---------- */
@@ -34,7 +34,7 @@ html[data-se-gamedrag] [data-se-dragsource] {
 .se-gd-tray {
   --se-gd-card-h: 96px;
   position: fixed;
-  z-index: 9000;
+  z-index: var(--se-z-drag, 9000);
   display: grid;
   grid-template-columns: repeat(var(--se-gd-count, 2), minmax(0, 1fr));
   gap: 10px;
@@ -42,7 +42,7 @@ html[data-se-gamedrag] [data-se-dragsource] {
   padding: 10px;
   background: var(--se-sidebar, #1d2128);
   pointer-events: none;
-  animation: se-gd-tray-in .16s ease-out both;
+  animation: se-gd-tray-in var(--se-dur, .15s) var(--se-ease) both;
 }
 
 .se-gd-tray[hidden] {
@@ -79,7 +79,7 @@ html[data-se-gamedrag] [data-se-dragsource] {
   font: 500 11px/1.3 var(--se-font, "Motiva Sans"), sans-serif;
   text-align: center;
   pointer-events: auto;
-  transition: border-color .15s ease-out, background-color .15s ease-out, color .15s ease-out;
+  transition: border-color var(--se-dur, .15s) ease-out, background-color var(--se-dur, .15s) ease-out, color var(--se-dur, .15s) ease-out;
 }
 
 .se-gd-card[data-kind="remove"] {
@@ -98,7 +98,6 @@ html[data-se-gamedrag] [data-se-dragsource] {
   height: 18px;
   background: var(--se-gd-tone);
   -webkit-mask: var(--se-gd-icon) center / contain no-repeat;
-  mask: var(--se-gd-icon) center / contain no-repeat;
 }
 
 /* Steam's words, in one color and the theme's type, wrapped to the card */
@@ -175,10 +174,11 @@ html[data-se-gamedrag] [data-se-dragsource] {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 10000;
+  /* Above the tray */
+  z-index: calc(var(--se-z-drag, 9000) + 1);
   pointer-events: none;
   will-change: transform;
-  transition: opacity .15s ease-out;
+  transition: opacity var(--se-dur, .15s) ease-out;
 }
 
 .se-gd-ghost[data-se-away] {
@@ -200,8 +200,8 @@ html[data-se-gamedrag] [data-se-dragsource] {
     0 12px 24px -10px rgba(0, 0, 0, .85);
   font: 600 13px/1 var(--se-font, "Motiva Sans"), sans-serif;
   color: var(--se-text, #e6e8eb);
-  transition: box-shadow .15s ease-out, background-color .15s ease-out;
-  animation: se-gd-chip-in .18s cubic-bezier(.2, .8, .2, 1) both;
+  transition: box-shadow var(--se-dur, .15s) ease-out, background-color var(--se-dur, .15s) ease-out;
+  animation: se-gd-chip-in var(--se-dur, .15s) var(--se-ease) both;
 }
 
 /* Over a card the chip takes its color: red to remove, the accent to add */
@@ -232,7 +232,7 @@ html[data-se-gamedrag] [data-se-dragsource] {
   flex: none;
   width: 24px;
   height: 24px;
-  border-radius: 6px;
+  border-radius: var(--se-radius-sm, 8px);
   object-fit: cover;
   background: var(--se-surface, #1f242b);
 }
@@ -251,7 +251,7 @@ html[data-se-gamedrag] [data-se-dragsource] {
   height: 20px;
   box-sizing: border-box;
   padding: 0 6px;
-  border-radius: 999px;
+  border-radius: var(--se-radius-pill, 999px);
   background: var(--se-accent, #7cc4ff);
   font: 700 11px/20px var(--se-font, "Motiva Sans"), sans-serif;
   text-align: center;

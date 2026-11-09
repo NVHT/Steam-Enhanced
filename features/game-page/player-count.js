@@ -12,37 +12,41 @@
   let hostRow = null;
   let currentAppId = 0;
   let activeRequest = null;
-  let frame = 0;
   let destroyed = false;
+  // The row's fiber walk is cached until the row or the route changes (React reuses the row).
+  let resolved = { target: null, route: '', id: 0 };
 
   const isValidAppId = id => Number.isSafeInteger(id) && id > 0 && id <= 4294967295;
 
-  const resolveSelectedAppId = target => {
-    const fromRow = SE.fromProps(target, 80, p => {
-      const id = Number(
-        p.overview?.appid ?? p.appOverview?.appid ?? p.app?.appid ?? p.appid ?? p.appId
-      );
-      return isValidAppId(id) ? id : undefined;
-    });
-
-    let fromRoute = 0;
+  const routePath = () => {
     for (const owner of SE.owners()) {
       try {
         const path =
           owner.MainWindowBrowserManager?.m_lastLocation?.pathname ||
           owner.location?.pathname ||
           '';
-        const match = path.match(/\/app\/(\d+)(?:\/|$)/);
-        if (match) {
-          fromRoute = Number(match[1]);
-          break;
-        }
+        if (/\/app\/\d+(?:\/|$)/.test(path)) return path;
       } catch (_) {}
     }
+    return '';
+  };
 
-    if (fromRow && fromRoute && fromRow !== fromRoute) return 0;
-    const resolved = fromRow || fromRoute;
-    return isValidAppId(resolved) ? resolved : 0;
+  const resolveSelectedAppId = target => {
+    const route = routePath();
+    if (route && resolved.target === target && resolved.route === route) return resolved.id;
+
+    const fromRow = SE.fromProps(target, 80, p => {
+      const id = Number(
+        p.overview?.appid ?? p.appOverview?.appid ?? p.app?.appid ?? p.appid ?? p.appId
+      );
+      return isValidAppId(id) ? id : undefined;
+    });
+    const fromRoute = Number((route.match(/\/app\/(\d+)/) || [])[1]) || 0;
+
+    const id = fromRow && fromRoute && fromRow !== fromRoute ? 0 : fromRow || fromRoute;
+    const valid = isValidAppId(id) ? id : 0;
+    resolved = route ? { target, route, id: valid } : { target: null, route: '', id: 0 };
+    return valid;
   };
 
   // Minimal protobuf codec for CMsgDPGetNumberOfCurrentPlayers (EMsg 5592).
@@ -318,16 +322,11 @@
   };
 
   const mountBadge = target => {
+    // A GameStat like its neighbours: game-page.css draws its icon (--se-stat-icon) like theirs.
     badge = document.createElement('button');
     badge.type = 'button';
     badge.id = 'se-player-count';
     badge.className = `${C.GameStat} se-player-count`;
-
-    const icon = document.createElement('span');
-    icon.className = 'se-player-count-icon';
-    icon.setAttribute('aria-hidden', 'true');
-    icon.innerHTML =
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="7" r="3"/><path d="M3 20v-3a6 6 0 0 1 12 0v3M16 4a3 3 0 0 1 0 6M18 13a5 5 0 0 1 3 4v3"/></svg>';
 
     const textWrap = document.createElement('span');
     textWrap.className = 'se-player-count-text';
@@ -340,7 +339,7 @@
     valueNode.className = C.PlayBarDetailLabel;
 
     textWrap.append(label, valueNode);
-    badge.append(icon, textWrap);
+    badge.append(textWrap);
     badge.addEventListener('click', event => {
       event.preventDefault();
       event.stopPropagation();
@@ -352,7 +351,6 @@
   };
 
   const update = () => {
-    frame = 0;
     if (destroyed) return;
     if (document.visibilityState === 'hidden') {
       abortActiveRequest();
@@ -364,10 +362,10 @@
       return;
     }
 
-    const stat = [...document.querySelectorAll(`.${C.InPage} .${C.GameStat}`)].find(
-      node => node !== badge && SE.visible(node)
+    // One visibility check per stats row, not one per stat.
+    const target = [...document.querySelectorAll(`.${C.InPage} .${C.GameStatsSection}`)].find(
+      row => [...row.querySelectorAll(`.${C.GameStat}`)].some(node => node !== badge) && SE.visible(row)
     );
-    const target = stat?.closest(`.${C.GameStatsSection}`);
     const nextAppId = target && resolveSelectedAppId(target);
 
     if (!target || !nextAppId) {
@@ -385,13 +383,14 @@
     void refreshBadge();
   };
 
-  const schedule = () => {
-    if (!destroyed && !frame) frame = requestAnimationFrame(update);
+  // core batches watchers into one frame; the poll refreshes the count once a minute.
+  const watcher = SE.watch(update, { attributes: ['class', 'hidden'], ignore: SE.inSide });
+  const timer = SE.poll(update, CACHE_TTL_MS, { active: () => !!badge && SE.visible(badge) });
+  // The poll only wakes on return; hiding the window must still cancel an in-flight request.
+  const onVisibility = () => {
+    if (document.visibilityState === 'hidden') abortActiveRequest();
   };
-
-  const watcher = SE.watch(schedule, { attributes: ['class', 'hidden'], ignore: SE.inside(SE.SIDE) });
-  const timer = SE.poll(() => update(), CACHE_TTL_MS, { active: () => !!badge && SE.visible(badge) });
-  document.addEventListener('visibilitychange', schedule);
+  document.addEventListener('visibilitychange', onVisibility);
 
   const countForApp = async appid => {
     if (!isValidAppId(appid)) return null;
@@ -418,8 +417,7 @@
       destroyed = true;
       watcher.disconnect();
       timer.disconnect();
-      if (frame) cancelAnimationFrame(frame);
-      document.removeEventListener('visibilitychange', schedule);
+      document.removeEventListener('visibilitychange', onVisibility);
       unmountBadge();
       cache.clear();
       delete window.__steamEnhancedPlayerCount;

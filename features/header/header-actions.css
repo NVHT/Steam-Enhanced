@@ -13,16 +13,10 @@
 }
 
 .se-header-action {
+  position: relative;
   align-items: center;
   flex: 0 0 auto;
   -webkit-app-region: no-drag;
-}
-
-.se-header-action > svg,
-.se-header-action > img {
-  width: 14px;
-  height: 14px;
-  object-fit: contain;
 }
 
 /*
@@ -46,7 +40,6 @@ body.se-header-actions-ready .BottomBarContainer {
 body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo {
   display: flex;
   flex-flow: row nowrap;
-  flex: 0 0 40px;
   -webkit-app-region: drag;
 }
 
@@ -57,8 +50,6 @@ body.se-header-actions-ready ._39oUCO1OuizVPwcnnv88no {
 body.se-header-actions-ready ._3s0lkohH8wU2do0K1il28Y {
   order: 1;
   flex: 0 0 auto;
-  height: 26px;
-  margin-top: 0;
   padding-inline-end: 10px;
   margin-inline-end: 6px;
   border-inline-end: 1px solid rgba(139, 146, 154, 0.18);
@@ -73,8 +64,6 @@ body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy {
   order: 2;
   flex: 0 1 auto;
   min-width: 0;
-  height: 32px;
-  min-height: 32px;
   padding: 0 0 0 2px;
   white-space: nowrap;
   overflow-x: auto;
@@ -137,21 +126,11 @@ body.se-header-actions-ready .qP17eBPXkfezFfexZ4hC3:has(.title-area:not(.OSX)) {
 }
 
 /*
- * Converted controls carry Steam's actual Button + AnnouncementsButton classes.
- * Dimensions track the live native announcements button.
- * Native classes provide background, corners, hover and focus treatment.
+ * Converted controls carry Steam's actual Button + AnnouncementsButton classes, which give
+ * background, corners, hover and focus; their text colour tracks the live Announcements
+ * button. Size: the Steam/Home button geometry below.
  */
 body.se-header-actions-ready .se-native-header-button {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 var(--se-announcement-width, 40px);
-  width: var(--se-announcement-width, 40px) !important;
-  min-width: var(--se-announcement-width, 40px) !important;
-  height: var(--se-announcement-height, 24px) !important;
-  min-height: var(--se-announcement-height, 24px) !important;
-  padding: var(--se-announcement-padding, 0px 12px) !important;
   margin: 0;
   font-size: 0 !important;
   line-height: 0;
@@ -181,7 +160,9 @@ body.se-header-actions-ready .se-menu-icon::after {
 body.se-header-actions-ready .se-menu-icon::before {
   content: '';
   display: block;
-  flex: 0 0 14px;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
   background-color: currentColor;
   -webkit-mask: var(--se-menu-icon) center / contain no-repeat;
 }
@@ -195,14 +176,10 @@ body.se-header-actions-ready .se-menu-icon[data-se-icon="steam"] .bSKGlAJG2UVWTs
 }
 
 body.se-header-actions-ready .se-native-header-button svg {
-  width: 14px !important;
-  height: 14px !important;
   min-width: 0;
   max-width: none;
   min-height: 0;
   max-height: none;
-  flex: 0 0 14px;
-  margin: 0;
 }
 
 body.se-header-actions-ready .se-menu-icon[data-se-icon="view"] {
@@ -242,8 +219,7 @@ body.se-header-actions-ready .se-menu-icon[data-se-icon="console"] {
 }
 
 /* Native tooltip sources cover the existing controls without replacing handlers. */
-body.se-header-actions-ready .se-menu-icon,
-body.se-header-actions-ready .se-header-action {
+body.se-header-actions-ready .se-menu-icon {
   position: relative;
 }
 
@@ -261,10 +237,6 @@ body.se-header-actions-ready .se-header-action {
 }
 
 /* Current Steam download percentage; no track when Steam exposes no progress. */
-.se-header-action {
-  position: relative;
-}
-
 .se-download-progress {
   position: absolute;
   left: 4px;
@@ -323,15 +295,6 @@ body.se-header-actions-ready .se-native-header-button {
   align-self: center;
 }
 
-/* Proxy actions follow the same live reference dimensions as the menu controls. */
-body.se-header-actions-ready .se-header-action {
-  width: var(--se-announcement-width, 40px) !important;
-  min-width: var(--se-announcement-width, 40px) !important;
-  flex: 0 0 var(--se-announcement-width, 40px);
-  height: var(--se-announcement-height, 32px) !important;
-  padding: var(--se-announcement-padding, 0px 12px) !important;
-}
-
 /* Only Friends Panel's header straightening paint; preserve its live body theme. */
 body.se-header-actions-ready #sfp-root {
   --sfp-header-surface: var(--se-announcement-header-surface, #171d25) !important;
@@ -356,24 +319,9 @@ body.se-header-actions-ready ._3s0lkohH8wU2do0K1il28Y._1Ky59qmywxOUtNcI1cgmkX {
   padding-inline-start: var(--se-steam-home-inset, 6px) !important;
 }
 
-body.se-header-actions-ready .se-native-header-button[data-se-icon="steam"] {
-  width: var(--se-steam-home-width, var(--se-announcement-width, 40px)) !important;
-  min-width: var(--se-steam-home-width, var(--se-announcement-width, 40px)) !important;
-  flex: 0 0 var(--se-steam-home-width, var(--se-announcement-width, 40px));
-  height: var(--se-steam-home-height, 36px) !important;
-  min-height: var(--se-steam-home-height, 36px) !important;
-  padding: 0 !important;
-}
-
-body.se-header-actions-ready .se-native-header-button[data-se-icon="steam"] svg {
-  width: 16px !important;
-  height: 16px !important;
-  flex: 0 0 16px;
-}
-
 /* Give the full-size Steam button equal breathing room above and below. */
 body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo {
-  flex-basis: calc(var(--se-steam-home-height, 36px) + 16px);
+  flex: 0 0 calc(var(--se-steam-home-height, 36px) + 16px);
   height: calc(var(--se-steam-home-height, 36px) + 16px);
   min-height: calc(var(--se-steam-home-height, 36px) + 16px);
   padding-block: 8px;
@@ -415,12 +363,6 @@ body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-button s
   flex: 0 0 16px;
   object-fit: contain;
   margin: 0;
-}
-
-body.se-header-actions-ready .se-menu-icon::before {
-  width: 16px;
-  height: 16px;
-  flex-basis: 16px;
 }
 
 /* Account and Big Picture use different native classes from the icon actions. */

@@ -19,19 +19,18 @@
   const PANEL = `.${C.AppGameInfoContainer}.${C.AppDetailsCollapsed}`;
 
   let observer;
-  let queued = 0;
   let patchedSet = null;
-  let transition;
+  let transition = null;
+  let transitionMissAt = -Infinity;
+  const RETRY_MS = 30000;
 
   // Steam's React, as Millennium exposes it; a startTransition from any other copy of React
-  // would not reach Steam's renderer and the update would stay urgent.
+  // would not reach Steam's renderer and the update would stay urgent. A miss (React not
+  // loaded yet) is retried after RETRY_MS instead of being remembered for good.
   const findTransition = () => {
-    if (transition !== undefined) return transition;
-    transition = null;
-    for (const owner of SE.owners()) {
-      const fn = SE.run(() => owner.SP_REACT?.startTransition);
-      if (typeof fn === 'function') return (transition = fn);
-    }
+    if (transition || performance.now() - transitionMissAt < RETRY_MS) return transition;
+    const fromMillennium = SE.global('SP_REACT', react => typeof react.startTransition === 'function');
+    if (fromMillennium) return (transition = fromMillennium.startTransition);
     // Without Millennium's handle: Steam's React is the copy that its react-dom loaded.
     for (const req of SE.requires()) {
       for (const mod of Object.values(req.c || {})) {
@@ -45,14 +44,19 @@
         }
       }
     }
-    return transition;
+    transitionMissAt = performance.now();
+    return null;
   };
 
   const alwaysOpen = (set) => {
-    if (patchedSet || !(set instanceof Set)) return;
+    if (set === patchedSet || !(set instanceof Set)) return;
     try {
+      if (patchedSet) delete patchedSet.has;
       Object.defineProperty(set, 'has', { configurable: true, writable: true, value: () => true });
       patchedSet = set;
+      // Every later page now renders open by itself: watch only as a slow safety net, in case
+      // Steam replaces the Set.
+      watchPanels(2000);
     } catch (_) {}
   };
 
@@ -86,7 +90,6 @@
   };
 
   const expand = () => {
-    queued = 0;
     for (const panel of document.querySelectorAll(PANEL)) {
       const component = panelOwner(panel);
       if (!component || component.state.bShowGameInfo) continue;
@@ -95,18 +98,19 @@
     }
   };
 
-  const schedule = () => {
-    if (!queued) queued = requestAnimationFrame(expand);
-  };
+  // core already batches watchers into one frame.
+  function watchPanels(throttle = 0) {
+    observer?.disconnect();
+    observer = SE.watch(expand, { attributes: ['class'], ignore: SE.inSide, throttle });
+  }
 
   const start = () => {
-    observer = SE.watch(schedule, { attributes: ['class'], ignore: SE.inside(SE.SIDE) });
-    schedule();
+    watchPanels();
+    expand();
   };
 
   state.destroy = () => {
     observer?.disconnect();
-    if (queued) cancelAnimationFrame(queued);
     if (patchedSet) delete patchedSet.has;
     patchedSet = null;
     removeEventListener('DOMContentLoaded', start);

@@ -1,14 +1,14 @@
 /*
  * Live player count badge in the Game Details play bar.
  *
- * Matches native `.GameStat` typography and spacing with a pulsing online
- * indicator dot. Paired with `features/game-page/player-count.js`.
+ * A native `.GameStat` (typography, spacing and the theme's stat icon come from
+ * game-page.css); this file adds the button reset, hover, focus and error state.
+ * Paired with `features/game-page/player-count.js`.
  */
 #se-player-count {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 9px;
   flex: 0 0 auto;
   border: 0;
   text-align: start;
@@ -18,30 +18,14 @@
   cursor: pointer;
 }
 
-#se-player-count::before,
-#se-player-count::after {
-  content: none !important;
-  display: none !important;
-}
-
+/* The same hover as the other clickable stats in the bar */
 #se-player-count:hover {
-  background: var(--se-hover, #2c3440) !important;
+  background: var(--se-hairline, rgba(255, 255, 255, .06)) !important;
 }
 
 #se-player-count:focus-visible {
-  outline: 2px solid var(--se-accent, #66c0f4);
-  outline-offset: 2px;
-}
-
-#se-player-count .se-player-count-icon {
-  display: flex;
-  color: var(--se-text-muted, #98a2ad);
-}
-
-#se-player-count .se-player-count-icon svg {
-  display: block;
-  width: 18px;
-  height: 18px;
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 #se-player-count .se-player-count-text {
@@ -53,5 +37,5 @@
 
 #se-player-count[data-state="error"] .se-player-count-text > :last-child {
   color: var(--se-text-muted, #98a2ad) !important;
-  font-size: 12px !important;
+  font-size: var(--se-fs-sm) !important;
 }

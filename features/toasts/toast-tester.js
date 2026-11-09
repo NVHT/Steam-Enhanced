@@ -9,7 +9,7 @@
  *
  * Developer tool: not injected in release builds. To use it, add these to skin.json "Patches":
  *   { "MatchRegexString": "^Steam$", "TargetCss": "features/toasts/toasts.css", "TargetJs": "features/toasts/toasts.js" },
- *   { "MatchRegexString": "^Steam$", "TargetJs": "features/toasts/toast-tester.js" }
+ *   { "MatchRegexString": "^Steam$", "TargetCss": "features/toasts/toast-tester.css", "TargetJs": "features/toasts/toast-tester.js" }
  */
 (window.__se ? init => init(window.__se) : init => addEventListener('se-core', () => init(window.__se), { once: true }))(SE => {
   window.__seToastTester?.destroy();
@@ -17,26 +17,15 @@
   const { run, esc, rarity } = SE;
   const PLAY_ALL_GAP_MS = 350;
 
-  const contextGlobal = name => {
-    for (const win of SE.owners()) {
-      const v = run(() => win[name]);
-      if (v) return v;
-    }
-    return null;
-  };
-
-  const steamClient = () => {
-    for (const win of SE.owners()) {
-      const sc = run(() => win.SteamClient);
-      if (typeof sc?.Apps?.GetMyAchievementsForApp === 'function') return sc;
-    }
-    return null;
-  };
+  const steamClient = () => SE.global('SteamClient', sc => typeof sc?.Apps?.GetMyAchievementsForApp === 'function');
 
   /* ---------- Your data: recent games and their achievements ---------- */
 
+  // Sorting the whole library per toast fired is wasteful: the list is kept for a minute.
+  let recent = { at: 0, games: [] };
   function recentGames(count = 6) {
-    const store = contextGlobal('appStore');
+    if (Date.now() - recent.at < 60000) return recent.games;
+    const store = SE.appStore();
     const list =
       run(() =>
         store.allApps
@@ -47,6 +36,7 @@
     const games = list.map(a => ({ appid: a.appid, name: a.display_name || `App ${a.appid}` }));
     // Placeholders keep the tester working without a library (art falls back to the plain ground).
     while (games.length < count) games.push({ appid: 0, name: ['Hollow Reach', 'Starfall Tactics', 'Neon Drift', 'Ironbound', 'Tidebreaker', 'Ember Trail'][games.length] });
+    recent = { at: Date.now(), games };
     return games;
   }
   const game = i => recentGames()[i % 6];
@@ -71,7 +61,7 @@
 
   // Your own account (for the mini-profile background on friend previews).
   function myAccountId() {
-    const sid = String(run(() => contextGlobal('App')?.m_CurrentUser?.strSteamID) || '');
+    const sid = String(run(() => SE.global('App')?.m_CurrentUser?.strSteamID) || '');
     return /^\d{17,20}$/.test(sid) ? Number(BigInt(sid) & 0xffffffffn) : 0;
   }
 

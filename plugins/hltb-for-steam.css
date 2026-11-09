@@ -15,7 +15,6 @@
   color: var(--se-text-muted, #98a2ad);
 }
 
-/* One bar in three stages. */
 .se-hltb-head {
   display: flex;
   justify-content: space-between;
@@ -25,9 +24,9 @@
 
 .se-hltb-title {
   text-transform: uppercase;
-  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
-  letter-spacing: var(--se-label-spacing, .1em) !important;
-  color: var(--se-label-color, #6f7984) !important;
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  letter-spacing: var(--se-label-spacing, .1em);
+  color: var(--se-label-color, #6f7984);
 }
 
 .se-hltb-you {
@@ -47,90 +46,27 @@
   margin-top: 14px;
 }
 
+.se-hltb-stages {
+  margin-top: 10px;
+}
+
+/*
+ * One bar in three stages: passed ones solid blue, the current one filling up to a dot,
+ * the rest a quiet track; all three passed turns the bar gold.
+ */
 .se-hltb-seg {
+  position: relative;
   flex: 1;
-  border-radius: 8px;
+  height: 6px;
+  overflow: visible;
+  border-radius: var(--se-radius-sm, 8px);
+  background: var(--se-check, rgba(255, 255, 255, .07));
 }
 
 .se-hltb-seg > span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--se-accent, #7cc4ff), #b9a3ff);
-}
-
-.se-hltb-stages {
-  margin-top: 10px;
-}
-
-.se-hltb-stage {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.se-hltb-val {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--se-text, #e6e8eb);
-  white-space: nowrap;
-}
-
-.se-hltb-lab {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--se-text-muted, #98a2ad);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.se-hltb-tick {
-  flex: none;
-  width: 12px;
-  height: 12px;
-}
-
-.se-hltb-tick circle {
-  fill: color-mix(in srgb, var(--se-running) 18%, transparent);
-}
-
-.se-hltb-tick path {
-  fill: none;
-  stroke: var(--se-running, #6cc24a);
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.se-hltb-foot {
-  margin-top: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--se-text-muted, #98a2ad);
-}
-
-.se-hltb-foot b {
-  color: var(--se-text, #e6e8eb);
-}
-
-/*
- * How Long To Beat stages: passed ones solid blue, the current one filling
- * up to a dot, the rest a quiet track; all three passed turns the bar gold.
- */
-.se-hltb-seg {
-  position: relative;
-  height: 6px !important;
-  overflow: visible !important;
-  background: rgba(255, 255, 255, .07);
-}
-
-.se-hltb-seg > span {
-  border-radius: 6px;
+  border-radius: var(--se-radius-sm, 8px);
 }
 
 .se-hltb-seg[data-st="done"] > span {
@@ -156,10 +92,66 @@
   background: linear-gradient(90deg, var(--se-gold, #f0c060), #ffd98a);
 }
 
+.se-hltb-stage {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.se-hltb-val {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--se-fs-md);
+  font-weight: 700;
+  color: var(--se-text, #e6e8eb);
+  white-space: nowrap;
+}
+
+.se-hltb-lab {
+  font-size: var(--se-fs-xs);
+  font-weight: 500;
+  color: var(--se-text-muted, #98a2ad);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-hltb-tick {
+  flex: none;
+  width: 12px;
+  height: 12px;
+}
+
+.se-hltb-tick circle {
+  fill: color-mix(in srgb, var(--se-running) 18%, transparent);
+}
+
+.se-hltb-tick path {
+  fill: none;
+  stroke: var(--se-running, #6cc24a);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .se-hltb-bars[data-all] ~ .se-hltb-stages .se-hltb-tick circle {
   fill: var(--se-gold-surface, rgba(240, 192, 96, .16));
 }
 
 .se-hltb-bars[data-all] ~ .se-hltb-stages .se-hltb-tick path {
   stroke: var(--se-gold, #f0c060);
+}
+
+.se-hltb-foot {
+  margin-top: 12px;
+  font-size: var(--se-fs-sm);
+  font-weight: 500;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+.se-hltb-foot b {
+  color: var(--se-text, #e6e8eb);
 }

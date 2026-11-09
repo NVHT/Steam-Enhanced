@@ -22,6 +22,7 @@
 
   const { C, esc } = SE;
   const ENTRY = `.${C.GameListEntryContainer}`;
+  const COVER = `.${C.LibraryItemBox}`;
   const NAME = `.${C.GameListEntryName}`;
   const SELECTED = `.${C.AppIconDownloading_Selected}`;
   const LIBRARY = `.${C.AchievementsOverlayContainer_Container}`;
@@ -41,6 +42,8 @@
   const docRoot = document.documentElement;
 
   let session = null;
+  /* Pending releaseLater timers, cleared on destroy */
+  const releaseTimers = new Set();
 
   /* ---------- Finding Steam's zones ---------- */
 
@@ -67,43 +70,65 @@
     scheduleLayout();
   };
 
+  /*
+   * Reads only: returns [el, kind] for a zone, or null. Zones are adopted after a whole pass,
+   * so marking one never forces a style recalc in the middle of the reads.
+   */
   const consider = el => {
-    if (!session || session.zones.has(el) || el.closest(`${ENTRY}, .se-gd-ghost, .se-gd-tray`)) return;
-    if (el.parentElement?.closest(`[${ZONE}]`)) return;
+    if (session.zones.has(el) || el.closest(`${ENTRY}, .se-gd-ghost, .se-gd-tray`)) return null;
+    if (el.parentElement?.closest(`[${ZONE}]`)) return null;
     /* Hidden by a previous drag and not yet released: still a zone */
     const kept = el.getAttribute(ZONE);
-    if (kept) return adopt(el, kept);
-    if (el.offsetWidth < MIN_ZONE_W || el.offsetHeight < MIN_ZONE_H) return;
+    if (kept) return [el, kept];
+    if (el.offsetWidth < MIN_ZONE_W || el.offsetHeight < MIN_ZONE_H) return null;
     const color = dashedColor(el);
-    if (color) adopt(el, classify(color));
+    return color ? [el, classify(color)] : null;
   };
 
-  const inspect = node => {
+  /* In document order, so an outer zone is marked before any zone-like box inside it */
+  const adoptAll = found => {
+    for (const [el, kind] of found) {
+      if (!session.zones.has(el) && !el.parentElement?.closest(`[${ZONE}]`)) adopt(el, kind);
+    }
+  };
+
+  const inspect = (node, found) => {
     if (node.nodeType !== 1) return;
-    consider(node);
+    const hit = consider(node);
+    if (hit) found.push(hit);
     const all = node.getElementsByTagName('*');
-    for (let i = 0; i < all.length && i < INSPECT_LIMIT; i++) consider(all[i]);
+    for (let i = 0; i < all.length && i < INSPECT_LIMIT; i++) {
+      const sub = consider(all[i]);
+      if (sub) found.push(sub);
+    }
   };
 
-  /* Everything in the library except the rows themselves (hundreds, never a zone) */
+  /* Everything in the library except the rows and covers (hundreds, never a zone) */
   const scanAll = root => {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
-      acceptNode: node => (node.matches(ENTRY) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+      acceptNode: node => (node.matches(`${ENTRY}, ${COVER}`) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
     });
-    for (let node = walker.nextNode(); node; node = walker.nextNode()) consider(node);
+    const found = [];
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const hit = consider(node);
+      if (hit) found.push(hit);
+    }
+    adoptAll(found);
   };
 
   const onMutations = records => {
     if (!session) return;
+    const found = [];
     for (const record of records) {
       const zone = record.target.nodeType === 1 ? record.target.closest(`[${ZONE}]`) : record.target.parentElement?.closest(`[${ZONE}]`);
       if (zone && session.zones.has(zone)) {
         session.stale.add(zone);
         continue;
       }
-      if (record.type === 'attributes') inspect(record.target);
-      else for (const node of record.addedNodes) inspect(node);
+      if (record.type === 'attributes') inspect(record.target, found);
+      else for (const node of record.addedNodes) inspect(node, found);
     }
+    adoptAll(found);
     for (const zone of session.zones.keys()) {
       if (!zone.isConnected) {
         session.zones.get(zone).remove();
@@ -274,6 +299,8 @@
   const GHOST_MAX = 520;
   const ADDED_LIMIT = 60;
   const RECENT_BODY_CHILDREN = 6;
+  /* The page-wide image scan is the costly part of the search: at most this often */
+  const IMAGE_SCAN_MS = 120;
 
   const isSelected = entry =>
     Boolean(entry.matches(SELECTED) || entry.closest(SELECTED) || entry.querySelector(SELECTED));
@@ -322,7 +349,7 @@
     return null;
   };
 
-  const findSteamGhost = (x, y) => {
+  const findSteamGhost = (x, y, scanImages) => {
     /* What Steam mounted for this drag: added since, or just before (portals go last in body) */
     const recent = [...document.body.children].slice(-RECENT_BODY_CHILDREN);
     for (const node of [...session.added, ...recent]) {
@@ -334,6 +361,7 @@
         if (layer && near(layer.getBoundingClientRect(), x, y)) return layer;
       }
     }
+    if (!scanImages) return null;
     /* Already mounted before the drag began, only shown now */
     for (const img of document.images) {
       if (excluded(img) || !near(img.getBoundingClientRect(), x, y)) continue;
@@ -356,10 +384,18 @@
     if (!session) return;
     session.move = 0;
     const { ghost, x, y } = session;
+    /* Search (layout reads) before moving the chip (a write), so the frame lays out once */
+    const now = performance.now();
+    let found = null;
+    if (!session.steamGhost?.isConnected && now < session.searchUntil) {
+      const scanImages = now - session.imageScanAt >= IMAGE_SCAN_MS;
+      if (scanImages) session.imageScanAt = now;
+      found = findSteamGhost(x, y, scanImages);
+    }
     ghost.style.transform = `translate3d(${x - HOTSPOT}px, ${y - HOTSPOT}px, 0)`;
-    if (!session.steamGhost?.isConnected && performance.now() < session.searchUntil) {
-      session.steamGhost = findSteamGhost(x, y);
-      session.steamGhost?.setAttribute(STEAM_GHOST, '');
+    if (found) {
+      session.steamGhost = found;
+      found.setAttribute(STEAM_GHOST, '');
     }
     SE.attr(ghost, 'data-se-away', session.steamGhost?.isConnected ? null : '');
   };
@@ -376,12 +412,14 @@
 
   /* Steam fades its zones out after a drag; they stay hidden until gone or past that fade */
   const releaseLater = zones => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
+      releaseTimers.delete(timer);
       for (const zone of zones) {
         if (session?.zones.has(zone)) continue;
         zone.removeAttribute(ZONE);
       }
     }, RELEASE_MS);
+    releaseTimers.add(timer);
   };
 
   const end = () => {
@@ -433,6 +471,7 @@
       list: listArea(entry),
       box: null,
       steamGhost: null,
+      imageScanAt: -Infinity,
       startedAt: performance.now(),
       searchUntil: performance.now() + GHOST_SEARCH_MS,
     };
@@ -462,9 +501,14 @@
     track(event.clientX, event.clientY);
   };
 
-  /* Leaving the window (no element to enter) */
+  /*
+   * Leaving the window. relatedTarget is null when there is no element to enter, but Chromium
+   * may also leave it null between elements, so the pointer must be at or past an edge too.
+   */
+  const leftWindow = ({ clientX: x, clientY: y }) => x <= 0 || y <= 0 || x >= innerWidth - 1 || y >= innerHeight - 1;
+
   const onDragLeave = event => {
-    if (!session || !event.isTrusted || event.relatedTarget) return;
+    if (!session || !event.isTrusted || event.relatedTarget || !leftWindow(event)) return;
     setOver(null);
     session.ghost.setAttribute('data-se-away', '');
   };
@@ -501,6 +545,8 @@
   window.__steamEnhancedGameDrag = {
     destroy() {
       end();
+      for (const timer of releaseTimers) clearTimeout(timer);
+      releaseTimers.clear();
       for (const [type, fn, capture] of listeners) window.removeEventListener(type, fn, capture);
       for (const el of document.querySelectorAll('.se-gd-ghost, .se-gd-tray')) el.remove();
       for (const el of document.querySelectorAll(`[${ZONE}]`)) el.removeAttribute(ZONE);

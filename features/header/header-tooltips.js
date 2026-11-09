@@ -90,6 +90,20 @@
     return bar ? bar.getBoundingClientRect().bottom - 2 : 48;
   };
 
+  /*
+   * Which side a tooltip opens on. Only the rail needs a measurement (a control below the
+   * title bar opens right), so it's taken once per mount and again only when the layout
+   * changes (rail mode or a window resize), not on every DOM change.
+   */
+  let layoutKey = '';
+  const directionFor = (node, barBottom) =>
+    node.getAttribute('data-se-tip-dir') ||
+    (node.closest('.se-fdock')
+      ? 'left'
+      : isRail && node.getBoundingClientRect().top >= barBottom()
+        ? 'right'
+        : 'bottom');
+
   function syncNativeTips() {
     const activeSet = new Set();
     if (isRail) {
@@ -144,26 +158,30 @@
     if (!native) return;
     const { React, DOM, Tooltip } = native;
 
+    const key = `${isRail}|${innerWidth}x${innerHeight}`;
+    const relayout = key !== layoutKey;
+    layoutKey = key;
+    let bar;
+    const barBottom = () => (bar ??= titleBarHeight());
+
     for (const node of candidates) {
       const label = labelFor(node);
       if (!label) continue;
-
-      const fallbackDirection = () =>
-        node.closest('.se-fdock')
-          ? 'left'
-          : isRail && node.getBoundingClientRect().top >= titleBarHeight()
-            ? 'right'
-            : 'bottom';
-      const direction = node.getAttribute('data-se-tip-dir') || fallbackDirection();
 
       let entry = mounts.get(node);
       if (!entry) {
         const host = document.createElement('span');
         host.className = 'se-header-tooltip-host';
         node.appendChild(host);
-        entry = { host, root: DOM.createRoot(host), label: null, direction: null };
+        entry = { host, root: DOM.createRoot(host), label: null, direction: null, dir: null, dirAttr: null };
         mounts.set(node, entry);
       }
+      const dirAttr = node.getAttribute('data-se-tip-dir');
+      if (relayout || entry.dir === null || dirAttr !== entry.dirAttr) {
+        entry.dir = directionFor(node, barBottom);
+        entry.dirAttr = dirAttr;
+      }
+      const direction = entry.dir;
 
       if (entry.label === label && entry.direction === direction) continue;
       entry.label = label;
@@ -188,10 +206,13 @@
   };
 
   const start = () => {
-    observer = SE.watch(schedule, {
+    // Core already batches non-sync watchers into one frame; the throttle keeps hover-driven
+    // class churn from re-querying the whole document more than ten times a second.
+    observer = SE.watch(update, {
       attributes: ['aria-label', 'class', 'data-se-icon', 'data-se-tip', 'data-se-tip-dir'],
-      sync: true,
+      throttle: 100,
     });
+    addEventListener('resize', schedule);
     schedule();
   };
 
@@ -199,6 +220,7 @@
     hasNotifications,
     destroy() {
       observer?.disconnect();
+      removeEventListener('resize', schedule);
       traySubscription?.Unregister();
       traySubscription = null;
       trayCallbacks = null;

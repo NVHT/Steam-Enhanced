@@ -13,6 +13,37 @@
   const WIDE_CAPSULE_SELECTOR = `.${C.FeaturedCapsule}`;
   const LANDSCAPE_CLS = C.Landscape;
 
+  // Covers on screen (IntersectionObserver), so a long grid isn't measured off-screen.
+  const onScreen = new Set();
+  const seenButtons = new WeakSet();
+  const io =
+    typeof IntersectionObserver === 'function'
+      ? new IntersectionObserver(entries => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) onScreen.add(entry.target);
+            else onScreen.delete(entry.target);
+          }
+          schedule();
+        })
+      : null;
+
+  const visibleButtons = () => {
+    const all = document.querySelectorAll(`${ACTION_BTN_SELECTOR}, ${UNINSTALLED_ICON_SELECTOR}`);
+    if (!io) return [...all];
+    for (const btn of all) {
+      if (seenButtons.has(btn)) continue;
+      seenButtons.add(btn);
+      io.observe(btn);
+    }
+    for (const btn of onScreen) {
+      if (!btn.isConnected) {
+        onScreen.delete(btn);
+        io.unobserve(btn);
+      }
+    }
+    return [...onScreen];
+  };
+
   const deduplicateEventDates = () => {
     for (const news of document.querySelectorAll(NEWS_SELECTOR)) {
       let prevDateText = null;
@@ -35,10 +66,12 @@
     return x;
   };
 
-  // Batch geometry reads across all shelves before applying style mutations to avoid layout thrashing.
-  const alignShelfCoverEdges = () => {
+  // Reads only; the writes are applied by applyShelfShifts() after every read of the frame.
+  const measureShelfShifts = () => {
     const measurements = [];
     for (const shelf of document.querySelectorAll(SHELF_SELECTOR)) {
+      // A shelf the Home stage drew its own panel for is out of sight: nothing to align.
+      if (shelf.closest('[data-se-hs-own]')) continue;
       const box = shelf.querySelector(COVER_BOX_SELECTOR);
       const firstCover = (box && box.querySelector('img')) || box || shelf.querySelector('img');
       if (!firstCover) continue;
@@ -58,7 +91,10 @@
         targetShift > 0 && targetShift <= 24 ? targetShift : 0,
       ]);
     }
+    return measurements;
+  };
 
+  const applyShelfShifts = measurements => {
     for (const [container, appliedShift, targetShift] of measurements) {
       if (targetShift !== appliedShift) {
         if (targetShift) container.style.setProperty('--se-cover-shift', `${targetShift}px`);
@@ -70,7 +106,10 @@
     }
   };
 
-  const boundItems = new WeakSet();
+  // Listeners on Steam's elements: one signal removes them all in destroy().
+  const listeners = new AbortController();
+  const hoverBound = new WeakSet();
+  const clickBound = new WeakSet();
 
   const findCoverContext = btn => {
     let el = btn.parentElement;
@@ -81,10 +120,10 @@
     return null;
   };
 
-  // Two-pass read/write measurement for cover Play / Install / Update action overlays.
-  const measureCoverActionButtons = () => {
+  // Cover Play / Install / Update overlays: measured here (reads), placed by placeCoverButtons().
+  const measureCoverButtons = () => {
     const plan = [];
-    for (const btn of document.querySelectorAll(`${ACTION_BTN_SELECTOR}, ${UNINSTALLED_ICON_SELECTOR}`)) {
+    for (const btn of visibleButtons()) {
       if (btn.closest(WIDE_CAPSULE_SELECTOR)) continue;
       const isUninstalledIcon = btn.matches(UNINSTALLED_ICON_SELECTOR);
       const directCover = isUninstalledIcon && btn.closest(COVER_BOX_SELECTOR);
@@ -126,9 +165,13 @@
 
       plan.push({ btn, isUninstalledIcon, context, coords });
     }
+    return plan;
+  };
 
+  const placeCoverButtons = plan => {
     const CSS_VARS = ['--se-cl', '--se-cb', '--se-cw'];
     for (const { btn, isUninstalledIcon, context, coords } of plan) {
+      const { item } = context;
       CSS_VARS.forEach((prop, idx) => {
         const px = `${Math.round(coords[idx])}px`;
         if (btn.style.getPropertyValue(prop) !== px) btn.style.setProperty(prop, px);
@@ -141,15 +184,17 @@
         if (btn.dataset.seAct !== actionType) btn.dataset.seAct = actionType;
       }
 
-      for (let parent = btn.parentElement; parent && parent !== context.item; parent = parent.parentElement) {
+      for (let parent = btn.parentElement; parent && parent !== item; parent = parent.parentElement) {
         SE.mark(parent, 'data-se-btnbox');
       }
 
-      if (isUninstalledIcon && !boundItems.has(context.item)) {
-        context.item.addEventListener(
+      // Bound once per item, whatever it showed first (an item can become uninstalled later).
+      if (isUninstalledIcon && !clickBound.has(item)) {
+        clickBound.add(item);
+        item.addEventListener(
           'click',
           event => {
-            const icon = context.item.querySelector('[data-se-cover-btn]');
+            const icon = item.querySelector('[data-se-cover-btn]');
             if (!icon || event.target === icon || icon.contains(event.target)) return;
             const rect = icon.getBoundingClientRect();
             if (
@@ -164,32 +209,31 @@
             event.preventDefault();
             icon.click();
           },
-          true
+          { capture: true, signal: listeners.signal }
         );
       }
 
-      if (!boundItems.has(context.item)) {
-        boundItems.add(context.item);
-        context.item.addEventListener('pointerenter', () =>
-          context.item.querySelector('[data-se-cover-btn]')?.setAttribute('data-se-hot', '')
-        );
-        context.item.addEventListener('pointerleave', () =>
-          context.item.querySelector('[data-se-cover-btn]')?.removeAttribute('data-se-hot')
-        );
+      if (!hoverBound.has(item)) {
+        hoverBound.add(item);
+        const opts = { signal: listeners.signal };
+        item.addEventListener('pointerenter', () => item.querySelector('[data-se-cover-btn]')?.setAttribute('data-se-hot', ''), opts);
+        item.addEventListener('pointerleave', () => item.querySelector('[data-se-cover-btn]')?.removeAttribute('data-se-hot'), opts);
       }
     }
   };
 
   let frame = 0;
   let observer;
-  let timer;
 
+  // Every read of the frame first, then every write: one layout per pass instead of three.
   const update = () => {
     frame = 0;
     try {
+      const shifts = measureShelfShifts();
+      const plan = measureCoverButtons();
       deduplicateEventDates();
-      alignShelfCoverEdges();
-      measureCoverActionButtons();
+      applyShelfShifts(shifts);
+      placeCoverButtons(plan);
     } catch (_) {}
   };
 
@@ -197,23 +241,22 @@
     if (!frame) frame = requestAnimationFrame(update);
   };
 
+  /*
+   * Structure changes only (Steam re-renders a date card rather than editing its text), plus
+   * covers scrolling into view (the IntersectionObserver) and resizes.
+   */
   const start = () => {
-    observer = SE.watch(schedule, {
-      characterData: true,
-      throttle: 100,
-      ignore: SE.inside(SE.SIDE),
-    });
+    observer = SE.watch(update, { throttle: 100, ignore: SE.inSide });
     addEventListener('resize', schedule);
-    timer = SE.poll(schedule, 2000, {
-      active: () => SE.visible(`.LibraryHome, .${C.LibraryItemBox}`),
-    });
     schedule();
   };
 
   window.__steamEnhancedHomePolish = {
     destroy() {
       observer?.disconnect();
-      timer?.disconnect();
+      io?.disconnect();
+      onScreen.clear();
+      listeners.abort();
       removeEventListener('resize', schedule);
       if (frame) cancelAnimationFrame(frame);
 

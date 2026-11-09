@@ -4,7 +4,7 @@
   const STORE_PLUGIN = 'hltb-for-millennium';
   const WIDGET = `#${LOCAL_PLUGIN}, #${STORE_PLUGIN}`;
 
-  function createCard({ C, esc, mark, unmark, fromProps, appIdOf, own, drop, schedule }) {
+  function createCard({ C, esc, mark, unmark, fromProps, appIdOf, appStore, own, drop, schedule }) {
     const STAT = `.${C.InPage} .${C.GameStat}`;
 
     function playtimeText(c) {
@@ -137,7 +137,7 @@
       }
       const cached = hltbResults.get(appid);
       if ((!cached || cached.expires <= Date.now()) && window.__steamEnhancedPluginRpc) {
-        const name = window.appStore?.GetAppOverviewByAppID(appid)?.display_name ||
+        const name = appStore?.()?.GetAppOverviewByAppID(appid)?.display_name ||
           fromProps(c, 120, p => p.overview?.display_name || p.appOverview?.display_name);
         loadHltb(appid, name);
       }

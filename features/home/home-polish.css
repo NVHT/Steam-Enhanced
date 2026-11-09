@@ -46,7 +46,7 @@
 
 ._3AjoLnMNKxYmNTGTJCLfgs[data-se-cover-btn]:not(#se-none)._1_Bo2Ied5s2Od4YKYTOsau:is([data-se-hot], :hover):not(._1aml4h4CSJbtrNbX4brUYs) {
   background: var(--se-play, #3a8a22) !important;
-  box-shadow: 0 8px 20px -8px rgba(80, 180, 50, .6) !important;
+  box-shadow: 0 8px 20px -8px var(--se-play-glow) !important;
   color: var(--se-text-strong, #fff) !important;
 }
 
@@ -92,7 +92,7 @@
   height: 36px !important;
   margin: 0 !important;
   padding: 0 !important;
-  border-radius: var(--se-radius-md, 10px) !important;
+  border-radius: var(--se-radius-md) !important;
   /* No backdrop blur: drawn once per cover, a blur each made shelves scroll heavily */
   background: rgba(12, 14, 18, .8) !important;
   box-shadow: 0 6px 16px -6px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .12) !important;
@@ -104,8 +104,10 @@
   gap: 8px;
   overflow: hidden;
   z-index: 14;
-  cursor: pointer;
-  transition: width .15s ease, background .15s, box-shadow .15s !important;
+  /* Ignores the pointer, so Steam's native "Install" tooltip stays away; a click on the bar is
+     passed to it by features/home/home-polish.js */
+  pointer-events: none !important;
+  transition: width var(--se-dur) ease-out, background var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out !important;
 }
 
 ._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none) svg {
@@ -143,12 +145,4 @@
 ._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn][data-se-act="stream"]:not(#se-none):is([data-se-hot], :hover)::after,
 .WYgDg9NyCcMIVuMyZ_NBC:hover ._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn][data-se-act="stream"]:not(#se-none)::after {
   content: "Stream";
-}
-
-/*
- * The Install icon ignores the pointer, so native "Install" tooltip stays away; a click
- * on the bar is passed to it by features/home/home-polish.js
- */
-._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none) {
-  pointer-events: none !important;
 }

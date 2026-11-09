@@ -1,11 +1,13 @@
-/* Collapse Library sidebar header controls into a 7-slot icon bar and annotate bracketed counts. */
+/*
+ * Collapse the Library sidebar header controls into a 7-slot icon bar. Header counts are
+ * owned by features/library/game-list.js.
+ */
 (window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
   const { C } = SE;
   window.__steamEnhancedSidebarIcons?.destroy();
 
   const roots = new Map();
   let observer;
-  let frame = 0;
 
   function restoreRoot(root, entry) {
     entry.button.remove();
@@ -17,25 +19,37 @@
     }
   }
 
-  const COUNT_RE = /^\(\s*([\d.,\s]+?(?:\s*\/\s*[\d.,\s]+?)?)\s*\)$/;
+  const setOpen = (root, entry, open) => {
+    root.classList.toggle('se-sidebar-search-open', open);
+    SE.mark(entry.button, 'aria-expanded', String(open));
+  };
 
-  const markCounts = () => {
-    const headers = document.querySelectorAll(
-      `.SectionHeaderContent, .${C.ShowcaseHeader}, .friendGroup .groupName, .${C.CollectionLabel}`
-    );
-    for (const header of headers) {
-      for (const el of header.querySelectorAll('*')) {
-        if (el.children.length) continue;
-        const match = COUNT_RE.exec(el.textContent.trim());
-        SE.attr(el, 'data-se-count', match ? match[1].replace(/\s*\/\s*/, ' / ') : null);
+  const mount = (root, search) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'se-sidebar-search se-sidebar-tip';
+    button.setAttribute('aria-label', 'Search games');
+    button.setAttribute('aria-expanded', 'false');
+    const entry = { button, search, labels: new Map() };
+
+    button.addEventListener('click', () => {
+      const open = !root.classList.contains('se-sidebar-search-open');
+      setOpen(root, entry, open);
+      if (open) search.querySelector('input')?.focus();
+    });
+    entry.onKey = event => {
+      if (event.key === 'Escape' && !search.querySelector('input')?.value) {
+        setOpen(root, entry, false);
+        button.focus();
       }
-    }
+    };
+    search.addEventListener('keydown', entry.onKey);
+    root.appendChild(button);
+    roots.set(root, entry);
+    return entry;
   };
 
   const update = () => {
-    frame = 0;
-    markCounts();
-
     for (const [root, entry] of roots) {
       if (!root.isConnected) {
         restoreRoot(root, entry);
@@ -49,72 +63,31 @@
       const search = root.querySelector(`.${C.ContainerHide_Container}`);
       if (!home || !games || !search || !root.querySelector(`.${C.AdvancedSearchButton}`)) continue;
 
-      let entry = roots.get(root);
-      if (!entry) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'se-sidebar-search se-sidebar-tip';
-        button.setAttribute('aria-label', 'Search games');
-        button.setAttribute('aria-expanded', 'false');
-        button.addEventListener('click', () => {
-          const open = !root.classList.contains('se-sidebar-search-open');
-          root.classList.toggle('se-sidebar-search-open', open);
-          button.setAttribute('aria-expanded', String(open));
-          if (open) root.querySelector(`.${C.ContainerHide_Container} input`)?.focus();
-        });
-
-        const onKey = event => {
-          if (event.key === 'Escape' && !search.querySelector('input')?.value) {
-            root.classList.remove('se-sidebar-search-open');
-            button.setAttribute('aria-expanded', 'false');
-            button.focus();
-          }
-        };
-
-        search.addEventListener('keydown', onKey);
-        root.appendChild(button);
-        entry = { button, search, onKey, labels: new Map() };
-        roots.set(root, entry);
-      }
-
-      const targets = [
+      const entry = roots.get(root) || mount(root, search);
+      for (const [node, label] of [
         [home, home.textContent.trim() || 'Home'],
         [games, games.textContent.trim() || 'Games'],
-      ];
-      for (const [node, label] of targets) {
+      ]) {
         if (!entry.labels.has(node)) entry.labels.set(node, node.getAttribute('aria-label'));
-        if (!node.classList.contains('se-sidebar-tip')) node.classList.add('se-sidebar-tip');
+        node.classList.add('se-sidebar-tip');
         SE.mark(node, 'aria-label', label);
       }
 
-      if (!root.classList.contains('se-sidebar-icons')) {
-        root.classList.add('se-sidebar-icons');
-      }
-      if (search.querySelector('input')?.value && !root.classList.contains('se-sidebar-search-open')) {
-        root.classList.add('se-sidebar-search-open');
-        entry.button.setAttribute('aria-expanded', 'true');
-      }
+      root.classList.add('se-sidebar-icons');
+      if (search.querySelector('input')?.value) setOpen(root, entry, true);
     }
   };
 
-  const schedule = () => {
-    if (!frame) frame = requestAnimationFrame(update);
-  };
-
   const start = () => {
-    observer = SE.watch(schedule, { attributes: ['class'], sync: true });
-    schedule();
+    observer = SE.watch(update);
+    update();
   };
 
   window.__steamEnhancedSidebarIcons = {
     destroy() {
       observer?.disconnect();
-      if (frame) cancelAnimationFrame(frame);
       for (const [root, entry] of roots) restoreRoot(root, entry);
       roots.clear();
-      for (const el of document.querySelectorAll('[data-se-count]')) {
-        el.removeAttribute('data-se-count');
-      }
       removeEventListener('DOMContentLoaded', start);
       delete window.__steamEnhancedSidebarIcons;
     },

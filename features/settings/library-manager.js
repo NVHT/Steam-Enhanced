@@ -31,7 +31,18 @@
   const PLUGIN = 0;
   const THEME = 1;
 
-  const sidebar = () => document.querySelector('.MillenniumDesktopSidebar');
+  let known = null;
+  const sidebar = () =>
+    known?.isConnected ? known : (known = document.querySelector('.MillenniumDesktopSidebar'));
+
+  // Only the drawer and the <style> Millennium rewrites beside it matter; until the drawer
+  // exists, every mutation might be the one that mounts it.
+  const outsideDrawer = (node) => {
+    if (!known?.isConnected) return false;
+    const el = node.nodeType === 1 ? node : node.parentElement;
+    const host = known.parentElement;
+    return !el || !(known.contains(el) || el === host || el.parentElement === host);
+  };
 
   function context(bar) {
     for (let f = SE.liveFiber(bar); f; f = f.return) {
@@ -51,36 +62,27 @@
   // Cache of plugin editability derived from Millennium's navigation panel registry
   // or its fallback disabledReason flags (0 = editable, 1 = no settings, 2 = disabled).
   const editable = new Map();
-  let panelsFound = null;
 
-  function findPanels() {
-    const wins = [window, ...SE.owners()];
-    for (let f = SE.fiber(sidebar()), n = 0; f && n < 4000; f = f.return, n++) {
-      try {
-        if ((f.tag === 3 || f.tag === 4) && f.stateNode?.containerInfo) {
-          const w = f.stateNode.containerInfo.ownerDocument?.defaultView;
-          if (w && !wins.includes(w)) wins.push(w);
-        }
-      } catch (_) {}
-    }
-    for (let i = 0; i < wins.length && wins.length < 16; i++) {
-      for (const k of ['opener', 'parent', 'top']) {
-        try {
-          const w = wins[i][k];
-          if (w && !wins.includes(w)) wins.push(w);
-        } catch (_) {}
+  // Millennium's registry of plugin settings panels. A miss is remembered for 5 s: paint asks
+  // twice per plugin, on every change in the drawer.
+  const PANELS = 'MILLENNIUM_SIDEBAR_NAVIGATION_PANELS';
+  let panelsFound = null;
+  let panelsRetry = 0;
+
+  function panels() {
+    if (panelsFound || performance.now() < panelsRetry) return panelsFound;
+    const isPanels = (p) => Boolean(p) && typeof p === 'object';
+    panelsFound = SE.global(PANELS, isPanels);
+    for (const w of panelsFound ? [] : SE.run(() => window.__seMillenniumWindow?.windows?.()) || []) {
+      const p = SE.run(() => w[PANELS]);
+      if (isPanels(p)) {
+        panelsFound = p;
+        break;
       }
     }
-    for (const w of wins) {
-      try {
-        const p = w.MILLENNIUM_SIDEBAR_NAVIGATION_PANELS;
-        if (p && typeof p === 'object') return p;
-      } catch (_) {}
-    }
-    return null;
+    panelsRetry = performance.now() + 5000;
+    return panelsFound;
   }
-
-  const panels = () => panelsFound || (panelsFound = findPanels());
 
   function hasSettings(plugin) {
     const p = panels();
@@ -207,7 +209,6 @@
   }
 
   let parts = null;
-  let frame = 0;
   let observer = null;
 
   function paint(bar) {
@@ -284,48 +285,45 @@
   }
 
   function update() {
-    frame = 0;
-    const bar = sidebar();
-    if (!bar) return;
+    const drawer = sidebar();
+    if (!drawer) return;
     try {
-      paint(bar);
+      paint(drawer);
     } catch (e) {
       console.warn('[Steam Enhanced] Library Manager:', e);
     }
     observer?.takeRecords();
   }
 
-  function schedule() {
-    if (!frame) frame = requestAnimationFrame(update);
-  }
-
   function onKey(e) {
     if (e.key !== 'Escape') return;
-    const bar = sidebar();
-    if (!bar?.hasAttribute('data-se-open')) return;
+    const drawer = sidebar();
+    if (!drawer?.hasAttribute('data-se-open')) return;
     if (e.target?.closest?.('.se-lmx-filter') && e.target.value) return;
-    context(bar)?.closeMenu?.();
+    context(drawer)?.closeMenu?.();
   }
 
   function start() {
-    observer = SE.watch(schedule, {
+    // Core batches non-sync subscribers into one frame, so update() runs at most once per frame.
+    observer = SE.watch(update, {
       characterData: true,
       attributes: ['data-focused-item-type', 'disabled'],
+      ignore: outsideDrawer,
     });
     document.addEventListener('keydown', onKey, true);
-    schedule();
+    update();
   }
 
   window.__steamEnhancedLibraryManager = {
     destroy() {
       observer?.disconnect();
-      if (frame) cancelAnimationFrame(frame);
+      clearTimeout(switchTimer);
       for (const el of made) el.remove();
       document.removeEventListener('keydown', onKey, true);
-      const bar = sidebar();
-      bar?.removeAttribute('data-se-open');
-      bar?.removeAttribute('data-se-shown');
-      bar?.removeAttribute('data-se-lmx');
+      const drawer = sidebar();
+      drawer?.removeAttribute('data-se-open');
+      drawer?.removeAttribute('data-se-shown');
+      drawer?.removeAttribute('data-se-lmx');
       delete window.__steamEnhancedLibraryManager;
     },
   };
