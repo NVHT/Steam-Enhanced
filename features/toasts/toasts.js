@@ -287,6 +287,23 @@
     };
   }
 
+  // A Steam app id (non-Steam game ids are 64-bit and have no art).
+  const appIdOf = v => {
+    const n = Number(v);
+    return Number.isInteger(n) && n > 0 && n <= 0xffffffff ? n : 0;
+  };
+
+  // The longest name of a game in your library that the text mentions.
+  function appByName(text) {
+    const apps = run(() => contextGlobal('appStore')?.allApps) || [];
+    let best = null;
+    for (const a of apps) {
+      const name = a?.display_name;
+      if (name && name.length > 2 && text.includes(name) && (!best || name.length > best.display_name.length)) best = a;
+    }
+    return best ? appIdOf(best.appid) : 0;
+  }
+
   function describe(key, src) {
     const note = noteOf(key, src);
     const data = note?.data;
@@ -296,9 +313,11 @@
     const kind = kindOf(note, tpl, `${seen.title} ${seen.text}`);
     const k = KINDS[kind];
     const appid =
-      Number(field(data, 'appid', 'game_id', 'gameid', 'app_id') || field(note, 'appid')) ||
-      Number(run(() => SE.fromProps(src, FIBER_DEPTH, p => (Number(p.appid) > 0 ? Number(p.appid) : undefined)))) ||
-      0;
+      appIdOf(field(data, 'appid', 'game_id', 'gameid', 'app_id') || field(note, 'appid')) ||
+      appIdOf(run(() => SE.fromProps(src, FIBER_DEPTH, p => (Number(p.appid) > 0 ? Number(p.appid) : undefined)))) ||
+      // A friend's game: their persona status carries it (the toast itself has none).
+      appIdOf(field(tpl?.personaStatus, 'm_unGamePlayedAppID', 'm_gameid', 'unGamePlayedAppID', 'gameid', 'appid')) ||
+      (kind === 'playing' ? appByName(`${seen.title} ${seen.text}`) : 0);
     const dismiss = [tpl?.onDismiss, stack?.onDismiss].find(f => typeof f === 'function') || null;
     const pct = Number(field(data, 'global_achieved_pct', 'global_achieved_percent', 'achieved_pct', 'flAchieved'));
     return {
@@ -1166,7 +1185,7 @@
   }
 
   window.__seToasts = {
-    version: '1.94.0',
+    version: '1.94.1',
     preview,
     clearAll,
     kinds: Object.keys(KINDS),
@@ -1191,6 +1210,7 @@
         noteKeys: run(() => Object.keys(noteOf(m.key, m.src) || {})),
         dataKeys: run(() => Object.keys(noteOf(m.key, m.src)?.data || {})),
         templateKeys: run(() => Object.keys(templateOf(m.src) || {}).filter(k => k !== 'children')),
+        personaKeys: run(() => Object.keys(templateOf(m.src)?.personaStatus || {}).slice(0, 60)),
       }));
     },
     destroy() {
