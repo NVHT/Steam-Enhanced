@@ -66,10 +66,10 @@
     trade: { label: 'Trade offer', accent: 'shop', ms: 6000, art: 'avatar', icon: 'trade' },
     comment: { label: 'Comment', accent: 'msg', ms: 6000, art: 'avatar', icon: 'chat' },
     family: { label: 'Steam Family', accent: 'sys', ms: 12000, art: 'app', icon: 'home' },
-    battery: { label: 'Battery low', accent: 'ach', ms: 6000, art: 'wall', icon: 'battery' },
+    battery: { label: 'Battery low', accent: 'ach', ms: 6000, art: 'ambient', icon: 'battery' },
     error: { label: 'Needs attention', accent: 'err', ms: 0, pri: true, art: 'app', icon: 'alert' },
     overlay: { label: 'Steam overlay', accent: 'sys', ms: 4000, art: 'app', icon: 'screen' },
-    controller: { label: 'Controller', accent: 'sys', ms: 5000, art: 'wall', icon: 'pad' },
+    controller: { label: 'Controller', accent: 'sys', ms: 5000, art: 'ambient', icon: 'pad' },
     system: { label: 'Steam', accent: 'sys', ms: 5000, art: 'app', icon: 'steam' },
   });
 
@@ -564,21 +564,22 @@
     el.className = 'se-tst-hero';
     const show = () => {
       art.replaceChildren(el);
-      delete art.dataset.plain;
+      delete art.dataset.ambient;
     };
     if (video) el.addEventListener('loadeddata', show, { once: true });
     else el.addEventListener('load', show, { once: true });
     if (video) run(() => el.play());
   }
 
-  // Steam's own sign-in background, the art the startup screen is built on.
-  const WALL_CROPS = ['18% 22%', '78% 64%', '46% 88%', '8% 70%', '62% 12%', '92% 34%'];
-  const wallURL = () =>
-    run(() => new URL('/images/client_login_bg_grid.jpg', shared().location.href).href) ||
-    'https://steamloopback.host/images/client_login_bg_grid.jpg';
+  /*
+   * The ground for toasts with no art: the toast's color in two slow drifting glows, the
+   * sweep spinner's light turning over it, and a dot grid that catches the light.
+   */
+  const AMBIENT_HTML = '<i class="se-tst-amb se-tst-amb-a"></i><i class="se-tst-amb se-tst-amb-b"></i>' +
+    '<i class="se-tst-amb se-tst-amb-sweep"></i><i class="se-tst-amb se-tst-amb-dots"></i>';
 
   const artURLs = m => {
-    const hero = m.appid && m.artKind !== 'wall' ? SE.heroURLs(m.appid, contextGlobal('appStore')) : [];
+    const hero = m.appid && m.artKind !== 'ambient' ? SE.heroURLs(m.appid, contextGlobal('appStore')) : [];
     if (m.artKind === 'image' && m.shot) return [m.shot, ...hero];
     if (m.artKind === 'app' || m.artKind === 'image') return hero;
     return [];
@@ -1022,18 +1023,16 @@
     const art = document.createElement('div');
     art.className = 'se-tst-art';
     const urls = artURLs(e);
-    // Steam's sign-in art (the capsule wall behind the startup screen), else the plain ground.
-    const wall = () => {
-      art.replaceChildren(artImg([wallURL()], 'se-tst-hero se-tst-wall', () => {
-        art.replaceChildren();
-        art.dataset.plain = '';
-      }));
-      art.style.setProperty('--se-tst-crop', WALL_CROPS[e.id % WALL_CROPS.length]);
+    // No art: the theme's own ground (toasts.css), lit in the toast's color.
+    const ambient = () => {
+      art.replaceChildren();
+      art.dataset.ambient = '';
+      art.insertAdjacentHTML('beforeend', AMBIENT_HTML);
     };
-    // No game art: the avatar as a glow (friends, achievements), else the wall.
+    // No game art: the avatar as a glow (friends, achievements), else the ambient ground.
     const fallback = () => {
-      if (e.icon && e.artKind !== 'wall') art.replaceChildren(artImg([e.icon], 'se-tst-glow'));
-      else wall();
+      if (e.icon && e.artKind !== 'ambient') art.replaceChildren(artImg([e.icon], 'se-tst-glow'));
+      else ambient();
     };
     if (urls.length) art.appendChild(artImg(urls, 'se-tst-hero', fallback));
     else fallback();
@@ -1056,7 +1055,7 @@
     thumb.dataset.id = String(e.id);
     thumb.dataset.accent = e.accent;
     thumb.setAttribute('aria-label', `${e.label}: ${e.title}`);
-    const thumbURLs = [...urls, ...(e.icon && e.artKind !== 'wall' ? [e.icon] : []), wallURL()];
+    const thumbURLs = [...urls, ...(e.icon && e.artKind !== 'ambient' ? [e.icon] : [])];
     if (thumbURLs.length) thumb.appendChild(artImg(thumbURLs, 'se-tst-thumb-img'));
 
     const v = { layer, thumb, rev: 0, armed: 0, leaving: false };
@@ -1712,7 +1711,7 @@
   }
 
   window.__seToasts = {
-    version: '1.95.5',
+    version: '1.95.6',
     preview,
     clearAll,
     kinds: Object.keys(KINDS),

@@ -174,11 +174,87 @@ html[data-se-tst-on] body > :not(#se-tst) {
   background: var(--se-surface, #1f242b);
 }
 
-.se-tst-art[data-plain] {
+/* ---------- Ambient ground: toasts with no art ---------- */
+
+.se-tst-art[data-ambient] {
+  background: var(--se-sidebar, #1d2128);
+}
+
+.se-tst-amb {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Two glows in the toast's color, drifting slowly against each other. */
+.se-tst-amb-a,
+.se-tst-amb-b {
+  border-radius: 50%;
+  filter: blur(26px);
+}
+
+.se-tst-amb-a {
+  right: -8%;
+  top: -60%;
+  width: 62%;
+  height: 170%;
+  background: color-mix(in srgb, var(--c) 38%, transparent);
+  animation: se-tst-drift-a 9s ease-in-out infinite alternate;
+}
+
+.se-tst-amb-b {
+  right: 26%;
+  top: 10%;
+  width: 40%;
+  height: 130%;
+  background: color-mix(in srgb, var(--se-accent, #7cc4ff) 18%, transparent);
+  animation: se-tst-drift-b 12s ease-in-out infinite alternate;
+}
+
+@keyframes se-tst-drift-a {
+  to { transform: translate(-18%, 14%) scale(1.15); }
+}
+
+@keyframes se-tst-drift-b {
+  to { transform: translate(22%, -16%) scale(.9); }
+}
+
+/* The sweep spinner's arc, as a slow beam of light turning round the right side. */
+.se-tst-amb-sweep {
+  right: -30%;
+  top: 50%;
+  width: 110%;
+  aspect-ratio: 1;
+  translate: 0 -50%;
+  background: conic-gradient(from 0deg, transparent 0 70%, color-mix(in srgb, var(--c) 22%, transparent) 88%, color-mix(in srgb, var(--c) 34%, transparent) 90%, transparent 91%);
+  border-radius: 50%;
+  filter: blur(6px);
+  animation: se-tst-beam 7s linear infinite;
+}
+
+@keyframes se-tst-beam {
+  to { rotate: 360deg; }
+}
+
+/* A dot matrix (the startup's `dots`), fading out toward the text. */
+.se-tst-amb-dots {
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, .16) 1px, transparent 1.5px) 0 0 / 10px 10px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 25%, #000 85%);
+  mask-image: linear-gradient(90deg, transparent 25%, #000 85%);
+}
+
+/* Only the toast on stage moves. */
+.se-tst-layer:not([data-on]) .se-tst-amb {
+  animation-play-state: paused;
+}
+
+/* Thumbs with no art: the same ground, still. */
+.se-tst-thumb:not(:has(img)) {
   background:
-    radial-gradient(ellipse 55% 120% at 88% 50%, color-mix(in srgb, var(--c) 14%, transparent), transparent 70%),
+    radial-gradient(ellipse 80% 120% at 85% 20%, color-mix(in srgb, var(--c) 45%, transparent), transparent 70%),
     var(--se-sidebar, #1d2128);
 }
+
 
 .se-tst-hero {
   width: 100%;
@@ -196,12 +272,6 @@ html[data-se-tst-on] body > :not(#se-tst) {
 
 @keyframes se-tst-push {
   to { transform: scale(1.14) translate(-2%, -1.5%); }
-}
-
-/* Steam's sign-in capsule wall: blurred and dimmed, as the startup's `wall` background. */
-.se-tst-wall {
-  object-position: var(--se-tst-crop, 50% 50%);
-  filter: blur(2px) saturate(.85) brightness(.62);
 }
 
 /* No game art: the friend's avatar as a soft glow. */
@@ -741,6 +811,7 @@ html[data-se-tst-on] body > :not(#se-tst) {
   }
 
   .se-tst-layer[data-on] .se-tst-hero,
+  .se-tst-amb,
   .se-tst-spark,
   .se-tst-layer[data-on]::after {
     animation: none !important;
