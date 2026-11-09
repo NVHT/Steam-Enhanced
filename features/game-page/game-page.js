@@ -337,13 +337,16 @@
    * may reuse the same nodes for the next game).
    */
   const appIds = new WeakMap();
+  const topChecked = new WeakSet(); // per instance, so a hot reload re-checks every wrapper
   const appIdOf = (el) => {
     const route = location.href;
     const routeId = +(route.match(/\/app\/(\d+)/) || [])[1] || 0;
     const hit = appIds.get(el);
     if (routeId && hit?.route === route) return hit.id;
-    const id = fiberAppId(el) || routeId;
-    if (routeId) appIds.set(el, { route, id });
+    const fromFiber = fiberAppId(el);
+    const id = fromFiber || routeId;
+    // Cache only an answer the route agrees with: a reused node can still hold the last game.
+    if (routeId && fromFiber === routeId) appIds.set(el, { route, id });
     return id;
   };
 
@@ -1950,8 +1953,8 @@
     for (const btn of document.querySelectorAll(TOP_BTN)) {
       const w = btn.parentElement;
       // One computed-style read per wrapper, not one per pass.
-      if (w && !w.__seTopChecked) {
-        w.__seTopChecked = true;
+      if (w && !topChecked.has(w)) {
+        topChecked.add(w);
         if (
           !w.matches(`:is(.${C.ScrollToTopButtonPosition}, .ScrollToTopButtonPosition)`) &&
           getComputedStyle(w).position === 'static'

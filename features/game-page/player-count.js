@@ -45,7 +45,9 @@
 
     const id = fromRow && fromRoute && fromRow !== fromRoute ? 0 : fromRow || fromRoute;
     const valid = isValidAppId(id) ? id : 0;
-    resolved = route ? { target, route, id: valid } : { target: null, route: '', id: 0 };
+    // Don't cache a disagreement: React may still be moving the row to the new game.
+    const settled = valid && (!fromRow || !fromRoute || fromRow === fromRoute);
+    resolved = route && settled ? { target, route, id: valid } : { target: null, route: '', id: 0 };
     return valid;
   };
 

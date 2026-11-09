@@ -522,6 +522,7 @@
   function restartCycle() {
     clearInterval(cycleTimer);
     cycleTimer = 0;
+    SE.attr(stage, 'data-se-hs-idle', null);
     const seconds = cycleSeconds();
     if (!seconds || reducedMotion.matches) return;
     stage?.style.setProperty('--se-hs-cycle', `${seconds}s`);
@@ -2026,6 +2027,10 @@
 
   function layout() {
     if (scope && !usable()) return;
+    // Back on Home: resume the art's push-in now rather than at the next cycle tick.
+    if (stage?.hasAttribute('data-se-hs-idle') && document.visibilityState === 'visible') {
+      SE.attr(stage, 'data-se-hs-idle', null);
+    }
     cardEvents = new Map();
     const lib = document.querySelector('.LibraryHome');
     const home = lib?.parentElement;

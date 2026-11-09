@@ -1437,7 +1437,7 @@
 
   /*
    * Steam re-stacks its toast windows whenever one comes or goes, moving the stage back to its
-   * corner. Checked every 250 ms while the tray is up (and on resize): the moment the window is off its spot the
+   * corner. Checked every frame while the tray is up (two screenX/Y reads, no layout): the moment the window is off its spot the
    * tray is hidden, the window is moved back, and the tray shows again. If Steam keeps winning
    * (more than FIGHTS_MAX moves in 10 s), the tray shows where Steam put it rather than vanish.
    */
@@ -1464,9 +1464,23 @@
       }
     }
   }
+  // A frame loop that runs only while guarding() holds; watchPlace() starts it again.
+  const guardLoop = () => {
+    let frame = 0;
+    const tick = () => {
+      frame = 0;
+      if (!guarding()) return;
+      guardPlace();
+      frame = requestAnimationFrame(tick);
+    };
+    return {
+      refresh: () => { if (!frame) tick(); },
+      disconnect: () => { cancelAnimationFrame(frame); frame = 0; },
+    };
+  };
   const watchPlace = () => {
     if (!IN_TOAST_WINDOW) return;
-    placeGuard ||= SE.poll(guardPlace, 250, { active: guarding });
+    placeGuard ||= guardLoop();
     placeGuard.refresh();
   };
 

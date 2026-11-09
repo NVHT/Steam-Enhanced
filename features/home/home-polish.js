@@ -245,9 +245,15 @@
    * Structure changes only (Steam re-renders a date card rather than editing its text), plus
    * covers scrolling into view (the IntersectionObserver) and resizes.
    */
+  const onImageLoad = (event) => {
+    if (event.target?.tagName === 'IMG' && event.target.closest(COVER_BOX_SELECTOR)) schedule();
+  };
+
   const start = () => {
     observer = SE.watch(update, { throttle: 100, ignore: SE.inSide });
     addEventListener('resize', schedule);
+    // A cover image that loads late can change the cover's size without any DOM change.
+    document.addEventListener('load', onImageLoad, true);
     schedule();
   };
 
@@ -258,6 +264,7 @@
       onScreen.clear();
       listeners.abort();
       removeEventListener('resize', schedule);
+      document.removeEventListener('load', onImageLoad, true);
       if (frame) cancelAnimationFrame(frame);
 
       for (const el of document.querySelectorAll('[data-se-repeat]')) {

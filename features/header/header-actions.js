@@ -22,6 +22,7 @@
 
   let settingsButton;
   let observer;
+  let menuObserver;
   let frame = 0;
   let group;
   let styleReference;
@@ -202,7 +203,11 @@
     const header = document.querySelector(`.${C.TopBar}`);
     const edge = header ? Math.round(header.getBoundingClientRect().bottom) : 0;
     const key = `${edge}|${innerWidth}|${coloredDividers.size}`;
-    if (key === stripKey) return;
+    if (key === stripKey) {
+      // React can rewrite a divider's className without the set changing: keep the mark on.
+      for (const divider of coloredDividers) divider.classList.add('se-library-strip');
+      return;
+    }
     stripKey = key;
 
     const candidates = new Set();
@@ -552,6 +557,13 @@
   function start() {
     addEventListener('resize', schedule);
     observer = SE.watch(update, { throttle: 200 });
+    // Steam's menu buttons get our icon classes; React rewriting their className would drop
+    // them, so class changes inside the menu bars repaint the icons before the next paint.
+    menuObserver = SE.watch(decorateMenuIcons, {
+      attributes: ['class'],
+      scope: [C.RootMenuBar, C.SuperNavBar].filter(Boolean).map((cls) => `.${cls}`).join(', '),
+      sync: true,
+    });
     update();
   }
 
@@ -559,6 +571,7 @@
     for (const divider of coloredDividers) divider.classList.remove('se-library-strip');
     coloredDividers.clear();
     observer?.disconnect();
+    menuObserver?.disconnect();
     homeResizeObserver?.disconnect();
     stripObserver?.disconnect();
     stripLists.clear();
