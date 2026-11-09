@@ -19,6 +19,8 @@
 (window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
   window.__steamEnhancedEmoticonPicker?.destroy();
   if (!document.body) return;
+  /* Toasts and the gamepad UIs never hold the desktop picker (Big Picture draws its own) */
+  if (/^(?:notificationtoasts_|Steam Big Picture Mode$|QuickAccess_|MainMenu_)/.test(document.title)) return;
 
   const ART = 'img[src*="emoticon" i], img[src*="sticker" i]';
   const ROOT = 'data-se-epicker';
@@ -178,10 +180,7 @@
     }
   };
 
-  let frame = 0;
-
   const update = () => {
-    frame = 0;
     const roots = new Set(document.querySelectorAll(`[${ROOT}]`));
     for (const img of document.querySelectorAll(ART)) {
       if (elsewhere.has(img) || img.closest(`[${ROOT}], .GamepadMode`)) continue;
@@ -193,17 +192,13 @@
     }
   };
 
-  const schedule = () => {
-    if (!frame) frame = requestAnimationFrame(update);
-  };
-
-  const watcher = SE.watch(schedule);
-  schedule();
+  /* 50 ms keeps an opening picker styled within a few frames while typing in chat stays cheap */
+  const watcher = SE.watch(update, { throttle: 50 });
+  update();
 
   window.__steamEnhancedEmoticonPicker = {
     destroy() {
       watcher.disconnect();
-      if (frame) cancelAnimationFrame(frame);
       const selector = ATTRS.map(name => `[${name}]`).join(', ');
       for (const el of document.querySelectorAll(selector)) {
         for (const name of ATTRS) el.removeAttribute(name);

@@ -34,7 +34,6 @@
     lastOnline: (t) => `Last online ${t}`,
     more: (n) => `+${n}`,
     friendsIn: (n) => `${n} friend${n === 1 ? '' : 's'} playing`,
-    none: 'No friends here',
     message: 'Send message',
     profile: 'View profile',
     viewGame: (g) => `View ${g} in Library`,
@@ -43,16 +42,16 @@
 
   const { C, run, esc, mainWindow } = SE;
 
-  function app() {
-    for (const o of SE.owners()) {
-      try {
-        if (o.g_FriendsUIApp?.FriendStore) return o.g_FriendsUIApp;
-      } catch (_) {}
-    }
-    return null;
-  }
+  const app = () => SE.global('g_FriendsUIApp', (a) => a.FriendStore);
 
   const ctx = (a) => run(() => a.GetDefaultBrowserContext());
+
+  // webpack `alias = req(123)` import inside a module's source, resolved to that module.
+  const importOf = (src, alias, req) => {
+    const name = alias.replace(/[$]/g, '\\$&');
+    const hit = new RegExp(`(?:^|[^\\w$])${name}\\s*=\\s*[\\w$]+\\(\\s*(\\d+)\\s*\\)`).exec(src);
+    return hit ? run(() => req(hit[1])) : null;
+  };
 
   const STATE = {
     0: 'offline',
@@ -184,8 +183,6 @@
       '<g fill="currentColor" fill-opacity=".32" stroke="none"><circle cx="11" cy="11" r="6.5"/></g><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
     add:
       '<g fill="currentColor" fill-opacity=".32" stroke="none"><circle cx="9.5" cy="8" r="3.5"/></g><circle cx="9.5" cy="8" r="3.5"/><path d="M3 20c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2M19.5 8.5v6M16.5 11.5h6"/>',
-    collapse:
-      '<g fill="currentColor" fill-opacity=".32" stroke="none"><path d="M14 4.5h3a3.5 3.5 0 0 1 3.5 3.5v8a3.5 3.5 0 0 1-3.5 3.5h-3z"/></g><rect x="3.5" y="4.5" width="17" height="15" rx="3.5"/><path d="M14 4.5v15M7.5 9.5l2.5 2.5-2.5 2.5"/>',
     chev: '<path d="M9 6l6 6-6 6"/>',
     down: '<path d="M6 9l6 6 6-6"/>',
     game: '<rect x="3" y="7" width="18" height="11" rx="4"/><path d="M8 11v3M6.5 12.5h3M15.5 12h.01M18 13.5h.01"/>',
@@ -193,6 +190,9 @@
 
   const svg = (n, s = 16) =>
     `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
+
+  // The collapse glyph is the shared token (tokens.css), drawn as a mask in currentColor.
+  const COLLAPSE_ICON = '<span class="se-fd-mask" style="--se-fd-mask:var(--se-icon-collapse)" aria-hidden="true"></span>';
 
   const avatar = (url, state, size, cls = '') =>
     `<span class="se-fd-av ${cls}" data-state="${state}" style="--s:${size}px">${url ? `<img src="${esc(url)}" alt="" draggable="false">` : ''}</span>`;
@@ -205,6 +205,7 @@
    */
   const EMPTY_AVATAR = /\/(?:0{40})?(?:_medium|_full)?\.jpg(?:[?#]|$)/i;
   const deadAvatars = new Set();
+  const DEAD_AVATAR_LIMIT = 200;
 
   const usableAvatar = (url) =>
     typeof url === 'string' && /^https?:\/\//i.test(url) && !EMPTY_AVATAR.test(url) && !deadAvatars.has(url) ? url : '';
@@ -275,7 +276,7 @@
     `<button type="button" class="se-fd-status" data-act="status"><span class="se-fd-myname">${esc(me?.name || '')}</span><span class="se-fd-mystate" data-state="${me?.state || 'online'}">${esc(statusLabel(me?.state))}${svg('down', 12)}</span></button>` +
     `<button type="button" class="se-fd-icon" data-act="search" data-se-tip="${COPY.search}" aria-label="${COPY.search}">${svg('search', 20)}</button>` +
     `<button type="button" class="se-fd-icon" data-act="add" data-se-tip="${COPY.add}" aria-label="${COPY.add}">${svg('add', 20)}</button>` +
-    `<button type="button" class="se-fd-icon" data-act="collapse" data-se-tip="${COPY.collapse}" aria-label="${COPY.collapse}">${svg('collapse', 20)}</button></div>` +
+    `<button type="button" class="se-fd-icon" data-act="collapse" data-se-tip="${COPY.collapse}" aria-label="${COPY.collapse}">${COLLAPSE_ICON}</button></div>` +
     (steamError ? `<div class="se-fd-error">${esc(steamError)}</div>` : '');
 
   function panelHTML(d) {
@@ -346,8 +347,9 @@
     );
   }
 
+  // Non-Steam games (appid 0) have no store header: the card keeps its plain surface.
   const flyHTML = (g) =>
-    `<div class="se-fd-flyhead" style="--art:url('https://shared.steamstatic.com/store_item_assets/steam/apps/${g.appid}/header.jpg')">` +
+    `<div class="se-fd-flyhead"${g.appid ? ` style="--art:url('https://shared.steamstatic.com/store_item_assets/steam/apps/${g.appid}/header.jpg')"` : ''}>` +
     `${gameIcon(g, 30)}<div><div class="se-fd-name">${esc(g.name)}</div><div class="se-fd-sub se-fd-green">${esc(COPY.friendsIn(g.friends.length))}</div></div></div>` +
     `<div class="se-fd-flybody">${g.friends.map((f) => friendRow(f, f.rp, true)).join('')}</div>`;
 
@@ -365,7 +367,11 @@
     const tile = img?.tagName === 'IMG' ? img.closest('.se-fd-gav') : null;
     if (!tile) return;
     const src = img.getAttribute('src');
-    if (src) deadAvatars.add(src);
+    if (src) {
+      // Oldest first out: a Set keeps insertion order.
+      if (deadAvatars.size >= DEAD_AVATAR_LIMIT) deadAvatars.delete(deadAvatars.values().next().value);
+      deadAvatars.add(src);
+    }
     img.outerHTML = groupInitials(tile.dataset.initials || '#');
   }
 
@@ -472,14 +478,27 @@
       searching,
       [...openGames],
       [...closedSections],
-      COPY.online,
       d,
     ]);
 
   let readAt = 0;
 
+  // Steam's own tree fills the open dock: only whether Friends is ready matters, not the list.
+  function renderSteam() {
+    const ready = Boolean(app());
+    dock.hidden = !ready;
+    if (!ready) return;
+    data = null;
+    sig = '';
+    dock.dataset.mode = mode;
+    dock.dataset.view = view;
+    if (own.childNodes.length) own.textContent = '';
+    showSteam();
+  }
+
   function render(lazy) {
     if (destroyed) return;
+    if (mode !== 'rail' && view === 'steam') return renderSteam();
     if (lazy && sig && data && performance.now() - readAt < 1000) return;
     readAt = performance.now();
     data = read();
@@ -496,12 +515,6 @@
     const scroll = own.querySelector('.se-fd-scroll')?.scrollTop || 0;
     dock.dataset.mode = mode;
     dock.dataset.view = mode === 'rail' ? 'theme' : view;
-
-    if (mode !== 'rail' && view === 'steam') {
-      if (own.childNodes.length) own.textContent = '';
-      showSteam();
-      return;
-    }
 
     patchPanel(own, mode === 'rail' ? railHTML(data) : panelHTML(data));
     const sc = own.querySelector('.se-fd-scroll');
@@ -624,69 +637,62 @@
   let popupFailure = false;
   let popupRuntimeFailure = '';
 
+  // React, the window's context-menu manager and ReactDOM's createPortal/flushSync, for the Store popup.
   function findChatPopupRuntime() {
     if (popupRuntime) return popupRuntime;
-    let React;
-    let manager;
-    let createPortal;
-    let flushSync;
+    const found = {};
+    const complete = () =>
+      found.React && found.manager && found.createPortal && found.flushSync ? { ...found } : null;
+    const inspect = (exp) => {
+      const values = [exp];
+      try {
+        values.push(...Object.values(exp || {}));
+      } catch (_) {}
+      for (const value of values) {
+        if (typeof value?.createPortal === 'function') found.createPortal ||= value.createPortal;
+        if (typeof value?.flushSync === 'function') found.flushSync ||= value.flushSync;
+        if (!found.React && typeof value?.createElement === 'function' && typeof value?.useState === 'function') {
+          found.React = value;
+        }
+        if (!found.manager) {
+          const candidate = run(() => value?.m_mapManagers?.get(window));
+          if (typeof candidate?.CreateContextMenuInstance === 'function') found.manager = candidate;
+        }
+      }
+    };
 
     for (const req of SE.requires()) {
-      const inspect = (exp) => {
-        if (typeof exp?.createPortal === 'function') createPortal = exp.createPortal;
-        if (typeof exp?.flushSync === 'function') flushSync = exp.flushSync;
-        const values = [exp];
-        try {
-          values.push(...Object.values(exp || {}));
-        } catch (_) {}
-        for (const value of values) {
-          if (!createPortal && typeof value?.createPortal === 'function') createPortal = value.createPortal;
-          if (!flushSync && typeof value?.flushSync === 'function') flushSync = value.flushSync;
-          if (!React && typeof value?.createElement === 'function' && typeof value?.useState === 'function') {
-            React = value;
-          }
-          if (!manager) {
-            const candidate = run(() => value?.m_mapManagers?.get(window));
-            if (typeof candidate?.CreateContextMenuInstance === 'function') manager = candidate;
-          }
-        }
-      };
-
       for (const module of Object.values(req.c || {})) inspect(module?.exports);
-      for (const [id, factory] of Object.entries(req.m || {})) {
-        if (React && manager && createPortal && flushSync) break;
-        const source = run(() => Function.prototype.toString.call(factory)) || '';
+    }
+    popupRuntime =
+      complete() ||
+      SE.findModule('friends-dock:popup-runtime', (source, id, req) => {
         if (
-          (!manager && source.includes('GetContextMenuManagerFromWindow') && source.includes('m_mapManagers')) ||
-          (!React && source.includes('createElement') && source.includes('useState') && source.includes('Fragment'))
+          (!found.manager && source.includes('GetContextMenuManagerFromWindow') && source.includes('m_mapManagers')) ||
+          (!found.React && source.includes('createElement') && source.includes('useState') && source.includes('Fragment'))
         ) {
           run(() => inspect(req(id)));
         }
-        if ((!createPortal || !flushSync) && source.includes('.createPortal')) {
+        if ((!found.createPortal || !found.flushSync) && source.includes('.createPortal')) {
           for (const call of source.matchAll(/([\w$]+)\.createPortal\b/g)) {
-            const alias = call[1].replace(/[$]/g, '\\$&');
-            const imported = new RegExp(`(?:^|[^\\w$])${alias}\\s*=\\s*[\\w$]+\\(\\s*(\\d+)\\s*\\)`).exec(source);
-            if (imported) run(() => inspect(req(imported[1])));
-            if (createPortal && flushSync) break;
+            inspect(importOf(source, call[1], req));
+            if (found.createPortal && found.flushSync) break;
           }
-          if (!createPortal || !flushSync) run(() => inspect(req(id)));
+          if (!found.createPortal || !found.flushSync) run(() => inspect(req(id)));
         }
-      }
-      if (React && manager && createPortal && flushSync) break;
-    }
+        return complete();
+      });
 
-    popupRuntimeFailure = [
-      !React && 'React',
-      !manager && 'context-menu manager',
-      !createPortal && 'ReactDOM portal',
-      !flushSync && 'ReactDOM synchronous commit',
-    ]
-      .filter(Boolean)
-      .join(', ');
-
-    if (React && manager && createPortal && flushSync) {
-      popupRuntime = { React, manager, createPortal, flushSync };
-    }
+    popupRuntimeFailure = popupRuntime
+      ? ''
+      : [
+          !found.React && 'React',
+          !found.manager && 'context-menu manager',
+          !found.createPortal && 'ReactDOM portal',
+          !found.flushSync && 'ReactDOM synchronous commit',
+        ]
+          .filter(Boolean)
+          .join(', ');
     return popupRuntime;
   }
 
@@ -828,6 +834,7 @@
       }
       run(() => entry.chatObserver?.disconnect());
       run(() => entry.detachChatEnhancements?.());
+      run(disposeGroupFlyouts);
       run(() => dock.append(chatBack, chatMinimize, chatChip));
     }
   }
@@ -842,22 +849,35 @@
     entry.anchor?.remove();
   }
 
+  /*
+   * The flyout's box follows only the window size, the dock's mode and the kind of chat, so the
+   * layout reads (computed style, dock rect) happen when one of those changes, not every frame.
+   */
+  let geometryCache = null;
+
   function chatGeometry(minimized) {
-    const style = getComputedStyle(dock);
-    const pixels = (name) => parseFloat(style.getPropertyValue(name)) || 0;
-    const edge = pixels('--se-chat-edge');
-    const bottom = pixels('--se-chat-bottom');
-    const dockWidth = dock.getBoundingClientRect().width;
     const group =
       Boolean(chatRoot().querySelector('.MultiUserChat:not([data-activechat="false"])')) ||
       Boolean(run(() => dockTabs?.activeTab?.GetChatRoomGroup?.()) || run(() => dockTabs?.activeTab?.m_group)) ||
       Boolean(findGroup(activeChatFriend));
+    const key = [innerWidth, innerHeight, minimized, group, dock.dataset.mode, dock.isConnected].join('|');
+    if (geometryCache?.key !== key) geometryCache = { key, value: measureChat(minimized, group) };
+    return geometryCache.value;
+  }
+
+  function measureChat(minimized, group) {
+    const style = getComputedStyle(dock);
+    const pixels = (name) => parseFloat(style.getPropertyValue(name)) || 0;
+    const edge = pixels('--se-chat-edge');
+    const bottom = pixels('--se-chat-bottom');
+    const rect = dock.getBoundingClientRect();
+    const dockWidth = rect.width;
     const maximumWidth = pixels(minimized ? '--se-chat-chip-width' : group ? '--se-chat-group-width' : '--se-chat-width');
     const width = Math.max(1, Math.min(maximumWidth, innerWidth - dockWidth - edge * 2));
     const height = minimized
       ? pixels('--se-chat-chip-height')
       : Math.max(1, Math.min(pixels('--se-chat-max-height'), innerHeight - pixels('--se-chat-height-clearance')));
-    const left = Math.max(edge, dock.getBoundingClientRect().left - edge - width);
+    const left = Math.max(edge, rect.left - edge - width);
     const top = Math.max(0, innerHeight - bottom - height);
     return { width, height, edge, bottom, left, top };
   }
@@ -1017,12 +1037,9 @@
     entry.doc = doc;
     entry.node = node;
 
+    // The popup's title ends in "Menu", so only the `.*` patches reach it; scrollbars.css is one.
     for (const sheet of document.querySelectorAll('link[rel="stylesheet"]')) {
-      if (
-        !/(?:shared\/(?:tokens|icons|scrollbars)|features\/friends\/(?:friends|chat|friends-dock))\.css(?:[?#]|$)/.test(
-          sheet.href
-        )
-      ) {
+      if (!/(?:shared\/(?:tokens|icons)|features\/friends\/(?:friends|chat|friends-dock))\.css(?:[?#]|$)/.test(sheet.href)) {
         continue;
       }
       if ([...doc.querySelectorAll('link[rel="stylesheet"]')].some((link) => link.href === sheet.href)) continue;
@@ -1064,9 +1081,7 @@
     for (const type of interactionEvents) {
       shell.addEventListener(type, markDockInteraction, true);
     }
-    entry.chatObserver = new MutationObserver(() => {
-      syncChatTabs();
-    });
+    entry.chatObserver = new MutationObserver(schedule);
     entry.chatObserver.observe(shell, { childList: true, subtree: true });
 
     let attempts = 0;
@@ -1241,6 +1256,11 @@
     }
   }
 
+  const TAB_NAME = ['.ChatTabName', '.chatTabName', C.ChatTabContent_ChatRoomName, C.playerName]
+    .filter(Boolean)
+    .map((cls) => (cls.startsWith('.') ? cls : `.${cls}`))
+    .join(', ');
+
   let chipSignature = '';
   let chipCountSeen = -1;
 
@@ -1260,7 +1280,7 @@
     const group = !friend ? findGroup(activeChatFriend) : null;
     const name =
       active
-        ?.querySelector(`.ChatTabName, .chatTabName, ._1HNpQBKKKQ1tG2OZH3CSsh, .${C.playerName}`)
+        ?.querySelector(TAB_NAME)
         ?.textContent?.trim() ||
       run(() => friend.display_name) ||
       run(() => group.name) ||
@@ -1343,15 +1363,12 @@
         if (destroyed || message !== 'SteamEnhanced.ChatBrowserFocus') return;
         const source = requestingURL || manager.m_URL || manager.m_URLRequested || '';
         if (!/^https:\/\/(?:store\.steampowered\.com|steamcommunity\.com)(?:\/|$)/i.test(source)) return;
-        if (message === 'SteamEnhanced.ChatBrowserFocus') {
-          if (args === 'blur' && focusedBrowserView === browser) focusedBrowserView = null;
-          if (args === 'focus' && onStore()) {
-            focusedBrowserView = browser;
-            foregroundApp = null;
-            requestChatHandoff();
-            schedule();
-          }
-          return;
+        if (args === 'blur' && focusedBrowserView === browser) focusedBrowserView = null;
+        if (args === 'focus' && onStore()) {
+          focusedBrowserView = browser;
+          foregroundApp = null;
+          requestChatHandoff();
+          schedule();
         }
       };
       run(() => {
@@ -1391,9 +1408,6 @@
     for (const win of chatRoot().querySelectorAll('.chatWindow.MultiUserChat')) {
       const headerEl = win.querySelector(':scope > .chatHeader.titleBarContainer');
       if (!headerEl) continue;
-      for (const key of ['seGrouplayout', 'seMembers', 'seNavcollapsed']) {
-        delete win.dataset[key];
-      }
       win.dataset.seFlyoutGroup = '1';
       let entry = groupFlyouts.get(win);
 
@@ -1562,81 +1576,46 @@
 
   chatBack.addEventListener('click', closeChat);
 
-  function findEmbed() {
-    for (const req of SE.requires()) {
-      const mods = req.m || {};
-      for (const id of Object.keys(mods)) {
-        let src = '';
-        try {
-          src = Function.prototype.toString.call(mods[id]);
-        } catch (_) {
-          continue;
-        }
-        if (!src.includes('PopupFriendsListDimensions') || !src.includes('elTarget')) continue;
-        let exp;
-        try {
-          exp = req(id);
-        } catch (_) {
-          continue;
-        }
-        for (const k of Object.keys(exp || {})) {
-          const fn = run(() => exp[k]);
-          if (typeof fn !== 'function' || fn.prototype?.render) continue;
-          const body = Function.prototype.toString.call(fn);
-          if (!body.includes('elTarget') || fn.length !== 3) continue;
-          const calls = [...body.matchAll(/\(0,\s*([\w$]+)\.createRoot\s*\)/g)];
-          if (calls.length !== 1) continue;
-          const alias = calls[0][1].replace(/[$]/g, '\\$&');
-          const imported = new RegExp(`(?:^|[^\\w$])${alias}\\s*=\\s*[\\w$]+\\((\\d+)\\)`).exec(src);
-          if (!imported) continue;
-          const dom = run(() => req(imported[1]));
-          const descriptor = dom && Object.getOwnPropertyDescriptor(dom, 'createRoot');
-          if (typeof descriptor?.value === 'function' && descriptor.writable) {
-            let jsx;
-            for (const call of src.matchAll(/([\w$]+)\.jsx\b/g)) {
-              const jsxAlias = call[1].replace(/[$]/g, '\\$&');
-              const jsxImported = new RegExp(`(?:^|[^\\w$])${jsxAlias}\\s*=\\s*[\\w$]+\\(\\s*(\\d+)\\s*\\)`).exec(src);
-              const candidate = jsxImported && run(() => req(jsxImported[1]));
-              if (typeof candidate?.jsx === 'function' && typeof candidate?.jsxs === 'function') {
-                jsx = candidate;
-                break;
-              }
-            }
-            return { mount: fn, dom, jsx };
+  // Steam's Friends & Chat embed entry (mount(FriendStore, ChatStore, elTarget)), its ReactDOM and JSX runtime.
+  const findEmbed = () =>
+    SE.findModule('friends-dock:embed', (src, id, req) => {
+      if (!src.includes('PopupFriendsListDimensions') || !src.includes('elTarget')) return null;
+      const exp = run(() => req(id));
+      for (const k of Object.keys(exp || {})) {
+        const fn = run(() => exp[k]);
+        if (typeof fn !== 'function' || fn.prototype?.render || fn.length !== 3) continue;
+        const body = Function.prototype.toString.call(fn);
+        if (!body.includes('elTarget')) continue;
+        const calls = [...body.matchAll(/\(0,\s*([\w$]+)\.createRoot\s*\)/g)];
+        if (calls.length !== 1) continue;
+        const dom = importOf(src, calls[0][1], req);
+        const descriptor = dom && Object.getOwnPropertyDescriptor(dom, 'createRoot');
+        if (typeof descriptor?.value !== 'function' || !descriptor.writable) continue;
+        let jsx;
+        for (const call of src.matchAll(/([\w$]+)\.jsx\b/g)) {
+          const candidate = importOf(src, call[1], req);
+          if (typeof candidate?.jsx === 'function' && typeof candidate?.jsxs === 'function') {
+            jsx = candidate;
+            break;
           }
         }
+        return { mount: fn, dom, jsx };
       }
-    }
-    return null;
-  }
+      return null;
+    });
 
   // Guard the Library window's modal manager entry in `m_mapModalManager` so the
   // embedded Friends & Chat tree does not overwrite the Library's modal overlay host.
   function managerRegistries() {
-    for (const req of SE.requires()) {
-      for (const id of Object.keys(req.m || {})) {
-        let src = '';
-        try {
-          src = Function.prototype.toString.call(req.m[id]);
-        } catch (_) {
-          continue;
-        }
-        if (!src.includes('Stomping CModalManager')) continue;
-        let exp;
-        try {
-          exp = req(id);
-        } catch (_) {
-          continue;
-        }
-        for (const v of Object.values(exp || {})) {
-          const map = v?.m_mapModalManager;
-          if (typeof map?.get === 'function' && typeof map.set === 'function') {
-            return [{ map }];
-          }
-        }
+    const map = SE.findModule('friends-dock:modal-managers', (src, id, req) => {
+      if (!src.includes('Stomping CModalManager')) return null;
+      for (const v of Object.values(run(() => req(id)) || {})) {
+        const candidate = v?.m_mapModalManager;
+        if (typeof candidate?.get === 'function' && typeof candidate.set === 'function') return candidate;
       }
-    }
-    return [];
+      return null;
+    });
+    return map ? [{ map }] : [];
   }
 
   function isPanelManager(value) {
@@ -1654,6 +1633,7 @@
     for (const r of libraryManagers) {
       try {
         const current = r.native.get.call(r.map, window);
+        if (current === r.own) continue;
         if (current && !isPanelManager(current)) {
           r.own = current;
         } else if (r.own && current !== r.own) {
@@ -1719,51 +1699,36 @@
   // Prevent the embedded FriendsUI container from overwriting the main window's document.title.
   let titlePatch = null;
 
+  // The FriendsUI class whose `title` setter writes `this[windowKey].document.title`.
+  const findTitleSetter = () =>
+    SE.findModule('friends-dock:title', (src, id, req) => {
+      if (!src.includes('FriendsUI Browser context missing from owner window') || !/\.document\.title\s*=/.test(src)) {
+        return null;
+      }
+      const exp = run(() => req(id));
+      for (const name of Object.keys(exp || {})) {
+        const proto = run(() => exp[name])?.prototype;
+        const descriptor = proto && Object.getOwnPropertyDescriptor(proto, 'title');
+        if (!descriptor?.configurable || typeof descriptor.set !== 'function') continue;
+        const match = /this\.([\w$]+)\.document\.title\s*=/.exec(Function.prototype.toString.call(descriptor.set));
+        if (match) return { proto, descriptor, windowKey: match[1] };
+      }
+      return null;
+    });
+
   function protectMainTitle() {
     if (titlePatch) return true;
-    for (const req of SE.requires()) {
-      for (const id of Object.keys(req.m || {})) {
-        let src;
-        try {
-          src = Function.prototype.toString.call(req.m[id]);
-        } catch (_) {
-          continue;
-        }
-        if (!src.includes('FriendsUI Browser context missing from owner window') || !/\.document\.title\s*=/.test(src)) {
-          continue;
-        }
-        let exp;
-        try {
-          exp = req(id);
-        } catch (_) {
-          continue;
-        }
-        for (const name of Object.keys(exp || {})) {
-          let value;
-          try {
-            value = exp[name];
-          } catch (_) {
-            continue;
-          }
-          const proto = value?.prototype;
-          if (!proto) continue;
-          const descriptor = Object.getOwnPropertyDescriptor(proto, 'title');
-          if (!descriptor?.configurable || typeof descriptor.set !== 'function') continue;
-          const setterSource = Function.prototype.toString.call(descriptor.set);
-          const match = /this\.([\w$]+)\.document\.title\s*=/.exec(setterSource);
-          if (!match) continue;
-          const windowKey = match[1];
-          const set = function (title) {
-            if (this[windowKey] === window) return undefined;
-            return descriptor.set.call(this, title);
-          };
-          Object.defineProperty(proto, 'title', { ...descriptor, set });
-          titlePatch = { proto, descriptor, set };
-          return true;
-        }
-      }
-    }
-    return false;
+    const found = findTitleSetter();
+    if (!found) return false;
+    const { proto, descriptor, windowKey } = found;
+    if (Object.getOwnPropertyDescriptor(proto, 'title')?.set !== descriptor.set) return false;
+    const set = function (title) {
+      if (this[windowKey] === window) return undefined;
+      return descriptor.set.call(this, title);
+    };
+    Object.defineProperty(proto, 'title', { ...descriptor, set });
+    titlePatch = { proto, descriptor, set };
+    return true;
   }
 
   function restoreTitleSetter() {
@@ -1834,7 +1799,7 @@
         const embed = findEmbed();
         if (!embed) throw new Error('not found in this Steam version');
         if (!protectMainTitle()) throw new Error('main-window title protection unavailable');
-        steamBar.innerHTML = `<button type="button" class="se-fd-icon" data-act="collapse" data-se-tip="${COPY.collapse}" aria-label="${COPY.collapse}">${svg('collapse', 20)}</button>`;
+        steamBar.innerHTML = `<button type="button" class="se-fd-icon" data-act="collapse" data-se-tip="${COPY.collapse}" aria-label="${COPY.collapse}">${COLLAPSE_ICON}</button>`;
         dock.append(steamBar, steamHost);
         guardLibraryManagers();
 
@@ -2998,12 +2963,16 @@
     return undefined;
   });
 
-  own.addEventListener('keydown', (e) => {
+  // Rows are divs with role=button: Enter and Space press them, as on a button.
+  function pressRow(e) {
     if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role=button]')) {
       e.preventDefault();
       e.target.click();
     }
-  });
+  }
+
+  own.addEventListener('keydown', pressRow);
+  fly.addEventListener('keydown', pressRow);
 
   function showFly(key, keep) {
     const g = data?.games.find((x) => x.key === key);
@@ -3090,19 +3059,27 @@
 
   let frame = 0;
 
-  function schedule() {
-    if (!destroyed && !frame) {
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        syncChatTabs();
-        keepLibraryManagers();
-        resumeOverlayChat();
-        place();
-      });
-    }
+  function sync() {
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    if (destroyed) return;
+    syncChatTabs();
+    keepLibraryManagers();
+    resumeOverlayChat();
+    place();
   }
 
-  const watcher = SE.watch(schedule);
+  // For callers outside the observer (navigation, focus, native events): one pass next frame.
+  function schedule() {
+    if (!destroyed && !frame) frame = requestAnimationFrame(sync);
+  }
+
+  /*
+   * Page changes drive placement; the dock's own subtree (Steam's list, a chat's messages) only
+   * matters for the chat tabs, so it gets its own throttled subscriber.
+   */
+  const watcher = SE.watch(sync, { ignore: SE.inSide, throttle: 100 });
+  const chatWatcher = SE.watch(syncChatTabs, { scope: '.se-fd-steam', throttle: 100 });
   window.addEventListener('focus', onDesktopChatFocus);
   document.addEventListener('visibilitychange', requestChatHandoff);
   const focusRegistration = run(() => window.SteamClient?.System?.UI?.RegisterForFocusChangeEvents?.((event) => {
@@ -3148,7 +3125,7 @@
     place();
   }
 
-  const timer = SE.poll(refreshFriends, 250, {
+  const timer = SE.poll(refreshFriends, 1000, {
     active: () =>
       SE.railMode() &&
       (pendingOverlayChats.size || (!dockHidden && (onLibrary() || onStore() || dock.dataset.chat === '1'))),
@@ -3204,6 +3181,7 @@
       clearTimeout(statusTimer);
       clearTimeout(flyTimer);
       watcher.disconnect();
+      chatWatcher.disconnect();
       localObserver?.disconnect();
       timer?.disconnect();
       if (frame) cancelAnimationFrame(frame);
@@ -3238,6 +3216,8 @@
       sig = '';
       openGames.clear();
       closedSections.clear();
+      deadAvatars.clear();
+      geometryCache = null;
       delete document.body.dataset.seFdock;
       document.body.removeAttribute('data-se-store-list');
       delete window.__steamEnhancedFriendsDock;

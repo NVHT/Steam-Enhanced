@@ -4,23 +4,32 @@
 
   const mounts = new Map();
   const savedTitles = new WeakMap();
+  /* Every target lives in Friends & Chat; outside it no mutation (or title change) matters */
+  const SCOPE = '.friendsui-container, .friendlist, .multiChatDialog';
+  let gate;
   let observer;
-  let frame = 0;
+  let sweep;
 
   const TARGET_SELECTOR =
     '.se-chat-tile[data-se-chat-tip], .friendlist [title], .multiChatDialog [title], .friendlist [data-se-native-tip], .multiChatDialog [data-se-native-tip]';
 
-  const update = () => {
-    frame = 0;
+  const release = (node, entry) => {
+    entry.root.unmount();
+    entry.host.remove();
+    node.style.position = entry.oldPosition;
+    node.removeAttribute('data-se-native-tip');
+    mounts.delete(node);
+  };
+
+  // A whole Friends & Chat tree can leave from outside the scope (the dock unmounting it).
+  const prune = () => {
     for (const [node, entry] of mounts) {
-      if (!node.isConnected || !entry.host.isConnected) {
-        entry.root.unmount();
-        entry.host.remove();
-        node.style.position = entry.oldPosition;
-        node.removeAttribute('data-se-native-tip');
-        mounts.delete(node);
-      }
+      if (!node.isConnected || !entry.host.isConnected) release(node, entry);
     }
+  };
+
+  const update = () => {
+    prune();
 
     const nodes = document.querySelectorAll(TARGET_SELECTOR);
     if (!nodes.length) return;
@@ -70,29 +79,32 @@
     }
   };
 
-  const schedule = () => {
-    if (!frame) frame = requestAnimationFrame(update);
-  };
+  const present = () => !!document.querySelector(SCOPE);
 
+  // Settings, Properties and other windows never show Friends & Chat: wait for it to appear.
   const start = () => {
-    observer = SE.watch(schedule, { attributes: ['data-se-chat-tip', 'title'], sync: true });
-    schedule();
+    if (!present()) {
+      gate ||= SE.watch(() => present() && start());
+      return;
+    }
+    gate?.disconnect();
+    gate = null;
+    observer ||= SE.watch(update, { scope: SCOPE, attributes: ['data-se-chat-tip', 'title'] });
+    sweep ||= SE.poll(prune, 5000, { active: () => mounts.size > 0 });
+    update();
   };
 
   window.__steamEnhancedChatTooltips = {
     destroy() {
+      gate?.disconnect();
       observer?.disconnect();
-      if (frame) cancelAnimationFrame(frame);
+      sweep?.disconnect();
       for (const [node, entry] of mounts) {
-        entry.root.unmount();
-        entry.host.remove();
-        node.style.position = entry.oldPosition;
-        node.removeAttribute('data-se-native-tip');
+        release(node, entry);
         if (savedTitles.has(node) && !node.hasAttribute('title')) {
           node.setAttribute('title', savedTitles.get(node));
         }
       }
-      mounts.clear();
       removeEventListener('DOMContentLoaded', start);
       delete window.__steamEnhancedChatTooltips;
     },

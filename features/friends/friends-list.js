@@ -6,16 +6,11 @@
   const { C, run, attr } = SE;
   const setAttr = (el, name, value) => attr(el, name, value || null);
 
-  const resolveFriendsApp = () => {
-    for (const win of SE.owners()) {
-      try {
-        if (win.g_FriendsUIApp?.FriendStore) return win.g_FriendsUIApp;
-      } catch (_) {}
-    }
-    return null;
-  };
+  const resolveFriendsApp = () => SE.global('g_FriendsUIApp', app => app.FriendStore);
 
   const LIST_SELECTOR = '.friendlist:not(.GamepadMode)';
+  /* The list and the Friends & Chat frame around it (banners sit outside the list itself) */
+  const SCOPE = '.friendsui-container, .friendlist';
   const PLAYER_NAME_CLS = C.playerName;
   const COUNT_RE = /^\(\s*(\d[\d.,\s]*?)\s*\)$/;
 
@@ -104,6 +99,8 @@
   const BANNER_SKIP = '.statusHeaderGlow, .avatarHolder, .playerAvatar, .ContextMenuButton, [class^="se-"], [class*=" se-"]';
   let bannerScanAt = -Infinity;
 
+  const hasOwnText = el => [...el.childNodes].some(node => node.nodeType === 3 && node.textContent.trim());
+
   const opaque = color => {
     const alpha = /rgba\([^)]*,\s*([\d.]+)\s*\)/.exec(color);
     return color !== 'transparent' && (!alpha || Number(alpha[1]) > .5);
@@ -126,7 +123,8 @@
     if (
       opaque(style.backgroundColor) &&
       el.querySelector('svg') &&
-      [el, ...el.querySelectorAll('*')].some(node => getComputedStyle(node).textTransform === 'uppercase')
+      /* Only elements holding text can show it uppercase: one style read each, not one per node */
+      [el, ...el.querySelectorAll('*')].some(node => hasOwnText(node) && getComputedStyle(node).textTransform === 'uppercase')
     ) {
       return 'invite';
     }
@@ -174,12 +172,10 @@
     }
   };
 
-  let frame = 0;
-
   const update = () => {
-    frame = 0;
     const lists = document.querySelectorAll(LIST_SELECTOR);
     if (!lists.length) return;
+    const games = new Set();
 
     const scanBanners = performance.now() - bannerScanAt > BANNER_SCAN_MS;
     if (scanBanners) bannerScanAt = performance.now();
@@ -200,6 +196,7 @@
             .join('')
         );
         if (!game) continue;
+        games.add(game);
 
         const visibleNames = [
           ...head.parentElement.querySelectorAll(`.friendsContainer .friend .${PLAYER_NAME_CLS}`),
@@ -233,21 +230,36 @@
         }
       }
     }
+    /* Only games that still have a group: the cache follows the list instead of growing */
+    for (const game of lastSeenPlayers.keys()) {
+      if (!games.has(game)) lastSeenPlayers.delete(game);
+    }
   };
 
-  const schedule = () => {
-    if (!frame) frame = requestAnimationFrame(update);
+  /*
+   * Outside the main window this also loads into Settings, Properties and the like: nothing runs
+   * there beyond a class lookup per mutation until a Friends list appears.
+   */
+  let watcher = null;
+  let timer = null;
+  const start = () => {
+    if (watcher) return;
+    gate.disconnect();
+    watcher = SE.watch(update, { scope: SCOPE, throttle: 250 });
+    timer = SE.poll(update, 2000, { active: () => SE.visible(LIST_SELECTOR) });
+    update();
   };
-
-  const watcher = SE.watch(schedule);
-  const timer = SE.poll(schedule, 2000, { active: () => SE.visible(LIST_SELECTOR) });
-  schedule();
+  const gate = SE.watch(() => {
+    if (document.getElementsByClassName('friendlist').length) start();
+  });
+  if (document.getElementsByClassName('friendlist').length) start();
 
   window.__steamEnhancedFriendsList = {
     destroy() {
-      watcher.disconnect();
+      gate.disconnect();
+      watcher?.disconnect();
       timer?.disconnect();
-      if (frame) cancelAnimationFrame(frame);
+      lastSeenPlayers.clear();
       for (const el of document.querySelectorAll(`[${BANNER}]`)) el.removeAttribute(BANNER);
       for (const el of document.querySelectorAll(`[${STRAY}]`)) el.removeAttribute(STRAY);
       for (const attrName of ['data-se-who', 'data-se-sub', 'data-se-voice']) {

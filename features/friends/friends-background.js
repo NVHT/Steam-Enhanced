@@ -49,6 +49,25 @@
     } catch (_) {}
   };
 
+  const restoreApp = app => {
+    const saved = patchedApps.get(app);
+    if (!saved) return;
+    try {
+      if (app.ShowPopupFriendsListAtStartup === saved.blocked) {
+        if (saved.own) Object.defineProperty(app, 'ShowPopupFriendsListAtStartup', saved.own);
+        else delete app.ShowPopupFriendsListAtStartup;
+      }
+    } catch (_) {}
+    patchedApps.delete(app);
+  };
+
+  // Every owner trapped and its app patched: the setter covers any later app, so polling can stop.
+  const settled = () =>
+    [...SE.owners()].every(owner => {
+      const app = SE.run(() => owner.g_FriendsUIApp);
+      return patchedOwners.has(owner) && !!app && patchedApps.has(app) && patchedRestores.has(SE.run(() => app.UIStore));
+    });
+
   const scanOwners = () => {
     const reachableApps = new Set();
     for (const owner of SE.owners()) {
@@ -69,6 +88,7 @@
         let currentValue = descriptor?.value;
         const get = () => currentValue;
         const set = nextValue => {
+          if (currentValue !== nextValue) restoreApp(currentValue);
           currentValue = nextValue;
           patchFriendsApp(nextValue);
           queueMicrotask(() => SE.run(() => suppressRestore(nextValue)));
@@ -83,26 +103,20 @@
       } catch (_) {}
     }
 
-    for (const [app, saved] of patchedApps) {
-      if (!reachableApps.has(app)) {
-        try {
-          if (app.ShowPopupFriendsListAtStartup === saved.blocked) {
-            if (saved.own) Object.defineProperty(app, 'ShowPopupFriendsListAtStartup', saved.own);
-            else delete app.ShowPopupFriendsListAtStartup;
-          }
-        } catch (_) {}
-        patchedApps.delete(app);
-      }
+    for (const app of [...patchedApps.keys()]) {
+      if (!reachableApps.has(app)) restoreApp(app);
     }
+    if (settled()) timer?.disconnect();
   };
 
+  let timer = null;
   scanOwners();
-  const timer = SE.poll(scanOwners, 1000);
+  if (!settled()) timer = SE.poll(scanOwners, 1000);
 
   window.__seFriendsBackground = {
     destroy() {
       destroyed = true;
-      timer.disconnect();
+      timer?.disconnect();
       for (const [owner, saved] of patchedOwners) {
         try {
           const current = Object.getOwnPropertyDescriptor(owner, 'g_FriendsUIApp');
@@ -122,13 +136,7 @@
           }
         } catch (_) {}
       }
-      for (const [app, saved] of patchedApps) {
-        try {
-          if (app.ShowPopupFriendsListAtStartup !== saved.blocked) continue;
-          if (saved.own) Object.defineProperty(app, 'ShowPopupFriendsListAtStartup', saved.own);
-          else delete app.ShowPopupFriendsListAtStartup;
-        } catch (_) {}
-      }
+      for (const app of [...patchedApps.keys()]) restoreApp(app);
       for (const [ui, { own, wrapper }] of patchedRestores) {
         SE.run(() => {
           if (ui.RestoreFromStateObject !== wrapper) return;

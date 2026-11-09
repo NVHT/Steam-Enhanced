@@ -67,6 +67,7 @@
     CarouselThumb: '_1Lot-TP3cPLuTO6bGZm8up',
     ChatTab: '_2XZq-_f6npaQdAgeRzKIkz',
     ChatTab_Active: 'Yd-DsWkYiFiYwpci--Yk_',
+    ChatTabContent_ChatRoomName: '_1HNpQBKKKQ1tG2OZH3CSsh',
     chatTextarea: '_113iuw_HlE_qSgt9cGWCSv',
     CheckboxWithImage: '_3mzKdQXht__YHo6PX1LmB6',
     ChildrenContainer: '_1VMQWnw-9FBp-MVXUbWfS_',

@@ -36,7 +36,7 @@
   display: inline-block;
   margin-inline-start: 6px;
   padding: 0 7px;
-  border-radius: 999px;
+  border-radius: var(--se-radius-pill);
   background: var(--se-surface-2, #262c35);
   color: var(--se-text-dim, #b8c0c8);
   font-size: 10.5px;
@@ -172,7 +172,7 @@
   box-shadow: inset 0 0 0 1px var(--se-accent-line, rgba(124, 196, 255, .3)) !important;
   color: var(--se-accent, #7cc4ff) !important;
   cursor: pointer;
-  transition: background-color .15s ease-out, color .15s ease-out;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
 }
 
 [data-se-banner="invite"]:not(#se-none):hover {
@@ -216,8 +216,7 @@
   padding: 0 !important;
 }
 
-.friendlist:not(.GamepadMode) .currentUserAvatar,
-.friendlist:not(.GamepadMode) .currentUserAvatar .avatarHolder {
+.friendlist:not(.GamepadMode) .currentUserAvatar {
   width: 36px !important;
   height: 36px !important;
   margin-right: 3px;
@@ -306,6 +305,12 @@
   color: var(--se-text-strong, #fff) !important;
 }
 
+/* Keyboard focus on every control the theme restyles, matching the rest of the theme */
+.friendlist:not(.GamepadMode) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton, .friendSearchClear, .friendInviteButton, .confirmInviteButton, .cancelAddFriends, .createChatRoomButton, .openGroupButton, .groupName, .friend, .ChatRoomListGroupItem_header):focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
 .friendlist:not(.GamepadMode) .friendRequestButton.friendRequestViewActive {
   background: var(--se-accent-tint, rgba(124, 196, 255, .14)) !important;
   color: var(--se-accent, #7cc4ff) !important;
@@ -363,15 +368,15 @@
   height: 16px !important;
   margin: 0 !important;
   padding: 0 4px !important;
-  border-radius: 999px !important;
+  border-radius: var(--se-radius-pill) !important;
   background: var(--se-danger, #e5737a) !important;
   box-shadow: 0 0 0 2px var(--se-sidebar, #1d2128);
   font: 800 10px/16px var(--se-font, "Motiva Sans"), sans-serif !important;
   letter-spacing: 0 !important;
-  color: #fff !important;
+  color: var(--se-text-strong) !important;
   text-align: center;
   transform: none !important;
-  z-index: 1;
+  z-index: var(--se-z-raised);
 }
 
 /* The "Friends" bar: a small label, its buttons at the end */
@@ -538,8 +543,8 @@
   width: 24px !important;
   height: 24px !important;
   margin: 0 !important;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, .06);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-hairline);
   color: var(--se-text-muted, #98a2ad);
   opacity: 1 !important;
   pointer-events: auto !important;
@@ -626,17 +631,17 @@
   left: auto !important;
   width: 18px !important;
   height: 18px !important;
-  border-radius: 5px;
+  border-radius: var(--se-radius-xs);
   background: var(--se-surface-2, #262c35) !important;
   box-shadow: 0 0 0 2px var(--se-sidebar, #1d2128);
-  z-index: 2;
+  z-index: calc(var(--se-z-raised) + 1);
 }
 
 .friendlist:not(.GamepadMode) .FavoriteFriend_GameIcon img {
   display: block;
   width: 100% !important;
   height: 100% !important;
-  border-radius: 5px !important;
+  border-radius: var(--se-radius-xs) !important;
   box-shadow: none !important;
 }
 
@@ -738,7 +743,7 @@
   border-right: 1.75px solid currentColor;
   border-bottom: 1.75px solid currentColor;
   transform: rotate(45deg);
-  transition: transform .15s ease, margin .15s ease;
+  transition: transform var(--se-dur) ease-out, margin var(--se-dur) ease-out;
 }
 
 .friendlist:not(.GamepadMode) .friendGroup .groupName.Collapsed .ExpandPlusMinus::before {
@@ -781,7 +786,7 @@
   width: 16px !important;
   height: 16px !important;
   margin: 0 !important;
-  border-radius: 4px;
+  border-radius: var(--se-radius-xs);
 }
 
 .friendlist:not(.GamepadMode) .friendGroup:is(:not(.gameGroup), .OtherGamesGroup) .groupName .groupCount {
@@ -846,7 +851,7 @@
   width: 34px !important;
   height: 34px !important;
   margin: 0 !important;
-  border-radius: 9px !important;
+  border-radius: var(--se-radius-md) !important;
   object-fit: cover;
   background: var(--se-surface-2, #262c35);
   box-shadow: none !important;
@@ -877,7 +882,7 @@
   height: 16px;
   margin: 0 !important;
   padding: 0 4px !important;
-  border-radius: 999px;
+  border-radius: var(--se-radius-pill);
   background: var(--se-running, #6cc24a) !important;
   box-shadow: 0 0 0 2px var(--se-sidebar, #1d2128);
   font: 800 10px/16px var(--se-font, "Motiva Sans"), sans-serif !important;
@@ -982,11 +987,6 @@
   --se-fd-ring: var(--se-online, #4cb4ff);
 }
 
-.friendlist:not(.GamepadMode) .friend.awayOrSnooze,
-.friendlist:not(.GamepadMode) .currentUserContainer.awayOrSnooze {
-  --se-fd-ring: color-mix(in srgb, var(--se-online) 50%, transparent);
-}
-
 .friendlist:not(.GamepadMode) .friend.ingame,
 .friendlist:not(.GamepadMode) .currentUserContainer.ingame {
   --se-fd-ring: var(--se-running, #6cc24a);
@@ -1024,6 +1024,7 @@
 .friendlist:not(.GamepadMode) .currentUserAvatar .avatarHolder {
   width: 36px !important;
   height: 36px !important;
+  margin-right: 3px;
 }
 
 .friendlist:not(.GamepadMode) .friend .avatarHolder img.avatar,
@@ -1119,7 +1120,7 @@
   width: var(--se-friend-game-icon-size) !important;
   height: var(--se-friend-game-icon-size) !important;
   margin: 0 !important;
-  border-radius: 6px !important;
+  border-radius: var(--se-radius-sm) !important;
   box-shadow: none !important;
 }
 
@@ -1128,7 +1129,7 @@
   display: grid !important;
   place-items: center;
   overflow: hidden;
-  border-radius: 6px !important;
+  border-radius: var(--se-radius-sm) !important;
   background: var(--se-surface-2, #262c35) !important;
   font-size: 0 !important;
   color: var(--se-text-muted, #98a2ad) !important;
@@ -1202,12 +1203,12 @@
   height: 18px;
   margin-inline-start: 8px !important;
   padding: 0 6px !important;
-  border-radius: 999px !important;
+  border-radius: var(--se-radius-pill) !important;
   background: var(--se-danger, #e5737a) !important;
   font: 800 10.5px/18px var(--se-font, "Motiva Sans"), sans-serif !important;
   letter-spacing: 0 !important;
   text-align: center;
-  color: #fff !important;
+  color: var(--se-text-strong) !important;
 }
 
 /* Each request: a friend row, the buttons at its end */
@@ -1293,7 +1294,7 @@
   box-shadow: none !important;
   color: var(--se-text-muted, #98a2ad) !important;
   cursor: pointer;
-  transition: background-color .15s ease, color .15s ease;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
 }
 
 .friendlist:not(.GamepadMode) .friendInviteButton > svg {
@@ -1358,7 +1359,7 @@
   font: 600 13px var(--se-font, "Motiva Sans"), sans-serif !important;
   color: var(--se-text, #e6e8eb) !important;
   cursor: pointer;
-  transition: background-color .15s ease, color .15s ease;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
 }
 
 .friendlist:not(.GamepadMode) .confirmInviteRequestContainer .confirmInviteButton:hover {
@@ -1376,7 +1377,7 @@
 }
 
 .friendlist:not(.GamepadMode) .confirmInviteRequestContainer .confirmInviteButton.confirmInvites.dim {
-  background: rgba(255, 255, 255, .04) !important;
+  background: var(--se-white-04) !important;
   color: var(--se-text-faint, #6f7984) !important;
   cursor: default;
 }
@@ -1395,7 +1396,7 @@
   border-radius: var(--se-radius-sm, 8px);
   color: var(--se-text-muted, #98a2ad);
   cursor: pointer;
-  z-index: 2;
+  z-index: calc(var(--se-z-raised) + 1);
 }
 
 .friendlist:not(.GamepadMode) .confirmInviteRequestContainer .cancelAddFriends:hover {
@@ -1480,7 +1481,7 @@
   background: currentColor;
   -webkit-mask: var(--se-fd-ico-chev) center / 14px 14px no-repeat;
   mask: var(--se-fd-ico-chev) center / 14px 14px no-repeat;
-  transition: transform .15s ease;
+  transition: transform var(--se-dur) ease-out;
 }
 
 .friendlist:not(.GamepadMode) .FriendsListChatSection.Collapsed .chatSectionTitle .ToggleGroupChatList::before {
@@ -1527,7 +1528,7 @@
   margin: 0 !important;
   padding: 0 !important;
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--se-radius-sm);
   background: none !important;
   color: var(--se-text-muted, #98a2ad) !important;
   cursor: pointer;
@@ -1562,7 +1563,7 @@
   left: 17px !important;
   inset-inline-start: 17px !important;
   margin: 0 !important;
-  z-index: 1;
+  z-index: var(--se-z-raised);
 }
 
 .friendlist:not(.GamepadMode) .chatSectionTitle > .ChatUnreadMessageIndicator .chatUnreadCircle {
@@ -1617,7 +1618,7 @@
   width: 32px !important;
   height: 32px !important;
   border: 0 !important;
-  border-radius: 9px !important;
+  border-radius: var(--se-radius-md) !important;
   overflow: hidden;
   box-shadow: none !important;
 }
@@ -1742,9 +1743,9 @@
   min-width: 18px !important;
   padding: 0 5px !important;
   box-sizing: border-box;
-  border-radius: 999px !important;
+  border-radius: var(--se-radius-pill) !important;
   font: 800 11px/18px var(--se-font, "Motiva Sans"), sans-serif !important;
-  color: #0f1115 !important;
+  color: var(--se-bg-ink) !important;
   text-align: center;
 }
 
@@ -1831,7 +1832,7 @@
   width: 24px !important;
   height: 24px !important;
   margin: 0 !important;
-  border-radius: 6px !important;
+  border-radius: var(--se-radius-sm) !important;
   color: var(--se-text-muted, #98a2ad);
 }
 
@@ -1850,7 +1851,7 @@
   height: 14px;
   background: currentColor;
   transform: rotate(-90deg);
-  transition: transform .15s ease;
+  transition: transform var(--se-dur) ease-out;
   -webkit-mask: var(--se-fd-ico-chev) center / 14px 14px no-repeat;
   mask: var(--se-fd-ico-chev) center / 14px 14px no-repeat;
 }
@@ -1881,15 +1882,12 @@
  * status keeps clear of them and the settings button sits below them
  */
 :is(html, body).friendsui-container .friendlist:not(.GamepadMode) .currentUserContainer {
+  padding-block: 18px !important;
   padding-inline-end: 110px !important;
 }
 
 :is(html, body).friendsui-container .friendlist:not(.GamepadMode) .friendListHeaderContainer {
   min-height: 72px !important;
-}
-
-:is(html, body).friendsui-container .friendlist:not(.GamepadMode) .currentUserContainer {
-  padding-block: 18px !important;
 }
 
 :is(html, body).friendsui-container .friendlist:not(.GamepadMode) .friendListButtons {
@@ -1918,7 +1916,7 @@
   width: var(--se-tile-sm, 30px) !important;
   height: var(--se-tile-sm, 30px) !important;
   margin: 0 !important;
-  z-index: 20;
+  z-index: var(--se-z-sticky);
 }
 
 /* The header, favorites and the Friends bar keep their height; only the list below scrolls */
@@ -1957,7 +1955,7 @@
   margin: 8px 0 0 !important;
   padding: 0 14px !important;
   border: 0 !important;
-  border-radius: 999px !important;
+  border-radius: var(--se-radius-pill) !important;
   background: var(--se-accent, #7cc4ff) !important;
   box-shadow: var(--se-shadow-card, 0 10px 24px -12px rgba(0, 0, 0, .8)), 0 0 0 3px var(--se-sidebar, #1d2128) !important;
   font: 700 12px/28px var(--se-font, "Motiva Sans"), sans-serif !important;
@@ -1968,7 +1966,7 @@
   text-overflow: ellipsis;
   color: var(--se-bg-ink, #0f1115) !important;
   transform: translateX(-50%);
-  transition: filter .15s ease;
+  transition: filter var(--se-dur) ease-out;
 }
 
 .friendlist:not(.GamepadMode) .unreadMessageViolator:hover {
@@ -2004,7 +2002,7 @@
   height: 18px;
   margin: -9px 0 0 !important;
   padding: 0 5px !important;
-  border-radius: 999px !important;
+  border-radius: var(--se-radius-pill) !important;
   background: var(--se-accent, #7cc4ff) !important;
   box-shadow: none !important;
   animation: none !important;
@@ -2018,7 +2016,7 @@
 /* A mention: the same pill in the theme's red */
 .friendlist:not(.GamepadMode) .unreadFriend .FriendMessageCount.HasUnreadMention {
   background: var(--se-danger, #e5737a) !important;
-  color: #fff !important;
+  color: var(--se-text-strong) !important;
 }
 
 

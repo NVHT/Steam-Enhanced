@@ -27,10 +27,18 @@
     return true;
   }
 
+  /*
+   * In the main window notifications only sit in the bell menu, so a click elsewhere skips the
+   * fiber walk. Toast, overlay and menu windows are mostly notifications: every click is checked.
+   */
+  const MENU = [SE.C.NotificationsMenu, SE.C.NotificationMenuItem].filter(Boolean).map(cls => `.${cls}`).join(', ');
+  const mainWindow = document.title === 'Steam';
+
   function onClick(event) {
     if (!event.isTrusted || event.button !== 0) return;
     const target = event.target?.nodeType === 1 ? event.target : event.target?.parentElement;
-    if (target) forward(target);
+    if (!target || (mainWindow && MENU && !target.closest(MENU))) return;
+    forward(target);
   }
 
   window.addEventListener('click', onClick, true);

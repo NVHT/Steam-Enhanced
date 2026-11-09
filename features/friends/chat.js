@@ -9,6 +9,13 @@
   const TAB_ACTIVE_CLS = C.ChatTab_Active;
   const TEXTAREA_CLS = C.chatTextarea;
   const SVG_NS = 'http://www.w3.org/2000/svg';
+  /* Desktop chat dialogs (not Big Picture's): chat.css keys every rule on this mark */
+  const DIALOG = 'data-se-chat';
+  /* The Friends window's list collapse button is shown: the tab strip leaves room for it */
+  const LIST_TOGGLE = 'data-se-list-toggle';
+  const SCOPE = '.friendsui-container, .multiChatDialog';
+  const COMPACT = run(() => new Intl.NumberFormat(undefined, { notation: 'compact', maximumFractionDigits: 1 }));
+  const compactNum = n => run(() => COMPACT.format(n)) || String(n);
 
   const ICONS = {
     voice:
@@ -229,13 +236,6 @@
         const match = el && el.textContent.replace(/[\s.,\u00a0\u202f']/g, '').match(/\d+/);
         return match ? +match[0] : null;
       };
-      const compactNum = n =>
-        run(() =>
-          new Intl.NumberFormat(undefined, {
-            notation: 'compact',
-            maximumFractionDigits: 1,
-          }).format(n)
-        ) || String(n);
 
       const onlineCount = parseDigits(stats.querySelector('.statMembersOnline'));
       const totalCount = parseDigits(stats.querySelector('.statMembersTotal'));
@@ -250,11 +250,25 @@
   const attachedDocuments = new Map();
   let frame = 0;
 
+  // Live collections: cheap enough to read on every mutation, before the frame paints.
+  const markDialogs = doc => {
+    const dialogs = doc.getElementsByClassName('multiChatDialog');
+    if (!dialogs.length) return false;
+    const listToggle = doc.getElementsByClassName('friendListCollapse').length > 0;
+    for (const dialog of dialogs) {
+      const desktop = !dialog.parentElement?.closest('.GamepadMode');
+      SE.attr(dialog, DIALOG, desktop);
+      SE.attr(dialog, LIST_TOGGLE, desktop && listToggle);
+    }
+    return true;
+  };
+
   const update = () => {
+    if (frame) cancelAnimationFrame(frame);
     frame = 0;
     for (const doc of [document, ...attachedDocuments.keys()]) {
-      for (const win of doc.querySelectorAll('.multiChatDialog .chatWindow')) {
-        if (win.closest('.GamepadMode')) continue;
+      if (!markDialogs(doc)) continue;
+      for (const win of doc.querySelectorAll(`.multiChatDialog[${DIALOG}] .chatWindow`)) {
         const isDirectChat =
           !!win.querySelector(':scope > .chatHeader:not(.titleBarContainer)') &&
           !win.querySelector(':scope > .chatHeader.titleBarContainer');
@@ -276,17 +290,33 @@
     }
   };
 
+  // Attached popup documents have their own observers; their changes land here once per frame.
   const schedule = () => {
     if (!frame) frame = requestAnimationFrame(update);
   };
 
-  const watcher = SE.watch(schedule);
-  const timer = SE.poll(schedule, 2000, {
-    active: () =>
-      SE.visible('.multiChatDialog .chatWindow') ||
-      [...attachedDocuments.keys()].some(doc => !!doc.querySelector('.multiChatDialog .chatWindow')),
-  });
-  schedule();
+  /*
+   * Most windows this runs in (Settings, Properties…) never show a chat: only the cheap mark pass
+   * runs until Friends & Chat appears, then the full pass, limited to its subtree.
+   */
+  let watcher = null;
+  let timer = null;
+  const start = () => {
+    watcher = SE.watch(update, { scope: SCOPE, throttle: 100 });
+    timer = SE.poll(update, 2000, {
+      active: () =>
+        SE.visible('.multiChatDialog .chatWindow') ||
+        [...attachedDocuments.keys()].some(doc => !!doc.querySelector('.multiChatDialog .chatWindow')),
+    });
+    update();
+  };
+  const onAnyMutation = () => {
+    if (markDialogs(document) || document.querySelector('.friendsui-container')) {
+      if (!watcher) start();
+    }
+  };
+  const markWatcher = SE.watch(onAnyMutation);
+  onAnyMutation();
 
   window.__steamEnhancedChat = {
     documents: () => [...attachedDocuments.keys()],
@@ -309,7 +339,8 @@
       const docs = [document, ...attachedDocuments.keys()];
       for (const obs of attachedDocuments.values()) obs.disconnect();
       attachedDocuments.clear();
-      watcher.disconnect();
+      markWatcher.disconnect();
+      watcher?.disconnect();
       timer?.disconnect();
       if (frame) cancelAnimationFrame(frame);
 
@@ -321,6 +352,10 @@
           el.removeAttribute('data-se-members');
           el.removeAttribute('data-se-friendchat');
           el.removeAttribute('data-se-navcollapsed');
+        }
+        for (const el of doc.querySelectorAll(`[${DIALOG}], [${LIST_TOGGLE}]`)) {
+          el.removeAttribute(DIALOG);
+          el.removeAttribute(LIST_TOGGLE);
         }
         for (const el of doc.querySelectorAll('textarea[data-se-placeholder]')) {
           el.removeAttribute('placeholder');
