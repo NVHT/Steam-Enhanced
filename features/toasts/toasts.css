@@ -177,83 +177,110 @@ html[data-se-tst-on] body > :not(#se-tst) {
 /* ---------- Ambient ground: toasts with no art ---------- */
 
 .se-tst-art[data-ambient] {
-  background:
-    radial-gradient(ellipse 45% 95% at 78% 50%, color-mix(in srgb, var(--c) 20%, transparent), transparent 72%),
-    var(--se-sidebar, #1d2128);
+  background: #111318; /* the splash's ground */
 }
 
-/* The mark: medallion, fanned cards, rim, and the sweep arc running round it. */
-.se-tst-mark {
+/* The splash's wireframe Library, lit in the toast's color. */
+.se-tst-wf {
   position: absolute;
-  right: 46px; /* clear of the countdown ring */
-  top: 50%;
-  width: 116px;
-  height: 116px;
-  translate: 0 -50%;
-  overflow: visible;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.se-tst-mk-med { fill: rgba(16, 18, 23, .55); }
-.se-tst-mk-rim { fill: none; stroke: color-mix(in srgb, var(--c) 35%, transparent); stroke-width: 2.5; }
-.se-tst-mk-rim2 { fill: none; stroke: color-mix(in srgb, var(--c) 14%, transparent); stroke-width: 1; }
-.se-tst-mk-b { stroke-width: 2.5; }
-.se-tst-mk-c1 .se-tst-mk-b { fill: color-mix(in srgb, var(--c) 12%, transparent); stroke: color-mix(in srgb, var(--c) 40%, transparent); }
-.se-tst-mk-c2 .se-tst-mk-b { fill: color-mix(in srgb, var(--c) 20%, transparent); stroke: color-mix(in srgb, var(--c) 58%, transparent); }
-.se-tst-mk-c3 .se-tst-mk-b { fill: color-mix(in srgb, var(--c) 30%, rgba(255, 255, 255, .04)); stroke: color-mix(in srgb, var(--c) 85%, #fff); }
-.se-tst-mk-bar { fill: color-mix(in srgb, var(--c) 60%, #fff); opacity: .5; }
-.se-tst-mk-strong { opacity: .8; }
-.se-tst-mk-shot { fill: color-mix(in srgb, var(--c) 16%, transparent); stroke: color-mix(in srgb, var(--c) 40%, #fff); stroke-opacity: .35; stroke-width: 1.5; }
-
-.se-tst-mk-card {
-  transform-box: fill-box;
-  transform-origin: 50% 90%;
-  animation: 5s cubic-bezier(.45, 0, .25, 1) infinite;
-}
-
-.se-tst-mk-c1 { animation-name: se-tst-fan1; }
-.se-tst-mk-c2 { animation-name: se-tst-fan2; }
-.se-tst-mk-c3 { animation-name: se-tst-fan3; }
-
-@keyframes se-tst-fan1 {
-  0%, 100% { transform: rotate(-15deg); }
-  45%, 60% { transform: rotate(-24deg) translateX(-8px); }
-}
-
-@keyframes se-tst-fan2 {
-  0%, 100% { transform: rotate(-3deg); }
-  45%, 60% { transform: rotate(-5deg) translateY(-4px); }
-}
-
-@keyframes se-tst-fan3 {
-  0%, 100% { transform: rotate(10deg); }
-  45%, 60% { transform: rotate(19deg) translateX(8px); }
-}
-
-.se-tst-mk-sweep {
-  transform-origin: 256px 256px;
-  animation: se-tst-mk-spin 3.6s linear infinite;
-}
-
-.se-tst-mk-arc {
+.se-tst-wf-ln {
   fill: none;
-  stroke: var(--c);
-  stroke-width: 5;
-  stroke-linecap: round;
-  stroke-dasharray: 180 1000;
-  filter: drop-shadow(0 0 6px var(--c));
+  stroke: rgba(124, 196, 255, .2);
+  stroke-width: 1;
 }
 
-.se-tst-mk-lead {
-  fill: #eaf6ff;
-  filter: drop-shadow(0 0 5px var(--c));
+.se-tst-wf-line {
+  fill: rgba(124, 196, 255, .2);
 }
 
-@keyframes se-tst-mk-spin {
-  to { transform: rotate(360deg); }
+.se-tst-wf-on {
+  stroke: color-mix(in srgb, var(--c) 75%, transparent);
+}
+
+/* The selection walks down the list. */
+.se-tst-wf-sel {
+  fill: var(--c);
+  opacity: .8;
+  animation: se-tst-wf-sel 7s steps(1) infinite;
+}
+
+@keyframes se-tst-wf-sel {
+  0% { transform: translateY(0); }
+  14% { transform: translateY(11px); }
+  28% { transform: translateY(22px); }
+  42% { transform: translateY(33px); }
+  57% { transform: translateY(44px); }
+  71% { transform: translateY(22px); }
+  85% { transform: translateY(11px); }
+}
+
+/* The hero panel's glow, where the splash has the mark. */
+.se-tst-wf-glow {
+  fill: color-mix(in srgb, var(--c) 40%, transparent);
+  filter: blur(14px);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: se-tst-wf-breathe 4s ease-in-out infinite alternate;
+}
+
+@keyframes se-tst-wf-breathe {
+  from { opacity: .35; transform: scale(.85); }
+  to { opacity: .9; transform: scale(1.1); }
+}
+
+/* The cards below it light up in turn. */
+.se-tst-wf-card {
+  animation: se-tst-wf-card 4.5s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 1.5s);
+}
+
+@keyframes se-tst-wf-card {
+  0%, 45%, 100% { stroke: rgba(124, 196, 255, .2); fill: transparent; }
+  15%, 30% { stroke: color-mix(in srgb, var(--c) 80%, transparent); fill: color-mix(in srgb, var(--c) 10%, transparent); }
+}
+
+/* Friends' status rings, as in the splash: green in game, blue online, grey offline. */
+.se-tst-wf-fr {
+  fill: none;
+  stroke-width: 1.2;
+  stroke: rgba(152, 162, 173, .35);
+}
+
+.se-tst-wf-fr[data-st="game"] { stroke: color-mix(in srgb, var(--se-running, #6cc24a) 75%, transparent); }
+.se-tst-wf-fr[data-st="on"] { stroke: color-mix(in srgb, var(--se-online, #4cb4ff) 75%, transparent); }
+
+.se-tst-wf-fr:not([data-st="off"]) {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: se-tst-wf-ring 2.6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -.7s);
+}
+
+@keyframes se-tst-wf-ring {
+  0%, 100% { stroke-opacity: .55; transform: scale(1); }
+  50% { stroke-opacity: 1; transform: scale(1.12); }
+}
+
+/* A light passing over the whole wireframe. */
+.se-tst-wf-light {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, color-mix(in srgb, var(--c) 14%, transparent) 50%, transparent 60%) 0 0 / 250% 100%;
+  animation: se-tst-wf-pass 5s linear infinite;
+}
+
+@keyframes se-tst-wf-pass {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
 }
 
 /* Only the toast on stage moves. */
-.se-tst-layer:not([data-on]) :is(.se-tst-mk-card, .se-tst-mk-sweep) {
+.se-tst-layer:not([data-on]) :is(.se-tst-wf *, .se-tst-wf-light) {
   animation-play-state: paused;
 }
 
@@ -820,7 +847,8 @@ html[data-se-tst-on] body > :not(#se-tst) {
   }
 
   .se-tst-layer[data-on] .se-tst-hero,
-  .se-tst-mark *,
+  .se-tst-wf *,
+  .se-tst-wf-light,
   .se-tst-spark,
   .se-tst-layer[data-on]::after {
     animation: none !important;
