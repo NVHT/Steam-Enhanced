@@ -796,6 +796,7 @@
       const key = keyOf(el);
       if (key !== null && !live.has(key)) live.set(key, el); // document order: the first hit is the toast's root
     }
+    if (tray?.hasAttribute('data-show')) fit();
     lastScan = { at: new Date().toISOString(), elements: document.body.getElementsByTagName('*').length, toasts: live.size, read: [] };
 
     const now = Date.now();
@@ -903,6 +904,28 @@
   if (document.body) start();
   else addEventListener('DOMContentLoaded', start, { once: true });
 
+  // Where the window is, where it should be, and what Steam offers to move it (for why()).
+  function placement() {
+    const src = active()?.src || models[0]?.src;
+    const popup = src && run(() => SE.fromProps(src, FIBER_DEPTH, p => ('registerPopup' in p && p.popup ? p.popup : undefined)));
+    const members = o => {
+      const out = new Set();
+      for (let x = o, i = 0; x && x !== Object.prototype && i < 4; x = Object.getPrototypeOf(x), i++) {
+        for (const k of Object.getOwnPropertyNames(x)) out.add(k);
+      }
+      return [...out].slice(0, 150);
+    };
+    return {
+      mover,
+      target,
+      got: { x: window.screenX, y: window.screenY, w: window.outerWidth, h: window.outerHeight, iw: window.innerWidth, ih: window.innerHeight, dpr: window.devicePixelRatio },
+      avail: { l: screen.availLeft, t: screen.availTop, w: screen.availWidth, h: screen.availHeight },
+      steamClientWindow: Object.keys(window.SteamClient?.Window || {}),
+      dock: dock && { bottom: dock.style.getPropertyValue('--se-tst-bottom'), scale: dock.style.getPropertyValue('--se-tst-scale') },
+      popup: !popup ? null : popup === window ? 'this window' : { type: typeof popup, members: run(() => members(popup)), holdsThisWindow: run(() => Object.values(popup).includes(window)) },
+    };
+  }
+
   // What React has above the window's text: component names and prop names, level by level.
   function probe() {
     const hosts = [...document.body.querySelectorAll('*')]
@@ -921,10 +944,10 @@
   }
 
   window.__seToasts = {
-    version: '1.93.4',
+    version: '1.93.5',
     probe,
     // Why nothing (or something) is on the stage: the last scan, and what each toast read as.
-    why: () => ({ enabled: enabled(), lastScan, models: models.length, skipped: skipped.size, pending: pendingKeys.size }),
+    why: () => ({ enabled: enabled(), lastScan, models: models.length, skipped: skipped.size, pending: pendingKeys.size, placement: placement() }),
     dump() {
       return models.map(m => ({
         id: m.id,
