@@ -612,6 +612,11 @@
     const main = SE.mainWindow();
     if (main && typeof main.Navigate === 'function' && !guardedNavigation.has(main)) return true;
     for (const entry of guardedRoutes.keys()) if (entry.component !== PopupOnlySettings) return true;
+    // A re-registered route is a new entry object the guard has never seen.
+    for (const owner of SE.owners()) {
+      const entry = SE.run(() => settingsRoutes(owner)?.get(SETTINGS_ROUTE));
+      if (entry && entry.component !== PopupOnlySettings) return true;
+    }
     for (const [store, { wrapped }] of guardedNavigation) if (store.Navigate !== wrapped) return true;
     return false;
   }

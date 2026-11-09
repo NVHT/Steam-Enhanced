@@ -1088,7 +1088,9 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
   color: var(--se-danger) !important;
 }
 
-/* Compact group chats: native lists become overlays instead of permanent columns. */
+/* Compact group chats: native lists become overlays instead of permanent columns. The first
+ * selector outweighs the flyout's base width rule; the second covers other hosts. */
+.se-fdock[data-chat="1"] .se-fd-steam .chat_main .chat_main_flex > .multiChatDialog:has(.MultiUserChat:not([data-activechat="false"])),
 .se-fdock[data-chat="1"] .multiChatDialog:has(.MultiUserChat:not([data-activechat="false"])) {
   width: min(var(--se-chat-group-width), calc(100vw - var(--se-chat-right) - var(--se-chat-edge))) !important;
 }

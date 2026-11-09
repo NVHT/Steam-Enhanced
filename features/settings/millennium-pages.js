@@ -928,9 +928,15 @@
 
   function start() {
     tagEditor();
-    editorWatch = SE.watch(tagEditor, { throttle: 250 });
+    // settings.js only drives this module while a Millennium page is up; this watch notices it
+    // going away so leave() resets filters and stops the Quick CSS poll.
+    editorWatch = SE.watch(() => {
+      tagEditor();
+      if (lastKey && !document.querySelector(`${ROOT} ${CONTENT}[data-se-mill-page]`)) schedule();
+    }, { throttle: 250 });
     addEventListener('resize', schedule);
     schedule();
+    window.__steamEnhancedSettings?.refresh?.(); // in case settings.js's first pass ran before the hooks existed
   }
 
   window.__steamEnhancedMillPages = {

@@ -74,6 +74,8 @@
     { records: true, attributes: ['src', 'srcset'] }
   );
   scan(document.documentElement);
+  // The shared watcher attaches to <body> at DOMContentLoaded; catch what rendered before that.
+  if (!document.body) addEventListener('DOMContentLoaded', () => scan(document.documentElement), { once: true });
 
   window.__steamEnhancedImages = {
     destroy() {

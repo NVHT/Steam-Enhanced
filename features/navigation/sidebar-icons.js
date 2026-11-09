@@ -79,7 +79,7 @@
   };
 
   const start = () => {
-    observer = SE.watch(update);
+    observer = SE.watch(update, { attributes: ['class'] }); // React can rewrite the root's className
     update();
   };
 

@@ -824,7 +824,7 @@
 
   function start() {
     /* Core already batches to a frame; rows' hover/selection classes are ignored */
-    observer = SE.watch(update, { attributes: ['class'], throttle: 100, ignore: LIST_ROWS });
+    observer = SE.watch(update, { attributes: ['class'], ignore: LIST_ROWS });
     document.addEventListener('keydown', onGlobalKeyDown, true);
     addEventListener('resize', schedule);
     document.addEventListener('scroll', onListScroll, { capture: true, passive: true });

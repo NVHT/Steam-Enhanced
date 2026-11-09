@@ -622,35 +622,24 @@
     poller = SE.poll(update, 250, { active: () => !!document.querySelector(`.${CLS.statusBox}`) });
   };
 
-  let idleTimer = 0;
-
   const stopWatching = () => {
-    clearTimeout(idleTimer);
-    idleTimer = 0;
     watcher?.disconnect();
     watcher = null;
   };
 
-  // Once nothing startup-related has shown for 8 s, the page-wide watcher goes too.
-  const scheduleIdleStop = () => {
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => {
-      if (!poller && !document.querySelector(`.${CLS.login}`)) stopWatching();
-    }, 8000);
-  };
 
   const check = () => {
     if (document.querySelector(`.${CLS.statusBox}`)) startPolling();
     else if (detectLoginScreen()) update();
     else if (poller || strip || bgLayer || signinTabs || docRoot.hasAttribute('data-se-startup')) {
       resetStartupState();
-      scheduleIdleStop();
     }
   };
 
-  watcher = SE.watch(check);
+  // Kept for the window's life (sign-out or an account switch can show sign-in again later);
+  // throttled, and check() is two querySelector calls when nothing startup-related is up.
+  watcher = SE.watch(check, { throttle: 250 });
   check();
-  scheduleIdleStop();
 
   artSaveTimer = setTimeout(persistRecentArt, 15000);
 

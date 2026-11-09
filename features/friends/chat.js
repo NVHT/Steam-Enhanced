@@ -315,7 +315,8 @@
       if (!watcher) start();
     }
   };
-  const markWatcher = SE.watch(onAnyMutation);
+  // `class` too: entering Big Picture (GamepadMode) or the list toggle can change without new nodes.
+  const markWatcher = SE.watch(onAnyMutation, { attributes: ['class'] });
   onAnyMutation();
 
   window.__steamEnhancedChat = {
@@ -326,9 +327,14 @@
     },
     attachDocument(doc) {
       if (!doc || doc === document || attachedDocuments.has(doc)) return () => {};
-      const obs = new MutationObserver(schedule);
-      obs.observe(doc.body, { childList: true, subtree: true });
+      // The popup paints on its own frames: mark new dialogs before it can paint them unstyled.
+      const obs = new MutationObserver(() => {
+        markDialogs(doc);
+        schedule();
+      });
+      obs.observe(doc.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
       attachedDocuments.set(doc, obs);
+      markDialogs(doc);
       schedule();
       return () => {
         obs.disconnect();

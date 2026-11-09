@@ -860,7 +860,7 @@
       Boolean(chatRoot().querySelector('.MultiUserChat:not([data-activechat="false"])')) ||
       Boolean(run(() => dockTabs?.activeTab?.GetChatRoomGroup?.()) || run(() => dockTabs?.activeTab?.m_group)) ||
       Boolean(findGroup(activeChatFriend));
-    const key = [innerWidth, innerHeight, minimized, group, dock.dataset.mode, dock.isConnected].join('|');
+    const key = [innerWidth, innerHeight, minimized, group, dock.dataset.mode, dock.isConnected, dock.hidden].join('|');
     if (geometryCache?.key !== key) geometryCache = { key, value: measureChat(minimized, group) };
     return geometryCache.value;
   }
@@ -1037,9 +1037,9 @@
     entry.doc = doc;
     entry.node = node;
 
-    // The popup's title ends in "Menu", so only the `.*` patches reach it; scrollbars.css is one.
+    // Copied even when a `.*` patch may already reach the popup: a duplicate href is skipped below.
     for (const sheet of document.querySelectorAll('link[rel="stylesheet"]')) {
-      if (!/(?:shared\/(?:tokens|icons)|features\/friends\/(?:friends|chat|friends-dock))\.css(?:[?#]|$)/.test(sheet.href)) {
+      if (!/(?:shared\/(?:tokens|icons|scrollbars)|features\/friends\/(?:friends|chat|friends-dock))\.css(?:[?#]|$)/.test(sheet.href)) {
         continue;
       }
       if ([...doc.querySelectorAll('link[rel="stylesheet"]')].some((link) => link.href === sheet.href)) continue;

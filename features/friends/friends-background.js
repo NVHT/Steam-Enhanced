@@ -106,12 +106,12 @@
     for (const app of [...patchedApps.keys()]) {
       if (!reachableApps.has(app)) restoreApp(app);
     }
-    if (settled()) timer?.disconnect();
   };
 
   let timer = null;
   scanOwners();
-  if (!settled()) timer = SE.poll(scanOwners, 1000);
+  // Keeps checking (cheaply) after everything is patched: Steam can swap an app's UIStore later.
+  timer = SE.poll(scanOwners, settled() ? 2000 : 1000);
 
   window.__seFriendsBackground = {
     destroy() {

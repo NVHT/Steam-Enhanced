@@ -402,21 +402,17 @@
   };
 
   const requireCache = new WeakMap();
-  const chunkNames = new WeakMap();
 
   // webpack's require() for every bundle reachable from this window. A chunk array is only
   // probed once webpack has hooked its push, so no junk entries pile up before the runtime loads.
   const requires = () => {
     const list = [];
     for (const win of owners()) {
-      let names = chunkNames.get(win);
-      if (!names) {
-        try {
-          names = Object.getOwnPropertyNames(win).filter(k => k.startsWith('webpackChunk'));
-        } catch (_) {
-          continue;
-        }
-        if (names.length) chunkNames.set(win, names);
+      let names;
+      try {
+        names = Object.getOwnPropertyNames(win).filter(k => k.startsWith('webpackChunk'));
+      } catch (_) {
+        continue;
       }
       for (const globalName of names) {
         const chunks = win[globalName];
@@ -442,8 +438,10 @@
     const cached = moduleCache.get(key);
     if (cached && (cached.hit || performance.now() < cached.until)) return cached.value;
     let value = null;
+    let scanned = 0;
     outer: for (const req of requires()) {
       for (const id of Object.keys(req.m || {})) {
+        scanned++;
         let src;
         try {
           src = Function.prototype.toString.call(req.m[id]);
@@ -458,7 +456,8 @@
         if (value) break outer;
       }
     }
-    moduleCache.set(key, { value, hit: !!value, until: performance.now() + retry });
+    // Nothing to scan yet (webpack not hooked): don't remember that as a miss.
+    if (scanned) moduleCache.set(key, { value, hit: !!value, until: performance.now() + retry });
     return value;
   };
 
@@ -608,13 +607,27 @@
     (!sub.scope || verdict(sub.scope, node, inside(sub.scope))) &&
     !(sub.ignore && verdict(sub.ignore, node, sub.ignore));
 
+  // A scope root that mounts or unmounts is a change for that scope too: its parent, the
+  // record's target, sits outside it.
+  const touchesScope = (scope, record) => {
+    for (const list of [record.addedNodes, record.removedNodes]) {
+      for (const node of list) {
+        if (node.nodeType === 1 && (node.matches(scope) || node.querySelector(scope))) return true;
+      }
+    }
+    return false;
+  };
+
   const matchesSubscriber = (sub, record) => {
     const typeMatches =
       record.type === 'childList' ||
       (record.type === 'attributes'
         ? sub.attributes.includes(record.attributeName)
         : sub.characterData);
-    return typeMatches && relevant(sub, record.target);
+    if (!typeMatches) return false;
+    if (relevant(sub, record.target)) return true;
+    return !!sub.scope && record.type === 'childList' && !(sub.ignore && verdict(sub.ignore, record.target, sub.ignore)) &&
+      touchesScope(sub.scope, record);
   };
 
   const invokeSubscriber = sub => {
@@ -806,9 +819,9 @@
   const poll = (fn, delay, opts = {}) => {
     const doc = opts.document || document;
     const win = doc.defaultView;
-    // While inactive, check back no faster than the active rate (and at most every 1.5 s):
-    // the `active` test is usually a layout read. Watchers call refresh() to wake it sooner.
-    const idleInterval = Math.max(delay, Number(opts.idle) || 1500);
+    // While inactive, re-check `active` every 0.5-1.5 s (the old fixed 500 ms ran a layout read
+    // twice a second per poll). Watchers call refresh() to wake it sooner.
+    const idleInterval = Number(opts.idle) || Math.min(Math.max(delay, 500), 1500);
     let lastWake = 0;
     let timer = null;
     let stopped = false;
