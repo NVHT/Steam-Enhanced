@@ -358,16 +358,17 @@
    */
   const STEAM_PAGE_ID = /^(?:\/?settings\/)?account$/i;
   const STEAM_ACCOUNT = /^(account|konto|compte|cuenta|conta)$/i;
-  const steamLists = new WeakMap();
+  // Only a yes is kept: a list still filling in may not look like Steam Settings yet.
+  const steamLists = new WeakSet();
 
   function isSteamSettings(list, items) {
-    if (steamLists.has(list)) return steamLists.get(list);
+    if (steamLists.has(list)) return true;
     const pages = fromProps(list, 10, (p) => (Array.isArray(p.pages) ? p.pages : undefined));
     const byId = pages?.some((page) =>
       [page?.identifier, page?.route, page?.key, page?.name].some((v) => typeof v === 'string' && STEAM_PAGE_ID.test(v))
     );
     const steam = Boolean(byId) || items.some((i) => STEAM_ACCOUNT.test(pageNameOf(i))) || items.length >= 14;
-    if (items.length) steamLists.set(list, steam);
+    if (steam) steamLists.add(list);
     return steam;
   }
 

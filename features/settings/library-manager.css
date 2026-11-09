@@ -105,8 +105,8 @@
 }
 
 .se-lmx-ib:focus-visible {
-  outline: 2px solid var(--se-accent-strong, rgba(124, 196, 255, .55));
-  outline-offset: 1px;
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-lmx-ib svg {
@@ -209,8 +209,9 @@
 }
 
 .se-lmx-item:focus-visible {
-  outline: 2px solid var(--se-accent-strong, rgba(124, 196, 255, .55));
-  outline-offset: -2px;
+  /* Inset: the list scrolls and would clip a ring drawn outside */
+  outline: var(--se-focus-outline);
+  outline-offset: calc(-1 * var(--se-focus-offset));
 }
 
 .se-lmx-name {
