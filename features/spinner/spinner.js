@@ -15,9 +15,7 @@
   const MIN_CARD_SPINNER_PX = 40;
   const BASE_BOX_HEIGHT = 84;
   const STARTUP_SELECTOR = `html[data-se-startup] .${SE.C.SpinnerLoaderContainer}`;
-  const ART_STORAGE_KEY = 'se-startup-art';
   const FALLBACK_WALL = '/images/client_login_bg_grid.jpg';
-  const WALL_CROPS = ['18% 22%', '78% 64%', '46% 88%', '8% 70%', '62% 12%', '92% 34%'];
   const docRoot = document.documentElement;
 
   const activeKind = () => {
@@ -25,64 +23,27 @@
     return val === 'steam' || KINDS[val] ? val : DEFAULT_KIND;
   };
 
+  // Recent covers and the wall crops come from startup.js (loaded before this file, same windows).
+  const startupArt = () => window.__steamEnhancedStartup?.art;
+  const toCssUrl = url => startupArt()?.cssUrl(url) ?? `url("${url}")`;
+
   let coverCache = { at: 0, list: [] };
 
-  const resolveRecentCovers = () => {
+  const recentCovers = () => {
     if (Date.now() - coverCache.at < 60000) return coverCache.list;
-    let list = [];
-
-    for (const win of SE.owners()) {
-      let hostWin = null;
-      try {
-        hostWin = win.appStore?.allApps ? win : null;
-      } catch (_) {}
-      if (!hostWin) continue;
-
-      const isHidden = appid => SE.run(() => hostWin.collectionStore.BIsHidden(appid)) || false;
-      const recentApps =
-        SE.run(() =>
-          hostWin.appStore.allApps
-            .filter(
-              app =>
-                app &&
-                app.rt_last_time_played > 0 &&
-                (app.app_type === 1 || app.app_type === 1073741824) &&
-                app.visible_in_game_list !== false &&
-                !isHidden(app.appid)
-            )
-            .sort((a, b) => b.rt_last_time_played - a.rt_last_time_played)
-            .slice(0, 8)
-        ) || [];
-
-      list = recentApps.map(app => SE.coverURLs(app, hostWin.appStore)).filter(urls => urls.length);
-      break;
-    }
-
-    if (!list.length) {
-      try {
-        const cached = JSON.parse(localStorage.getItem(ART_STORAGE_KEY) || 'null');
-        list = (cached?.games || []).map(g => g.cover).filter(urls => urls?.length);
-      } catch (_) {
-        list = [];
-      }
-    }
-
-    coverCache = { at: Date.now(), list };
-    return list;
+    const games = startupArt()?.recentGames() || [];
+    coverCache = { at: Date.now(), list: games.map(g => g.cover).filter(urls => urls?.length) };
+    return coverCache.list;
   };
-
-  const toCssUrl = url => `url("${String(url).replace(/["\\\n]/g, ch => encodeURIComponent(ch))}")`;
 
   // Stack candidate capsule URLs above a cropped slice of Steam's login grid as fallback.
   const applyCardBackground = (card, index) => {
-    const covers = resolveRecentCovers();
+    const covers = recentCovers();
     const urls = covers.length ? covers[index % covers.length] : [];
+    const crops = startupArt()?.WALL_CROPS || ['center'];
     card.style.backgroundImage = [...urls.map(toCssUrl), toCssUrl(FALLBACK_WALL)].join(', ');
     card.style.backgroundSize = [...urls.map(() => 'cover'), '900px auto'].join(', ');
-    card.style.backgroundPosition = [
-      ...urls.map(() => 'center'),
-      WALL_CROPS[index % WALL_CROPS.length],
-    ].join(', ');
+    card.style.backgroundPosition = [...urls.map(() => 'center'), crops[index % crops.length]].join(', ');
   };
 
   const buildSpinner = kind => {
@@ -121,13 +82,8 @@
     return container;
   };
 
-  const mountSpinner = holder => {
-    let kind = activeKind();
-    if (kind === 'steam') return;
-
-    const isStartup = holder.matches(STARTUP_SELECTOR);
-    // In-page sweep spinners are handled purely via CSS mask replacement on .SteamLogoThrobber.
-    if (kind === 'sweep' && !isStartup) return;
+  const mountSpinner = (holder, isStartup) => {
+    let kind = cachedKind;
 
     const firstChild = holder.firstElementChild;
     const height = isStartup
@@ -157,17 +113,18 @@
       cachedKind = activeKind();
     }
     SE.mark(docRoot, 'data-se-spinner-kind', cachedKind);
+    if (cachedKind === 'steam') return;
 
-    const targets = [];
-    for (const el of liveThrobbers) {
-      if (!el.hasAttribute('data-se-spinner')) targets.push(el);
-    }
     if (docRoot.hasAttribute('data-se-startup')) {
-      targets.push(
-        ...document.querySelectorAll(`.${SE.C.SpinnerLoaderContainer}:not([data-se-spinner])`)
-      );
+      for (const holder of document.querySelectorAll(`${STARTUP_SELECTOR}:not([data-se-spinner])`)) {
+        mountSpinner(holder, true);
+      }
     }
-    for (const holder of targets) mountSpinner(holder);
+    // In-page sweep spinners are drawn by CSS alone (spinner.css) and never need a node.
+    if (cachedKind === 'sweep') return;
+    for (const el of [...liveThrobbers]) {
+      if (!el.hasAttribute('data-se-spinner') && !el.matches(STARTUP_SELECTOR)) mountSpinner(el, false);
+    }
   };
 
   const watcher = SE.watch(scan);
@@ -180,6 +137,7 @@
         SE.unmark(el.parentNode, 'data-se-spinner');
         el.remove();
       }
+      SE.unmark(docRoot, 'data-se-spinner-kind');
     },
   };
 });

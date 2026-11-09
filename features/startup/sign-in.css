@@ -296,7 +296,7 @@ html[data-se-login="chooser"] .se-startup-bg::after {
 }
 
 [data-se-si="button"]:not(#se-none):hover:not(:disabled) {
-  background: #9ad2ff;
+  background: var(--se-accent-hover, #9ad2ff);
 }
 
 [data-se-si="button"]:not(#se-none):focus-visible {
@@ -366,16 +366,19 @@ html[data-se-login="chooser"] .se-startup-bg::after {
   border-radius: 12px;
 }
 
+/*
+ * The scan line: the line is the top 2 px of a box that spans the travel (the tile less 30 px),
+ * so it moves by transform (its own height) instead of animating top.
+ */
 [data-se-si="qr-tile"]::after {
   content: "";
   position: absolute;
   left: 8px;
   right: 8px;
   top: 14px;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--se-accent);
-  box-shadow: 0 0 12px 2px color-mix(in srgb, var(--se-accent) 60%, transparent);
+  height: calc(100% - 30px);
+  background: linear-gradient(var(--se-accent), var(--se-accent)) top / 100% 2px no-repeat;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--se-accent) 60%, transparent));
   pointer-events: none;
   z-index: 2;
   animation: se-signin-scan 3.2s ease-in-out infinite;
@@ -389,10 +392,10 @@ html[data-se-login="chooser"] .se-startup-bg::after {
 @keyframes se-signin-scan {
   0%,
   100% {
-    top: 14px;
+    transform: translateY(0);
   }
   50% {
-    top: calc(100% - 16px);
+    transform: translateY(100%);
   }
 }
 

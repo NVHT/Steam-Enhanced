@@ -15,15 +15,15 @@
   const BODY = '._32eeZuly3nnz3cMXdSgyj9';
   const LABEL = '._2yhBdvNsgdBGL_UjfmTDGH';
   const BUILT = 'data-se-about';
-  const FALLBACK_VERSION = '1.92.11';
   const AUTHOR = 'NVHT';
   const TAGLINE = 'The Steam you always wanted.';
   const COPIED_MS = 1400;
 
-  let themeVersion = FALLBACK_VERSION;
-  let copiedTimer = 0;
+  let themeVersion = '';
+  let versionRequest = null;
+  const flashes = new Map();
 
-  /* Steam lists: beta branch, version, client build, web build, API version. */
+  /* Each fact is a label span followed by loose text up to the next <br>. */
   const readFacts = body => {
     const facts = [];
     let current = null;
@@ -40,6 +40,32 @@
     return facts.filter(fact => fact.label);
   };
 
+  /*
+   * Steam lists: beta branch (only when on a beta), client version, client build date, web build
+   * date, API version. Labels are localised, so English labels are tried first and the list's
+   * order is the fallback.
+   */
+  const FACT_LABELS = {
+    branch: /beta|branch/i,
+    api: /\bapi\b/i,
+    web: /\bweb\b/i,
+    client: /build|date/i,
+    version: /version/i,
+  };
+
+  const classifyFacts = facts => {
+    const byKey = {};
+    const rest = [];
+    for (const fact of facts) {
+      const key = Object.keys(FACT_LABELS).find(k => !byKey[k] && FACT_LABELS[k].test(fact.label));
+      if (key) byKey[key] = fact;
+      else rest.push(fact);
+    }
+    if (!rest.length) return byKey;
+    const order = facts.length >= 5 ? ['branch', 'version', 'client', 'web', 'api'] : ['version', 'client', 'web', 'api'];
+    return Object.fromEntries(order.map((key, i) => [key, facts[i]]));
+  };
+
   /* "Wed, Oct 21, 2026 4:11 PM UTC -07:00" -> { main: "Oct 21, 2026", sub: "4:11 PM" } */
   const splitDate = value => {
     const match = value.match(/^(?:[^\d,]+,\s*)?(.*?\d{4})\s+(.+?)(?:\s+UTC.*)?$/);
@@ -48,18 +74,22 @@
 
   const shortLabel = label => label.replace(/^Steam\s+/i, '');
 
-  /* The skin's own manifest is the source of the version; the constant covers a failed fetch. */
-  const loadThemeVersion = async () => {
-    const asset = [...document.querySelectorAll('link[href], script[src]')]
-      .map(el => el.href || el.src)
-      .find(url => /\/shared\/(?:tokens\.css|core\.js)(?:[?#]|$)/.test(url));
-    if (!asset) return;
-    try {
-      const response = await fetch(new URL('../skin.json', asset), { cache: 'no-store' });
-      const version = (await response.json())?.version;
-      if (typeof version === 'string' && version) themeVersion = version;
-    } catch (_) {}
-  };
+  const versionText = () => (themeVersion ? `v${themeVersion} · by ${AUTHOR}` : '');
+
+  /* The skin's own manifest is the source of the version: read once, when the dialog first opens. */
+  const loadThemeVersion = () =>
+    (versionRequest ||= (async () => {
+      const asset = [...document.querySelectorAll('link[href], script[src]')]
+        .map(el => el.href || el.src)
+        .find(url => /\/shared\/(?:tokens\.css|core\.js)(?:[?#]|$)/.test(url));
+      if (!asset) return;
+      try {
+        const response = await fetch(new URL('../skin.json', asset), { cache: 'no-store' });
+        const version = (await response.json())?.version;
+        if (typeof version === 'string' && version) themeVersion = version;
+      } catch (_) {}
+      for (const node of document.querySelectorAll('.se-about-version')) node.textContent = versionText();
+    })());
 
   const copyText = async text => {
     try {
@@ -76,16 +106,23 @@
     area.remove();
   };
 
+  // button -> { timer, hint, text }: each keeps its own original text, so quick clicks never stick.
+  const restoreCopied = button => {
+    const flash = flashes.get(button);
+    if (!flash) return;
+    clearTimeout(flash.timer);
+    flashes.delete(button);
+    button.removeAttribute('data-copied');
+    flash.hint.textContent = flash.text;
+  };
+
   const flashCopied = (button, hint) => {
-    const previous = hint.textContent;
-    clearTimeout(copiedTimer);
-    for (const node of document.querySelectorAll(`[${BUILT}] [data-copied]`)) node.removeAttribute('data-copied');
+    for (const other of [...flashes.keys()]) if (other !== button) restoreCopied(other);
+    const text = flashes.get(button)?.text ?? hint.textContent;
+    clearTimeout(flashes.get(button)?.timer);
     button.setAttribute('data-copied', '');
     hint.textContent = 'Copied';
-    copiedTimer = setTimeout(() => {
-      button.removeAttribute('data-copied');
-      hint.textContent = previous;
-    }, COPIED_MS);
+    flashes.set(button, { hint, text, timer: setTimeout(() => restoreCopied(button), COPIED_MS) });
   };
 
   const el = (tag, className, text) => {
@@ -100,7 +137,7 @@
     button.type = 'button';
     button.append(...children);
     button.addEventListener('click', () => {
-      copyText(copyValue);
+      copyText(typeof copyValue === 'function' ? copyValue() : copyValue);
       flashCopied(button, hint);
     });
     return button;
@@ -110,7 +147,7 @@
     const brand = el('div', 'se-about-brand');
     const name = el('div', 'se-about-name');
     name.append(el('span', 'se-about-name-steam', 'Steam'), ' Enhanced');
-    const version = el('div', 'se-about-version', `v${themeVersion} · by ${AUTHOR}`);
+    const version = el('div', 'se-about-version', versionText());
     brand.append(el('div', 'se-about-logo'), name, version, el('div', 'se-about-tagline', TAGLINE));
     return brand;
   };
@@ -119,7 +156,7 @@
     const main = el('div', 'se-about-main');
     main.append(el('div', 'se-about-title', title));
 
-    const [branch, version, client, web, api] = facts;
+    const { branch, version, client, web, api } = classifyFacts(facts);
     if (version) {
       const hint = el('span', 'se-about-hint', 'Click to copy');
       const text = el('span', 'se-about-hero-text');
@@ -147,7 +184,8 @@
   };
 
   const buildCopyAll = facts => {
-    const text = [`Steam Enhanced ${themeVersion}`, ...facts.map(fact => `${fact.label}: ${fact.value}`)].join('\n');
+    const text = () =>
+      [`Steam Enhanced ${themeVersion}`.trim(), ...facts.map(fact => `${fact.label}: ${fact.value}`)].join('\n');
     const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     icon.setAttribute('viewBox', '0 0 24 24');
     icon.setAttribute('aria-hidden', 'true');
@@ -172,6 +210,7 @@
     for (const node of [brand, main, copyAll]) node.classList.add('se-about');
     inner.append(brand, main, copyAll);
     SE.mark(dialog, BUILT);
+    loadThemeVersion();
   };
 
   const scan = () => {
@@ -184,16 +223,11 @@
 
   const watcher = SE.watch(scan, { throttle: 100 });
   scan();
-  loadThemeVersion().then(() => {
-    for (const node of document.querySelectorAll('.se-about-version')) {
-      node.textContent = `v${themeVersion} · by ${AUTHOR}`;
-    }
-  });
 
   window.__steamEnhancedAboutSteam = {
     destroy() {
       watcher.disconnect();
-      clearTimeout(copiedTimer);
+      for (const button of [...flashes.keys()]) restoreCopied(button);
       document.querySelectorAll('.se-about').forEach(node => node.remove());
       document.querySelectorAll(`[${BUILT}]`).forEach(node => SE.unmark(node, BUILT));
       delete window.__steamEnhancedAboutSteam;

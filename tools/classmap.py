@@ -4,7 +4,8 @@ Usage:
   python3 classmap.py build   <STEAM_SRC> <THEME_DIR>
       Rebuild shared/core.js class map and tools/classmap.json from active hashes.
   python3 classmap.py convert <THEME_DIR>
-      Replace raw hash string literals in feature JS files with SE.C.<Key> lookups.
+      Replace raw hash string literals in feature JS files with class map lookups:
+      C.<Key> where the file destructures C, SE.C.<Key> otherwise.
   python3 classmap.py rehash  <NEW_STEAM_SRC> <THEME_DIR>
       Match recorded classes against new Steam bundles by module similarity and
       update hashes in shared/core.js, CSS files, and tools/classmap.json.
@@ -21,7 +22,10 @@ import steamclasses as sc
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATE = os.path.join(HERE, 'classmap.json')
-HASH = re.compile(r'(?<![\w$-])-?[_a-zA-Z][\w-]{16,25}(?![\w-])')
+# Same length range as steamclasses.HASH_RE, so every indexed class can be found in the theme
+HASH = re.compile(r'(?<![\w$-])-?[_a-zA-Z][\w-]{16,26}(?![\w-])')
+# `const { C } = SE` or a destructured `{ C, ... }` parameter: the file can use bare C.<Key>
+C_BINDING = re.compile(r'[{,]\s*C\s*[,}]')
 GENERIC = {
     'Container', 'Active', 'Name', 'Header', 'Icon', 'Label', 'Text', 'Title',
     'Hidden', 'Visible', 'Loading', 'Wrapper', 'Content', 'Selected', 'Disabled',
@@ -51,6 +55,20 @@ def js_files(theme):
 
 def css_files(theme):
     return sorted(str(p) for p in Path(theme).rglob('*.css'))
+
+
+def module_list(mods, by, hashes):
+    """Module key lists for the given hashes, numbered in first-use order."""
+    modules, mod_id = [], {}
+
+    def get_mod_id(h):
+        idx = by[h][0]
+        if idx not in mod_id:
+            mod_id[idx] = len(modules)
+            modules.append(sorted(mods[idx].keys()))
+        return mod_id[idx]
+
+    return modules, get_mod_id
 
 
 def module_label(keys, name, taken=()):
@@ -84,12 +102,6 @@ def build(src, theme):
             continue
         for h in HASH.findall(Path(f).read_text(encoding='utf-8')):
             if sc.is_hash(h) and h in by:
-                used.add(h)
-
-    if os.path.exists(STATE):
-        saved = json.loads(Path(STATE).read_text(encoding='utf-8')).get('classes', {})
-        for h, info in saved.items():
-            if h in by and info.get('core', True):
                 used.add(h)
 
     for f in css_files(theme):
@@ -133,15 +145,7 @@ def build(src, theme):
             key_of[h] = key
             taken.add(key)
 
-    modules, mod_id = [], {}
-
-    def get_mod_id(h):
-        idx = by[h][0]
-        if idx not in mod_id:
-            mod_id[idx] = len(modules)
-            modules.append(sorted(mods[idx].keys()))
-        return mod_id[idx]
-
+    modules, get_mod_id = module_list(mods, by, used | css_used)
     state = {'modules': modules, 'classes': {}}
     for h in sorted(used):
         state['classes'][h] = {'key': key_of[h], 'name': by[h][1], 'module': get_mod_id(h), 'core': True}
@@ -280,6 +284,7 @@ def convert(theme):
 
     for f in js_files(theme):
         src = Path(f).read_text(encoding='utf-8')
+        ref = 'C.' if C_BINDING.search(src) else 'SE.C.'
         out, last, count = [], 0, 0
         for kind, start, end in tokens(src):
             lit = src[start:end]
@@ -287,18 +292,18 @@ def convert(theme):
                 continue
             body, quote = lit[1:-1], lit[0]
             if kind == 'str' and body in keymap:
-                replacement = f'C.{keymap[body]}'
+                replacement = f'{ref}{keymap[body]}'
             elif kind == 'str':
                 if '`' in body or '${' in body:
                     continue
                 body = body.replace("\\'", "'") if quote == "'" else body.replace('\\"', '"')
                 replacement = '`' + HASH.sub(
-                    lambda m: '${C.' + keymap[m.group(0)] + '}' if m.group(0) in keymap else m.group(0),
+                    lambda m: '${' + ref + keymap[m.group(0)] + '}' if m.group(0) in keymap else m.group(0),
                     body,
                 ) + '`'
             else:
                 replacement = HASH.sub(
-                    lambda m: '${C.' + keymap[m.group(0)] + '}' if m.group(0) in keymap else m.group(0),
+                    lambda m: '${' + ref + keymap[m.group(0)] + '}' if m.group(0) in keymap else m.group(0),
                     lit,
                 )
             out.append(src[last:start])
@@ -349,9 +354,19 @@ def rehash(new_src, theme):
 
     missing_str = ', '.join(k or h for k, h in lost) or '-'
     print(f'{len(moves)} classes updated; {len(lost)} unresolved: {missing_str}')
-    if moves:
-        full['classes'] = {moves.get(h, h): v for h, v in state.items()}
-        save(full)
+    if not moves:
+        return
+    # Module key lists come from the new bundles, so the next rehash compares against them;
+    # unresolved classes keep the lists they were recorded with
+    classes = {moves.get(h, h): dict(v) for h, v in state.items()}
+    modules, get_mod_id = module_list(mods, by, set(classes))
+    for h, info in classes.items():
+        if h in by:
+            info['module'] = get_mod_id(h)
+        else:
+            modules.append(old_mods[info['module']])
+            info['module'] = len(modules) - 1
+    save({'modules': modules, 'classes': classes})
 
 
 if __name__ == '__main__':

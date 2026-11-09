@@ -84,9 +84,15 @@ def build(logo_href):
 
 def main(theme):
     css_path = Path(theme) / 'features' / 'spinner' / 'spinner.css'
+    mark_path = Path(theme) / 'branding' / 'mark.png'
+    for path in (css_path, mark_path):
+        if not path.is_file():
+            sys.exit(f'spinner_svg: {path} not found (is {theme} the theme folder?)')
     css = css_path.read_text(encoding='utf-8')
     token = re.search(r'(--se-spinner-image: url\("data:image/svg\+xml;base64,)([A-Za-z0-9+/=]+)("\))', css)
-    mark = (Path(theme) / 'branding' / 'mark.png').read_bytes()
+    if not token:
+        sys.exit(f'spinner_svg: no --se-spinner-image: url("data:image/svg+xml;base64,...") in {css_path}')
+    mark = mark_path.read_bytes()
     logo = 'data:image/png;base64,' + base64.b64encode(mark).decode('ascii')
     encoded = base64.b64encode(build(logo).encode('utf-8')).decode('ascii')
     css_path.write_text(css[: token.start(2)] + encoded + css[token.end(2):], encoding='utf-8')

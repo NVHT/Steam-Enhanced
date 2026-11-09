@@ -10,7 +10,8 @@
 (window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
   window.__steamEnhancedHoverCards?.destroy();
 
-  const LINE = '._1VGPO4xU5sgRK6DFt4t74O > div:not(.MIHa_O-B1JXrzkoGc255n)';
+  const PLAYTIME = '._1VGPO4xU5sgRK6DFt4t74O';
+  const LINE = `${PLAYTIME} > div:not(.MIHa_O-B1JXrzkoGc255n)`;
   const SPLIT = /^(.*\S)\s*[:：]\s*(\S.*)$/s;
   const ATTRS = ['data-se-src', 'data-se-label', 'data-se-value'];
 
@@ -35,8 +36,15 @@
     for (const el of document.querySelectorAll(LINE)) split(el);
   };
 
+  // Only mutations that add or touch a card's playtime block count: the main window's text
+  // changes (download speeds, timers) would otherwise rescan the whole document every frame.
+  const inPlaytime = SE.inside(PLAYTIME);
+  const touchesPlaytime = record =>
+    inPlaytime(record.target) ||
+    [...record.addedNodes].some(node => node.nodeType === 1 && (node.matches(PLAYTIME) || node.querySelector(PLAYTIME)));
+
   // Text updates matter too: the hover re-renders its lines in place when playtime loads.
-  const watcher = SE.watch(scan, { characterData: true });
+  const watcher = SE.watch(records => records.some(touchesPlaytime) && scan(), { characterData: true, records: true });
   scan();
 
   window.__steamEnhancedHoverCards = {

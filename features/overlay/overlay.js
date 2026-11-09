@@ -21,10 +21,11 @@
   const ATTR = 'data-se-ov';
   const LOGO_ATTR = 'data-se-ov-logo';
   const TICK_MS = 1000;
+  const { C } = SE;
   const SEL = Object.freeze({
-    timeStats: '.fi6UDkxJq66MLo2z9wabQ .vCykYvbW9JAoUuOZK3L8M',
-    logo: '.iu7jaxFxWk1sYge_kwKmz._3KwfoP3QLtY80hx0gtZBZ4 img',
-    backToGame: '.fi6UDkxJq66MLo2z9wabQ .mh8m9p4PBg_Qrev1bfTzc',
+    timeStats: `.${C.AchievementContent_TopSection} .${C.TimeStats}`,
+    logo: `.${C.TopSectionMiddle}.${C.ShowGameLogo} img`,
+    backToGame: `.${C.AchievementContent_TopSection} .${C.BackToGameBtn}`,
   });
   const ICON = Object.freeze({
     play: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.6v10.8a.6.6 0 0 0 .9.5l8.6-5.4a.6.6 0 0 0 0-1L4.9 2.1a.6.6 0 0 0-.9.5z"/></svg>',
@@ -51,18 +52,12 @@
     return null;
   };
 
-  // Walk Steam's webpack modules whose source contains every marker, and
-  // return the first export `pick` accepts. Source scans are costly, so
-  // callers cache the result.
-  const findExport = (markers, pick) => {
-    for (const req of SE.requires()) {
-      for (const [id, factory] of Object.entries(req.m || {})) {
-        const src = SE.run(() => Function.prototype.toString.call(factory)) || '';
-        if (!markers.every(marker => src.includes(marker))) continue;
-        for (const value of Object.values(SE.run(() => req(id)) || {})) {
-          if (SE.run(() => pick(value))) return value;
-        }
-      }
+  // The first export of a module whose source has every marker that `pick` accepts. Used
+  // inside SE.findModule tests, which own the scan and cache its result.
+  const exportOf = (src, id, req, markers, pick) => {
+    if (!markers.every(marker => src.includes(marker))) return null;
+    for (const value of Object.values(SE.run(() => req(id)) || {})) {
+      if (SE.run(() => pick(value))) return value;
     }
     return null;
   };
@@ -88,14 +83,7 @@
 
   const desktopOverlay = () => SE.run(() => findInstance()?.DesktopOverlay) || null;
 
-  const overviewOf = appid => {
-    if (!appid) return null;
-    for (const win of SE.owners()) {
-      const app = SE.run(() => win.appStore?.GetAppOverviewByAppID(appid));
-      if (app) return app;
-    }
-    return null;
-  };
+  const overviewOf = appid => (appid ? SE.run(() => SE.appStore()?.GetAppOverviewByAppID(appid)) || null : null);
 
   const readStats = () => {
     const ov = desktopOverlay();
@@ -124,7 +112,8 @@
   // Steam's own overlay path for a friend's chat: the chat window opens in
   // this overlay (and still goes through the theme's chat routing).
   const openChat = steamid64 => {
-    const accountId = Number(BigInt(steamid64) & 0xffffffffn);
+    const accountId = SE.run(() => Number(BigInt(steamid64) & 0xffffffffn));
+    if (!accountId) return;
     const browserInfo = SE.run(() => findInstance().params.browserInfo);
     const friend = SE.run(() => contextGlobal('g_FriendsUIApp').FriendStore.GetFriend(accountId));
     if (friend && browserInfo) SE.run(() => friend.OpenChatDialog(browserInfo));
@@ -134,11 +123,13 @@
 
   const LOAD_TIMEOUT_MS = 10_000;
 
-  const withTimeout = promise =>
-    Promise.race([
-      promise,
-      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), LOAD_TIMEOUT_MS)),
-    ]);
+  const withTimeout = promise => {
+    let timer = 0;
+    const timeout = new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error('timeout')), LOAD_TIMEOUT_MS);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+  };
 
   // One entry per key: keeps the last good value, refreshes after `ttl`, and
   // backs off by `retry` after a failure or a call that never answers.
@@ -183,7 +174,6 @@
 
   const ACH_ROWS = 3;
   const EOK = 1;
-  const STORE_RETRY_MS = 30_000;
 
   // Same maths as Steam's own progress bars: current / max, from zero.
   const progressOf = a => Math.min(1, Math.max(0, Math.min(a.flCurrentProgress, a.flMaxProgress) / a.flMaxProgress));
@@ -216,19 +206,12 @@
 
   // Steam's AchievementStore: the source of Game Overview's achievements. It
   // caches per game and reloads itself when an achievement unlocks.
-  let achievementStore = null;
-  let storeRetryAt = 0;
   const summaries = new WeakMap();
 
-  const resolveAchievementStore = () => {
-    if (achievementStore || Date.now() < storeRetryAt) return achievementStore;
-    storeRetryAt = Date.now() + STORE_RETRY_MS;
-    achievementStore = findExport(
-      ['GetMyAchievementsForApp', 'm_mapMyAchievements'],
-      value => typeof value?.GetMyAchievements === 'function'
+  const resolveAchievementStore = () =>
+    SE.findModule('overlay:achievement-store', (src, id, req) =>
+      exportOf(src, id, req, ['GetMyAchievementsForApp', 'm_mapMyAchievements'], value => typeof value?.GetMyAchievements === 'function')
     );
-    return achievementStore;
-  };
 
   // undefined while loading, null when the game has none.
   const achievementsFromStore = (store, appid) => {
@@ -259,26 +242,32 @@
   const AVATARS_MAX = 24;
 
   // Player.GetFriendsGameplayInfo, the service call behind Steam's "Friends who
-  // have played recently". Resolved once from Steam's webpack modules by shape.
-  let gameplayApi;
-
-  const resolveGameplayApi = () => {
-    if (gameplayApi !== undefined) return gameplayApi;
-    const service = findExport(['Player.GetFriendsGameplayInfo#1'], value => typeof value?.GetFriendsGameplayInfo === 'function');
-    const Request = findExport(
+  // have played recently": its service, request class and message class, found by
+  // shape in one pass over Steam's webpack modules.
+  const GAMEPLAY_PARTS = Object.freeze({
+    service: [['Player.GetFriendsGameplayInfo#1'], value => typeof value?.GetFriendsGameplayInfo === 'function'],
+    Request: [
       ['CPlayer_GetFriendsGameplayInfo_Request'],
-      value => typeof value === 'function' && value.prototype.getClassName() === 'CPlayer_GetFriendsGameplayInfo_Request'
-    );
-    const Message = findExport(
+      value => typeof value === 'function' && value.prototype.getClassName() === 'CPlayer_GetFriendsGameplayInfo_Request',
+    ],
+    Message: [
       ['InitFromPacket', 'SerializeBody'],
       value =>
         typeof value?.Init === 'function' &&
         typeof value.InitFromPacket === 'function' &&
         typeof value.prototype?.Body === 'function' &&
-        typeof value.prototype?.Hdr === 'function'
-    );
-    gameplayApi = Message && Request && service ? { Message, Request, service } : null;
-    return gameplayApi;
+        typeof value.prototype?.Hdr === 'function',
+    ],
+  });
+
+  const resolveGameplayApi = () => {
+    const found = {};
+    return SE.findModule('overlay:gameplay-api', (src, id, req) => {
+      for (const [part, [markers, pick]] of Object.entries(GAMEPLAY_PARTS)) {
+        if (!found[part]) found[part] = exportOf(src, id, req, markers, pick);
+      }
+      return found.service && found.Request && found.Message ? found : null;
+    });
   };
 
   const loadRecentPlayers = async appid => {
@@ -499,8 +488,7 @@
 
   const dateFormat = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
 
-  const renderAchievements = part => {
-    const appid = readStats().appid;
+  const renderAchievements = (part, appid) => {
     const store = appid ? resolveAchievementStore() : null;
     const data = !appid ? null : store ? achievementsFromStore(store, appid) : achievementsCache.get(appid);
     const visible = !!data && data.total > 0;
@@ -566,7 +554,7 @@
   };
 
   const renderOverview = (overview, appid) => {
-    renderAchievements(overview.achievements);
+    renderAchievements(overview.achievements, appid);
     renderAvatars(overview.inGame, appid ? friendsInGame(appid) : []);
     renderAvatars(overview.recent, appid ? friendsPlayedRecently(appid, recentCache.get(appid)) : []);
   };

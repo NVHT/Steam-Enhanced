@@ -7,9 +7,10 @@
  * client is set to. The top-left column gains a game card and Achievements
  * and Friends sections (built by `overlay.js`).
  *
- * Every rule is gated on `html[data-se-ov]`, which `overlay.js` sets while
- * `--se-overlay` is not `off`. Keyboard-only and pinned-preview states keep
- * Steam's own presentation.
+ * Rules on Steam's markup are gated on `html[data-se-ov]`, which `overlay.js`
+ * sets while `--se-overlay` is not `off`; the `.se-ov-*` elements only exist
+ * while it is set. Keyboard-only and pinned-preview states keep Steam's own
+ * presentation.
  *
  * Overlay buttons are DialogButtons, so the global `button.DialogButton:not(#se-none)`
  * skin in `features/dialogs/dialogs.css` (specificity 1,1,1) would win; button
@@ -169,7 +170,7 @@ html[data-se-ov] .se-ov-card {
 }
 
 .se-ov-stat-label {
-  color: #a9b6c4;
+  color: var(--se-text-dim, #b8c0c8);
   font: 700 14px/18px var(--se-font), 'Motiva Sans', sans-serif;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -214,11 +215,11 @@ html[data-se-ov] .se-ov-back {
   color: var(--se-bg-ink, #0f1115);
   font: 600 13px/1 var(--se-font), 'Motiva Sans', sans-serif;
   cursor: pointer;
-  transition: background-color 0.15s ease-out;
+  transition: background-color var(--se-dur) ease-out;
 }
 
 html[data-se-ov] .se-ov-back:hover {
-  background: #9ad2ff;
+  background: color-mix(in srgb, #fff 25%, var(--se-accent, #7cc4ff));
 }
 
 html[data-se-ov] .se-ov-back:active {
@@ -226,8 +227,8 @@ html[data-se-ov] .se-ov-back:active {
 }
 
 html[data-se-ov] .se-ov-back:focus-visible {
-  outline: 2px solid var(--se-accent, #7cc4ff);
-  outline-offset: 2px;
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-ov-back svg {
@@ -253,7 +254,7 @@ html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .BoygotvcKo4DC4dSix8G3:not(#se-none) {
   font: 600 13px/1 var(--se-font), 'Motiva Sans', sans-serif !important;
   letter-spacing: 0 !important;
   text-transform: none !important;
-  transition: background-color 0.15s ease-out, color 0.15s ease-out !important;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out !important;
 }
 
 html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .BoygotvcKo4DC4dSix8G3:not(#se-none):hover {
@@ -293,7 +294,7 @@ html[data-se-ov] .se-ov-overview {
 }
 
 .se-ov-sec-label {
-  color: #a9b6c4;
+  color: var(--se-text-dim, #b8c0c8);
   font: 700 13px/18px var(--se-font), 'Motiva Sans', sans-serif;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -314,7 +315,7 @@ html[data-se-ov] .se-ov-sec-link {
   font: 600 13px/1 var(--se-font), 'Motiva Sans', sans-serif;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
-  transition: background-color 0.15s ease-out, color 0.15s ease-out;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
 }
 
 html[data-se-ov] .se-ov-sec-link:hover {
@@ -323,8 +324,8 @@ html[data-se-ov] .se-ov-sec-link:hover {
 }
 
 html[data-se-ov] .se-ov-sec-link:focus-visible {
-  outline: 2px solid var(--se-accent, #7cc4ff);
-  outline-offset: 1px;
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-ov-sec-link svg {
@@ -425,7 +426,7 @@ html[data-se-ov] .se-ov-avatar {
   background: var(--se-surface-2, #262c35);
   box-shadow: 0 0 0 2px rgb(var(--se-ov-ink)), 0 0 0 4px var(--se-ov-ring);
   cursor: pointer;
-  transition: box-shadow 0.15s ease-out;
+  transition: box-shadow var(--se-dur) ease-out;
 }
 
 html[data-se-ov] .se-ov-avatar[data-status='online'] {
@@ -452,7 +453,7 @@ html[data-se-ov] .se-ov-avatar[data-status='online'][data-away] {
   height: 100%;
   border-radius: var(--se-avatar-radius, 23%);
   object-fit: cover;
-  transition: filter 0.15s ease-out, opacity 0.15s ease-out;
+  transition: filter var(--se-dur) ease-out, opacity var(--se-dur) ease-out;
 }
 
 .se-ov-avatar[data-status='offline'] img {
@@ -473,9 +474,10 @@ html[data-se-ov] .se-ov-avatar[data-away]:hover {
   box-shadow: none;
 }
 
+/* Offset past the 4px status ring */
 html[data-se-ov] .se-ov-avatar:focus-visible {
-  outline: 2px solid var(--se-accent, #7cc4ff);
-  outline-offset: 5px;
+  outline: var(--se-focus-outline);
+  outline-offset: calc(var(--se-focus-offset) + 3px);
 }
 
 html[data-se-ov] .se-ov-avatar-more {
@@ -531,7 +533,7 @@ html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .mh8m9p4PBg_Qrev1bfTzc:not(#se-none) {
   background: var(--se-surface-2, #262c35) !important;
   box-shadow: none !important;
   color: var(--se-text, #e6e8eb) !important;
-  transition: background-color 0.12s ease, color 0.12s ease !important;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out !important;
 }
 
 html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ .mh8m9p4PBg_Qrev1bfTzc:not(#se-none):hover {
@@ -552,7 +554,7 @@ html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV .fbu3l7kPiBeb3EKCjIb8n {
   height: auto !important;
   gap: 6px !important;
   padding: 7px !important;
-  border-radius: 18px !important;
+  border-radius: var(--se-radius-xl) !important;
   background: var(--se-ov-bar-bg) !important;
   box-shadow: var(--se-shadow-pop) !important;
 }
@@ -568,7 +570,7 @@ html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV ._3ZLaTxSHxeGcoKlIy_-Z0L:not(#se-none)
   background: transparent !important;
   box-shadow: none !important;
   color: var(--se-text-dim, #b8c0c8) !important;
-  transition: background-color 0.12s ease, color 0.12s ease !important;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out !important;
 }
 
 html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV:not(._1xInQb2gVGxBqTwFBdXoFW):not(._2yjI56d0zadVmPZgDjq2nM) ._3ZLaTxSHxeGcoKlIy_-Z0L:not(#se-none) {

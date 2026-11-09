@@ -137,10 +137,16 @@
   let artSaveTimer = 0;
   let signinTabs = null;
   let activeSigninTab = 'password';
+  let bgSetting = { at: -Infinity, kind: 'library' };
 
+  // Read at most every 2 s: getComputedStyle on the root forces a style recalc, and update() polls.
   const resolveBackgroundSetting = () => {
-    const val = getComputedStyle(docRoot).getPropertyValue('--se-startup-background').trim().toLowerCase();
-    return VALID_BACKGROUNDS.includes(val) ? val : 'library';
+    const now = performance.now();
+    if (now - bgSetting.at > 2000) {
+      const val = getComputedStyle(docRoot).getPropertyValue('--se-startup-background').trim().toLowerCase();
+      bgSetting = { at: now, kind: VALID_BACKGROUNDS.includes(val) ? val : 'library' };
+    }
+    return bgSetting.kind;
   };
 
   const resolveLoginStore = () => {
@@ -225,28 +231,27 @@
     }
   };
 
-  // Cache recent game hero & capsule artwork in localStorage from the main client context
-  // so it is available immediately on subsequent cold starts.
-  const storeCdnBase = appid => `https://shared.steamstatic.com/store_item_assets/steam/apps/${appid}`;
-  const dedupeUrls = (...lists) => [...new Set(lists.flat().filter(u => typeof u === 'string' && u))];
-
-  const persistRecentArt = () => {
-    artSaveTimer = 0;
-    let hostWin = null;
-    for (const win of SE.owners()) {
-      try {
-        if (win.appStore?.allApps) {
-          hostWin = win;
-          break;
-        }
-      } catch (_) {}
+  /*
+   * Recent games' hero and capsule art. Read live from the library when this window can reach
+   * it; the main window also caches it in localStorage so it is there on the next cold start.
+   * spinner.js reads it through window.__steamEnhancedStartup.art.
+   */
+  const ownAppStore = () => {
+    try {
+      return window.appStore?.allApps ? window.appStore : null;
+    } catch (_) {
+      return null;
     }
-    if (!hostWin) return;
+  };
 
-    const isHidden = appid => SE.run(() => hostWin.collectionStore.BIsHidden(appid)) || false;
+  const liveRecentGames = () => {
+    const store = SE.appStore();
+    if (!store?.allApps) return [];
+    const collections = SE.global('collectionStore');
+    const isHidden = appid => SE.run(() => collections.BIsHidden(appid)) || false;
     const recentApps =
       SE.run(() =>
-        hostWin.appStore.allApps
+        store.allApps
           .filter(
             app =>
               app &&
@@ -258,22 +263,22 @@
           .sort((a, b) => b.rt_last_time_played - a.rt_last_time_played)
           .slice(0, 8)
       ) || [];
+    return recentApps.map(app => ({
+      id: app.appid,
+      hero: SE.heroURLs(app.appid, store).filter(url => !url.endsWith('/header.jpg')),
+      cover: SE.coverURLs(app, store),
+    }));
+  };
 
-    if (!recentApps.length) {
+  // Only the window that owns the library writes the cache; every other window would repeat it.
+  const persistRecentArt = () => {
+    artSaveTimer = 0;
+    if (!ownAppStore()) return;
+    const games = liveRecentGames();
+    if (!games.length) {
       artSaveTimer = setTimeout(persistRecentArt, 30000);
       return;
     }
-
-    const games = recentApps.map(app => ({
-      id: app.appid,
-      hero: dedupeUrls(
-        app.rt_custom_image_mtime ? SE.run(() => hostWin.appStore.GetCustomHeroImageURLs(app)) || [] : [],
-        `/assets/${app.appid}/library_hero.jpg`,
-        `${storeCdnBase(app.appid)}/library_hero.jpg`
-      ),
-      cover: dedupeUrls(SE.coverURLs(app, hostWin.appStore)),
-    }));
-
     try {
       localStorage.setItem(ART_STORAGE_KEY, JSON.stringify({ at: Date.now(), games }));
     } catch (_) {}
@@ -287,6 +292,11 @@
     } catch (_) {
       return [];
     }
+  };
+
+  const recentGames = () => {
+    const live = liveRecentGames();
+    return live.length ? live : readCachedArt();
   };
 
   const toCssUrl = url => `url("${String(url).replace(/["\\\n]/g, ch => encodeURIComponent(ch))}")`;
@@ -444,20 +454,15 @@
   };
 
   // Tag sign-in form elements structurally so sign-in.css remains resilient to hash changes.
-  let taggedSigninNodes = new Set();
-
   const tagNode = (el, role) => {
-    if (!el) return;
-    SE.mark(el, SIGNIN_ATTR, role);
-    taggedSigninNodes.add(el);
+    if (el) SE.mark(el, SIGNIN_ATTR, role);
   };
 
   const clearSigninTags = () => {
-    for (const el of taggedSigninNodes) {
+    for (const el of document.querySelectorAll(`[${SIGNIN_ATTR}]`)) {
       SE.unmark(el, SIGNIN_ATTR);
       SE.unmark(el, 'data-se-si-busy');
     }
-    taggedSigninNodes = new Set();
   };
 
   const annotateSigninForm = form => {
@@ -549,7 +554,13 @@
     return { kind: 'other', el: loginHost };
   };
 
+  const stopPolling = () => {
+    poller?.disconnect();
+    poller = null;
+  };
+
   const resetStartupState = () => {
+    stopPolling();
     strip?.remove();
     strip = null;
     removeSigninTabBar();
@@ -611,33 +622,45 @@
     poller = SE.poll(update, 250, { active: () => !!document.querySelector(`.${CLS.statusBox}`) });
   };
 
-  watcher = SE.watch(() => {
+  let idleTimer = 0;
+
+  const stopWatching = () => {
+    clearTimeout(idleTimer);
+    idleTimer = 0;
+    watcher?.disconnect();
+    watcher = null;
+  };
+
+  // Once nothing startup-related has shown for 8 s, the page-wide watcher goes too.
+  const scheduleIdleStop = () => {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      if (!poller && !document.querySelector(`.${CLS.login}`)) stopWatching();
+    }, 8000);
+  };
+
+  const check = () => {
     if (document.querySelector(`.${CLS.statusBox}`)) startPolling();
     else if (detectLoginScreen()) update();
-    else if (strip || bgLayer || signinTabs) resetStartupState();
-  });
-
-  if (document.querySelector(`.${CLS.statusBox}`)) startPolling();
-  else if (detectLoginScreen()) update();
-
-  // Disconnect the observer in non-startup windows once the initial load settles.
-  const idleDisconnectTimer = setTimeout(() => {
-    if (!poller && !document.querySelector(`.${CLS.login}`)) {
-      watcher?.disconnect();
-      watcher = null;
+    else if (poller || strip || bgLayer || signinTabs || docRoot.hasAttribute('data-se-startup')) {
+      resetStartupState();
+      scheduleIdleStop();
     }
-  }, 8000);
+  };
+
+  watcher = SE.watch(check);
+  check();
+  scheduleIdleStop();
 
   artSaveTimer = setTimeout(persistRecentArt, 15000);
 
   window.__steamEnhancedStartup = {
     destroy() {
-      clearTimeout(idleDisconnectTimer);
       clearTimeout(artSaveTimer);
-      watcher?.disconnect();
-      poller?.disconnect();
-      poller = null;
+      stopWatching();
       resetStartupState();
+      delete window.__steamEnhancedStartup;
     },
+    art: { recentGames, cssUrl: toCssUrl, WALL_CROPS },
   };
 });

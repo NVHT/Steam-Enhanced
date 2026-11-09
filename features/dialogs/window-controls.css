@@ -25,12 +25,17 @@
   border-radius: var(--se-radius-sm, 8px);
   color: var(--se-text-muted, #98a2ad);
   background: transparent;
-  transition: background-color .15s ease, color .15s ease;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
 }
 
 .title-area:not(.OSX) .title-bar-actions .title-area-icon:is(.minimizeButton, .maximizeButton, .restoreButton, .closeButton):hover {
   background: var(--se-hover, #2c3440);
   color: var(--se-text-strong, #fff);
+}
+
+.title-area:not(.OSX) .title-bar-actions .title-area-icon:is(.minimizeButton, .maximizeButton, .restoreButton, .closeButton):focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: calc(-1 * var(--se-focus-offset));
 }
 
 .title-area:not(.OSX) .title-bar-actions .title-area-icon.closeButton:hover {

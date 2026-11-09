@@ -13,25 +13,22 @@
     of: 'of',
   };
 
-  const CLS = {
-    page: SE.C.DownloadsPage,
-    basic: SE.C.BasicUI,
-    active: SE.C.DownloadSectionActiveItem,
-    networkBar: SE.C.Network,
-    progressBar: SE.C.ProgressBar,
-    count: SE.C.Count,
-    state: SE.C.State,
-    heroImage: SE.C.HeaderImage,
-  };
-
-  const PAGE_SELECTOR = `.${CLS.page}:not(.${CLS.basic})`;
+  const { C } = SE;
+  const PAGE_SELECTOR = `.${C.DownloadsPage}:not(.${C.BasicUI})`;
+  const ROW = `.${C.SectionItem}`;
+  const LINKS_ROW = `.${C.DetailsAndType}`;
   const setAttr = (el, name, val) => SE.attr(el, name, val || null);
 
+  // Steam's router is found by module id; a build without it is retried now and then, not
+  // every frame (each try walks every webpack bundle).
+  const NATIVE_RETRY_MS = 30000;
   let restoreLibraryRoute;
   let nativeSwitch;
+  let nativeRetryAt = 0;
 
   function enableNativeLibrary(page) {
-    if (restoreLibraryRoute) return;
+    if (restoreLibraryRoute || performance.now() < nativeRetryAt) return;
+    nativeRetryAt = performance.now() + NATIVE_RETRY_MS;
     for (const require of SE.requires()) {
       const router = SE.run(() => require.m?.[49519] && require(49519));
       const React = SE.run(() => require.m?.[63696] && require(63696));
@@ -93,6 +90,7 @@
   const libraryRows = library.querySelector('.se-dl-library-rows');
   const libraryEmpty = library.querySelector('.se-dl-library-empty');
   const libraryMore = library.querySelector('button');
+  const HOST_ATTR = 'data-se-dl-host';
   let apps = [];
   let matches = [];
   let libraryHost;
@@ -162,23 +160,25 @@
     if (host !== libraryHost) {
       moreObserver?.disconnect();
       library.remove();
+      SE.unmark(libraryHost, HOST_ATTR);
       libraryHost = host;
       nextRead = 0;
     }
     if (!host) return;
+    SE.mark(host, HOST_ATTR);
     if (library.nextElementSibling !== page) {
       page.before(library);
       moreObserver?.observe(libraryMore);
     }
     if (Date.now() < nextRead) return;
     nextRead = Date.now() + 5000;
-    const owner = [...SE.owners()].find((win) => SE.run(() => win.appStore?.allApps));
-    const store = owner?.appStore;
+    const store = SE.global('appStore', (candidate) => candidate.allApps);
+    const collections = SE.global('collectionStore');
     const items = SE.run(() => store?.allApps) || [];
     const next = items.filter((app) =>
       (app.app_type === 1 || app.app_type === 1073741824) &&
       app.visible_in_game_list !== false && app.display_name &&
-      !SE.run(() => owner.collectionStore?.BIsHidden(app.appid))
+      !SE.run(() => collections?.BIsHidden(app.appid))
     ).map((app) => ({
       appid: app.appid,
       name: app.display_name,
@@ -212,7 +212,7 @@
   };
 
   function logoURLs(appid) {
-    const store = [...SE.owners()].map((win) => SE.run(() => win.appStore)).find(Boolean);
+    const store = SE.appStore();
     const app = store && SE.run(() => store.GetAppOverviewByAppID(Number(appid)));
     const urls = [];
     if (app?.rt_custom_image_mtime) {
@@ -237,8 +237,7 @@
       page.prepend(layer);
       mountedNodes.add(layer);
     }
-    const value = `url("${art.replace(/["\\]/g, '\\$&')}")`;
-    if (layer.style.getPropertyValue('--se-dl-art') !== value) layer.style.setProperty('--se-dl-art', value);
+    SE.cssVar(layer, '--se-dl-art', `url("${art.replace(/["\\]/g, '\\$&')}")`);
     setAttr(page, 'data-se-dl-art', '1');
   }
 
@@ -248,25 +247,24 @@
   // ---------------------------------------------------------------------------------------
   const SVG_NS = 'http://www.w3.org/2000/svg';
   const SEL = {
-    name: `.${SE.C.ActiveItemLiveRegion_Name}, ._35eOQ6EeVHNV5HGBrJ1-Vu`,
-    tag: '._1IKbaHLvcciS-EMMYx1WVG .Rgy-7t7i1Yv97qhWQae7K',
-    bar: '._1vMU1vG5ZtLihr3mfXUymR',
-    installBar: '.HifZB5TP6WNuubp1dzyxS',
-    barLabel: '._3a973VY2X3US_cZqA9ZgNF, ._2ns4wnmgr4XBzARpwn2NZ1',
-    timeLeft: '._3nx-k9xXUVgejG1BIAc84r',
-    stat: '._26UBk-6weCeV-VClfXNWJZ',
-    statValue: '.eXF8xL2LUtzeWMbK-FSRz',
-    statLabel: '._1iulCOMUxV6sBbqoKo_yXw',
-    controls: '._1r3ouwFT2-tsTAcnXYZ6NU',
+    name: `.${C.ActiveItemLiveRegion_Name}`,
+    tag: `.${C.ContentTypes} .${C.ContentType}`,
+    bar: `.${C.ProgressBar}`,
+    installBar: `.${C.Disk}`,
+    barLabel: `.${C.Autofocused_Label}, .${C.State}`,
+    timeLeft: `.${C.DownloadTimeRemaining}`,
+    stat: `.${C.SingleStat}`,
+    statValue: `.${C.Figure}`,
+    statLabel: `.${C.LegendText}`,
+    controls: `.${C.Bottom}`,
     // Steam's pause/resume: its action slot, its action-button class, or any button-like
     // element; class names and tags vary between builds
-    pause: '._2ZfashhZu6uE9fCwyPS9mJ > *, ._3oavRVhIS9tC3vBsFT4Ggi, button, .DialogButton, [role="button"]',
-    links: '.Bku7JSkuQ7NyWi6M4w1sl > *',
-    graph: '._3GBFL10vEfhI28U95WaqMj',
-    graphBar: '.gpPxCvNVctmdxo8yfyEAJ, .OS07NfYlp6v-Eh5oQ7dwn',
-    diskLine: '._3H2JWLH8rucdSC1XVZ7Xdk',
-    activeRow: '._1VNuYHM6BPBOJspC6zPf5r',
-    scroller: '._373v1eWNyaPKhgnea9FZSt > ._3Mbhnlk1Go2j8yCdjthzc7',
+    pause: `.${C.ButtonWrapper} > *, .${C.ActiveItemLiveRegion_Button}, button, .DialogButton, [role="button"]`,
+    links: `${LINKS_ROW} > *`,
+    graph: `.${C.DownloadGraphWrapper}`,
+    graphBar: `.${C.GraphBarWrapper}, .${C.GraphBarDownload}`,
+    diskLine: `.${C.GraphLine}`,
+    scroller: `.${C.TopSection} > .${C.Section}`,
   };
   // Dual-tone stat icons: a soft filled shape under a solid stroke, both in currentColor
   const STAT_ICON = {
@@ -314,21 +312,11 @@
   const setHidden = (el, hidden) => {
     if (el.hidden !== hidden) el.hidden = hidden;
   };
-  const setSvgAttr = (el, name, value) => {
-    if (value == null) {
-      if (el.hasAttribute(name)) el.removeAttribute(name);
-    } else if (el.getAttribute(name) !== value) {
-      el.setAttribute(name, value);
-    }
-  };
-  const setStyle = (el, prop, value) => {
-    if (el.style.getPropertyValue(prop) !== value) el.style.setProperty(prop, value);
-  };
 
   // The outermost button-like element, outside the links row: nested matches are its parts
   function findPause(root) {
     if (!root) return null;
-    const links = root.querySelector('.Bku7JSkuQ7NyWi6M4w1sl');
+    const links = root.querySelector(LINKS_ROW);
     return [...root.querySelectorAll(SEL.pause)].find((el) =>
       !links?.contains(el) && !el.parentElement.closest(SEL.pause) && (el.querySelector('svg') || textOf(el))
     ) || null;
@@ -362,7 +350,10 @@
     };
   }
 
+  let heroCount = 0;
+
   function buildHero() {
+    const gradientId = `se-dlh-fill-${++heroCount}`;
     const hero = document.createElement('section');
     hero.className = 'se-dlh';
     hero.setAttribute('aria-label', 'Current download');
@@ -388,12 +379,12 @@
         </div>
         <div class="se-dlh-plot">
           <svg viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
-            <defs><linearGradient id="se-dlh-fill" x1="0" y1="0" x2="0" y2="1">
+            <defs><linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stop-color="currentColor" stop-opacity=".3"/>
               <stop offset="1" stop-color="currentColor" stop-opacity="0"/>
             </linearGradient></defs>
             <g class="se-dlh-grid"><line x1="0" y1="33.3" x2="1000" y2="33.3"/><line x1="0" y1="66.6" x2="1000" y2="66.6"/></g>
-            <path class="se-dlh-area" fill="url(#se-dlh-fill)"/>
+            <path class="se-dlh-area" fill="url(#${gradientId})"/>
             <path class="se-dlh-disk" fill="none"/>
             <path class="se-dlh-line" fill="none"/>
           </svg>
@@ -482,16 +473,27 @@
   }
 
   // A bar's value: the top of its lowest-reaching visible box (the fill, not a full-height
-  // wrapper); an empty bar sits on the floor
+  // wrapper); an empty bar sits on the floor. The fill found is remembered, so later frames
+  // measure one box per bar instead of its whole subtree.
+  const barFills = new WeakMap();
+
   function barTop(bar, box) {
+    const fill = barFills.get(bar);
+    if (fill && bar.contains(fill)) {
+      const r = fill.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) return r.top;
+    }
     let top = box.bottom;
-    let found = false;
+    let found = null;
     for (const el of [bar, ...bar.querySelectorAll('*')]) {
       const r = el.getBoundingClientRect();
       if (r.width <= 0 || r.height <= 0) continue;
-      if (!found || r.top > top) top = r.top;
-      found = true;
+      if (!found || r.top > top) {
+        top = r.top;
+        found = el;
+      }
     }
+    if (found && found !== bar) barFills.set(bar, found);
     return found ? top : box.bottom;
   }
 
@@ -530,24 +532,23 @@
     return { network, disk };
   }
 
-  function renderGraph(refs, graph) {
-    const series = readSeries(graph);
+  function renderGraph(refs, series) {
     const network = series?.network || [];
     if (network.length >= 2) {
       const line = smoothPath(network);
       const first = network[0];
       const last = network[network.length - 1];
-      setSvgAttr(refs.line, 'd', line);
-      setSvgAttr(refs.area, 'd', `${line} L${round(last[0])},100 L${round(first[0])},100 Z`);
-      setStyle(refs.dot, 'left', `${round(last[0] / 10)}%`);
-      setStyle(refs.dot, 'top', `${round(last[1])}%`);
+      SE.attr(refs.line, 'd', line);
+      SE.attr(refs.area, 'd', `${line} L${round(last[0])},100 L${round(first[0])},100 Z`);
+      SE.cssVar(refs.dot, 'left', `${round(last[0] / 10)}%`);
+      SE.cssVar(refs.dot, 'top', `${round(last[1])}%`);
       setHidden(refs.dot, false);
     } else {
-      setSvgAttr(refs.line, 'd', null);
-      setSvgAttr(refs.area, 'd', null);
+      SE.attr(refs.line, 'd', null);
+      SE.attr(refs.area, 'd', null);
       setHidden(refs.dot, true);
     }
-    setSvgAttr(refs.disk, 'd', series?.disk.length >= 2 ? smoothPath(series.disk) : null);
+    SE.attr(refs.disk, 'd', series?.disk.length >= 2 ? smoothPath(series.disk) : null);
   }
 
   function renderStats(refs, stats) {
@@ -599,13 +600,11 @@
 
   // Steam's download API (SteamClient.Downloads). The overview subscription is the source of
   // truth for "paused"; the store is read when the subscription is unavailable.
-  const steamDownloads = () =>
-    SE.run(() => window.SteamClient?.Downloads) ||
-    [...SE.owners()].map((win) => SE.run(() => win.SteamClient?.Downloads)).find(Boolean);
+  const steamDownloads = () => SE.global('SteamClient', (client) => client.Downloads)?.Downloads || null;
   let liveOverview = null;
   let overviewSubscription = null;
   const downloadOverview = () =>
-    liveOverview || [...SE.owners()].map((win) => SE.run(() => win.downloadsStore?.m_DownloadOverview)).find(Boolean);
+    liveOverview || SE.global('downloadsStore', (store) => store.m_DownloadOverview)?.m_DownloadOverview || null;
 
   // The control Steam's handler is on: the button itself, not a wrapper around it
   const CLICKABLE = 'button, [role="button"], .DialogButton';
@@ -622,12 +621,8 @@
   }
 
   // React's props on a DOM node (Steam's UI is React): the handler Steam itself runs on click
-  const reactProps = (el) => {
-    const key = el && Object.keys(el).find((name) => name.startsWith('__reactProps$'));
-    return key ? el[key] : null;
-  };
   const handlerOf = (el) => {
-    const props = reactProps(el);
+    const props = SE.props(el);
     return props?.onClick || props?.onActivate || props?.onOKButton || null;
   };
 
@@ -635,7 +630,7 @@
   // click handler, outside the links, preferring the controls beside the time left; innermost wins
   function findPauseHandler(row) {
     if (!row) return null;
-    const links = row.querySelector('.Bku7JSkuQ7NyWi6M4w1sl');
+    const links = row.querySelector(LINKS_ROW);
     const candidates = [row, ...row.querySelectorAll('*')].filter((el) =>
       handlerOf(el) && el.querySelector('svg') && !links?.contains(el) && !el.closest(SEL.graph)
     );
@@ -675,11 +670,26 @@
 
   const heroes = new WeakMap();
 
+  // Steam's own block feeds the hero: kept laid out (its graph is measured) but out of sight
+  // and unread. A row that stops being the source gets its own state back.
+  function claimSource(refs, row) {
+    if (refs.row && refs.row !== row) {
+      SE.unmark(refs.row, 'data-se-dlh-source');
+      SE.unmark(refs.row, 'aria-hidden');
+    }
+    refs.row = row;
+    setAttr(row, 'data-se-dlh-source', '1');
+    setAttr(row, 'aria-hidden', 'true');
+  }
+
   function syncHero(page, item, appid, active) {
     const scroller = page.querySelector(SEL.scroller);
     let refs = heroes.get(page);
     if (!item || !scroller) {
-      refs?.hero.remove();
+      if (refs) {
+        refs.hero.remove();
+        claimSource(refs, null);
+      }
       setAttr(page, 'data-se-dlh', null);
       return;
     }
@@ -687,22 +697,23 @@
       refs = buildHero();
       heroes.set(page, refs);
     }
+    // Claimed before reading, so the graph is measured at the source's fixed width
+    const row = item.closest(ROW) || item;
+    claimSource(refs, row);
+
+    // Reads first (Steam's block and its graph), writes after: one layout per frame.
+    // The whole source row is searched: some builds put Pause beside the transfer block.
+    const data = readTransfer(item);
+    data.button ||= findPause(row);
+    const series = readSeries(data.graph);
+    const canPause = !!(data.button || steamDownloads() || findPauseHandler(row));
+
     if (refs.hero.parentElement !== scroller || scroller.firstElementChild !== refs.hero) {
       scroller.prepend(refs.hero);
       mountedNodes.add(refs.hero);
     }
-    // Steam's own block: kept laid out (the graph is measured) but out of sight and unread
-    const row = item.closest(SEL.activeRow) || item;
-    setAttr(row, 'data-se-dlh-source', '1');
-    setAttr(row, 'aria-hidden', 'true');
     setAttr(page, 'data-se-dlh', '1');
-
-    // Search the whole source row: Steam puts the pause button beside the transfer block in
-    // some builds
-    const data = readTransfer(item);
-    data.button ||= findPause(row);
     refs.source = data;
-    refs.row = row;
     refs.appid = appid;
     const overview = downloadOverview();
     if (refs.optimistic && Date.now() - refs.optimistic < 2500) active = !refs.paused;
@@ -723,12 +734,12 @@
     setText(refs.sub, sub);
 
     const clamp = (value) => `${round(Math.max(0, Math.min(100, value ?? 0)))}%`;
-    setStyle(refs.fill, 'width', clamp(pct));
+    SE.cssVar(refs.fill, 'width', clamp(pct));
     setHidden(refs.installBar, data.install?.value == null);
-    if (data.install?.value != null) setStyle(refs.installFill, 'width', clamp(data.install.value));
+    if (data.install?.value != null) SE.cssVar(refs.installFill, 'width', clamp(data.install.value));
     setText(refs.pct, pct == null ? '' : `${Math.round(pct)}%`);
 
-    setHidden(refs.pause, !data.button && !steamDownloads() && !findPauseHandler(row));
+    setHidden(refs.pause, !canPause);
     const pauseLabel = active ? 'Pause' : 'Resume';
     if (refs.pauseLabel.textContent !== pauseLabel) {
       refs.pauseLabel.textContent = pauseLabel;
@@ -736,18 +747,19 @@
     }
 
     renderStats(refs, data.stats);
-    renderGraph(refs, data.graph);
+    renderGraph(refs, series);
     renderLinks(refs, data.links);
   }
 
   // Page buttons (settings, queue actions, section actions): tagged by role and given the
   // theme's dual-tone icon, so the CSS styles them as one tile set whatever classes Steam uses
   // A queue entry: Steam's draggable wrapper around the card (react-beautiful-dnd's handle)
-  const ITEM = '._21P7c4MWmsU2QSZeL-uyZo';
+  const ITEM = `.${C.SectionItemWrapper}`;
   const RBD_HANDLE = 'data-rbd-drag-handle-context-id';
-  const QUEUE_ROW_SELECTOR = '._1ugNiylO2vKXhirsGocAxa ._1VNuYHM6BPBOJspC6zPf5r';
-  const SECTION_TITLE_SELECTOR = '.qq2xItSXjpCsNrcxyPJtO';
-  const SETTINGS_SELECTOR = '.lzk4zNVWG2zPV5Mk_o5GL ._3Tfp8-wTAttW3WVa_X9JVC';
+  const QUEUE = `.${C.ItemLists}`;
+  const QUEUE_ROW_SELECTOR = `${QUEUE} ${ROW}`;
+  const SECTION_TITLE_SELECTOR = `.${C.SectionTitle}`;
+  const SETTINGS_SELECTOR = `.${C.SettingsButton} .${C.DiskGraph_Button}`;
   const ACTION_ICON = {
     settings: '<path class="tone" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/>' +
       '<path d="M10.3 3.5h3.4l.5 2.4 1.7 1 2.3-.8 1.7 2.9-1.8 1.7v1.9l1.8 1.7-1.7 2.9-2.3-.8-1.7 1-.5 2.4h-3.4l-.5-2.4-1.7-1-2.3.8-1.7-2.9 1.8-1.7v-1.9L3.9 9l1.7-2.9 2.3.8 1.7-1z"/>' +
@@ -763,8 +775,8 @@
   // "remove" before "play": a row's Play label never names removal, the reverse can
   function actionIcon(el) {
     const label = `${el.getAttribute('aria-label') || ''} ${el.title || ''} ${textOf(el)}`.toLowerCase();
-    if (el.matches('._2xR-V97DWI7svSjgiCb3N-') || /remove|cancel|delete/.test(label)) return 'remove';
-    if (el.matches('.sQZ70orTPi-ELUlaS-ywR') || /\bplay\b/.test(label)) return 'play';
+    if (el.matches(`.${C.RemoveFromQueue}`) || /remove|cancel|delete/.test(label)) return 'remove';
+    if (el.matches(`.${C.PlayButton}`) || /\bplay\b/.test(label)) return 'play';
     if (/clear/.test(label)) return 'clear';
     return 'download';
   }
@@ -805,9 +817,9 @@
   }
 
   // A control: a button-like element (tag, role, tab stop or Steam's button classes)
-  const CONTROL = 'button, [role="button"], [tabindex], .DialogButton, ._3oavRVhIS9tC3vBsFT4Ggi, .sQZ70orTPi-ELUlaS-ywR';
-  const ROW_NAME = '._35eOQ6EeVHNV5HGBrJ1-Vu';
-  const ROW_ART = '._2pjdgFqp04LlhgtFS0rQn_';
+  const CONTROL = `button, [role="button"], [tabindex], .DialogButton, .${C.ActiveItemLiveRegion_Button}, .${C.PlayButton}`;
+  const ROW_NAME = SEL.name;
+  const ROW_ART = `.${C.AppPortrait}`;
 
   // A row's actions: each outermost control in the row that is not the row's own body (it
   // holds neither the name nor the art) and has a box. Steam draws some icons with CSS, so an
@@ -816,7 +828,7 @@
     const controls = [];
     for (const el of scope.querySelectorAll(CONTROL)) {
       if (el.querySelector(ROW_NAME) || el.querySelector(ROW_ART) || el.closest(ROW_ART)) continue;
-      if (el.closest('.Bku7JSkuQ7NyWi6M4w1sl, ._1vMU1vG5ZtLihr3mfXUymR, .se-dl-icon, .se-dl-grip')) continue;
+      if (el.closest(`${LINKS_ROW}, ${SEL.bar}, .se-dl-icon, .se-dl-grip`)) continue;
       let outer = true;
       for (let up = el.parentElement; up && up !== scope; up = up.parentElement) {
         if (up.matches(CONTROL) && !up.querySelector(ROW_NAME)) {
@@ -836,7 +848,13 @@
     return bar && bar !== scope ? bar : null;
   }
 
+  // Batched as reads (every row's controls), writes (tags), one measure pass, then the
+  // reserved widths, so a long queue costs two layouts per frame rather than one per row
   function tagActions(page) {
+    const rows = [...page.querySelectorAll(QUEUE_ROW_SELECTOR)].map((row) => {
+      const scope = row.closest(ITEM) || row;
+      return { row, scope, controls: rowControls(scope), bar: null };
+    });
     const settings = page.querySelector(SETTINGS_SELECTOR);
     if (settings) tagAction(settings, 'settings');
     for (const title of page.querySelectorAll(SECTION_TITLE_SELECTOR)) {
@@ -844,9 +862,8 @@
         if (!el.parentElement.closest(CONTROL) && textOf(el)) tagAction(el, actionIcon(el));
       }
     }
-    for (const row of page.querySelectorAll(QUEUE_ROW_SELECTOR)) {
-      const scope = row.closest(ITEM) || row;
-      const controls = rowControls(scope);
+    for (const entry of rows) {
+      const { scope, controls } = entry;
       // Unlabelled Steam icons: the last icon-only control is remove (✕ ends every row), the
       // others start the download now
       const iconOnly = controls.filter((el) => !textOf(el) && !el.querySelector(':scope > .se-dl-label'));
@@ -858,12 +875,12 @@
       for (const el of scope.querySelectorAll('[data-se-dl-bar]')) {
         if (!controls.some((control) => el.contains(control))) el.removeAttribute('data-se-dl-bar');
       }
-      const bar = actionBar(controls, scope);
-      if (bar) setAttr(bar, 'data-se-dl-bar', '1');
-      // Room at the row's end for the bar, measured: the state text stops 20px short of it
-      const width = bar ? Math.ceil(bar.getBoundingClientRect().width) + 20 : 0;
-      setStyle(row, '--dl-actions-w', `${width}px`);
+      entry.bar = actionBar(controls, scope);
+      if (entry.bar) setAttr(entry.bar, 'data-se-dl-bar', '1');
     }
+    // Room at the row's end for the bar: the state text stops 20px short of it
+    const widths = rows.map(({ bar }) => (bar ? Math.ceil(bar.getBoundingClientRect().width) + 20 : 0));
+    rows.forEach(({ row }, index) => SE.cssVar(row, '--dl-actions-w', `${widths[index]}px`));
   }
 
   // ---------------------------------------------------------------------------------------
@@ -871,8 +888,7 @@
   // others slide aside, a line marks the landing spot; dropping on the transfer at the top
   // downloads it now. Steam's own drag is held off on these rows so the two never fight.
   // ---------------------------------------------------------------------------------------
-  const BUILD = '1.90.13';
-  const SORT_SECTION = '._1ugNiylO2vKXhirsGocAxa ._3Mbhnlk1Go2j8yCdjthzc7:not(.Zh51LA1WZNKTkf1qlZabn)';
+  const SORT_SECTION = `${QUEUE} .${C.Section}:not(.${C.Completed})`;
   const GRIP_ICON = '<svg viewBox="0 0 12 20" aria-hidden="true"><circle cx="3" cy="4" r="1.6"/><circle cx="9" cy="4" r="1.6"/>' +
     '<circle cx="3" cy="10" r="1.6"/><circle cx="9" cy="10" r="1.6"/><circle cx="3" cy="16" r="1.6"/><circle cx="9" cy="16" r="1.6"/></svg>';
   let drag = null;
@@ -882,10 +898,10 @@
 
   function syncGrips(page) {
     for (const section of page.querySelectorAll(SORT_SECTION)) {
-      const items = [...section.querySelectorAll(`:scope ${ITEM}`)].filter((item) => item.querySelector(QUEUE_ROW_SELECTOR.split(' ').pop()));
+      const items = [...section.querySelectorAll(`:scope ${ITEM}`)].filter((item) => item.querySelector(ROW));
       const sortable = items.length > 1;
       for (const item of items) {
-        const card = item.querySelector('._1VNuYHM6BPBOJspC6zPf5r');
+        const card = item.querySelector(ROW);
         let grip = card?.querySelector(':scope > .se-dl-grip');
         if (!sortable || !card) {
           grip?.remove();
@@ -1092,36 +1108,39 @@
 
   let frame = 0;
 
+  // Only the visible page is decorated: a mounted but hidden one keeps its last state
   const update = () => {
+    if (frame) cancelAnimationFrame(frame);
     frame = 0;
     for (const node of mountedNodes) {
       if (!node.isConnected) mountedNodes.delete(node);
     }
-    const pages = [...document.querySelectorAll(PAGE_SELECTOR)];
-    const visiblePage = pages.find((page) => page.getClientRects().length);
-    if (visiblePage) enableNativeLibrary(visiblePage);
-    syncLibrary(visiblePage?.closest('.se-dl-native-layout') ? null : visiblePage);
-    for (const page of pages) {
-      setAttr(page, 'data-se-dl-title', COPY.title);
-      // One transfer is in progress at a time: the first active item is the hero
-      const item = page.querySelector(`.${CLS.active}`);
-      const active = !!item?.querySelector(
-        `.${CLS.progressBar}.${CLS.networkBar}[role="progressbar"], [role="progressbar"]`
-      );
-      // Absolute URL: a relative one in a custom property resolves against the theme's
-      // stylesheet, not the page, and the backdrop would load nothing
-      const heroImage = item?.querySelector(`.${CLS.heroImage} img`);
-      const pageArt = heroImage?.currentSrc || heroImage?.src || '';
+    for (const el of rbdHandles.keys()) {
+      if (!el.isConnected) rbdHandles.delete(el);
+    }
+    const page = [...document.querySelectorAll(PAGE_SELECTOR)].find((candidate) => candidate.getClientRects().length);
+    if (page) enableNativeLibrary(page);
+    syncLibrary(page?.closest('.se-dl-native-layout') ? null : page);
+    if (!page) return;
+    loadThemeVersion();
 
-      syncBackdrop(page, pageArt);
-      syncHero(page, item, appIdFromArt(pageArt), active);
-      tagActions(page);
-      if (!drag) syncGrips(page);
+    setAttr(page, 'data-se-dl-title', COPY.title);
+    // One transfer is in progress at a time: the first active item is the hero
+    const item = page.querySelector(`.${C.DownloadSectionActiveItem}`);
+    const active = !!item?.querySelector('[role="progressbar"]');
+    // Absolute URL: a relative one in a custom property resolves against the theme's
+    // stylesheet, not the page, and the backdrop would load nothing
+    const heroImage = item?.querySelector(`.${C.HeaderImage} img`);
+    const pageArt = heroImage?.currentSrc || heroImage?.src || '';
 
-      for (const countNode of page.querySelectorAll(`.${CLS.count}`)) {
-        const match = /\(\s*(\d+)\s*\)/.exec(countNode.textContent);
-        setAttr(countNode, 'data-se-count', match ? match[1] : '');
-      }
+    syncHero(page, item, appIdFromArt(pageArt), active);
+    syncBackdrop(page, pageArt);
+    tagActions(page);
+    if (!drag) syncGrips(page);
+
+    for (const countNode of page.querySelectorAll(`.${C.Count}`)) {
+      const match = /\(\s*(\d+)\s*\)/.exec(countNode.textContent);
+      setAttr(countNode, 'data-se-count', match ? match[1] : '');
     }
   };
 
@@ -1136,7 +1155,11 @@
     })
   );
 
-  const watcher = SE.watch(schedule, { attributes: ['aria-valuenow'] });
+  // The Library list mounted beside the page and the shell's chrome change all the time and
+  // never affect the page
+  const besidePage = SE.inside('.se-dl-native-list, .se-dl-library');
+  const ignore = (node) => SE.inSide(node) || besidePage(node);
+  const watcher = SE.watch(update, { attributes: ['aria-valuenow'], ignore });
   const timer = SE.poll(schedule, 1500, { active: () => SE.visible(PAGE_SELECTOR) });
   schedule();
 
@@ -1173,6 +1196,22 @@
     else fallback();
   }
 
+  // The skin's manifest is the source of the version: fetched once, when the page first shows,
+  // so a report made later needs no wait
+  let themeVersion = null;
+  const loadThemeVersion = () => (themeVersion ||= (async () => {
+    try {
+      const asset = [...document.querySelectorAll('script[src], link[href]')]
+        .map((el) => el.src || el.href)
+        .find((url) => /\/shared\/(?:core\.js|tokens\.css)(?:[?#]|$)/.test(url));
+      const response = await fetch(new URL('../skin.json', asset), { cache: 'no-store' });
+      const version = (await response.json())?.version;
+      return typeof version === 'string' && version ? version : 'unknown';
+    } catch (_) {
+      return 'unknown';
+    }
+  })());
+
   // Ctrl+Shift+D on the Downloads page: copies the support report, no console needed
   function toast(message) {
     const note = document.createElement('div');
@@ -1191,20 +1230,20 @@
     if (!document.querySelector(PAGE_SELECTOR)) return;
     event.preventDefault();
     event.stopPropagation();
-    window.__steamEnhancedDownloads?.debug();
-    toast(`Steam Enhanced ${BUILD}: download info copied`);
+    window.__steamEnhancedDownloads?.debug().then((report) => toast(`Steam Enhanced ${report.build}: download info copied`));
   };
   addEventListener('keydown', debugKey, true);
 
   window.__steamEnhancedDownloads = {
     get library() { return library.isConnected ? library : null; },
     // Support: copies Steam's transfer block and queue markup, and lists the download API
-    debug() {
+    async debug() {
+      const build = await loadThemeVersion();
       const page = document.querySelector(PAGE_SELECTOR);
       const row = page?.querySelector('[data-se-dlh-source]');
       const pause = findPauseHandler(row);
       const report = {
-        build: BUILD,
+        build,
         api: Object.keys(steamDownloads() || {}),
         sortSections: page?.querySelectorAll(SORT_SECTION).length ?? 0,
         items: page?.querySelectorAll(`${SORT_SECTION} ${ITEM}`).length ?? 0,
@@ -1213,7 +1252,7 @@
         overview: liveOverview,
         pause: pause ? pause.el.outerHTML.slice(0, 400) : null,
         transfer: row?.outerHTML.replace(/<svg[\s\S]*?<\/svg>/g, '<svg/>').slice(0, 20000),
-        queue: page?.querySelector('._1ugNiylO2vKXhirsGocAxa')?.outerHTML.replace(/<svg[\s\S]*?<\/svg>/g, '<svg/>').slice(0, 20000),
+        queue: page?.querySelector(QUEUE)?.outerHTML.replace(/<svg[\s\S]*?<\/svg>/g, '<svg/>').slice(0, 20000),
       };
       copyText(JSON.stringify(report, null, 2));
       return report;
@@ -1238,6 +1277,7 @@
       for (const node of mountedNodes) node.remove();
       mountedNodes.clear();
       for (const el of document.querySelectorAll('[data-se-dlh-source]')) el.removeAttribute('aria-hidden');
+      for (const el of document.querySelectorAll(`${PAGE_SELECTOR} ${ROW}`)) SE.cssVar(el, '--dl-actions-w', null);
       for (const attrName of TRACKED_ATTRS) {
         for (const el of document.querySelectorAll(`${PAGE_SELECTOR} [${attrName}], ${PAGE_SELECTOR}[${attrName}]`)) {
           el.removeAttribute(attrName);

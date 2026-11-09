@@ -13,7 +13,7 @@
  * - finished with no pixels: decode() tells a failure from an image without an intrinsic size
  *   (an SVG), which must stay visible.
  */
-(() => {
+(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
   window.__steamEnhancedImages?.destroy();
   if (!document.documentElement) return;
 
@@ -57,25 +57,27 @@
     else for (const img of node.getElementsByTagName('img')) watch(img);
   };
 
-  /* A new source on a broken image keeps it hidden until that source loads (settle waits) */
-  const observer = new MutationObserver(records => {
-    for (const record of records) {
-      if (record.type === 'attributes') watch(record.target);
-      else for (const node of record.addedNodes) scan(node);
-    }
-  });
-
-  observer.observe(document.documentElement, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['src', 'srcset'],
-  });
+  /*
+   * A new source on a broken image keeps it hidden until that source loads (settle waits).
+   * Only images: iframes, scripts, <source> and media carry src/srcset too.
+   */
+  const watcher = SE.watch(
+    records => {
+      for (const record of records) {
+        if (record.type === 'attributes') {
+          if (record.target.tagName === 'IMG') watch(record.target);
+        } else {
+          for (const node of record.addedNodes) scan(node);
+        }
+      }
+    },
+    { records: true, attributes: ['src', 'srcset'] }
+  );
   scan(document.documentElement);
 
   window.__steamEnhancedImages = {
     destroy() {
-      observer.disconnect();
+      watcher.disconnect();
       for (const img of document.images) {
         img.removeEventListener('error', onError);
         img.removeEventListener('load', onLoad);
@@ -84,4 +86,4 @@
       delete window.__steamEnhancedImages;
     },
   };
-})();
+});
