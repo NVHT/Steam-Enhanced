@@ -178,7 +178,7 @@ html[data-se-mill] body,
   height: 20px;
   padding: 0 7px !important;
   box-sizing: border-box;
-  border-radius: 6px !important;
+  border-radius: var(--se-radius-sm) !important;
   background: rgba(255, 255, 255, .06) !important;
   animation: none !important;
   font: 600 11px/20px var(--se-font) !important;
@@ -294,7 +294,7 @@ html[data-se-mill] body,
   padding: 10px;
   box-sizing: border-box;
   margin-bottom: 6px;
-  border-radius: 12px;
+  border-radius: var(--se-radius-ml);
   background: var(--se-surface-2, #262c35);
   color: var(--se-accent, #7cc4ff) !important;
   fill: currentColor;
@@ -372,11 +372,22 @@ html[data-se-mill] body,
   gap: 7px !important;
 }
 
+/*
+ * The log itself: a recessed well that reaches the bottom of the window
+ * (features/settings/millennium-pages.js measures the room left under the controls: --se-logs-h).
+ */
 .MillenniumSettings .MillenniumLogs_Text:not(#se-none) {
-  border-radius: 12px;
+  box-sizing: border-box;
+  height: var(--se-logs-h, 100%) !important;
+  min-height: 320px;
+  flex: none !important;
+  margin: 0 !important;
+  padding: 14px 16px 14px 20px !important;
+  overflow-y: auto !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-ml);
   background: var(--se-field, #15181d) !important;
   box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
-  padding: 14px 16px !important;
   font: 12px/1.6 Consolas, "Cascadia Mono", "Courier New", monospace !important;
   color: var(--se-text-dim, #b8c0c8) !important;
 }
@@ -461,9 +472,10 @@ html[data-se-mill] body,
  * that fills the page.
  */
 .MillenniumSettings .MillenniumLogs_TextContainer:not(#se-none) {
+  height: auto !important;
+  min-height: 0;
   margin-top: 18px !important;
   gap: 14px !important;
-  min-height: 0;
 }
 
 .MillenniumSettings .MillenniumLogs_ControlSection:not(#se-none) {
@@ -506,13 +518,6 @@ html[data-se-mill] body,
 .MillenniumSettings .MillenniumLogs_Icons .MillenniumIconButton svg {
   width: 16px !important;
   height: 16px !important;
-}
-
-.MillenniumSettings .MillenniumLogs_Text:not(#se-none) {
-  box-sizing: border-box;
-  min-height: 320px;
-  margin: 0 !important;
-  border: 0 !important;
 }
 
 /*
@@ -592,34 +597,20 @@ html[data-se-mill] body,
   color: var(--se-text-dim, #b8c0c8) !important;
 }
 
-/*
- * Logs › one log: the well reaches the bottom of the window
- * features/settings/settings.js measures the room left under the controls (--se-logs-h).
- */
-.MillenniumSettings .MillenniumLogs_TextContainer:not(#se-none) {
-  height: auto !important;
-}
-
-.MillenniumSettings .MillenniumLogs_Text:not(#se-none) {
-  height: var(--se-logs-h, 100%) !important;
-  flex: none !important;
-  overflow-y: auto !important;
-}
-
-/* Quick CSS Editor window */
-html:has(.MillenniumQuickCss_CodeEditor),
-html:has(.MillenniumQuickCss_CodeEditor) body,
-html:has(.MillenniumQuickCss_CodeEditor) .PopupFullWindow:not(#se-none),
-html:has(.MillenniumQuickCss_CodeEditor) .ModalPosition_Content:not(#se-none),
-html:has(.MillenniumQuickCss_CodeEditor) .DialogContent:not(#se-none),
-html:has(.MillenniumQuickCss_CodeEditor) .GenericConfirmDialog:not(#se-none),
-html:has(.MillenniumQuickCss_CodeEditor) .DialogContent_InnerWidth:not(#se-none) {
+/* Quick CSS Editor window (features/settings/millennium-pages.js tags it html[data-se-qce]) */
+html[data-se-qce],
+html[data-se-qce] body,
+html[data-se-qce] .PopupFullWindow:not(#se-none),
+html[data-se-qce] .ModalPosition_Content:not(#se-none),
+html[data-se-qce] .DialogContent:not(#se-none),
+html[data-se-qce] .GenericConfirmDialog:not(#se-none),
+html[data-se-qce] .DialogContent_InnerWidth:not(#se-none) {
   background: var(--se-bg, #171a20) !important;
   border: 0 !important;
   box-shadow: none !important;
 }
 
-html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader:not(#se-none) {
+html[data-se-qce] .DialogHeader:not(#se-none) {
   margin: 0 0 14px !important;
   padding: 0 !important;
   border: 0 !important;
@@ -629,7 +620,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader:not(#se-none) {
   color: var(--se-text, #e6e8eb) !important;
 }
 
-html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
+html[data-se-qce] .DialogHeader::after {
   content: 'Applies to every Steam window as you type, and saves on its own';
   display: block;
   margin-top: 3px;
@@ -638,11 +629,11 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 }
 
 .MillenniumQuickCss_CodeEditor:not(#se-none) {
-  border-radius: 12px;
+  border-radius: var(--se-radius-ml);
   overflow: hidden;
   background: var(--se-field, #15181d) !important;
   box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
-  transition: box-shadow .15s;
+  transition: box-shadow var(--se-dur) ease-out;
 }
 
 .MillenniumQuickCss_CodeEditor:focus-within:not(#se-none) {
@@ -657,22 +648,6 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 
 .MillenniumQuickCss_CodeEditor .cm-scroller {
   font: 13px/1.65 "Cascadia Mono", Consolas, "Courier New", monospace !important;
-}
-
-.MillenniumQuickCss_CodeEditor .cm-scroller::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.MillenniumQuickCss_CodeEditor .cm-scroller::-webkit-scrollbar-thumb {
-  border: 3px solid transparent;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, .14) padding-box;
-}
-
-.MillenniumQuickCss_CodeEditor .cm-scroller::-webkit-scrollbar-corner,
-.MillenniumQuickCss_CodeEditor .cm-scroller::-webkit-scrollbar-track {
-  background: transparent;
 }
 
 .MillenniumQuickCss_CodeEditor .cm-gutters {
@@ -729,7 +704,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 }
 
 .MillenniumQuickCss_CodeEditor .cm-nonmatchingBracket {
-  background: rgba(255, 92, 92, .18) !important;
+  background: color-mix(in srgb, var(--se-danger) 18%, transparent) !important;
   color: inherit !important;
 }
 
@@ -738,12 +713,12 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 }
 
 .MillenniumQuickCss_CodeEditor .cm-searchMatch {
-  background: rgba(255, 200, 44, .2) !important;
+  background: color-mix(in srgb, var(--se-warning) 20%, transparent) !important;
   outline: 0 !important;
 }
 
 .MillenniumQuickCss_CodeEditor .cm-searchMatch-selected {
-  background: rgba(255, 200, 44, .38) !important;
+  background: color-mix(in srgb, var(--se-warning) 38%, transparent) !important;
 }
 
 .MillenniumQuickCss_CodeEditor .cm-line:only-child:has(> br:only-child)::before {
@@ -757,7 +732,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 .MillenniumQuickCss_CodeEditor .cm-tooltip {
   overflow: hidden;
   border: 0 !important;
-  border-radius: 10px !important;
+  border-radius: var(--se-radius-md) !important;
   background: var(--se-surface, #1f242b) !important;
   box-shadow: 0 14px 34px rgba(0, 0, 0, .5), inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06)) !important;
 }
@@ -769,7 +744,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 
 .cm-tooltip-autocomplete > ul > li {
   padding: 3px 10px !important;
-  border-radius: 6px;
+  border-radius: var(--se-radius-sm);
   color: var(--se-text-dim, #b8c0c8) !important;
 }
 
@@ -796,7 +771,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   padding: 0 9px !important;
   box-sizing: border-box;
   border: 0 !important;
-  border-radius: 6px !important;
+  border-radius: var(--se-radius-sm) !important;
   background: var(--se-field, #15181d) !important;
   background-image: none !important;
   color: var(--se-text, #e6e8eb) !important;
@@ -899,14 +874,20 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   color: var(--se-text-faint, #6f7984);
 }
 
-.se-pm[data-head] > span::before {
-  content: attr(data-col);
-  position: absolute;
-  top: -24px;
+/* The uppercase label: the plugin table's heads, the toolbars' headings, Logs' "Sources" */
+.se-pm[data-head] > span::before,
+.MillenniumSettings .se-mtool-label,
+.se-logs-head {
   font: var(--se-label-font, 700 11px/14px var(--se-font));
   letter-spacing: var(--se-label-spacing, .1em);
   text-transform: uppercase;
   color: var(--se-label-color, #6f7984);
+}
+
+.se-pm[data-head] > span::before {
+  content: attr(data-col);
+  position: absolute;
+  top: -24px;
 }
 
 .MillenniumSettings .MillenniumPlugins_PluginField .MillenniumIconButton:not(#se-none):not(#se-p2) {
@@ -988,6 +969,12 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   color: var(--se-text-strong, #fff) !important;
 }
 
+.MillenniumSettings .se-mill-act:focus-visible,
+.MillenniumSettings .MillenniumThemes_ThemeItem .DialogButton.se-theme-settings:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
 .MillenniumSettings .se-mill-act svg {
   width: 16px;
   height: 16px;
@@ -1009,10 +996,6 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 }
 
 .MillenniumSettings .se-mtool-label {
-  font: var(--se-label-font, 700 11px/14px var(--se-font));
-  letter-spacing: var(--se-label-spacing, .1em);
-  text-transform: uppercase;
-  color: var(--se-label-color, #808a96);
   padding-left: 4px;
 }
 
@@ -1026,10 +1009,10 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   margin-left: auto;
   padding: 0 10px;
   box-sizing: border-box;
-  border-radius: 8px;
+  border-radius: var(--se-radius-sm);
   background: var(--se-field, #15181d);
   box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
-  color: var(--se-text-faint, #808a96);
+  color: var(--se-text-faint, #6f7984);
 }
 
 .MillenniumSettings .se-mfilter:focus-within {
@@ -1054,7 +1037,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 }
 
 .MillenniumSettings .se-mfilter input::placeholder {
-  color: var(--se-text-faint, #808a96);
+  color: var(--se-text-faint, #6f7984);
   font-style: normal;
 }
 
@@ -1066,7 +1049,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   display: inline-flex;
   gap: 2px;
   padding: 3px;
-  border-radius: 9px;
+  border-radius: var(--se-radius-md);
   background: var(--se-field, #15181d);
   box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
 }
@@ -1079,7 +1062,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   gap: 6px;
   height: 26px;
   padding: 0 11px;
-  border-radius: 7px;
+  border-radius: var(--se-radius-sm);
   cursor: pointer;
   color: var(--se-text-muted, #98a2ad);
   font: 700 12.5px/26px var(--se-font);
@@ -1097,12 +1080,12 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 
 .MillenniumSettings .se-mseg b {
   font-weight: 600;
-  color: var(--se-text-faint, #808a96);
+  color: var(--se-text-faint, #6f7984);
 }
 
 .MillenniumSettings .se-mseg button:focus-visible {
-  outline: 2px solid var(--se-accent-strong, rgba(124, 196, 255, .55));
-  outline-offset: 1px;
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 /* Themes: the theme in use as a large card, the rest as a grid of cards */
@@ -1133,7 +1116,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   margin: 0 !important;
   min-height: 0 !important;
   border: 0 !important;
-  border-radius: 14px !important;
+  border-radius: var(--se-radius-lg) !important;
   background: var(--se-surface, #1f242b) !important;
   background-image: none !important;
   box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06)) !important;
@@ -1151,21 +1134,17 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   width: auto !important;
   height: 98px !important;
   margin: 0 !important;
-  border-radius: 9px;
+  border-radius: var(--se-radius-md);
   background: var(--se-thumb, none) center / cover no-repeat, var(--se-field, #15181d) !important;
   box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
   font: 800 30px/1 var(--se-font);
-  color: var(--se-text-faint, #808a96) !important;
+  color: var(--se-text-faint, #6f7984) !important;
   -webkit-mask: none !important;
   mask: none !important;
 }
 
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem[data-se-thumb]::before {
   content: '' !important;
-}
-
-.MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeLabel::before {
-  display: none !important;
 }
 
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem ._1W1to_azoBRG95oNAFpf9Q:not(#se-none):not(#se-p2) {
@@ -1318,11 +1297,11 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   height: var(--se-fill-h, 520px);
   margin-top: 18px;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: var(--se-radius-lg);
   background: var(--se-field, #15181d);
   outline: 1px solid var(--se-hairline, rgba(255, 255, 255, .06));
   outline-offset: -1px;
-  transition: box-shadow .15s;
+  transition: box-shadow var(--se-dur) ease-out;
 }
 
 .se-qc:focus-within {
@@ -1335,7 +1314,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   flex: none;
   display: flex;
   align-items: center;
-  background: #1a1e24;
+  background: var(--se-sidebar);
   color: var(--se-text-muted, #98a2ad);
 }
 
@@ -1362,11 +1341,11 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--se-text-faint, #808a96);
+  background: var(--se-text-faint, #6f7984);
 }
 
 .se-qc-state[data-state="saved"] {
-  color: #7fd35c;
+  color: var(--se-running);
 }
 
 .se-qc-state[data-state="saved"] i {
@@ -1378,11 +1357,11 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 }
 
 .se-qc-state[data-state="error"] {
-  color: #ff8f8f;
+  color: var(--se-danger-text);
 }
 
 .se-qc-state[data-state="error"] i {
-  background: #ff6b6b;
+  background: var(--se-danger);
 }
 
 .se-qc-tools {
@@ -1407,8 +1386,8 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   flex: none;
   width: 40px;
   height: 22px;
-  border-radius: 11px;
-  background: #323944;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-selected);
   cursor: pointer;
 }
 
@@ -1421,7 +1400,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   height: 16px;
   border-radius: 50%;
   background: var(--se-text-muted, #98a2ad);
-  transition: left .15s;
+  transition: transform var(--se-dur) ease-out, background-color var(--se-dur) ease-out;
 }
 
 .se-msw[data-on] {
@@ -1429,13 +1408,13 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 }
 
 .se-msw[data-on]::after {
-  left: 21px;
+  transform: translateX(18px);
   background: var(--se-bg-ink, #0f1115);
 }
 
 .se-msw:focus-visible {
-  outline: 2px solid var(--se-accent-strong, rgba(124, 196, 255, .55));
-  outline-offset: 2px;
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-qc-main {
@@ -1462,7 +1441,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 
 .se-qc-gutter {
   position: relative;
-  z-index: 1;
+  z-index: var(--se-z-raised);
   flex: none;
   width: 52px;
   margin: 0;
@@ -1470,7 +1449,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   box-sizing: border-box;
   text-align: right;
   font: var(--se-qc-font) !important;
-  color: #5f6873;
+  color: var(--se-text-faint);
   user-select: none;
   background: none;
   border: 0;
@@ -1527,22 +1506,6 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 
 .se-qc-ta::selection {
   background: rgba(124, 196, 255, .24);
-}
-
-.se-qc-ta::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.se-qc-ta::-webkit-scrollbar-thumb {
-  border: 3px solid transparent;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, .14) padding-box;
-}
-
-.se-qc-ta::-webkit-scrollbar-track,
-.se-qc-ta::-webkit-scrollbar-corner {
-  background: transparent;
 }
 
 .se-qc-hl .c {
@@ -1627,17 +1590,13 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   gap: 2px;
   overflow: auto;
   align-self: stretch;
-  border-radius: 14px;
+  border-radius: var(--se-radius-lg);
   background: var(--se-surface, #1f242b);
   box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
 }
 
 .se-logs-head {
   padding: 6px 10px 8px;
-  font: var(--se-label-font, 700 11px/14px var(--se-font));
-  letter-spacing: var(--se-label-spacing, .1em);
-  text-transform: uppercase;
-  color: var(--se-label-color, #808a96);
 }
 
 .se-logs-src button {
@@ -1649,7 +1608,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   width: 100%;
   min-height: 38px;
   padding: 0 10px;
-  border-radius: 8px;
+  border-radius: var(--se-radius-sm);
   cursor: pointer;
   color: var(--se-text-dim, #b8c0c8);
   font: 600 13px/1.3 var(--se-font);
@@ -1674,8 +1633,8 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 }
 
 .se-logs-src button:focus-visible {
-  outline: 2px solid var(--se-accent-strong, rgba(124, 196, 255, .55));
-  outline-offset: -2px;
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-logs-src b {
@@ -1683,19 +1642,19 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   height: 18px;
   padding: 0 5px;
   box-sizing: border-box;
-  border-radius: 9px;
+  border-radius: var(--se-radius-md);
   font: 800 11px/18px var(--se-font);
   text-align: center;
 }
 
 .se-logs-src b[data-k="warning"] {
-  background: rgba(255, 200, 44, .16);
-  color: #ffd166;
+  background: color-mix(in srgb, var(--se-warning) 16%, transparent);
+  color: var(--se-warning);
 }
 
 .se-logs-src b[data-k="error"] {
-  background: rgba(255, 92, 92, .16);
-  color: #ff8f8f;
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent);
+  color: var(--se-danger-text);
 }
 
 .MillenniumSettings .se-logs-level button {
@@ -1712,20 +1671,16 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
 }
 
 .MillenniumSettings .MillenniumLogs_Text > span[style*="255, 200, 44"] {
-  box-shadow: inset 2px 0 0 #ffd166;
+  box-shadow: inset 2px 0 0 var(--se-warning);
 }
 
 .MillenniumSettings .MillenniumLogs_Text > span[style*="255, 68, 68"] {
-  box-shadow: inset 2px 0 0 #ff6b6b;
+  box-shadow: inset 2px 0 0 var(--se-danger);
 }
 
 .MillenniumSettings [data-se-level="error"] .MillenniumLogs_Text > span:not([style*="255, 68, 68"]),
 .MillenniumSettings [data-se-level="warning"] .MillenniumLogs_Text > span:not([style*="255, 200, 44"]) {
   display: none;
-}
-
-.MillenniumSettings .MillenniumLogs_Text:not(#se-none) {
-  padding-left: 20px !important;
 }
 
 .MillenniumSettings [data-se-mill-page="logs"] .MillenniumLogs_TextContainer:has(.se-logs-foot) .MillenniumLogs_Text:not(#se-none) {
@@ -1739,8 +1694,8 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   height: 32px;
   margin-top: -14px;
   padding: 0 14px;
-  border-radius: 0 0 12px 12px;
-  background: #1a1e24;
+  border-radius: 0 0 var(--se-radius-ml) var(--se-radius-ml);
+  background: var(--se-sidebar);
   box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
   font: 500 12px var(--se-font);
   color: var(--se-text-muted, #98a2ad);
@@ -1758,7 +1713,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   box-sizing: border-box;
   min-height: calc(100vh - 190px);
   padding: 24px;
-  border-radius: 14px;
+  border-radius: var(--se-radius-lg);
   text-align: center;
   background: var(--se-surface, #1f242b);
   box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
@@ -1772,7 +1727,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   margin-bottom: 6px;
   padding: 10px;
   box-sizing: border-box;
-  border-radius: 12px;
+  border-radius: var(--se-radius-ml);
   background: var(--se-surface-2, #262c35);
   color: var(--se-accent, #7cc4ff);
 }
@@ -1804,7 +1759,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   height: 44px !important;
   padding: 11px !important;
   margin: 0 !important;
-  border-radius: 12px;
+  border-radius: var(--se-radius-ml);
   background: color-mix(in srgb, var(--se-running, #6cc24a) 14%, transparent);
   color: var(--se-running, #6cc24a) !important;
 }
@@ -1834,7 +1789,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   height: 30px !important;
   padding: 0 14px !important;
   gap: 7px !important;
-  border-radius: 8px !important;
+  border-radius: var(--se-radius-sm) !important;
   background: var(--se-accent, #7cc4ff) !important;
   color: var(--se-bg-ink, #0f1115) !important;
   box-shadow: none !important;
@@ -1881,7 +1836,7 @@ html:has(.MillenniumQuickCss_CodeEditor) .DialogHeader::after {
   width: 16px;
   height: 16px;
   background: currentColor;
-  transition: transform .2s;
+  transition: transform .2s var(--se-ease);
   -webkit-mask: var(--se-ic-mmenu) center / 16px 16px no-repeat;
   mask: var(--se-ic-mmenu) center / 16px 16px no-repeat;
 }
