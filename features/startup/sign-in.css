@@ -577,7 +577,7 @@ html[data-se-startup-bg="hero"] ._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.
   padding: 0;
 }
 
-/* Each account: a round avatar inside the startup's ring, its name under it. */
+/* Each account: the toast's rounded-square avatar inside the startup's ring, its name under it. */
 ._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6:not(#se-none) {
   flex: 0 0 136px;
   gap: 0;
@@ -595,21 +595,31 @@ html[data-se-startup-bg="hero"] ._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.
   box-sizing: border-box;
   margin: 0 0 16px;
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--se-avatar-radius, 23%);
   background: var(--se-surface);
   box-shadow: none;
   transform: none;
 }
 
-/* Clipped a little inside the edge, so square images with a frame (Steam's "?") read round. */
+/* Clipped a little inside the edge, so square images with a frame (Steam's "?") lose it. */
 ._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._1q5iGs9FEBhJcXc2mY3HPG > img:not(#se-none) {
   display: block;
   width: 100%;
   height: 100%;
   margin: 0;
-  border-radius: 50%;
+  border-radius: var(--se-avatar-radius, 23%);
   object-fit: cover;
-  clip-path: circle(46.5%);
+  clip-path: inset(3.5% round 20%);
+}
+
+/*
+ * The ring: a 4 px band 8 px out, concentric with the avatar's corners. A rounded square
+ * can't spin, so the arc travels round it instead (a conic fill cut to the band).
+ */
+@property --se-si-arc {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
 }
 
 ._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._1q5iGs9FEBhJcXc2mY3HPG::before {
@@ -617,16 +627,18 @@ html[data-se-startup-bg="hero"] ._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.
   position: absolute;
   inset: -8px;
   box-sizing: border-box;
-  border-radius: 50%;
-  border: 4px solid rgba(255, 255, 255, .08);
+  padding: 4px;
+  border-radius: calc(104px * .23 + 8px);
+  background: rgba(255, 255, 255, .08);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
   pointer-events: none;
-  transition: border-color .2s;
 }
 
-/* Pointing at an account spins the ring; the keyboard's or the menu's choice holds it still. */
+/* Pointing at an account runs the arc; the keyboard's or the menu's choice holds it still. */
 ._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6:is(:hover, :focus-visible, .gpfocus, ._1Bj4ekFS3Y3McdYpme6WhO) ._1q5iGs9FEBhJcXc2mY3HPG::before {
-  border-color: var(--se-accent-line);
-  border-top-color: var(--se-accent);
+  background: conic-gradient(from calc(var(--se-si-arc) - 45deg), var(--se-accent) 0 25%, var(--se-accent-line) 0);
 }
 
 ._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6:hover ._1q5iGs9FEBhJcXc2mY3HPG::before {
@@ -635,7 +647,7 @@ html[data-se-startup-bg="hero"] ._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.
 
 @keyframes se-signin-ring {
   to {
-    transform: rotate(360deg);
+    --se-si-arc: 360deg;
   }
 }
 
@@ -687,7 +699,7 @@ html[data-se-startup-bg="hero"] ._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.
  * shown only while the account is pointed at or the button has the keyboard.
  */
 ._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none) {
-  inset: 79px auto auto 79px;
+  inset: 88px auto auto 88px;
   z-index: 1;
   flex: none !important;
   box-sizing: border-box !important;
