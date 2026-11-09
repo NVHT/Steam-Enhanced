@@ -81,6 +81,18 @@ html[data-se-tst-on] body > :not(#se-tst) {
   animation: se-tst-letter-out .34s cubic-bezier(.65, 0, .35, 1) forwards;
 }
 
+/* Another toast window took over the stage mid-queue: it appears in place, no rise. */
+.se-tst-tray[data-show][data-instant]:not([data-out]),
+.se-tst-tray[data-show][data-instant]:not([data-out]) .se-tst-stage,
+.se-tst-tray[data-instant][data-queue] .se-tst-strip {
+  animation: none;
+}
+
+.se-tst-layer[data-instant],
+.se-tst-layer[data-instant] .se-tst-ct > * {
+  transition: none !important;
+}
+
 @keyframes se-tst-open {
   from { opacity: 0; transform: translateY(28px) scale(.96); }
   to { opacity: 1; transform: none; }
@@ -177,7 +189,7 @@ html[data-se-tst-on] body > :not(#se-tst) {
 
 /* A slow push-in over the toast's lifetime. */
 .se-tst-layer[data-on]:not([data-sticky]) .se-tst-hero {
-  animation: se-tst-push var(--se-tst-d, 6000ms) ease-out forwards;
+  animation: se-tst-push var(--se-tst-d, 6000ms) ease-out var(--se-tst-delay, 0ms) forwards;
 }
 
 @keyframes se-tst-push {
@@ -551,11 +563,11 @@ html[data-se-tst-on] body > :not(#se-tst) {
 }
 
 .se-tst-layer[data-on] .se-tst-arc {
-  animation: se-tst-fill var(--se-tst-d, 6000ms) linear forwards;
+  animation: se-tst-fill var(--se-tst-d, 6000ms) linear var(--se-tst-delay, 0ms) forwards;
 }
 
 .se-tst-layer[data-on] .se-tst-lead {
-  animation: se-tst-spin var(--se-tst-d, 6000ms) linear forwards;
+  animation: se-tst-spin var(--se-tst-d, 6000ms) linear var(--se-tst-delay, 0ms) forwards;
 }
 
 /* Until handled: a full, quieter ring and no lead. */
@@ -669,7 +681,7 @@ html[data-se-tst-on] body > :not(#se-tst) {
   border-radius: 1px;
   background: var(--c);
   transform-origin: left;
-  animation: se-tst-thumb var(--se-tst-d, 6000ms) linear forwards;
+  animation: se-tst-thumb var(--se-tst-d, 6000ms) linear var(--se-tst-delay, 0ms) forwards;
 }
 
 .se-tst-thumb[data-sticky]::after {

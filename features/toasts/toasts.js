@@ -1,17 +1,18 @@
 /*
  * Stage toasts: Steam's desktop notification toasts as a miniature Library Home stage at the
- * bottom centre of the screen. Runs in Steam's `notificationtoasts_` window.
+ * bottom centre of the screen. Runs in Steam's `notificationtoasts_` windows (one per toast).
  *
  * Steam keeps rendering its own toasts. Each one is read from its React props (kind, app,
- * ids) and its rendered output (text, images, buttons), then played on the stage: the game's
- * hero art under the Home stage grade, a sweep countdown, and a strip for the ones waiting.
- * One toast plays at a time. Clicks go to Steam's own toast and buttons, so what they do,
- * and the language they're in, stay Steam's.
+ * ids) and its rendered output (text, images, buttons) into a queue the toast windows share.
+ * One window draws the stage and plays the queue one toast at a time: the game's hero art
+ * under the Home stage grade, a sweep countdown, and a strip for the ones waiting. Clicks go
+ * to Steam's own toast and buttons, so what they do, and the language they're in, stay Steam's.
  *
- * Fail-safe: a Steam toast is hidden only once its Stage toast exists; a toast this script
- * can't read stays as Steam drew it. `--se-toasts: off` (shared/tokens.css) turns it all off.
- * Debug, in the toast window's console: `__seToasts.dump()` lists what was read;
- * `__seToasts.probe()` shows the React components and props above the window's text.
+ * Fail-safe: a Steam toast is hidden only once it's queued; a toast this script can't read
+ * stays as Steam drew it. `--se-toasts: off` (shared/tokens.css) turns it all off.
+ * Debug, in a toast window's console: `__seToasts.why()` shows the shared queue, which window
+ * is the stage and the placement; `__seToasts.probe()` shows the React components and props
+ * above the window's text.
  */
 (window.__se ? init => init(window.__se) : init => addEventListener('se-core', () => init(window.__se), { once: true }))(SE => {
   window.__seToasts?.destroy();
@@ -154,7 +155,7 @@
 
   /*
    * The toast an element belongs to: the `notification` prop of the component that stacks it.
-   * It may be an object or a plain id, so models are kept in a Map (not a WeakMap) by that value.
+   * It may be an object or a plain id, so entries are kept in a Map (not a WeakMap) by that value.
    */
   const NO_ID = Object.freeze({ noId: true });
   const toastIn = p => ('notification' in p && ('toastIndex' in p || 'toastCount' in p) ? p : undefined);
@@ -389,7 +390,8 @@
         counts: rarity.TIERS.map(t => ({ t, n: all.filter(a => rarity.tierOf(a.flAchieved) === t).length })).filter(c => c.n),
       };
     }
-    paint(m);
+    m.rev++;
+    notify();
   }
 
   /* ---------- View ---------- */
@@ -415,6 +417,8 @@
     pos = strip.querySelector('.se-tst-pos');
     dock.addEventListener('click', onDockClick);
     dock.addEventListener('animationend', onDockAnimationEnd);
+    dock.addEventListener('pointerover', onTrayHover);
+    dock.addEventListener('pointerout', onTrayHover);
     document.body.appendChild(dock);
   }
 
@@ -529,120 +533,181 @@
     return `<div class="se-tst-ds">${esc(m.text)}</div>`;
   }
 
-  // (Re)draws a layer's content in place; its art and countdown are left running.
-  function paint(m) {
-    if (!m.layer) return;
-    const tier = m.kind === 'ach' && !m.mastered ? rarity.tierOf(m.pct) : null;
-    const tierId = m.mastered ? 'legendary' : tier?.id;
-    SE.attr(m.layer, 'data-se-tier', tierId || null);
-    SE.attr(m.thumb, 'data-se-tier', tierId || null);
-    const label = m.kind === 'ach' && m.mastered ? 'Game mastered' : m.label;
-    m.layer.querySelector('.se-tst-ct').innerHTML =
-      `<div class="se-tst-tile">${tileHTML(m, tier)}</div>` +
-      `<div class="se-tst-tx"><div class="se-tst-ey">${esc(label)}</div>` +
-      `<div class="se-tst-tt">${esc(m.title)}</div>${detailHTML(m)}</div>` +
-      `<div class="se-tst-rt">${rightHTML(m, tier)}</div>`;
-    if (m === active()) syncTray();
+  /* ---------- One stage for every toast window ---------- */
+
+  /*
+   * Steam opens a window per toast. They share one queue (the hub, kept in Steam's shared
+   * context: the windows' opener) and one stage. The newest window that has reached the
+   * bottom centre plays every toast, one at a time, with the rest waiting in its strip; the
+   * other windows read their own Steam toast into the queue and draw nothing. When the stage's
+   * window closes (Steam's timer), the next newest takes over where it left off.
+   *
+   * A toast plays in a slot: its own time, shortened when the queue wouldn't otherwise finish
+   * before the last Steam toast closes (never below MIN_SLOT_MS).
+   *
+   * Steam's toast is dismissed by its own window once its Stage toast has played, except the
+   * stage's own, which stays until the queue empties (dismissing it closes the stage).
+   */
+  const HUB_KEY = '__seToastHub';
+  const HUB_V = 2;
+  const MIN_SLOT_MS = 2500;
+  const MIN_LEFT_MS = 1500;      // a shortened toast still shows at least this much more
+  const CLOSE_MS = 900;          // the tray's close animation, with margin
+  const HANDOFF_MS = 60;         // the old stage steps down this long after the new one draws
+
+  const alive = w => !!w && run(() => !w.closed) === true;
+
+  // The shared context, or this window for previews in the main window.
+  const home = () => (IN_TOAST_WINDOW ? shared() : window);
+
+  /*
+   * Made from the shared context's own constructors, so the hub outlives whichever toast
+   * window created it.
+   */
+  function hub() {
+    const at = home();
+    let h = run(() => at[HUB_KEY]);
+    if (h?.v === HUB_V) return h;
+    const O = run(() => at.Object && at.Array) ? at : window;
+    h = new O.Object();
+    Object.assign(h, {
+      v: HUB_V,
+      seq: 0,
+      wins: new O.Array(),     // toast windows, oldest first
+      stage: null,             // the window drawing the tray
+      entries: new O.Array(),  // play order
+      active: 0,               // entry id on the stage
+      startedAt: 0,
+      pausedAt: 0,
+      slot: 0,
+      playRev: 0,              // bumped whenever the active toast (re)starts
+      open: false,
+      closing: false,
+    });
+    run(() => { at[HUB_KEY] = h; });
+    return h;
   }
 
-  function makeLayer(m) {
-    const layer = document.createElement('div');
-    layer.className = 'se-tst-layer';
-    layer.dataset.id = String(m.id);
-    layer.dataset.accent = m.accent;
-    if (!m.ms) layer.dataset.sticky = '';
-    layer.style.setProperty('--se-tst-d', `${m.ms || 1}ms`);
+  const entryById = id => hub().entries.find(e => e.id === id) || null;
+  const activeEntry = () => {
+    const h = hub();
+    return h.entries.find(e => e.id === h.active && !e.done) || null;
+  };
+  const live = () => hub().entries.filter(e => !e.done);
+  const isStage = () => hub().stage === window;
+  const elapsed = h => Math.max(0, (h.pausedAt || Date.now()) - h.startedAt);
 
-    const art = document.createElement('div');
-    art.className = 'se-tst-art';
-    const urls = artURLs(m);
-    // No art at all: the avatar as a glow, else the plain ground in the toast's color.
-    const fallback = () => {
-      art.replaceChildren();
-      if (m.icon) art.appendChild(artImg([m.icon], 'se-tst-glow'));
-      else art.dataset.plain = '';
-    };
-    if (urls.length) art.appendChild(artImg(urls, 'se-tst-hero', fallback));
-    else if (m.artKind === 'avatar' && m.icon) art.appendChild(artImg([m.icon], 'se-tst-glow'));
-    else art.dataset.plain = '';
-    // A friend with no game art: their mini-profile background, once it arrives.
-    if (m.accountId && !urls.length) profileArt(m.accountId, art);
+  function register() {
+    const h = hub();
+    if (!h.wins.includes(window)) h.wins.push(window);
+  }
 
-    layer.append(art);
-    layer.insertAdjacentHTML(
-      'beforeend',
-      '<div class="se-tst-grade"></div><div class="se-tst-ct"></div>' +
-        '<button type="button" class="se-tst-sweep" aria-label="Dismiss">' +
-        '<svg class="se-tst-ring" viewBox="0 0 30 30" aria-hidden="true">' +
-        '<circle class="se-tst-trk" cx="15" cy="15" r="13.5"/><circle class="se-tst-arc" cx="15" cy="15" r="13.5"/></svg>' +
-        `<span class="se-tst-lead"></span><span class="se-tst-kdot"></span>${icon('close', 'se-tst-x')}</button>`
-    );
-    m.layer = layer;
+  // Every window (this one too) re-syncs on its next tick.
+  function notify() {
+    const h = hub();
+    for (const w of new Set([...h.wins, window])) if (alive(w)) run(() => w.__seToasts?.wake?.());
+  }
 
-    const thumb = document.createElement('button');
-    thumb.type = 'button';
-    thumb.className = 'se-tst-thumb';
-    thumb.dataset.id = String(m.id);
-    thumb.dataset.accent = m.accent;
-    thumb.style.setProperty('--se-tst-d', `${m.ms || 1}ms`);
-    if (!m.ms) thumb.dataset.sticky = '';
-    thumb.setAttribute('aria-label', `${m.label}: ${m.title}`);
-    const thumbURLs = urls.length ? urls : m.icon ? [m.icon] : [];
-    if (thumbURLs.length) thumb.appendChild(artImg(thumbURLs, 'se-tst-thumb-img'));
-    m.thumb = thumb;
+  let syncQueued = false;
+  function wake() {
+    if (syncQueued) return;
+    syncQueued = true;
+    setTimeout(sync, 0);
+  }
 
-    stage.appendChild(layer);
-    paint(m);
+  /*
+   * The slot for the toast about to play: its time, or less so that everything still queued
+   * fits before the last live Steam toast closes.
+   */
+  function slotFor(e, h, waiting) {
+    if (!e.ms) return 0;
+    const ends = h.entries.filter(x => !x.stale && alive(x.win)).map(x => x.deadline);
+    const horizon = ends.length ? Math.max(...ends) : Infinity;
+    if (!Number.isFinite(horizon)) return e.ms;
+    const fair = (horizon - Date.now() - CLOSE_MS) / Math.max(1, waiting);
+    return Math.round(Math.min(e.ms, Math.max(MIN_SLOT_MS, fair)));
+  }
+
+  /*
+   * More toasts joined while one plays: shorten what's left of it to its fair share, so the
+   * rest still fit (the countdown jumps ahead rather than toasts being lost).
+   */
+  function reslot(h) {
+    const cur = h.entries.find(e => e.id === h.active && !e.done);
+    if (!cur || !h.slot) return;
+    const played = elapsed(h);
+    const share = slotFor(cur, h, h.entries.filter(x => !x.done).length);
+    const slot = Math.round(Math.max(MIN_SLOT_MS, played + MIN_LEFT_MS, Math.min(h.slot, played + share)));
+    if (slot >= h.slot) return;
+    h.slot = slot;
+    h.playRev++;
+  }
+
+  // Puts `id` (else the first waiting) on the stage, or starts closing when nothing waits.
+  function advance(h, id = 0) {
+    const waiting = h.entries.filter(x => !x.done);
+    const next = (id && waiting.find(x => x.id === id)) || waiting[0];
+    if (!next) {
+      h.active = 0;
+      if (h.open) h.closing = true;
+      return;
+    }
+    h.closing = false;
+    h.active = next.id;
+    h.startedAt = Date.now();
+    h.pausedAt = 0;
+    h.slot = slotFor(next, h, waiting.length);
+    h.playRev++;
   }
 
   /* ---------- Queue ---------- */
 
-  let seq = 0;
-  let activeId = 0;
-  let closing = false;
-  const models = [];                  // in play order
-  const byKey = new Map();           // Steam notification (object or id) → model
-  const pendingKeys = new Map();      // unreadable so far → first seen
+  const byKey = new Map();           // this window's Steam notifications (object or id) → entry
+  const pendingKeys = new Map();     // unreadable so far → first seen
   const skipped = new Set();         // gave up: left native
 
-  const active = () => models.find(m => m.id === activeId) || null;
-  const pending = () => models.filter(m => !m.done);
-
   function add(key, src, info) {
+    const h = hub();
+    const now = Date.now();
     // `seenIcon` is what Steam drew; `icon` may be filled in later (an achievement's own image).
-    const m = { id: ++seq, key, src, born: Date.now(), done: false, stale: false, layer: null, thumb: null, ...info, seenIcon: info.icon };
-    byKey.set(key, m);
+    const e = {
+      id: ++h.seq,
+      key,
+      src,
+      win: window,
+      born: now,
+      deadline: info.preview || !info.ms ? Infinity : now + info.ms,
+      done: false,
+      stale: false,
+      released: false,
+      rev: 1,
+      ...info,
+      seenIcon: info.icon,
+    };
+    byKey.set(key, e);
     if (src) mark(src, SRC_ATTR);
 
     // Priority toasts play next; the rest join the end.
-    const at = m.pri && activeId ? models.findIndex(x => x.id === activeId) + 1 : models.length;
-    models.splice(at, 0, m);
-
-    if (!dock) build();
-    makeLayer(m);
-    const next = pending()[pending().indexOf(m) + 1];
-    strip.insertBefore(m.thumb, next?.thumb || pos);
-
-    if (!activeId || closing) {
-      closing = false;
-      activeId = m.id;
-      open();
-    }
-    syncTray();
-    enrichAchievement(m);
-    return m;
+    const at = e.pri && h.active ? h.entries.findIndex(x => x.id === h.active) + 1 : h.entries.length;
+    h.entries.splice(at, 0, e);
+    if (!h.active) advance(h);
+    else reslot(h);
+    enrichAchievement(e);
+    notify();
+    return e;
   }
 
   /*
    * Plays a Stage toast from a description instead of a Steam toast (the toast tester).
-   * spec: { kind, title, text, icon, appid, pct, buttons: [labels], mastered: { total, counts } }.
-   * Buttons and clicks only finish the preview.
+   * spec: { kind, title, text, icon, shot, appid, accountId, pct, ms, buttons: [labels],
+   * mastered: { total, counts } }. Buttons and clicks only finish the preview.
    */
   function preview(spec = {}) {
     if (!document.body) return null;
+    register();
     const kind = KINDS[spec.kind] ? spec.kind : 'system';
     const k = KINDS[kind];
-    const m = add({ preview: true }, null, {
+    const e = add({ preview: true }, null, {
       kind,
       label: k.label,
       accent: k.accent,
@@ -658,115 +723,330 @@
       buttons: (spec.buttons || []).map(label => ({ label, el: null })),
       click: null,
       dismiss: null,
-      stackIndex: 0,
       appid: Number(spec.appid) || 0,
       achId: '',
       accountId: Number(spec.accountId) || 0,
       pct: Number.isFinite(spec.pct) ? spec.pct : NaN,
+      mastered: spec.mastered || null,
       preview: true,
     });
-    if (spec.mastered) {
-      m.mastered = spec.mastered;
-      paint(m);
-    }
-    return m.id;
+    return e.id;
   }
 
-  // Ends every toast now (the tester's Clear).
+  // Ends every toast now, without the close animation (the tester's Clear).
   function clearAll() {
-    if (tray) closed(false);
+    const h = hub();
+    for (const e of h.entries) e.done = true;
+    h.active = 0;
+    h.open = false;
+    h.closing = false;
+    teardown();
+    notify();
+  }
+
+  const history = []; // the last toasts finished, and why (for why())
+  function finish(e, why = '') {
+    if (!e || e.done) return;
+    e.done = true;
+    history.push({ title: e.title, kind: e.kind, ms: e.ms, slot: e.id === hub().active ? hub().slot : 0, why, after: Date.now() - e.born });
+    if (history.length > 6) history.shift();
+    const h = hub();
+    if (e.id === h.active) advance(h);
+    notify();
   }
 
   function play(id) {
-    const m = models.find(x => x.id === id && !x.done);
-    if (!m) return;
-    activeId = id;
-    syncTray();
+    const h = hub();
+    if (id === h.active || !entryById(id) || entryById(id).done) return;
+    advance(h, id);
+    notify();
   }
 
-  const history = []; // the last toasts finished, and why (for dump())
-  function finish(m, why = '') {
-    if (!m || m.done) return;
-    m.done = true;
-    history.push({ title: m.title, kind: m.kind, ms: m.ms, why, after: Date.now() - m.born });
-    if (history.length > 6) history.shift();
-    m.thumb?.remove();
-    if (m.id === activeId) {
-      const next = pending()[0];
-      if (next) activeId = next.id;
-      else close();
+  // The close animation ended: the queue is empty.
+  function closed() {
+    const h = hub();
+    if (!h.closing) return;
+    h.closing = false;
+    h.open = false;
+    teardown();
+    notify(); // windows now release their finished toasts, the stage's own included
+  }
+
+  /*
+   * This window's part: dismiss Steam's toast for entries that have played (not the stage's
+   * own while the tray is up), and forget entries nobody needs any more.
+   */
+  function release(h) {
+    const up = h.open || h.closing;
+    for (const e of h.entries) {
+      if (e.win !== window || !e.done || e.released) continue;
+      if (IN_TOAST_WINDOW && isStage() && up) continue; // dismissing it would close the stage
+      e.released = true;
+      unmark(e.src, SRC_ATTR);
+      if (e.dismiss && e.src?.isConnected) run(e.dismiss);
     }
-    syncTray();
-    setTimeout(prune, PRUNE_MS);
+    for (let i = h.entries.length - 1; i >= 0; i--) {
+      const e = h.entries[i];
+      if (!e.done || !(e.released || !alive(e.win))) continue;
+      h.entries.splice(i, 1);
+      if (e.preview && e.win === window) byKey.delete(e.key);
+    }
   }
 
-  // Steam closes its toast (and so its window) once ours has finished, keeping both in step.
-  const dismissSteam = m => {
-    if (m.dismiss && m.src?.isConnected) run(m.dismiss);
-  };
+  /*
+   * The window that should be the stage: the newest one that's ready at the bottom centre.
+   * Windows whose toast couldn't be read (left native) never get ready, so never take it.
+   */
+  function candidate(h) {
+    for (let i = h.wins.length - 1; i >= 0; i--) {
+      const w = h.wins[i];
+      if (alive(w) && run(() => w.__seToasts?.ready?.())) return w;
+    }
+    return null;
+  }
 
-  function prune() {
-    for (let i = models.length - 1; i >= 0; i--) {
-      const m = models[i];
-      if (m.done && m.id !== activeId) {
-        m.layer?.remove();
-        unmark(m.src, SRC_ATTR);
-        dismissSteam(m);
-        models.splice(i, 1);
+  let claiming = false;
+  async function claim() {
+    claiming = true;
+    try {
+      await place(); // Steam may have moved the window back to its corner meanwhile
+    } finally {
+      claiming = false;
+    }
+    const h = hub();
+    if (candidate(h) !== window) return;
+    // Hover pauses don't carry over (the pointer is on the old window).
+    if (h.pausedAt) {
+      h.startedAt += Date.now() - h.pausedAt;
+      h.pausedAt = 0;
+    }
+    h.stage = window;
+    render(true);
+    setTimeout(notify, HANDOFF_MS); // the old stage steps down once this one is drawn
+  }
+
+  function sync() {
+    syncQueued = false;
+    if (!document.body) return;
+    const h = hub();
+    for (let i = h.wins.length - 1; i >= 0; i--) if (!alive(h.wins[i])) h.wins.splice(i, 1);
+    if (h.stage && !alive(h.stage)) h.stage = null;
+
+    const want = candidate(h);
+    if (want === window && h.stage !== window && !claiming) claim();
+    if (h.stage === window) {
+      tick(h);
+      render();
+    } else {
+      teardown();
+    }
+    release(h);
+
+    // Get to the bottom centre once a toast from this window is queued, ready to take over.
+    if (IN_TOAST_WINDOW && !ready() && !preparing && byKeyHasLive()) prepare();
+  }
+
+  const byKeyHasLive = () => [...byKey.values()].some(e => !e.done);
+
+  /*
+   * The stage's housekeeping: a countdown that ended without its animationend (a window that
+   * was hidden), and queued toasts whose Steam toast is long gone.
+   */
+  function tick(h) {
+    const cur = activeEntry();
+    if (cur && h.slot && !h.pausedAt && elapsed(h) > h.slot + 600) finish(cur, 'countdown (late)');
+    const now = Date.now();
+    for (const e of h.entries) {
+      if (!e.done && e.stale && e.id !== h.active && now - e.born > STALE_MAX_MS) finish(e, 'dropped by Steam');
+    }
+  }
+
+  /* ---------- Placement readiness ---------- */
+
+  let preparing = false;
+  let prepared = !IN_TOAST_WINDOW;
+  // Ready to be the stage: at the bottom centre, with a toast of its own still up.
+  const ready = () =>
+    prepared && !!document.body && (!IN_TOAST_WINDOW || [...byKey.values()].some(e => !e.released));
+
+  async function prepare() {
+    preparing = true;
+    try {
+      await place();
+    } finally {
+      preparing = false;
+      // Even if the window couldn't be moved it can play the stage where Steam put it.
+      prepared = true;
+      notify();
+    }
+  }
+
+  /* ---------- Drawing the stage (only in the stage window) ---------- */
+
+  const views = new Map(); // entry id → { layer, thumb, rev, armed, leaving }
+
+  // (Re)draws an entry's content in place; its art and countdown are left running.
+  function paint(e, v) {
+    v.rev = e.rev;
+    const tier = e.kind === 'ach' && !e.mastered ? rarity.tierOf(e.pct) : null;
+    const tierId = e.mastered ? 'legendary' : tier?.id;
+    SE.attr(v.layer, 'data-se-tier', tierId || null);
+    SE.attr(v.thumb, 'data-se-tier', tierId || null);
+    const label = e.kind === 'ach' && e.mastered ? 'Game mastered' : e.label;
+    v.layer.querySelector('.se-tst-ct').innerHTML =
+      `<div class="se-tst-tile">${tileHTML(e, tier)}</div>` +
+      `<div class="se-tst-tx"><div class="se-tst-ey">${esc(label)}</div>` +
+      `<div class="se-tst-tt">${esc(e.title)}</div>${detailHTML(e)}</div>` +
+      `<div class="se-tst-rt">${rightHTML(e, tier)}</div>`;
+  }
+
+  function makeView(e, instant) {
+    const layer = document.createElement('div');
+    layer.className = 'se-tst-layer';
+    // Taking over mid-toast: already showing, no fade-in (cleared once drawn).
+    if (instant) {
+      layer.dataset.instant = '';
+      setTimeout(() => delete layer.dataset.instant, 80);
+    }
+    layer.dataset.id = String(e.id);
+    layer.dataset.accent = e.accent;
+
+    const art = document.createElement('div');
+    art.className = 'se-tst-art';
+    const urls = artURLs(e);
+    // No art at all: the avatar as a glow, else the plain ground in the toast's color.
+    const fallback = () => {
+      art.replaceChildren();
+      if (e.icon) art.appendChild(artImg([e.icon], 'se-tst-glow'));
+      else art.dataset.plain = '';
+    };
+    if (urls.length) art.appendChild(artImg(urls, 'se-tst-hero', fallback));
+    else if (e.artKind === 'avatar' && e.icon) art.appendChild(artImg([e.icon], 'se-tst-glow'));
+    else art.dataset.plain = '';
+    // A friend with no game art: their mini-profile background, once it arrives.
+    if (e.accountId && !urls.length) profileArt(e.accountId, art);
+
+    layer.append(art);
+    layer.insertAdjacentHTML(
+      'beforeend',
+      '<div class="se-tst-grade"></div><div class="se-tst-ct"></div>' +
+        '<button type="button" class="se-tst-sweep" aria-label="Dismiss">' +
+        '<svg class="se-tst-ring" viewBox="0 0 30 30" aria-hidden="true">' +
+        '<circle class="se-tst-trk" cx="15" cy="15" r="13.5"/><circle class="se-tst-arc" cx="15" cy="15" r="13.5"/></svg>' +
+        `<span class="se-tst-lead"></span><span class="se-tst-kdot"></span>${icon('close', 'se-tst-x')}</button>`
+    );
+
+    const thumb = document.createElement('button');
+    thumb.type = 'button';
+    thumb.className = 'se-tst-thumb';
+    thumb.dataset.id = String(e.id);
+    thumb.dataset.accent = e.accent;
+    thumb.setAttribute('aria-label', `${e.label}: ${e.title}`);
+    const thumbURLs = urls.length ? urls : e.icon ? [e.icon] : [];
+    if (thumbURLs.length) thumb.appendChild(artImg(thumbURLs, 'se-tst-thumb-img'));
+
+    const v = { layer, thumb, rev: 0, armed: 0, leaving: false };
+    views.set(e.id, v);
+    stage.appendChild(layer);
+    paint(e, v);
+    return v;
+  }
+
+  // Finished: out of the strip now, off the stage after its crossfade.
+  function leave(id, v) {
+    if (v.leaving) return;
+    v.leaving = true;
+    v.thumb.remove();
+    unmark(v.layer, 'data-on');
+    setTimeout(() => {
+      v.layer.remove();
+      if (views.get(id) === v) views.delete(id);
+    }, PRUNE_MS);
+  }
+
+  /*
+   * Starts the active toast's countdown: its slot as the duration, minus the time it has
+   * already played (a stage that took over mid-toast picks up where the last one was).
+   */
+  function arm(v, h) {
+    // The pointer is already on the tray (it just clicked): CSS holds the countdown, so does the hub.
+    if (h.slot && !h.pausedAt && run(() => tray.matches(':hover'))) h.pausedAt = Date.now();
+    const left = -elapsed(h);
+    for (const el of [v.layer, v.thumb]) {
+      el.style.setProperty('--se-tst-d', `${h.slot || 1}ms`);
+      el.style.setProperty('--se-tst-delay', `${left}ms`);
+      SE.attr(el, 'data-sticky', h.slot ? null : '');
+      unmark(el, 'data-on');
+    }
+    void v.layer.offsetWidth; // restart the animations
+    mark(v.layer, 'data-on');
+    mark(v.thumb, 'data-on');
+    v.armed = h.playRev;
+  }
+
+  function render(instant = false) {
+    const h = hub();
+    const list = h.entries;
+    const waiting = list.filter(e => !e.done);
+    if (!waiting.length && !h.closing && !h.open) return teardown();
+    if (!dock) build();
+
+    for (const e of list) {
+      let v = views.get(e.id);
+      if (!v && !e.done) {
+        v = makeView(e, instant);
+        // In play order: before the next waiting entry's thumb.
+        const after = waiting.slice(waiting.indexOf(e) + 1).map(x => views.get(x.id)).find(x => x && !x.leaving);
+        strip.insertBefore(v.thumb, after?.thumb || pos);
+      }
+      if (!v || v.leaving) continue;
+      if (e.done) leave(e.id, v);
+      else if (v.rev !== e.rev) paint(e, v);
+    }
+    for (const [id, v] of views) if (!list.some(e => e.id === id)) leave(id, v);
+
+    const cur = activeEntry();
+    for (const [id, v] of views) {
+      if (v.leaving) continue;
+      if (cur && id === cur.id) {
+        if (v.armed !== h.playRev) arm(v, h);
+      } else if (v.armed) {
+        v.armed = 0;
+        unmark(v.layer, 'data-on');
+        unmark(v.thumb, 'data-on');
       }
     }
-  }
 
-  function syncTray() {
-    if (!tray) return;
-    const cur = active();
-    for (const m of models) {
-      const on = m === cur;
-      if (m.layer && on !== m.layer.hasAttribute('data-on')) SE.attr(m.layer, 'data-on', on || null);
-      if (m.thumb) SE.attr(m.thumb, 'data-on', on || null);
-    }
-    SE.attr(tray, 'data-se-tier', cur?.layer?.getAttribute('data-se-tier') || null);
-    SE.attr(tray, 'data-accent', cur?.accent || null);
-    const list = pending();
-    const i = list.indexOf(cur);
-    SE.attr(tray, 'data-queue', list.length > 1 && !closing ? '' : null);
-    pos.textContent = i >= 0 ? `${i + 1} of ${list.length}` : '';
-  }
-
-  /* ---------- Open / close and placement ---------- */
-
-  function open() {
-    unmark(tray, 'data-out');
-    // Hidden until the window sits at the bottom centre, so it never flashes in Steam's corner.
-    mark(dock, 'data-placing');
-    place().finally(() => {
-      unmark(dock, 'data-placing');
-      // Restart the rise and letterbox each time the tray opens.
+    // The tray: rises in when it opens, or simply appears when this window takes over.
+    const wasOut = tray.hasAttribute('data-out');
+    SE.attr(tray, 'data-out', h.closing || null);
+    if (!tray.hasAttribute('data-show') || (wasOut && !h.closing)) {
+      SE.attr(tray, 'data-instant', instant && h.open ? '' : null);
       unmark(tray, 'data-show');
       void tray.offsetWidth;
       mark(tray, 'data-show');
-    });
-  }
-
-  function close() {
-    closing = true;
-    mark(tray, 'data-out');
-  }
-
-  function closed(steamToo = true) {
-    for (const m of models) {
-      m.layer?.remove();
-      m.thumb?.remove();
-      unmark(m.src, SRC_ATTR);
-      if (steamToo) dismissSteam(m);
+      h.open = true;
+      fit();
     }
-    models.length = 0;
-    activeId = 0;
-    closing = false;
-    unmark(tray, 'data-show');
-    unmark(tray, 'data-out');
-    syncTray();
+
+    const curView = cur && views.get(cur.id);
+    SE.attr(tray, 'data-se-tier', curView?.layer.getAttribute('data-se-tier') || null);
+    SE.attr(tray, 'data-accent', cur?.accent || null);
+    const i = waiting.indexOf(cur);
+    SE.attr(tray, 'data-queue', waiting.length > 1 && !h.closing ? '' : null);
+    pos.textContent = i >= 0 && waiting.length > 1 ? `${i + 1} of ${waiting.length}` : '';
+    return undefined;
   }
+
+  // This window stops drawing the stage (another took over, or the queue is empty).
+  function teardown() {
+    if (!dock) return;
+    dock.remove();
+    dock = tray = stage = strip = pos = null;
+    views.clear();
+  }
+
+  /* ---------- Placement ---------- */
 
   /*
    * Steam sizes and places the toast window itself (its corner). The window is moved to the
@@ -940,8 +1220,8 @@
     const h = BOX.padTop + BOX.trayH + BOX.padBottom;
     const left = s.availLeft ?? 0;
     const top = s.availTop ?? 0;
-    const stack = active()?.stackIndex || 0;
-    const bottom = top + s.availHeight - BOX.lift + BOX.padBottom - stack * (BOX.trayH + BOX.gap);
+    // Every toast window goes to the same spot; only the stage draws anything there.
+    const bottom = top + s.availHeight - BOX.lift + BOX.padBottom;
     return { x: Math.round(left + (s.availWidth - w) / 2), y: Math.round(bottom - h), w, h };
   }
 
@@ -1018,7 +1298,6 @@
   }
 
   // Steam may put the window back in its corner when its own toast list changes.
-  // A toast below closing moves this one down a slot (its toastIndex changes).
   let replaceTimer = 0;
   let reMoves = 0;
   function restack() {
@@ -1038,45 +1317,60 @@
     restack();
   }
 
-  /* ---------- Events ---------- */
+  /* ---------- Events (stage window) ---------- */
 
   function onDockClick(e) {
     const thumb = e.target.closest('.se-tst-thumb');
     if (thumb) return play(Number(thumb.dataset.id));
 
     const layer = e.target.closest('.se-tst-layer');
-    const m = layer && models.find(x => x.id === Number(layer.dataset.id));
-    if (!m) return;
+    const m = layer && entryById(Number(layer.dataset.id));
+    if (!m || m.done) return undefined;
 
     if (e.target.closest('.se-tst-sweep')) return finish(m, 'close button');
 
+    // Steam's toast may live in another toast window: its elements and handlers still work
+    // from here, as long as that window is open.
+    const usable = !m.stale && alive(m.win);
     const act = e.target.closest('[data-se-tst-act]');
     if (act) {
       const b = m.buttons[Number(act.dataset.seTstAct)];
-      if (b?.el?.isConnected) run(() => b.el.click());
+      if (usable && b?.el?.isConnected) run(() => b.el.click());
       return finish(m, 'action');
     }
 
     // The toast itself: Steam's own click (opens the chat, game, store page...), then the
     // theme's friend-chat forwarding, as when the native toast is clicked.
-    if (!m.stale && m.click?.isConnected) {
+    if (usable && m.click?.isConnected) {
       run(() => m.click.click());
-      run(() => window.__seFriendNotificationClicks?.forward?.(m.click));
+      run(() => (m.win.__seFriendNotificationClicks || window.__seFriendNotificationClicks)?.forward?.(m.click));
     }
-    finish(m, 'click');
+    return finish(m, 'click');
   }
 
   function onDockAnimationEnd(e) {
     if (e.animationName === 'se-tst-fill') {
       const layer = e.target.closest('.se-tst-layer');
-      const m = layer && models.find(x => x.id === Number(layer.dataset.id));
-      if (m && m.id === activeId) finish(m, 'countdown');
-    } else if (e.animationName === 'se-tst-close' && e.target === tray && closing) {
+      const cur = activeEntry();
+      if (cur && layer && Number(layer.dataset.id) === cur.id) finish(cur, 'countdown');
+    } else if (e.animationName === 'se-tst-close' && e.target === tray && hub().closing) {
       closed();
     }
   }
 
-  /* ---------- Scanning Steam's toasts ---------- */
+  // Hovering the tray pauses the countdown (CSS); the hub keeps the time so a new stage agrees.
+  function onTrayHover(e) {
+    const h = hub();
+    if (!e.target.closest?.('.se-tst-tray')) return;
+    if (e.type === 'pointerover' && !h.pausedAt && h.active) {
+      h.pausedAt = Date.now();
+    } else if (e.type === 'pointerout' && h.pausedAt && !tray?.contains(e.relatedTarget)) {
+      h.startedAt += Date.now() - h.pausedAt;
+      h.pausedAt = 0;
+    }
+  }
+
+  /* ---------- Scanning this window's Steam toasts ---------- */
 
   let lastScan = null; // for __seToasts.why()
 
@@ -1088,7 +1382,7 @@
       const key = keyOf(el);
       if (key !== null && !live.has(key)) live.set(key, el); // document order: the first hit is the toast's root
     }
-    if (tray?.hasAttribute('data-show')) {
+    if (isStage() && tray?.hasAttribute('data-show')) {
       fit();
       // Steam can move the window back to its corner after it landed: move it again (a few times).
       if (mover >= 0 && target && (!landed(target) || (sizer >= 0 && !sized(target))) && reMoves < 3) {
@@ -1122,17 +1416,16 @@
     }
 
     // Toasts Steam dropped: the one playing finishes on its own timer, queued ones are kept a while.
-    for (const m of models) {
-      if (m.done || live.has(m.key)) continue;
-      if (!m.stale) {
+    for (const [k, m] of byKey) {
+      if (m.preview || live.has(k)) continue;
+      if (!m.done && !m.stale) {
         m.stale = true;
-        if (m.layer) for (const b of m.layer.querySelectorAll('[data-se-tst-act]')) b.disabled = true;
+        m.rev++;
+        notify();
       }
-      if (m.id !== activeId && now - m.born > STALE_MAX_MS) finish(m, 'dropped by Steam');
+      // Finished toasts are forgotten once Steam has removed them too (never replayed before that).
+      if (m.done) byKey.delete(k);
     }
-
-    // Finished toasts are forgotten once Steam has removed them too (never replayed before that).
-    for (const [k, m] of byKey) if (m.done && !live.has(k)) byKey.delete(k);
 
     // Steam's own drawing goes out of sight only while every toast it has is on the stage.
     const all = live.size > 0 && [...live.keys()].every(k => byKey.has(k));
@@ -1165,19 +1458,19 @@
     m.buttons = info.buttons;
     m.click = info.click;
     m.dismiss = info.dismiss || m.dismiss;
-    if (info.stackIndex !== m.stackIndex) {
-      m.stackIndex = info.stackIndex;
-      if (m.id === activeId) restack();
-    }
     if (!info.title || (info.title === m.title && info.text === m.text && info.icon === m.seenIcon)) return;
     Object.assign(m, { title: info.title, text: info.text, seenIcon: info.icon, icon: info.icon || m.icon });
-    paint(m);
-    if (m.id === activeId && m.layer) {
-      // New content: the countdown starts over, as Steam's does.
-      unmark(m.layer, 'data-on');
-      void m.layer.offsetWidth;
-      mark(m.layer, 'data-on');
+    m.rev++;
+    // New content: Steam restarts its timer, and so does the stage if it's playing this one.
+    if (info.ms) m.deadline = Date.now() + info.ms;
+    const h = hub();
+    if (m.id === h.active) {
+      h.startedAt = Date.now();
+      h.pausedAt = 0;
+      h.slot = slotFor(m, h, live().length);
+      h.playRev++;
     }
+    notify();
   }
 
   /* ---------- Lifecycle ---------- */
@@ -1185,13 +1478,39 @@
   let watcher = null;
   let poller = null;
 
+  const busy = () => hub().entries.length > 0 || pendingKeys.size > 0 || unseenSince > 0;
+  const step = () => {
+    scan();
+    sync();
+  };
+
+  // Steam closed this toast window: its queued toasts stay queued (without their buttons),
+  // and if it was the stage, the next newest window takes over.
+  function onPageHide() {
+    const h = hub();
+    for (const e of h.entries) if (e.win === window && !e.done) e.stale = true;
+    const i = h.wins.indexOf(window);
+    if (i >= 0) h.wins.splice(i, 1);
+    if (h.stage === window) h.stage = null;
+    const others = h.wins.filter(alive);
+    // The last toast window: nothing is left to show the queue, so it ends here.
+    if (!others.length && IN_TOAST_WINDOW) {
+      h.entries.splice(0);
+      Object.assign(h, { active: 0, open: false, closing: false, pausedAt: 0 });
+    }
+    for (const w of others) run(() => w.__seToasts?.wake?.());
+  }
+
   function start() {
     if (!enabled() || !IN_TOAST_WINDOW) return;
-    watcher = SE.watch(scan, { throttle: 60, characterData: true });
-    // Steam can fill a toast in without a DOM mutation the observer sees (images, late props).
-    poller = SE.poll(scan, 400, { active: () => models.length > 0 || pendingKeys.size > 0 || unseenSince > 0 });
+    register();
+    watcher = SE.watch(step, { throttle: 60, characterData: true });
+    // Steam can fill a toast in without a DOM mutation the observer sees (images, late props),
+    // and the stage needs its housekeeping while toasts are queued.
+    poller = SE.poll(step, 400, { active: busy });
     addEventListener('resize', onWindowResize);
-    scan();
+    addEventListener('pagehide', onPageHide);
+    step();
   }
 
   if (document.body) start();
@@ -1199,7 +1518,8 @@
 
   // Where the window is, where it should be, and what Steam offers to move it (for why()).
   function placement() {
-    const src = active()?.src || models[0]?.src;
+    const own = [...byKey.values()].filter(e => !e.preview);
+    const src = own.find(e => !e.done)?.src || own[0]?.src;
     const popup = src && run(() => SE.fromProps(src, FIBER_DEPTH, p => ('registerPopup' in p && p.popup ? p.popup : undefined)));
     const members = o => {
       const out = new Set();
@@ -1242,17 +1562,35 @@
     });
   }
 
+  // What every toast window is doing, from this one's point of view.
+  function stageInfo() {
+    const h = hub();
+    const name = w => (w === window ? 'this window' : run(() => w.name) || '?');
+    return {
+      stage: h.stage ? name(h.stage) : null,
+      windows: h.wins.map(w => ({ name: name(w), alive: alive(w), ready: !!run(() => w.__seToasts?.ready?.()) })),
+      active: h.active,
+      slot: h.slot,
+      elapsed: h.active ? elapsed(h) : 0,
+      open: h.open,
+      closing: h.closing,
+      queue: h.entries.map(e => ({ id: e.id, title: e.title, done: e.done, stale: e.stale, released: e.released, from: name(e.win), deadlineIn: Number.isFinite(e.deadline) ? e.deadline - Date.now() : null })),
+    };
+  }
+
   window.__seToasts = {
-    version: '1.94.2',
+    version: '1.95.0',
     preview,
     clearAll,
     kinds: Object.keys(KINDS),
     probe,
-    // Why nothing (or something) is on the stage: the last scan, and what each toast read as.
+    wake,
+    ready,
     history: () => history.slice(),
-    why: () => ({ history: history.slice(), enabled: enabled(), lastScan, models: models.length, skipped: skipped.size, pending: pendingKeys.size, placement: placement() }),
+    // Why nothing (or something) is on the stage: the last scan, the shared queue and placement.
+    why: () => ({ history: history.slice(), enabled: enabled(), lastScan, stage: stageInfo(), skipped: skipped.size, pending: pendingKeys.size, placement: placement() }),
     dump() {
-      return models.map(m => ({
+      return [...byKey.values()].map(m => ({
         id: m.id,
         kind: m.kind,
         title: m.title,
@@ -1262,7 +1600,6 @@
         buttons: m.buttons.map(b => b.label),
         stale: m.stale,
         done: m.done,
-        stackIndex: m.stackIndex,
         canDismiss: !!m.dismiss,
         dataClass: run(() => noteOf(m.key, m.src)?.data?.getClassName?.()),
         noteKeys: run(() => Object.keys(noteOf(m.key, m.src) || {})),
@@ -1276,9 +1613,14 @@
       poller?.disconnect();
       clearTimeout(replaceTimer);
       removeEventListener('resize', onWindowResize);
+      removeEventListener('pagehide', onPageHide);
+      const h = hub();
+      const i = h.wins.indexOf(window);
+      if (i >= 0) h.wins.splice(i, 1);
+      if (h.stage === window) h.stage = null;
       for (const el of document.querySelectorAll(`[${SRC_ATTR}]`)) unmark(el, SRC_ATTR);
       unmark(root, ON_ATTR);
-      dock?.remove();
+      teardown();
       delete window.__seToasts;
     },
   };
