@@ -11,7 +11,7 @@
 
 <p align="center">
   <img alt="Millennium: theme" src="https://img.shields.io/badge/Millennium-theme-7cc4ff?style=flat-square&labelColor=171a20">
-  <img alt="version: 1.93.11" src="https://img.shields.io/badge/version-1.93.11-f0c060?style=flat-square&labelColor=171a20">
+  <img alt="version: 1.94.0" src="https://img.shields.io/badge/version-1.94.0-f0c060?style=flat-square&labelColor=171a20">
   <img alt="platform: Steam desktop" src="https://img.shields.io/badge/platform-Steam%20desktop-33404f?style=flat-square&labelColor=171a20">
 </p>
 
@@ -187,7 +187,7 @@ Spinners smaller than 40px fall back to `sweep`.
 | `--se-home-stage-tray` | `30` | Minimum share of the window height kept for the glass tray, in percent (0–70). |
 | `--se-overlay` | `on` | `off` restores Steam's default in-game overlay look. |
 | `--se-overlay-dim` | `0.9` | How dark the backdrop behind the overlay is (0–1). |
-| `--se-toasts` | `on` | `off` restores Steam's own desktop notification toasts. |
+| `--se-toasts` | `on` | `off` restores Steam's own desktop notification toasts. Press **Ctrl+Shift+T** in Steam to preview every kind. |
 
 </details>
 

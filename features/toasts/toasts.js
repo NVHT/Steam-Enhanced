@@ -19,6 +19,10 @@
   const { run, esc, mark, unmark, rarity } = SE;
   const root = document.documentElement;
 
+  // In Steam's toast windows this reads and plays Steam's toasts. Anywhere else (the main
+  // window) it only plays previews, for the toast tester (features/toasts/toast-tester.js).
+  const IN_TOAST_WINDOW = /^notificationtoasts_/.test(window.name || document.title || '');
+
   /* ---------- Config ---------- */
 
   const SRC_ATTR = 'data-se-tst-src';   // on Steam toasts that have a Stage toast
@@ -342,6 +346,7 @@
 
   async function enrichAchievement(m) {
     if (m.kind !== 'ach' || !m.appid) return;
+    if (m.preview && (Number.isFinite(m.pct) || m.mastered)) return; // the tester gave its own
     const all = await achievements(m.appid);
     if (!all.length || m.done) return;
     const name = m.title.toLowerCase();
@@ -531,7 +536,7 @@
     // `seenIcon` is what Steam drew; `icon` may be filled in later (an achievement's own image).
     const m = { id: ++seq, key, src, born: Date.now(), done: false, stale: false, layer: null, thumb: null, ...info, seenIcon: info.icon };
     byKey.set(key, m);
-    mark(src, SRC_ATTR);
+    if (src) mark(src, SRC_ATTR);
 
     // Priority toasts play next; the rest join the end.
     const at = m.pri && activeId ? models.findIndex(x => x.id === activeId) + 1 : models.length;
@@ -549,6 +554,50 @@
     }
     syncTray();
     enrichAchievement(m);
+    return m;
+  }
+
+  /*
+   * Plays a Stage toast from a description instead of a Steam toast (the toast tester).
+   * spec: { kind, title, text, icon, appid, pct, buttons: [labels], mastered: { total, counts } }.
+   * Buttons and clicks only finish the preview.
+   */
+  function preview(spec = {}) {
+    if (!document.body) return null;
+    const kind = KINDS[spec.kind] ? spec.kind : 'system';
+    const k = KINDS[kind];
+    const m = add({ preview: true }, null, {
+      kind,
+      label: k.label,
+      accent: k.accent,
+      ms: spec.ms ?? k.ms,
+      pri: !!k.pri,
+      artKind: k.art,
+      glyph: k.icon,
+      play: !!k.play,
+      title: spec.title || k.label,
+      text: spec.text || '',
+      icon: spec.icon || '',
+      shot: spec.shot || '',
+      buttons: (spec.buttons || []).map(label => ({ label, el: null })),
+      click: null,
+      dismiss: null,
+      stackIndex: 0,
+      appid: Number(spec.appid) || 0,
+      achId: '',
+      pct: Number.isFinite(spec.pct) ? spec.pct : NaN,
+      preview: true,
+    });
+    if (spec.mastered) {
+      m.mastered = spec.mastered;
+      paint(m);
+    }
+    return m.id;
+  }
+
+  // Ends every toast now (the tester's Clear).
+  function clearAll() {
+    if (tray) closed(false);
   }
 
   function play(id) {
@@ -837,6 +886,7 @@
   }
 
   async function place() {
+    if (!IN_TOAST_WINDOW) return; // a preview in the main window sits at its bottom centre (CSS)
     try {
       await moveWindow();
     } finally {
@@ -1059,7 +1109,7 @@
   let poller = null;
 
   function start() {
-    if (!enabled()) return;
+    if (!enabled() || !IN_TOAST_WINDOW) return;
     watcher = SE.watch(scan, { throttle: 60, characterData: true });
     // Steam can fill a toast in without a DOM mutation the observer sees (images, late props).
     poller = SE.poll(scan, 400, { active: () => models.length > 0 || pendingKeys.size > 0 || unseenSince > 0 });
@@ -1116,7 +1166,10 @@
   }
 
   window.__seToasts = {
-    version: '1.93.11',
+    version: '1.94.0',
+    preview,
+    clearAll,
+    kinds: Object.keys(KINDS),
     probe,
     // Why nothing (or something) is on the stage: the last scan, and what each toast read as.
     history: () => history.slice(),
