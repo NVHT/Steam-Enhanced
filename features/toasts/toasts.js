@@ -28,8 +28,11 @@
   const PRUNE_MS = 650;                 // finished layers leave after their crossfade
   const SVG_NS = 'http://www.w3.org/2000/svg';
 
-  // Window box around the tray: room for its shadow, and its lift off the work area.
-  const BOX = Object.freeze({ trayW: 480, padX: 40, padTop: 56, lift: 24, maxTrayH: 176 });
+  /*
+   * Each toast is its own window (Steam stacks them by toastIndex). Each window is sized to its
+   * tray plus room for the shadow, centred, and stacked up from `lift` above the work area.
+   */
+  const BOX = Object.freeze({ trayW: 480, trayH: 136, padX: 32, padTop: 32, padBottom: 8, lift: 24, gap: 10 });
 
   /*
    * Kinds: eyebrow, accent, countdown (0 = until handled), art source and fallback icon.
@@ -133,37 +136,63 @@
   };
 
   /*
-   * The notification (or notification group) a rendered element belongs to. Steam's prop
-   * names aren't stable, so any prop that looks like one counts: a notification has a
-   * protobuf `data` message or a type/id; a group has a `notifications` array of them.
+   * How Steam draws a desktop toast (React tree above the toast's text):
+   *
+   *   ee(appid, notification, toastIndex, toastCount, onDismiss, registerPopup)  one popup window per toast
+   *   └ Oe(notification, onDismiss, toastIndex, toastCount)                       the toast
+   *     └ ?(className, group, location, onDismiss)                                its notification group
+   *       └ ze(logo, title, icon, body, onActivate, onDismiss, personaStatus)    the template
+   *
+   * Minified names change between Steam builds, so components are matched by their props.
    */
-  const FIBER_DEPTH = 14;
-  const isNote = v =>
-    !!v && typeof v === 'object' && !Array.isArray(v) && !v.$$typeof && !v.nodeType &&
-    (typeof v.data?.getClassName === 'function' || 'eType' in v || 'notificationID' in v ||
-      'notification_id' in v || 'notificationid' in v);
-  const isGroup = v => !!v && typeof v === 'object' && Array.isArray(v.notifications) && isNote(v.notifications.at(-1));
+  const FIBER_DEPTH = 24;
+  const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v) && !v.$$typeof && !v.nodeType;
 
-  const noteIn = p => {
-    for (const name in p) {
-      if (name === 'children' || name === 'className' || name === 'style') continue;
-      const v = run(() => p[name]);
-      if (isGroup(v) || isNote(v)) return v;
-      if (isNote(v?.notification)) return v.notification;
-    }
-    return isNote(p) ? p : undefined;
+  // The toast an element belongs to: the `notification` prop of the component that stacks it.
+  const toastIn = p => (isObj(p.notification) && ('toastIndex' in p || 'toastCount' in p) ? p : undefined);
+  const keyOf = el => (el && el !== document.body ? run(() => SE.fromProps(el, FIBER_DEPTH, toastIn))?.notification || null : null);
+
+  // Props of the first component below `src` that matches.
+  const below = (src, test) => run(() => SE.findDown(src, test, 800)) || null;
+  const templateOf = src => below(src, p => typeof p.onActivate === 'function' && ('title' in p || 'body' in p));
+  const groupOf = src => below(src, p => isObj(p.group) && 'location' in p)?.group || null;
+  const stackOf = src => run(() => SE.fromProps(src, FIBER_DEPTH, toastIn)) || null;
+
+  // The notification itself: the group's newest (as friend-notification-clicks.js reads it), else the toast's.
+  const noteOf = (key, src) => {
+    const group = src && groupOf(src);
+    return (Array.isArray(group?.notifications) && group.notifications.at(-1)) || key;
   };
 
-  const keyOf = el => (el && el !== document.body ? run(() => SE.fromProps(el, FIBER_DEPTH, noteIn)) || null : null);
-  const noteOf = key => (Array.isArray(key?.notifications) ? key.notifications.at(-1) : key);
+  // English wording, only when Steam's data says nothing about the kind.
+  const TEXT_KINDS = [
+    [/\bachievement\b/i, 'ach'],
+    [/ready to play|download (is )?complete/i, 'ready'],
+    [/\bscreenshot/i, 'shot'],
+    [/\bclip\b|recording/i, 'clip'],
+    [/friend request|wants to be (your )?friends?/i, 'request'],
+    [/\binvited?\b/i, 'invite'],
+    [/wishlist|on sale|% off/i, 'sale'],
+    [/\bgift\b/i, 'gift'],
+    [/trade offer/i, 'trade'],
+    [/comment/i, 'comment'],
+    [/battery/i, 'battery'],
+  ];
 
-  function kindOf(note) {
+  function kindOf(note, tpl, text) {
     const data = note?.data;
     const cls = String(run(() => data?.getClassName?.()) || '');
     for (const [re, kind] of CLASS_RULES) if (cls && re.test(cls)) return kind;
     const type = Number(field(note, 'eType', 'notification_type', 'type'));
-    return TYPE_KINDS[type] || 'system';
+    if (TYPE_KINDS[type]) return TYPE_KINDS[type];
+    // A friend's presence toast carries their persona status.
+    if (tpl && 'personaStatus' in tpl && tpl.personaStatus) return /\bplaying\b/i.test(text) ? 'playing' : 'online';
+    for (const [re, kind] of TEXT_KINDS) if (re.test(text)) return kind;
+    return 'system';
   }
+
+  // A plain URL from a template prop (Steam passes either a URL or an element).
+  const urlOf = v => (typeof v === 'string' && /^(https?:|\/|data:image\/(?!gif))/.test(v) ? v : '');
 
   const contextGlobal = name => {
     for (const win of SE.owners()) {
@@ -235,12 +264,18 @@
   }
 
   function describe(key, src) {
-    const note = noteOf(key);
+    const note = noteOf(key, src);
     const data = note?.data;
-    const kind = kindOf(note);
-    const k = KINDS[kind];
+    const tpl = templateOf(src);
+    const stack = stackOf(src);
     const seen = read(src);
-    const appid = Number(field(data, 'appid', 'game_id', 'gameid', 'app_id') || field(note, 'appid')) || 0;
+    const kind = kindOf(note, tpl, `${seen.title} ${seen.text}`);
+    const k = KINDS[kind];
+    const appid =
+      Number(field(data, 'appid', 'game_id', 'gameid', 'app_id') || field(note, 'appid')) ||
+      Number(run(() => SE.fromProps(src, FIBER_DEPTH, p => (Number(p.appid) > 0 ? Number(p.appid) : undefined)))) ||
+      0;
+    const dismiss = [tpl?.onDismiss, stack?.onDismiss].find(f => typeof f === 'function') || null;
     const pct = Number(field(data, 'global_achieved_pct', 'global_achieved_percent', 'achieved_pct', 'flAchieved'));
     return {
       kind,
@@ -253,10 +288,12 @@
       play: !!k.play,
       title: seen.title,
       text: seen.text,
-      icon: seen.icon,
+      icon: seen.icon || urlOf(tpl?.logo) || urlOf(tpl?.icon),
       shot: kind === 'shot' ? seen.large : '',
       buttons: seen.buttons,
       click: seen.click,
+      dismiss,
+      stackIndex: Number(stack?.toastIndex) || 0,
       appid,
       achId: String(field(data, 'achievement_id', 'api_name', 'achievement', 'name_id') || ''),
       pct: Number.isFinite(pct) ? pct : NaN,
@@ -513,12 +550,18 @@
     setTimeout(prune, PRUNE_MS);
   }
 
+  // Steam closes its toast (and so its window) once ours has finished, keeping both in step.
+  const dismissSteam = m => {
+    if (m.dismiss && m.src?.isConnected) run(m.dismiss);
+  };
+
   function prune() {
     for (let i = models.length - 1; i >= 0; i--) {
       const m = models[i];
       if (m.done && m.id !== activeId) {
         m.layer?.remove();
         unmark(m.src, SRC_ATTR);
+        dismissSteam(m);
         models.splice(i, 1);
       }
     }
@@ -560,11 +603,12 @@
     mark(tray, 'data-out');
   }
 
-  function closed() {
+  function closed(steamToo = true) {
     for (const m of models) {
       m.layer?.remove();
       m.thumb?.remove();
       unmark(m.src, SRC_ATTR);
+      if (steamToo) dismissSteam(m);
     }
     models.length = 0;
     activeId = 0;
@@ -603,19 +647,46 @@
   function wanted() {
     const s = window.screen;
     const w = BOX.trayW + BOX.padX * 2;
-    const h = BOX.maxTrayH + BOX.padTop + BOX.lift;
+    const h = BOX.padTop + BOX.trayH + BOX.padBottom;
     const left = s.availLeft ?? 0;
     const top = s.availTop ?? 0;
-    return { x: Math.round(left + (s.availWidth - w) / 2), y: Math.round(top + s.availHeight - h), w, h };
+    const stack = active()?.stackIndex || 0;
+    const bottom = top + s.availHeight - BOX.lift + BOX.padBottom - stack * (BOX.trayH + BOX.gap);
+    return { x: Math.round(left + (s.availWidth - w) / 2), y: Math.round(bottom - h), w, h };
   }
 
   const fullArea = () => window.innerWidth >= screen.availWidth - 8 && window.innerHeight >= screen.availHeight / 2;
   const landed = t => Math.abs(window.screenX - t.x) <= 4 && Math.abs(window.screenY - t.y) <= 4;
 
+  /*
+   * Where the tray sits in the window: its own small window → just above the bottom pad;
+   * a work-area window → `lift` up. If the window stays smaller than the tray (it couldn't be
+   * moved or sized), the tray scales down to fit rather than being cut off.
+   */
+  function fit() {
+    if (!dock) return;
+    const full = fullArea();
+    const bottom = full ? BOX.lift : mover >= 0 ? BOX.padBottom : 4;
+    const scale = Math.min(1, (window.innerWidth - 8) / BOX.trayW, (window.innerHeight - bottom - 4) / BOX.trayH);
+    dock.style.setProperty('--se-tst-bottom', `${bottom}px`);
+    dock.style.setProperty('--se-tst-scale', String(Math.max(0.5, Math.round(scale * 1000) / 1000)));
+  }
+
   async function place() {
+    try {
+      await moveWindow();
+    } finally {
+      fit();
+    }
+  }
+
+  async function moveWindow() {
     if (fullArea() || mover === -2) return;
     target = wanted();
-    if (landed(target)) return;
+    if (landed(target)) {
+      if (mover < 0) mover = 0;
+      return;
+    }
     const order = mover >= 0 ? [mover] : MOVERS.map((_, i) => i);
     for (const i of order) {
       if (i > 0 && typeof window.SteamClient?.Window?.MoveTo !== 'function') continue;
@@ -639,13 +710,21 @@
   }
 
   // Steam may put the window back in its corner when its own toast list changes.
+  // A toast below closing moves this one down a slot (its toastIndex changes).
   let replaceTimer = 0;
-  function onWindowResize() {
+  function restack() {
     if (!tray?.hasAttribute('data-show') || mover < 0 || replaceTimer) return;
     replaceTimer = setTimeout(() => {
       replaceTimer = 0;
-      if (target && !landed(target)) run(MOVERS[mover], target.x, target.y, target.w, target.h);
+      target = wanted();
+      if (!landed(target)) run(MOVERS[mover], target.x, target.y, target.w, target.h);
+      fit();
     }, 60);
+  }
+
+  function onWindowResize() {
+    fit();
+    restack();
   }
 
   /* ---------- Events ---------- */
@@ -759,6 +838,11 @@
     const info = describe(key, src);
     m.buttons = info.buttons;
     m.click = info.click;
+    m.dismiss = info.dismiss || m.dismiss;
+    if (info.stackIndex !== m.stackIndex) {
+      m.stackIndex = info.stackIndex;
+      if (m.id === activeId) restack();
+    }
     if (!info.title || (info.title === m.title && info.text === m.text && info.icon === m.seenIcon)) return;
     Object.assign(m, { title: info.title, text: info.text, seenIcon: info.icon, icon: info.icon || m.icon });
     paint(m);
@@ -772,7 +856,7 @@
 
   // Steam hides the window when its toasts are gone; start fresh next time.
   function onVisibility() {
-    if (document.visibilityState === 'hidden' && tray) closed();
+    if (document.visibilityState === 'hidden' && tray) closed(false);
   }
 
   /* ---------- Lifecycle ---------- */
@@ -823,8 +907,12 @@
         buttons: m.buttons.map(b => b.label),
         stale: m.stale,
         done: m.done,
-        dataClass: run(() => noteOf(m.key)?.data?.getClassName?.()),
-        eType: field(noteOf(m.key), 'eType'),
+        stackIndex: m.stackIndex,
+        canDismiss: !!m.dismiss,
+        dataClass: run(() => noteOf(m.key, m.src)?.data?.getClassName?.()),
+        noteKeys: run(() => Object.keys(noteOf(m.key, m.src) || {})),
+        dataKeys: run(() => Object.keys(noteOf(m.key, m.src)?.data || {})),
+        templateKeys: run(() => Object.keys(templateOf(m.src) || {}).filter(k => k !== 'children')),
       }));
     },
     destroy() {
