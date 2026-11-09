@@ -213,16 +213,8 @@
 
   /* ---------- Rarity tiers ---------- */
 
-  // Tier by global unlock rate (flAchieved: % of players). Colors: --se-tier-* in shared/tokens.css.
-  const TIERS = [
-    { id: 'legendary', name: 'Legendary', max: 5, rank: 5 },
-    { id: 'epic', name: 'Epic', max: 15, rank: 4 },
-    { id: 'rare', name: 'Rare', max: 35, rank: 3 },
-    { id: 'uncommon', name: 'Uncommon', max: 60, rank: 2 },
-    { id: 'common', name: 'Common', max: Infinity, rank: 1 },
-  ];
-  const tierOf = (pct) => (typeof pct === 'number' && Number.isFinite(pct) ? TIERS.find((t) => pct <= t.max) : null);
-  const fmtPct = (pct) => (pct > 0 && pct < 0.1 ? '<0.1' : pct.toFixed(1));
+  // Tier by global unlock rate (flAchieved: % of players), shared with the toasts (SE.rarity in core.js).
+  const { TIERS, tierOf, fmtPct } = SE.rarity;
 
   // One sparkle per tier rank (unlocked only) and the tier's initial, layered over an icon.
   function tierFx(t, locked) {

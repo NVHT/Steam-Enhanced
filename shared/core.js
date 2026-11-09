@@ -463,6 +463,38 @@
     return [...new Set(urls)];
   };
 
+  // Hero art for an app: the user's custom hero, the local copy, then the CDN (header as a last resort).
+  const heroURLs = (appid, store) => {
+    if (!appid) return [];
+    const appStore = store || resolveAppStore();
+    const app = appStore && run(() => appStore.GetAppOverviewByAppID(Number(appid)));
+    const cdn = `https://shared.steamstatic.com/store_item_assets/steam/apps/${appid}`;
+    const urls = [];
+    if (app?.rt_custom_image_mtime) {
+      const custom = run(() => appStore.GetCustomHeroImageURLs(app));
+      if (Array.isArray(custom)) urls.push(...custom.filter(Boolean));
+    }
+    urls.push(
+      `/assets/${appid}/library_hero.jpg`,
+      `${cdn}/library_hero.jpg`,
+      `/assets/${appid}/header.jpg`,
+      `${cdn}/header.jpg`
+    );
+    return [...new Set(urls)];
+  };
+
+  // Achievement rarity tiers by global unlock rate (% of players). Colors: --se-tier-* in tokens.css.
+  const TIERS = Object.freeze([
+    Object.freeze({ id: 'legendary', name: 'Legendary', max: 5, rank: 5 }),
+    Object.freeze({ id: 'epic', name: 'Epic', max: 15, rank: 4 }),
+    Object.freeze({ id: 'rare', name: 'Rare', max: 35, rank: 3 }),
+    Object.freeze({ id: 'uncommon', name: 'Uncommon', max: 60, rank: 2 }),
+    Object.freeze({ id: 'common', name: 'Common', max: Infinity, rank: 1 }),
+  ]);
+  const tierOf = pct => (typeof pct === 'number' && Number.isFinite(pct) ? TIERS.find(t => pct <= t.max) : null);
+  const fmtPct = pct => (pct > 0 && pct < 0.1 ? '<0.1' : pct.toFixed(1));
+  const rarity = Object.freeze({ TIERS, tierOf, fmtPct });
+
   // Multiplexed document.body MutationObserver shared across feature modules.
   // Filters out no-op attribute/characterData writes to prevent observer feedback loops.
   const subscribers = [];
@@ -722,6 +754,8 @@
     esc,
     isInstalled,
     coverURLs,
+    heroURLs,
+    rarity,
     watch,
     visible,
     poll,

@@ -11,7 +11,7 @@
 
 <p align="center">
   <img alt="Millennium: theme" src="https://img.shields.io/badge/Millennium-theme-7cc4ff?style=flat-square&labelColor=171a20">
-  <img alt="version: 1.92.11" src="https://img.shields.io/badge/version-1.92.11-f0c060?style=flat-square&labelColor=171a20">
+  <img alt="version: 1.93.1" src="https://img.shields.io/badge/version-1.93.1-f0c060?style=flat-square&labelColor=171a20">
   <img alt="platform: Steam desktop" src="https://img.shields.io/badge/platform-Steam%20desktop-33404f?style=flat-square&labelColor=171a20">
 </p>
 
@@ -124,6 +124,7 @@ Steam Enhanced rebuilds the Steam client from the Library out: a navigation rail
 ### And everywhere else
 
 - **Navigation rail** with a consolidated root menu, title-bar library search and header quick actions. Restart Steam and Reload UI sit right above Exit.
+- **Stage toasts.** Steam's desktop notifications play at the bottom centre as a small Home stage: the game's hero art, the sweep spinner as the countdown, achievements in their rarity tier, and a strip for the ones waiting.
 - **Notifications** grouped by day under a summary card, opened by hovering the bell. The account menu has profile actions, Do Not Disturb and Online Status.
 - **Settings and dialogs**: Steam Settings, App Properties, the Millennium Settings popup and the Millennium Library Manager, all restyled.
 
@@ -177,7 +178,7 @@ Spinners smaller than 40px fall back to `sweep`.
 </details>
 
 <details>
-<summary><b>Home stage and overlay</b></summary>
+<summary><b>Home stage, overlay and toasts</b></summary>
 
 | Token | Default | What it does |
 | --- | --- | --- |
@@ -186,6 +187,7 @@ Spinners smaller than 40px fall back to `sweep`.
 | `--se-home-stage-tray` | `30` | Minimum share of the window height kept for the glass tray, in percent (0–70). |
 | `--se-overlay` | `on` | `off` restores Steam's default in-game overlay look. |
 | `--se-overlay-dim` | `0.9` | How dark the backdrop behind the overlay is (0–1). |
+| `--se-toasts` | `on` | `off` restores Steam's own desktop notification toasts. |
 
 </details>
 

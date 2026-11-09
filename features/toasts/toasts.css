@@ -1,0 +1,699 @@
+/*
+ * Stage toasts (features/toasts/toasts.js), in Steam's notificationtoasts_ window.
+ *
+ * A miniature Library Home stage: the glass tray (.se-hs-tray), hero art with the stage's
+ * grade and slow push-in (.se-hs-hero, .se-hs-grade), stage-sized numbers and the green
+ * PLAY (.se-hs-stat, .se-hs-play), the sweep spinner as the countdown, and a strip of the
+ * toasts waiting (.se-hs-strip). Achievements carry the game page's rarity tiers.
+ */
+
+/* ---------- Steam's own toasts: out of sight once they're on the stage ---------- */
+
+[data-se-tst-src] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+html[data-se-tst-on],
+html[data-se-tst-on] body {
+  background: transparent !important;
+}
+
+html[data-se-tst-on] body > :not(#se-tst) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ---------- Dock and tray ---------- */
+
+#se-tst {
+  --c: var(--se-accent, #7cc4ff);
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 24px;
+  z-index: 2147483000;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--se-text, #e6e8eb);
+  font-family: var(--se-font, "Motiva Sans", Arial, sans-serif);
+}
+
+#se-tst[data-placing] {
+  visibility: hidden;
+}
+
+.se-tst-tray {
+  --c: var(--se-accent, #7cc4ff);
+  position: relative;
+  width: 480px;
+  box-sizing: border-box;
+  padding: 6px;
+  border-radius: 18px;
+  background: rgba(16, 18, 23, .82);
+  backdrop-filter: blur(12px) saturate(1.15);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), 0 30px 60px -30px rgba(0, 0, 0, .85), 0 18px 36px -18px rgba(0, 0, 0, .7);
+  pointer-events: auto;
+  transition: box-shadow .4s ease;
+}
+
+.se-tst-tray:not([data-show]) {
+  display: none;
+}
+
+.se-tst-tray[data-show] {
+  animation: se-tst-open .55s cubic-bezier(.2, .9, .25, 1) both;
+}
+
+.se-tst-tray[data-show] .se-tst-stage {
+  animation: se-tst-letter .6s .1s cubic-bezier(.65, 0, .35, 1) both;
+}
+
+.se-tst-tray[data-out] {
+  animation: se-tst-close .42s .22s cubic-bezier(.5, 0, .75, 0) forwards;
+}
+
+.se-tst-tray[data-out] .se-tst-stage {
+  animation: se-tst-letter-out .34s cubic-bezier(.65, 0, .35, 1) forwards;
+}
+
+@keyframes se-tst-open {
+  from { opacity: 0; transform: translateY(28px) scale(.96); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes se-tst-close {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(24px) scale(.97); }
+}
+
+@keyframes se-tst-letter {
+  from { clip-path: inset(50% 0 50% 0 round 13px); }
+  to { clip-path: inset(0 0 0 0 round 13px); }
+}
+
+@keyframes se-tst-letter-out {
+  from { clip-path: inset(0 0 0 0 round 13px); }
+  to { clip-path: inset(50% 0 50% 0 round 13px); }
+}
+
+/* ---------- Accents: kind, then rarity tier ---------- */
+
+[data-accent="msg"] { --c: var(--se-accent, #7cc4ff); }
+[data-accent="on"] { --c: var(--se-online, #4cb4ff); }
+[data-accent="play"] { --c: var(--se-running, #6cc24a); }
+[data-accent="inv"] { --c: #b08cff; }
+[data-accent="ach"] { --c: var(--se-gold-text, #f3cf86); }
+[data-accent="dl"] { --c: #5fd4c4; }
+[data-accent="shop"] { --c: #ff8fb8; }
+[data-accent="sys"] { --c: var(--se-text-dim, #b8c0c8); }
+[data-accent="err"] { --c: var(--se-danger-text, #ffb0b3); }
+
+#se-tst [data-se-tier="legendary"] { --c: var(--se-tier-legendary, #f0c060); --se-tst-aura: 0 0 18px 4px; --se-tst-gl: 34%; }
+#se-tst [data-se-tier="epic"] { --c: var(--se-tier-epic, #b98cff); --se-tst-aura: 0 0 14px 2px; --se-tst-gl: 26%; }
+#se-tst [data-se-tier="rare"] { --c: var(--se-tier-rare, #5fb2ff); --se-tst-aura: 0 0 10px 1px; --se-tst-gl: 20%; }
+#se-tst [data-se-tier="uncommon"] { --c: var(--se-tier-uncommon, #7bc46a); --se-tst-aura: 0 0 6px 0; --se-tst-gl: 14%; }
+#se-tst [data-se-tier="common"] { --c: var(--se-tier-common, #8d97a2); --se-tst-aura: 0 0 5px 0; --se-tst-gl: 8%; }
+
+.se-tst-tray[data-se-tier="legendary"] {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent), 0 0 40px -12px color-mix(in srgb, var(--c) 40%, transparent), 0 30px 60px -30px rgba(0, 0, 0, .85);
+}
+
+.se-tst-tray[data-se-tier="epic"] {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent), 0 0 32px -14px color-mix(in srgb, var(--c) 30%, transparent), 0 30px 60px -30px rgba(0, 0, 0, .85);
+}
+
+/* ---------- Stage and layers (crossfade, like the Home stage's art layers) ---------- */
+
+.se-tst-stage {
+  position: relative;
+  height: 124px;
+  border-radius: 13px;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--se-bg, #171a20);
+}
+
+.se-tst-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  transition: opacity .5s ease;
+}
+
+.se-tst-layer[data-on] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.se-tst-art {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  background: var(--se-surface, #1f242b);
+}
+
+.se-tst-art[data-plain] {
+  background:
+    radial-gradient(ellipse 55% 120% at 88% 50%, color-mix(in srgb, var(--c) 14%, transparent), transparent 70%),
+    var(--se-sidebar, #1d2128);
+}
+
+.se-tst-hero {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  transform: scale(1.04);
+  transform-origin: 70% 40%;
+}
+
+/* A slow push-in over the toast's lifetime. */
+.se-tst-layer[data-on]:not([data-sticky]) .se-tst-hero {
+  animation: se-tst-push var(--se-tst-d, 6000ms) ease-out forwards;
+}
+
+@keyframes se-tst-push {
+  to { transform: scale(1.14) translate(-2%, -1.5%); }
+}
+
+/* No game art: the friend's avatar as a soft glow. */
+.se-tst-glow {
+  position: absolute;
+  left: 30%;
+  top: -60%;
+  width: 90%;
+  height: 220%;
+  object-fit: cover;
+  filter: blur(28px) saturate(1.4);
+  opacity: .5;
+}
+
+.se-tst-grade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 50% 70% at 92% 0%, rgba(255, 196, 150, .14), transparent 70%),
+    linear-gradient(90deg, rgba(0, 0, 0, .74) 0%, rgba(0, 0, 0, .42) 42%, rgba(0, 0, 0, .04) 78%),
+    radial-gradient(ellipse 90% 95% at 50% 45%, transparent 50%, rgba(0, 0, 0, .45) 100%);
+}
+
+/* Rarity: the corner light takes the tier's color, stronger the rarer it is. */
+.se-tst-layer[data-se-tier] .se-tst-grade {
+  background:
+    radial-gradient(ellipse 60% 95% at 88% 0%, color-mix(in srgb, var(--c) var(--se-tst-gl, 20%), transparent), transparent 70%),
+    linear-gradient(90deg, rgba(0, 0, 0, .74) 0%, rgba(0, 0, 0, .42) 42%, rgba(0, 0, 0, .04) 78%),
+    radial-gradient(ellipse 90% 95% at 50% 45%, transparent 50%, rgba(0, 0, 0, .45) 100%);
+}
+
+.se-tst-layer[data-accent="err"] .se-tst-grade {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, .8), rgba(40, 8, 10, .5) 50%, color-mix(in srgb, var(--se-danger, #e5737a) 12%, transparent)),
+    radial-gradient(ellipse 90% 95% at 50% 45%, transparent 50%, rgba(0, 0, 0, .45) 100%);
+}
+
+/* Legendary (and Mastered): the banner's slow shine. */
+.se-tst-layer[data-on][data-se-tier="legendary"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 230, 170, .14) 50%, transparent 60%) 0 0 / 250% 100%;
+  animation: se-tst-shine 4.5s linear infinite;
+}
+
+@keyframes se-tst-shine {
+  from { background-position: 150% 0; }
+  to { background-position: -50% 0; }
+}
+
+/* ---------- Content ---------- */
+
+.se-tst-ct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 16px;
+}
+
+.se-tst-ct > * {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .3s ease, transform .45s cubic-bezier(.2, .8, .2, 1);
+}
+
+.se-tst-layer[data-on] .se-tst-ct > * {
+  opacity: 1;
+  transform: none;
+}
+
+.se-tst-layer[data-on] .se-tst-ct > :nth-child(1) { transition-delay: .3s; }
+.se-tst-layer[data-on] .se-tst-ct > :nth-child(2) { transition-delay: .38s; }
+.se-tst-layer[data-on] .se-tst-ct > :nth-child(3) { transition-delay: .46s; }
+
+.se-tst-tile {
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: rgba(16, 18, 23, .62);
+  backdrop-filter: blur(8px);
+  color: var(--c);
+  box-shadow: 0 10px 22px -8px rgba(0, 0, 0, .85), inset 0 0 0 1px rgba(255, 255, 255, .14);
+}
+
+.se-tst-tile > svg {
+  width: 24px;
+  height: 24px;
+}
+
+.se-tst-tile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* Achievement icon: the tier's aura and color, as on the game page. */
+.se-tst-layer[data-se-tier] .se-tst-tile {
+  background: color-mix(in srgb, var(--c) 22%, var(--se-surface, #1f242b));
+  box-shadow: var(--se-tst-aura) color-mix(in srgb, var(--c) 60%, transparent), inset 0 0 0 1px rgba(255, 255, 255, .08);
+}
+
+.se-tst-fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.se-tst-initial {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  font: 800 13px/1 var(--se-font, inherit);
+  color: var(--c);
+  text-shadow: 0 0 3px #0b0d10, 0 1px 2px #0b0d10;
+}
+
+/* Four-point sparkles, one per tier rank, placed as in game-page.css. */
+.se-tst-spark {
+  position: absolute;
+  background: var(--c);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  animation: se-tst-twinkle 1.6s ease-in-out infinite;
+}
+
+.se-tst-spark:nth-child(1) { left: -10%; top: -10%; width: 25%; height: 25%; }
+.se-tst-spark:nth-child(2) { left: 83%; top: -12%; width: 19%; height: 19%; animation-duration: 1.95s; animation-delay: .3s; }
+.se-tst-spark:nth-child(3) { left: -10%; top: 77%; width: 17%; height: 17%; animation-duration: 2.3s; animation-delay: .6s; }
+.se-tst-spark:nth-child(4) { left: 42%; top: -17%; width: 15%; height: 15%; animation-duration: 2.65s; animation-delay: .9s; }
+.se-tst-spark:nth-child(5) { left: 90%; top: 29%; width: 15%; height: 15%; animation-duration: 3s; animation-delay: 1.2s; }
+
+@keyframes se-tst-twinkle {
+  0%, 100% { opacity: .25; transform: scale(.6) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(45deg); }
+}
+
+.se-tst-tx {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.se-tst-ey {
+  font: 700 10.5px/13px var(--se-font, inherit);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--c);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .8);
+}
+
+.se-tst-tt {
+  font: 800 19px/23px var(--se-font, inherit);
+  color: var(--se-text-strong, #fff);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-tst-ds {
+  font: 400 13px/17px var(--se-font, inherit);
+  color: #d0d7de;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-tst-ds:empty {
+  display: none;
+}
+
+.se-tst-chips {
+  display: flex;
+  gap: 4px;
+}
+
+.se-tst-chips i {
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--se-chip, rgba(12, 14, 18, .55));
+  font: 700 11px/18px var(--se-font, inherit);
+  font-style: normal;
+  color: var(--c);
+}
+
+.se-tst-rt {
+  flex: none;
+  align-self: flex-end;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.se-tst-rt:empty {
+  display: none;
+}
+
+/* Buttons: PLAY as on the stage, the rest accent or glass. */
+.se-tst-btn {
+  height: 36px;
+  max-width: 150px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 10px;
+  font: 700 13px/36px var(--se-font, inherit);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.se-tst-btn:hover {
+  filter: brightness(1.1);
+}
+
+.se-tst-btn:focus-visible,
+.se-tst-sweep:focus-visible,
+.se-tst-thumb:focus-visible {
+  outline: 2px solid var(--se-accent, #7cc4ff);
+  outline-offset: 2px;
+}
+
+.se-tst-btn:disabled {
+  opacity: .45;
+  cursor: default;
+  filter: none;
+}
+
+.se-tst-btn-play {
+  padding: 0 20px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--se-play, #3a8a22) 72%, #b6f07a 28%), var(--se-play, #3f9420));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 12px 26px -10px rgba(80, 180, 50, .8);
+  color: var(--se-text-strong, #fff);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.se-tst-btn-acc {
+  background: var(--se-accent, #7cc4ff);
+  box-shadow: 0 12px 26px -12px var(--se-accent-strong, rgba(124, 196, 255, .55));
+  color: var(--se-bg-ink, #0f1115);
+}
+
+.se-tst-btn-glass {
+  background: rgba(255, 255, 255, .1);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14);
+  color: var(--se-text-strong, #fff);
+}
+
+.se-tst-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.se-tst-stat b {
+  font: 800 26px/1 var(--se-font, inherit);
+  color: var(--c);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, .55);
+}
+
+.se-tst-stat small {
+  font-size: .55em;
+  font-weight: 600;
+  color: #d0d7de;
+}
+
+.se-tst-pill {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c) 16%, transparent);
+  color: var(--c);
+  font: 600 11.5px/14px var(--se-font, inherit);
+  font-style: normal;
+}
+
+/* ---------- Sweep countdown: the theme's spinner; on hover, the close button ---------- */
+
+.se-tst-sweep {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(16, 18, 23, .62);
+  backdrop-filter: blur(6px);
+  color: var(--c);
+  cursor: pointer;
+}
+
+.se-tst-ring {
+  position: absolute;
+  inset: 0;
+  width: 30px;
+  height: 30px;
+  transform: rotate(-90deg);
+}
+
+.se-tst-ring circle {
+  fill: none;
+  stroke-width: 2.5;
+}
+
+.se-tst-trk {
+  stroke: rgba(255, 255, 255, .12);
+}
+
+.se-tst-arc {
+  stroke: var(--c);
+  stroke-dasharray: 84.8;
+  stroke-dashoffset: 84.8;
+  stroke-linecap: round;
+}
+
+.se-tst-lead {
+  position: absolute;
+  inset: 0;
+}
+
+.se-tst-lead::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -1px;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: #eaf6ff;
+  box-shadow: 0 0 6px 1px var(--c);
+}
+
+.se-tst-layer[data-on] .se-tst-arc {
+  animation: se-tst-fill var(--se-tst-d, 6000ms) linear forwards;
+}
+
+.se-tst-layer[data-on] .se-tst-lead {
+  animation: se-tst-spin var(--se-tst-d, 6000ms) linear forwards;
+}
+
+/* Until handled: a full, quieter ring and no lead. */
+.se-tst-layer[data-sticky] .se-tst-arc {
+  animation: none;
+  stroke-dashoffset: 0;
+  stroke-opacity: .5;
+}
+
+.se-tst-layer[data-sticky] .se-tst-lead {
+  display: none;
+}
+
+.se-tst-kdot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c);
+  transition: opacity .15s;
+}
+
+.se-tst-x {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  color: var(--se-text-strong, #fff);
+  opacity: 0;
+  transition: opacity .15s;
+}
+
+.se-tst-sweep:is(:hover, :focus-visible) .se-tst-kdot { opacity: 0; }
+.se-tst-sweep:is(:hover, :focus-visible) .se-tst-x { opacity: 1; }
+
+@keyframes se-tst-fill {
+  from { stroke-dashoffset: 84.8; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes se-tst-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Hovering the tray pauses everything that counts down. */
+.se-tst-tray:hover .se-tst-layer[data-on] :is(.se-tst-arc, .se-tst-lead, .se-tst-hero),
+.se-tst-tray:hover .se-tst-thumb[data-on]::after {
+  animation-play-state: paused;
+}
+
+/* ---------- Strip: the queue, like the Home stage's game strip ---------- */
+
+.se-tst-strip {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px 2px;
+}
+
+.se-tst-tray[data-queue] .se-tst-strip {
+  display: flex;
+  animation: se-tst-strip .35s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+@keyframes se-tst-strip {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.se-tst-thumb {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--c) 30%, var(--se-surface, #1f242b));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+  cursor: pointer;
+  transition: transform .25s cubic-bezier(.3, 1.4, .6, 1), box-shadow .2s;
+}
+
+.se-tst-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.se-tst-thumb:hover {
+  transform: translateY(-2px);
+}
+
+.se-tst-thumb[data-on] {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 2px var(--c);
+}
+
+.se-tst-thumb[data-on]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--c);
+  transform-origin: left;
+  animation: se-tst-thumb var(--se-tst-d, 6000ms) linear forwards;
+}
+
+.se-tst-thumb[data-sticky]::after {
+  animation: none;
+}
+
+@keyframes se-tst-thumb {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.se-tst-pos {
+  margin-left: auto;
+  font: 700 11.5px/1 var(--se-font, inherit);
+  color: var(--se-text-muted, #98a2ad);
+}
+
+/* ---------- Reduced motion: fades only (the close still ends, so the tray still clears) ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .se-tst-tray[data-show],
+  .se-tst-tray[data-show] .se-tst-stage,
+  .se-tst-tray[data-queue] .se-tst-strip {
+    animation-duration: .15s;
+    animation-delay: 0s;
+  }
+
+  @keyframes se-tst-open { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes se-tst-letter { from { clip-path: none; } to { clip-path: none; } }
+
+  .se-tst-tray[data-out] {
+    animation: se-tst-close .15s linear forwards;
+  }
+
+  .se-tst-tray[data-out] .se-tst-stage {
+    animation: none;
+  }
+
+  .se-tst-layer[data-on] .se-tst-hero,
+  .se-tst-spark,
+  .se-tst-layer[data-on]::after {
+    animation: none !important;
+  }
+
+  .se-tst-ct > *,
+  .se-tst-layer[data-on] .se-tst-ct > * {
+    transform: none;
+    transition-delay: 0s !important;
+  }
+}
