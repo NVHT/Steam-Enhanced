@@ -1634,14 +1634,19 @@
   color: #edc4fd !important;
 }
 
-/* Review prompt ("Would you recommend this game?") */
-._3LE-6w1ItIAB4CKJFCa3Od {
-  /* ReviewContainer */
+/*
+ * Review prompt ("Would you recommend this game?"): a 64 px tile with your playtime (488 over
+ * HOURS), the question and a muted line beside it, then Yes (green thumb, green tint), No (red
+ * thumb, red tint) and Maybe Later as a plain text link.
+ */
+._3LE-6w1ItIAB4CKJFCa3Od:not(#se-none) {
+  /* ReviewContainer: the cards' inset hairline, not a border */
   position: relative;
-  padding: 14px 52px 14px 18px !important;
-  border-radius: var(--se-radius-lg, 14px);
+  padding: 19px 21px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg, 14px) !important;
   background: var(--se-surface, #1f242b) !important;
-  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
+  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06)) !important;
   color: var(--se-text-muted, #98a2ad) !important;
   font-size: 13.5px !important;
   font-weight: 400 !important;
@@ -1654,71 +1659,12 @@
   inset-inline-end: 16px !important;
 }
 
-/* Yes · No · Maybe Later: pills */
-._35_OgqfHHZfSzTYfv367K6,
-._1kCN0pAntrcGCSmcc-vYdk {
-  /* CompactThumbButton, ReviewThumbButton */
-  display: inline-flex !important;
-  align-items: center;
-  gap: 6px;
-  height: 32px;
-  box-sizing: border-box;
-  padding: 0 16px !important;
-  margin: 0 3px !important;
-  border: 0 !important;
-  border-radius: 999px !important;
-  background: var(--se-surface-2, #262c35) !important;
-  color: var(--se-text, #e6e8eb) !important;
-  font-size: 13px !important;
-}
-
-._35_OgqfHHZfSzTYfv367K6:not(.Z3L6KGVxi4ZjGUzbYUjBC):hover,
-._1kCN0pAntrcGCSmcc-vYdk:not(.Z3L6KGVxi4ZjGUzbYUjBC):hover {
-  background: var(--se-hover, #2c3440) !important;
-  color: var(--se-text-strong, #fff) !important;
-}
-
-:is(._35_OgqfHHZfSzTYfv367K6, ._1kCN0pAntrcGCSmcc-vYdk).Z3L6KGVxi4ZjGUzbYUjBC {
-  /* Selected */
-  background: var(--se-accent-surface, #24384b) !important;
-  color: var(--se-accent, #7cc4ff) !important;
-}
-
-._35_OgqfHHZfSzTYfv367K6 span,
-._1kCN0pAntrcGCSmcc-vYdk span {
-  padding-inline-start: 0 !important;
-  vertical-align: baseline !important;
-}
-
-/*
- * The thumb sits in the pill beside its word (Steam positions it absolutely
- * over a padded label, which overlapped once the padding went).
- */
-._35_OgqfHHZfSzTYfv367K6 ._2Jkk-4RGWzhce22lSnA9Em:not(#se-none),
-._1kCN0pAntrcGCSmcc-vYdk ._2Jkk-4RGWzhce22lSnA9Em:not(#se-none) {
-  position: static !important;
-  margin: 0 !important;
-}
-
-._35_OgqfHHZfSzTYfv367K6:hover ._2Jkk-4RGWzhce22lSnA9Em:not(#se-none),
-._1kCN0pAntrcGCSmcc-vYdk:hover ._2Jkk-4RGWzhce22lSnA9Em:not(#se-none) {
-  fill: var(--se-text-strong, #fff) !important;
-}
-
-:is(._35_OgqfHHZfSzTYfv367K6, ._1kCN0pAntrcGCSmcc-vYdk).Z3L6KGVxi4ZjGUzbYUjBC ._2Jkk-4RGWzhce22lSnA9Em:not(#se-none) {
-  fill: var(--se-accent, #7cc4ff) !important;
-}
-
-/*
- * The question block: no gray box inside the card — playtime in accent, question in white,
- * the pills on the right.
- */
 ._2SAb6geDpe6toA1GaP0GjH:not(#se-none) {
-  /* RatingContainer */
+  /* RatingContainer: no gray box, the question block left and the pills right */
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 18px;
+  gap: 18px !important;
   flex: 1 1 auto !important;
   width: 100% !important;
   max-width: none !important;
@@ -1735,73 +1681,178 @@
   flex: 1 1 auto !important;
 }
 
-._2SAb6geDpe6toA1GaP0GjH ._1E6Ivnp3A4apXqQYtlQHEc {
-  margin-inline-start: auto !important;
-}
-
-._2SAb6geDpe6toA1GaP0GjH ._2aeAnRfwltWfd9Hb9M_1uE {
+._3LE-6w1ItIAB4CKJFCa3Od ._2SAb6geDpe6toA1GaP0GjH > ._2aeAnRfwltWfd9Hb9M_1uE:not(#se-none) {
+  /* LeftContainer: the question over the playtime line (reversed beside the tile) */
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
   margin: 0 !important;
   font: 500 13.5px/1.45 var(--se-font) !important;
-  min-width: 0;
 }
 
-/* LeftContainer */
-._2SAb6geDpe6toA1GaP0GjH .qX4kNo6O0M-mYntdErKSJ {
-  color: var(--se-accent, #7cc4ff) !important;
-  font-weight: 600;
+._3LE-6w1ItIAB4CKJFCa3Od[data-se-rv-hours] ._2SAb6geDpe6toA1GaP0GjH > ._2aeAnRfwltWfd9Hb9M_1uE:not(#se-none) {
+  flex-direction: column-reverse;
 }
 
-/* Playtime */
-._2SAb6geDpe6toA1GaP0GjH .My1beniJXh9pXud8rxYLK {
+._3LE-6w1ItIAB4CKJFCa3Od .se-rv-hours {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-lg, 14px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
+  /* Over the tint, the tint again: a slightly brighter 1 px edge */
+  border: 1px solid var(--se-accent-tint, rgba(124, 196, 255, .14));
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od .se-rv-hours b {
+  font: 800 var(--se-fs-2xl)/1 var(--se-font, inherit);
+  color: var(--se-accent, #7cc4ff);
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od .se-rv-hours i {
+  font: 700 var(--se-fs-2xs)/1.2 var(--se-font, inherit);
+  font-style: normal;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--se-text-muted, #98a2ad);
+}
+
+/* The playtime line: Steam's text when there is no tile, the muted helper line when there is */
+._3LE-6w1ItIAB4CKJFCa3Od .qX4kNo6O0M-mYntdErKSJ:not(#se-none) {
+  font: 500 13.5px/1.35 var(--se-font, inherit) !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od [data-se-rv-text]:not(#se-none) {
+  font-size: 0 !important;
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od .qX4kNo6O0M-mYntdErKSJ[data-se-rv-text]::after {
+  content: attr(data-se-rv-text);
+  font-size: 13.5px;
+}
+
+/* RecommendGame: the question */
+._3LE-6w1ItIAB4CKJFCa3Od .My1beniJXh9pXud8rxYLK:not(#se-none) {
+  font: 700 16.5px/1.3 var(--se-font, inherit) !important;
   color: var(--se-text, #e6e8eb) !important;
 }
 
-/* RecommendGame */
-._2SAb6geDpe6toA1GaP0GjH ._1E6Ivnp3A4apXqQYtlQHEc {
+._3LE-6w1ItIAB4CKJFCa3Od .My1beniJXh9pXud8rxYLK[data-se-rv-text]:not(#se-none) {
+  font-size: 0 !important;
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od .My1beniJXh9pXud8rxYLK[data-se-rv-text]::after {
+  content: attr(data-se-rv-text);
+  font-size: 16.5px;
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od ._1E6Ivnp3A4apXqQYtlQHEc:not(#se-none) {
+  /* RightContainer */
+  flex: none;
   display: flex !important;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-inline-start: auto !important;
 }
 
-/* RightContainer */
-._2SAb6geDpe6toA1GaP0GjH ._1E6Ivnp3A4apXqQYtlQHEc ._35_OgqfHHZfSzTYfv367K6,
-._2SAb6geDpe6toA1GaP0GjH ._1E6Ivnp3A4apXqQYtlQHEc ._1kCN0pAntrcGCSmcc-vYdk {
-  margin: 0 !important;
-}
-
-/*
- * The thumbs in Yes / No sit centered beside the word, the same size and
- * color as the text (Steam's icon has padding in its own drawing, so it looked tiny)
- */
-._35_OgqfHHZfSzTYfv367K6:not(#se-none),
-._1kCN0pAntrcGCSmcc-vYdk:not(#se-none) {
+/* Yes · No · Maybe Later: pills (CompactThumbButton, ReviewThumbButton) */
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6):not(#se-none) {
+  display: inline-flex !important;
+  align-items: center !important;
   justify-content: center;
-  gap: 7px !important;
+  gap: 8px !important;
+  box-sizing: border-box;
+  height: var(--se-control-h, 34px) !important;
+  margin: 0 !important;
+  padding: 0 16px 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2, #262c35) !important;
+  box-shadow: none !important;
+  font: 600 var(--se-fs-md) var(--se-font, inherit) !important;
+  color: var(--se-text, #e6e8eb) !important;
+  transition: background-color var(--se-dur) ease-out;
 }
 
-._35_OgqfHHZfSzTYfv367K6 ._2Jkk-4RGWzhce22lSnA9Em:not(#se-none),
-._1kCN0pAntrcGCSmcc-vYdk ._2Jkk-4RGWzhce22lSnA9Em:not(#se-none) {
-  flex: 0 0 18px !important;
-  width: 18px !important;
-  height: 18px !important;
-  align-self: center !important;
-  fill: currentColor !important;
-  color: inherit !important;
-  opacity: .9;
+/* A pill the JS hasn't named (up / down / later) keeps the plain hover and selected fills */
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6):not([data-se-rv-btn], .Z3L6KGVxi4ZjGUzbYUjBC):hover:not(#se-none) {
+  background: var(--se-hover, #2c3440) !important;
 }
 
-._35_OgqfHHZfSzTYfv367K6 ._2Jkk-4RGWzhce22lSnA9Em:not(#se-none) *,
-._1kCN0pAntrcGCSmcc-vYdk ._2Jkk-4RGWzhce22lSnA9Em:not(#se-none) * {
-  fill: currentColor !important;
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6).Z3L6KGVxi4ZjGUzbYUjBC:not([data-se-rv-btn]):not(#se-none) {
+  /* Selected */
+  background: var(--se-accent-surface, #24384b) !important;
 }
 
-._35_OgqfHHZfSzTYfv367K6 > span:not(#se-none),
-._1kCN0pAntrcGCSmcc-vYdk > span:not(#se-none) {
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6) > span:not(#se-none) {
   display: inline-flex !important;
   align-items: center !important;
   gap: 7px;
+  padding-inline-start: 0 !important;
   line-height: 1 !important;
+  vertical-align: baseline !important;
+}
+
+/* Steam's thumb is replaced by the theme's dual-tone one (::before) */
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6) ._2Jkk-4RGWzhce22lSnA9Em:not(#se-none) {
+  display: none !important;
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6):not([data-se-rv-btn="later"])::before {
+  content: '';
+  flex: none;
+  width: 18px;
+  height: 18px;
+  background: center / contain no-repeat;
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="up"]:not(#se-none) {
+  background: color-mix(in srgb, var(--se-running) 12%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--se-running) 20%, transparent) !important;
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="down"]:not(#se-none) {
+  background: color-mix(in srgb, var(--se-danger) 10%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--se-danger) 20%, transparent) !important;
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="up"]:hover:not(#se-none) {
+  background: color-mix(in srgb, var(--se-running) 20%, transparent) !important;
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="down"]:hover:not(#se-none) {
+  background: color-mix(in srgb, var(--se-danger) 18%, transparent) !important;
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="up"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10v10H4V10z' fill='%236cc24a' fill-opacity='.35' stroke='%236cc24a' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M7 10l4-7c1.6 0 2.6 1.2 2.2 2.8L12.6 9H19a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.8 20H7z' fill='%236cc24a' fill-opacity='.35' stroke='%236cc24a' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="down"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10v10H4V10z' fill='%23e5737a' fill-opacity='.35' stroke='%23e5737a' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M7 10l4-7c1.6 0 2.6 1.2 2.2 2.8L12.6 9H19a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.8 20H7z' fill='%23e5737a' fill-opacity='.35' stroke='%23e5737a' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
+  transform: rotate(180deg);
+}
+
+/* Maybe Later: plain muted text, lighter on hover */
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="later"]:not(#se-none) {
+  padding: 0 6px !important;
+  background: none !important;
+  border: 0 !important;
+  color: var(--se-text-muted, #98a2ad) !important;
+}
+
+._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="later"]:hover:not(#se-none) {
+  color: var(--se-text, #e6e8eb) !important;
 }
 
 /*
@@ -1846,14 +1897,22 @@
   white-space: nowrap;
 }
 
+/*
+ * UnlockedLabel, the only piece of Steam's summary left (the rest is hidden below): the line,
+ * then the theme's own gold bar from --se-pct (set by game-page.js), so it no longer depends
+ * on how this Steam build nests its bar and medal.
+ */
 ._2xTb6N-jUUQ-mIkMB6OVMm > ._3jC8om-5Sci_dkUB-6VYiU:not(#se-none) {
-  /* UnlockedLabel */
   grid-column: 2;
-  margin: 0 !important;
+  grid-row: 1 / span 2 !important;
+  align-self: center !important;
   display: flex;
+  flex-wrap: wrap !important;
   justify-content: space-between;
   gap: 12px;
-  font: 700 14px/1.3 var(--se-font, inherit) !important;
+  row-gap: 10px !important;
+  margin: 0 !important;
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font, inherit) !important;
   color: var(--se-text, #e6e8eb) !important;
 }
 
@@ -1862,54 +1921,18 @@
   font-weight: 600;
 }
 
-._2xTb6N-jUUQ-mIkMB6OVMm > ._1SYKvWwSL8VCFp-KXZyjXf:not(#se-none) {
-  /* ProgressRow: the bar only */
-  grid-column: 2;
-  grid-row: 2;
-  align-self: start;
-  margin: 0 !important;
-  display: flex !important;
-  gap: 0 !important;
-}
-
-._2xTb6N-jUUQ-mIkMB6OVMm > ._1SYKvWwSL8VCFp-KXZyjXf > :not(._6MT2UJrz5bk1FX-saHB-i),
-._2xTb6N-jUUQ-mIkMB6OVMm > :not(._3jC8om-5Sci_dkUB-6VYiU):not(._1SYKvWwSL8VCFp-KXZyjXf) {
-  display: none !important;
-}
-
-/* Steam's medal, wherever this build puts it */
-/* The bar's segments (one per achievement set): gold when unlocked */
-._2xTb6N-jUUQ-mIkMB6OVMm ._3WOeX9PHv29FSw4EKlG77h:not(._3eZH1oNlB2EnSOcHMJqoiL):not(._2E98Z2axaJzx4rToEJq4nU):not(#se-none) {
-  /* Unlocked, not NoneUnlocked / Dimmed */
-  background: linear-gradient(90deg, var(--se-gold, #f0c060), #ffd98a) !important;
-}
-
-._2xTb6N-jUUQ-mIkMB6OVMm ._3WOeX9PHv29FSw4EKlG77h._2enJwIutXoVwW16Bbu6S6O:not(._3eZH1oNlB2EnSOcHMJqoiL):not(#se-none) {
-  background: #c9a0ff !important;
-}
-
-/* DLC sets */
+._2xTb6N-jUUQ-mIkMB6OVMm > :not(._3jC8om-5Sci_dkUB-6VYiU):not(#se-none),
 ._2xTb6N-jUUQ-mIkMB6OVMm ._3-Mt5LIsZO10peYvp8gXHa {
+  /* Everything but the line, and the DLC sets wherever this build puts them */
   display: none !important;
 }
 
-/* CompletedCallout */
-._2xTb6N-jUUQ-mIkMB6OVMm ._6MT2UJrz5bk1FX-saHB-i:not(#se-none) {
-  /* ProgressBar */
-  flex: 1;
-  height: 6px !important;
-  min-height: 0 !important;
-  border-radius: 6px !important;
-  overflow: hidden;
-  background: var(--se-selected, #33404f) !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-
-._2xTb6N-jUUQ-mIkMB6OVMm ._6MT2UJrz5bk1FX-saHB-i * {
-  height: 100% !important;
-  border: 0 !important;
-  box-shadow: none !important;
+._2xTb6N-jUUQ-mIkMB6OVMm > ._3jC8om-5Sci_dkUB-6VYiU::after {
+  content: '';
+  flex: 0 0 100%;
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--se-gold, #f0c060), #ffd98a) 0 0 / calc(var(--se-pct, 0) * 1%) 100% no-repeat, var(--se-selected, #33404f);
 }
 
 /* The latest unlock */
@@ -1927,7 +1950,7 @@
   flex: none;
   width: 44px !important;
   height: 44px !important;
-  border-radius: 8px;
+  border-radius: var(--se-radius-sm, 8px);
   overflow: hidden;
   margin: 0 !important;
 }
@@ -1953,12 +1976,12 @@
 }
 
 ._1rvHQ_ELBAWYmrssg3iNZE img {
-  border-radius: 8px !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
 }
 
 ._1rvHQ_ELBAWYmrssg3iNZE ._2gISWIeEzZ9PNuAzVuMaWd:not(#se-none) {
   /* Remainder "+66" */
-  border-radius: 8px !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
   background: var(--se-surface-2, #262c35) !important;
   font: 700 13px var(--se-font, inherit) !important;
   color: var(--se-text-dim, #b8c0c8) !important;
@@ -1979,30 +2002,6 @@
 }
 
 /*
- * The summary draws its own gold bar under the line (from --se-pct, set by
- * features/game-page/game-page.js), so it no longer depends on how this Steam build nests its bar and
- * medal; everything of Steam's in the summary except the line is hidden.
- */
-._2xTb6N-jUUQ-mIkMB6OVMm > :not(._3jC8om-5Sci_dkUB-6VYiU):not(#se-none) {
-  display: none !important;
-}
-
-._2xTb6N-jUUQ-mIkMB6OVMm > ._3jC8om-5Sci_dkUB-6VYiU:not(#se-none) {
-  grid-row: 1 / span 2 !important;
-  align-self: center !important;
-  flex-wrap: wrap !important;
-  row-gap: 10px !important;
-}
-
-._2xTb6N-jUUQ-mIkMB6OVMm > ._3jC8om-5Sci_dkUB-6VYiU::after {
-  content: '';
-  flex: 0 0 100%;
-  height: 6px;
-  border-radius: 6px;
-  background: linear-gradient(90deg, var(--se-gold, #f0c060), #ffd98a) 0 0 / calc(var(--se-pct, 0) * 1%) 100% no-repeat, var(--se-selected, #33404f);
-}
-
-/*
  * The icon rows. This Steam build draws them with its "additional items"
  * row (Additional > InnerContainer > ItemWrapper, the last one the "+N" remainder).
  * Every icon and the "+N" get the same rounded corners as the latest-unlock icon,
@@ -2010,19 +2009,19 @@
  */
 [data-se-sec="achievements"] ._2H_ytAwp5tfeou0kdWjLl4:not(#se-none) {
   /* ItemWrapper */
-  border-radius: 8px !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
   overflow: hidden !important;
 }
 
 [data-se-sec="achievements"] ._2H_ytAwp5tfeou0kdWjLl4 *:not(#se-none) {
-  border-radius: 8px !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
   box-shadow: none !important;
 }
 
 [data-se-sec="achievements"] .lZ2c49vTWJ60klQOY9l2K:not(#se-none),
 [data-se-sec="achievements"] ._2gISWIeEzZ9PNuAzVuMaWd:not(#se-none) {
   /* RemainderContainer, Remainder: "+N" */
-  border-radius: 8px !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
   border: 0 !important;
   background: var(--se-surface-2, #262c35) !important;
 }
@@ -2042,8 +2041,10 @@
   gap: 12px;
   /* Visible, so sparkles and auras can spill past the icons; the JS fits the count to the width. */
   overflow: visible;
-  margin: 2px 0 4px;
   min-height: 52px;
+  /* Room around the icons for a lifted icon and its sparkles. */
+  margin: -6px 0 4px;
+  padding: 10px 0 8px;
 }
 
 .se-ach-ico,
@@ -2054,12 +2055,12 @@
   height: 52px;
   padding: 0;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--se-radius-md, 10px);
   overflow: hidden;
   cursor: pointer;
   background: var(--se-surface-2, #262c35);
   font: inherit;
-  transition: transform .15s ease-out, box-shadow .15s ease-out, filter .15s ease-out;
+  transition: transform var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out, filter var(--se-dur) ease-out;
 }
 
 .se-ach-ico img {
@@ -2067,12 +2068,10 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: inherit;
 }
 
-.se-ach-ico {
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-gold) 32%, transparent);
-}
-
+/* The gold edge sits over the image, so it is drawn by ::after (an inset shadow would be hidden) */
 .se-ach-ico::after {
   content: '';
   position: absolute;
@@ -2109,23 +2108,21 @@
 
 .se-ach-ico:focus-visible,
 .se-ach-more:focus-visible {
-  outline: 2px solid var(--se-accent-strong, rgba(124, 196, 255, .55));
-  outline-offset: 2px;
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 /*
- * Steam's rare-achievement glow is gone everywhere in the card (the rotating
- * gold light behind the icons, which showed as gold slivers beside each one). Steam's
- * own icons get the theme's gold edge, so they match whether or not the theme draws
- * the row.
+ * Achievement icons, in the card and in the feed. Steam's rare-achievement glow is gone (the
+ * rotating gold light behind the icons, which showed as gold slivers beside each one); Steam's
+ * own icons get the theme's gold edge, so they match whether or not the theme draws the row.
+ * The image takes the frame's rounding; hover lifts the icon and firms the edge, without glow.
  */
-[data-se-sec="achievements"] ._2HUbCbZUn27MliiC8gRxGB:not(#se-none),
-[data-se-sec="achievements"] ._2D_EJk8-jCnfqiwoKkOMVh:not(#se-none),
-[data-se-sec="achievements"] ._1Z2eJs9-zNTKcWKy4M-oDE:not(#se-none) {
+:is([data-se-sec="achievements"], [data-se-sec="activity"]) :is(._2HUbCbZUn27MliiC8gRxGB, ._2D_EJk8-jCnfqiwoKkOMVh, ._1Z2eJs9-zNTKcWKy4M-oDE):not(#se-none) {
   display: none !important;
 }
 
-[data-se-sec="achievements"] ._3s4Rq3jnntBVP7HbJj1RMQ:not(#se-none) {
+:is([data-se-sec="achievements"], [data-se-sec="activity"]) ._3s4Rq3jnntBVP7HbJj1RMQ:not(#se-none) {
   box-shadow: none !important;
 }
 
@@ -2139,14 +2136,14 @@
   box-shadow: none !important;
 }
 
-[data-se-sec="achievements"] ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none) {
+:is([data-se-sec="achievements"], [data-se-sec="activity"]) ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none) {
   position: relative !important;
-  border-radius: 10px !important;
+  border-radius: var(--se-radius-md, 10px) !important;
   overflow: hidden !important;
-  transition: transform .15s ease-out;
+  transition: transform var(--se-dur) ease-out;
 }
 
-[data-se-sec="achievements"] ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none)::after {
+:is([data-se-sec="achievements"], [data-se-sec="activity"]) ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none)::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -2155,7 +2152,12 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-gold) 32%, transparent);
 }
 
-[data-se-sec="achievements"] ._2H_ytAwp5tfeou0kdWjLl4:hover ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none) {
+:is([data-se-sec="achievements"], [data-se-sec="activity"]) ._1fEbX-PfpZ2FhkhttWcm-V img:not(#se-none) {
+  border-radius: inherit !important;
+}
+
+[data-se-sec="achievements"] ._2H_ytAwp5tfeou0kdWjLl4:hover ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none),
+[data-se-sec="activity"] :is(._26QliGU0MSP6WN4r-RtI5q, .PrimaryAchievement):hover ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none) {
   transform: translateY(-2px);
 }
 
@@ -2163,20 +2165,9 @@
   box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
 }
 
-/*
- * Icons. the image takes the frame's rounding, so no corner shows inside
- * the edge; hover lifts the icon and firms the edge, without any glow.
- */
-[data-se-sec="achievements"] ._1fEbX-PfpZ2FhkhttWcm-V img:not(#se-none) {
-  border-radius: inherit !important;
-}
-
-.se-ach-ico img {
-  border-radius: inherit;
-}
-
 .se-ach-ico:hover::after,
-[data-se-sec="achievements"] ._2H_ytAwp5tfeou0kdWjLl4:hover ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none)::after {
+[data-se-sec="achievements"] ._2H_ytAwp5tfeou0kdWjLl4:hover ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none)::after,
+[data-se-sec="activity"] :is(._26QliGU0MSP6WN4r-RtI5q, .PrimaryAchievement):hover ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none)::after {
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-gold) 70%, transparent) !important;
 }
 
@@ -2191,7 +2182,7 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  font: 700 20px var(--se-font, inherit);
+  font: 700 var(--se-fs-2xl) var(--se-font, inherit);
   color: var(--se-text-muted, #98a2ad);
 }
 
@@ -2206,12 +2197,6 @@
 [data-se-sec="achievements"] ._1j_gja8bHXjiS-BeSQk8hb ._1fEbX-PfpZ2FhkhttWcm-V img:not(#se-none) {
   width: 100% !important;
   height: 100% !important;
-}
-
-/* Room around the icons for a lifted icon and its sparkles. */
-.se-ach-row {
-  padding: 10px 0 8px;
-  margin-top: -6px;
 }
 
 [data-se-sec="achievements"] ._1IIKwlQaVZU6bIeEQJvmTK:not(#se-none) {
@@ -2258,7 +2243,7 @@
  */
 .se-ach-tip {
   position: fixed;
-  z-index: 10000;
+  z-index: var(--se-z-toast);
   width: 340px;
   overflow: hidden;
   pointer-events: none;
@@ -2269,7 +2254,7 @@
   font-family: var(--se-font, "Motiva Sans", Arial, sans-serif);
   opacity: 0;
   transform: translateY(4px);
-  transition: opacity .15s ease-out, transform .15s ease-out;
+  transition: opacity var(--se-dur) ease-out, transform var(--se-dur) var(--se-ease);
 }
 
 .se-ach-tip[data-on] {
@@ -2529,7 +2514,7 @@
   margin: 4px 0 8px;
   padding: 14px 18px;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: var(--se-radius-ml, 12px);
   background: linear-gradient(90deg,
       color-mix(in srgb, var(--se-banner) 12%, transparent),
       color-mix(in srgb, var(--se-banner) 4%, transparent) 55%,
@@ -2547,21 +2532,22 @@
 }
 
 .se-ach-banner[data-done]::before {
+  /* The shine moves by transform (composited), not by repainting a background each frame */
   content: '';
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 250%;
   pointer-events: none;
-  background: linear-gradient(105deg, transparent 40%, rgba(255, 230, 170, .1) 50%, transparent 60%) 0 0 / 250% 100%;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 230, 170, .1) 50%, transparent 60%);
+  transform: translateX(-90%);
   animation: se-ach-sweep 4.5s linear infinite;
 }
 
 @keyframes se-ach-sweep {
-  from {
-    background-position: 150% 0;
-  }
-
   to {
-    background-position: -50% 0;
+    transform: translateX(30%);
   }
 }
 
@@ -2728,13 +2714,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .se-ach-spark,
-  .se-ach-banner[data-done]::before {
+  .se-ach-spark {
     animation: none;
+    opacity: .8;
   }
 
-  .se-ach-spark {
-    opacity: .8;
+  .se-ach-banner[data-done]::before {
+    animation: none;
   }
 }
 
@@ -4921,55 +4907,21 @@
 }
 
 /*
- * Achievements in the feed look like those in the Achievements card: no rare glow,
- * a 52 px rounded icon on a fine gold edge that lifts on hover, the name and
- * description in the card's type; hovering opens the theme's tooltip.
+ * Achievements in the feed look like those in the Achievements card (the shared icon rules
+ * are with the card's): a 52 px icon, the name and description in the card's type; hovering
+ * opens the theme's tooltip.
  */
-[data-se-sec="activity"] ._2HUbCbZUn27MliiC8gRxGB:not(#se-none),
-[data-se-sec="activity"] ._2D_EJk8-jCnfqiwoKkOMVh:not(#se-none),
-[data-se-sec="activity"] ._1Z2eJs9-zNTKcWKy4M-oDE:not(#se-none) {
-  display: none !important;
-}
-
-[data-se-sec="activity"] ._3s4Rq3jnntBVP7HbJj1RMQ:not(#se-none) {
-  box-shadow: none !important;
-}
-
 [data-se-sec="activity"] ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none) {
-  position: relative !important;
   --icon-size: 52px !important;
   width: 52px !important;
   height: 52px !important;
   flex: none !important;
-  border-radius: 10px !important;
-  overflow: hidden !important;
-  transition: transform .15s ease-out;
-}
-
-[data-se-sec="activity"] ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none)::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-gold) 32%, transparent);
 }
 
 [data-se-sec="activity"] ._1fEbX-PfpZ2FhkhttWcm-V img:not(#se-none) {
   width: 100% !important;
   height: 100% !important;
-  border-radius: inherit !important;
   box-shadow: none !important;
-}
-
-[data-se-sec="activity"] ._26QliGU0MSP6WN4r-RtI5q:hover ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none),
-[data-se-sec="activity"] .PrimaryAchievement:hover ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none) {
-  transform: translateY(-2px);
-}
-
-[data-se-sec="activity"] ._26QliGU0MSP6WN4r-RtI5q:hover ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none)::after,
-[data-se-sec="activity"] .PrimaryAchievement:hover ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none)::after {
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-gold) 70%, transparent);
 }
 
 [data-se-sec="activity"] ._26QliGU0MSP6WN4r-RtI5q:not(#se-none),
@@ -5061,172 +5013,6 @@
 
 [data-se-sec="activity"] img[data-se-fr-pic][data-se-fr-state="offline"]:not(#se-none) {
   outline: 2px solid var(--se-offline, #6b7480) !important;
-}
-
-/*
- * "Would you recommend this game?": a 64 px tile with your playtime (488 over HOURS),
- * the question and a muted line beside it, then Yes (green thumb, green tint), No (red
- * thumb, red tint) and Maybe Later as a plain text link.
- */
-._3LE-6w1ItIAB4CKJFCa3Od:not(#se-none) {
-  padding: 18px 20px !important;
-  border-radius: 14px !important;
-  background: var(--se-surface, #1f242b) !important;
-  border: 1px solid var(--se-hairline, rgba(255, 255, 255, .06)) !important;
-  box-shadow: none !important;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od ._2SAb6geDpe6toA1GaP0GjH:not(#se-none) {
-  display: flex !important;
-  align-items: center !important;
-  gap: 18px !important;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od ._2SAb6geDpe6toA1GaP0GjH > ._2aeAnRfwltWfd9Hb9M_1uE:not(#se-none) {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od[data-se-rv-hours] ._2SAb6geDpe6toA1GaP0GjH > ._2aeAnRfwltWfd9Hb9M_1uE:not(#se-none) {
-  flex-direction: column-reverse;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od .se-rv-hours {
-  flex: none;
-  width: 64px;
-  height: 64px;
-  box-sizing: border-box;
-  border-radius: 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  background: var(--se-accent-tint, rgba(124, 196, 255, .14));
-  border: 1px solid var(--se-accent-tint, rgba(124, 196, 255, .14));
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od .se-rv-hours b {
-  font: 800 20px/1 var(--se-font, inherit);
-  color: var(--se-accent, #7cc4ff);
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od .se-rv-hours i {
-  font: 700 10.5px/1.2 var(--se-font, inherit);
-  font-style: normal;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--se-text-muted, #98a2ad);
-}
-
-/* The playtime line: Steam's text when there is no tile, the muted helper line when there is */
-._3LE-6w1ItIAB4CKJFCa3Od .qX4kNo6O0M-mYntdErKSJ:not(#se-none) {
-  font: 500 13.5px/1.35 var(--se-font, inherit) !important;
-  color: var(--se-text-muted, #98a2ad) !important;
-  letter-spacing: 0 !important;
-  text-transform: none !important;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od [data-se-rv-text]:not(#se-none) {
-  font-size: 0 !important;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od .qX4kNo6O0M-mYntdErKSJ[data-se-rv-text]::after {
-  content: attr(data-se-rv-text);
-  font-size: 13.5px;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od .My1beniJXh9pXud8rxYLK:not(#se-none) {
-  font: 700 16.5px/1.3 var(--se-font, inherit) !important;
-  color: var(--se-text, #e6e8eb) !important;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od .My1beniJXh9pXud8rxYLK[data-se-rv-text]:not(#se-none) {
-  font-size: 0 !important;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od .My1beniJXh9pXud8rxYLK[data-se-rv-text]::after {
-  content: attr(data-se-rv-text);
-  font-size: 16.5px;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od ._1E6Ivnp3A4apXqQYtlQHEc:not(#se-none) {
-  margin-left: auto !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  flex: none;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od ._1kCN0pAntrcGCSmcc-vYdk:not(#se-none),
-._3LE-6w1ItIAB4CKJFCa3Od ._35_OgqfHHZfSzTYfv367K6:not(#se-none) {
-  display: inline-flex !important;
-  align-items: center !important;
-  height: var(--se-control-h, 34px) !important;
-  padding: 0 16px 0 12px !important;
-  gap: 8px !important;
-  border-radius: 999px !important;
-  font: 600 13px var(--se-font, inherit) !important;
-  color: var(--se-text, #e6e8eb) !important;
-  box-shadow: none !important;
-  transition: background-color .15s;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od ._1kCN0pAntrcGCSmcc-vYdk ._2Jkk-4RGWzhce22lSnA9Em:not(#se-none),
-._3LE-6w1ItIAB4CKJFCa3Od ._35_OgqfHHZfSzTYfv367K6 ._2Jkk-4RGWzhce22lSnA9Em:not(#se-none) {
-  display: none !important;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od ._1kCN0pAntrcGCSmcc-vYdk:not([data-se-rv-btn="later"])::before,
-._3LE-6w1ItIAB4CKJFCa3Od ._35_OgqfHHZfSzTYfv367K6:not([data-se-rv-btn="later"])::before {
-  content: '';
-  flex: none;
-  width: 18px;
-  height: 18px;
-  background: center / contain no-repeat;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="up"]:not(#se-none) {
-  background: color-mix(in srgb, var(--se-running) 12%, transparent) !important;
-  border: 1px solid color-mix(in srgb, var(--se-running) 20%, transparent) !important;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="down"]:not(#se-none) {
-  background: color-mix(in srgb, var(--se-danger) 10%, transparent) !important;
-  border: 1px solid color-mix(in srgb, var(--se-danger) 20%, transparent) !important;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="up"]:hover:not(#se-none) {
-  background: color-mix(in srgb, var(--se-running) 20%, transparent) !important;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="down"]:hover:not(#se-none) {
-  background: color-mix(in srgb, var(--se-danger) 18%, transparent) !important;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="up"]::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10v10H4V10z' fill='%236cc24a' fill-opacity='.35' stroke='%236cc24a' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M7 10l4-7c1.6 0 2.6 1.2 2.2 2.8L12.6 9H19a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.8 20H7z' fill='%236cc24a' fill-opacity='.35' stroke='%236cc24a' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="down"]::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10v10H4V10z' fill='%23e5737a' fill-opacity='.35' stroke='%23e5737a' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M7 10l4-7c1.6 0 2.6 1.2 2.2 2.8L12.6 9H19a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.8 20H7z' fill='%23e5737a' fill-opacity='.35' stroke='%23e5737a' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
-  transform: rotate(180deg);
-}
-
-/* Maybe Later: plain muted text, lighter on hover */
-._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="later"]:not(#se-none) {
-  height: var(--se-control-h, 34px) !important;
-  padding: 0 6px !important;
-  background: none !important;
-  border: 0 !important;
-  font: 600 13px var(--se-font, inherit) !important;
-  color: var(--se-text-muted, #98a2ad) !important;
-}
-
-._3LE-6w1ItIAB4CKJFCa3Od :is(._1kCN0pAntrcGCSmcc-vYdk, ._35_OgqfHHZfSzTYfv367K6)[data-se-rv-btn="later"]:hover:not(#se-none) {
-  color: var(--se-text, #e6e8eb) !important;
 }
 
 /* The emoji button works before the text box is clicked, so it never looks disabled. */
