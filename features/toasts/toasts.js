@@ -287,6 +287,13 @@
     };
   }
 
+  // A friend's 32-bit account id from their 64-bit SteamID (individual accounts only).
+  const accountIdOf = v => {
+    if (!/^\d{17,20}$/.test(String(v || ''))) return 0;
+    const id = BigInt(String(v));
+    return ((id >> 52n) & 15n) === 1n ? Number(id & 0xffffffffn) : 0;
+  };
+
   // A Steam app id (non-Steam game ids are 64-bit and have no art).
   const appIdOf = v => {
     const n = Number(v);
@@ -340,6 +347,7 @@
       stackIndex: Number(stack?.toastIndex) || 0,
       appid,
       achId: String(field(data, 'achievement_id', 'api_name', 'achievement', 'name_id') || ''),
+      accountId: accountIdOf(field(data, 'steamid', 'steamid_sender', 'steamid_friend')),
       pct: Number.isFinite(pct) ? pct : NaN,
     };
   }
@@ -432,6 +440,49 @@
     return img;
   }
 
+  /*
+   * A friend's mini-profile background (the one Steam shows on their hover card), from the
+   * community's mini-profile JSON. Fetched once per friend and shared across toast windows.
+   */
+  function miniProfile(accountId) {
+    const host = run(() => window.opener) || window;
+    const cache = run(() => (host.__seMiniProfiles ||= new Map())) || new Map();
+    if (!cache.has(accountId)) {
+      cache.set(
+        accountId,
+        fetch(`https://steamcommunity.com/miniprofile/${accountId}/json`, { credentials: 'include' })
+          .then(r => (r.ok ? r.json() : null))
+          .catch(() => null)
+      );
+    }
+    return cache.get(accountId);
+  }
+
+  async function profileArt(accountId, art) {
+    const bg = (await miniProfile(accountId))?.profile_background;
+    if (!bg || !art.isConnected) return;
+    const video = bg['video/webm'] || bg['video/mp4'];
+    const still = bg.image || bg['image/jpeg'] || bg['image/png'];
+    let el;
+    if (video) {
+      el = document.createElement('video');
+      Object.assign(el, { src: video, muted: true, loop: true, autoplay: true, playsInline: true });
+      el.setAttribute('aria-hidden', 'true');
+    } else if (typeof still === 'string') {
+      el = artImg([still], 'se-tst-hero');
+    } else {
+      return;
+    }
+    el.className = 'se-tst-hero';
+    const show = () => {
+      art.replaceChildren(el);
+      delete art.dataset.plain;
+    };
+    if (video) el.addEventListener('loadeddata', show, { once: true });
+    else el.addEventListener('load', show, { once: true });
+    if (video) run(() => el.play());
+  }
+
   const artURLs = m => {
     if (m.artKind === 'image' && m.shot) return [m.shot];
     if (m.artKind !== 'none' && m.appid) return SE.heroURLs(m.appid, contextGlobal('appStore'));
@@ -442,8 +493,12 @@
     return `<span class="se-tst-fx" aria-hidden="true">${'<i class="se-tst-spark"></i>'.repeat(rank)}</span>`;
   }
 
+  // Presence on the avatar, as in the friends list: blue online, green in game.
+  const PRESENCE = Object.freeze({ online: 'online', playing: 'ingame' });
+
   function tileHTML(m, tier) {
     const img = m.icon ? `<img class="se-tst-tile-img" src="${esc(m.icon)}" alt="" draggable="false">` : icon(m.glyph);
+    if (PRESENCE[m.kind]) return `${img}<span class="se-tst-dot" data-state="${PRESENCE[m.kind]}"></span>`;
     if (m.kind !== 'ach') return img;
     if (m.mastered) return icon('cup') + sparkles(5);
     return tier ? img + sparkles(tier.rank) + `<b class="se-tst-initial">${tier.name[0]}</b>` : img;
@@ -510,6 +565,8 @@
     if (urls.length) art.appendChild(artImg(urls, 'se-tst-hero', fallback));
     else if (m.artKind === 'avatar' && m.icon) art.appendChild(artImg([m.icon], 'se-tst-glow'));
     else art.dataset.plain = '';
+    // A friend with no game art: their mini-profile background, once it arrives.
+    if (m.accountId && !urls.length) profileArt(m.accountId, art);
 
     layer.append(art);
     layer.insertAdjacentHTML(
@@ -604,6 +661,7 @@
       stackIndex: 0,
       appid: Number(spec.appid) || 0,
       achId: '',
+      accountId: Number(spec.accountId) || 0,
       pct: Number.isFinite(spec.pct) ? spec.pct : NaN,
       preview: true,
     });
@@ -1185,7 +1243,7 @@
   }
 
   window.__seToasts = {
-    version: '1.94.1',
+    version: '1.94.2',
     preview,
     clearAll,
     kinds: Object.keys(KINDS),
@@ -1210,7 +1268,7 @@
         noteKeys: run(() => Object.keys(noteOf(m.key, m.src) || {})),
         dataKeys: run(() => Object.keys(noteOf(m.key, m.src)?.data || {})),
         templateKeys: run(() => Object.keys(templateOf(m.src) || {}).filter(k => k !== 'children')),
-        personaKeys: run(() => Object.keys(templateOf(m.src)?.personaStatus || {}).slice(0, 60)),
+        accountId: m.accountId,
       }));
     },
     destroy() {

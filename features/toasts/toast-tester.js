@@ -65,6 +65,12 @@
     return achCache.get(appid);
   }
 
+  // Your own account (for the mini-profile background on friend previews).
+  function myAccountId() {
+    const sid = String(run(() => contextGlobal('App')?.m_CurrentUser?.strSteamID) || '');
+    return /^\d{17,20}$/.test(sid) ? Number(BigInt(sid) & 0xffffffffn) : 0;
+  }
+
   const SAMPLE_PCT = { legendary: 2.1, epic: 9.4, rare: 28.0, uncommon: 48.7, common: 82.3 };
 
   // A real unlocked achievement in this tier from your recent games, else a sample one.
@@ -100,9 +106,9 @@
 
   const GROUPS = [
     ['Friends & chat', [
-      ['Message', () => ({ kind: 'msg', title: 'Mara', text: 'you hopping on tonight? squad is forming around 9' })],
+      ['Message', () => ({ kind: 'msg', title: 'Mara', text: 'you hopping on tonight? squad is forming around 9', accountId: myAccountId() })],
       ['Group chat', () => ({ kind: 'msg', title: 'Night Raid Crew', text: 'Rivet: lobby is up, join when ready' })],
-      ['Online', () => ({ kind: 'online', title: 'Juno_42', text: 'is now online' })],
+      ['Online', () => ({ kind: 'online', title: 'Juno_42', text: 'is now online', accountId: myAccountId() })],
       ['Now playing', () => ({ kind: 'playing', title: 'Rivet', text: `is now playing ${game(1).name}`, appid: game(1).appid })],
       ['Comment', () => ({ kind: 'comment', title: 'Otter commented on your profile', text: '“that showcase is clean”' })],
       ['Voice call', () => ({ kind: 'call', title: 'Juno_42', text: 'is calling you', buttons: ['Answer', 'Decline'] })],
