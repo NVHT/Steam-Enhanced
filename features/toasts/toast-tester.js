@@ -110,12 +110,12 @@
       ['Group chat', () => ({ kind: 'msg', title: 'Night Raid Crew', text: 'Rivet: lobby is up, join when ready' })],
       ['Online', () => ({ kind: 'online', title: 'Juno_42', text: 'is now online', accountId: myAccountId() })],
       ['Now playing', () => ({ kind: 'playing', title: 'Rivet', text: `is now playing ${game(1).name}`, appid: game(1).appid })],
-      ['Comment', () => ({ kind: 'comment', title: 'Otter commented on your profile', text: '“that showcase is clean”' })],
-      ['Voice call', () => ({ kind: 'call', title: 'Juno_42', text: 'is calling you', buttons: ['Answer', 'Decline'] })],
+      ['Comment', () => ({ kind: 'comment', title: 'Otter commented on your profile', text: '“that showcase is clean”', accountId: myAccountId() })],
+      ['Voice call', () => ({ kind: 'call', title: 'Juno_42', text: 'is calling you', buttons: ['Answer', 'Decline'], accountId: myAccountId() })],
     ]],
     ['Invites & requests', [
       ['Game invite', () => ({ kind: 'invite', title: 'Mara invited you to play', text: game(2).name, appid: game(2).appid, buttons: ['Join', 'Ignore'] })],
-      ['Friend request', () => ({ kind: 'request', title: 'Tidebreaker', text: 'wants to be your friend', buttons: ['Accept', 'Ignore'] })],
+      ['Friend request', () => ({ kind: 'request', title: 'Tidebreaker', text: 'wants to be your friend', buttons: ['Accept', 'Ignore'], accountId: myAccountId() })],
       ['Steam Family', () => ({ kind: 'family', title: 'Leo wants to play', text: `${game(3).name} · asks for 1 h more`, appid: game(3).appid, buttons: ['Approve', 'Deny'] })],
     ]],
     ['Achievements', [
@@ -126,7 +126,7 @@
       ['Ready to play', () => ({ kind: 'ready', title: game(0).name, text: 'Download complete', appid: game(0).appid, buttons: ['Play'] })],
       ['Updated', () => ({ kind: 'update', title: '3 games updated', text: `${game(1).name}, ${game(2).name} and 1 more`, appid: game(1).appid })],
       ['Disk full', () => ({ kind: 'error', title: game(2).name, text: 'Download paused · not enough disk space', appid: game(2).appid, buttons: ['Free space', 'Retry'] })],
-      ['Screenshot', () => ({ kind: 'shot', title: game(0).name, text: 'Screenshot saved · F12', shot: hero(game(0)) })],
+      ['Screenshot', () => ({ kind: 'shot', title: game(0).name, text: 'Screenshot saved · F12', shot: hero(game(0)), appid: game(0).appid })],
       ['Clip', () => ({ kind: 'clip', title: game(1).name, text: 'Clip saved · last 30 seconds', appid: game(1).appid })],
     ]],
     ['Store & inventory', [
@@ -134,11 +134,11 @@
       ['Released', () => ({ kind: 'sale', title: `${game(5).name} is out`, text: 'A game on your wishlist just released', appid: game(5).appid })],
       ['Gift', () => ({ kind: 'gift', title: 'Otter sent you a gift', text: game(3).name, appid: game(3).appid, buttons: ['Add to library'] })],
       ['New item', () => ({ kind: 'item', title: 'Ember Trail Badge', text: `${game(0).name} · added to your inventory`, appid: game(0).appid })],
-      ['Trade offer', () => ({ kind: 'trade', title: 'kestrel sent a trade offer', text: 'You give 2 items · you get 3' })],
+      ['Trade offer', () => ({ kind: 'trade', title: 'kestrel sent a trade offer', text: 'You give 2 items · you get 3', accountId: myAccountId() })],
     ]],
     ['System', [
       ['Overlay', () => ({ kind: 'overlay', title: game(0).name, text: 'Press Shift+Tab to open the overlay', appid: game(0).appid })],
-      ['Controller', () => ({ kind: 'system', title: 'Wireless controller connected', text: 'Player 1 · Steam Input on' })],
+      ['Controller', () => ({ kind: 'controller', title: 'Wireless controller connected', text: 'Player 1 · Steam Input on' })],
       ['Battery low', () => ({ kind: 'battery', title: 'Wireless controller', text: 'Battery at 10%' })],
     ]],
   ];

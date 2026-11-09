@@ -65,9 +65,10 @@
     trade: { label: 'Trade offer', accent: 'shop', ms: 6000, art: 'avatar', icon: 'trade' },
     comment: { label: 'Comment', accent: 'msg', ms: 6000, art: 'avatar', icon: 'chat' },
     family: { label: 'Steam Family', accent: 'sys', ms: 12000, art: 'app', icon: 'home' },
-    battery: { label: 'Battery low', accent: 'ach', ms: 6000, art: 'none', icon: 'battery' },
+    battery: { label: 'Battery low', accent: 'ach', ms: 6000, art: 'wall', icon: 'battery' },
     error: { label: 'Needs attention', accent: 'err', ms: 0, pri: true, art: 'app', icon: 'alert' },
     overlay: { label: 'Steam overlay', accent: 'sys', ms: 4000, art: 'app', icon: 'screen' },
+    controller: { label: 'Controller', accent: 'sys', ms: 5000, art: 'wall', icon: 'pad' },
     system: { label: 'Steam', accent: 'sys', ms: 5000, art: 'app', icon: 'steam' },
   });
 
@@ -84,6 +85,7 @@
     [/Screenshot/, 'shot'],
     [/GameRecording|Clip/, 'clip'],
     [/LowBattery|Battery/, 'battery'],
+    [/Controller|SteamInput|Gamepad/, 'controller'],
     [/LowDiskSpace|Disk|CloudSync|Error|Failure/, 'error'],
     [/Gift/, 'gift'],
     [/ItemAnnouncement|Item/, 'item'],
@@ -103,28 +105,34 @@
     59: 'invite',
   });
 
+  /*
+   * Duotone glyphs: the shape in a 40% tint of the toast's color, the detail at full strength
+   * (`.d` paths and strokes). One color, two tones.
+   */
+  const T = 'opacity=".4"';
+  const S = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
   const ICONS = Object.freeze({
-    chat: '<path d="M4 4h16v12H9l-5 4z" fill="currentColor"/>',
-    dot: '<circle cx="12" cy="12" r="6" fill="currentColor"/>',
-    play: '<path d="M8 5l11 7-11 7z" fill="currentColor"/>',
-    pad: '<path d="M6 8h12a3 3 0 0 1 3 3v4a2 2 0 0 1-3.5 1.3L15 14H9l-2.5 2.3A2 2 0 0 1 3 15v-4a3 3 0 0 1 3-3z" fill="currentColor"/>',
-    plus: '<circle cx="9" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20c.9-3.3 3.4-5 6.5-5s5.6 1.7 6.5 5M19 8v6M16 11h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-    phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z" fill="currentColor"/>',
-    trophy: '<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
-    cup: '<path d="M7 3h10v6a5 5 0 0 1-10 0zM7 5H4a3.5 3.5 0 0 0 3.5 5M17 5h3a3.5 3.5 0 0 1-3.5 5M10.5 15h3v3h-3zM7.5 19h9v2h-9z" fill="currentColor"/>',
-    check: '<path d="M5 12l5 5 9-10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>',
-    down: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
-    camera: '<path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/>',
-    rec: '<circle cx="12" cy="12" r="5" fill="currentColor"/>',
-    tag: '<path d="M3 12V4h8l9 9-8 8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="7.5" cy="7.5" r="1.3" fill="currentColor"/>',
-    gift: '<path d="M3 8h18v4H3zM5 12v8h14v-8M12 8v12M12 8c-1.5-3-5-3-5-1s3 1 5 1c2 0 5 1 5-1s-3.5-2-5 1" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
-    cube: '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9zM4 7.5l8 4.5 8-4.5M12 12v9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
-    trade: '<path d="M4 8h14l-4-4M20 16H6l4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
-    home: '<path d="M4 11l8-7 8 7v9H4zM10 20v-5h4v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
-    battery: '<rect x="3" y="8" width="16" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 11v2M6 11v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-    alert: '<path d="M12 3l9 16H3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-    screen: '<rect x="3" y="6" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 14h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-    steam: '<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/>',
+    chat: `<path d="M4 4.5A1.5 1.5 0 0 1 5.5 3h13A1.5 1.5 0 0 1 20 4.5v10a1.5 1.5 0 0 1-1.5 1.5H9l-5 4z" fill="currentColor" ${T}/><path d="M8 8h8M8 11.5h5" ${S}/>`,
+    dot: `<circle cx="12" cy="12" r="9" fill="currentColor" ${T}/><circle cx="12" cy="12" r="4.5" fill="currentColor"/>`,
+    play: `<circle cx="12" cy="12" r="10" fill="currentColor" ${T}/><path d="M10 8.2l6 3.8-6 3.8z" fill="currentColor"/>`,
+    pad: `<path d="M7 7h10a4 4 0 0 1 4 4v4.5a2.5 2.5 0 0 1-4.4 1.6L14.8 15H9.2l-1.8 2.1A2.5 2.5 0 0 1 3 15.5V11a4 4 0 0 1 4-4z" fill="currentColor" ${T}/><path d="M8 9.8v3.4M6.3 11.5h3.4" ${S}/><circle cx="15.5" cy="10.6" r="1.2" fill="currentColor"/><circle cx="17.6" cy="12.7" r="1.2" fill="currentColor"/>`,
+    plus: `<circle cx="9" cy="8" r="4" fill="currentColor" ${T}/><path d="M2 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5z" fill="currentColor" ${T}/><path d="M19 8v6M16 11h6" ${S}/>`,
+    phone: `<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z" fill="currentColor"/><path d="M15 3.5a6 6 0 0 1 5.5 5.5M15 7a2.5 2.5 0 0 1 2 2" ${S} ${T}/>`,
+    trophy: `<path d="M7 3h10v6a5 5 0 0 1-10 0z" fill="currentColor" ${T}/><path d="M7 5H4.5a3 3 0 0 0 3 4.5M17 5h2.5a3 3 0 0 1-3 4.5M12 14v3.5M8 20.5h8" ${S}/>`,
+    cup: `<path d="M7 3h10v6a5 5 0 0 1-10 0z" fill="currentColor"/><path d="M7 5H4a3.5 3.5 0 0 0 3.5 5M17 5h3a3.5 3.5 0 0 1-3.5 5" ${S}/><path d="M10.5 15h3v3h-3zM7.5 19h9v2h-9z" fill="currentColor" ${T}/>`,
+    check: `<circle cx="12" cy="12" r="10" fill="currentColor" ${T}/><path d="M7.5 12.2l3 3 6-6.4" ${S} stroke-width="2.4"/>`,
+    down: `<path d="M4 15h16v3.5A1.5 1.5 0 0 1 18.5 20h-13A1.5 1.5 0 0 1 4 18.5z" fill="currentColor" ${T}/><path d="M12 3.5v9M8 8.5l4 4 4-4" ${S}/>`,
+    camera: `<path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.7l1.8-2.5h6l1.8 2.5h2.7A1.5 1.5 0 0 1 21 8.5v10a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z" fill="currentColor" ${T}/><circle cx="12" cy="13.5" r="3.6" ${S}/>`,
+    rec: `<circle cx="12" cy="12" r="9.5" fill="currentColor" ${T}/><circle cx="12" cy="12" r="4.5" fill="currentColor"/>`,
+    tag: `<path d="M3 4.5A1.5 1.5 0 0 1 4.5 3h6.9a1.5 1.5 0 0 1 1.1.4l8.3 8.4a1.5 1.5 0 0 1 0 2.1l-6.8 6.8a1.5 1.5 0 0 1-2.1 0l-8.4-8.3a1.5 1.5 0 0 1-.4-1.1z" fill="currentColor" ${T}/><circle cx="8" cy="8" r="1.8" fill="currentColor"/>`,
+    gift: `<path d="M4 12h16v7.5A1.5 1.5 0 0 1 18.5 21h-13A1.5 1.5 0 0 1 4 19.5zM3 8.5A1.5 1.5 0 0 1 4.5 7h15A1.5 1.5 0 0 1 21 8.5V12H3z" fill="currentColor" ${T}/><path d="M12 7v14M12 7c-1.5-3-5-3-5-1s3 1 5 1c2 0 5 1 5-1s-3.5-2-5 1" ${S}/>`,
+    cube: `<path d="M12 3l8 4.5L12 12 4 7.5z" fill="currentColor"/><path d="M4 7.5L12 12v9l-8-4.5zM20 7.5V16.5L12 21v-9z" fill="currentColor" ${T}/>`,
+    trade: `<path d="M4 8h14l-4-4" ${S} stroke-width="2.2"/><path d="M20 16H6l4 4" ${S} stroke-width="2.2" ${T}/>`,
+    home: `<path d="M3.5 11L12 3.5l8.5 7.5v8.5A1.5 1.5 0 0 1 19 21H5a1.5 1.5 0 0 1-1.5-1.5z" fill="currentColor" ${T}/><path d="M10 21v-5.5h4V21" ${S}/>`,
+    battery: `<rect x="2.5" y="7" width="17" height="10" rx="2.5" fill="currentColor" ${T}/><path d="M21.5 10.5v3" ${S}/><rect x="5" y="9.5" width="3.5" height="5" rx="1" fill="currentColor"/>`,
+    alert: `<path d="M10.3 4.2a2 2 0 0 1 3.4 0l7.6 13.2a2 2 0 0 1-1.7 3H4.4a2 2 0 0 1-1.7-3z" fill="currentColor" ${T}/><path d="M12 9.5v4M12 16.8h.01" ${S} stroke-width="2.4"/>`,
+    screen: `<rect x="2.5" y="4" width="19" height="13" rx="2" fill="currentColor" ${T}/><path d="M8 20.5h8M12 17v3.5M6.5 13h6" ${S}/>`,
+    steam: `<circle cx="12" cy="12" r="10" fill="currentColor" ${T}/><circle cx="12" cy="12" r="4" fill="currentColor"/>`,
     close: '<path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>',
   });
   const icon = (name, cls = '') =>
@@ -194,6 +202,7 @@
     [/trade offer/i, 'trade'],
     [/comment/i, 'comment'],
     [/battery/i, 'battery'],
+    [/\bcontroller\b/i, 'controller'],
   ];
 
   function kindOf(note, tpl, text) {
@@ -353,7 +362,7 @@
       stackIndex: Number(stack?.toastIndex) || 0,
       appid,
       achId: String(field(data, 'achievement_id', 'api_name', 'achievement', 'name_id') || ''),
-      accountId: accountIdOf(field(data, 'steamid', 'steamid_sender', 'steamid_friend')),
+      accountId: accountIdOf(field(data, 'steamid', 'steamid_sender', 'steamid_friend', 'steamid_requestor', 'steamid_commenter', 'steamid_partner', 'steamid_inviter', 'steamid_caller', 'steamid_other')),
       pct: Number.isFinite(pct) ? pct : NaN,
     };
   }
@@ -561,9 +570,16 @@
     if (video) run(() => el.play());
   }
 
+  // Steam's own sign-in background, the art the startup screen is built on.
+  const WALL_CROPS = ['18% 22%', '78% 64%', '46% 88%', '8% 70%', '62% 12%', '92% 34%'];
+  const wallURL = () =>
+    run(() => new URL('/images/client_login_bg_grid.jpg', shared().location.href).href) ||
+    'https://steamloopback.host/images/client_login_bg_grid.jpg';
+
   const artURLs = m => {
-    if (m.artKind === 'image' && m.shot) return [m.shot];
-    if (m.artKind !== 'none' && m.appid) return SE.heroURLs(m.appid, contextGlobal('appStore'));
+    const hero = m.appid && m.artKind !== 'wall' ? SE.heroURLs(m.appid, contextGlobal('appStore')) : [];
+    if (m.artKind === 'image' && m.shot) return [m.shot, ...hero];
+    if (m.artKind === 'app' || m.artKind === 'image') return hero;
     return [];
   };
 
@@ -571,12 +587,11 @@
     return `<span class="se-tst-fx" aria-hidden="true">${'<i class="se-tst-spark"></i>'.repeat(rank)}</span>`;
   }
 
-  // Presence on the avatar, as in the friends list: blue online, green in game.
+  // Presence as an outline round the avatar, as in the friends list: blue online, green in game.
   const PRESENCE = Object.freeze({ online: 'online', playing: 'ingame' });
 
   function tileHTML(m, tier) {
     const img = m.icon ? `<img class="se-tst-tile-img" src="${esc(m.icon)}" alt="" draggable="false">` : icon(m.glyph);
-    if (PRESENCE[m.kind]) return `${img}<span class="se-tst-dot" data-state="${PRESENCE[m.kind]}"></span>`;
     if (m.kind !== 'ach') return img;
     if (m.mastered) return icon('cup') + sparkles(5);
     return tier ? img + sparkles(tier.rank) + `<b class="se-tst-initial">${tier.name[0]}</b>` : img;
@@ -986,7 +1001,7 @@
     SE.attr(v.thumb, 'data-se-tier', tierId || null);
     const label = e.kind === 'ach' && e.mastered ? 'Game mastered' : e.label;
     v.layer.querySelector('.se-tst-ct').innerHTML =
-      `<div class="se-tst-tile">${tileHTML(e, tier)}</div>` +
+      `<div class="se-tst-tile"${PRESENCE[e.kind] ? ` data-presence="${PRESENCE[e.kind]}"` : ''}>${tileHTML(e, tier)}</div>` +
       `<div class="se-tst-tx"><div class="se-tst-ey">${esc(label)}</div>` +
       `<div class="se-tst-tt">${esc(e.title)}</div>${detailHTML(e)}</div>` +
       `<div class="se-tst-rt">${rightHTML(e, tier)}</div>`;
@@ -1006,16 +1021,22 @@
     const art = document.createElement('div');
     art.className = 'se-tst-art';
     const urls = artURLs(e);
-    // No art at all: the avatar as a glow, else the plain ground in the toast's color.
+    // Steam's sign-in art (the capsule wall behind the startup screen), else the plain ground.
+    const wall = () => {
+      art.replaceChildren(artImg([wallURL()], 'se-tst-hero se-tst-wall', () => {
+        art.replaceChildren();
+        art.dataset.plain = '';
+      }));
+      art.style.setProperty('--se-tst-crop', WALL_CROPS[e.id % WALL_CROPS.length]);
+    };
+    // No game art: the avatar as a glow (friends, achievements), else the wall.
     const fallback = () => {
-      art.replaceChildren();
-      if (e.icon) art.appendChild(artImg([e.icon], 'se-tst-glow'));
-      else art.dataset.plain = '';
+      if (e.icon && e.artKind !== 'wall') art.replaceChildren(artImg([e.icon], 'se-tst-glow'));
+      else wall();
     };
     if (urls.length) art.appendChild(artImg(urls, 'se-tst-hero', fallback));
-    else if (e.artKind === 'avatar' && e.icon) art.appendChild(artImg([e.icon], 'se-tst-glow'));
-    else art.dataset.plain = '';
-    // A friend with no game art: their mini-profile background, once it arrives.
+    else fallback();
+    // A friend: their mini-profile background replaces the glow once it arrives.
     if (e.accountId && !urls.length) profileArt(e.accountId, art);
 
     layer.append(art);
@@ -1034,7 +1055,7 @@
     thumb.dataset.id = String(e.id);
     thumb.dataset.accent = e.accent;
     thumb.setAttribute('aria-label', `${e.label}: ${e.title}`);
-    const thumbURLs = urls.length ? urls : e.icon ? [e.icon] : [];
+    const thumbURLs = [...urls, ...(e.icon && e.artKind !== 'wall' ? [e.icon] : []), wallURL()];
     if (thumbURLs.length) thumb.appendChild(artImg(thumbURLs, 'se-tst-thumb-img'));
 
     const v = { layer, thumb, rev: 0, armed: 0, leaving: false };
@@ -1690,7 +1711,7 @@
   }
 
   window.__seToasts = {
-    version: '1.95.2',
+    version: '1.95.3',
     preview,
     clearAll,
     kinds: Object.keys(KINDS),

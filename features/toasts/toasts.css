@@ -198,6 +198,12 @@ html[data-se-tst-on] body > :not(#se-tst) {
   to { transform: scale(1.14) translate(-2%, -1.5%); }
 }
 
+/* Steam's sign-in capsule wall: blurred and dimmed, as the startup's `wall` background. */
+.se-tst-wall {
+  object-position: var(--se-tst-crop, 50% 50%);
+  filter: blur(2px) saturate(.85) brightness(.62);
+}
+
 /* No game art: the friend's avatar as a soft glow. */
 .se-tst-glow {
   position: absolute;
@@ -294,19 +300,14 @@ html[data-se-tst-on] body > :not(#se-tst) {
   height: 24px;
 }
 
-.se-tst-dot {
-  position: absolute;
-  right: -3px;
-  bottom: -3px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--se-online, #4cb4ff);
-  box-shadow: 0 0 0 3px rgba(16, 18, 23, .9);
+/* Presence: an outline round the avatar, a gap of the tray's glass between. */
+.se-tst-tile[data-presence] {
+  --se-tst-status: var(--se-online, #4cb4ff);
+  box-shadow: 0 0 0 2px rgba(16, 18, 23, .9), 0 0 0 4px var(--se-tst-status), 0 10px 22px -8px rgba(0, 0, 0, .85);
 }
 
-.se-tst-dot[data-state="ingame"] {
-  background: var(--se-running, #6cc24a);
+.se-tst-tile[data-presence="ingame"] {
+  --se-tst-status: var(--se-running, #6cc24a);
 }
 
 .se-tst-tile-img {
