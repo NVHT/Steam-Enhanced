@@ -333,7 +333,8 @@
       label: k.label,
       accent: k.accent,
       // Steam's own display time for this toast, so ours ends with it; sticky kinds stay sticky.
-      ms: k.ms && Number(field(key, 'nToastDurationMS')) > 0 ? Number(field(key, 'nToastDurationMS')) : k.ms,
+      ms: k.ms && steamMs(key) > 0 ? steamMs(key) : k.ms,
+      steamMs: steamMs(key),
       pri: !!k.pri,
       artKind: k.art,
       glyph: k.icon,
@@ -351,6 +352,74 @@
       accountId: accountIdOf(field(data, 'steamid', 'steamid_sender', 'steamid_friend')),
       pct: Number.isFinite(pct) ? pct : NaN,
     };
+  }
+
+  /* ---------- Steam's timer ---------- */
+
+  /*
+   * Steam closes each toast window when its own timer runs out, whatever the stage is doing:
+   * that cuts the close animation short and ignores hover. So as soon as a toast appears its
+   * duration is set far out (read before Steam schedules it, if Steam reads it late) and the
+   * theme dismisses it itself once it has played.
+   *
+   * Whether Steam honours that is learnt, not assumed: until a toast window has outlived its
+   * original time, slots still shrink to fit Steam's timers (hub.timerHeld).
+   * A guard dismisses any toast the stage never finishes, so none can stay up forever.
+   */
+  const HOLD_MS = 10 * 60 * 1000;
+  const GUARD_MS = 60 * 1000;          // past Steam's own time, unless hovered
+  const origMs = new WeakMap();        // notification → Steam's original duration
+
+  const steamMs = key => (key && typeof key === 'object' && origMs.has(key) ? origMs.get(key) : Number(field(key, 'nToastDurationMS')) || 0);
+
+  function holdTimer(key) {
+    if (!key || typeof key !== 'object' || origMs.has(key)) return;
+    const ms = Number(run(() => key.nToastDurationMS));
+    if (!(ms > 0)) return;
+    origMs.set(key, ms);
+    run(() => { key.nToastDurationMS = HOLD_MS; });
+  }
+  const held = key => !!key && typeof key === 'object' && run(() => key.nToastDurationMS) === HOLD_MS;
+
+  // Put Steam's duration back for a toast left native (it can't be read), and close it on time.
+  function letGo(key, src, born) {
+    const ms = origMs.get(key);
+    if (!ms || !held(key)) return;
+    run(() => { key.nToastDurationMS = ms; });
+    const dismiss = stackOf(src)?.onDismiss;
+    if (typeof dismiss === 'function') setTimeout(() => run(dismiss), Math.max(0, born + ms - Date.now()));
+  }
+
+  // Newly drawn toasts, seen at once (not throttled) so the duration changes before Steam reads it.
+  function onEarlyMutation(records) {
+    for (const r of records) {
+      for (const n of r.addedNodes) {
+        if (n.nodeType !== 1 || dock?.contains(n)) continue;
+        holdTimer(keyOf(n));
+        for (const el of n.querySelectorAll?.('*') || []) {
+          const key = keyOf(el);
+          if (key !== null) {
+            holdTimer(key);
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  // The pointer on the stage counts as on every queued Steam toast (Steam may pause on hover).
+  function hoverSteam(on) {
+    const types = on ? ['pointerover', 'pointerenter', 'mouseover', 'mouseenter'] : ['pointerout', 'pointerleave', 'mouseout', 'mouseleave'];
+    for (const e of hub().entries) {
+      const el = e.click || e.src;
+      if (e.done || !alive(e.win) || !el?.isConnected) continue;
+      run(() => {
+        for (const type of types) {
+          const Ctor = type.startsWith('pointer') ? e.win.PointerEvent || e.win.MouseEvent : e.win.MouseEvent;
+          el.dispatchEvent(new Ctor(type, { bubbles: !type.endsWith('enter') && !type.endsWith('leave'), relatedTarget: null }));
+        }
+      });
+    }
   }
 
   /* ---------- Achievements: the theme's rarity ---------- */
@@ -549,7 +618,7 @@
    * stage's own, which stays until the queue empties (dismissing it closes the stage).
    */
   const HUB_KEY = '__seToastHub';
-  const HUB_V = 2;
+  const HUB_V = 3;
   const MIN_SLOT_MS = 2500;
   const MIN_LEFT_MS = 1500;      // a shortened toast still shows at least this much more
   const CLOSE_MS = 900;          // the tray's close animation, with margin
@@ -583,6 +652,8 @@
       playRev: 0,              // bumped whenever the active toast (re)starts
       open: false,
       closing: false,
+      timerHeld: false,        // Steam's timer waits for the theme (learnt)
+      steamCloses: new O.Array(), // windows Steam closed before the theme did (for why())
     });
     run(() => { at[HUB_KEY] = h; });
     return h;
@@ -621,6 +692,7 @@
    */
   function slotFor(e, h, waiting) {
     if (!e.ms) return 0;
+    if (h.timerHeld) return e.ms;
     const ends = h.entries.filter(x => !x.stale && alive(x.win)).map(x => x.deadline);
     const horizon = ends.length ? Math.max(...ends) : Infinity;
     if (!Number.isFinite(horizon)) return e.ms;
@@ -783,7 +855,10 @@
       if (IN_TOAST_WINDOW && isStage() && up) continue; // dismissing it would close the stage
       e.released = true;
       unmark(e.src, SRC_ATTR);
-      if (e.dismiss && e.src?.isConnected) run(e.dismiss);
+      if (e.dismiss && e.src?.isConnected) {
+        dismissedByUs = true;
+        run(e.dismiss);
+      }
     }
     for (let i = h.entries.length - 1; i >= 0; i--) {
       const e = h.entries[i];
@@ -840,6 +915,7 @@
     } else {
       teardown();
     }
+    if (IN_TOAST_WINDOW) guard(h);
     release(h);
 
     // Get to the bottom centre once a toast from this window is queued, ready to take over.
@@ -858,6 +934,17 @@
     const now = Date.now();
     for (const e of h.entries) {
       if (!e.done && e.stale && e.id !== h.active && now - e.born > STALE_MAX_MS) finish(e, 'dropped by Steam');
+      // A toast window still open well past Steam's own time: Steam waits for the theme.
+      if (!h.timerHeld && !e.stale && e.steamMs && alive(e.win) && now - e.born > e.steamMs + 1500) h.timerHeld = true;
+    }
+  }
+
+  // This window's toasts that never finished (the stage is gone or stuck): end them.
+  function guard(h) {
+    if (h.pausedAt) return;
+    const now = Date.now();
+    for (const e of byKey.values()) {
+      if (!e.done && !e.preview && now - e.born > (e.steamMs || STALE_MAX_MS) + GUARD_MS) finish(e, 'guard');
     }
   }
 
@@ -1364,9 +1451,11 @@
     if (!e.target.closest?.('.se-tst-tray')) return;
     if (e.type === 'pointerover' && !h.pausedAt && h.active) {
       h.pausedAt = Date.now();
+      hoverSteam(true);
     } else if (e.type === 'pointerout' && h.pausedAt && !tray?.contains(e.relatedTarget)) {
       h.startedAt += Date.now() - h.pausedAt;
       h.pausedAt = 0;
+      hoverSteam(false);
     }
   }
 
@@ -1410,6 +1499,7 @@
       } else if (!pendingKeys.has(key)) {
         pendingKeys.set(key, now);
       } else if (now - pendingKeys.get(key) > ADOPT_TIMEOUT_MS) {
+        letGo(key, src, pendingKeys.get(key));
         pendingKeys.delete(key);
         skipped.add(key);
       }
@@ -1477,6 +1567,7 @@
 
   let watcher = null;
   let poller = null;
+  let early = null;
 
   const busy = () => hub().entries.length > 0 || pendingKeys.size > 0 || unseenSince > 0;
   const step = () => {
@@ -1486,8 +1577,17 @@
 
   // Steam closed this toast window: its queued toasts stay queued (without their buttons),
   // and if it was the stage, the next newest window takes over.
+  let dismissedByUs = false;
   function onPageHide() {
     const h = hub();
+    // Steam closed it on its own timer (the theme hadn't dismissed it): Steam doesn't wait.
+    const own = [...byKey.values()].filter(e => !e.preview);
+    if (!dismissedByUs && own.length) {
+      const first = Math.min(...own.map(e => e.born));
+      h.steamCloses.push({ window: window.name, after: Date.now() - first, steamMs: own[0].steamMs, held: own.some(e => held(e.key)) });
+      if (h.steamCloses.length > 6) h.steamCloses.shift();
+      h.timerHeld = false;
+    }
     for (const e of h.entries) if (e.win === window && !e.done) e.stale = true;
     const i = h.wins.indexOf(window);
     if (i >= 0) h.wins.splice(i, 1);
@@ -1504,6 +1604,9 @@
   function start() {
     if (!enabled() || !IN_TOAST_WINDOW) return;
     register();
+    early = new MutationObserver(onEarlyMutation);
+    early.observe(document.body, { childList: true, subtree: true });
+    for (const el of document.body.querySelectorAll('*')) holdTimer(keyOf(el));
     watcher = SE.watch(step, { throttle: 60, characterData: true });
     // Steam can fill a toast in without a DOM mutation the observer sees (images, late props),
     // and the stage needs its housekeeping while toasts are queued.
@@ -1569,6 +1672,9 @@
     return {
       stage: h.stage ? name(h.stage) : null,
       windows: h.wins.map(w => ({ name: name(w), alive: alive(w), ready: !!run(() => w.__seToasts?.ready?.()) })),
+      timerHeld: h.timerHeld,
+      steamCloses: [...h.steamCloses],
+      heldHere: [...byKey.values()].filter(e => !e.preview).map(e => ({ title: e.title, steamMs: e.steamMs, held: held(e.key) })),
       active: h.active,
       slot: h.slot,
       elapsed: h.active ? elapsed(h) : 0,
@@ -1579,7 +1685,7 @@
   }
 
   window.__seToasts = {
-    version: '1.95.0',
+    version: '1.95.1',
     preview,
     clearAll,
     kinds: Object.keys(KINDS),
@@ -1611,6 +1717,7 @@
     destroy() {
       watcher?.disconnect();
       poller?.disconnect();
+      early?.disconnect();
       clearTimeout(replaceTimer);
       removeEventListener('resize', onWindowResize);
       removeEventListener('pagehide', onPageHide);
