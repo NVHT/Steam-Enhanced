@@ -653,32 +653,77 @@
    * shows is divided out from then on. Resizing uses the standard API, which Steam allows.
    */
   const scWindow = () => window.SteamClient?.Window;
-  let ratio = null; // where Steam's MoveTo puts the window ÷ what it was asked
   const sane = r => Number.isFinite(r) && r > 0.2 && r < 5;
+
+  // The ratio is the same for every toast window, so it's kept in Steam's shared context
+  // (this window's opener) once measured; later toasts land in one move.
+  const shared = () => run(() => window.opener) || window;
+  const getRatio = () => run(() => shared().__seToastMoveRatio) || null;
+  const setRatio = r => run(() => { shared().__seToastMoveRatio = r; });
+
+  // Steam moves the window a moment after MoveTo returns: wait until it really has moved
+  // (Steam's own small corner adjustments don't count).
+  const MOVED = 40;
+  const movedFrom = from => Math.abs(window.screenX - from.x) > MOVED || Math.abs(window.screenY - from.y) > MOVED;
+  async function settle(from, t, ms = 1200) {
+    for (const end = Date.now() + ms; Date.now() < end; ) {
+      await sleep(50);
+      if (landed(t) || movedFrom(from)) {
+        await sleep(80); // let it finish
+        return;
+      }
+    }
+  }
+
+  // A new toast window opens mid-screen and Steam then moves it to its corner: wait for that
+  // to finish (position unchanged for a few checks), so Steam doesn't undo our move.
+  async function steamPlaced(ms = 1500) {
+    let last = { x: window.screenX, y: window.screenY };
+    let still = 0;
+    for (const end = Date.now() + ms; Date.now() < end && still < 4; ) {
+      await sleep(60);
+      const now = { x: window.screenX, y: window.screenY };
+      still = now.x === last.x && now.y === last.y ? still + 1 : 0;
+      last = now;
+    }
+  }
+
   const MOVERS = [
     {
       name: 'SteamClient MoveTo',
       steam: true,
       async move(t) {
         const W = scWindow();
-        if (ratio) {
-          W.MoveTo(Math.round(t.x / ratio.x), Math.round(t.y / ratio.y), 1);
-          return sleep(150);
+        const known = getRatio();
+        const from = { x: window.screenX, y: window.screenY };
+        if (known) {
+          W.MoveTo(Math.round(t.x / known.x), Math.round(t.y / known.y), 1);
+          return settle(from, t);
         }
         W.MoveTo(t.x, t.y, 1);
-        await sleep(150);
+        await settle(from, t);
         if (landed(t)) {
-          ratio = { x: 1, y: 1 };
+          setRatio({ x: 1, y: 1 });
           return undefined;
         }
+        if (!movedFrom(from)) return undefined; // didn't move
         const r = { x: window.screenX / t.x, y: window.screenY / t.y };
         if (!sane(r.x) || !sane(r.y)) return undefined;
-        ratio = r;
+        const again = { x: window.screenX, y: window.screenY };
         W.MoveTo(Math.round(t.x / r.x), Math.round(t.y / r.y), 1);
-        return sleep(150);
+        await settle(again, t);
+        if (landed(t)) setRatio(r);
+        return undefined;
       },
     },
-    { name: 'window.moveTo', move: t => (window.moveTo(t.x, t.y), sleep(150)) },
+    {
+      name: 'window.moveTo',
+      move(t) {
+        const from = { x: window.screenX, y: window.screenY };
+        window.moveTo(t.x, t.y);
+        return settle(from, t, 600);
+      },
+    },
   ];
   let mover = -1;          // index into MOVERS that worked, -1 = untried, -2 = none work
   let target = null;
@@ -729,7 +774,10 @@
 
   async function moveWindow() {
     if (fullArea() || mover === -2) return;
-    steamRect = steamRect || { x: window.screenX, y: window.screenY, w: window.outerWidth, h: window.outerHeight };
+    if (!steamRect) {
+      await steamPlaced();
+      steamRect = { x: window.screenX, y: window.screenY, w: window.outerWidth, h: window.outerHeight };
+    }
     target = wanted();
     if (landed(target)) {
       if (mover < 0) mover = 0;
@@ -739,7 +787,7 @@
     for (const i of order) {
       if (MOVERS[i].steam && typeof scWindow()?.MoveTo !== 'function') continue;
       await applyMove(i, target);
-      attempts.push({ mover: MOVERS[i].name, x: window.screenX, y: window.screenY, ratio });
+      attempts.push({ mover: MOVERS[i].name, x: window.screenX, y: window.screenY, ratio: getRatio() });
       if (landed(target)) {
         mover = i;
         return;
@@ -750,8 +798,9 @@
     // Couldn't land it: put the window back as Steam had it (size and spot), so it stays on
     // screen in Steam's corner and the tray scales down to fit.
     run(() => window.resizeTo(steamRect.w, steamRect.h));
-    if (ratio && typeof scWindow()?.MoveTo === 'function') {
-      run(() => scWindow().MoveTo(Math.round(steamRect.x / ratio.x), Math.round(steamRect.y / ratio.y), 1));
+    const r = getRatio();
+    if (r && typeof scWindow()?.MoveTo === 'function') {
+      run(() => scWindow().MoveTo(Math.round(steamRect.x / r.x), Math.round(steamRect.y / r.y), 1));
     } else {
       run(() => window.moveTo(steamRect.x, steamRect.y));
     }
@@ -764,6 +813,7 @@
   // Steam may put the window back in its corner when its own toast list changes.
   // A toast below closing moves this one down a slot (its toastIndex changes).
   let replaceTimer = 0;
+  let reMoves = 0;
   function restack() {
     if (!tray?.hasAttribute('data-show') || mover < 0 || replaceTimer) return;
     replaceTimer = setTimeout(() => {
@@ -829,7 +879,14 @@
       const key = keyOf(el);
       if (key !== null && !live.has(key)) live.set(key, el); // document order: the first hit is the toast's root
     }
-    if (tray?.hasAttribute('data-show')) fit();
+    if (tray?.hasAttribute('data-show')) {
+      fit();
+      // Steam can move the window back to its corner after it landed: move it again (a few times).
+      if (mover >= 0 && target && !landed(target) && reMoves < 3) {
+        reMoves++;
+        restack();
+      }
+    }
     lastScan = { at: new Date().toISOString(), elements: document.body.getElementsByTagName('*').length, toasts: live.size, read: [] };
 
     const now = Date.now();
@@ -947,7 +1004,7 @@
       target,
       attempts,
       steamRect,
-      ratio,
+      ratio: getRatio(),
       got: { x: window.screenX, y: window.screenY, w: window.outerWidth, h: window.outerHeight, iw: window.innerWidth, ih: window.innerHeight, dpr: window.devicePixelRatio },
       avail: { l: screen.availLeft, t: screen.availTop, w: screen.availWidth, h: screen.availHeight },
       steamClientWindow: Object.keys(window.SteamClient?.Window || {}),
@@ -974,7 +1031,7 @@
   }
 
   window.__seToasts = {
-    version: '1.93.7',
+    version: '1.93.8',
     probe,
     // Why nothing (or something) is on the stage: the last scan, and what each toast read as.
     history: () => history.slice(),
