@@ -431,25 +431,10 @@
   }
 }
 
-/* Play panel */
-._3Yf8b2v5oOD8Wqsxu04ar._1U7LKpx70kEsz3jJwAFOi- ._3fLo166MlaNqP8r8tTyRz {
-  /* In-page PlayBar */
-  height: auto !important;
-  border-radius: var(--se-radius-lg, 14px);
-  background: var(--se-surface, #1f242b) !important;
-  box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06)) !important;
-  backdrop-filter: none !important;
-}
-
-/* Sticky copy at the top when scrolling: solid, full width */
+/* Play panel. Sticky copy at the top when scrolling: solid, full width */
 ._39RheXihcN6H2k2muQTjkI ._3fLo166MlaNqP8r8tTyRz {
   background: var(--se-sidebar, #1d2128) !important;
-  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, .8) !important;
-}
-
-._3Yf8b2v5oOD8Wqsxu04ar._1U7LKpx70kEsz3jJwAFOi- ._3Y87YQY56ZCOqhgcZFaDc5 {
-  /* InnerContainer */
-  padding: 14px !important;
+  box-shadow: var(--se-shadow-card) !important;
 }
 
 ._3Yf8b2v5oOD8Wqsxu04ar ._9EHg918wH6CQCQlD5PWOO {
@@ -489,10 +474,6 @@
 ._1FnJ6dPuknQFQ2RTpKTI16._1hhB2Wf7iExA15zh_lDQ_y {
   /* ShowingStreaming: no room kept for it */
   min-width: 0 !important;
-}
-
-._1hhB2Wf7iExA15zh_lDQ_y ._3ydigb6zZAjJ0JCDgHwSYA {
-  border-radius: var(--se-radius-lg, 14px) !important;
 }
 
 ._1FnJ6dPuknQFQ2RTpKTI16._3cI5TXsFX3bvpR-7EBOtxq {
@@ -543,6 +524,7 @@
   /* StatusNameContainer */
   gap: 6px;
   align-items: center !important;
+  height: auto !important;
 }
 
 ._2cRYms-zZc4misk9tj3bt8 {
@@ -580,11 +562,6 @@
   flex: 0 1 auto;
   gap: 6px;
   align-items: center;
-}
-
-._1YbtIWcfkQJOysLXQbwzRf .zjtAIAWI6HE0oCtJzw6Qt {
-  /* StatusNameContainer */
-  height: auto !important;
 }
 
 ._1kiZKVbDe-9Ikootk57kpA {
@@ -648,12 +625,21 @@
   border-left: 1px solid var(--se-hairline, rgba(255, 255, 255, .06));
 }
 
+/* Favorite first, Manage second, then everything else */
 .lO1IF132jJ1gc9yz2HYvV > * {
+  order: 3;
+  align-self: center;
   margin: 0 !important;
 }
 
+.lO1IF132jJ1gc9yz2HYvV > ._21hXW2oDD7zvNsoOaW7Yob,
+.lO1IF132jJ1gc9yz2HYvV > :has(._21hXW2oDD7zvNsoOaW7Yob) {
+  order: 1;
+}
+
 .lO1IF132jJ1gc9yz2HYvV > ._3oddBTkj_FjknCgBnPqcmQ {
-  /* MenuButtonContainer */
+  /* MenuButtonContainer (Manage) */
+  order: 2;
   display: flex !important;
   width: auto !important;
   padding: 0 !important;
@@ -690,21 +676,6 @@
   color: var(--se-accent, #7cc4ff) !important;
 }
 
-/* Favorite first, Manage second, then everything else */
-.lO1IF132jJ1gc9yz2HYvV > ._21hXW2oDD7zvNsoOaW7Yob,
-.lO1IF132jJ1gc9yz2HYvV > :has(._21hXW2oDD7zvNsoOaW7Yob) {
-  order: 1;
-}
-
-.lO1IF132jJ1gc9yz2HYvV > ._3oddBTkj_FjknCgBnPqcmQ {
-  order: 2;
-}
-
-/* MenuButtonContainer (Manage) */
-.lO1IF132jJ1gc9yz2HYvV > * {
-  order: 3;
-}
-
 .lO1IF132jJ1gc9yz2HYvV ._3qDWQGB0rtwM3qpXTb11Q- svg,
 .lO1IF132jJ1gc9yz2HYvV ._21hXW2oDD7zvNsoOaW7Yob svg {
   width: 18px !important;
@@ -720,6 +691,7 @@
  */
 ._3Yf8b2v5oOD8Wqsxu04ar._1U7LKpx70kEsz3jJwAFOi- ._3fLo166MlaNqP8r8tTyRz:not(#se-none) {
   /* In-page PlayBar */
+  height: auto !important;
   border-radius: var(--se-radius-lg, 14px);
   background: rgba(23, 26, 32, .72) !important;
   backdrop-filter: blur(18px) saturate(1.15) !important;
@@ -739,21 +711,25 @@
   flex: 0 1 auto !important;
 }
 
-/* GameStatsSection */
+/* GameStat and DetailsSection (cloud): no tile, an even 26 px apart (see below) */
 ._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA:not(#se-none),
-/* GameStat */ ._1U7LKpx70kEsz3jJwAFOi- ._1YbtIWcfkQJOysLXQbwzRf ._1dg8hJMsAYISbeQUxcCJcv:not(#se-none) {
-  /* DetailsSection (cloud) */
+._1U7LKpx70kEsz3jJwAFOi- ._1YbtIWcfkQJOysLXQbwzRf ._1dg8hJMsAYISbeQUxcCJcv:not(#se-none) {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 4px 2px !important;
   background: none !important;
-  border-radius: 8px !important;
+  border-radius: var(--se-radius-sm, 8px) !important;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA:not(#se-none) {
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 4px 2px !important;
 }
 
 ._1U7LKpx70kEsz3jJwAFOi- ._1qG6xUlNu-qvdhpSxwed5:not(#se-none):hover {
   /* ClickablePlayBarItem */
-  background: rgba(255, 255, 255, .06) !important;
+  background: var(--se-hairline, rgba(255, 255, 255, .06)) !important;
 }
 
 ._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA ._1tIg-QIrwMNtCm7NcYADyi,
@@ -767,13 +743,6 @@
   fill: currentColor;
 }
 
-._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA ._34lrt5-Fc3usZU6trA1P0-:not(#se-none) {
-  /* PlayBarLabel */
-  font: 700 10px/14px var(--se-font) !important;
-  letter-spacing: var(--se-label-spacing, .1em) !important;
-  color: var(--se-label-color, #6f7984) !important;
-}
-
 ._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA ._2TYVGoD27ZMfjRirKQNLfk:not(#se-none) {
   /* PlayBarDetailLabel */
   font-weight: 700 !important;
@@ -783,7 +752,6 @@
   /* Play */
   background: linear-gradient(180deg, color-mix(in srgb, var(--se-play, #3a8a22) 72%, #b6f07a 28%), var(--se-play, #3f9420)) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25);
-  letter-spacing: .06em;
 }
 
 /*
@@ -806,21 +774,19 @@
   -webkit-mask: var(--se-stat-icon, var(--se-icon-stat-default)) center / contain no-repeat;
 }
 
-._1U7LKpx70kEsz3jJwAFOi- ._3pS8kMrtScuY1Qf-W8tmRV {
-  --se-stat-icon: var(--se-icon-stat-default);
-}
-
-/* LastPlayed */
+/*
+ * LastPlayed keeps the default clock; the same component with an icon is size on disk
+ * (a drive).
+ */
 ._1U7LKpx70kEsz3jJwAFOi- ._3pS8kMrtScuY1Qf-W8tmRV:has(> :is(._1GZdosVXnfrf69yU8DWASl, ._1UXbBdCvbg9tyZhc4owO4W)) {
   --se-stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='13' width='17' height='6' rx='2'/%3E%3Cpath d='M5 13l2.5-7h9L19 13'/%3E%3Cpath d='M16.5 16h.01'/%3E%3C/svg%3E");
 }
 
-/* Same component with an icon: size on disk */
+/* Cloud status (built like size on disk) */
 ._1U7LKpx70kEsz3jJwAFOi- ._2cRYms-zZc4misk9tj3bt8 ._1kiZKVbDe-9Ikootk57kpA:not(#se-none) {
   --se-stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 18h10a4 4 0 0 0 .5-8 6 6 0 0 0-11.5 1.5A3.3 3.3 0 0 0 7 18z'/%3E%3Cpath d='M9.5 13.5l2 2 3.5-3.5'/%3E%3C/svg%3E");
 }
 
-/* Cloud status (built like size on disk) */
 /* Even spacing: every stat the same 26 px apart, no extra margins or padding around the cloud tile */
 ._1U7LKpx70kEsz3jJwAFOi- ._1YbtIWcfkQJOysLXQbwzRf:not(#se-none),
 ._1U7LKpx70kEsz3jJwAFOi- ._1mDAVT4sTzFRwJtlKCw2Ws:not(#se-none) {
@@ -836,29 +802,21 @@
   gap: 0 !important;
 }
 
-._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA:not(#se-none) {
-  margin: 0 !important;
-  padding: 4px 2px !important;
-  gap: 10px !important;
-  align-items: center !important;
-}
-
 ._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA ._3m_zjRTQBqcfzCjXLXUHcR:not(#se-none) {
   padding: 0 !important;
   gap: 3px !important;
   justify-content: center;
 }
 
+/* Playtime */
 ._1U7LKpx70kEsz3jJwAFOi- ._1aKegVl9_lSdNAyWYZQlr9 {
   --se-stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3.5h10M7 20.5h10M8 3.5c0 4 4 5 4 8.5s-4 4.5-4 8.5M16 3.5c0 4-4 5-4 8.5s4 4.5 4 8.5'/%3E%3C/svg%3E");
 }
 
-/* Playtime */
-._1U7LKpx70kEsz3jJwAFOi- #playercount-badge {
+/* Player count: the Player Count plugin's badge and the theme's own */
+._1U7LKpx70kEsz3jJwAFOi- :is(#playercount-badge, #se-player-count) {
   --se-stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='8.5' r='3.5'/%3E%3Cpath d='M2.5 19.5c.9-3.3 3.4-5 6.5-5s5.6 1.7 6.5 5'/%3E%3Ccircle cx='17' cy='9' r='2.7'/%3E%3Cpath d='M17 14.3c2.3.1 3.9 1.7 4.6 4.7'/%3E%3C/svg%3E");
 }
-
-/* Player Count plugin */
 
 /* Space Required (not installed): a drive with a download arrow; game-page.js sets data-se-stat */
 ._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA[data-se-stat="space"]:not(#se-none) {
@@ -891,16 +849,6 @@
   text-transform: uppercase;
 }
 
-._1U7LKpx70kEsz3jJwAFOi- ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA:not(#se-none) {
-  padding: 0 28px !important;
-}
-
-._1U7LKpx70kEsz3jJwAFOi- ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA svg {
-  width: 15px !important;
-  height: 15px !important;
-  flex: none;
-}
-
 /*
  * Native buttons right of the stats (Favorite, Manage, controller, game
  * info) wear one set of dual-tone icons (outline over a 32% fill, like the rail's), 18 px, in the text color; features/game-page/game-page.js
@@ -931,10 +879,6 @@
   --se-btn-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M17.32 5H6.68a4 4 0 0 0-3.98 3.59l-.02.15C2.6 9.42 2 14.46 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.41-1.41A2 2 0 0 1 9.83 16h4.34a2 2 0 0 1 1.41.59L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.55-.6-6.58-.69-7.26l-.02-.15A4 4 0 0 0 17.32 5z'/%3E%3C/g%3E%3Cpath d='M17.32 5H6.68a4 4 0 0 0-3.98 3.59l-.02.15C2.6 9.42 2 14.46 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.41-1.41A2 2 0 0 1 9.83 16h4.34a2 2 0 0 1 1.41.59L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.55-.6-6.58-.69-7.26l-.02-.15A4 4 0 0 0 17.32 5z'/%3E%3Cpath d='M6 11h4M8 9v4M15 12h.01M18 10h.01'/%3E%3C/svg%3E");
 }
 
-._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon="info"] {
-  --se-btn-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3C/g%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 16.5v-5M12 8h.01'/%3E%3C/svg%3E");
-}
-
 ._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon]:not(#se-none) {
   opacity: 1 !important;
   color: var(--se-text, #e6e8eb) !important;
@@ -953,14 +897,7 @@
   --se-btn-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' stroke='none'%3E%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z'/%3E%3C/g%3E%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z'/%3E%3C/svg%3E");
 }
 
-/* Favorited */
-._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon="info"]._3qDWQGB0rtwM3qpXTb11Q-.fyJia4DC2A-H5pIR9DD87 {
-  background: var(--se-hover, #2c3440) !important;
-  color: var(--se-text-strong, #fff) !important;
-}
-
-/* Info open (MenuActive) */
-/* The game-details toggle is hidden (the details are always open) */
+/* The game-details toggle is hidden (always-open-game-details.js keeps the details open) */
 ._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon="info"]:not(#se-none),
 .lO1IF132jJ1gc9yz2HYvV ._3qDWQGB0rtwM3qpXTb11Q-:has(.zvLq1GUCH3yLuqv_TXBJ1):not(#se-none),
 .lO1IF132jJ1gc9yz2HYvV ._2v1XDHrL4pTW4qCXaYUPG6:has(.zvLq1GUCH3yLuqv_TXBJ1):not(#se-none) {
@@ -973,10 +910,6 @@
   align-items: center !important;
   justify-content: center !important;
   line-height: 0 !important;
-}
-
-.lO1IF132jJ1gc9yz2HYvV > * {
-  align-self: center;
 }
 
 /*
@@ -995,6 +928,7 @@
 
 /* PLAY: the triangle and the word centered together, both white */
 ._1U7LKpx70kEsz3jJwAFOi- ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA:not(#se-none) {
+  padding: 0 28px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;

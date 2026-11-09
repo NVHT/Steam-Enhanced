@@ -11,38 +11,24 @@
 }
 
 /* Native controls remain mounted in their React owners; only layout changes. */
+/* The rail's surface; rail and title bar share the game list's color */
 html body.se-header-actions-ready::before {
   content: '';
   position: fixed;
   inset: 0 auto 0 0;
-  pointer-events: none;
-  z-index: 20;
-}
-
-html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo {
-  position: relative;
-  z-index: 21;
-}
-
-html body.se-header-actions-ready ._3s0lkohH8wU2do0K1il28Y {
+  z-index: var(--se-z-sticky, 20);
   width: var(--se-rail-width);
-  box-sizing: border-box;
-  padding-inline: 6px !important;
-  margin: 0;
-  border: 0;
+  background: var(--se-rail-bg);
+  pointer-events: none;
 }
 
+/* Page buttons (top and size from the :not(#se-none) rules below) */
 html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy {
   position: fixed;
-  top: var(--se-rail-top);
-  left: 6px;
-  z-index: 22;
-  width: var(--se-steam-home-width, 44px);
+  z-index: calc(var(--se-z-sticky, 20) + 2);
   height: auto;
   min-height: 0;
   max-height: calc(100vh - var(--se-rail-top));
-  padding: 0;
-  margin: 0;
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -51,7 +37,6 @@ html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy ._2D64jIEK7wpUR_NlObDW
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
 }
 
 html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy ._2D64jIEK7wpUR_NlObDW76 > ._7AlhCx3XGzBeIrQaCneUD {
@@ -59,11 +44,23 @@ html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy ._2D64jIEK7wpUR_NlObDW
   align-self: center;
 }
 
+/* Bottom action stack: Add, Downloads, Friends, Big Picture, News, Bell, Settings, Avatar */
 html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u {
   position: fixed;
-  z-index: 22;
+  z-index: calc(var(--se-z-sticky, 20) + 2);
+  top: auto;
+  bottom: 12px;
+  left: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--se-rail-width);
+  height: auto;
   max-height: calc(100vh - var(--se-rail-top) - var(--se-rail-nav-count, 5) * var(--se-rail-step) - 16px);
   margin: 0;
+  margin-inline: 0 !important;
+  padding: 0;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
@@ -74,6 +71,8 @@ html body.se-header-actions-ready .se-header-actions {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 4px;
+  margin: 0 !important;
 }
 
 html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > * {
@@ -108,7 +107,7 @@ html body.se-header-actions-ready ._1rDh5rXSFZJOqCa4UpnI4z::after {
   content: '';
   position: absolute;
   top: 0;
-  z-index: 40;
+  z-index: calc(var(--se-z-sticky, 20) + 20);
   width: var(--se-frame-r);
   height: var(--se-frame-r);
   pointer-events: none;
@@ -162,12 +161,6 @@ html body.se-header-actions-ready .se-header-actions {
   flex: 0 0 auto;
   padding: 0;
   margin: 0;
-}
-
-html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u {
-  box-sizing: border-box;
-  padding: 0;
-  margin-inline: 0 !important;
 }
 
 html body.se-header-actions-ready ._3yD46y5pd3zOGR7CzKs0mC > :first-child {
@@ -224,12 +217,6 @@ html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u ._3yD46y5pd3zOGR7CzKs
   object-fit: cover;
 }
 
-/* Bottom action stack: Add, Downloads, Friends, Big Picture, News, Bell, Settings, Avatar. */
-html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u {
-  top: auto;
-  height: auto;
-}
-
 html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > .se-header-actions {
   order: 0;
 }
@@ -273,21 +260,16 @@ html body.se-header-actions-ready {
   /* Title bar + 12 px + Steam button + divider block */
   --se-rail-top: calc(var(--se-rail-bar) + 12px + var(--se-rail-btn) + 9px);
   --se-rail-step: calc(var(--se-rail-btn) + 4px);
+  /* The title-bar search field, and the Filters panel under it */
+  --se-title-search-w: min(600px, calc(100vw - 520px));
 }
 
-/* Rail controls read their size from these, so pin them inside the header. */
+/* The title bar. Rail controls read their size from these, so pin them inside it. */
 html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo {
   --se-steam-home-width: var(--se-rail-btn);
   --se-steam-home-height: var(--se-rail-btn);
-}
-
-/* Rail and title bar share the game list's surface. */
-html body.se-header-actions-ready::before {
-  background: var(--se-rail-bg);
-  width: var(--se-rail-width);
-}
-
-html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo {
+  position: relative;
+  z-index: calc(var(--se-z-sticky, 20) + 1);
   flex-basis: var(--se-rail-bar) !important;
   height: var(--se-rail-bar) !important;
   min-height: var(--se-rail-bar) !important;
@@ -306,7 +288,8 @@ html body.se-header-actions-ready ._3s0lkohH8wU2do0K1il28Y:not(#se-none) {
   position: fixed;
   top: calc(var(--se-rail-bar) + 12px);
   left: 0;
-  z-index: 22;
+  z-index: calc(var(--se-z-sticky, 20) + 2);
+  box-sizing: border-box;
   width: var(--se-rail-width) !important;
   height: var(--se-rail-btn) !important;
   padding: 0 !important;
@@ -319,6 +302,7 @@ html body.se-header-actions-ready ._3s0lkohH8wU2do0K1il28Y:not(#se-none) {
 
 /* Page buttons: full-width column so the accent bar can sit on the rail's edge. */
 html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy:not(#se-none) {
+  top: calc(var(--se-rail-bar) + 12px + var(--se-rail-btn));
   left: 0;
   width: var(--se-rail-width);
   padding: 0;
@@ -347,11 +331,6 @@ html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy ._2D64jIEK7wpUR_NlObDW
   flex: 0 0 auto;
 }
 
-html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy:not(#se-none) {
-  top: calc(var(--se-rail-bar) + 12px + var(--se-rail-btn));
-  padding-top: 0;
-}
-
 /*
  * Steam pads each page item 10 px left/right (4 px on the first); that pushed the
  * buttons off the rail's center line and hid the accent bar. center a full-width row.
@@ -364,22 +343,6 @@ html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy ._2D64jIEK7wpUR_NlObDW
   display: flex;
   justify-content: center;
   align-self: stretch;
-}
-
-/* Bottom stack. */
-html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u {
-  left: 0;
-  width: var(--se-rail-width);
-  bottom: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm,
-html body.se-header-actions-ready .se-header-actions {
-  gap: 4px;
-  margin: 0 !important;
 }
 
 /* No tiles at rest; a soft fill on hover. */
@@ -396,7 +359,7 @@ html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u ._2Szzh5sKyGgnLUR870z
   border-radius: var(--se-radius-md, 10px) !important;
   color: var(--se-text-muted, #98a2ad);
   box-shadow: none !important;
-  transition: background-color .15s ease-out, color .15s ease-out;
+  transition: background-color var(--se-dur, .15s) ease-out, color var(--se-dur, .15s) ease-out;
 }
 
 html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-button:not(#se-none):hover,
@@ -423,7 +386,8 @@ html body.se-header-actions-ready ._7AlhCx3XGzBeIrQaCneUD._1gqEjB5QsKT_NftD1dEsd
   text-shadow: none;
 }
 
-html body.se-header-actions-ready ._7AlhCx3XGzBeIrQaCneUD._1gqEjB5QsKT_NftD1dEsdZ:not(._2cO0HdvLEGAdhosLekWsmo) ._19axKcqYRuaJ8vdYKYmtTQ.se-menu-icon:not(#se-none)::after {
+html body.se-header-actions-ready ._7AlhCx3XGzBeIrQaCneUD._1gqEjB5QsKT_NftD1dEsdZ:not(._2cO0HdvLEGAdhosLekWsmo) ._19axKcqYRuaJ8vdYKYmtTQ.se-menu-icon:not(#se-none)::after,
+html body.se-header-actions-ready .se-rail-extra._1gqEjB5QsKT_NftD1dEsdZ > .se-native-header-button.se-menu-icon:not(#se-none)::after {
   content: '' !important;
   display: block !important;
   position: absolute;
@@ -496,7 +460,7 @@ html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u .se-download-ring cir
 }
 
 html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u .se-download-ring-track {
-  stroke: rgba(255, 255, 255, .1);
+  stroke: var(--se-white-10, rgba(255, 255, 255, .1));
 }
 
 html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u .se-download-ring-value {
@@ -520,14 +484,6 @@ html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u ._3yD46y5pd3zOGR7CzKs
   --se-status: var(--se-offline, #6b7480);
 }
 
-html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u ._3yD46y5pd3zOGR7CzKs0mC.online:not(#se-none) {
-  --se-status: var(--se-online, #4cb4ff);
-}
-
-html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u ._3yD46y5pd3zOGR7CzKs0mC.ingame:not(#se-none) {
-  --se-status: var(--se-running, #6cc24a);
-}
-
 html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u ._3yD46y5pd3zOGR7CzKs0mC:not(#se-none) > :first-child {
   width: 30px !important;
   height: 30px !important;
@@ -549,7 +505,7 @@ html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo [data-se-menu-open] >
 }
 
 html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo ._3yD46y5pd3zOGR7CzKs0mC[data-se-menu-open]:not(#se-none) > :first-child {
-  box-shadow: 0 0 0 2px var(--se-rail-bg, var(--se-sidebar, #1d2128)), 0 0 0 4px var(--se-status), 0 0 0 7px rgba(255, 255, 255, .1);
+  box-shadow: 0 0 0 2px var(--se-rail-bg, var(--se-sidebar, #1d2128)), 0 0 0 4px var(--se-status), 0 0 0 7px var(--se-white-10, rgba(255, 255, 255, .1));
 }
 
 /*
@@ -573,22 +529,16 @@ html body.se-header-actions-ready .se-rail-extra > .se-native-header-button {
   position: relative;
 }
 
+html body.se-header-actions-ready .se-rail-extra > .se-native-header-button:focus-visible,
+html body.se-header-actions-ready .se-list-toggle:focus-visible,
+.se-title-search .se-title-filters:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
 html body.se-header-actions-ready .se-rail-extra._1gqEjB5QsKT_NftD1dEsdZ > .se-native-header-button:not(#se-none) {
   background: var(--se-accent-tint, rgba(124, 196, 255, .14)) !important;
   color: var(--se-accent, #7cc4ff) !important;
-}
-
-html body.se-header-actions-ready .se-rail-extra._1gqEjB5QsKT_NftD1dEsdZ > .se-native-header-button.se-menu-icon:not(#se-none)::after {
-  content: '' !important;
-  display: block !important;
-  position: absolute;
-  left: -10px;
-  top: 8px;
-  bottom: 8px;
-  width: 3px;
-  height: auto;
-  border-radius: 0 3px 3px 0;
-  background: var(--se-accent, #7cc4ff);
 }
 
 /*
@@ -647,7 +597,7 @@ html body.se-header-actions-ready .se-title-search {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 23;
+  z-index: calc(var(--se-z-sticky, 20) + 3);
   display: flex;
   align-items: center;
   box-sizing: border-box;
@@ -655,7 +605,7 @@ html body.se-header-actions-ready .se-title-search {
   box-shadow: inset 0 0 0 1px var(--se-hairline, rgba(255, 255, 255, .06));
   color: var(--se-text-faint, #6f7984);
   -webkit-app-region: no-drag;
-  transition: box-shadow .15s ease-out;
+  transition: box-shadow var(--se-dur, .15s) ease-out;
 }
 
 html body.se-header-actions-ready .se-title-search:focus-within {
@@ -687,19 +637,6 @@ html body.se-header-actions-ready .se-title-search:focus-within {
 
 .se-title-search input::placeholder {
   color: var(--se-text-faint, #6f7984);
-}
-
-.se-title-search kbd {
-  padding: 0 5px;
-  border-radius: var(--se-radius-xs, 4px);
-  background: var(--se-surface-2, #262c35);
-  color: var(--se-text-dim, #b8c0c8);
-  font: 500 10.5px/16px var(--se-font);
-}
-
-.se-title-search.se-has-text kbd,
-.se-title-search:focus-within kbd {
-  display: none;
 }
 
 .se-title-search .se-title-filters {
@@ -796,7 +733,7 @@ html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo ._3Z3ohQ8-1NKnCZkbS6f
 html body.se-header-actions-ready .se-list-toggle {
   position: absolute;
   left: calc(var(--se-list-left, 60px) + 6px);
-  z-index: 24;
+  z-index: calc(var(--se-z-sticky, 20) + 4);
   padding: 0;
   border: 0;
   display: flex;
@@ -859,7 +796,7 @@ html body.se-header-actions-ready[data-se-list] .se-sidebar-icons ._2WgQEFvIzJw_
   position: fixed !important;
   width: auto !important;
   max-width: calc(var(--se-list-right) - var(--se-list-left) - 110px);
-  z-index: 24;
+  z-index: calc(var(--se-z-sticky, 20) + 4);
   -webkit-app-region: no-drag;
 }
 
@@ -904,19 +841,6 @@ html body.se-header-actions-ready[data-se-list] .se-sidebar-icons ._3kSh7qVSTDcP
   letter-spacing: 0;
 }
 
-html body.se-header-actions-ready[data-se-list] .se-sidebar-icons ._3A3N3EnrSNMQLL058Qbzsn[data-se-n] {
-  font-size: 0 !important;
-  display: flex;
-  align-items: center;
-  height: 24px;
-}
-
-html body.se-header-actions-ready[data-se-list] .se-sidebar-icons ._3A3N3EnrSNMQLL058Qbzsn[data-se-n]::after {
-  content: attr(data-se-n);
-  font: 600 12.5px/24px var(--se-font);
-  color: var(--se-text-faint, #6f7984);
-}
-
 html body.se-header-actions-ready[data-se-list] .se-sidebar-icons ._15aGnszAf3gHD-PFdJBoFD {
   width: 12px !important;
   margin: 0 !important;
@@ -933,7 +857,7 @@ html body.se-header-actions-ready[data-se-list] .se-sidebar-icons ._36r2az6roul_
   left: auto !important;
   right: calc(100vw - var(--se-list-right) + 6px) !important;
   width: auto !important;
-  z-index: 24;
+  z-index: calc(var(--se-z-sticky, 20) + 4);
   -webkit-app-region: no-drag;
 }
 
@@ -1032,8 +956,8 @@ html body.se-header-actions-ready[data-se-list] .se-sidebar-icons ._3mzKdQXht__Y
 html body.se-header-actions-ready .se-list-top {
   position: absolute;
   top: calc((var(--se-rail-bar) - 40px) / 2);
-  left: calc(var(--se-list-right, 360px) - 134px);
-  z-index: 24;
+  left: calc(var(--se-list-right, calc(var(--se-rail-width, 60px) + var(--se-list-w, 350px))) - 134px);
+  z-index: calc(var(--se-z-sticky, 20) + 4);
   width: 40px;
   height: 40px;
   padding: 0;
@@ -1048,7 +972,7 @@ html body.se-header-actions-ready .se-list-top {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity .18s ease, visibility 0s linear .18s, background-color .15s ease, color .15s ease;
+  transition: opacity var(--se-dur, .15s) ease-out, visibility 0s linear var(--se-dur, .15s), background-color var(--se-dur, .15s) ease-out, color var(--se-dur, .15s) ease-out;
   -webkit-app-region: no-drag;
 }
 
@@ -1093,11 +1017,11 @@ html body.se-header-actions-ready .RGNMWtyj73_-WdhflrmuY ._2CmrnGY-Amtd83ScJkFvx
   background: transparent !important;
 }
 
-/* Search field at the title bar's 40 px button height; no shortcut hint. */
+/* Search field at the title bar's 40 px button height. */
 html body.se-header-actions-ready .se-title-search {
   top: calc((var(--se-rail-bar) - 40px) / 2);
   height: 40px;
-  width: min(600px, calc(100vw - 520px));
+  width: var(--se-title-search-w);
   padding: 0 4px 0 14px;
   gap: 10px;
   border-radius: var(--se-radius-md, 10px);
@@ -1113,10 +1037,6 @@ html body.se-header-actions-ready .se-title-search {
 .se-title-search input {
   height: 38px;
   font-size: 14px;
-}
-
-.se-title-search kbd {
-  display: none !important;
 }
 
 .se-title-search .se-title-filters {
@@ -1142,10 +1062,10 @@ html body.se-header-actions-ready .se-title-search {
 html body.se-header-actions-ready .se-sidebar-icons ._20QAC4WMXm8qFE8waUT5oo .vCCmYvn9yQ_V8CpKupllU ._1dgAMymUAUYzUcZjUjOFm7 .Woh0kBQCmatzC1daBX9i6 {
   position: fixed !important;
   top: calc(var(--se-rail-bar) + 6px) !important;
-  left: calc(50vw - min(300px, (100vw - 520px) / 2)) !important;
-  inset-inline-start: calc(50vw - min(300px, (100vw - 520px) / 2)) !important;
+  left: calc(50vw - var(--se-title-search-w) / 2) !important;
+  inset-inline-start: calc(50vw - var(--se-title-search-w) / 2) !important;
   right: auto !important;
-  width: min(600px, calc(100vw - 520px)) !important;
+  width: var(--se-title-search-w) !important;
   max-height: calc(100vh - var(--se-rail-bar) - 24px) !important;
   overflow: auto !important;
   transform-origin: top center;
@@ -1233,7 +1153,7 @@ html body.se-header-actions-ready .se-sidebar-icons ._20QAC4WMXm8qFE8waUT5oo .vC
   justify-content: center;
   border: 0 !important;
   border-radius: var(--se-radius-xs, 4px) !important;
-  background: rgba(255, 255, 255, .07) !important;
+  background: var(--se-check, rgba(255, 255, 255, .07)) !important;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12) !important;
 }
 
@@ -1392,7 +1312,7 @@ html body.se-header-actions-ready[data-se-store-list]:not(.se-list-hidden) .RGNM
   inset: 0 auto 0 0 !important;
   width: var(--se-list-w) !important;
   height: 100% !important;
-  z-index: 20;
+  z-index: var(--se-z-sticky, 20);
   background: var(--se-sidebar, #1d2128);
   overflow: hidden;
 }
@@ -1416,13 +1336,9 @@ html body.se-header-actions-ready[data-se-store-list]:not(.se-list-hidden) ._3xR
   height: 100% !important;
 }
 
-/* The retained list was measured at zero while the Library view was hidden. */
+/* The retained list was measured at zero while the Library view was hidden (size: above). */
 html body.se-header-actions-ready[data-se-store-list]:not(.se-list-hidden) ._9sPoVBFyE_vE87mnZJ5aB {
-  flex: 0 0 var(--se-list-w) !important;
-  width: var(--se-list-w) !important;
-  min-width: var(--se-list-w) !important;
   max-width: var(--se-list-w) !important;
-  height: 100% !important;
   visibility: visible !important;
 }
 
