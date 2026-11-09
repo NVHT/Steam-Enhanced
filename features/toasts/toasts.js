@@ -556,9 +556,12 @@
     syncTray();
   }
 
-  function finish(m) {
+  const history = []; // the last toasts finished, and why (for dump())
+  function finish(m, why = '') {
     if (!m || m.done) return;
     m.done = true;
+    history.push({ title: m.title, kind: m.kind, ms: m.ms, why, after: Date.now() - m.born });
+    if (history.length > 6) history.shift();
     m.thumb?.remove();
     if (m.id === activeId) {
       const next = pending()[0];
@@ -643,25 +646,30 @@
    * window API is tried first, then SteamClient.Window; whichever lands is remembered.
    * If Steam already gives the window the whole work area, the tray is placed by CSS alone.
    */
+  /*
+   * Ways to move the window, tried in turn until one lands (then remembered). Steam's
+   * MoveTo takes its coordinates in an order of units that isn't documented, so each reading
+   * is tried. Resizing uses the standard API, which Steam allows.
+   */
+  const scWindow = () => window.SteamClient?.Window;
+  const dpr = () => window.devicePixelRatio || 1;
   const MOVERS = [
-    (x, y, w, h) => {
-      window.resizeTo(w, h);
-      window.moveTo(x, y);
-    },
-    (x, y, w, h) => {
-      const d = window.devicePixelRatio || 1;
-      window.SteamClient.Window.ResizeTo(Math.round(w * d), Math.round(h * d), false);
-      window.SteamClient.Window.MoveTo(Math.round(x * d), Math.round(y * d), d);
-    },
-    (x, y, w, h) => {
-      window.SteamClient.Window.ResizeTo(w, h, true);
-      window.SteamClient.Window.MoveTo(x, y);
-    },
+    { name: 'window.moveTo', move: (x, y) => window.moveTo(x, y) },
+    { name: 'MoveTo(css, dpr)', steam: true, move: (x, y) => scWindow().MoveTo(x, y, dpr()) },
+    { name: 'MoveTo(px, dpr)', steam: true, move: (x, y) => scWindow().MoveTo(Math.round(x * dpr()), Math.round(y * dpr()), dpr()) },
+    { name: 'MoveTo(css)', steam: true, move: (x, y) => scWindow().MoveTo(x, y) },
+    { name: 'MoveTo(px)', steam: true, move: (x, y) => scWindow().MoveTo(Math.round(x * dpr()), Math.round(y * dpr())) },
   ];
   let mover = -1;          // index into MOVERS that worked, -1 = untried, -2 = none work
   let target = null;
   let placeWarned = false;
+  let attempts = [];       // what each mover did, for why()
+  let steamSize = null;    // the window's size as Steam made it
   const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const applyMove = (i, t) => {
+    run(() => window.resizeTo(t.w, t.h));
+    run(MOVERS[i].move, t.x, t.y);
+  };
 
   function wanted() {
     const s = window.screen;
@@ -701,6 +709,7 @@
 
   async function moveWindow() {
     if (fullArea() || mover === -2) return;
+    steamSize = steamSize || { w: window.outerWidth, h: window.outerHeight };
     target = wanted();
     if (landed(target)) {
       if (mover < 0) mover = 0;
@@ -708,23 +717,23 @@
     }
     const order = mover >= 0 ? [mover] : MOVERS.map((_, i) => i);
     for (const i of order) {
-      if (i > 0 && typeof window.SteamClient?.Window?.MoveTo !== 'function') continue;
-      run(MOVERS[i], target.x, target.y, target.w, target.h);
-      await sleep(120);
+      if (MOVERS[i].steam && typeof scWindow()?.MoveTo !== 'function') continue;
+      applyMove(i, target);
+      await sleep(200);
+      attempts.push({ mover: MOVERS[i].name, x: window.screenX, y: window.screenY });
       if (landed(target)) {
         mover = i;
         return;
       }
     }
-    if (mover < 0) {
-      mover = -2;
-      if (!placeWarned) {
-        placeWarned = true;
-        console.warn('[Steam Enhanced] Toasts: could not move the toast window; showing it where Steam put it.', {
-          want: target,
-          got: { x: window.screenX, y: window.screenY, w: window.outerWidth, h: window.outerHeight },
-        });
-      }
+    if (mover >= 0) return;
+    mover = -2;
+    // Couldn't move it: give the window back its own size, so Steam's corner keeps it on screen
+    // (the tray scales down to fit it).
+    run(() => window.resizeTo(steamSize.w, steamSize.h));
+    if (!placeWarned) {
+      placeWarned = true;
+      console.warn('[Steam Enhanced] Toasts: could not move the toast window; showing it where Steam put it.', { want: target, attempts });
     }
   }
 
@@ -736,7 +745,7 @@
     replaceTimer = setTimeout(() => {
       replaceTimer = 0;
       target = wanted();
-      if (!landed(target)) run(MOVERS[mover], target.x, target.y, target.w, target.h);
+      if (!landed(target)) applyMove(mover, target);
       fit();
     }, 60);
   }
@@ -756,13 +765,13 @@
     const m = layer && models.find(x => x.id === Number(layer.dataset.id));
     if (!m) return;
 
-    if (e.target.closest('.se-tst-sweep')) return finish(m);
+    if (e.target.closest('.se-tst-sweep')) return finish(m, 'close button');
 
     const act = e.target.closest('[data-se-tst-act]');
     if (act) {
       const b = m.buttons[Number(act.dataset.seTstAct)];
       if (b?.el?.isConnected) run(() => b.el.click());
-      return finish(m);
+      return finish(m, 'action');
     }
 
     // The toast itself: Steam's own click (opens the chat, game, store page...), then the
@@ -771,14 +780,14 @@
       run(() => m.click.click());
       run(() => window.__seFriendNotificationClicks?.forward?.(m.click));
     }
-    finish(m);
+    finish(m, 'click');
   }
 
   function onDockAnimationEnd(e) {
     if (e.animationName === 'se-tst-fill') {
       const layer = e.target.closest('.se-tst-layer');
       const m = layer && models.find(x => x.id === Number(layer.dataset.id));
-      if (m && m.id === activeId) finish(m);
+      if (m && m.id === activeId) finish(m, 'countdown');
     } else if (e.animationName === 'se-tst-close' && e.target === tray && closing) {
       closed();
     }
@@ -829,7 +838,7 @@
         m.stale = true;
         if (m.layer) for (const b of m.layer.querySelectorAll('[data-se-tst-act]')) b.disabled = true;
       }
-      if (m.id !== activeId && now - m.born > STALE_MAX_MS) finish(m);
+      if (m.id !== activeId && now - m.born > STALE_MAX_MS) finish(m, 'dropped by Steam');
     }
 
     // Finished toasts are forgotten once Steam has removed them too (never replayed before that).
@@ -883,7 +892,10 @@
 
   // Steam hides the window when its toasts are gone; start fresh next time.
   function onVisibility() {
-    if (document.visibilityState === 'hidden' && tray) closed(false);
+    if (document.visibilityState === 'hidden' && tray) {
+      history.push({ why: 'window hidden', models: models.length });
+      closed(false);
+    }
   }
 
   /* ---------- Lifecycle ---------- */
@@ -916,8 +928,10 @@
       return [...out].slice(0, 150);
     };
     return {
-      mover,
+      mover: MOVERS[mover]?.name || mover,
       target,
+      attempts,
+      steamSize,
       got: { x: window.screenX, y: window.screenY, w: window.outerWidth, h: window.outerHeight, iw: window.innerWidth, ih: window.innerHeight, dpr: window.devicePixelRatio },
       avail: { l: screen.availLeft, t: screen.availTop, w: screen.availWidth, h: screen.availHeight },
       steamClientWindow: Object.keys(window.SteamClient?.Window || {}),
@@ -944,10 +958,11 @@
   }
 
   window.__seToasts = {
-    version: '1.93.5',
+    version: '1.93.6',
     probe,
     // Why nothing (or something) is on the stage: the last scan, and what each toast read as.
-    why: () => ({ enabled: enabled(), lastScan, models: models.length, skipped: skipped.size, pending: pendingKeys.size, placement: placement() }),
+    history: () => history.slice(),
+    why: () => ({ history: history.slice(), enabled: enabled(), lastScan, models: models.length, skipped: skipped.size, pending: pendingKeys.size, placement: placement() }),
     dump() {
       return models.map(m => ({
         id: m.id,
