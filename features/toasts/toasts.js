@@ -572,11 +572,28 @@
   }
 
   /*
-   * The ground for toasts with no art: the toast's color in two slow drifting glows, the
-   * sweep spinner's light turning over it, and a dot grid that catches the light.
+   * The ground for toasts with no art: the Steam Enhanced mark (branding/mark.svg): its three
+   * fanned game cards in the medallion, in the toast's color, without the Steam logo. The cards
+   * fan out and settle, and the sweep spinner's arc runs round the rim.
    */
-  const AMBIENT_HTML = '<i class="se-tst-amb se-tst-amb-a"></i><i class="se-tst-amb se-tst-amb-b"></i>' +
-    '<i class="se-tst-amb se-tst-amb-sweep"></i><i class="se-tst-amb se-tst-amb-dots"></i>';
+  const AMBIENT_HTML =
+    '<svg class="se-tst-mark" viewBox="92 92 328 328" aria-hidden="true">' +
+    '<circle class="se-tst-mk-med" cx="256" cy="256" r="156"/>' +
+    '<g transform="translate(216 232)"><g class="se-tst-mk-card se-tst-mk-c1">' +
+    '<rect class="se-tst-mk-b" x="-52" y="-72" width="104" height="144" rx="14"/>' +
+    '<rect class="se-tst-mk-bar" x="-40" y="-58" width="46" height="6" rx="3"/></g></g>' +
+    '<g transform="translate(248 226)"><g class="se-tst-mk-card se-tst-mk-c2">' +
+    '<rect class="se-tst-mk-b" x="-54" y="-74" width="108" height="148" rx="14"/>' +
+    '<rect class="se-tst-mk-bar" x="-41" y="-59" width="52" height="6" rx="3"/>' +
+    '<rect class="se-tst-mk-bar" x="-41" y="-47" width="34" height="5" rx="2.5"/></g></g>' +
+    '<g transform="translate(280 234)"><g class="se-tst-mk-card se-tst-mk-c3">' +
+    '<rect class="se-tst-mk-b" x="-54" y="-74" width="108" height="148" rx="14"/>' +
+    '<rect class="se-tst-mk-shot" x="-44" y="-64" width="88" height="68" rx="8"/>' +
+    '<rect class="se-tst-mk-bar se-tst-mk-strong" x="-40" y="14" width="56" height="6" rx="3"/>' +
+    '<rect class="se-tst-mk-bar" x="-40" y="26" width="38" height="5" rx="2.5"/></g></g>' +
+    '<circle class="se-tst-mk-rim" cx="256" cy="256" r="156"/><circle class="se-tst-mk-rim2" cx="256" cy="256" r="162"/>' +
+    '<g class="se-tst-mk-sweep"><circle class="se-tst-mk-arc" cx="256" cy="256" r="156" transform="rotate(-90 256 256)"/>' +
+    '<circle class="se-tst-mk-lead" cx="256" cy="100" r="6" transform="rotate(37 256 256)"/></g></svg>';
 
   const artURLs = m => {
     const hero = m.appid && m.artKind !== 'ambient' ? SE.heroURLs(m.appid, contextGlobal('appStore')) : [];
@@ -1711,7 +1728,7 @@
   }
 
   window.__seToasts = {
-    version: '1.95.6',
+    version: '1.95.7',
     preview,
     clearAll,
     kinds: Object.keys(KINDS),
