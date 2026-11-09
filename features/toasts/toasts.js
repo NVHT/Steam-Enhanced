@@ -34,10 +34,14 @@
   const SVG_NS = 'http://www.w3.org/2000/svg';
 
   /*
-   * Each toast is its own window (Steam stacks them by toastIndex). Each window is sized to its
-   * tray plus room for the shadow, centred, and stacked up from `lift` above the work area.
+   * Size. The tray is drawn at 480 px wide (toasts.css) and zoomed to TRAY_W. Each toast window
+   * is sized to the tray at its tallest (with the strip) plus room for the shadow, and sits at
+   * the bottom centre, `lift` above the work area.
    */
-  const BOX = Object.freeze({ trayW: 480, trayH: 136, padX: 32, padTop: 32, padBottom: 8, lift: 24, gap: 10 });
+  const TRAY_W = 400;
+  const ZOOM = TRAY_W / 480;
+  const TRAY_H = Math.ceil(170 * ZOOM); // stage 124 + strip 34 + padding 12, zoomed
+  const BOX = Object.freeze({ trayW: TRAY_W, trayH: TRAY_H, padX: 24, padTop: 24, padBottom: 8, lift: 24 });
 
   /*
    * Kinds: eyebrow, accent, countdown (0 = until handled), art source and fallback icon.
@@ -474,6 +478,7 @@
   function build() {
     dock = document.createElement('div');
     dock.id = 'se-tst';
+    dock.style.setProperty('--se-tst-zoom', String(Math.round(ZOOM * 10000) / 10000));
     dock.setAttribute('role', 'region');
     dock.setAttribute('aria-label', 'Notifications');
     dock.setAttribute('aria-live', 'polite');
@@ -1685,7 +1690,7 @@
   }
 
   window.__seToasts = {
-    version: '1.95.1',
+    version: '1.95.2',
     preview,
     clearAll,
     kinds: Object.keys(KINDS),
