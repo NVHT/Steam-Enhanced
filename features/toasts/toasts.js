@@ -232,11 +232,21 @@
 
   // Text lines (one per block), images and buttons, in the order Steam draws them.
   function read(src) {
+    // Steam wraps the whole toast in a role="button" element (its click target): that one
+    // isn't an action button. Real buttons are <button>s, or role="button"s holding less text.
+    const all = clean(src.textContent || '');
+    const isAction = el =>
+      el.matches('button, .DialogButton') || (el.matches(BUTTONS) && clean(el.textContent || '') !== all);
+    const actionOf = el => {
+      for (let cur = el; cur && cur !== src; cur = cur.parentElement) if (cur.matches(BUTTONS) && isAction(cur)) return cur;
+      return null;
+    };
+
     const lines = new Map();
     const walker = document.createTreeWalker(src, NodeFilter.SHOW_TEXT);
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
       const host = node.parentElement;
-      if (!host || !node.data.trim() || host.closest(BUTTONS) || !shown(host)) continue;
+      if (!host || !node.data.trim() || actionOf(host) || !shown(host)) continue;
       const block = blockOf(host, src);
       lines.set(block, `${lines.get(block) || ''} ${node.data}`);
     }
@@ -247,14 +257,14 @@
       .filter(i => i.src && !i.src.startsWith('data:image/gif'));
 
     const buttons = [...src.querySelectorAll(BUTTONS)]
-      .filter(b => !b.parentElement?.closest(BUTTONS) && clean(b.textContent || ''))
+      .filter(b => isAction(b) && !actionOf(b.parentElement) && clean(b.textContent || ''))
       .slice(0, 2)
       .map(b => ({ label: clean(b.textContent), el: b }));
 
     // The element whose React onClick is the toast's own action (opening the chat, the game...).
     let click = src;
     for (const el of [src, ...src.querySelectorAll('*')]) {
-      if (el.closest(BUTTONS) && el !== src) continue;
+      if (el !== src && actionOf(el)) continue;
       if (typeof SE.props(el)?.onClick === 'function') {
         click = el;
         break;
@@ -289,7 +299,8 @@
       kind,
       label: k.label,
       accent: k.accent,
-      ms: k.ms,
+      // Steam's own display time for this toast, so ours ends with it; sticky kinds stay sticky.
+      ms: k.ms && Number(field(key, 'nToastDurationMS')) > 0 ? Number(field(key, 'nToastDurationMS')) : k.ms,
       pri: !!k.pri,
       artKind: k.art,
       glyph: k.icon,
@@ -910,7 +921,7 @@
   }
 
   window.__seToasts = {
-    version: '1.93.3',
+    version: '1.93.4',
     probe,
     // Why nothing (or something) is on the stage: the last scan, and what each toast read as.
     why: () => ({ enabled: enabled(), lastScan, models: models.length, skipped: skipped.size, pending: pendingKeys.size }),
