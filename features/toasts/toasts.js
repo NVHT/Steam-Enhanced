@@ -34,12 +34,13 @@
   const SVG_NS = 'http://www.w3.org/2000/svg';
 
   /*
-   * Size. The tray is drawn at 480 px wide (toasts.css) and zoomed to TRAY_W. Each toast window
-   * is sized to the tray at its tallest (with the strip) plus room for the shadow, and sits at
-   * the bottom centre, `lift` above the work area.
+   * Size. The tray is laid out at BASE_W (toasts.css) and zoomed as a whole to TRAY_W. Each toast
+   * window is sized to the tray at its tallest (with the strip) plus room for the shadow, and
+   * sits at the bottom centre, `lift` above the work area.
    */
-  const TRAY_W = 400;
-  const ZOOM = TRAY_W / 480;
+  const BASE_W = 420;
+  const TRAY_W = 350;
+  const ZOOM = TRAY_W / BASE_W;
   const TRAY_H = Math.ceil(170 * ZOOM); // stage 124 + strip 34 + padding 12, zoomed
   const BOX = Object.freeze({ trayW: TRAY_W, trayH: TRAY_H, padX: 24, padTop: 24, padBottom: 8, lift: 24 });
 
@@ -1711,7 +1712,7 @@
   }
 
   window.__seToasts = {
-    version: '1.95.4',
+    version: '1.95.5',
     preview,
     clearAll,
     kinds: Object.keys(KINDS),
