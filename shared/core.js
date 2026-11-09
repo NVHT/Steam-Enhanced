@@ -374,29 +374,85 @@
   };
 
   const requireCache = new WeakMap();
+  const chunkNames = new WeakMap();
 
+  // webpack's require() for every bundle reachable from this window. A chunk array is only
+  // probed once webpack has hooked its push, so no junk entries pile up before the runtime loads.
   const requires = () => {
     const list = [];
     for (const win of owners()) {
-      let chunkGlobals;
-      try {
-        chunkGlobals = Object.getOwnPropertyNames(win).filter(k => k.startsWith('webpackChunk'));
-      } catch (_) {
-        continue;
+      let names = chunkNames.get(win);
+      if (!names) {
+        try {
+          names = Object.getOwnPropertyNames(win).filter(k => k.startsWith('webpackChunk'));
+        } catch (_) {
+          continue;
+        }
+        if (names.length) chunkNames.set(win, names);
       }
-      for (const globalName of chunkGlobals) {
+      for (const globalName of names) {
         const chunks = win[globalName];
         if (!Array.isArray(chunks)) continue;
         let req = requireCache.get(chunks);
-        if (!req) {
-          const chunkId = 'se-core-' + Math.random().toString(36).slice(2);
-          chunks.push([[chunkId], {}, r => { req = r; }]);
+        if (!req && chunks.push !== Array.prototype.push) {
+          chunks.push([['se-core-' + Math.random().toString(36).slice(2)], {}, r => { req = r; }]);
           if (req) requireCache.set(chunks, req);
         }
         if (req && !list.includes(req)) list.push(req);
       }
     }
     return list;
+  };
+
+  /*
+   * Scans webpack module sources once per key. `test(src, id, req)` returns the wanted value
+   * (or anything falsy to keep looking). Hits are kept for good; misses are remembered for
+   * `retry` ms, so a hot path that asks every frame costs one scan per window, not one per call.
+   */
+  const moduleCache = new Map();
+  const findModule = (key, test, { retry = 30000 } = {}) => {
+    const cached = moduleCache.get(key);
+    if (cached && (cached.hit || performance.now() < cached.until)) return cached.value;
+    let value = null;
+    outer: for (const req of requires()) {
+      for (const id of Object.keys(req.m || {})) {
+        let src;
+        try {
+          src = Function.prototype.toString.call(req.m[id]);
+        } catch (_) {
+          continue;
+        }
+        try {
+          value = test(src, id, req) || null;
+        } catch (_) {
+          value = null;
+        }
+        if (value) break outer;
+      }
+    }
+    moduleCache.set(key, { value, hit: !!value, until: performance.now() + retry });
+    return value;
+  };
+
+  // The first truthy `name` global across this window and its opener/parent chain.
+  const global = (name, test) => {
+    for (const win of owners()) {
+      try {
+        const value = win[name];
+        if (value && (!test || test(value))) return value;
+      } catch (_) {}
+    }
+    return null;
+  };
+
+  // Sets a custom property only when it changes (no style invalidation for a no-op write).
+  const cssVar = (el, name, value) => {
+    if (!el) return;
+    if (value == null || value === '') {
+      if (el.style.getPropertyValue(name)) el.style.removeProperty(name);
+    } else if (el.style.getPropertyValue(name) !== String(value)) {
+      el.style.setProperty(name, String(value));
+    }
   };
 
   const railMode = () => !!document.body?.classList.contains('se-header-actions-ready');
@@ -433,14 +489,7 @@
     }
   };
 
-  const resolveAppStore = () => {
-    for (const win of owners()) {
-      try {
-        if (win.appStore) return win.appStore;
-      } catch (_) {}
-    }
-    return null;
-  };
+  const resolveAppStore = () => global('appStore');
 
   const coverURLs = (app, store) => {
     const appStore = store || resolveAppStore();
@@ -515,13 +564,29 @@
     return true;
   };
 
+  // Per-dispatch memo of ignore/scope verdicts, so 20 subscribers sharing SE.inside(SE.SIDE)
+  // walk closest() once per record target instead of once each.
+  let verdicts = null;
+  const verdict = (key, node, test) => {
+    if (!verdicts) verdicts = new Map(); // a nested dispatch (takeRecords in a sync sub) cleared it
+    let byNode = verdicts.get(key);
+    if (!byNode) verdicts.set(key, (byNode = new Map()));
+    let result = byNode.get(node);
+    if (result === undefined) byNode.set(node, (result = !!run(test, node)));
+    return result;
+  };
+
+  const relevant = (sub, node) =>
+    (!sub.scope || verdict(sub.scope, node, inside(sub.scope))) &&
+    !(sub.ignore && verdict(sub.ignore, node, sub.ignore));
+
   const matchesSubscriber = (sub, record) => {
     const typeMatches =
       record.type === 'childList' ||
       (record.type === 'attributes'
         ? sub.attributes.includes(record.attributeName)
         : sub.characterData);
-    return typeMatches && !(sub.ignore && run(sub.ignore, record.target));
+    return typeMatches && relevant(sub, record.target);
   };
 
   const invokeSubscriber = sub => {
@@ -572,17 +637,19 @@
     }
     if (!activeRecords.length) return;
 
+    verdicts = new Map();
     for (const sub of subscribers) {
       if (sub === excludedSub) continue;
+      const filtered = !!(sub.ignore || sub.scope);
       if (
-        !sub.ignore &&
+        !filtered &&
         !hasChildList &&
         !(hasCharData && sub.characterData) &&
         !sub.attributes.some(attrName => mutatedAttrs.has(attrName))
       ) {
         continue;
       }
-      if (sub.ignore && !activeRecords.some(record => matchesSubscriber(sub, record))) continue;
+      if (filtered && !activeRecords.some(record => matchesSubscriber(sub, record))) continue;
 
       if (sub.records) {
         try {
@@ -596,11 +663,19 @@
         enqueueSubscriber(sub);
       }
     }
+    verdicts = null;
   };
 
+  let waitingForBody = false;
   const syncObserver = () => {
     if (!document.body) {
-      addEventListener('DOMContentLoaded', syncObserver, { once: true });
+      if (!waitingForBody) {
+        waitingForBody = true;
+        addEventListener('DOMContentLoaded', () => {
+          waitingForBody = false;
+          syncObserver();
+        }, { once: true });
+      }
       return;
     }
     if (!subscribers.length) {
@@ -629,8 +704,17 @@
     });
   };
 
+  /*
+   * Subscribes to body mutations. Non-sync subscribers are already coalesced into one rAF, so
+   * callers don't need their own frame scheduling. Options:
+   *   scope       only mutations inside this selector count (cheapest way to stay quiet)
+   *   ignore      node => true to skip mutations under that node
+   *   attributes  attribute names to watch (each widens the shared observer: keep it short)
+   *   characterData, throttle (ms), sync (run inside the observer callback), records (get them)
+   */
   const watch = (fn, opts = {}) => {
     const sub = {
+      scope: typeof opts.scope === 'string' && opts.scope ? opts.scope : null,
       fn,
       attributes: opts.attributes || [],
       characterData: !!opts.characterData,
@@ -658,14 +742,27 @@
       takeRecords() {
         if (observer) dispatchRecords(observer.takeRecords(), sub);
         pendingSubs.delete(sub);
+        if (sub.timer) {
+          clearTimeout(sub.timer);
+          sub.timer = 0;
+        }
         return [];
       },
     };
   };
 
-  const inside = selector => node => {
-    const el = node.nodeType === 1 ? node : node.parentElement;
-    return !!el?.closest?.(selector);
+  // One predicate per selector, so verdicts are shared between subscribers using the same one.
+  const insideCache = new Map();
+  const inside = selector => {
+    let test = insideCache.get(selector);
+    if (!test) {
+      test = node => {
+        const el = node.nodeType === 1 ? node : node.parentElement;
+        return !!el?.closest?.(selector);
+      };
+      insideCache.set(selector, test);
+    }
+    return test;
   };
 
   // High-frequency chrome regions excluded by content-area observers.
@@ -681,7 +778,10 @@
   const poll = (fn, delay, opts = {}) => {
     const doc = opts.document || document;
     const win = doc.defaultView;
-    const idleInterval = Math.min(delay, 500);
+    // While inactive, check back no faster than the active rate (and at most every 1.5 s):
+    // the `active` test is usually a layout read. Watchers call refresh() to wake it sooner.
+    const idleInterval = Math.max(delay, Number(opts.idle) || 1500);
+    let lastWake = 0;
     let timer = null;
     let stopped = false;
     let isActive = false;
@@ -711,7 +811,11 @@
     };
 
     const wake = () => {
-      if (!stopped && isDocumentVisible() && (timer === null || !isActive)) tick();
+      if (stopped || !isDocumentVisible() || (timer !== null && isActive)) return;
+      const now = performance.now();
+      if (timer !== null && now - lastWake < 100) return; // resize fires per frame
+      lastWake = now;
+      tick();
     };
 
     const wakeEvents = ['resize', 'focus', 'pageshow'];
@@ -747,6 +851,10 @@
     mainWindow,
     navigate,
     requires,
+    findModule,
+    global,
+    appStore: resolveAppStore,
+    cssVar,
     railMode,
     mark,
     unmark,
@@ -761,6 +869,7 @@
     poll,
     inside,
     SIDE,
+    inSide: inside(SIDE),
   };
   dispatchEvent(new Event('se-core'));
 })();

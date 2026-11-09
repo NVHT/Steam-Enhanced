@@ -6,6 +6,10 @@
  *
  * Previews use the same rendering, queue, motion and rarity code as real toasts. Reading
  * Steam's own toasts and placing their windows only happens in Steam's toast windows.
+ *
+ * Developer tool: not injected in release builds. To use it, add these to skin.json "Patches":
+ *   { "MatchRegexString": "^Steam$", "TargetCss": "features/toasts/toasts.css", "TargetJs": "features/toasts/toasts.js" },
+ *   { "MatchRegexString": "^Steam$", "TargetJs": "features/toasts/toast-tester.js" }
  */
 (window.__se ? init => init(window.__se) : init => addEventListener('se-core', () => init(window.__se), { once: true }))(SE => {
   window.__seToastTester?.destroy();
