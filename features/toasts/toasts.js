@@ -28,6 +28,7 @@
 
   const SRC_ATTR = 'data-se-tst-src';   // on Steam toasts that have a Stage toast
   const ON_ATTR = 'data-se-tst-on';     // on <html> while every Steam toast is adopted
+  const WAIT_ATTR = 'data-se-tst-wait'; // on <html> while a new toast window is being read
   const ADOPT_TIMEOUT_MS = 2000;        // a toast still unreadable after this stays native
   const STALE_MAX_MS = 30000;           // a queued toast Steam has dropped is kept this long
   const PRUNE_MS = 650;                 // finished layers leave after their crossfade
@@ -1163,6 +1164,7 @@
       fit();
     }
 
+    watchPlace();
     const curView = cur && views.get(cur.id);
     SE.attr(tray, 'data-se-tier', curView?.layer.getAttribute('data-se-tier') || null);
     SE.attr(tray, 'data-accent', cur?.accent || null);
@@ -1174,6 +1176,8 @@
 
   // This window stops drawing the stage (another took over, or the queue is empty).
   function teardown() {
+    cancelAnimationFrame(guardFrame);
+    guardFrame = 0;
     if (!dock) return;
     dock.remove();
     dock = tray = stage = strip = pos = null;
@@ -1431,9 +1435,42 @@
     }
   }
 
-  // Steam may put the window back in its corner when its own toast list changes.
+  /*
+   * Steam re-stacks its toast windows whenever one comes or goes, moving the stage back to its
+   * corner. Checked every frame while the tray is up: the moment the window is off its spot the
+   * tray is hidden, the window is moved back, and the tray shows again. If Steam keeps winning
+   * (more than FIGHTS_MAX moves in 10 s), the tray shows where Steam put it rather than vanish.
+   */
+  const FIGHTS_MAX = 10;
+  let guardFrame = 0;
+  let fixing = false;
+  let fights = [];
+  function guardPlace() {
+    guardFrame = 0;
+    if (!isStage() || !tray?.hasAttribute('data-show') || mover < 0 || !target) return;
+    if (!fixing && (!landed(target) || (sizer >= 0 && !sized(target)))) {
+      const now = Date.now();
+      fights = fights.filter(t => now - t < 10000);
+      if (fights.length < FIGHTS_MAX) {
+        fights.push(now);
+        fixing = true;
+        mark(dock, 'data-placing');
+        Promise.resolve(landed(target) || applyMove(mover, target))
+          .then(() => ensureSize(target))
+          .finally(() => {
+            fixing = false;
+            fit();
+            unmark(dock, 'data-placing');
+          });
+      }
+    }
+    guardFrame = requestAnimationFrame(guardPlace);
+  }
+  const watchPlace = () => {
+    if (!guardFrame && IN_TOAST_WINDOW) guardFrame = requestAnimationFrame(guardPlace);
+  };
+
   let replaceTimer = 0;
-  let reMoves = 0;
   function restack() {
     if (!tray?.hasAttribute('data-show') || mover < 0 || replaceTimer) return;
     replaceTimer = setTimeout(() => {
@@ -1520,11 +1557,7 @@
     }
     if (isStage() && tray?.hasAttribute('data-show')) {
       fit();
-      // Steam can move the window back to its corner after it landed: move it again (a few times).
-      if (mover >= 0 && target && (!landed(target) || (sizer >= 0 && !sized(target))) && reMoves < 3) {
-        reMoves++;
-        restack();
-      }
+      watchPlace();
     }
     lastScan = { at: new Date().toISOString(), elements: document.body.getElementsByTagName('*').length, toasts: live.size, read: [] };
 
@@ -1547,6 +1580,7 @@
         pendingKeys.set(key, now);
       } else if (now - pendingKeys.get(key) > ADOPT_TIMEOUT_MS) {
         letGo(key, src, pendingKeys.get(key));
+        unmark(root, WAIT_ATTR);
         pendingKeys.delete(key);
         skipped.add(key);
       }
@@ -1651,6 +1685,8 @@
   function start() {
     if (!enabled() || !IN_TOAST_WINDOW) return;
     register();
+    // A toast that can't be read is shown as Steam drew it, once reading it has been given up.
+    setTimeout(() => unmark(root, WAIT_ATTR), ADOPT_TIMEOUT_MS + 500);
     early = new MutationObserver(onEarlyMutation);
     early.observe(document.body, { childList: true, subtree: true });
     for (const el of document.body.querySelectorAll('*')) holdTimer(keyOf(el));
@@ -1662,6 +1698,12 @@
     addEventListener('pagehide', onPageHide);
     step();
   }
+
+  /*
+   * A new toast window shows nothing until its toast is read (or reading is given up), so
+   * Steam's own toast never flashes in its corner first.
+   */
+  if (IN_TOAST_WINDOW && enabled()) mark(root, WAIT_ATTR);
 
   if (document.body) start();
   else addEventListener('DOMContentLoaded', start, { once: true });
@@ -1732,7 +1774,7 @@
   }
 
   window.__seToasts = {
-    version: '1.95.8',
+    version: '1.95.9',
     preview,
     clearAll,
     kinds: Object.keys(KINDS),
@@ -1774,6 +1816,8 @@
       if (h.stage === window) h.stage = null;
       for (const el of document.querySelectorAll(`[${SRC_ATTR}]`)) unmark(el, SRC_ATTR);
       unmark(root, ON_ATTR);
+      unmark(root, WAIT_ATTR);
+      cancelAnimationFrame(guardFrame);
       teardown();
       delete window.__seToasts;
     },
