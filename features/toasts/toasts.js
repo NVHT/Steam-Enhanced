@@ -250,7 +250,9 @@
       const block = blockOf(host, src);
       lines.set(block, `${lines.get(block) || ''} ${node.data}`);
     }
-    const text = [...new Set([...lines.values()].map(clean).filter(Boolean))];
+    const uniq = [...new Set([...lines.values()].map(clean).filter(Boolean))];
+    // Drop lines another line already says (a group chat draws the sender, then "sender: message").
+    const text = uniq.filter((l, i) => i === 0 || !uniq.some((o, j) => j !== i && j !== 0 && o.length > l.length && o.includes(l)));
 
     const images = [...src.querySelectorAll('img')]
       .map(img => ({ src: img.currentSrc || img.getAttribute('src') || '', area: img.offsetWidth * img.offsetHeight }))
@@ -1114,7 +1116,7 @@
   }
 
   window.__seToasts = {
-    version: '1.93.10',
+    version: '1.93.11',
     probe,
     // Why nothing (or something) is on the stage: the last scan, and what each toast read as.
     history: () => history.slice(),
