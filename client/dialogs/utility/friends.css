@@ -1,0 +1,1130 @@
+/*
+ * Utility dialogs › Friends & Chat dialogs: pickers, invites, notifications, toggles, leave
+ * voice, group chat settings.
+ * Utility dialog styles load in order: base, servers, media, library-tools, modals, friends, standalone.
+ */
+
+/*
+ * Friends & Chat: the small dialogs
+ * (Friends settings and group settings are paged settings dialogs, styled by the client/settings/ styles.)
+ * Create group chat / invite friends: Steam's friend picker (FriendPicker, FriendPicker_Suggestions,
+ * FriendPicker_SuggestedFriend, FriendPicker_ChosenFriend, DialogListBuilderInput); add nickname
+ * (Dialog_EditNickName); new / manage friend category (nicknameInput, nicknameError); the invite link
+ * (InviteFriendToChatDialog_LinkInput). Global class names, not hashed.
+ */
+/*
+ * The picker's field: Steam wraps label and box in one DialogListBuilderInput group, so the
+ * field look goes on the inner box (_DialogInputContainer) only; the group stays clear and
+ * the label sits above the box, as in every other dialog
+ */
+.FriendPicker .DialogListBuilderInput:not(#se-none) {
+  min-height: 0;
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.FriendPicker .DialogListBuilderInput > label {
+  display: block;
+}
+
+.FriendPicker .DialogListBuilderInput .DialogLabel:not(#se-none) {
+  margin: 0 0 8px !important;
+}
+
+.FriendPicker .DialogListBuilderInput ._DialogInputContainer:not(#se-none) {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  margin: 0 !important;
+  padding: 4px 6px !important;
+  cursor: text;
+}
+
+.FriendPicker .DialogListBuilderInput .DialogListBuilderInput_List {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.FriendPicker .DialogListBuilderInput .DialogListBuilderInput_ListItem {
+  display: flex;
+  margin: 0 !important;
+}
+
+.FriendPicker .DialogListBuilderInput .DialogListBuilderInput_Input:not(#se-none) {
+  flex: 1;
+  min-width: 80px;
+  max-width: none;
+  height: 30px;
+  margin: 0 !important;
+  padding: 0 6px !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  font: 500 14px var(--se-font) !important;
+  color: var(--se-text) !important;
+  font-style: normal !important;
+}
+
+.FriendPicker .DialogListBuilderInput .DialogListBuilderInput_Input::placeholder {
+  color: var(--se-text-faint);
+  font-style: normal;
+}
+
+/* The chosen friends: accent chips */
+.FriendPicker_ChosenFriend:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 8px 0 11px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  line-height: 28px;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+.FriendPicker_ChosenFriend:not(#se-none):hover {
+  background: color-mix(in srgb, var(--se-accent) 24%, transparent);
+}
+
+.FriendPicker_ChosenFriend span:not(#se-none) {
+  max-width: 140px;
+  font: 600 12.5px/28px var(--se-font);
+  color: var(--se-text);
+}
+
+.FriendPicker_ChosenFriend .SVGIcon_X_Line:not(#se-none) {
+  width: 9px;
+  height: 9px;
+  margin: 0;
+  flex: none;
+}
+
+.FriendPicker_ChosenFriend .SVGIcon_X_Line line {
+  stroke: var(--se-accent) !important;
+}
+
+.FriendPicker_ChosenFriend:hover .SVGIcon_X_Line line {
+  stroke: var(--se-text-strong) !important;
+}
+
+/*
+ * The friends to pick from: a sunken, rounded list (Steam's FriendPickerFriendList; older
+ * builds call it FriendPicker_Suggestions) with the friends list's rows
+ */
+.FriendPickerFriendList:not(#se-none),
+.FriendPicker_Suggestions:not(#se-none) {
+  overflow: hidden;
+  padding: 4px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-bg);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.FriendPickerFriendList .insetShadow,
+.FriendPicker_Suggestions .insetShadow {
+  display: none !important;
+}
+
+.FriendPickerScrollPanel:not(#se-none) {
+  padding: 0 !important;
+  scrollbar-width: none;
+}
+
+.FriendPickerScrollPanel::-webkit-scrollbar {
+  width: 0 !important;
+  display: none;
+}
+
+.FriendPicker_SuggestedFriend:not(#se-none) {
+  margin: 0 0 2px;
+  border-radius: var(--se-radius-sm);
+  cursor: pointer;
+}
+
+.FriendPicker_SuggestedFriend:not(#se-none):is(.Hover, :hover),
+.FriendPicker_Focus .FriendPicker_SuggestedFriend.Focus:not(#se-none) {
+  background: var(--se-hover) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend {
+  --se-pk-ring: var(--se-border-strong);
+}
+
+.FriendPicker_SuggestedFriend .friend:not(#se-none) {
+  display: flex !important;
+  align-items: center;
+  height: auto !important;
+  min-height: 44px;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: 4px 10px !important;
+  background: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+.FriendPicker_SuggestedFriend .friend.online {
+  --se-pk-ring: var(--se-online);
+}
+
+.FriendPicker_SuggestedFriend .friend.awayOrSnooze {
+  --se-pk-ring: color-mix(in srgb, var(--se-online) 50%, transparent);
+}
+
+.FriendPicker_SuggestedFriend .friend.ingame {
+  --se-pk-ring: var(--se-running);
+}
+
+.FriendPicker_SuggestedFriend .friend :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g /* avatarHolder */):not(#se-none) {
+  flex: none;
+  position: relative;
+  width: 30px !important;
+  height: 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--se-avatar-radius) !important;
+  overflow: visible !important;
+  transform: none !important;
+}
+
+.FriendPicker_SuggestedFriend .friend .avatarHolder :is(img.avatar, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none),
+.FriendPicker_SuggestedFriend .friend .nibodjvvrm86uCfnnAn4g :is(img.avatar, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none) {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: var(--se-avatar-radius) !important;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px var(--se-bg), 0 0 0 4px var(--se-pk-ring) !important;
+}
+
+.FriendPicker_SuggestedFriend:is(.Hover, :hover, .Focus) .friend .avatarHolder :is(img.avatar, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none),
+.FriendPicker_SuggestedFriend:is(.Hover, :hover, .Focus) .friend .nibodjvvrm86uCfnnAn4g :is(img.avatar, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none) {
+  box-shadow: 0 0 0 2px var(--se-hover), 0 0 0 4px var(--se-pk-ring) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend.offline .avatarHolder :is(img.avatar, ._3h-QRJGxnVOIExtHD1R0f2),
+.FriendPicker_SuggestedFriend .friend.offline .nibodjvvrm86uCfnnAn4g :is(img.avatar, ._3h-QRJGxnVOIExtHD1R0f2) {
+  filter: grayscale(.6);
+  opacity: .6;
+}
+
+.FriendPicker_SuggestedFriend .friend :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g) :is(.avatarStatus, .avatarFrame, ._3xUpb5DWXPFNcHHIcv-9pe /* avatarStatus */, .X_mJE4BYV5StDPwZhSiAu /* avatarFrame */) {
+  display: none !important;
+}
+
+.FriendPicker_SuggestedFriend .friend .labelHolder:not(#se-none) {
+  height: auto !important;
+  margin: 0 0 0 12px !important;
+  padding: 0 !important;
+  min-width: 0;
+}
+
+.FriendPicker_SuggestedFriend .friend .nOdcT-MoOaXGePXLyPe0H /* playerName */ {
+  font: 600 13.5px/1.3 var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend.offline .nOdcT-MoOaXGePXLyPe0H {
+  color: var(--se-text-muted) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend ._3sxE7F1LV2IcSX68YsH9dI /* richPresenceContainer */ {
+  margin: 0 !important;
+}
+
+.FriendPicker_SuggestedFriend .friend :is(._2Ri005Wg_uXDTa71kdRbcN /* richPresenceLabel */, ._1cB0qtF0paHWWyj1XNcnbG /* gameName */) {
+  margin: 0 !important;
+  padding: 0 !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  font: 500 12px/1.3 var(--se-font) !important;
+  color: var(--se-text-faint) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend.online ._2Ri005Wg_uXDTa71kdRbcN,
+.FriendPicker_SuggestedFriend .friend.online ._1cB0qtF0paHWWyj1XNcnbG {
+  color: var(--se-online) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend.awayOrSnooze ._2Ri005Wg_uXDTa71kdRbcN,
+.FriendPicker_SuggestedFriend .friend.awayOrSnooze ._1cB0qtF0paHWWyj1XNcnbG {
+  color: color-mix(in srgb, var(--se-online) 70%, transparent) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend.ingame ._2Ri005Wg_uXDTa71kdRbcN,
+.FriendPicker_SuggestedFriend .friend.ingame ._1cB0qtF0paHWWyj1XNcnbG {
+  color: var(--se-running) !important;
+}
+
+.FriendPicker_SuggestedFriend .friend .ContextMenuButton {
+  display: none !important;
+}
+
+/*
+ * Invite to Group Chat: the group under the title (its avatar and name on one line), the
+ * link field with Copy, the expiry picker on the right, and an "OR" rule before the picker
+ */
+.ChatRoomGroupInviteDialog .DialogHeader .displayRow:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.ChatRoomGroupInviteDialog .DialogHeaderSubtitle:not(#se-none),
+.InviteToVoiceHeader .DialogHeaderSubtitle:not(#se-none) {
+  margin: 0;
+  font: 600 15px/1.3 var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-accent) !important;
+}
+
+.ChatRoomGroupInviteDialog .DialogHeader .ChatRoomGroupAvatar:not(#se-none),
+.ChatRoomGroupInviteDialog .DialogHeader .ChatRoomMultiFriendAvatar:not(#se-none) {
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  box-shadow: none;
+}
+
+/*
+ * A group of friends' avatars (unsaved group chats): two fill the tile side by side, three
+ * put the first on the left; Steam leaves two of them in the top half of an empty square
+ */
+.ChatRoomMultiFriendAvatar.With2Items .MultiAvatar,
+.ChatRoomMultiFriendAvatar.With3Items .MultiAvatar.Index0 {
+  height: 100% !important;
+  object-fit: cover;
+}
+
+.ChatRoomMultiFriendAvatar.With3Items .MultiAvatar.Index2 {
+  inset-inline-start: auto !important;
+  inset-inline-end: 0 !important;
+  bottom: 0 !important;
+  top: auto !important;
+}
+
+.ChatRoomMultiFriendAvatar .MultiAvatar {
+  object-fit: cover;
+}
+
+.inviteLinkContainer .DialogInputLabelGroup:not(#se-none) {
+  margin: 18px 0 0;
+}
+
+.inviteLinkContainer .DialogInput_Wrapper._DialogLayout:not(#se-none) {
+  padding: 0;
+  background: none;
+  border-radius: 0;
+}
+
+.inviteLinkContainer .DialogInput_Wrapper._DialogLayout .displayRow:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inviteLinkContainer .DialogInputLabelGroup .DialogInput:not(#se-none) {
+  flex: 1 1 auto;
+  margin: 0 !important;
+  line-height: normal;
+}
+
+.inviteLinkContainer .DialogButton.DialogInput_CopyAction:not(#se-none) {
+  flex: 0 0 auto;
+  min-width: 96px;
+  margin: 0 !important;
+  background: var(--se-accent) !important;
+  color: var(--se-bg-ink) !important;
+}
+
+.inviteLinkContainer .DialogButton.DialogInput_CopyAction:not(#se-none):hover {
+  background: var(--se-accent-hover) !important;
+  color: var(--se-bg-ink) !important;
+}
+
+.expireLinkInContainer:not(#se-none) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 10px 0 0;
+}
+
+.expireLinkInContainer .DialogLabel:not(#se-none) {
+  margin: 0 !important;
+  white-space: nowrap;
+}
+
+.expireLinkInContainer > :not(.DialogLabel) {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0 !important;
+}
+
+.inviteLinkContainer .DialogDropDown._DialogInputContainer:not(#se-none),
+.expireLinkInContainer .DialogDropDown._DialogInputContainer:not(#se-none) {
+  position: relative;
+  flex: 0 0 auto;
+  width: auto !important;
+  min-width: 150px;
+  height: var(--se-control-h-sm);
+  margin: 0 !important;
+  padding: 0 30px 0 12px !important;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: none !important;
+  font: 600 13px var(--se-font) !important;
+  color: var(--se-text) !important;
+  text-align: start;
+}
+
+.inviteLinkContainer .DialogDropDown._DialogInputContainer:not(#se-none):hover,
+.expireLinkInContainer .DialogDropDown._DialogInputContainer:not(#se-none):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.inviteLinkContainer .DialogDropDown_Arrow:not(#se-none),
+.expireLinkInContainer .DialogDropDown_Arrow:not(#se-none) {
+  top: 50% !important;
+  inset-inline-end: 8px !important;
+  width: 14px !important;
+  height: 14px !important;
+  transform: translateY(-50%);
+}
+
+.OrSeparator:not(#se-none) {
+  gap: 14px;
+  margin: 22px 0 18px;
+}
+
+.OrSeparator .HBar:not(#se-none) {
+  height: 1px;
+  background: var(--se-hairline);
+}
+
+.OrSeparator .OrSeparatorLabel:not(#se-none) {
+  margin: 0;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  color: var(--se-label-color) !important;
+}
+
+/*
+ * Notifications for a group chat: the chat's name in the accent color under the title, the
+ * channel table as the theme's rows, "Settings" as a link
+ */
+.ChatRoomNotificationSettingsDialog .whiteText:not(#se-none) {
+  color: var(--se-accent) !important;
+}
+
+.ChatRoomNotificationSettingsDialog .notificationsChannelHeader:not(#se-none) {
+  padding: 0 12px 6px;
+  border: 0;
+}
+
+.ChatRoomNotificationSettingsDialog .NotificationChannelNameLabel:not(#se-none),
+.ChatRoomNotificationSettingsDialog .OverrideChannelLabel:not(#se-none) {
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color) !important;
+}
+
+/* The level picker: native dropdown at full width, no second box behind it */
+.ChatRoomNotificationSettingsDialog .notificationRow:not(#se-none) {
+  margin: 0 0 10px;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.ChatRoomNotificationSettingsDialog .notificationRow > * {
+  flex: 1;
+  min-width: 0;
+  margin: 0 !important;
+}
+
+.ChatRoomNotificationSettingsDialog .notificationGeneralHeader .DialogLabel:not(#se-none) {
+  margin: 0 0 8px !important;
+}
+
+/*
+ * "Display an indicator…": the option as one of the theme's rows (label left, switch right);
+ * Steam's glowing gold dot becomes the blue unread dot of the friends list, before the label
+ */
+.ChatRoomNotificationSettingsDialog .indicatorOptionContainer:not(#se-none) {
+  position: relative;
+}
+
+.ChatRoomNotificationSettingsDialog .indicatorOption.DialogToggleField:not(#se-none) {
+  min-height: 48px;
+  margin: 0 !important;
+  padding: 8px 12px 8px 30px !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+}
+
+.ChatRoomNotificationSettingsDialog .indicatorOptionContainer .DialogToggle_Label:not(#se-none) {
+  padding: 0 !important;
+}
+
+.ChatRoomNotificationSettingsDialog .indicatorOptionContainer .ChatUnreadMessageIndicator:not(#se-none) {
+  position: absolute !important;
+  top: 50% !important;
+  bottom: auto !important;
+  inset-inline-start: 12px !important;
+  left: 12px;
+  width: 8px !important;
+  height: 8px !important;
+  margin: -4px 0 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  pointer-events: none;
+}
+
+.ChatRoomNotificationSettingsDialog .indicatorOptionContainer .chatUnreadCircle:not(#se-none) {
+  position: static !important;
+  display: block;
+  width: 8px !important;
+  height: 8px !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  background: var(--se-accent) !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+.ChatRoomNotificationSettingsDialog .indicatorOptionContainer .ChatUnreadMessageIndicator.Hidden {
+  opacity: 0 !important;
+}
+
+.ChatRoomNotificationSettingsDialog .DialogHBar:not(#se-none) {
+  height: 1px;
+  margin: 16px 0;
+  background: var(--se-hairline);
+}
+
+.ChatRoomNotificationSettingsDialog .textLink:not(#se-none),
+.FriendNotificationsDialog .textLink:not(#se-none) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+  border: 0 !important;
+  cursor: pointer;
+}
+
+.ChatRoomNotificationSettingsDialog .textLink:not(#se-none):hover,
+.FriendNotificationsDialog .textLink:not(#se-none):hover {
+  text-decoration: underline !important;
+}
+
+/*
+ * Friend Notifications: the friend as a rounded-square avatar with its status ring; the options as a
+ * card of rows (a header row of uppercase label, then each option with its two ticks)
+ */
+.FriendNotificationsDialog .friend {
+  --se-pk-ring: var(--se-border-strong);
+}
+
+.FriendNotificationsDialog .friend:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0 20px;
+  padding: 0;
+  background: none !important;
+}
+
+.FriendNotificationsDialog .friend.online {
+  --se-pk-ring: var(--se-online);
+}
+
+.FriendNotificationsDialog .friend.awayOrSnooze {
+  --se-pk-ring: color-mix(in srgb, var(--se-online) 50%, transparent);
+}
+
+.FriendNotificationsDialog .friend.ingame {
+  --se-pk-ring: var(--se-running);
+}
+
+.FriendNotificationsDialog .friend :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g /* avatarHolder */):not(#se-none) {
+  flex: none;
+  width: 56px !important;
+  height: 56px !important;
+  padding: 0 !important;
+  border-radius: var(--se-avatar-radius);
+  overflow: visible !important;
+}
+
+.FriendNotificationsDialog .friend .avatarHolder :is(img, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none),
+.FriendNotificationsDialog .friend .nibodjvvrm86uCfnnAn4g :is(img, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none) {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: var(--se-avatar-radius) !important;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px var(--se-surface), 0 0 0 4px var(--se-pk-ring) !important;
+}
+
+.FriendNotificationsDialog .friend :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g) :is(.avatarStatus, .avatarFrame, ._3xUpb5DWXPFNcHHIcv-9pe /* avatarStatus */, .X_mJE4BYV5StDPwZhSiAu /* avatarFrame */) {
+  display: none !important;
+}
+
+.FriendNotificationsDialog .friend .labelHolder:not(#se-none) {
+  margin: 0 !important;
+  font: 700 17px/1.3 var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+.FriendNotificationsDialog .friend .labelHolder .playerNickname,
+.FriendNotificationsDialog .friend .labelHolder .playerNicknameBracket {
+  font-weight: 500;
+  color: var(--se-text-faint) !important;
+}
+
+.FriendNotificationsDialog .DialogBodyText:not(#se-none) {
+  margin: 0 0 18px !important;
+}
+
+.FriendNotificationsDialog .useDefaultsCheckBox:not(#se-none) {
+  margin: 0 0 16px;
+  font: 500 14px var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+.FriendNotificationsDialog .SettingsGroup:not(#se-none) {
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+}
+
+.FriendsSettingsNotificationRow:not(#se-none) {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 6px 16px;
+  background: none;
+  font: 500 14px var(--se-font) !important;
+  color: var(--se-text);
+}
+
+.FriendsSettingsNotificationRow + .FriendsSettingsNotificationRow:not(.FriendsSettingsNotificationRow_Header) {
+  box-shadow: inset 0 1px 0 var(--se-hairline);
+}
+
+.FriendsSettingsNotificationRow.FriendsSettingsNotificationRow_Header:not(#se-none) {
+  min-height: 36px;
+  background: rgba(0, 0, 0, .14);
+}
+
+.FriendsSettingsNotificationRow_Header .FriendsSettingsNotificationRow_Label:not(#se-none),
+.FriendsSettingsNotificationRow_Header .FriendsSettingsNotificationRow_Checkbox:not(#se-none) {
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color) !important;
+}
+
+.FriendsSettingsNotificationRow .FriendsSettingsNotificationRow_Label:not(#se-none) {
+  flex: 1 1 50%;
+  min-width: 0;
+}
+
+.FriendsSettingsNotificationRow .FriendsSettingsNotificationRow_Checkbox:not(#se-none) {
+  flex: 1 1 25%;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.FriendsSettingsNotificationRow_Checkbox .DialogCheckbox_Container:not(#se-none) {
+  margin: 0 !important;
+}
+
+.DialogBody.useDefaults .FriendsSettingsNotificationRow:not(.FriendsSettingsNotificationRow_Header) {
+  opacity: .5;
+}
+
+.DialogBody.useDefaults .FriendsSettingsNotificationRow:not(.FriendsSettingsNotificationRow_Header) .FriendsSettingsNotificationRow_Label {
+  color: var(--se-text-dim) !important;
+}
+
+.Dialog_EditNickName .friend .avatarMedium:not(#se-none) {
+  border: 0;
+  border-radius: var(--se-avatar-radius);
+  overflow: hidden;
+  box-shadow: 0 0 0 2px var(--se-surface), 0 0 0 4px var(--se-hairline);
+}
+
+.Dialog_EditNickName .friend .avatarMedium img {
+  border-radius: var(--se-avatar-radius);
+}
+
+.Dialog_EditNickName .friend .labelHolder .nickNamedAs:not(#se-none) {
+  font: 500 12.5px var(--se-font);
+  color: var(--se-text-faint);
+}
+
+.Dialog_EditNickName .friend .DialogTextInputBase:not(#se-none) {
+  min-height: 40px;
+  padding-inline: 12px !important;
+  font: 600 18px var(--se-font) !important;
+}
+
+.Dialog_EditNickName .friend:is(.online, .ingame) .DialogTextInputBase:not(#se-none) {
+  color: var(--se-text) !important;
+}
+
+.nicknameError:not(#se-none) {
+  margin: 14px 0;
+  padding: 10px 12px;
+  border-radius: var(--se-radius-md);
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent);
+  font: 500 13px var(--se-font);
+  color: var(--se-danger-text);
+}
+
+input.InviteFriendToChatDialog_LinkInput:not(#se-none) {
+  font: 500 13px Consolas, "Cascadia Mono", "SF Mono", monospace !important;
+  letter-spacing: .02em;
+}
+
+.DialogHighlight:not(#se-none) {
+  color: var(--se-accent);
+}
+
+/*
+ * Steam's OFF / ON toggles (DialogToggleField)
+ * Friends & Chat options (unread indicator, push-to-talk, group permissions…) use a pair of
+ * OFF / ON boxes in bright blue: drawn as the theme's switch (the Settings window's), a
+ * 38 x 22 track, blue with a dark knob when on. Steam's two options stay in the DOM and the
+ * whole control keeps its click; text content are hidden.
+ */
+.DialogToggleField._DialogInputContainer:not(.GamepadMode *):not(#se-none) {
+  align-items: center;
+  gap: 16px;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggle_Label:not(#se-none) {
+  font: 500 14px/1.4 var(--se-font) !important;
+  color: var(--se-text) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggle_Description:not(#se-none) {
+  padding-top: 2px;
+  font: 400 12.5px/1.45 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_Control:not(#se-none) {
+  position: relative;
+  flex: none;
+  align-self: center;
+  width: 38px;
+  height: 22px;
+  margin: 0 !important;
+  padding: 0;
+  border-radius: var(--se-radius-pill);
+  overflow: hidden;
+  background: var(--se-track) !important;
+  color: transparent !important;
+  line-height: 22px;
+  font-size: 0 !important;
+  transition: background-color var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_Control:hover {
+  box-shadow: 0 0 0 3px var(--se-hairline);
+}
+
+.DialogToggleField:not(.GamepadMode *):focus-visible .DialogToggleField_Control {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_OptionPanel:not(#se-none) {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_Option:not(#se-none) {
+  flex: 1;
+  width: auto;
+  background: none !important;
+  color: transparent !important;
+  font-size: 0 !important;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_Control::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--se-text-muted);
+  pointer-events: none;
+  transition: transform var(--se-dur) ease-out, background-color var(--se-dur) ease-out;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_Control:has(.DialogToggleField_Option.On.Active):not(#se-none) {
+  background: var(--se-accent) !important;
+}
+
+.DialogToggleField:not(.GamepadMode *) .DialogToggleField_Control:has(.DialogToggleField_Option.On.Active):not(#se-none)::after {
+  background: var(--se-bg-ink);
+  transform: translateX(16px);
+}
+
+.DialogToggleField.Disabled:not(.GamepadMode *) .DialogToggleField_Control {
+  opacity: .4;
+  cursor: default;
+}
+
+.DialogToggleField.Disabled:not(.GamepadMode *) .DialogToggleField_Control:hover {
+  box-shadow: none;
+}
+
+/*
+ * Leave voice chat? (CloseActiveVoiceWindowConfirmation)
+ * The example of the voice bar, the dashed ring around its leave button and the "you can
+ * leave from here" note in the theme's colors.
+ */
+.CloseActiveVoiceWindowConfirmation .furtherDetails:not(#se-none) {
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-accent-tint);
+  font: 500 13px/1.45 var(--se-font);
+  color: var(--se-text-dim);
+}
+
+.CloseActiveVoiceWindowConfirmation .activeVoiceDetails:not(#se-none) {
+  font: 500 14px/1.5 var(--se-font);
+  color: var(--se-text);
+}
+
+.CloseActiveVoiceWindowConfirmation .circleHighlight:not(#se-none) {
+  border: 1.5px dashed var(--se-danger);
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  inset-inline-end: 4px;
+}
+
+.CloseActiveVoiceWindowConfirmation .exitIconExample {
+  color: var(--se-danger);
+}
+
+.CloseActiveVoiceWindowConfirmation .exitIconExample :is(.ExitDoor, .Arrow polyline) {
+  stroke: currentColor !important;
+}
+
+.CloseActiveVoiceWindowConfirmation .dontShowConfirmation:not(#se-none) {
+  align-items: center;
+  gap: 8px;
+  font: 500 13.5px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.CloseActiveVoiceWindowConfirmation .dontShowConfirmation:hover {
+  color: var(--se-text);
+}
+
+.CloseActiveVoiceWindowConfirmation .dontShowConfirmation .DialogCheckbox:not(#se-none) {
+  margin: 0 !important;
+}
+
+/*
+ * Group chat settings (Friends & Chat)
+ * native two-column dialog (module 72945: Container _2VY6HOZ…, Nav xSTLmzyl…, NavTitle
+ * uyoPtKbi…, NavItems MWzjHR-u…, NavItem _2YV0m3IR…, Active _1DfstUr4…, Content _3mf9BBKx…;
+ * module 86360: DialogTitle e600t61O…, DialogContent _3t8HxXdv…; module 36308: LeaveButton
+ * _1NqKTWvx…), drawn like the theme's Settings window: a sidebar of 34 px pages with the
+ * current one tinted, the page on the card color with a plain title, Leave in red.
+ */
+._2VY6HOZXxO2AsBaLssl0Uy:not(.GamepadMode *) {
+  max-width: 100%;
+  font-family: var(--se-font);
+}
+
+.xSTLmzylFJdIfak7ZdhuA:not(.GamepadMode *) {
+  box-sizing: border-box;
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  padding: 22px 14px 14px !important;
+  background: var(--se-sidebar) !important;
+  box-shadow: inset -1px 0 0 var(--se-hairline);
+}
+
+.xSTLmzylFJdIfak7ZdhuA .uyoPtKbi4K01XGuYF5-C_ {
+  /* NavTitle */
+  margin: 0 0 14px !important;
+  padding: 0 10px;
+  font: 700 18px/24px var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text) !important;
+}
+
+.xSTLmzylFJdIfak7ZdhuA .MWzjHR-uqa-svGrdXYfUl {
+  gap: 2px;
+}
+
+/* NavItems */
+.xSTLmzylFJdIfak7ZdhuA .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV {
+  /* NavItem */
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 34px;
+  margin: 0 !important;
+  padding: 0 10px;
+  border-radius: var(--se-radius-sm);
+  font: 500 13.5px var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text-dim) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+.xSTLmzylFJdIfak7ZdhuA .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV:is(:hover, .gpfocus):not(._1DfstUr4tIt3Jdt7Mrxfxo) {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.xSTLmzylFJdIfak7ZdhuA .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV._1DfstUr4tIt3Jdt7Mrxfxo {
+  /* Active */
+  background: var(--se-accent-tint) !important;
+  color: var(--se-text) !important;
+  font-weight: 600 !important;
+}
+
+/* Leave Group Chat: a red row at the foot of the sidebar */
+._1NqKTWvxtFgflRlqLTtv7e:not(.GamepadMode *) {
+  gap: 8px;
+  height: 34px;
+  margin: 0 !important;
+  padding: 0 10px;
+  border-radius: var(--se-radius-sm);
+  font: 600 13px var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-danger) !important;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+._1NqKTWvxtFgflRlqLTtv7e:not(.GamepadMode *):is(:hover, .gpfocus) {
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent) !important;
+  color: var(--se-danger-text) !important;
+}
+
+._1NqKTWvxtFgflRlqLTtv7e svg {
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  flex: none;
+}
+
+._1NqKTWvxtFgflRlqLTtv7e g {
+  stroke: currentColor !important;
+}
+
+/* The page */
+._3mf9BBKxhIVdrt6nIWBt4x:not(.GamepadMode *) {
+  min-width: 0;
+  background: var(--se-surface) !important;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ:not(.GamepadMode *) {
+  padding: 28px 30px 24px !important;
+  margin: 0 !important;
+  scrollbar-width: none;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ::-webkit-scrollbar {
+  width: 0 !important;
+  display: none;
+}
+
+.e600t61ObcLA11pIZAVb9:not(.GamepadMode *) {
+  /* DialogTitle */
+  margin: 0 0 18px !important;
+  font: 700 22px/28px var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text) !important;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ .DialogBodyText,
+._3t8HxXdv4QoWO7f3awdiCQ .DialogBody {
+  font: 400 14px/1.55 var(--se-font) !important;
+  color: var(--se-text-dim) !important;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ .DialogBodyText ul {
+  margin: 10px 0 20px;
+  padding-inline-start: 4px;
+  list-style: none;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ .DialogBodyText li {
+  position: relative;
+  margin: 0 0 6px;
+  padding-inline-start: 20px;
+  color: var(--se-text);
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ .DialogBodyText li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 2px;
+  top: .45em;
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid var(--se-accent);
+  border-bottom: 2px solid var(--se-accent);
+  transform: rotate(-45deg);
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ .DialogBody .DialogInputLabelGroup {
+  margin-bottom: 16px;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ button.DialogButton:not(#se-none) {
+  min-height: var(--se-control-h);
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ .ErrorWhileSaving {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: var(--se-radius-md);
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent);
+  font: 500 13px var(--se-font);
+  color: var(--se-danger-text);
+}
+
+/* Leave Group Chat page: the question, then Leave in red */
+._3t8HxXdv4QoWO7f3awdiCQ > div:not([class]) {
+  font: 500 14px/1.5 var(--se-font);
+  color: var(--se-text);
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ > div:not([class]) > button.DialogButton:not(#se-none) {
+  display: block;
+  width: auto;
+  min-width: 140px;
+  margin-top: 16px;
+  background: color-mix(in srgb, var(--se-danger) 18%, transparent) !important;
+  color: var(--se-danger-text) !important;
+}
+
+._3t8HxXdv4QoWO7f3awdiCQ > div:not([class]) > button.DialogButton:not(#se-none):hover {
+  background: var(--se-danger) !important;
+  color: var(--se-text-strong) !important;
+}
+
+/* Invite links: the table as rows in a card, the date in uppercase label, Delete as a quiet red button */
+.InviteLinksTable:not(#se-none) {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+}
+
+.InviteLinksTable th:not(#se-none) {
+  height: 36px;
+  padding: 0 14px;
+  text-align: start;
+  background: rgba(0, 0, 0, .14);
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color) !important;
+}
+
+.InviteLinksTable td:not(#se-none) {
+  padding: 8px 14px;
+  border: 0;
+  font: 500 13px var(--se-font);
+  color: var(--se-text-dim);
+}
+
+.InviteLinksTable tbody tr + tr td {
+  box-shadow: inset 0 1px 0 var(--se-hairline);
+}
+
+.InviteLinksTable tbody tr:not(#se-none) {
+  background: none !important;
+}
+
+.InviteLinksTable .inviteURLLink:not(#se-none) {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--se-control-h-sm);
+  margin: 0 !important;
+  font: 500 13px Consolas, "Cascadia Mono", "SF Mono", monospace !important;
+  color: var(--se-text) !important;
+}
+
+.InviteLinksTable .dateCell:not(#se-none) {
+  font-variant-numeric: tabular-nums;
+  text-transform: none;
+  color: var(--se-text-muted);
+  white-space: nowrap;
+}
+
+.InviteLinksTable .buttonCell:not(#se-none) {
+  text-align: end;
+}
+
+.InviteLinksTable .buttonCell button.DialogButton:not(#se-none) {
+  min-height: var(--se-control-h-sm);
+  width: auto;
+  padding: 0 14px;
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent) !important;
+  color: var(--se-danger-text) !important;
+}
+
+.InviteLinksTable .buttonCell button.DialogButton:not(#se-none):hover {
+  background: var(--se-danger) !important;
+  color: var(--se-text-strong) !important;
+}

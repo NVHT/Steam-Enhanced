@@ -1,0 +1,297 @@
+/*
+ * Redeem a Steam Gift Card or Wallet Code (/account/redeemwalletcode):
+ *
+ *   [ Home › Account                                                 ]
+ *   [ Redeem a Steam Gift Card or Wallet Code                        ]
+ *   [ ▭ Steam ID 7656119…  ⧉ ↗ ]
+ *   [ [ XXXXX-XXXXX-XXXXX            ]( Continue ) ][ YOUR STEAM ACCOUNT ]
+ *   [                                               ][ Wallet Balance     ]
+ *   [                                               ][ $0.00              ]
+ *   [ Steam Gift Cards and Wallet Codes work just like … ]   [ card art ]   ]
+ *   [ Where can I purchase …   ( Purchase Digital Gift Cards )            ]
+ *
+ * Header, page colour, Steam ID chip and the wallet card come from account/page.css (the page
+ * carries .se-store-account too). Steam's page (account.css, cart.css): #main_content >
+ * .leftcol > .wallet_code_content_box (#error_display, #wallet_code_form > .wallet_code_ctn >
+ * form.wallet_code_input_ctn > input#wallet_code + button#validate_btn, #captcha_entry,
+ * #validate_btn_in_progress; #address_form for codes that need one), .rightcol (wallet card);
+ * then .upsell_and_graphic > #redeem_wallet_code_upsell_text + .wallet_card_image. Steam's
+ * script shows, hides and fills these as a code is checked; CSS alone styles them, so it never
+ * gets in the way. Rules use html.se-store-redeem:not(#se-none) for ID-level weight.
+ */
+
+html.se-store-redeem:not(#se-none) .page_content_ctn {
+  background: none !important;
+}
+
+/* ---------- Layout: the code card beside the wallet card ---------- */
+
+html.se-store-redeem:not(#se-none) #main_content {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  align-items: start;
+  gap: 32px;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+html.se-store-redeem:not(#se-none) #main_content > :is(.leftcol, .rightcol) {
+  width: auto !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+html.se-store-redeem:not(#se-none) #main_content > .rightcol {
+  grid-column: 2;
+}
+
+html.se-store-redeem:not(#se-none) #main_content > div:not([class]) {
+  display: none !important; /* float clearers */
+}
+
+/* ---------- Code card ---------- */
+
+html.se-store-redeem:not(#se-none) .wallet_code_content_box {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 28px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-md)/1.55 var(--se-font) !important;
+}
+
+html.se-store-redeem:not(#se-none) :is(.redeem_wallet_code_form, .wallet_code_ctn) {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  background: none !important;
+}
+
+html.se-store-redeem:not(#se-none) .wallet_code_ctn > div:not([class]):not(:empty) {
+  margin-top: 12px;
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-base)/1.5 var(--se-font);
+}
+
+html.se-store-redeem:not(#se-none) form.wallet_code_input_ctn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+/* The code field: wide and set like a code */
+html.se-store-redeem:not(#se-none) input#wallet_code {
+  flex: 1 1 280px;
+  box-sizing: border-box;
+  width: auto !important;
+  height: 48px !important;
+  margin: 0 !important;
+  padding: 0 18px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-lg)/1 var(--se-font) !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  outline: none;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-store-redeem:not(#se-none) input#wallet_code::placeholder {
+  color: var(--se-text-faint);
+  font-weight: 500;
+  letter-spacing: .02em;
+  text-transform: none;
+}
+
+html.se-store-redeem:not(#se-none) input#wallet_code:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--se-accent);
+}
+
+/* Continue, and Steam's busy twin of it while the code is checked */
+html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress) {
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: 48px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-accent) !important;
+  color: var(--se-on-accent) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+/* Steam shows and hides these two with inline display; only the shown one becomes flex */
+html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress):not([style*="none"]) {
+  display: inline-flex !important;
+}
+
+html.se-store-redeem:not(#se-none) #validate_btn:hover {
+  background: var(--se-accent-hover) !important;
+}
+
+html.se-store-redeem:not(#se-none) #validate_btn_in_progress {
+  background: var(--se-accent-surface) !important;
+  color: var(--se-text) !important;
+  cursor: progress;
+}
+
+html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress) > span {
+  padding: 0 26px !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: 700 var(--se-fs-md)/48px var(--se-font) !important;
+  text-shadow: none !important;
+}
+
+html.se-store-redeem:not(#se-none) #captcha_entry {
+  flex-basis: 100%;
+}
+
+/* Errors: a tinted note over the field */
+html.se-store-redeem:not(#se-none) #error_display.checkout_error {
+  margin: 0 0 14px !important;
+  padding: 10px 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: color-mix(in srgb, var(--se-danger) 12%, transparent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-danger) 28%, transparent);
+  color: var(--se-danger-text) !important;
+  font: 600 var(--se-fs-base)/1.45 var(--se-font) !important;
+}
+
+html.se-store-redeem:not(#se-none) #error_display.checkout_error:not([style*="none"]) {
+  display: block !important;
+}
+
+/* Fields of the address step some codes need */
+html.se-store-redeem:not(#se-none) #address_form :is(input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), select) {
+  box-sizing: border-box;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text);
+  font: 500 var(--se-fs-md)/1.4 var(--se-font);
+}
+
+/* ---------- About gift cards: text beside the card art ---------- */
+
+html.se-store-redeem:not(#se-none) .upsell_and_graphic {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+  align-items: center;
+  gap: 32px;
+  box-sizing: border-box;
+  height: auto !important;
+  margin-top: 32px !important;
+  margin-bottom: 64px !important;
+  padding: 28px 32px !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-redeem:not(#se-none) .redeem_wallet_code_upsell {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-md)/1.6 var(--se-font) !important;
+}
+
+html.se-store-redeem:not(#se-none) .redeem_wallet_code_upsell_header {
+  margin: 8px 0 0 !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-lg)/1.35 var(--se-font) !important;
+  text-transform: none !important;
+}
+
+html.se-store-redeem:not(#se-none) .redeem_wallet_code_upsell a[class*="btn"] {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-redeem:not(#se-none) .redeem_wallet_code_upsell a[class*="btn"] > span {
+  padding: 0 20px !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: 600 var(--se-fs-md)/38px var(--se-font) !important;
+  text-shadow: none !important;
+}
+
+html.se-store-redeem:not(#se-none) .redeem_wallet_code_upsell a[class*="btn"]:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-redeem:not(#se-none) .redeem_wallet_code_upsell a:not([class*="btn"]) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+html.se-store-redeem:not(#se-none) .wallet_card_image {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  float: none !important;
+}
+
+html.se-store-redeem:not(#se-none) .wallet_card_image img {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  max-height: 260px;
+  object-fit: contain;
+}
+
+/* ---------- Narrow windows: one column ---------- */
+
+@media (max-width: 1000px) {
+  html.se-store-redeem:not(#se-none) :is(#main_content, .upsell_and_graphic) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html.se-store-redeem:not(#se-none) #main_content > .rightcol {
+    grid-column: 1;
+  }
+
+  html.se-store-redeem:not(#se-none) .wallet_card_image {
+    display: none;
+  }
+}

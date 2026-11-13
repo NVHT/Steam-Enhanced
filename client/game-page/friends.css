@@ -1,0 +1,368 @@
+/*
+ * Game page › friends who play: groups, avatars and status rings.
+ * Game page styles load in order: layout, play-bar, overview, achievements, friends, cards, activity.
+ */
+
+/*
+ * Friends who play (client/game-page/game-page.js marks the groups, the grid, the avatars
+ * and their status bars by structure, since the class names differ between Steam builds).
+ * Tabs (Recently · n / Previously · n / Wishlist · n) above Steam's groups, one group shown at
+ * a time, Steam's own "Show all" kept; Recently as a list (the card sits in the left column, under
+ * How Long To Beat) with rounded-square avatars and a status ring; a footer with avatar stacks
+ * and "View all friends who play".
+ */
+[data-se-sec="friends"] [data-se-fr] > .nTb1NqsRSnwl0UTOYn_JA,
+[data-se-sec="friends"] [data-se-fr] > .SubsectionHeader {
+  display: none !important;
+}
+
+[data-se-sec="friends"][data-se-fr-tab="recent"] [data-se-fr]:not([data-se-fr="recent"], [data-se-fr="ingame"]),
+[data-se-sec="friends"][data-se-fr-tab="ever"] [data-se-fr]:not([data-se-fr="ever"]),
+[data-se-sec="friends"][data-se-fr-tab="wishlist"] [data-se-fr]:not([data-se-fr="wishlist"]) {
+  display: none !important;
+}
+
+[data-se-sec="friends"] [data-se-fr] {
+  width: 100% !important;
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+}
+
+[data-se-sec="friends"] [data-se-fr="ingame"]:not(#se-none) {
+  margin-bottom: 12px !important;
+}
+
+.se-fr-tabs {
+  display: flex;
+  gap: 2px;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 14px;
+  padding: 2px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+}
+
+.se-fr-tab {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 30px;
+  padding: 0 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: transparent;
+  cursor: pointer;
+  font: 600 var(--se-fs-md) var(--se-font);
+  color: var(--se-text-muted);
+  white-space: nowrap;
+}
+
+.se-fr-tab span {
+  margin-left: 4px;
+  font-weight: 500;
+  color: var(--se-text-faint);
+}
+
+.se-fr-tab:hover {
+  color: var(--se-text);
+}
+
+.se-fr-tab[data-on] {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.se-fr-tab[data-on] span {
+  color: var(--se-text-dim);
+}
+
+/* The grids: Recently / playing now a list of avatar, name and time (more columns if the card
+   is ever wider); the rest rows of avatars */
+[data-se-sec="friends"] [data-se-fr-grid] {
+  box-sizing: border-box;
+  padding: 5px !important;
+}
+
+[data-se-sec="friends"] :is([data-se-fr="recent"], [data-se-fr="ingame"]) [data-se-fr-grid]:not(#se-none) {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  gap: 10px 18px !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+[data-se-sec="friends"] :is([data-se-fr="ever"], [data-se-fr="wishlist"]) [data-se-fr-grid] {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: auto !important;
+}
+
+[data-se-sec="friends"] [data-se-fr-grid] > * {
+  flex: none !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+[data-se-sec="friends"] [data-se-fr-grid] > :not(#se-none) {
+  align-items: center !important;
+  height: auto !important;
+  min-height: 40px;
+  overflow: visible !important;
+}
+
+[data-se-sec="friends"] :is([data-se-fr="recent"], [data-se-fr="ingame"]) [data-se-fr-grid] > * {
+  display: flex !important;
+  gap: 12px !important;
+  padding: 0 !important;
+}
+
+[data-se-sec="friends"] [data-se-fr-grid] > * > :not([data-se-fr-av]) {
+  min-width: 0;
+}
+
+/* Nothing in a friend clips a ring or cuts a line */
+[data-se-sec="friends"] [data-se-fr-grid] > * *:not(img) {
+  overflow: visible !important;
+  line-height: 1.35 !important;
+}
+
+[data-se-sec="friends"] [data-se-fr-grid] > * div:not([data-se-fr-avwrap], [data-se-fr-av]),
+[data-se-sec="friends"] [data-se-fr-grid] > * span:not([data-se-fr-avwrap], [data-se-fr-av]) {
+  text-overflow: clip;
+}
+
+/*
+ * A friend is AvatarAndLabel > Panel > avatarHolder > [avatarStatus | img], then LabelHolder
+ * (28 px tall in Steam, which cut the second line). Native rules win on these, so they carry
+ * an id-level weight (:not(#se-none)).
+ */
+[data-se-sec="friends"] [data-se-fr-grid] :is(.LabelHolder, ._21_CDFn4v_FolhtQzF6WRD):not(#se-none) {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+[data-se-sec="friends"] [data-se-fr-grid] :is(.LabelHolder, ._21_CDFn4v_FolhtQzF6WRD) *:not(#se-none) {
+  overflow: hidden !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 1.3 !important;
+}
+
+/* Steam's group boxes span the card; Steam keeps its own collapse and "Show all …" link */
+[data-se-sec="friends"] [data-se-fr] [data-se-fr-wrap] {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+[data-se-sec="friends"] ._34gmVq6C3FNtdHqDLa3-XR,
+[data-se-sec="friends"] .ShowMore {
+  color: var(--se-accent) !important;
+  font: 600 12.5px var(--se-font) !important;
+  background: none !important;
+}
+
+/* Rounded-square avatars (as in the toasts); Steam's status bar and edges are hidden */
+[data-se-sec="friends"] ._1_sHcxv9rQdANehiviVZR4,
+[data-se-sec="friends"] .AvatarHolder {
+  border-radius: var(--se-avatar-radius) !important;
+}
+
+[data-se-sec="friends"] ._1_sHcxv9rQdANehiviVZR4 img:not([class*="AvatarFrame"]):not(.Uk4DBWxeyo7Tn8SAl8afe),
+[data-se-sec="friends"] .AvatarHolder img:not([class*="AvatarFrame"]):not(.Uk4DBWxeyo7Tn8SAl8afe) {
+  border-radius: var(--se-avatar-radius) !important;
+}
+
+[data-se-sec="friends"] :is(._1_sHcxv9rQdANehiviVZR4, .AvatarHolder) :is(._3pbKzT087jaL2EeQO1qsaR, .AvatarStatus) {
+  display: none !important;
+}
+
+[data-se-sec="friends"] :is(._1_sHcxv9rQdANehiviVZR4, .AvatarHolder):is(._2K3Q_r66P06VLgIPo-DYsv, .InGame) {
+  box-shadow: 0 0 0 2px var(--se-surface), 0 0 0 4px var(--se-running) !important;
+}
+
+[data-se-sec="friends"] :is([data-se-fr-status], .avatarStatus, ._3xUpb5DWXPFNcHHIcv-9pe):not(#se-none) {
+  display: none !important;
+}
+
+[data-se-sec="friends"] [data-se-fr-av] {
+  position: relative;
+  overflow: visible !important;
+  border-radius: var(--se-avatar-radius) !important;
+}
+
+[data-se-sec="friends"] [data-se-fr-av]:not(#se-none) {
+  width: 36px !important;
+  height: 36px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+[data-se-sec="friends"] :is([data-se-fr="recent"], [data-se-fr="ingame"]) [data-se-fr-av] {
+  flex: none !important;
+  margin: 0 !important;
+}
+
+[data-se-sec="friends"] [data-se-fr-av]::before,
+[data-se-sec="friends"] [data-se-fr-av]::after,
+[data-se-sec="friends"] [data-se-fr-avwrap]::before,
+[data-se-sec="friends"] [data-se-fr-avwrap]::after {
+  display: none !important;
+}
+
+[data-se-sec="friends"] [data-se-fr-av] > img {
+  border-radius: var(--se-avatar-radius) !important;
+  object-fit: cover;
+}
+
+[data-se-sec="friends"] [data-se-fr-av] > img[data-se-fr-pic] {
+  position: static !important;
+  margin: 0 !important;
+}
+
+[data-se-sec="friends"] [data-se-fr-avwrap] {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
+  outline: 0 !important;
+}
+
+[data-se-sec="friends"] [data-se-fr-grid] > * > [data-se-fr-avwrap]:not(#se-none) {
+  display: flex !important;
+  flex: none !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px !important;
+  height: 36px !important;
+}
+
+/*
+ * The status ring is drawn on the image itself, 2 px out from it: green in game, blue
+ * online, dashed when away (green or blue), gray offline. Shared with the feed's avatars.
+ */
+:is([data-se-sec="friends"], [data-se-sec="activity"]) img[data-se-fr-pic][data-se-fr-state^="ingame"] {
+  --se-fr-ring: var(--se-running);
+}
+
+:is([data-se-sec="friends"], [data-se-sec="activity"]) img[data-se-fr-pic][data-se-fr-state^="online"] {
+  --se-fr-ring: var(--se-online);
+}
+
+:is([data-se-sec="friends"], [data-se-sec="activity"]) img[data-se-fr-pic][data-se-fr-state="offline"] {
+  --se-fr-ring: var(--se-offline);
+}
+
+:is([data-se-sec="friends"], [data-se-sec="activity"]) img[data-se-fr-pic][data-se-fr-state$="-away"] {
+  --se-fr-ring-style: dashed;
+}
+
+[data-se-sec="friends"] img[data-se-fr-pic] {
+  border: 0 !important;
+  box-shadow: none !important;
+  object-fit: cover !important;
+  outline: 2px var(--se-fr-ring-style, solid) var(--se-fr-ring, rgba(255, 255, 255, .16));
+  outline-offset: 2px;
+}
+
+[data-se-sec="friends"] img[data-se-fr-pic]:not(#se-none) {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: var(--se-avatar-radius) !important;
+  overflow: hidden !important;
+}
+
+/* The ring: color from native state classes on the avatar holder as well */
+[data-se-sec="friends"] .avatarHolder:is(.online, .Online) > img:not(#se-none) {
+  outline: 2px solid var(--se-online);
+  outline-offset: 2px;
+}
+
+[data-se-sec="friends"] .avatarHolder:is(.ingame, .inGame, .InGame) > img:not(#se-none) {
+  outline: 2px solid var(--se-running);
+  outline-offset: 2px;
+}
+
+[data-se-sec="friends"] .avatarHolder:is(.offline, .Offline) > img:not(#se-none) {
+  outline: 2px solid var(--se-offline);
+  outline-offset: 2px;
+}
+
+[data-se-sec="friends"] .avatarHolder.awayOrSnooze > img:not(#se-none) {
+  outline-style: dashed;
+}
+
+/* footer */
+.se-fr-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px 22px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px solid var(--se-hairline);
+}
+
+.se-fr-stack {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: 500 var(--se-fs-md) var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-fr-stack:hover {
+  color: var(--se-text);
+}
+
+.se-fr-faces {
+  display: inline-flex;
+}
+
+.se-fr-faces img {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--se-avatar-radius);
+  object-fit: cover;
+  box-shadow: 0 0 0 2px var(--se-surface);
+  outline: 0 !important;
+}
+
+.se-fr-faces img + img {
+  margin-left: -8px;
+}
+
+.se-fr-all {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: 600 var(--se-fs-md) var(--se-font);
+  color: var(--se-accent);
+}
+
+.se-fr-all:hover {
+  color: var(--se-text-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

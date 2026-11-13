@@ -1,0 +1,19 @@
+/*
+ * Game page lower right column (.rightcol.game_meta_data): hidden, and the left column takes
+ * the page width. What it held is shown elsewhere or dropped by design:
+ *   achievements, Points Shop, age rating, Metacritic, Deck  hero chips (app/hero.js)
+ *   Share / Embed / Report                                    hero buttons (app/hero.js)
+ *   languages                                                 summary strip (app/summary.js)
+ *   title, genre, developer, publisher, release date          hero meta line (app/hero.js)
+ *   links (website, socials, manual, news, hub), awards       not shown
+ * It stays in the DOM: the hero and summary read it, and their buttons click Steam's own.
+ */
+html.se-store-app .page_content > .rightcol.game_meta_data {
+  display: none !important;
+}
+
+html.se-store-app .page_content:has(> .rightcol.game_meta_data) > .leftcol {
+  float: none !important;
+  width: 100% !important;
+  max-width: none !important;
+}

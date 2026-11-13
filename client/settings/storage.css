@@ -1,0 +1,481 @@
+/*
+ * Settings › Storage: the games list, its header, selection bar and sort menus.
+ * Settings styles load in order: layout, controls, pages, storage, search, game-properties, finishing.
+ */
+
+/*
+ * Storage › list header: the first row of the games card — "6 ITEMS" on the
+ * left, "Sort [Size on Disk ⌄]" on the right. AppHeaderContainer > AppHeader holds the
+ * "Items" text, the count, a rule and Steam's sort button (Carat, text, SortIcon).
+ */
+.CFTLX2wIKOK3hNV-fS7_V ._1eB-NaNLJlY_YHNc7PKSoM:not(#se-none) {
+  /* AppHeaderContainer */
+  margin: 22px 0 0 !important;
+  padding: 0 !important;
+  height: auto !important;
+  border-radius: var(--se-radius-lg) var(--se-radius-lg) 0 0 !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 1px 0 var(--se-hairline), inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline), inset 0 -1px 0 var(--se-hairline) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3_uaa39SNrhTAYH7hF9tbE:not(#se-none) {
+  /* AppHeader: "Items" text node + count + rule + sort */
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  height: 50px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 10px 0 18px !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase !important;
+  color: var(--se-label-color) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3X3BBs3tVxzpy2wDfRoHwC:not(#se-none) {
+  /* Count, shown first: "6 ITEMS" */
+  order: -1;
+  margin: 0 !important;
+  padding: 0 !important;
+  font: inherit !important;
+  letter-spacing: inherit !important;
+  color: inherit !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3_uaa39SNrhTAYH7hF9tbE ._2iZ4o1LliFQ93guDcyj81Q:not(#se-none) {
+  flex: 1 1 auto !important;
+  height: 0 !important;
+  margin: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  visibility: hidden;
+}
+
+/* Rule → spacer */
+.CFTLX2wIKOK3hNV-fS7_V ._3_uaa39SNrhTAYH7hF9tbE ._1tBzypb5E2AwNuBuVns9Hl {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+/* SortingDropDown */
+.CFTLX2wIKOK3hNV-fS7_V ._3_uaa39SNrhTAYH7hF9tbE ._1tBzypb5E2AwNuBuVns9Hl[data-se-sortlabel]::before {
+  content: attr(data-se-sortlabel);
+  font: 600 12.5px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2ddeJfhiG4hmAfqvi1FL6X:not(#se-none):not(#se-sort) {
+  /* The sort button → compact dropdown */
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  height: var(--se-control-h-sm) !important;
+  min-height: 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 10px 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: none !important;
+  font: 600 12.5px var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text) !important;
+  text-shadow: none !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2ddeJfhiG4hmAfqvi1FL6X:not(#se-none):not(#se-sort):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2ddeJfhiG4hmAfqvi1FL6X > svg:first-child {
+  order: 2;
+  width: 12px !important;
+  height: 12px !important;
+  margin: 0 !important;
+  color: var(--se-text-muted) !important;
+  fill: currentColor;
+}
+
+/* Carat after the text */
+.CFTLX2wIKOK3hNV-fS7_V ._2ddeJfhiG4hmAfqvi1FL6X .jewgwEvvtdAvjtgVEX2Mh {
+  display: none !important;
+}
+
+/* Decorative sort icon */
+.CFTLX2wIKOK3hNV-fS7_V ._2ddeJfhiG4hmAfqvi1FL6X div,
+.CFTLX2wIKOK3hNV-fS7_V ._2ddeJfhiG4hmAfqvi1FL6X span {
+  font: inherit !important;
+  color: inherit !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._299aNmx77BOVzXgzOho1sG {
+  /* LibraryInventory: rows form one card */
+  overflow: hidden;
+  background: none !important;
+}
+
+/*
+ * Rows are virtualized: each sits in a fixed-height slot inside one tall list box.
+ * The slots carry the surface (no gaps), the list box carries the rounded corners.
+ */
+.CFTLX2wIKOK3hNV-fS7_V ._299aNmx77BOVzXgzOho1sG :has(> ._2RCSUgg2X_uF_C0e1lrcqc) {
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 -1px 0 var(--se-hairline);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._299aNmx77BOVzXgzOho1sG :has(> * > ._2RCSUgg2X_uF_C0e1lrcqc) {
+  border-radius: 0 0 var(--se-radius-lg) var(--se-radius-lg) !important;
+  overflow: hidden !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._299aNmx77BOVzXgzOho1sG {
+  margin-top: 0 !important;
+  border-radius: 0 0 var(--se-radius-lg) var(--se-radius-lg) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2RCSUgg2X_uF_C0e1lrcqc {
+  /* AppBody: the surface also fills the gap Steam leaves under each row */
+  margin: 0 !important;
+  padding: 0 18px !important;
+  box-sizing: border-box;
+  border-radius: 0 !important;
+  background: var(--se-surface) !important;
+  box-shadow: 0 14px 0 0 var(--se-surface) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2RCSUgg2X_uF_C0e1lrcqc:hover {
+  background: var(--se-hover) !important;
+}
+
+/*
+ * Storage › selection bar: a tinted bar under the list — "1 selected 176.68 MB"
+ * on the left, Uninstall and Move (primary) on the right; hidden while nothing is selected.
+ * AppActionBar > [div > AppActionSelected], AppActionBarButtons > ActionButton ×2.
+ */
+.CFTLX2wIKOK3hNV-fS7_V ._35T-OYn63jW6GmmpnEm8-b:not(#se-none) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  height: 54px !important;
+  box-sizing: border-box !important;
+  margin: 12px 0 0 !important;
+  padding: 0 10px 0 18px !important;
+  bottom: 12px !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: color-mix(in srgb, var(--se-accent) 8%, var(--se-bg)) !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent-line), 0 10px 24px -8px rgba(0, 0, 0, .7) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._35T-OYn63jW6GmmpnEm8-b:not(:has(._1dFOkDnInbUQgf2eUbF2G9)) {
+  display: none !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1dFOkDnInbUQgf2eUbF2G9:not(#se-none) {
+  /* "SELECTED 1 APP ( 176.68 MB )" */
+  margin: 0 !important;
+  font: 700 13.5px var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-accent) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1dFOkDnInbUQgf2eUbF2G9[data-se-count]:not(#se-none) {
+  font-size: 0 !important;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1dFOkDnInbUQgf2eUbF2G9[data-se-count]::before {
+  content: attr(data-se-count);
+  font: 700 13.5px var(--se-font);
+  color: var(--se-accent);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1dFOkDnInbUQgf2eUbF2G9[data-se-count]::after {
+  content: attr(data-se-size);
+  font: 500 13px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1ku9Muh0bHhu-FFjExoVL3 {
+  display: flex !important;
+  gap: 8px !important;
+  margin: 0 !important;
+}
+
+/* Uninstall / Move */
+.CFTLX2wIKOK3hNV-fS7_V ._1ku9Muh0bHhu-FFjExoVL3 button.O_nD7TklmaIZ80TPx3rjt:not(#se-none):not(#se-ab) {
+  min-width: 0 !important;
+  height: 34px !important;
+  padding: 0 14px !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) !important;
+  color: var(--se-text) !important;
+  font: 600 13px var(--se-font) !important;
+  text-shadow: none !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1ku9Muh0bHhu-FFjExoVL3 button.O_nD7TklmaIZ80TPx3rjt:not(#se-none):not(#se-ab):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1ku9Muh0bHhu-FFjExoVL3 button.O_nD7TklmaIZ80TPx3rjt:last-child._19KE2KdEXIYl3OB0p1Y59k:not(#se-none):not(#se-ab) {
+  background: var(--se-accent) !important;
+  color: var(--se-bg-ink) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1ku9Muh0bHhu-FFjExoVL3 button.O_nD7TklmaIZ80TPx3rjt:first-child._19KE2KdEXIYl3OB0p1Y59k:not(#se-none):not(#se-ab) {
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent) !important;
+  color: var(--se-danger-text) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1ku9Muh0bHhu-FFjExoVL3 button.O_nD7TklmaIZ80TPx3rjt:first-child._19KE2KdEXIYl3OB0p1Y59k:not(#se-none):not(#se-ab):hover {
+  background: color-mix(in srgb, var(--se-danger) 24%, transparent) !important;
+  color: var(--se-danger-text) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1ku9Muh0bHhu-FFjExoVL3 button.O_nD7TklmaIZ80TPx3rjt:last-child._19KE2KdEXIYl3OB0p1Y59k:not(#se-none):not(#se-ab):hover {
+  filter: brightness(1.08);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1ku9Muh0bHhu-FFjExoVL3 button.O_nD7TklmaIZ80TPx3rjt:disabled:not(#se-none):not(#se-ab) {
+  opacity: .45 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2n6FNLKyb6al_YPk13xS7S .DialogDropDown_CurrentDisplay,
+.CFTLX2wIKOK3hNV-fS7_V ._2n6FNLKyb6al_YPk13xS7S ._3OHR1e3u08hK7hMx4fFy_L {
+  font: 600 12.5px var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2RCSUgg2X_uF_C0e1lrcqc._2qURXDJ4ZtfSVOesDk7A73 {
+  background: var(--se-hover) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1O1Jq87hokErcc093uvh6L {
+  border-radius: var(--se-radius-sm) !important;
+  overflow: hidden;
+}
+
+/* portrait */
+.CFTLX2wIKOK3hNV-fS7_V .YxhO6W2VNKG69k4WqIrip {
+  font: 600 14px var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+/* AppName */
+.CFTLX2wIKOK3hNV-fS7_V ._g4ceYb5tVuSmXg0aNEdR,
+.CFTLX2wIKOK3hNV-fS7_V ._1L9a0QuKYIDA8pw0ztz0tr {
+  font: 500 12px var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .mohK9opGjpCsWNdUuJuFE {
+  font: 700 13px var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+/* AppSize */
+/* Remote Play / Controller sub-tables */
+.CFTLX2wIKOK3hNV-fS7_V ._1HL6KuwUJaZQ7x2rmAxxSz {
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase !important;
+  color: var(--se-label-color) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .Nn_lQL1PkHr06VTQhWnRD {
+  font: 500 12.5px var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+/* Icons (generated: duotone, as masks) */
+:root {
+  --se-ic-mail: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223%22 y=%225%22 width=%2218%22 height=%2214%22 rx=%222.5%22/%3E%3C/g%3E%3Crect x=%223%22 y=%225%22 width=%2218%22 height=%2214%22 rx=%222.5%22/%3E%3Cpath d=%22M4 7l8 6 8-6%22/%3E%3C/svg%3E");
+  --se-ic-account: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223%22 y=%225%22 width=%2218%22 height=%2214%22 rx=%222.5%22/%3E%3C/g%3E%3Crect x=%223%22 y=%225%22 width=%2218%22 height=%2214%22 rx=%222.5%22/%3E%3Ccircle cx=%229%22 cy=%2211%22 r=%222.2%22/%3E%3Cpath d=%22M5.8 16.2c.6-1.6 1.8-2.4 3.2-2.4s2.6.8 3.2 2.4M14.5 10h4M14.5 13.5h3%22/%3E%3C/svg%3E");
+  --se-ic-friendsic: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%229%22 cy=%228.5%22 r=%223.5%22/%3E%3C/g%3E%3Ccircle cx=%229%22 cy=%228.5%22 r=%223.5%22/%3E%3Cpath d=%22M2.5 19.5c.9-3.3 3.4-5 6.5-5s5.6 1.7 6.5 5%22/%3E%3Ccircle cx=%2217%22 cy=%229%22 r=%222.7%22/%3E%3Cpath d=%22M17 14.3c2.3.1 3.9 1.7 4.6 4.7%22/%3E%3C/svg%3E");
+  --se-ic-family: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%222%22/%3E%3C/g%3E%3Ccircle cx=%227.5%22 cy=%228%22 r=%222.5%22/%3E%3Ccircle cx=%2216.5%22 cy=%228%22 r=%222.5%22/%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%222%22/%3E%3Cpath d=%22M3 18c.6-2.6 2.3-4 4.5-4M21 18c-.6-2.6-2.3-4-4.5-4M8.5 20c.5-1.8 1.8-2.8 3.5-2.8s3 1 3.5 2.8%22/%3E%3C/svg%3E");
+  --se-ic-security: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z%22/%3E%3C/g%3E%3Cpath d=%22M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z%22/%3E%3Cpath d=%22M9 12l2 2 4-4%22/%3E%3C/svg%3E");
+  --se-ic-notify: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z%22/%3E%3C/g%3E%3Cpath d=%22M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z%22/%3E%3Cpath d=%22M10 20.5a2 2 0 0 0 4 0%22/%3E%3C/svg%3E");
+  --se-ic-interface: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223%22 y=%224%22 width=%2218%22 height=%2213%22 rx=%222.5%22/%3E%3C/g%3E%3Crect x=%223%22 y=%224%22 width=%2218%22 height=%2213%22 rx=%222.5%22/%3E%3Cpath d=%22M9 20.5h6M12 17v3.5%22/%3E%3C/svg%3E");
+  --se-ic-storeic: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8z%22/%3E%3C/g%3E%3Cpath d=%22M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8z%22/%3E%3Cpath d=%22M9 10V7a3 3 0 0 1 6 0v3%22/%3E%3C/svg%3E");
+  --se-ic-libic: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223.5%22 y=%224%22 width=%224.5%22 height=%2216%22 rx=%221%22/%3E%3Crect x=%2210%22 y=%224%22 width=%224.5%22 height=%2216%22 rx=%221%22/%3E%3C/g%3E%3Crect x=%223.5%22 y=%224%22 width=%224.5%22 height=%2216%22 rx=%221%22/%3E%3Crect x=%2210%22 y=%224%22 width=%224.5%22 height=%2216%22 rx=%221%22/%3E%3Cpath d=%22M16.6 5.4l3.1-.8 3 14.2-3.1.8z%22/%3E%3C/svg%3E");
+  --se-ic-dl: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M4 15.5v2.5A2 2 0 0 0 6 20h12a2 2 0 0 0 2-2v-2.5z%22/%3E%3C/g%3E%3Cpath d=%22M12 3.5v11m-4.5-4.5L12 14.5 16.5 10%22/%3E%3Cpath d=%22M4 15.5v2.5A2 2 0 0 0 6 20h12a2 2 0 0 0 2-2v-2.5%22/%3E%3C/svg%3E");
+  --se-ic-storage: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223%22 y=%2213%22 width=%2218%22 height=%227%22 rx=%222%22/%3E%3C/g%3E%3Crect x=%223%22 y=%2213%22 width=%2218%22 height=%227%22 rx=%222%22/%3E%3Cpath d=%22M5 13l2.2-7.2A1.5 1.5 0 0 1 8.6 4.8h6.8a1.5 1.5 0 0 1 1.4 1l2.2 7.2%22/%3E%3Cpath d=%22M16.5 16.5h.01%22/%3E%3C/svg%3E");
+  --se-ic-cloud: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M7 18.5a4.5 4.5 0 0 1-.6-9 6 6 0 0 1 11.5 1.6 3.8 3.8 0 0 1-.4 7.4z%22/%3E%3C/g%3E%3Cpath d=%22M7 18.5a4.5 4.5 0 0 1-.6-9 6 6 0 0 1 11.5 1.6 3.8 3.8 0 0 1-.4 7.4z%22/%3E%3C/svg%3E");
+  --se-ic-ingame: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%2211%22 y=%229%22 width=%227%22 height=%225%22 rx=%221.2%22/%3E%3C/g%3E%3Crect x=%223%22 y=%224%22 width=%2218%22 height=%2213%22 rx=%222.5%22/%3E%3Cpath d=%22M7 21h10%22/%3E%3Crect x=%2211%22 y=%229%22 width=%227%22 height=%225%22 rx=%221.2%22/%3E%3C/svg%3E");
+  --se-ic-access: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%229%22/%3E%3C/g%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%229%22/%3E%3Ccircle cx=%2212%22 cy=%227.6%22 r=%221.3%22/%3E%3Cpath d=%22M7.5 10h9M12 10v4l-2.5 4M12 14l2.5 4%22/%3E%3C/svg%3E");
+  --se-ic-controller: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M7.2 7.5h9.6a4 4 0 0 1 3.9 3.2l1 4.8a2.4 2.4 0 0 1-4.2 2L15.4 15H8.6l-2.1 2.5a2.4 2.4 0 0 1-4.2-2l1-4.8a4 4 0 0 1 3.9-3.2z%22/%3E%3C/g%3E%3Cpath d=%22M7.2 7.5h9.6a4 4 0 0 1 3.9 3.2l1 4.8a2.4 2.4 0 0 1-4.2 2L15.4 15H8.6l-2.1 2.5a2.4 2.4 0 0 1-4.2-2l1-4.8a4 4 0 0 1 3.9-3.2z%22/%3E%3Cpath d=%22M7.5 10.2v3M6 11.7h3%22/%3E%3Cpath d=%22M15.6 11.2h.01M17.6 12.6h.01%22/%3E%3C/svg%3E");
+  --se-ic-rec: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%229%22 cy=%2212%22 r=%222.5%22/%3E%3C/g%3E%3Crect x=%223%22 y=%225%22 width=%2218%22 height=%2214%22 rx=%223%22/%3E%3Ccircle cx=%229%22 cy=%2212%22 r=%222.5%22/%3E%3Cpath d=%22M14 10.5h4M14 13.5h3%22/%3E%3C/svg%3E");
+  --se-ic-voice: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%229%22 y=%223%22 width=%226%22 height=%2211%22 rx=%223%22/%3E%3C/g%3E%3Crect x=%229%22 y=%223%22 width=%226%22 height=%2211%22 rx=%223%22/%3E%3Cpath d=%22M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21%22/%3E%3C/svg%3E");
+  --se-ic-remote: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223%22 y=%224%22 width=%2218%22 height=%2212%22 rx=%222.5%22/%3E%3C/g%3E%3Crect x=%223%22 y=%224%22 width=%2218%22 height=%2212%22 rx=%222.5%22/%3E%3Cpath d=%22M3 19.5a3 3 0 0 1 3 0M3 16.5a6 6 0 0 1 6 3%22/%3E%3C/svg%3E");
+  --se-ic-broadcast: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%222.2%22/%3E%3C/g%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%222.2%22/%3E%3Cpath d=%22M8.2 8.2a5.4 5.4 0 0 0 0 7.6M15.8 8.2a5.4 5.4 0 0 1 0 7.6M5.4 5.4a9.3 9.3 0 0 0 0 13.2M18.6 5.4a9.3 9.3 0 0 1 0 13.2%22/%3E%3C/svg%3E");
+  --se-ic-music: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%227.5%22 cy=%2217.5%22 r=%222.5%22/%3E%3C/g%3E%3Ccircle cx=%227.5%22 cy=%2217.5%22 r=%222.5%22/%3E%3Ccircle cx=%2217.5%22 cy=%2215.5%22 r=%222.5%22/%3E%3Cpath d=%22M10 17.5V6l10-2v11.5%22/%3E%3C/svg%3E");
+  --se-ic-check: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%229%22/%3E%3C/g%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%229%22/%3E%3Cpath d=%22M8 12.2l2.6 2.6L16 9.4%22/%3E%3C/svg%3E");
+  --se-ic-add: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223.5%22 y=%223.5%22 width=%2217%22 height=%2217%22 rx=%224.5%22/%3E%3C/g%3E%3Crect x=%223.5%22 y=%223.5%22 width=%2217%22 height=%2217%22 rx=%224.5%22/%3E%3Cpath d=%22M12 8v8M8 12h8%22/%3E%3C/svg%3E");
+  --se-ic-family-accent: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%237cc4ff%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%237cc4ff%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%222%22/%3E%3C/g%3E%3Ccircle cx=%227.5%22 cy=%228%22 r=%222.5%22/%3E%3Ccircle cx=%2216.5%22 cy=%228%22 r=%222.5%22/%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%222%22/%3E%3Cpath d=%22M3 18c.6-2.6 2.3-4 4.5-4M21 18c-.6-2.6-2.3-4-4.5-4M8.5 20c.5-1.8 1.8-2.8 3.5-2.8s3 1 3.5 2.8%22/%3E%3C/svg%3E");
+}
+
+[data-se-icon="account"],
+[data-se-row="account"] {
+  --se-ic: var(--se-ic-account);
+}
+
+[data-se-icon="friendsic"],
+[data-se-row="friendsic"] {
+  --se-ic: var(--se-ic-friendsic);
+}
+
+[data-se-icon="family"],
+[data-se-row="family"] {
+  --se-ic: var(--se-ic-family);
+}
+
+[data-se-icon="security"],
+[data-se-row="security"] {
+  --se-ic: var(--se-ic-security);
+}
+
+[data-se-icon="notify"],
+[data-se-row="notify"] {
+  --se-ic: var(--se-ic-notify);
+}
+
+[data-se-icon="interface"],
+[data-se-row="interface"] {
+  --se-ic: var(--se-ic-interface);
+}
+
+[data-se-icon="storeic"],
+[data-se-row="storeic"] {
+  --se-ic: var(--se-ic-storeic);
+}
+
+[data-se-icon="libic"],
+[data-se-row="libic"] {
+  --se-ic: var(--se-ic-libic);
+}
+
+[data-se-icon="dl"],
+[data-se-row="dl"] {
+  --se-ic: var(--se-ic-dl);
+}
+
+[data-se-icon="storage"],
+[data-se-row="storage"] {
+  --se-ic: var(--se-ic-storage);
+}
+
+[data-se-icon="cloud"],
+[data-se-row="cloud"] {
+  --se-ic: var(--se-ic-cloud);
+}
+
+[data-se-icon="ingame"],
+[data-se-row="ingame"] {
+  --se-ic: var(--se-ic-ingame);
+}
+
+[data-se-icon="access"],
+[data-se-row="access"] {
+  --se-ic: var(--se-ic-access);
+}
+
+[data-se-icon="controller"],
+[data-se-row="controller"] {
+  --se-ic: var(--se-ic-controller);
+}
+
+[data-se-icon="rec"],
+[data-se-row="rec"] {
+  --se-ic: var(--se-ic-rec);
+}
+
+[data-se-icon="voice"],
+[data-se-row="voice"] {
+  --se-ic: var(--se-ic-voice);
+}
+
+[data-se-icon="remote"],
+[data-se-row="remote"] {
+  --se-ic: var(--se-ic-remote);
+}
+
+[data-se-icon="broadcast"],
+[data-se-row="broadcast"] {
+  --se-ic: var(--se-ic-broadcast);
+}
+
+[data-se-icon="music"],
+[data-se-row="music"] {
+  --se-ic: var(--se-ic-music);
+}
+
+[data-se-icon="check"],
+[data-se-row="check"] {
+  --se-ic: var(--se-ic-check);
+}
+
+[data-se-icon="add"],
+[data-se-row="add"] {
+  --se-ic: var(--se-ic-add);
+}
+
+[data-se-row="mail"] {
+  --se-ic: var(--se-ic-mail);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V button.DialogButton[data-se-tile="add"] {
+  --se-tile-ic: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2242%22 height=%2242%22 viewBox=%220 0 42 42%22%3E%3Crect width=%2242%22 height=%2242%22 rx=%2211%22 fill=%22%237cc4ff%22 fill-opacity=%22.12%22/%3E%3Cg transform=%22translate%2810.5 10.5%29 scale%28.875%29%22 fill=%22none%22 stroke=%22%237cc4ff%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%237cc4ff%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223.5%22 y=%223.5%22 width=%2217%22 height=%2217%22 rx=%224.5%22/%3E%3C/g%3E%3Crect x=%223.5%22 y=%223.5%22 width=%2217%22 height=%2217%22 rx=%224.5%22/%3E%3Cpath d=%22M12 8v8M8 12h8%22/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.CFTLX2wIKOK3hNV-fS7_V button.DialogButton[data-se-tile="tag"] {
+  --se-tile-ic: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2242%22 height=%2242%22 viewBox=%220 0 42 42%22%3E%3Crect width=%2242%22 height=%2242%22 rx=%2211%22 fill=%22%237cc4ff%22 fill-opacity=%22.12%22/%3E%3Cg transform=%22translate%2810.5 10.5%29 scale%28.875%29%22 fill=%22none%22 stroke=%22%237cc4ff%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%237cc4ff%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1.5 1.5 0 0 1 0 2.1l-6.6 6.6a1.5 1.5 0 0 1-2.1 0z%22/%3E%3C/g%3E%3Cpath d=%22M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1.5 1.5 0 0 1 0 2.1l-6.6 6.6a1.5 1.5 0 0 1-2.1 0z%22/%3E%3Ccircle cx=%228%22 cy=%228%22 r=%221.5%22/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.CFTLX2wIKOK3hNV-fS7_V button.DialogButton[data-se-tile="storeic"] {
+  --se-tile-ic: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2242%22 height=%2242%22 viewBox=%220 0 42 42%22%3E%3Crect width=%2242%22 height=%2242%22 rx=%2211%22 fill=%22%237cc4ff%22 fill-opacity=%22.12%22/%3E%3Cg transform=%22translate%2810.5 10.5%29 scale%28.875%29%22 fill=%22none%22 stroke=%22%237cc4ff%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%237cc4ff%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8z%22/%3E%3C/g%3E%3Cpath d=%22M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8z%22/%3E%3Cpath d=%22M9 10V7a3 3 0 0 1 6 0v3%22/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/*
+ * Short sort menus (Storage's three choices, which open in their own popup): as wide as
+ * their button — the library's 220px minimum pushed them past the popup's edge.
+ */
+html[data-se-settings] ._1ZpBQtDqcKBbfIIv01Vs1R:not(#se-none),
+html:is([data-se-props], [data-se-mill]) ._1ZpBQtDqcKBbfIIv01Vs1R:not(:has(._1ZtpSq62fy_8W-_0pMn5cu:nth-child(4))):not(#se-none) {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  transform: translateY(4px) !important;
+}
+
+/* Settings / Properties: no visible scrollbars; wheel, keys and dragging still scroll. */
+._2sssIwe0duyIrFvat2oXzH,
+._2sssIwe0duyIrFvat2oXzH * {
+  scrollbar-width: none !important;
+}
+
+._2sssIwe0duyIrFvat2oXzH::-webkit-scrollbar,
+._2sssIwe0duyIrFvat2oXzH *::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+}

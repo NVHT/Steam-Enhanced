@@ -1,0 +1,807 @@
+/*
+ * Game page › cards: My review, Notes, the left-column cards (DLC, add-ons, trading cards,
+ * screenshots, Workshop) and Activity's post box.
+ * Game page styles load in order: layout, play-bar, overview, achievements, friends, cards, activity.
+ */
+
+/*
+ * My review, Controller and Notes share the cards' style: the heading with
+ * its link on the right ("View all my reviews", "View controller settings", "New
+ * Note"); Steam's buttons for these are hidden and clicked by the link. The review
+ * button and the controller text take the theme's sizes.
+ */
+[data-se-sec="review"] :is(.DialogButton, button):not(.se-ach-view):not([data-se-replaced]):not(#se-none) {
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 12px 0 0 !important;
+  padding: 10px 14px !important;
+  box-sizing: border-box;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: none !important;
+  font: 600 13px/1.35 var(--se-font) !important;
+  text-align: left !important;
+  color: var(--se-text) !important;
+}
+
+[data-se-sec="review"] :is(.DialogButton, button):not(.se-ach-view):not([data-se-replaced]):not(#se-none):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+/*
+ * My review (module 83779): the verdict as a tile row like the theme's lists, the review text
+ * in the body color, Likes / Comments as quiet stats and the reactions as wrapping chips.
+ * ReviewMetadata ._2ID9U4dgdadY74FJ3YHhbB (also Steam's section Highlight ._38t1mljBjmJfqjpVzMT1CG),
+ * ReviewIcon ._1izIEyRuLgphVa7NKAGtIb, thumbs-down box .H3AIY0blJD66-WY00q3AI, ReviewDescription
+ * ._2xqsVJC_WssHXEpRf5Ocxj, PlayedForTime .BDa6lbTAdR4RwtqgRNUnO, ReviewText ._3k8QEeaHvwc2EQBC7nteqS,
+ * CommentsGroup ._2Z3ghRCL5qh2cqXrrd9l8Z, CommentsContainer ._17u7kJzj4gno8unUOzRaz-, reminder box
+ * ._1ckgRqBDUbThcwQTHHL6K0; reactions (awardicon chunk) IconList ._2cI0LExX5UtjoTq7F6CTwY,
+ * IconContainer ._6f_B5nDywKxTeX2mN82H, ReactionCount ._18GX_0BWySenzVNaYO4IsZ.
+ */
+[data-se-sec="review"] ._2ID9U4dgdadY74FJ3YHhbB:not(#se-none) {
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: none;
+  color: var(--se-text);
+  transition: background-color var(--se-dur) ease-out;
+}
+
+[data-se-sec="review"] ._2ID9U4dgdadY74FJ3YHhbB:hover:not(#se-none) {
+  background: var(--se-hover);
+}
+
+[data-se-sec="review"] ._2ID9U4dgdadY74FJ3YHhbB ._1izIEyRuLgphVa7NKAGtIb:not(#se-none) {
+  flex: none;
+  box-sizing: border-box;
+  width: var(--se-tile);
+  height: var(--se-tile);
+  margin: 0;
+  padding: 10px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-accent-tint);
+  fill: var(--se-accent);
+}
+
+[data-se-sec="review"] ._2ID9U4dgdadY74FJ3YHhbB .H3AIY0blJD66-WY00q3AI:not(#se-none) {
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent);
+}
+
+[data-se-sec="review"] ._2ID9U4dgdadY74FJ3YHhbB .H3AIY0blJD66-WY00q3AI svg:not(#se-none) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: var(--se-danger);
+}
+
+[data-se-sec="review"] ._2xqsVJC_WssHXEpRf5Ocxj:not(#se-none) {
+  min-width: 0;
+  gap: 2px;
+}
+
+[data-se-sec="review"] ._2xqsVJC_WssHXEpRf5Ocxj > :first-child:not(#se-none) {
+  font: 700 14px/20px var(--se-font);
+  color: var(--se-text-strong);
+}
+
+[data-se-sec="review"] .BDa6lbTAdR4RwtqgRNUnO:not(#se-none) {
+  padding: 0;
+  font: 500 12.5px/18px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+[data-se-sec="review"] ._3k8QEeaHvwc2EQBC7nteqS:not(#se-none) {
+  font: 500 13.5px/1.5 var(--se-font);
+  color: var(--se-text-dim);
+}
+
+/* Likes · Comments: one row of small stats, brighter on hover (they open the review page) */
+[data-se-sec="review"] ._2Z3ghRCL5qh2cqXrrd9l8Z:not(#se-none) {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: 12px 0 0;
+}
+
+[data-se-sec="review"] ._17u7kJzj4gno8unUOzRaz-:not(#se-none) {
+  gap: 6px;
+  font: 500 13px/18px var(--se-font);
+}
+
+[data-se-sec="review"] ._17u7kJzj4gno8unUOzRaz- :is(._2cFKqVak8vsZdvk9mKdum_, .szq-QUt-0soxUfoD65BC7):not(#se-none) {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  fill: var(--se-text-faint);
+}
+
+[data-se-sec="review"] ._17u7kJzj4gno8unUOzRaz- ._2EyEa4GxazAthx5c83AUGO:not(#se-none) {
+  color: var(--se-text-muted);
+}
+
+[data-se-sec="review"] ._17u7kJzj4gno8unUOzRaz- ._2FYBwhP98BAjYNtW0mlkR7:not(#se-none) {
+  margin: 0;
+  font-weight: 700;
+  color: var(--se-text);
+}
+
+[data-se-sec="review"] ._17u7kJzj4gno8unUOzRaz-:hover :is(._2EyEa4GxazAthx5c83AUGO, ._2FYBwhP98BAjYNtW0mlkR7):not(#se-none) {
+  color: var(--se-text-strong);
+}
+
+[data-se-sec="review"] ._17u7kJzj4gno8unUOzRaz-:hover :is(._2cFKqVak8vsZdvk9mKdum_, .szq-QUt-0soxUfoD65BC7):not(#se-none) {
+  fill: var(--se-text-strong);
+}
+
+/* Reactions: chips that wrap instead of running off the card */
+[data-se-sec="review"] ._2cI0LExX5UtjoTq7F6CTwY:not(#se-none) {
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 12px;
+}
+
+[data-se-sec="review"] ._6f_B5nDywKxTeX2mN82H:not(#se-none) {
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 4px 9px 4px 6px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface-2);
+}
+
+[data-se-sec="review"] ._6f_B5nDywKxTeX2mN82H:hover:not(#se-none) {
+  background: var(--se-hover);
+}
+
+[data-se-sec="review"] ._18GX_0BWySenzVNaYO4IsZ:not(#se-none) {
+  padding: 0;
+  font: 700 12.5px/18px var(--se-font);
+  color: var(--se-text-dim);
+}
+
+/* "You've played N more hours" reminder: an accent-tinted note, not a blue outline */
+[data-se-sec="review"] ._1ckgRqBDUbThcwQTHHL6K0:not(#se-none) {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  font: 500 13px/1.45 var(--se-font);
+  color: var(--se-text);
+}
+
+/*
+ * Notes (module 82332): each note a row with a note icon, like the theme's lists; "Untitled"
+ * muted, "View all" as the accent link. NoteLink ._2L6IIbLCMWUJcOhliUVqKb, Untitled
+ * .AvA0nDJdAGTxkLQxguvnv, ViewAllLink ._2AEMZFc1Ww_IHff0xyfNc8.
+ */
+[data-se-sec="notes"] ._2L6IIbLCMWUJcOhliUVqKb:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin: 0 -8px;
+  padding: 7px 8px;
+  border-radius: var(--se-radius-sm);
+  font: 600 13.5px/20px var(--se-font);
+  color: var(--se-text);
+  transition: background-color var(--se-dur) ease-out;
+}
+
+[data-se-sec="notes"] ._2L6IIbLCMWUJcOhliUVqKb:not(._2AEMZFc1Ww_IHff0xyfNc8)::before {
+  content: '';
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background: var(--se-text-faint);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M6 3.5h8.5l4 4V19a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 19V5A1.5 1.5 0 0 1 6 3.5z'/%3E%3C/g%3E%3Cpath d='M6 3.5h8.5l4 4V19a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 19V5A1.5 1.5 0 0 1 6 3.5z'/%3E%3Cpath d='M14.5 3.5v4h4M8.5 12.5h7M8.5 16h5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+[data-se-sec="notes"] ._2L6IIbLCMWUJcOhliUVqKb:hover:not(#se-none) {
+  background: var(--se-surface-2);
+  color: var(--se-text-strong);
+  text-decoration: none;
+}
+
+[data-se-sec="notes"] ._2L6IIbLCMWUJcOhliUVqKb:hover::before {
+  background: var(--se-accent);
+}
+
+[data-se-sec="notes"] ._2L6IIbLCMWUJcOhliUVqKb.AvA0nDJdAGTxkLQxguvnv:not(#se-none) {
+  font-style: normal;
+  color: var(--se-text-muted);
+}
+
+[data-se-sec="notes"] ._2L6IIbLCMWUJcOhliUVqKb._2AEMZFc1Ww_IHff0xyfNc8:not(#se-none) {
+  width: fit-content;
+  margin: 8px 0 0;
+  padding: 0;
+  font: 600 13px/18px var(--se-font);
+  color: var(--se-accent);
+}
+
+[data-se-sec="notes"] ._2L6IIbLCMWUJcOhliUVqKb._2AEMZFc1Ww_IHff0xyfNc8:hover:not(#se-none) {
+  background: none;
+  color: var(--se-text-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+[data-se-sec="controller"] .bG5F-o9ZUikaoNCIniMEa:not(#se-none) {
+  font-family: var(--se-font) !important;
+}
+
+[data-se-sec="controller"] .bG5F-o9ZUikaoNCIniMEa div:not(#se-none),
+[data-se-sec="controller"] .bG5F-o9ZUikaoNCIniMEa span:not(#se-none) {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+[data-se-sec="controller"] .bG5F-o9ZUikaoNCIniMEa svg:not(#se-none) {
+  width: 44px !important;
+  height: 44px !important;
+  flex: none;
+}
+
+/*
+ * The left-column cards (DLC, add-ons, trading cards, screenshots, Workshop):
+ * the heading carries the main link; images in a small grid; other buttons with
+ * text full width in the theme's style.
+ */
+[data-se-sec]:is([data-se-sec="dlc"], [data-se-sec="additionalcontent"], [data-se-sec="cards"], [data-se-sec="screenshots"], [data-se-sec="workshop"]) {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+[data-se-cgrid]:not(#se-none) {
+  display: grid !important;
+  gap: 8px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  flex-wrap: initial;
+}
+
+[data-se-sec="dlc"] [data-se-cgrid]:not(#se-none),
+[data-se-sec="screenshots"] [data-se-cgrid]:not(#se-none) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+[data-se-sec="cards"] [data-se-cgrid]:not(#se-none) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+[data-se-cgrid] > *:not(#se-none) {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  flex: none !important;
+}
+
+[data-se-cgrid] img:not(#se-none) {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+[data-se-cgrid] > * img:only-of-type:not(#se-none) {
+  width: 100% !important;
+}
+
+[data-se-sec="workshop"] div:not(#se-none),
+[data-se-sec="workshop"] span:not(#se-none) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+[data-se-sec="dlc"] [data-se-textbtn]:not([data-se-replaced]):not(#se-none),
+[data-se-sec="cards"] [data-se-textbtn]:not([data-se-replaced]):not(#se-none),
+[data-se-sec="screenshots"] [data-se-textbtn]:not([data-se-replaced]):not(#se-none),
+[data-se-sec="workshop"] [data-se-textbtn]:not([data-se-replaced]):not(#se-none) {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 10px 0 0 !important;
+  padding: 9px 14px !important;
+  box-sizing: border-box;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: none !important;
+  font: 600 13px/1.35 var(--se-font) !important;
+  text-align: center !important;
+  color: var(--se-text) !important;
+}
+
+[data-se-sec="dlc"] [data-se-textbtn]:not([data-se-replaced]):not(#se-none):hover,
+[data-se-sec="cards"] [data-se-textbtn]:not([data-se-replaced]):not(#se-none):hover,
+[data-se-sec="screenshots"] [data-se-textbtn]:not([data-se-replaced]):not(#se-none):hover,
+[data-se-sec="workshop"] [data-se-textbtn]:not([data-se-replaced]):not(#se-none):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+[data-se-sec="dlc"] [data-se-cgrid] img:not(#se-none) {
+  width: 100% !important;
+  aspect-ratio: 460 / 215;
+  object-fit: cover;
+}
+
+/* Community content hidden; every DLC shown (the theme's grid, client/game-page/game-page.js). */
+[data-se-sec="community"],
+[data-se-hidden],
+.A6G1leLXs7Vqw45hoXg-l,
+.CommunityContentContainer {
+  display: none !important;
+}
+
+.se-dlc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.se-dlc-tile {
+  position: relative;
+  display: block;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  overflow: hidden;
+  aspect-ratio: 460 / 215;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  transition: transform var(--se-dur) ease-out, filter var(--se-dur) ease-out;
+}
+
+.se-dlc-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.se-dlc-tile:hover {
+  transform: translateY(-2px);
+}
+
+.se-dlc-name {
+  display: none;
+}
+
+.se-dlc-tile.se-dlc-noart .se-dlc-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 6px;
+  box-sizing: border-box;
+  font: 600 11.5px/1.3 var(--se-font);
+  color: var(--se-text-dim);
+  text-align: center;
+}
+
+/*
+ * Steam's six DLC tiles are replaced by the theme's full grid (this outranks the grid's own
+ * display above); the link sits at the bottom of Trading cards and Recordings.
+ */
+[data-se-cgrid][data-se-replaced]:not(#se-none) {
+  display: none !important;
+}
+
+.se-ach-view.se-link-foot {
+  display: block;
+  margin: 12px 0 0 auto;
+  text-align: right;
+}
+
+/* No patterned strip or padding around the left cards' buttons. */
+[data-se-btnwrap]:not(#se-none) {
+  background: none !important;
+  background-image: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+
+[data-se-btnwrap]::before,
+[data-se-btnwrap]::after {
+  display: none !important;
+}
+
+/* The patterned strip is Steam's WorkshopContainer background image. */
+[data-se-sec="workshop"] ._176QJCynkEUSdR_-9btdAW:not(#se-none),
+[data-se-sec="workshop"] .WorkshopContainer:not(#se-none),
+[data-se-sec="workshop"] ._1zmwcbn8AgDTiWuHGyMD2w:not(#se-none),
+[data-se-sec="workshop"] .WorkshopHightlight:not(#se-none) {
+  background: none !important;
+  background-image: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+/* The theme's small tooltip (DLC names), like its other tooltips. */
+.se-tip-label {
+  position: fixed;
+  z-index: var(--se-z-toast);
+  max-width: 280px;
+  padding: 7px 11px;
+  pointer-events: none;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-hover);
+  color: var(--se-text);
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, .8), inset 0 0 0 1px var(--se-hairline);
+  font: 500 12.5px/1.4 var(--se-font);
+  opacity: 0;
+  transform: translateY(3px);
+  transition: opacity var(--se-dur) ease-out, transform var(--se-dur) var(--se-ease);
+}
+
+.se-tip-label[data-on] {
+  opacity: 1;
+  transform: none;
+}
+
+.se-tip-label .se-tip-sub {
+  margin-top: 2px;
+  font-size: 11.5px;
+  color: var(--se-text-muted);
+}
+
+/*
+ * Activity's post box: a card of its own on one row, field then emoji then Post, always shown
+ * (Steam folds the buttons away, max-height 0, until the field has focus). The field is
+ * rounded with an upright placeholder; the buttons are 38 px tiles with dual-tone icons, Post
+ * in the accent color once there is text.
+ */
+[data-se-sec="activity"] :is(._3x31AgESSlUqX3D4MTHv2m, .PostTextEntry):not(#se-none) {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px;
+  box-sizing: border-box;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 0 14px !important;
+  padding: 12px 14px !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+[data-se-sec="activity"] :is(._3x31AgESSlUqX3D4MTHv2m, .PostTextEntry) > :not(#se-none) {
+  margin-bottom: 0 !important;
+}
+
+[data-se-sec="activity"] :is(._3x31AgESSlUqX3D4MTHv2m, .PostTextEntry) > :first-child:not(#se-none) {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0 !important;
+}
+
+/* PostTextEntryArea: Steam puts the class on the field and, in some builds, on its wrapper */
+[data-se-sec="activity"] :is(._1JlC29Ic6L-QvL-39X_d-X, .PostTextEntryArea):not(#se-none) {
+  box-sizing: border-box;
+  width: 100% !important;
+  min-height: var(--se-control-h) !important;
+  margin: 0 !important;
+  padding: 7px 14px !important;
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: none !important;
+  font: 500 var(--se-fs-md)/1.45 var(--se-font) !important;
+  font-style: normal !important;
+  color: var(--se-text) !important;
+  resize: none;
+}
+
+[data-se-sec="activity"] :is(._1JlC29Ic6L-QvL-39X_d-X, .PostTextEntryArea):not(#se-none):focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent-line) !important;
+}
+
+[data-se-sec="activity"] :is(._1JlC29Ic6L-QvL-39X_d-X, .PostTextEntryArea)::placeholder {
+  font-style: normal !important;
+  color: var(--se-text-faint) !important;
+}
+
+[data-se-sec="activity"] div:is(._1JlC29Ic6L-QvL-39X_d-X, .PostTextEntryArea):not(#se-none) {
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+[data-se-sec="activity"] :is(._3x31AgESSlUqX3D4MTHv2m, .PostTextEntry) > :is(._1JlC29Ic6L-QvL-39X_d-X, .PostTextEntryArea):not(#se-none) {
+  flex: 1 1 auto !important;
+}
+
+/* The field itself: one row (38 px for Steam's field, 34 px otherwise); it scrolls inside once focused */
+[data-se-sec="activity"] :is(._3x31AgESSlUqX3D4MTHv2m, .PostTextEntry) textarea:not(#se-none) {
+  box-sizing: border-box;
+  display: block;
+  width: 100% !important;
+  height: var(--se-control-h) !important;
+  min-height: var(--se-control-h) !important;
+  max-height: var(--se-control-h);
+  margin: 0 !important;
+  padding: 7px 14px !important;
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: none !important;
+  font: 500 var(--se-fs-md)/20px var(--se-font) !important;
+  color: var(--se-text) !important;
+  resize: none;
+  overflow: hidden;
+}
+
+[data-se-sec="activity"] :is(._3x31AgESSlUqX3D4MTHv2m, .PostTextEntry) textarea:not(#se-none):focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent-line) !important;
+  overflow: auto;
+}
+
+[data-se-sec="activity"] textarea:is(._1JlC29Ic6L-QvL-39X_d-X, .PostTextEntryArea):not(#se-none) {
+  height: 38px !important;
+  min-height: 38px !important;
+}
+
+[data-se-sec="activity"] :is(._3x31AgESSlUqX3D4MTHv2m, .PostTextEntry) textarea::placeholder {
+  margin: 0 !important;
+  font-style: normal !important;
+  color: var(--se-text-faint) !important;
+}
+
+/* Controls: emoji then Post, always open */
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls):not(#se-none) {
+  display: flex !important;
+  flex: none !important;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: none !important;
+  transition: none !important;
+}
+
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls) > :not(#se-none) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box;
+  height: var(--se-control-h) !important;
+  min-width: var(--se-control-h) !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: none !important;
+  font: 600 var(--se-fs-md) var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+  vertical-align: middle;
+}
+
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls) > :not(#se-none):hover {
+  background-color: var(--se-hover) !important;
+  box-shadow: none !important;
+  color: var(--se-text-strong) !important;
+}
+
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls) > * * {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls) > :last-child:not(:first-child):not(#se-none) {
+  padding: 0 22px !important;
+}
+
+/* The emoji wrapper and Post are the same 38 px composer tile. */
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls) > :is(:first-child, ._2JSyABqFEh-v_dwaTnBydR, .PostButton):not(#se-none):not(#se-none2) {
+  box-sizing: border-box !important;
+  flex: none !important;
+  width: 38px !important;
+  min-width: 38px !important;
+  max-width: 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  justify-content: center !important;
+}
+
+/*
+ * EmoticonButton: the theme's smiley, Steam's icon hidden; no glow or new-emoticon dot, and
+ * never drawn as disabled (it works before the field is clicked).
+ */
+[data-se-sec="activity"] :is(.bACIuqv-b_9TztCczFK19, .EmoticonButton):not(#se-none) {
+  display: inline-flex !important;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-control-h) !important;
+  height: var(--se-control-h) !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) var(--se-icon-emoji) center / 20px 20px no-repeat !important;
+  opacity: 1 !important;
+}
+
+[data-se-sec="activity"] :is(.bACIuqv-b_9TztCczFK19, .EmoticonButton):not(#se-none):hover {
+  background-color: var(--se-hover) !important;
+  background-image: var(--se-icon-emoji-hover) !important;
+}
+
+[data-se-sec="activity"] :is(.bACIuqv-b_9TztCczFK19, .EmoticonButton):not(#se-none),
+[data-se-sec="activity"] :is(.bACIuqv-b_9TztCczFK19, .EmoticonButton) *:not(#se-none) {
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  animation: none !important;
+}
+
+[data-se-sec="activity"] :is(.bACIuqv-b_9TztCczFK19, .EmoticonButton) *:not(#se-none) {
+  visibility: hidden !important;
+}
+
+[data-se-sec="activity"] :is(.bACIuqv-b_9TztCczFK19, .EmoticonButton).disabled:not(#se-none) {
+  opacity: 1 !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  filter: none !important;
+}
+
+[data-se-sec="activity"] [data-se-emo-dot]:not(#se-none),
+[data-se-sec="activity"] :is(.bACIuqv-b_9TztCczFK19, .EmoticonButton)::before,
+[data-se-sec="activity"] :is(.bACIuqv-b_9TztCczFK19, .EmoticonButton)::after {
+  display: none !important;
+}
+
+/*
+ * The emoji button is drawn on the outer element of the row (the same kind of box as Post):
+ * one background, one 20 px icon. Everything inside it (Steam's button and icon) is
+ * transparent and hidden, so no second square shows; Steam's button still takes the click.
+ */
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls) > :first-child:not(#se-none) {
+  position: relative;
+  background-color: var(--se-surface-2) !important;
+  background-image: var(--se-icon-emoji) !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 20px 20px !important;
+}
+
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls) > :first-child:not(#se-none):hover {
+  background-color: var(--se-hover) !important;
+  background-image: var(--se-icon-emoji-hover) !important;
+}
+
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls) > :first-child svg,
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls) > :first-child img {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls) > :first-child *:not(#se-none) {
+  border: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls) > :first-child :is(.bACIuqv-b_9TztCczFK19, .EmoticonButton):not(#se-none) {
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  visibility: visible !important;
+  opacity: 0 !important;
+}
+
+/* Post: a paper plane in place of the word (kept for screen readers) */
+[data-se-sec="activity"] :is(._2JSyABqFEh-v_dwaTnBydR, .PostButton):not(#se-none) {
+  position: relative;
+  display: inline-flex !important;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  width: auto !important;
+  opacity: 1 !important;
+}
+
+[data-se-sec="activity"] :is(._2JSyABqFEh-v_dwaTnBydR, .PostButton) p:not(#se-none) {
+  margin: 0 !important;
+}
+
+[data-se-sec="activity"] :is(._2JSyABqFEh-v_dwaTnBydR, .PostButton) :is(._3jvEkfXhmZjvEbkpEv5EsH, .Label, p):not(#se-none) {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap;
+  font: inherit !important;
+  color: inherit !important;
+}
+
+[data-se-sec="activity"] :is(._2JSyABqFEh-v_dwaTnBydR, .PostButton)::before {
+  content: '';
+  flex: none;
+  width: 20px !important;
+  height: 20px !important;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3.8 11.4 20.2 3.8l-6.6 16.4-2.7-7.1z' fill='%2398a2ad' fill-opacity='.28'/%3E%3Cpath d='M3.8 11.4 20.2 3.8l-6.6 16.4-2.7-7.1zM10.9 13.1l9.3-9.3' fill='none' stroke='%2398a2ad' stroke-width='1.8' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E") center / 18px 18px no-repeat;
+  background-size: 20px 20px !important;
+}
+
+[data-se-sec="activity"] :is(._2JSyABqFEh-v_dwaTnBydR, .PostButton):hover::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3.8 11.4 20.2 3.8l-6.6 16.4-2.7-7.1z' fill='%23e6e8eb' fill-opacity='.28'/%3E%3Cpath d='M3.8 11.4 20.2 3.8l-6.6 16.4-2.7-7.1zM10.9 13.1l9.3-9.3' fill='none' stroke='%23e6e8eb' stroke-width='1.8' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* Enabled (there is text): accent tile, dark icon */
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls) > :is(.bGfjajFo4DI-ULSQxw1KY, .Enabled):not(#se-none),
+[data-se-sec="activity"] :is(._2JSyABqFEh-v_dwaTnBydR, .PostButton):is(.bGfjajFo4DI-ULSQxw1KY, .Enabled):not(#se-none) {
+  background: var(--se-accent) !important;
+  color: var(--se-bg-ink) !important;
+  cursor: pointer;
+}
+
+[data-se-sec="activity"] :is(._37e7DrDNmf1FmsMGA5y0A0, .Controls) > :is(.bGfjajFo4DI-ULSQxw1KY, .Enabled):not(#se-none):hover {
+  background: var(--se-accent) !important;
+  box-shadow: none !important;
+  filter: brightness(1.08);
+}
+
+[data-se-sec="activity"] :is(._2JSyABqFEh-v_dwaTnBydR, .PostButton):is(.bGfjajFo4DI-ULSQxw1KY, .Enabled)::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3.8 11.4 20.2 3.8l-6.6 16.4-2.7-7.1z' fill='%230f1115' fill-opacity='.28'/%3E%3Cpath d='M3.8 11.4 20.2 3.8l-6.6 16.4-2.7-7.1zM10.9 13.1l9.3-9.3' fill='none' stroke='%230f1115' stroke-width='1.8' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+}
+
+/* No "Activity" heading over the post box and feed */
+[data-se-sec="activity"] ._1Q2q_tQ9_Eq8YdEHNAHS3F:not(#se-none),
+[data-se-sec="activity"] ._2-tRKdDi1-8O0Ik8RqNv_z:not(#se-none) {
+  display: none !important;
+}
+
+/* Additional content rows (Manual, soundtracks) hover like the theme's rows. */
+[data-se-sec="additionalcontent"] :is(._11iUUsCpGW7-08wUrrGpge, .AdditionalItem):not(#se-none) {
+  border-radius: var(--se-radius-md) !important;
+  padding: 6px !important;
+  margin: 0 -6px 2px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+[data-se-sec="additionalcontent"] :is(._11iUUsCpGW7-08wUrrGpge, .AdditionalItem):not(#se-none):hover {
+  background: var(--se-hover) !important;
+}
+
+[data-se-sec="additionalcontent"] :is(._11iUUsCpGW7-08wUrrGpge, .AdditionalItem) img:not(#se-none) {
+  border-radius: var(--se-radius-sm);
+}

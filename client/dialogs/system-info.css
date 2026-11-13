@@ -1,0 +1,711 @@
+/*
+ * System Information, as built by client/dialogs/system-info.js. Applies only once the script
+ * has built the layout ([data-se-sysinfo]); until then utility/base.css gives the stock dialog
+ * the theme's title and footer.
+ *
+ * Grid on the dialog root (600 × 500 window, resizable):
+ *   [ title ........................................... ]
+ *   [ system line: OS · form factor · maker ........... ]
+ *   [ view: spec tiles / chips + filter / section cards (scrolls) ]
+ *   [ copy specs ][ ............ ][ Compare ][ Close ]
+ * HardwareSurveyDialog _3v2Gg_GCpLHpHQDLFQ7cvI, Desktop hYVp3sXyS0uYfJnzVoK-m.
+ */
+[data-se-sysinfo]:not(#se-none) {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 14px 8px;
+  white-space: normal; /* Steam sets pre-line on the survey dialog */
+}
+
+/* Steam's description, throbber and sections stay mounted for React, out of sight */
+[data-se-sysinfo] > :not(.DialogHeader, .DialogFooter, .se-sysinfo):not(#se-none) {
+  display: none !important;
+}
+
+[data-se-sysinfo] > .DialogHeader:not(#se-none) {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  margin: 0 !important;
+}
+
+[data-se-sysinfo] > .DialogFooter:not(#se-none) {
+  grid-column: 3;
+  grid-row: 4;
+  align-self: center;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+[data-se-sysinfo] > .DialogFooter button.DialogButton:not(#se-none) {
+  flex: none;
+  width: auto;
+  min-width: 104px;
+}
+
+/* Shared */
+.se-sysinfo[hidden],
+.se-sysinfo [hidden] {
+  display: none !important;
+}
+
+.se-sysinfo svg {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.se-sysinfo svg .d {
+  fill: currentColor;
+  fill-opacity: .3;
+  stroke: none;
+}
+
+/* Zero-specificity reset, so each control's own class sets its colours */
+:where(.se-sysinfo) button,
+:where(button.se-sysinfo) {
+  appearance: none;
+  margin: 0;
+  border: 0;
+  font-family: var(--se-font);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+  transition:
+    background-color var(--se-dur) ease-out,
+    box-shadow var(--se-dur) ease-out,
+    color var(--se-dur) ease-out,
+    opacity var(--se-dur) ease-out;
+}
+
+.se-sysinfo :is(button, input):focus-visible,
+button.se-sysinfo:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* Steam's native tooltip: its hit box covers the control */
+[data-se-sysinfo-tip] {
+  position: relative;
+}
+
+.se-sysinfo-tip {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: inherit;
+}
+
+.se-sysinfo-tip > *,
+.se-sysinfo-tip-hitbox {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The copied check: hidden until [data-copied] */
+.se-sysinfo :is(.se-sysinfo-spec, .se-sysinfo-row, .se-sysinfo-pill) > svg:last-of-type {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.6;
+  color: var(--se-text-strong);
+  opacity: 0;
+}
+
+.se-sysinfo [data-copied] > svg:last-of-type {
+  opacity: 1;
+}
+
+/* View */
+.se-sysinfo-view {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  container-type: inline-size;
+}
+
+/*
+ * System line under the title: OS · form factor · maker. It stays out of the title's row, which
+ * the window's caption buttons share at the top right.
+ */
+.se-sysinfo-meta {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  min-width: 0;
+  margin-top: -10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  overflow: hidden;
+}
+
+.se-sysinfo-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 1 auto;
+  min-width: 0;
+  font: 500 12px/16px var(--se-font);
+  color: var(--se-text-muted);
+  white-space: nowrap;
+}
+
+.se-sysinfo-meta-item + .se-sysinfo-meta-item::before {
+  content: "";
+  flex: none;
+  width: 3px;
+  height: 3px;
+  margin: 0 4px 0 -8px;
+  border-radius: 50%;
+  background: var(--se-text-faint);
+}
+
+.se-sysinfo-meta-item > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-sysinfo-meta-item svg {
+  width: 13px;
+  height: 13px;
+  color: var(--se-text-faint);
+}
+
+/* Spec tiles: two columns, four once the window is wide enough */
+.se-sysinfo-specs {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@container (min-width: 820px) {
+  .se-sysinfo-specs[data-count="4"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.se-sysinfo-spec {
+  position: relative;
+  min-width: 0;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px 0 10px;
+  border-radius: var(--se-radius-ml);
+  background: var(--se-bg);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text);
+}
+
+.se-sysinfo-spec:hover {
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-white-10);
+}
+
+.se-sysinfo-spec-icon,
+.se-sysinfo-card-icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-white-04);
+  color: var(--se-text-dim);
+}
+
+.se-sysinfo-spec-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.se-sysinfo-spec-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.se-sysinfo-spec-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.se-sysinfo-spec-text > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-sysinfo-spec-label {
+  font: 700 8.5px/10px var(--se-font);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--se-text-faint);
+}
+
+.se-sysinfo-spec-value {
+  font: 700 13px/16px var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.se-sysinfo-spec-sub {
+  font: 500 10.5px/12px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-sysinfo-spec-sub:empty {
+  display: none;
+}
+
+/* Toolbar: section chips and the filter */
+.se-sysinfo-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.se-sysinfo-chips {
+  position: relative; /* offset parent for the scroll spy */
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
+}
+
+.se-sysinfo-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.se-sysinfo-chip {
+  flex: none;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px 0 8px;
+  border-radius: var(--se-radius-pill);
+  background: none;
+  font: 600 11px/1 var(--se-font);
+  color: var(--se-text-muted);
+  white-space: nowrap;
+}
+
+.se-sysinfo-chip svg {
+  width: 13px;
+  height: 13px;
+}
+
+.se-sysinfo-chip:hover {
+  background: var(--se-surface-2);
+  color: var(--se-text);
+}
+
+.se-sysinfo-chip[data-active] {
+  background: var(--se-surface-2);
+  color: var(--se-text-strong);
+}
+
+.se-sysinfo-filter {
+  flex: none;
+  width: 168px;
+  height: 28px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px 0 10px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-faint);
+  cursor: text;
+  -webkit-app-region: no-drag;
+  transition: box-shadow var(--se-dur) ease-out;
+}
+
+.se-sysinfo-filter:focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-white-14);
+  color: var(--se-text-muted);
+}
+
+.se-sysinfo-filter > svg {
+  width: 13px;
+  height: 13px;
+}
+
+.se-sysinfo-filter input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  font: 500 12px/1 var(--se-font);
+  color: var(--se-text);
+}
+
+.se-sysinfo-filter input::placeholder {
+  color: var(--se-text-faint);
+}
+
+.se-sysinfo-filter input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.se-sysinfo .se-sysinfo-filter input:focus-visible {
+  outline: 0;
+}
+
+.se-sysinfo-filter-clear {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--se-white-10);
+  color: var(--se-text-dim);
+  visibility: hidden;
+}
+
+.se-sysinfo-filter[data-filled] .se-sysinfo-filter-clear {
+  visibility: visible;
+}
+
+.se-sysinfo-filter-clear svg {
+  width: 10px;
+  height: 10px;
+  stroke-width: 2.6;
+}
+
+.se-sysinfo-filter-clear:hover {
+  background: var(--se-white-14);
+  color: var(--se-text-strong);
+}
+
+/* Section cards */
+.se-sysinfo-list {
+  position: relative; /* offset parent for the scroll spy */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  outline: 0;
+  user-select: text;
+}
+
+.se-sysinfo-card {
+  flex: none;
+  padding: 10px 8px 6px;
+  border-radius: var(--se-radius-ml);
+  background: var(--se-bg);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-sysinfo-card-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 4px 6px;
+}
+
+.se-sysinfo-card-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+}
+
+.se-sysinfo-card-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.se-sysinfo-card-title {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 700 12.5px/16px var(--se-font);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--se-text-strong);
+}
+
+.se-sysinfo-card-count {
+  flex: none;
+  min-width: 18px;
+  height: 16px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-04);
+  font: 700 9.5px/16px var(--se-font);
+  text-align: center;
+  color: var(--se-text-faint);
+}
+
+.se-sysinfo-card-copy {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  padding: 0;
+  border-radius: var(--se-radius-sm);
+  background: none;
+  color: var(--se-text-faint);
+  opacity: 0;
+}
+
+.se-sysinfo-card-copy svg {
+  width: 13px;
+  height: 13px;
+}
+
+.se-sysinfo-card:hover .se-sysinfo-card-copy,
+.se-sysinfo-card-copy:focus-visible,
+.se-sysinfo-card-copy[data-copied] {
+  opacity: 1;
+}
+
+.se-sysinfo-card-copy:hover {
+  background: var(--se-surface-2);
+  color: var(--se-text-strong);
+}
+
+.se-sysinfo-card-copy[data-copied] {
+  color: var(--se-text-strong);
+}
+
+/* Standalone facts as pills */
+.se-sysinfo-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 4px 6px;
+}
+
+.se-sysinfo-pill {
+  max-width: 100%;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface-2);
+  font: 600 11.5px/16px var(--se-font);
+  color: var(--se-text);
+  overflow-wrap: anywhere;
+}
+
+.se-sysinfo-pill:hover {
+  background: var(--se-hover);
+}
+
+.se-sysinfo-pill:not([data-copied]) > svg:last-of-type {
+  display: none;
+}
+
+/* Label/value rows */
+.se-sysinfo-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.se-sysinfo-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(96px, 36%) minmax(0, 1fr) 14px;
+  align-items: baseline;
+  column-gap: 12px;
+  width: 100%;
+  min-height: 28px;
+  box-sizing: border-box;
+  padding: 6px 6px 6px 8px;
+  border-radius: var(--se-radius-sm);
+  background: none;
+  font: 500 12px/16px var(--se-font);
+  user-select: text;
+}
+
+.se-sysinfo-row + .se-sysinfo-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8px;
+  right: 8px;
+  height: 1px;
+  background: var(--se-hairline);
+}
+
+.se-sysinfo-row:hover {
+  background: var(--se-white-04);
+}
+
+.se-sysinfo-row:hover::before,
+.se-sysinfo-row:hover + .se-sysinfo-row::before {
+  opacity: 0;
+}
+
+.se-sysinfo-row > svg:last-of-type {
+  align-self: center;
+}
+
+.se-sysinfo-row-label {
+  min-width: 0;
+  color: var(--se-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.se-sysinfo-row-value {
+  min-width: 0;
+  font-weight: 600;
+  color: var(--se-text);
+  overflow-wrap: anywhere;
+}
+
+.se-sysinfo-mono {
+  font-family: Consolas, "Cascadia Mono", "SF Mono", monospace;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: .01em;
+}
+
+/* Identifiers: blurred, with an eye, until clicked */
+.se-sysinfo-row[data-private]:not([data-revealed]) .se-sysinfo-row-value {
+  filter: blur(4.5px);
+  user-select: none;
+}
+
+.se-sysinfo-row[data-private]:not([data-revealed]):not([data-copied]) > svg:last-of-type {
+  color: var(--se-text-faint);
+  opacity: 1;
+}
+
+.se-sysinfo-row[data-private]:not([data-revealed]):hover > svg:last-of-type {
+  color: var(--se-text-strong);
+}
+
+/* Filter matches */
+.se-sysinfo mark {
+  border-radius: 3px;
+  background: var(--se-white-25);
+  color: var(--se-text-strong);
+}
+
+.se-sysinfo-empty {
+  margin: 0;
+  padding: 28px 12px;
+  font: 500 12px/16px var(--se-font);
+  text-align: center;
+  color: var(--se-text-faint);
+}
+
+/* Loading: skeleton bars while Steam runs the survey */
+.se-sysinfo-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.se-sysinfo-loading-text {
+  padding: 2px 2px 4px;
+  font: 600 11px/14px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-sysinfo-skeleton {
+  height: 72px;
+  border-radius: var(--se-radius-ml);
+  background:
+    linear-gradient(100deg, transparent 30%, var(--se-white-04) 50%, transparent 70%) 0 0 / 200% 100%,
+    var(--se-bg);
+  animation: se-sysinfo-shimmer 1.4s linear infinite;
+}
+
+@keyframes se-sysinfo-shimmer {
+  from {
+    background-position: 150% 0, 0 0;
+  }
+
+  to {
+    background-position: -50% 0, 0 0;
+  }
+}
+
+/* Copy specs, beside Steam's Compare and Close */
+.se-sysinfo-copyall {
+  grid-column: 1;
+  grid-row: 4;
+  align-self: center;
+  justify-self: start;
+  height: var(--se-control-h);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px 0 12px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  font: 600 12.5px/1 var(--se-font);
+  color: var(--se-text);
+  white-space: nowrap;
+}
+
+.se-sysinfo-copyall svg {
+  width: 14px;
+  height: 14px;
+}
+
+.se-sysinfo-copyall:hover:not(:disabled) {
+  background: var(--se-hover);
+}
+
+.se-sysinfo-copyall[data-copied] svg {
+  color: var(--se-text-strong);
+}
+
+.se-sysinfo-copyall:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(.se-sysinfo) button,
+  :where(button.se-sysinfo) {
+    transition: none;
+  }
+
+  .se-sysinfo-skeleton {
+    animation: none;
+  }
+}
+
+/* Until Steam's survey returns there is nothing to jump to or filter */
+[data-se-sysinfo]:not([data-se-sysinfo-ready]) .se-sysinfo-bar {
+  display: none;
+}

@@ -1,0 +1,310 @@
+/*
+ * Backup Game Files and Restore From Backup (styles for client/dialogs/backups.js).
+ *
+ * Once the script has marked a dialog ([data-se-backup] = backup | restore), the path field and
+ * Browse become one folder card that opens the picker anywhere you click it.
+ *
+ * Backup, choosing:                          Backup, backing up:
+ *   [ Backup Game Files                  ]     [ Backup Game Files                  ]
+ *   [ Create a backup of the game…       ]     [ Create a backup of the game…       ]
+ *   [ (game) Portal 2  12.4 GB           ]     [ (folder) D:\Backups                ]
+ *   [ CHOOSE A DIRECTORY…                ]     [ Portal 2 game files are being…     ]
+ *   [ (folder) Backups        [Browse…]  ]     [ ███████████░░░░░░░░░░░░░░░░░░░░░░  ]
+ *   [          D:\                       ]     [ 42%  1.9 GB of 4.5 GB  Game 1 of 2 ]
+ *   [      [Create Backup] [Cancel]      ]     [      [Create Backup] [Cancel]      ]
+ *
+ * Restore: the same card, then "BACKUPS FOUND" and a chip per game in place of Steam's sentence.
+ * Icons stay neutral; only the failure text takes a tone.
+ *
+ * BackupAppsDialog YmQ9vcw08n7STkTEQLiYW, BackupAppsContent cBVQzUqhygc4rrsrAVaAf,
+ * BackupAppInput _3h_6VENNNeSv1LxRpIP263, BackupAppsBrowse v71Rz05Rte4GxZMKzvwAO,
+ * BackupAppsIndicator _24O5i9aa5PKJmbP0tL_Jbf, BackupAppsBar _1cpd2EVhu3enwXF7ZaEIuE,
+ * ResultMessage _1MhH8GEfbC2CockG6DE_4, Checkmark AdaZjNmjZyFjebARyeD3d,
+ * Exclamation Mtfia7HxpGXdeOeMWobSm, DialogBodyText _2Nmi6ONpGvLOgRE87Ky2MA,
+ * Error _3WuW55JICXrYcPUy-vqMIL, Success n7a6ADEuosAef3zl_uaWA, ExtraPadding _3XJVQHmJH6TijvWtED4ula.
+ */
+
+/* ---------- Text ---------- */
+
+/* "Choose a directory to create the backup files:" as the card's label */
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup="backup"] ._2Nmi6ONpGvLOgRE87Ky2MA:has(+ .cBVQzUqhygc4rrsrAVaAf):not(#se-none) {
+  padding: 0 0 10px !important;
+  font: 500 13px/1.4 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+/* Once it's working, the folder line below says where, so the "Choose a directory" prompt goes */
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup="backup"]:not([data-se-backup-step="choose"]) ._2Nmi6ONpGvLOgRE87Ky2MA:only-child:not(#se-none) {
+  display: none !important;
+}
+
+/* ---------- Folder card ---------- */
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup] .cBVQzUqhygc4rrsrAVaAf:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  box-sizing: border-box;
+  padding: 10px 10px 10px 16px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out;
+}
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup] .cBVQzUqhygc4rrsrAVaAf:not(#se-none):hover {
+  box-shadow: inset 0 0 0 1px var(--se-white-14);
+}
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup] .cBVQzUqhygc4rrsrAVaAf:not(#se-none):has(button:focus-visible) {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong), 0 0 0 3px var(--se-accent-tint);
+}
+
+/* The read-only field stays mounted (Steam's value) but the card face shows the path */
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup] .cBVQzUqhygc4rrsrAVaAf ._3h_6VENNNeSv1LxRpIP263:not(#se-none) {
+  display: none !important;
+}
+
+.se-bk-face {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.se-bk-face > svg {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  color: var(--se-text-faint);
+  transition: color var(--se-dur) ease-out;
+}
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup-picked] .se-bk-face > svg,
+.cBVQzUqhygc4rrsrAVaAf:hover .se-bk-face > svg {
+  color: var(--se-text-dim);
+}
+
+.se-bk-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.se-bk-title,
+.se-bk-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.se-bk-title {
+  font: 600 14px/1.25 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.YmQ9vcw08n7STkTEQLiYW:not([data-se-backup-picked]) .se-bk-title {
+  color: var(--se-text-dim);
+}
+
+.se-bk-sub {
+  font: 400 12px/1.3 var(--se-font);
+  color: var(--se-text-faint);
+}
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup] button.v71Rz05Rte4GxZMKzvwAO:not(#se-none) {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 108px;
+  margin: 0 !important;
+  padding-inline: 18px !important;
+}
+
+/* ---------- Backup: the folder while it works, as a read-only line ---------- */
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup="backup"]:not([data-se-backup-step="choose"]) ._3h_6VENNNeSv1LxRpIP263:not(#se-none) {
+  position: relative;
+  margin: 0 0 6px;
+}
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup="backup"]:not([data-se-backup-step="choose"]) ._3h_6VENNNeSv1LxRpIP263::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 14px;
+  top: 50%;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  translate: 0 -50%;
+  background: var(--se-text-faint);
+  pointer-events: none;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' fill='black' fill-opacity='.3' stroke='none'/%3E%3Cpath d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup="backup"]:not([data-se-backup-step="choose"]) ._3h_6VENNNeSv1LxRpIP263 .DialogTextInputBase:not(#se-none) {
+  padding-inline-start: 42px !important;
+  background: var(--se-white-04) !important;
+  box-shadow: none !important;
+  color: var(--se-text-dim) !important;
+  opacity: 1;
+}
+
+/* ---------- Backup: progress ---------- */
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup-step="progress"] ._2Nmi6ONpGvLOgRE87Ky2MA:has(._24O5i9aa5PKJmbP0tL_Jbf):not(#se-none) {
+  padding: 14px 0 0 !important;
+  font: 500 13.5px/1.4 var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup] ._24O5i9aa5PKJmbP0tL_Jbf:not(#se-none) {
+  min-height: 0;
+  height: 8px;
+  margin: 12px 0 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-10);
+}
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup] ._1cpd2EVhu3enwXF7ZaEIuE:not(#se-none) {
+  border-radius: inherit;
+  background: var(--se-accent);
+  transition: width .35s var(--se-ease);
+}
+
+.se-bk-progress {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 10px;
+  font: 500 12.5px/1.3 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-faint);
+}
+
+.se-bk-percent {
+  font-weight: 700;
+  color: var(--se-text);
+}
+
+.se-bk-count {
+  margin-inline-start: auto;
+}
+
+/* ---------- Backup: result ---------- */
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup] ._1MhH8GEfbC2CockG6DE_4:not(#se-none) {
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 14px 16px !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-white-04);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  font: 600 13.5px/1.4 var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup] ._1MhH8GEfbC2CockG6DE_4._3WuW55JICXrYcPUy-vqMIL:not(#se-none) {
+  color: var(--se-danger-text) !important;
+}
+
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup] ._1MhH8GEfbC2CockG6DE_4 :is(.AdaZjNmjZyFjebARyeD3d, .Mtfia7HxpGXdeOeMWobSm):not(#se-none) {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  color: var(--se-text-dim);
+}
+
+/* ---------- Games ---------- */
+
+/* Restore: Steam's run-on sentence gives way to the chips */
+.YmQ9vcw08n7STkTEQLiYW[data-se-backup="restore"][data-se-backup-step="found"] ._3XJVQHmJH6TijvWtED4ula:not(#se-none) {
+  display: none !important;
+}
+
+.se-bk-games {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.se-bk-found {
+  padding: 14px 2px 2px;
+}
+
+.se-bk-found::before {
+  content: 'Backups found';
+  margin-inline-end: 6px;
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.se-bk-apps {
+  margin: 0 0 18px;
+}
+
+.se-bk-game {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 100%;
+  min-height: 28px;
+  box-sizing: border-box;
+  padding: 0 12px 0 9px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-04);
+  box-shadow: inset 0 0 0 1px var(--se-white-10);
+  font: 600 12.5px/1 var(--se-font);
+  color: var(--se-text);
+}
+
+.se-bk-game-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.se-bk-game-meta {
+  flex: 0 0 auto;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-faint);
+}
+
+.se-bk-game > svg {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  color: var(--se-text-faint);
+}
+
+/* ---------- Icons ---------- */
+
+.se-bk svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.se-bk svg .d {
+  fill: currentColor;
+  fill-opacity: .3;
+  stroke: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .YmQ9vcw08n7STkTEQLiYW[data-se-backup] :is(.cBVQzUqhygc4rrsrAVaAf, ._1cpd2EVhu3enwXF7ZaEIuE),
+  .se-bk-face > svg {
+    transition: none !important;
+  }
+}

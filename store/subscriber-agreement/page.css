@@ -1,0 +1,557 @@
+/*
+ * Steam Subscriber Agreement (/subscriber_agreement/), as rebuilt by subscriber-agreement/page.js:
+ *
+ *   [ breadcrumbs ................................................ ]
+ *   [ Steam Subscriber Agreement                                   ]
+ *   [ ▤ 11 sections · ◷ 45 min read · flags ...................... ]
+ *   [ contents (sticky) ][ intro card                              ]
+ *   [  1 Registration…  ][ 1 · Registration as a subscriber…   🔗 ]
+ *   [  2 Licenses       ][ …                                       ]
+ *
+ * Looks follow the store's shared parts (shared/ui.css): radius-xl cards, titles in the text
+ * colour, pill-button chips. Steam's page (styles_ssav5.css): #main >
+ * #main_content > .page_title_area, #ssa_box > #languages + #ssa_body; the Privacy Policy has
+ * #basicContent > #basicContainer > #pageTitle + #newsColumn in place of #ssa_body. Rules use html.se-store-ssa:not(#se-none) for ID-level weight over
+ * Steam's #ssa_* rules. Until the script is done ([data-se-ssa-ready]) only the colours apply,
+ * so the text never jumps under a half-built layout.
+ */
+
+/* ---------- Page ---------- */
+
+html.se-store-ssa:not(#se-none) body,
+html.se-store-ssa:not(#se-none) :is(.responsive_page_frame, .responsive_page_content, .responsive_page_template_content) {
+  background: var(--se-bg) !important;
+}
+
+html.se-store-ssa:not(#se-none) #main {
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-ssa:not(#se-none) #main_content {
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 28px 0 64px !important;
+  background: none !important;
+  color: var(--se-text-dim);
+}
+
+/* ---------- Header ---------- */
+
+html.se-store-ssa:not(#se-none) .page_title_area {
+  margin: 0 0 28px !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-ssa:not(#se-none) .page_title_area .blockbg {
+  background: none !important;
+  padding: 0 !important;
+}
+
+html.se-store-ssa:not(#se-none) .page_title_area .breadcrumbs {
+  height: auto !important;
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+  font: 600 var(--se-fs-sm)/1.4 var(--se-font) !important;
+  letter-spacing: .02em;
+  text-transform: none !important;
+  color: var(--se-text-faint) !important;
+}
+
+html.se-store-ssa:not(#se-none) .page_title_area .breadcrumbs a {
+  color: var(--se-text-muted) !important;
+  text-decoration: none !important;
+  transition: color var(--se-dur-fast);
+}
+
+html.se-store-ssa:not(#se-none) .page_title_area .breadcrumbs a:hover {
+  color: var(--se-white) !important;
+}
+
+html.se-store-ssa:not(#se-none) .page_title_area .page_name {
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-ssa:not(#se-none) .page_title_area .page_name .blockbg {
+  font: 800 var(--se-fs-display)/1.15 var(--se-font) !important;
+  letter-spacing: -.02em;
+  text-transform: none !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store-ssa:not(#se-none) .page_title_area :is(.breadcrumbs, .page_name) > div:not(.blockbg) {
+  display: none;
+}
+
+.se-ssa-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  margin-top: 14px;
+}
+
+.se-ssa-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font: 600 var(--se-fs-md)/1 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-ssa-meta svg,
+.se-ssa-layout svg {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+:is(.se-ssa-meta, .se-ssa-layout) svg .d {
+  fill: currentColor;
+  fill-opacity: .3;
+  stroke: none;
+}
+
+.se-ssa-meta-item svg {
+  width: 16px;
+  height: 16px;
+  color: var(--se-text-faint);
+}
+
+/* Language flags: round chips, the page's own language lit */
+html.se-store-ssa:not(#se-none) .se-ssa-meta #languages {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 !important;
+  padding: 0 0 0 20px !important;
+  box-shadow: inset 1px 0 0 var(--se-divider);
+  float: none !important;
+  background: none !important;
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-meta #languages a {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0 !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-meta #languages a:hover {
+  background: var(--se-hover);
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-meta #languages img {
+  width: 18px !important;
+  height: auto !important;
+  margin: 0 !important;
+  border-radius: 3px;
+  opacity: .85;
+}
+
+/* ---------- Layout ---------- */
+
+.se-ssa-layout {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr); /* fills to the store bar's right edge */
+  align-items: start;
+  gap: 32px;
+}
+
+/* Steam's box and body: plain wrappers around the cards */
+html.se-store-ssa:not(#se-none) .se-ssa-layout #ssa_box {
+  justify-self: stretch;
+  box-sizing: border-box;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-layout :is(#ssa_body, #basicContent, #basicContainer, #newsColumn) {
+  box-sizing: border-box;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  float: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-lg)/1.75 var(--se-font) !important;
+}
+
+/* The heading, its <br> and the parts the sidebar replaces */
+html.se-store-ssa[data-se-ssa-ready]:not(#se-none) #ssa_body > :is(h3, br),
+html.se-store-ssa:not(#se-none) [data-se-ssa-hidden] {
+  display: none !important;
+}
+
+/* ---------- Contents sidebar ---------- */
+
+.se-ssa-aside {
+  --se-ssa-progress: 0;
+  position: sticky;
+  top: calc(var(--se-nav-h, 46px) + 38px); /* under the floating store bar */
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - var(--se-nav-h, 46px) - 62px);
+  padding: 18px 10px 10px;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-ssa-aside-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 10px 10px;
+}
+
+.se-ssa-aside-title {
+  font: 700 var(--se-fs-xs)/1 var(--se-font);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--se-text-faint);
+}
+
+.se-ssa-progress-text {
+  font: 700 var(--se-fs-xs)/1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-muted);
+}
+
+.se-ssa-progress {
+  position: relative;
+  height: 3px;
+  margin: 0 10px 12px;
+  overflow: hidden;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+}
+
+.se-ssa-progress-bar {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--se-accent);
+  transform: scaleX(var(--se-ssa-progress));
+  transform-origin: left;
+}
+
+.se-ssa-toc {
+  position: relative; /* offset parent for keeping the active entry in view */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: auto !important; /* thin (or any width) drops the theme's bar (core/scrollbars.css) for Chromium's */
+  scrollbar-color: auto !important;
+}
+
+html.se-store-ssa:not(#se-none) a.se-ssa-toc-item {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-muted);
+  font: 600 var(--se-fs-base)/1.4 var(--se-font);
+  text-decoration: none;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-ssa:not(#se-none) a.se-ssa-toc-item:hover {
+  background: var(--se-hover);
+  color: var(--se-text);
+}
+
+html.se-store-ssa:not(#se-none) a.se-ssa-toc-item[aria-current] {
+  background: var(--se-accent-surface);
+  color: var(--se-text);
+}
+
+.se-ssa-toc-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+  font: 700 var(--se-fs-xs)/1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-faint);
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+[aria-current] > .se-ssa-toc-num {
+  background: var(--se-accent);
+  color: var(--se-on-accent);
+}
+
+.se-ssa-toc-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* ---------- Document ---------- */
+
+.se-ssa-doc {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.se-ssa-card {
+  scroll-margin-top: calc(var(--se-nav-h, 46px) + 38px);
+  padding: 28px 36px 24px;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-ssa-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 14px;
+}
+
+.se-ssa-num {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-accent-surface);
+  font: 800 var(--se-fs-lg)/1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-accent);
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font: 700 var(--se-fs-2xl)/1.3 var(--se-font);
+  letter-spacing: -.01em;
+  text-transform: none;
+  color: var(--se-text);
+}
+
+.se-ssa-link {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: none;
+  color: var(--se-text-faint);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--se-dur-fast), background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+.se-ssa-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+.se-ssa-card:hover .se-ssa-link,
+.se-ssa-link:focus-visible,
+.se-ssa-link[data-copied] {
+  opacity: 1;
+}
+
+.se-ssa-link:hover,
+.se-ssa-link[data-copied] {
+  background: var(--se-hover);
+  color: var(--se-white);
+}
+
+/* Body text */
+html.se-store-ssa:not(#se-none) .se-ssa-card p {
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  color: var(--se-text-dim);
+  font: inherit;
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-card > :last-child {
+  margin-bottom: 0 !important;
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-card :is(b, strong) {
+  color: var(--se-text);
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-card a[href] {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+  box-shadow: inset 0 -1px 0 var(--se-accent-surface);
+  transition: color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-card a[href]:hover {
+  color: var(--se-accent-hover) !important;
+  box-shadow: inset 0 -1px 0 currentColor;
+}
+
+/* Lettered sub-headings: "D. Enforcement" */
+html.se-store-ssa:not(#se-none) .se-ssa-card p[data-se-ssa-sub] {
+  margin: 26px 0 10px !important;
+  padding-top: 18px !important;
+  border-top: 1px solid var(--se-divider);
+  font: 700 var(--se-fs-lg)/1.4 var(--se-font);
+  color: var(--se-text);
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-card p[data-se-ssa-sub="first"] {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  border-top: 0;
+}
+
+/* All-caps clauses: a recessed block in smaller type, so they don't shout over the rest */
+html.se-store-ssa:not(#se-none) .se-ssa-card p[data-se-ssa-caps] {
+  padding: 14px 18px !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  font-size: var(--se-fs-base);
+  line-height: 1.65;
+  letter-spacing: .01em;
+  color: var(--se-text-muted);
+}
+
+/* Lists */
+html.se-store-ssa:not(#se-none) .se-ssa-card :is(ul, ol) {
+  margin: 0 0 16px !important;
+  padding: 0 0 0 4px !important;
+  list-style: none !important;
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-card li {
+  position: relative;
+  margin: 0 0 10px !important;
+  padding: 0 0 0 22px !important;
+  color: var(--se-text-dim);
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-card li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: .72em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--se-accent);
+  opacity: .7;
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-card li > br:last-child {
+  display: none;
+}
+
+/* <br> pairs inside a card (the Privacy Policy is all text and breaks): the second is the
+   paragraph gap. Breaks at a card's edges are hidden by page.js. */
+html.se-store-ssa:not(#se-none) .se-ssa-card > br + br {
+  display: block;
+  content: "";
+  margin-top: 8px;
+}
+
+/* Bold run-in headings inside the text ("Right to Know.") */
+html.se-store-ssa:not(#se-none) .se-ssa-card > :is(b, strong) {
+  color: var(--se-text);
+  font-weight: 700;
+}
+
+/* Loose links under Steam's box ("Privacy Feedback"): the store's pill button, at the sidebar's foot */
+.se-ssa-foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 12px 0 0;
+  box-shadow: inset 0 1px 0 var(--se-hairline);
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-foot a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-base)/1 var(--se-font);
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-ssa:not(#se-none) .se-ssa-foot a:hover {
+  background: var(--se-hover);
+  color: var(--se-text) !important;
+}
+
+/* ---------- Narrow windows: contents above the document ---------- */
+
+@media (max-width: 1000px) {
+  .se-ssa-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .se-ssa-aside {
+    position: static;
+    max-height: 360px;
+  }
+
+  .se-ssa-card {
+    padding: 22px 22px 18px;
+  }
+}

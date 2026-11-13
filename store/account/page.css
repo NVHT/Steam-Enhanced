@@ -1,0 +1,2736 @@
+/*
+ * Account pages (/account/ and the pages its sidebar links to), as rebuilt by account/page.js:
+ *
+ *   [ Home › Account                                               ]
+ *   [ connorn3794's Account                                        ]
+ *   [ ▭ Steam ID 7656119…  ⧉ ↗ ]
+ *   [ sidebar (sticky)  ][ ▣ Store & Purchase History               ]
+ *   [  👤 Account det…  ][ [ $0.00 wallet ][ links ]                ]
+ *   [  ⚙ Store prefs    ][ ✉ Contact Info                           ]
+ *   [  …                ][ ⚠ Delete my Steam account (danger)       ]
+ *
+ * Every other page: the same header and sidebar, its content column as one card ("panel").
+ *
+ * Steam's frame (account.css, steamaccount.css): .page_header_ctn > .page_content >
+ * .breadcrumbs, h2.pageheader (.youraccount_steamid on Account details); then
+ * .page_content_ctn > .page_content (#main_content) > .two_column.left (a.nav_item) +
+ * .two_column.right. Account details fills the right column with .account_header_line bars over
+ * .account_setting_block > .account_setting_sub_block floats. The layout keys on the frame
+ * itself (.page_content:has(> .two_column.left)), so an /account/ page without the sidebar
+ * (purchase history ...) keeps its own layout. Store looks follow shared/ui.css. Rules use
+ * html.se-store-account:not(#se-none) for ID-level weight over Steam's rules. Until the
+ * script is done ([data-se-account-ready]) the content column is held back so it never jumps
+ * from Steam's look to the cards; if the script fails it shows after 1.5s anyway.
+ */
+
+/* ---------- Page ---------- */
+
+html.se-store-account:not(#se-none) body,
+html.se-store-account:not(#se-none) :is(.responsive_page_frame, .responsive_page_content, .responsive_page_template_content, .page_content_ctn) {
+  background: var(--se-bg) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-hidden] {
+  display: none !important;
+}
+
+:is(.se-account-id, .se-account-nav-icon, .se-account-chip) svg {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+:is(.se-account-id, .se-account-nav-icon, .se-account-chip) svg .d {
+  fill: currentColor;
+  fill-opacity: .3;
+  stroke: none;
+}
+
+/* ---------- Header ---------- */
+
+html.se-store-account:not(#se-none) .page_header_ctn {
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 28px 0 28px !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs {
+  height: auto !important;
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+  font: 600 var(--se-fs-sm)/1.4 var(--se-font) !important;
+  letter-spacing: .02em;
+  text-transform: none !important;
+  color: var(--se-text-faint) !important;
+}
+
+html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs .blockbg {
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs a {
+  color: var(--se-text-muted) !important;
+  text-decoration: none !important;
+  transition: color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs a:hover {
+  color: var(--se-white) !important;
+}
+
+/* The current page's name: a .pageheader span on some pages, which Steam sets as a title */
+html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs :is(.pageheader, .breadcrumb_current_page) {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font: inherit !important;
+  letter-spacing: inherit !important;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) h2.pageheader {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-display)/1.15 var(--se-font) !important;
+  letter-spacing: -.02em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/* Steam's plain line until the chip replaces it */
+html.se-store-account:not(#se-none) .youraccount_steamid {
+  margin-top: 12px !important;
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-md)/1.4 var(--se-font) !important;
+}
+
+.se-account-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 4px 4px 4px 14px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  font: 600 var(--se-fs-md)/1 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-account-id > svg {
+  width: 17px;
+  height: 17px;
+  color: var(--se-text-faint);
+}
+
+.se-account-id-num {
+  color: var(--se-text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+  user-select: all;
+}
+
+.se-account-id-actions {
+  display: flex;
+  gap: 2px;
+  margin-left: 4px;
+  padding-left: 6px;
+  box-shadow: inset 1px 0 0 var(--se-divider);
+}
+
+html.se-store-account:not(#se-none) .se-account-id-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: none;
+  color: var(--se-text-faint);
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+.se-account-id-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+html.se-store-account:not(#se-none) .se-account-id-btn:hover {
+  background: var(--se-hover);
+  color: var(--se-white);
+}
+
+html.se-store-account:not(#se-none) .se-account-id-btn[data-copied] {
+  background: var(--se-accent-surface);
+  color: var(--se-accent);
+}
+
+/* ---------- Layout: sidebar + cards ---------- */
+
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) {
+  display: grid !important;
+  grid-template-columns: 280px minmax(0, 1fr);
+  align-items: start;
+  gap: 32px;
+  padding: 0 0 64px !important;
+  background: none !important;
+}
+
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > :not(.two_column) {
+  display: none !important;
+}
+
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column {
+  box-sizing: border-box;
+  width: auto !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+@keyframes se-account-reveal {
+  to { visibility: visible; }
+}
+
+html.se-store-account:not([data-se-account-ready]):not(#se-none) .page_content:has(> .two_column.left) > .two_column.right {
+  visibility: hidden;
+  animation: se-account-reveal 0s 1.5s forwards;
+}
+
+/* ---------- Sidebar ---------- */
+
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.left {
+  position: sticky;
+  top: calc(var(--se-nav-h, 46px) + 38px); /* under the floating store bar */
+  display: flex !important;
+  flex-direction: column;
+  gap: 2px;
+  height: auto !important;
+  padding: 10px !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-account:not(#se-none) a.nav_item {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  width: auto !important;
+  height: auto !important;
+  min-height: 40px;
+  margin: 0 !important;
+  padding: 6px 10px !important;
+  box-sizing: border-box;
+  border: 0 !important;
+  border-image: none !important;
+  border-radius: var(--se-radius-sm);
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-md)/1.3 var(--se-font) !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) a.nav_item:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+/* Steam marks the current page with a bar on the left edge (a pseudo-element); the link's fill
+   says it now */
+html.se-store-account:not(#se-none) a.nav_item::before,
+html.se-store-account:not(#se-none) a.nav_item::after {
+  content: none !important;
+  display: none !important;
+}
+
+html.se-store-account:not(#se-none) a.nav_item.active {
+  background: var(--se-accent-surface) !important;
+  color: var(--se-text) !important;
+}
+
+/* Steam's own glyphs give way to the theme's */
+html.se-store-account:not(#se-none) a.nav_item[data-se-account-nav] > img {
+  display: none !important;
+}
+
+.se-account-nav-icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-pill);
+  color: var(--se-text-faint);
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+.se-account-nav-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+a.nav_item:hover > .se-account-nav-icon {
+  color: var(--se-text-dim);
+}
+
+a.nav_item.active > .se-account-nav-icon {
+  background: var(--se-accent);
+  color: var(--se-on-accent);
+}
+
+/* ---------- Cards ---------- */
+
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.right {
+  display: flex !important;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.se-account-card {
+  padding: 24px 28px 28px;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+/* Header bar → card title */
+html.se-store-account:not(#se-none) .se-account-card .account_header_line {
+  height: auto !important;
+  margin: 0 0 18px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_header_line > div {
+  display: flex !important;
+  align-items: center;
+  gap: 14px;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-2xl)/1.3 var(--se-font) !important;
+  letter-spacing: -.01em;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_header_line img {
+  display: none !important;
+}
+
+.se-account-chip {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim);
+}
+
+.se-account-chip svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Block → a grid of tiles (Steam floats half-width columns) */
+html.se-store-account:not(#se-none) .se-account-card :is(.account_setting_block, .account_setting_block_short) {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_setting_block + .account_setting_block {
+  margin-top: 12px !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card :is(.account_setting_sub_block, .account_setting_sub_block_long):not([data-se-account-hidden]) {
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  width: auto !important;
+  min-width: 0;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 18px 20px !important;
+  float: none !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-md)/1.55 var(--se-font) !important;
+}
+
+/* Steam spaces with <br>s; the tile's gap does that now */
+html.se-store-account:not(#se-none) .se-account-card .account_setting_sub_block > br {
+  display: none;
+}
+
+html.se-store-account:not(#se-none) .se-account-card :is(p, .account_setting_sub_block > div) {
+  margin: 0 !important;
+  padding: 0;
+  color: var(--se-text-dim);
+  font: inherit;
+}
+
+html.se-store-account:not(#se-none) .se-account-card :is(b, strong) {
+  color: var(--se-text);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .inner_rule {
+  height: 1px;
+  margin: 4px 0 !important;
+  border: 0 !important;
+  background: var(--se-divider) !important;
+}
+
+/* Loose links in the text */
+html.se-store-account:not(#se-none) .se-account-card a[href]:not(.account_manage_link, .accountData a, .payment_method_box a) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+  transition: color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) .se-account-card a[href]:not(.account_manage_link, .accountData a, .payment_method_box a):hover {
+  color: var(--se-accent-hover) !important;
+}
+
+/* Rows: label then value */
+html.se-store-account:not(#se-none) .se-account-card .accountRow {
+  position: static !important;
+  display: flex;
+  flex-direction: row-reverse; /* Steam puts the value first */
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text-muted) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .accountData {
+  position: static !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .accountData a {
+  color: var(--se-text) !important;
+  text-decoration: none !important;
+}
+
+/* Steam's small inline icons: on the text's line; the phone one is the theme's glyph (page.js) */
+html.se-store-account:not(#se-none) .se-account-card .account_setting_sub_block img {
+  width: auto;
+  height: 1.1em;
+  margin: 0 4px 0 2px;
+  vertical-align: -.2em;
+  opacity: .75;
+}
+
+.se-account-inline-icon {
+  width: 1.15em;
+  height: 1.15em;
+  margin: 0 3px 0 4px;
+  vertical-align: -.22em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: var(--se-text-muted);
+}
+
+.se-account-inline-icon .d {
+  fill: currentColor;
+  fill-opacity: .3;
+  stroke: none;
+}
+
+/* Named anchors between sections (scroll targets): out of the column's flow, so they add no gap */
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.right > a:empty {
+  position: absolute;
+}
+
+/* ---------- Settings sections (Store preferences) ----------
+ * Each card holds an .account_settings_container: h2 subsections, each a p of help and a
+ * blockquote of controls (label.account_manage_checkbox > text + input, radios, tag and word
+ * forms, links), with div.hspacer between. Checkboxes become switches at the row's end, the
+ * spacers dividers, Steam's floats a plain column.
+ */
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-md)/1.6 var(--se-font) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container :is(.half, .content_two_column) {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-lg)/1.35 var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container a:has(> h2) {
+  display: block;
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container p {
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  color: var(--se-text-dim) !important;
+  font: inherit !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container h3 {
+  margin: 18px 0 8px !important;
+  padding: 0 !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container blockquote h3:first-child {
+  margin-top: 0 !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container blockquote {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-dim);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container br {
+  display: none;
+}
+
+/* …except the one that puts "View Example Products" under its description */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .account_setting_parenthetical br {
+  display: inline;
+}
+
+/* Spacers between subsections: dividers; the last one in a card has nothing after it */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .hspacer {
+  height: 1px !important;
+  margin: 22px 0 !important;
+  background: var(--se-divider) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container > .hspacer:last-child {
+  display: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container a:not([class*="btn"]):not(.account_manage_link):not(.tooltip):not(.dselect_container a) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container a:not([class*="btn"]):not(.account_manage_link):not(.tooltip):not(.dselect_container a):hover {
+  color: var(--se-accent-hover) !important;
+}
+
+/* Steam's "?" help icons */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .hover_tooltip img {
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+  vertical-align: -2px;
+  opacity: .55;
+  transition: opacity var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .hover_tooltip:hover img {
+  opacity: 1;
+}
+
+/* Checkbox rows: text left, switch right */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container label.account_manage_checkbox {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-sizing: border-box;
+  min-height: 46px;
+  margin: 0 0 6px !important;
+  padding: 8px 14px !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.35 var(--se-font) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container label.account_manage_checkbox:hover {
+  background: var(--se-hover);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container label.account_manage_checkbox > input {
+  order: 2;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container label.account_manage_checkbox > a {
+  margin-right: auto; /* "Show titles not in [my languages]": the link stays with its words */
+  margin-left: -10px;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container input[type="checkbox"] {
+  flex: none;
+  position: relative;
+  width: 38px;
+  height: 22px;
+  margin: 0 !important;
+  border-radius: var(--se-radius-pill);
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--se-text-muted);
+  transition: transform var(--se-dur-fast) var(--se-ease), background-color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container input[type="checkbox"]:checked {
+  background: var(--se-accent);
+  box-shadow: none;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container input[type="checkbox"]:checked::after {
+  background: var(--se-on-accent);
+  transform: translateX(16px);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container input:is([type="checkbox"], [type="radio"]):focus-visible {
+  outline: 2px solid var(--se-accent);
+  outline-offset: 2px;
+}
+
+/* Radios (chat filtering): a dot before the label */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .h3_content > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 8px;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .h3_content > div > label {
+  color: var(--se-text) !important;
+  cursor: pointer;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container input[type="radio"] {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0 !important;
+  border-radius: 50%;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  cursor: pointer;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container input[type="radio"]:checked {
+  background: var(--se-on-accent);
+  box-shadow: inset 0 0 0 6px var(--se-accent);
+}
+
+/* Mature content: a table of descriptors with a Store and a Community switch each */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .preference_row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 110px 110px;
+  align-items: center;
+  gap: 12px;
+  margin: 0 !important;
+  padding: 12px 14px !important;
+  border: 0 !important;
+  box-shadow: inset 0 -1px 0 var(--se-hairline);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .preference_row:last-child {
+  box-shadow: none;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .preference_row > * {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .preference_row :is(.store_pref_col, .community_pref_col) {
+  display: flex;
+  justify-content: center;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .account_manage_subtitle {
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.4 var(--se-font) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .account_setting_parenthetical {
+  display: block;
+  margin-top: 2px;
+  color: var(--se-text-muted) !important;
+  font: 400 var(--se-fs-base)/1.5 var(--se-font) !important;
+}
+
+/* Links Steam styles as manage links (View List, Edit Preferences, the queue buttons): pills */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container :is(a, div).account_manage_link {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  width: auto !important;
+  min-height: 36px;
+  margin: 4px 8px 0 0 !important;
+  padding: 0 16px !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.3 var(--se-font) !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container :is(a, div).account_manage_link:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container :is(a, div).account_manage_link::after {
+  margin-left: 4px;
+}
+
+/* Tag and word forms: the field, then Add */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container :is(.app_tag_form_ctn, [class$="_words_form_ctn"]) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100% !important;
+  max-width: 420px;
+  height: auto !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container :is(.app_tag_form_ctn, [class$="_words_form_ctn"]) > button {
+  order: 2;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .gray_bevel.for_text_input {
+  flex: 1;
+  overflow: visible !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .gray_bevel.for_text_input input {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 36px !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-md)/1 var(--se-font) !important;
+  outline: none;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .gray_bevel.for_text_input input::placeholder {
+  color: var(--se-text-faint);
+  font-style: normal;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .gray_bevel.for_text_input input:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--se-accent);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container :is(button, div, a)[class*="btnv6_"] {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 36px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), opacity var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container :is(button, div, a)[class*="btnv6_"] > span {
+  padding: 0 16px !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: 600 var(--se-fs-md)/36px var(--se-font) !important;
+  text-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container :is(button, div, a)[class*="btnv6_"]:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container :is(button, div, a)[class*="btnv6_"].btn_disabled {
+  opacity: .45;
+  pointer-events: none;
+}
+
+/* Word lists: two tiles side by side */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container div:has(> .content_two_column) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+  height: auto !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .word_form {
+  width: auto !important;
+  height: auto !important;
+  padding: 16px !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .word_form > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* "View custom words" / "Hide custom words": a text toggle (Steam draws it as a grey box) */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .text_filter_action_link {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 4px 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-accent) !important;
+  font: 600 var(--se-fs-base)/1.2 var(--se-font) !important;
+  cursor: pointer;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .text_filter_action_link:hover {
+  color: var(--se-accent-hover) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .text_filter_action_link[style*="none"] {
+  display: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .text_filter_action_link > span {
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+}
+
+/* Steam's double-chevron image → the theme's chevron, turned by .up / .down */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .text_filter_toggle_icon {
+  width: 12px !important;
+  height: 12px !important;
+  margin: 0 !important;
+  float: none !important;
+  background: currentColor !important;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform var(--se-dur-fast) var(--se-ease);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .text_filter_toggle_icon.up {
+  transform: rotate(180deg);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .word_form hr {
+  height: 1px;
+  margin: 12px 0;
+  border: 0;
+  background: var(--se-divider);
+}
+
+/* Tags (excluded tags, custom words): chips */
+/* Steam paints the chip's inner box (red when the word is "broken"); the chip carries the tone */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .tag_downvoted > div {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .tag_downvoted > div > * {
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .tag_downvoted > div > span:last-child {
+  opacity: .6;
+  cursor: pointer;
+  transition: opacity var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .tag_downvoted > div > span:last-child:hover {
+  opacity: 1;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .tag_downvoted.broken {
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-danger) 35%, transparent) !important;
+  color: var(--se-danger-text) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .tag_downvoted {
+  display: inline-flex !important;
+  align-items: center;
+  height: 28px !important;
+  margin: 6px 6px 0 0 !important;
+  padding: 0 10px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-base)/1 var(--se-font) !important;
+}
+
+/* Ignored products: a small stat tile */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .not_interested_container {
+  display: inline-flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 12px 0 0 !important;
+  padding: 12px 16px !important;
+  float: none !important;
+  vertical-align: middle;
+  border: 0 !important; /* Steam outlines it in blue */
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .not_interested_container > * {
+  width: auto !important;
+  height: auto !important;
+  float: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .not_interested_container .count {
+  text-align: left !important;
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-3xl)/1.1 var(--se-font) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .not_interested_container .description {
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-base)/1.4 var(--se-font) !important;
+}
+
+/* Ignored products (/account/notinterested/): the list, or its empty state */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container p.info {
+  color: var(--se-text-muted) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .ignored_apps {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .ignored_apps:not(:has(*)) {
+  padding: 36px 20px !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-md)/1.4 var(--se-font) !important;
+  text-align: center;
+}
+
+/* ---------- Action links: one row button each ---------- */
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  margin: 0 !important;
+  padding: 8px 14px !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.3 var(--se-font) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link::after {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  opacity: .5;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: opacity var(--se-dur-fast), transform var(--se-dur-fast) var(--se-ease);
+}
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link:hover::after {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+/* Add funds: the page's one primary action */
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link[href*="addfunds" i] {
+  background: var(--se-accent) !important;
+  box-shadow: none;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link[href*="addfunds" i]:hover {
+  background: var(--se-accent-hover) !important;
+}
+
+/* ---------- Wallet tile ---------- */
+
+.se-account-balance {
+  order: -1; /* heads the tile, above Add funds */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 4px;
+}
+
+.se-account-balance-label {
+  font: var(--se-label-font);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--se-text-faint);
+}
+
+html.se-store-account:not(#se-none) .se-account-balance-amount {
+  align-self: flex-start;
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-4xl)/1.1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+  text-decoration: none !important;
+  transition: color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) a.se-account-balance-amount:hover {
+  color: var(--se-accent-hover) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-wallet] > p {
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-base);
+}
+
+/* Saved payment method: a field with the brand, the card's tail and its actions */
+html.se-store-account:not(#se-none) .se-account-card .payment_method_box {
+  margin: 0 !important;
+  padding: 6px 6px 6px 14px !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .payment_method_box table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .payment_method_box td {
+  padding: 0 !important;
+  vertical-align: middle;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-md)/1.3 var(--se-font) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .payment_method_box td + td {
+  width: 1%;
+  padding-left: 6px !important;
+  white-space: nowrap;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .cached_payment_method_description {
+  margin-left: 6px;
+  color: var(--se-text-muted);
+  font-weight: 500;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .payment_method_box td a {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface-2);
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-sm)/1 var(--se-font);
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .payment_method_box td a:hover {
+  background: var(--se-hover);
+  color: var(--se-text) !important;
+}
+
+/* ---------- Danger card: delete account ---------- */
+
+.se-account-card[data-tone="danger"] {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: color-mix(in srgb, var(--se-danger) 6%, var(--se-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-danger) 22%, transparent);
+}
+
+.se-account-card[data-tone="danger"] > .se-account-chip {
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent);
+  box-shadow: none;
+  color: var(--se-danger);
+}
+
+html.se-store-account:not(#se-none) .se-account-card[data-tone="danger"] > .account_setting_block_short {
+  flex: 1;
+  min-width: 0;
+  display: block !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card[data-tone="danger"] .account_setting_sub_block_long {
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none;
+  color: var(--se-text-muted) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card[data-tone="danger"] .account_setting_sub_block_long > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+  color: var(--se-text-muted);
+}
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link.delete_link {
+  order: 2;
+  width: auto;
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent) !important;
+  box-shadow: none;
+  color: var(--se-danger) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link.delete_link:hover {
+  background: var(--se-danger) !important;
+  color: var(--se-on-accent) !important;
+}
+
+/* ---------- Other pages: the content column as one card ----------
+ * Store preferences, Language Preferences, Data & Browsing ... are Steam's own forms (and a few
+ * React apps): they keep their markup; the column becomes a card and Steam's controls take the
+ * theme's type, fields and pill buttons.
+ */
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] {
+  display: block !important;
+  min-height: 240px;
+  padding: 28px 32px 32px !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-md)/1.6 var(--se-font) !important;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(h1, h2, h3, h4) {
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--se-text);
+  font-family: var(--se-font);
+  font-weight: 700;
+  letter-spacing: -.01em;
+  text-transform: none;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] h2 {
+  font-size: var(--se-fs-2xl);
+  line-height: 1.3;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(h3, h4) {
+  font-size: var(--se-fs-lg);
+  line-height: 1.4;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(p, li, label, td, th) {
+  color: var(--se-text-dim);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(b, strong) {
+  color: var(--se-text);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] a[href]:not([class*="btn"]) {
+  color: var(--se-accent);
+  text-decoration: none;
+  transition: color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] a[href]:not([class*="btn"]):hover {
+  color: var(--se-accent-hover);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] hr,
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] .inner_rule {
+  height: 1px;
+  margin: 20px 0;
+  border: 0;
+  background: var(--se-divider);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] table {
+  border-collapse: collapse;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(td, th) {
+  border-color: var(--se-divider);
+}
+
+/* Fields */
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(input:is([type="text"], [type="email"], [type="number"], [type="search"], [type="tel"], [type="password"], :not([type])), select, textarea) {
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text);
+  font: 500 var(--se-fs-md)/1.4 var(--se-font);
+  outline: none;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] textarea {
+  padding: 10px 12px;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(input, select, textarea):focus-visible {
+  box-shadow: inset 0 0 0 1px var(--se-accent);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] select option {
+  background: var(--se-surface-2);
+  color: var(--se-text);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] input:is([type="checkbox"], [type="radio"]) {
+  accent-color: var(--se-accent);
+}
+
+/* Steam's buttons (buttons.css): pills; the green one is the page's accent action */
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(.btn_green_steamui, .btn_blue_steamui, .btn_grey_steamui, .btn_grey_black, .btnv6_blue_hoverfade, .btnv6_green_white_innerfade, .btn_darkblue_white_innerfade, .btnv6_lightblue_blue, .btnv6_grey_black, .btn_green_white_innerfade) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1 var(--se-font);
+  text-decoration: none;
+  text-shadow: none;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(.btn_green_steamui, .btn_blue_steamui, .btn_grey_steamui, .btn_grey_black, .btnv6_blue_hoverfade, .btnv6_green_white_innerfade, .btn_darkblue_white_innerfade, .btnv6_lightblue_blue, .btnv6_grey_black, .btn_green_white_innerfade) > span {
+  display: block;
+  padding: 0 18px !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: 36px !important;
+  text-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(.btn_green_steamui, .btn_blue_steamui, .btn_grey_steamui, .btn_grey_black, .btnv6_blue_hoverfade, .btnv6_green_white_innerfade, .btn_darkblue_white_innerfade, .btnv6_lightblue_blue, .btnv6_grey_black, .btn_green_white_innerfade):hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(.btn_green_steamui, .btnv6_green_white_innerfade, .btn_green_white_innerfade) {
+  background: var(--se-accent) !important;
+  box-shadow: none;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(.btn_green_steamui, .btnv6_green_white_innerfade, .btn_green_white_innerfade):hover {
+  background: var(--se-accent-hover) !important;
+}
+
+/* A sidebar-less settings page (Update Store & Wallet Country): #main_content is the card, its
+   header bar the card's title */
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] {
+  box-sizing: border-box;
+  margin-bottom: 64px !important;
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] > .account_header_line {
+  height: auto !important;
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] > .account_header_line > div {
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-2xl)/1.3 var(--se-font) !important;
+  letter-spacing: -.01em;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] :is(.account_change_country_content, .account_change_country_block) {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  background: none !important;
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] :is(.spacer, .account_change_country_content > div:empty) {
+  display: none !important;
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] p {
+  margin: 0 0 12px;
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] #other_country_contact_support {
+  margin-top: 16px !important;
+  padding-top: 16px !important;
+  border-top: 1px solid var(--se-divider);
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] #other_country_contact_support > br {
+  display: none;
+}
+
+/* ---------- Wallet card (Add funds, Redeem a code) ----------
+ * Steam's .rightcol > .block.accountInfoBlock: .block_header, .block_content > .accountBalance
+ * (label and figure, moved into .se-account-balance by page.js), a.addfunds_linkbar(s), some
+ * in a .wallent_actions_ctn. The pages place the card; this draws it.
+ */
+
+html.se-store-account:not(#se-none) .rightcol .accountInfoBlock {
+  margin: 0 !important;
+  padding: 22px 22px 18px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-account:not(#se-none) .rightcol .accountInfoBlock .block_header {
+  height: auto !important;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-store-account:not(#se-none) .rightcol .accountInfoBlock .block_header > div {
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store-account:not(#se-none) .rightcol .accountInfoBlock .block_content {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* Balance: Steam's label and figure, moved into the theme's head by page.js */
+html.se-store-account:not(#se-none) .rightcol .se-account-balance {
+  margin: 0 0 18px;
+  padding: 0;
+}
+
+html.se-store-account:not(#se-none) .se-account-balance > :is(.accountLabel, .accountData) {
+  position: static !important;
+  inset: auto !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  background: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-balance > .accountLabel {
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-base)/1.3 var(--se-font) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-balance > .accountData {
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-4xl)/1.1 var(--se-font) !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+}
+
+html.se-store-account:not(#se-none) .wallent_actions_ctn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-account:not(#se-none) a.addfunds_linkbar {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-sizing: border-box;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 40px;
+  margin: 0 !important;
+  padding: 8px 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.3 var(--se-font) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) a.addfunds_linkbar::after {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  opacity: .5;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+html.se-store-account:not(#se-none) .rightcol .accountInfoBlock .block_content > a.addfunds_linkbar + a.addfunds_linkbar {
+  margin-top: 8px !important;
+}
+
+html.se-store-account:not(#se-none) a.addfunds_linkbar:hover {
+  background: var(--se-hover) !important;
+}
+
+/* Steam's own arrow images inside the link bars */
+html.se-store-account:not(#se-none) a.addfunds_linkbar img {
+  display: none;
+}
+
+/* ---------- React pages in the classic frame (Family Management, Security & Devices,
+ * Data & Browsing) ----------
+ * Steam renders their content after load, nested a few <div>s deep: header bars
+ * (.account_header_line, sometimes in a wrapper) each followed by their body. React owns
+ * those nodes, so nothing moves: the column drops the panel card, each bar draws as a card's
+ * top and the element after it as the card's body. Steam's stable dialog classes
+ * (DialogButton, DialogToggleField, ActiveTab) take the theme's controls.
+ */
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) {
+  min-height: 0;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 24px 28px 10px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl) var(--se-radius-xl) 0 0;
+  background: var(--se-surface) !important;
+  box-shadow: none; /* a split card: a hairline would show the seam */
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-2xl)/1.3 var(--se-font) !important;
+  letter-spacing: -.01em;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line > div {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--se-text-dim);
+}
+
+/* The theme's icon chip (page.js sets --se-account-icon, an image in the theme's colour): one
+   pseudo-element, the chip its background colour and the icon its background image */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line[style*="--se-account-icon"] {
+  gap: 14px;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line[style*="--se-account-icon"]::before {
+  content: "";
+  flex: none;
+  order: -1;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill) var(--se-account-icon) center / 20px 20px no-repeat;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+/* …and Steam's own glyph in the bar steps aside; links (the "?" help) keep theirs */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line[style*="--se-account-icon"] > svg,
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line[style*="--se-account-icon"] > div > svg {
+  display: none;
+}
+
+/* Intro text (Family Management): the card's full width, not Steam's narrow centred column */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) div:has(> p):not(:has(button, .DialogButton)) {
+  width: auto !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  text-align: left !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) div:has(> .DialogButton:not(.Small)) {
+  gap: 12px;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Big dialog buttons (Join / Create a family): tiles with the theme's icon chip, label beside it */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:not(.Small)[style*="--se-account-icon"] {
+  position: relative !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 72px;
+  padding: 16px 20px 16px 76px !important; /* room for the 42px chip at 20px */
+  text-align: left !important;
+  text-transform: none !important;
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font) !important;
+  letter-spacing: 0 !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:not(.Small)[style*="--se-account-icon"]::after {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: auto !important;
+  left: 20px !important;
+  top: 50% !important;
+  width: 42px !important;
+  height: 42px !important;
+  margin: -21px 0 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-pill) var(--se-account-icon) center / 20px 20px no-repeat !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:not(.Small)[style*="--se-account-icon"]:hover::after {
+  background-color: var(--se-accent-surface) !important;
+}
+
+/* Steam's label sits beside the chip; its glyph row (arrow + people) steps aside */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:not(.Small)[style*="--se-account-icon"] > * {
+  margin: 0 !important;
+  text-align: left !important;
+  text-transform: none !important;
+  font: inherit !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:not(.Small)[style*="--se-account-icon"] > div:has(> svg) {
+  display: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line a {
+  margin-left: auto;
+  color: var(--se-text-faint) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :is(.account_header_line, div:has(> .account_header_line)) + div {
+  box-sizing: border-box;
+  width: auto !important;
+  margin: 0 0 16px !important;
+  padding: 10px 28px 28px !important;
+  float: none !important;
+  border: 0 !important;
+  border-radius: 0 0 var(--se-radius-xl) var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: none;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) div:has(> .account_header_line) {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* Tabs (Family Management) */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .ActiveTab {
+  color: var(--se-text) !important;
+  box-shadow: inset 0 -2px 0 var(--se-accent);
+}
+
+/* Dialog buttons: big ones as tiles (Join / Create a family), small ones round */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton {
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font-family: var(--se-font) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:hover {
+  background: var(--se-hover) !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent-surface) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Primary:not(.Small) {
+  font-weight: 700 !important;
+}
+
+/* A form's own button (Create, Send invite): an accent pill, not a tile */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:not(.Small):not([style*="--se-account-icon"]):not(:has(svg)) {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
+  min-width: 96px !important;
+  height: 38px !important;
+  padding: 0 22px !important;
+  border-radius: var(--se-radius-pill) !important;
+  font: 700 var(--se-fs-md)/1 var(--se-font) !important;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Primary:not(.Small):not([style*="--se-account-icon"]):not(:has(svg)) {
+  background: var(--se-accent) !important;
+  box-shadow: none !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Primary:not(.Small):not([style*="--se-account-icon"]):not(:has(svg)):hover {
+  background: var(--se-accent-hover) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Disabled {
+  opacity: .45;
+  pointer-events: none;
+}
+
+/* Family forms (Join / Create a family): a step title over its help text, then field + button */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) div:has(> p) > div:first-child:not(:has(*)) {
+  margin: 18px 0 6px !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-xl)/1.35 var(--se-font) !important;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) div:has(> input + .DialogButton) {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  width: auto !important;
+  max-width: 640px;
+  height: auto !important;
+  margin: 8px 0 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) div:has(> input + .DialogButton) > input {
+  flex: 1;
+  height: 38px !important;
+}
+
+/* Small buttons (a device's expand chevron): a 32px circle that stays inside its row; Steam's
+   focus ring (a pseudo-element and outline) gives way to the theme's */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Small {
+  display: inline-flex !important;
+  flex: none !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+  width: 32px !important;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  outline: none !important;
+  line-height: 1 !important;
+}
+
+/* Its holder: Steam pins the holder (and the button) to 12×12 with !important, sized for its
+   bare chevron; the theme's 32px circle then spills out of it, past the device row. The
+   holder takes the button's size again. */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> .DialogButton.Small) {
+  display: flex !important;
+  flex: none !important;
+  width: auto !important;
+  height: auto !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+/* The row it sits in (a device's location, then the chevron): centred on one line. (A :has()
+   can't nest another, so the row is found through its child: :has(> * > button).) */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> * > .DialogButton.Small) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px;
+}
+
+/* Every item on the line is the chevron's height, its text on that height's middle */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> * > .DialogButton.Small) > * {
+  align-self: center !important;
+  height: 32px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> * > .DialogButton.Small) > :not(:has(> .DialogButton.Small)) {
+  display: block !important;
+  line-height: 32px !important;
+  white-space: nowrap;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Small::before,
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Small::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* A small button with a label instead of a glyph ("Sign out everywhere"): a pill, as wide as
+   its words */
+/* A box that only holds a dialog button: Steam's dark backing goes, the button carries the look */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> .DialogButton:only-child) {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Small:not(:has(svg)) {
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: none !important;
+  height: 32px !important; /* the row it may share with a chevron is 32px tall */
+  padding: 0 18px !important;
+  font: 600 var(--se-fs-md)/1 var(--se-font) !important;
+  white-space: nowrap;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Small svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:focus {
+  outline: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--se-accent) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton svg {
+  color: var(--se-text-dim);
+}
+
+/* On/off fields (Data & Browsing): label and description, then a segmented OFF / ON */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggle_Label {
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.35 var(--se-font) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggle_Description {
+  color: var(--se-text-muted) !important;
+  font: 400 var(--se-fs-base)/1.5 var(--se-font) !important;
+}
+
+/* The control's frame: Steam backs the pill with a square dark box */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField_Control {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField_OptionPanel {
+  display: flex !important;
+  gap: 2px;
+  padding: 3px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField_Option {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  height: 26px !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: 700 var(--se-fs-xs)/1 var(--se-font) !important;
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField_Option:hover:not(.Active) {
+  color: var(--se-text) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField_Option.Active {
+  background: var(--se-accent) !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField_Option.Off.Active {
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+}
+
+/* Reject All / Accept All (Data & Browsing): pills */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_settings_container > .Panel.Focusable:has(> .Focusable) {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 8px;
+  height: auto !important;
+  margin: 0 0 18px !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_settings_container > .Panel.Focusable > .Focusable {
+  display: inline-flex !important;
+  align-items: center;
+  height: 34px !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1 var(--se-font) !important;
+  cursor: pointer;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_settings_container > .Panel.Focusable > .Focusable:hover {
+  background: var(--se-hover) !important;
+}
+
+/* Steam's own blue and grey boxes in these sections (Steam Guard's authenticator panel, its
+   link buttons), marked by page.js: tiles in the theme's surface, buttons as pills */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="tile"] {
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+/* One inset for every outer tile, so icons and titles line up from tile to tile (the Steam
+   Guard bar and the device panel each came with Steam's own padding) */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="tile"]:not([data-se-account-tone="tile"] [data-se-account-tone="tile"]) {
+  padding: 12px 16px !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="tile"] [data-se-account-tone="tile"],
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="tile"] > .Panel {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="tile"] + [data-se-account-tone="tile"] {
+  margin-top: 8px !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="tile"] [data-se-account-tone="tile"] {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="button"] {
+  display: inline-flex !important;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.2 var(--se-font) !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+/* The label in the text colour, whatever element Steam put it in and however it coloured it */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :is([data-se-account-tone="button"], [data-se-account-tone="button"] *) {
+  color: var(--se-text) !important;
+  -webkit-text-fill-color: var(--se-text) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="button"]:hover {
+  background: var(--se-hover) !important;
+}
+
+/* Steam's picture icons (Steam Guard shield, device phone / PC), marked by page.js: the theme's
+   chip. An <img> swaps its picture for the icon; an <svg> hides its paths over a background. */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-glyph] {
+  box-sizing: border-box !important;
+  flex: none !important;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px;
+  border-radius: var(--se-radius-md) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  object-fit: contain;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) img[data-se-account-glyph]:not([data-se-account-glyph="badge"]) {
+  margin: 0 8px 0 0 !important; /* the same gap as a device's icon and name */
+  vertical-align: middle;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) img[data-se-account-glyph] {
+  content: var(--se-account-icon);
+  padding: 10px !important;
+  background: var(--se-pill) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) svg[data-se-account-glyph] {
+  background: var(--se-pill) var(--se-account-icon) center / 20px 20px no-repeat !important;
+  overflow: hidden;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) svg[data-se-account-glyph] > * {
+  display: none !important;
+}
+
+/* The status badge over a device icon: a small accent disc with the shield, on the chip's corner */
+/* Its holder: exactly the chip's size (Steam stretches it to the row's height, which dropped
+   the badge to the row's foot), pinned to the row's top so it stays put when the row expands */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> [data-se-account-glyph="badge"]) {
+  position: relative !important;
+  flex: none !important;
+  align-self: flex-start !important;
+  width: 40px !important;
+  height: 40px !important;
+  margin: 4px 13px 0 0 !important; /* lines the name up with the Steam Guard bar's title */
+  padding: 0 !important;
+}
+
+/* The device's text column: no extra inset of Steam's, so the name lines up with the bar's title */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> [data-se-account-glyph="badge"]) + * {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) img[data-se-account-glyph="badge"] {
+  content: var(--se-account-icon);
+  position: absolute !important;
+  right: -4px !important;
+  bottom: -4px !important;
+  left: auto !important;
+  top: auto !important;
+  box-sizing: border-box !important;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 3px !important;
+  border-radius: 50% !important;
+  background: var(--se-accent) !important;
+  box-shadow: 0 0 0 2px var(--se-surface-2) !important;
+  transform: none !important;
+}
+
+/* ---------- Language Preferences ----------
+ * The primary language is Steam's .dselect dropdown (button.trigger + a list it shows and
+ * hides); the secondary and additional ones are long lists of input + label pairs in two
+ * columns. Those get square checkboxes, not switches: forty switches read as noise.
+ */
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .dselect_container {
+  position: relative;
+  display: inline-block;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 0 4px !important;
+}
+
+/* Steam backs the open dropdown with a dark box and a black rule under the trigger */
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container :is(.dselect_container, .dselect_container.active, .dselect_container .dropcontainer) {
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .dselect_container .dropcontainer {
+  z-index: 20;
+  padding: 0 !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .dselect_container button.trigger {
+  position: relative;
+  min-width: 280px;
+  height: 38px !important;
+  margin: 0 !important;
+  padding: 0 38px 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/38px var(--se-font) !important;
+  text-align: left;
+  cursor: pointer;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .dselect_container button.trigger::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  background: var(--se-text-muted);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .dselect_container .dropcontainer ul {
+  max-height: 360px;
+  margin: 6px 0 0 !important;
+  padding: 6px !important;
+  overflow-y: auto;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-shadow-pop);
+  list-style: none;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .dselect_container .dropcontainer li a {
+  display: block;
+  padding: 8px 12px !important;
+  border-radius: var(--se-radius-sm);
+  background: none !important;
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-md)/1.3 var(--se-font) !important;
+  text-decoration: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .dselect_container .dropcontainer li a:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .dselect_container .dropcontainer li a.highlighted_selection,
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .dselect_container .dropcontainer li a:focus-visible {
+  background: var(--se-accent-surface) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .two_column_container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0 24px;
+  width: auto !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .two_column_container .half blockquote {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 10px;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .two_column_container blockquote > label {
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-md)/1.35 var(--se-font) !important;
+  cursor: pointer;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container input:is(.secondary_language_checkbox, .additional_language_checkbox) {
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 5px !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container input:is(.secondary_language_checkbox, .additional_language_checkbox)::after {
+  inset: 0;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container input:is(.secondary_language_checkbox, .additional_language_checkbox):checked::after {
+  background: var(--se-on-accent);
+  transform: none;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center / 12px no-repeat;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .language_beta {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent-surface);
+  color: var(--se-accent) !important;
+  font: 700 10px/1 var(--se-font) !important;
+  letter-spacing: .06em;
+  vertical-align: 1px;
+}
+
+/* Save, under the cards: the page's accent action, on the right */
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.right > a[class*="btn_green"] {
+  align-self: flex-end;
+  display: inline-flex !important;
+  align-items: center;
+  width: auto !important;
+  height: 40px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-accent) !important;
+  color: var(--se-on-accent) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.right > a[class*="btn_green"] > span {
+  padding: 0 28px !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: 700 var(--se-fs-md)/40px var(--se-font) !important;
+  text-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.right > a[class*="btn_green"]:hover {
+  background: var(--se-accent-hover) !important;
+}
+
+/* ---------- Newer account pages (Notification Settings, Playtests) ----------
+ * #StoreTemplate pages with hashed classes; page.js marks their parts
+ * ([data-se-account-modern]) and these rules give them the classic pages' look: the wide
+ * frame, the title and chip, the sidebar card with icons (a mask from the link's
+ * --se-account-icon), section headings over card bodies.
+ */
+
+:is(html.se-store-account:not(#se-none) [data-se-account-modern="header"], html.se-store-account:not(#se-none) [data-se-account-modern="frame"]) {
+  box-sizing: border-box;
+  width: min(1760px, calc(100% - 64px)) !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="header"] {
+  padding: 28px 0 !important;
+}
+
+/* The band behind the header: Steam paints a blue spotlight image there; the classic pages
+   have none, so it goes. */
+html.se-store-account:not(#se-none) :has(> [data-se-account-modern="header"]) {
+  min-height: 0 !important;
+  height: auto !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="crumbs"] {
+  margin: 0 0 10px !important;
+  color: var(--se-text-faint) !important;
+  font: 600 var(--se-fs-sm)/1.4 var(--se-font) !important;
+  letter-spacing: .02em;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="crumbs"] a {
+  color: var(--se-text-muted) !important;
+  text-decoration: none !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="crumbs"] a:hover {
+  color: var(--se-white) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="title"] {
+  margin: 0 !important;
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-display)/1.15 var(--se-font) !important;
+  letter-spacing: -.02em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="frame"] {
+  display: grid !important;
+  grid-template-columns: 280px minmax(0, 1fr);
+  align-items: start;
+  gap: 32px;
+  padding: 0 0 64px !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="nav"] {
+  position: sticky;
+  top: calc(var(--se-nav-h, 46px) + 38px);
+  display: flex !important;
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+  width: auto !important;
+  padding: 10px !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+:is(html.se-store-account:not(#se-none) [data-se-account-modern="link"], html.se-store-account:not(#se-none) [data-se-account-modern="link-active"]) {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  min-height: 40px;
+  margin: 0 !important;
+  padding: 6px 10px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-md)/1.3 var(--se-font) !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+:is(html.se-store-account:not(#se-none) [data-se-account-modern="link"], html.se-store-account:not(#se-none) [data-se-account-modern="link-active"])::before {
+  content: "";
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-pill);
+}
+
+:is(html.se-store-account:not(#se-none) [data-se-account-modern="link"], html.se-store-account:not(#se-none) [data-se-account-modern="link-active"])::after {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  background: var(--se-text-faint);
+  -webkit-mask: var(--se-account-icon) center / contain no-repeat;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="link"]:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="link-active"] {
+  background: var(--se-accent-surface) !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="link-active"]::before {
+  background: var(--se-accent);
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="link-active"]::after {
+  background: var(--se-on-accent);
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] {
+  width: auto !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-md)/1.55 var(--se-font) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="heading"] {
+  height: auto !important;
+  margin: 0 !important;
+  padding: 24px 28px 10px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl) var(--se-radius-xl) 0 0;
+  background: var(--se-surface) !important;
+  box-shadow: none; /* a split card: a hairline would show the seam */
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-2xl)/1.3 var(--se-font) !important;
+  letter-spacing: -.01em;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="block"] {
+  box-sizing: border-box;
+  width: auto !important;
+  margin: 0 0 16px !important;
+  padding: 24px 28px 28px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="heading"] + [data-se-account-modern="block"] {
+  padding-top: 10px !important;
+  border-radius: 0 0 var(--se-radius-xl) var(--se-radius-xl);
+  box-shadow: none; /* the heading's card continues: no seam */
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] h2 {
+  margin: 18px 0 6px !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-lg)/1.35 var(--se-font) !important;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] h2:first-child {
+  margin-top: 0 !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] p {
+  color: var(--se-text-dim) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] a:not(:has(img)) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 36px !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1 var(--se-font) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] button:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] button > span {
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+}
+
+/* A group of buttons (Accept Invite / Decline Invite): the first is the action */
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] :has(> button + button) > button:first-child {
+  background: var(--se-accent) !important;
+  box-shadow: none;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] :has(> button + button) > button:first-child:hover {
+  background: var(--se-accent-hover) !important;
+}
+
+/* Notification Settings: groups (a title with a stable id, notificationgroup_N, then rows of a
+   label and a channel dropdown) */
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [id^="notificationgroup_"] {
+  margin: 18px 0 6px !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+/* The group itself: Steam tints it white (5%), a box behind the rows; the rows are the cards */
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] :has(> [id^="notificationgroup_"]) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  outline: none;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] :has(> [id^="notificationgroup_"]):first-child [id^="notificationgroup_"] {
+  margin-top: 0 !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [id^="notificationgroup_"] ~ * {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 52px;
+  margin: 0 0 6px !important;
+  padding: 8px 8px 8px 16px !important;
+  box-sizing: border-box;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.35 var(--se-font) !important;
+}
+
+/* The channel dropdown (the label "Email, Toast, Mobile, Feed" and a chevron): a field */
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [id^="notificationgroup_"] ~ * > :last-child > [role="combobox"] {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  box-sizing: border-box;
+  height: 36px !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-md)/1 var(--se-font) !important;
+  cursor: pointer;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [id^="notificationgroup_"] ~ * > :last-child > [role="combobox"]:hover {
+  box-shadow: inset 0 0 0 1px var(--se-accent-surface) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [id^="notificationgroup_"] ~ * > :last-child > [role="combobox"] svg {
+  width: 12px;
+  height: 12px;
+  color: var(--se-text-muted);
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [id^="notificationgroup_"] ~ * > :last-child > [role="combobox"][aria-expanded="true"] {
+  box-shadow: inset 0 0 0 1px var(--se-accent) !important;
+}
+
+/* The channel menu (a popover listbox of checkbox options). It sits in the top layer but stays
+   inside the content in the DOM, so it is reached by role. */
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [role="listbox"][popover] {
+  min-width: 240px;
+  padding: 6px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-pop) !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [role="listbox"][popover] [role="option"] {
+  padding: 8px 10px !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-md)/1.35 var(--se-font) !important;
+  cursor: pointer;
+  transition: background var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [role="listbox"][popover] [role="option"]:is(:hover, :focus-visible) {
+  background: var(--se-pill) !important;
+  outline: none;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [role="listbox"][popover] [role="option"][aria-disabled="true"] {
+  opacity: .55;
+  cursor: default;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [role="listbox"][popover] [role="option"][aria-disabled="true"]:hover {
+  background: none !important;
+}
+
+/* The note under an option ("Feed is automatically enabled…") */
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [role="listbox"][popover] [role="option"] span + span {
+  margin-top: 2px;
+  color: var(--se-text-faint) !important;
+  font: 400 var(--se-fs-sm)/1.35 var(--se-font) !important;
+}
+
+/* Option checkboxes: the theme's square box, accent when checked */
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [role="listbox"][popover] [role="checkbox"] {
+  display: grid !important;
+  place-items: center;
+  flex: none;
+  width: 18px !important;
+  height: 18px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 5px !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1.5px var(--se-text-faint) !important;
+  color: transparent !important;
+  transition: background var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [role="listbox"][popover] [role="checkbox"] > * {
+  display: grid !important;
+  place-items: center;
+  width: auto !important;
+  height: auto !important;
+  background: none !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [role="listbox"][popover] [role="checkbox"] svg {
+  width: 11px !important;
+  height: 11px !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] [role="listbox"][popover] [role="checkbox"][aria-checked="true"] {
+  background: var(--se-accent) !important;
+  box-shadow: none !important;
+  color: var(--se-on-accent) !important;
+}
+
+/* Avatars (Playtests: who invited you): Steam's square picture, with a status bar along one
+   edge, becomes the store's rounded avatar (as in shared/ui.css). The avatar is an <img> after
+   an empty frame <div> that draws the bar; the frame steps aside. */
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] :has(> div:empty + img) {
+  flex: none;
+  overflow: hidden;
+  border-radius: var(--se-radius-sm);
+  background: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] :has(> div:empty + img) > img {
+  display: block;
+  border-radius: var(--se-radius-sm) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-modern="content"] :has(> div:empty + img) > div:empty {
+  display: none !important;
+}
+
+/* ---------- Narrow windows: sidebar above the cards ---------- */
+
+@media (max-width: 1000px) {
+  html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.left {
+    position: static;
+    flex-flow: row wrap;
+  }
+
+  .se-account-card {
+    padding: 20px 20px 22px;
+  }
+
+  html.se-store-account:not(#se-none) [data-se-account-modern="frame"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html.se-store-account:not(#se-none) [data-se-account-modern="nav"] {
+    position: static;
+  }
+}

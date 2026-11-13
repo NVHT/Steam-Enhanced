@@ -1,0 +1,607 @@
+/*
+ * Store UI parts: the looks the store pages share, each defined once. Every block lists the
+ * elements that wear that look across the store (front page, rows, New On Steam / Upcoming,
+ * Steam Charts, sale pages, the store bar, hover cards), so one edit here restyles all of
+ * them. Each page's own file keeps only what's particular to it there: placement, size and
+ * the odd variant (set after this file, so it wins).
+ *
+ * Loaded on every store page (store/loader.js), right after shared/base.css.
+ * Selectors are the members' own, at their own weight; nothing here is generic on its own.
+ */
+
+/* ==========================================================================
+ * Cards: the theme's dark rounded surface with a hairline ring (graphs, lists, banners, queue
+ * and tab panels, sale blocks, filters). Members add their own spacing, clipping and depth.
+ * ========================================================================== */
+html.se-store-charts:not(#se-none) .eyc4VnVmsCc-,
+html.se-store-charts:not(#se-none) .NBN-f1mBrso-,
+html.se-store-charts:not(#se-none) .RSXs4rVtOK8-,
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_static,
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discover_queue_empty,
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tabs_row_ctn,
+html.se-store-explore:not(#se-none) #tab_preview_container,
+html.se-store-front #module_discounts_and_events .I5xcEcLqHQE- .nL4oSzmS8Ds-,
+html.se-store-rows:not(#se-none) .community_recommendation_app,
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc-,
+html.se-store-rows:not(#se-none) [data-se-shelf-panel],
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .VideoRow > :not(button),
+html.se-store:not(#se-none) .BEJJ0zhyKjM-:not(.qpvtVMRAn98-),
+html.se-store:not(#se-none) ._8Wp5WbqAbJA-.K2PjXmYWvSg-,
+html.se-store:not(#se-none) .-hv44tztogk-,
+html.se-store-labs:not(#se-none) .labs-content .capsule,
+html.se-store-labs:not(#se-none) .labs-content .right-column-box,
+html.se-store-dlc:not(#se-none) .curator_featured > .focus,
+html.se-store-dlc:not(#se-none) :is(#filtertags_container, #client_filter),
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation {
+  border-radius: var(--se-radius-xl) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+/* ==========================================================================
+ * Pop-up panels: menus, dropdowns, suggestion boxes, hover cards and pickers, a frosted dark
+ * panel with a ring and a deep shadow (--se-panel-bg / --se-panel-shadow; the store bar's
+ * menus use its own surface).
+ * ========================================================================== */
+html.se-store [data-se-nav="panel"] > div,
+html.se-store .O2jUvAs3OiU-,
+html.se-store [data-se-nav="sug-box"],
+html.se-store:not(#se-none) .game_hover_box,
+html.se-store:not(#se-none) .store_tooltip,
+html.se-store-rows:not(#se-none) .ds_options_tooltip,
+html.se-store:not(#se-none) .PFP2RDjCi0w-,
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) [role="menu"],
+html.se-store-charts:not(#se-none) [role="listbox"],
+html.se-store-charts:not(#se-none) body > :has(> div > .contextMenuItem .rdtPicker) {
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-panel-bg) !important;
+  backdrop-filter: var(--se-blur-panel);
+  box-shadow: var(--se-panel-shadow) !important;
+}
+
+/* ==========================================================================
+ * Text fields: pickers and search boxes, a raised rounded field with a ring.
+ * ========================================================================== */
+html.se-store-charts:not(#se-none) .SteamChartsShell [role="combobox"],
+html.se-store:not(#se-none) .-hv44tztogk- .DialogInput {
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  outline: 0;
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+/* ==========================================================================
+ * Section titles: 22px bold in the text colour, with Steam's caps, rules, shadows and fonts
+ * cleared. Members add their own spacing (and Steam Charts dims its subtitles).
+ * ========================================================================== */
+html.se-store-explore:not(#se-none) :is(.home_ctn, .page_content, .home_page_content) > :is(h2, .home_page_content_title):not([data-se-explore-title]),
+html.se-store-front #module_discounts_and_events .txCSzBxQT1Q-,
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .IdjQXo6E9yc-,
+html.se-store-rows:not(#se-none) .mzAzU7-I6qg- .bKJhafR0h9g-,
+html.se-store-rows:not(#se-none) :is([data-se-shelf-title], .title_grid .home_section_title),
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionHeader,
+html.se-store:not(#se-none) .SaleOuterContainer .social_share .mlr-XtYml6w-,
+html.se-store-charts:not(#se-none) :is(.GpbRWedhZd4-, .Kdj9Bbw3CHY-),
+html.se-store-labs:not(#se-none) .labs-content h1 {
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+  line-height: 1.25 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/* ==========================================================================
+ * Tag pills: small rounded tag chips (rows, tab lists, hover cards, sale pages). Members set
+ * their own size where it differs.
+ * ========================================================================== */
+html.se-store-explore:not(#se-none) #tab_preview_container .tags a,
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview .tags > a,
+html.se-store:not(#se-none) :is(.WidgetTag, .IX0d42JL3W4- ._5F2vJItlDB0-),
+html.se-store:not(#se-none) .game_hover_box .hover_tag_row .app_tag,
+html.se-store:not(#se-none) .se-chip-tag,
+html.se-store-rows:not(#se-none) [data-se-tile] .deep_dive_tag {
+  display: inline-flex !important;
+  align-items: center;
+  height: 24px;
+  margin: 0 !important;
+  padding: 0 10px !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-pill) !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-sm) !important;
+  line-height: 1;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .tags a:hover,
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview .tags > a:hover,
+html.se-store:not(#se-none) a:is(.WidgetTag, .IX0d42JL3W4- ._5F2vJItlDB0-):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+/* ==========================================================================
+ * Pill buttons: "See more", "Browse all", "Show more", "Follow", "Share" and the like, a
+ * raised pill with a thin ring that lights up on hover.
+ * ========================================================================== */
+html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLKwjtCwE- :is(a, button), .title_grid .see_more_link > a),
+html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn,
+html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) a,
+html.se-store-front #module_discounts_and_events a.znS2DqGQQHM-,
+html.se-store-rows:not(#se-none) .community_recommendation_app .view_more a,
+html.se-store-charts:not(#se-none) .NBN-f1mBrso- ._4IVE0bUT9m8-,
+html.se-store-charts:not(#se-none) .Hm1VV1Ltxnc- a,
+html.se-store-charts:not(#se-none) .Tc1RM13bONs- button,
+html.se-store:not(#se-none) .SaleOuterContainer .SocialShareButton,
+html.se-store-labs:not(#se-none) .labs-content a.experiment-button,
+html.se-store-dlc:not(#se-none) .se-dlc-hero__store {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  margin: 0 !important;
+  padding: 0 12px 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text-muted) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLKwjtCwE- :is(a, button), .title_grid .see_more_link > a):hover,
+html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn:hover,
+html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) a:hover,
+html.se-store-front #module_discounts_and_events a.znS2DqGQQHM-:hover,
+html.se-store-rows:not(#se-none) .community_recommendation_app .view_more a:hover,
+html.se-store-charts:not(#se-none) .NBN-f1mBrso- ._4IVE0bUT9m8-:hover,
+html.se-store-charts:not(#se-none) .Hm1VV1Ltxnc- a:hover,
+html.se-store-charts:not(#se-none) .Tc1RM13bONs- button:hover,
+html.se-store:not(#se-none) .SaleOuterContainer .SocialShareButton:hover,
+html.se-store-labs:not(#se-none) .labs-content a.experiment-button:hover,
+html.se-store-dlc:not(#se-none) .se-dlc-hero__store:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+/* ==========================================================================
+ * Glass chips: frosted pills laid over art (item flags, live and DLC badges, price chips, the
+ * trailer's labels and checkboxes, wishlist buttons on art). Members set size, text and place.
+ * ========================================================================== */
+html.se-store:not(#se-none) :is([data-se-price], .se-cinema__price, #module_discounts_and_events .cV6I71ujCms- > *, [data-se-nav="panel"] .dkW-v-f4lTw-, .O2jUvAs3OiU- .dkW-v-f4lTw-),
+html.se-store-rows:not(#se-none) :is([data-se-slot], .nHdn-Ea4zSg-) .ds_flag,
+html.se-store-rows:not(#se-none) .UcrgejVf5aA-,
+html.se-store-rows:not(#se-none) [data-se-tile] .broadcast_live_stream_icon,
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .ds_flag,
+html.se-store-front:not(#se-none) .se-tabs__badge,
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc- .rsPEubiF9HI-,
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- .Orilt6rfaTI-,
+html.se-store:not(#se-none) :is(.LCYi5cxHqgI-, .SaleOuterContainer .ds_flag, :is(.trailercarousel, .contenthubmaincarousel) .-D61WKs-ZxQ-, :is(.trailercarousel, .contenthubmaincarousel) .rs5MCL6BI2A-),
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .DialogCheckbox_Container,
+html.se-store:not(#se-none) :is(.PFP2RDjCi0w-, .K2PjXmYWvSg-, .UYfcYZDtfbs-) .KoUJweWUwjY-,
+html.se-store:not(#se-none) [data-se-dlc]::after,
+html.se-store-labs:not(#se-none) .labs-content :is(.shipped, .shelved) {
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line) !important;
+}
+
+/* ==========================================================================
+ * Round arrow buttons: carousel and pager arrows on every store page. A circle with a drawn
+ * chevron (Steam's own art hidden), pointing right unless it's a "previous" arrow; it grows a
+ * little on hover. Members tune it with --se-arrow-size, --se-arrow-chevron, --se-arrow-bg,
+ * --se-arrow-bg-hover and --se-arrow-ring; their own files place them.
+ * ========================================================================== */
+html.se-store-rows:not(#se-none) :is([data-se-arrow], :is(.CarouselBtnLeft, .CarouselBtnRight)),
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .VideoRow > button,
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel :is(.CarouselBtnLeft, .CarouselBtnRight),
+html.se-store-charts:not(#se-none) .tynMzW2BivY- .n-IZj12HrBI- .CYLNhM6Qimg-,
+html.se-store-charts:not(#se-none) .YqWcdxOb1HQ- .lEUeKqj6qis- .V0nSJVwdJYU- {
+  display: grid !important;
+  place-items: center;
+  flex: none;
+  box-sizing: border-box;
+  width: var(--se-arrow-size, 44px) !important;
+  height: var(--se-arrow-size, 44px) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--se-arrow-bg, var(--se-glass-btn)) !important;
+  background-image: none !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: var(--se-arrow-ring, inset 0 0 0 1px var(--se-glass-btn-line), var(--se-glass-btn-shadow)) !important;
+  cursor: pointer;
+  scale: 1;
+  transition: scale var(--se-dur) var(--se-ease), background-color var(--se-dur-fast), opacity var(--se-dur);
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-arrow], :is(.CarouselBtnLeft, .CarouselBtnRight)):hover,
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .VideoRow > button:not(:disabled):hover,
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel :is(.CarouselBtnLeft, .CarouselBtnRight):not(:disabled):hover,
+html.se-store-charts:not(#se-none) .tynMzW2BivY- .n-IZj12HrBI-:not(._5lng8kFUn7U-) .CYLNhM6Qimg-:hover,
+html.se-store-charts:not(#se-none) .YqWcdxOb1HQ- .lEUeKqj6qis-:not(._4Hwybg0uOZA-) .V0nSJVwdJYU-:hover {
+  background: var(--se-arrow-bg-hover, var(--se-glass-btn-hover)) !important;
+  scale: 1.08;
+}
+
+/* Steam's arrow art gives way to the drawn chevron. */
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .VideoRow > button svg,
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel :is(.CarouselBtnLeft, .CarouselBtnRight) svg {
+  display: none !important;
+}
+
+/* The chevron: a right-pointing corner, nudged to look centred. */
+html.se-store-rows:not(#se-none) :is([data-se-arrow], :is(.CarouselBtnLeft, .CarouselBtnRight))::before,
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .VideoRow > button::before,
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel :is(.CarouselBtnLeft, .CarouselBtnRight)::before,
+html.se-store-charts:not(#se-none) .tynMzW2BivY- .CYLNhM6Qimg-::before,
+html.se-store-charts:not(#se-none) .YqWcdxOb1HQ- .V0nSJVwdJYU-::before {
+  content: "";
+  width: var(--se-arrow-chevron, 9px);
+  height: var(--se-arrow-chevron, 9px);
+  border: solid var(--se-white);
+  border-width: 2px 2px 0 0;
+  transform: translateX(-2px) rotate(45deg);
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-arrow="prev"], .CarouselBtnLeft)::before,
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .VideoRow > button:first-child::before,
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel .CarouselBtnLeft::before,
+html.se-store-charts:not(#se-none) .tynMzW2BivY- .CYLNhM6Qimg-:has(._08s9A9T59Mc-)::before,
+html.se-store-charts:not(#se-none) .YqWcdxOb1HQ- .V0nSJVwdJYU-:has(._8wtllXu9kAY-)::before {
+  transform: translateX(2px) rotate(-135deg);
+}
+
+/* ==========================================================================
+ * Pre-purchase tags: Steam's "Pre-Purchase" label beside or over a price, a small green pill
+ * (the classic label keeps Steam's clock icon as its background; the React one draws it as an
+ * <svg>). Rows lay it on the art as a glass chip instead.
+ * ========================================================================== */
+html.se-store-rows:not(#se-none) [data-se-tile] .prepurchase_tag,
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .prepurchase_tag,
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .prepurchase_tag,
+html.se-store:not(#se-none) .NqZ9uMSo13A- {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 5px;
+  box-sizing: border-box;
+  height: 18px;
+  margin: 0 !important;
+  padding: 0 8px 0 20px !important;
+  border-radius: var(--se-radius-pill) !important;
+  background-color: var(--se-prepurchase-bg) !important;
+  background-position: 7px center !important;
+  color: var(--se-prepurchase) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .04em;
+  line-height: 1 !important;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* React's label (saletags.css .NqZ9uMSo13A-): a dark-green box with a 26px clock; the icon
+   shrinks to the text and takes its colour. */
+html.se-store:not(#se-none) .NqZ9uMSo13A- {
+  height: 20px !important;
+  padding: 0 9px 0 7px !important;
+  overflow: visible;
+}
+
+html.se-store:not(#se-none) .NqZ9uMSo13A- svg {
+  flex: none;
+  width: 11px !important;
+  height: 11px !important;
+}
+
+html.se-store:not(#se-none) .NqZ9uMSo13A- svg path {
+  fill: currentColor !important;
+}
+
+/* ==========================================================================
+ * Price chip
+ * ========================================================================== */
+/*
+ * The shared price chip, on every store page (store bar menus and search suggestions too).
+ * Prices are tagged [data-se-price] by the page scripts; a few React widgets are matched by
+ * class. Scoped under html.se-store.
+ */
+
+/*
+ * Price chip: ONE style and size for every price on the store: the store bar's menus and
+ * search suggestions (React .dkW-v-f4lTw-), and on the front page the Cinema hero bar
+ * (.se-cinema__price), Discounts & Events (.cV6I71ujCms- > *) and every content row
+ * ([data-se-price], tagged by the page scripts: classic .discount_block and React widgets). Fixed height
+ * The React widget's inner parts carry hashed classes per store build; both builds in use are
+ * listed (menus: .pnC74wQYjms-/.cQ79XIQ7w-Y-/...; Steam Charts: .KY4Cd9W1L6Q-/.YHonIqDIZys-/...),
+ * and pages that tag the widget's parts by shape (data-se-price-pct / -bundle / -amounts /
+ * -was / -now, shared/sale.js) are covered whatever the build's hashes.
+ * and type sizes, so a chip with a discount badge is exactly as tall as one without.
+ */
+html.se-store {
+  --se-price-h: 32px;
+  --se-price-radius: 10px;
+  --se-price-pct-h: 24px;
+  --se-price-pct-radius: 7px;
+  --se-price-size: 14px;
+  --se-price-was-size: 11.5px;
+  --se-price-pct-size: 13px;
+}
+
+html.se-store:not(#se-none) :is([data-se-price], .se-cinema__price, #module_discounts_and_events .cV6I71ujCms- > *, [data-se-nav="panel"] .dkW-v-f4lTw-, .O2jUvAs3OiU- .dkW-v-f4lTw-) {
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: var(--se-price-h) !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-price-radius) !important;
+  white-space: nowrap;
+  line-height: 1 !important;
+}
+
+html.se-store:not(#se-none) [data-se-price] {
+  position: relative !important;
+  inset: auto !important;
+}
+
+/* Two ID-weight :not()s so this outranks the chip rule above, whose :is() carries an ID. */
+html.se-store:not(#se-none):not(#se-hidden) .se-cinema__price[hidden] {
+  display: none !important;
+}
+
+/* With a discount badge: the badge sits 4px in from the chip's edge. */
+html.se-store:not(#se-none) :is([data-se-price], .se-cinema__price, #module_discounts_and_events .cV6I71ujCms- > *, [data-se-nav="panel"] .dkW-v-f4lTw-, .O2jUvAs3OiU- .dkW-v-f4lTw-):has(:is(.discount_pct, .pnC74wQYjms-, .nw-DtQ670Sc-, .KY4Cd9W1L6Q-, [data-se-price-pct], .se-cinema__pct)) {
+  padding-inline-start: 4px !important;
+}
+
+/* The discount badge. */
+html.se-store:not(#se-none) :is([data-se-price], .se-cinema__price, #module_discounts_and_events .cV6I71ujCms-, [data-se-nav="panel"] .dkW-v-f4lTw-, .O2jUvAs3OiU- .dkW-v-f4lTw-) :is(.discount_pct, .pnC74wQYjms-, .KY4Cd9W1L6Q-, [data-se-price-pct], .se-cinema__pct) {
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  /* Steam's React widget sets align-self: stretch on its badge; with a fixed height that pins
+     it to the chip's top edge instead of centring it. */
+  align-self: center !important;
+  justify-content: center;
+  height: var(--se-price-pct-h) !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 7px !important;
+  border-radius: var(--se-price-pct-radius) !important;
+  background: var(--se-cart) !important;
+  color: #0f1a00 !important;
+  font-size: var(--se-price-pct-size) !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+}
+
+html.se-store:not(#se-none) :is([data-se-price], #module_discounts_and_events .cV6I71ujCms-, [data-se-nav="panel"] .dkW-v-f4lTw-, .O2jUvAs3OiU- .dkW-v-f4lTw-) :is(.pnC74wQYjms-, .KY4Cd9W1L6Q-, [data-se-price-pct]) * {
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+}
+
+/* A bundle's extra "-10%" (classic .bundle_base_discount, React .lhAo55IfauA-) would make some chips wider than others; the main badge carries it. */
+html.se-store:not(#se-none) :is([data-se-price], #module_discounts_and_events .cV6I71ujCms-, [data-se-nav="panel"] .dkW-v-f4lTw-, .O2jUvAs3OiU- .dkW-v-f4lTw-) :is(.bundle_base_discount, .lhAo55IfauA-, .MH69xixbsuo-, [data-se-price-bundle]) {
+  display: none !important;
+}
+
+/* Was and now, on one line. */
+html.se-store:not(#se-none) :is([data-se-price], .se-cinema__price, #module_discounts_and_events .cV6I71ujCms-, [data-se-nav="panel"] .dkW-v-f4lTw-, .O2jUvAs3OiU- .dkW-v-f4lTw-) :is(.discount_prices, .cQ79XIQ7w-Y-, .YHonIqDIZys-, [data-se-price-amounts], .se-cinema__amounts) {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: baseline !important;
+  gap: 6px !important;
+  align-self: center !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  line-height: 1 !important;
+}
+
+html.se-store:not(#se-none) :is([data-se-price], .se-cinema__price, #module_discounts_and_events .cV6I71ujCms-, [data-se-nav="panel"] .dkW-v-f4lTw-, .O2jUvAs3OiU- .dkW-v-f4lTw-) :is(.discount_original_price, .Cnw9IXSgr7I-, .Y9w82-bhx7g-, [data-se-price-was], .se-cinema__was) {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: rgba(255, 255, 255, .5) !important;
+  font-size: var(--se-price-was-size) !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  text-decoration: line-through !important;
+}
+
+/* The price itself; also Steam's text-only states ("Free To Play", "Free"). */
+html.se-store:not(#se-none) :is([data-se-price], .se-cinema__price, #module_discounts_and_events .cV6I71ujCms-, [data-se-nav="panel"] .dkW-v-f4lTw-, .O2jUvAs3OiU- .dkW-v-f4lTw-) :is(.discount_final_price, .JBijjejcvmo-, .QYFii1vIT5Q-, [data-se-price-now], .se-cinema__now, .TSCZ-XXe31E-, .NCC9qjeD1o8-) {
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  background: none !important;
+  color: var(--se-white) !important;
+  font-size: var(--se-price-size) !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ==========================================================================
+ * Game hover card
+ * ========================================================================== */
+/*
+ * Steam's game hover card (store.css .game_hover_box: the popup beside a hovered capsule) as a
+ * dark theme card, on every store page.
+ */
+
+/* ---------- Game hover card (store.css .game_hover_box) ---------- */
+
+html.se-store:not(#se-none) .game_hover_box {
+  width: 320px;
+  margin: 0;
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-base);
+  line-height: 1.45;
+}
+
+html.se-store:not(#se-none) .game_hover_box .content {
+  padding: 18px;
+}
+
+html.se-store:not(#se-none) .game_hover :is(.hover_arrow_left, .hover_arrow_right) {
+  display: none;
+}
+
+html.se-store:not(#se-none) .game_hover_box h4.hover_title {
+  margin: 0 0 4px;
+  color: var(--se-white);
+  font-size: var(--se-fs-lg);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+html.se-store:not(#se-none) .game_hover_box .hover_release {
+  margin-bottom: 10px;
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-sm);
+}
+
+html.se-store:not(#se-none) .game_hover_box .hover_screenshots {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  margin: 10px 0 12px;
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+}
+
+/* Blocks (reviews, friends who recommend): theme wells. */
+html.se-store:not(#se-none) .game_hover_box :is(.hover_review_summary, .hover_details_block_full, .hover_details_block) {
+  height: auto;
+  margin: 10px 0;
+  padding: 8px 12px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim);
+  line-height: 1.4;
+}
+
+html.se-store:not(#se-none) .game_hover_box .hover_details_block {
+  float: none;
+  display: inline-flex;
+  margin-inline-end: 6px;
+}
+
+html.se-store:not(#se-none) .game_hover_box .hover_review_summary .game_review_summary {
+  font-weight: 700;
+}
+
+html.se-store:not(#se-none) .game_hover_box .hover_body .positive {
+  color: var(--se-accent);
+}
+
+/* User tags: pills. */
+html.se-store:not(#se-none) .game_hover_box .hover_tag_row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  height: auto;
+  max-height: 56px;
+  margin-top: 6px;
+}
+
+html.se-store:not(#se-none) .game_hover_box .hover_tag_row .app_tag {
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  line-height: 24px;
+}
+
+/* Friends who own it: rounded avatars. */
+html.se-store:not(#se-none) .game_hover_box .hover_friends_blocks img,
+html.se-store:not(#se-none) .game_hover_box .friend_blocks_row img {
+  border-radius: var(--se-radius-sm);
+}
+
+html.se-store:not(#se-none) .game_hover_box :is(.playerAvatar, .friend_block_holder) {
+  border-radius: var(--se-radius-md);
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.se-store-rows:not(#se-none) [data-se-tile] .broadcast_live_stream_icon::before {
+    animation: none;
+  }
+
+  html.se-store-rows:not(#se-none) :is([data-se-tile], [data-se-tile-art] img, img[data-se-tile-art], [data-se-price-bar],
+    [data-se-arrow], .mzAzU7-I6qg- img, .nHdn-Ea4zSg- .e217oOT2n-w-) {
+    transition: none !important;
+  }
+}
+
+/* ==========================================================================
+ * Theme-made parts shared across pages
+ * ========================================================================== */
+
+/* Tag chips added to list rows (front/tabs.js, explore/page.js): one line, at most three. */
+html.se-store:not(#se-none) .se-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  height: 22px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+html.se-store:not(#se-none) .se-chip-tag {
+  height: 22px;
+  padding: 0 9px !important;
+  font-size: var(--se-fs-xs) !important;
+}
+
+/* The chevron after a link's label ("View in store", "See more"); nudges on hover. */
+html.se-store .se-arrow-icon {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border: solid currentColor;
+  border-width: 2px 2px 0 0;
+  transform: rotate(45deg);
+  transition: transform var(--se-dur-fast) var(--se-ease);
+}
+
+html.se-store :hover > .se-arrow-icon {
+  transform: translateX(3px) rotate(45deg);
+}

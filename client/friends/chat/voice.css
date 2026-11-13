@@ -1,0 +1,873 @@
+/*
+ * Chat › voice: voice rooms, one-to-one voice, voice buttons and notices; group chat
+ * channel lists.
+ * Chat styles load in order: tabs, header, messages, input, voice, members, icons, groups.
+ */
+
+/*
+ * Voice outside the chat log
+ * The voice bar Steam puts over the friends list while you are in a call (and its copy in the
+ * "leave voice chat?" dialog): Steam's gradient-bordered green band with a glow becomes the
+ * theme's green strip, a small-caps "VOICE CHAT" label over the call's name and its controls
+ * as 30 px tiles (mic, headphones, invite; leave in red). Who is talking in a voice channel
+ * shows Steam's muted-mic / muted-output marks as small red glyphs.
+ */
+.friendlist:not(.GamepadMode) .activeVoiceControls,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceControls {
+  position: relative;
+  box-sizing: border-box;
+  height: auto !important;
+  margin: 8px 10px !important;
+  padding: 6px 6px 6px 12px !important;
+  border: 0 !important;
+  border-image: none !important;
+  border-radius: var(--se-radius-md) !important;
+  background: color-mix(in srgb, var(--se-running) 10%, transparent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-running) 25%, transparent) !important;
+}
+
+.friendlist:not(.GamepadMode) .friendListHeaderContainer .activeVoiceControls::before {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .activeVoiceControls .buttonsContainer,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceControls .buttonsContainer {
+  display: block;
+}
+
+.friendlist:not(.GamepadMode) .activeVoiceFlexBox,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceFlexBox {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px;
+  min-height: 30px;
+}
+
+.friendlist:not(.GamepadMode) .activeVoiceLabels,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceLabels {
+  flex: 1;
+  min-width: 0;
+  padding: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .activeVoiceLabels .activeVoiceHeader,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceLabels .activeVoiceHeader {
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase;
+  color: var(--se-running) !important;
+}
+
+.friendlist:not(.GamepadMode) .activeVoiceLabels .activeVoiceName,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceLabels .activeVoiceName {
+  max-height: none;
+  margin-top: 1px;
+  font: 600 13px/1.3 var(--se-font), sans-serif !important;
+  color: var(--se-text) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.friendlist:not(.GamepadMode) .activeVoiceLabels .activeVoiceName:hover,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceLabels .activeVoiceName:hover {
+  color: var(--se-text-strong) !important;
+}
+
+.friendlist:not(.GamepadMode) .activeVoiceButtons,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons {
+  flex: none;
+  display: flex !important;
+  align-items: center;
+  gap: 2px;
+  min-width: 0 !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .activeVoiceButtons .activeVoiceButtonsSpacer,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons .activeVoiceButtonsSpacer,
+.friendlist:not(.GamepadMode) .activeVoiceButtons .activeVoiceButtonsSpacerAfter,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons .activeVoiceButtonsSpacerAfter {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .activeVoiceButtons :is(button, .VoiceControlPanelButton),
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons :is(button, .VoiceControlPanelButton) {
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: none !important;
+  width: var(--se-tile-sm) !important;
+  height: var(--se-tile-sm) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--se-text-muted) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+.friendlist:not(.GamepadMode) .activeVoiceButtons :is(button, .VoiceControlPanelButton):hover,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons :is(button, .VoiceControlPanelButton):hover {
+  background: color-mix(in srgb, var(--se-running) 14%, transparent) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.friendlist:not(.GamepadMode) .activeVoiceButtons :is(button, .VoiceControlPanelButton) :is(svg, .SVGIcon_Shadow),
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons :is(button, .VoiceControlPanelButton) :is(svg, .SVGIcon_Shadow) {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .activeVoiceButtons .VoiceControlPanelButton::before,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons .VoiceControlPanelButton::before {
+  content: "";
+  flex: none;
+  display: block;
+  width: var(--se-tile-icon);
+  height: var(--se-tile-icon);
+  background: currentColor;
+  -webkit-mask: var(--se-chat-ico) center / contain no-repeat;
+  mask: var(--se-chat-ico) center / contain no-repeat;
+}
+
+.friendlist:not(.GamepadMode) .VoiceControlPanelButton.ToggleMicrophoneButton,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .VoiceControlPanelButton.ToggleMicrophoneButton {
+  --se-chat-ico: var(--se-chat-ico-mic);
+}
+
+.friendlist:not(.GamepadMode) .MicMuted .VoiceControlPanelButton.ToggleMicrophoneButton,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .MicMuted .VoiceControlPanelButton.ToggleMicrophoneButton {
+  --se-chat-ico: var(--se-chat-ico-mic-off);
+  color: var(--se-danger) !important;
+}
+
+.friendlist:not(.GamepadMode) .VoiceControlPanelButton.ToggleVoiceOutputButton,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .VoiceControlPanelButton.ToggleVoiceOutputButton {
+  --se-chat-ico: var(--se-chat-ico-headphones);
+}
+
+.friendlist:not(.GamepadMode) .VoiceControlPanelButton.ToggleVoiceOutputButton.disabled,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .VoiceControlPanelButton.ToggleVoiceOutputButton.disabled {
+  color: var(--se-danger) !important;
+}
+
+.friendlist:not(.GamepadMode) .VoiceControlPanelButton.chatInvite,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .VoiceControlPanelButton.chatInvite {
+  --se-chat-ico: var(--se-chat-ico-invite);
+}
+
+.friendlist:not(.GamepadMode) .VoiceControlPanelButton.chatEndVoiceChat,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .VoiceControlPanelButton.chatEndVoiceChat {
+  --se-chat-ico: var(--se-chat-ico-hangup);
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent) !important;
+  color: var(--se-danger) !important;
+}
+
+.friendlist:not(.GamepadMode) .VoiceControlPanelButton.chatEndVoiceChat:hover,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .VoiceControlPanelButton.chatEndVoiceChat:hover {
+  background: color-mix(in srgb, var(--se-danger) 90%, transparent) !important;
+  color: var(--se-text-strong) !important;
+}
+
+/* "Reconnecting…" and push-to-talk under the bar */
+.friendlist:not(.GamepadMode) .activeVoiceControls .connectionStatusLabels,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceControls .connectionStatusLabels {
+  margin: 2px 0 0 !important;
+  text-align: start;
+  font: 600 11px/14px var(--se-font), sans-serif !important;
+  color: var(--se-running) !important;
+}
+
+a.connectionStatus:not(.GamepadMode *) {
+  color: var(--se-running) !important;
+  text-decoration: none;
+}
+
+.friendlist:not(.GamepadMode) .activeVoicePushToTalk {
+  float: none !important;
+  margin: 4px 0 0 !important;
+  font: 600 11px/14px var(--se-font), sans-serif !important;
+  color: var(--se-text-faint) !important;
+}
+
+.friendlist:not(.GamepadMode) .activeVoicePushToTalk.pushToTalkKeyDown {
+  color: var(--se-running) !important;
+}
+
+/* The leave-voice dialog only shows the bar as an example: it isn't clickable there */
+.CloseActiveVoiceWindowConfirmation .activeVoiceControls {
+  margin: 8px 0 !important;
+}
+
+/*
+ * Who is in a voice channel: full brightness (Steam dims everyone outside your own call to 70 %),
+ * with the muted marks as small red glyphs at the row's end
+ */
+.multiChatDialog[data-se-chat] .VoiceChannelParticipants .friend {
+  filter: none !important;
+  opacity: .75;
+}
+
+.multiChatDialog[data-se-chat] .ActiveVoiceChannel .VoiceChannelParticipants .friend {
+  opacity: 1;
+}
+
+.multiChatDialog[data-se-chat] .VoiceChannelParticipants .friend .labelHolder {
+  min-width: 0;
+}
+
+.multiChatDialog[data-se-chat] .voiceStatusIconsContainer {
+  align-items: center;
+  gap: 2px;
+  margin: 0 0 0 auto !important;
+}
+
+.multiChatDialog[data-se-chat] .voicestatusIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 16px !important;
+}
+
+.multiChatDialog[data-se-chat] .voicestatusIcon .SVGIcon_Button {
+  width: 14px !important;
+  height: 14px !important;
+  margin: 0 !important;
+}
+
+.multiChatDialog[data-se-chat] .no_mic_for_session .voicestatusIcon.voiceStatusMic,
+.multiChatDialog[data-se-chat] .mic_muted_self .voicestatusIcon.voiceStatusMic,
+.multiChatDialog[data-se-chat] .mic_muted_remotely .voicestatusIcon.voiceStatusMic,
+.multiChatDialog[data-se-chat] .output_muted_self .voicestatusIcon.voiceStatusOutput,
+.multiChatDialog[data-se-chat] .output_muted_remotely .voicestatusIcon.voiceStatusOutput {
+  width: 16px !important;
+  opacity: 1 !important;
+  color: var(--se-danger) !important;
+}
+
+.multiChatDialog[data-se-chat] .voicestatusIcon .SVGIcon_Button path,
+.multiChatDialog[data-se-chat] .voicestatusIcon .SVGIcon_Button rect,
+.multiChatDialog[data-se-chat] .voicestatusIcon .SVGIcon_Button circle,
+.multiChatDialog[data-se-chat] .voicestatusIcon .SVGIcon_Button polygon {
+  fill: currentColor !important;
+}
+
+.multiChatDialog[data-se-chat] .voicestatusIcon .SVGIcon_Button :is(line, .MicStrike) {
+  stroke: currentColor !important;
+}
+
+/*
+ * The voice room's scratch pad (text over a voice channel): a panel like the theme's menus
+ * over a dimmed backdrop, its title bar as a small-caps header with a close tile
+ */
+.multiChatDialog[data-se-chat] .VoiceRoomChatHistory {
+  background-color: rgba(10, 12, 15, .55) !important;
+}
+
+.multiChatDialog[data-se-chat] .VoiceRoomChatWindow {
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-sidebar) !important;
+  box-shadow: var(--se-shadow-pop) !important;
+}
+
+.multiChatDialog[data-se-chat] .VoiceRoomChatTitle {
+  position: relative;
+  align-items: center;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 0 44px 0 16px !important;
+  background: none !important;
+  border-bottom: 1px solid var(--se-hairline);
+}
+
+.multiChatDialog[data-se-chat] .VoiceRoomChatTitle .VoiceRoomTitleLabels {
+  margin: 0 !important;
+}
+
+.multiChatDialog[data-se-chat] .VoiceChatTextChannelName {
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase;
+  text-align: start !important;
+  color: var(--se-label-color) !important;
+}
+
+.multiChatDialog[data-se-chat] .VoiceRoomChatTitle .MinimizeTextChat {
+  top: 50%;
+  inset-inline-end: 8px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-tile-sm) !important;
+  height: var(--se-tile-sm) !important;
+  margin-top: calc(var(--se-tile-sm) / -2);
+  border-radius: var(--se-radius-sm);
+  opacity: 1 !important;
+  color: var(--se-text-muted);
+}
+
+.multiChatDialog[data-se-chat] .VoiceRoomChatTitle .MinimizeTextChat:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.multiChatDialog[data-se-chat] .VoiceRoomChatTitle .MinimizeTextChat > svg {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .VoiceRoomChatTitle .MinimizeTextChat::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-close-sm) center / 12px 12px no-repeat;
+  mask: var(--se-icon-close-sm) center / 12px 12px no-repeat;
+}
+
+.multiChatDialog[data-se-chat] .VoiceChatTextChannelDesc {
+  top: 44px !important;
+  height: auto !important;
+  padding: 6px 16px !important;
+  box-sizing: border-box;
+  background: linear-gradient(to bottom, var(--se-sidebar) 40%, transparent) !important;
+  text-shadow: none !important;
+  text-align: start !important;
+  font: 500 12px/1.4 var(--se-font), sans-serif !important;
+  color: var(--se-text-faint) !important;
+}
+
+/*
+ * One-to-one voice
+ * The strip over the log: Steam sizes it at 100 % of the window and then the theme's side
+ * margins pushed its end (and the hang-up button) off the right edge; now it fits. Your
+ * avatar and your friend's are round with a green ring (an empty dashed ring while they
+ * haven't joined); End / Stop Voice Chat is the theme's red button (Steam reuses its green
+ * "join" class for it), Start Talking the green one, Decline a plain one.
+ */
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls {
+  box-sizing: border-box !important;
+  width: auto !important;
+  max-width: none !important;
+  height: auto !important;
+  min-height: 50px;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls > .VoiceToggleIconCtn {
+  position: static !important;
+  margin: 0 !important;
+  top: auto !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers {
+  flex: 1 1 auto;
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers > div[style] {
+  flex: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers .friend {
+  flex: none;
+  width: 30px !important;
+  height: 30px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers .friend :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g /* avatarHolder */) {
+  position: relative;
+  width: 30px !important;
+  height: 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--se-avatar-radius) !important;
+  overflow: visible !important;
+  transform: none !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers .friend :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g) :is(img.avatar, .avatar, ._3h-QRJGxnVOIExtHD1R0f2 /* avatar */) {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: var(--se-avatar-radius) !important;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px var(--se-sidebar), 0 0 0 4px var(--se-running) !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers .friend :is(.avatarStatus, .avatarFrame, ._3xUpb5DWXPFNcHHIcv-9pe /* avatarStatus */, .X_mJE4BYV5StDPwZhSiAu /* avatarFrame */) {
+  display: none !important;
+}
+
+/* The friend who hasn't joined yet: an empty, dashed ring */
+.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers .friend.emptyFriend .avatarHolder :is(img.avatar, .avatar) {
+  opacity: 0;
+  box-shadow: none !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers .friend.emptyFriend .avatarHolder {
+  box-sizing: border-box;
+  border: 1.5px dashed color-mix(in srgb, var(--se-running) 60%, transparent) !important;
+  background: color-mix(in srgb, var(--se-running) 6%, transparent);
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers .friend .connecting .avatar,
+.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers .friend .slowconnecting .avatar,
+.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers .friend:is(.connecting, .slowconnecting) .avatar {
+  filter: brightness(.5);
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls .inviteButton {
+  flex: none;
+  align-self: center !important;
+  justify-content: center;
+  box-sizing: border-box;
+  height: var(--se-control-h-sm);
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  box-shadow: none !important;
+  font: 600 13px/1 var(--se-font), sans-serif !important;
+  white-space: nowrap;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+/* Start Talking (you were invited): green */
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls.WaitingForYou .inviteButton.inviteButtonJoinVoice {
+  background: var(--se-running) !important;
+  color: var(--se-bg-ink) !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls.WaitingForYou .inviteButton.inviteButtonJoinVoice:hover {
+  filter: brightness(1.1);
+}
+
+/* End / Stop Voice Chat (you are in it): red */
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls:not(.WaitingForYou) .inviteButton.inviteButtonJoinVoice {
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent) !important;
+  color: var(--se-danger) !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls:not(.WaitingForYou) .inviteButton.inviteButtonJoinVoice:hover {
+  background: color-mix(in srgb, var(--se-danger) 90%, transparent) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls .inviteButton.inviteButtonDeclineVoice {
+  background: var(--se-surface-2) !important;
+  color: var(--se-text) !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls .inviteButton.inviteButtonDeclineVoice:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceStatusLabel {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0 !important;
+  align-self: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls.WaitingForPartner .OneOnOneVoiceStatusLabel {
+  color: var(--se-text-muted) !important;
+  font-weight: 600 !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls > .OneOnOneVoiceClose {
+  flex: none;
+  position: static !important;
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-tile-sm) !important;
+  height: var(--se-tile-sm) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+/*
+ * The voice buttons (mic, headphones, invite, leave): Steam's glyph sits in a 24 px box
+ * (VoiceIconCtn) inside each button; the theme draws its own glyph on the button, so that box
+ * goes too, or it pushed the glyph off-center and stretched the hover tile. Steam's green
+ * press flash is replaced by the tile's own colors.
+ */
+.multiChatDialog[data-se-chat] .VoiceControlPanelButton .VoiceIconCtn,
+.friendlist:not(.GamepadMode) .VoiceControlPanelButton .VoiceIconCtn,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .VoiceControlPanelButton .VoiceIconCtn {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .VoiceControlPanelButton,
+.friendlist:not(.GamepadMode) .VoiceControlPanelButton,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .VoiceControlPanelButton {
+  overflow: hidden;
+}
+
+.multiChatDialog[data-se-chat] .VoiceControlPanelButton:active:not(.chatEndVoiceChat),
+.friendlist:not(.GamepadMode) .VoiceControlPanelButton:active:not(.chatEndVoiceChat),
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .VoiceControlPanelButton:active:not(.chatEndVoiceChat) {
+  background: var(--se-selected) !important;
+}
+
+/*
+ * The friend chat's tab while in voice: Steam's glowing mic over the avatar becomes a small
+ * green mic before it (ChatTab _2XZq-…, MicStatus c9l09VKq…)
+ */
+.multiChatDialog[data-se-chat] :is(._2XZq-_f6npaQdAgeRzKIkz, .chatTab) :is(.c9l09VKqQIXJvsl0gqItO /* MicStatus */, .MicStatus) {
+  position: static !important;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  mix-blend-mode: normal !important;
+  color: var(--se-running);
+}
+
+.multiChatDialog[data-se-chat] ._2XZq-_f6npaQdAgeRzKIkz .c9l09VKqQIXJvsl0gqItO svg,
+.multiChatDialog[data-se-chat] ._2XZq-_f6npaQdAgeRzKIkz .MicStatus svg,
+.multiChatDialog[data-se-chat] .chatTab .c9l09VKqQIXJvsl0gqItO svg,
+.multiChatDialog[data-se-chat] .chatTab .MicStatus svg {
+  width: 16px !important;
+  height: 16px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.multiChatDialog[data-se-chat] ._2XZq-_f6npaQdAgeRzKIkz .c9l09VKqQIXJvsl0gqItO svg path,
+.multiChatDialog[data-se-chat] ._2XZq-_f6npaQdAgeRzKIkz .MicStatus svg path,
+.multiChatDialog[data-se-chat] .chatTab .c9l09VKqQIXJvsl0gqItO svg path,
+.multiChatDialog[data-se-chat] .chatTab .MicStatus svg path,
+.multiChatDialog[data-se-chat] ._2XZq-_f6npaQdAgeRzKIkz .c9l09VKqQIXJvsl0gqItO svg rect,
+.multiChatDialog[data-se-chat] ._2XZq-_f6npaQdAgeRzKIkz .MicStatus svg rect,
+.multiChatDialog[data-se-chat] .chatTab .c9l09VKqQIXJvsl0gqItO svg rect,
+.multiChatDialog[data-se-chat] .chatTab .MicStatus svg rect,
+.multiChatDialog[data-se-chat] ._2XZq-_f6npaQdAgeRzKIkz .c9l09VKqQIXJvsl0gqItO svg circle,
+.multiChatDialog[data-se-chat] ._2XZq-_f6npaQdAgeRzKIkz .MicStatus svg circle,
+.multiChatDialog[data-se-chat] .chatTab .c9l09VKqQIXJvsl0gqItO svg circle,
+.multiChatDialog[data-se-chat] .chatTab .MicStatus svg circle {
+  fill: currentColor !important;
+}
+
+.multiChatDialog[data-se-chat] ._2XZq-_f6npaQdAgeRzKIkz .c9l09VKqQIXJvsl0gqItO svg line,
+.multiChatDialog[data-se-chat] ._2XZq-_f6npaQdAgeRzKIkz .MicStatus svg line,
+.multiChatDialog[data-se-chat] .chatTab .c9l09VKqQIXJvsl0gqItO svg line,
+.multiChatDialog[data-se-chat] .chatTab .MicStatus svg line {
+  stroke: var(--se-danger) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatTab.VoiceActive .ChatTabContent {
+  margin-inline-start: 0 !important;
+}
+
+.multiChatDialog[data-se-chat] .vs5AhAWHJLa_eDOBkDcMy:has(> .c9l09VKqQIXJvsl0gqItO) /* ChatTabRow */ {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/*
+ * "X has opened voice chat…": Steam floats it right in blue italics; the log's quiet centered
+ * notice line, with a small green phone
+ */
+.multiChatDialog[data-se-chat] .msg.voiceChannelInvite {
+  float: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin: 4px 0 !important;
+  padding: 0 !important;
+  font: 500 12.5px/1.5 var(--se-font), sans-serif !important;
+  font-style: normal !important;
+  text-align: center;
+  color: var(--se-text-faint) !important;
+}
+
+.multiChatDialog[data-se-chat] .msg.voiceChannelInvite::before {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: var(--se-running);
+  -webkit-mask: var(--se-chat-ico-phone) center / contain no-repeat;
+  mask: var(--se-chat-ico-phone) center / contain no-repeat;
+}
+
+.multiChatDialog[data-se-chat] .ChatMessageBlock:has(> .msg.voiceChannelInvite) {
+  padding-inline-start: var(--se-chat-gutter) !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatMessageBlock:has(> .msg.voiceChannelInvite:only-of-type):hover {
+  background: none !important;
+}
+
+/* The call's mic and headphones beside the message input: together, not spread apart */
+.multiChatDialog[data-se-chat] .chatEntry .activeVoiceControls,
+.multiChatDialog[data-se-chat] .chatEntry .activeVoiceFlexBox,
+.multiChatDialog[data-se-chat] .chatEntry .activeVoiceButtons {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 2px;
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.multiChatDialog[data-se-chat] .chatEntry .activeVoicePushToTalk {
+  display: none !important;
+}
+
+/* Group chat: channels on the left, members on the right */
+.multiChatDialog[data-se-chat] .chatRoomGroupNavColumn,
+.multiChatDialog[data-se-chat] .MemberListColumn {
+  background: color-mix(in srgb, var(--se-bg) 60%, var(--se-sidebar)) !important;
+  box-shadow: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomGroupNavColumn:not(.chatRoomGroupNavCollapsed) {
+  min-width: 240px !important;
+  max-width: 240px !important;
+  border-inline-end: 1px solid var(--se-hairline);
+}
+
+.multiChatDialog[data-se-chat] .chatRoomGroupNavColumn.defaultChatOnly {
+  min-width: 0 !important;
+  max-width: 0 !important;
+  border: 0;
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn {
+  width: 240px !important;
+  border-inline-start: 1px solid var(--se-hairline);
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn.MemberListViewCompact {
+  width: 56px !important;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomGroupHeader {
+  border: 0 !important;
+  border-bottom: 1px solid var(--se-hairline) !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow:not([data-se-grouplayout]) > .chatHeader.titleBarContainer .chatRoomGroupHeader {
+  box-sizing: border-box;
+  align-items: center !important;
+  gap: 12px;
+  width: 100%;
+  min-height: 68px;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupHeader .ChatRoomGroupAvatar {
+  flex: none;
+  width: 36px !important;
+  height: 36px !important;
+  margin: 0 !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupHeader .ChatRoomGroupAvatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupHeaderName {
+  margin: 0 !important;
+  font: 700 16px/1.3 var(--se-font), sans-serif !important;
+  color: var(--se-text) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupHeaderTagline {
+  margin: 0 !important;
+  font: 500 12px/1.3 var(--se-font), sans-serif !important;
+  font-style: normal !important;
+  letter-spacing: 0 !important;
+  color: var(--se-text-faint) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupStats {
+  flex-direction: row !important;
+  align-self: center !important;
+  gap: 10px;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .statMemberStat {
+  align-items: center;
+  gap: 5px;
+  margin: 0 !important;
+  font: 600 12px/1.3 var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .statMemberStat .statCircle {
+  width: 6px;
+  height: 6px;
+  margin: 0 !important;
+  border-radius: 50%;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomGroupHeader .ChatRoomGroupAvatar,
+.multiChatDialog[data-se-chat] .chatRoomGroupHeader .ChatRoomGroupAvatar img {
+  border-radius: var(--se-radius-md) !important;
+}
+
+/* Section labels (Text channels, Voice channels, Online…) */
+.multiChatDialog[data-se-chat] .chatRoomGroupNavColumn :is(.ChannelTypeTitle, .ChannelTypeLabel, .chatRoomChannelGroups .chatSectionTitle, .groupName),
+.multiChatDialog[data-se-chat] .MemberListColumn :is(.ChannelTypeTitle, .ChannelTypeLabel, .chatRoomChannelGroups .chatSectionTitle, .groupName) {
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color) !important;
+  background: none !important;
+}
+
+/* Channel rows, the open one on a tile */
+.multiChatDialog[data-se-chat] .chatRoomTextChannel,
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannel {
+  margin: 0 8px 2px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text-muted) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomTextChannel:hover,
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannel:hover {
+  background: var(--se-chat-row-hover) !important;
+  color: var(--se-text) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomTextChannel.ActiveTextChannel {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomTextChannel,
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannelNameContainer {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 36px;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomTextChannelIcon,
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannelIcon {
+  align-self: center !important;
+  margin-block: 0 !important;
+  position: static !important;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomTextChannelName,
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannelName {
+  font: 600 13.5px/36px var(--se-font), sans-serif !important;
+  color: inherit !important;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomTextChannel.ActiveTextChannel .chatRoomTextChannelName {
+  font-weight: 700 !important;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomTextChannelIcon svg,
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannelIcon svg {
+  fill: currentColor !important;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannelIconGlow {
+  display: none !important;
+}
+
+/* Unread in a channel: the blue count */
+.multiChatDialog[data-se-chat] .chatRoomTextChannelUnreadNumber {
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent) !important;
+  color: var(--se-bg-ink) !important;
+  font: 800 10px/16px var(--se-font), sans-serif !important;
+  text-align: center;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomTextChannel .chatUnreadCircle {
+  background: var(--se-accent) !important;
+  box-shadow: none !important;
+}
+
+/* The live voice channel: the green row, with who's talking under it */
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannel.ActiveVoiceChannel,
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannel:has(.friend) {
+  background: color-mix(in srgb, var(--se-running) 10%, transparent) !important;
+  color: var(--se-running) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannel .friend {
+  margin: 0 0 0 18px !important;
+  padding: 0 8px !important;
+  border-radius: var(--se-radius-sm);
+  background: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannel .friend .avatarHolder {
+  width: 22px !important;
+  height: 22px !important;
+  overflow: visible !important;
+}
+
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannel .friend .avatarHolder :is(img.avatar, .avatar) {
+  border-radius: var(--se-avatar-radius) !important;
+  box-shadow: 0 0 0 2px var(--se-sidebar), 0 0 0 4px var(--se-running) !important;
+}
+
+/* Your voice controls at the foot of the channel list */
+.multiChatDialog[data-se-chat] .chatRoomGroupNavFooter {
+  padding: 10px !important;
+  border-top: 1px solid var(--se-hairline);
+  background: var(--se-bg) !important;
+  box-shadow: none !important;
+}

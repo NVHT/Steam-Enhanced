@@ -1,0 +1,688 @@
+/*
+ * Game rows on the store front and New On Steam: rows found by shape and tagged with data-se-*
+ * by shared/rows.js (heading, tiles, art, price, arrows, page dots), plus the pieces they share:
+ * pill "See more" buttons, round glass arrows, pill page dots, item flags ("On wishlist"...)
+ * and the "•••" options button. Tiles are 18px art cards that lift on hover; prices use the
+ * shared chip (shared/ui.css).
+ *
+ * Scoped under html.se-store-rows (store/loader.js: the front page and explore lists). React item
+ * flags use Steam's hashed class names (SteamTracking, store Vite build of 2026-11-09).
+ *
+ * Rules use html.se-store-rows:not(#se-none), an ID-level weight: the live store pages load
+ * page CSS beyond what SteamTracking records, and some of it outranks plain class selectors.
+ */
+
+html.se-store-rows {
+  --se-sh-gap: 16px;
+}
+
+/* ---------- Shared pieces ---------- */
+
+/* Pill button with a chevron: "See More", "Explore more", "Customize, Explore by Tag, & More". */
+html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLKwjtCwE- :is(a, button), .title_grid .see_more_link > a) * {
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  -webkit-text-fill-color: currentColor !important;
+  text-decoration: none !important;
+  font: inherit !important;
+  line-height: inherit !important;
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLKwjtCwE- :is(a, button), .title_grid .see_more_link > a)::after {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border: solid currentColor;
+  border-width: 1.75px 1.75px 0 0;
+  transform: rotate(45deg);
+  transition: transform var(--se-dur) var(--se-ease);
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLKwjtCwE- :is(a, button), .title_grid .see_more_link > a):hover::after {
+  transform: translateX(2px) rotate(45deg);
+}
+
+/* Round glass carousel arrows, riding the edges of the row. */
+html.se-store-rows:not(#se-none) :is([data-se-arrow], :is(.CarouselBtnLeft, .CarouselBtnRight)) {
+  z-index: 4 !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  opacity: 1;
+}
+
+/* Steam's React arrow is a full-height 50px column; it becomes a circle on the row's middle. */
+html.se-store-rows:not(#se-none) :is([data-se-arrow], .CarouselBtnLeft, .CarouselBtnRight) {
+  position: absolute !important;
+  top: 50% !important;
+  bottom: auto !important;
+  translate: 0 -50%;
+  transform: none;
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-arrow="prev"], .CarouselBtnLeft) {
+  inset-inline-start: -22px !important;
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-arrow="next"], .CarouselBtnRight) {
+  inset-inline-end: -22px !important;
+}
+
+/*
+ * Steam's own chevron art (classic: a background image; React: an SVG) gives way to one
+ * drawn here. Its inner element stays, stretched over the circle, since it can be the part
+ * that takes the click.
+ */
+html.se-store-rows:not(#se-none) [data-se-arrow] > * {
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  background: none !important;
+  box-shadow: none !important;
+  opacity: 0 !important;
+}
+
+html.se-store-rows:not(#se-none) :is(.CarouselBtnLeft, .CarouselBtnRight) > * {
+  position: absolute !important;
+  inset: 0 !important;
+  opacity: 0 !important;
+}
+
+html.se-store-rows:not(#se-none) :is(.CarouselBtnLeft, .CarouselBtnRight)[disabled] {
+  opacity: .35;
+  pointer-events: none;
+}
+
+/* Page dots: small dots, the current page a wide accent pill. */
+html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-) {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  gap: 6px !important;
+  margin-top: 16px !important;
+  padding: 0 !important;
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-) > * {
+  flex: none;
+  width: 8px !important;
+  height: 8px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: rgba(255, 255, 255, .2) !important;
+  opacity: 1 !important;
+  transition: width var(--se-dur) var(--se-ease), background-color var(--se-dur);
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-) > * > * {
+  display: none !important;
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-) > :hover {
+  background: rgba(255, 255, 255, .4) !important;
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-) > :is(.carousel__dot--selected, .focus, .active) {
+  width: 26px !important;
+  background: var(--se-accent) !important;
+}
+
+/* ---------- Content rows (shared/rows.js tags) ---------- */
+
+html.se-store-rows:not(#se-none) [data-se-shelf] {
+  position: relative;
+  margin-top: 40px !important;
+  background: none !important;
+}
+
+html.se-store-rows:not(#se-none) [data-se-shelf-head] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px;
+  min-height: 32px;
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-shelf-title], .title_grid .home_section_title) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 !important;
+}
+
+/* Steam's backdrop (the blue panel) becomes a quiet theme card. */
+html.se-store-rows:not(#se-none) [data-se-shelf-panel] {
+  padding: 20px !important;
+  border: 0 !important;
+  background-image: none !important;
+}
+
+/* Steam Deck row: the icon in the heading stays, tinted to the accent. */
+html.se-store-rows:not(#se-none) [data-se-shelf-title] :is(img, svg) {
+  width: 22px;
+  height: 22px;
+  filter: none;
+  color: var(--se-accent);
+}
+
+html.se-store-rows:not(#se-none) [data-se-slot] {
+  position: relative;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--se-radius-xl) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  isolation: isolate;
+  transition: transform var(--se-dur) var(--se-ease), box-shadow var(--se-dur);
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile-art] {
+  display: block;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile-art],
+html.se-store-rows:not(#se-none) [data-se-tile-art] img,
+html.se-store-rows:not(#se-none) img[data-se-tile-art] {
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-store-rows:not(#se-none) [data-se-slot]:hover [data-se-tile] {
+  transform: translateY(-3px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14), var(--se-shadow-md);
+}
+
+html.se-store-rows:not(#se-none) [data-se-slot]:hover :is([data-se-tile-art] img, img[data-se-tile-art]) {
+  transform: scale(1.04);
+}
+
+/* Classic capsules: the art box holds the price (shared/rows.js moves it in) and the trailer. */
+html.se-store-rows:not(#se-none) [data-se-tile-art]:not(img) {
+  position: relative;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile-art]:not(img) > :is(img, video) {
+  display: block;
+  width: 100%;
+  border-radius: inherit;
+}
+
+/* Bottom scrim so the price chip always reads over bright art: on the art box where there is one. */
+html.se-store-rows:not(#se-none) [data-se-tile-art]:not(img)::after,
+html.se-store-rows:not(#se-none) [data-se-tile]:has(> img[data-se-tile-art])::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 40%;
+  z-index: 1;
+  background: linear-gradient(180deg, transparent, rgba(8, 10, 14, .55));
+  pointer-events: none;
+}
+
+/* The strip under the art collapses: its price rides the art's corner instead. */
+html.se-store-rows:not(#se-none) [data-se-price-bar] {
+  position: absolute !important;
+  inset: auto 12px 12px auto !important;
+  z-index: 3;
+  width: auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  pointer-events: none;
+}
+
+html.se-store-rows:not(#se-none) [data-se-slot]:hover [data-se-price-bar] {
+  translate: 0 -3px;
+}
+
+html.se-store-rows:not(#se-none) [data-se-price-bar] {
+  transition: translate var(--se-dur) var(--se-ease);
+}
+
+/* A price moved into the art box rides its bottom-right corner. */
+html.se-store-rows:not(#se-none) [data-se-tile-art] > [data-se-price] {
+  position: absolute !important;
+  inset: auto 12px 12px auto !important;
+  z-index: 3;
+  transition: translate var(--se-dur) var(--se-ease);
+}
+
+/* Prices: the shared price chip lives in shared/ui.css (every store page, menus included). */
+
+/* Games with no price yet (upcoming): Steam still renders an empty .discount_block, a blank
+   strip under the art. shared/rows.js never tags it; it is taken out of the tile here. */
+html.se-store-rows:not(#se-none) [data-se-tile] .discount_block.empty {
+  display: none !important;
+}
+
+/* "Because You Played <strong>Game</strong>": the game in the accent colour. */
+html.se-store-rows:not(#se-none) :is([data-se-shelf-title], .title_grid .home_section_title) strong {
+  color: var(--se-accent);
+  font-weight: 700;
+}
+
+/* Deep-dive rows: the key tags under the art become pills on the tile. */
+html.se-store-rows:not(#se-none) [data-se-tile] .capsule_row_ctn {
+  border: 0 !important;
+  margin: 0 !important;
+  padding: 12px !important;
+  background: none !important;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .deep_dive_key_tags {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 58px;
+  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .deep_dive_tag {
+  height: 26px;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+/*
+ * The strip under the art in other classic rows: "Recently updated" notes
+ * (.recently_updated_desc), a curator's quote (.curator_capsule_ctn) and a creator with its
+ * Follow button (.creator_capsule_ctn). Steam paints each with its own blue or pink gradient;
+ * here they sit on the tile like the deep-dive tags.
+ */
+html.se-store-rows:not(#se-none) [data-se-tile] :is(.recently_updated_desc, .curator_capsule_ctn, .creator_capsule_ctn) {
+  margin: 0 !important;
+  padding: 12px 14px 14px !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-sm) !important;
+  line-height: 1.45 !important;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] :is(.curator_capsule_ctn, .creator_capsule_ctn) {
+  gap: 10px;
+}
+
+/* These carry their own padding; the strip around them adds none. */
+html.se-store-rows:not(#se-none) [data-se-tile] .capsule_row_ctn:has(> :is(.recently_updated_desc, .curator_capsule_ctn, .creator_capsule_ctn)) {
+  padding: 0 !important;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .curator_capsule_link {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  color: var(--se-text) !important;
+  text-decoration: none !important;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .curator_capsule_avatar {
+  flex: none;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 1px var(--se-hairline);
+  object-fit: cover;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .curator_capsule_name {
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 700 !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .curator_capsule_link:hover .curator_capsule_name {
+  color: var(--se-accent) !important;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .curator_capsule_blurb {
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-sm) !important;
+  line-height: 1.45 !important;
+}
+
+/* Follow / Following: a small pill; following carries the accent. */
+html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn {
+  height: 28px;
+  width: 112px !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn > span {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  white-space: nowrap;
+  align-items: center;
+  gap: 6px;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+}
+
+/* One width for both states, each with its own icon (+ / tick) in place of Steam's checkbox image. */
+html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn img {
+  display: none !important;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn > span::before {
+  content: "";
+  flex: none;
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn.following > span::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn.following {
+  background: var(--se-accent-surface) !important;
+  box-shadow: inset 0 0 0 1px rgba(124, 196, 255, .35) !important;
+  color: var(--se-accent) !important;
+}
+
+/*
+ * Upcoming games: Steam's "Pre-Purchase" label and the followed creator's avatars sit in a
+ * strip under the art. Both ride the art instead: Pre-Purchase as a small green pill over the
+ * price chip (bottom-right), the avatars as a row of round chips bottom-left.
+ */
+html.se-store-rows:not(#se-none) [data-se-tile] .prepurchase_tag {
+  position: absolute !important;
+  right: 12px !important;
+  bottom: calc(12px + var(--se-price-h, 32px) + 6px) !important;
+  left: auto !important;
+  top: auto !important;
+  z-index: 4;
+  height: 20px;
+  padding: 0 9px 0 22px !important;
+  background-color: var(--se-glass-chip) !important;
+  background-position: 8px center !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  transition: translate var(--se-dur) var(--se-ease);
+}
+
+/* No price yet: the pill takes the price's corner. */
+html.se-store-rows:not(#se-none) [data-se-tile]:not(:has([data-se-price])) .prepurchase_tag {
+  bottom: 12px !important;
+}
+
+html.se-store-rows:not(#se-none) [data-se-slot]:hover [data-se-tile] .prepurchase_tag {
+  translate: 0 -3px;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .curated_app_curators {
+  position: absolute !important;
+  left: 12px !important;
+  bottom: 12px !important;
+  z-index: 4;
+  display: flex !important;
+  gap: 4px;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .curated_app_curators > div:not(.steam_curator_for_app) {
+  display: none !important; /* Steam's float clearer */
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .steam_curator_for_app {
+  float: none !important;
+  width: 26px !important;
+  height: 26px !important;
+  margin: 0 !important;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px var(--se-glass-chip), var(--se-shadow-sm);
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .steam_curator_for_app_img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+/* "LIVE" badge: a glass chip with a pulsing red dot, top-left. */
+html.se-store-rows:not(#se-none) [data-se-tile] .broadcast_live_stream_icon {
+  position: absolute !important;
+  top: 10px !important;
+  left: 10px !important;
+  z-index: 4;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  margin: 0 !important;
+  padding: 0 10px 0 9px !important;
+  background-image: none !important;
+  color: var(--se-white) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em;
+  line-height: 1 !important;
+  text-transform: uppercase;
+}
+
+html.se-store-rows:not(#se-none) [data-se-tile] .broadcast_live_stream_icon::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--se-live);
+  box-shadow: 0 0 8px var(--se-live);
+  animation: se-sh-live 1.6s var(--se-ease) infinite;
+}
+
+@keyframes se-sh-live {
+  50% {
+    opacity: .35;
+  }
+}
+
+/* ---------- Item flags: "On wishlist", "In library", "In cart", "Ignored" ---------- */
+
+/*
+ * Flags sit on the art's top-right corner, clear of deal banners (top-left), logos (often
+ * bottom-left) and the price chip (bottom-right).
+ */
+
+/* React flags (main.css): ItemFlag .UcrgejVf5aA- + kind; label ._3bO01VgrZH0-. */
+html.se-store-rows:not(#se-none) .UcrgejVf5aA- {
+  top: 10px;
+  bottom: auto;
+  inset-inline: auto 10px;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px 0 8px;
+  color: var(--se-white);
+  font-size: var(--se-fs-xs);
+  font-weight: 700;
+  letter-spacing: .06em;
+  line-height: 24px;
+}
+
+html.se-store-rows:not(#se-none) .UcrgejVf5aA- > svg {
+  width: 12px;
+  height: 12px;
+  margin: 0;
+}
+
+html.se-store-rows:not(#se-none) .UcrgejVf5aA- ._3bO01VgrZH0- {
+  margin: 0;
+}
+
+html.se-store-rows:not(#se-none) .UcrgejVf5aA-.qKiMR-l-sSM- {
+  color: var(--se-wish);
+}
+
+html.se-store-rows:not(#se-none) .UcrgejVf5aA-.OferR7G18q8- {
+  color: var(--se-owned);
+}
+
+html.se-store-rows:not(#se-none) .UcrgejVf5aA-.Bwzkt-xJYHk- {
+  color: var(--se-cart);
+}
+
+html.se-store-rows:not(#se-none) .UcrgejVf5aA-:is(.hEMzwaA6L4s-, .ba1bCn8blyk-) {
+  color: var(--se-text-muted);
+}
+
+/* The label keeps white text; only the icon takes the kind's colour. */
+html.se-store-rows:not(#se-none) .UcrgejVf5aA- ._3bO01VgrZH0- {
+  color: var(--se-white);
+}
+
+/* Classic flags (.ds_flag) in the rows and calendar: the same chip. Discounts & Events places its own (front/sections.css). */
+html.se-store-rows:not(#se-none) :is([data-se-slot], .nHdn-Ea4zSg-) .ds_flag {
+  position: absolute !important;
+  width: auto !important;
+  top: 10px !important;
+  bottom: auto !important;
+  right: 10px !important;
+  left: auto !important;
+  z-index: 4;
+  height: auto !important;
+  padding: 4px 10px !important;
+  color: var(--se-white) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .06em;
+  line-height: 14px !important;
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-slot], .nHdn-Ea4zSg-) .ds_flag.ds_wishlist_flag {
+  color: var(--se-wish) !important;
+}
+
+/*
+ * The chip's background replaces Steam's star image, so the star comes back as a mask in
+ * the text colour. Also covers the tabbed lists' flags (front/tabs.css).
+ */
+html.se-store-rows:not(#se-none) :is([data-se-slot], .nHdn-Ea4zSg-, [data-se-tabs] .tab_row_item) .ds_flag.ds_wishlist_flag::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-inline-end: .45em;
+  vertical-align: -.14em;
+  background: currentColor;
+  -webkit-mask: var(--se-star-mask) center / contain no-repeat;
+  mask: var(--se-star-mask) center / contain no-repeat;
+}
+
+html.se-store-rows:not(#se-none) :is([data-se-slot], .nHdn-Ea4zSg-) .ds_flag.ds_owned_flag {
+  color: var(--se-owned) !important;
+}
+
+/* Steam dims owned/ignored art behind a flag; the chip alone says it. */
+html.se-store-rows:not(#se-none) :is([data-se-slot], .nHdn-Ea4zSg-) .ds_flagged img {
+  opacity: 1 !important;
+}
+
+/* ---------- "•••" options button and its menu (store.css .ds_options) ---------- */
+
+/* The button: a glass circle with three dots, top-right like the flags; accent on hover. */
+html.se-store-rows:not(#se-none) .ds_options {
+  top: 8px;
+  inset-inline-end: 8px;
+  padding: 0;
+}
+
+html.se-store-rows:not(#se-none) *:hover > .ds_options,
+html.se-store-rows:not(#se-none) .ds_hover.ds_options {
+  inset-inline-end: 8px;
+}
+
+html.se-store-rows:not(#se-none) .ds_options > div {
+  position: static;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='6' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='18' cy='12' r='1.8'/%3E%3C/svg%3E") center / 18px no-repeat,
+    var(--se-glass-chip);
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line), var(--se-shadow-sm);
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-rows:not(#se-none) .ds_options:hover > div {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230f1115'%3E%3Ccircle cx='6' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='18' cy='12' r='1.8'/%3E%3C/svg%3E") center / 18px no-repeat,
+    var(--se-accent);
+}
+
+/*
+ * While the button shows, a flag in the same corner steps aside. Steam adds both to the
+ * tile it decorates (.ds_flagged / [data-ds-appid]), not always as siblings.
+ */
+html.se-store-rows:not(#se-none) :is(.ds_flagged, [data-ds-appid]):hover:has(.ds_options) :is(.ds_flag, .UcrgejVf5aA-),
+html.se-store-rows:not(#se-none) :is([data-se-slot], [data-se-tile]):hover:has(> .ds_options) > :is(.ds_flag, .UcrgejVf5aA-) {
+  translate: -40px 0;
+}
+
+html.se-store-rows:not(#se-none) :is(.ds_flag, .UcrgejVf5aA-) {
+  transition: translate var(--se-dur) var(--se-ease);
+}
+
+/* The menu: the theme's popover. */
+html.se-store-rows:not(#se-none) .ds_options_tooltip {
+  padding: 6px;
+  color: var(--se-text-dim);
+}
+
+html.se-store-rows:not(#se-none) .ds_options_tooltip > .option {
+  margin: 0;
+  padding: 9px 14px;
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-base);
+  font-weight: 500;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-rows:not(#se-none) .ds_options_tooltip > .option:hover {
+  background: var(--se-hover);
+  color: var(--se-white);
+}
+
+/* ---------- Page end ----------
+ * The endless "more content" area under the last row (Steam's autoloader, switched off by
+ * shared/rows.js): gone with its loading, "no more" and sign-in notes, so the footer ends the page.
+ */
+html.se-store-rows:not(#se-none) :is(#content_more, #content_loading, #content_none, #content_callout, #content_login) {
+  display: none !important;
+}

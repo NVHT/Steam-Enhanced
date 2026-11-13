@@ -1,0 +1,606 @@
+/*
+ * Store front page modules below the hero, in the Cinema hero's style (front/hero.css):
+ * Discounts & Events, category tiles, Recommended by the community, the Personal Calendar and
+ * the Discovery Queue banner. Game rows, item flags and the hover card they share with other
+ * store pages: shared/rows.css and shared/ui.css.
+ *
+ * Selectors use Steam's hashed class names from SteamTracking (store Vite build of 2026-11-09)
+ * where Steam has no stable ones; if a store update renames them, that part falls back to
+ * Steam's look. Rules carry an ID-level weight (:not(#se-none) or #module_*): the live front
+ * page loads page CSS beyond what SteamTracking records, and some of it outranks classes.
+ */
+
+/* ---------- Discounts & Events ----------
+ * Steam's React section (discountsandeventshome.css + carouselarrows.css on SteamTracking,
+ * Vite build of 2026-11-09; hashed class names below).
+ * Restyled to match the Cinema hero: borderless grid of rounded art tiles that fill their
+ * column, glass chips for the deal banner and the price, round glass arrows, pill pips.
+ */
+
+html.se-store-front #module_discounts_and_events {
+  margin-top: 40px;
+  --se-de-gap: 16px;
+}
+
+html.se-store-front #module_discounts_and_events .tW10-at9cMc- {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 14px !important;
+}
+
+html.se-store-front #module_discounts_and_events a.znS2DqGQQHM-::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border: solid currentColor;
+  border-width: 1.75px 1.75px 0 0;
+  transform: rotate(45deg);
+  transition: transform var(--se-dur) var(--se-ease);
+}
+
+html.se-store-front #module_discounts_and_events a.znS2DqGQQHM-:hover::after {
+  transform: translateX(2px) rotate(45deg);
+}
+
+/* No backdrop panel: the tiles sit straight on the page. */
+html.se-store-front #module_discounts_and_events .F6Wso3e7oqk-,
+html.se-store-front #module_discounts_and_events .F6Wso3e7oqk- .carousel__slider {
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-front #module_discounts_and_events .F6Wso3e7oqk- .carousel__slider {
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+html.se-store-front #module_discounts_and_events .F6Wso3e7oqk- .carousel__slider-tray-wrapper,
+html.se-store-front #module_discounts_and_events .F6Wso3e7oqk- .horizontalSlider___281Ls {
+  overflow: hidden;
+  border-radius: var(--se-radius-xl);
+}
+
+html.se-store-front #module_discounts_and_events ._5w6AlYMyKXw- {
+  gap: var(--se-de-gap) !important;
+  padding: 0 !important;
+}
+
+/* Columns: one tall tile, or two tiles that split the height (no gap left in the middle). */
+html.se-store-front #module_discounts_and_events .h8E3fLYHMcw- {
+  justify-content: stretch !important;
+  gap: var(--se-de-gap) !important;
+}
+
+html.se-store-front #module_discounts_and_events .I5xcEcLqHQE- {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  position: relative;
+  border-radius: var(--se-radius-xl);
+  transition: transform var(--se-dur) var(--se-ease), box-shadow var(--se-dur);
+}
+
+html.se-store-front #module_discounts_and_events .I5xcEcLqHQE- :is(.Wv-2-GahLGE-, .-qUG2JW7G8E-) {
+  flex: 1 1 auto;
+  height: 100%;
+}
+
+html.se-store-front #module_discounts_and_events .I5xcEcLqHQE- .nL4oSzmS8Ds- {
+  flex: 1 1 auto !important;
+  aspect-ratio: auto !important;
+  height: 100%;
+  isolation: isolate;
+}
+
+html.se-store-front #module_discounts_and_events .I5xcEcLqHQE- .auc77O9GIek- {
+  transition: opacity var(--se-dur), transform var(--se-dur-slow) var(--se-ease) !important;
+}
+
+html.se-store-front #module_discounts_and_events .I5xcEcLqHQE-:hover {
+  transform: translateY(-3px);
+}
+
+html.se-store-front #module_discounts_and_events .I5xcEcLqHQE-:hover .nL4oSzmS8Ds- {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14), var(--se-shadow-md);
+}
+
+html.se-store-front #module_discounts_and_events .I5xcEcLqHQE-:hover .auc77O9GIek- {
+  transform: scale(1.04);
+}
+
+/* Bottom scrim so the price chip always reads. */
+html.se-store-front #module_discounts_and_events .I5xcEcLqHQE- .nL4oSzmS8Ds-::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 40%;
+  z-index: 1;
+  background: linear-gradient(180deg, transparent, rgba(8, 10, 14, .55));
+  pointer-events: none;
+}
+
+/* Deal banner: glass chip with a coloured dot. */
+html.se-store-front #module_discounts_and_events .I5xcEcLqHQE- .jxYpM-g5fRs- {
+  top: 12px !important;
+  left: 12px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px 5px 9px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line) !important;
+  color: var(--se-white) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .06em;
+  line-height: 14px !important;
+}
+
+html.se-store-front #module_discounts_and_events .I5xcEcLqHQE- .jxYpM-g5fRs-::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff5fa2;
+  box-shadow: 0 0 8px #ff5fa2;
+}
+
+html.se-store-front #module_discounts_and_events .I5xcEcLqHQE-.-xyaBPF0Lno- .jxYpM-g5fRs-::before {
+  background: #3ddbd0;
+  box-shadow: 0 0 8px #3ddbd0;
+}
+
+/* Price: lifted out of the strip under the art into a glass chip on its corner. */
+html.se-store-front #module_discounts_and_events .I5xcEcLqHQE- .cV6I71ujCms- {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 2;
+  min-height: 0 !important;
+  pointer-events: none;
+}
+
+/* The chip itself: the shared price chip (shared/ui.css). */
+
+/* "On wishlist" flag: glass chip on the top-right, clear of the deal banner on the top-left. */
+html.se-store-front #module_discounts_and_events .ds_flag {
+  top: 12px !important;
+  right: 12px !important;
+  left: auto !important;
+  padding: 3px 9px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  color: var(--se-wish) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 600 !important;
+  letter-spacing: .04em;
+}
+
+/* Arrows: shared/rows.css (one style for every carousel on the page). */
+
+/* Pips: small dots, the current page a wide accent pill. */
+html.se-store-front #module_discounts_and_events .I8j65FBXdOY- {
+  gap: 6px !important;
+  margin-top: 16px !important;
+}
+
+html.se-store-front #module_discounts_and_events .I8j65FBXdOY- .carousel__dot {
+  width: 8px !important;
+  height: 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: rgba(255, 255, 255, .2) !important;
+  opacity: 1 !important;
+  transition: width var(--se-dur) var(--se-ease), background-color var(--se-dur);
+}
+
+html.se-store-front #module_discounts_and_events .I8j65FBXdOY- .carousel__dot > * {
+  display: none !important;
+}
+
+html.se-store-front #module_discounts_and_events .I8j65FBXdOY- .carousel__dot:hover {
+  background: rgba(255, 255, 255, .4) !important;
+}
+
+html.se-store-front #module_discounts_and_events .I8j65FBXdOY- .carousel__dot--selected {
+  width: 26px !important;
+  background: var(--se-accent) !important;
+}
+
+/* Tabbed lists + preview pane: front/tabs.css. */
+
+/* ---------- Category tiles (content hub carousel: a.content_hub_capsule_ctn) ---------- */
+
+html.se-store-rows:not(#se-none) .content_hub_capsule_ctn {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--se-radius-xl) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  isolation: isolate;
+  transition: transform var(--se-dur) var(--se-ease), box-shadow var(--se-dur);
+}
+
+html.se-store-rows:not(#se-none) .content_hub_capsule_ctn:hover {
+  transform: translateY(-3px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14), var(--se-shadow-md);
+}
+
+html.se-store-rows:not(#se-none) .content_hub_capsule_ctn img {
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-store-rows:not(#se-none) .content_hub_capsule_ctn:hover img {
+  transform: scale(1.04);
+}
+
+/*
+ * Steam sizes each tile at a fixed 300x135, which left the widened page's row short on
+ * the right. Each page now shares its width among its tiles, keeping Steam's 20:9 shape.
+ */
+html.se-store-rows:not(#se-none) .content_hub_carousel .carousel_items > * {
+  display: grid !important;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: var(--se-sh-gap) !important;
+  box-sizing: border-box;
+  min-width: 100%;
+}
+
+html.se-store-rows:not(#se-none) .content_hub_capsule_ctn {
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  aspect-ratio: 20 / 9;
+  margin: 0 !important;
+}
+
+html.se-store-rows:not(#se-none) .content_hub_capsule_ctn img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+/* The category name: bold, centred near the foot, over the fade. */
+html.se-store-rows:not(#se-none) .content_hub_capsule_ctn .label_ctn {
+  position: absolute !important;
+  inset: auto 16px 14px 16px !important;
+  z-index: 1;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-end !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-rows:not(#se-none) .content_hub_capsule_ctn .label {
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-white) !important;
+  font-size: var(--se-fs-xl) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .6);
+  text-transform: none !important;
+}
+
+/* Steam's per-category tint gives way to the neutral bottom fade the other tiles use. */
+html.se-store-rows:not(#se-none) .content_hub_capsule_ctn .gradient {
+  opacity: 1 !important;
+  background: linear-gradient(180deg, transparent 35%, rgba(8, 10, 14, .72)) !important;
+}
+
+/* ---------- Recommended by the community: one review card per page ---------- */
+
+html.se-store-rows:not(#se-none) .community_recommendation_app {
+  overflow: hidden;
+  background-image: none !important;
+}
+
+html.se-store-rows:not(#se-none) .community_recommendation_app .right_col {
+  background: none !important;
+}
+
+/* The quote: larger, in the body colour, with a soft accent quotation mark. */
+html.se-store-rows:not(#se-none) .community_recommendation_app .review_box .content {
+  position: relative;
+  isolation: isolate;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-lg) !important;
+  line-height: 1.6 !important;
+}
+
+html.se-store-rows:not(#se-none) .community_recommendation_app .review_box .content::before {
+  content: "\201C";
+  position: absolute;
+  top: -.45em;
+  inset-inline-start: -.08em;
+  z-index: -1;
+  color: var(--se-accent);
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1;
+  opacity: .18;
+}
+
+/*
+ * Steam spreads the quote, the link and the reviewer evenly down the card (space-between),
+ * which strands the link mid-card. Here the link follows the quote and the reviewer sits
+ * at the bottom.
+ */
+html.se-store-rows:not(#se-none) .community_recommendation_app .review_box {
+  justify-content: flex-start !important;
+  gap: 16px;
+}
+
+html.se-store-rows:not(#se-none) .community_recommendation_app .view_more {
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: start !important;
+}
+
+html.se-store-rows:not(#se-none) .community_recommendation_app .review_box .author_block {
+  margin-top: auto !important;
+}
+
+/* "Read Entire Review": the theme's pill button. */
+html.se-store-rows:not(#se-none) .community_recommendation_app .view_more a::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border: solid currentColor;
+  border-width: 1.75px 1.75px 0 0;
+  transform: rotate(45deg);
+}
+
+/* Reviewer: round avatar, bold name, muted lines. */
+html.se-store-rows:not(#se-none) .community_recommendation_app .author_block {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+}
+
+html.se-store-rows:not(#se-none) .community_recommendation_app .author_block .playerAvatar {
+  width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background: none !important;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-rows:not(#se-none) .community_recommendation_app .author_block .playerAvatar img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+html.se-store-rows:not(#se-none) .community_recommendation_app .persona_name a {
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-md);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+html.se-store-rows:not(#se-none) .community_recommendation_app .persona_name a:hover {
+  color: var(--se-accent) !important;
+}
+
+html.se-store-rows:not(#se-none) .community_recommendation_app .hours {
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+/* The price's strip: no box of its own; the shared chip carries it. */
+html.se-store-rows:not(#se-none) .community_recommendation_app .price_ctn {
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* ---------- Personal Calendar (personalcalendarhome.css) ---------- */
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- {
+  margin-top: 40px;
+  margin-bottom: 0;
+}
+
+/* The page's calendar pattern behind the section stays out; the section is on the page bg. */
+html.se-store-rows:not(#se-none) .personal_calendar_background {
+  background: none !important;
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- ._37RLKwjtCwE- {
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .IdjQXo6E9yc- {
+  align-items: center;
+  gap: 10px;
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .sGDLZ2AYREY- {
+  margin-top: 2px;
+  color: var(--se-text-muted);
+  text-shadow: none;
+  font-size: var(--se-fs-md);
+}
+
+/* "NEW" badge: a small accent pill. */
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .x8jWPgfdVoI- {
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent-surface);
+  color: var(--se-accent);
+  font-size: var(--se-fs-xs);
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .carousel__slider-tray {
+  gap: 0;
+}
+
+/* Days: theme cards; today carries an accent ring and pill. */
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc- {
+  margin: 0 6px;
+  padding: 12px 10px 14px;
+  gap: 10px;
+  overflow: hidden;
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc-:is(._8XPG-IbvHHs-, .N3v3VnhKgU8-) {
+  background: var(--se-surface);
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc-:has(.lGsGMjZ-9IE-) {
+  background: linear-gradient(180deg, var(--se-accent-surface), var(--se-surface) 45%);
+  box-shadow: inset 0 0 0 1px rgba(124, 196, 255, .35);
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc- .CAnATFwmik4- {
+  align-items: baseline;
+  font-size: var(--se-fs-sm);
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc- .CAnATFwmik4- .FeN6na6SvAg- {
+  color: var(--se-text-faint);
+  font-weight: 600;
+  letter-spacing: .08em;
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc- .CAnATFwmik4- .bLQQ-syFWHg- {
+  color: var(--se-text);
+  letter-spacing: .02em;
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc- .CAnATFwmik4- .lGsGMjZ-9IE- {
+  padding: 3px 10px;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent);
+  color: var(--se-on-accent);
+  font-size: var(--se-fs-xs);
+  letter-spacing: .08em;
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc- .N83ri6QShHM- {
+  gap: 10px;
+  padding: 0;
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc- .N83ri6QShHM- .MDx-yf8h-Ww- {
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  color: var(--se-text-muted);
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .-UQT03dsikU- {
+  border-radius: var(--se-radius-lg);
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .-UQT03dsikU- .e217oOT2n-w- {
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  transition: transform var(--se-dur) var(--se-ease), box-shadow var(--se-dur);
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .-UQT03dsikU- .e217oOT2n-w-.T5zU104tmR0- {
+  transform: translateY(-2px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14), var(--se-shadow-md);
+}
+
+/* "+1 More": a glass pill on the column's foot. */
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc- .rsPEubiF9HI- {
+  bottom: 10px;
+  height: 24px;
+  padding: 0 11px;
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line), var(--se-shadow-sm) !important;
+  color: var(--se-white);
+  font-size: var(--se-fs-sm);
+  font-weight: 600;
+  line-height: 24px;
+}
+
+html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc- .rsPEubiF9HI-:hover {
+  background: var(--se-glass-btn-hover);
+}
+
+/* ---------- Discovery Queue banner (discoveryqueuewidget.css) ---------- */
+
+html.se-store-rows:not(#se-none) .mzAzU7-I6qg- {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  margin-top: 40px;
+  border-radius: var(--se-radius-xl);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  isolation: isolate;
+}
+
+html.se-store-rows:not(#se-none) .mzAzU7-I6qg- .dycaOmod9zw- {
+  padding: 0 32px;
+  gap: 6px;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(124, 196, 255, .22), transparent 55%),
+    linear-gradient(90deg, var(--se-bg) 0%, rgba(23, 26, 32, .92) 40%, rgba(23, 26, 32, 0) 72%);
+  transition: filter var(--se-dur);
+}
+
+html.se-store-rows:not(#se-none) .mzAzU7-I6qg- .dycaOmod9zw-:dir(rtl) {
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(124, 196, 255, .22), transparent 55%),
+    linear-gradient(-90deg, var(--se-bg) 0%, rgba(23, 26, 32, .92) 40%, rgba(23, 26, 32, 0) 72%);
+}
+
+html.se-store-rows:not(#se-none) .mzAzU7-I6qg-:hover .dycaOmod9zw- {
+  filter: none;
+}
+
+html.se-store-rows:not(#se-none) .mzAzU7-I6qg- .MFeNsPbs3Hc- {
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-md);
+  font-weight: 400;
+}
+
+/* Call to action: a round accent button under the text, its arrow nudging on hover. */
+html.se-store-rows:not(#se-none) .mzAzU7-I6qg- .dycaOmod9zw-::after {
+  content: "";
+  width: 36px;
+  height: 36px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f1115' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E") center / 18px no-repeat,
+    var(--se-accent);
+  box-shadow: 0 10px 24px -10px rgba(124, 196, 255, .7);
+  transition: transform var(--se-dur) var(--se-ease), background-color var(--se-dur-fast);
+}
+
+html.se-store-rows:not(#se-none) .mzAzU7-I6qg-:hover .dycaOmod9zw-::after {
+  transform: translateX(4px);
+}
+
+/* The capsules behind the banner zoom a touch on hover. */
+html.se-store-rows:not(#se-none) .mzAzU7-I6qg- img {
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-store-rows:not(#se-none) .mzAzU7-I6qg-:hover img {
+  transform: scale(1.03);
+}

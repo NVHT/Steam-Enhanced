@@ -1,0 +1,270 @@
+/*
+ * Chat › members list.
+ * Chat styles load in order: tabs, header, messages, input, voice, members, icons, groups.
+ */
+
+/*
+ * Members: rows like the friends list's, rounded-square avatars with their status ring.
+ * Steam's member list is a virtual list with fixed 36 px slots (.chatRoomMembers
+ * .ChatRoomMemberScrollList_List), so a row must fit the slot: a 28 px avatar, the name
+ * and one more line (the game, or the status); a third rich-presence line is left out.
+ */
+.multiChatDialog[data-se-chat] .MemberListColumn .friend {
+  box-sizing: border-box !important;
+  height: 36px !important;
+  min-height: 0 !important;
+  margin: 0 8px !important;
+  padding: 0 8px !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: none !important;
+  box-shadow: none !important;
+  align-items: center;
+  overflow: hidden;
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn .friend:hover {
+  background: var(--se-hover) !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn .friend .avatarHolder {
+  flex: none;
+  width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  border-radius: var(--se-avatar-radius) !important;
+  transform: none !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn .friend .avatarHolder :is(img.avatar, .avatar) {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: var(--se-avatar-radius) !important;
+  box-shadow: 0 0 0 2px var(--se-sidebar), 0 0 0 4px var(--se-chat-ring, var(--se-border-strong)) !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn .friend .avatarHolder .avatarStatus,
+.multiChatDialog[data-se-chat] .MemberListColumn .friend .avatarHolder .avatarFrame {
+  display: none !important;
+}
+
+/* Steam can combine the in-game and away classes on the same persona. */
+.multiChatDialog[data-se-chat] .awayOrSnooze .avatarHolder :is(img.avatar, .avatar),
+.multiChatDialog[data-se-chat] .avatarHolder.awayOrSnooze :is(img.avatar, .avatar) {
+  box-shadow: none !important;
+  outline: 2px dashed var(--se-online) !important;
+  outline-offset: 2px;
+}
+
+.multiChatDialog[data-se-chat] :is(.awayOrSnooze.ingame, .ingame .awayOrSnooze, .awayOrSnooze .ingame) .avatarHolder :is(img.avatar, .avatar),
+.multiChatDialog[data-se-chat] .ingame .avatarHolder.awayOrSnooze :is(img.avatar, .avatar),
+.multiChatDialog[data-se-chat] .avatarHolder.awayOrSnooze.ingame :is(img.avatar, .avatar) {
+  outline-color: var(--se-running) !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn .friend.offline {
+  opacity: .55;
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn .friend.offline .avatarHolder img.avatar {
+  filter: grayscale(1);
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn .friend .labelHolder {
+  min-width: 0;
+  height: auto !important;
+  margin: 0 0 0 10px !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn .friend :is(.nOdcT-MoOaXGePXLyPe0H /* playerName */, ._2Ri005Wg_uXDTa71kdRbcN /* richPresenceLabel */) {
+  display: block;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn .nOdcT-MoOaXGePXLyPe0H {
+  font: 600 13px/16px var(--se-font), sans-serif !important;
+  color: var(--se-text) !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn ._2Ri005Wg_uXDTa71kdRbcN {
+  font: 500 11.5px/15px var(--se-font), sans-serif !important;
+  color: var(--se-text-faint) !important;
+}
+
+/* With a game showing, its rich presence ("Playing on: …") is the third line: left out */
+/* (_3sxE7F… richPresenceContainer, _1cB0q… gameName, _2Ri00… richPresenceLabel) */
+.multiChatDialog[data-se-chat] .MemberListColumn ._3sxE7F1LV2IcSX68YsH9dI:has(._1cB0qtF0paHWWyj1XNcnbG) ._2Ri005Wg_uXDTa71kdRbcN:not(._1cB0qtF0paHWWyj1XNcnbG) {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn .online ._2Ri005Wg_uXDTa71kdRbcN {
+  color: var(--se-online) !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn .awayOrSnooze ._2Ri005Wg_uXDTa71kdRbcN {
+  color: color-mix(in srgb, var(--se-online) 70%, transparent) !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListColumn .ingame ._2Ri005Wg_uXDTa71kdRbcN {
+  color: var(--se-running) !important;
+}
+
+/* The member list's bar: collapse as a tile, "Filter by Name" as the theme's field */
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100% !important;
+  max-width: 100%;
+  padding: 0 10px 0 8px !important;
+  overflow: visible;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer > :not(.ToggleMemberListView) {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.multiChatDialog[data-se-chat] .MemberListOption.ToggleMemberListView {
+  flex: none;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-tile-sm) !important;
+  height: var(--se-tile-sm) !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background: none !important;
+  color: var(--se-text-muted);
+  cursor: pointer;
+}
+
+/* Steam dims these to 50%; at full strength they match the other tiles */
+.multiChatDialog[data-se-chat] :is(.MemberListOption.ToggleMemberListView, .chatRoomGroupNavColumn:not(.chatRoomGroupNavCollapsed) .chatRoomGroupNavCollapseExpand) {
+  opacity: 1 !important;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out !important;
+}
+
+/* Steam pads both by 4 px, which made them 38 px: exactly the 30 px tile like the rest */
+.multiChatDialog[data-se-chat] :is(.MemberListOption.ToggleMemberListView, .chatRoomGroupNavCollapseExpand) {
+  box-sizing: border-box !important;
+  width: var(--se-tile-sm) !important;
+  height: var(--se-tile-sm) !important;
+  min-width: var(--se-tile-sm) !important;
+  min-height: var(--se-tile-sm) !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListOption.ToggleMemberListView:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong);
+}
+
+.multiChatDialog[data-se-chat] .MemberListOption.ToggleMemberListView svg {
+  width: var(--se-tile-icon) !important;
+  height: var(--se-tile-icon) !important;
+  fill: currentColor !important;
+  stroke: currentColor;
+}
+
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer .inputContainer {
+  position: relative;
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: var(--se-tile-sm) !important;
+  margin: 0 !important;
+  padding: 0 3px 0 10px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer .inputContainer:focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong), 0 0 0 3px var(--se-accent-tint) !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer input {
+  flex: 1 1 0;
+  width: auto !important;
+  min-width: 0;
+  height: var(--se-tile-sm) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  font: 500 13px var(--se-font), sans-serif !important;
+  font-style: normal !important;
+  color: var(--se-text) !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer input::placeholder {
+  font-style: normal !important;
+  color: var(--se-text-faint) !important;
+  opacity: 1;
+}
+
+/* Clear: a small tile inside the field (the friends search's) */
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer .friendSearchClear {
+  position: static !important;
+  flex: none;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-hairline);
+  color: var(--se-text-muted);
+  opacity: 1 !important;
+  transform: none !important;
+  cursor: pointer;
+}
+
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer .friendSearchClear:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer .friendSearchClear > svg {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer .friendSearchClear::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  -webkit-mask: var(--se-chat-ico-close-sm) center / 12px 12px no-repeat;
+  mask: var(--se-chat-ico-close-sm) center / 12px 12px no-repeat;
+}
+
+.multiChatDialog[data-se-chat] {
+  --se-chat-ico-close-sm: var(--se-icon-close-sm);
+}
+
+.multiChatDialog[data-se-chat] .chatRoomMembers .friendGroup .groupName {
+  margin: 0 !important;
+  padding: 0 16px !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color) !important;
+  background: none !important;
+}

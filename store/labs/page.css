@@ -1,0 +1,251 @@
+/*
+ * Steam Labs (/labs/): labs.css paints the page navy with cyan uppercase headings, gradient
+ * capsules with a diagonal "Shipped!" sash, and white buttons. Restyled as the store front:
+ * the theme's page colour, section titles, experiment capsules as rounded cards in a grid
+ * (labs/page.js groups them), the art zooming on hover, "Shipped" as a glass chip on the art,
+ * pill buttons, and the side column as cards.
+ *
+ * Shared looks (cards, titles, pill buttons, glass chips) come from shared/ui.css, which lists
+ * the Labs parts alongside the other store pages'. Rules use
+ * html.se-store-labs:not(#se-none) for ID-level weight over labs.css.
+ */
+
+/* ---------- Page ---------- */
+
+html.se-store-labs:not(#se-none) body.labs {
+  background: var(--se-bg) !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+}
+
+html.se-store-labs:not(#se-none) .page_content_ctn.labs a:not(.experiment-button),
+html.se-store-labs:not(#se-none) .page_content_ctn.labs a:not(.experiment-button):visited {
+  color: var(--se-accent);
+  text-decoration: none;
+}
+
+html.se-store-labs:not(#se-none) .page_content_ctn.labs a:not(.experiment-button):hover {
+  color: var(--se-white);
+}
+
+/* Logo row: a little air under the store bar. */
+html.se-store-labs:not(#se-none) .page_content_ctn.labs .page_content > div:first-child img {
+  margin: 24px 0 8px !important;
+}
+
+/* Two columns: experiments and the side column, top-aligned. */
+html.se-store-labs:not(#se-none) .labs-content {
+  align-items: flex-start;
+  gap: 32px !important;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .left-column {
+  flex: 1 1 0 !important;
+  min-width: 0;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .right-column {
+  flex: 0 0 clamp(300px, 30%, 420px) !important;
+  min-width: 0;
+}
+
+/* Steam spaces sections with <br>s; the titles carry the spacing instead. */
+html.se-store-labs:not(#se-none) .labs-content .left-column > br {
+  display: none;
+}
+
+/* Section titles ("Active Experiments", "Past Experiments"): spacing (look: shared/ui.css). */
+html.se-store-labs:not(#se-none) .labs-content h1 {
+  margin: 32px 0 16px !important;
+}
+
+html.se-store-labs:not(#se-none) .labs-content :is(.left-column, .right-column, .right-column-box) > h1:first-child {
+  margin-top: 8px !important;
+}
+
+/* ---------- Experiment cards ---------- */
+
+html.se-store-labs:not(#se-none) [data-se-labs-grid] {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .capsule {
+  display: flex;
+  flex-direction: column;
+  margin: 0 !important;
+  overflow: hidden;
+  background-image: none !important;
+  transition: box-shadow var(--se-dur-fast), translate var(--se-dur) var(--se-ease);
+}
+
+html.se-store-labs:not(#se-none) .labs-content .capsule:hover {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16), var(--se-shadow-md) !important;
+  translate: 0 -3px;
+}
+
+/* Art: the card's top, cropped to Steam's 7:3, zooming gently on hover. */
+html.se-store-labs:not(#se-none) .labs-content .capsule-banner {
+  margin: 0 !important;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .capsule-banner-ctn {
+  position: relative;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .capsule-banner img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0 !important;
+  transition: transform var(--se-dur-slow) var(--se-ease) !important;
+}
+
+/* "Shipped!" / "Shelved": the diagonal sash becomes a chip on the art's corner. */
+html.se-store-labs:not(#se-none) .labs-content :is(.shipped, .shelved) {
+  position: absolute !important;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 4px 10px !important;
+  transform: none !important;
+  color: #c6ef5a !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em;
+  line-height: 14px;
+  text-align: start;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .shelved {
+  color: var(--se-text-dim) !important;
+}
+
+/* Text: title, date, description, button. */
+html.se-store-labs:not(#se-none) .labs-content .exp_text_ctn {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px 18px !important;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .capsule h2 {
+  margin: 0 !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.3;
+  text-transform: none !important;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .capsule h2 .experiment-name {
+  color: var(--se-text-dim);
+  font-weight: 400;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .capsule p {
+  margin: 0 !important;
+  color: var(--se-text-dim);
+  font-family: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  line-height: 1.55 !important;
+}
+
+/* The date leading each description, as a faint label. */
+html.se-store-labs:not(#se-none) .labs-content .capsule p > b:first-child {
+  color: var(--se-text-faint);
+  font-weight: 600;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .experiment-buttons {
+  min-height: 0 !important;
+  margin-top: auto;
+  padding-top: 6px;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .experiment-buttons:empty {
+  display: none;
+}
+
+/* ---------- Side column ---------- */
+
+html.se-store-labs:not(#se-none) .labs-content .right-column-box {
+  margin: 0 0 20px !important;
+  padding: 18px 20px !important;
+  background-image: none !important;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .right-column h1 {
+  padding: 0 !important;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .active-experiments-row {
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px !important;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .active-experiments-icon {
+  flex: none;
+  width: 44px !important;
+  margin: 0 !important;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .active-experiments-icon :is(a, img) {
+  width: 44px !important;
+  border-radius: 50%;
+  font-size: var(--se-fs-lg) !important;
+}
+
+/* The number badge keeps Steam's colour per experiment, with white text over it. */
+html.se-store-labs:not(#se-none) .page_content_ctn.labs .active-experiments-icon a {
+  color: var(--se-white) !important;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .active-experiments-description {
+  flex: 1 1 auto;
+  width: auto !important;
+  margin: 0 !important;
+  font-size: var(--se-fs-base);
+  line-height: 1.45;
+}
+
+/* Narrow windows: one column, side column under the experiments. */
+@media screen and (max-width: 910px) {
+  html.se-store-labs:not(#se-none) .labs-content {
+    flex-direction: column;
+  }
+
+  html.se-store-labs:not(#se-none) .labs-content .right-column {
+    flex-basis: auto !important;
+    width: 100%;
+  }
+
+  html.se-store-labs:not(#se-none) .labs-content .capsule {
+    display: flex !important;
+  }
+}
+
+/* Long button labels ("Try the Interactive Recommender Experiment") wrap inside the card
+   instead of running past its edge; the pill grows to two lines. */
+html.se-store-labs:not(#se-none) .labs-content a.experiment-button {
+  box-sizing: border-box;
+  max-width: 100%;
+  height: auto !important;
+  min-height: 32px;
+  padding-block: 8px !important;
+  line-height: 1.3 !important;
+  white-space: normal !important;
+  text-align: start;
+}
+
+html.se-store-labs:not(#se-none) .labs-content .capsule {
+  min-width: 0;
+}

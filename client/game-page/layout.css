@@ -1,0 +1,690 @@
+/*
+ * Game Details page layout and component styles.
+ *
+ * Dissolves Steam's nested two-column wrappers (`display: contents`) into a
+ * unified CSS Grid where left-column cards (dock width) and right-column sections
+ * stack independently via measured `--se-span` row spans. Styles the hero
+ * banner, floating play bar, link pills, game
+ * info summary, achievements, Friends Who Play tabs, left-column grids (DLC,
+ * trading cards, screenshots, Workshop), and the activity feed. Paired with
+ * `client/game-page/game-page.js`.
+ *
+ * This file: the banner, the logo and the page grid. Game page styles load in order:
+ * layout, play-bar, overview, achievements, friends, cards, activity.
+ */
+/*
+ * Banner
+ * A taller banner, the game's logo centered near its
+ * bottom, the play bar floating over its lower edge, the art fading into the page.
+ */
+:root {
+  --se-gp-overlap: 52px;
+  /* How far the play bar rises into the banner */
+}
+
+._2gZXhRmKUk68pA28-5ZmGQ {
+  /* Header */
+  container-type: inline-size;
+  position: relative;
+}
+
+._2gZXhRmKUk68pA28-5ZmGQ .NZMJ6g2iVnFsOOp-lDmIP.NZMJ6g2iVnFsOOp-lDmIP:not(._1amMH3zqcKV3WYkLKNId8R) {
+  /* TopCapsule (not NoArt) */
+  --header-height: calc(100cqw * 620 / 1920) !important;
+  height: var(--header-height) !important;
+  min-height: var(--header-height) !important;
+  max-height: none !important;
+}
+
+/* Paint the corner above every artwork layer without clipping banner controls. */
+._2gZXhRmKUk68pA28-5ZmGQ::before {
+  --se-hero-corner: var(--se-radius-lg);
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: calc(var(--se-z-sticky) * 2); /* 40: above the hero's own layers */
+  width: var(--se-hero-corner);
+  height: var(--se-hero-corner);
+  background: radial-gradient(
+    circle at 0 100%,
+    transparent calc(var(--se-hero-corner) - .5px),
+    var(--se-rail-bg, var(--se-sidebar)) var(--se-hero-corner)
+  );
+  pointer-events: none;
+}
+
+/* Keep the full hero artwork visible without affecting the separately positioned logo. */
+._2gZXhRmKUk68pA28-5ZmGQ .NZMJ6g2iVnFsOOp-lDmIP:not(._1amMH3zqcKV3WYkLKNId8R) img:not(._3NBxSLAZLbbbnul8KfDFjw):not(._2Eh7Soh97QONu_grMi2m66 img) {
+  object-fit: contain !important;
+  object-position: center top !important;
+}
+
+._2gZXhRmKUk68pA28-5ZmGQ .NZMJ6g2iVnFsOOp-lDmIP:not(._1amMH3zqcKV3WYkLKNId8R) [style*="background-image"]:not(._2Eh7Soh97QONu_grMi2m66):not(._2Eh7Soh97QONu_grMi2m66 *) {
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center top !important;
+}
+
+/* Paint above the artwork and below the logo (z-index: 2). */
+._2gZXhRmKUk68pA28-5ZmGQ::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Overlap the page edge to hide gaps at fractional scroll offsets. */
+  bottom: -2px;
+  height: calc(62% + 2px);
+  z-index: var(--se-z-raised);
+  pointer-events: none;
+  background: linear-gradient(0deg,
+      var(--se-bg) 2px,
+      color-mix(in srgb, var(--se-bg) 78%, transparent) 28%,
+      color-mix(in srgb, var(--se-bg) 32%, transparent) 62%,
+      transparent 100%);
+}
+
+/* Steam caps the artwork container at 320px and its image at 1660px. */
+._2gZXhRmKUk68pA28-5ZmGQ ._1IX7FPSY9Jb82KhBVBSkZa {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+}
+
+._2gZXhRmKUk68pA28-5ZmGQ ._1IX7FPSY9Jb82KhBVBSkZa .QlR9EFwTdUNm_J5vx54_Z {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+._2gZXhRmKUk68pA28-5ZmGQ .QlR9EFwTdUNm_J5vx54_Z > img.HNbe3eZf6H7dtJ042x1vM {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  object-fit: contain !important;
+}
+
+/*
+ * Center the game logo above the play bar. Steam's logo editor draws its own box.
+ */
+._2gZXhRmKUk68pA28-5ZmGQ ._2Eh7Soh97QONu_grMi2m66 {
+  /* BoxSizer */
+  left: 50% !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: calc(var(--se-gp-overlap) + 2px) !important;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+._2gZXhRmKUk68pA28-5ZmGQ ._2Eh7Soh97QONu_grMi2m66 ._2DVdg_N1qLNDdnxJqN-RBX {
+  /* TitleImageContainer */
+  justify-content: center !important;
+  align-items: flex-end !important;
+}
+
+._2gZXhRmKUk68pA28-5ZmGQ ._2Eh7Soh97QONu_grMi2m66 ._3NBxSLAZLbbbnul8KfDFjw {
+  /* TitleLogo */
+  left: 50% !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: 0 !important;
+  margin: 0 !important;
+  transform: translateX(-50%);
+  object-position: bottom center !important;
+  filter: drop-shadow(0 6px 24px rgba(0, 0, 0, .55));
+}
+
+/* Fit logo artwork into a common box, shrinking it on narrow game pages. */
+._2gZXhRmKUk68pA28-5ZmGQ ._2Eh7Soh97QONu_grMi2m66 img._3NBxSLAZLbbbnul8KfDFjw {
+  width: min(580px, 78cqw) !important;
+  height: min(172px, 23cqw) !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-view-box: var(--se-logo-crop, none) !important;
+  object-fit: contain !important;
+}
+
+/*
+ * Two-column CSS Grid layout.
+ * Dissolves AppGameInfoContainer, ColumnContainer, LeftColumn, and
+ * RightColumn via `display: contents` so child cards participate in a single
+ * grid and stack independently using `--se-span` row spans.
+ */
+._27RcNu8aXKBpYkHcNNrt-X {
+  /* Container */
+  display: grid !important;
+  /*
+   * Left column matches the Friends dock (--se-fd-w). On narrow pages it gives way to
+   * the content, down to 220px, so the right-hand sections keep room to read.
+   */
+  grid-template-columns: clamp(220px, 34%, var(--se-fd-w)) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  grid-auto-rows: 1px;
+  grid-auto-flow: row dense;
+  column-gap: 24px;
+  row-gap: 0;
+  align-items: start;
+  box-sizing: border-box;
+  padding: 0 32px 44px !important;
+  background: var(--se-bg) !important;
+  transform-style: flat !important;
+}
+
+:where(._27RcNu8aXKBpYkHcNNrt-X > *, ._27RcNu8aXKBpYkHcNNrt-X > ._25oBZpa3dUcMw8QAsa2u67 > ._2jPMy2QZr8bWi6yrk5ZzHA > ._37mmOlZM_8n5yJAG5CHiW7 > *, ._27RcNu8aXKBpYkHcNNrt-X > .OhSdLYuggDtBcWjYP0j_9 > *, ._27RcNu8aXKBpYkHcNNrt-X > .OhSdLYuggDtBcWjYP0j_9 > :is(._2aor4XVOYzN1PBSREk0UbO, ._1sZgBDTw5NH-yuVDZK1SUU) > *) {
+  grid-column: 2 / -1;
+  grid-row-end: span var(--se-span, 1);
+  min-width: 0;
+  order: 60;
+  margin: 0 0 16px !important;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X > ._1Qa-Aq8WFiF9584yU_1xuC,
+/* Backdrop: Steam's glass, not needed */ ._27RcNu8aXKBpYkHcNNrt-X ._1FXWy2UilVZIppT-PetDWw {
+  /* GameInfoShadow */
+  display: none !important;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X > .OhSdLYuggDtBcWjYP0j_9,
+/* ColumnContainer */ ._27RcNu8aXKBpYkHcNNrt-X > .OhSdLYuggDtBcWjYP0j_9 > :is(._2aor4XVOYzN1PBSREk0UbO, ._1sZgBDTw5NH-yuVDZK1SUU),
+/* RightColumn, LeftColumn */ ._27RcNu8aXKBpYkHcNNrt-X > ._25oBZpa3dUcMw8QAsa2u67,
+/* AppGameInfoContainer */ ._27RcNu8aXKBpYkHcNNrt-X > ._25oBZpa3dUcMw8QAsa2u67 > ._2jPMy2QZr8bWi6yrk5ZzHA,
+._27RcNu8aXKBpYkHcNNrt-X > ._25oBZpa3dUcMw8QAsa2u67 > ._2jPMy2QZr8bWi6yrk5ZzHA > ._37mmOlZM_8n5yJAG5CHiW7 {
+  display: contents !important;
+}
+
+/*
+ * Row 1: Steam's scroll marker (an empty <span>) and the play bar share a row. The
+ * marker sits at the bar's top edge: when it leaves the screen Steam swaps the bar
+ * for its compact top bar.
+ */
+._27RcNu8aXKBpYkHcNNrt-X > span {
+  grid-row: 1 !important;
+  grid-column: 1 !important;
+  align-self: start;
+  order: 0;
+  margin-top: calc(-1 * var(--se-gp-overlap, 52px)) !important;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X > ._3Yf8b2v5oOD8Wqsxu04ar._1U7LKpx70kEsz3jJwAFOi- {
+  /* Play bar, in page */
+  grid-row: 1 !important;
+  grid-column: 1 / -1 !important;
+  justify-self: center;
+  order: 1;
+  position: relative;
+  z-index: 3;
+  width: max-content !important;
+  max-width: 100%;
+  inset: auto !important;
+  translate: none !important;
+  margin-inline: auto !important;
+  margin-top: calc(-1 * var(--se-gp-overlap, 52px)) !important;
+  margin-bottom: 4px !important;
+}
+
+/* LinksSection */
+._27RcNu8aXKBpYkHcNNrt-X > ._3-V8vjmrwuJM6Ws3tsjFJj {
+  grid-row: 2 !important;
+  grid-column: 1 / -1 !important;
+  order: 2;
+  margin: 0 0 22px !important;
+}
+
+/* Left column: Portrait (the cover), then Stats (the facts) */
+._27RcNu8aXKBpYkHcNNrt-X ._1Id6ZFEUVa5PKEMIvSg4nE {
+  grid-column: 1 !important;
+  order: 10;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X ._3cntzF30xAuwn1ARWJjvCb {
+  grid-column: 1 !important;
+  order: 11;
+}
+
+/* How Long To Beat, then Friends who play, then My review */
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="hltb"] {
+  grid-column: 1 !important;
+  order: 12;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="friends"] {
+  grid-column: 1 !important;
+  order: 13;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="review"] {
+  grid-column: 1 !important;
+  order: 14;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="controller"] {
+  grid-column: 1 !important;
+  order: 15;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="notes"] {
+  grid-column: 1 !important;
+  order: 16;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="mastersubincluded"] {
+  grid-column: 1 !important;
+  order: 17;
+}
+
+/* Right column, full width */
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="notice"] {
+  order: 19;
+}
+
+/* Description */
+._27RcNu8aXKBpYkHcNNrt-X ._2AMl0koRXkR77BaY7Sa3Ie {
+  order: 20;
+}
+
+/* FeaturesList: chips */
+._27RcNu8aXKBpYkHcNNrt-X .nkIX48cHLbjc0eaP5CNmM {
+  order: 21;
+}
+
+/* Spotlights (spotlights.css styles the cards themselves) */
+._27RcNu8aXKBpYkHcNNrt-X ._11kuVRYZvWXn-3rBJ_6yL8 {
+  order: 22;
+  width: auto !important;
+  padding: 0 !important;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X ._11kuVRYZvWXn-3rBJ_6yL8:empty {
+  display: none !important;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X ._11kuVRYZvWXn-3rBJ_6yL8 > div:last-child {
+  margin-bottom: 0 !important;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="achievements"] {
+  order: 24;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="activityrollup"] {
+  order: 27;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="activity"] {
+  order: 28;
+}
+
+/* DLC, add-ons, cards, screenshots and Workshop in the left column, under Notes */
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="dlc"] {
+  grid-column: 1 !important;
+  order: 18;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="additionalcontent"] {
+  grid-column: 1 !important;
+  order: 19;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="cards"] {
+  grid-column: 1 !important;
+  order: 20;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="screenshots"] {
+  grid-column: 1 !important;
+  order: 21;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="workshop"] {
+  grid-column: 1 !important;
+  order: 22;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="community"] {
+  order: 40;
+}
+
+._1sZgBDTw5NH-yuVDZK1SUU ._3yTl3RiWfo-Itg-xp967wP {
+  /* ActivityFeedContainer: Steam caps it at 66% */
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec] > ._2r4TK4BAuU-J4FuF_O7v_5 {
+  margin: 0 !important;
+}
+
+/* The feed and community are not boxed: their entries are cards of their own */
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="activity"] > ._2r4TK4BAuU-J4FuF_O7v_5 > ._31ptFGGMZrSQc5BCX1e5lm:not(#se-none),
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="community"] > ._2r4TK4BAuU-J4FuF_O7v_5 > ._31ptFGGMZrSQc5BCX1e5lm:not(#se-none) {
+  background: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  overflow: visible;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="activity"] > ._2r4TK4BAuU-J4FuF_O7v_5 > ._31ptFGGMZrSQc5BCX1e5lm > ._5uvIN6jXDXzzck59F-nhv:not(#se-none),
+._27RcNu8aXKBpYkHcNNrt-X [data-se-sec="community"] > ._2r4TK4BAuU-J4FuF_O7v_5 > ._31ptFGGMZrSQc5BCX1e5lm > ._5uvIN6jXDXzzck59F-nhv:not(#se-none) {
+  padding: 0 !important;
+}
+
+/* The game info pieces, now on the page itself */
+._27RcNu8aXKBpYkHcNNrt-X ._1Id6ZFEUVa5PKEMIvSg4nE:not(#se-none) {
+  /* Portrait: the cover */
+  z-index: auto !important;
+  width: auto !important;
+  transform: none !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  overflow: hidden;
+  box-shadow: 0 18px 36px -14px rgba(0, 0, 0, .85);
+}
+
+._27RcNu8aXKBpYkHcNNrt-X ._1Id6ZFEUVa5PKEMIvSg4nE ._3JzkHhrsBKThuVrwsu3Q7T:not(#se-none) {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* ZoomInButton: the cover is always shown large, so native zoom is not needed */
+._27RcNu8aXKBpYkHcNNrt-X ._1Id6ZFEUVa5PKEMIvSg4nE ._2mMT5wI35EZKZ_XeO7BfPu {
+  display: none !important;
+}
+
+/* Stats: Developer · Publisher · Franchise · Released, one under another */
+._27RcNu8aXKBpYkHcNNrt-X ._3cntzF30xAuwn1ARWJjvCb:not(#se-none) {
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: wrap;
+  gap: 12px !important;
+  max-height: none !important;
+  padding: 0 2px !important;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X ._2AMl0koRXkR77BaY7Sa3Ie ._3GkV1NVDKuXYTLyRt2Uirz:not(#se-none) {
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+  color: var(--se-text-dim) !important;
+}
+
+/*
+ * The game info pieces carry grid-area names from Steam's card layout (the card itself is
+ * dissolved by display: contents above): placed here instead.
+ */
+._27RcNu8aXKBpYkHcNNrt-X :is(._1Id6ZFEUVa5PKEMIvSg4nE, ._3cntzF30xAuwn1ARWJjvCb):not(#se-none) {
+  grid-row: auto / span var(--se-span, 1) !important;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X :is(._2AMl0koRXkR77BaY7Sa3Ie, .nkIX48cHLbjc0eaP5CNmM):not(#se-none) {
+  grid-row: auto / span var(--se-span, 1) !important;
+  grid-column: 2 / -1 !important;
+}
+
+._27RcNu8aXKBpYkHcNNrt-X .nkIX48cHLbjc0eaP5CNmM:not(#se-none) {
+  margin-top: -4px !important;
+}
+
+/* Narrow windows: tighter page edges (the left column shrinks on its own) */
+@media (max-width: 1180px) {
+  ._27RcNu8aXKBpYkHcNNrt-X {
+    padding: 0 20px 32px !important;
+    column-gap: 18px;
+  }
+}
+
+/* Play panel. Sticky copy at the top when scrolling: solid, full width */
+._39RheXihcN6H2k2muQTjkI ._3fLo166MlaNqP8r8tTyRz {
+  background: var(--se-sidebar) !important;
+  box-shadow: var(--se-shadow-card) !important;
+}
+
+._3Yf8b2v5oOD8Wqsxu04ar ._9EHg918wH6CQCQlD5PWOO {
+  /* Row */
+  align-items: center;
+  gap: 10px;
+}
+
+/* PLAY / INSTALL / STOP */
+._1FnJ6dPuknQFQ2RTpKTI16 {
+  /* PlayButtonContainer */
+  border-radius: var(--se-radius-lg) !important;
+  overflow: hidden;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1FnJ6dPuknQFQ2RTpKTI16 {
+  height: 52px !important;
+}
+
+._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA {
+  /* PlayButton */
+  border-radius: var(--se-radius-lg) !important;
+  padding: 0 30px !important;
+  font-weight: 800 !important;
+  letter-spacing: .05em;
+}
+
+/*
+ * The launch-target arrow beside Play (streaming, launch options) is hidden: one
+ * clean button. Launch options stay under Manage (the gear).
+ */
+._1FnJ6dPuknQFQ2RTpKTI16 ._2q-gZ3XJzlvSGHSF-GvSmi {
+  /* StreamingSelector */
+  display: none !important;
+}
+
+._1FnJ6dPuknQFQ2RTpKTI16._1hhB2Wf7iExA15zh_lDQ_y {
+  /* ShowingStreaming: no room kept for it */
+  min-width: 0 !important;
+}
+
+._1FnJ6dPuknQFQ2RTpKTI16._3cI5TXsFX3bvpR-7EBOtxq {
+  /* Green (Play) */
+  box-shadow: 0 8px 24px -10px rgba(80, 180, 50, .75);
+}
+
+._1FnJ6dPuknQFQ2RTpKTI16._3cI5TXsFX3bvpR-7EBOtxq ._3ydigb6zZAjJ0JCDgHwSYA {
+  background: var(--se-play) !important;
+}
+
+/* Stats: one tile each */
+._1YbtIWcfkQJOysLXQbwzRf {
+  /* StatusAndStats */
+  flex: 1 1 auto !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 6px;
+  min-width: 0;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Cloud status, download progress…: one more tile in the row, not a row of its own */
+._1YbtIWcfkQJOysLXQbwzRf ._1dg8hJMsAYISbeQUxcCJcv {
+  /* DetailsSection */
+  height: auto !important;
+  flex: none;
+  padding: 7px 11px !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+}
+
+._1YbtIWcfkQJOysLXQbwzRf ._1dg8hJMsAYISbeQUxcCJcv:empty {
+  display: none;
+}
+
+/*
+ * Cloud status is five tiles stacked in one cell, one per sync state; Steam shows the
+ * current one and gives the others height 0, which tile padding would undo.
+ */
+._1nxYsdQLxAV_i8JIm-f64w:not(._2sKVnd_AUg44QSdoAp8Lne) {
+  /* SuperimposedGridItems, not Visible */
+  display: none !important;
+}
+
+._1YbtIWcfkQJOysLXQbwzRf .zjtAIAWI6HE0oCtJzw6Qt {
+  /* StatusNameContainer */
+  gap: 6px;
+  align-items: center !important;
+  height: auto !important;
+}
+
+._2cRYms-zZc4misk9tj3bt8 {
+  /* PlayBarCloudStatusContainer */
+  align-self: center;
+}
+
+/*
+ * Player Count plugin: its tile matches the others, without the people icon. The
+ * plugin forces the icon's display inline, so it is collapsed to nothing instead.
+ */
+[data-player-count-icon],
+#playercount-badge svg {
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+#playercount-badge {
+  position: relative;
+}
+
+._1YbtIWcfkQJOysLXQbwzRf ._1mDAVT4sTzFRwJtlKCw2Ws {
+  /* GameStatsSection: Steam makes it full width */
+  width: auto !important;
+  flex: 0 1 auto;
+  gap: 6px;
+  align-items: center;
+}
+
+._1kiZKVbDe-9Ikootk57kpA {
+  /* GameStat */
+  margin: 0 !important;
+  padding: 7px 11px !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+}
+
+._1qG6xUlNu-qvdhpSxwed5:hover {
+  /* ClickablePlayBarItem */
+  background: var(--se-hover) !important;
+}
+
+._39RheXihcN6H2k2muQTjkI ._1kiZKVbDe-9Ikootk57kpA ._1tIg-QIrwMNtCm7NcYADyi,
+._39RheXihcN6H2k2muQTjkI ._1kiZKVbDe-9Ikootk57kpA ._3bkqc-SsCg0b3FTEuewlK8 {
+  /* GameStatIcon(Forced), sticky bar */
+  display: none !important;
+}
+
+._1kiZKVbDe-9Ikootk57kpA ._3m_zjRTQBqcfzCjXLXUHcR {
+  /* GameStatRight */
+  padding: 0 !important;
+  gap: 2px;
+}
+
+._1kiZKVbDe-9Ikootk57kpA ._34lrt5-Fc3usZU6trA1P0- {
+  /* PlayBarLabel: the section-label style a size down, to fit the bar */
+  white-space: nowrap;
+  text-transform: uppercase;
+  font: 700 10px/14px var(--se-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  color: var(--se-label-color) !important;
+}
+
+._1kiZKVbDe-9Ikootk57kpA ._2TYVGoD27ZMfjRirKQNLfk {
+  /* PlayBarDetailLabel */
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--se-text) !important;
+}
+
+/* Right-side play bar controls */
+._3Yf8b2v5oOD8Wqsxu04ar ._1EAxK56o5a9Nieu5HYkJ4k {
+  /* RightControls */
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 12px;
+  margin-inline-start: auto;
+}
+
+.lO1IF132jJ1gc9yz2HYvV {
+  /* AppButtonsContainer */
+  display: flex !important;
+  align-items: center;
+  gap: 6px !important;
+  padding-left: 10px;
+  border-left: 1px solid var(--se-hairline);
+}
+
+/* Favorite first, Manage second, then everything else */
+.lO1IF132jJ1gc9yz2HYvV > * {
+  order: 3;
+  align-self: center;
+  margin: 0 !important;
+}
+
+.lO1IF132jJ1gc9yz2HYvV > ._21hXW2oDD7zvNsoOaW7Yob,
+.lO1IF132jJ1gc9yz2HYvV > :has(._21hXW2oDD7zvNsoOaW7Yob) {
+  order: 1;
+}
+
+.lO1IF132jJ1gc9yz2HYvV > ._3oddBTkj_FjknCgBnPqcmQ {
+  /* MenuButtonContainer (Manage) */
+  order: 2;
+  display: flex !important;
+  width: auto !important;
+  padding: 0 !important;
+}
+
+.lO1IF132jJ1gc9yz2HYvV ._3qDWQGB0rtwM3qpXTb11Q-,
+.lO1IF132jJ1gc9yz2HYvV ._21hXW2oDD7zvNsoOaW7Yob {
+  /* MenuButton, FavoriteButton */
+  box-sizing: border-box !important;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  padding: 11px !important;
+  margin: 0 !important;
+  /* Steam adds 10px after each MenuButton */
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  color: var(--se-text) !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.lO1IF132jJ1gc9yz2HYvV ._3qDWQGB0rtwM3qpXTb11Q-:hover,
+.lO1IF132jJ1gc9yz2HYvV ._21hXW2oDD7zvNsoOaW7Yob:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.lO1IF132jJ1gc9yz2HYvV ._21hXW2oDD7zvNsoOaW7Yob._2WaHZuAetbqENmqDthu3nl {
+  /* Favorited */
+  background: var(--se-accent-surface) !important;
+  color: var(--se-accent) !important;
+}
+
+.lO1IF132jJ1gc9yz2HYvV ._3qDWQGB0rtwM3qpXTb11Q- svg,
+.lO1IF132jJ1gc9yz2HYvV ._21hXW2oDD7zvNsoOaW7Yob svg {
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px;
+  max-height: 18px;
+  flex: none;
+}

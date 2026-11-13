@@ -1,0 +1,233 @@
+/*
+ * Utility windows and secondary client dialogs.
+ *
+ * Styles Players, Game Servers, Recordings & Screenshots (Media Manager),
+ * Add a Non-Steam Game, Activate a Product, System Report, System Information,
+ * Back Up / Restore, Mark as Private, Marketing Messages, Game
+ * Launching, Cloud Conflict, Friends & Chat utility popups, Game Info, Remote
+ * Play pairing, Shutdown, and the Steam Input Controller Configurator frame.
+ *
+ * Uses `:not(#se-none)` where ID-level specificity is required to override
+ * deeply nested native CSS module selectors. Many rules still also carry `!important`
+ * (left as is until a specificity pass reconciles the two).
+ *
+ * This file: the shared title line, recessed lists and Players. Utility dialog styles load in
+ * order: base, servers, media, library-tools, modals, friends, standalone.
+ */
+/* Header: the theme's plain title (font, color, case from dialogs.css), as in Settings */
+.u-Qbw_um9KIbq019Iid1E .DialogHeader:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 .DialogHeader:not(#se-none),
+._1tQy-wDVMFDobGfNObgSHR .DialogHeader:not(#se-none),
+._2siQZCB9yAOkiG8N-zRZEe .DialogHeader:not(#se-none),
+._2TAQYpbxatDYN3Ex76KX5u .DialogHeader:not(#se-none),
+._3v2Gg_GCpLHpHQDLFQ7cvI .DialogHeader:not(#se-none),
+.YmQ9vcw08n7STkTEQLiYW .DialogHeader:not(#se-none) {
+  display: block !important;
+  margin: 0 0 6px !important;
+  padding: 0 !important;
+  text-align: start !important;
+  letter-spacing: -.01em !important;
+}
+
+/* The line under the title */
+.u-Qbw_um9KIbq019Iid1E ._2YQGbvgjzxYmACl2lUK0mG:not(#se-none),
+._1tQy-wDVMFDobGfNObgSHR .Xdr35d96Gm9KXkUcxmFnK:not(#se-none) {
+  margin: 0 0 18px !important;
+  padding: 0 !important;
+  font: 400 13.5px/1.5 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+/* Footers: buttons to the right, Close/Cancel quiet, the main action in the accent color */
+.u-Qbw_um9KIbq019Iid1E .DialogFooter:not(#se-none),
+._1tQy-wDVMFDobGfNObgSHR .DialogFooter:not(#se-none),
+._2TAQYpbxatDYN3Ex76KX5u .DialogFooter:not(#se-none),
+._3v2Gg_GCpLHpHQDLFQ7cvI .DialogFooter:not(#se-none),
+.YmQ9vcw08n7STkTEQLiYW .DialogFooter:not(#se-none),
+._2siQZCB9yAOkiG8N-zRZEe .DialogFooter:not(#se-none) {
+  padding-top: 16px !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E button.DialogButton:not(#se-none),
+._1tQy-wDVMFDobGfNObgSHR button.DialogButton:not(#se-none),
+._2TAQYpbxatDYN3Ex76KX5u button.DialogButton:not(#se-none),
+._3v2Gg_GCpLHpHQDLFQ7cvI button.DialogButton:not(#se-none),
+.YmQ9vcw08n7STkTEQLiYW button.DialogButton:not(#se-none),
+._2siQZCB9yAOkiG8N-zRZEe button.DialogButton:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 button.DialogButton:not(#se-none) {
+  height: var(--se-control-h) !important;
+  min-height: var(--se-control-h) !important;
+  padding: 0 18px !important;
+  line-height: var(--se-control-h) !important;
+}
+
+/* Shared: the recessed container, its header row and its rows */
+/* Players list, server list, Add a Non-Steam Game list */
+.u-Qbw_um9KIbq019Iid1E ._1pbQVchAJ7LcA5eIIGV-EN:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._2_4_nZy-T2C3pHa81tGH76:not(#se-none) {
+  margin: 0 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  overflow: hidden;
+  background: var(--se-bg) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._20evaxvMeG8jMJ31t-5-L5:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._2cIK-w-zexbpzoh8jWH-tn:not(#se-none) {
+  box-sizing: border-box;
+  min-height: 38px;
+  padding: 0 6px !important;
+  align-items: center;
+  background: transparent !important;
+  border-bottom: 1px solid var(--se-hairline);
+}
+
+/* Header labels: uppercase label, faint; the sorted column brighter with an accent caret */
+.u-Qbw_um9KIbq019Iid1E ._2I8M7g9rIxbeCZoFpl6_as:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._3mOBJyckqa4Zt5FoB_dBhZ:not(#se-none) {
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase !important;
+  color: var(--se-label-color) !important;
+  transition: color var(--se-dur) ease-out;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._2I8M7g9rIxbeCZoFpl6_as:not(#se-none):hover,
+._2rxrVvbku0AC8Qbequ4-z9 ._3mOBJyckqa4Zt5FoB_dBhZ:not(#se-none):hover {
+  color: var(--se-text-dim) !important;
+}
+
+:is(.u-Qbw_um9KIbq019Iid1E ._2VJwnBYoIWLWhunHyjXDUD._1USi1mEv6zVuMeiEKJBQew, .u-Qbw_um9KIbq019Iid1E ._1USi1mEv6zVuMeiEKJBQew ._2I8M7g9rIxbeCZoFpl6_as, ._2rxrVvbku0AC8Qbequ4-z9 .YqWIL4IWbXSsejmllz4iL, ._2rxrVvbku0AC8Qbequ4-z9 .YqWIL4IWbXSsejmllz4iL ._3mOBJyckqa4Zt5FoB_dBhZ):not(#se-none) {
+  color: var(--se-text) !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E svg.ohzxWXowFiTaMNCOdtRNh:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 svg._11USeacMygE1MnaISNLUjP:not(#se-none) {
+  width: 10px !important;
+  height: 10px !important;
+  margin-inline-start: 6px !important;
+  color: var(--se-accent) !important;
+  fill: currentColor !important;
+}
+
+/* Column resizers: a 1px divider that shows only while the header is under the pointer */
+.u-Qbw_um9KIbq019Iid1E ._3ZJ6gL7WvTh8sUOWVhLqe1:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._1XAm7DWwrTa6XnYYJ5kxAK:not(#se-none) {
+  top: 25% !important;
+  height: 50% !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: inset -1px 0 0 var(--se-hairline);
+  transition: box-shadow var(--se-dur) ease-out;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._3ZJ6gL7WvTh8sUOWVhLqe1 span,
+._2rxrVvbku0AC8Qbequ4-z9 ._1XAm7DWwrTa6XnYYJ5kxAK span {
+  border: 0 !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._20evaxvMeG8jMJ31t-5-L5:hover ._3ZJ6gL7WvTh8sUOWVhLqe1:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._2cIK-w-zexbpzoh8jWH-tn:hover ._1XAm7DWwrTa6XnYYJ5kxAK:not(#se-none) {
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, .16);
+}
+
+/* Empty lists: a faint icon over a quiet line, in the middle of the container */
+.u-Qbw_um9KIbq019Iid1E ._2cgN-Vb3W5DAcPXDg4HRNB:not(#se-none),
+._2rxrVvbku0AC8Qbequ4-z9 ._3uDXkXFyL7ipng8MUUHmcq:not(#se-none) {
+  flex: 1 1 auto;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 160px;
+  margin: 0 !important;
+  padding: 32px 24px !important;
+  text-align: center;
+  font: 500 13.5px/1.5 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._2cgN-Vb3W5DAcPXDg4HRNB::before,
+._2rxrVvbku0AC8Qbequ4-z9 ._3uDXkXFyL7ipng8MUUHmcq::before {
+  content: '';
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--se-dlg-empty) center / 26px 26px no-repeat, var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.u-Qbw_um9KIbq019Iid1E {
+  --se-dlg-empty: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f7984' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='8' r='3.5' fill='%236f7984' fill-opacity='.32' stroke='none'/%3E%3Ccircle cx='9' cy='8' r='3.5'/%3E%3Cpath d='M3 19.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5'/%3E%3Cpath d='M15.5 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2 .7 3.5 2.6 3.5 5.2'/%3E%3C/svg%3E");
+}
+
+._2rxrVvbku0AC8Qbequ4-z9 {
+  --se-dlg-empty: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f7984' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='7' rx='2' fill='%236f7984' fill-opacity='.32' stroke='none'/%3E%3Crect x='3' y='4' width='18' height='7' rx='2'/%3E%3Crect x='3' y='13' width='18' height='7' rx='2'/%3E%3Cpath d='M7 7.5h.01M7 16.5h.01M11 7.5h6M11 16.5h6'/%3E%3C/svg%3E");
+}
+
+/* The server well holds the empty line as its only child: fill it so the line can center */
+._2rxrVvbku0AC8Qbequ4-z9 ._2_4_nZy-T2C3pHa81tGH76 [role="rowgroup"]:has(> ._3uDXkXFyL7ipng8MUUHmcq) {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Players */
+.u-Qbw_um9KIbq019Iid1E ._3kjELHPFlI9SV9QYNi_TaH:not(#se-none) {
+  padding: 4px 0;
+  background: transparent;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._3kjELHPFlI9SV9QYNi_TaH [role="row"] {
+  box-sizing: border-box;
+  min-height: 48px;
+  margin: 1px 6px;
+  align-items: center;
+  border-radius: var(--se-radius-sm);
+  transition: background-color var(--se-dur) ease-out;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._3kjELHPFlI9SV9QYNi_TaH [role="row"]:hover {
+  background: var(--se-hover);
+}
+
+.u-Qbw_um9KIbq019Iid1E ._3kjELHPFlI9SV9QYNi_TaH [role="cell"] {
+  padding-inline: 12px;
+  font: 500 13px/1.35 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.u-Qbw_um9KIbq019Iid1E ._1N2zM_9rkWAnULKER9yxLN:not(#se-none) {
+  gap: 10px;
+  font: 600 13.5px var(--se-font);
+  color: var(--se-text);
+}
+
+.u-Qbw_um9KIbq019Iid1E ._1N2zM_9rkWAnULKER9yxLN img {
+  border-radius: var(--se-avatar-radius);
+}
+
+.u-Qbw_um9KIbq019Iid1E button._2Dz7_wdqfJvQIcXt7Gy-XG:not(#se-none) {
+  height: var(--se-control-h-sm) !important;
+  min-height: 0 !important;
+  padding: 0 12px !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-accent-tint) !important;
+  color: var(--se-accent) !important;
+  font: 700 12px/28px var(--se-font) !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E button._2Dz7_wdqfJvQIcXt7Gy-XG:not(#se-none):hover {
+  background: var(--se-accent) !important;
+  color: var(--se-bg-ink) !important;
+}
+
+.u-Qbw_um9KIbq019Iid1E ._1Z8gkDy_OHZvAsWnkIu7MN:not(#se-none) {
+  font: 600 12px var(--se-font);
+  color: var(--se-text-faint);
+}
+
+.u-Qbw_um9KIbq019Iid1E ._1Z8gkDy_OHZvAsWnkIu7MN._1T0DLB9syB7_oU6GXuNbv2 {
+  color: var(--se-danger-text);
+}

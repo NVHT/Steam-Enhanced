@@ -1,0 +1,207 @@
+/*
+ * Legal Info (/legal/) and Video Policy (/video_policy), as rebuilt by legal/page.js, in the
+ * Subscriber Agreement's look (Video Policy: one card across, no section count):
+ *
+ *   [ Legal Info                                                   ]
+ *   [ ▤ 4 sections                                                 ]
+ *   [ © Copyright           ][ ▶ Valve Video Policy                ]
+ *   [ ▤ Third Party Notices ][ ⛨ Claims of Copyright Infringement ]
+ *
+ * Steam's page (store.css, styles_legalv5.css): .page_header_ctn > .page_content >
+ * h2.pageheader, then #main > #main_content > #legal_box. Store looks follow shared/ui.css:
+ * radius-xl cards, titles in the text colour. Rules use
+ * html.se-store-legal:not(#se-none) for ID-level weight over Steam's #legal_box rules.
+ */
+
+/* ---------- Page ---------- */
+
+html.se-store-legal:not(#se-none) body,
+html.se-store-legal:not(#se-none) :is(.responsive_page_frame, .responsive_page_content, .responsive_page_template_content) {
+  background: var(--se-bg) !important;
+}
+
+/* ---------- Header ---------- */
+
+html.se-store-legal:not(#se-none) .page_header_ctn {
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 28px 0 28px !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-legal:not(#se-none) .page_header_ctn .page_content {
+  width: var(--se-page-width) !important;
+}
+
+html.se-store-legal:not(#se-none) h2.pageheader {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-display)/1.15 var(--se-font) !important;
+  letter-spacing: -.02em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+.se-legal-meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 14px;
+  font: 600 var(--se-fs-md)/1 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+:is(.se-legal-meta, .se-legal-grid) svg {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+:is(.se-legal-meta, .se-legal-grid) svg .d {
+  fill: currentColor;
+  fill-opacity: .3;
+  stroke: none;
+}
+
+.se-legal-meta svg {
+  width: 16px;
+  height: 16px;
+  color: var(--se-text-faint);
+}
+
+/* ---------- Content column ---------- */
+
+html.se-store-legal:not(#se-none) #main {
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding: 0 0 64px !important;
+  background: none !important;
+}
+
+html.se-store-legal:not(#se-none) #main_content {
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-legal:not(#se-none) #legal_box {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-lg)/1.75 var(--se-font) !important;
+}
+
+/* ---------- Cards ---------- */
+
+.se-legal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* two by two: an odd count never strands one card */
+  gap: 16px;
+}
+
+/* One section (Video Policy): one card across */
+.se-legal-grid[data-count="1"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.se-legal-card {
+  display: flex;
+  flex-direction: column;
+  padding: 26px 32px 28px;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-legal-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 12px;
+}
+
+.se-legal-icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim);
+}
+
+.se-legal-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+html.se-store-legal:not(#se-none) .se-legal-head h2 {
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-2xl)/1.3 var(--se-font) !important;
+  letter-spacing: -.01em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+.se-legal-body {
+  color: var(--se-text-dim);
+}
+
+/* Steam spaces paragraphs with <br> pairs: the second one becomes the paragraph gap */
+html.se-store-legal:not(#se-none) .se-legal-body > br + br {
+  display: block;
+  content: "";
+  margin-top: 8px;
+}
+
+/* Links */
+html.se-store-legal:not(#se-none) .se-legal-body a[href] {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+  box-shadow: inset 0 -1px 0 var(--se-accent-surface);
+  transition: color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-store-legal:not(#se-none) .se-legal-body a[href]:hover {
+  color: var(--se-accent-hover) !important;
+  box-shadow: inset 0 -1px 0 currentColor;
+}
+
+@media (max-width: 1000px) {
+  .se-legal-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .se-legal-card {
+    padding: 22px 22px 22px;
+  }
+}

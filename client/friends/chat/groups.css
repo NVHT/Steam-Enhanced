@@ -1,0 +1,404 @@
+/*
+ * Chat › the group chat layout and the collapsible friends list beside the chat.
+ * Chat styles load in order: tabs, header, messages, input, voice, members, icons, groups.
+ */
+
+/*
+ * Group chats: the custom layout
+ * client/friends/chat/chat.js marks a group chat with a channel list (data-se-grouplayout) and how wide its
+ * member list is (data-se-members), and adds the open channel's name to the header. Nothing
+ * is moved: Steam's group header is laid over the window's top edge, its avatar, name and
+ * counts in the channel column's top, its buttons at the end of the chat column's header
+ * beside "# general"; the member list runs the window's full height, the message input
+ * stays under the chat. Without the script, native layout (styled above) is kept.
+ */
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] {
+  --se-g-nav: 240px;
+  --se-g-members: 240px;
+  --se-g-head: 68px;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout][data-se-members="compact"] {
+  --se-g-members: 56px;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout][data-se-members="none"] {
+  --se-g-members: 0px;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader.titleBarContainer {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  right: var(--se-g-members);
+  height: var(--se-g-head) !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatHeaderGradient,
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .disconnectBlocker,
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupSpacer,
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupHeaderTagline,
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .statMembersInGame,
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .statCircle {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomHeader,
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupHeader,
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupControls {
+  position: static !important;
+  display: block !important;
+  height: 100%;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  pointer-events: none;
+}
+
+/* The group card at the top of the channel column */
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupHeader .ChatRoomGroupAvatar {
+  position: absolute !important;
+  left: 14px;
+  top: calc((var(--se-g-head) - 36px) / 2);
+  width: 36px !important;
+  height: 36px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupHeaderNameandTag {
+  position: absolute !important;
+  left: 58px;
+  top: 14px;
+  width: calc(var(--se-g-nav) - 58px - 6px - var(--se-tile-sm) - 2px);
+  min-width: 0 !important;
+  display: block !important;
+  pointer-events: auto;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupHeaderName {
+  display: block;
+  margin: 0 !important;
+  font: 700 14px/20px var(--se-font), sans-serif !important;
+  color: var(--se-text) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupStats {
+  position: absolute !important;
+  left: 58px;
+  top: 35px;
+  width: calc(var(--se-g-nav) - 58px - 6px - var(--se-tile-sm) - 2px);
+  text-overflow: ellipsis;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: baseline;
+  gap: 0;
+  margin: 0 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupStats .statMemberStat {
+  display: inline-flex !important;
+  gap: 0;
+  margin: 0 !important;
+  font: 600 12px/18px var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: lowercase !important;
+  color: var(--se-online) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupStats .statMemberStat.statMembersInGame {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupStats .statMembersOnline {
+  order: 1;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupStats .statMembersOnline::after {
+  content: "\00a0online";
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupStats .statMembersTotal {
+  order: 2;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupStats .statMembersOnline + .statMembersTotal::before,
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupStats .statMembersTotal:not(:only-child)::before {
+  content: "\00a0·\00a0";
+}
+
+/* The chat column's header: "# general" and the group's buttons as tiles */
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .se-group-channel {
+  position: absolute;
+  left: calc(var(--se-g-nav) + var(--se-chat-gutter, 20px));
+  right: 160px;
+  top: 0;
+  height: var(--se-g-head);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font: 700 16px/1.3 var(--se-font), sans-serif;
+  color: var(--se-text);
+  pointer-events: auto;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .se-group-channel::before {
+  content: "";
+  flex: none;
+  width: 20px;
+  height: 20px;
+  background: var(--se-text-faint);
+  -webkit-mask: var(--se-chat-ico-hash) center / contain no-repeat;
+  mask: var(--se-chat-ico-hash) center / contain no-repeat;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .se-group-channel span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomOptions {
+  position: absolute !important;
+  top: calc((var(--se-g-head) - var(--se-tile-sm)) / 2);
+  right: 16px;
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 2px;
+  margin: 0 !important;
+  pointer-events: auto;
+}
+
+/* The channel list's pin button: at the card's end */
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] .chatRoomGroupNavColumn {
+  position: relative;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] .chatRoomGroupNavCollapseExpand {
+  position: absolute !important;
+  top: calc((var(--se-g-head) - var(--se-tile-sm)) / 2) !important;
+  right: 6px !important;
+  left: auto !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  z-index: 7;
+}
+
+/* Channel list pinned closed: Steam's 46 px column; the card keeps only the avatar */
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout][data-se-navcollapsed] {
+  --se-g-nav: 46px;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout][data-se-navcollapsed] > .chatHeader .chatRoomGroupHeader .ChatRoomGroupAvatar {
+  left: 5px;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout][data-se-navcollapsed] > .chatHeader .chatRoomGroupHeaderNameandTag,
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout][data-se-navcollapsed] > .chatHeader .chatRoomGroupStats {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout][data-se-navcollapsed] .chatRoomGroupNavColumn {
+  border-inline-end: 1px solid var(--se-hairline);
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout][data-se-navcollapsed] .chatRoomTextChannel,
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout][data-se-navcollapsed] .chatRoomVoiceChannel {
+  margin: 0 4px 2px !important;
+  padding: 0 !important;
+  justify-content: center;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout][data-se-navcollapsed] .chatRoomTextChannelIcon,
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout][data-se-navcollapsed] .chatRoomVoiceChannelIcon {
+  margin: 0 !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout][data-se-navcollapsed] .ChannelTypeTitle {
+  justify-content: center !important;
+  padding-inline: 0 !important;
+}
+
+/* The member list's bar: as tall as the chat column's header, the same 1px divider under it */
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] .MemberListOptionsContainer {
+  height: var(--se-g-head) !important;
+  min-height: var(--se-g-head) !important;
+  box-shadow: inset 0 -1px 0 var(--se-hairline) !important;
+}
+
+/* The channel column: room for the card, a 1px divider under it */
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] .chatRoomGroupNavColumn {
+  box-sizing: border-box;
+  padding-top: var(--se-g-head) !important;
+  background-image: linear-gradient(to bottom, transparent calc(var(--se-g-head) - 1px), var(--se-hairline) calc(var(--se-g-head) - 1px), var(--se-hairline) var(--se-g-head), transparent var(--se-g-head)) !important;
+}
+
+/* The chat column: room for its header, a 1px divider under it */
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] .ChatRoomGroupDialog_history {
+  box-sizing: border-box;
+  padding-top: var(--se-g-head) !important;
+  background-image: linear-gradient(to bottom, transparent calc(var(--se-g-head) - 1px), var(--se-hairline) calc(var(--se-g-head) - 1px), var(--se-hairline) var(--se-g-head), transparent var(--se-g-head)) !important;
+}
+
+/* The member list at full height; the message input under the chat only */
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] .chatHistoryAndMembers > .displayColumn.fullWidth {
+  position: relative !important;
+  box-sizing: border-box;
+  padding-inline-end: var(--se-g-members) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] .chatHistoryAndMembers > .displayColumn.fullWidth > .displayRow {
+  position: static !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] .chatHistoryAndMembers .MemberListColumn {
+  position: absolute !important;
+  top: 0;
+  bottom: 0;
+  inset-inline-end: 0;
+  width: var(--se-g-members) !important;
+  z-index: 6;
+}
+
+/* "Friends List" (shown while the list is collapsed): only its icon, as a tile at the strip's start */
+.multiChatDialog[data-se-chat] .ChatTabs.friendsListCollapsed {
+  display: flex !important;
+  align-items: center;
+}
+
+.multiChatDialog[data-se-chat] .ChatTabs.friendsListCollapsed .chatTabSetContainer {
+  flex: 1;
+  min-width: 0;
+  padding-inline-start: 8px !important;
+}
+
+/*
+ * With the friends list open beside the chat, its collapse button (client/friends/friends.css) takes the same
+ * spot at the strip's start: the tabs leave room for it
+ */
+:is(html, body).friendsui-container .multiChatDialog[data-se-chat][data-se-list-toggle] .ChatTabs:not(.friendsListCollapsed) .chatTabSetContainer {
+  padding-inline-start: 48px !important;
+}
+
+.multiChatDialog[data-se-chat] .chatTabOpenFriendsList {
+  position: static !important;
+  align-self: center !important;
+  margin: 0 0 0 10px !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* The voice button beside the box: just its tile (Steam keeps a 46 px slot for it) */
+.multiChatDialog[data-se-chat] .chatEntry .ChatMessageEntryVoice:not(.Active) {
+  flex: none !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatEntry .ChatMessageEntryVoice .buttonsContainer {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* The member list's bar: the toggle and the field level, both 30 px */
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer {
+  height: auto !important;
+  min-height: 46px;
+}
+
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer .socialInputContainer {
+  flex: 1 1 0;
+  width: auto !important;
+  min-width: 0;
+  max-height: none !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListViewCompact .MemberListOptionsContainer .socialInputContainer {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer :is(.inputContainer, form) {
+  margin: 0 !important;
+}
+
+/* The channel list's pin button: a plain tile at rest */
+.multiChatDialog[data-se-chat] .chatRoomGroupNavCollapseExpand:not(:hover),
+.multiChatDialog[data-se-chat] .chatRoomGroupNavCollapseExpand > * {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* The group's counts: client/friends/chat/chat.js writes them short ("1.5K online · 11K members") so they fit */
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupStats[data-se-stats] > * {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow.MultiUserChat[data-se-grouplayout] > .chatHeader .chatRoomGroupStats[data-se-stats]::before {
+  content: attr(data-se-stats);
+  display: block;
+  min-width: 0;
+  font: 600 11px/18px var(--se-font), sans-serif;
+  color: var(--se-online);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/*
+ * The friends list collapsed in the Friends & Chat window: Steam slides it off the edge but
+ * leaves it painted, so its text ("Friends List", a name) peeked out beside the tabs
+ */
+:is(html, body).friendsui-container .friendsListContainer.collapsed {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Native tooltip hitboxes for theme-created chat controls. */
+.se-chat-tile {
+  position: relative;
+}
+
+.se-chat-tooltip-host {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.se-chat-tooltip-host > *,
+.se-chat-tooltip-hitbox {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The voice bar over the friends list has no invite button in Steam's design; keep it hidden */
+.friendlist:not(.GamepadMode) .friendListHeaderContainer .VoiceControlPanelButton.chatInvite {
+  display: none !important;
+}

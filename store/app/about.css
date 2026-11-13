@@ -1,0 +1,366 @@
+/*
+ * Game page "About this game" (app/about.js), under the summary strip: the heading, then the
+ * whole description in one column, unclipped. Steam's media block hosts it; Steam's player
+ * column stays rendered off the layout, for the fullscreen view the trailer tiles open
+ * (app/trailers.js). Tokens: shared/base.css.
+ */
+
+/* ---------- Grid ----------
+ * app/summary.css already places the media block after the buttons (order 1) and hides
+ * Steam's glance column. The block and its #game_highlights wrapper carry Steam's fixed
+ * 940px; both take the page width, and the player column's parent becomes two columns.
+ */
+html.se-app-about-on .page_top_area > .game_media_and_summary_ctn:has([data-se-about]) {
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: 100%;
+  margin-inline: auto !important;
+}
+
+/* Steam paints the media block as a panel (.block) with a glow (.game_background_glow) behind
+   the player and About; the section sits on the page like the strip above it. */
+html.se-app-about-on .page_top_area > .game_media_and_summary_ctn:has([data-se-about]),
+html.se-app-about-on .game_media_and_summary_ctn:has([data-se-about]) .game_background_glow,
+html.se-app-about-on [data-se-about] {
+  background: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+html.se-app-about-on .game_media_and_summary_ctn:has([data-se-about]) .game_background_glow {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-app-about-on [data-se-about] {
+  position: relative;
+  box-sizing: border-box;
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 8px 0 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+/*
+ * Steam's player: off the layout but still rendered. Its fullscreen view is the player raised
+ * into the top layer, which escapes this clip and size; display: none would stop it showing.
+ * It keeps a real width, since Steam sizes the video from its container.
+ */
+html.se-app-about-on [data-se-about] > .leftcol {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 960px !important;
+  max-width: none !important;
+  margin: 0 !important;
+  float: none !important;
+  clip-path: inset(50%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- Steam's player: the trailer only, as a theme card ----------
+ * The React carousel (.gamehighlight_desktopcarousel) is two wrapper divs around: the player
+ * (the one element with [popover], also Steam's "Trailers & Screenshots" overlay), two hidden
+ * panels, and the thumbnail strip. Only the player stays; the summary strip above already
+ * shows the screenshots. Its class names are hashed per build, so it is found by structure.
+ * The popover overlay renders in the top layer, so the card's clipping never cuts it.
+ */
+html.se-app-about-on [data-se-about] .gamehighlight_desktopcarousel > div > div > :not([popover]) {
+  display: none !important;
+}
+
+/* The player's own prev / next arrows step through every slide, screenshots included, which
+   the trailer list can't follow; the list is the way between trailers. They are the slide
+   track's children that hold nothing but an icon (the track is the parent of the slides,
+   which wrap [data-trailer-player]). */
+html.se-app-about-on [data-se-about] .gamehighlight_desktopcarousel [popover] div:has(> div > [data-trailer-player]) > div:has(> svg:only-child) {
+  display: none !important;
+}
+
+html.se-app-about-on [data-se-about] .gamehighlight_desktopcarousel {
+  position: relative;
+  border-radius: var(--se-radius-lg);
+  overflow: hidden;
+  background: #000;
+  box-shadow: var(--se-shadow-lg);
+}
+
+/* Hairline ring above the video, like the theme's other art cards. */
+html.se-app-about-on [data-se-about] .gamehighlight_desktopcarousel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  pointer-events: none;
+}
+
+html.se-app-about-on [data-se-about] .gamehighlight_desktopcarousel video {
+  display: block;
+  background: #000;
+}
+
+html.se-app-about-on [data-se-about] :is(.highlight_ctn, .highlight_overflow, .gamehighlight_desktopcarousel) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* Steam's player controls and menus take the theme's look from shared/sale.css, which
+   styles the same player on sale pages. */
+
+/* Clearing divs and anything else Steam leaves in the block take no room. */
+html.se-app-about-on [data-se-about] > :not(.leftcol, .se-app-about) {
+  display: none !important;
+}
+
+/* Steam's own About section further down: its content is shown here. */
+html.se-app-about-on [data-se-about-source] {
+  display: none !important;
+}
+
+/* ---------- Headings ----------
+ * Steam styles every h2 in its content blocks (size, weight, case, floats, borders) with
+ * rules that outrank a single class, so these are scoped to the grid and marked important.
+ */
+html.se-app-about-on [data-se-about] .se-app-about__title {
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-white) !important;
+  font-family: inherit !important;
+  /* The summary strip's heading (app/summary.css .se-app-summary__heading): Overview,
+     Screenshots, Trailers. */
+  font-size: var(--se-fs-xl) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+  text-transform: none !important;
+}
+
+/* ---------- About row ----------
+ * The whole description in balanced columns: app/about.js picks the fewest columns that keep
+ * the row within --se-about-row, at no narrower than --se-about-column-min. No clip, no
+ * inner scroll.
+ */
+
+.se-app-about {
+  /* Row height for the columns (app/about.js): 42% of the window, about 545px full screen at
+     4K / 150%, never under 380px or over 560px. */
+  --se-about-row: clamp(380px, 42vh, 560px);
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  color: var(--se-text-muted);
+}
+
+.se-app-about__body {
+  --se-about-column-min: 300px;
+
+  width: 100%;
+  min-width: 0;
+  column-gap: 44px;
+  column-fill: balance;
+  column-rule: 1px solid var(--se-divider);
+}
+
+/* Keep headings with their text, figures whole, and no single lines stranded. */
+.se-app-about__body :is(h1, h2, h3, h4, .bb_tag) {
+  break-after: avoid;
+}
+
+.se-app-about__body :is(img, video, li, .bb_img_ctn) {
+  break-inside: avoid;
+}
+
+.se-app-about__body :is(p, .bb_paragraph) {
+  orphans: 2;
+  widows: 2;
+}
+
+/* The first heading in a column sits flush with the column top. */
+.se-app-about__body .game_area_description > :first-child {
+  margin-top: 0 !important;
+}
+
+/* Steam's description markup (bbcode output), in theme type, on the page itself. Steam gives
+   the block its own panel and, on some games, a height cap; neither applies here. */
+.se-app-about__body :is(.game_area_description, .game_page_autocollapse, #aboutThisGame) {
+  max-height: none !important;
+  overflow: visible !important;
+  background: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+.se-app-about__body .game_area_description {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-md);
+  line-height: 1.75;
+}
+
+.se-app-about__body :is(h1, h2, h3, h4, .bb_tag) {
+  float: none !important;
+  margin: 20px 0 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-gold) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.se-app-about__body :is(p, .bb_paragraph) {
+  margin: 0 0 12px;
+}
+
+.se-app-about__body :is(ul, ol) {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+.se-app-about__body li::marker {
+  color: var(--se-accent);
+}
+
+/* Media never overflows its column (Steam sizes some with inline widths); banner art fills
+   it (app/about.js marks it [data-se-wide] once its size is known). */
+.se-app-about__body :is(img, video) {
+  display: block;
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 8px 0 14px;
+  border-radius: var(--se-radius-md);
+}
+
+.se-app-about__body :is(img, video)[data-se-wide] {
+  width: 100% !important;
+}
+
+/* Tall art (app/about.js [data-se-tall]): whole, at most the row's height, centred. */
+.se-app-about__body :is(img, video)[data-se-tall] {
+  width: auto !important;
+  max-height: var(--se-about-row);
+  margin-inline: auto;
+  object-fit: contain;
+}
+
+.se-app-about__body .bb_img_ctn:has(> [data-se-tall]) {
+  width: fit-content;
+  margin-inline: auto;
+}
+
+/* ---------- Steam's image controls ----------
+ * Animated images sit in .bb_img_ctn with .bb_img_icons over the top-right corner: play /
+ * pause (.bb_img_play_pause, .playing / .paused) and expand (.bb_img_expand). The box takes
+ * the image's width (the whole column for banner art), and the controls become the theme's
+ * glass buttons with their own glyphs; Steam's icons inside are hidden.
+ */
+.se-app-about__body .bb_img_ctn {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 8px 0 14px;
+  break-inside: avoid;
+}
+
+.se-app-about__body .bb_img_ctn:has(> [data-se-wide]) {
+  width: 100%;
+}
+
+.se-app-about__body .bb_img_ctn > :is(img, video) {
+  margin: 0;
+}
+
+.se-app-about__body .bb_img_icons {
+  top: 10px;
+  inset-inline-end: 10px;
+  gap: 6px;
+  z-index: 1;
+}
+
+.se-app-about__body :is(.bb_img_play_pause, .bb_img_expand) {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-btn);
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line), var(--se-glass-btn-shadow);
+  backdrop-filter: var(--se-blur-chip);
+  color: var(--se-text);
+  font-size: 0;
+  cursor: pointer;
+  transition: opacity var(--se-dur-fast), background var(--se-dur-fast);
+}
+
+.se-app-about__body :is(.bb_img_play_pause, .bb_img_expand):hover {
+  background: var(--se-glass-btn-hover);
+}
+
+.se-app-about__body :is(.bb_img_play_pause, .bb_img_expand) > * {
+  display: none !important;
+}
+
+.se-app-about__body :is(.bb_img_play_pause, .bb_img_expand)::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: var(--se-glyph) center / contain no-repeat;
+  mask: var(--se-glyph) center / contain no-repeat;
+}
+
+/* Playing: pause bars. Paused: a play triangle (Steam keeps the paused button showing). */
+.se-app-about__body .bb_img_play_pause {
+  --se-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='6' y='5' width='4' height='14' rx='1.2'/%3E%3Crect x='14' y='5' width='4' height='14' rx='1.2'/%3E%3C/svg%3E");
+}
+
+.se-app-about__body .bb_img_play_pause.paused {
+  --se-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z'/%3E%3C/svg%3E");
+}
+
+/* Expand: arrows out to the corners. */
+.se-app-about__body .bb_img_expand {
+  --se-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7'/%3E%3C/svg%3E");
+}
+
+.se-app-about__body :is(.bb_img_play_pause, .bb_img_expand):focus-visible {
+  outline: 2px solid var(--se-accent);
+  outline-offset: 2px;
+}
+
+.se-app-about__body .game_area_description > :first-child:is(img, video),
+.se-app-about__body .game_area_description > :first-child :is(img, video):first-child {
+  margin-top: 0;
+}
+
+.se-app-about__body a {
+  color: var(--se-accent);
+}
+
+/* Measures --se-about-row in pixels for app/about.js; takes no room. */
+.se-app-about__probe {
+  position: absolute;
+  width: 0;
+  height: var(--se-about-row);
+  visibility: hidden;
+  pointer-events: none;
+}

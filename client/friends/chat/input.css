@@ -1,0 +1,219 @@
+/*
+ * Chat › the message input.
+ * Chat styles load in order: tabs, header, messages, input, voice, members, icons, groups.
+ */
+
+/*
+ * The message input: one field holding attach, the text, emoticons, voice and send
+ * Steam builds the row as.chatEntry > form.chatEntryControls (text, send) + the actions
+ * container (emoticons, attach) + the voice button. The row itself becomes the field; the
+ * form and the action groups dissolve (display: contents) so their buttons line up inside
+ * it, and `order` puts them where the theme has them: attach · text · emoticons · voice · send.
+ */
+.multiChatDialog[data-se-chat] .chatWindow .chatEntry {
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 2px;
+  height: auto !important;
+  min-height: 40px;
+  margin: 0 var(--se-chat-gutter) 16px !important;
+  padding: 0 5px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08) !important;
+  transition: box-shadow var(--se-dur) ease-out;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow .chatEntry:focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong), 0 0 0 3px var(--se-accent-tint) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow .chatEntry > * {
+  margin-bottom: 0 !important;
+}
+
+.multiChatDialog[data-se-chat] .chatEntry :is(._3Ule3rolhZJiBN4yNNtk1s /* chatEntryControls */, .W0OhkJtz8zMUW8Mhu0BMO /* chatEntryActionsContainer */, ._2WfNoLBdfKwyutA6ho4aSH /* chatEntryActionsGroup */) {
+  display: contents !important;
+}
+
+.multiChatDialog[data-se-chat] .chatEntry .RVIs84dAE6wHcjH9tkinc._3zOBeq5W4cNK3lRz_7aroW /* attach */ {
+  order: -1;
+}
+
+.multiChatDialog[data-se-chat] .chatEntry ._113iuw_HlE_qSgt9cGWCSv,
+.multiChatDialog[data-se-chat] .chatEntry .chatTextarea {
+  order: 0;
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0;
+  max-height: 160px;
+}
+
+.multiChatDialog[data-se-chat] .chatEntry .RVIs84dAE6wHcjH9tkinc:not(._3zOBeq5W4cNK3lRz_7aroW, .Aupswi7-c-w3XwNO5cp2i) /* send */ {
+  order: 9;
+  margin-inline-start: 2px !important;
+}
+
+.multiChatDialog[data-se-chat] :is(._113iuw_HlE_qSgt9cGWCSv /* chatTextarea */, .chatTextarea) {
+  align-self: center !important;
+  box-sizing: content-box !important;
+  height: 20px;
+  /* One line; native rule makes it 42 px */
+  min-height: 20px;
+  max-height: 160px;
+  margin: 0 !important;
+  padding: 10px 6px !important;
+  overflow-y: auto;
+  border: 0 !important;
+  outline: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  font: 500 14px/20px var(--se-font), sans-serif !important;
+  color: var(--se-text) !important;
+}
+
+/* It grows with input content, up to eight lines */
+@supports (field-sizing: content) {
+  .multiChatDialog[data-se-chat] ._113iuw_HlE_qSgt9cGWCSv,
+  .multiChatDialog[data-se-chat] .chatTextarea {
+    height: auto;
+    field-sizing: content;
+  }
+}
+
+.multiChatDialog[data-se-chat] ._113iuw_HlE_qSgt9cGWCSv::placeholder,
+.multiChatDialog[data-se-chat] .chatTextarea::placeholder {
+  color: var(--se-text-faint) !important;
+  opacity: 1;
+}
+
+/* Attach (EmbedButton) and emoticons (EmoticonPickerButton) light like the rail; send waits gray */
+.multiChatDialog[data-se-chat] .chatEntry .RVIs84dAE6wHcjH9tkinc:is(._3zOBeq5W4cNK3lRz_7aroW /* EmbedButton */, .Aupswi7-c-w3XwNO5cp2i /* EmoticonPickerButton */):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatEntry .RVIs84dAE6wHcjH9tkinc:not(._3zOBeq5W4cNK3lRz_7aroW, .Aupswi7-c-w3XwNO5cp2i) {
+  background: var(--se-hairline) !important;
+  color: var(--se-text-faint) !important;
+}
+
+/* The glyphs: Steam's are hidden, the theme's drawn as masks in the tile's color */
+.multiChatDialog[data-se-chat] {
+  --se-chat-ico-attach: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='8.5' fill='%23000' fill-opacity='.32' stroke='none'/%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 8v8M8 12h8'/%3E%3C/svg%3E");
+  --se-chat-ico-emoticon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='8.5' fill='%23000' fill-opacity='.32' stroke='none'/%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M8.5 14.5a4.5 4.5 0 0 0 7 0'/%3E%3Cpath d='M9.5 10h.01M14.5 10h.01' stroke-width='2.4'/%3E%3C/svg%3E");
+  --se-chat-ico-send: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.9' stroke-linejoin='round'%3E%3Cpath d='M4 12l16-8-6 16-2.5-6.5z' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M4 12l16-8-6 16-2.5-6.5z'/%3E%3C/svg%3E");
+}
+
+.multiChatDialog[data-se-chat] .chatEntry .RVIs84dAE6wHcjH9tkinc > svg,
+.multiChatDialog[data-se-chat] .chatEntry .RVIs84dAE6wHcjH9tkinc > div,
+.multiChatDialog[data-se-chat] .chatEntry .RVIs84dAE6wHcjH9tkinc > img {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatEntry .RVIs84dAE6wHcjH9tkinc::before {
+  content: "";
+  width: 18px;
+  /* Send; attach and emoticons are --se-tile-icon (below) */
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: var(--se-chat-ico) center / contain no-repeat;
+  mask: var(--se-chat-ico) center / contain no-repeat;
+}
+
+.multiChatDialog[data-se-chat] .chatEntry .RVIs84dAE6wHcjH9tkinc._3zOBeq5W4cNK3lRz_7aroW {
+  --se-chat-ico: var(--se-chat-ico-attach);
+}
+
+.multiChatDialog[data-se-chat] .chatEntry .RVIs84dAE6wHcjH9tkinc.Aupswi7-c-w3XwNO5cp2i {
+  --se-chat-ico: var(--se-chat-ico-emoticon);
+}
+
+.multiChatDialog[data-se-chat] .chatEntry .RVIs84dAE6wHcjH9tkinc:not(._3zOBeq5W4cNK3lRz_7aroW, .Aupswi7-c-w3XwNO5cp2i) {
+  --se-chat-ico: var(--se-chat-ico-send);
+}
+
+.multiChatDialog[data-se-chat] .chatEntry .RVIs84dAE6wHcjH9tkinc:is(._3zOBeq5W4cNK3lRz_7aroW, .Aupswi7-c-w3XwNO5cp2i)::before {
+  width: var(--se-tile-icon);
+  height: var(--se-tile-icon);
+}
+
+/* Send: blue once there is something to send (Steam marks an empty box.disabled) */
+.multiChatDialog[data-se-chat] .chatEntry .RVIs84dAE6wHcjH9tkinc:not(._3zOBeq5W4cNK3lRz_7aroW, .Aupswi7-c-w3XwNO5cp2i, .jaQN2IyN4P8LZXJ6P11qy /* disabled */) {
+  background: var(--se-accent) !important;
+  color: var(--se-bg-ink) !important;
+}
+
+/* The voice button beside the box keeps its tile; Steam's border and backing go */
+.multiChatDialog[data-se-chat] .ChatMessageEntryVoice {
+  order: 2;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.multiChatDialog[data-se-chat] .VoiceToggleIconCtn {
+  position: static !important;
+}
+
+/* Voice: a green strip with the controls; leave is the only red */
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls {
+  margin: 10px var(--se-chat-gutter) 0 !important;
+  padding: 6px 6px 6px 12px !important;
+  border-radius: var(--se-radius-md) !important;
+  background: color-mix(in srgb, var(--se-running) 10%, transparent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-running) 25%, transparent) !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls .friend {
+  background: none !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls .friend .avatarHolder img.avatar {
+  border-radius: var(--se-avatar-radius) !important;
+}
+
+.multiChatDialog[data-se-chat] .OneOnOneVoiceStatusLabel,
+.multiChatDialog[data-se-chat] .activeVoiceName,
+.multiChatDialog[data-se-chat] .connectionStatusLabels {
+  font: 700 13px/1.3 var(--se-font), sans-serif !important;
+  color: var(--se-running) !important;
+}
+
+.multiChatDialog[data-se-chat] .activeVoiceControls {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.multiChatDialog[data-se-chat] .activeVoiceButtons {
+  display: flex !important;
+  align-items: center;
+  gap: 2px;
+  min-width: 0 !important;
+}
+
+.multiChatDialog[data-se-chat] .activeVoiceButtons .activeVoiceButtonsSpacer,
+.multiChatDialog[data-se-chat] .activeVoiceButtons .activeVoiceButtonsSpacerAfter {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .activeVoiceButtons .chatEndVoiceChat,
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls .chatEndVoiceChat,
+.multiChatDialog[data-se-chat] .OneOnOneVoiceClose {
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent) !important;
+  color: var(--se-danger) !important;
+}
+
+.multiChatDialog[data-se-chat] .activeVoiceButtons .chatEndVoiceChat:hover,
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls .chatEndVoiceChat:hover,
+.multiChatDialog[data-se-chat] .OneOnOneVoiceClose:hover {
+  background: color-mix(in srgb, var(--se-danger) 90%, transparent) !important;
+  color: var(--se-text-strong) !important;
+}

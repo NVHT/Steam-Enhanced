@@ -1,0 +1,1225 @@
+/*
+ * Friend Activity (/id/<name>/home, /my/home): a social feed in three columns.
+ *
+ *   - Left rail: you (avatar and name) over your shortcuts (profile, games, friends, groups,
+ *     inventory, trade offers...) as a slim nav that stays in view.
+ *   - Feed (centre, readable width): the status box as a composer card, then each event as a
+ *     card: author row with a type chip, wide art (workshop previews asked for at full size),
+ *     quiet action buttons, comments in an inset panel. Day headers stay pinned as a glass pill.
+ *   - Right column: the friends list button with the online count, friends in-game as one card
+ *     of rows, add friends, events and groups; it scrolls on its own when taller than the window.
+ *   - Header: "Friend Activity" as a display title with the settings links, search on the right.
+ *
+ * Steam keeps the rail and the right column's content in one box (#friendactivity_right_column);
+ * activity/page.js splits it into .se-activity-rail and .se-activity-side and marks the page
+ * [data-se-arranged]. Without the script (or below Steam's 910px breakpoint, where Steam turns
+ * that box into its menu) the page falls back to the feed beside Steam's box.
+ *
+ * Ids and classes are Steam's (SteamTracking: steamcommunity.com/public/css/skin_1/
+ * profile_friendactivity.css; the page report). Buttons, avatars, comments and friend rows are
+ * shared/ui.css.
+ */
+
+html.se-community-activity {
+  --se-activity-width: var(--se-community-width);
+  --se-activity-rail: 232px;
+  --se-activity-side: 300px;
+  --se-activity-feed: 880px;
+}
+
+/* ---------- Page ---------- */
+
+@media (min-width: 911px) {
+  html.se-community-activity #blotter_page {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) var(--se-activity-side);
+    grid-template-areas:
+      "head head"
+      "feed side";
+    align-items: start;
+    column-gap: 24px;
+    box-sizing: border-box;
+    width: var(--se-activity-width) !important;
+    max-width: none !important;
+    margin: 0 auto !important;
+    padding: 28px 0 72px !important;
+  }
+
+  html.se-community-activity #blotter_page > * {
+    grid-column: 1;
+    float: none !important;
+    min-width: 0;
+  }
+
+  html.se-community-activity #blotter_page > :first-child {
+    grid-area: head;
+  }
+
+  html.se-community-activity #blotter_page > #friendactivity_right_column {
+    grid-area: side;
+    width: auto !important;
+    margin: 0 !important;
+  }
+
+  html.se-community-activity #blotter_page > #blotter_content {
+    grid-area: feed;
+    width: auto !important;
+    margin: 0 !important;
+  }
+
+  html.se-community-activity #blotter_page > :is(div:empty, #blotter_throbber) {
+    grid-column: 1;
+  }
+
+  html.se-community-activity :is(.blotter_day, .blotter_block, .blotter_status_entry) {
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  /* Three columns once activity/page.js has split Steam's box into the two rails */
+  html.se-community-activity #blotter_page[data-se-arranged] {
+    grid-template-columns: var(--se-activity-rail) minmax(0, 1fr) var(--se-activity-side);
+    grid-template-areas:
+      "head head head"
+      "rail feed side";
+    column-gap: 32px;
+  }
+
+  html.se-community-activity #blotter_page[data-se-arranged] > * {
+    grid-column: 2;
+  }
+
+  html.se-community-activity #blotter_page[data-se-arranged] > :first-child {
+    grid-area: head;
+  }
+
+  html.se-community-activity #blotter_page[data-se-arranged] > #blotter_content {
+    grid-area: feed;
+    justify-self: center;
+    width: 100% !important;
+    max-width: var(--se-activity-feed) !important;
+  }
+
+  html.se-community-activity #blotter_page[data-se-arranged] > #friendactivity_right_column {
+    display: none !important;
+  }
+
+  html.se-community-activity #blotter_page[data-se-arranged] > .se-activity-rail {
+    grid-area: rail;
+    position: sticky;
+    top: 20px;
+  }
+
+  html.se-community-activity #blotter_page[data-se-arranged] > .se-activity-side {
+    grid-area: side;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    margin-right: -6px !important;
+    padding-right: 6px !important;
+  }
+}
+
+html.se-community-activity #ModalContentContainer {
+  background: none !important;
+}
+
+/* ---------- Header ---------- */
+
+html.se-community-activity .friend_activity_header {
+  display: flex !important;
+  align-items: center;
+  gap: 20px;
+  height: auto !important;
+  margin: 0 0 24px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-activity .friend_activity_header > div:empty {
+  display: none;
+}
+
+html.se-community-activity .blotter_page_title {
+  order: 1;
+  flex: 1;
+  display: flex !important;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-activity .blotter_page_title h1 {
+  order: -1;
+  margin: 0 !important;
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-display)/1.1 var(--se-font) !important;
+  letter-spacing: -.02em;
+  text-transform: none !important;
+}
+
+/* Settings links (Steam separates them with "|") */
+html.se-community-activity .blotter_page_title > span {
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  color: var(--se-text-faint) !important;
+  font: 500 var(--se-fs-sm)/1.4 var(--se-font) !important;
+}
+
+html.se-community-activity .blotter_page_title > span a {
+  color: var(--se-text-muted) !important;
+  text-decoration: none !important;
+}
+
+html.se-community-activity .blotter_page_title > span a:hover {
+  color: var(--se-accent) !important;
+}
+
+/* Search */
+html.se-community-activity .friend_activity_header_search {
+  order: 2;
+  position: relative;
+  flex: none;
+  float: none !important;
+  width: 300px !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-community-activity :is(#searchInputBoxNew, #profileFriendSearchInputBox) {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 40px !important;
+  margin: 0 !important;
+  padding: 0 40px 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-md)/1 var(--se-font) !important;
+  outline: 0 !important;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-community-activity #profileFriendSearchInputBox {
+  height: 36px !important;
+  font-size: var(--se-fs-base) !important;
+}
+
+html.se-community-activity :is(#searchInputBoxNew, #profileFriendSearchInputBox):focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent) !important;
+}
+
+html.se-community-activity :is(#searchInputBoxNew, #profileFriendSearchInputBox)::placeholder {
+  color: var(--se-text-faint);
+}
+
+/* Steam floats and offsets the field and its image button. Both share one grid cell instead,
+   the button at the field's end, so nothing depends on Steam's positioning. */
+html.se-community-activity :is(#headerSearchForm, #profileFriendSearchField) {
+  display: grid !important;
+  align-items: center;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-activity :is(#headerSearchForm, #profileFriendSearchField) > * {
+  grid-area: 1 / 1;
+  position: static !important;
+  inset: auto !important;
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-activity :is(#searchInputBoxNew, #profileFriendSearchInputBox) {
+  display: block;
+}
+
+html.se-community-activity :is(#searchSubmitImg, #profileFriendSearchSubmitImg) {
+  justify-self: end;
+  width: 22px !important;
+  height: 22px !important;
+  margin-right: 12px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  object-fit: contain;
+  opacity: .55;
+  transition: opacity var(--se-dur-fast);
+}
+
+html.se-community-activity :is(#searchSubmitImg, #profileFriendSearchSubmitImg):hover {
+  opacity: 1;
+}
+
+/* ---------- Status box ---------- */
+
+html.se-community-activity .blotter_status_entry {
+  display: block;
+  margin: 0 0 20px !important;
+  padding: 18px 20px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+/* The entry clears Steam's floated side column: with the grid it has nothing to clear */
+html.se-community-activity .blotter_status_entry .commentthread_entry {
+  height: auto !important;
+  margin: 0 !important;
+}
+
+html.se-community-activity .blotter_status_entry .commentthread_entry > div:empty:not([id]) {
+  display: none;
+}
+
+html.se-community-activity .blotter_status_entry .commentthread_entry_quotebox {
+  margin: 0 0 12px !important;
+}
+
+html.se-community-activity .blotter_status_submit_ctn {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-activity .blotter_status_submit_ctn > * {
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-activity .blotter_status_submit_ctn > .blotter_appselect {
+  order: 1;
+  margin-right: auto !important;
+}
+
+html.se-community-activity .blotter_status_submit_ctn > .emoticon_container {
+  order: 2;
+}
+
+html.se-community-activity:not(#se-none) #blotter_statuspost_submit {
+  order: 3;
+  height: 34px;
+  padding: 0 20px !important;
+  background: var(--se-accent) !important;
+  box-shadow: none !important;
+  color: var(--se-on-accent) !important;
+  font-size: var(--se-fs-base) !important;
+  text-transform: none !important;
+}
+
+html.se-community-activity:not(#se-none) #blotter_statuspost_submit > span {
+  text-transform: none !important;
+}
+
+html.se-community-activity:not(#se-none) #blotter_statuspost_submit:hover {
+  background: var(--se-accent-hover) !important;
+}
+
+/* Tag with game */
+html.se-community-activity .blotter_appselect {
+  width: auto !important;
+  height: auto !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-activity .blotter_appselect_activeoption {
+  position: relative;
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  height: 34px !important;
+  max-width: 260px;
+  padding: 0 32px 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line);
+  color: var(--se-text-dim) !important;
+  font: 600 var(--se-fs-sm)/1 var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-activity .blotter_appselect_activeoption:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-community-activity .blotter_appselect_activeoption::after {
+  content: "";
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -5px;
+  border: solid currentColor;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+  opacity: .7;
+}
+
+html.se-community-activity #blotter_appselect_app_options {
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-panel-bg) !important;
+  box-shadow: var(--se-panel-shadow) !important;
+  backdrop-filter: var(--se-blur-panel);
+  overflow: hidden;
+}
+
+html.se-community-activity #blotter_appselect_app_options {
+  padding: 8px !important;
+}
+
+/* Steam paints the list and its wrappers light blue: everything inside sits on the panel */
+html.se-community-activity #blotter_appselect_app_options :is(div, ul, li, form) {
+  border: 0 !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+html.se-community-activity #blotter_appselect_app_options input:not([type="image"], [type="submit"]) {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 36px !important;
+  margin: 0 0 6px !important;
+  padding: 0 36px 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-base)/1 var(--se-font) !important;
+  outline: 0 !important;
+}
+
+html.se-community-activity #blotter_appselect_app_options input:not([type="image"], [type="submit"]):focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent) !important;
+}
+
+html.se-community-activity:not(#se-none) #blotter_appselect_app_options .option {
+  margin: 0 !important;
+  padding: 9px 12px !important;
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-dim) !important;
+  font: 600 var(--se-fs-base)/1.3 var(--se-font) !important;
+  text-shadow: none !important;
+  cursor: pointer;
+}
+
+html.se-community-activity:not(#se-none) #blotter_appselect_app_options .option:is(:hover, .active, .selected, .highlighted, .focus) {
+  background-color: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+/* ---------- Day headers ---------- */
+
+html.se-community-activity .blotter_day {
+  margin: 0 0 8px !important;
+  background: none !important;
+}
+
+html.se-community-activity .blotter_day_header {
+  position: sticky;
+  top: 12px;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  height: auto !important;
+  margin: 8px 0 14px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  pointer-events: none;
+}
+
+html.se-community-activity .blotter_day_header_date {
+  float: none !important;
+  margin: 0 !important;
+  padding: 6px 14px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line), var(--se-shadow-sm);
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-xs)/1.3 var(--se-font) !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  backdrop-filter: var(--se-blur-chip);
+  pointer-events: auto;
+}
+
+/* ---------- Event cards ---------- */
+
+html.se-community-activity .blotter_block {
+  box-sizing: border-box;
+  margin: 0 0 16px !important;
+  padding: 18px 20px 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-md)/1.6 var(--se-font) !important;
+}
+
+/* Steam's per-type wrappers (.blotter_workshopitempublished...) and inner panels */
+html.se-community-activity .blotter_block > [class^="blotter_"],
+html.se-community-activity .blotter_block :is(
+  .blotter_gamepurchase_content,
+  .blotter_userstatus_content,
+  .blotter_recommendation_content,
+  .blotter_screenshot_gallery,
+  .blotter_workshopitem,
+  .blotter_workshopitem_content
+) {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* Author row */
+html.se-community-activity .blotter_author_block {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  height: auto !important;
+  margin: 0 0 16px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-base)/1.4 var(--se-font) !important;
+}
+
+html.se-community-activity .blotter_author_block > * {
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-activity .blotter_avatar_holder {
+  flex: none;
+  position: relative;
+}
+
+html.se-community-activity .blotter_author_block a {
+  color: var(--se-text) !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+}
+
+html.se-community-activity .blotter_author_block a:hover {
+  color: var(--se-accent) !important;
+}
+
+/* Type chip (activity/page.js) */
+html.se-community-activity .se-activity-kind {
+  flex: none;
+  margin-left: auto !important;
+  padding: 3px 10px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+  color: var(--se-text-muted);
+  font: 700 var(--se-fs-xs)/1.3 var(--se-font);
+  letter-spacing: .02em;
+}
+
+html.se-community-activity .se-activity-kind[data-se-kind="purchase"] { background: color-mix(in srgb, var(--se-cart) 16%, transparent); color: var(--se-cart); }
+html.se-community-activity .se-activity-kind[data-se-kind="review"] { background: var(--se-accent-surface); color: var(--se-accent); }
+html.se-community-activity .se-activity-kind[data-se-kind="achievement"] { background: color-mix(in srgb, var(--se-gold) 16%, transparent); color: var(--se-gold); }
+
+/* Content */
+html.se-community-activity .blotter_block a {
+  color: var(--se-accent);
+}
+
+html.se-community-activity .blotter_block :is(
+  .blotter_gamepurchase_logo,
+  .blotter_screenshot_gallery,
+  .blotter_workshopitem_preview,
+  .blotter_recommendation_content,
+  .blotter_screenshot
+) img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--se-radius-md);
+}
+
+/* Workshop / artwork: the art wide across the card, the title under it */
+html.se-community-activity .blotter_workshopitem {
+  display: flex !important;
+  flex-direction: column;
+  gap: 12px;
+}
+
+html.se-community-activity .blotter_workshopitem_preview {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+}
+
+html.se-community-activity .blotter_workshopitem_preview a {
+  display: block;
+}
+
+html.se-community-activity .blotter_workshopitem_preview img {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  max-height: 560px;
+  object-fit: contain;
+  border-radius: var(--se-radius-lg) !important;
+  background: rgba(0, 0, 0, .28);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-activity .blotter_workshopitem_title a:empty,
+html.se-community-activity .blotter_workshopitem_metadata:not(:has(a:not(:empty))) {
+  display: none !important;
+}
+
+html.se-community-activity .blotter_workshopitem > * {
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-activity .blotter_workshopitem > div:empty {
+  display: none;
+}
+
+html.se-community-activity .blotter_workshopitem_metadata {
+  width: auto !important;
+  height: auto !important;
+}
+
+html.se-community-activity .blotter_workshopitem_title a {
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-lg)/1.35 var(--se-font) !important;
+  text-decoration: none !important;
+}
+
+html.se-community-activity .blotter_workshopitem_description {
+  margin-top: 6px !important;
+  color: var(--se-text-muted) !important;
+  font: 400 var(--se-fs-base)/1.6 var(--se-font) !important;
+}
+
+html.se-community-activity .blotter_workshopitem_description:empty {
+  display: none;
+}
+
+/* Purchases */
+html.se-community-activity .blotter_gamepurchase_content {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+html.se-community-activity .blotter_gamepurchase_content > * {
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-activity .blotter_gamepurchase_content img {
+  border-radius: var(--se-radius-md);
+}
+
+/* "+2 more" (activity/page.js): a tile the height of the capsules */
+html.se-community-activity .blotter_gamepurchase_content [data-se-more] {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  min-width: 64px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-muted) !important;
+  font: 700 var(--se-fs-xl, 20px)/1 var(--se-font) !important;
+}
+
+/* Game names under the capsules */
+html.se-community-activity .blotter_gamepurchase_details a {
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+html.se-community-activity .blotter_gamepurchase_details a:hover {
+  text-decoration: underline !important;
+}
+
+html.se-community-activity .blotter_gamepurchase_details {
+  flex: 1;
+  min-width: 200px;
+  color: var(--se-text-dim) !important;
+}
+
+/* Status posts */
+html.se-community-activity .blotter_userstatus_content {
+  color: var(--se-text) !important;
+  font: 400 var(--se-fs-lg)/1.6 var(--se-font) !important;
+}
+
+/* Daily roll-up: compact rows */
+html.se-community-activity .blotter_daily_rollup_line {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  margin: 0 !important;
+  padding: 8px 0 !important;
+  border-top: 1px solid var(--se-divider);
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-base)/1.5 var(--se-font) !important;
+}
+
+html.se-community-activity .blotter_daily_rollup_line:first-child {
+  border-top: 0;
+  padding-top: 0 !important;
+}
+
+html.se-community-activity .blotter_daily_rollup_line > * {
+  float: none !important;
+  margin: 0 !important;
+}
+
+/* Actions row: Rate up / down, Share, then who rated */
+html.se-community-activity .blotter_control_container {
+  position: static !important;
+  display: flex !important;
+  width: auto !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  border-left: 0 !important;
+  background: none !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  height: auto !important;
+  margin-top: 14px !important;
+  padding-top: 10px !important;
+  border-top: 1px solid var(--se-divider) !important;
+}
+
+html.se-community-activity .blotter_control_container > * {
+  float: none !important;
+  margin: 0 !important;
+}
+
+/* Quiet actions: no face until hovered */
+html.se-community-activity:not(#se-none) .blotter_control_container :is(.btn_grey_grey, .btn_grey_black) {
+  height: 34px;
+  padding: 0 12px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--se-text-muted) !important;
+}
+
+html.se-community-activity:not(#se-none) .blotter_control_container :is(.btn_grey_grey, .btn_grey_black):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-community-activity .blotter_control_container .ico16 {
+  opacity: .85;
+}
+
+html.se-community-activity .blotter_voters_names {
+  margin-left: auto !important;
+  color: var(--se-text-faint) !important;
+  font: 500 var(--se-fs-sm)/1.4 var(--se-font) !important;
+}
+
+html.se-community-activity .blotter_voters_names a {
+  color: var(--se-text-muted) !important;
+}
+
+html.se-community-activity .blotter_comment_thread {
+  width: auto !important;
+  margin: 14px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-activity .blotter_comment_thread .commentthread_area {
+  padding: 14px 16px !important;
+  border-radius: var(--se-radius-lg);
+  background: rgba(0, 0, 0, .16) !important;
+}
+
+/* No comments yet: only the composer, without the panel or the "0 Comments" header */
+html.se-community-activity .blotter_comment_thread .commentthread_area:not(:has(.commentthread_comment)) {
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-activity .blotter_comment_thread .commentthread_area:not(:has(.commentthread_comment)) .commentthread_header {
+  display: none !important;
+}
+
+html.se-community-activity .blotter_comment_thread .commentthread_area:not(:has(.commentthread_comment)) .commentthread_entry {
+  margin-top: 4px !important;
+}
+
+html.se-community-activity .blotter_comment_thread .commentthread_header {
+  margin-bottom: 4px !important;
+}
+
+html.se-community-activity .blotter_comment_thread .commentthread_comment_container,
+html.se-community-activity .blotter_comment_thread .commentthread_comments {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-activity .blotter_comment_thread .commentthread_entry {
+  margin: 10px 0 0 !important;
+}
+
+/* Loading more */
+html.se-community-activity #blotter_throbber {
+  margin: 24px auto !important;
+  opacity: .7;
+}
+
+/* ---------- Side column ---------- */
+
+html.se-community-activity .friends_launch_area {
+  display: flex !important;
+  flex-direction: column;
+  gap: 12px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-community-activity .friends_launch_area > * {
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-activity :is(.friends_launch_area, .se-activity-side) > a.nohover {
+  display: block;
+  width: auto !important;
+  height: auto !important;
+  text-decoration: none !important;
+}
+
+html.se-community-activity :is(.friends_launch_area, .se-activity-side) > a.nohover > div:empty {
+  display: none;
+}
+
+/* Cards */
+html.se-community-activity :is(.friends_launch_area, .se-activity-side) :is(.box, .friends_add_block, .blotter_eventsblock, .se-activity-friends) {
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 14px 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim) !important;
+  font: 500 var(--se-fs-base)/1.45 var(--se-font) !important;
+}
+
+/* View Friends List: a card-sized button */
+html.se-community-activity .friends_link_block {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-community-activity a.nohover:hover .friends_link_block {
+  background: var(--se-surface-2) !important;
+}
+
+html.se-community-activity .friends_link_block > * {
+  float: none !important;
+  margin: 0 !important;
+  width: auto !important;
+}
+
+html.se-community-activity .friends_link_block .profile_button_icon {
+  grid-row: span 2;
+}
+
+html.se-community-activity .friends_link_block .profile_button_text {
+  height: auto !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-md)/1.3 var(--se-font) !important;
+}
+
+html.se-community-activity .profile_link_block_text_friends {
+  color: var(--se-status-online) !important;
+  font: 600 var(--se-fs-xs)/1.4 var(--se-font) !important;
+}
+
+/* Labels */
+html.se-community-activity :is(.profile_add_friends_title, .blotter_eventsblock > .blotter_eventsblock_title, .profile_friends_ingame) {
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+html.se-community-activity .profile_friends_ingame {
+  height: auto !important;
+  margin: 8px 0 0 !important;
+  padding: 0 4px !important;
+}
+
+html.se-community-activity .profileFriendSearchBox {
+  width: auto !important;
+  height: auto !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+/* Your menu */
+html.se-community-activity #persona > a {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  height: auto !important;
+  text-decoration: none !important;
+}
+
+html.se-community-activity #persona .blotter_avatar_holder {
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+html.se-community-activity #persona .friendName {
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-activity .profile_options_divider {
+  height: 1px !important;
+  margin: 10px 0 !important;
+  border: 0 !important;
+  background: var(--se-divider) !important;
+}
+
+html.se-community-activity .profile_menu_item {
+  height: auto !important;
+  margin: 0 -8px !important;
+}
+
+html.se-community-activity .profile_menu_item a {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px !important;
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-dim) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-activity .profile_menu_item a:hover {
+  background: var(--se-hover);
+  color: var(--se-white) !important;
+}
+
+html.se-community-activity .profile_menu_item img {
+  flex: none;
+  margin: 0 !important;
+  opacity: .7;
+}
+
+html.se-community-activity .profile_menu_text {
+  margin: 0 !important;
+  font: 600 var(--se-fs-base)/1.3 var(--se-font) !important;
+}
+
+/* Groups */
+html.se-community-activity .profile_group_block a {
+  color: var(--se-text-dim) !important;
+  text-decoration: none !important;
+}
+
+html.se-community-activity .profile_group_block a:hover {
+  color: var(--se-accent) !important;
+}
+
+html.se-community-activity .profile_group_block .profile_view_group_text {
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-md)/1.3 var(--se-font) !important;
+}
+
+html.se-community-activity .groupBlockMedium {
+  width: auto !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+  overflow: hidden;
+}
+
+html.se-community-activity .groupBlockMedium :is(.mediumHolder_default, .avatarMedium) {
+  width: auto !important;
+  background: none !important;
+}
+
+html.se-community-activity .groupBlockMedium img {
+  border-radius: var(--se-radius-sm);
+}
+
+html.se-community-activity .profile_primary_group_name {
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-base)/1.3 var(--se-font) !important;
+}
+
+html.se-community-activity .profile_group_block > br {
+  display: none;
+}
+
+html.se-community-activity .profile_group_block > a:last-child {
+  display: inline-block;
+  margin-top: 10px;
+  font: 600 var(--se-fs-sm)/1.3 var(--se-font) !important;
+}
+
+/* Friends in-game: rows (shared/ui.css) with a "view all" link */
+html.se-community-activity .friends_launch_area > .friendBlock,
+html.se-community-activity .se-activity-friends > .friendBlock {
+  margin: -8px 0 0 !important;
+}
+
+html.se-community-activity .profile_friends_ingame_viewall {
+  padding: 4px 12px !important;
+}
+
+html.se-community-activity :is(.profile_friends_ingame_viewall, .blotter_eventsblock_sublinks) a {
+  color: var(--se-accent) !important;
+  font: 600 var(--se-fs-sm)/1.3 var(--se-font) !important;
+  text-decoration: none !important;
+}
+
+/* Events */
+html.se-community-activity .blotter_eventsblock_content {
+  width: auto !important;
+}
+
+html.se-community-activity .blotter_eventsblock_event {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 10px;
+  row-gap: 4px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 0 10px !important;
+}
+
+html.se-community-activity .blotter_eventsblock_event > * {
+  float: none !important;
+  margin: 0 !important;
+  width: auto !important;
+}
+
+html.se-community-activity .blotter_eventsblock_event > .blotter_eventsblock_title {
+  grid-column: 1 / -1;
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-sm)/1.4 var(--se-font) !important;
+}
+
+html.se-community-activity .blotter_eventsblock_event > div:empty {
+  display: none;
+}
+
+html.se-community-activity .blotter_eventsblock_event_text {
+  color: var(--se-text-dim) !important;
+  font: 500 var(--se-fs-sm)/1.45 var(--se-font) !important;
+}
+
+html.se-community-activity .blotter_eventsblock_event_text a {
+  color: var(--se-text) !important;
+  font-weight: 600;
+}
+
+html.se-community-activity .eventSmallText {
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+}
+
+html.se-community-activity .hiliteTextRed {
+  color: var(--se-danger) !important;
+}
+
+/* ---------- Rails (activity/page.js) ---------- */
+
+html.se-community-activity :is(.se-activity-rail, .se-activity-side) {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Left rail: you, then your shortcuts as a nav. Steam's box loses its card here. */
+html.se-community-activity .se-activity-rail .profile_link_block {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-community-activity .se-activity-rail #persona {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 0 6px !important;
+}
+
+html.se-community-activity .se-activity-rail #persona > a {
+  padding: 8px 10px !important;
+  border-radius: var(--se-radius-lg);
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-community-activity .se-activity-rail #persona > a:hover {
+  background: var(--se-hover);
+}
+
+html.se-community-activity .se-activity-rail #persona .friendName {
+  font-size: var(--se-fs-lg) !important;
+}
+
+html.se-community-activity .se-activity-rail .profile_options_divider {
+  margin: 8px 10px !important;
+}
+
+html.se-community-activity .se-activity-rail .profile_menu_item {
+  margin: 0 !important;
+}
+
+html.se-community-activity .se-activity-rail .profile_menu_item a {
+  gap: 12px;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 0 12px !important;
+  border-radius: var(--se-radius-pill);
+  color: var(--se-text-muted) !important;
+}
+
+html.se-community-activity .se-activity-rail .profile_menu_item a:hover {
+  background: var(--se-pill);
+  color: var(--se-white) !important;
+}
+
+html.se-community-activity .se-activity-rail .profile_menu_item a:hover img {
+  opacity: 1;
+}
+
+/* Steam spaces the label for its own icon (padding / offset): the link's gap does that here */
+html.se-community-activity .profile_menu_item .profile_menu_text {
+  position: static !important;
+  inset: auto !important;
+  float: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-indent: 0 !important;
+}
+
+html.se-community-activity .se-activity-rail .profile_menu_text {
+  font: 600 var(--se-fs-md)/1.2 var(--se-font) !important;
+}
+
+/* Right column: the friends list button as the column's header card */
+html.se-community-activity .se-activity-side .friends_link_block {
+  padding: 14px 16px !important;
+}
+
+html.se-community-activity .se-activity-friends {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 8px 8px !important;
+}
+
+html.se-community-activity .se-activity-friends > .profile_friends_ingame {
+  margin: 0 0 6px !important;
+  padding: 0 8px !important;
+}
+
+html.se-community-activity .se-activity-friends > .friendBlock {
+  margin: 0 !important;
+}
+
+html.se-community-activity .se-activity-friends > .profile_friends_ingame_viewall {
+  margin-top: 4px !important;
+  padding: 8px !important;
+  border-top: 1px solid var(--se-divider);
+}
+
+/* Duotone icons in the rail and the side buttons (shared/icons.js) */
+html.se-community-activity .se-activity-rail .profile_menu_item .se-duo {
+  width: 20px;
+  height: 20px;
+}
+
+html.se-community-activity .friends_link_block .se-duo {
+  width: 28px;
+  height: 28px;
+}
+
+html.se-community-activity .profile_group_block a.nohover > div:has(> .se-duo) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

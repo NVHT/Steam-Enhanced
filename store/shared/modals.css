@@ -1,0 +1,704 @@
+/*
+ * Steam's classic store dialogs (every store page): dialog.newmodal, opened by Steam's
+ * CModal / ShowDialog for things like "Example Products", "Customize Your Discovery Queue",
+ * confirmations and alerts. Steam positions each one (inline left/top/width); this restyles
+ * it as a theme card:
+ *
+ *   [ Customize Your Discovery Queue                          ( × ) ]
+ *   [ Pick from the options below …                                 ]
+ *   [ INCLUDE THE FOLLOWING TYPES OF CONTENT                        ]
+ *   [ Early Access Products                                  [■—]   ]
+ *   [                                        ( Cancel )( OK )        ]
+ *
+ * Steam's markup (shared_global.css): .newmodal_background (the scrim), dialog.newmodal >
+ * .modal_top_bar, .newmodal_header_border > .newmodal_header > .newmodal_close + .title_text,
+ * .newmodal_content_border > .newmodal_content > (content) + .newmodal_buttons > .btn_*_steamui.
+ * Content that recurs in these dialogs (example-product lists, the Discovery Queue settings)
+ * is styled below the frame. Rules use html.se-store:not(#se-none) for ID-level weight.
+ */
+
+/* ---------- Scrim ---------- */
+
+html.se-store:not(#se-none) .newmodal_background {
+  background: rgb(0 0 0 / .6) !important;
+  opacity: 1 !important;
+  backdrop-filter: blur(4px);
+}
+
+/* ---------- Frame ---------- */
+
+html.se-store:not(#se-none) .newmodal {
+  overflow: hidden;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg, 0 24px 64px rgb(0 0 0 / .5)) !important;
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-md)/1.55 var(--se-font) !important;
+}
+
+html.se-store:not(#se-none) .newmodal .modal_top_bar {
+  display: none !important;
+}
+
+html.se-store:not(#se-none) .newmodal :is(.newmodal_header_border, .newmodal_content_border) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-store:not(#se-none) .newmodal .newmodal_header {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 12px;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 20px 20px 0 26px !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-store:not(#se-none) .newmodal .title_text {
+  flex: 1;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-2xl)/1.3 var(--se-font) !important;
+  letter-spacing: -.01em;
+  text-transform: none !important;
+  white-space: normal !important;
+}
+
+/* Close: a round button with the theme's × */
+html.se-store:not(#se-none) .newmodal .newmodal_close {
+  position: static !important;
+  flex: none;
+  width: 34px !important;
+  height: 34px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface-2) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .newmodal .newmodal_close::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--se-text-muted);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .newmodal .newmodal_close:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store:not(#se-none) .newmodal .newmodal_close:hover::before {
+  background: var(--se-text);
+}
+
+html.se-store:not(#se-none) .newmodal .newmodal_content {
+  margin: 0 !important;
+  padding: 16px 26px 24px !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font: inherit !important;
+}
+
+html.se-store:not(#se-none) .newmodal .newmodal_content p {
+  margin: 0 0 14px !important;
+  color: var(--se-text-dim) !important;
+}
+
+html.se-store:not(#se-none) .newmodal .newmodal_content a:not([class*="btn"]):not(.app_tag) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+/* ---------- Buttons: the green one is the dialog's action ---------- */
+
+html.se-store:not(#se-none) .newmodal .newmodal_buttons {
+  display: flex;
+  flex-direction: row-reverse; /* Steam lists OK first; the action sits on the right */
+  justify-content: flex-start;
+  gap: 10px;
+  margin: 22px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  text-align: right;
+}
+
+html.se-store:not(#se-none) .newmodal .newmodal_buttons > [class*="btn_"] {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .newmodal .newmodal_buttons > [class*="btn_"] > span {
+  padding: 0 22px !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: 700 var(--se-fs-md)/38px var(--se-font) !important;
+  text-shadow: none !important;
+}
+
+html.se-store:not(#se-none) .newmodal .newmodal_buttons > [class*="btn_"]:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store:not(#se-none) .newmodal .newmodal_buttons > :is(.btn_green_steamui, .btn_green_white_innerfade, .btnv6_green_white_innerfade, .btn_blue_steamui) {
+  background: var(--se-accent) !important;
+  box-shadow: none;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-store:not(#se-none) .newmodal .newmodal_buttons > :is(.btn_green_steamui, .btn_green_white_innerfade, .btnv6_green_white_innerfade, .btn_blue_steamui):hover {
+  background: var(--se-accent-hover) !important;
+}
+
+/* ---------- Example products (Store preferences → Mature content) ---------- */
+
+html.se-store:not(#se-none) .newmodal .newmodal_content > div > div:has(> .content_descriptors_example_app) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+html.se-store:not(#se-none) .newmodal .content_descriptors_examples_desc {
+  grid-column: 1 / -1;
+}
+
+html.se-store:not(#se-none) .newmodal .content_descriptors_examples_desc:empty {
+  display: none;
+}
+
+html.se-store:not(#se-none) .newmodal .content_descriptors_example_app {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 8px !important;
+  float: none !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store:not(#se-none) .newmodal .content_descriptors_example_app .app_logo {
+  flex: none;
+  width: 92px !important;
+  height: auto !important;
+  aspect-ratio: 231 / 87; /* Steam's small capsule */
+  object-fit: cover;
+  margin: 0 !important;
+  border-radius: var(--se-radius-xs);
+}
+
+html.se-store:not(#se-none) .newmodal .content_descriptors_example_app .app_name {
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-base)/1.35 var(--se-font) !important;
+}
+
+/* ---------- Discovery Queue settings ---------- */
+
+html.se-store:not(#se-none) .newmodal :is(.dq_settings_content, .queue_options_ctn, .dq_settings_section) {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  background: none !important;
+}
+
+html.se-store:not(#se-none) .newmodal .queue_options_ctn {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+html.se-store:not(#se-none) .newmodal .dq_settings_section_title {
+  margin: 0 0 8px !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store:not(#se-none) .newmodal .dq_settings_checkrow {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 42px;
+  margin: 0 0 6px !important;
+  padding: 6px 12px !important;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store:not(#se-none) .newmodal .dq_settings_checkrow > label {
+  flex: 1;
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.3 var(--se-font) !important;
+  cursor: pointer;
+}
+
+/* Checkboxes in dialogs: the theme's switch, at the row's end */
+html.se-store:not(#se-none) .newmodal .dq_settings_checkrow > input[type="checkbox"] {
+  order: 2;
+  flex: none;
+  position: relative;
+  width: 38px;
+  height: 22px;
+  margin: 0 !important;
+  border-radius: var(--se-radius-pill);
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .newmodal .dq_settings_checkrow > input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--se-text-muted);
+  transition: transform var(--se-dur-fast) var(--se-ease), background-color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .newmodal .dq_settings_checkrow > input[type="checkbox"]:checked {
+  background: var(--se-accent);
+  box-shadow: none;
+}
+
+html.se-store:not(#se-none) .newmodal .dq_settings_checkrow > input[type="checkbox"]:checked::after {
+  background: var(--se-on-accent);
+  transform: translateX(16px);
+}
+
+/* Excluded tags: chips with Steam's check toggle */
+html.se-store:not(#se-none) .newmodal .dq_excluded_tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 10px !important;
+}
+
+html.se-store:not(#se-none) .newmodal .app_tag_control {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  margin: 0 !important;
+  padding: 0 12px 0 8px !important;
+  float: none !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store:not(#se-none) .newmodal .app_tag_control .app_tag {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-base)/1 var(--se-font) !important;
+  text-decoration: none !important;
+}
+
+html.se-store:not(#se-none) .newmodal .app_tag_checkbox {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  float: none !important;
+  border-radius: 4px;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  cursor: pointer;
+}
+
+html.se-store:not(#se-none) .newmodal .app_tag_checkbox.checked {
+  background: var(--se-accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23071423' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center / 12px no-repeat !important;
+  box-shadow: none;
+}
+
+/* Tag search: field, then Add */
+html.se-store:not(#se-none) .newmodal .app_tag_form_ctn form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+html.se-store:not(#se-none) .newmodal .app_tag_form_ctn button {
+  order: 2;
+  float: none !important;
+}
+
+html.se-store:not(#se-none) .newmodal .gray_bevel.for_text_input {
+  flex: 1;
+  height: auto !important; /* Steam's fixed height clips the theme's taller field */
+  overflow: visible !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store:not(#se-none) .newmodal .gray_bevel.for_text_input input {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 36px !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-md)/1 var(--se-font) !important;
+  outline: none;
+}
+
+html.se-store:not(#se-none) .newmodal .gray_bevel.for_text_input input::placeholder {
+  color: var(--se-text-faint);
+  font-style: normal;
+}
+
+html.se-store:not(#se-none) .newmodal .gray_bevel.for_text_input input:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--se-accent);
+}
+
+html.se-store:not(#se-none) .newmodal button[class*="btnv6_"] {
+  display: inline-flex !important;
+  align-items: center;
+  height: 36px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  cursor: pointer;
+}
+
+html.se-store:not(#se-none) .newmodal button[class*="btnv6_"] > span {
+  padding: 0 16px !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: 600 var(--se-fs-md)/36px var(--se-font) !important;
+  text-shadow: none !important;
+}
+
+html.se-store:not(#se-none) .newmodal button[class*="btnv6_"].btn_disabled {
+  opacity: .45;
+  pointer-events: none;
+}
+
+/* ---------- Review Score Settings (Store preferences → Review Score Settings) ----------
+ * .review_anomalous_events_dialog: Steam's "*" mark, a description (p, ul), a float clearer,
+ * then .review_events_preferences_radio_btns: a caption and one span.review_event_preference
+ * per choice (label > radio + text). The mark becomes a neutral chip beside the description; each
+ * choice a row that lights when picked.
+ */
+
+html.se-store:not(#se-none) .newmodal .review_anomalous_events_dialog {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: start;
+}
+
+html.se-store:not(#se-none) .newmodal .review_anomalous_events_dialog > div:not([class]) {
+  display: none; /* float clearer */
+}
+
+html.se-store:not(#se-none) .newmodal .review_anomalous_events_icon {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 38px !important;
+  height: 38px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim) !important;
+  font: 800 22px/1 var(--se-font) !important;
+}
+
+html.se-store:not(#se-none) .newmodal .review_anomalous_events_desc {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+html.se-store:not(#se-none) .newmodal .review_anomalous_events_desc > br {
+  display: none;
+}
+
+html.se-store:not(#se-none) .newmodal .review_anomalous_events_desc ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 14px !important;
+  padding: 0 0 0 18px !important;
+}
+
+html.se-store:not(#se-none) .newmodal .review_anomalous_events_desc li {
+  color: var(--se-text-dim) !important;
+}
+
+html.se-store:not(#se-none) .newmodal .review_anomalous_events_desc li::marker {
+  color: var(--se-accent);
+}
+
+html.se-store:not(#se-none) .newmodal .review_anomalous_events_desc > p:last-child {
+  margin-bottom: 0 !important;
+}
+
+html.se-store:not(#se-none) .newmodal .review_events_preferences_controls {
+  grid-column: 1 / -1;
+  margin: 20px 0 0 !important;
+  padding: 18px 0 0 !important;
+  float: none !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: inset 0 1px 0 var(--se-divider);
+}
+
+/* The caption is a bare text node: set as a label; the choices restore their own type */
+html.se-store:not(#se-none) .newmodal .review_events_preferences_radio_btns {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important; /* Steam boxes the choices in grey */
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store:not(#se-none) .newmodal .review_events_preferences_radio_btns > div {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store:not(#se-none) .newmodal .review_events_preferences_radio_btns > div:first-of-type {
+  margin-top: 4px;
+}
+
+/* Flex, so the &nbsp; Steam leaves after each label sits beside it instead of adding a line */
+html.se-store:not(#se-none) .newmodal .review_event_preference {
+  display: flex !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+html.se-store:not(#se-none) .newmodal .review_event_preference > label {
+  flex: 1;
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  margin: 0 !important;
+  padding: 8px 14px !important;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.4 var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .newmodal .review_event_preference > label:hover {
+  background: var(--se-hover);
+}
+
+html.se-store:not(#se-none) .newmodal .review_event_preference > label:has(> input:checked) {
+  box-shadow: inset 0 0 0 1px var(--se-accent);
+}
+
+html.se-store:not(#se-none) .newmodal .review_event_preference input[type="radio"] {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0 !important;
+  border-radius: 50%;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  cursor: pointer;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .newmodal .review_event_preference input[type="radio"]:checked {
+  background: var(--se-on-accent);
+  box-shadow: inset 0 0 0 6px var(--se-accent);
+}
+
+html.se-store:not(#se-none) .newmodal .review_event_preference input[type="radio"]:focus-visible {
+  outline: 2px solid var(--se-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Choice rows and text areas (Report dialogs and the like) ----------
+ * Report dialogs (DLC, curator and franchise pages) are a list of bare radios, each followed
+ * by its text and a <br>, then a textarea in Steam's bevelled box. The page script wraps
+ * each radio and its text in label[data-se-choice] (store/dlc/page.js), so a whole row is
+ * clickable; here the rows become stacked option cards with the theme's radio, and the
+ * textarea a theme field.
+ */
+html.se-store:not(#se-none) .newmodal [data-se-choice-list] {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+html.se-store:not(#se-none) .newmodal [data-se-choice-list] > br {
+  display: none;
+}
+
+html.se-store:not(#se-none) .newmodal label[data-se-choice] {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim);
+  line-height: 1.45;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .newmodal label[data-se-choice]:hover {
+  background: var(--se-hover);
+  color: var(--se-text);
+}
+
+html.se-store:not(#se-none) .newmodal label[data-se-choice]:has(> input:checked) {
+  background: var(--se-accent-surface);
+  box-shadow: inset 0 0 0 1px var(--se-accent);
+  color: var(--se-text);
+}
+
+/* The lead word ("Offensive", "Copyright"), split off by the script, as the row's title. */
+html.se-store:not(#se-none) .newmodal [data-se-choice-title] {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--se-text);
+  font-weight: 700;
+}
+
+html.se-store:not(#se-none) .newmodal label[data-se-choice] > input[type="radio"] {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0 !important;
+  border-radius: 50%;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-white-25, rgba(255, 255, 255, .25));
+  cursor: pointer;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .newmodal label[data-se-choice] > input[type="radio"]:checked {
+  background: var(--se-on-accent);
+  box-shadow: inset 0 0 0 5px var(--se-accent);
+}
+
+html.se-store:not(#se-none) .newmodal label[data-se-choice] > input[type="radio"]:focus-visible {
+  outline: 2px solid var(--se-accent);
+  outline-offset: 2px;
+}
+
+/* Steam's bevelled box around the textarea: the field carries the look instead. */
+html.se-store:not(#se-none) .newmodal :has(> textarea):not(.newmodal_content, form) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store:not(#se-none) .newmodal textarea {
+  box-sizing: border-box;
+  display: block;
+  width: 100% !important;
+  min-height: 96px;
+  margin: 0 !important;
+  padding: 12px 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font: 400 var(--se-fs-md)/1.5 var(--se-font) !important;
+  outline: 0 !important;
+  resize: vertical;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .newmodal textarea::placeholder {
+  color: var(--se-text-faint);
+}
+
+html.se-store:not(#se-none) .newmodal textarea:focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent), 0 0 0 3px rgba(124, 196, 255, .18) !important;
+}

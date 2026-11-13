@@ -1,0 +1,779 @@
+/*
+ * Startup sign-in form, QR code scanner tab, and account chooser styles.
+ *
+ * Scoped to `html[data-se-login]` and `CachedUsers` account switcher lists.
+ * Styles the tabbed Password / QR Code sign-in card (`[data-se-si]`) and the
+ * circular avatar account selector. Paired with `client/startup/startup.js`.
+ */
+/*
+ * The background
+ * startup.css draws it; the shade moves to where each screen's content sits.
+ */
+html[data-se-login="signin"] .se-startup-bg::after,
+html[data-se-login="other"] .se-startup-bg::after {
+  background: radial-gradient(ellipse 34% 44% at 50% 48%, rgba(23, 26, 32, .8), rgba(23, 26, 32, .2) 90%), linear-gradient(180deg, transparent 55%, rgba(23, 26, 32, .7));
+}
+
+html[data-se-login="chooser"] .se-startup-bg::after {
+  background: radial-gradient(ellipse 40% 40% at 50% 46%, rgba(23, 26, 32, .7), rgba(23, 26, 32, .2) 90%), linear-gradient(180deg, transparent 60%, rgba(23, 26, 32, .75));
+}
+
+/* Sign in */
+/* The column: logo, title, card, links, centered. */
+[data-se-si="column"]:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: auto;
+  box-sizing: border-box;
+  padding: 20px 24px 16px;
+  background: transparent;
+  font-family: var(--se-font);
+}
+
+/* Steam's logo and wordmark become the startup's round tile, with the title beside it. */
+[data-se-si="logo"]:not(#se-none) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+[data-se-si="wordmark"]:not(#se-none) {
+  display: none;
+}
+
+[data-se-si="logo"]::before {
+  content: "";
+  flex: none;
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 3px solid var(--se-accent-line);
+  background: var(--se-brand-mark) center / 28px no-repeat, var(--se-surface);
+  box-shadow: inset 0 0 0 4px var(--se-bg);
+}
+
+[data-se-si="logo"]::after {
+  content: "Sign in to Steam";
+  color: var(--se-text);
+  font: 700 18px/24px var(--se-font);
+  letter-spacing: -.01em;
+}
+
+/* Back to the account chooser: a small button in the window's corner. */
+[data-se-si="back"]:not(#se-none) {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 5;
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-muted);
+  cursor: pointer;
+}
+
+[data-se-si="back"]:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+[data-se-si="back"]:not(#se-none) svg {
+  width: 14px;
+  height: 14px;
+  color: inherit;
+}
+
+/* The card: Steam's row holding the form and the QR code. */
+[data-se-si="card"]:not(#se-none) {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: stretch;
+  width: min(380px, 100%);
+  box-sizing: border-box;
+  margin: 16px 0 0;
+  padding: 4px;
+  border-radius: 16px;
+  background: var(--se-surface);
+  box-shadow: var(--se-shadow-pop);
+}
+
+/* The switch */
+.se-signin-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--se-field);
+}
+
+.se-signin-tab {
+  flex: 1;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: transparent;
+  color: var(--se-text-muted);
+  font: 600 12.5px var(--se-font);
+  cursor: pointer;
+  transition: background-color .15s, color .15s;
+}
+
+.se-signin-tab:hover {
+  color: var(--se-text);
+}
+
+.se-signin-tab[aria-selected="true"] {
+  background: var(--se-accent-surface);
+  color: var(--se-accent);
+}
+
+.se-signin-tab:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--se-accent-strong);
+}
+
+.se-signin-tab svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+/* One side at a time, the same height either way so the card doesn't jump. */
+[data-se-signin-tab="password"] > [data-se-si="qr"],
+[data-se-signin-tab="qr"] > [data-se-si="form"] {
+  display: none !important;
+}
+
+[data-se-signin-tab] > [data-se-si="form"]:not(#se-none),
+[data-se-signin-tab] > [data-se-si="qr"]:not(#se-none) {
+  min-height: 242px;
+  box-sizing: border-box;
+}
+
+/* The password side */
+[data-se-si="form"]:not(#se-none) {
+  display: grid;
+  flex: none;
+  grid-template-columns: 1fr;
+  align-content: start;
+  gap: 10px;
+  padding: 14px 16px 6px;
+}
+
+[data-se-si="field"]:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+[data-se-si="label"]:not(#se-none) {
+  margin: 0;
+  color: var(--se-text-muted) !important;
+  font: 700 10.5px/14px var(--se-font) !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+[data-se-si="input"]:not(#se-none) {
+  width: 100%;
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  outline: none;
+  background: var(--se-field) !important;
+  color: var(--se-text) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+  font: 500 14px var(--se-font);
+  transition: box-shadow .15s;
+}
+
+[data-se-si="input"]:not(#se-none):hover {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14);
+}
+
+[data-se-si="input"]:not(#se-none):focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent), 0 0 0 3px var(--se-accent-tint);
+}
+
+[data-se-si="remember"]:not(#se-none) {
+  display: flex;
+  color: var(--se-text-dim);
+  font: 400 13px var(--se-font);
+}
+
+[data-se-si="remember"] > * {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+}
+
+[data-se-si="remember"] label:not(#se-none) {
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+[data-se-si="check"]:not(#se-none) {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-check);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14);
+  outline: none;
+}
+
+[data-se-si="check"][aria-checked="true"]:not(#se-none) {
+  background: var(--se-accent);
+  box-shadow: none;
+}
+
+[data-se-si="check"]:focus-visible {
+  box-shadow: 0 0 0 3px var(--se-accent-tint);
+}
+
+[data-se-si="check"] > * {
+  display: flex;
+  width: 12px;
+  height: 12px;
+  color: var(--se-bg-ink);
+}
+
+[data-se-si="check"] svg {
+  width: 100%;
+  height: 100%;
+}
+
+[data-se-si="check"] svg * {
+  stroke: var(--se-bg-ink) !important;
+}
+
+[data-se-si="submit"]:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-top: 2px;
+}
+
+[data-se-si="button"]:not(#se-none) {
+  position: relative;
+  width: 100%;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-accent);
+  color: var(--se-bg-ink);
+  font: 700 14px var(--se-font);
+  box-shadow: none;
+  cursor: pointer;
+}
+
+[data-se-si="button"]:not(#se-none):hover:not(:disabled) {
+  background: var(--se-accent-hover);
+}
+
+[data-se-si="button"]:not(#se-none):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--se-accent-strong);
+}
+
+[data-se-si="button"]:not(#se-none):disabled {
+  background: var(--se-accent-tint);
+  color: color-mix(in srgb, var(--se-accent) 45%, transparent);
+  cursor: default;
+}
+
+[data-se-si="error"]:not(#se-none) {
+  color: var(--se-danger-text);
+  font: 500 12px/14px var(--se-font);
+  text-align: center;
+}
+
+/* The QR side: the code on a white tile, a blue line sweeping down it. */
+[data-se-si="qr"]:not(#se-none) {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 12px;
+}
+
+[data-se-si="qr"] > * {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* The switch already says QR code; the label is only needed when the code sits beside the form. */
+[data-se-signin-tab] [data-se-si="qr-label"] {
+  display: none;
+}
+
+[data-se-si="qr-label"]:not(#se-none) {
+  color: var(--se-accent) !important;
+  font: 700 11px/14px var(--se-font) !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+[data-se-si="qr-tile"]:not(#se-none) {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* Steam's code draws its own white frame; a slimmer one, rounded like the tile. */
+[data-se-si="qr-code"]:not(#se-none) {
+  display: block;
+  width: 136px;
+  height: 136px;
+  border-style: solid;
+  border-color: #fff;
+  border-width: 10px;
+  border-radius: 12px;
+}
+
+/*
+ * The scan line: the line is the top 2 px of a box that spans the travel (the tile less 30 px),
+ * so it moves by transform (its own height) instead of animating top.
+ */
+[data-se-si="qr-tile"]::after {
+  content: "";
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 14px;
+  height: calc(100% - 30px);
+  background: linear-gradient(var(--se-accent), var(--se-accent)) top / 100% 2px no-repeat;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--se-accent) 60%, transparent));
+  pointer-events: none;
+  z-index: 2;
+  animation: se-signin-scan 3.2s ease-in-out infinite;
+}
+
+/* No sweep while Steam shows its own state over the code (loading, scanned, expired). */
+[data-se-si="qr-tile"][data-se-si-busy]::after {
+  display: none;
+}
+
+@keyframes se-signin-scan {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(100%);
+  }
+}
+
+[data-se-si="qr-help"]:not(#se-none) {
+  display: block;
+  max-width: 280px;
+  padding: 0;
+  color: var(--se-text-dim);
+  font: 400 12px/16px var(--se-font);
+  text-align: center;
+}
+
+[data-se-si="qr-help"] * {
+  padding: 0 !important;
+}
+
+[data-se-si="qr-help"] a:not(#se-none) {
+  color: var(--se-accent);
+  font: inherit;
+  text-decoration: none;
+}
+
+[data-se-si="qr-help"] a:hover {
+  color: #a8d8ff;
+}
+
+/* The links under the card: help · no account? create one */
+[data-se-si="footer"]:not(#se-none) {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px 18px;
+  margin-top: 14px;
+  padding: 0;
+  color: var(--se-text-muted);
+  font: 600 12px var(--se-font);
+}
+
+[data-se-si="help"]:not(#se-none) {
+  color: var(--se-text-dim);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+[data-se-si="help"]:hover {
+  color: var(--se-text-strong);
+}
+
+[data-se-si="create"]:not(#se-none) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+}
+
+[data-se-si="footer"] > * + [data-se-si="create"]::before {
+  content: "·";
+  margin-right: 13px;
+  color: var(--se-track);
+}
+
+[data-se-si="create-prompt"]:not(#se-none) {
+  color: var(--se-text-muted);
+  font: inherit;
+}
+
+[data-se-si="create-link"]:not(#se-none) {
+  color: var(--se-accent);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+[data-se-si="create-link"]:hover {
+  color: #a8d8ff;
+}
+
+/* Accounts: "Who's playing?" and Change account */
+/*
+ * The startup window's frame around the list. Everything is top-aligned and compact so the
+ * list and the switch at the foot always fit the window.
+ */
+html[data-se-login="chooser"] ._27A5ub1QLLIMmgywKVMg4z:not(#se-none) {
+  gap: 0;
+  padding-inline: 24px;
+  background: none;
+  font-family: var(--se-font);
+}
+
+html[data-se-login="chooser"] ._27A5ub1QLLIMmgywKVMg4z ._29VQq5eE-j95L-SafIOc1T:not(#se-none) {
+  justify-content: flex-start;
+  align-items: center;
+  padding: 28px 0 24px;
+}
+
+/*
+ * The header above the title shows the theme's lockup (logo + "Steam Enhanced" in the theme
+ * font, rendered from assets/lockup.png at 3x). Steam's own artwork inside it keeps its place
+ * but isn't drawn; the box paints the lockup (works whether the header is an <svg> or a wrapper).
+ */
+html[data-se-login="chooser"] {
+  --se-brand-lockup: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA1EAAACECAMAAABGQFGZAAADAFBMVEUAAAD+/v4jKTGXoq0dIysZHCMoMTwuOUXO6f41RVX///////////9SdZKXoqz///////////+Xoaw0TGP///+Xoax6wvy54v46VW1EWWxJaYZahqt2uPCXoaxKY3ltlbaVpLGXoayx2/qXoq1updLd8P4TFhutxdiTttJmiqeKqsVmm8eZ0/5wreCXn66Gm61whZabna+mu80nLDMjJCpoe4smKjImKzJDS1MmKzKoyuRNU1UjKC+SxezH2eenp68kKTFUfaJekLprcneAgP/ruljwxm/h7faZmczDzNNka3GFjJEbKCh2aUkbGzczMzN8oL2Jkpukq7Gns70AAFUcIilNSTtcgZ2Strasikmvmmy90N7Wq1fG090MDxAmL0A/YHxflMBmWj1hXU93ZT9/kJ+FeFeesL2dwd+rp5jcslreu3Pj3MEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABtznsnAAABAHRSTlMA/v7+////////U82N/0yubw+P/y7P/////////67//xFv/zH/////////////If//Ev/OEv+QrP9y//8v//8GUP///wL///8F////E/8JBf////8DJP//B///////////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuvE9TgAAHUpJREFUeNrtnedj2li2wLEqAgSIMpaEkWgxbRJsPE4ce+K06WV3Zmd7eb2/9/9/fveql9uEReKFe7IlsdWA++P0cysVlHz+8vmLKwGK4v/ZXYIrALl68fzl5xUuXI5MPnv5QtijvHjzGX+PuRwRT3vFKYCKayoux8LTc+GDyHOup7hwnjhTXLgUAupK+IByxZHictjyufCBhSPFhQNVqvAABRcOFEeKC5d9+lCKoqqKwn0pLlxS8mJnnrSupqnqrpkp/s5zOUjZMWwOeLL05VK3NHVHNfWcv/dcuBMVayjNXrqrlbu0d9ZS3JXicoBS3InSLOf99cX3m9Wi+uRJdbXs7qqkrvi7z+Xg5E0hBu6291WAEZBqtTqpngCZuLYGAxS7UPWGv/9cDkw+K6Kb9IVPU4qoe1e/AUhBKU4Vj/dxOTB5yew3WbNPP508yRMFdZQWIAWpKkTUS/4JcDlKFaXorz6FUn1Svf/l52vHsm40a7ny/SgQ7VNjpIpBxZUUlyP0okKePv10sdR88w7kdjXHj/U5Gvw3+AHASivKFPekuFSOLhdlBzy9WloeTL6ocT4q+cOCeornpLgclLDEIxY+Tq6TICfQSVrgQaV/7AsPoHOp8Oxu3uCb+frJ1XI8JUVB/E7hWV4uFR7pS4vqG3wLC62HAnSC/92JKR7t43JEbpR25hl812qaFv+/yT/wgJSuYkaKO1JcKkdTde588gkAaqYlQVE8hLJqKoYro6Z4BTqXCq/pC2N8n3zyyatXeqx5QtNOVS1Hv75wQWXfYrVxL65txwyPSh7NghQPTXCpHEmoDwL1yVnsQXlZKMiJc7GYQ9luVxsIlSerCwsdofAsv+//D2sA8k+By3EQ5QGVtPg8SDR9swUsuY51oyqSJwJITDlLCNXSDg6PIFRvfKS++2+BE8XlqIlyIFDrNFCq5gLVtLq+kfIC6mjXgKpl5oz31PgE/xS4HANRXQjUIHKOfJ4u5vONo0pYUZ3lbKYnmBKEP1NDfvxT4HIERGlnACg3HTS/3s7/XZEoogxmMzs6T/jXr+5oSPFPgcvhE6XMsj6Uam/n4o3EIJo7Wzv+mcLd/371VxpSOz76aNpsjjvjcXM64p8jl8dO1DsY5btJAiXO599JjOLMZgNw7s2Pf/7qq6++/PJPP96Rgui70NQciknpDzvNY+SqV2OX3o63aMRS48BkJfHuNEhEvYVOlJUASlvMF6rELOp65mqCdvcfEKgvf7y7IeWlCr+KcV9ESb8zPbbPs3XCLu3dblFLXKLBCcpK8h0mEGVCoPQEUNZ2vhGkAiIMZususPR+/z9f/vX3oDqQlOot+BqmaJ58qMacKE7UIyQKRiVmiXoiZz6/lgqKPVub4FI/fvkvXsEtaPxQyyDqdUckSr/JieJEPTaiLKiitHj/XRAztxjUUubf3bWH1J/8SAdspFIeTtRlX6TJ8JITxYl6VESpZymbT72ebzVpB1EH7wBS/xbOnwXyYKK+oQMlimnLrxn9vMOJ4kR9FKLeejZfpKGc+RaVhAKMmF2ta5qW49i6rpsqwpkadP2N4r30MM7uY398Y8gAVL/CieJEPSaiPBVlxUGJ+TytoTTAz8XSXc/W69l8vgCTW3Tbdhx9qSG01EALgFIUrJJif/wOA1BikxPFiXpURA1gsURURaRt53cp1QRGteiD5XIA1NJyvl2Ii+38diEudcf8AyLZOxioAVACVkkxP/1IzCahxk2Q5R13+ngVxYniRH1koqCKOtMSid33KUb05WA5gDgBuRVF0M2xcd0N+Ato6hCvrazpZ76LHTJccGI3FZUK6l3GGd8mJ4oT9aiIgirqbRjnUzfzTUI/aaY9C2jyVJQoLlaiuHGX7vbev2j1duOYSfPPTiOlPoQofPgByGs/7zuscKI4UY+JKE9FRWEJZy4KYQ9U17Zt03IBSi6QzUbcTmDXoSi67uLr8KJgxOwEAJYItusDM+4FQSop1ocfJ4BCVkdMh4hfHA1R7f3cghP1QKJgm6EeIbCdB2E+03HMLhBIlNdbuFqJt6CHd7Fw3eX9SQIoIBtnoCVq0d8GgAoYJcX68EMKUJCpPDWcKE7URyVq5iV3A7kOSyVsU9MgUF3T1QeD5YVn9c1XwHtauZuqf72v5xvxL1VPVqYbKykrUlICWkmxPnx/JzY4UZyoj0kU7DOcBV4UiPNtfZuvGwBl2voM6KSBLxMYj/jJ9YGa38lQBOceIiUOlGRWiuxJFXejnnGiOFF/J0TBuIQuRNVHTmDzmSCV6+VxdRiZcF0IlAtDfa479y52IYciiBCpWSIpbA6cKBaPykkxPrsRE1XhRHGi/k6IgtndUKNo84UUEwVosk3TdKNQn7sVVzN3BS/1rQZI+n5bvRe/A0w5E7CzVLLMQgd5XrzZp1SKZqP6nKiSierV2o1Gu9YzmIkCZ7QxZ+SuAA9ttMHBvcJPxXqPHQ4Pjm8zN44h3yQaUbCNYx2GzjdRfaxmA4sPRibMbkzUagFVlGfzfS/LN/d+YEIUZHkOlNRFKs9rR4Ykwuwrnt9lOh60+EKJI4TDZkJQ5bTTcWfY93PHY1oJ+7PmeNjvB5lm0O+IwTmUMJQy8m8BThmP8kf7t+/3O819EVWrxxKeUEtcpd426EQZyTNOCH2IvXajng7h56/vXTDxVA3EU500KKveaKfyCK12jdpHmXywesModHyrxkzUOjb6BG0uRtVEdteXpI4Coy/F5cRTUbKsfR1G+ubgH6dAScVAyZL9NmiS9wLoD/ejpsUCGQy1SmCtdzInYPsXR2DlI0rem19Q1Wq687g/vkyFKdN3H+2HqCwfRiObt2r1KETlzkBag70sTDFUeSCSv/Z+0q7Tz4qkjboTCZJa/oRWr7LT8TSiYqNPEPS4hUMOieomdNQtTER5V3ovy99GofMqcKnE6ulpIiUla2/NyOyzLPXBRDVLJ2qKqsEdoiIg0yFj0XuOqNGQ8BT5ksXOhyCqV6flgpnOqPeyOqNOyDXXaxSiDFTmuoVBpI27DU6x1dDPhmUKc3yDlagzz0AD7s1mHnU8yZ7J58kyqpm4dV3Rz+xq8l0MVLUqy9enp6fLQD/BP4IOzT7vupZlabv5UYl8VP+bkokaszLyjHjV/pRAVBN1Rue1fyDqsv3R3onCrMbk4mU746SGvc0JnY4MUT0MiKglb5DKRpC2XwN7eI/6luW/GChEKUBFLUNtEht9QMnYOaKWizC1CxC6SABVVeU7QNQqNPlgANDWwyyvliNql5qJTqlEEfqCszd6TSl871ziiGpi+iPhcZcYQEd7Jgq7WFqFz0ivXoNWElU38ET1sGcZ7MsdZ/oVJrBBLuyiEAUDE742ASNl53qi0ykiKqyS1d3F0g+cn2yBmfckBqrqyAIgahHrKFnu6t2YqO6OOmpEUh4PIGpEOnL4Glu4gaYgidRl4scEZr/APUD/i70SZbAUAbKekV7urUJIpYnCn9sqstwR5GJsVsJ7aJBfSI1GlA6I8j0eQXFTbVF2aPb9wSfK1n8SxeBCf5PlTQKo0ztZjYkKklS6GUT71G4ufl7ZoQxJHI7KImpKQWSECcYzUJD4DhgSnoRdRZZLFGm19Aqf0WJybpBrPUVUm33FU4EiKUMmpGh36FGIGkA3KjD6FovU0IiQKH3pqyh7FRRLAHtPkN8ngJoIsnV6OlkB7RQafdDsU7w+KUSXlMI+BYkcrduNqEvq3IrUVf9I7XjsYBu6cCcQfjfdI1HklVj4jNQDGIXWusF8j14xbLMuW6vYDQgGKEoQRIGivpmvogRrfpHqxrXTRNn2ah6Vx97Iwn3I0+nEBW7V6WTiJnUUMPu0uJVXLaeHF2SNpg8nKjtKEzQxZoLjTZyihImoznDYx4YzRvmRguPmuIN5Mnjr8ZCE8wckKvIp2M+oJ29UZ1jrOxDVKL7cG4VefepFIF9Fvc5OlAJCfQM/0idcb53UyIg0UaCxIwbqyUaWrQioW0GWbieTiZ0iSrXBEBfPQ8sVIikPGtyCypQWyfA2UwmiUZxsxXUFN4PbTi8TqaT0c+GIiixV1MjBcfBdaqTjjpf7J6reatTaLdx6R5/Rarfz+aYe0lxqwboE1OGx54UkCn0PshoEL6WFf6wMgq02KOIwerUGVtPmbL5GzfCrJ1psRGlRfhcQtbiR5QRS/xSYffbSA8q5qCYaOMChmwCoiQVUFABqosh5otClfQXqUqboWbKkCc3kKiR8tGOK+wVEk9i7FR8/woXivxgS4u4p3sbMRNVJgucjKmJoo9c74Yysm9/IoQsWbTJJhdMeBj6XVMOF44x8Djh6rhZaF9ZxYcA2+nuhh3vh+XsQiHICHbVcqOdygqmuExMFNJQ1T3ZEzQE52uIUmnygCEmDQC3klI4SIh2lPkBH4cMIYELzF7sQ1cG7LImFnQIWjW9ykGAfSVSHFDMc4TAfltPDW8cs0KSX0UO6RaQzsl/i6YK3fHlStkDDwBCVzDxlyGlhnKh0siq93muIM/D5sxbG5sumw9qsRPlACe7tb248FjKOlA0nH9nOJtViWPVLz1XF+78FJMrKEmUJcWjiATNlp4QJzd8UJuo1KdAxLRKrT0U4miiiRoTXMcZrvL0S1SD44S2GMzJIJdccS7q0hiYq7ctkFjb6lFziqZ1/5Doh89Sjcl43qBY0migrqJgQb0G9HqwkPw+gCohyXAiUXk0BBcr4rJCda8jTZCWniZJtC4Ia6CjlAXPPL4ciexkQjSiyAhsXKnaf5hULKYOWehmv8Xnk0R6Jyq6SBuIU8hkGvUaBsAzbaDx6pJVroDREg3AjlP3YJiVy2yglVDfoTmmeqG6CqNWtVw7xvQCQ8qAKCpFMSJR5nwEKMiVeWM7FanIKgXqlZoCSHTsRPlcetDcHISWEyFIRoRni1nQmXDgtli5DEfWa4ME1CW7ZdI9EkerrQm1APiO97NoFSxEbyPs2iK+yh1BcLXy9X2yktrBKMFOg10Lpxh7D258nykwQtQgdpcD4kzVHAyNkPaIsMQ+UF5eA4gGlhcZiRJRp43SUUim8e9S4QAKHRNSIkkodF2qtmuYcqREpV5twvHLff998EKIa5KpTg+WMlJvTKBhtrKOIymuDXp5pg6Y/AiLayG+LNrnayMjfFf1dYTAR5btRakQUMP7eS0BNSY6m+UQ5F0igYqIAUHIGKECU6ocmHq6jPKaGrEiRiBpT+uxHxXocc87PiGSQDkkdlIyJ7IcR1SMvkR7LGSlLsVXZpes1c9s2mo30r9v0CleARDKYUCPWB6YAauO+XShFf3miLD/WB6v6kkSBoSw/g5iDvxlA13Wce7yK8sJ8Zh4ouQuJ8nTUjfVwooL+PBakSEQNaf5/f8eOrFGOqCkhzNgnXWqPRBnk5d5jOqNdlKg6hagaS9qtdUK24fxHxyz+OuW5Wrlb4F5Yj0KU7uejPFMsRRSQX8BkFgmmZ5fWlmzz/aSpUdBdzlh9UEc5jqOUtLO1MUXpqktmovo0HTSkRPumcCfgaCPgflblJYj6I0FBDkk+2f6IqlOWe4/pDCpRIIXqSdh/Xs8TalCozRNVLzwOoEXjo555mXWWkEudTBSc1TfwiRJW/5X9UP72HuSaJFW/IAO1VE0150WBogrT96MEDRCllrlX/GV2E9EhM1HUrE8H30w4zlYf9YckogrGGTvFiSqc4W0VJqpF8Ytyv8/VFoCihhMKURTjqs2CIPmV1RsoyRLFdIs2mSg1QZT7Kv9F9/VGBUmnXwKgniCB0lXVVvNAgZ5FPwxRPlH5jvJmYaKKlL+iIM7KM4ZhM2UT1S5jslGLSFSDYvi0CjTy4oii6cF29qb1SuGhRSwlrwaTNVujVMo+PTtbB0QtF8h7bUHeSQMzLzFAvXLA9qC2lDf6JMsMInuQKKFkojI9Tn3GhTtiJyqpxC7pm+5wotgqw3clqlbUeStGlEH8psA6Ugii1mdnM8FH6mJxvUXe7f5CkIW7iy0SKBMA1bURRp9gdv2NpGDLoVU+UekC0ybbwp2yE9Uv0CHFiaK39pVIFNsQQaMIUT3mWxi0/qizszM/1ifoC01WN1+j7lcVNa84IgfUrAs3sDZNhNEn+L3w4MrdXFt8pRwZozUKYeE2dyFqLHKi6ETV2JXBLkS1CxNVqNOpxn4LWg8vIEr1dZS90M5BEur9t6g7PrkXHUFW52mglqoFA+xmV84BJatmSJS1L6KSKdPSiRILAXX0RNVO9kvUnnVUm/0WFKJsQJTm6yhzoZ+fw+rzm9/klZRXdaSc36WA0lUNJoE1S5VzQAGiVJ8oZX9ETZHZn3KsPrHIvqVHT1Tv5NERVdkPUTSrzwJEWUFCajYDVbJQZOHiPg8UnHEpuzFQtw4ISZiwQdf+Rznuhs+E+kA80coN7CuLqEQSZ1x2ZEJEaiiv4xfuWzrupJsOj5soA9X4Wt9XrK+1H6LKiUxogCg9+DtokJJDpmQrEaWIgnybczUC6pVjWj5Qqg1De2meZMkPTMAELyBK2RNRHdQaZYqe9zsUGSPC7eNn2Iaq4yaqgRkHC/tl0y22uxJlFI+eU/NRCekx36JGnYDpBfs8cVaOZ7oFTCk/VzNAnU5kIQRqBUv+NA8ozZTzErhRENpcqK88oppFieozjnNAOVEdkiN31EQZ5AGy9RKIqjCU9RWtmSAptV0zvH6wT/PNPnW2DNyh8wCq7+bJUgnAkSwHQC1Vr+YPAgWmhyGI0sxQL1m5eX3lETVFBfuY6vr6hQcGTiucKAxRDfJs5VKIKr4pSaOoViujCsl3pEKzz50JURQ8YOpGTAJ16026BH+5MGHPlOkBpZpCHigp5UZp+9dRjER12Pr6ELHBaYUThSOqTuajFKIahStla0XrluoMjpRBmy4GpiFBs8/XJ/bMjGsfQNvh+T/cgNzu9V9CoCb6uQWBugVhdknt+lR1UUDJSsroU/ZF1Lio1dcs1PdOrm3lRIULr0DDyM5E1RgaHdPdHEbR8GCDwexrn9D3OPQyUv7inyU204VQnV9XN8Cku9tCHwrOZpHhsJaFch55S8D2QwEFjL4wvGfm3agCRE3HjAmpJtvCfV1sk7cOGcAmj/Ux4NEuhSiDYQuAVvpNaRVUUmV0HHpmH2zoCM0+MzmyTz6/ATbfHBT2WXAe37V8DrfgcKVzmSZCKtKn7U5UnzicuXA+innhsh095EQxlJiWEuvLjsQwsC819uMK11nQu+IbDETB3TnOBJSSgkj5c49gikoFKkudnJ5e03kC3YaxitJ1S92ZqCa596+PHHdCXLhT+m7ZI1YdNeX5KAYd1T4ph6jeCWXQRC0bazToOqfWos2xIVY2IYny9mQLgnHSIKukLvzUrgO75DUR+FIOC1Bx6FyA0zN33is+QGaIXvvfDNHF502i89OnbS0zTiBM9KNGPMOL8KMM8iLcnahMs2VuRlMj/9QNClLwnDZ+2Nou08XCPt5BQJQ6W2eU1H8Gkb7b7QQG+e5YgJK7XUUKtB4gytqZqGhBDxF6KrWBILr2vE/2ffqIq74eJk8jXWr60WsmGjWKfIxYX4P8rf4AonqEieiZ6bU1lNfTQt+khx0UmIWWZQJmGO07C3SKpM+cNFHn80S9+cRiAgpkqKTQSwNEqcLD9+HNTzsfi7j+qCl5CEqHMOTrcpw28Z7h87vNj1/Xx9QY/yGIamGnRtROyiMqf7FwKHl2hjumfjedeg63Bq0T+G9Xik5pjurPIyW1XgtppISLCKjbGyagpG5XCFWUYyNUlFC8W8MfIduc+tP8L5tDwo6g6LTs5QjVqpgaaB43Bk8RnlpKT+Z22D1qotqYaa/5TbQfRBRybydU+WAPd0a9UfP3Ekgy2ChzJwE/B5tUUvbsbcbuO9c2cwjU/EJgAkrWupFWsnIN8QWIuhR36bfN1OJ1YGXruAMmQkwxBehwEEvlWXrXmT5SE/WD/T1Gzc6jqD1/NERli1Kxe3M8kCiDqakxqVmYzqiVuNtNnJIaRP9Y21mkgIBpRn6rB5PNF6sox0GoKOGhA88pu9fSZpAxdDyNcXtSDTvD/mPp5ng8RLVP9t3NUaDnKRVR6BV4KKbjWyxEeUoqUCWS8m6djvdJcZ0fG1CRzYdTUaxW32i4E1AYFKeVIkgx9Sj2OVHs27GVQRRL630mAMHSrN9m3zW0VWEhyvOkXCF0pd6ttSxS7CLFcT6sihLKGHhOCoIPaXMyqddtMtE36nOi6F/ttXp5RNE2nkY8MfWMzKb3Dco3AhNRygwgFaSNJElbv1MSOIW7v7MCpYZAKU5u9GXhmgn6FKLhJaO9OMWHvonbE3QIE9c5UXRrqVEpkyiaEqnRCx2yWqdXYJ/VXoWNKK8CPQpOSOY/D4QdNRSISkhJm08THkYUWKNEpvpNZhdsmss74XiasinKaYUT1aJaV41KyUSRVnzLKLwXcbvAzBcPPjaivODETImQejdQd9JQSaCwNl/h2vPmkG1MJW6aH2bDAbSa6kzZ/LnOZYUTlXJakLHtWqV0opCZIe9hsE1NOFOu3jbYDw/SWYxEqbNEvA8gNRhoxTWU0E0ABaedI8MSu3RzXKKg6jS/YE9mocoDp538rtnofaWzO1mH3HGiUDnTbHd82UTBJV+nW2+ZK+beuXoDf0YPkZiqVIoQ5dt9doSUNhiYxfSTF+WLgfKcKE0oiSh/hj8IXHtLuN8fdjpThq08gsOHMCk1wnSLBNFw7yDS1Z4FR/bh8JYKF7QuaMdTJVqN3j5v1Uvcqp7aTxtf4hhzWA8yt0xH18kvBbPIgd0H6vvMCCn17cAupqFAHioGSrB1rM1XYschl8coPViY8IFuBe5l7PWlUMnDEiXMYFuHGiGl6ANdKBSTAIndCCh9MNAthRPF5fAFS5QKldQsRkqyB3qXWUF5MYlYQw2AqAInissREyU4QEc9nWkxUpr+VtdYeFI0z+KLfSigogaWwInictREgZHNT5+mkJK6oF9QpYb4NC8kEWsoRwdE2QInisuREyVYT5NIQaZgV7vdVQj+E4jwgVrzBE+KrSPbDDlRXI6OKMGZQaSsBFKSYupgilgXqakEiJMXkSgEFCeKy7EQJZgQqadxUMFjRYOT+QBUUsZ5MsG0Pk1N8SRoHlCmwIniwonyxyF5ll88V9kv71M9qBwTQtTtmoFowf67cckt7ILXdU3gRHE5FrkSJOJqV9cQqad6RJTglyNJggLGXfowdeF0ZiWqps0oKFulAHXFPwUuhyMvBJoMnqYDFEJq8kRWhKyCshXaDV7wT4HL4chzqHXIK94Glh8snE2hQcEJuGCDNYMLBe/9nH8KXA6JKLpo72Dd7Nksp26QKPmnDNbr9YBu8UGkXvJPgcvhyBtPR1G0lOB4RM3WDIT4s5ghUOuBRccJ3PkN/xS4HI58JlBx8gMUkCjAlE5lSrXegqIjCBQDflC9/Zp/ClwOKzTBoqUEVZ/5MtBNLCqKZsEaPijUmHl4X+5GcTk0s0+SmGw5VV8HUM3e6fl+3ARNoIyPyTyEoXhu9HE5NLNPkti0FCwpCpmCbpVu+XvvmqYFqstnT2chTogNbXAaCtybG31cDkte+nVDbHoKBB3WAVFnMzcWLw/sejjZGtuVAqB4pI/LASopZi3lTzUarNFEvbVNlR0n39z8jH8CXA5SSTHiFOVvZ0mg3AH4j60WuYJfzsRVFJfDk99eFdVSYajC96PUQiQlNRS43W/5+8+lcpDhvgK+VAkS1lq84e8+l8oh5qSk3bTUjjgFGkriRbJcDlN+dRVrKekDaqgrHjnncpjyw9WH0lJSQkNd/cDfeS4HKr+LC8n3jVRcr/47/r5zOVj5PKWl9oOVlNZQPBPF5aB9qReChO93Kg2p6A4vfsXfcy6VA8/0ClJKT+3Ng+KNu1yOyfLblzcVaSgwrOVz/m5zOSY1FWspqWz/CQLFS4+4HIv88DyKx5Vo+EmpyWPPedCcyxHJZ29eZDRLOfopHCX2kof4uBydvHn5/MVV2W7U1YvnL7n7xOXA5f8B1wlr9/OXl/oAAAAASUVORK5CYII=");
+}
+
+html[data-se-login="chooser"] ._27A5ub1QLLIMmgywKVMg4z ._2E_ejdBSC79L4iDC4FAMHY:not(#se-none) {
+  flex: none;
+  width: 180px;
+  height: 28px;
+  background: var(--se-brand-lockup) center / contain no-repeat;
+}
+
+html[data-se-login="chooser"] ._27A5ub1QLLIMmgywKVMg4z ._2E_ejdBSC79L4iDC4FAMHY > *:not(#se-none) {
+  visibility: hidden;
+}
+
+html[data-se-login="chooser"] ._27A5ub1QLLIMmgywKVMg4z ._1Tsmp8q3Beodvix_OSedxk:not(#se-none) {
+  flex: 1 0 auto;
+  align-self: stretch;
+  align-items: center;
+  margin: 0;
+  background: none;
+}
+
+html[data-se-login="chooser"] ._27A5ub1QLLIMmgywKVMg4z ._2OLQBEFErC3eaxHeD7--LU:not(#se-none) {
+  padding: 12px 0 0;
+  color: var(--se-text);
+  font: 800 28px/34px var(--se-font);
+  letter-spacing: -.015em;
+}
+
+html[data-se-login="chooser"] ._1cpxSyGwDz13Qlo95Kbo5H:not(#se-none) {
+  flex: 1 0 auto;
+  align-self: stretch;
+  margin-top: 28px;
+}
+
+html[data-se-login="chooser"] ._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.-M9HbGeKVWXVykt0Zmw4n:not(#se-none) {
+  margin-top: auto;
+}
+
+/* Over the hero art, the title and names get a soft shadow so they read on any picture. */
+html[data-se-startup-bg="hero"][data-se-login="chooser"] ._2OLQBEFErC3eaxHeD7--LU,
+html[data-se-startup-bg="hero"][data-se-login="chooser"] ._3ywfzCGY59FNeDwi9wBXUv,
+html[data-se-startup-bg="hero"][data-se-login="chooser"] ._2E_ejdBSC79L4iDC4FAMHY {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .6);
+}
+
+html[data-se-startup-bg="hero"] ._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.-M9HbGeKVWXVykt0Zmw4n:not(#se-none) {
+  background: rgba(23, 26, 32, .7);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* The list, wherever it appears */
+._1cpxSyGwDz13Qlo95Kbo5H:not(#se-none) {
+  gap: 28px;
+  overflow: visible;
+  font-family: var(--se-font);
+}
+
+._1cpxSyGwDz13Qlo95Kbo5H ._3_UJISaXYkHIzh4veFFlVT .MQo3fYnDGRxXsAJDgXZ_J:not(#se-none) {
+  margin: 0;
+  color: var(--se-text);
+  font: 800 28px/34px var(--se-font);
+  letter-spacing: -.015em;
+  text-align: center;
+}
+
+._1cpxSyGwDz13Qlo95Kbo5H ._3_UJISaXYkHIzh4veFFlVT .B4i0JkS5Gn4YOH_8Qr-H-:not(#se-none) {
+  color: var(--se-text-muted);
+  font: 400 14px/20px var(--se-font);
+  text-align: center;
+}
+
+._1cpxSyGwDz13Qlo95Kbo5H ._1rFuHnL8fa-9b2nm_ZMF4L:not(#se-none) {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px 32px;
+  padding: 0;
+}
+
+/* Each account: the toast's rounded-square avatar inside the startup's ring, its name under it. */
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6:not(#se-none) {
+  flex: 0 0 136px;
+  gap: 0;
+  padding: 8px 0 0;
+  border: 0;
+  outline: none;
+  transform: none;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._1q5iGs9FEBhJcXc2mY3HPG:not(#se-none) {
+  position: relative;
+  flex: none;
+  width: 104px;
+  height: 104px;
+  box-sizing: border-box;
+  margin: 0 0 16px;
+  border: 0;
+  border-radius: var(--se-avatar-radius);
+  background: var(--se-surface);
+  box-shadow: none;
+  transform: none;
+}
+
+/* Clipped a little inside the edge, so square images with a frame (Steam's "?") lose it. */
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._1q5iGs9FEBhJcXc2mY3HPG > img:not(#se-none) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border-radius: var(--se-avatar-radius);
+  object-fit: cover;
+  clip-path: inset(3.5% round 20%);
+}
+
+/*
+ * The ring: a 4 px band 8 px out, concentric with the avatar's corners. A rounded square
+ * can't spin, so the arc travels round it instead (a conic fill cut to the band).
+ */
+@property --se-si-arc {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._1q5iGs9FEBhJcXc2mY3HPG::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  box-sizing: border-box;
+  padding: 4px;
+  border-radius: calc(104px * .23 + 8px);
+  background: rgba(255, 255, 255, .08);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+
+/* Pointing at an account runs the arc; the keyboard's or the menu's choice holds it still. */
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6:is(:hover, :focus-visible, .gpfocus, ._1Bj4ekFS3Y3McdYpme6WhO) ._1q5iGs9FEBhJcXc2mY3HPG::before {
+  background: conic-gradient(from calc(var(--se-si-arc) - 45deg), var(--se-accent) 0 25%, var(--se-accent-line) 0);
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6:hover ._1q5iGs9FEBhJcXc2mY3HPG::before {
+  animation: se-signin-ring 1.1s linear infinite;
+}
+
+@keyframes se-signin-ring {
+  to {
+    --se-si-arc: 360deg;
+  }
+}
+
+/* Add account: an empty disc with Steam's plus, drawn at the theme's icon weight. */
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6._1vFy9XM83l2YQ2QjmWl1CK ._1q5iGs9FEBhJcXc2mY3HPG:not(#se-none) {
+  margin-block: 0 16px;
+  background: rgba(31, 36, 43, .8);
+  color: var(--se-text-muted);
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6._1vFy9XM83l2YQ2QjmWl1CK ._1q5iGs9FEBhJcXc2mY3HPG svg:not(#se-none) {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 34%;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6._1vFy9XM83l2YQ2QjmWl1CK:hover ._1q5iGs9FEBhJcXc2mY3HPG {
+  color: var(--se-accent);
+}
+
+/*
+ * The name always shows; the account name under it appears on hover (as in Steam), so a name
+ * that is the same as the account name isn't doubled.
+ */
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._3ywfzCGY59FNeDwi9wBXUv:not(#se-none) {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._3ywfzCGY59FNeDwi9wBXUv._1TlEvP30mzqbqbKluifFEN:not(#se-none) {
+  margin: 0;
+  opacity: 1;
+  color: var(--se-text);
+  font: 700 15px/20px var(--se-font);
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6 ._3ywfzCGY59FNeDwi9wBXUv.cG5NAvF5GI4xApThQ-oON:not(#se-none) {
+  min-height: 16px;
+  margin-top: 2px;
+  color: var(--se-text-muted);
+  font: 400 12px/16px var(--se-font);
+}
+
+/*
+ * The ⋯ menu (Remove account): a small solid button sitting on the ring at the lower right,
+ * shown only while the account is pointed at or the button has the keyboard.
+ */
+._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none) {
+  inset: 88px auto auto 88px;
+  z-index: 1;
+  flex: none !important;
+  box-sizing: border-box !important;
+  width: 26px !important;
+  min-width: 0 !important;
+  max-width: 26px !important;
+  height: 26px !important;
+  min-height: 0 !important;
+  max-height: 26px !important;
+  aspect-ratio: 1;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 0 !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: 0 0 0 3px var(--se-bg), 0 4px 10px -2px rgba(0, 0, 0, .6) !important;
+  color: var(--se-text) !important;
+  opacity: 0 !important;
+  transition: opacity .15s, background-color .15s !important;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV:is(:hover, ._1Bj4ekFS3Y3McdYpme6WhO) ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none),
+._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none):focus-visible {
+  opacity: 1 !important;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none):is(:hover, :focus-visible) {
+  background: var(--se-accent) !important;
+  color: var(--se-bg-ink) !important;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L ._3bvVUTxEPL3cm065bRRLEg ._1ytPahj2hONDeZYLCN7eEu:not(#se-none) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L ._3bvVUTxEPL3cm065bRRLEg ._1ytPahj2hONDeZYLCN7eEu svg:not(#se-none) {
+  width: 14px;
+  height: 14px;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L ._3bvVUTxEPL3cm065bRRLEg ._1ytPahj2hONDeZYLCN7eEu svg * {
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* "Ask which account to use each time": a pill. */
+._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.-M9HbGeKVWXVykt0Zmw4n:not(#se-none) {
+  flex: none;
+  align-self: center;
+  margin-top: 0;
+  padding: 6px 8px 6px 16px;
+  border-radius: 999px;
+  background: rgba(31, 36, 43, .85);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07);
+  color: var(--se-text-dim);
+  font: 400 13px var(--se-font);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  [data-se-si="qr-tile"]::after {
+    animation: none;
+    display: none;
+  }
+  ._1rFuHnL8fa-9b2nm_ZMF4L .hPf0QcicQJpY6-6E43gi6:hover ._1q5iGs9FEBhJcXc2mY3HPG::before {
+    animation: none;
+  }
+}

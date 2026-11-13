@@ -1,0 +1,1137 @@
+/*
+ * Steam Support (help.steampowered.com), site-wide (help/loader.js): Steam's navy wizard over a
+ * blue-lit background (help.css) in the theme's look, matching the store's legal pages.
+ *
+ *   [ Steam Support                                   (display title) ]
+ *   [ Home > …                                                        ]
+ *   [ What do you need help with, name?                               ]
+ *   [ RECENT PRODUCTS                                                 ]
+ *   [ ▭ The Witcher 3            › ][ ▭ Cyberpunk 2077             › ]
+ *   [ ◉ Games, Software, etc.    › ][ ◉ Purchases                  › ]
+ *   [ 🔍 Search Steam Support                                        ]
+ *
+ * Wizard buttons (.help_wizard_button) are rounded cards with a drawn chevron on every page,
+ * and a game's header (.help_app_header) is a card of art, title and facts;
+ * on the home page the buttons lay out two across, and the large topic buttons carry an icon chip
+ * (help/site.js). Classes are help.css's own (SteamTracking), stable across Steam's builds.
+ */
+
+/* ---------- Page ---------- */
+
+html.se-help body.v6 {
+  background: var(--se-bg) !important;
+  color: var(--se-text-dim) !important;
+}
+
+html.se-help :is(.responsive_page_frame, .responsive_page_content, .responsive_page_template_content, .page_body_ctn) {
+  background: none !important;
+}
+
+html.se-help #page_content {
+  box-sizing: border-box;
+  width: min(100% - 56px, 1100px) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding-bottom: 48px;
+}
+
+/* The loading throbber's row stays out of the way once the page is in */
+html.se-help #loading_throbber.page_loaded {
+  display: none !important;
+}
+
+html.se-help #wizard_contents {
+  padding: 28px 0 24px !important;
+}
+
+/* Title: "Steam Support" as the store's display heading */
+html.se-help a.help_header {
+  display: inline-block;
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-display)/1.15 var(--se-font) !important;
+  letter-spacing: -.02em;
+  text-decoration: none !important;
+}
+
+html.se-help a.help_header:hover {
+  color: var(--se-white) !important;
+}
+
+/* Breadcrumbs */
+html.se-help .breadcrumbs {
+  margin: 10px 0 0 !important;
+  color: var(--se-text-faint) !important;
+  font: 600 var(--se-fs-sm)/1.4 var(--se-font) !important;
+  text-transform: none !important;
+}
+
+html.se-help .breadcrumbs a {
+  color: var(--se-text-muted) !important;
+  text-decoration: none !important;
+  transition: color var(--se-dur-fast);
+}
+
+html.se-help .breadcrumbs a:hover {
+  color: var(--se-white) !important;
+}
+
+html.se-help .breadcrumbs .breadcrumb_current_page {
+  color: var(--se-text-dim) !important;
+}
+
+/* Greeting and section labels */
+html.se-help .help_intro_text {
+  margin: 22px 0 18px !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-2xl)/1.3 var(--se-font) !important;
+  letter-spacing: -.01em;
+}
+
+html.se-help .help_section_text {
+  margin: 6px 0 2px;
+  color: var(--se-text-faint) !important;
+  font: 700 var(--se-fs-xs)/1.4 var(--se-font) !important;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+html.se-help .help_divider {
+  max-width: none !important;
+  margin: 14px 0 !important;
+  background: var(--se-divider) !important;
+}
+
+/* ---------- Wizard buttons: rounded cards with a chevron ---------- */
+
+html.se-help a.help_wizard_button {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: none !important;
+  min-height: 52px;
+  box-sizing: border-box;
+  margin: 8px 0 0 !important;
+  padding: 6px 44px 6px 8px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.35 var(--se-font) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast), transform var(--se-dur) var(--se-ease);
+}
+
+html.se-help a.help_wizard_button:not(.disabled):not(.nohover):hover,
+html.se-help a.help_wizard_button.opened {
+  background: var(--se-hover) !important;
+  box-shadow: inset 0 0 0 1px var(--se-white-10, rgba(255, 255, 255, .1));
+}
+
+html.se-help a.help_wizard_button > span {
+  flex: 1;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 0 0 6px;
+}
+
+html.se-help a.help_wizard_button > img {
+  flex: none;
+  float: none !important;
+  width: auto;
+  height: 40px;
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm);
+  object-fit: cover;
+}
+
+html.se-help a.help_wizard_button > img + span {
+  margin-left: 0 !important;
+}
+
+/* Chevron: drawn, in place of Steam's arrow image */
+html.se-help a.help_wizard_arrow_right {
+  background-image: none !important;
+}
+
+html.se-help a.help_wizard_arrow_right::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  background: var(--se-text-faint);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: background-color var(--se-dur-fast), translate var(--se-dur) var(--se-ease);
+}
+
+html.se-help a.help_wizard_arrow_right:not(.disabled):hover::after {
+  background: var(--se-text);
+  translate: 2px 0;
+}
+
+/* High-priority buttons: the accent */
+html.se-help a.help_wizard_button.help_wizard_button_highpri {
+  background: var(--se-accent) !important;
+  box-shadow: none;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-help a.help_wizard_button.help_wizard_button_highpri:not(.disabled):not(.nohover):hover {
+  background: var(--se-accent-hover) !important;
+}
+
+html.se-help a.help_wizard_button.help_wizard_button_highpri::after {
+  background: var(--se-on-accent);
+}
+
+/* Large topic buttons: taller, with an icon chip (help/site.js) */
+html.se-help a.help_wizard_button_large {
+  min-height: 68px;
+  padding-left: 14px !important;
+  font-size: var(--se-fs-lg) !important;
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon]::before {
+  content: "";
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-help-icon) center / 22px 22px no-repeat, var(--se-pill);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="game"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23b8c0c8' fill-opacity='.32' stroke='none' d='M7 7h10a5 5 0 0 1 4.9 6l-.6 3a2.5 2.5 0 0 1-4.3 1.2L15 15H9l-2 2.2A2.5 2.5 0 0 1 2.7 16l-.6-3A5 5 0 0 1 7 7z'/%3E%3Cpath d='M7 7h10a5 5 0 0 1 4.9 6l-.6 3a2.5 2.5 0 0 1-4.3 1.2L15 15H9l-2 2.2A2.5 2.5 0 0 1 2.7 16l-.6-3A5 5 0 0 1 7 7zM7.5 10v4M5.5 12h4M15.5 11h.01M17.5 13h.01'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="cart"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23b8c0c8' fill-opacity='.32' stroke='none' d='M6 6h15l-1.6 8.2a2 2 0 0 1-2 1.6H8.7a2 2 0 0 1-2-1.7z'/%3E%3Cpath d='M3 3h2.5l2.2 11.1a2 2 0 0 0 2 1.7h7.7a2 2 0 0 0 2-1.6L21 6H6M9.5 20h.01M17.5 20h.01'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="account"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23b8c0c8' fill-opacity='.32' stroke='none' cx='12' cy='8' r='4'/%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="gift"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect fill='%23b8c0c8' fill-opacity='.32' stroke='none' x='4' y='10' width='16' height='10' rx='1.5'/%3E%3Cpath d='M4 10h16v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20zM3 7h18v3H3zM12 7v14.5M12 7S10.5 3 8 3.5 7 7 12 7zM12 7s1.5-4 4-3.5S17 7 12 7z'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="hardware"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect fill='%23b8c0c8' fill-opacity='.32' stroke='none' x='2' y='7' width='20' height='10' rx='5'/%3E%3Crect x='2' y='7' width='20' height='10' rx='5'/%3E%3Crect x='8' y='9' width='8' height='6' rx='1'/%3E%3Cpath d='M5 11v2M4 12h2M18.5 11h.01M18.5 13h.01'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="community"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23b8c0c8' fill-opacity='.32' stroke='none' cx='9' cy='8' r='3.5'/%3E%3Ccircle cx='9' cy='8' r='3.5'/%3E%3Cpath d='M3 19.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M15.5 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2 .7 3.5 2.6 3.5 5.2'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="key"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23b8c0c8' fill-opacity='.32' stroke='none' cx='8' cy='15' r='4.5'/%3E%3Ccircle cx='8' cy='15' r='4.5'/%3E%3Cpath d='M11.3 11.7L20 3M16.5 6.5l2.5 2.5M14.5 8.5l2 2'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="client"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect fill='%23b8c0c8' fill-opacity='.32' stroke='none' x='3' y='4' width='18' height='5'/%3E%3Crect x='3' y='4' width='18' height='16' rx='2'/%3E%3Cpath d='M3 9h18M6.5 6.5h.01M9.5 6.5h.01'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="help"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23b8c0c8' fill-opacity='.32' stroke='none' cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M9.5 9.5a2.5 2.5 0 0 1 4.8 1c0 1.7-2.3 2.2-2.3 3.5M12 17h.01'/%3E%3C/svg%3E");
+}
+
+/* ---------- Home: two across ---------- */
+
+html.se-help #help_home_block {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 12px;
+  align-items: start;
+}
+
+html.se-help #help_home_block > :not(a.help_wizard_button) {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+  html.se-help #help_home_block {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Search ---------- */
+
+html.se-help #help_search_support_form {
+  margin-top: 16px !important;
+}
+
+html.se-help #help_search_support_input {
+  width: 100% !important;
+  max-width: none !important;
+  height: 54px !important;
+  box-sizing: border-box;
+  padding: 0 18px 0 50px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f7984' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%236f7984' fill-opacity='.32' stroke='none' cx='11' cy='11' r='6.5'/%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M20 20l-4.2-4.2'/%3E%3C/svg%3E") 18px center / 20px 20px no-repeat, var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-lg)/1 var(--se-font) !important;
+  font-style: normal !important;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-help #help_search_support_input:focus {
+  outline: 0 !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent) !important;
+}
+
+html.se-help #help_search_support_input::placeholder {
+  color: var(--se-text-faint) !important;
+  font-style: normal !important;
+  text-align: left !important;
+}
+
+/* ---------- Game header (wizard pages for one game) ----------
+ * .help_app_header: capsule and name, account / playtime / purchase facts, then the purchase
+ * line and the store / library links. Steam floats them in a translucent box; laid out as a
+ * card instead: art and title on the left, facts as label/value pairs on the right, the
+ * purchase line under a divider with the links as pill buttons.
+ */
+html.se-help .help_app_header {
+  max-width: none !important;
+  margin: 16px 0 12px !important;
+  padding: 20px 24px !important;
+  overflow: visible !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-help .help_app_header > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+html.se-help .help_app_header [style*="clear"] {
+  display: none !important;
+}
+
+html.se-help .help_app_header .subbox_left {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  width: auto !important;
+  max-width: none !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+html.se-help .help_app_header .subbox_left > a {
+  flex: none;
+  display: block;
+}
+
+html.se-help .help_app_header img {
+  float: none !important;
+  display: block;
+  width: 184px;
+  max-width: none !important;
+  height: auto;
+  margin: 0 !important;
+  border-radius: var(--se-radius-md);
+  box-shadow: 0 0 0 1px var(--se-hairline);
+}
+
+html.se-help .help_app_header .game_name {
+  min-width: 0;
+  font: 700 var(--se-fs-2xl)/1.3 var(--se-font) !important;
+  letter-spacing: -.01em;
+}
+
+html.se-help .help_app_header .game_name a {
+  color: var(--se-text) !important;
+  text-decoration: none !important;
+}
+
+html.se-help .help_app_header .game_name a:hover {
+  color: var(--se-white) !important;
+}
+
+/* Account, playtime, purchase date: label over value, side by side */
+html.se-help .help_app_header .account_details {
+  flex: none;
+  display: flex;
+  gap: 28px;
+  width: auto !important;
+  margin: 0 !important;
+  float: none !important;
+  overflow: visible !important;
+}
+
+html.se-help .help_app_header .account_details > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0 !important;
+}
+
+html.se-help .help_app_header .help_highlight_text {
+  color: var(--se-text-faint) !important;
+  font: 700 var(--se-fs-xs)/1.3 var(--se-font) !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+html.se-help .help_app_header .help_lowlight_text {
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.3 var(--se-font) !important;
+}
+
+/* Purchase line and links, under a divider */
+html.se-help .help_purchase_detail_box {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 16px 0 0 !important;
+  padding: 16px 0 0 !important;
+  border-top: 1px solid var(--se-divider);
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-base)/1.5 var(--se-font) !important;
+}
+
+html.se-help .help_purchase_detail_box :is(.help_header_left, .help_header_right) {
+  width: auto !important;
+  float: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+html.se-help .help_purchase_detail_box .help_header_left {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+html.se-help .help_purchase_detail_box .help_header_left a {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+html.se-help .help_purchase_detail_box .help_header_left a:hover {
+  color: var(--se-accent-hover) !important;
+}
+
+html.se-help .help_purchase_detail_box .help_header_right {
+  flex: none;
+  display: flex;
+  gap: 8px;
+}
+
+html.se-help .help_header_link a {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-sm)/1 var(--se-font) !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-help .help_header_link a:hover {
+  background: var(--se-hover);
+  color: var(--se-white) !important;
+}
+
+@media (max-width: 900px) {
+  html.se-help .help_app_header > div:first-child,
+  html.se-help .help_purchase_detail_box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ---------- Site buttons and the error panel ---------- */
+
+html.se-help .help_site_button {
+  display: inline-flex !important;
+  align-items: center;
+  height: 34px;
+  padding: 0 16px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-base)/1 var(--se-font) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-help .help_site_button:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-help #error_contents {
+  padding: 28px 0 0 !important;
+}
+
+html.se-help .error_bg {
+  max-width: none !important;
+  margin-top: 16px !important;
+  padding: 24px 28px !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-help #error_description {
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-lg)/1.6 var(--se-font) !important;
+}
+
+html.se-help .error_reload {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+/* ==========================================================================
+ * Every other Support page: help.css's components by role, so each wizard step, FAQ, form,
+ * refund, account-data, ticket and recovery page takes the theme's look. Groups are help.css's
+ * own selectors (SteamTracking), listed by what they draw.
+ * ========================================================================== */
+
+/* ---------- Column: help.css caps most blocks at the old 712px wizard width ---------- */
+
+html.se-help :is(
+  .help_page_text, .help_page_section_header, .help_page_important_warning, .help_page_trade_ctn,
+  .help_page_purchasetoprove, .help_wizard_button_notes, .loginbox_background, .login_help_links_box,
+  .help_top_details, .help_refund_request_area, .refund_result_message, #refund_tell_why_text,
+  .help_app_header_divider, .help_official_box, .help_itempurchase_detail_box, .help_issue_details,
+  .help_notinlibrary_details, .help_missingrefund_details, .help_cannot_launch_game_details,
+  .help_cannot_install_game_details, .help_before_contacting_steam_support_details,
+  .help_issue_delete_header, .help_search_results_faqs, .help_section_content, .help_section_body_small,
+  .help_step_section, .help_section_alert, .help_home_error_events, .help_event_limiteduser,
+  .help_login_nag, .create_help_request_form, .help_request_page, .issue_help_requests,
+  .help_restrictedaccount_content, .help_report_scam, .help_provide_pop_header,
+  .help_provide_pop_subheader, #report_abuse_container, .dropdown_help_btn_container
+) {
+  max-width: none !important;
+}
+
+/* ---------- Text ----------
+ * Role groups use :where(), so a group adds no weight of its own: !important beats help.css,
+ * and any more specific rule here (the game header, the official box) still wins.
+ */
+
+html.se-help body.v6 {
+  font-weight: 400;
+}
+
+html.se-help #page_content {
+  color: var(--se-text-dim);
+  font: 400 var(--se-fs-md)/1.6 var(--se-font);
+}
+
+html.se-help #page_content a {
+  color: var(--se-text);
+  transition: color var(--se-dur-fast);
+}
+
+html.se-help #page_content a:hover {
+  color: var(--se-accent);
+}
+
+/* Links inside running text: accent, so they read as links */
+html.se-help :where(.help_faq_text, .help_page_text, .help_issue_details, .help_section_content, .help_step_section, .help_top_details, .help_request_message, .refund_note, .help_official_box) a:not([class*="btn"]):not(.help_wizard_button) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+html.se-help :where(.help_faq_text, .help_page_text, .help_issue_details, .help_section_content, .help_step_section, .help_top_details, .help_request_message, .refund_note, .help_official_box) a:not([class*="btn"]):not(.help_wizard_button):hover {
+  color: var(--se-accent-hover) !important;
+}
+
+/* Headings: the theme's text colour and weight, in place of help.css's blues */
+html.se-help body.v6 h2.pageheader {
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-display)/1.15 var(--se-font) !important;
+  letter-spacing: -.02em;
+  text-transform: none !important;
+}
+
+html.se-help body.v6 h2,
+html.se-help body.v6 .help_refund_request_area h1 {
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-xl)/1.35 var(--se-font) !important;
+  letter-spacing: -.01em;
+  text-transform: none !important;
+}
+
+html.se-help body.v6 h3 {
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-2xl)/1.3 var(--se-font) !important;
+}
+
+html.se-help body.v6 h4 {
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-lg)/1.4 var(--se-font) !important;
+}
+
+html.se-help :where(
+  .help_page_title, .help_page_inside_title, .help_section_medium_header, .help_section_medium_header_no_padding,
+  .help_section_mediumsteps_header, .help_section_mediumwhite_header, .help_section_alert .title, .help_game_header,
+  .help_request_track_shipping_title, .help_request_legal_dmca_instructions .instructions_title,
+  .help_pendingform_title, .help_vacorgameban_accountheader, .vac_title,
+  .help_page_section_header_large, .help_delete_how, .feature_title, .login_help_links_box .title,
+  .help_recoveraccount_header, .help_provide_pop_header, .help_page_section_header
+) {
+  color: var(--se-text) !important;
+  font-family: var(--se-font) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em;
+}
+
+html.se-help :where(.help_page_title, .help_page_inside_title, .help_game_header, .help_section_alert .title) {
+  font-size: var(--se-fs-xl) !important;
+}
+
+/* Small caps headers: the theme's section label */
+html.se-help :where(.help_section_small_header, .help_section_small_header_lowercase, .help_request_headers .col, .help_subsection_header) {
+  color: var(--se-text-faint) !important;
+  font: 700 var(--se-fs-xs)/1.4 var(--se-font) !important;
+  letter-spacing: .1em;
+  text-transform: uppercase !important;
+}
+
+html.se-help :where(.help_recoveraccount_header_subheader, .help_provide_pop_subheader, body.v6 .help_refund_request_area h2, body.v6 h2 .header_inline) {
+  color: var(--se-text-muted) !important;
+  font-weight: 500 !important;
+}
+
+/* Values and highlights: accent */
+html.se-help :where(
+  .help_highlight_text, .refund_value, .refund_value_details, .purchase_detail_field, .refund_token_balance_name,
+  .refund_request_warnings, .purchase_rma_details_help_issue, .help_purchase_failure_note,
+  .help_restrictedaccount_step, .help_itembug_currency, .help_damagedwalletcode_details .highlight,
+  .create_help_request_secondary, .help_request_email_validation_hightlight, .orderdetails_orderdate,
+  .search_error_tip_prefix, .help_issue_details .bold, .help_request_title,
+  .create_request_form_row .hint_text.right_hint
+) {
+  color: var(--se-accent) !important;
+}
+
+/* Kept out of the :is() lists: an id in one would give the whole list id weight */
+html.se-help #what_is_this a {
+  color: var(--se-accent) !important;
+}
+
+html.se-help #help_request_email_verification p {
+  color: var(--se-text-muted) !important;
+}
+
+html.se-help #gift_refundable_notes h2 {
+  color: var(--se-text) !important;
+}
+
+html.se-help :where(.help_whitelight_text, .help_issue_details .HighlightedText, .help_missingrefund_details b, .help_request_name, .help_pendingform_notadded, .code_text, .code_explanation) {
+  color: var(--se-text) !important;
+}
+
+/* Secondary text: muted */
+html.se-help :where(
+  .help_lowlight_text, .help_faq_text, .help_text_block, .help_your_issue_start, .refund_note,
+  .help_purchase_detail_text, .purchase_totals, .help_chargeback_note, .help_request_state_msg,
+  .small_timestamp, .help_game_playtime, .help_wizard_button_dark, .help_header_nolink, .help_purchase_qty,
+  .create_request_form_row .hint_text:not(.right_hint), .help_game_cooldown_levelup, .refund_item_header,
+  .refund_game_detail, .refund_token_balance_amount, .help_delete_step_text, .help_request_header_row,
+  .help_request_area, .attached_file_size, .scam_report_date, .help_page_trade_date, .help_page_trade_with,
+  .hardware_support_serial_section, .help_event_limiteduser_spend span
+) {
+  color: var(--se-text-muted) !important;
+}
+
+/* FAQ and article text reads at body size */
+html.se-help :where(.help_faq_text, .help_page_text, .help_issue_details, .help_section_content) {
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-md) !important;
+  line-height: 1.65 !important;
+}
+
+/* Struck-out prices */
+html.se-help :where(.lineitem_price_strikeout, .help_purchase_price.price_strikeout) {
+  color: var(--se-text-faint) !important;
+}
+
+/* Danger, warning, success */
+html.se-help :where(
+  .warning, #error_description, .help_highlight_bans_text, .help_page_important_warning, #change_password_error,
+  .vac_ban_header, .help_refund_request_area h1.failed, #updateShippingError, #shipping_error_display,
+  #validate_email_error_contents, .help_microtxn_info .warning
+) {
+  color: var(--se-danger) !important;
+}
+
+html.se-help :where(.help_delete_important, .help_game_cooldown_expirationtime, .agent_actions .help_section_text, .help_page_section_contrast, .promotion_details) {
+  color: var(--se-gold) !important;
+}
+
+html.se-help :where(.no_vac_bans_header, .help_request_state_msg b) {
+  color: var(--se-cart) !important;
+}
+
+/* ---------- Panels: help.css's dark translucent boxes as the theme's cards ---------- */
+
+html.se-help :is(
+  .help_page_section_ctn, .help_page_purchasetoprove, .help_wizard_button_notes, .loginbox_background,
+  .help_refund_request_area, .purchase_gift_message_box, .purchase_rma_details_box, .refund_info_box, .info_box,
+  .refund_game_block, .remove_games_block, .help_game_guides_box, .help_game_refund_box,
+  .help_itempurchase_detail_box, .help_issue_details, .help_notinlibrary_details, .help_missingrefund_details,
+  .help_cannot_launch_game_details, .help_cannot_install_game_details,
+  .help_before_contacting_steam_support_details, .help_issue_delete, .help_vacorgameban_account,
+  .account_recovery_box, .account_select_row > div:not(.account_reset_column), .accountname_area,
+  .help_section_content, .help_login_nag, .create_help_request_form, .help_request_track_shipping,
+  .help_request_legal_dmca_instructions, .help_restrictedaccount_instructions, .help_chargeback_box,
+  .data_removed_box, .help_game_highlight_details, .help_request_footerbox, .attachment_upload_targetarea,
+  .help_official_box, .help_purchase_failure_box, .login_signin_msg, .system_report_details_inner
+) {
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+/* A card inside a card steps down a shade */
+html.se-help :is(.help_app_header, .help_issue_details, .help_section_content, .help_refund_request_area, .help_page_section_ctn) :is(.info_box, .refund_info_box, .help_game_highlight_details, .purchase_rma_details_box, .purchase_gift_message_box, .refund_game_block, .remove_games_block) {
+  background: var(--se-surface-2) !important;
+}
+
+/* Official and featured boxes: a soft accent wash */
+html.se-help :is(.help_official_box, .help_purchase_failure_box) {
+  background: linear-gradient(135deg, var(--se-accent-surface), var(--se-surface) 60%) !important;
+}
+
+html.se-help .help_official_box .help_highlight_text.help_highlight_text {
+  color: var(--se-text) !important;
+  font-weight: 700;
+}
+
+/* Notices with a coloured edge: warnings and alerts keep their meaning */
+html.se-help :is(.help_issue_warning, .help_section_alert, .help_important_info_box, .help_event_limiteduser, .help_page_trade_box) {
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+}
+
+html.se-help :is(.help_section_alert, .help_important_info_box) {
+  box-shadow: inset 3px 0 0 var(--se-danger), inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+html.se-help :is(.help_issue_warning, .help_event_limiteduser, .help_page_trade_box) {
+  box-shadow: inset 3px 0 0 var(--se-gold), inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+html.se-help .help_page_trade_header {
+  border-radius: var(--se-radius-lg) var(--se-radius-lg) 0 0;
+  background: rgba(240, 192, 96, .14) !important;
+  color: var(--se-gold) !important;
+}
+
+/* Messages: errors red, notes accent, both as tinted rounded strips */
+html.se-help :is(#verify_code_error_msg, #changepw_error_msg, #search_error_msg, #form_submit_error) {
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: rgba(229, 115, 122, .12) !important;
+  box-shadow: inset 0 0 0 1px rgba(229, 115, 122, .35);
+  color: var(--se-text) !important;
+}
+
+html.se-help :is(#form_submit_search_error, #recovery_code_resent, .help_request_recent_submit) {
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-accent-surface) !important;
+  box-shadow: inset 0 0 0 1px rgba(124, 196, 255, .3);
+  color: var(--se-text) !important;
+}
+
+html.se-help .reset_complete_emailprefsdiffer {
+  border-radius: var(--se-radius-md);
+  background: rgba(240, 192, 96, .14) !important;
+  box-shadow: inset 0 0 0 1px rgba(240, 192, 96, .35);
+  color: var(--se-text) !important;
+}
+
+/* Password strength tags: pills */
+html.se-help .password_tag {
+  border-radius: var(--se-radius-pill) !important;
+}
+
+html.se-help .password_tag::before {
+  display: none !important;
+}
+
+/* Dividers */
+html.se-help :is(.help_app_header_divider, .hardware_serial_divider) {
+  background: var(--se-divider) !important;
+}
+
+html.se-help :is(.help_page_section_hr, .refund_token_balance_hr, .purchase_totals .line_break, .search_error_hr, .help_page_trade_footer) {
+  border-color: var(--se-divider) !important;
+}
+
+html.se-help :is(.help_section_divider, .help_section_divider_dim) hr,
+html.se-help .help_issue_details .issue_hr {
+  border: 0 !important;
+  border-top: 1px solid var(--se-divider) !important;
+}
+
+/* ---------- Forms ---------- */
+
+html.se-help :is(
+  input:is([type="text"], [type="email"], [type="password"], [type="tel"], [type="number"], [type="date"], [type="time"], [type="search"], [type="url"]),
+  input.text_input, textarea, select
+):not(.authcode_entry_input, .twofactorauthcode_entry_input, #twofactor_username, #help_search_support_input) {
+  box-sizing: border-box;
+  min-height: 38px;
+  padding: 8px 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-md)/1.4 var(--se-font) !important;
+  font-style: normal !important;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-help :is(
+  input:is([type="text"], [type="email"], [type="password"], [type="tel"], [type="number"], [type="date"], [type="time"], [type="search"], [type="url"]),
+  input.text_input, textarea, select
+):not(.authcode_entry_input, .twofactorauthcode_entry_input, #twofactor_username, #help_search_support_input):focus {
+  outline: 0 !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent) !important;
+}
+
+html.se-help :is(input, textarea)::placeholder {
+  color: var(--se-text-faint) !important;
+  font-style: normal !important;
+  text-align: start !important;
+}
+
+html.se-help input:is([type="checkbox"], [type="radio"]) {
+  accent-color: var(--se-accent);
+}
+
+/* Codes typed into big single-purpose boxes keep their size, on the theme's field */
+html.se-help :is(input.unlockcode_entry_input, #hardware_serial_entry) {
+  background: var(--se-field) !important;
+}
+
+/* Steam's custom dropdown (.dselect_container) */
+html.se-help .dselect_container .trigger,
+html.se-help .dselect_container .activetrigger {
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+}
+
+html.se-help .dselect_container .trigger:hover,
+html.se-help .dselect_container .activetrigger {
+  background: var(--se-hover) !important;
+}
+
+html.se-help .dselect_container .activetrigger {
+  box-shadow: inset 0 0 0 1px var(--se-accent);
+}
+
+html.se-help .dselect_container .dropcontainer ul {
+  margin-top: 4px;
+  padding: 6px !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-panel-bg) !important;
+  box-shadow: var(--se-panel-shadow);
+}
+
+html.se-help .dselect_container .dropcontainer ul li a {
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-dim) !important;
+}
+
+html.se-help .dselect_container .dropcontainer ul li a:hover,
+html.se-help .dselect_container .dropcontainer ul li a.highlighted {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+/* ---------- Buttons ---------- */
+
+/* Submit buttons and help.css's own action buttons: the accent pill */
+html.se-help :is(input[type="submit"], .change_password_button, .help_game_request_refund_button, .self_lock_button) {
+  height: 38px;
+  padding: 0 20px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-accent) !important;
+  color: var(--se-on-accent) !important;
+  font: 700 var(--se-fs-md)/38px var(--se-font) !important;
+  text-shadow: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-help :is(input[type="submit"], .change_password_button, .help_game_request_refund_button, .self_lock_button):hover {
+  background: var(--se-accent-hover) !important;
+  color: var(--se-on-accent) !important;
+}
+
+/* Steam's shared buttons (buttons.css): green / blue as the accent pill, the rest grey */
+html.se-help :is([class*="btn_green"], [class*="btn_blue"], [class*="btnv6_blue"], [class*="btnv6_green"], [class*="btn_grey"], [class*="btnv6_grey"], [class*="btnv6_lightblue"]):not(.btn_link) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  text-shadow: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-help :is([class*="btn_green"], [class*="btn_blue"], [class*="btnv6_blue"], [class*="btnv6_green"]):not(.btn_link) {
+  background: var(--se-accent) !important;
+  box-shadow: none;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-help :is([class*="btn_green"], [class*="btn_blue"], [class*="btnv6_blue"], [class*="btnv6_green"], [class*="btn_grey"], [class*="btnv6_grey"], [class*="btnv6_lightblue"]):not(.btn_link) > span {
+  padding: 0 18px !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  background: none !important;
+  color: inherit !important;
+  font: 700 var(--se-fs-md)/36px var(--se-font) !important;
+  text-shadow: none !important;
+}
+
+html.se-help :is([class*="btn_grey"], [class*="btnv6_grey"], [class*="btnv6_lightblue"]):not(.btn_link):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-help :is([class*="btn_green"], [class*="btn_blue"], [class*="btnv6_blue"], [class*="btnv6_green"]):not(.btn_link):hover {
+  background: var(--se-accent-hover) !important;
+}
+
+html.se-help .btn_disabled,
+html.se-help :is(input[type="submit"], button):disabled {
+  opacity: .45;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Login nag's two buttons */
+html.se-help .btn_login_nag_right.btnv6_blue_hoverfade {
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+}
+
+/* Lock / print / bookmark choice buttons on account recovery */
+html.se-help .lock_button_row .lock_button {
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background-color: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-help .lock_button_row .lock_button:hover {
+  background-color: var(--se-hover) !important;
+}
+
+html.se-help .lock_button_row .lock_button.selected {
+  box-shadow: inset 0 0 0 2px var(--se-accent);
+}
+
+/* ---------- Tables and lists ---------- */
+
+html.se-help :is(.AccountDataTable, .fraud_refund_table) {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-help :is(.AccountDataTable, .fraud_refund_table) th {
+  padding: 10px 12px !important;
+  background: var(--se-surface-2) !important;
+  color: var(--se-text-faint) !important;
+  font: 700 var(--se-fs-xs)/1.4 var(--se-font) !important;
+  letter-spacing: .08em;
+  text-align: start;
+  text-transform: uppercase;
+}
+
+html.se-help :is(.AccountDataTable, .fraud_refund_table) td {
+  padding: 9px 12px !important;
+  border: 0 !important;
+  border-top: 1px solid var(--se-divider) !important;
+  color: var(--se-text-dim);
+}
+
+html.se-help .fraud_refund_table tr.fraud_other_row {
+  background: var(--se-surface-2) !important;
+}
+
+html.se-help .AccountDataTableDescription {
+  color: var(--se-text-muted) !important;
+}
+
+html.se-help .AccountDataLoadMore {
+  color: var(--se-accent) !important;
+}
+
+/* Support tickets: a rounded list of rows */
+html.se-help .help_request_page {
+  background: none !important;
+}
+
+html.se-help .help_request_table {
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-help .help_request_header {
+  background: var(--se-surface-2) !important;
+}
+
+html.se-help :is(.help_request_header, .help_request_row) {
+  border-bottom: 1px solid var(--se-divider) !important;
+}
+
+html.se-help a.help_request_row {
+  color: var(--se-text-muted) !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-help a.help_request_row:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-help a.help_request_row.closed {
+  background: none !important;
+  opacity: .7;
+}
+
+html.se-help .help_request_row .col.title {
+  color: var(--se-text) !important;
+}
+
+/* A ticket's messages: cards, Steam's replies on the accent wash */
+html.se-help .help_request_message {
+  overflow: hidden;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-help .help_request_message:is(.new, .from_steam) {
+  background: linear-gradient(135deg, var(--se-accent-surface), var(--se-surface) 55%) !important;
+}
+
+html.se-help .help_request_message .help_request_author_bar {
+  background: var(--se-surface-2) !important;
+}
+
+html.se-help .help_request_message.from_steam .help_request_author_bar {
+  background: rgba(124, 196, 255, .16) !important;
+}
+
+/* FAQ search results */
+html.se-help .help_search_result {
+  border-radius: var(--se-radius-md);
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-help .help_search_result:hover {
+  background: var(--se-hover) !important;
+}
+
+/* Scam reports: alternating rows on the theme's surfaces */
+html.se-help .scam_report_trade,
+html.se-help .scam_report_trade.even {
+  background: var(--se-surface) !important;
+}
+
+html.se-help .scam_report_trade.odd {
+  background: var(--se-surface-2) !important;
+}
+
+html.se-help .scam_report_trade_separator {
+  background: var(--se-divider) !important;
+  border: 0 !important;
+}
+
+/* ---------- Bits ---------- */
+
+html.se-help .help_tooltip {
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-panel-bg) !important;
+  box-shadow: var(--se-panel-shadow);
+  color: var(--se-text) !important;
+}
+
+/* Spending limit progress */
+html.se-help .help_limiteduser_spend_ctn {
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-pill) !important;
+  box-shadow: none !important;
+}
+
+html.se-help .help_limiteduser_spend_progress_bar {
+  border: 0 !important;
+  border-radius: inherit !important;
+  background: var(--se-accent) !important;
+}
+
+/* Loading bars */
+html.se-help :is(.LoadingThrobber .Bar, .throbber > div) {
+  background-color: var(--se-accent) !important;
+}
+
+/* Trade item art */
+html.se-help .help_page_trade_item img {
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+}
+
+html.se-help .market_image {
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+}
+
+/* Sign-in pages and dark-page variants: the theme's page, no blue glow */
+html.se-help :is(.page_body_ctn.login, body.v6 .page_content_ctn.dark) {
+  background: none !important;
+}

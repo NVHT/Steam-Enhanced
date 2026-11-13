@@ -1,0 +1,468 @@
+/*
+ * Settings › page specifics: Family, Notifications, Library, Voice.
+ * Settings styles load in order: layout, controls, pages, storage, search, game-properties, finishing.
+ */
+
+/*
+ * Family: the "Steam Families" intro and its button become one header card (row 1 of
+ * the panel); anything else in the panel (Family View…) runs full width below it.
+ */
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family]:not(#se-none) {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: 22px 52px 18px minmax(0, 1fr) 18px auto 22px;
+  align-items: center;
+  align-content: start !important;
+  grid-auto-rows: auto;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: 0 0 auto !important;
+  overflow: visible !important;
+  margin: 22px 0 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family]::after {
+  content: '';
+  grid-column: 1 / -1;
+  grid-row: 1;
+  align-self: stretch;
+  z-index: 0;
+  border-radius: var(--se-radius-lg);
+  background: linear-gradient(110deg, var(--se-surface-2) 0%, var(--se-surface) 65%);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family]::before {
+  content: '';
+  grid-column: 2;
+  grid-row: 1;
+  z-index: var(--se-z-raised);
+  width: 52px;
+  height: 52px;
+  margin: 22px 0;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-accent-tint) var(--se-ic-family-accent) center / 26px 26px no-repeat;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family] > * {
+  grid-column: 1 / -1;
+  position: relative;
+  z-index: var(--se-z-raised);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family] > :first-child:not(.WIVHxIb79kMHNG7iA_Q9H) {
+  grid-column: 4;
+  grid-row: 1;
+  padding: 22px 0 !important;
+  margin: 0 !important;
+  font: 500 13px/1.45 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family] > :first-child[data-se-head]::before {
+  content: attr(data-se-head);
+  display: block;
+  margin-bottom: 4px;
+  font: 700 16px var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-family] a {
+  color: var(--se-accent) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .WIVHxIb79kMHNG7iA_Q9H:not(#se-none) {
+  grid-column: 6;
+  grid-row: 1;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .WIVHxIb79kMHNG7iA_Q9H ._3W3GOfKp-DI8NI_UMouX-S {
+  display: none !important;
+}
+
+/* placeholder */
+.CFTLX2wIKOK3hNV-fS7_V .QXpTLSmzoZutYgh3fp02Y:not(#se-none):not(#se-p) {
+  width: auto !important;
+  background: var(--se-accent) !important;
+  color: var(--se-bg-ink) !important;
+}
+
+/* Notifications: Toast / Sound columns. */
+.CFTLX2wIKOK3hNV-fS7_V ._2zGUtyw-lRSsEUPY1qaqf7 {
+  /* NotificationSectionHeader */
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: space-between !important;
+  margin: 22px 0 10px !important;
+  padding: 0 18px 0 4px !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2zGUtyw-lRSsEUPY1qaqf7 [data-se-sec]:not(#se-none) {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._27r3CjIYhU20TsukVgm25C {
+  display: grid !important;
+  grid-template-columns: 76px 76px;
+  justify-items: center;
+  align-items: center;
+  gap: 0 !important;
+  margin: 0 !important;
+}
+
+/* Toggles */
+.CFTLX2wIKOK3hNV-fS7_V ._27r3CjIYhU20TsukVgm25C > * {
+  margin: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2zGUtyw-lRSsEUPY1qaqf7 ._27r3CjIYhU20TsukVgm25C > * {
+  white-space: nowrap;
+  padding: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2zGUtyw-lRSsEUPY1qaqf7 ._27r3CjIYhU20TsukVgm25C > * {
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase !important;
+  color: var(--se-label-color) !important;
+}
+
+/* Library: the three actions become tiles with an icon. */
+.CFTLX2wIKOK3hNV-fS7_V .RoSh6WoygUX6LLAoB20f3 {
+  display: flex !important;
+  gap: 10px !important;
+  margin: 22px 0 0 !important;
+  padding: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .RoSh6WoygUX6LLAoB20f3 button.DialogButton:not(#se-none):not(#se-t1):not(#se-t2) {
+  position: relative;
+  flex: 1 1 0 !important;
+  height: auto !important;
+  min-height: 74px !important;
+  padding: 16px 16px 16px 72px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  gap: 3px;
+  border-radius: var(--se-radius-lg) !important;
+  background-color: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  text-align: left !important;
+  text-shadow: none !important;
+  font: 700 14px/18px var(--se-font) !important;
+  color: var(--se-text) !important;
+  white-space: normal !important;
+  background-image: var(--se-tile-ic, none) !important;
+  background-repeat: no-repeat !important;
+  background-position: 16px center !important;
+  background-size: 42px 42px !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .RoSh6WoygUX6LLAoB20f3 button.DialogButton:not(#se-none):not(#se-t1):not(#se-t2):hover {
+  background-color: var(--se-hover) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .RoSh6WoygUX6LLAoB20f3 button.DialogButton[data-se-sub]::after {
+  content: attr(data-se-sub);
+  display: block;
+  font: 500 12px/16px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+/* Downloads: "Game update timing" (a FakeContainer: title, description, dropdown row) becomes a row of its card. */
+.CFTLX2wIKOK3hNV-fS7_V ._3Vl2zkYPoCpw1q_1n28D3z[data-se-c]:not(#se-none) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 14px;
+  align-items: center;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3Vl2zkYPoCpw1q_1n28D3z > ._1RCWDLVLFja1TdD1P53BMq,
+.CFTLX2wIKOK3hNV-fS7_V ._3Vl2zkYPoCpw1q_1n28D3z > .SettingsDialogBodyText {
+  grid-column: 1;
+  margin: 0 !important;
+  padding: 0 !important;
+  font: 600 14px/19px var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3Vl2zkYPoCpw1q_1n28D3z > ._3w92Ej5Kq7nbt5WACQ6jwI {
+  grid-column: 1;
+  margin: 3px 0 0 !important;
+  padding: 0 !important;
+  font: 500 12.5px/1.4 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3Vl2zkYPoCpw1q_1n28D3z a {
+  color: var(--se-accent) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3Vl2zkYPoCpw1q_1n28D3z > ._1m4hl8tdIUyt1rAnE4y5ZQ {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Game Recording: the three modes as selectable cards in a row. */
+.CFTLX2wIKOK3hNV-fS7_V ._2KgeKsqRFBSwJXDDLlYFj7 {
+  margin: 22px 0 0 !important;
+  padding: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2KgeKsqRFBSwJXDDLlYFj7 > ._1RCWDLVLFja1TdD1P53BMq {
+  display: none !important;
+}
+
+/* "Select your recording mode:" (the page description says it) */
+.CFTLX2wIKOK3hNV-fS7_V ._1EntoGyxFp22pF4skClUbC {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._7EGqd8bdiXJBd2fj5Hh8r:not(#se-none) {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 14px !important;
+  margin: 0 !important;
+  padding: 16px 18px !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  cursor: pointer;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._7EGqd8bdiXJBd2fj5Hh8r:not(#se-none):hover {
+  background: var(--se-hover) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._7EGqd8bdiXJBd2fj5Hh8r.MYyvJ6lNQZtM4MHwS-Y3g:not(#se-none) {
+  background: var(--se-accent-tint) !important;
+  box-shadow: inset 0 0 0 1.5px var(--se-accent-strong) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2sQtvR60AbFF5UzDwY9hit:not(#se-none) {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px;
+  margin: 1px 0 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  box-shadow: inset 0 0 0 2px #4b5866 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2sQtvR60AbFF5UzDwY9hit._1gKI37LOWj1Df3QSnxvKyF:not(#se-none) {
+  box-shadow: inset 0 0 0 5px var(--se-accent) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2sQtvR60AbFF5UzDwY9hit::before,
+.CFTLX2wIKOK3hNV-fS7_V ._2sQtvR60AbFF5UzDwY9hit::after {
+  display: none !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3HgL0eRQXwU6dIEXXK6qba {
+  min-width: 0;
+  font: 500 12.5px/1.45 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3HgL0eRQXwU6dIEXXK6qba > ._1RUoX0kTOBfqpwCaBZGDLJ {
+  margin: 0 0 4px !important;
+  font: 700 14px/19px var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3HgL0eRQXwU6dIEXXK6qba b {
+  color: var(--se-text);
+}
+
+/* Voice: microphone level meter. */
+.CFTLX2wIKOK3hNV-fS7_V ._2Dptk9e7W_k4zYB5wfRTcp {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .Qeg4qAFIMLaYd3mHOBndS {
+  flex: 1 1 auto;
+  height: 6px !important;
+  min-width: 160px;
+  border-radius: var(--se-radius-sm) !important;
+  overflow: hidden;
+  background: var(--se-selected) !important;
+  border: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .Qeg4qAFIMLaYd3mHOBndS > * {
+  height: 100% !important;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-running) !important;
+}
+
+/* Storage: a drive card (name, size, usage bar, legend), then the installed items. */
+.CFTLX2wIKOK3hNV-fS7_V ._18pPl6a2EhE7NRoba3yw7L {
+  /* DriveDropdownControl */
+  margin: 22px 0 0 !important;
+  padding: 16px 18px 6px !important;
+  border-radius: var(--se-radius-lg) var(--se-radius-lg) 0 0 !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 1px 0 var(--se-hairline), inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._18pPl6a2EhE7NRoba3yw7L .DialogDropDown:not(#se-none):not(#se-dd):not(#se-dd2),
+.CFTLX2wIKOK3hNV-fS7_V ._18pPl6a2EhE7NRoba3yw7L .v8oJcDOQF6xmlVTw4VhOr:not(#se-none):not(#se-dd):not(#se-dd2),
+.CFTLX2wIKOK3hNV-fS7_V ._18pPl6a2EhE7NRoba3yw7L .iFalJAi3VT9vGdVVOLNgA:not(#se-none):not(#se-dd):not(#se-dd2) {
+  width: 100% !important;
+  height: 44px !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._18pPl6a2EhE7NRoba3yw7L ._1rihlgVMF4Q_fFZDnXeVt5,
+.CFTLX2wIKOK3hNV-fS7_V ._1LvKJs5FKB30xbur_XL2DL ._1rihlgVMF4Q_fFZDnXeVt5 {
+  font: 700 14px var(--se-font) !important;
+  color: var(--se-text) !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._5bG9Iwr014pu3H1SPRwYh {
+  font: 700 13px var(--se-font) !important;
+  color: var(--se-text) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-drive]:not(#se-none) {
+  /* The row holding DriveUsage and the "…" button */
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 14px !important;
+  margin: var(--se-join, 0px) 0 0 !important;
+  padding: 4px 18px 18px !important;
+  border-radius: 0 0 var(--se-radius-lg) var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 -1px 0 var(--se-hairline), inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1LvKJs5FKB30xbur_XL2DL:not(#se-none) {
+  /* DriveUsage */
+  flex: 1 1 auto !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._18pPl6a2EhE7NRoba3yw7L:not(#se-none) {
+  margin-bottom: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1LvKJs5FKB30xbur_XL2DL > ._1rihlgVMF4Q_fFZDnXeVt5 {
+  margin: 0 0 12px !important;
+  font: 500 12px var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+  text-transform: none !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1EubJAK9z7JtdGks5M2f8t {
+  height: 10px !important;
+  border-radius: var(--se-radius-sm) !important;
+  overflow: hidden;
+  background: var(--se-selected) !important;
+}
+
+/* indicator */
+.CFTLX2wIKOK3hNV-fS7_V .wEM7Q5RG3mzmns1x1Zjux {
+  height: 10px !important;
+  border-radius: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V :is(._22KCiI1IJ7Op5fP8OZtqa-) {
+  background: var(--se-accent) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V :is(._2W7tN4vCUKpfU8L0WFTIJT) {
+  background: #b9a3ff !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V :is(._1W6jWiFmoiCg9NZKWnF1sn) {
+  background: var(--se-running) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V :is(._3mzewepCzbFGOjI5X0u_Xh) {
+  background: var(--se-online) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V :is(._1GOFGeTHq8sYkjxutW5G-a) {
+  background: #ff9ad5 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V :is(._2h-2O3n134sdwgtdM_Fuqr) {
+  background: var(--se-text) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V :is(._1SwNAeBlLusPoHHiJK1PGk) {
+  background: var(--se-gold) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2g2Ot3OPmLYBoz7PgpMnu6 {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 6px 16px !important;
+  margin: 10px 0 0 !important;
+}
+
+/* labels */
+.CFTLX2wIKOK3hNV-fS7_V .GKxgpfNV7qATpOCAVTZhM {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  font: 600 11.5px var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2jcmNE7U-Ujkk6nmPxvC1r {
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  margin: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._181OY9APZJDARykJ_KOFPE {
+  color: var(--se-text) !important;
+  font-weight: 600 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1WKUOT3FdB9-48MMP0Tz9l:not(#se-none) {
+  background: var(--se-surface-2) !important;
+  border-radius: var(--se-radius-sm) !important;
+}

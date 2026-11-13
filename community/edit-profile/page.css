@@ -1,0 +1,430 @@
+/*
+ * Edit Profile (/id/<name>/edit/..., every tab).
+ *
+ *   - Header: the shared profile sub-page card (shared/small-header.css), with the editor's
+ *     React avatar sized like the others and its frame left out.
+ *   - Two columns at the page width: a sticky menu card on the left (tabs as rows, the open
+ *     one in the accent, "Back to Your Profile" as a quiet link, the Points Shop as a gold
+ *     pill), the editor as a glass card on the right.
+ *   - Editor: the tab title large, the intro muted; each titled group of fields as a panel;
+ *     fields, dropdowns and text areas in the theme's field style; Save / Cancel as a sticky
+ *     action bar at the foot.
+ *
+ * The editor's classes are hashed per Steam build: its parts are tagged [data-se-edit] by
+ * edit-profile/page.js. Dialog* classes are Steam's shared React dialog classes (stable).
+ */
+
+html.se-community-edit-profile {
+  --se-edit-card: rgba(23, 26, 32, .84);
+  --se-edit-blur: blur(20px) saturate(1.25);
+}
+
+/* ---------- Page frame ---------- */
+
+html.se-community-edit-profile body {
+  background-image: none !important;
+}
+
+html.se-community-edit-profile #profile_edit_main_content {
+  background: none !important;
+}
+
+html.se-community-edit-profile .grouppage_content_area.groupadmin_content {
+  box-sizing: border-box;
+  width: var(--se-community-width) !important;
+  max-width: none !important;
+  margin: 0 auto 72px !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-edit-profile :is(.grouppage_content_area .maincontent, #profile_edit_leftcol) {
+  float: none !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* ---------- Header avatar (React): sized like the other sub-pages, frame left out ---------- */
+
+html.se-community-edit-profile .profile_small_header_avatar,
+html.se-community-edit-profile .profile_small_header_avatar > div,
+html.se-community-edit-profile .profile_small_header_avatar > div > div {
+  position: relative !important;
+  width: 76px !important;
+  height: 76px !important;
+}
+
+html.se-community-edit-profile .profile_small_header_avatar div:has(+ img) {
+  display: none !important;
+}
+
+html.se-community-edit-profile .profile_small_header_avatar img {
+  display: block;
+  width: 76px !important;
+  height: 76px !important;
+  border-radius: var(--se-radius-lg);
+  box-shadow: 0 0 0 2px var(--se-bg), 0 0 0 4px var(--se-status-online);
+}
+
+html.se-community-edit-profile .profile_small_header_additional:not(:has(* *)) {
+  display: none !important;
+}
+
+/* ---------- Two columns ---------- */
+
+html.se-community-edit-profile [data-se-edit="shell"] {
+  display: grid !important;
+  grid-template-columns: 260px minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+  width: auto !important;
+  height: auto !important;
+}
+
+html.se-community-edit-profile [data-se-edit="shell"] > * {
+  width: auto !important;
+  min-width: 0;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+/* ---------- Menu ---------- */
+
+html.se-community-edit-profile [data-se-edit="nav"] {
+  position: sticky !important;
+  top: 20px;
+  display: flex !important;
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+  padding: 10px !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-edit-card) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  backdrop-filter: var(--se-edit-blur);
+}
+
+html.se-community-edit-profile [data-se-edit="link"] {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  min-height: 38px;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-md)/1.3 var(--se-font) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-edit-profile [data-se-edit="link"]:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+html.se-community-edit-profile [data-se-edit="link"]:is(.active, [aria-current="page"]) {
+  background: var(--se-accent-surface) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-community-edit-profile [data-se-edit="link"]:is(.active, [aria-current="page"])::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--se-accent);
+}
+
+html.se-community-edit-profile [data-se-edit="rule"] {
+  height: 1px !important;
+  margin: 6px 10px !important;
+  padding: 0 !important;
+  background: var(--se-divider) !important;
+}
+
+html.se-community-edit-profile [data-se-edit="back"] {
+  margin: 0 0 4px !important;
+  padding: 0 !important;
+}
+
+html.se-community-edit-profile [data-se-edit="back"] a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--se-radius-md);
+  color: var(--se-text-faint) !important;
+  font: 600 var(--se-fs-sm)/1.3 var(--se-font) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-edit-profile [data-se-edit="back"] a::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6 6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+html.se-community-edit-profile [data-se-edit="back"] a:hover {
+  background: var(--se-hover);
+  color: var(--se-text) !important;
+}
+
+html.se-community-edit-profile [data-se-edit="promo"] {
+  margin: 10px 0 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-edit-profile [data-se-edit="promo"] a {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 38px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-gold-surface, rgba(240, 192, 96, .16)) !important;
+  color: var(--se-gold) !important;
+  font: 700 var(--se-fs-md)/1 var(--se-font) !important;
+  text-decoration: none !important;
+  transition: filter var(--se-dur-fast);
+}
+
+html.se-community-edit-profile [data-se-edit="promo"] a:hover {
+  filter: brightness(1.2);
+}
+
+/* ---------- Editor ---------- */
+
+html.se-community-edit-profile [data-se-edit="main"] {
+  box-sizing: border-box;
+  padding: 28px 32px !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-edit-card) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  backdrop-filter: var(--se-edit-blur);
+  color: var(--se-text-dim);
+}
+
+html.se-community-edit-profile [data-se-edit="main"] :is(form, .Panel) {
+  width: auto !important;
+  max-width: none !important;
+}
+
+html.se-community-edit-profile [data-se-edit="main"] .DialogHeader {
+  margin: 0 0 6px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-headline)/1.15 var(--se-font) !important;
+  letter-spacing: -.01em;
+  text-transform: none !important;
+}
+
+html.se-community-edit-profile [data-se-edit="main"] .DialogBodyText {
+  max-width: 78ch;
+  margin: 0 0 8px !important;
+  color: var(--se-text-muted) !important;
+  font: 400 var(--se-fs-md)/1.6 var(--se-font) !important;
+}
+
+html.se-community-edit-profile [data-se-edit="main"] a:not(.DialogButton) {
+  color: var(--se-accent) !important;
+}
+
+/* Field groups as panels */
+html.se-community-edit-profile [data-se-edit="section"] {
+  margin: 20px 0 0 !important;
+  padding: 20px 22px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: rgba(255, 255, 255, .03) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-edit-profile [data-se-edit="section"] > :not([data-se-edit="title"]) {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-edit-profile [data-se-edit="title"] {
+  height: auto !important;
+  margin: 0 0 16px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Fields */
+html.se-community-edit-profile [data-se-edit="main"] .DialogInputLabelGroup {
+  width: auto !important;
+  margin: 0 0 16px !important;
+  padding: 0 !important;
+}
+
+html.se-community-edit-profile [data-se-edit="main"] .DialogInputLabelGroup:last-child {
+  margin-bottom: 0 !important;
+}
+
+html.se-community-edit-profile [data-se-edit="main"] .DialogLabel {
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.3 var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html.se-community-edit-profile [data-se-edit="main"] .DialogInputRequirementLabel {
+  color: var(--se-text-faint) !important;
+  font-weight: 500 !important;
+}
+
+html.se-community-edit-profile [data-se-edit="main"] .DialogInput_Wrapper {
+  width: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-community-edit-profile [data-se-edit="main"] :is(.DialogInput, .DialogTextInputBase, textarea, select, .DialogDropDown) {
+  box-sizing: border-box;
+  width: 100% !important;
+  min-height: 40px;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font: 400 var(--se-fs-md)/40px var(--se-font) !important;
+  outline: 0 !important;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-community-edit-profile [data-se-edit="main"] textarea {
+  min-height: 120px;
+  padding: 12px 14px !important;
+  line-height: 1.6 !important;
+  resize: vertical;
+}
+
+html.se-community-edit-profile [data-se-edit="main"] :is(.DialogInput, .DialogTextInputBase, textarea, select):focus,
+html.se-community-edit-profile [data-se-edit="main"] .DialogDropDown:is(:hover, :focus-within) {
+  box-shadow: inset 0 0 0 1px var(--se-accent) !important;
+}
+
+html.se-community-edit-profile [data-se-edit="main"] .DialogInputPlaceholder::placeholder {
+  color: var(--se-text-faint);
+}
+
+html.se-community-edit-profile [data-se-edit="main"] .DialogDropDown {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+/* ---------- Buttons and the action bar ---------- */
+
+html.se-community-edit-profile [data-se-edit="main"] button.DialogButton {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: auto !important;
+  min-width: 110px;
+  height: 38px !important;
+  margin: 0 !important;
+  padding: 0 22px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line) !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-md)/1 var(--se-font) !important;
+  text-transform: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-edit-profile [data-se-edit="main"] button.DialogButton:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-community-edit-profile [data-se-edit="main"] button.DialogButton.Primary {
+  background: var(--se-accent) !important;
+  box-shadow: none !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-community-edit-profile [data-se-edit="main"] button.DialogButton.Primary:hover {
+  background: var(--se-accent-hover) !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-community-edit-profile [data-se-edit="main"] button.DialogButton:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+/* Save / Cancel: a bar that stays in view at the foot of the window */
+html.se-community-edit-profile [data-se-edit="actions"] {
+  position: sticky !important;
+  bottom: 16px;
+  z-index: 2;
+  display: flex !important;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  gap: 10px;
+  width: auto !important;
+  height: auto !important;
+  margin: 24px 0 0 !important;
+  padding: 12px !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-panel-bg) !important;
+  box-shadow: var(--se-panel-shadow);
+  backdrop-filter: var(--se-blur-panel);
+}
+
+/* ---------- Below Steam's breakpoint ---------- */
+
+@media (max-width: 910px) {
+  html.se-community-edit-profile [data-se-edit="shell"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html.se-community-edit-profile [data-se-edit="nav"] {
+    position: static !important;
+  }
+
+  html.se-community-edit-profile [data-se-edit="main"] {
+    padding: 20px !important;
+  }
+}

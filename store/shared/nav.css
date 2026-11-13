@@ -1,0 +1,992 @@
+/*
+ * Store bar redesign, "one capsule" (every store page). Styles the [data-se-nav] tags that
+ * shared/nav.js puts on Steam's React store bar; everything is scoped under html.se-store
+ * (store/loader.js) and the tags, so the file is inert where there is no bar.
+ * Icons are the theme's duotone style (core/icons.css): 24px grid, 1.75 stroke, 32% fills,
+ * drawn as ::before masks so React's own children are never touched.
+ */
+html.se-store {
+  --se-nav-h: 46px;      /* capsule: Steam's own menu row height, so page layout still fits */
+  --se-nav-ctl: 36px;    /* every control inside it */
+  --se-ni-browse: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Crect%20x='3.5'%20y='3.5'%20width='7'%20height='7'%20rx='1.5'/%3E%3Crect%20x='13.5'%20y='13.5'%20width='7'%20height='7'%20rx='1.5'/%3E%3C/g%3E%3Crect%20x='3.5'%20y='3.5'%20width='7'%20height='7'%20rx='1.5'/%3E%3Crect%20x='13.5'%20y='3.5'%20width='7'%20height='7'%20rx='1.5'/%3E%3Crect%20x='3.5'%20y='13.5'%20width='7'%20height='7'%20rx='1.5'/%3E%3Crect%20x='13.5'%20y='13.5'%20width='7'%20height='7'%20rx='1.5'/%3E%3C/svg%3E");
+  --se-ni-recommendations: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Cpath%20d='M11%203.5l1.9%205.1%205.1%201.9-5.1%201.9L11%2017.5l-1.9-5.1-5.1-1.9%205.1-1.9z'/%3E%3C/g%3E%3Cpath%20d='M11%203.5l1.9%205.1%205.1%201.9-5.1%201.9L11%2017.5l-1.9-5.1-5.1-1.9%205.1-1.9z'/%3E%3Cpath%20d='M18.5%2015.5v5M16%2018h5'/%3E%3C/svg%3E");
+  --se-ni-categories: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Cpath%20d='M3.5%2012.2V4.5a1%201%200%200%201%201-1h7.7l8.3%208.3a1.4%201.4%200%200%201%200%202l-6.2%206.2a1.4%201.4%200%200%201-2%200z'/%3E%3C/g%3E%3Cpath%20d='M3.5%2012.2V4.5a1%201%200%200%201%201-1h7.7l8.3%208.3a1.4%201.4%200%200%201%200%202l-6.2%206.2a1.4%201.4%200%200%201-2%200z'/%3E%3Ccircle%20cx='8'%20cy='8'%20r='1.5'/%3E%3C/svg%3E");
+  --se-ni-hardware: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Crect%20x='7.5'%20y='8.5'%20width='9'%20height='7'%20rx='1'/%3E%3C/g%3E%3Crect%20x='2.5'%20y='6.5'%20width='19'%20height='11'%20rx='3'/%3E%3Crect%20x='7.5'%20y='8.5'%20width='9'%20height='7'%20rx='1'/%3E%3Cpath%20d='M5%2010.5v1M19%2012.5v1'/%3E%3C/svg%3E");
+  --se-ni-play: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Cpath%20d='M7%208h10a4.5%204.5%200%200%201%204.4%205.4l-.6%203a2.5%202.5%200%200%201-4.3%201.2L15%2016H9l-1.5%201.6a2.5%202.5%200%200%201-4.3-1.2l-.6-3A4.5%204.5%200%200%201%207%208z'/%3E%3C/g%3E%3Cpath%20d='M7%208h10a4.5%204.5%200%200%201%204.4%205.4l-.6%203a2.5%202.5%200%200%201-4.3%201.2L15%2016H9l-1.5%201.6a2.5%202.5%200%200%201-4.3-1.2l-.6-3A4.5%204.5%200%200%201%207%208z'/%3E%3Cpath%20d='M8%2010.5v3M6.5%2012h3M15.5%2011h.01M17.5%2013h.01'/%3E%3C/svg%3E");
+  --se-ni-special: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Cpath%20d='M4.5%2010.5h15v9a1%201%200%200%201-1%201h-13a1%201%200%200%201-1-1z'/%3E%3C/g%3E%3Cpath%20d='M4.5%2010.5h15v9a1%201%200%200%201-1%201h-13a1%201%200%200%201-1-1zM3.5%207.5h17v3h-17zM12%207.5v13'/%3E%3Cpath%20d='M12%207.5C10.5%204%207%204.3%207.6%206.6%208%207.5%2012%207.5%2012%207.5zM12%207.5c1.5-3.5%205-3.2%204.4-.9-.4.9-4.4.9-4.4.9z'/%3E%3C/svg%3E");
+  --se-ni-wishlist: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Cpath%20d='M12%2020s-7.5-4.6-7.5-10A4.3%204.3%200%200%201%2012%206.6a4.3%204.3%200%200%201%207.5%203.4c0%205.4-7.5%2010-7.5%2010z'/%3E%3C/g%3E%3Cpath%20d='M12%2020s-7.5-4.6-7.5-10A4.3%204.3%200%200%201%2012%206.6a4.3%204.3%200%200%201%207.5%203.4c0%205.4-7.5%2010-7.5%2010z'/%3E%3C/svg%3E");
+  --se-ni-cart: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Cpath%20d='M6.2%207.5h13.6l-1.5%207a1.5%201.5%200%200%201-1.5%201.2H9.2a1.5%201.5%200%200%201-1.5-1.2z'/%3E%3C/g%3E%3Cpath%20d='M3%204.5h2.2l2.5%2010a1.5%201.5%200%200%200%201.5%201.2h7.6a1.5%201.5%200%200%200%201.5-1.2l1.5-7H6.2'/%3E%3Ccircle%20cx='9.5'%20cy='19.5'%20r='1.25'/%3E%3Ccircle%20cx='16.5'%20cy='19.5'%20r='1.25'/%3E%3C/svg%3E");
+  --se-ni-search: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Ccircle%20cx='10.5'%20cy='10.5'%20r='6.5'/%3E%3C/g%3E%3Ccircle%20cx='10.5'%20cy='10.5'%20r='6.5'/%3E%3Cpath%20d='M20%2020l-4.6-4.6'/%3E%3C/svg%3E");
+}
+
+/* ---------- Band and capsule ---------- */
+
+/*
+ * Steam's sticky strip and every wrapper shared/nav.js tags around it: transparent, so the page
+ * (the hero's rounded corners included) scrolls visibly under the floating capsule instead of
+ * being cut by a solid band. Steam's gradient/blur layers (incl. pseudo-elements) go too.
+ * Height is left to Steam, which reserves exactly that much room above the page.
+ */
+html.se-store [data-se-nav="shell"],
+html.se-store [data-se-nav="band"] {
+  overflow: visible !important;
+  background: transparent !important;
+  border: 0 !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store [data-se-nav="shell"]::before,
+html.se-store [data-se-nav="shell"]::after,
+html.se-store [data-se-nav="band"]::before,
+html.se-store [data-se-nav="band"]::after {
+  background: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store [data-se-nav="bar"] {
+  box-sizing: border-box;
+  align-items: center;
+  gap: 4px;
+  height: var(--se-nav-h) !important;
+  margin-block: 0 !important;
+  padding: 0 8px !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-md) !important;
+}
+
+/* ---------- Menus: plain text tabs with a duotone icon ---------- */
+
+html.se-store [data-se-nav="menu"],
+html.se-store [data-se-nav="menu"] > div {
+  align-self: center;
+  gap: 2px;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store [data-se-nav="item"] {
+  height: var(--se-nav-ctl);
+  margin: 0 !important;
+  padding: 0 14px 0 11px !important;
+  gap: 7px;
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 400 !important;
+  text-shadow: none !important;
+  transition: color var(--se-dur-fast), background-color var(--se-dur-fast);
+}
+
+html.se-store [data-se-nav="item"]::before {
+  content: "";
+  flex: none;
+  order: -1;
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: var(--se-nav-icon, var(--se-ni-browse)) center / contain no-repeat;
+  mask: var(--se-nav-icon, var(--se-ni-browse)) center / contain no-repeat;
+}
+
+html.se-store [data-se-icon="browse"] { --se-nav-icon: var(--se-ni-browse); }
+html.se-store [data-se-icon="recommendations"] { --se-nav-icon: var(--se-ni-recommendations); }
+html.se-store [data-se-icon="categories"] { --se-nav-icon: var(--se-ni-categories); }
+html.se-store [data-se-icon="hardware"] { --se-nav-icon: var(--se-ni-hardware); }
+html.se-store [data-se-icon="play"] { --se-nav-icon: var(--se-ni-play); }
+html.se-store [data-se-icon="special"] { --se-nav-icon: var(--se-ni-special); }
+
+html.se-store [data-se-nav="item"]:hover,
+html.se-store [data-se-nav="item"]:focus-visible {
+  color: var(--se-text) !important;
+  background: var(--se-hover);
+}
+
+html.se-store [data-se-nav="item"][aria-expanded="true"] {
+  color: var(--se-white) !important;
+  background: var(--se-selected);
+}
+
+/* Steam's blue underline under the open menu; the pill background replaces it. */
+html.se-store [data-se-nav="item"] > div > div {
+  display: none !important;
+}
+
+/* No dropdown arrows: menus open on hover (shared/nav.js). */
+html.se-store [data-se-nav="item"] svg {
+  display: none !important;
+}
+
+/* ---------- Search: between two dividers ---------- */
+
+html.se-store [data-se-nav="search"] {
+  position: relative;
+  align-self: stretch;
+  align-items: center;
+  margin: 0 4px !important;
+  padding: 0 12px;
+  justify-content: stretch !important;
+}
+
+html.se-store [data-se-nav="search"]::before,
+html.se-store [data-se-nav="search"]::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 1px;
+  height: 24px;
+  transform: translateY(-50%);
+  background: var(--se-divider);
+}
+
+html.se-store [data-se-nav="search"]::before { left: 0; }
+html.se-store [data-se-nav="search"]::after { right: 0; }
+
+html.se-store [data-se-nav="search-form"] {
+  position: relative;
+  flex: 1;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: var(--se-nav-ctl) !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px transparent;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-store [data-se-nav="search-form"]:focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent);
+}
+
+html.se-store [data-se-nav="search-input"] {
+  height: 100%;
+  padding: 0 12px 0 2px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-base) !important;
+  outline: none !important;
+}
+
+html.se-store [data-se-nav="search-input"]::placeholder {
+  color: var(--se-text-faint) !important;
+  font-style: normal !important;
+  font-size: var(--se-fs-base) !important;
+}
+
+/* Steam's blue submit square becomes the field's leading duotone magnifier. */
+html.se-store [data-se-nav="search-submit"] {
+  order: -1;
+  width: 38px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--se-text-faint) !important;
+}
+
+html.se-store [data-se-nav="search-submit"] svg {
+  display: none !important;
+}
+
+html.se-store [data-se-nav="search-submit"]::before {
+  content: "";
+  width: 17px;
+  height: 17px;
+  background: currentColor;
+  -webkit-mask: var(--se-ni-search) center / contain no-repeat;
+  mask: var(--se-ni-search) center / contain no-repeat;
+}
+
+html.se-store [data-se-nav="search-submit"]:hover,
+html.se-store [data-se-nav="search-form"]:focus-within [data-se-nav="search-submit"] {
+  color: var(--se-text) !important;
+}
+
+/* ---------- Wishlist and cart: our own icon buttons (shared/nav.js), mockup N1 ---------- */
+
+/* Steam's originals stay in the DOM (React owns them) but out of sight. */
+html.se-store [data-se-nav="wishlist-src"],
+html.se-store [data-se-nav="cart-src"] {
+  display: none !important;
+}
+
+html.se-store .se-nav-btn {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--se-nav-ctl);
+  height: var(--se-nav-ctl);
+  margin-left: 8px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  color: var(--se-text);
+  text-decoration: none;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store .se-nav-btn:hover,
+html.se-store .se-nav-btn:focus-visible {
+  background: var(--se-hover);
+  color: var(--se-white);
+  outline: none;
+}
+
+html.se-store .se-nav-btn__icon {
+  width: 19px;
+  height: 19px;
+  background: currentColor;
+  -webkit-mask: var(--se-ni-wishlist) center / contain no-repeat;
+  mask: var(--se-ni-wishlist) center / contain no-repeat;
+}
+
+html.se-store .se-nav-btn[data-se-own="cart"] .se-nav-btn__icon {
+  -webkit-mask-image: var(--se-ni-cart);
+  mask-image: var(--se-ni-cart);
+}
+
+/* Count bubble pinned to the top-right corner, ringed so it reads on the capsule. */
+html.se-store .se-nav-btn__count {
+  position: absolute;
+  top: -4px;
+  right: -7px;
+  box-sizing: border-box;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-accent);
+  color: var(--se-on-accent);
+  font-size: var(--se-fs-xs);
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 2px var(--se-surface);
+  pointer-events: none;
+}
+
+html.se-store .se-nav-btn__count[hidden] {
+  display: none;
+}
+
+/* ---------- Dropdown panel: its own surface (the band behind it is transparent now) ---------- */
+
+/*
+ * The surface spans exactly the capsule. shared/nav.js measures the capsule's offset in the
+ * band (--se-nav-bar-x) and the content width that leaves after this box's own padding
+ * (--se-nav-panel-w), so Steam's box-sizing and fixed panel height stay untouched.
+ */
+/*
+ * The panel's outer box spans the whole band width; Steam paints it (dark wash + blur), which
+ * showed as a dark slab beside the dropdown. Only the inner surface (below) is drawn.
+ */
+html.se-store [data-se-nav="panel"] {
+  margin-top: 8px !important;
+  background: transparent !important;
+  border: 0 !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/*
+ * Steam sizes the panel's inner boxes for its own full-width layout; at the capsule's width
+ * the content wraps taller, so let them grow. The outer panel keeps Steam's inline height
+ * while it animates open and closed (that's what its slide relies on).
+ */
+html.se-store [data-se-nav="panel"] > div,
+html.se-store [data-se-nav="panel"] > div > div,
+html.se-store [data-se-nav="panel"] > div > div > div {
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* Steam's own fixed-height menu body (Popover, main.css), by its current class too. */
+html.se-store [data-se-nav="band"] .RZQWX-64UNU- {
+  height: auto !important;
+}
+
+html.se-store [data-se-nav="panel"]:not([style*="px"]) {
+  height: auto !important;
+  max-height: none !important;
+}
+
+html.se-store [data-se-nav="panel"] > div {
+  left: 0 !important;
+  right: auto !important;
+  width: var(--se-nav-panel-w, auto) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 0 0 var(--se-nav-bar-x, 0px) !important;
+  padding-inline: 16px !important;  /* Steam pads it out to the page width; the capsule is that width already */
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg) !important;
+  overflow: hidden;
+}
+
+/* ---------- Panel contents (data-se-p roles from shared/nav.js) ---------- */
+
+html.se-store {
+  --se-menu-ring: inset 0 0 0 1px var(--se-hairline);
+  --se-menu-ring-hi: inset 0 0 0 1px rgba(255, 255, 255, .14);
+  --se-menu-scrim: linear-gradient(180deg, transparent 35%, rgba(8, 10, 14, .85) 100%);
+  --se-menu-sale: #a4d007;
+}
+
+html.se-store [data-se-p="heading"] {
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 600 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store [data-se-p="rule"] {
+  height: 1px !important;
+  border: 0 !important;
+  background: var(--se-divider) !important;
+}
+
+/* Plain text links: muted, lighting up into a pill. */
+html.se-store [data-se-p="link"] {
+  margin-inline: -10px !important;
+  padding: 5px 10px !important;
+  border-radius: var(--se-radius-sm) !important;
+  color: var(--se-text-muted) !important;
+  text-decoration: none !important;
+  transition: color var(--se-dur-fast), background-color var(--se-dur-fast);
+}
+
+html.se-store [data-se-p="link"]:is(:hover, :focus-visible) {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+  outline: none;
+}
+
+/* Every tile: rounded, hairline ring, lifts on hover. */
+html.se-store :is([data-se-p="art"], [data-se-p="stage"], [data-se-p="icon"], [data-se-p="row"], [data-se-p="button"], [data-se-p="mosaic"]) {
+  position: relative !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  box-shadow: var(--se-menu-ring) !important;
+  text-decoration: none !important;
+  isolation: isolate;
+  transition: transform var(--se-dur) var(--se-ease), box-shadow var(--se-dur), background-color var(--se-dur-fast);
+}
+
+html.se-store :is([data-se-p="art"], [data-se-p="stage"], [data-se-p="icon"], [data-se-p="button"], [data-se-p="mosaic"]):is(:hover, :focus-visible) {
+  transform: translateY(-2px);
+  box-shadow: var(--se-menu-ring-hi), var(--se-shadow-md) !important;
+  outline: none;
+}
+
+/* Art tiles: dark stage, artwork zooms gently, bottom scrim for the label. */
+html.se-store [data-se-p="art"] {
+  background-color: var(--se-surface-2) !important;
+}
+
+html.se-store [data-se-p="art"] img {
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-store [data-se-p="art"]:hover img {
+  transform: scale(1.04);
+}
+
+html.se-store [data-se-p="art"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--se-menu-scrim);
+  pointer-events: none;
+}
+
+/* Hardware: product photos on dark stages with a soft colour glow, label on a scrim. */
+html.se-store [data-se-p="stage"] {
+  --se-glow: #ff6f7d;
+  background:
+    radial-gradient(70% 60% at 50% 38%, color-mix(in srgb, var(--se-glow) 30%, transparent), transparent 70%),
+    var(--se-surface-2) !important;
+}
+
+html.se-store [data-se-p="stage"]:nth-child(4n + 2) { --se-glow: #5ab8ff; }
+html.se-store [data-se-p="stage"]:nth-child(4n + 3) { --se-glow: #9bd23c; }
+html.se-store [data-se-p="stage"]:nth-child(4n + 4) { --se-glow: #c47cff; }
+
+html.se-store [data-se-p="stage"] * {
+  background-image: none !important;
+}
+
+html.se-store [data-se-p="stage"] img {
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, .55));
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-store [data-se-p="stage"]:hover img {
+  transform: translateY(-3px) scale(1.03);
+}
+
+/* Steam's white label boxes: dropped, the text sits on the art. */
+html.se-store [data-se-p="label"] {
+  position: relative;
+  z-index: 2;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-white) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, .75);
+}
+
+html.se-store [data-se-p="label"] * {
+  color: inherit !important;
+}
+
+/* Icon tiles (Ways to Play, Special Sections): dark, glyph in a tinted badge. */
+html.se-store [data-se-p="icon"] {
+  background: var(--se-surface-2) !important;
+  background-image: none !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store [data-se-p="icon"]:is(:hover, :focus-visible) {
+  background: var(--se-hover) !important;
+}
+
+html.se-store [data-se-p="icon"] svg {
+  box-sizing: content-box;
+  padding: 10px;
+  border-radius: var(--se-radius-lg);
+  background: color-mix(in srgb, var(--se-accent) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 28%, transparent);
+  color: var(--se-accent) !important;
+  transition: background-color var(--se-dur-fast), transform var(--se-dur) var(--se-ease);
+}
+
+html.se-store [data-se-p="icon"] svg :is(path, circle, rect, polygon) {
+  fill: currentColor !important;
+}
+
+html.se-store [data-se-p="icon"]:hover svg {
+  background: color-mix(in srgb, var(--se-accent) 26%, transparent);
+  transform: scale(1.06);
+}
+
+html.se-store [data-se-p="badge"] {
+  background: none !important;
+}
+
+/* Game rows (recommendations, search results): capsule + text on a quiet tile. */
+html.se-store [data-se-p="row"] {
+  background: var(--se-surface-2) !important;
+}
+
+html.se-store [data-se-p="row"]:is(:hover, :focus-visible) {
+  background: var(--se-hover) !important;
+  outline: none;
+}
+
+html.se-store [data-se-p="row"] img {
+  border-radius: var(--se-radius-sm);
+}
+
+/* Filled text links: tag chips and wide buttons. */
+html.se-store [data-se-p="chip"] {
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-menu-ring) !important;
+  color: var(--se-text-muted) !important;
+  text-decoration: none !important;
+  transition: color var(--se-dur-fast), background-color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-store [data-se-p="chip"]:is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--se-accent) 14%, var(--se-surface-2)) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 40%, transparent) !important;
+  color: var(--se-text) !important;
+  outline: none;
+}
+
+html.se-store :is([data-se-p="button"], [data-se-p="mosaic"]) {
+  background: var(--se-surface-2) !important;
+  background-image: none !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store :is([data-se-p="button"], [data-se-p="mosaic"]):is(:hover, :focus-visible) {
+  background: var(--se-hover) !important;
+}
+
+/* Steam's faint capsule mosaic behind the small Browse rows. */
+html.se-store [data-se-p="mosaic"] img {
+  display: none !important;
+}
+
+/* Blue call-to-action buttons → accent. */
+html.se-store [data-se-p="cta"] {
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-accent) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-store [data-se-p="cta"] * {
+  color: inherit !important;
+}
+
+html.se-store [data-se-p="cta"] svg :is(path, polygon) {
+  fill: currentColor !important;
+}
+
+/* Prices. */
+html.se-store [data-se-p="pct"] {
+  padding: 1px 6px !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: color-mix(in srgb, var(--se-menu-sale) 18%, transparent) !important;
+  color: var(--se-menu-sale) !important;
+  font-weight: 700 !important;
+}
+
+html.se-store [data-se-p="was"] {
+  color: var(--se-text-faint) !important;
+}
+
+/* Panels: Steam's tinted washes and overlays give way to the theme's surfaces. */
+html.se-store [data-se-nav="panel"] .dUvJZktS6bk- {
+  background: none !important;
+}
+
+html.se-store [data-se-nav="panel"] .YEIG5t1R8UY- {
+  background: linear-gradient(270deg, transparent 20%, var(--se-surface) 85%) !important;
+}
+
+html.se-store [data-se-nav="panel"] .tlx2FXGxPBc- {
+  background: var(--se-menu-scrim) !important;
+}
+
+/*
+ * Category tiles: the row's width shared among its tiles. Steam fixes each tile's width and
+ * spreads them apart (space-between); the art then fills the wider tile.
+ */
+html.se-store:not(#se-none) [data-se-nav="panel"] .eyLJRKegBn0- {
+  justify-content: stretch !important;
+  gap: 12px !important;
+}
+
+html.se-store:not(#se-none) [data-se-nav="panel"] .eyLJRKegBn0- > a {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+html.se-store:not(#se-none) [data-se-nav="panel"] .eyLJRKegBn0- > a > img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  object-fit: cover;
+}
+
+/*
+ * Game rows (menus and search suggestions): the price chip at the row's end, beside the
+ * title. Under the title it made each row taller than Steam's fixed box, which then
+ * spread the rows apart and cut off the last one.
+ */
+html.se-store:not(#se-none) :is([data-se-nav="panel"], .O2jUvAs3OiU-) .QHiQcR8jG10- {
+  align-items: center !important;
+}
+
+html.se-store:not(#se-none) :is([data-se-nav="panel"], .O2jUvAs3OiU-) .QHiQcR8jG10- .cchAfQhDUvE- {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+html.se-store:not(#se-none) :is([data-se-nav="panel"], .O2jUvAs3OiU-) .QHiQcR8jG10- .-sYwJqKAVvw- {
+  min-width: 0;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  white-space: normal !important;
+  line-height: 1.3 !important;
+}
+
+html.se-store:not(#se-none) :is([data-se-nav="panel"], .O2jUvAs3OiU-) .QHiQcR8jG10- .FY3FS-llgYw- {
+  flex: none !important;
+  margin: 0 !important;
+}
+
+/*
+ * Recommended-for-you list: Steam pins each row at 56px and spreads them with
+ * space-between, which leaves wide gaps. Rows share the box's height instead, with a
+ * fixed gap, and the capsule fills its row.
+ */
+html.se-store:not(#se-none) .l8Ot6WpreQ8- {
+  justify-content: flex-start !important;
+  gap: 10px !important;
+}
+
+html.se-store:not(#se-none) .l8Ot6WpreQ8- > .QHiQcR8jG10- {
+  flex: 1 1 0 !important;
+  height: auto !important;
+  min-height: 56px !important;
+  overflow: hidden;
+}
+
+html.se-store:not(#se-none) .l8Ot6WpreQ8- > .QHiQcR8jG10- .Jhq3hD97Ms8- {
+  flex: none !important;
+  align-self: stretch !important;
+  width: auto !important;
+  height: 100% !important;
+  aspect-ratio: 77 / 29;
+}
+
+html.se-store:not(#se-none) .l8Ot6WpreQ8- > .QHiQcR8jG10- .Jhq3hD97Ms8- > img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+/* ---------- Search suggestions ----------
+ * Selectors use Steam's current hashed class names (SteamTracking, Vite build of 2026-11-09, main.css); a Steam
+ * redeploy that renames them needs these refreshed. shared/nav.js pins the box under the field.
+ */
+
+/* Positioner: under the field, at its width, whatever mode Steam's layout is in. */
+html.se-store .ybF-Nf0hQ3w- {
+  position: fixed !important;
+  inset: var(--se-sug-y, 64px) auto auto var(--se-sug-x, 0px) !important;
+  width: var(--se-sug-w, 640px) !important;
+  z-index: 30 !important;
+}
+
+html.se-store .ybF-Nf0hQ3w- .EGZnhUAocxE- {
+  position: static !important;
+}
+
+html.se-store .O2jUvAs3OiU- {
+  gap: 4px !important;
+  max-height: calc(100vh - var(--se-sug-y, 64px) - 16px);
+  overflow-x: hidden; /* never a sideways scrollbar: everything inside wraps or clips */
+  overflow-y: auto;
+  padding: 8px !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg) !important;
+  scrollbar-width: auto !important; /* thin (or any width) drops the theme's bar (core/scrollbars.css) for Chromium's */
+  scrollbar-color: auto !important;
+  animation: se-sug-in var(--se-dur-fast) var(--se-ease);
+}
+
+@keyframes se-sug-in {
+  from { opacity: 0; transform: translateY(-4px); }
+}
+
+html.se-store .O2jUvAs3OiU- .w6F-8HDoxbw- + .w6F-8HDoxbw- {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--se-divider);
+}
+
+html.se-store .O2jUvAs3OiU- .w6F-8HDoxbw- .Lvs2qQJx5Ug- {
+  padding: 2px 8px 6px;
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 600 !important;
+  line-height: 16px !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+html.se-store .O2jUvAs3OiU- .w6F-8HDoxbw- ._6udfJIcyaRc- {
+  gap: 2px !important;
+}
+
+/* Game results: compact rows that light up, capsule art with rounded corners. */
+html.se-store .O2jUvAs3OiU- .QHiQcR8jG10- {
+  height: auto !important;
+  gap: 12px !important;
+  padding: 6px !important;
+  border-radius: var(--se-radius-md) !important;
+  background: transparent !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store .O2jUvAs3OiU- .QHiQcR8jG10-:is(.YwCAkIaJoFI-, :hover, .gpfocus) {
+  background: var(--se-hover) !important;
+}
+
+html.se-store .O2jUvAs3OiU- .QHiQcR8jG10- .Jhq3hD97Ms8- {
+  flex: none;
+  width: 112px !important;
+  overflow: hidden;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2) !important;
+}
+
+html.se-store .O2jUvAs3OiU- .QHiQcR8jG10- .cchAfQhDUvE- .-sYwJqKAVvw- {
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+}
+
+html.se-store .O2jUvAs3OiU- .QHiQcR8jG10- .cchAfQhDUvE- .FY3FS-llgYw- {
+  margin-top: 2px;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+/* Prices: the shared price chip (shared/ui.css). */
+
+/* "Free" (bare text, no widget; shared/nav.js): the same chip, the line itself as its body. */
+html.se-store:not(#se-none) .O2jUvAs3OiU- .QHiQcR8jG10- .cchAfQhDUvE- .FY3FS-llgYw-[data-se-price-text] {
+  box-sizing: border-box;
+  flex: none !important;
+  display: inline-flex !important;
+  align-items: center;
+  height: var(--se-price-h, 32px);
+  margin: 0 !important;
+  padding: 0 12px !important;
+  overflow: visible;
+  border-radius: var(--se-price-radius, 10px);
+  background: var(--se-glass-chip) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  color: var(--se-white) !important;
+  font-size: var(--se-price-size, 14px) !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+}
+
+/*
+ * Recently viewed: a strip of capsule-art tiles (shared/nav.js sets --se-recent-art) under a
+ * heading aligned with the other sections'. Steam's ", " separators are bare text in the block:
+ * the block's font-size is zeroed so they take no room (flex, not grid, where they'd each take
+ * a cell), and the tiles space themselves with margins. A tile without art keeps the name.
+ */
+html.se-store .O2jUvAs3OiU- .YmtQkHMBLzw- {
+  display: flex !important;
+  flex-wrap: wrap;
+  margin: 0 2px; /* tiles' outer edges on the rows' art (6px in), net of their 4px margins */
+  padding: 0 0 4px !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+html.se-store .O2jUvAs3OiU- .YmtQkHMBLzw- > .Lvs2qQJx5Ug- {
+  box-sizing: border-box; /* its own padding inside the row, or it spills past the box */
+  flex: 0 0 calc(100% + 4px);
+  margin: 0 -2px; /* the heading stays in line with the other sections' */
+}
+
+html.se-store .O2jUvAs3OiU- .YmtQkHMBLzw- a.KKRHY2AccFo- {
+  position: relative;
+  flex: 1 1 140px;
+  max-width: calc(25% - 8px);
+  margin: 0 4px 8px;
+  display: flex !important;
+  align-items: flex-end;
+  min-width: 0;
+  aspect-ratio: 231 / 87;
+  padding: 0 10px 7px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-recent-art, none) center / cover no-repeat, var(--se-surface-2) !important;
+  box-shadow: var(--se-menu-ring);
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 700;
+  line-height: 1.25 !important;
+  text-decoration: none !important;
+  transition: box-shadow var(--se-dur-fast), transform var(--se-dur) var(--se-ease), filter var(--se-dur-fast);
+}
+
+/* With art: the picture is the tile, the name is in the tooltip */
+html.se-store .O2jUvAs3OiU- .YmtQkHMBLzw- a.KKRHY2AccFo-[data-se-recent-art=""] {
+  font-size: 0 !important;
+}
+
+/* Without art (bundles, missing capsules): the name on the tile, two lines at most */
+html.se-store .O2jUvAs3OiU- .YmtQkHMBLzw- a.KKRHY2AccFo-:not([data-se-recent-art=""]) {
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  padding: 8px 10px;
+  white-space: normal;
+}
+
+html.se-store .O2jUvAs3OiU- .YmtQkHMBLzw- a.KKRHY2AccFo-:is(:hover, .pvj7AUbIUvA-) {
+  transform: translateY(-1px);
+  box-shadow: var(--se-menu-ring-hi), var(--se-shadow-md);
+  filter: brightness(1.08);
+}
+
+/*
+ * Top genres: art tiles with the label on a scrim, like the Categories menu. The tiles are
+ * .fGs1iLkUXjA- (Steam: 63px, a tiny 10px white caps label centred at the bottom); the art
+ * shows through brighter, under a bottom scrim, with the name in the theme's type.
+ */
+html.se-store .O2jUvAs3OiU- .-s4I8IVD21k- ._6udfJIcyaRc- {
+  gap: 8px !important;
+  padding: 0 2px;
+}
+
+html.se-store .O2jUvAs3OiU- .fGs1iLkUXjA- {
+  box-sizing: border-box;
+  height: 64px !important;
+  padding: 0 14px 11px !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  overflow: hidden;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-menu-ring);
+  text-decoration: none !important;
+  transition: box-shadow var(--se-dur-fast), transform var(--se-dur) var(--se-ease);
+}
+
+html.se-store .O2jUvAs3OiU- .fGs1iLkUXjA-:is(:hover, .pvj7AUbIUvA-) {
+  transform: translateY(-1px);
+  box-shadow: var(--se-menu-ring-hi), var(--se-shadow-md);
+}
+
+html.se-store .O2jUvAs3OiU- .fGs1iLkUXjA- ._0efmIyaYm1o- {
+  background: none !important;
+}
+
+html.se-store .O2jUvAs3OiU- .fGs1iLkUXjA- ._0efmIyaYm1o- > img {
+  opacity: .75 !important;
+}
+
+html.se-store .O2jUvAs3OiU- .fGs1iLkUXjA- ._0efmIyaYm1o- ._2bcxcrdUNdY- {
+  background: var(--se-menu-scrim, linear-gradient(0deg, rgba(10, 12, 16, .92), rgba(10, 12, 16, .2))) !important;
+  opacity: 1 !important;
+}
+
+html.se-store .O2jUvAs3OiU- .fGs1iLkUXjA- ._077DfADYleA- {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border-radius: 0 !important;
+  background: none !important;
+  color: var(--se-white) !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0 !important;
+  text-align: left !important;
+  text-overflow: ellipsis;
+  text-transform: none !important;
+  text-decoration: none !important;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, .75);
+  white-space: nowrap;
+  transform: none !important;
+}
+
+/* Advanced Search: a footer link row. */
+html.se-store .O2jUvAs3OiU- .JhiIqI-S0Js- {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 9px 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store .O2jUvAs3OiU- .JhiIqI-S0Js-::before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  background: currentColor;
+  -webkit-mask: var(--se-ni-search) center / contain no-repeat;
+  mask: var(--se-ni-search) center / contain no-repeat;
+}
+
+html.se-store .O2jUvAs3OiU- .JhiIqI-S0Js-:is(:hover, .pvj7AUbIUvA-) {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store .O2jUvAs3OiU- .XxvfleuvczA- {
+  padding: 6px 8px;
+  color: var(--se-text-muted) !important;
+}
+
+/* Search suggestions surface, found structurally by shared/nav.js (works if classes change). */
+html.se-store [data-se-nav="sug-box"] {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-height: calc(100vh - 120px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 8px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg) !important;
+  scrollbar-width: auto !important; /* thin (or any width) drops the theme's bar (core/scrollbars.css) for Chromium's */
+  scrollbar-color: auto !important;
+}
+
+html.se-store [data-se-nav="sug-box"] [data-se-p="row"] {
+  padding: 6px !important;
+  border-radius: var(--se-radius-md) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html.se-store [data-se-nav="sug-box"] [data-se-p="row"]:is(:hover, :focus-visible) {
+  background: var(--se-hover) !important;
+}
+
+html.se-store [data-se-nav="sug-box"] [data-se-p="row"] img {
+  border-radius: var(--se-radius-sm);
+}
+
+html.se-store [data-se-nav="sug-box"] [data-se-p="link"] {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text-muted) !important;
+}
+
+html.se-store [data-se-nav="sug-box"] [data-se-p="link"]:hover {
+  background: none !important;
+  color: var(--se-accent) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.se-store [data-se-p],
+  html.se-store [data-se-p] img,
+  html.se-store [data-se-p] svg {
+    transition: none !important;
+    transform: none !important;
+  }
+}

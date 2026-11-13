@@ -1,0 +1,702 @@
+/*
+ * Store front tabbed lists: ranked list + spotlight (mockup A). Pairs with front/tabs.js,
+ * which adds the tag chips, dates, badge, "View in store" and "See more" elements and the
+ * data-se-tabs-* tags used here. Steam's own classes (.tab_row_item, .tab_preview and
+ * friends) come from home.js and are stable across store builds.
+ *
+ * Rules use `html.se-store-front:not(#se-none)` for ID-level weight over Steam's home CSS.
+ */
+
+html.se-store-front {
+  --se-tabs-spot-w: clamp(360px, 26vw, 460px);
+  --se-tabs-art-w: 152px;
+  --se-tabs-price-w: 190px;
+  --se-tabs-gap: 24px;
+  --se-tabs-pad: 18px;
+}
+
+/* Steam's backdrop around the whole section: gone, so it sits on the page colour like every other row. */
+html.se-store-front:not(#se-none) :is(.home_tab_section, .home_tab_bg_ctn):has([data-se-tabs]) {
+  background: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+/* ---------- Tabs bar ---------- */
+
+/* One row: tabs, then Top Sellers' options, then "See more" at the far end. */
+html.se-store-front:not(#se-none) [data-se-tabs] .tabs_menu_ctn {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px 20px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 0 20px !important;
+  padding: 0 !important;
+  text-align: start;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .home_tabs_row_ctn {
+  display: inline-flex;
+  flex: none;
+  width: max-content !important;
+  gap: 4px;
+  margin: 0 !important;
+  padding: 4px;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .home_tab_button {
+  display: inline-flex !important;
+  align-items: center;
+  height: 34px;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: transparent !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600;
+  text-transform: none !important;
+  letter-spacing: 0;
+  transition: color var(--se-dur-fast), background-color var(--se-dur-fast);
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .home_tab_button .tab_content {
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .home_tab_button:is(:hover, :focus-visible) {
+  color: var(--se-text) !important;
+  outline: none;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .home_tab_button.active {
+  background: var(--se-selected) !important;
+  color: var(--se-white) !important;
+}
+
+/* Top Sellers' checkboxes sit between the tabs and "See more". */
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_controls_ctn {
+  flex: 0 1 auto;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-sm);
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .topsellers_controls {
+  align-items: center;
+  gap: 16px;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_control {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_control label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--se-text-muted);
+  cursor: pointer;
+  transition: color var(--se-dur-fast);
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_control label:hover {
+  color: var(--se-text);
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_control input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--se-accent);
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .top_sellers_info {
+  display: inline-flex;
+  margin: 0 !important;
+  opacity: .6;
+  transition: opacity var(--se-dur-fast);
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .top_sellers_info:hover {
+  opacity: 1;
+}
+
+html.se-store-front:not(#se-none) .se-tabs__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  margin-left: auto;
+  padding: 0 14px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-base);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--se-dur-fast), background-color var(--se-dur-fast);
+}
+
+html.se-store-front:not(#se-none) .se-tabs__more:not([href]) {
+  display: none;
+}
+
+html.se-store-front:not(#se-none) .se-tabs__more:is(:hover, :focus-visible) {
+  background: var(--se-selected);
+  color: var(--se-white);
+  outline: none;
+}
+
+
+/* The link moved up beside the tabs, so Steam's strip under the list goes. */
+html.se-store-front:not(#se-none) [data-se-tabs][data-se-tabs-more] .home_tab_content :is(.see_more_link, .tab_see_more) {
+  display: none !important;
+}
+
+/* ---------- Columns ---------- */
+
+@media (min-width: 911px) {
+  html.se-store-front:not(#se-none) [data-se-tabs-split] {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) var(--se-tabs-spot-w);
+    align-items: start;
+    gap: var(--se-tabs-gap);
+  }
+
+  html.se-store-front:not(#se-none) [data-se-tabs-split] > :not([data-se-tabs-list], [data-se-tabs-spot]) {
+    grid-column: 1 / -1;
+  }
+
+  html.se-store-front:not(#se-none) [data-se-tabs-list] {
+    float: none !important;
+    width: auto !important;
+    min-width: 0;
+    margin: 0 !important;
+  }
+
+  /* The spotlight runs the list's full height; the badge and button are placed over it. */
+  html.se-store-front:not(#se-none) [data-se-tabs-spot] {
+    position: relative;
+    align-self: stretch;
+    display: flex !important;
+    flex-direction: column;
+    float: none !important;
+    width: auto !important;
+    min-width: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: none !important;
+  }
+}
+
+/* Anything else Steam keeps in the preview column would push the card below the list's top. */
+html.se-store-front:not(#se-none) [data-se-tabs-spot] > :not(#tab_preview_container, .se-tabs__own) {
+  display: none !important;
+}
+
+/* ---------- Ranked rows ---------- */
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_content_items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  counter-reset: se-tabs-rank;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: 16px;
+  height: auto !important;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 8px 12px 8px 8px !important;
+  border-radius: var(--se-radius-lg);
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--se-text);
+  text-decoration: none;
+  counter-increment: se-tabs-rank;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item.focus {
+  background: var(--se-surface-2) !important;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item::before {
+  content: counter(se-tabs-rank);
+  flex: none;
+  width: 28px;
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-xl);
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item.focus::before {
+  color: var(--se-text);
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .tab_item_header {
+  flex: none;
+  float: none !important;
+  width: var(--se-tabs-art-w) !important;
+  height: auto !important;
+  aspect-ratio: 184 / 69;
+  margin: 0 !important;
+  border-radius: var(--se-radius-md);
+  overflow: hidden;
+  background: rgba(0, 0, 0, .25);
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .tab_row_capsule {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  border-radius: 0;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .tab_item_content {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex !important;
+  align-items: center;
+  gap: 16px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .tab_item_col:not(.tab_item_price) {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  float: none !important;
+  width: auto !important;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .tab_item_title {
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Replaced by front/tabs.js's chips and date column. */
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item[data-se-tabs-row] :is(.tab_item_tags, .tab_item_release_date),
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .tab_item_capsule_purchase {
+  display: none !important;
+}
+
+
+
+html.se-store-front:not(#se-none) .se-tabs__date {
+  flex: none;
+  width: 96px;
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-sm);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fixed-width price column, chips flush right: dates and prices line up row to row. */
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .tab_item_price {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  float: none !important;
+  width: var(--se-tabs-price-w) !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .tab_item_purchase {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Upcoming games: Steam's "Pre-Purchase" label, as a small pill over the price chip. */
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .tab_item_purchase [data-se-price] {
+  margin: 0 !important;
+}
+
+/*
+ * Wishlist / owned flag and the "•••" options button: on the art's top corners, so they
+ * cover neither the rank nor the price. The art starts after the row's padding, the rank
+ * column and the gap.
+ */
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item {
+  --se-tabs-art-x: calc(8px + 28px + 16px);
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .ds_flag {
+  position: absolute !important;
+  top: 13px !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: calc(var(--se-tabs-art-x) + 5px) !important;
+  translate: none !important;
+  z-index: 3;
+  max-width: calc(var(--se-tabs-art-w) - 46px);
+  height: auto !important;
+  padding: 3px 8px !important;
+  overflow: hidden;
+  color: var(--se-white) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .06em;
+  line-height: 13px !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .ds_flag.ds_wishlist_flag {
+  color: var(--se-wish) !important;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .ds_flag.ds_owned_flag {
+  color: var(--se-owned) !important;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item.ds_flagged img {
+  opacity: 1 !important;
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .ds_options,
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item:hover > .ds_options {
+  top: 11px !important;
+  right: auto !important;
+  inset-inline-end: auto !important;
+  left: calc(var(--se-tabs-art-x) + var(--se-tabs-art-w) - 35px) !important;
+  padding: 0 !important;
+  transition: opacity var(--se-dur);
+}
+
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .ds_options > div {
+  width: 30px;
+  height: 30px;
+}
+
+/* ---------- Spotlight ---------- */
+
+html.se-store-front:not(#se-none) #tab_preview_container {
+  /* The hero's height comes from the card's width (cqw), whatever the video's own size. */
+  container-type: inline-size;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  height: auto !important;
+  min-height: 320px;
+  /* Steam pads the container's top, which pushed the card's content below the list's first row. */
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-xl);
+  overflow: hidden;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+/*
+ * One preview, a grid of rows: the hero (microtrailer, or the first screenshot when there is
+ * none) edge to edge, the details, then the screenshots, which take the rest of the card's
+ * height: the first one wide, the others side by side under it.
+ */
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: auto auto;
+  grid-auto-rows: minmax(96px, 1fr);
+  gap: 14px 8px;
+  margin: 0;
+  padding: 0 var(--se-tabs-pad) 76px !important;
+  overflow: hidden;
+  background: none !important;
+  border-radius: 0;
+}
+
+/* The focused preview fills the card (and sets its height when the list is shorter); the others fade out stacked over it. */
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview.focus {
+  position: relative;
+  inset: auto !important;
+  flex: 1 1 auto;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview > * {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview_video,
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview:not(:has(> .tab_preview_video)) .screenshot:first-child {
+  order: -2;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: block;
+  position: static !important;
+  width: 100cqw !important;
+  max-width: none !important;
+  height: calc(100cqw * 9 / 16) !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 calc(-1 * var(--se-tabs-pad)) !important;
+  border-radius: 0 !important;
+  object-fit: cover;
+  background-color: #000;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview_details {
+  order: -1;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_screenshots_ctn {
+  display: contents;
+}
+
+/* Gallery: the shots after the hero. First one wide (row 3), the rest share row 4. */
+html.se-store-front:not(#se-none) #tab_preview_container .screenshot {
+  grid-column: span 3;
+  grid-row: 4;
+  align-self: stretch;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0;
+  aspect-ratio: auto !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm);
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview:has(> .tab_preview_video) .screenshot:first-child,
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview:not(:has(> .tab_preview_video)) .screenshot:nth-child(2) {
+  grid-column: 1 / -1;
+  grid-row: 3;
+}
+
+/* A lone shot in row 4 takes the whole row. */
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview:has(> .tab_preview_video) .screenshot:nth-child(2):last-child,
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview:not(:has(> .tab_preview_video)) .screenshot:nth-child(3):last-child {
+  grid-column: 1 / -1;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .screenshot.empty {
+  padding: 8px;
+  background: var(--se-on-accent);
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-xs);
+  line-height: 1.3;
+  text-align: center;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .screenshot.empty > div {
+  padding: 0;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_title {
+  display: block;
+  height: auto !important;
+  padding: 0 !important;
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Review summary as a pill, with the row's release date beside it. */
+html.se-store-front:not(#se-none) #tab_preview_container .tab_review_summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  width: auto !important;
+  max-width: 100%;
+  height: 26px;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: 0 11px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill) !important;
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-sm);
+  justify-self: start;
+  align-self: flex-start;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_review_summary .title {
+  display: none;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_review_summary .game_review_summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--se-fs-sm);
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_review_summary .game_review_summary::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+html.se-store-front:not(#se-none) .se-tabs__spot-date {
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-sm);
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview_details:has(.se-tabs__spot-date) {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 10px;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview_details:has(.se-tabs__spot-date) > :not(.tab_review_summary, .se-tabs__spot-date) {
+  grid-column: 1 / -1;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  height: 24px;
+  margin: 0 !important;
+  overflow: hidden;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview .tags:not(:has(> a)) {
+  display: none;
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview .tags > a {
+  color: var(--se-text-dim) !important;
+  transition: color var(--se-dur-fast), background-color var(--se-dur-fast);
+}
+
+html.se-store-front:not(#se-none) #tab_preview_container .tab_preview .tags > a:hover {
+  background: rgba(255, 255, 255, .12) !important;
+}
+
+/* Badge over the hero, and the button pinned to the card's foot. */
+html.se-store-front:not(#se-none) .se-tabs__badge {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  max-width: calc(100% - 28px);
+  padding: 0 10px;
+  backdrop-filter: var(--se-blur-chip);
+  color: var(--se-white);
+  font-size: var(--se-fs-xs);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+html.se-store-front:not(#se-none) .se-tabs__foot {
+  position: absolute;
+  left: var(--se-tabs-pad);
+  right: var(--se-tabs-pad);
+  bottom: var(--se-tabs-pad);
+  z-index: 2;
+  display: flex;
+}
+
+html.se-store-front:not(#se-none) .se-tabs__view {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-accent);
+  color: var(--se-on-accent) !important;
+  font-size: var(--se-fs-md);
+  font-weight: 700;
+  text-decoration: none;
+  transition: filter var(--se-dur-fast);
+}
+
+html.se-store-front:not(#se-none) .se-tabs__view:is(:hover, :focus-visible) {
+  filter: brightness(1.1);
+  outline: none;
+}
+
+
+/* No row focused yet (the preview builds on first hover): hide the overlays. */
+html.se-store-front:not(#se-none) #tab_preview_container[data-se-tabs-idle] ~ :is(.se-tabs__badge, .se-tabs__foot) {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.se-store-front:not(#se-none) [data-se-tabs] :is(.tab_row_item, .home_tab_button),
+  html.se-store-front:not(#se-none) :is(.se-tabs__more, .se-tabs__view) {
+    transition: none;
+  }
+}

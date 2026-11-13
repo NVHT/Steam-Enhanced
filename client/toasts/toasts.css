@@ -1,0 +1,1128 @@
+/*
+ * Stage toasts (client/toasts/toasts.js), in Steam's notificationtoasts_ window.
+ *
+ * A miniature Library Home stage, drawn in the Home stage's style (home-stage.css): a glass
+ * tray, hero art under the stage's grade with a slow push-in, stage-sized numbers and the
+ * green PLAY, the sweep spinner as the countdown, and a strip of the toasts waiting.
+ * Achievements carry the game page's rarity tiers.
+ *
+ * The compact style (end of file, `--se-toasts-style: compact`): Steam's own toast, restyled in
+ * place, on the desktop and in game. Also what an in-game toast falls back to when the overlay
+ * won't place the stage.
+ */
+
+/* ---------- Steam's own toasts: out of sight once they're on the stage ---------- */
+
+[data-se-tst-src] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+html[data-se-tst-on],
+html[data-se-tst-on] body,
+html[data-se-tst-wait],
+html[data-se-tst-wait] body {
+  background: transparent !important;
+}
+
+html[data-se-tst-on] body > :not(#se-tst),
+html[data-se-tst-wait] body > :not(#se-tst) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ---------- Dock and tray ---------- */
+
+#se-tst {
+  --c: var(--se-accent);
+  /* Kind colours with no theme token yet (shared with the notification menu) */
+  --se-tst-violet: var(--se-kind-violet);
+  --se-tst-teal: var(--se-kind-teal);
+  --se-tst-pink: var(--se-kind-pink);
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: var(--se-tst-bottom, 24px);
+  z-index: var(--se-z-max);
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  /* Set by toasts.js only when the window can't be made big enough for the tray. */
+  transform: scale(var(--se-tst-scale, 1));
+  transform-origin: 50% 100%;
+  color: var(--se-text);
+  font-family: var(--se-font);
+}
+
+#se-tst[data-placing] {
+  visibility: hidden;
+}
+
+.se-tst-tray {
+  position: relative;
+  width: 420px; /* BASE_W in toasts.js */
+  box-sizing: border-box;
+  padding: 6px;
+  border-radius: var(--se-radius-xl);
+  /* No backdrop blur: the toast window is transparent, so there is nothing behind to blur */
+  background: rgba(16, 18, 23, .82);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), 0 6px 18px -6px rgba(0, 0, 0, .75);
+  pointer-events: auto;
+  transition: box-shadow .4s ease;
+  /* Drawn at 420 px, scaled as a whole (art, text, buttons, strip) to the size toasts.js sets. */
+  zoom: var(--se-tst-zoom, 1);
+}
+
+.se-tst-tray:not([data-show]) {
+  display: none;
+}
+
+.se-tst-tray[data-show] {
+  animation: se-tst-open .55s cubic-bezier(.2, .9, .25, 1) both;
+}
+
+.se-tst-tray[data-show] .se-tst-stage {
+  animation: se-tst-letter .6s .1s cubic-bezier(.65, 0, .35, 1) both;
+}
+
+.se-tst-tray[data-out] {
+  animation: se-tst-close .42s .22s cubic-bezier(.5, 0, .75, 0) forwards;
+}
+
+.se-tst-tray[data-out] .se-tst-stage {
+  animation: se-tst-letter-out .34s cubic-bezier(.65, 0, .35, 1) forwards;
+}
+
+/* Another toast window took over the stage mid-queue: it appears in place, no rise. */
+.se-tst-tray[data-show][data-instant]:not([data-out]),
+.se-tst-tray[data-show][data-instant]:not([data-out]) .se-tst-stage,
+.se-tst-tray[data-instant][data-queue] .se-tst-strip {
+  animation: none;
+}
+
+.se-tst-layer[data-instant],
+.se-tst-layer[data-instant] .se-tst-ct > * {
+  transition: none !important;
+}
+
+@keyframes se-tst-open {
+  from { opacity: 0; transform: translateY(28px) scale(.96); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes se-tst-close {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(24px) scale(.97); }
+}
+
+@keyframes se-tst-letter {
+  from { clip-path: inset(50% 0 50% 0 round 13px); }
+  to { clip-path: inset(0 0 0 0 round 13px); }
+}
+
+@keyframes se-tst-letter-out {
+  from { clip-path: inset(0 0 0 0 round 13px); }
+  to { clip-path: inset(50% 0 50% 0 round 13px); }
+}
+
+/* ---------- Accents: kind, then rarity tier ---------- */
+
+#se-tst[data-accent="msg"], #se-tst [data-accent="msg"] { --c: var(--se-accent); }
+#se-tst[data-accent="on"], #se-tst [data-accent="on"] { --c: var(--se-online); }
+#se-tst[data-accent="play"], #se-tst [data-accent="play"] { --c: var(--se-running); }
+#se-tst[data-accent="inv"], #se-tst [data-accent="inv"] { --c: var(--se-tst-violet); }
+#se-tst[data-accent="ach"], #se-tst [data-accent="ach"] { --c: var(--se-gold-text); }
+#se-tst[data-accent="dl"], #se-tst [data-accent="dl"] { --c: var(--se-tst-teal); }
+#se-tst[data-accent="shop"], #se-tst [data-accent="shop"] { --c: var(--se-tst-pink); }
+#se-tst[data-accent="sys"], #se-tst [data-accent="sys"] { --c: var(--se-text-dim); }
+#se-tst[data-accent="err"], #se-tst [data-accent="err"] { --c: var(--se-danger-text); }
+
+#se-tst [data-se-tier="legendary"] { --c: var(--se-tier-legendary); --se-tst-aura: 0 0 18px 4px; --se-tst-gl: 34%; }
+#se-tst [data-se-tier="epic"] { --c: var(--se-tier-epic); --se-tst-aura: 0 0 14px 2px; --se-tst-gl: 26%; }
+#se-tst [data-se-tier="rare"] { --c: var(--se-tier-rare); --se-tst-aura: 0 0 10px 1px; --se-tst-gl: 20%; }
+#se-tst [data-se-tier="uncommon"] { --c: var(--se-tier-uncommon); --se-tst-aura: 0 0 6px 0; --se-tst-gl: 14%; }
+#se-tst [data-se-tier="common"] { --c: var(--se-tier-common); --se-tst-aura: 0 0 5px 0; --se-tst-gl: 8%; }
+
+.se-tst-tray[data-se-tier="legendary"] {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent), 0 0 28px -10px color-mix(in srgb, var(--c) 40%, transparent), 0 6px 18px -6px rgba(0, 0, 0, .75);
+}
+
+.se-tst-tray[data-se-tier="epic"] {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent), 0 0 24px -12px color-mix(in srgb, var(--c) 30%, transparent), 0 6px 18px -6px rgba(0, 0, 0, .75);
+}
+
+/* ---------- Stage and layers (crossfade, like the Home stage's art layers) ---------- */
+
+.se-tst-stage {
+  position: relative;
+  height: 124px;
+  border-radius: 13px;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--se-bg);
+}
+
+.se-tst-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  transition: opacity .5s ease;
+}
+
+.se-tst-layer[data-on] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.se-tst-art {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  background: var(--se-surface);
+}
+
+/* ---------- Ambient ground: toasts with no art ---------- */
+
+.se-tst-art[data-ambient] {
+  background: #0f1115; /* the splash's ground */
+}
+
+/* The splash's wireframe Library, lit in the toast's color. */
+.se-tst-wf {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.se-tst-wf-ln {
+  fill: none;
+  stroke: rgba(124, 196, 255, .2);
+  stroke-width: 1;
+}
+
+.se-tst-wf-line {
+  fill: rgba(124, 196, 255, .2);
+}
+
+.se-tst-wf-on {
+  stroke: color-mix(in srgb, var(--c) 75%, transparent);
+}
+
+/* Current rail page and selected game: a tinted tile with an indicator bar, in the toast's color. */
+.se-tst-wf-tint {
+  fill: color-mix(in srgb, var(--c) 12%, transparent);
+  stroke: color-mix(in srgb, var(--c) 40%, transparent);
+  stroke-width: 1;
+}
+
+.se-tst-wf-bar {
+  fill: var(--c);
+}
+
+/* The selection walks down the list. */
+.se-tst-wf-sel {
+  animation: se-tst-wf-sel 7s steps(1) infinite;
+}
+
+@keyframes se-tst-wf-sel {
+  0% { transform: translateY(0); }
+  14% { transform: translateY(11px); }
+  28% { transform: translateY(22px); }
+  42% { transform: translateY(33px); }
+  57% { transform: translateY(44px); }
+  71% { transform: translateY(22px); }
+  85% { transform: translateY(11px); }
+}
+
+/* The hero panel's glow, where the splash has the mark. */
+.se-tst-wf-glow-stop {
+  stop-color: var(--c);
+}
+
+.se-tst-wf-glow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: se-tst-wf-breathe 4s ease-in-out infinite alternate;
+}
+
+@keyframes se-tst-wf-breathe {
+  from { opacity: .35; transform: scale(.85); }
+  to { opacity: .9; transform: scale(1.1); }
+}
+
+/* The cards below it light up in turn. */
+.se-tst-wf-card {
+  animation: se-tst-wf-card 4.5s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 1.5s);
+}
+
+@keyframes se-tst-wf-card {
+  0%, 45%, 100% { stroke: rgba(124, 196, 255, .2); fill: transparent; }
+  15%, 30% { stroke: color-mix(in srgb, var(--c) 80%, transparent); fill: color-mix(in srgb, var(--c) 10%, transparent); }
+}
+
+/* Friends' status rings, as in the splash: green in game, blue online, grey offline. */
+.se-tst-wf-fr {
+  fill: none;
+  stroke-width: 1.2;
+  stroke: rgba(152, 162, 173, .35);
+}
+
+.se-tst-wf-fr[data-st="game"] { stroke: color-mix(in srgb, var(--se-running) 75%, transparent); }
+.se-tst-wf-fr[data-st="on"] { stroke: color-mix(in srgb, var(--se-online) 75%, transparent); }
+
+.se-tst-wf-fr:not([data-st="off"]) {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: se-tst-wf-ring 2.6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -.7s);
+}
+
+@keyframes se-tst-wf-ring {
+  0%, 100% { stroke-opacity: .55; transform: scale(1); }
+  50% { stroke-opacity: 1; transform: scale(1.12); }
+}
+
+/* A light passing over the whole wireframe. */
+.se-tst-wf-light {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 250%;
+  background: linear-gradient(105deg, transparent 40%, color-mix(in srgb, var(--c) 14%, transparent) 50%, transparent 60%);
+  animation: se-tst-pass 5s linear infinite;
+}
+
+/* The light's sweep, moved on the GPU (the same path background-position 150% → -50% took) */
+@keyframes se-tst-pass {
+  from { transform: translateX(-90%); }
+  to { transform: translateX(30%); }
+}
+
+/* Only the toast on stage moves. */
+.se-tst-layer:not([data-on]) :is(.se-tst-wf *, .se-tst-wf-light) {
+  animation-play-state: paused;
+}
+
+/* Thumbs with no art: the same ground, still. */
+.se-tst-thumb:not(:has(img)) {
+  background:
+    radial-gradient(ellipse 80% 120% at 85% 20%, color-mix(in srgb, var(--c) 45%, transparent), transparent 70%),
+    var(--se-sidebar);
+}
+
+
+.se-tst-hero {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  transform: scale(1.04);
+  transform-origin: 70% 40%;
+}
+
+/* A slow push-in over the toast's lifetime. */
+.se-tst-layer[data-on]:not([data-sticky]) .se-tst-hero {
+  animation: se-tst-push var(--se-tst-d, 6000ms) ease-out var(--se-tst-delay, 0ms) forwards;
+}
+
+@keyframes se-tst-push {
+  to { transform: scale(1.14) translate(-2%, -1.5%); }
+}
+
+/* No game art: the friend's avatar as a soft glow. */
+.se-tst-glow {
+  position: absolute;
+  left: 30%;
+  top: -60%;
+  width: 90%;
+  height: 220%;
+  object-fit: cover;
+  filter: blur(28px) saturate(1.4);
+  opacity: .5;
+}
+
+.se-tst-grade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 50% 70% at 92% 0%, rgba(255, 196, 150, .14), transparent 70%),
+    linear-gradient(90deg, rgba(0, 0, 0, .74) 0%, rgba(0, 0, 0, .42) 42%, rgba(0, 0, 0, .04) 78%),
+    radial-gradient(ellipse 90% 95% at 50% 45%, transparent 50%, rgba(0, 0, 0, .45) 100%);
+}
+
+/* Rarity: the corner light takes the tier's color, stronger the rarer it is. */
+.se-tst-layer[data-se-tier] .se-tst-grade {
+  background:
+    radial-gradient(ellipse 60% 95% at 88% 0%, color-mix(in srgb, var(--c) var(--se-tst-gl, 20%), transparent), transparent 70%),
+    linear-gradient(90deg, rgba(0, 0, 0, .74) 0%, rgba(0, 0, 0, .42) 42%, rgba(0, 0, 0, .04) 78%),
+    radial-gradient(ellipse 90% 95% at 50% 45%, transparent 50%, rgba(0, 0, 0, .45) 100%);
+}
+
+.se-tst-layer[data-accent="err"] .se-tst-grade {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, .8), rgba(40, 8, 10, .5) 50%, color-mix(in srgb, var(--se-danger) 12%, transparent)),
+    radial-gradient(ellipse 90% 95% at 50% 45%, transparent 50%, rgba(0, 0, 0, .45) 100%);
+}
+
+/* Legendary (and Mastered): the banner's slow shine. */
+.se-tst-layer[data-on][data-se-tier="legendary"]::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 250%;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 230, 170, .14) 50%, transparent 60%);
+  animation: se-tst-pass 4.5s linear infinite;
+}
+
+/* ---------- Content ---------- */
+
+.se-tst-ct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 16px;
+}
+
+.se-tst-ct > * {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .3s ease, transform .45s var(--se-ease);
+}
+
+.se-tst-layer[data-on] .se-tst-ct > * {
+  opacity: 1;
+  transform: none;
+}
+
+.se-tst-layer[data-on] .se-tst-ct > :nth-child(1) { transition-delay: .3s; }
+.se-tst-layer[data-on] .se-tst-ct > :nth-child(2) { transition-delay: .38s; }
+.se-tst-layer[data-on] .se-tst-ct > :nth-child(3) { transition-delay: .46s; }
+
+.se-tst-tile {
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--se-radius-ml);
+  display: grid;
+  place-items: center;
+  /* Opaque enough to hold on the art without a nested backdrop blur */
+  background: rgba(16, 18, 23, .78);
+  color: var(--c);
+  box-shadow: 0 10px 22px -8px rgba(0, 0, 0, .85), inset 0 0 0 1px rgba(255, 255, 255, .14);
+}
+
+.se-tst-tile > svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Presence: an outline round the avatar, a gap of the tray's glass between. */
+.se-tst-tile[data-presence] {
+  --se-tst-status: var(--se-online);
+  box-shadow: 0 0 0 2px rgba(16, 18, 23, .9), 0 0 0 4px var(--se-tst-status), 0 10px 22px -8px rgba(0, 0, 0, .85);
+}
+
+.se-tst-tile[data-presence="ingame"] {
+  --se-tst-status: var(--se-running);
+}
+
+.se-tst-tile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* Achievement icon: the tier's aura and color, as on the game page. */
+.se-tst-layer[data-se-tier] .se-tst-tile {
+  background: color-mix(in srgb, var(--c) 22%, var(--se-surface));
+  box-shadow: var(--se-tst-aura) color-mix(in srgb, var(--c) 60%, transparent), inset 0 0 0 1px rgba(255, 255, 255, .08);
+}
+
+.se-tst-fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.se-tst-initial {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  font: 800 13px/1 var(--se-font);
+  color: var(--c);
+  text-shadow: 0 0 3px #0b0d10, 0 1px 2px #0b0d10;
+}
+
+/* Four-point sparkles, one per tier rank, placed as in client/game-page/achievements.css. */
+.se-tst-spark {
+  position: absolute;
+  background: var(--c);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  animation: se-tst-twinkle 1.6s ease-in-out infinite;
+}
+
+.se-tst-spark:nth-child(1) { left: -10%; top: -10%; width: 25%; height: 25%; }
+.se-tst-spark:nth-child(2) { left: 83%; top: -12%; width: 19%; height: 19%; animation-duration: 1.95s; animation-delay: .3s; }
+.se-tst-spark:nth-child(3) { left: -10%; top: 77%; width: 17%; height: 17%; animation-duration: 2.3s; animation-delay: .6s; }
+.se-tst-spark:nth-child(4) { left: 42%; top: -17%; width: 15%; height: 15%; animation-duration: 2.65s; animation-delay: .9s; }
+.se-tst-spark:nth-child(5) { left: 90%; top: 29%; width: 15%; height: 15%; animation-duration: 3s; animation-delay: 1.2s; }
+
+@keyframes se-tst-twinkle {
+  0%, 100% { opacity: .25; transform: scale(.6) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(45deg); }
+}
+
+.se-tst-tx {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.se-tst-ey {
+  font: 700 10.5px/13px var(--se-font);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--c);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .8);
+}
+
+.se-tst-tt {
+  font: 800 19px/23px var(--se-font);
+  color: var(--se-text-strong);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-tst-ds {
+  font: 400 13px/17px var(--se-font);
+  color: #d0d7de;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-tst-ds:empty {
+  display: none;
+}
+
+.se-tst-chips {
+  display: flex;
+  gap: 4px;
+}
+
+.se-tst-chips i {
+  padding: 0 6px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-chip);
+  font: 700 11px/18px var(--se-font);
+  font-style: normal;
+  color: var(--c);
+}
+
+.se-tst-rt {
+  flex: none;
+  align-self: flex-end;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.se-tst-rt:empty {
+  display: none;
+}
+
+/* Buttons: PLAY as on the stage, the rest accent or glass. */
+.se-tst-btn {
+  height: 36px;
+  max-width: 150px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  font: 700 13px/36px var(--se-font);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.se-tst-btn:hover {
+  filter: brightness(1.1);
+}
+
+.se-tst-btn:focus-visible,
+.se-tst-sweep:focus-visible,
+.se-tst-thumb:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-tst-btn:disabled {
+  opacity: .45;
+  cursor: default;
+  filter: none;
+}
+
+.se-tst-btn-play {
+  padding: 0 20px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--se-play) 72%, #b6f07a 28%), var(--se-play));
+  box-shadow: inset 0 1px 0 var(--se-white-25), 0 12px 26px -10px var(--se-play-glow);
+  color: var(--se-text-strong);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.se-tst-btn-acc {
+  background: var(--se-accent);
+  box-shadow: 0 12px 26px -12px var(--se-accent-strong);
+  color: var(--se-bg-ink);
+}
+
+.se-tst-btn-glass {
+  background: var(--se-white-10);
+  box-shadow: inset 0 0 0 1px var(--se-white-14);
+  color: var(--se-text-strong);
+}
+
+.se-tst-stat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.se-tst-stat b {
+  font: 800 26px/1 var(--se-font);
+  /* The tier's color, lifted toward white so even Common's grey reads on bright art. */
+  color: color-mix(in srgb, var(--c) 62%, #fff);
+  /* A tight dark edge first, so the number holds on bright art; then the soft lift. */
+  text-shadow: 0 0 2px rgba(0, 0, 0, .9), 0 1px 3px rgba(0, 0, 0, .85), 0 2px 18px rgba(0, 0, 0, .6);
+}
+
+.se-tst-stat small {
+  font-size: .55em;
+  font-weight: 600;
+  color: #d0d7de;
+}
+
+.se-tst-pill {
+  padding: 2px 9px;
+  border-radius: var(--se-radius-pill);
+  background: color-mix(in srgb, var(--c) 18%, rgba(12, 14, 18, .78));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent);
+  color: var(--c);
+  font: 600 11.5px/14px var(--se-font);
+  font-style: normal;
+}
+
+/* A soft dark pool right behind the stat, so it holds on any art. */
+.se-tst-stat::before {
+  content: "";
+  position: absolute;
+  inset: -18px -22px -14px -30px;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(8, 10, 14, .82), rgba(8, 10, 14, .5) 60%, transparent);
+  pointer-events: none;
+}
+
+/* ---------- Sweep countdown: the theme's spinner; on hover, the close button ---------- */
+
+.se-tst-sweep {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(16, 18, 23, .78);
+  color: var(--c);
+  cursor: pointer;
+}
+
+.se-tst-ring {
+  position: absolute;
+  inset: 0;
+  width: 30px;
+  height: 30px;
+  transform: rotate(-90deg);
+}
+
+.se-tst-ring circle {
+  fill: none;
+  stroke-width: 2.5;
+}
+
+.se-tst-trk {
+  stroke: rgba(255, 255, 255, .12);
+}
+
+.se-tst-arc {
+  stroke: var(--c);
+  stroke-dasharray: 84.8;
+  stroke-dashoffset: 84.8;
+  stroke-linecap: round;
+}
+
+.se-tst-lead {
+  position: absolute;
+  inset: 0;
+}
+
+.se-tst-lead::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -1px;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: #eaf6ff;
+  box-shadow: 0 0 6px 1px var(--c);
+}
+
+.se-tst-layer[data-on] .se-tst-arc {
+  animation: se-tst-fill var(--se-tst-d, 6000ms) linear var(--se-tst-delay, 0ms) forwards;
+}
+
+.se-tst-layer[data-on] .se-tst-lead {
+  animation: se-tst-spin var(--se-tst-d, 6000ms) linear var(--se-tst-delay, 0ms) forwards;
+}
+
+/* Until handled: a full, quieter ring and no lead. */
+.se-tst-layer[data-sticky] .se-tst-arc {
+  animation: none;
+  stroke-dashoffset: 0;
+  stroke-opacity: .5;
+}
+
+.se-tst-layer[data-sticky] .se-tst-lead {
+  display: none;
+}
+
+.se-tst-kdot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c);
+  transition: opacity var(--se-dur) ease-out;
+}
+
+.se-tst-x {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  color: var(--se-text-strong);
+  opacity: 0;
+  transition: opacity var(--se-dur) ease-out;
+}
+
+.se-tst-sweep:is(:hover, :focus-visible) .se-tst-kdot { opacity: 0; }
+.se-tst-sweep:is(:hover, :focus-visible) .se-tst-x { opacity: 1; }
+
+@keyframes se-tst-fill {
+  from { stroke-dashoffset: 84.8; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes se-tst-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Hovering the tray pauses everything that counts down. */
+.se-tst-tray:hover .se-tst-layer[data-on] :is(.se-tst-arc, .se-tst-lead, .se-tst-hero),
+.se-tst-tray:hover .se-tst-thumb[data-on]::after {
+  animation-play-state: paused;
+}
+
+/* ---------- Strip: the queue, like the Home stage's game strip ---------- */
+
+.se-tst-strip {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px 2px;
+}
+
+.se-tst-tray[data-queue] .se-tst-strip {
+  display: flex;
+  animation: se-tst-strip .35s var(--se-ease) both;
+}
+
+@keyframes se-tst-strip {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.se-tst-thumb {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: color-mix(in srgb, var(--c) 30%, var(--se-surface));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+  cursor: pointer;
+  transition: transform .25s cubic-bezier(.3, 1.4, .6, 1), box-shadow .2s;
+}
+
+/* A long queue shows its next 8; the count beside them says how many are waiting. */
+.se-tst-thumb:nth-of-type(n + 9) {
+  display: none;
+}
+
+.se-tst-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.se-tst-thumb:hover {
+  transform: translateY(-2px);
+}
+
+.se-tst-thumb[data-on] {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 2px var(--c);
+}
+
+.se-tst-thumb[data-on]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--c);
+  transform-origin: left;
+  animation: se-tst-thumb var(--se-tst-d, 6000ms) linear var(--se-tst-delay, 0ms) forwards;
+}
+
+.se-tst-thumb[data-sticky]::after {
+  animation: none;
+}
+
+@keyframes se-tst-thumb {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.se-tst-pos {
+  margin-left: auto;
+  font: 700 11.5px/1 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+/* ---------- Reduced motion: fades only (the close still ends, so the tray still clears) ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .se-tst-tray[data-show],
+  .se-tst-tray[data-show] .se-tst-stage,
+  .se-tst-tray[data-queue] .se-tst-strip {
+    animation-duration: .15s;
+    animation-delay: 0s;
+  }
+
+  @keyframes se-tst-open { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes se-tst-letter { from { clip-path: none; } to { clip-path: none; } }
+
+  .se-tst-tray[data-out] {
+    animation: se-tst-close .15s linear forwards;
+  }
+
+  .se-tst-tray[data-out] .se-tst-stage {
+    animation: none;
+  }
+
+  .se-tst-layer[data-on] .se-tst-hero,
+  .se-tst-wf *,
+  .se-tst-wf-light,
+  .se-tst-spark,
+  .se-tst-layer[data-on]::after {
+    animation: none !important;
+  }
+
+  .se-tst-ct > *,
+  .se-tst-layer[data-on] .se-tst-ct > * {
+    transform: none;
+    transition-delay: 0s !important;
+  }
+}
+
+/* ---------- Compact style ---------- */
+
+/*
+ * Steam keeps its toast window where and how big it made it, so the toast is styled in place:
+ * the tray's glass, an accent wash from the art side, the kind's eyebrow and glyph (toasts.js),
+ * and a countdown on Steam's own --toast-duration. Scoped to <html> carrying data-se-tst-compact,
+ * which only toasts.js sets, and only once the toast has been read.
+ */
+html[data-se-tst-compact] { --c: var(--se-accent); }
+html[data-se-tst-compact="on"] { --c: var(--se-online); }
+html[data-se-tst-compact="play"] { --c: var(--se-running); }
+html[data-se-tst-compact="inv"] { --c: var(--se-kind-violet); }
+html[data-se-tst-compact="ach"] { --c: var(--se-gold-text); }
+html[data-se-tst-compact="dl"] { --c: var(--se-kind-teal); }
+html[data-se-tst-compact="shop"] { --c: var(--se-kind-pink); }
+html[data-se-tst-compact="sys"] { --c: var(--se-text-dim); }
+html[data-se-tst-compact="err"] { --c: var(--se-danger-text); }
+
+/*
+ * The card. Steam stacks its toast windows edge to edge and sizes each to its toast: the card is
+ * inset 3 px top and bottom inside its window, so stacked cards sit 6 px apart. The Stage tray's
+ * radius, so both styles share one corner.
+ */
+html[data-se-tst-compact] .DesktopToastPopup {
+  position: relative;
+  box-sizing: border-box;
+  height: calc(100vh - 6px) !important;
+  margin: 3px 0 !important;
+  overflow: hidden;
+  border-radius: var(--se-radius-xl) !important;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--c) 20%, transparent), transparent 58%),
+    rgba(16, 18, 23, .94) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08) !important;
+  font-family: var(--se-font), 'Motiva Sans', sans-serif !important;
+}
+
+/* Steam's Steam-logo watermark: the wash replaces it. */
+html[data-se-tst-compact] .DesktopToastBackground {
+  display: none !important;
+}
+
+/*
+ * Steam's layers inside the card carry their own background and a smaller radius, which showed
+ * at some corners: they're made clear and follow the card's corner.
+ */
+html[data-se-tst-compact] .DesktopToastPopup > :not(.DesktopToastBackground),
+html[data-se-tst-compact] .DesktopToastPopup :is(.StandardTemplateContainer, .DesktopToastTemplate):not(#se-none) {
+  border-radius: inherit !important;
+}
+
+html[data-se-tst-compact] .DesktopToastPopup :is(.StandardTemplateContainer, .DesktopToastTemplate):not(#se-none) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+}
+
+/*
+ * Layout. Steam's window is only as tall as its own toast and the eyebrow adds a line: the
+ * template is laid out to the card's height, the tile kept to fit, and the lines set tight so a
+ * three-line toast (a friend request: name, who, "is awaiting your response") fits whole.
+ */
+html[data-se-tst-compact] .DesktopToastTemplate:not(#se-none) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+  height: 100% !important;
+  padding: 0 12px 0 9px !important;
+}
+
+/*
+ * The art or avatar tile. Steam gives the image inside the same readable class, so the tile is
+ * the container only. Its ring takes a friend's presence colour (below), otherwise the accent.
+ */
+html[data-se-tst-compact] .StandardLogoDimensions:not(img):not(#se-none) {
+  flex: none !important;
+  width: min(46px, calc(100vh - 24px)) !important;
+  height: min(46px, calc(100vh - 24px)) !important;
+  margin: 0 !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  outline: 0 !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .08),
+    0 0 0 1px var(--se-tst-cmp-ring, color-mix(in srgb, var(--c) 35%, transparent)) !important;
+}
+
+html[data-se-tst-compact] .StandardLogoDimensions > :not(#se-none) {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: inherit !important;
+  box-shadow: none !important;
+  object-fit: cover;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/*
+ * Friend avatars, as everywhere else in the theme: Steam's presence bar is hidden, whether it's
+ * drawn beside the tile (an empty AvatarStatus element, a pseudo-element) or inside an avatar
+ * holder (the status elements library.css hides), and the tile's ring shows presence instead.
+ */
+html[data-se-tst-compact] :is(.StandardLogoDimensions, .DesktopToastTemplate)::before,
+html[data-se-tst-compact] :is(.StandardLogoDimensions, .DesktopToastTemplate)::after,
+html[data-se-tst-compact] .DesktopToastTemplate > :is(.AvatarStatus, ._1iutOH026zK2dbpsMFDmMm),
+html[data-se-tst-compact] .DesktopToastTemplate > :empty:not(img, .StandardLogoDimensions),
+html[data-se-tst-compact] .StandardLogoDimensions :is(
+  .avatarStatus,
+  .AvatarStatus,
+  ._3pbKzT087jaL2EeQO1qsaR,
+  ._3xUpb5DWXPFNcHHIcv-9pe,
+  ._1_sHcxv9rQdANehiviVZR4 > div:empty,
+  .nibodjvvrm86uCfnnAn4g > div:empty
+):not(#se-none) {
+  display: none !important;
+}
+
+html[data-se-tst-compact] .StandardLogoDimensions :is(.avatarHolder, .AvatarHolder, ._1_sHcxv9rQdANehiviVZR4):not(#se-none) {
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html[data-se-tst-compact] .StandardLogoDimensions :is(.avatarHolder, .AvatarHolder, ._1_sHcxv9rQdANehiviVZR4) img:not([class*="AvatarFrame"]) {
+  border-radius: var(--se-radius-md) !important;
+}
+
+html[data-se-tst-compact] .StandardLogoDimensions:not(img):has(:is(.online, .Online)),
+html[data-se-tst-compact] .DesktopToastTemplate:has(> .AvatarStatus:is(.online, .Online)) > .StandardLogoDimensions:not(img) {
+  --se-tst-cmp-ring: var(--se-online);
+}
+
+html[data-se-tst-compact] .StandardLogoDimensions:not(img):has(:is(.ingame, .inGame, .InGame, ._2K3Q_r66P06VLgIPo-DYsv)),
+html[data-se-tst-compact] .DesktopToastTemplate:has(> .AvatarStatus:is(.ingame, .inGame, .InGame, ._2K3Q_r66P06VLgIPo-DYsv)) > .StandardLogoDimensions:not(img) {
+  --se-tst-cmp-ring: var(--se-running);
+}
+
+html[data-se-tst-compact] .StandardLogoDimensions:not(img):has(:is(.offline, .Offline)),
+html[data-se-tst-compact] .DesktopToastTemplate:has(> .AvatarStatus:is(.offline, .Offline)) > .StandardLogoDimensions:not(img) {
+  --se-tst-cmp-ring: var(--se-text-faint);
+}
+
+html[data-se-tst-compact] .StandardLogoDimensions:not(img):has(.awayOrSnooze),
+html[data-se-tst-compact] .DesktopToastTemplate:has(> .AvatarStatus:is(.awayOrSnooze, .away, .snooze)) > .StandardLogoDimensions:not(img) {
+  --se-tst-cmp-ring: color-mix(in srgb, var(--se-online) 45%, transparent);
+}
+
+/* ---------- Compact style: text ---------- */
+
+html[data-se-tst-compact] .Content:not(#se-none) {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 14px !important;
+}
+
+html[data-se-tst-compact] .Content :is(.Header, .Body) {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* The eyebrow carries the kind's glyph (Steam's header icon would repeat it); a message toast's
+   header is empty, its name lives in its Body. */
+html[data-se-tst-compact] .Header .Icon,
+html[data-se-tst-compact] .Header:empty {
+  display: none !important;
+}
+
+.se-tst-cmp-ey {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 1px;
+  color: var(--c);
+  font: 700 9.5px/11px var(--se-font), 'Motiva Sans', sans-serif;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.se-tst-cmp-gl {
+  flex: none;
+  width: 12px;
+  height: 12px;
+}
+
+/* Title and line; message toasts use their own Body (the friend's name, the message). */
+html[data-se-tst-compact] :is(.Title, .GroupMessageUserName, .StandardNotificationDescription, .GroupMessageBody) {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+html[data-se-tst-compact] :is(.Title, .GroupMessageUserName) {
+  color: var(--se-text-strong) !important;
+  font: 600 13px/16px var(--se-font), 'Motiva Sans', sans-serif !important;
+}
+
+html[data-se-tst-compact] :is(.StandardNotificationDescription, .GroupMessageBody) {
+  margin: 0 !important;
+  color: var(--se-text-dim) !important;
+  font: 400 12px/14px var(--se-font), 'Motiva Sans', sans-serif !important;
+}
+
+/* Any further line Steam adds (a request's "is awaiting your response") */
+html[data-se-tst-compact] .Content > :not(.se-tst-cmp-ey, .Header, .Body, .StandardNotificationDescription) {
+  overflow: hidden;
+  margin: 0 !important;
+  color: var(--se-text-faint) !important;
+  font: 400 11.5px/14px var(--se-font), 'Motiva Sans', sans-serif !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+html[data-se-tst-compact] .GroupMessageIcon {
+  width: 12px !important;
+  height: 12px !important;
+  margin-inline-end: 4px !important;
+  color: var(--se-text-faint) !important;
+  vertical-align: -1px;
+}
+
+/* Countdown: drains over Steam's own display time, so it ends as Steam closes the toast. */
+html[data-se-tst-compact] .DesktopToastPopup::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 2px;
+  background: var(--c);
+  transform-origin: left center;
+  animation: se-tst-cmp-drain var(--toast-duration, 5000ms) linear forwards;
+}
+
+@keyframes se-tst-cmp-drain {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-se-tst-compact] .DesktopToastPopup::after {
+    animation: none;
+    opacity: .6;
+  }
+}

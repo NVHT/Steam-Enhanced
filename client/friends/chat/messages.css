@@ -1,0 +1,414 @@
+/*
+ * Chat › the log: speaker lines, messages, reactions, media, day and unread lines.
+ * Chat styles load in order: tabs, header, messages, input, voice, members, icons, groups.
+ */
+
+/*
+ * The owner's crown (Steam's rankIcon, first in the speaker line, its glyph pinned 5 px up and
+ * left of an empty box, so it fell under the name): a small gold crown after the name
+ */
+.multiChatDialog[data-se-chat] .ChatSpeaker .speakerHoverArea {
+  gap: 6px;
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker .speakerHoverArea > .speakerName {
+  order: 1;
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker .speakerHoverArea > .rankIcon {
+  order: 2;
+  position: relative !important;
+  flex: none;
+  align-self: center;
+  display: flex;
+  width: 14px;
+  height: 14px;
+  margin: 0 !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker .rankIcon > * {
+  position: static !important;
+  width: 14px !important;
+  height: 14px !important;
+  margin: 0 !important;
+  background: none !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker .rankIcon .SVGIcon_Crown,
+.multiChatDialog[data-se-chat] .ChatSpeaker .rankIcon .SVGIcon_Crown * {
+  fill: var(--se-gold) !important;
+  stroke: none !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker .speakerName .playerNickname {
+  font-weight: 500;
+  color: var(--se-text-faint) !important;
+}
+
+/* Your own name in blue */
+.multiChatDialog[data-se-chat] .ChatMessageBlock:has(.isCurrentUser) .speakerName {
+  color: var(--se-accent) !important;
+}
+
+.multiChatDialog[data-se-chat] .speakerTimeStamp {
+  margin: 0 !important;
+  font: 500 11.5px/1.4 var(--se-font), sans-serif !important;
+  color: var(--se-text-faint) !important;
+  opacity: 1 !important;
+}
+
+/* The lines */
+.multiChatDialog[data-se-chat] .ChatMessageBlock .msg {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border-radius: 0 !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatMessageBlock ._3qYm9oxf8MdyvQDJgbfCrF:hover /* MsgWithAddons */ {
+  background: none !important;
+}
+
+.multiChatDialog[data-se-chat] .msgText {
+  margin: 0 !important;
+  font: 500 14px/1.5 var(--se-font), sans-serif;
+  color: var(--se-chat-body) !important;
+}
+
+.multiChatDialog[data-se-chat] .msg .msgText > a,
+.multiChatDialog[data-se-chat] .msg .msgText > a:hover {
+  border-bottom: 0 !important;
+  color: var(--se-accent) !important;
+}
+
+.multiChatDialog[data-se-chat] .msg .msgText > a:hover {
+  text-decoration: underline;
+}
+
+/* A line's own time, on hover, in the avatar gutter */
+.multiChatDialog[data-se-chat] .msg .FriendChatTimeStamp {
+  inset-inline-start: calc((var(--se-chat-avatar) + 12px) * -1) !important;
+  top: 0 !important;
+  width: var(--se-chat-avatar) !important;
+  border: 0 !important;
+  background: none !important;
+  font: 500 10px/21px var(--se-font), sans-serif !important;
+  color: var(--se-text-faint) !important;
+  text-align: center !important;
+}
+
+/* React, reply, more: the floating bar over a hovered line, as tiles */
+.multiChatDialog[data-se-chat] ._3qYm9oxf8MdyvQDJgbfCrF ._10OzYaCdn7cgVMec9ozEJG /* Addons */ {
+  top: -22px !important;
+  gap: 2px;
+  padding: 3px !important;
+  border-radius: var(--se-radius-ml) !important;
+  background: var(--se-sidebar) !important;
+  box-shadow: var(--se-shadow-pop) !important;
+}
+
+.multiChatDialog[data-se-chat] ._10OzYaCdn7cgVMec9ozEJG > * {
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-tile-sm) !important;
+  height: var(--se-tile-sm) !important;
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-muted);
+}
+
+.multiChatDialog[data-se-chat] ._10OzYaCdn7cgVMec9ozEJG > :hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.multiChatDialog[data-se-chat] ._10OzYaCdn7cgVMec9ozEJG ._2ovvDFSsxzUoYuqzJsxecQ /* Emoticon */ {
+  width: var(--se-tile-icon) !important;
+  height: var(--se-tile-icon) !important;
+}
+
+/*
+ * React's smiley and More's dots in the theme's icons. Steam draws both with its Emoticon
+ * glyph class, so the button's place decides the icon: the first is the dual-tone face of the
+ * entry bar, the others three dots. Each is a mask in the tile's color; Steam's white glyph
+ * (an <img> or <svg>) is painted out.
+ */
+.multiChatDialog[data-se-chat] ._10OzYaCdn7cgVMec9ozEJG {
+  --se-chat-ico-dots: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='5.5' r='1.9'/%3E%3Ccircle cx='12' cy='12' r='1.9'/%3E%3Ccircle cx='12' cy='18.5' r='1.9'/%3E%3C/svg%3E");
+}
+
+.multiChatDialog[data-se-chat] ._10OzYaCdn7cgVMec9ozEJG > * {
+  --se-chat-addon-ico: var(--se-chat-ico-dots);
+}
+
+.multiChatDialog[data-se-chat] ._10OzYaCdn7cgVMec9ozEJG > :first-child {
+  --se-chat-addon-ico: var(--se-chat-ico-emoticon);
+}
+
+.multiChatDialog[data-se-chat] ._10OzYaCdn7cgVMec9ozEJG ._2ovvDFSsxzUoYuqzJsxecQ {
+  object-position: -9999px 0;
+  background: currentColor !important;
+  -webkit-mask: var(--se-chat-addon-ico) center / contain no-repeat;
+  mask: var(--se-chat-addon-ico) center / contain no-repeat;
+}
+
+.multiChatDialog[data-se-chat] ._10OzYaCdn7cgVMec9ozEJG ._2ovvDFSsxzUoYuqzJsxecQ > * {
+  visibility: hidden !important;
+}
+
+/* A More button drawn without the Emoticon class: its own dots, in the tile's color */
+.multiChatDialog[data-se-chat] ._10OzYaCdn7cgVMec9ozEJG > :not(:first-child, ._2ovvDFSsxzUoYuqzJsxecQ):not(:has(._2ovvDFSsxzUoYuqzJsxecQ)) svg {
+  width: 16px !important;
+  height: 16px !important;
+  fill: currentColor !important;
+  color: inherit !important;
+}
+
+/* Reactions: pills under the line, yours outlined in blue */
+.multiChatDialog[data-se-chat] ._1Ab0f8lGXvkC0tPjkFoYj8 /* MessageReactions */ {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.multiChatDialog[data-se-chat] .UA15KlVbtDSJkqSpIAMIN /* MessageReaction */ {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  margin: 0 !important;
+  padding: 0 8px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-hairline) !important;
+  box-shadow: none !important;
+  font: 700 12px var(--se-font), sans-serif;
+  color: var(--se-text-muted);
+}
+
+/* Steam marks your own reaction only by an inline border color (#8D8E94; others #1B1C20) */
+.multiChatDialog[data-se-chat] .UA15KlVbtDSJkqSpIAMIN[style*="141, 142, 148"] {
+  background: var(--se-accent-tint) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 45%, transparent) !important;
+  color: var(--se-accent);
+}
+
+.multiChatDialog[data-se-chat] .a2_2ffGgB_f8RBwW8D8Rj /* ReactionCount */ {
+  color: inherit !important;
+  font-weight: 700;
+}
+
+/* Images and link previews */
+.multiChatDialog[data-se-chat] .chatImageContainer .BBCodeImageWrapper {
+  background: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatImageContainer :is(.chatImageFull, img.chatImage) {
+  border-radius: var(--se-radius-md) !important;
+}
+
+.multiChatDialog[data-se-chat] .msg :is(div.ChatMessageOpenGraph, div.SteamPublishedFile, .ChatMessageSteamStore) {
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07) !important;
+}
+
+/* Invites (game, group, voice): a card in the log, Join as the accent button */
+.multiChatDialog[data-se-chat] .ChatMessageInvite {
+  max-width: 420px !important;
+  min-width: 0 !important;
+  margin: 8px 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07) !important;
+  color: var(--se-text-muted) !important;
+  font-family: var(--se-font), sans-serif !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatMessageInvite .leftInviteContainer {
+  background: none !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatMessageInvite .groupName {
+  font: 700 14px/1.35 var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  color: var(--se-text) !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatMessageInvite .inviteLabel {
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color) !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatMessageInvite .inviteButton,
+.multiChatDialog[data-se-chat] .ChatMessageInvite .DialogButton {
+  min-height: var(--se-control-h) !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-hairline) !important;
+  box-shadow: none !important;
+  font: 700 13px var(--se-font), sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  color: var(--se-text) !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatMessageInvite .inviteButtonJoinChat,
+.multiChatDialog[data-se-chat] .ChatMessageInvite .acceptGameInviteButton,
+.multiChatDialog[data-se-chat] .ChatMessageInvite .inviteButtonJoinVoice {
+  background: var(--se-accent) !important;
+  color: var(--se-bg-ink) !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatMessageInvite .invitedTimeLabel {
+  color: var(--se-text-faint) !important;
+}
+
+/* The day line: thin rules with the label between them */
+.multiChatDialog[data-se-chat] .msg.timeDivision {
+  align-items: center;
+  height: auto !important;
+  margin: 6px 0 10px !important;
+  padding: 0 var(--se-chat-gutter) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color) !important;
+}
+
+.multiChatDialog[data-se-chat] .msg.timeDivision .preHorizDivider,
+.multiChatDialog[data-se-chat] .msg.timeDivision .horizDivider {
+  flex: 1 !important;
+  width: auto !important;
+  height: 1px !important;
+  border: 0 !important;
+  background: rgba(255, 255, 255, .07) !important;
+}
+
+.multiChatDialog[data-se-chat] .msg.timeDivision .preHorizDivider {
+  margin: 0 12px 0 0 !important;
+}
+
+.multiChatDialog[data-se-chat] .msg.timeDivision .horizDivider {
+  margin: 0 0 0 12px !important;
+}
+
+/* The unread line: red, no rule after the label */
+.multiChatDialog[data-se-chat] .msg.timeDivision.new_messages {
+  font-size: 0 !important;
+  color: var(--se-danger) !important;
+}
+
+.multiChatDialog[data-se-chat] .msg.timeDivision.new_messages::after {
+  content: "New";
+  flex: none;
+  margin-inline-start: 12px;
+  font: 800 11px/14px var(--se-font), sans-serif;
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+}
+
+.multiChatDialog[data-se-chat] .msg.timeDivision.new_messages .preHorizDivider {
+  margin: 0 !important;
+  background: color-mix(in srgb, var(--se-danger) 55%, transparent) !important;
+}
+
+.multiChatDialog[data-se-chat] .msg.timeDivision.new_messages .horizDivider {
+  flex: 0 0 0 !important;
+  margin: 0 !important;
+}
+
+/* "time passes" between runs: a quiet 1px divider */
+.multiChatDialog[data-se-chat] .timeDivision.time_passes .preHorizDivider,
+.multiChatDialog[data-se-chat] .timeDivision.time_passes .horizDivider {
+  border: 0 !important;
+  background: var(--se-hairline) !important;
+  margin-inline-start: 0 !important;
+}
+
+/* Native notices in the log ("115 people joined the chat…"): a quiet centered line */
+.multiChatDialog[data-se-chat] .msg.serverMsg .msgText {
+  width: 100%;
+  margin: 2px 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  text-align: center !important;
+  font: 500 12.5px/1.5 var(--se-font), sans-serif !important;
+  color: var(--se-text-faint) !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatMessageBlock:has(> .msg.serverMsg:only-child) {
+  padding-inline-start: var(--se-chat-gutter) !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatMessageBlock:has(> .msg.serverMsg:only-child):hover {
+  background: none !important;
+}
+
+/* "invite another friend" over a one-to-one chat: the theme's tile */
+.multiChatDialog[data-se-chat] .inviteAnotherFriendButton {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-tile-sm) !important;
+  height: var(--se-tile-sm) !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text-muted) !important;
+  cursor: pointer;
+}
+
+.multiChatDialog[data-se-chat] .inviteAnotherFriendButton:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.multiChatDialog[data-se-chat] .inviteAnotherFriendButton svg {
+  width: var(--se-tile-icon) !important;
+  height: var(--se-tile-icon) !important;
+  fill: currentColor !important;
+}
+
+/* typing */
+.multiChatDialog[data-se-chat] .FriendChatTypingNotification::before {
+  content: "";
+  flex: none;
+  display: inline-block;
+  width: 21px;
+  height: 5px;
+  margin-inline-end: 8px;
+  vertical-align: middle;
+  background: radial-gradient(circle at 2.5px 2.5px, var(--se-text-muted) 2.5px, transparent 2.6px) 0 0 / 8px 5px no-repeat, radial-gradient(circle at 2.5px 2.5px, rgba(152, 162, 173, .7) 2.5px, transparent 2.6px) 8px 0 / 8px 5px no-repeat, radial-gradient(circle at 2.5px 2.5px, rgba(152, 162, 173, .4) 2.5px, transparent 2.6px) 16px 0 / 8px 5px no-repeat;
+}
+
+.multiChatDialog[data-se-chat] .FriendChatTypingNotification {
+  width: auto !important;
+  padding: 0 0 6px calc(var(--se-chat-gutter) + 4px) !important;
+  background: none !important;
+  font: 600 12px/18px var(--se-font), sans-serif !important;
+  color: var(--se-text-muted) !important;
+}
+
+/* "new messages" jump bar over the log */
+.multiChatDialog[data-se-chat] .unreadMessageViolator {
+  inset-inline: auto !important;
+  left: 50% !important;
+  width: auto !important;
+  margin: 8px 0 0 !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-danger) !important;
+  box-shadow: var(--se-shadow-card) !important;
+  font: 800 11px/28px var(--se-font), sans-serif !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--se-text-strong) !important;
+  transform: translateX(-50%);
+}

@@ -1,0 +1,863 @@
+/*
+ * Game page › achievements: the card, its rows and icons, tooltips, rarity tiers and the
+ * progress banner.
+ * Game page styles load in order: layout, play-bar, overview, achievements, friends, cards, activity.
+ */
+
+/*
+ * The achievements card. The summary is two columns: a
+ * gold ring with the count (client/game-page/game-page.js sets --se-pct and data-se-count) and,
+ * beside it, "You've unlocked…" over a gold bar. Steam's medal is hidden (the full
+ * ring says the same). Then the latest unlock as an icon with its name, the unlocked
+ * icons, and the locked ones under a quiet label.
+ */
+._2xTb6N-jUUQ-mIkMB6OVMm:not(#se-none) {
+  /* HighlightDiv */
+  display: grid !important;
+  grid-template-columns: 52px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 14px;
+  row-gap: 8px;
+  margin: 4px 0 6px !important;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+._2xTb6N-jUUQ-mIkMB6OVMm::before {
+  content: '';
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: conic-gradient(var(--se-gold) calc(var(--se-pct, 0) * 1%), var(--se-selected) 0);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 6px), #000 calc(100% - 5.5px));
+}
+
+._2xTb6N-jUUQ-mIkMB6OVMm::after {
+  content: attr(data-se-count);
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  justify-self: center;
+  font: 800 12px/1 var(--se-font);
+  color: var(--se-text);
+  white-space: nowrap;
+}
+
+/*
+ * UnlockedLabel, the only piece of Steam's summary left (the rest is hidden below): the line,
+ * then the theme's own gold bar from --se-pct (set by game-page.js), so it no longer depends
+ * on how this Steam build nests its bar and medal.
+ */
+._2xTb6N-jUUQ-mIkMB6OVMm > ._3jC8om-5Sci_dkUB-6VYiU:not(#se-none) {
+  grid-column: 2;
+  grid-row: 1 / span 2 !important;
+  align-self: center !important;
+  display: flex;
+  flex-wrap: wrap !important;
+  justify-content: space-between;
+  gap: 12px;
+  row-gap: 10px !important;
+  margin: 0 !important;
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+._2xTb6N-jUUQ-mIkMB6OVMm > ._3jC8om-5Sci_dkUB-6VYiU ._14kZVEyaz7WX57N47z4Yr1 {
+  color: var(--se-text-muted) !important;
+  font-weight: 600;
+}
+
+._2xTb6N-jUUQ-mIkMB6OVMm > :not(._3jC8om-5Sci_dkUB-6VYiU):not(#se-none),
+._2xTb6N-jUUQ-mIkMB6OVMm ._3-Mt5LIsZO10peYvp8gXHa {
+  /* Everything but the line, and the DLC sets wherever this build puts them */
+  display: none !important;
+}
+
+._2xTb6N-jUUQ-mIkMB6OVMm > ._3jC8om-5Sci_dkUB-6VYiU::after {
+  content: '';
+  flex: 0 0 100%;
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--se-gold), var(--se-gold-light)) 0 0 / calc(var(--se-pct, 0) * 1%) 100% no-repeat, var(--se-selected);
+}
+
+/* The latest unlock */
+._1j_gja8bHXjiS-BeSQk8hb:not(#se-none) {
+  /* Featured */
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px;
+  margin: 12px 0 10px !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+._1j_gja8bHXjiS-BeSQk8hb .zcasgBSVIteabq-j_3g1m:not(#se-none) {
+  flex: none;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: var(--se-radius-sm);
+  overflow: hidden;
+  margin: 0 !important;
+}
+
+._1j_gja8bHXjiS-BeSQk8hb ._1s_9cSxUjb4609MSH0EjWH:not(#se-none) {
+  padding: 0 !important;
+}
+
+._1j_gja8bHXjiS-BeSQk8hb ._39Y01uSRcLiDg5DneTTR0m:not(#se-none) {
+  margin: 0 0 2px !important;
+  font: 700 13.5px/1.3 var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+._1j_gja8bHXjiS-BeSQk8hb ._2gLHbXukQBdrIKhqEYVvOe:not(#se-none) {
+  font: 500 12.5px/1.4 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+/* Icon rows: rounded, a little gap */
+._1rvHQ_ELBAWYmrssg3iNZE:not(#se-none) {
+  gap: 6px !important;
+}
+
+._1rvHQ_ELBAWYmrssg3iNZE img {
+  border-radius: var(--se-radius-sm) !important;
+}
+
+._1rvHQ_ELBAWYmrssg3iNZE ._2gISWIeEzZ9PNuAzVuMaWd:not(#se-none) {
+  /* Remainder "+66" */
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) !important;
+  font: 700 13px var(--se-font) !important;
+  color: var(--se-text-dim) !important;
+}
+
+/* Locked: a quiet label and a 1px divider above */
+._3ca11X3AK6npLS3emMa5Lr:not(#se-none) {
+  margin-top: 14px !important;
+  padding-top: 12px !important;
+  border: 0 !important;
+  box-shadow: inset 0 1px 0 var(--se-hairline);
+}
+
+._3ca11X3AK6npLS3emMa5Lr .uoFNFZ7Hs5cF1IjP2fvPw:not(#se-none) {
+  margin-bottom: 8px !important;
+  font: 600 12px var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+/*
+ * The icon rows. This Steam build draws them with its "additional items"
+ * row (Additional > InnerContainer > ItemWrapper, the last one the "+N" remainder).
+ * Every icon and the "+N" get the same rounded corners as the latest-unlock icon,
+ * without Steam's gold glow.
+ */
+[data-se-sec="achievements"] ._2H_ytAwp5tfeou0kdWjLl4:not(#se-none) {
+  /* ItemWrapper */
+  border-radius: var(--se-radius-sm) !important;
+  overflow: hidden !important;
+}
+
+[data-se-sec="achievements"] ._2H_ytAwp5tfeou0kdWjLl4 *:not(#se-none) {
+  border-radius: var(--se-radius-sm) !important;
+  box-shadow: none !important;
+}
+
+[data-se-sec="achievements"] .lZ2c49vTWJ60klQOY9l2K:not(#se-none),
+[data-se-sec="achievements"] ._2gISWIeEzZ9PNuAzVuMaWd:not(#se-none) {
+  /* RemainderContainer, Remainder: "+N" */
+  border-radius: var(--se-radius-sm) !important;
+  border: 0 !important;
+  background: var(--se-surface-2) !important;
+}
+
+/*
+ * Custom achievement rows (client/game-page/game-page.js), in place of Steam's short
+ * ones. Rarity is drawn by the tier effects further down (sparkles, aura, letter);
+ * locked icons are dimmed and come up to full color on hover.
+ */
+[data-se-replaced] {
+  display: none !important;
+}
+
+.se-ach-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 12px;
+  /* Visible, so sparkles and auras can spill past the icons; the JS fits the count to the width. */
+  overflow: visible;
+  min-height: 52px;
+  /* Room around the icons for a lifted icon and its sparkles. */
+  margin: -6px 0 4px;
+  padding: 10px 0 8px;
+}
+
+.se-ach-ico,
+.se-ach-more {
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--se-surface-2);
+  font: inherit;
+  transition: transform var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out, filter var(--se-dur) ease-out;
+}
+
+.se-ach-ico img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* The gold edge sits over the image, so it is drawn by ::after (an inset shadow would be hidden) */
+.se-ach-ico::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-gold) 32%, transparent);
+  pointer-events: none;
+}
+
+.se-ach-row[data-locked] .se-ach-ico img {
+  filter: grayscale(1) brightness(.7);
+}
+
+.se-ach-row[data-locked] .se-ach-ico::after {
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-ach-row[data-locked] .se-ach-ico:hover img {
+  filter: none;
+}
+
+.se-ach-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 700 14px var(--se-font);
+  color: var(--se-text-dim);
+}
+
+.se-ach-more:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.se-ach-ico:focus-visible,
+.se-ach-more:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/*
+ * Achievement icons, in the card and in the feed. Steam's rare-achievement glow is gone (the
+ * rotating gold light behind the icons, which showed as gold slivers beside each one); Steam's
+ * own icons get the theme's gold edge, so they match whether or not the theme draws the row.
+ * The image takes the frame's rounding; hover lifts the icon and firms the edge, without glow.
+ */
+:is([data-se-sec="achievements"], [data-se-sec="activity"]) :is(._2HUbCbZUn27MliiC8gRxGB, ._2D_EJk8-jCnfqiwoKkOMVh, ._1Z2eJs9-zNTKcWKy4M-oDE, ._1R1QQtfmrxNkfIGlKSdDqG, .kt0NXHlg2kFjVkiN_2eEL, ._3vFmYitX2pXuOenxR0blk8):not(#se-none) {
+  display: none !important;
+}
+
+:is([data-se-sec="achievements"], [data-se-sec="activity"]) :is(._3s4Rq3jnntBVP7HbJj1RMQ, ._2BCoqu4wd4ehkJkelVhjb3):not(#se-none) {
+  box-shadow: none !important;
+}
+
+/* IconGlow: also on the image itself, so only its light goes */
+[data-se-sec="achievements"] :is(._2HUbCbZUn27MliiC8gRxGB, ._1R1QQtfmrxNkfIGlKSdDqG):not(#se-none),
+[data-se-sec="achievements"] :is(._2HUbCbZUn27MliiC8gRxGB, ._1R1QQtfmrxNkfIGlKSdDqG):not(#se-none)::before,
+[data-se-sec="achievements"] :is(._2HUbCbZUn27MliiC8gRxGB, ._1R1QQtfmrxNkfIGlKSdDqG):not(#se-none)::after {
+  background: none !important;
+  animation: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+:is([data-se-sec="achievements"], [data-se-sec="activity"]) :is(._1fEbX-PfpZ2FhkhttWcm-V, ._1DmdUWkRKPlUYGtbBrrRtx):not(#se-none) {
+  position: relative !important;
+  border-radius: var(--se-radius-md) !important;
+  overflow: hidden !important;
+  transition: transform var(--se-dur) ease-out;
+}
+
+:is([data-se-sec="achievements"], [data-se-sec="activity"]) :is(._1fEbX-PfpZ2FhkhttWcm-V, ._1DmdUWkRKPlUYGtbBrrRtx):not(#se-none)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-gold) 32%, transparent);
+}
+
+:is([data-se-sec="achievements"], [data-se-sec="activity"]) :is(._1fEbX-PfpZ2FhkhttWcm-V, ._1DmdUWkRKPlUYGtbBrrRtx) img:not(#se-none) {
+  border-radius: inherit !important;
+}
+
+[data-se-sec="achievements"] ._2H_ytAwp5tfeou0kdWjLl4:hover :is(._1fEbX-PfpZ2FhkhttWcm-V, ._1DmdUWkRKPlUYGtbBrrRtx):not(#se-none),
+[data-se-sec="activity"] :is(._26QliGU0MSP6WN4r-RtI5q, .PrimaryAchievement):hover :is(._1fEbX-PfpZ2FhkhttWcm-V, ._1DmdUWkRKPlUYGtbBrrRtx):not(#se-none) {
+  transform: translateY(-2px);
+}
+
+[data-se-sec="achievements"] ._3ca11X3AK6npLS3emMa5Lr :is(._1fEbX-PfpZ2FhkhttWcm-V, ._1DmdUWkRKPlUYGtbBrrRtx):not(#se-none)::after {
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-ach-ico:hover::after,
+[data-se-sec="achievements"] ._2H_ytAwp5tfeou0kdWjLl4:hover :is(._1fEbX-PfpZ2FhkhttWcm-V, ._1DmdUWkRKPlUYGtbBrrRtx):not(#se-none)::after,
+[data-se-sec="activity"] :is(._26QliGU0MSP6WN4r-RtI5q, .PrimaryAchievement):hover :is(._1fEbX-PfpZ2FhkhttWcm-V, ._1DmdUWkRKPlUYGtbBrrRtx):not(#se-none)::after {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-gold) 70%, transparent) !important;
+}
+
+.se-ach-ico:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.se-ach-q {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font: 700 var(--se-fs-2xl) var(--se-font);
+  color: var(--se-text-muted);
+}
+
+/* The latest-unlock icon is the same size as the icons in the rows. */
+[data-se-sec="achievements"] ._1j_gja8bHXjiS-BeSQk8hb :is(._1fEbX-PfpZ2FhkhttWcm-V, ._1DmdUWkRKPlUYGtbBrrRtx):not(#se-none) {
+  --icon-size: 52px !important;
+  width: 52px !important;
+  height: 52px !important;
+  flex: none !important;
+}
+
+[data-se-sec="achievements"] ._1j_gja8bHXjiS-BeSQk8hb :is(._1fEbX-PfpZ2FhkhttWcm-V, ._1DmdUWkRKPlUYGtbBrrRtx) img:not(#se-none) {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+[data-se-sec="achievements"] ._1IIKwlQaVZU6bIeEQJvmTK:not(#se-none) {
+  padding-top: 3px !important;
+}
+
+/* "View My Achievements" as a link on the heading's line (client/game-page/game-page.js). */
+._1Q2q_tQ9_Eq8YdEHNAHS3F[data-se-has-link] {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px;
+  row-gap: 4px;
+}
+
+._1Q2q_tQ9_Eq8YdEHNAHS3F[data-se-has-link] > :not(.se-ach-view) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.se-ach-view {
+  flex: none;
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: 600 12.5px/16px var(--se-font);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--se-accent);
+}
+
+.se-ach-view:is(:hover, :focus-visible) {
+  color: var(--se-text-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  outline: none;
+}
+
+/*
+ * The achievement tooltip in the theme's style: a dark panel like its menus,
+ * the icon with the same gold edge as in the card, name and description, then a quiet
+ * line with when it was unlocked and a pill with the rarity tier and how many players
+ * have it, in the tier's color. native achievement tooltip stays hidden while it is open.
+ */
+.se-ach-tip {
+  position: fixed;
+  z-index: var(--se-z-toast);
+  width: 340px;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-hover);
+  color: var(--se-text);
+  box-shadow: var(--se-shadow-pop);
+  font-family: var(--se-font);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity var(--se-dur) ease-out, transform var(--se-dur) var(--se-ease);
+}
+
+.se-ach-tip[data-on] {
+  opacity: 1;
+  transform: none;
+}
+
+.se-ach-tip-main {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 14px;
+}
+
+.se-ach-tip-ico {
+  position: relative;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--se-radius-md);
+  overflow: hidden;
+  background: var(--se-surface);
+}
+
+.se-ach-tip-ico::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-gold) 45%, transparent);
+}
+
+.se-ach-tip-ico img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.se-ach-tip-ico.se-locked img {
+  filter: grayscale(1) brightness(.75);
+}
+
+.se-ach-tip-ico.se-locked::after {
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-ach-tip-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.se-ach-tip-name {
+  font-weight: 700;
+  font-size: 14.5px;
+  line-height: 1.3;
+  color: var(--se-text-strong);
+}
+
+.se-ach-tip-desc {
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--se-text-muted);
+}
+
+.se-ach-tip-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--se-hairline);
+  background: rgba(0, 0, 0, .14);
+  font-weight: 500;
+  font-size: 12.5px;
+  color: var(--se-text-faint);
+}
+
+.se-ach-tip-pct {
+  flex: none;
+  padding: 2px 9px;
+  border-radius: var(--se-radius-pill);
+  background: rgba(255, 255, 255, .06);
+  font-weight: 600;
+  color: var(--se-text-dim);
+}
+
+.se-ach-tip-pct[data-se-tier] {
+  background: color-mix(in srgb, var(--se-tier) 16%, transparent);
+  color: var(--se-tier);
+}
+
+/*
+ * Achievement rarity (client/game-page/game-page.js tags icons with data-se-tier;
+ * the tier colors, initial and sparkles are in core/achievement-tiers.css).
+ * Tier by global unlock rate: Legendary ≤ 5%, Epic ≤ 15%, Rare ≤ 35%, Uncommon ≤ 60%,
+ * Common above. Unlocked icons get an aura and one twinkling sparkle per tier (1–5);
+ * every icon carries the tier's initial in the corner, so it reads without color.
+ * Locked icons keep only a faded initial.
+ */
+/* Tier colors and auras: core/achievement-tiers.css. */
+.se-ach-ico[data-se-tier],
+[data-se-sec="achievements"] :is(._1fEbX-PfpZ2FhkhttWcm-V, ._1DmdUWkRKPlUYGtbBrrRtx)[data-se-tier]:not(#se-none) {
+  overflow: visible !important;
+  box-shadow: var(--se-tier-aura) color-mix(in srgb, var(--se-tier) 60%, transparent) !important;
+}
+
+.se-ach-ico[data-se-tier-locked],
+[data-se-sec="achievements"] :is(._1fEbX-PfpZ2FhkhttWcm-V, ._1DmdUWkRKPlUYGtbBrrRtx)[data-se-tier-locked]:not(#se-none) {
+  box-shadow: none !important;
+}
+
+/* A neutral hairline instead of the gold edge: the tier effects carry the color. */
+.se-ach-ico[data-se-tier]::after,
+[data-se-sec="achievements"] :is(._1fEbX-PfpZ2FhkhttWcm-V, ._1DmdUWkRKPlUYGtbBrrRtx)[data-se-tier]:not(#se-none)::after {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08) !important;
+}
+
+.se-ach-ico[data-se-tier]:hover::after {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2) !important;
+}
+
+/* The latest-unlock icon's frame would clip the aura and sparkles. */
+._1j_gja8bHXjiS-BeSQk8hb .zcasgBSVIteabq-j_3g1m:is(:has([data-se-tier]), [data-se-tier]):not(#se-none) {
+  overflow: visible !important;
+}
+
+/* Tier initial and sparkles (.se-ach-fx, .se-ach-spark): core/achievement-tiers.css. */
+
+/*
+ * Progress banner (client/game-page/game-page.js), in place of Steam's ring and bar.
+ * In progress: a ring fills around an outlined trophy, the band is the theme's blue and
+ * warms toward gold near 100% (--se-banner, set per game). Mastered: gold, a filled
+ * trophy with sparkles and a slow shine across the band. Chips count each tier.
+ */
+._2xTb6N-jUUQ-mIkMB6OVMm[data-se-replaced]:not(#se-none) {
+  /* HighlightDiv: outranks its own display: grid above */
+  display: none !important;
+}
+
+.se-ach-banner {
+  --se-banner: var(--se-accent);
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin: 4px 0 8px;
+  padding: 14px 18px;
+  overflow: hidden;
+  border-radius: var(--se-radius-ml);
+  background: linear-gradient(90deg,
+      color-mix(in srgb, var(--se-banner) 12%, transparent),
+      color-mix(in srgb, var(--se-banner) 4%, transparent) 55%,
+      transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-banner) 15%, transparent);
+  font-family: var(--se-font);
+}
+
+.se-ach-banner[data-done] {
+  background: linear-gradient(90deg,
+      color-mix(in srgb, var(--se-banner) 16%, transparent),
+      color-mix(in srgb, var(--se-banner) 4%, transparent) 55%,
+      transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-banner) 22%, transparent);
+}
+
+.se-ach-banner[data-done]::before {
+  /* The shine moves by transform (composited), not by repainting a background each frame */
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 250%;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 230, 170, .1) 50%, transparent 60%);
+  transform: translateX(-90%);
+  animation: se-ach-sweep 4.5s linear infinite;
+}
+
+@keyframes se-ach-sweep {
+  to {
+    transform: translateX(30%);
+  }
+}
+
+.se-ach-banner > * {
+  position: relative;
+}
+
+.se-ach-banner-emblem {
+  flex: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+.se-ach-banner-emblem::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(var(--se-banner) calc(var(--se-pct, 0) * 1%), var(--se-selected) 0);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 5px), #000 calc(100% - 4.5px));
+  mask: radial-gradient(closest-side, transparent calc(100% - 5px), #000 calc(100% - 4.5px));
+}
+
+.se-ach-banner-emblem svg {
+  position: absolute;
+  left: 17px;
+  top: 16px;
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: var(--se-banner);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: .85;
+}
+
+.se-ach-banner[data-done] .se-ach-banner-emblem {
+  box-shadow: 0 0 18px 2px color-mix(in srgb, var(--se-banner) 35%, transparent);
+}
+
+.se-ach-banner[data-done] .se-ach-banner-emblem svg {
+  fill: color-mix(in srgb, var(--se-banner) 25%, transparent);
+  opacity: 1;
+}
+
+.se-ach-banner-emblem .se-ach-spark {
+  background: var(--se-banner);
+}
+
+.se-ach-banner-emblem .se-ach-spark:nth-of-type(1) {
+  left: -10%;
+  top: -7%;
+  width: 20%;
+  height: 20%;
+}
+
+.se-ach-banner-emblem .se-ach-spark:nth-of-type(2) {
+  left: 83%;
+  top: -3%;
+  width: 15%;
+  height: 15%;
+  animation-duration: 1.8s;
+  animation-delay: .5s;
+}
+
+.se-ach-banner-emblem .se-ach-spark:nth-of-type(3) {
+  left: 90%;
+  top: 67%;
+  width: 17%;
+  height: 17%;
+  animation-duration: 1.96s;
+  animation-delay: .9s;
+}
+
+.se-ach-banner-emblem .se-ach-spark:nth-of-type(4) {
+  left: -7%;
+  top: 73%;
+  width: 13%;
+  height: 13%;
+  animation-duration: 2.1s;
+  animation-delay: 1.3s;
+}
+
+.se-ach-banner-text {
+  flex: 1 1 260px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.se-ach-banner-eyebrow {
+  font: 800 11px/14px var(--se-font);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--se-banner);
+}
+
+.se-ach-banner-title {
+  font: 800 18px/1.25 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.se-ach-banner-sub {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 500 12.5px/1.4 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-ach-banner-tiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.se-ach-banner-chip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 10px 7px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-chip);
+}
+
+.se-ach-banner-chip[data-full] {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-tier) 45%, transparent);
+}
+
+.se-ach-banner-count {
+  white-space: nowrap;
+  font: 700 13px/16px var(--se-font);
+  color: var(--se-text);
+}
+
+.se-ach-banner-count b {
+  margin-right: 5px;
+  font-weight: 800;
+  color: var(--se-tier);
+}
+
+.se-ach-banner-count small {
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--se-text-muted);
+}
+
+.se-ach-banner-meter {
+  display: block;
+  height: 2px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--se-tier) 18%, transparent);
+}
+
+.se-ach-banner-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--se-tier);
+}
+
+/*
+ * First row of the card: the banner and the latest unlock side by side (client/game-page/game-page.js
+ * tags the card body and the lead card). Everything else in the body spans both columns.
+ * The lead card takes its tier's color; without a tier it stays gold. It stacks under the banner
+ * when the card is narrow.
+ */
+[data-se-ach-body]:not(#se-none) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 32%);
+  column-gap: 12px;
+  align-items: stretch;
+  container: se-ach-body / inline-size;
+}
+
+[data-se-ach-body] > * {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+[data-se-ach-body] > .se-ach-banner {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+[data-se-ach-body] > ._1j_gja8bHXjiS-BeSQk8hb[data-se-ach-lead]:not(#se-none) {
+  /* Featured */
+  --se-lead: var(--se-tier, var(--se-gold));
+  grid-column: 2;
+  grid-row: 1;
+  gap: 14px;
+  margin: 4px 0 8px !important;
+  padding: 14px 18px !important;
+  border-radius: var(--se-radius-ml);
+  background: linear-gradient(90deg,
+      color-mix(in srgb, var(--se-lead) 12%, transparent),
+      color-mix(in srgb, var(--se-lead) 4%, transparent)) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-lead) 18%, transparent);
+  cursor: pointer;
+  transition: box-shadow var(--se-dur) ease-out;
+}
+
+[data-se-ach-body] > ._1j_gja8bHXjiS-BeSQk8hb[data-se-ach-lead]:hover:not(#se-none) {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-lead) 40%, transparent);
+}
+
+[data-se-ach-lead] ._1s_9cSxUjb4609MSH0EjWH:not(#se-none) {
+  /* TextSection */
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+[data-se-ach-lead] ._39Y01uSRcLiDg5DneTTR0m:not(#se-none) {
+  /* Name */
+  margin: 0 !important;
+  font: 800 15px/1.25 var(--se-font) !important;
+  color: var(--se-text-strong) !important;
+}
+
+[data-se-ach-lead] ._2gLHbXukQBdrIKhqEYVvOe:not(#se-none) {
+  /* Desc */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.se-ach-lead-eyebrow {
+  font: 800 11px/14px var(--se-font);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--se-lead, var(--se-gold));
+}
+
+.se-ach-lead-meta {
+  font: 600 12px/1.4 var(--se-font);
+  color: var(--se-text-faint);
+}
+
+@container se-ach-body (max-width: 900px) {
+  [data-se-ach-body] > .se-ach-banner,
+  [data-se-ach-body] > ._1j_gja8bHXjiS-BeSQk8hb[data-se-ach-lead]:not(#se-none) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  [data-se-ach-body] > ._1j_gja8bHXjiS-BeSQk8hb[data-se-ach-lead]:not(#se-none) {
+    margin-top: 0 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-ach-spark {
+    animation: none;
+    opacity: .8;
+  }
+
+  .se-ach-banner[data-done]::before {
+    animation: none;
+  }
+}

@@ -1,0 +1,157 @@
+/*
+ * HowLongToBeat progress card
+ * Hide the plugin widget once the theme card has data.
+ */
+:is(#hltb-for-steam, #hltb-for-millennium)[data-se-copied] {
+  display: none !important;
+}
+
+.se-hltb-card {
+  box-sizing: border-box;
+  padding: 16px 18px 18px;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-muted);
+}
+
+.se-hltb-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.se-hltb-title {
+  text-transform: uppercase;
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  color: var(--se-label-color);
+}
+
+.se-hltb-you {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--se-accent);
+  white-space: nowrap;
+}
+
+.se-hltb-bars,
+.se-hltb-stages {
+  display: flex;
+  gap: 6px;
+}
+
+.se-hltb-bars {
+  margin-top: 14px;
+}
+
+.se-hltb-stages {
+  margin-top: 10px;
+}
+
+/*
+ * One bar in three stages: passed ones solid blue, the current one filling up to a dot,
+ * the rest a quiet track; all three passed turns the bar gold.
+ */
+.se-hltb-seg {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  overflow: visible;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-check);
+}
+
+.se-hltb-seg > span {
+  display: block;
+  height: 100%;
+  border-radius: var(--se-radius-sm);
+}
+
+.se-hltb-seg[data-st="done"] > span {
+  background: var(--se-accent);
+}
+
+.se-hltb-seg[data-st="now"] > span {
+  background: linear-gradient(90deg, var(--se-accent-strong), var(--se-accent));
+}
+
+.se-hltb-seg > i {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--se-accent);
+  box-shadow: 0 0 0 3px var(--se-surface);
+}
+
+.se-hltb-bars[data-all] .se-hltb-seg > span {
+  background: linear-gradient(90deg, var(--se-gold), var(--se-gold-light));
+}
+
+.se-hltb-stage {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.se-hltb-val {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--se-fs-md);
+  font-weight: 700;
+  color: var(--se-text);
+  white-space: nowrap;
+}
+
+.se-hltb-lab {
+  font-size: var(--se-fs-xs);
+  font-weight: 500;
+  color: var(--se-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-hltb-tick {
+  flex: none;
+  width: 12px;
+  height: 12px;
+}
+
+.se-hltb-tick circle {
+  fill: color-mix(in srgb, var(--se-running) 18%, transparent);
+}
+
+.se-hltb-tick path {
+  fill: none;
+  stroke: var(--se-running);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.se-hltb-bars[data-all] ~ .se-hltb-stages .se-hltb-tick circle {
+  fill: var(--se-gold-surface);
+}
+
+.se-hltb-bars[data-all] ~ .se-hltb-stages .se-hltb-tick path {
+  stroke: var(--se-gold);
+}
+
+.se-hltb-foot {
+  margin-top: 12px;
+  font-size: var(--se-fs-sm);
+  font-weight: 500;
+  color: var(--se-text-muted);
+}
+
+.se-hltb-foot b {
+  color: var(--se-text);
+}

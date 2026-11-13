@@ -1,0 +1,349 @@
+/*
+ * Chat › the header: the group and its actions.
+ * Chat styles load in order: tabs, header, messages, input, voice, members, icons, groups.
+ */
+
+/*
+ * Header: the group and its actions
+ * Only group chats fill.chatHeader (as.chatHeader.titleBarContainer). In a one-to-one chat
+ * Steam renders it as an empty div; the friend is shown by the tab, so it folds away.
+ */
+.multiChatDialog[data-se-chat] .chatWindow .chatHeader:not(.titleBarContainer) {
+  min-height: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden;
+}
+
+/* Features/friends/chat.js draws the friend into it: avatar with ring, name, status or game, three tiles */
+.multiChatDialog[data-se-chat] .chatWindow .chatHeader:not(.titleBarContainer):has(> .se-chat-head) {
+  display: block !important;
+  height: auto !important;
+  overflow: visible;
+  background: var(--se-sidebar) !important;
+  border-bottom: 1px solid var(--se-hairline) !important;
+}
+
+.se-chat-head {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 68px;
+  padding: 0 16px 0 var(--se-chat-gutter, 20px);
+  font-family: var(--se-font);
+  -webkit-app-region: drag;
+}
+
+.se-chat-head .se-chat-avatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--se-avatar-radius);
+  box-shadow: 0 0 0 2px var(--se-sidebar), 0 0 0 4px var(--se-chat-head-ring, var(--se-border-strong));
+}
+
+.se-chat-head .se-chat-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--se-avatar-radius);
+  object-fit: cover;
+}
+
+.se-chat-head .se-chat-who {
+  flex: 1;
+  min-width: 0;
+}
+
+.se-chat-head .se-chat-name {
+  font: 700 16px/1.3 var(--se-font), sans-serif;
+  color: var(--se-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-chat-head .se-chat-status {
+  font: 600 12.5px/1.3 var(--se-font), sans-serif;
+  color: var(--se-chat-head-status, var(--se-text-faint));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-chat-head[data-se-status="online"] {
+  --se-chat-head-ring: var(--se-online);
+  --se-chat-head-status: var(--se-online);
+}
+
+.se-chat-head[data-se-status="awayOrSnooze"] {
+  --se-chat-head-ring: color-mix(in srgb, var(--se-online) 50%, transparent);
+  --se-chat-head-status: color-mix(in srgb, var(--se-online) 70%, transparent);
+}
+
+.se-chat-head[data-se-status="ingame"] {
+  --se-chat-head-ring: var(--se-running);
+  --se-chat-head-status: var(--se-running);
+}
+
+.se-chat-head[data-se-status="ingame-away"] {
+  --se-chat-head-ring: var(--se-running);
+  --se-chat-head-status: var(--se-running);
+}
+
+.se-chat-head:is([data-se-status="awayOrSnooze"], [data-se-status="ingame-away"]) .se-chat-avatar {
+  box-shadow: none;
+  outline: 2px dashed var(--se-chat-head-ring, var(--se-online));
+  outline-offset: 2px;
+}
+
+.se-chat-head[data-se-status="offline"] .se-chat-avatar img {
+  filter: grayscale(.6);
+  opacity: .7;
+}
+
+.se-chat-head .se-chat-actions {
+  display: flex;
+  gap: 2px;
+  -webkit-app-region: no-drag;
+}
+
+.se-chat-head .se-chat-tile {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-tile-sm);
+  height: var(--se-tile-sm);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: transparent;
+  color: var(--se-text-muted);
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+.se-chat-head .se-chat-tile:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.se-chat-head .se-chat-tile:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-chat-head .se-chat-tile svg {
+  width: var(--se-tile-icon);
+  height: var(--se-tile-icon);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.se-chat-head .se-chat-tile svg .fill {
+  fill: currentColor;
+  fill-opacity: .32;
+  stroke: none;
+}
+
+.se-chat-head .se-chat-tile svg .dot {
+  fill: currentColor;
+  stroke: none;
+}
+
+.se-chat-head[data-se-voice] .se-chat-voice {
+  background: color-mix(in srgb, var(--se-running) 14%, transparent);
+  color: var(--se-running);
+}
+
+/*
+ * With the header there, its tiles replace Steam's: the floating "invite another friend"
+ * button and the voice button beside the box go (still in the page, so the tiles can use
+ * them); voice comes back beside the box while a call is on, with its mute controls
+ */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat]:has(.se-chat-head) .inviteAnotherFriendButton,
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat]:has(.se-chat-head) .chatEntry .ChatMessageEntryVoice:not(.Active) {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow .chatHeader.titleBarContainer {
+  box-sizing: border-box !important;
+  min-height: 68px !important;
+  padding: 0 16px 0 var(--se-chat-gutter) !important;
+  align-items: center !important;
+  background: var(--se-sidebar) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--se-hairline) !important;
+  box-shadow: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeaderGradient {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .chatRoomHeaderButtons,
+.multiChatDialog[data-se-chat] .chatHeader .chatActionsCtn {
+  display: flex !important;
+  align-items: center;
+  gap: 2px;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .friend {
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  align-items: center;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .friend .avatarHolder {
+  flex: none;
+  position: relative;
+  width: 40px !important;
+  height: 40px !important;
+  overflow: visible !important;
+  transform: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .friend .avatarHolder :is(img.avatar, .avatar) {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: var(--se-avatar-radius) !important;
+  box-shadow: 0 0 0 2px var(--se-sidebar), 0 0 0 4px var(--se-chat-ring, var(--se-border-strong)) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .avatarHolder .avatarStatus,
+.multiChatDialog[data-se-chat] .chatHeader .avatarHolder .avatarFrame {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .friend .labelHolder {
+  margin: 0 0 0 12px !important;
+  height: auto !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader :is(.nOdcT-MoOaXGePXLyPe0H /* playerName */, .chatRoomGroupHeaderName) {
+  font: 700 16px/1.3 var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader :is(._2Ri005Wg_uXDTa71kdRbcN /* richPresenceLabel */, ._1cB0qtF0paHWWyj1XNcnbG /* gameName */) {
+  margin: 0 !important;
+  font: 600 12.5px/1.3 var(--se-font), sans-serif !important;
+  color: var(--se-text-faint) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .online ._2Ri005Wg_uXDTa71kdRbcN,
+.multiChatDialog[data-se-chat] .chatHeader .online ._1cB0qtF0paHWWyj1XNcnbG {
+  color: var(--se-online) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .awayOrSnooze ._2Ri005Wg_uXDTa71kdRbcN,
+.multiChatDialog[data-se-chat] .chatHeader .awayOrSnooze ._1cB0qtF0paHWWyj1XNcnbG {
+  color: color-mix(in srgb, var(--se-online) 70%, transparent) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .ingame ._2Ri005Wg_uXDTa71kdRbcN,
+.multiChatDialog[data-se-chat] .chatHeader .ingame ._1cB0qtF0paHWWyj1XNcnbG {
+  color: var(--se-running) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupStats {
+  font: 600 12px/1.3 var(--se-font), sans-serif !important;
+  color: var(--se-online) !important;
+}
+
+/* The log: one avatar and name per run, later lines tucked under it, no bubbles */
+.multiChatDialog[data-se-chat] .chatHistoryScroll {
+  padding: 14px 0 8px !important;
+}
+
+.multiChatDialog[data-se-chat] .chatHistory {
+  margin: 0 !important;
+  padding: 0 0 16px !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatMessageBlock {
+  position: relative;
+  margin: 0 !important;
+  padding: 6px var(--se-chat-gutter) 6px calc(var(--se-chat-gutter) + var(--se-chat-avatar) + 12px) !important;
+  border-radius: 0;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+.multiChatDialog[data-se-chat] .ChatMessageBlock:hover {
+  background: var(--se-chat-row-hover) !important;
+}
+
+/* The speaker line: name, then the time */
+.multiChatDialog[data-se-chat] .ChatSpeaker {
+  position: static !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker .speaker {
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 8px;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker .speakerHoverArea {
+  display: flex;
+  align-items: baseline;
+  position: static !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker .speakerStatus {
+  display: none !important;
+}
+
+/* The avatar sits in the gutter, level with the name */
+.multiChatDialog[data-se-chat] .ChatSpeaker :is(.speakerAvatar, .nibodjvvrm86uCfnnAn4g /* avatarHolder */) {
+  position: absolute !important;
+  top: 6px;
+  inset-inline-start: var(--se-chat-gutter);
+  width: var(--se-chat-avatar) !important;
+  height: var(--se-chat-avatar) !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker .speakerAvatar .nibodjvvrm86uCfnnAn4g,
+.multiChatDialog[data-se-chat] .ChatSpeaker .nibodjvvrm86uCfnnAn4g .nibodjvvrm86uCfnnAn4g {
+  position: static !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker :is(img.avatar, ._3h-QRJGxnVOIExtHD1R0f2 /* avatar */) {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: var(--se-avatar-radius) !important;
+  box-shadow: none !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker :is(.avatarFrame, .X_mJE4BYV5StDPwZhSiAu /* avatarFrame */) {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker .speakerName {
+  max-width: none !important;
+  margin: 0 !important;
+  font: 700 14px/1.4 var(--se-font), sans-serif !important;
+  color: var(--se-text) !important;
+}

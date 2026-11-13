@@ -1,0 +1,603 @@
+/*
+ * Store front page: "Cinema" redesign, built by front/hero.js. Page rules are scoped under
+ * html.se-store-front (store/loader.js); Steam's own carousel is hidden only once the
+ * hero has mounted (html.se-cinema-on). Tokens: shared/base.css; the deals section and the
+ * other front page modules: front/sections.css.
+ */
+
+/* Hero sizing, set by the window only. */
+html.se-store-front {
+  /* Hero bar screenshots: one tile width for every slide, set by the window only. */
+  --se-cinema-shot-w: clamp(112px, 8vw, 160px);
+  --se-cinema-shot-gap: 6px;
+}
+
+/* ---------- Page ---------- */
+
+html.se-store-front body,
+html.se-store-front .responsive_page_template_content {
+  background: var(--se-bg) !important;
+}
+
+html.se-store-front .home_page_content,
+html.se-store-front .home_section_title,
+html.se-store-front .home_page_content_title {
+  color: var(--se-text);
+}
+
+/*
+ * Fluid layout. Steam sizes each section with .home_pagecontent_ctn (1200px + 50px padding)
+ * and its first child (1200px); the React carousels inside size their slides in percent,
+ * so widening those two levels is enough. --store-page-width drives the React store bar.
+ */
+html.se-store-front body.v6 {
+  --store-page-width: min(100vw - 2 * var(--se-page-gutter), var(--se-page-max));
+}
+
+html.se-store-front .home_pagecontent_ctn {
+  box-sizing: border-box !important;
+  width: min(100%, var(--se-page-max) + 2 * var(--se-page-gutter)) !important;
+  max-width: none !important;
+  padding-inline: var(--se-page-gutter) !important;
+}
+
+html.se-store-front .home_pagecontent_ctn > div,
+html.se-store-front .home_page_content,
+html.se-store-front .personal_calendar_ctn,
+html.se-store-front .personal_calendar_background {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* The store bar's capsule lines up with the hero and sections below it. */
+html.se-store-front [data-se-nav="bar"] {
+  width: min(var(--se-page-max), 100% - 2 * var(--se-page-gutter)) !important;
+  max-width: none !important;
+}
+
+/* Steam's carousel stays mounted for its own scripts; the hero replaces it. */
+html.se-cinema-on #home_maincap_v7 {
+  display: none !important;
+}
+
+/*
+ * Steam's takeover (html.se-takeover, set by front/hero.js when its game leads the hero):
+ * the link reserves the band's height, and the art is #page_background_holder, an image or a
+ * .fullscreen-bg video laid behind the whole page top, plus a strip under the store menu. The
+ * band, its art and the gutter offset it adds all go; art in any other shape is found where it
+ * paints and tagged [data-se-takeover-art] by front/hero.js.
+ */
+html.se-cinema-on.se-takeover :is(.home_page_takeover_link, #page_background_holder, .page_background_holder, .fullscreen-bg, .menu_takeover_background, [data-se-takeover-art]) {
+  display: none !important;
+}
+
+/* Pseudo-elements can't sit inside :is(), so the list is spelled out. */
+html.se-cinema-on.se-takeover [data-se-takeover-bg],
+html.se-cinema-on.se-takeover [data-se-takeover-bg]::before,
+html.se-cinema-on.se-takeover [data-se-takeover-bg]::after {
+  background-image: none !important;
+}
+
+html.se-cinema-on.se-takeover [data-se-takeover-fill] {
+  background-color: transparent !important;
+}
+
+html.se-cinema-on.se-takeover .home_page_body_ctn.has_takeover {
+  background: none !important;
+}
+
+html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
+  margin-top: 0 !important;
+}
+
+/* ---------- Cinema hero (Cinema bar layout) ---------- */
+
+.se-cinema {
+  position: relative;
+  box-sizing: border-box;
+  width: min(var(--se-page-max), 100% - 2 * var(--se-page-gutter));
+  height: clamp(460px, 40vw, 620px);
+  margin: 18px auto 0;
+  border-radius: var(--se-radius-xl);
+  overflow: hidden;
+  /* Animated art layers get their own compositing layer, which overflow+radius doesn't
+     clip in Chromium; clip-path does, so all four corners stay rounded. */
+  clip-path: inset(0 round 18px);
+  isolation: isolate;
+  background: var(--se-surface);
+  color: var(--se-text);
+  font-family: inherit;
+  outline: none;
+}
+
+.se-cinema:focus-visible {
+  box-shadow: 0 0 0 2px var(--se-accent);
+}
+
+.se-cinema__art {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity .8s var(--se-ease), transform 8s linear;
+}
+
+/* Round the layers themselves too, so the corners hold even if the parent clip doesn't. */
+.se-cinema__art,
+.se-cinema__scrim {
+  border-radius: var(--se-radius-xl);
+}
+
+.se-cinema__art.is-front {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.se-cinema__art.is-missing {
+  visibility: hidden;
+}
+
+.se-cinema__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(0deg, rgba(15, 17, 21, .95) 0%, rgba(15, 17, 21, .45) 38%, rgba(15, 17, 21, 0) 62%),
+    linear-gradient(180deg, rgba(15, 17, 21, .55) 0%, rgba(15, 17, 21, 0) 18%);
+}
+
+/* ---- Top: game tabs with progress ---- */
+
+/* Top row: label on the left, game tabs filling the rest. */
+.se-cinema__top {
+  position: absolute;
+  top: 22px;
+  left: 32px;
+  right: 32px;
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+}
+
+.se-cinema__top .se-cinema__label {
+  flex: none;
+  /* Level with the tab names: tab padding 4 + track 3 + gap 7, same 16px line box. */
+  padding-top: 14px;
+  line-height: 16px;
+  font-weight: 700;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .6);
+}
+
+.se-cinema__tabs {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.se-cinema__tab {
+  appearance: none;
+  align-items: stretch;
+  flex: 0 1 140px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 0;
+  padding: 4px 0;
+  border: 0;
+  border-radius: 0;
+  background: none !important;
+  box-shadow: none !important;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.se-cinema__track {
+  position: relative;
+  display: block;
+  align-self: stretch; /* empty span: never let the button's layout shrink it to 0 */
+  width: 100%;
+  flex: none;
+  height: 3px;
+  border-radius: var(--se-radius-xs);
+  background: rgba(255, 255, 255, .18);
+  overflow: hidden;
+}
+
+.se-cinema__tab[data-done] .se-cinema__track {
+  background: rgba(124, 196, 255, .55);
+}
+
+.se-cinema__tab-name {
+  display: block;
+  max-width: 100%;
+  font-size: var(--se-fs-sm);
+  line-height: 16px;
+  font-weight: 700;
+  color: var(--se-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .6);
+  transition: color var(--se-dur-fast);
+}
+
+.se-cinema__tab:hover .se-cinema__tab-name,
+.se-cinema__tab:focus-visible .se-cinema__tab-name {
+  color: var(--se-text);
+}
+
+.se-cinema__tab:focus-visible {
+  outline: none;
+}
+
+.se-cinema__tab[aria-current] .se-cinema__tab-name {
+  color: var(--se-white);
+}
+
+/* Autoplay progress, inside the active tab's track. */
+.se-cinema__progress {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: var(--se-accent);
+  transform: scaleX(0); /* set every frame by front/hero.js */
+  transform-origin: left center;
+}
+
+/* ---- Lower left on the art: label + logo ---- */
+
+.se-cinema__head {
+  position: absolute;
+  left: 36px;
+  bottom: 146px;
+  width: min(560px, 100% - 72px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.se-cinema__label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--se-fs-xs);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--se-accent);
+}
+
+.se-cinema__count {
+  color: var(--se-text-faint);
+  letter-spacing: .06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.se-cinema__logo {
+  display: none;
+  max-width: min(520px, 100%);
+  max-height: 170px;
+  object-fit: contain;
+  object-position: left bottom;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .5));
+}
+
+.se-cinema.has-logo .se-cinema__logo {
+  display: block;
+}
+
+/* No logo: the store capsule (logo printed on it) as a framed tile. */
+.se-cinema__capsule {
+  display: none;
+  width: min(340px, 100%);
+  aspect-ratio: 616 / 353;
+  object-fit: cover;
+  border-radius: var(--se-radius-lg);
+  box-shadow: var(--se-shadow-md), 0 0 0 1px var(--se-hairline);
+}
+
+.se-cinema.has-capsule .se-cinema__capsule {
+  display: block;
+}
+
+/* No logo or capsule: the title, set large like a logo lockup. */
+.se-cinema__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: 0;
+  max-width: 100%;
+  font-size: var(--se-fs-hero);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -.01em;
+  color: var(--se-white);
+  text-wrap: balance;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, .6);
+}
+
+.se-cinema.is-long-title .se-cinema__title {
+  font-size: var(--se-fs-display);
+}
+
+/* Hidden while the logo/capsule lookup runs, so it doesn't flash. */
+.se-cinema.is-art-pending .se-cinema__title {
+  opacity: 0;
+}
+
+/* With a logo or capsule the title stays for screen readers only. */
+.se-cinema.has-capsule .se-cinema__title,
+.se-cinema.has-logo .se-cinema__title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- Bottom: the glass bar ---- */
+
+.se-cinema__bar {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  box-sizing: border-box;
+  min-height: 104px;
+  padding: 14px 16px 14px 20px;
+  display: grid;
+  /*
+   * The screenshot track is a fixed width (four tiles), so the tiles keep one size on every
+   * slide; the description takes whatever the chips and price leave.
+   */
+  grid-template-columns:
+    [meta] auto
+    [desc] minmax(0, 1fr)
+    [shots] calc(4 * var(--se-cinema-shot-w) + 3 * var(--se-cinema-shot-gap))
+    [buy] auto;
+  align-items: center;
+  gap: 24px;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-glass);
+  backdrop-filter: var(--se-blur-panel);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-cinema__meta {
+  grid-column: meta;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* The game's short description, middle of the bar. */
+.se-cinema__desc {
+  grid-column: desc;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  margin: 0;
+  font-size: var(--se-fs-base);
+  line-height: 1.45;
+  color: var(--se-text-dim);
+}
+
+.se-cinema__desc[hidden] {
+  display: none;
+}
+
+.se-cinema__badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: var(--se-radius-sm);
+  background: rgba(240, 192, 96, .16);
+  color: var(--se-gold);
+  font-size: var(--se-fs-sm);
+}
+
+.se-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 26px;
+  padding: 0 11px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+  font-size: var(--se-fs-sm);
+  color: #d0d7de;
+  white-space: nowrap;
+}
+
+.se-chip__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.se-chip__muted {
+  color: var(--se-text-muted);
+}
+
+.se-chip__muted::before {
+  content: "·";
+  margin-right: 8px;
+}
+
+.se-chip--review.is-positive { color: var(--se-accent); }
+.se-chip--review.is-mixed { color: var(--se-gold); }
+.se-chip--review.is-negative { color: var(--se-danger); }
+
+/*
+ * Screenshots: hover previews one as the hero art. Fixed-size 16:9 tiles; a slide with
+ * fewer than four keeps the same tile size, left-aligned.
+ */
+.se-cinema__shots {
+  grid-column: shots;
+  display: grid;
+  grid-template-columns: repeat(4, var(--se-cinema-shot-w));
+  gap: var(--se-cinema-shot-gap);
+  min-width: 0;
+}
+
+.se-cinema__shots[hidden] {
+  display: none;
+}
+
+.se-cinema__shot {
+  display: block;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--se-radius-sm);
+  overflow: hidden;
+  background: var(--se-surface-2);
+  opacity: .8;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  transition: opacity var(--se-dur-fast), transform var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+.se-cinema__shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.se-cinema__shot:hover,
+.se-cinema__shot:focus-visible,
+.se-cinema__shot[data-active] {
+  opacity: 1;
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 2px var(--se-accent);
+  outline: none;
+}
+
+/* Price, call to action, wishlist */
+.se-cinema__buy {
+  grid-column: buy;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.se-cinema__price {
+  margin-right: 6px;
+}
+
+.se-cinema__price[hidden] {
+  display: none;
+}
+
+/* Pct, was, now: the shared price chip (shared/ui.css). */
+
+.se-cinema__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 18px 0 20px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-accent);
+  color: var(--se-on-accent) !important;
+  font-size: var(--se-fs-md);
+  white-space: nowrap;
+  text-decoration: none !important;
+  transition: background var(--se-dur-fast);
+}
+
+.se-cinema__cta:hover {
+  background: var(--se-accent-hover);
+}
+
+/* The arrow nudges on hover; the button itself never changes size. */
+
+.se-cinema__wish {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  color: var(--se-text-dim);
+  cursor: pointer;
+  transition: background var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+.se-cinema__wish[hidden] {
+  display: none;
+}
+
+.se-cinema__wish::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.se-cinema__wish[aria-pressed="true"]::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z'/%3E%3C/svg%3E");
+}
+
+.se-cinema__wish:hover,
+.se-cinema__wish:focus-visible {
+  background: var(--se-hover);
+  color: var(--se-text);
+  outline: none;
+}
+
+.se-cinema__wish[aria-pressed="true"] {
+  color: var(--se-wish);
+}
+
+.se-cinema__wish:disabled {
+  opacity: .6;
+  cursor: progress;
+}
+
+/* Narrow windows: stack the bar, drop the screenshots, trim the tabs. */
+@media (max-width: 1100px) {
+  .se-cinema__bar {
+    grid-template-columns: [meta] auto [desc] minmax(0, 1fr) [buy] auto;
+  }
+
+  .se-cinema__shots {
+    display: none;
+  }
+
+  .se-cinema__top .se-cinema__label {
+    display: none;
+  }
+
+  .se-cinema__tab {
+    flex-basis: 90px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-cinema__art {
+    transition: opacity var(--se-dur);
+    transform: none;
+  }
+
+  .se-cinema__progress {
+    display: none;
+  }
+}

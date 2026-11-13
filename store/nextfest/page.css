@@ -1,0 +1,589 @@
+/*
+ * Steam Next Fest (/sale/nextfest/). The event's custom CSS (.SaleCustomCSS) paints the
+ * "Coming Soon" page in its own palette: a brown text slab under the logo, plain centred copy,
+ * a stock "Set a reminder" button and a bare share link. Restyled as the store front:
+ *  - the logo on the page colour with a soft accent glow behind it;
+ *  - the text section as one hero card: eyebrow, the dates as the headline, a countdown in
+ *    tiles (nextfest/page.js builds both), the copy, then the reminder as the accent pill;
+ *  - "Share with Friends" under the card is the shared footer row (shared/sale.css).
+ * While the fest runs, its game sections keep the sale look from shared/sale.css.
+ *
+ * Steam's stable class names only (SaleTextCtn, SaveDate, RemindMeWidget, ...), not the
+ * hashed ones. Rules use html.se-store-nextfest:not(#se-none) and !important where the
+ * event's custom CSS or Steam's inline styles would win otherwise.
+ */
+
+/* ---------- Page ---------- */
+
+html.se-store-nextfest:not(#se-none) body.sale_page_background {
+  background: var(--se-bg) !important;
+}
+
+/*
+ * The event's custom CSS paints a checkered pixel pattern over the page and a lime offset
+ * glow behind the text section, through backgrounds, shadows, filters and pseudo-elements on
+ * the renderer's wrappers. All of it is cleared here: the page colour shows through, and the
+ * card below draws its own surface. (The theme's own pseudo-elements, on the logo and the
+ * card, are set further down and win on order.)
+ */
+html.se-store-nextfest:not(#se-none) body.sale_page_background,
+html.se-store-nextfest:not(#se-none) :is(.react_landing_background, .SaleBackgroundCtn, .SaleBackground, .SaleOuterContainer, .SaleSectionTabListContainer, .SaleSectionCtn) {
+  background-image: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+html.se-store-nextfest:not(#se-none) :is(.react_landing_background, .SaleBackgroundCtn, .SaleBackground, .SaleOuterContainer, .SaleSectionTabListContainer, .SaleSectionCtn) {
+  background-color: transparent !important;
+}
+
+html.se-store-nextfest:not(#se-none) body.sale_page_background::before,
+html.se-store-nextfest:not(#se-none) body.sale_page_background::after,
+html.se-store-nextfest:not(#se-none) :is(.react_landing_background, .SaleBackgroundCtn, .SaleBackground, .SaleOuterContainer, .SaleSectionTabListContainer, .SaleSectionCtn, .SalePageLogoCtn, .SaleSectionForCustomCSS, .SaleTextCtn)::before,
+html.se-store-nextfest:not(#se-none) :is(.react_landing_background, .SaleBackgroundCtn, .SaleBackground, .SaleOuterContainer, .SaleSectionTabListContainer, .SaleSectionCtn, .SalePageLogoCtn, .SaleSectionForCustomCSS, .SaleTextCtn)::after {
+  content: none !important;
+}
+
+/* Steam's own art layer (the first child of .SaleBackground, before the content column). */
+html.se-store-nextfest:not(#se-none) .SaleBackground > :not(.SaleOuterContainer) {
+  display: none !important;
+}
+
+/* Steam's empty header slot. */
+html.se-store-nextfest:not(#se-none) .SaleSectionCtn.nextfest_header:empty {
+  display: none;
+}
+
+/* ---------- Logo ---------- */
+
+html.se-store-nextfest:not(#se-none) .SalePageLogoCtn {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 48px 0 36px;
+  isolation: isolate;
+}
+
+/* The glow: an accent ellipse fading out behind the logo. */
+html.se-store-nextfest:not(#se-none) .SalePageLogoCtn::before {
+  content: "" !important;
+  position: absolute;
+  inset: 0 10%;
+  z-index: -1;
+  background: radial-gradient(50% 60% at 50% 55%, rgba(124, 196, 255, .14), transparent 70%);
+  pointer-events: none;
+}
+
+html.se-store-nextfest:not(#se-none) .SalePageLogoCtn img {
+  display: block;
+  max-width: 80%;
+  height: auto;
+  filter: drop-shadow(0 18px 40px rgba(0, 0, 0, .6));
+}
+
+/*
+ * The February 2027 logo has the dates printed beside the mark in dark grey, made for the
+ * event's light pattern and unreadable on the page colour. The card states the dates, so the
+ * art is cropped to the mark and shifted by half the cut to stay centred. Matched by this
+ * art's file name only: the next edition's logo is left whole until it's checked.
+ */
+html.se-store-nextfest:not(#se-none) .SalePageLogoCtn img[src*="4f330e082cd36c32a0870bd50a3b61ed1749d241"] {
+  clip-path: inset(0 33% 0 0);
+  translate: 16.5% 0;
+}
+
+/* ---------- Hero card ---------- */
+
+/* Steam's slab (inline brown gradient) becomes the card, centred at a reading width. */
+html.se-store-nextfest:not(#se-none) .text_section .SaleSectionForCustomCSS {
+  position: relative;
+  box-sizing: border-box;
+  width: min(100%, 920px) !important;
+  margin: 0 auto !important;
+  padding: 44px clamp(24px, 6vw, 64px) 48px !important;
+  overflow: hidden;
+  border-radius: var(--se-radius-xl) !important;
+  background: var(--se-surface) !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg) !important;
+  filter: none !important;
+  transform: none !important;
+  translate: none !important;
+}
+
+/* A faint accent wash down from the card's top edge. */
+html.se-store-nextfest:not(#se-none) .text_section .SaleSectionForCustomCSS::before {
+  content: "" !important;
+  position: absolute;
+  inset: 0 0 auto;
+  height: 220px;
+  background: radial-gradient(70% 100% at 50% 0%, rgba(124, 196, 255, .1), transparent 70%);
+  pointer-events: none;
+}
+
+/* Content: a centred column, the actions on one row. Steam's <br> spacers go; gaps space it. */
+html.se-store-nextfest:not(#se-none) .text_section .SaleTextCtn {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 640px;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+  text-align: center;
+}
+
+html.se-store-nextfest:not(#se-none) .text_section .SaleTextCtn > * {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+html.se-store-nextfest:not(#se-none) .text_section .SaleTextCtn > br {
+  display: none;
+}
+
+/* Steam's date line, as written: the headline when nextfest/page.js couldn't parse it. */
+html.se-store-nextfest:not(#se-none) .text_section .SaveDate,
+html.se-store-nextfest:not(#se-none) .text_section .SaveDate b {
+  margin: 0 !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-3xl) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+  line-height: 1.25 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html.se-store-nextfest:not(#se-none) .text_section .SaveDate[data-se-nf-parsed] {
+  display: none !important;
+}
+
+/* Eyebrow and headline (nextfest/page.js). */
+html.se-store-nextfest:not(#se-none) [data-se-nf-heading] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+html.se-store-nextfest:not(#se-none) [data-se-nf-eyebrow] {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent-surface);
+  color: var(--se-accent);
+  font-size: var(--se-fs-xs);
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+html.se-store-nextfest:not(#se-none) [data-se-nf-range] {
+  color: var(--se-text);
+  font-size: var(--se-fs-display);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+}
+
+/* ---------- Countdown ---------- */
+
+html.se-store-nextfest:not(#se-none) [data-se-nf-countdown] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0 12px;
+}
+
+html.se-store-nextfest:not(#se-none) [data-se-nf-status] {
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-sm);
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* While the fest runs: a pulsing dot before the status. */
+html.se-store-nextfest:not(#se-none) [data-se-nf-live] [data-se-nf-status] {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--se-prepurchase);
+}
+
+html.se-store-nextfest:not(#se-none) [data-se-nf-live] [data-se-nf-status]::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: se-nf-pulse 1.6s var(--se-ease) infinite;
+}
+
+@keyframes se-nf-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(181, 223, 32, .55); }
+  100% { box-shadow: 0 0 0 10px rgba(181, 223, 32, 0); }
+}
+
+html.se-store-nextfest:not(#se-none) [data-se-nf-tiles] {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 96px));
+  gap: 10px;
+}
+
+html.se-store-nextfest:not(#se-none) [data-se-nf-tile] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 0 12px;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-nextfest:not(#se-none) [data-se-nf-value] {
+  color: var(--se-text);
+  font-size: var(--se-fs-4xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1;
+}
+
+html.se-store-nextfest:not(#se-none) [data-se-nf-label] {
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-xs);
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* ---------- Copy ---------- */
+
+html.se-store-nextfest:not(#se-none) .text_section .SaleTextCtn h3.BB_Header3 {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.6 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/* The second line ("Sign up here...") reads as the lead-in to the button. */
+html.se-store-nextfest:not(#se-none) .text_section .SaleTextCtn h3.BB_Header3 ~ h3.BB_Header3 {
+  margin-top: 4px !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-base) !important;
+}
+
+/* ---------- Reminder ---------- */
+
+html.se-store-nextfest:not(#se-none) .text_section .RemindMeBtn {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin: 12px 0 0 !important;
+}
+
+html.se-store-nextfest:not(#se-none) .RemindMeWidget {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  width: var(--se-nf-reminder-width) !important;
+  min-width: 0 !important;
+  height: 42px;
+  margin: 0 !important;
+  padding: 0 18px 0 22px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-accent) !important;
+  background-image: none !important;
+  box-shadow: 0 12px 28px -12px rgba(124, 196, 255, .6) !important;
+  color: #0b1624 !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur);
+}
+
+html.se-store-nextfest:not(#se-none) .RemindMeWidget > * {
+  position: static !important;
+  display: flex !important;
+  align-items: center;
+  align-self: center;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background-color: transparent !important;
+  color: inherit !important;
+  font: inherit !important;
+  /* After the shorthand, which would reset it. */
+  line-height: 1 !important;
+}
+
+/*
+ * The dropdown arrow: Steam's is a white sprite (35x32 slot), invisible on the accent pill and
+ * leaving a blank gap that pushes the label off centre. It's redrawn as the theme's chevron,
+ * a mask in the text colour, sized to the label: down on the page's button, up on the copy
+ * the open menu lays over it.
+ */
+html.se-store-nextfest:not(#se-none) .RemindMeWidget > :last-child:not(:first-child) {
+  flex: none;
+  width: 14px !important;
+  min-width: 0 !important;
+  height: 14px !important;
+  background: currentColor !important;
+  -webkit-mask: var(--se-nf-chevron) center / contain no-repeat;
+  mask: var(--se-nf-chevron) center / contain no-repeat;
+  transition: rotate var(--se-dur) var(--se-ease);
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .RemindMeWidget > :last-child:not(:first-child) {
+  rotate: 180deg;
+}
+
+html.se-store-nextfest {
+  /* The reminder button and its menu share one width, so the open menu reads as one piece. */
+  --se-nf-reminder-width: 248px;
+  --se-nf-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+html.se-store-nextfest:not(#se-none) .RemindMeWidget :is(svg, path) {
+  fill: currentColor !important;
+}
+
+html.se-store-nextfest:not(#se-none) .RemindMeWidget:hover {
+  background: var(--se-accent-hover) !important;
+  box-shadow: 0 14px 30px -12px rgba(124, 196, 255, .75) !important;
+}
+
+html.se-store-nextfest:not(#se-none) .RemindMeWidget:focus-visible {
+  outline: 2px solid var(--se-accent-hover);
+  outline-offset: 3px;
+}
+
+html.se-store-nextfest:not(#se-none) .RemindMeWidget[aria-expanded="true"] {
+  background: var(--se-accent-hover) !important;
+}
+
+/*
+ * The reminder's menu (apppartnereventspage.css): a pop-up Steam appends to <body>, anchored
+ * under the button. ._8D33ZtA7ymg- is the pop-up, .Kd1BYtvJHJU- its grey box; inside,
+ * .NOqR9p4DLhY- headings ("Get a notification", "Add to calendar"), DialogCheckbox rows
+ * ("via email", "via mobile app") and .kuZjNUoyxrA-, the row of calendar links. Restyled as
+ * the theme's pop-up panel: small caps headings, checkbox rows that light up on hover with
+ * the accent box when on, and the calendar links as pill buttons. Hashes from SteamTracking
+ * (store CSS of 2026-11-09).
+ */
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- {
+  background: none !important;
+  box-shadow: none !important;
+  /* Onto the page's button (nextfest/page.js measures it). */
+  translate: var(--se-nf-menu-x, 0) var(--se-nf-menu-y, 0);
+}
+
+/* The pop-up's column: its copy of the button, then the panel centred under it. */
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- > div:has(> .RemindMeWidget) {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* The copy wears the open state: the pressed shade, no glow. */
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .RemindMeWidget {
+  flex: none;
+  max-width: none !important;
+  background: var(--se-accent-hover) !important;
+  box-shadow: none !important;
+  transition: none;
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .Kd1BYtvJHJU- {
+  box-sizing: border-box;
+  width: var(--se-nf-reminder-width) !important;
+  min-width: 0 !important;
+  margin-top: 8px;
+  padding: 6px !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-panel-bg) !important;
+  backdrop-filter: var(--se-blur-panel);
+  box-shadow: var(--se-panel-shadow) !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .NOqR9p4DLhY- {
+  margin: 0 !important;
+  padding: 10px 10px 6px !important;
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em;
+  line-height: 1.2 !important;
+  text-transform: uppercase;
+}
+
+/* A hairline between the two groups. */
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .NOqR9p4DLhY- ~ .NOqR9p4DLhY- {
+  margin-top: 6px !important;
+  padding-top: 12px !important;
+  box-shadow: inset 0 1px 0 var(--se-hairline);
+}
+
+/* Checkbox rows: Steam's grey band behind them (row and focus wrappers) goes; each row
+   lights up on its own instead. */
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .Kd1BYtvJHJU- > .N7OtL5zwQl8-,
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .Kd1BYtvJHJU- > .N7OtL5zwQl8-:hover,
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .s1rk-Hqt8Vo-,
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .s1rk-Hqt8Vo-:hover {
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .DialogCheckbox_Container {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  height: 36px !important;
+  margin: 0 !important;
+  padding: 0 10px !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 500;
+  text-shadow: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .DialogCheckbox_Container:is(:hover, :focus-visible) {
+  outline: 0;
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .DialogCheckbox {
+  flex: none;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xs) !important;
+  background: rgba(255, 255, 255, .08) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2) !important;
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- [aria-checked="true"] .DialogCheckbox {
+  background: var(--se-accent) !important;
+  box-shadow: none !important;
+}
+
+/* The tick: dark on the accent, hidden while unchecked (Steam draws it either way). */
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .DialogCheckbox svg {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 3px;
+  opacity: 0;
+  transition: opacity var(--se-dur-fast);
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- [aria-checked="true"] .DialogCheckbox svg {
+  opacity: 1;
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .DialogCheckbox svg path {
+  stroke: #0b1624 !important;
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .DialogCheckbox svg path[filter] {
+  display: none;
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .DialogToggle_Label {
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  color: inherit !important;
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .DialogCheckbox_Container > div[style*="clear"] {
+  display: none;
+}
+
+/* Calendar links: Apple / Google / Outlook as pills on one row. */
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .kuZjNUoyxrA- {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 !important;
+  padding: 2px 8px 8px !important;
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .kuZjNUoyxrA- > a {
+  display: inline-flex !important;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .kuZjNUoyxrA- > a:is(:hover, :focus-visible) {
+  outline: 0;
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+/* ---------- Narrow windows ---------- */
+
+@media (max-width: 640px) {
+  html.se-store-nextfest:not(#se-none) [data-se-nf-tiles] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  html.se-store-nextfest:not(#se-none) [data-se-nf-value] {
+    font-size: var(--se-fs-3xl);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.se-store-nextfest:not(#se-none) [data-se-nf-live] [data-se-nf-status]::before {
+    animation: none;
+  }
+}

@@ -1,0 +1,250 @@
+/*
+ * Account tables (Purchase History, Licenses), as built by account/table.js: the toolbar
+ * (search, type chips, count), the table as a card, its sticky header and the "nothing
+ * matches" card. Page files (account-history/, account-licenses/) style their own columns.
+ * Rules use html.se-store-account:not(#se-none) for ID-level weight over Steam's rules.
+ */
+
+html.se-store-account:not(#se-none) {
+  --se-table-head-top: calc(var(--se-nav-h, 46px) + 26px); /* the sticky header, under the floating store bar */
+}
+
+/* ---------- Toolbar ---------- */
+
+.se-table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  margin: 0 0 14px;
+}
+
+.se-table-search {
+  flex: 0 1 380px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 6px 0 14px;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-faint);
+  cursor: text;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+.se-table-search:focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent);
+}
+
+:is(.se-table-search, .se-table-search-clear) > svg,
+.se-table-search-clear svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+html.se-store-account:not(#se-none) .se-table-search-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--se-text);
+  font: 500 var(--se-fs-md)/1 var(--se-font);
+  outline: none;
+}
+
+.se-table-search-input::placeholder {
+  color: var(--se-text-faint);
+}
+
+.se-table-search-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.se-table-search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: none;
+  color: var(--se-text-faint);
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+.se-table-search-clear:hover {
+  background: var(--se-hover);
+  color: var(--se-text);
+}
+
+.se-table-search-clear[hidden] {
+  display: none;
+}
+
+.se-table-chips[hidden] {
+  display: none;
+}
+
+.se-table-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.se-table-chip {
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-muted);
+  font: 600 var(--se-fs-base)/1 var(--se-font);
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+.se-table-chip:hover {
+  background: var(--se-hover);
+  color: var(--se-text);
+}
+
+.se-table-chip[aria-pressed="true"] {
+  background: var(--se-accent);
+  box-shadow: none;
+  color: var(--se-on-accent);
+}
+
+.se-table-count {
+  margin-left: auto;
+  color: var(--se-text-faint);
+  font: 600 var(--se-fs-base)/1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Table ---------- */
+
+html.se-store-account:not(#se-none) table[data-se-table] {
+  width: 100% !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border-radius: var(--se-radius-xl);
+  overflow: clip; /* rounds the corners without becoming a scroller, so the header can stick */
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-md)/1.5 var(--se-font) !important;
+}
+
+html.se-store-account:not(#se-none) table[data-se-table] th {
+  height: auto !important;
+  padding: 14px 16px 12px !important;
+  border: 0 !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 -1px 0 var(--se-divider);
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .12em !important;
+  text-align: left;
+  text-transform: uppercase !important;
+  white-space: nowrap;
+}
+
+html.se-store-account:not(#se-none) table[data-se-table] td {
+  padding: 16px !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: inset 0 -1px 0 var(--se-hairline);
+  vertical-align: top;
+  color: var(--se-text-dim) !important;
+}
+
+html.se-store-account:not(#se-none) table[data-se-table] tr[data-se-table-row] {
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-account:not(#se-none) table[data-se-table] tr[data-se-table-row]:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-account:not(#se-none) table[data-se-table] tr[data-se-table-hidden] {
+  display: none !important;
+}
+
+/*
+ * The header sticks under the store bar: a <thead> as a whole (Purchase History's is two rows;
+ * sticking one leaves a hole where the other scrolls away), or the header <tr> Steam puts in
+ * the body (Licenses). Once stuck the page colour fills the gap above it, so rows never show
+ * between the store bar and the header, and a shadow sets it over the rows.
+ */
+html.se-store-account:not(#se-none) table[data-se-table] [data-se-table-head] {
+  position: sticky;
+  top: var(--se-table-head-top);
+  z-index: 3;
+}
+
+html.se-store-account:not(#se-none) table[data-se-table] thead[data-se-table-head] > tr + tr > th {
+  padding-top: 0 !important;
+  font-size: 10px !important;
+}
+
+html.se-store-account:not(#se-none) table[data-se-table] :is(thead[data-se-table-head] > tr:first-child, tr[data-se-table-head]) > th {
+  position: relative;
+}
+
+html.se-store-account:not(#se-none) table[data-se-table][data-se-table-stuck] :is(thead[data-se-table-head] > tr:first-child, tr[data-se-table-head]) > th::before {
+  content: "";
+  position: absolute;
+  inset: auto -1px 100% -1px;
+  height: calc(var(--se-table-head-top) + 2px);
+  background: var(--se-bg);
+  pointer-events: none;
+}
+
+html.se-store-account:not(#se-none) table[data-se-table][data-se-table-stuck] [data-se-table-head] {
+  box-shadow: var(--se-shadow-sm);
+}
+
+/* ---------- Nothing matches ---------- */
+
+.se-table-empty {
+  padding: 48px 24px;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-muted);
+  font: 600 var(--se-fs-md)/1.4 var(--se-font);
+  text-align: center;
+}
+
+.se-table-empty[hidden] {
+  display: none;
+}
+
+/* The whole table filtered away: the empty card stands in for it */
+html.se-store-account:not(#se-none) table[data-se-table]:has(+ .se-table-empty:not([hidden])) {
+  display: none !important;
+}
+
+@media (max-width: 1100px) {
+  .se-table-count {
+    margin-left: 0;
+  }
+}

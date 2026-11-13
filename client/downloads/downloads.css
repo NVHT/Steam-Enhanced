@@ -1,0 +1,1572 @@
+/*
+ * Downloads page (art backdrop).
+ *
+ * The game downloading paints the whole page: its hero art, blurred and darkened, sits behind
+ * everything (`.se-dl-backdrop`). Over it, one column: the transfer in progress (`.se-dlh`,
+ * built by `client/downloads/downloads.js` from Steam's own block, which stays mounted out of
+ * sight): eyebrow, the game's logo, sizes and time left, progress with the percentage and
+ * Pause, three stat cards and the speed graph. The queue follows in a panel below. Panels are
+ * translucent over the art; with nothing downloading the page keeps its plain ground.
+ *
+ * Page _1bq4x9pa4-9RLY-dXWUZTp (BasicUI fqntpaymdveMMSFkyHYNz excluded),
+ * Detail _373v1eWNyaPKhgnea9FZSt, DetailScroller _3Mbhnlk1Go2j8yCdjthzc7,
+ * ActiveItem _2sCvZTD6ZTZz3p9_ekH_gI, EmptyItem _1zv2D9H37p5yuOJNsCemS3,
+ * ItemListWrapper (queue column) _1l0LmmqDUXH19SjfELddn7, ItemLists _1ugNiylO2vKXhirsGocAxa,
+ * Row _1VNuYHM6BPBOJspC6zPf5r, Stat _26UBk-6weCeV-VClfXNWJZ, Graph _3GBFL10vEfhI28U95WaqMj.
+ */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) {
+  --dl-pad: 32px;
+  /* Panels: translucent over the art; solid surface on the plain page */
+  --dl-glass: rgba(15, 17, 21, .55);
+  --dl-ring: inset 0 0 0 1px rgba(255, 255, 255, .09);
+  --dl-card: var(--dl-glass);
+  position: relative;
+  isolation: isolate;
+  border-top-left-radius: var(--se-radius-lg);
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  /* Title, transfer, queue: the queue takes what is left and scrolls inside its panel */
+  grid-template-rows: auto max-content minmax(0, 1fr);
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100%;
+  padding: 0 var(--dl-pad);
+  box-sizing: border-box;
+  overflow: hidden !important;
+  background: var(--se-bg) !important;
+  font-family: var(--se-font);
+  color: var(--se-text);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz):not([data-se-dl-art]) {
+  --dl-glass: var(--se-surface);
+  --dl-ring: inset 0 0 0 1px var(--se-hairline);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz)[data-se-dl-title]::before {
+  content: attr(data-se-dl-title);
+  position: relative;
+  z-index: var(--se-z-raised);
+  grid-column: 1;
+  grid-row: 1;
+  padding: 26px 0 8px;
+  font: 800 28px/1.15 var(--se-font), sans-serif;
+  letter-spacing: -.01em;
+  color: var(--se-text-strong);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .SEmVpmXrYVl3OxL1sDFTg {
+  display: none !important;
+}
+
+/* The art behind everything: blurred, darkened, fading into the page toward the foot */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) > .se-dl-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) > .se-dl-backdrop::before {
+  content: '';
+  position: absolute;
+  /* Past the edges, so the blur has no soft border */
+  inset: -60px;
+  background: var(--se-dl-art) center 25% / cover no-repeat;
+  filter: blur(40px) saturate(1.3) brightness(.7);
+  transition: opacity .4s var(--se-ease);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) > .se-dl-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(23, 26, 32, .1) 0%, rgba(23, 26, 32, .45) 45%, var(--se-bg) 100%);
+}
+
+/* Steam's settings button: on the title's line, at the end */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt > .lzk4zNVWG2zPV5Mk_o5GL {
+  top: -48px !important;
+  right: 0 !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .lzk4zNVWG2zPV5Mk_o5GL {
+  display: flex;
+}
+
+/* The detail: under the title; it scrolls on its own when the window is short */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt {
+  grid-column: 1;
+  grid-row: 2;
+  position: relative;
+  z-index: var(--se-z-raised);
+  height: auto !important;
+  min-height: 0;
+  margin: 0 !important;
+  overflow: visible !important;
+  background: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt > ._3Mbhnlk1Go2j8yCdjthzc7 {
+  height: auto !important;
+  overflow: visible !important;
+  box-sizing: border-box;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt > ._3Mbhnlk1Go2j8yCdjthzc7::-webkit-scrollbar {
+  display: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._3Mbhnlk1Go2j8yCdjthzc7._2KB3yVOsiRCK9qK6mwKl9c {
+  background: transparent !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt .OINnOU8K5HzPe2nzczpZi {
+  height: auto !important;
+  margin: 0 !important;
+  border: 0 !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._21P7c4MWmsU2QSZeL-uyZo {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1VNuYHM6BPBOJspC6zPf5r.IbePLaw-vSvhG1GTenYFg {
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1VNuYHM6BPBOJspC6zPf5r.IbePLaw-vSvhG1GTenYFg ._3ebCJiEl-ybizhZ4avcFw5 {
+  display: block;
+  overflow: visible;
+}
+
+/*
+ * The transfer in progress (.se-dlh, drawn by client/downloads/downloads.js).
+ * Steam's own block stays mounted as its data source, out of sight: laid out at a fixed width
+ * so its graph can still be measured, but invisible, unfocusable (focus would scroll the page
+ * to it) and unread (the hero is read instead). Scripted clicks still reach its buttons.
+ */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dlh-source] {
+  position: absolute !important;
+  top: 0 !important;
+  left: -20000px !important;
+  width: 1000px !important;
+  max-height: 600px;
+  overflow: hidden !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dlh-source] ._3GBFL10vEfhI28U95WaqMj {
+  height: 150px !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 0 4px;
+  color: var(--se-text);
+}
+
+/* Eyebrow, logo (or the name), then sizes and time left */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-eyebrow {
+  font: 700 12px/16px var(--se-font), sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--se-gold-text);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh[data-state="waiting"] .se-dlh-eyebrow {
+  color: var(--se-text-dim);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-logo {
+  display: block;
+  width: auto;
+  max-width: min(420px, 70%);
+  height: auto;
+  max-height: 130px;
+  margin-top: 12px;
+  object-fit: contain;
+  object-position: left bottom;
+  filter: drop-shadow(0 6px 24px rgba(0, 0, 0, .5));
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-logo[hidden],
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh[data-logo] .se-dlh-name {
+  display: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-name {
+  margin: 8px 0 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 800 52px/1.05 var(--se-font), sans-serif;
+  letter-spacing: -.02em;
+  color: var(--se-text-strong);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .35);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-sub {
+  margin: 12px 0 0;
+  font: 500 14px/1.4 var(--se-font), sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, .75);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-sub:empty {
+  display: none;
+}
+
+/* Progress: one wide bar (install as a thin green line under it), the percentage, Pause */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-progress {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-bars {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-bar {
+  height: 8px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-14);
+  overflow: hidden;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-bar[hidden] {
+  display: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--se-accent) 70%, #1a4f80), var(--se-accent));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--se-accent) 55%, transparent);
+  transition: width .4s var(--se-ease);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-bar-install {
+  height: 3px;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-bar-install .se-dlh-fill {
+  background: var(--se-running);
+  box-shadow: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-pct {
+  flex: none;
+  min-width: 3ch;
+  font: 800 22px/1 var(--se-font), sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-strong);
+  text-align: right;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-pause {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent);
+  box-shadow: 0 8px 22px -10px color-mix(in srgb, var(--se-accent) 80%, transparent);
+  font: 800 13px/1 var(--se-font), sans-serif;
+  color: var(--se-bg-ink);
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, transform var(--se-dur) ease-out;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-pause[hidden] {
+  display: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-pause:hover {
+  background: color-mix(in srgb, #fff 25%, var(--se-accent));
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-pause:active {
+  transform: scale(.97);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-pause:focus-visible,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-links button:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-pause-icon,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-pause-icon svg {
+  display: block;
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
+}
+
+/* Stats: three translucent cards */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-stat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: var(--se-radius-lg);
+  background: var(--dl-glass);
+  box-shadow: var(--dl-ring);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-stat-icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--se-radius-ml);
+  background: rgba(255, 255, 255, .06);
+  color: rgba(230, 232, 235, .85);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-stat-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-stat-icon .tone {
+  fill: currentColor;
+  fill-opacity: .3;
+  stroke: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-stat-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-stat-label {
+  font: 600 11.5px/1.3 var(--se-font), sans-serif;
+  color: rgba(255, 255, 255, .65);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-stat-value {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 800 20px/1.3 var(--se-font), sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-strong);
+}
+
+/* Speed graph: a smooth accent line with a soft fill; disk dashed */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-graph {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: var(--se-radius-lg);
+  background: var(--dl-glass);
+  box-shadow: var(--dl-ring);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-graph-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font: 500 11.5px/1 var(--se-font), sans-serif;
+  color: rgba(255, 255, 255, .7);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-graph-title {
+  flex: 1;
+  font: 700 13px/1 var(--se-font), sans-serif;
+  color: var(--se-text-strong);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-key::before {
+  content: '';
+  width: 12px;
+  border-top: 2px solid var(--se-accent);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-key-disk::before {
+  border-top-style: dashed;
+  border-top-color: rgba(255, 255, 255, .6);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-plot {
+  position: relative;
+  height: 130px;
+  color: var(--se-accent);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-plot svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-grid line {
+  stroke: rgba(255, 255, 255, .07);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-line {
+  stroke: currentColor;
+  stroke-width: 2.4px;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--se-accent) 60%, transparent));
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-disk {
+  stroke: rgba(255, 255, 255, .45);
+  stroke-width: 1.6px;
+  stroke-dasharray: 4 5;
+  vector-effect: non-scaling-stroke;
+}
+
+/* The latest sample: an HTML dot, so the stretched SVG cannot squash it */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--se-accent) 45%, transparent), 0 0 14px var(--se-accent);
+  pointer-events: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-dot[hidden] {
+  display: none;
+}
+
+/* Download limit and patch notes: quiet text buttons */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-links:empty {
+  display: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-links button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 600 12px/1.3 var(--se-font), sans-serif;
+  color: rgba(255, 255, 255, .6);
+  cursor: pointer;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh-links button:hover {
+  color: var(--se-text);
+}
+
+/* Stat cells in Steam's empty state */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._26UBk-6weCeV-VClfXNWJZ .Ayu--dDVVaKmP2gNYPAQ0 {
+  height: auto !important;
+  margin: 0 !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._26UBk-6weCeV-VClfXNWJZ ._3PLc4OJQTCKFtmy81QMYv5 {
+  display: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._26UBk-6weCeV-VClfXNWJZ ._1iulCOMUxV6sBbqoKo_yXw {
+  display: flex !important;
+  align-items: center;
+  gap: 7px;
+  font: 600 11.5px/1.3 var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: rgba(255, 255, 255, .7) !important;
+}
+
+/* Legend keys that match the graph: network solid accent, disk dashed */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._26UBk-6weCeV-VClfXNWJZ:nth-child(1) ._1iulCOMUxV6sBbqoKo_yXw::before,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._26UBk-6weCeV-VClfXNWJZ:nth-child(3) ._1iulCOMUxV6sBbqoKo_yXw::before {
+  content: '';
+  flex: none;
+  width: 10px;
+  height: 0;
+  border-top: 2px solid var(--se-accent);
+  border-radius: 1px;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._26UBk-6weCeV-VClfXNWJZ:nth-child(3) ._1iulCOMUxV6sBbqoKo_yXw::before {
+  border-top: 2px dashed var(--se-text-muted);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._26UBk-6weCeV-VClfXNWJZ ._5TdA4FjU9OYsTIaHzloD {
+  padding: 0 !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._26UBk-6weCeV-VClfXNWJZ .eXF8xL2LUtzeWMbK-FSRz {
+  font: 800 20px/1.3 var(--se-font), sans-serif !important;
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-strong) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._26UBk-6weCeV-VClfXNWJZ:nth-child(1) .eXF8xL2LUtzeWMbK-FSRz {
+  color: var(--se-accent) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1BxZDLT8KveuJzn-1q4NTP {
+  -webkit-mask-image: none !important;
+  mix-blend-mode: normal !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1BxZDLT8KveuJzn-1q4NTP .gpPxCvNVctmdxo8yfyEAJ,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1BxZDLT8KveuJzn-1q4NTP .OS07NfYlp6v-Eh5oQ7dwn {
+  color: color-mix(in srgb, var(--se-accent) 60%, transparent) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1BxZDLT8KveuJzn-1q4NTP .gpPxCvNVctmdxo8yfyEAJ:hover ._3raSL6OYLHmLlbF96kGtnr {
+  color: var(--se-accent) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1BxZDLT8KveuJzn-1q4NTP ._3H2JWLH8rucdSC1XVZ7Xdk {
+  stroke: rgba(255, 255, 255, .55) !important;
+  stroke-opacity: 1;
+  stroke-width: 1.5px !important;
+  stroke-dasharray: 3 4;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1BxZDLT8KveuJzn-1q4NTP ._2-AUyaXfJHWP85tZVENytR {
+  height: 100% !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1BxZDLT8KveuJzn-1q4NTP .RfMM3QjbVZCURuo5YTHWD {
+  display: none !important;
+}
+
+/*
+ * Nothing downloading (no art): one card with an empty state (icon, Steam's message) at its
+ * top and the idle stats strip and graph under it
+ */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: auto auto auto;
+  column-gap: 0;
+  height: auto !important;
+  margin-top: 12px;
+  padding: 0 20px 20px !important;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-lg);
+  background: var(--dl-glass);
+  box-shadow: var(--dl-ring);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 > ._3KDkLoCR8OM8xfdQysKn9t,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 > ._20JlDJD9-uoCjNLGp_8mY6,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 > ._24D3LpyHe8-HbiQftVVsna,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 ._2XqX2Zbz7zS2_xq8AksGCu,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 ._vrwj4IQ-vqMravrbJb64 {
+  display: contents !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 ._3mZ2rKd2RECK4q4ufmsDYX {
+  display: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 > ._1nCT-M7nZcoNzedbVzbXha {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  height: auto !important;
+  padding: 40px 20px 30px;
+  text-align: center;
+  font: 600 15px/1.4 var(--se-font), sans-serif;
+  color: var(--se-text-dim);
+}
+
+/* A download glyph in an accent-tinted disc */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 > ._1nCT-M7nZcoNzedbVzbXha::before {
+  content: '';
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237cc4ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11M7 10l5 5 5-5M5 20h14'/%3E%3C/svg%3E") center / 26px 26px no-repeat,
+    var(--se-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 ._26UBk-6weCeV-VClfXNWJZ {
+  grid-row: 2;
+  display: flex !important;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 4px;
+  margin: 0;
+  padding: 14px 16px;
+  min-width: 0 !important;
+  background: rgba(0, 0, 0, .2);
+  box-shadow: inset 1px 0 0 var(--se-hairline);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 ._26UBk-6weCeV-VClfXNWJZ:nth-child(1) {
+  border-radius: var(--se-radius-md) 0 0 var(--se-radius-md);
+  box-shadow: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 ._26UBk-6weCeV-VClfXNWJZ:nth-child(3) {
+  border-radius: 0 var(--se-radius-md) var(--se-radius-md) 0;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 ._26UBk-6weCeV-VClfXNWJZ ._1iulCOMUxV6sBbqoKo_yXw {
+  color: var(--se-text-faint) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 ._26UBk-6weCeV-VClfXNWJZ .eXF8xL2LUtzeWMbK-FSRz {
+  color: var(--se-text-muted) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3 ._3GBFL10vEfhI28U95WaqMj {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  margin: 8px 0 0 !important;
+  height: 120px !important;
+  border-radius: var(--se-radius-md);
+  overflow: hidden;
+  background: rgba(0, 0, 0, .2);
+}
+
+/* The queue: a panel under the transfer, as tall as its rows; it scrolls inside once it
+   reaches the page's foot */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1l0LmmqDUXH19SjfELddn7 {
+  grid-column: 1;
+  grid-row: 3;
+  align-self: start;
+  position: relative;
+  z-index: var(--se-z-raised);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 0;
+  max-height: calc(100% - 20px - var(--dl-pad));
+  margin: 20px 0 var(--dl-pad);
+  border-radius: var(--se-radius-lg);
+  background: var(--dl-glass);
+  box-shadow: var(--dl-ring);
+  overflow: hidden;
+}
+
+/* ItemLists: the panel's scroller */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa {
+  flex: 1 1 auto;
+  height: auto !important;
+  min-height: 0;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow-y: auto !important;
+  scrollbar-width: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa::-webkit-scrollbar {
+  display: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._3Mbhnlk1Go2j8yCdjthzc7 {
+  margin-top: 22px !important;
+  padding-bottom: 0 !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._3Mbhnlk1Go2j8yCdjthzc7:first-child {
+  margin-top: 0 !important;
+}
+
+/* No rows at all: a quiet note under the section titles */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa:not(:has(._1VNuYHM6BPBOJspC6zPf5r))::after {
+  content: 'Nothing queued';
+  display: block;
+  margin: 6px 4px 0;
+  padding: 18px 12px;
+  border-radius: var(--se-radius-md);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07);
+  font: 500 12.5px/1.4 var(--se-font), sans-serif;
+  color: var(--se-text-faint);
+  text-align: center;
+}
+
+/* Section titles: the name, a count pill, and Steam's actions (Clear all, …) as ghost pills */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 32px;
+  margin: 0 0 10px !important;
+  padding: 0 2px !important;
+  font: 700 15px/1.2 var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text-strong) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO .TK9wvF55dyA6RcOclozC8,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO ._1CGnw50aAma6AYKF51Qzsm {
+  font: inherit !important;
+  letter-spacing: inherit !important;
+  color: inherit !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO ._1CGnw50aAma6AYKF51Qzsm[data-se-count] {
+  font-size: 0 !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO ._1CGnw50aAma6AYKF51Qzsm[data-se-count]::after {
+  /* The count: a quiet figure beside the title, same size, lighter */
+  content: attr(data-se-count);
+  margin-left: 2px;
+  font: 600 15px/1.2 var(--se-font), sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, .4);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO ._1CTr1yKRkOXnJ4gSS1-1A3 {
+  visibility: hidden;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO .qrwf3iWWPa-yXVD0zOlHM {
+  display: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .OINnOU8K5HzPe2nzczpZi {
+  position: relative;
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .OINnOU8K5HzPe2nzczpZi.d9VKGABvFZQGmdqtaicMo {
+  box-shadow: 0 0 0 2px var(--se-accent-line);
+  background: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .OINnOU8K5HzPe2nzczpZi ._3T0JB8ekn9tlXVJd7Wjw2f:empty {
+  display: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1zv2D9H37p5yuOJNsCemS3 {
+  padding: 4px 4px !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1zv2D9H37p5yuOJNsCemS3 ._1nCT-M7nZcoNzedbVzbXha {
+  height: auto !important;
+  font: 500 12.5px/1.4 var(--se-font), sans-serif;
+  color: var(--se-text-faint);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz):has(._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3) ._1ugNiylO2vKXhirsGocAxa ._1zv2D9H37p5yuOJNsCemS3 {
+  display: none !important;
+}
+
+/* A row: a card with the game's art, its name and sizes, and its state at the end */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1VNuYHM6BPBOJspC6zPf5r {
+  --dl-row-art-w: 132px;
+  --dl-row-pad: 12px;
+  position: relative;
+  height: auto !important;
+  min-height: 86px;
+  margin: 0 !important;
+  padding: var(--dl-row-pad) calc(16px + var(--dl-actions-w, 0px)) var(--dl-row-pad) var(--dl-row-pad) !important;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-white-04) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06) !important;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1VNuYHM6BPBOJspC6zPf5r:is(:hover, ._3-SbBb63lDnu6LzKV-q3Cg),
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .gpfocus > ._1VNuYHM6BPBOJspC6zPf5r {
+  background: rgba(255, 255, 255, .08) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._3ebCJiEl-ybizhZ4avcFw5 {
+  gap: 16px !important;
+  align-items: center;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2pjdgFqp04LlhgtFS0rQn_ {
+  flex: none;
+  width: var(--dl-row-art-w) !important;
+  height: 62px !important;
+  border-radius: var(--se-radius-md) !important;
+  overflow: hidden;
+  background: var(--se-surface-2);
+  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, .7);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2pjdgFqp04LlhgtFS0rQn_ > *,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2pjdgFqp04LlhgtFS0rQn_ :is(div:has(> img), img) {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2pjdgFqp04LlhgtFS0rQn_ img {
+  object-fit: cover;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Zh51LA1WZNKTkf1qlZabn ._2pjdgFqp04LlhgtFS0rQn_ img {
+  filter: saturate(.85);
+  opacity: .9;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2xy0gY9dA8OoNNR7_Z2y2x {
+  flex: 1 1 auto;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 5px 16px !important;
+  min-width: 0;
+  overflow: visible !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2xy0gY9dA8OoNNR7_Z2y2x > .kGTS55N3oEbxE7HAgE9ZX:not(._2WEwEIAncE7-wa4Ye07a8x) {
+  display: contents !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1Er4SotWhGIid50maW3Lfv {
+  grid-column: 1;
+  min-width: 0;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1Er4SotWhGIid50maW3Lfv ._35eOQ6EeVHNV5HGBrJ1-Vu {
+  display: block !important;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 700 15px/1.3 var(--se-font), sans-serif !important;
+  color: var(--se-text-strong) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Zh51LA1WZNKTkf1qlZabn ._1Er4SotWhGIid50maW3Lfv ._35eOQ6EeVHNV5HGBrJ1-Vu {
+  font-weight: 600 !important;
+  color: var(--se-text-dim) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1Er4SotWhGIid50maW3Lfv ._1IKbaHLvcciS-EMMYx1WVG {
+  display: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Bku7JSkuQ7NyWi6M4w1sl {
+  grid-column: 1;
+  min-width: 0;
+  height: auto !important;
+  gap: 6px !important;
+  overflow: hidden;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Bku7JSkuQ7NyWi6M4w1sl > * {
+  margin: 0 !important;
+  font: 500 12.5px/1.3 var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: rgba(255, 255, 255, .7) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Bku7JSkuQ7NyWi6M4w1sl ._1dHjjSl-57o1KQsQ1m1HSA {
+  color: rgba(255, 255, 255, .7) !important;
+  font-weight: 500;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Bku7JSkuQ7NyWi6M4w1sl ._22mb5kcx6UUTgRNUjEp1yv {
+  display: none !important;
+}
+
+/* Its state ("Next · 1% complete", "Auto-updates on", …): both lines at the end */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2xy0gY9dA8OoNNR7_Z2y2x > ._1SyggnJY6qbRSmbZpkK3-H {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  justify-self: end;
+  align-self: center;
+  max-width: none !important;
+  overflow: visible !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  font: 600 12.5px/1.45 var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: rgba(255, 255, 255, .75) !important;
+  text-align: right;
+  white-space: nowrap;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2xy0gY9dA8OoNNR7_Z2y2x > ._1SyggnJY6qbRSmbZpkK3-H * {
+  font: inherit !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._3Mbhnlk1Go2j8yCdjthzc7:not(.Zh51LA1WZNKTkf1qlZabn) ._1SyggnJY6qbRSmbZpkK3-H ._2ns4wnmgr4XBzARpwn2NZ1 > span:only-child {
+  color: var(--se-running) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._3Mbhnlk1Go2j8yCdjthzc7:not(.Zh51LA1WZNKTkf1qlZabn) ._1SyggnJY6qbRSmbZpkK3-H > div:not([class]) {
+  font-weight: 700;
+  color: var(--se-text-strong) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._3Mbhnlk1Go2j8yCdjthzc7:not(.Zh51LA1WZNKTkf1qlZabn) ._1SyggnJY6qbRSmbZpkK3-H > div:not([class]) ~ div:not([class]) {
+  font-weight: 500;
+  color: rgba(255, 255, 255, .65) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1SyggnJY6qbRSmbZpkK3-H ._1ia3Wetvb6Jx1P6qi8vFJh {
+  color: var(--se-danger-text) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Zh51LA1WZNKTkf1qlZabn .Bku7JSkuQ7NyWi6M4w1sl {
+  display: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Zh51LA1WZNKTkf1qlZabn ._2xy0gY9dA8OoNNR7_Z2y2x > ._1SyggnJY6qbRSmbZpkK3-H {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: start;
+  max-width: 100% !important;
+  text-align: left;
+  color: var(--se-text-faint) !important;
+  font-weight: 500 !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Zh51LA1WZNKTkf1qlZabn ._1SyggnJY6qbRSmbZpkK3-H > div:not([class])::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 4px;
+  margin: 0 6px 3px 0;
+  border-left: 2px solid var(--se-running);
+  border-bottom: 2px solid var(--se-running);
+  transform: rotate(-45deg);
+}
+
+/* A partly downloaded one: a thin bar across the row's foot */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1_uxK_0wz2NWDqpHB-os-Z .FuJLsEk_Umr68UjGanMno {
+  color: var(--se-text-muted) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1_uxK_0wz2NWDqpHB-os-Z ._1vMU1vG5ZtLihr3mfXUymR {
+  position: absolute;
+  left: calc(var(--dl-row-pad) + var(--dl-row-art-w) + 16px) !important;
+  right: 16px !important;
+  bottom: 12px;
+  width: auto !important;
+  margin: 0 !important;
+  height: 4px !important;
+  background: var(--se-white-10) !important;
+}
+
+/*
+ * A row's actions (start now, remove, Play): the box holding them (data-se-dl-bar, found by
+ * client/downloads/downloads.js) is pinned to the row's end and always shown; the row keeps
+ * room for it (--dl-actions-w, in the row's padding), so the state text never runs under it.
+ */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-bar] {
+  position: absolute !important;
+  inset: 50% 16px auto auto !important;
+  z-index: var(--se-z-sticky);
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: translateY(-50%) !important;
+}
+
+/* Steam's drag handle: the theme's grip (.se-dl-grip) takes its place */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._14DhZoqwtCm4l0yDeN6QZe {
+  display: none !important;
+}
+
+/*
+ * Reordering (client/downloads/downloads.js): a grip at each Up Next card's start. The dragged
+ * card lifts and follows the pointer, the others slide aside, a line marks where it lands, and
+ * the transfer at the top lights up when it would start now.
+ */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa [data-se-dl-sortable] {
+  padding-left: calc(var(--dl-row-pad) + 26px) !important;
+  cursor: grab;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa [data-se-dl-sortable] [data-se-dl-bar] {
+  cursor: default;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa [data-se-dl-sortable] ._1vMU1vG5ZtLihr3mfXUymR {
+  left: calc(var(--dl-row-pad) + 26px + var(--dl-row-art-w) + 16px) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dl-grip {
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 44px;
+  margin-top: -22px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: none;
+  color: rgba(255, 255, 255, .32);
+  cursor: grab;
+  touch-action: none;
+  transition: color var(--se-dur) ease-out, background-color var(--se-dur) ease-out;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dl-grip svg {
+  width: 9px;
+  height: 15px;
+  fill: currentColor;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dl-grip:hover,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dl-grip:focus-visible,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-dragging] .se-dl-grip {
+  color: var(--se-accent);
+  background: color-mix(in srgb, var(--se-accent) 14%, transparent);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dl-grip:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-sorting] {
+  user-select: none;
+  cursor: grabbing;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-sorting] ._21P7c4MWmsU2QSZeL-uyZo:not([data-se-dl-ghost]) {
+  transition: transform .2s var(--se-ease);
+}
+
+/* The slot the card will land in: an empty, accent-edged card */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._21P7c4MWmsU2QSZeL-uyZo[data-se-dl-dragging]:not([data-se-dl-ghost]) ._1VNuYHM6BPBOJspC6zPf5r {
+  background: color-mix(in srgb, var(--se-accent) 7%, transparent) !important;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--se-accent) 70%, transparent),
+    0 0 24px -8px color-mix(in srgb, var(--se-accent) 60%, transparent) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._21P7c4MWmsU2QSZeL-uyZo[data-se-dl-dragging]:not([data-se-dl-ghost]) ._1VNuYHM6BPBOJspC6zPf5r > *,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._21P7c4MWmsU2QSZeL-uyZo[data-se-dl-dragging]:not([data-se-dl-ghost]) [data-se-dl-bar] {
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* The lifted card, following the pointer */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-ghost] {
+  position: fixed !important;
+  z-index: var(--se-z-drag);
+  margin: 0 !important;
+  pointer-events: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-ghost] ._1VNuYHM6BPBOJspC6zPf5r {
+  background: rgba(36, 42, 51, .97) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12), 0 24px 48px -12px rgba(0, 0, 0, .85) !important;
+  scale: 1.02;
+  animation: se-dl-lift var(--se-dur) var(--se-ease);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-ghost][data-now] ._1VNuYHM6BPBOJspC6zPf5r {
+  box-shadow: inset 0 0 0 2px var(--se-accent), 0 24px 48px -12px rgba(0, 0, 0, .85) !important;
+  scale: .96;
+  transition: scale var(--se-dur) var(--se-ease);
+}
+
+@keyframes se-dl-lift {
+  from { scale: 1; }
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-sorting] .se-dl-grip {
+  cursor: inherit;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh[data-drop]::before {
+  content: '';
+  position: absolute;
+  inset: 0 -14px -10px;
+  border-radius: var(--se-radius-xl);
+  background: color-mix(in srgb, var(--se-accent) 8%, transparent);
+  box-shadow: inset 0 0 0 2px var(--se-accent), 0 0 32px -6px color-mix(in srgb, var(--se-accent) 60%, transparent);
+  pointer-events: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh[data-drop]::after {
+  content: 'Drop to download now';
+  position: absolute;
+  top: 6px;
+  right: 0;
+  padding: 6px 12px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent);
+  font: 800 12px/1 var(--se-font), sans-serif;
+  color: var(--se-bg-ink);
+}
+
+/* Steam's wrappers inside the bar dissolve, so its actions line up in one row */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-bar] :has([data-se-dl-action]):not([data-se-dl-action]) {
+  display: contents !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-bar] > :not([data-se-dl-action], :has([data-se-dl-action])) {
+  display: none !important;
+}
+
+/*
+ * Page buttons (settings, row actions, section actions): one tile set. client/downloads/
+ * downloads.js tags each (data-se-dl-action) and adds the theme's dual-tone icon; Steam's own
+ * icon is hidden and everything Steam nests inside dissolves, so the tile alone sets the size.
+ *   neutral 36px tile · Download (blue) and Play (green): labelled buttons of one size, like the
+ *   game page's Install and Play · remove turns red
+ */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action] {
+  --dl-btn-bg: rgba(255, 255, 255, .07);
+  --dl-btn-ring: var(--se-white-10);
+  --dl-btn-hover: var(--se-white-14);
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  flex: none !important;
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: none !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--dl-btn-bg) !important;
+  box-shadow: inset 0 0 0 1px var(--dl-btn-ring) !important;
+  font: 700 13px/1 var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  white-space: nowrap !important;
+  color: var(--se-text-strong) !important;
+  opacity: 1 !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out, transform var(--se-dur) ease-out;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action]:hover {
+  background: var(--dl-btn-hover) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action]:active {
+  transform: scale(.96);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action]:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* Labelled ones (Play, Clear all) size to the label */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action][data-se-dl-text] {
+  width: auto !important;
+  padding: 0 16px 0 12px !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="clear"][data-se-dl-text] {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 14px !important;
+  font-weight: 600 !important;
+  font-size: 12.5px !important;
+}
+
+/* Steam's nested markup inside a tile: flattened, its own icon hidden */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action] :not(svg, svg *) {
+  display: contents !important;
+  font: inherit !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: inherit !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action] svg:not(.se-dl-icon) {
+  display: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action] svg.se-dl-icon {
+  display: block !important;
+  flex: none !important;
+  width: 18px !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  max-height: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.8px !important;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: inherit;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action] svg.se-dl-icon .tone {
+  fill: currentColor !important;
+  fill-opacity: .3 !important;
+  stroke: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action] svg.se-dl-icon :not(.tone) {
+  fill: none !important;
+}
+
+/* Download and Play: one size, so they line up row to row */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) :is([data-se-dl-action="download"], [data-se-dl-action="play"])[data-se-dl-text] {
+  min-width: 120px !important;
+  padding: 0 18px 0 14px !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) :is([data-se-dl-action="download"], [data-se-dl-action="play"]) svg.se-dl-icon {
+  width: 16px !important;
+  min-width: 16px !important;
+  height: 16px !important;
+}
+
+/* Download: Steam's Install blue */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="download"] {
+  --dl-btn-bg: linear-gradient(90deg, #06bfff, #2d73ff);
+  --dl-btn-ring: rgba(255, 255, 255, .16);
+  --dl-btn-hover: linear-gradient(90deg, #3ccdff, #4a88ff);
+  box-shadow: inset 0 0 0 1px var(--dl-btn-ring), 0 6px 16px -8px rgba(45, 115, 255, .9) !important;
+  color: #fff !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="download"] svg.se-dl-icon .tone {
+  fill-opacity: .45 !important;
+}
+
+/* Remove: quiet until hovered, then red */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="remove"] {
+  color: rgba(255, 255, 255, .78) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="remove"]:hover,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="clear"]:hover {
+  --dl-btn-hover: color-mix(in srgb, var(--se-danger) 85%, transparent);
+  --dl-btn-ring: transparent;
+  color: #fff !important;
+}
+
+/* Play: the green call to action */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="play"] {
+  --dl-btn-bg: linear-gradient(180deg, #4fa52e, var(--se-play));
+  --dl-btn-ring: var(--se-white-14);
+  --dl-btn-hover: linear-gradient(180deg, #5cb83a, var(--se-play-hover));
+  box-shadow: inset 0 0 0 1px var(--dl-btn-ring), 0 6px 16px -8px var(--se-play-glow) !important;
+  color: #fff !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="play"] svg.se-dl-icon .tone {
+  fill-opacity: .9 !important;
+}
+
+/* Section actions sit at the title's end */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO [data-se-dl-action] {
+  margin-left: auto !important;
+}
+
+/* The jump bar ("Completed (3) · View") at the list's foot */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .mw7VZNUZJWOhSrh3-kiym {
+  left: 8px;
+  right: 8px;
+  bottom: 10px !important;
+  width: auto !important;
+  height: 32px !important;
+  padding: 0 14px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-shadow-pop);
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  color: var(--se-text-muted) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .mw7VZNUZJWOhSrh3-kiym:not(._2S18z89-a_4mTjE5Lnl0wf) {
+  transform: translateY(calc(100% + 12px)) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .mw7VZNUZJWOhSrh3-kiym .TK9wvF55dyA6RcOclozC8,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .mw7VZNUZJWOhSrh3-kiym ._1CGnw50aAma6AYKF51Qzsm {
+  color: var(--se-text) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .mw7VZNUZJWOhSrh3-kiym ._26xEjt23hBWk4HaJpFeQt6 {
+  color: var(--se-accent) !important;
+}
+
+/* Library games beside the Downloads queue and transfer details (host marked by downloads.js). */
+[data-se-dl-host][data-se-dl-host] { /* doubled: keeps the old :has() rule's weight over Steam's classes */
+  display: flex;
+  flex-direction: row;
+  min-width: 0;
+}
+
+.se-dl-library {
+  min-height: 0;
+  flex: 0 0 var(--se-list-w);
+  box-sizing: border-box;
+  width: var(--se-list-w);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--se-sidebar);
+  color: var(--se-text);
+  border-inline-end: 1px solid var(--se-hairline);
+}
+
+.se-list-hidden .se-dl-library,
+.se-header-actions-ready .se-dl-library > input,
+.se-title-filters[hidden] {
+  display: none !important;
+}
+
+.se-dl-library + ._1bq4x9pa4-9RLY-dXWUZTp {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.se-dl-library h2 {
+  margin: 12px 12px 6px;
+  font: var(--se-label-font);
+  text-transform: uppercase;
+  color: var(--se-text-muted);
+}
+
+.se-dl-library > input {
+  margin: 0 8px 6px;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--se-hairline);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-field);
+  color: inherit;
+  font: inherit;
+}
+
+.se-dl-library-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 6px 8px;
+}
+
+.se-dl-library button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 6px;
+  min-height: 28px;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.se-dl-library button[hidden],
+.se-dl-library-empty:empty {
+  display: none;
+}
+
+.se-dl-library button[data-installed="false"],
+.se-dl-library-empty {
+  color: var(--se-text-muted);
+}
+
+.se-dl-library button:is(:hover, :focus-visible) {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.se-dl-library button:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: calc(var(--se-focus-offset) * -1);
+}
+
+.se-dl-library button img {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--se-radius-xs);
+}
+
+.se-dl-library button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.se-dl-library-empty {
+  padding: 6px;
+}
+
+/* The native Library route supplies its own list, filters, and collection state. */
+.se-dl-native-layout {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.se-dl-native-list {
+  flex: 0 0 var(--se-list-w);
+  box-sizing: border-box;
+  width: var(--se-list-w);
+  min-width: 0;
+  overflow: hidden;
+  background: var(--se-sidebar);
+}
+
+.se-list-hidden .se-dl-native-list {
+  display: none;
+}
+
+.se-dl-native-list ._3xRRJfD2xy95i9NhJxLTp0 {
+  width: 100%;
+  height: 100%;
+}
+
+.se-dl-native-list ._3xRRJfD2xy95i9NhJxLTp0 > :not(._9sPoVBFyE_vE87mnZJ5aB) {
+  display: none !important;
+}
+
+.se-dl-native-list ._3xRRJfD2xy95i9NhJxLTp0 > ._9sPoVBFyE_vE87mnZJ5aB {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 100%;
+}
+
+.se-dl-native-content {
+  flex: 1 1 0;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Support toast (Ctrl+Shift+D on the Downloads page) */
+.se-dl-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  z-index: var(--se-z-toast);
+  padding: 10px 16px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent);
+  box-shadow: 0 12px 32px -10px rgba(0, 0, 0, .8);
+  font: 700 13px/1 var(--se-font), sans-serif;
+  color: var(--se-bg-ink);
+  translate: -50% 0;
+  pointer-events: none;
+  animation: se-dl-toast 2.6s ease both;
+}
+
+@keyframes se-dl-toast {
+  0% { opacity: 0; translate: -50% 8px; }
+  8%, 85% { opacity: 1; translate: -50% 0; }
+  100% { opacity: 0; }
+}
+
+/* Queue entries: Steam's draggable wrapper around each card, spaced like the cards */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._21P7c4MWmsU2QSZeL-uyZo:not([data-se-dl-ghost]) {
+  margin: 0 0 8px !important;
+  border-radius: var(--se-radius-lg);
+  outline-offset: 2px;
+}

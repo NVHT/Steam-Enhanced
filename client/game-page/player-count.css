@@ -1,0 +1,44 @@
+/*
+ * Live player count badge in the Game Details play bar.
+ *
+ * A native `.GameStat` (typography, spacing and the theme's stat icon come from
+ * client/game-page/play-bar.css); this file adds the button reset, hover, focus and error state.
+ * Paired with `client/game-page/player-count.js`.
+ */
+#se-player-count {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  border: 0;
+  text-align: start;
+  color: var(--se-text);
+  font-family: var(--se-font);
+  font-size: inherit;
+  cursor: pointer;
+}
+
+/*
+ * The same hover as the other clickable stats in the bar. Scoped to the in-page bar so it
+ * outranks play-bar.css's tile reset there (this file loads after it).
+ */
+._1U7LKpx70kEsz3jJwAFOi- #se-player-count:hover {
+  background: var(--se-hairline) !important;
+}
+
+#se-player-count:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+#se-player-count .se-player-count-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+
+#se-player-count[data-state="error"] .se-player-count-text > :last-child {
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-sm) !important;
+}

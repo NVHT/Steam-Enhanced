@@ -1,0 +1,2065 @@
+/*
+ * Steam's sale-page renderer (storelink.css / saletags.css / salesectionfactory2.css /
+ * trailerdefines.css / carouselarrows.css: React with hashed class names, plus a few stable
+ * ones like .SaleOuterContainer, .SaleSectionCarousel, .trailercarousel, .VideoRow), which
+ * draws sale and event pages, the Steam Charts monthly / yearly pages and other curated store
+ * pages. Styled once here for every store page (html.se-store); paired with
+ * shared/sale.js, which tags its price widgets and places its carousel arrows.
+ *
+ * Covers: the featured trailer carousel (video, info panel, player controls and menus), item
+ * flags and the DLC chip, the game hover card, capsule tiles and carousels (arrows, scroll
+ * bar), the "DLC for you" block and DLC rows, the expanded library card, the library filters
+ * sidebar and the share section. Hashes come from SteamTracking (store CSS of 2026-11-09).
+ */
+
+/* ---------- DLC marker ----------
+ * Steam lays a purple corner image (appmgmt/artassets/capsule_dlc*.png) over DLC art; it gives
+ * way to the theme's glass chip reading "DLC", bottom-left of the art, clear of the flags
+ * (top-left) and wishlist buttons (top-right). Matched by its src, stable where its class is
+ * hashed; shared/sale.js marks its parent [data-se-dlc]. The art rules below skip it.
+ */
+html.se-store:not(#se-none) img[src*="/capsule_dlc"] {
+  display: none !important;
+}
+
+html.se-store:not(#se-none) [data-se-dlc]::after {
+  content: "DLC";
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 3;
+  padding: 4px 10px;
+  color: #e3c8ff;
+  font-family: inherit;
+  font-size: var(--se-fs-xs);
+  font-weight: 700;
+  letter-spacing: .08em;
+  line-height: 14px;
+  text-transform: none;
+  pointer-events: none;
+}
+
+/* ---------- Shared parts ---------- */
+
+/* Tag pills: every tag list in the renderer (.WidgetTag: hover card, library card, DLC rows,
+   tag boxes; the trailer panel's chips by class). */
+html.se-store:not(#se-none) :is(.WidgetTag, .IX0d42JL3W4- ._5F2vJItlDB0-) {
+  box-shadow: none !important;
+  line-height: 24px;
+  text-shadow: none !important;
+}
+
+/* Review scores (.ReviewScore): the rating word in its colour (positive in the accent; Steam's
+   mixed / negative colours kept), the count faint. */
+html.se-store:not(#se-none) .ReviewScore ._4nNWbL6J2cI- {
+  gap: 2px 6px;
+  font-weight: 700;
+}
+
+html.se-store:not(#se-none) .ReviewScore ._4nNWbL6J2cI-.I-L7P5K0HUM- {
+  color: var(--se-accent);
+}
+
+html.se-store:not(#se-none) .ReviewScore :is(.ZBPprMOYoMs-, .S8JsHzHuIMA-, ._3C-jnxRevMo-) {
+  color: var(--se-text-faint);
+  font-weight: 400;
+}
+
+/* ---------- Featured trailer carousel ----------
+ * The Steam Charts monthly trailer row (.trailercarousel) and the Discounts & Events hero
+ * carousel (.contenthubmaincarousel) are the same video player and info card (.VideoRow,
+ * .AppVideoCtn: stable names), styled together.
+ */
+
+/* The column takes the row's height (set by the panel); the player is laid over it absolutely,
+   so it never feeds height back into the row (a 100% chain grew the card past the panel). */
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .AppVideoCtn {
+  position: relative !important;
+  align-self: stretch !important;
+  height: auto !important;
+  min-height: 320px;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .AppVideoCtn > .XUHGRxAX2xY- {
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .AppVideoCtn :is(.atnaqSRaIew-, .hPeepTEP2A0-) {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .AppVideoCtn .RmSUNTNiH6o- {
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .AppVideoCtn :is(video, img._4KA4WmZc39M-) {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+/* The video's frame: dark under and around the 16:9 player instead of Steam's grey. */
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) :is(.AppVideoCtn, .XUHGRxAX2xY-, .atnaqSRaIew-) {
+  background: #0b0d10 !important;
+}
+
+/* Trailer and its info panel: one rounded card; Steam's cut-arrow buttons become the round
+   glass arrows. */
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .VideoRow > :not(button) {
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg) !important;
+}
+
+/*
+ * Info panel beside the video (salesectionfactory2.css .IX0d42JL3W4-): title, tag chips,
+ * description, release date, then the price chip and a pill "Add to wishlist".
+ */
+/* Steam lays the panel out as a grid of areas that changes with its width, with parts placed
+   absolutely; at this width they overlapped. One column instead: details, then actions. The
+   capsule block (and its second wishlist button) is dropped: the video beside it shows the game. */
+html.se-store:not(#se-none) .IX0d42JL3W4- {
+  display: flex !important;
+  flex-direction: column;
+  grid-template: none !important;
+  box-sizing: border-box !important;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden !important;
+  gap: 0;
+  padding: 20px !important;
+  background: var(--se-surface) !important;
+}
+
+/* The game's capsule leads the panel, as a rounded art tile; its duplicate wishlist button
+   and the tall library art Steam swaps in at other widths stay hidden. */
+html.se-store:not(#se-none) .IX0d42JL3W4- ._1ihFHPGMuJU- {
+  display: block !important;
+  position: relative !important;
+  inset: auto !important;
+  flex: none;
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 0 16px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- ._1ihFHPGMuJU- > a {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important; /* Steam pads it, which drew a frame around the art */
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* No hover zoom, glow or offset on the art: a still tile in the panel's text column. */
+html.se-store:not(#se-none) .IX0d42JL3W4- :is(._1ihFHPGMuJU-, ._1ihFHPGMuJU- > a, .JEr1QdMWTjI-),
+html.se-store:not(#se-none) .IX0d42JL3W4- :is(._1ihFHPGMuJU-, ._1ihFHPGMuJU- > a, .JEr1QdMWTjI-):hover {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  transform: none !important;
+  translate: none !important;
+  scale: none !important;
+  filter: none !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .JEr1QdMWTjI- {
+  display: block !important;
+  position: static !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 460 / 215;
+  margin: 0 !important;
+  border-radius: var(--se-radius-lg);
+  object-fit: cover;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- :is(.azlE8-h0HzU-, ._1ihFHPGMuJU- .KoUJweWUwjY-) {
+  display: none !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .eusVyRUbhSg- {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  /* Steam insets the details 16/20px and centres them at some widths, so the text started
+     right of the art and price, and its lines ran past the panel's clipped edge. Flush and
+     stretched to the panel's own column instead. */
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  min-width: 0;
+  padding: 0 !important;
+  text-align: start !important;
+  overflow: hidden;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .eusVyRUbhSg- > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- :is(.eusVyRUbhSg-, .eusVyRUbhSg- div, .AfmLaFPPMcw-, .i-R41LUf8Sk-, ._3IS7UvM1aVI-, .AuwabCf8Jt8-, .Qk1XPTmq4Pw-) {
+  position: static !important;
+  inset: auto !important;
+  width: auto !important;
+  height: auto !important;
+  margin-inline: 0 !important;
+  transform: none !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .A8b41UrilKU- {
+  display: block !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .i-R41LUf8Sk- {
+  flex: none;
+  margin-top: 16px !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .A8b41UrilKU- {
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  text-decoration: none !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .KK3DL3vbFZU- {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 54px; /* two rows of chips */
+  margin: 10px 0 0 !important;
+  overflow: hidden;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .Qk1XPTmq4Pw- {
+  /* Steam grows the description into a padded, lit box on hover; it is plain text with
+     nothing to click, so it simply never receives the hover. */
+  pointer-events: none !important;
+  flex: 0 1 auto !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Steam expands the description into a lit box on hover (on the description or one of its
+   wrappers); nothing in the details lights up here except the tag chips' own hover. */
+html.se-store:not(#se-none) .IX0d42JL3W4- :is(.eusVyRUbhSg-, .eusVyRUbhSg- :not(._5F2vJItlDB0-)),
+html.se-store:not(#se-none) .IX0d42JL3W4- :is(.eusVyRUbhSg-, .eusVyRUbhSg- :not(._5F2vJItlDB0-)):hover {
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .eusVyRUbhSg- :is(*, *:hover)::before,
+html.se-store:not(#se-none) .IX0d42JL3W4- .eusVyRUbhSg- :is(*, *:hover)::after {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- :is(.Qk1XPTmq4Pw-, .kGvFF7-ofHs-):hover {
+  z-index: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  -webkit-line-clamp: 4 !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .kGvFF7-ofHs- {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  margin-top: 12px;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-base) !important;
+  line-height: 1.5 !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .hI5NWEJ-Uyo- {
+  margin-top: 10px;
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+/* Actions: price chip, then the wishlist pill. */
+html.se-store:not(#se-none) .IX0d42JL3W4- .AuwabCf8Jt8- {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 8px 10px;
+  background: none !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .KoUJweWUwjY- {
+  /* saletags.css pins every wishlist button to its card's top-right corner; this one sits
+     in the actions row beside the price. */
+  position: static !important;
+  inset: auto !important;
+  overflow: visible !important;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text-muted) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+/* Steam sizes the button to its icon and slides the label out on hover; here the label sits
+   inside the pill. */
+html.se-store:not(#se-none) .IX0d42JL3W4- .KoUJweWUwjY- {
+  flex: none !important; /* the actions row would otherwise shrink it below its label */
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: none !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .KoUJweWUwjY- > * {
+  position: static !important;
+  inset: auto !important;
+  align-self: center !important;
+  height: auto !important;
+  padding: 0 !important;
+  translate: none !important;
+  vertical-align: middle !important;
+  flex: none;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+/* After the "> *" reset above, which would let the icon take its 100x100 viewBox size. */
+html.se-store:not(#se-none) .IX0d42JL3W4- .KoUJweWUwjY- > svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .KoUJweWUwjY- .WishlistButtonText {
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+  color: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+}
+
+html.se-store:not(#se-none) .IX0d42JL3W4- .KoUJweWUwjY-:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-wish) !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .VideoRow > button {
+  align-self: center;
+  margin: 0 8px !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .VideoRow > button:disabled {
+  opacity: .3;
+  cursor: default;
+}
+
+/* The trailer player's menus (quality, …): role="menu" with menuitemcheckbox rows. The theme's
+   glass panel with rounded rows; the chosen option in white with an accent check. */
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) [role="menu"] {
+  gap: 2px !important;
+  padding: 6px !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: rgba(16, 18, 23, .86) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line), var(--se-shadow-md) !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) [role="menu"] > [role^="menuitem"] {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 32px;
+  padding: 0 10px !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) [role="menu"] > [role^="menuitem"]:is(:hover, :focus-visible) {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+  outline: none;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) [role="menu"] > [aria-checked="true"] {
+  color: var(--se-white) !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) [role="menu"] > [role^="menuitem"] svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) [role="menu"] > [role^="menuitem"] svg path {
+  stroke: var(--se-accent) !important;
+}
+
+/*
+ * The trailer player's control bar (trailertitlebar.css .EE0MOLi31qY-), shared by the sale
+ * trailer carousels and the game page's media carousel (.gamehighlight_desktopcarousel, laid
+ * out by app/about.css): a soft scrim instead of a hard edge, a rounded seek track (played in
+ * the accent, buffered faint), round icon buttons that light up, and the time in tabular
+ * figures. Parts by role where Steam gives one.
+ */
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) .EE0MOLi31qY- {
+  padding: 24px 14px 10px !important;
+  background: linear-gradient(180deg, transparent, rgba(8, 10, 14, .78)) !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) [role="slider"][aria-label] {
+  padding: 6px 0 !important;
+  cursor: pointer;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) [role="slider"] .GsDewiltMCM- {
+  position: relative;
+  height: 4px !important;
+  overflow: hidden;
+  border-radius: var(--se-radius-pill);
+  background: rgba(255, 255, 255, .18) !important;
+  transition: height var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) [role="slider"]:hover .GsDewiltMCM- {
+  height: 6px !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) [role="slider"] .BffT7IQWKYg- {
+  height: 100% !important;
+  border-radius: var(--se-radius-pill);
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) [role="slider"] .aejFKWIp7Dg- {
+  background: rgba(255, 255, 255, .22) !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) [role="slider"] .eBjRkRA8NpA- {
+  background: var(--se-accent) !important;
+}
+
+/* Icon buttons: 34px circles. */
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) .EE0MOLi31qY- .cOcEiRe-dIg- {
+  display: grid !important;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0 !important;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, .85);
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) .EE0MOLi31qY- .cOcEiRe-dIg-:hover {
+  background: rgba(255, 255, 255, .12);
+  color: var(--se-white);
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) .EE0MOLi31qY- .cOcEiRe-dIg- svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) .EE0MOLi31qY- .QkF4JCVWpWw- {
+  gap: 4px;
+  margin-left: 6px;
+  color: rgba(255, 255, 255, .85) !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel, .gamehighlight_desktopcarousel) .EE0MOLi31qY- .QkF4JCVWpWw- ._8RH876Wgr7A- {
+  color: rgba(255, 255, 255, .45);
+}
+
+/* "On Wishlist" on the video (trailerdefines.css .-D61WKs-ZxQ-, shown with .cIdEvZnHFHs-): the
+   theme's pink glass chip with a star, top-left. */
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .-D61WKs-ZxQ- {
+  top: 12px !important;
+  left: 12px !important;
+  z-index: 12 !important;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px 5px 9px !important;
+  color: var(--se-wish) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .06em;
+  line-height: 14px;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .-D61WKs-ZxQ-::before {
+  content: "★";
+  font-size: var(--se-fs-xs);
+}
+
+/* The title chip moves down when the wishlist chip holds the corner. */
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .AppVideoCtn:has(.-D61WKs-ZxQ-.cIdEvZnHFHs-) .rs5MCL6BI2A- {
+  top: 48px !important;
+}
+
+/* Video title strip ("General / Cinematic | Game"): a glass chip on the video's corner. */
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .rs5MCL6BI2A- {
+  top: 12px !important;
+  inset-inline-start: 12px !important;
+  padding: 5px 11px !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 600;
+  text-shadow: none !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .rs5MCL6BI2A- .iRWZX4LtE-Q- {
+  color: var(--se-accent);
+}
+
+/* "Autoplay Videos" / "Auto Advance" checkboxes (Steam's DialogCheckbox): glass pills with a
+   rounded box, filled with the accent when on. */
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .DialogCheckbox_Container {
+  align-items: center;
+  gap: 8px;
+  height: auto !important;
+  padding: 5px 12px 5px 6px !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 600;
+  text-shadow: none !important;
+  cursor: pointer;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .DialogCheckbox_Container.LkfujtBIcfQ- {
+  top: 12px !important;
+  inset-inline-end: 12px !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .atnaqSRaIew-:hover .DialogCheckbox_Container.LkfujtBIcfQ- {
+  display: flex !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .DialogCheckbox {
+  flex: none;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xs) !important;
+  background: rgba(255, 255, 255, .12) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18) !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .DialogCheckbox.Active {
+  background: var(--se-accent) !important;
+  box-shadow: none !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .DialogCheckbox svg {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 3px;
+  box-sizing: border-box;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .DialogCheckbox svg path {
+  stroke: var(--se-on-accent) !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .DialogCheckbox svg path[filter] {
+  display: none;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .DialogToggle_Label {
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .DialogCheckbox_Container > div[style*="clear"] {
+  display: none;
+}
+
+/* Under the carousel: the auto-advance strip (salesectionfactory2.css .fD3uO-2SB9A-): no
+   black slab; a thin rounded countdown bar in the accent, the status in faint text, and the
+   "Auto Advance" pill at the end. */
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .fD3uO-2SB9A- {
+  gap: 12px;
+  margin-top: 10px;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  backdrop-filter: none !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .HRbFcf6y6hE- {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .-ZUk3xT7ZlY- {
+  flex: none;
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .KLUTL0g4Wbo- {
+  flex: 1 1 auto;
+  height: 4px !important;
+  border-radius: var(--se-radius-pill);
+  background: linear-gradient(90deg, var(--se-accent) var(--auto-advance-ratio, 0%), rgba(255, 255, 255, .12) 0) !important;
+}
+
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .KLUTL0g4Wbo-::before,
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .KLUTL0g4Wbo-::after,
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .KLUTL0g4Wbo- > * {
+  display: none !important;
+}
+
+
+/* ==========================================================================
+ * Tier tiles (legacy monthly page): flags and the game hover card.
+ * ========================================================================== */
+
+/* Classic flags on the tiles (.ds_flag "On Wishlist" / "In Library" / "Ignored"): the theme's
+   glass chip, top-left, clear of the wishlist button in the other corner. */
+html.se-store:not(#se-none) .SaleOuterContainer .ds_flag {
+  position: absolute !important;
+  inset: 10px auto auto 10px !important;
+  z-index: 4;
+  width: auto !important;
+  height: auto !important;
+  padding: 4px 10px !important;
+  color: var(--se-owned) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .06em;
+  line-height: 14px !important;
+  text-transform: uppercase;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .ds_flag.ds_wishlist_flag {
+  color: var(--se-wish) !important;
+}
+
+/* Steam's star is a background image the chip replaces; it returns as a mask in the text colour. */
+html.se-store:not(#se-none) .SaleOuterContainer .ds_flag.ds_wishlist_flag::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-inline-end: .45em;
+  vertical-align: -.14em;
+  background: currentColor;
+  -webkit-mask: var(--se-star-mask) center / contain no-repeat;
+  mask: var(--se-star-mask) center / contain no-repeat;
+}
+
+/* Steam dims flagged art; the chip alone says it. */
+html.se-store:not(#se-none) .SaleOuterContainer .ds_flagged img {
+  opacity: 1 !important;
+}
+
+/*
+ * Hover card (saletags.css .PFP2RDjCi0w-): screenshot, capsule over its lower edge beside the
+ * price, then title, tags, review summary, platforms and date. The store front's hover card:
+ * one dark rounded card, no foil gradients, shine sweep or drop-shadowed panels.
+ */
+html.se-store:not(#se-none) .PFP2RDjCi0w- {
+  overflow: hidden;
+  color: var(--se-text-dim);
+  font-family: inherit !important;
+}
+
+/* Screenshot: the top of the card, its corners clipped by the card. */
+html.se-store:not(#se-none) .PFP2RDjCi0w- ._4lcICEhYuQw- {
+  overflow: hidden;
+}
+
+/* Capsule and price row: the capsule rides up over the screenshot as a rounded tile. */
+html.se-store:not(#se-none) .PFP2RDjCi0w- .brHZRAeRCnw- {
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+}
+
+html.se-store:not(#se-none) .PFP2RDjCi0w- .JsLUT-ZChQQ- .-G728TP4qEc- {
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), var(--se-shadow-sm) !important;
+}
+
+html.se-store:not(#se-none) .PFP2RDjCi0w- .JsLUT-ZChQQ- .-G728TP4qEc- img {
+  width: 100%;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+html.se-store:not(#se-none) .PFP2RDjCi0w- .AWrycDVaY80-::after {
+  display: none !important;
+}
+
+html.se-store:not(#se-none) .PFP2RDjCi0w- .Er5Gw2jrA3A- {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 10px;
+}
+
+/* Green "in library"-style strip: the theme's green pill. */
+html.se-store:not(#se-none) .PFP2RDjCi0w- .mVkwv5PYwMg- {
+  align-self: flex-start;
+  margin: 10px 14px 0;
+  padding: 3px 10px;
+  border-radius: var(--se-radius-pill);
+  background: rgba(164, 208, 7, .16) !important;
+  color: #c6ef5a !important;
+  font-size: var(--se-fs-sm);
+  font-weight: 700;
+  text-shadow: none;
+}
+
+/* Text panel: flat on the card, no glass slab or shadow of its own. */
+html.se-store:not(#se-none) .PFP2RDjCi0w- .uN9-XHR7odQ- {
+  background: none !important;
+  backdrop-filter: none;
+  box-shadow: none !important;
+}
+
+html.se-store:not(#se-none) .PFP2RDjCi0w- .k0yt-Gxhbs4- {
+  padding: 12px 16px 16px;
+}
+
+html.se-store:not(#se-none) .PFP2RDjCi0w- .io6uTUtzW-A- {
+  max-height: none;
+  padding: 0;
+  color: var(--se-white);
+  font-size: var(--se-fs-xl);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* Tags: the theme's pill chips, two rows at most. */
+html.se-store:not(#se-none) .PFP2RDjCi0w- ._58-zzK2uRws- {
+  max-height: none;
+  padding: 10px 0 0;
+}
+
+html.se-store:not(#se-none) .PFP2RDjCi0w- .mGygcOFcFcQ- {
+  gap: 6px;
+  max-height: 54px;
+  padding: 0;
+}
+
+html.se-store:not(#se-none) .PFP2RDjCi0w- .GwjmtMACpAo- {
+  margin: 12px 0 0;
+}
+
+/* Platforms and release date. */
+html.se-store:not(#se-none) .PFP2RDjCi0w- .N6R56w3oY8s- {
+  gap: 8px;
+  margin: 8px 0 0;
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-sm);
+}
+
+html.se-store:not(#se-none) .PFP2RDjCi0w- .aRGldfNGEPM- {
+  opacity: 1;
+  padding: 0;
+}
+
+html.se-store:not(#se-none) .PFP2RDjCi0w- .aRGldfNGEPM- svg {
+  fill: var(--se-text-faint);
+  color: var(--se-text-faint);
+}
+
+html.se-store:not(#se-none) .PFP2RDjCi0w- .X9907eDQcow- {
+  color: var(--se-text-faint);
+}
+
+/* Wishlist button on the card's screenshot: a glass circle with a star that opens into a
+   labelled pill on hover (Steam's is a blue square). */
+html.se-store:not(#se-none) :is(.PFP2RDjCi0w-, .K2PjXmYWvSg-, .UYfcYZDtfbs-) .KoUJweWUwjY- {
+  top: 10px;
+  inset-inline-end: 10px;
+  align-items: center;
+  min-width: 32px;
+  height: 32px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12) !important;
+  color: var(--se-white);
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+/* A 14px star centred in the circle (Steam's 24px + padding grew it past the button). */
+html.se-store:not(#se-none) :is(.PFP2RDjCi0w-, .K2PjXmYWvSg-, .UYfcYZDtfbs-) .KoUJweWUwjY- > svg {
+  flex: none;
+  box-sizing: content-box !important;
+  width: 14px !important;
+  height: 14px !important;
+  margin: 0 !important;
+  padding: 9px !important;
+}
+
+html.se-store:not(#se-none) :is(.PFP2RDjCi0w-, .K2PjXmYWvSg-, .UYfcYZDtfbs-) .KoUJweWUwjY- .XAGO1LWGig0- {
+  padding: 0;
+  line-height: 32px;
+  text-shadow: none;
+}
+
+html.se-store:not(#se-none) :is(.PFP2RDjCi0w-, .K2PjXmYWvSg-, .UYfcYZDtfbs-) .KoUJweWUwjY-:hover {
+  background: rgba(255, 102, 170, .22) !important;
+  color: var(--se-wish);
+}
+
+html.se-store:not(#se-none) :is(.PFP2RDjCi0w-, .K2PjXmYWvSg-, .UYfcYZDtfbs-) .KoUJweWUwjY-:hover .XAGO1LWGig0- {
+  padding-inline-end: 12px;
+  color: var(--se-wish);
+  font-size: var(--se-fs-sm);
+  font-weight: 600;
+}
+
+/* Tile flags (saletags.css .WWolAsqP274- stack of .LCYi5cxHqgI-: "On Wishlist" as a pale box,
+   .ZuMhm9DQqbw- blue, .eASrfjoxe3o- gradient): the theme's glass chips, top-left. */
+html.se-store:not(#se-none) .WWolAsqP274- {
+  top: 10px !important;
+  left: 10px !important;
+  justify-items: start;
+  row-gap: 6px;
+}
+
+html.se-store:not(#se-none) .LCYi5cxHqgI- {
+  gap: 6px;
+  height: auto !important;
+  padding: 4px 10px !important;
+  color: var(--se-wish) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700;
+  letter-spacing: .06em;
+  line-height: 14px;
+}
+
+html.se-store:not(#se-none) .LCYi5cxHqgI-.ZuMhm9DQqbw- {
+  color: var(--se-owned) !important;
+}
+
+html.se-store:not(#se-none) .LCYi5cxHqgI-.eASrfjoxe3o- {
+  color: var(--se-accent) !important;
+}
+
+html.se-store:not(#se-none) .LCYi5cxHqgI- .ppO76q5Y-Zg- {
+  width: auto;
+  height: 10px;
+  margin: 0 !important;
+  fill: currentColor;
+  color: inherit;
+}
+
+/* Steam's flag icons are drawn dark for its pale box; on the glass chip they take the text
+   colour (SVG) or are knocked out to white (image). */
+html.se-store:not(#se-none) .LCYi5cxHqgI- :is(svg, svg *) {
+  fill: currentColor !important;
+}
+
+html.se-store:not(#se-none) .LCYi5cxHqgI- img {
+  filter: brightness(0) invert(1);
+}
+
+/*
+ * The tier tiles themselves (saletags.css .iwrzh-mg8hE- holding a compact .PFP2RDjCi0w-
+ * .djLCJl8FKv8-, whose text panel slides up on hover): rounded theme tiles with a hairline
+ * ring, no scale bump, and a solid panel under the text (the card rules above flatten it for
+ * the popover, where the card itself is the backdrop).
+ */
+html.se-store:not(#se-none) .iwrzh-mg8hE- {
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .iwrzh-mg8hE-.oZCOhIQDgxo-:hover {
+  transform: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22);
+}
+
+html.se-store:not(#se-none) .PFP2RDjCi0w-.djLCJl8FKv8- {
+  border-radius: inherit;
+  box-shadow: none !important;
+}
+
+html.se-store:not(#se-none) .PFP2RDjCi0w-.djLCJl8FKv8- .uN9-XHR7odQ- {
+  background: rgba(23, 26, 32, .94) !important;
+}
+
+/* The popover card (main.css .j-9OlMX1FS8- positioner) keeps Steam's fade; it just scales in
+   from 98% instead of 95% so it doesn't jump. */
+html.se-store:not(#se-none) .lx1fe7xI0bg- {
+  transform: scale(.98);
+}
+
+html.se-store:not(#se-none) .lx1fe7xI0bg-:is(.ARp2qEoElPE-, .DwDon-U2yLI-) {
+  transform: none;
+}
+
+/*
+ * Capsule carousels on the monthly page ("On Wishlist" …: storelink .SaleSectionCarousel with
+ * hero-art capsules): the front page's rows. Section header in the title style, round glass
+ * arrows over the row's ends, rounded art tiles with the price chip on a clear bottom bar.
+ */
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionHeader {
+  margin: 0 0 14px !important;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionLabelCtn {
+  margin: 0 !important;
+  padding: 0 4px !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer :is(.SaleSectionCarousel, .SaleSectionCarousel .carousel, .SaleSectionCarousel .SliderBody) {
+  overflow: visible !important;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel .carousel {
+  position: relative;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel :is(.CarouselBtnLeft, .CarouselBtnRight) {
+  position: absolute !important;
+  top: var(--se-arrow-y, 50%) !important;
+  bottom: auto !important;
+  z-index: 6;
+  margin: -22px 0 0 !important;
+  /* storelink.css nudges the right arrow 16px in (translate(-16px)), off the measured spot. */
+  transform: none !important;
+  translate: none !important;
+  opacity: 1;
+}
+
+/* The arrows sit just inside the row's visible edges, over the end tiles, at the same spot on
+   every row: the row keeps its full width (lined up with the section title) and nothing
+   hangs off the page. shared/sale.js measures each row's window (its wrappers differ per
+   section) into --se-arrow-x / -y. */
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel .CarouselBtnLeft {
+  left: var(--se-arrow-x, 12px) !important;
+  right: auto !important;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel .CarouselBtnRight {
+  right: var(--se-arrow-x, 12px) !important;
+  left: auto !important;
+}
+
+/* At a row's end the arrow goes away instead of greying out. */
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel :is(.CarouselBtnLeft, .CarouselBtnRight):is(:disabled, [data-se-end]) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Hero art fills its tile. */
+html.se-store:not(#se-none) .SaleOuterContainer .HeroCapsuleImageContainer {
+  overflow: hidden;
+  background: none !important;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .HeroCapsuleImageContainer img:not([src*="/capsule_dlc"]) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Bottom bar: no strip of its own; the price chip sits at its end on the tile's surface, and
+   any platform icons at its start. Steam fixes the bar at 38px, which clipped the price chip
+   (and its padding) in grid tiles; it sizes to a compact 30px chip instead. */
+html.se-store:not(#se-none) .SaleOuterContainer .CapsuleBottomBar {
+  display: flex !important;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  --se-price-h: 30px;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 8px 10px !important;
+  background: var(--se-surface) !important;
+  box-shadow: none !important;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .CapsuleBottomBar .aCttqIa8NC4- {
+  display: inline-flex;
+  gap: 6px;
+  margin-inline-end: auto;
+  color: var(--se-text-faint);
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .CapsuleBottomBar .aCttqIa8NC4-:empty {
+  display: none;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .CapsuleBottomBar .aCttqIa8NC4- :is(svg, img) {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+  opacity: .8;
+}
+
+/* Tiles lift a little on hover, like the front page's. */
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel .iwrzh-mg8hE- {
+  transition: transform var(--se-dur) var(--se-ease), box-shadow var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel .iwrzh-mg8hE-:hover {
+  transform: translateY(-3px) !important;
+}
+
+/*
+ * "DLC for you" block (salesectionfactory2.css .BEJJ0zhyKjM-: a purple foil band with the
+ * game's blurred library hero behind it): a rounded theme surface; the hero stays as a faint
+ * wash fading down, clipped to the card.
+ */
+html.se-store:not(#se-none) .BEJJ0zhyKjM-:not(.qpvtVMRAn98-) {
+  overflow: hidden;
+}
+
+html.se-store:not(#se-none) .BEJJ0zhyKjM- .hKkjz-K347w- {
+  filter: saturate(.6) opacity(.22) blur(6px);
+  border-radius: inherit;
+}
+
+/*
+ * Expanded library capsule (saletags.css ._8Wp5WbqAbJA-.K2PjXmYWvSg-: hero art over a column
+ * with the description, tags, release info, media strip and review score): one rounded theme
+ * card instead of Steam's black gradient slab.
+ */
+html.se-store:not(#se-none) ._8Wp5WbqAbJA-.K2PjXmYWvSg- {
+  overflow: hidden;
+}
+
+/*
+ * Expanded library card, art column: Steam fixes the art to a 377:452 box, which left a strip
+ * under it when the text column ran taller. The art is laid over the whole column instead
+ * (absolute, cover) and the column clipped to the card's left corners (the card's wrappers
+ * carry no radius to inherit). The flag stack (.CapsuleDecorators) keeps its own size.
+ */
+html.se-store:not(#se-none) .K2PjXmYWvSg- .bdPmPtfuqIY- {
+  align-items: stretch;
+  overflow: hidden;
+  border-radius: var(--se-radius-xl);
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .JCVuyoKAC-k- {
+  position: relative;
+  aspect-ratio: auto !important;
+  align-self: stretch;
+  overflow: hidden;
+  clip-path: inset(0 round var(--se-radius-xl) 0 0 var(--se-radius-xl));
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .JCVuyoKAC-k- > div {
+  position: absolute;
+  inset: 0;
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .JCVuyoKAC-k- > div > a,
+html.se-store:not(#se-none) .K2PjXmYWvSg- .JCVuyoKAC-k- .vL-XYGsLedM- {
+  display: block;
+  height: 100%;
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .JCVuyoKAC-k- .vL-XYGsLedM- {
+  position: relative;
+}
+html.se-store:not(#se-none) .K2PjXmYWvSg- .JCVuyoKAC-k- .HeroCapsuleImageContainer {
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: auto !important;
+  padding: 0 !important;
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .JCVuyoKAC-k- .HeroCapsuleImageContainer img:not([src*="/capsule_dlc"]) {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  object-fit: cover;
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .JCVuyoKAC-k- .CapsuleDecorators {
+  z-index: 2;
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .VGzHGCF3I5o- {
+  position: relative;
+  padding: 0 20px 18px;
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .-rXzhlz0w3Q- {
+  gap: 20px;
+  margin: 16px 0 0;
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- ._-7gyAR9oUx4- {
+  gap: 14px;
+  justify-content: flex-start;
+  padding: 0;
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .StoreSaleWidgetShortDesc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-base) !important;
+  line-height: 1.55 !important;
+}
+
+/* Tags: a faint label, then the theme's pill chips. */
+html.se-store:not(#se-none) .SaleOuterContainer .SaleTagBlockCtn {
+  align-items: center;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .WidgetTagTitle {
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700;
+  letter-spacing: .07em;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .TagBox {
+  gap: 6px !important;
+  max-height: 54px !important;
+}
+
+/* Release / developer / publisher: faint labels, values in the text colour. */
+html.se-store:not(#se-none) .K2PjXmYWvSg- .R9ivMzB3Gic- :is(.W9-byrNtR9Q-, .llT8dhJgnqw-) {
+  color: var(--se-text-faint) !important;
+  line-height: 22px;
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .R9ivMzB3Gic- :is(.W9-byrNtR9Q-, .llT8dhJgnqw-) span {
+  color: var(--se-text) !important;
+}
+
+/* Media strip: rounded trailer and screenshots. */
+html.se-store:not(#se-none) .K2PjXmYWvSg- .WDTUiOfZjRM- {
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .WDTUiOfZjRM- img {
+  display: block;
+  object-fit: cover;
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .kxs4VtommH4- {
+  margin: 14px 0 0;
+}
+
+/*
+ * DLC widgets in "DLC for you" (saletags.css ._8Wp5WbqAbJA-.UYfcYZDtfbs-: capsule left, a grid
+ * of title / tags / date / reviews / description / price right, over a blurred copy of the
+ * art): rounded theme rows on the block's surface, the art clipped to the left end.
+ */
+html.se-store:not(#se-none) ._8Wp5WbqAbJA-.UYfcYZDtfbs- {
+  overflow: hidden;
+  margin: 0 0 12px;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface-2) !important;
+  backdrop-filter: none;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+/* The DLC art is a wide header capsule (460:215): shown whole, as a rounded tile inset in the
+   row's left cell, not stretched to the row's height (which cropped it to a sliver). */
+html.se-store:not(#se-none) .UYfcYZDtfbs- .MN6Xv-pm6i8- {
+  align-self: center;
+  padding: 16px 0 16px 16px !important;
+}
+
+html.se-store:not(#se-none) .UYfcYZDtfbs- .MN6Xv-pm6i8- .CapsuleImageCtn {
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .06);
+}
+
+html.se-store:not(#se-none) .UYfcYZDtfbs- .MN6Xv-pm6i8- img:not([src*="/capsule_dlc"]) {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 460 / 215;
+  object-fit: cover;
+}
+
+/* Steam's blurred copy of the art behind the text: the row's surface instead. */
+html.se-store:not(#se-none) .UYfcYZDtfbs- .raYV6Y-MQ7I- {
+  display: none !important;
+}
+
+html.se-store:not(#se-none) .UYfcYZDtfbs- .-Rv33oXsbT0- {
+  align-content: start;
+  row-gap: 8px;
+  padding: 18px 20px !important;
+}
+
+html.se-store:not(#se-none) .UYfcYZDtfbs- .ncKEDk26SHQ- {
+  display: flex !important;
+  margin: 0;
+  padding: 0 44px 0 0; /* clear of the wishlist button */
+}
+
+html.se-store:not(#se-none) .UYfcYZDtfbs- .StoreSaleWidgetTitle {
+  margin: 0;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  text-decoration: none !important;
+}
+
+html.se-store:not(#se-none) .UYfcYZDtfbs- .V7rq-SSC9xQ- {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  height: 24px;
+  margin: 0;
+}
+
+html.se-store:not(#se-none) .UYfcYZDtfbs- .A8oyzoRvWQ8- {
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-sm) !important;
+  letter-spacing: .04em;
+}
+
+html.se-store:not(#se-none) .UYfcYZDtfbs- .StoreSaleWidgetShortDesc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-base) !important;
+  line-height: 1.55 !important;
+}
+
+html.se-store:not(#se-none) .UYfcYZDtfbs- .OClIuwfiMKQ- {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+/*
+ * Filters sidebar of the library grid (salesectionfactory2.css .-hv44tztogk-: a sticky black
+ * column with uppercase headings, faint rows and grey chips): a sticky theme panel. Group
+ * headings as collapsible rows with a chevron, options as rounded rows with a faint count
+ * (the chosen one in the accent, unavailable ones dimmed), active filters as pill chips, and
+ * the search box as a theme field. Inline colours Steam writes on the parts are overridden.
+ */
+html.se-store:not(#se-none) .-hv44tztogk- {
+  box-sizing: border-box;
+  padding: 16px 12px !important;
+  opacity: 1;
+  overflow-y: auto !important;
+  color: var(--se-text-dim) !important;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .LqxuK0WbfSg- {
+  padding: 0 8px 8px !important;
+  border: 0 !important;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- :is(.oY5r-Odsz8g-, .FnGZEAq6WGU-, .aX52PmtYxbo-) {
+  margin: 2px 8px 8px;
+  padding: 0;
+  color: var(--se-text-faint) !important;
+  opacity: 1;
+  font-size: var(--se-fs-sm);
+  letter-spacing: .02em;
+  text-transform: none;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .FnGZEAq6WGU-:hover {
+  color: var(--se-accent) !important;
+}
+
+/* Active filters ("Hide ignored items", chosen tags): pill chips with their ✕. */
+html.se-store:not(#se-none) .-hv44tztogk- ._0lePp7tY0Dk- {
+  gap: 6px;
+  padding: 0 6px 8px;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- ._0lePp7tY0Dk- .LVHHx1-pubk- {
+  display: inline-flex;
+  gap: 6px;
+  margin: 0;
+  padding: 4px 10px 4px 8px;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: rgba(124, 196, 255, .14);
+  color: var(--se-owned) !important;
+  font-size: var(--se-fs-sm);
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- ._0lePp7tY0Dk- .LVHHx1-pubk-:hover {
+  background: rgba(124, 196, 255, .24);
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- ._0lePp7tY0Dk- .LVHHx1-pubk- svg {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  fill: currentColor;
+}
+
+/* Search: the theme's field. */
+html.se-store:not(#se-none) .-hv44tztogk- .iJWUYfeV95s- {
+  padding: 0 4px 6px;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .DialogInput {
+  width: 100%;
+  transition: box-shadow var(--se-dur-fast);
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-base) !important;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .DialogInput::placeholder {
+  color: var(--se-text-faint);
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .DialogInput:focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent) !important;
+}
+
+/* Groups: heading rows with a small chevron. */
+html.se-store:not(#se-none) .-hv44tztogk- .q2wFgOjNF-Y- {
+  margin: 2px 0;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .A2HZ4hMXGp4- {
+  align-items: center;
+  padding: 0 8px;
+  border-radius: var(--se-radius-sm);
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .A2HZ4hMXGp4-:hover {
+  background: var(--se-hover);
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- ._7X4jrVmFGtI- {
+  padding: 8px 0 !important;
+  border: 0 !important;
+  color: var(--se-text) !important;
+  opacity: 1;
+  font-size: var(--se-fs-base);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .A2HZ4hMXGp4- svg {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin: 0;
+  fill: var(--se-text-faint);
+  stroke: none;
+  transition: transform var(--se-dur) var(--se-ease);
+}
+
+/* Options: rounded rows, count on the right. */
+html.se-store:not(#se-none) .-hv44tztogk- :is(.-Ege6f1Yptk-, .VXdc59plnX8-, .WBkoWSO5LiA-) {
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 0 16px;
+  border-radius: var(--se-radius-sm);
+  opacity: 1;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- :is(.-Ege6f1Yptk-, .VXdc59plnX8-):hover {
+  background: var(--se-hover);
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .qiave-4s9Ho- {
+  margin: 0;
+  padding: 6px 0;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-base);
+  text-decoration: none !important;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .-Ege6f1Yptk-:hover .qiave-4s9Ho- {
+  color: var(--se-text) !important;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .VXdc59plnX8- .qiave-4s9Ho- {
+  color: var(--se-accent) !important;
+  font-weight: 700;
+}
+
+/* The chosen option: a soft accent fill with a short rounded bar inside its left edge, in
+   place of Steam's orange left border (which bent round the row's rounded corners). */
+html.se-store:not(#se-none) .-hv44tztogk- .VXdc59plnX8- {
+  position: relative;
+  border: 0 !important;
+  background: var(--se-accent-surface) !important;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .VXdc59plnX8-:hover {
+  background: color-mix(in srgb, var(--se-accent-surface) 80%, var(--se-accent) 20%) !important;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .VXdc59plnX8-::before {
+  content: "" !important;
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 6px;
+  width: 3px;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent) !important;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .VXdc59plnX8-::after {
+  display: none !important;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .WBkoWSO5LiA- {
+  opacity: .4;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- .bHjauJ-LbAQ- {
+  margin: 0;
+  color: var(--se-text-faint);
+  opacity: 1;
+  font-size: var(--se-fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- ._-7fa3EBI-Lw- {
+  margin: 2px 0 6px;
+  padding: 4px 16px;
+  color: var(--se-accent);
+  opacity: 1;
+  font-size: var(--se-fs-sm);
+  font-weight: 600;
+}
+
+html.se-store:not(#se-none) .-hv44tztogk- ._-7fa3EBI-Lw-:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* Expanded library card, bottom bar (platforms, price): no black strip; it sits on the card
+   under a hairline, the platform icons small and faint. */
+html.se-store:not(#se-none) .K2PjXmYWvSg- .VGzHGCF3I5o- .fNtXEMzHz58- {
+  display: flex;
+  align-items: center;
+  height: auto !important;
+  margin: 14px 0 0;
+  padding: 12px 0 0 !important;
+  background: none !important;
+  box-shadow: inset 0 1px 0 var(--se-hairline) !important;
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .fNtXEMzHz58- .aCttqIa8NC4- :is(img, svg) {
+  width: 16px !important;
+  height: 16px !important;
+  fill: var(--se-text-faint) !important;
+  color: var(--se-text-faint) !important;
+}
+
+html.se-store:not(#se-none) .K2PjXmYWvSg- .fNtXEMzHz58- .aCttqIa8NC4- img {
+  opacity: .55;
+}
+
+/*
+ * Carousel scroll bar under the rows (carouselarrows.css .Udbg33O1Kjs-: a 1px track with a
+ * grey thumb and two invisible click halves): a slim rounded track with a light pill thumb,
+ * brighter on hover. The click halves stay as they are.
+ */
+html.se-store:not(#se-none) .SaleOuterContainer .Udbg33O1Kjs- {
+  height: 28px;
+  margin: 10px 8px 0;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .Udbg33O1Kjs- .IxjyotVSZiA- {
+  inset: 12px 0 !important;
+  height: 4px;
+  border-radius: var(--se-radius-pill);
+  background: rgba(255, 255, 255, .07) !important;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .Udbg33O1Kjs- .cD9zjaueru0- {
+  top: 12px !important;
+  bottom: auto !important;
+  height: 4px;
+  border-radius: var(--se-radius-pill);
+  background: rgba(255, 255, 255, .32) !important;
+  transition: left var(--se-dur-slow) var(--se-ease), right var(--se-dur-slow) var(--se-ease), inset var(--se-dur-slow) var(--se-ease), background-color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .Udbg33O1Kjs-:hover .cD9zjaueru0- {
+  background: rgba(255, 255, 255, .55) !important;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .Udbg33O1Kjs- .-LFP33ltPBY- {
+  background: none !important;
+  border: 0 !important;
+  cursor: pointer;
+}
+
+/* "Share with Friends" (partnereventshared.css .yYL-OrX9PtQ- share button): the title in the
+   section style beside a pill button with the share icon in the text colour. */
+html.se-store:not(#se-none) .SaleOuterContainer .social_share ._5uN-ZG0AdmQ- {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .social_share .mlr-XtYml6w- {
+  margin: 0;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .SocialShareButton {
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px 0 14px !important;
+  color: var(--se-text) !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .SocialShareButton .SocialShareIcon {
+  width: 14px !important;
+  height: 14px !important;
+  margin: 0 !important;
+  fill: currentColor !important;
+}
+
+/*
+ * The page-end share row (.footer_default_social_share: "Share with Friends", the share
+ * button and an empty spacer), on event, hub and archive pages. Steam's footer layout (and
+ * events' custom CSS) splits it across the page: the title pushed to one side, the button
+ * dropped to the other. One centred row instead, every part sized to its content: direction
+ * (flex and writing), wrapping, order, floats and widths are all reset, so whichever of them a page uses, it
+ * can't pull the row apart. The empty spacer goes.
+ */
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCtn.footer_default_social_share {
+  display: flex !important;
+  flex-flow: row wrap !important;
+  direction: ltr !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px 16px;
+  position: static !important;
+  inset: auto !important;
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 28px auto 64px !important;
+  padding: 0 !important;
+  float: none !important;
+  transform: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  text-align: center !important;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .footer_default_social_share > * {
+  position: static !important;
+  flex: none !important;
+  order: 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  float: none !important;
+  transform: none !important;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .footer_default_social_share > :empty {
+  display: none !important;
+}
+
+/* The title: a quiet label beside the button, not a page heading. */
+html.se-store:not(#se-none) .SaleOuterContainer .footer_default_social_share > :first-child {
+  padding: 0 !important;
+  color: var(--se-text-muted) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/*
+ * Section tabs ("New Releases / Top Sellers / Most Played …": salesectionfactory2.css
+ * .i8Nz35tfmTA-, a frosted band of uppercase links with an underline under the active one):
+ * a segmented control. One rounded track centred on the page, each tab a pill, the active one
+ * filled.
+ */
+/* The band spans the page column itself, so "centred" means the page's centre: Steam offsets
+   it within its section (and pads its scrolling row), which pushed the track off to one side.
+   It sticks under the store bar as the page scrolls, as Steam means it to, but as a sticky
+   block in its own place: Steam's own pinning swapped its size and offsets as it caught,
+   and the tabs jumped. One mode, the same box, pinned or not. */
+html.se-store:not(#se-none) .i8Nz35tfmTA- {
+  position: sticky !important;
+  /* Below the floating store bar: its 46px capsule (--se-nav-h, shared/nav.css) in a strip
+     with 6px above and below, then a 12px gap. Steam's own offset variable stays 0 here,
+     since the theme's bar replaces the menu that set it; the larger of the two wins. */
+  top: calc(max(var(--store-menu-floating-height, 0px), var(--se-nav-h, 46px) + 12px) + 12px) !important;
+  left: auto !important;
+  right: auto !important;
+  z-index: 150 !important;
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: 100% !important;
+  margin: 0 auto 20px !important;
+  padding: 0 !important;
+  transform: none !important;
+  translate: none !important;
+  border-radius: 0 !important;
+  background: none !important;
+  backdrop-filter: none !important;
+}
+
+html.se-store:not(#se-none) .i8Nz35tfmTA- .nVdaSJgIKUI- {
+  display: flex !important;
+  /* safe: when the tabs overflow, the row scrolls from its start instead of clipping it. */
+  justify-content: safe center !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  scrollbar-width: none;
+}
+
+html.se-store:not(#se-none) .i8Nz35tfmTA- .N0K1kaLyXQ0- {
+  flex: none;
+  /* Sized to its tabs (some hubs stretch it across the page, leaving the tabs at its start). */
+  width: max-content !important;
+  max-width: 100% !important;
+  gap: 4px;
+  margin: 0 auto !important;
+  padding: 4px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store:not(#se-none) .i8Nz35tfmTA- .lCddIzY8s9c- {
+  height: 36px !important;
+  padding: 0 16px !important;
+  border-radius: var(--se-radius-pill);
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+/* Steam's underline. */
+html.se-store:not(#se-none) .i8Nz35tfmTA- .lCddIzY8s9c-::after {
+  display: none !important;
+}
+
+html.se-store:not(#se-none) .i8Nz35tfmTA- .lCddIzY8s9c-:not(.f1tg24vfjWA-):hover {
+  background: var(--se-hover);
+  color: var(--se-text) !important;
+}
+
+html.se-store:not(#se-none) .i8Nz35tfmTA- .lCddIzY8s9c-.f1tg24vfjWA- {
+  background: var(--se-selected);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-white) !important;
+  font-weight: 700 !important;
+}
+
+/*
+ * Grid tiles stretched by their row (a tier's lead tile beside smaller ones, a wide capsule
+ * beside tall ones): Steam keeps the art at its own ratio and pins the bottom bar to the
+ * tile's foot, leaving an empty slab between them. The art grows into that space instead:
+ * each wrapper down to the art box flexes, the box keeps Steam's ratio padding as its least
+ * height and the image covers it. Tiles that aren't stretched look as before.
+ */
+html.se-store:not(#se-none) .SaleOuterContainer .iwrzh-mg8hE- > a,
+html.se-store:not(#se-none) .SaleOuterContainer .iwrzh-mg8hE- > a > div:not(.CapsuleBottomBar),
+html.se-store:not(#se-none) .SaleOuterContainer .iwrzh-mg8hE- > a > div:not(.CapsuleBottomBar) > .Panel {
+  display: flex !important;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .iwrzh-mg8hE- > a > div:not(.CapsuleBottomBar) > .Panel {
+  position: relative;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .iwrzh-mg8hE- :is(.HeroCapsuleImageContainer, .CapsuleImageCtn) {
+  flex: 1 1 auto;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .iwrzh-mg8hE- :is(.HeroCapsuleImageContainer, .CapsuleImageCtn) > img:not([src*="/capsule_dlc"]) {
+  height: 100% !important;
+  object-fit: cover;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .iwrzh-mg8hE- .CapsuleBottomBar {
+  flex: none;
+}
+
+/*
+ * Content hubs (Discounts & Events, categories, tags, genres: .SaleBackgroundCtn
+ * .ContentHubSalePage). Steam paints them near-black with an art layer and a glow band behind
+ * the top, and sets the title plain. On the theme: the page colour, no art layers, the title
+ * as the page's heading, and the carousel's slide dots centred under it.
+ */
+html.se-store:not(#se-none) body:has(.ContentHubSalePage) {
+  background: var(--se-bg) !important;
+}
+
+html.se-store:not(#se-none) .ContentHubSalePage,
+html.se-store:not(#se-none) .ContentHubSalePage .SaleBackground {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* The art layer and the glow band (the first children before the content column). */
+html.se-store:not(#se-none) .ContentHubSalePage .SaleBackground > :not(.SaleOuterContainer) {
+  display: none !important;
+}
+
+html.se-store:not(#se-none) .ContentHubSalePage .ContentHubTitleCtn {
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  height: auto !important;
+  margin: 28px auto 20px !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store:not(#se-none) .ContentHubSalePage .ContentHubTitle {
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-display) !important;
+  font-weight: 800 !important;
+  letter-spacing: -.02em !important;
+  line-height: 1.15 !important;
+  text-align: left !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/* The main carousel's slide dots: one centred row under the carousel. */
+html.se-store:not(#se-none) .contenthubmaincarousel .tYEw8zCMszM- {
+  display: flex !important;
+  justify-content: center !important;
+  flex-wrap: wrap;
+  gap: 6px;
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  margin: 14px 0 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+}
+
+/* Hub sections: Steam tints each section's panel (a purple wash under the tab bar on
+   Discounts & Events); they sit on the page colour like the rest of the hub. */
+html.se-store:not(#se-none) .ContentHubSalePage :is(.SaleSectionCtn, .SaleSectionForCustomCSS) {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* ==========================================================================
+ * Item browser (.SaleSectionCtn.sale_item_browser: "All / New & Trending / Top Sellers ..."
+ * over a filters column and a list of expanded game cards, on hubs and sale pages). The
+ * cards and the filters column are styled above; here the bar on top and the spacing:
+ *  - the bar as one card: the sort tabs as pills (the current one filled), the list / grid
+ *    toggle as a round button, the name search as a pill field with its glass inside;
+ *  - the filters column and the cards with even gaps; "Show more" as a pill.
+ * Hashes from the live store CSS (salesectionfactory2.css, 2026-11-09).
+ * ========================================================================== */
+
+html.se-store:not(#se-none) .sale_item_browser .SaleSectionForCustomCSS {
+  padding: 0 !important;
+}
+
+/* The section's backdrop layer (an empty first child Steam paints a gradient into), which
+   showed past the bar's rounded ends, and any fade Steam draws on the bar's edges. */
+html.se-store:not(#se-none) .sale_item_browser .SaleSectionForCustomCSS > ._29km0evCwsI- {
+  display: none !important;
+}
+
+html.se-store:not(#se-none) .sale_item_browser :is(.EtG3bD1IPJE-, ._25-ogODAwZc-)::before,
+html.se-store:not(#se-none) .sale_item_browser :is(.EtG3bD1IPJE-, ._25-ogODAwZc-)::after {
+  display: none !important;
+}
+
+/* The bar's sticky holder: Steam's dark backdrop and shadow (a halo round the bar) go. */
+html.se-store:not(#se-none) .sale_item_browser .FQuVIvXzECY- {
+  background: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+html.se-store:not(#se-none) .sale_item_browser .FQuVIvXzECY-::before,
+html.se-store:not(#se-none) .sale_item_browser .FQuVIvXzECY-::after {
+  display: none !important;
+}
+
+/* The bar. */
+html.se-store:not(#se-none) .sale_item_browser .EtG3bD1IPJE- {
+  box-shadow: none !important;
+  margin: 0 0 20px !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store:not(#se-none) .sale_item_browser ._25-ogODAwZc- {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 6px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg);
+  /* Frosted, so it reads over the cards when it sticks to the top while scrolling. */
+  background: color-mix(in srgb, var(--se-surface) 88%, transparent) !important;
+  backdrop-filter: var(--se-blur-panel);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store:not(#se-none) .sale_item_browser .wvR9NvCjhik- {
+  display: inline-flex !important;
+  align-items: center;
+  height: 36px !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+/* Steam's underline. */
+html.se-store:not(#se-none) .sale_item_browser .wvR9NvCjhik-::after {
+  display: none !important;
+}
+
+html.se-store:not(#se-none) .sale_item_browser .wvR9NvCjhik-:not(.Ya1xfGj0Mwk-):is(:hover, :focus-visible) {
+  outline: 0;
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store:not(#se-none) .sale_item_browser .wvR9NvCjhik-.Ya1xfGj0Mwk- {
+  background: var(--se-selected) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-white) !important;
+}
+
+/* Right end: the view toggle, then the search field with the glass inside it. */
+html.se-store:not(#se-none) .sale_item_browser .DUihfqC0e9s- {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 0 auto !important;
+  padding: 0 !important;
+}
+
+html.se-store:not(#se-none) .sale_item_browser .BpgMlRuOjcU- {
+  display: grid !important;
+  place-items: center;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text-muted) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .sale_item_browser .BpgMlRuOjcU-:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store:not(#se-none) .sale_item_browser .BpgMlRuOjcU-[aria-pressed="true"] {
+  background: var(--se-accent-surface) !important;
+  color: var(--se-accent) !important;
+}
+
+html.se-store:not(#se-none) .sale_item_browser .BpgMlRuOjcU- svg {
+  width: 16px !important;
+  height: 12px !important;
+}
+
+html.se-store:not(#se-none) .sale_item_browser .DUihfqC0e9s- > .SVGIcon_MagnifyingGlass {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 15px !important;
+  height: 15px !important;
+  margin: 0 -31px 0 0 !important;
+  color: var(--se-text-muted) !important;
+  fill: currentColor !important;
+  pointer-events: none;
+}
+
+html.se-store:not(#se-none) .sale_item_browser .DUihfqC0e9s- .DialogInput_Wrapper {
+  margin: 0 !important;
+}
+
+html.se-store:not(#se-none) .sale_item_browser .DUihfqC0e9s- .DialogInput {
+  box-sizing: border-box;
+  width: clamp(180px, 18vw, 280px) !important;
+  height: 36px !important;
+  padding: 0 14px 0 36px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  outline: 0;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .sale_item_browser .DUihfqC0e9s- .DialogInput::placeholder {
+  color: var(--se-text-faint) !important;
+  font-style: normal !important;
+}
+
+html.se-store:not(#se-none) .sale_item_browser .DUihfqC0e9s- .DialogInput:focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent) !important;
+}
+
+/* Filters column beside the cards, and the cards down the list, with even gaps. */
+html.se-store:not(#se-none) .sale_item_browser .hts1AEUagvA- {
+  gap: 24px;
+}
+
+html.se-store:not(#se-none) .sale_item_browser .AtwSCnEe4FE- {
+  display: flex !important;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+html.se-store:not(#se-none) .sale_item_browser .AtwSCnEe4FE- > ._8Wp5WbqAbJA- {
+  margin: 0 !important;
+}
+
+/* "Show more": the theme's pill, centred under the list. */
+html.se-store:not(#se-none) .sale_item_browser .WG2aFl-nbr4- {
+  display: flex !important;
+  justify-content: center;
+  margin: 8px 0 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store:not(#se-none) .sale_item_browser button._1sCZkpPvEB8- {
+  height: 40px !important;
+  padding: 0 22px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store:not(#se-none) .sale_item_browser button._1sCZkpPvEB8-:hover {
+  background: var(--se-hover) !important;
+}
+
+/* Hubs: the panels' backgrounds Steam writes inline (a purple-to-slate gradient on the tab
+   band, the tab panels such as "On Your Wishlist", the browser and its filters). Only the
+   gradients: art set as a url() is untouched. */
+html.se-store:not(#se-none) .ContentHubSalePage [style*="linear-gradient"] {
+  background-image: none !important;
+}

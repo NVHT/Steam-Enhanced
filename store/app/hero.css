@@ -1,0 +1,522 @@
+/*
+ * Game page (/app/<id>/...): the hero built by app/hero.js, scoped under html.se-store-app
+ * (store/loader.js). Steam's title row and backdrop change only once the hero has
+ * mounted (html.se-app-hero-on). Tokens: shared/base.css.
+ */
+
+/* ---------- Page ---------- */
+
+/* The theme's page colour under the whole page, instead of Steam's blue and per-game backdrop. */
+html.se-store-app body.v6.app,
+html.se-store-app .game_page_background.game {
+  background-color: var(--se-bg) !important;
+  background-image: none !important;
+}
+
+/* The hero carries the art; Steam's generated backdrop stays mounted but unseen. */
+html.se-app-hero-on .page_top_area > .game_page_background_ctn {
+  display: none !important;
+}
+
+/* ---------- Steam's title row, over the art ---------- */
+
+html.se-app-hero-on .page_top_area {
+  position: relative;
+}
+
+/* Breadcrumbs at the left, Community Hub at the right, in the page column at the top of the art. */
+html.se-app-hero-on .page_top_area > .page_title_area {
+  position: absolute;
+  inset: 20px 0 auto;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 0 !important;
+  padding: 0 !important;
+  pointer-events: none;
+}
+
+html.se-app-hero-on .page_title_area > * {
+  pointer-events: auto;
+}
+
+html.se-app-hero-on .page_title_area .breadcrumbs {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: var(--se-fs-sm);
+}
+
+/*
+ * Breadcrumbs as glass buttons, like Community Hub. Steam separates the links with bare " > "
+ * text (or separator spans): font-size 0 on the row drops those, the links restore their size,
+ * and a chevron after each button but the last stands in for them.
+ */
+html.se-app-hero-on .page_title_area .breadcrumbs .blockbg {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  /* No gap: the " > " text nodes are anonymous flex items too, so spacing goes on the pills. */
+  row-gap: 6px;
+  padding: 0 !important;
+  background: none !important;
+  font-size: 0 !important;
+}
+
+html.se-app-hero-on .page_title_area .breadcrumbs .blockbg > :not(a) {
+  display: none !important;
+}
+
+html.se-app-hero-on .page_title_area .breadcrumbs .blockbg > a {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-btn);
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line), var(--se-glass-btn-shadow);
+  backdrop-filter: var(--se-blur-chip);
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-sm);
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-app-hero-on .page_title_area .breadcrumbs .blockbg > a:not(:first-of-type) {
+  margin-left: 22px;
+}
+
+html.se-app-hero-on .page_title_area .breadcrumbs .blockbg > a:hover {
+  background: var(--se-glass-btn-hover);
+  color: var(--se-white) !important;
+}
+
+html.se-app-hero-on .page_title_area .breadcrumbs .blockbg > a:not(:last-of-type)::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  /* Centred in the 22px margin without widening the pill: 16 padding + 5, then back out. */
+  margin: 0 -33px 0 21px;
+  background: var(--se-text-faint);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+  pointer-events: none;
+}
+
+html.se-app-hero-on .page_title_area .apphub_HomeHeaderContent,
+html.se-app-hero-on .page_title_area .apphub_HeaderStandardTop {
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* The hero's title replaces Steam's. */
+html.se-app-hero-on #appHubAppName {
+  display: none !important;
+}
+
+html.se-app-hero-on .apphub_OtherSiteInfo {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  float: none !important;
+  margin: 0 !important;
+}
+
+/* ---------- Share / Embed / Report (app/hero.js), round glass icons before Community Hub ---------- */
+
+/* Steam's row in the right column, which ours click. */
+html.se-app-hero-on [data-se-tools-source] {
+  display: none !important;
+}
+
+.se-app-hero__tools {
+  display: flex;
+  gap: 8px;
+}
+
+.se-app-hero__tools[hidden] {
+  display: none;
+}
+
+.se-app-hero__tool {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-btn);
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line), var(--se-glass-btn-shadow);
+  backdrop-filter: var(--se-blur-chip);
+  color: var(--se-text);
+  cursor: pointer;
+  transition: background var(--se-dur-fast);
+}
+
+.se-app-hero__tool:hover {
+  background: var(--se-glass-btn-hover);
+}
+
+.se-app-hero__tool:focus-visible {
+  outline: 2px solid var(--se-accent);
+  outline-offset: 2px;
+}
+
+.se-app-hero__tool::before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  background: currentColor;
+  -webkit-mask: var(--se-tool-icon) center / contain no-repeat;
+  mask: var(--se-tool-icon) center / contain no-repeat;
+}
+
+.se-app-hero__tool[data-se-kind="share"] {
+  --se-tool-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='18' cy='5' r='3'/%3E%3Ccircle cx='6' cy='12' r='3'/%3E%3Ccircle cx='18' cy='19' r='3'/%3E%3Cpath d='M8.6 13.5l6.8 4M15.4 6.5l-6.8 4'/%3E%3C/svg%3E");
+}
+
+.se-app-hero__tool[data-se-kind="embed"] {
+  --se-tool-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16'/%3E%3C/svg%3E");
+}
+
+.se-app-hero__tool[data-se-kind="report"] {
+  --se-tool-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 21V4M5 4h11l-2 4 2 4H5'/%3E%3C/svg%3E");
+}
+
+/* Community Hub: a round glass button, like the theme's other buttons on art. */
+html.se-app-hero-on .apphub_OtherSiteInfo > a {
+  display: inline-flex !important;
+  align-items: center;
+  height: 32px;
+  padding: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-glass-btn) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line), var(--se-glass-btn-shadow);
+  backdrop-filter: var(--se-blur-chip);
+  transition: background var(--se-dur-fast);
+}
+
+html.se-app-hero-on .apphub_OtherSiteInfo > a:hover {
+  background: var(--se-glass-btn-hover) !important;
+}
+
+html.se-app-hero-on .apphub_OtherSiteInfo > a > span {
+  padding: 0 16px !important;
+  border-radius: inherit !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 700;
+  line-height: 32px !important;
+}
+
+/* ---------- Hero ---------- */
+
+.se-app-hero {
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  min-height: clamp(520px, 60vh, 680px);
+  padding: 96px var(--se-page-gutter) 52px;
+  overflow: hidden;
+  /* Shown until (or instead of) the art: a warm glow on the page colour. */
+  background: radial-gradient(60% 80% at 50% 30%, var(--se-surface-2), var(--se-bg) 70%);
+  color: var(--se-text);
+  text-align: center;
+}
+
+.se-app-hero [hidden] {
+  display: none !important;
+}
+
+.se-app-hero__art {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-position: center 25%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity var(--se-dur-slow) var(--se-ease), transform 1.2s var(--se-ease);
+}
+
+.se-app-hero__art[data-se-loaded] {
+  opacity: 1;
+  transform: none;
+}
+
+/* A small capsule stretched to hero size: blur it into a glow rather than show its pixels. */
+.se-app-hero__art[data-se-soft] {
+  inset: -48px;
+  filter: blur(28px) saturate(1.2);
+}
+
+/* Shade: darker at the top for the title row, clear in the middle, the page colour at the foot. */
+.se-app-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(70% 55% at 50% 72%, color-mix(in srgb, var(--se-bg) 55%, transparent), transparent 70%),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--se-bg) 60%, transparent) 0%,
+      color-mix(in srgb, var(--se-bg) 10%, transparent) 30%,
+      color-mix(in srgb, var(--se-bg) 45%, transparent) 62%,
+      var(--se-bg) 100%);
+}
+
+.se-app-hero__meta {
+  margin: 0;
+  color: var(--se-gold);
+  font-size: var(--se-fs-xs);
+  font-weight: 800;
+  line-height: 14px;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, .6);
+}
+
+.se-app-hero__title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: min(1100px, 100%);
+  margin: 0;
+  color: var(--se-white);
+  font-weight: 900;
+  text-transform: uppercase;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, .45);
+}
+
+/*
+ * Each line stays on one line (app/hero.js picks the split by measuring) and is scaled down by
+ * --se-fit, never below 0.55, when it is still wider than the title column.
+ */
+.se-app-hero__prefix,
+.se-app-hero__lead,
+.se-app-hero__tail {
+  max-width: none;
+  white-space: nowrap;
+}
+
+/* A maker's possessive ("Sid Meier's"), small, above the name. */
+.se-app-hero__prefix {
+  margin-bottom: .45em;
+  color: var(--se-white);
+  font-size: calc(clamp(15px, 1.5vw, 22px) * var(--se-fit, 1));
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: .14em;
+  opacity: .9;
+}
+
+.se-app-hero__prefix[hidden] {
+  display: none;
+}
+
+.se-app-hero__lead {
+  font-size: calc(clamp(56px, 7vw, 104px) * var(--se-fit, 1));
+  line-height: .9;
+  letter-spacing: -.02em;
+}
+
+/* Spaced gold capitals; padding-left balances the trailing letter-space so it stays centred. */
+.se-app-hero__tail {
+  margin-top: .1em;
+  color: var(--se-gold);
+  font-size: calc(clamp(24px, 3vw, 44px) * var(--se-fit, 1));
+  line-height: 1.2;
+  letter-spacing: .55em;
+  padding-left: .55em;
+}
+
+.se-app-hero__tail[data-se-long] {
+  letter-spacing: .18em;
+  padding-left: .18em;
+}
+
+/* ---------- Chips ---------- */
+
+/* Two rows: the top tags, then the game's standing (reviews, Metacritic, Deck, age rating). */
+.se-app-hero__chips {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.se-app-hero__chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.se-app-hero__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* Same size as the summary strip's pills (app/summary.css .se-app-summary__pill). */
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  backdrop-filter: var(--se-blur-chip);
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-sm);
+  font-weight: 600;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+a.se-app-hero__chip:hover {
+  background: var(--se-glass-btn-hover);
+  color: var(--se-text) !important;
+}
+
+/* Review summary and Deck status take their tone's colour. */
+.se-app-hero__chip[data-se-tone] {
+  --tone: var(--se-text-dim);
+  background: color-mix(in srgb, var(--tone) 14%, var(--se-glass-chip));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 32%, transparent);
+  color: var(--tone) !important;
+  font-weight: 700;
+}
+
+.se-app-hero__chip[data-se-tone="positive"] { --tone: var(--se-accent-hover); }
+.se-app-hero__chip[data-se-kind="metacritic"][data-se-tone="positive"] { --tone: var(--se-cart); }
+
+/* Age rating: by the youngest age it allows (app/hero.js ratingTone). */
+.se-app-hero__chip[data-se-tone="everyone"] { --tone: var(--se-cart); }
+.se-app-hero__chip[data-se-tone="older"] { --tone: var(--se-accent-hover); }
+.se-app-hero__chip[data-se-tone="teen"] { --tone: var(--se-gold); }
+.se-app-hero__chip[data-se-tone="mature"] { --tone: color-mix(in srgb, var(--se-gold) 45%, var(--se-danger)); }
+.se-app-hero__chip[data-se-tone="adult"] { --tone: var(--se-danger); }
+.se-app-hero__chip[data-se-tone="mixed"],
+.se-app-hero__chip[data-se-tone="playable"] { --tone: var(--se-gold); }
+.se-app-hero__chip[data-se-tone="negative"],
+.se-app-hero__chip[data-se-tone="unsupported"] { --tone: var(--se-danger); }
+.se-app-hero__chip[data-se-tone="verified"] { --tone: var(--se-cart); }
+.se-app-hero__chip[data-se-tone="achievements"] { --tone: var(--se-gold); }
+.se-app-hero__chip[data-se-tone="points"] { --tone: var(--se-gold); }
+
+a.se-app-hero__chip[data-se-tone]:hover {
+  background: color-mix(in srgb, var(--tone) 24%, var(--se-glass-chip));
+}
+
+/* Steam's Deck section: the chip shows its status and opens its details (app/hero.js). */
+html.se-app-hero-on [data-se-deck-source] {
+  display: none !important;
+}
+
+/* A chip that opens something (the Deck chip): a button dressed as the link chips. */
+button.se-app-hero__chip {
+  border: 0;
+  font: inherit;
+  font-size: var(--se-fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.se-app-hero__chip:hover {
+  background: var(--se-glass-btn-hover);
+  color: var(--se-text) !important;
+}
+
+button.se-app-hero__chip[data-se-tone]:hover {
+  background: color-mix(in srgb, var(--tone) 24%, var(--se-glass-chip));
+  color: var(--tone) !important;
+}
+
+button.se-app-hero__chip:focus-visible {
+  outline: 2px solid var(--se-accent);
+  outline-offset: 2px;
+}
+
+/* Steam's age rating, Metacritic, achievements, Points Shop and franchise boxes: their chips
+   show them (app/hero.js). */
+html.se-app-hero-on [data-se-chip-source] {
+  display: none !important;
+}
+
+/* The same blocks before app/hero.js reaches them (Steam renders them late, in React): the
+   panel that directly holds the achievements or Points Shop link. */
+html.se-app-hero-on .game_meta_data :is(div:has(> a[href*="steamcommunity.com/achievements/"]), div:has(> a[href*="/points/shop/app/"])) {
+  display: none !important;
+}
+
+/* Franchise chip: its own row above the tags. Chips carry no icons: the label says it all. */
+.se-app-hero__chip[data-se-kind="franchise"] {
+  color: var(--se-text) !important;
+}
+
+/* ---------- Steam Deck details (Steam's modal, opened by the hero's Deck chip) ----------
+ * Steam's own dialog (.DeckVerifiedModalDialog, React, hashed classes): the theme's shared
+ * modal card (client/dialogs/dialogs.css) already rounds it; this gives it the theme's
+ * surface instead of Steam's navy, with the fades of its scrolling pane to match, the
+ * device tabs (Steam Deck, Steam Machine, SteamOS, Steam Frame) as pills, and the theme's
+ * text colours. Found by structure and Steam's stable names (ActiveTab, role="button").
+ */
+html.se-store .DeckVerifiedModalDialog :is(.ModalPosition_Content, .DialogContent):not(#se-none) {
+  background: var(--se-surface) !important;
+}
+
+html.se-store .DeckVerifiedModalDialog .DialogContent_InnerWidth > :not(#se-none) {
+  color: var(--se-text-dim);
+}
+
+html.se-store .DeckVerifiedModalDialog .DialogContent_InnerWidth > :not(#se-none)::before {
+  background-image: linear-gradient(var(--se-surface), transparent) !important;
+}
+
+html.se-store .DeckVerifiedModalDialog .DialogContent_InnerWidth > :not(#se-none)::after {
+  background-image: linear-gradient(transparent, var(--se-surface)) !important;
+}
+
+html.se-store .DeckVerifiedModalDialog .DialogContent_InnerWidth b {
+  color: var(--se-white);
+  font-weight: 700;
+}
+
+/* Device tabs: the row of buttons that holds the active tab. */
+html.se-store .DeckVerifiedModalDialog :has(> .ActiveTab) {
+  gap: 6px;
+}
+
+html.se-store .DeckVerifiedModalDialog :has(> .ActiveTab) > [role="button"]:not(#se-none) {
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-pill) !important;
+  box-shadow: none !important;
+  color: var(--se-text-dim) !important;
+  transition: background var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store .DeckVerifiedModalDialog :has(> .ActiveTab) > [role="button"]:not(#se-none):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store .DeckVerifiedModalDialog :has(> .ActiveTab) > .ActiveTab:not(#se-none) {
+  background: var(--se-accent-surface) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 45%, transparent) !important;
+  color: var(--se-accent-hover) !important;
+}

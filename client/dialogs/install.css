@@ -1,0 +1,710 @@
+/*
+ * Install dialog (styles for client/dialogs/install.js).
+ *
+ * Without the script the dialog already reads as the theme's: the game as a small card and the
+ * drives as rows like the theme's lists (the first block below, every window). Once the script
+ * has marked the dialog ([data-se-inst], desktop windows only) it becomes:
+ *
+ *   [ hero art, fading into the card                          (×) ]
+ *   [ INSTALL                                                     ]
+ *   [ [ capsule ]  Call of Duty®: Modern Warfare® III             ]
+ *   [              (↓) 139.33 GB                                  ]
+ *   [ INSTALL TO                                              (⚙) ]
+ *   [ (drive) Windows (C:)  ★ Default              2.83 TB free   ]
+ *   [         C:\Program Files (x86)\Steam                        ]
+ *   [         [■■■■■■■■■■■■▒▒▒········]                            ]
+ *   [         1.08 TB of 3.91 TB used    2.69 TB left after install]
+ *   [ SHORTCUTS                                                   ]
+ *   [ [(▭) Desktop shortcut   (o )] [(▦) Start menu shortcut ( o)]]
+ *   [ (i) Steam's notice, when it has one                         ]
+ *   [ [        (↓) Install        ] [          Cancel           ] ]
+ *
+ * [data-se-inst-action] is install or storage (Steam's footer swaps Install for Manage Storage
+ * when nothing fits), [data-se-inst-notice] info or warning, [data-se-inst-fit] yes or no per drive.
+ *
+ * InstallRequestModal _3wtPUBfilFITcl1s4u6A7T, AppsToInstall Krg05lMwvNmhhVXhqdleu, AppToInstall
+ * _3MJEANCb5PkduXTSJ6o3bq, AppLogo _3mitVrK37Z0VhEoNSmfjT8, AppName _1_JaK7j-59AgDKQOOOJVBA,
+ * AppSizeRequired I_nktXyVJHrZEc6dPTTnU, DiskSpace _3lAxXofku7q3P5FhXRfqH0, CreateShortcuts
+ * _27EB_QZeH3i0zloLWPdw84, FolderSelector vaNI84b_TV6hw20mhGl_d, Header NtxG7ioEuQKxrtXEy57H5,
+ * FolderSettings _2pnPQKKjSPKgzPwlaXMqu_, FolderOption Oo5JPcEk_erKEYAzYp2nY, Focused
+ * _2-svusNL8L22pzjYeV4GMS, Active gkgG-dWgjpwS_aqlcMNTM, FolderFlag _1p727K-lt5u7dR3PbUTcNZ,
+ * Warning bhL5Q352pNmO44_JjKZTX, FolderFlagStar _VEHWl9XgUCHDV7oGKSW4, FolderName
+ * _2vs_5hKYSMZTn7dKHTim5D, NoSpace _3WMFKYH3gPd8T5RGPjpUah, FreeSpace _3a3KjxO7NqnVAjxtVypiCk,
+ * NoticeInstallFolder WonjNtnAq8aOefGl_x2v4.
+ *
+ * Icons are the theme's duotone: a 1.8px outline over a 30% fill, drawn as CSS masks so they
+ * take the text color. Icons and buttons stay neutral; text carries any tone.
+ *
+ * Big Picture (.GamepadMode) keeps Steam's dialog.
+ */
+
+/* ---------- Baseline (no script) ---------- */
+
+/* Install: the game as a small card, the drives as rows like the theme's lists */
+.Krg05lMwvNmhhVXhqdleu:not(#se-none) {
+  gap: 6px;
+  margin-top: 8px;
+  border: 0 !important;
+}
+
+.Krg05lMwvNmhhVXhqdleu ._3MJEANCb5PkduXTSJ6o3bq:not(#se-none) {
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px 10px 10px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  line-height: 1.3 !important;
+}
+
+.Krg05lMwvNmhhVXhqdleu ._3mitVrK37Z0VhEoNSmfjT8:not(#se-none) {
+  width: 84px !important;
+  height: 38px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm);
+  overflow: hidden;
+  object-fit: cover;
+}
+
+.Krg05lMwvNmhhVXhqdleu ._3mitVrK37Z0VhEoNSmfjT8 img {
+  border-radius: var(--se-radius-sm);
+  object-fit: cover;
+}
+
+.Krg05lMwvNmhhVXhqdleu ._1_JaK7j-59AgDKQOOOJVBA:not(#se-none) {
+  font: 700 14px/1.3 var(--se-font), sans-serif !important;
+  color: var(--se-text) !important;
+  white-space: nowrap;
+}
+
+._3lAxXofku7q3P5FhXRfqH0:not(#se-none) {
+  font: 600 12.5px/1.3 var(--se-font), sans-serif !important;
+  text-transform: none !important;
+  color: var(--se-text-muted) !important;
+}
+
+._27EB_QZeH3i0zloLWPdw84:not(#se-none) {
+  gap: 18px !important;
+  margin-top: 14px !important;
+}
+
+.vaNI84b_TV6hw20mhGl_d:not(#se-none) {
+  padding: 18px 0 6px !important;
+}
+
+.vaNI84b_TV6hw20mhGl_d .NtxG7ioEuQKxrtXEy57H5:not(#se-none) {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase !important;
+  color: var(--se-label-color) !important;
+}
+
+.vaNI84b_TV6hw20mhGl_d ._2pnPQKKjSPKgzPwlaXMqu_:not(#se-none) {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 30px !important;
+  min-width: 0 !important;
+  height: 30px !important;
+  min-height: 0 !important;
+  margin-left: auto;
+  padding: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: transparent !important;
+  color: var(--se-text-muted) !important;
+}
+
+.vaNI84b_TV6hw20mhGl_d ._2pnPQKKjSPKgzPwlaXMqu_:not(#se-none):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.vaNI84b_TV6hw20mhGl_d ._2pnPQKKjSPKgzPwlaXMqu_ svg {
+  width: 16px !important;
+  height: 16px !important;
+  padding: 0 !important;
+}
+
+.Oo5JPcEk_erKEYAzYp2nY:not(#se-none) {
+  position: relative;
+  min-height: 44px;
+  box-sizing: border-box;
+  margin: 0 0 4px !important;
+  padding: 0 14px !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  font: 600 13.5px/1.3 var(--se-font), sans-serif !important;
+  color: var(--se-text-dim) !important;
+}
+
+.Oo5JPcEk_erKEYAzYp2nY:not(#se-none):is(:hover, ._2-svusNL8L22pzjYeV4GMS) {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.Oo5JPcEk_erKEYAzYp2nY.gkgG-dWgjpwS_aqlcMNTM:not(#se-none) {
+  background: var(--se-accent-tint) !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  color: var(--se-text-strong) !important;
+}
+
+.Oo5JPcEk_erKEYAzYp2nY ._1p727K-lt5u7dR3PbUTcNZ:not(#se-none) {
+  color: var(--se-text-muted);
+}
+
+.Oo5JPcEk_erKEYAzYp2nY.gkgG-dWgjpwS_aqlcMNTM ._1p727K-lt5u7dR3PbUTcNZ:not(#se-none) {
+  color: var(--se-accent);
+}
+
+.Oo5JPcEk_erKEYAzYp2nY ._1p727K-lt5u7dR3PbUTcNZ.bhL5Q352pNmO44_JjKZTX:not(#se-none) {
+  color: var(--se-warning);
+}
+
+.Oo5JPcEk_erKEYAzYp2nY ._VEHWl9XgUCHDV7oGKSW4:not(#se-none) {
+  width: 13px !important;
+  height: 13px !important;
+  margin: 0 !important;
+  color: var(--se-warning);
+}
+
+.Oo5JPcEk_erKEYAzYp2nY ._VEHWl9XgUCHDV7oGKSW4 svg {
+  width: 13px;
+  height: 13px;
+}
+
+.Oo5JPcEk_erKEYAzYp2nY ._2vs_5hKYSMZTn7dKHTim5D._3WMFKYH3gPd8T5RGPjpUah:not(#se-none) {
+  color: var(--se-danger-text) !important;
+}
+
+.Oo5JPcEk_erKEYAzYp2nY ._3a3KjxO7NqnVAjxtVypiCk:not(#se-none) {
+  color: var(--se-text-muted) !important;
+}
+
+.Oo5JPcEk_erKEYAzYp2nY.gkgG-dWgjpwS_aqlcMNTM ._3a3KjxO7NqnVAjxtVypiCk:not(#se-none) {
+  color: var(--se-accent) !important;
+}
+
+/* ---------- Redesign ---------- */
+
+[data-se-inst] {
+  --inst-i-download: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path fill='%23000' fill-opacity='.3' stroke='none' d='M4.5 14.5h15V17a3 3 0 0 1-3 3h-9a3 3 0 0 1-3-3z'/><path d='M4.5 14.5V17a3 3 0 0 0 3 3h9a3 3 0 0 0 3-3v-2.5M12 4v10M8 10l4 4 4-4'/></svg>");
+  --inst-i-desktop: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect fill='%23000' fill-opacity='.3' stroke='none' x='3' y='4.5' width='18' height='12' rx='2.2'/><rect x='3' y='4.5' width='18' height='12' rx='2.2'/><path d='M9 20h6M12 16.5V20'/></svg>");
+  --inst-i-menu: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect fill='%23000' fill-opacity='.3' stroke='none' x='4' y='4' width='6.5' height='6.5' rx='1.6'/><rect fill='%23000' fill-opacity='.3' stroke='none' x='13.5' y='13.5' width='6.5' height='6.5' rx='1.6'/><rect x='4' y='4' width='6.5' height='6.5' rx='1.6'/><rect x='13.5' y='4' width='6.5' height='6.5' rx='1.6'/><rect x='4' y='13.5' width='6.5' height='6.5' rx='1.6'/><rect x='13.5' y='13.5' width='6.5' height='6.5' rx='1.6'/></svg>");
+  --inst-i-info: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle fill='%23000' fill-opacity='.3' stroke='none' cx='12' cy='12' r='8.5'/><circle cx='12' cy='12' r='8.5'/><path d='M12 11v5M12 8v.2'/></svg>");
+}
+
+/* Title: Steam's "Install" as an eyebrow over the game */
+[data-se-inst] .DialogHeader:not(#se-none) {
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  font: 800 11.5px/14px var(--se-font), sans-serif !important;
+  letter-spacing: .16em !important;
+  text-transform: uppercase !important;
+  color: var(--se-accent) !important;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .6);
+}
+
+/* Body: the game, then where it goes, then shortcuts, then Steam's notice */
+[data-se-inst] :has(> .Krg05lMwvNmhhVXhqdleu):not(#se-none) {
+  display: flex !important;
+  flex-direction: column;
+  margin: 0 !important;
+}
+
+[data-se-inst] .Krg05lMwvNmhhVXhqdleu { order: 0; }
+[data-se-inst] .vaNI84b_TV6hw20mhGl_d { order: 1; }
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 { order: 2; }
+[data-se-inst] .WonjNtnAq8aOefGl_x2v4 { order: 3; }
+
+/* The game: large capsule, title, size chip */
+[data-se-inst] .Krg05lMwvNmhhVXhqdleu:not(#se-none) {
+  gap: 14px;
+  margin: 0 !important;
+}
+
+[data-se-inst] .Krg05lMwvNmhhVXhqdleu ._3MJEANCb5PkduXTSJ6o3bq:not(#se-none) {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "logo name" "logo size";
+  align-content: center;
+  align-items: center;
+  column-gap: 18px;
+  row-gap: 10px;
+  padding: 0 !important;
+  background: transparent;
+  box-shadow: none;
+}
+
+[data-se-inst] .Krg05lMwvNmhhVXhqdleu ._3mitVrK37Z0VhEoNSmfjT8:not(#se-none) {
+  grid-area: logo;
+  width: 172px !important;
+  height: 80px !important;
+  border-radius: var(--se-radius-md);
+  box-shadow: 0 14px 30px -12px rgba(0, 0, 0, .9), 0 0 0 1px rgba(255, 255, 255, .1);
+}
+
+[data-se-inst] .Krg05lMwvNmhhVXhqdleu ._3mitVrK37Z0VhEoNSmfjT8 img {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+[data-se-inst] .Krg05lMwvNmhhVXhqdleu ._1_JaK7j-59AgDKQOOOJVBA:not(#se-none) {
+  grid-area: name;
+  align-self: end;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  white-space: normal;
+  font: 800 20px/1.2 var(--se-font), sans-serif !important;
+  color: var(--se-text-strong) !important;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .6);
+}
+
+[data-se-inst] .Krg05lMwvNmhhVXhqdleu .I_nktXyVJHrZEc6dPTTnU:not(#se-none) {
+  grid-area: size;
+  align-self: start;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border-radius: var(--se-radius-pill);
+  background: rgba(255, 255, 255, .08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font: 700 12.5px/1 var(--se-font), sans-serif !important;
+  color: var(--se-text) !important;
+}
+
+[data-se-inst] .Krg05lMwvNmhhVXhqdleu .I_nktXyVJHrZEc6dPTTnU::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--inst-i-download) center / contain no-repeat;
+  mask: var(--inst-i-download) center / contain no-repeat;
+}
+
+/* Several apps (a bundle): smaller capsules, one per row */
+[data-se-inst] .Krg05lMwvNmhhVXhqdleu:has(> ._3MJEANCb5PkduXTSJ6o3bq ~ ._3MJEANCb5PkduXTSJ6o3bq) ._3mitVrK37Z0VhEoNSmfjT8:not(#se-none) {
+  width: 108px !important;
+  height: 50px !important;
+}
+
+[data-se-inst] .Krg05lMwvNmhhVXhqdleu:has(> ._3MJEANCb5PkduXTSJ6o3bq ~ ._3MJEANCb5PkduXTSJ6o3bq) ._1_JaK7j-59AgDKQOOOJVBA:not(#se-none) {
+  font-size: 15px !important;
+}
+
+/* ---------- Drives ---------- */
+
+[data-se-inst] .vaNI84b_TV6hw20mhGl_d:not(#se-none) {
+  padding: 24px 0 0 !important;
+}
+
+[data-se-inst] .vaNI84b_TV6hw20mhGl_d .NtxG7ioEuQKxrtXEy57H5:not(#se-none) {
+  min-height: 30px;
+  margin-bottom: 8px;
+}
+
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY:not(#se-none) {
+  display: grid !important;
+  grid-template-columns: 38px auto minmax(0, 1fr) auto;
+  grid-template-areas: "flag name star free" "flag usage usage usage";
+  align-items: center;
+  column-gap: 12px;
+  min-height: 0;
+  margin: 0 0 6px !important;
+  padding: 12px 16px 12px 12px !important;
+  cursor: pointer;
+  transition: background var(--se-dur-fast) var(--se-ease), box-shadow var(--se-dur-fast) var(--se-ease);
+}
+
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY:not(#se-none)::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--se-accent);
+  opacity: 0;
+  transition: opacity var(--se-dur-fast) var(--se-ease);
+}
+
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY.gkgG-dWgjpwS_aqlcMNTM:not(#se-none)::before {
+  opacity: 1;
+}
+
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY[data-se-inst-fit="no"]:not(#se-none) {
+  cursor: not-allowed;
+  background: var(--se-surface-2) !important;
+}
+
+/* Drive glyph in a tile */
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY ._1p727K-lt5u7dR3PbUTcNZ:not(#se-none) {
+  grid-area: flag;
+  align-self: start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--se-radius-sm);
+  background: rgba(255, 255, 255, .05);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+/* Icons stay neutral (the text carries tone): selected reads brighter, a full drive dimmer */
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY ._1p727K-lt5u7dR3PbUTcNZ:not(#se-none) {
+  color: var(--se-text-muted);
+}
+
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY.gkgG-dWgjpwS_aqlcMNTM ._1p727K-lt5u7dR3PbUTcNZ:not(#se-none) {
+  background: var(--se-white-10);
+  box-shadow: inset 0 0 0 1px var(--se-white-14);
+  color: var(--se-text-strong);
+}
+
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY ._1p727K-lt5u7dR3PbUTcNZ.bhL5Q352pNmO44_JjKZTX:not(#se-none) {
+  color: var(--se-text-faint);
+}
+
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY ._1p727K-lt5u7dR3PbUTcNZ svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY ._2vs_5hKYSMZTn7dKHTim5D:not(#se-none) {
+  grid-area: name;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 700 14.5px/1.3 var(--se-font), sans-serif !important;
+  color: var(--se-text-strong);
+}
+
+/* Default library: a quiet pill */
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY ._VEHWl9XgUCHDV7oGKSW4:not(#se-none) {
+  grid-area: star;
+  justify-self: start;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+  width: auto !important;
+  height: 20px !important;
+  padding: 0 8px 0 6px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-10);
+  color: var(--se-text-muted);
+}
+
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY ._VEHWl9XgUCHDV7oGKSW4 svg {
+  width: 11px !important;
+  height: 11px !important;
+}
+
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY ._VEHWl9XgUCHDV7oGKSW4::after {
+  content: "Default";
+  font: 700 11px/1 var(--se-font), sans-serif;
+  color: var(--se-text-dim);
+}
+
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY ._3a3KjxO7NqnVAjxtVypiCk:not(#se-none) {
+  grid-area: free;
+  justify-self: end;
+  font: 700 13px/1.3 var(--se-font), sans-serif !important;
+}
+
+/* Path, capacity bar, caption (install.js) */
+.se-inst-usage {
+  grid-area: usage;
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  margin-top: 4px;
+}
+
+.se-inst-path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 500 11.5px/1.3 var(--se-font), sans-serif;
+  color: var(--se-text-faint);
+}
+
+.se-inst-bar {
+  display: flex;
+  gap: 2px;
+  height: 6px;
+  margin-top: 3px;
+  border-radius: var(--se-radius-pill);
+  overflow: hidden;
+  background: rgba(255, 255, 255, .07);
+}
+
+.se-inst-bar > i {
+  flex: none;
+  width: var(--w, 0%);
+  height: 100%;
+  transition: width var(--se-dur-slow) var(--se-ease), background var(--se-dur) var(--se-ease);
+}
+
+.se-inst-bar-used {
+  border-radius: var(--se-radius-pill) 0 0 var(--se-radius-pill);
+  background: rgba(255, 255, 255, .26);
+}
+
+.se-inst-bar-need {
+  border-radius: 0 var(--se-radius-pill) var(--se-radius-pill) 0;
+  background: var(--se-accent-strong);
+}
+
+.gkgG-dWgjpwS_aqlcMNTM .se-inst-bar-need {
+  background: repeating-linear-gradient(-45deg, var(--se-accent) 0 4px, var(--se-accent-hover) 4px 8px);
+}
+
+[data-se-inst-fit="no"] .se-inst-bar-need {
+  background: var(--se-danger);
+}
+
+.se-inst-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font: 600 11.5px/1.3 var(--se-font), sans-serif;
+  color: var(--se-text-muted);
+  white-space: nowrap;
+}
+
+.se-inst-caption-after {
+  margin-left: auto;
+  color: var(--se-text-dim);
+}
+
+.gkgG-dWgjpwS_aqlcMNTM .se-inst-caption-after {
+  color: var(--se-accent);
+}
+
+[data-se-inst-fit="no"] .se-inst-caption-after {
+  color: var(--se-danger-text);
+}
+
+.se-inst-usage [hidden] {
+  display: none;
+}
+
+/* ---------- Shortcuts: two toggle tiles ---------- */
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84:not(#se-none) {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px !important;
+  margin-top: 18px !important;
+}
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84::before {
+  content: "Shortcuts";
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 .DialogCheckbox_Container:not(#se-none) {
+  --inst-icon: var(--inst-i-desktop);
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: 10px 14px !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  cursor: pointer;
+  transition: background var(--se-dur-fast) var(--se-ease), box-shadow var(--se-dur-fast) var(--se-ease);
+}
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 > :nth-child(2) .DialogCheckbox_Container:not(#se-none),
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 > .DialogCheckbox_Container:nth-child(2):not(#se-none) {
+  --inst-icon: var(--inst-i-menu);
+}
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 .DialogCheckbox_Container::before {
+  content: "";
+  flex: none;
+  width: 18px;
+  height: 18px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--inst-icon) center / contain no-repeat;
+  mask: var(--inst-icon) center / contain no-repeat;
+  transition: background var(--se-dur-fast) var(--se-ease);
+}
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 .DialogCheckbox_Container:hover {
+  background: var(--se-hover);
+}
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 .DialogCheckbox_Container:has(.DialogCheckbox.Active) {
+  background: var(--se-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+}
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 .DialogCheckbox_Container:has(.DialogCheckbox.Active)::before {
+  background: var(--se-text-strong);
+}
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 .DialogToggle_Label:not(#se-none) {
+  flex: 1;
+  min-width: 0;
+  margin: 0 !important;
+  font: 600 13.5px/1.25 var(--se-font), sans-serif !important;
+  color: var(--se-text-dim) !important;
+}
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 .DialogCheckbox_Container:has(.DialogCheckbox.Active) .DialogToggle_Label:not(#se-none) {
+  color: var(--se-text-strong) !important;
+}
+
+/* The checkbox as a switch */
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 .DialogCheckbox:not(#se-none) {
+  position: relative;
+  order: 2;
+  flex: none;
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: rgba(255, 255, 255, .12) !important;
+  box-shadow: none !important;
+  transition: background var(--se-dur-fast) var(--se-ease);
+}
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 .DialogCheckbox:not(#se-none).Active {
+  background: var(--se-accent) !important;
+}
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 .DialogCheckbox svg {
+  display: none !important;
+}
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 .DialogCheckbox::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--se-text-muted);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .4);
+  transition: transform var(--se-dur) var(--se-ease), background var(--se-dur-fast) var(--se-ease);
+}
+
+[data-se-inst] ._27EB_QZeH3i0zloLWPdw84 .DialogCheckbox.Active::after {
+  transform: translateX(14px);
+  background: var(--se-bg-ink);
+}
+
+/* ---------- Notice ---------- */
+
+[data-se-inst]:not([data-se-inst-notice]) .WonjNtnAq8aOefGl_x2v4:not(#se-none) {
+  display: none !important;
+}
+
+[data-se-inst][data-se-inst-notice] .WonjNtnAq8aOefGl_x2v4:not(#se-none) {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px !important;
+  padding: 10px 14px 10px 12px !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  font: 500 12.5px/1.45 var(--se-font), sans-serif !important;
+  color: var(--se-text) !important;
+}
+
+[data-se-inst][data-se-inst-notice="info"] .WonjNtnAq8aOefGl_x2v4::before {
+  content: "";
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--inst-i-info) center / contain no-repeat;
+  mask: var(--inst-i-info) center / contain no-repeat;
+}
+
+[data-se-inst][data-se-inst-notice="warning"] .WonjNtnAq8aOefGl_x2v4:not(#se-none) {
+  background: var(--se-gold-surface);
+  box-shadow: inset 0 0 0 1px rgba(240, 192, 96, .3);
+  color: var(--se-gold-text) !important;
+}
+
+[data-se-inst][data-se-inst-notice] .WonjNtnAq8aOefGl_x2v4 ._1p727K-lt5u7dR3PbUTcNZ:not(#se-none) {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--se-text-muted);
+}
+
+[data-se-inst][data-se-inst-notice] .WonjNtnAq8aOefGl_x2v4 ._1p727K-lt5u7dR3PbUTcNZ svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- Footer ---------- */
+
+[data-se-inst] .DialogFooter:not(#se-none) {
+  margin-top: 24px !important;
+}
+
+/* Buttons stay neutral: Install is the brighter of the two, not a colored one */
+[data-se-inst] .DialogFooter .DialogButton.Primary:not(.Disabled):not(#se-none) {
+  background: var(--se-white-14) !important;
+  box-shadow: none !important;
+  color: var(--se-text-strong) !important;
+}
+
+[data-se-inst] .DialogFooter .DialogButton.Primary:is(:hover, :focus, .gpfocus):not(.Disabled):not(#se-none) {
+  background: var(--se-white-25) !important;
+  color: var(--se-text-strong) !important;
+}
+
+/* Install gets a download glyph. Steam's own ::before (hidden theme-wide) is reused for it. */
+[data-se-inst][data-se-inst-action="install"] .DialogFooter .DialogButton.Primary:not(#se-none)::before {
+  content: "" !important;
+  position: static !important;
+  display: inline-block !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin: -3px 8px 0 -4px !important;
+  vertical-align: middle;
+  opacity: 1 !important;
+  background: currentColor !important;
+  -webkit-mask: var(--inst-i-download) center / contain no-repeat;
+  mask: var(--inst-i-download) center / contain no-repeat;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-dialog-art img,
+  .se-inst-bar > i,
+  [data-se-inst] ._27EB_QZeH3i0zloLWPdw84 .DialogCheckbox::after {
+    transition: none !important;
+  }
+}

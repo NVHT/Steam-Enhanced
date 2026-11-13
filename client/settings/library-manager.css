@@ -1,0 +1,460 @@
+/*
+ * Millennium Library Manager modal window styles.
+ *
+ * Transforms `.MillenniumDesktopSidebar[data-se-lmx]` into a centered two-column
+ * modal with a searchable plugin/theme list on the left and Millennium's
+ * active item editor on the right. Paired with
+ * `client/settings/library-manager.js`.
+ */
+/* The window: centered over a dimmed Steam, fading in and out */
+.MillenniumDesktopSidebar[data-se-lmx]:not(#se-none) {
+  --se-lmx-head: 78px;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: min(940px, calc(100% - 80px)) !important;
+  height: min(640px, calc(100% - 80px)) !important;
+  display: grid !important;
+  grid-template-columns: 280px minmax(0, 1fr);
+  grid-template-rows: var(--se-lmx-head) 58px minmax(0, 1fr) auto;
+  overflow: hidden !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-bg) !important;
+  color: var(--se-text);
+  font-family: var(--se-font);
+  box-shadow: var(--se-shadow-pop) !important;
+  opacity: 0;
+  transform: translate(-50%, -48%) scale(.98) !important;
+  transition: opacity .2s var(--se-ease), transform .2s var(--se-ease) !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx][data-se-open]:not(#se-none) {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+
+/* Closed (Millennium hides it): out of the way */
+.MillenniumDesktopSidebar[data-se-lmx]:not([data-se-shown]):not(#se-none) {
+  display: none !important;
+}
+
+.MillenniumDesktopSidebar_Overlay:not(#se-none) {
+  background: rgba(8, 10, 14, .62) !important;
+}
+
+/* Millennium's own title row: the window's head takes its place */
+.MillenniumDesktopSidebar[data-se-lmx] > .MillenniumDesktopSidebar_Title {
+  display: none !important;
+}
+
+/* Head */
+.se-lmx-head {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px 0 24px;
+  box-shadow: inset 0 -1px 0 var(--se-hairline);
+}
+
+.se-lmx-titles {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.se-lmx-titles b {
+  font: 800 20px/26px var(--se-font);
+  letter-spacing: -.01em;
+  color: var(--se-text);
+}
+
+.se-lmx-titles span {
+  margin-top: 2px;
+  font: 500 13px/18px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-lmx-ib {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--se-radius-sm);
+  cursor: pointer;
+  background: var(--se-surface-2);
+  color: var(--se-text-muted);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-lmx-ib[data-ghost] {
+  background: none;
+  box-shadow: none;
+}
+
+.se-lmx-ib:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.se-lmx-ib:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-lmx-ib svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* List */
+.se-lmx-list {
+  grid-column: 1;
+  grid-row: 2 / -1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  overflow-y: auto;
+  box-shadow: inset -1px 0 0 var(--se-hairline);
+}
+
+.se-lmx-filter {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-faint);
+}
+
+.se-lmx-filter:focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+}
+
+.se-lmx-filter svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+.se-lmx-filter input {
+  all: unset;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  color: var(--se-text);
+  font: 500 13px/34px var(--se-font);
+}
+
+.se-lmx-filter input::placeholder {
+  color: var(--se-text-faint);
+}
+
+.se-lmx-filter input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.se-lmx-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.se-lmx-label {
+  padding: 10px 10px 6px;
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.se-lmx-item {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-height: 42px;
+  padding: 5px 10px;
+  border-radius: var(--se-radius-sm);
+  cursor: pointer;
+}
+
+.se-lmx-item:hover:not([disabled]) {
+  background: var(--se-surface-2);
+}
+
+.se-lmx-item[data-on] {
+  background: var(--se-accent-tint);
+}
+
+.se-lmx-item[disabled] {
+  cursor: default;
+  opacity: .55;
+}
+
+.se-lmx-item:focus-visible {
+  /* Inset: the list scrolls and would clip a ring drawn outside */
+  outline: var(--se-focus-outline);
+  outline-offset: calc(-1 * var(--se-focus-offset));
+}
+
+.se-lmx-name {
+  font: 700 13px/18px var(--se-font);
+  color: var(--se-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-lmx-meta {
+  font: 500 11.5px/16px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-lmx-note {
+  padding: 10px;
+  font: 500 12px/16px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+/* The open item: its name, then Millennium's editor */
+.se-lmx-ph {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 220px 0 20px;
+}
+
+.se-lmx-ph b {
+  font: 800 17px/22px var(--se-font);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-lmx-chip:not(:empty) {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: var(--se-radius-sm);
+  background: rgba(255, 255, 255, .06);
+  color: var(--se-text-muted);
+  font: 600 11px/20px var(--se-font);
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] > .MillenniumDesktopSidebar_Content:not(#se-none) {
+  grid-column: 2;
+  grid-row: 3;
+  min-height: 0;
+  height: auto !important;
+  overflow-y: auto !important;
+  padding: 0 20px 20px !important;
+  display: block !important;
+}
+
+/* Nothing open: the empty side in its place (Millennium's own lists stay out of sight) */
+.MillenniumDesktopSidebar[data-se-lmx]:not([data-focused-item-type]) > .MillenniumDesktopSidebar_Content:not(#se-none):not(#se-p2),
+.MillenniumDesktopSidebar[data-se-lmx]:not([data-focused-item-type]) > .se-lmx-ph:not(#se-none):not(#se-p2) {
+  display: none !important;
+}
+
+.se-lmx-empty {
+  grid-column: 2;
+  grid-row: 2 / -1;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  font: 500 13px/18px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.MillenniumDesktopSidebar[data-se-lmx]:not([data-focused-item-type]) > .se-lmx-empty {
+  display: flex;
+}
+
+.se-lmx-empty b {
+  font: 700 15px/20px var(--se-font);
+  color: var(--se-text);
+}
+
+.se-lmx-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 6px;
+  border-radius: var(--se-radius-ml);
+  background: var(--se-surface-2);
+  color: var(--se-accent);
+}
+
+.se-lmx-tile svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Millennium's tab menu (Main, Colors…) at the right of the name row */
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorHeader:not(#se-none) {
+  position: absolute !important;
+  top: calc(var(--se-lmx-head) + 12px);
+  right: 20px;
+  width: 190px;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
+  z-index: var(--se-z-raised);
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorHeader .DialogDropDown:not(#se-none):not(#se-p2) {
+  width: 100% !important;
+  height: 34px !important;
+  min-height: 0 !important;
+  padding: 0 12px !important;
+  box-sizing: border-box !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font: 700 13px/34px var(--se-font) !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent:not(#se-none) {
+  padding: 0 !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+/* Its settings: one card of rows */
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .DialogBody:not(#se-none) {
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .eKmEXJCm_lgme24Fp_HWt:not(#se-none) {
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  background: transparent !important;
+  box-shadow: inset 0 -1px 0 var(--se-hairline) !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .eKmEXJCm_lgme24Fp_HWt:last-child:not(#se-none) {
+  box-shadow: none !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .eKmEXJCm_lgme24Fp_HWt::after {
+  display: none !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent ._3jMlJm4PQCA8SfNlUR99Fo:not(#se-none) {
+  font: 700 13.5px/19px var(--se-font) !important;
+  color: var(--se-text) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  padding: 0 !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent ._1W1to_azoBRG95oNAFpf9Q:not(#se-none) {
+  margin-top: 3px !important;
+  font: 500 12.5px/1.45 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .DialogDropDown:not(#se-none):not(#se-p2),
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .DialogButton:not(#se-none):not(#se-p2) {
+  min-height: 0 !important;
+  height: 32px !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font: 600 12.5px/32px var(--se-font) !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .DialogDropDown:hover:not(#se-none):not(#se-p2),
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .DialogButton:hover:not(#se-none):not(#se-p2) {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+/* Foot (a theme open): reload */
+.se-lmx-foot {
+  grid-column: 2;
+  grid-row: 4;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  box-shadow: inset 0 1px 0 var(--se-hairline);
+  font: 500 12.5px/17px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-lmx-foot[hidden] {
+  display: none;
+}
+
+.se-lmx-foot svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--se-accent);
+}
+
+.se-lmx-foot span {
+  flex: 1;
+}
+
+.se-lmx-foot button {
+  all: unset;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--se-radius-sm);
+  cursor: pointer;
+  background: var(--se-accent);
+  color: var(--se-bg-ink);
+  font: 700 12.5px/30px var(--se-font);
+}
+
+.se-lmx-foot button:hover {
+  filter: brightness(1.08);
+}
+
+.se-lmx-foot button:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}

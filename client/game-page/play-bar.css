@@ -1,0 +1,384 @@
+/*
+ * Game page › play bar: the floating bar, its stats, buttons and PLAY, and the compact bar.
+ * Game page styles load in order: layout, play-bar, overview, achievements, friends, cards, activity.
+ */
+
+/*
+ * The bar floats over the banner's lower edge — frosted glass, sized to its
+ * contents, the stats as icon + label + value with no tiles behind them.
+ */
+._3Yf8b2v5oOD8Wqsxu04ar._1U7LKpx70kEsz3jJwAFOi- ._3fLo166MlaNqP8r8tTyRz:not(#se-none) {
+  /* In-page PlayBar */
+  height: auto !important;
+  border-radius: var(--se-radius-lg);
+  background: color-mix(in srgb, var(--se-bg) 72%, transparent) !important;
+  backdrop-filter: blur(18px) saturate(1.15) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), 0 20px 40px -20px rgba(0, 0, 0, .8) !important;
+}
+
+._3Yf8b2v5oOD8Wqsxu04ar._1U7LKpx70kEsz3jJwAFOi- ._3Y87YQY56ZCOqhgcZFaDc5:not(#se-none) {
+  padding: 12px 14px 12px 12px !important;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._9EHg918wH6CQCQlD5PWOO:not(#se-none) {
+  gap: 22px;
+  flex-wrap: nowrap;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1YbtIWcfkQJOysLXQbwzRf:not(#se-none) {
+  flex: 0 1 auto !important;
+}
+
+/* GameStat and DetailsSection (cloud): no tile, an even 26 px apart (see below) */
+._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA:not(#se-none),
+._1U7LKpx70kEsz3jJwAFOi- ._1YbtIWcfkQJOysLXQbwzRf ._1dg8hJMsAYISbeQUxcCJcv:not(#se-none) {
+  display: flex;
+  align-items: center;
+  background: none !important;
+  border-radius: var(--se-radius-sm) !important;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA:not(#se-none) {
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 4px 2px !important;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1qG6xUlNu-qvdhpSxwed5:not(#se-none):hover {
+  /* ClickablePlayBarItem */
+  background: var(--se-hairline) !important;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA ._1tIg-QIrwMNtCm7NcYADyi,
+._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA ._3bkqc-SsCg0b3FTEuewlK8 {
+  /* GameStatIcon */
+  flex: none;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  color: var(--se-text-muted);
+  fill: currentColor;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA ._2TYVGoD27ZMfjRirKQNLfk:not(#se-none) {
+  /* PlayBarDetailLabel */
+  font-weight: 700 !important;
+}
+
+/* Green PLAY, in the page and in the sticky bar */
+:is(._1U7LKpx70kEsz3jJwAFOi-, ._39RheXihcN6H2k2muQTjkI) ._1FnJ6dPuknQFQ2RTpKTI16._3cI5TXsFX3bvpR-7EBOtxq ._3ydigb6zZAjJ0JCDgHwSYA:not(#se-none) {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--se-play) 72%, #b6f07a 28%), var(--se-play)) !important;
+  box-shadow: inset 0 1px 0 var(--se-white-25);
+}
+
+/*
+ * Every stat in the bar gets the same small icon, drawn by the theme (Steam's
+ * own icons differ in size and color, and some stats have none). Achievements get a
+ * gold progress ring (client/game-page/game-page.js sets --se-pct) instead of the bar beside the count.
+ */
+._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA ._1tIg-QIrwMNtCm7NcYADyi:not(#se-none),
+._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA ._3bkqc-SsCg0b3FTEuewlK8:not(#se-none) {
+  /* Steam's GameStatIcon(Forced) */
+  display: none !important;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA::before {
+  content: '';
+  flex: none;
+  width: 18px;
+  height: 18px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-stat-icon, var(--se-icon-stat-default)) center / contain no-repeat;
+}
+
+/*
+ * LastPlayed keeps the default clock; the same component with an icon is size on disk
+ * (a drive).
+ */
+._1U7LKpx70kEsz3jJwAFOi- ._3pS8kMrtScuY1Qf-W8tmRV:has(> :is(._1GZdosVXnfrf69yU8DWASl, ._1UXbBdCvbg9tyZhc4owO4W)) {
+  --se-stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='13' width='17' height='6' rx='2'/%3E%3Cpath d='M5 13l2.5-7h9L19 13'/%3E%3Cpath d='M16.5 16h.01'/%3E%3C/svg%3E");
+}
+
+/* Cloud status (built like size on disk) */
+._1U7LKpx70kEsz3jJwAFOi- ._2cRYms-zZc4misk9tj3bt8 ._1kiZKVbDe-9Ikootk57kpA:not(#se-none) {
+  --se-stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 18h10a4 4 0 0 0 .5-8 6 6 0 0 0-11.5 1.5A3.3 3.3 0 0 0 7 18z'/%3E%3Cpath d='M9.5 13.5l2 2 3.5-3.5'/%3E%3C/svg%3E");
+}
+
+/* Even spacing: every stat the same 26 px apart, no extra margins or padding around the cloud tile */
+._1U7LKpx70kEsz3jJwAFOi- ._1YbtIWcfkQJOysLXQbwzRf:not(#se-none),
+._1U7LKpx70kEsz3jJwAFOi- ._1mDAVT4sTzFRwJtlKCw2Ws:not(#se-none) {
+  gap: 26px !important;
+  align-items: center !important;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1YbtIWcfkQJOysLXQbwzRf ._1dg8hJMsAYISbeQUxcCJcv:not(#se-none),
+._1U7LKpx70kEsz3jJwAFOi- ._1YbtIWcfkQJOysLXQbwzRf .zjtAIAWI6HE0oCtJzw6Qt:not(#se-none),
+._1U7LKpx70kEsz3jJwAFOi- ._1YbtIWcfkQJOysLXQbwzRf ._2cRYms-zZc4misk9tj3bt8:not(#se-none) {
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA ._3m_zjRTQBqcfzCjXLXUHcR:not(#se-none) {
+  padding: 0 !important;
+  gap: 3px !important;
+  justify-content: center;
+}
+
+/* Playtime */
+._1U7LKpx70kEsz3jJwAFOi- ._1aKegVl9_lSdNAyWYZQlr9 {
+  --se-stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3.5h10M7 20.5h10M8 3.5c0 4 4 5 4 8.5s-4 4.5-4 8.5M16 3.5c0 4-4 5-4 8.5s4 4.5 4 8.5'/%3E%3C/svg%3E");
+}
+
+/* Player count: the Player Count plugin's badge and the theme's own */
+._1U7LKpx70kEsz3jJwAFOi- :is(#playercount-badge, #se-player-count) {
+  --se-stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='8.5' r='3.5'/%3E%3Cpath d='M2.5 19.5c.9-3.3 3.4-5 6.5-5s5.6 1.7 6.5 5'/%3E%3Ccircle cx='17' cy='9' r='2.7'/%3E%3Cpath d='M17 14.3c2.3.1 3.9 1.7 4.6 4.7'/%3E%3C/svg%3E");
+}
+
+/* Space Required (not installed): a drive with a download arrow; game-page.js sets data-se-stat */
+._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA[data-se-stat="space"]:not(#se-none) {
+  --se-stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='14' width='17' height='6.5' rx='2'/%3E%3Cpath d='M12 3.5v7.5M8.75 8 12 11.25 15.25 8M16.5 17.25h.01'/%3E%3C/svg%3E");
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1kiZKVbDe-9Ikootk57kpA.UAhWiMg9Q2VPsQQBj_ikT::before {
+  /* MiniAchievements: ring */
+  width: 20px;
+  height: 20px;
+  background: conic-gradient(var(--se-gold) calc(var(--se-pct, 0) * 1%), rgba(255, 255, 255, .12) 0);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3px), #000 calc(100% - .5px), transparent 100%);
+}
+
+._1U7LKpx70kEsz3jJwAFOi- .UAhWiMg9Q2VPsQQBj_ikT ._16quGbk-i_9yE-tFyyOK8G > :not(._2muiKHUkOiTvX-6arqnQUC) {
+  /* The progress bar */
+  display: none !important;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- .UAhWiMg9Q2VPsQQBj_ikT ._2muiKHUkOiTvX-6arqnQUC:not(#se-none) {
+  /* AchievementCountLabel */
+  color: var(--se-gold) !important;
+}
+
+/* PLAY: the theme's weight and size */
+._1U7LKpx70kEsz3jJwAFOi- ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA:not(#se-none),
+._1U7LKpx70kEsz3jJwAFOi- ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA *:not(svg, svg *) {
+  font: 800 15px/1 var(--se-font) !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase;
+}
+
+/*
+ * Native buttons right of the stats (Favorite, Manage, controller, game
+ * info) wear one set of dual-tone icons (outline over a 32% fill, like the rail's), 18 px, in the text color; client/game-page/game-page.js
+ * names each in data-se-icon. Plugins' buttons keep their own icons.
+ */
+._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon] > * {
+  display: none !important;
+}
+
+._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon]::before {
+  content: '';
+  flex: none;
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: var(--se-btn-icon) center / contain no-repeat;
+}
+
+._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon="heart"] {
+  --se-btn-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z'/%3E%3C/g%3E%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z'/%3E%3C/svg%3E");
+}
+
+._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon="gear"] {
+  --se-btn-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z'/%3E%3C/g%3E%3Cpath d='M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+}
+
+._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon="pad"] {
+  --se-btn-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M17.32 5H6.68a4 4 0 0 0-3.98 3.59l-.02.15C2.6 9.42 2 14.46 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.41-1.41A2 2 0 0 1 9.83 16h4.34a2 2 0 0 1 1.41.59L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.55-.6-6.58-.69-7.26l-.02-.15A4 4 0 0 0 17.32 5z'/%3E%3C/g%3E%3Cpath d='M17.32 5H6.68a4 4 0 0 0-3.98 3.59l-.02.15C2.6 9.42 2 14.46 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.41-1.41A2 2 0 0 1 9.83 16h4.34a2 2 0 0 1 1.41.59L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.55-.6-6.58-.69-7.26l-.02-.15A4 4 0 0 0 17.32 5z'/%3E%3Cpath d='M6 11h4M8 9v4M15 12h.01M18 10h.01'/%3E%3C/svg%3E");
+}
+
+._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon]:not(#se-none) {
+  opacity: 1 !important;
+  color: var(--se-text) !important;
+}
+
+._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon]:not(#se-none):hover {
+  color: var(--se-text-strong) !important;
+}
+
+._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon="heart"]._2WaHZuAetbqENmqDthu3nl:not(#se-none) {
+  color: var(--se-accent) !important;
+}
+
+/* Favorited: the heart filled solid */
+._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon="heart"]._2WaHZuAetbqENmqDthu3nl {
+  --se-btn-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' stroke='none'%3E%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z'/%3E%3C/g%3E%3Cpath d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z'/%3E%3C/svg%3E");
+}
+
+/* The game-details toggle is hidden (always-open-game-details.js keeps the details open) */
+._1EAxK56o5a9Nieu5HYkJ4k [data-se-icon="info"]:not(#se-none),
+.lO1IF132jJ1gc9yz2HYvV ._3qDWQGB0rtwM3qpXTb11Q-:has(.zvLq1GUCH3yLuqv_TXBJ1):not(#se-none),
+.lO1IF132jJ1gc9yz2HYvV ._2v1XDHrL4pTW4qCXaYUPG6:has(.zvLq1GUCH3yLuqv_TXBJ1):not(#se-none) {
+  display: none !important;
+}
+
+/* Every button: a 40 px tile with its icon in the middle */
+.lO1IF132jJ1gc9yz2HYvV ._3qDWQGB0rtwM3qpXTb11Q-:not(#se-none),
+.lO1IF132jJ1gc9yz2HYvV ._21hXW2oDD7zvNsoOaW7Yob:not(#se-none) {
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 0 !important;
+}
+
+/*
+ * PLAY: Steam's ActionSection is 46 px tall and the theme's button 52 px, so the
+ * button hung 6 px below the rest of the bar; the section now fits the button and
+ * sits centered in the row like everything else.
+ */
+._1U7LKpx70kEsz3jJwAFOi- ._2zxzStp5qY5M1evOm8keES:not(#se-none) {
+  /* ActionSection */
+  height: auto !important;
+  align-self: center !important;
+  display: flex;
+  align-items: center;
+  margin: 0 !important;
+}
+
+/* PLAY: the triangle and the word centered together, both white */
+._1U7LKpx70kEsz3jJwAFOi- ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA:not(#se-none) {
+  padding: 0 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  color: var(--se-text-strong) !important;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA > *:not(#se-none) {
+  position: static !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex: none !important;
+  width: auto;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA svg:not(#se-none) {
+  width: 14px !important;
+  height: 14px !important;
+  color: var(--se-text-strong) !important;
+  fill: var(--se-text-strong) !important;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA svg:not(#se-none) * {
+  fill: var(--se-text-strong) !important;
+}
+
+/*
+ * The compact bar Steam shows at the top once you scroll — the same PLAY
+ * (green gradient, heavy small capitals, white triangle, centered) at 40 px, and the
+ * game's icon and name centered in the bar instead of pinned to its top.
+ */
+/* Row */
+._39RheXihcN6H2k2muQTjkI ._9EHg918wH6CQCQlD5PWOO:not(#se-none) {
+  align-items: center !important;
+  gap: 16px;
+}
+
+/* InnerContainer */
+._39RheXihcN6H2k2muQTjkI ._3Y87YQY56ZCOqhgcZFaDc5:not(#se-none) {
+  padding-block: 8px !important;
+}
+
+._39RheXihcN6H2k2muQTjkI ._2zxzStp5qY5M1evOm8keES:not(#se-none) {
+  /* ActionSection */
+  height: auto !important;
+  align-self: center !important;
+  display: flex;
+  align-items: center;
+  margin: 0 !important;
+}
+
+/* PlayButtonContainer */
+._39RheXihcN6H2k2muQTjkI ._1FnJ6dPuknQFQ2RTpKTI16:not(#se-none) {
+  height: 40px !important;
+  min-width: 0 !important;
+}
+
+._39RheXihcN6H2k2muQTjkI ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA:not(#se-none) {
+  /* PlayButton */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  padding: 0 22px !important;
+  color: var(--se-text-strong) !important;
+  font: 800 13.5px/1 var(--se-font) !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase;
+}
+
+._39RheXihcN6H2k2muQTjkI ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA *:not(svg, svg *) {
+  font: inherit !important;
+  letter-spacing: inherit !important;
+  text-transform: inherit;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: static !important;
+}
+
+._39RheXihcN6H2k2muQTjkI ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA svg:not(#se-none) {
+  width: 12px !important;
+  height: 12px !important;
+  margin: 0 !important;
+  fill: var(--se-text-strong) !important;
+  color: var(--se-text-strong) !important;
+}
+
+._39RheXihcN6H2k2muQTjkI ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA svg:not(#se-none) * {
+  fill: var(--se-text-strong) !important;
+}
+
+/* StatusAndStats */
+._39RheXihcN6H2k2muQTjkI ._1YbtIWcfkQJOysLXQbwzRf:not(#se-none) {
+  align-self: stretch !important;
+  height: auto !important;
+}
+
+._39RheXihcN6H2k2muQTjkI ._2MBVRXpsw6DUjs7937DWZW:not(#se-none) {
+  /* PlayBarIconAndGame */
+  top: 50% !important;
+  height: auto !important;
+  transform: translateY(-50%);
+  padding-inline-start: 0 !important;
+  gap: 10px;
+}
+
+/* PlayBarGameIcon */
+._39RheXihcN6H2k2muQTjkI ._1iNIp1p3ZhPoBwZbkmdb8o:not(#se-none) {
+  width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+}
+
+/* PlayBarGameName */
+._39RheXihcN6H2k2muQTjkI ._3rpUkswF6xc_ste4Ros_xM:not(#se-none) {
+  font: 600 14.5px/1.2 var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+/* Links: Overview · Store Page · DLC · Community Hub… */
+._3-V8vjmrwuJM6Ws3tsjFJj {
+  /* LinksSection */
+  padding: 0 !important;
+}
+
+/* The wrappers (InnerContainer, InnerContainerLower2): no box of their own */
+._3-V8vjmrwuJM6Ws3tsjFJj > div,
+._3-V8vjmrwuJM6Ws3tsjFJj ._1Ak5Eixho9KoGUXjyp1zKD,
+._3-V8vjmrwuJM6Ws3tsjFJj ._2ESi7WxCzXVx5-FsveYJ1f {
+  background: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+}

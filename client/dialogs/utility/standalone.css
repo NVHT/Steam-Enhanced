@@ -1,0 +1,667 @@
+/*
+ * Utility dialogs › standalone windows and prompts: dismiss button, Game Info, pending gifts,
+ * Remote Play, Shutdown, Steam Runtime, controller configurator, review and note editors.
+ * Utility dialog styles load in order: base, servers, media, library-tools, modals, friends, standalone.
+ */
+
+/*
+ * The close button of in-window dialogs (ModalPosition_Dismiss)
+ * Steam's 14 px "x" on a textured square: the theme's 30 px tile, gray at rest, lit on hover.
+ */
+.ModalPosition_Dismiss .closeButton:not(#se-none) {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-tile-sm);
+  height: var(--se-tile-sm);
+  padding: 0;
+  border-radius: var(--se-radius-sm);
+  background: transparent none !important;
+  box-shadow: none !important;
+  opacity: 1;
+  color: var(--se-text-muted);
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+.ModalPosition_Dismiss .closeButton:not(#se-none):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong);
+}
+
+.ModalPosition_Dismiss .closeButton > svg {
+  display: none !important;
+}
+
+.ModalPosition_Dismiss .closeButton::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-close-sm) center / 14px 14px no-repeat;
+  mask: var(--se-icon-close-sm) center / 14px 14px no-repeat;
+}
+
+/*
+ * Game Info (players and friends on your server)
+ * GameInfoDialogContents._1J28NGrw629-j5cVtncv_, PlayersList._3HOjFOu8W2UHP4m6q7OorG, FriendsList._1FQ0ez0uS2BdoZGsI5hQ6G,
+ * Header.vATYv4EBNodEsN_HqvfJT, Details._3s0LVYddVEc1fa7aGrAd9C, PingFailed._3LzQqDpZIP3tQp8AORI8Ep.
+ */
+._3HOjFOu8W2UHP4m6q7OorG:not(#se-none),
+._1FQ0ez0uS2BdoZGsI5hQ6G:not(#se-none) {
+  overflow: hidden;
+  padding: 4px 6px;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-bg);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+._3HOjFOu8W2UHP4m6q7OorG .vATYv4EBNodEsN_HqvfJT:not(#se-none),
+._1FQ0ez0uS2BdoZGsI5hQ6G .vATYv4EBNodEsN_HqvfJT:not(#se-none) {
+  padding: 10px 8px 6px;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase !important;
+  color: var(--se-label-color) !important;
+}
+
+._3HOjFOu8W2UHP4m6q7OorG ._3s0LVYddVEc1fa7aGrAd9C:not(#se-none),
+._1FQ0ez0uS2BdoZGsI5hQ6G ._3s0LVYddVEc1fa7aGrAd9C:not(#se-none) {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--se-hairline);
+  font: 500 13px var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-dim);
+}
+
+._3LzQqDpZIP3tQp8AORI8Ep:not(#se-none) {
+  color: var(--se-danger-text);
+}
+
+/*
+ * Pending gifts: a store page in a dialog, framed like the announcements
+ * PendingGiftsDialog._1I9_2lGTsH32GiBEXyePrp, BrowserViewHost._26k_TTAZxn5E9toMQvauz7.
+ */
+._1I9_2lGTsH32GiBEXyePrp.DialogContent:not(#se-none) {
+  padding: 36px 0 0;
+  background: var(--se-bg);
+}
+
+._26k_TTAZxn5E9toMQvauz7:not(#se-none) {
+  background: var(--se-bg);
+}
+
+/*
+ * Remote Play: the PIN, authorize / spectate prompts, pairing
+ * SegmentedCharacterInput._1gzkmmy_XA39rp9MtxJfZJ (Input._3xcXqLVteTNHmk-gh9W65d, Danger._3lEvxoIfUV21o8WAfErUcA, Disabled
+ * ._4WrcvilhO29CHFM0pqglW), ErrorText._1E9uclIRw_L0pOLMZ_iy0a, SpectatePermissionToggle._2OEHcYnHqO4xH2-GmADNaW,
+ * PairingPopup._1YEkwA6LdSf-burHZ56Tet, ModalImage._3eEmTVBpnuykohYaNCdzAF, Description._3bxBp2g6blvd6BCKYnz0gh.
+ */
+._1gzkmmy_XA39rp9MtxJfZJ:not(#se-none) {
+  gap: 12px;
+  padding: 14px 20px;
+  border: 0;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+._1gzkmmy_XA39rp9MtxJfZJ:not(#se-none):focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong), 0 0 0 3px var(--se-accent-tint);
+}
+
+._1gzkmmy_XA39rp9MtxJfZJ._3lEvxoIfUV21o8WAfErUcA:not(#se-none) {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-danger) 70%, transparent), 0 0 0 3px color-mix(in srgb, var(--se-danger) 16%, transparent);
+}
+
+._1gzkmmy_XA39rp9MtxJfZJ._4WrcvilhO29CHFM0pqglW:not(#se-none) {
+  opacity: .55;
+}
+
+._1gzkmmy_XA39rp9MtxJfZJ ._3xcXqLVteTNHmk-gh9W65d:not(#se-none) {
+  border-bottom: 2px solid var(--se-border-strong);
+  font: 700 26px var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text);
+  caret-color: var(--se-accent);
+}
+
+._1gzkmmy_XA39rp9MtxJfZJ ._3xcXqLVteTNHmk-gh9W65d:not(#se-none):focus {
+  border-bottom-color: var(--se-accent);
+}
+
+._1E9uclIRw_L0pOLMZ_iy0a._1E9uclIRw_L0pOLMZ_iy0a:not(#se-none) {
+  font: 500 13px var(--se-font);
+  color: var(--se-danger-text);
+}
+
+._3eEmTVBpnuykohYaNCdzAF svg:not(#se-none) {
+  color: var(--se-text-muted);
+}
+
+._3bxBp2g6blvd6BCKYnz0gh:not(#se-none) {
+  font: 400 14px/1.5 var(--se-font);
+  color: var(--se-text-dim);
+}
+
+/*
+ * Shutdown ("Waiting for <game> to shut down…", "Shutting down Steam…")
+ * Steam opens it as a fixed 600×240 popup holding its large (92px) spinner, a line of text
+ * and two buttons; with dialog padding that overflows and the buttons get cut off. The
+ * content is laid out as one centred column with a smaller spinner so all of it fits,
+ * even when a long game name wraps.
+ * ShutdownDialog ._3StXNL1HvLIJMUxfaFLdX- (the dialog box itself in a popup, its wrapper in
+ * a modal), Body ._2Se5JD_UkWeIyaZiXXmxDD, Buttons ._29slAFSSeZuzwWblDDcahS,
+ * Button ._2RbfG_Cx096a1vnHitlOtg; spinner LoadingWrapper ._2wAKy-0ZkO_vhbiQCP9MgE.
+ */
+._3StXNL1HvLIJMUxfaFLdX- {
+  --se-shutdown-spinner: 56px;
+}
+
+:is(._3StXNL1HvLIJMUxfaFLdX-.DialogContent, ._3StXNL1HvLIJMUxfaFLdX- > .DialogContent):not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  padding: 18px 28px 20px !important;
+}
+
+:is(._3StXNL1HvLIJMUxfaFLdX-.DialogContent, ._3StXNL1HvLIJMUxfaFLdX- > .DialogContent) > .DialogContent_InnerWidth:not(#se-none) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+._3StXNL1HvLIJMUxfaFLdX- ._2Se5JD_UkWeIyaZiXXmxDD:not(#se-none) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: center;
+  font: 500 14px/20px var(--se-font);
+  color: var(--se-text-dim);
+}
+
+._3StXNL1HvLIJMUxfaFLdX- ._2Se5JD_UkWeIyaZiXXmxDD .SteamLogoThrobber:not(#se-none) {
+  width: var(--se-shutdown-spinner, 56px) !important;
+  height: var(--se-shutdown-spinner, 56px) !important;
+  margin: 0 !important;
+}
+
+._3StXNL1HvLIJMUxfaFLdX- ._2Se5JD_UkWeIyaZiXXmxDD .SteamLogoThrobber > *:not(.se-spinner):not(#se-none),
+._3StXNL1HvLIJMUxfaFLdX- ._2Se5JD_UkWeIyaZiXXmxDD .SteamLogoThrobber img:not(#se-none) {
+  display: block;
+  flex: none;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* The message: at most two lines, so the buttons never leave the window */
+._3StXNL1HvLIJMUxfaFLdX- ._2Se5JD_UkWeIyaZiXXmxDD > :not(._29slAFSSeZuzwWblDDcahS, ._2RbfG_Cx096a1vnHitlOtg, :has(.SteamLogoThrobber)):not(#se-none) {
+  display: -webkit-box;
+  max-width: 100%;
+  margin: 0 !important;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+  font: inherit !important;
+  color: inherit !important;
+}
+
+._3StXNL1HvLIJMUxfaFLdX- ._29slAFSSeZuzwWblDDcahS:not(#se-none) {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  margin: 2px 0 0 !important;
+}
+
+._3StXNL1HvLIJMUxfaFLdX- ._2RbfG_Cx096a1vnHitlOtg:not(#se-none) {
+  flex: none;
+  width: auto !important;
+  min-width: 112px !important;
+  height: var(--se-control-h) !important;
+  margin: 0 !important;
+  padding: 0 18px !important;
+}
+
+/*
+ * Steam Runtime system info, licenses (Linux)
+ * SteamRuntimeSystemInfoDialogContent.q5OA-x6LcVkvtLCGp-8JC, TextContainer
+ * .YvsXGGpc_ep7jT-hmQxZe, Text._3ff2d75A8KI0jL0j2vZUAw, LicensesDialog._1wvG6Xu0RaAGmTuBxIDE1s, LicenseText._2xERUX8eLmvYpGy3DV5IFq,
+ * LanguageBetaTag._24BN2A3khkLXilnwdxCSHL.
+ */
+.q5OA-x6LcVkvtLCGp-8JC .YvsXGGpc_ep7jT-hmQxZe:not(#se-none) {
+  box-sizing: border-box;
+  padding: 14px 18px;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-bg) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.q5OA-x6LcVkvtLCGp-8JC .YvsXGGpc_ep7jT-hmQxZe ._3ff2d75A8KI0jL0j2vZUAw:not(#se-none) {
+  font: 400 12.5px/1.6 Consolas, "Cascadia Mono", "SF Mono", monospace !important;
+  color: var(--se-text-dim) !important;
+}
+
+._1wvG6Xu0RaAGmTuBxIDE1s ._2xERUX8eLmvYpGy3DV5IFq:not(#se-none) {
+  font: 400 13px/1.55 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+._24BN2A3khkLXilnwdxCSHL:not(#se-none) {
+  padding: 1px 8px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-gold-surface);
+  font: 700 11px/16px var(--se-font);
+  letter-spacing: .06em;
+  color: var(--se-gold-text);
+}
+
+/*
+ * Controller configurator (Steam Input)
+ * Its frame in the theme's grounds and controls; the binding editor inside keeps Steam's layout.
+ * ControllerConfiguratorMain.APY6jDS50MNUPuX38IgC0, TopSection._20sN9G_C5kZ9GO_mVUuWTD, BottomSection
+ * ._3RsRfCOW7Do0JNHcEs2nqX, ControllerSelectionContainer.TYpuuReNb2qPgvjWhRNpL,
+ * ControllerSelectionOptions._3rsQRA6-lR_jrdiuv3ARnf, ControllerSelectionOption
+ * .tNl7CupYn5jcZaRWX6PU0, CurrentSelection._1DMzCviYCYOj6lKga1y_vt, YourControllerLabel
+ * .TA5dR9XJAWRyQcgS4_una, CommunityConfigsCallout._1xfC8oO6JVNnioU1NPTN9s, ErrorMsgButton
+ * .q_6vIMfTLjN8LibKa-cXz, ConfigurationName._2IlcVo9eEhKl7iybZ09tOS, ConfigurationDescription
+ * ._6wAebKulOPCal1hTcnWM-, Creator._2j7kLVQ6grd7T5eCqlIGpJ, SupportTitle._32f4mUbAzCnRxr-yFIrsQW, SupportLabel
+ * ._2fNrpCE_Xp5xNOpejG5Krs, QuickSettingsHeader._3gVR5OLNO_2dJFPrZk0TG2; interstitials (module 366):
+ * ConfiguratorInterstitialContainer._3FS5uBh6SB9gq4vjbnKa4G, ContainerInner.IbaDJeXoUV46mwyWeP42O,
+ * DialogStyle._3BeKk1O8jsZ3W8XtvhB-ci, ControlLabel.tGJeFkznK3-BCMgr4GSHi, ConfigButtonContainer.nggdu5y4G6UWA-8U8zRNx.
+ */
+.APY6jDS50MNUPuX38IgC0:not(#se-none) {
+  background-color: var(--se-bg);
+}
+
+._20sN9G_C5kZ9GO_mVUuWTD:not(#se-none) {
+  background-color: var(--se-sidebar);
+  box-shadow: inset 0 -1px 0 var(--se-hairline);
+}
+
+._3RsRfCOW7Do0JNHcEs2nqX:not(#se-none) {
+  background-color: var(--se-bg);
+}
+
+.TYpuuReNb2qPgvjWhRNpL:not(#se-none) {
+  background: var(--se-sidebar);
+}
+
+._3rsQRA6-lR_jrdiuv3ARnf:not(#se-none) {
+  background: var(--se-sidebar);
+  gap: 4px;
+  padding: 6px 0;
+}
+
+._3rsQRA6-lR_jrdiuv3ARnf .tNl7CupYn5jcZaRWX6PU0:not(#se-none) {
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-muted);
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+._3rsQRA6-lR_jrdiuv3ARnf .tNl7CupYn5jcZaRWX6PU0:not(#se-none):hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+._3rsQRA6-lR_jrdiuv3ARnf .tNl7CupYn5jcZaRWX6PU0._1DMzCviYCYOj6lKga1y_vt:not(#se-none) {
+  background: var(--se-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  color: var(--se-text-strong);
+}
+
+.TA5dR9XJAWRyQcgS4_una:not(#se-none) {
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent);
+  color: var(--se-bg-ink);
+  font-weight: 700;
+}
+
+._1xfC8oO6JVNnioU1NPTN9s:not(#se-none) {
+  padding: 8px 12px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  font: 500 12.5px/1.45 var(--se-font);
+  color: var(--se-text-dim);
+}
+
+.q_6vIMfTLjN8LibKa-cXz:not(#se-none) {
+  padding: 4px 10px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-danger);
+  color: var(--se-bg-ink);
+  font-weight: 700;
+}
+
+._2IlcVo9eEhKl7iybZ09tOS:not(#se-none) {
+  font: 700 16px/1.3 var(--se-font);
+  color: var(--se-text);
+}
+
+._6wAebKulOPCal1hTcnWM-:not(#se-none),
+._2j7kLVQ6grd7T5eCqlIGpJ:not(#se-none),
+._2fNrpCE_Xp5xNOpejG5Krs:not(#se-none) {
+  font-family: var(--se-font);
+  color: var(--se-text-muted);
+}
+
+._32f4mUbAzCnRxr-yFIrsQW:not(#se-none),
+._3gVR5OLNO_2dJFPrZk0TG2:not(#se-none) {
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.DesktopUI ._3FS5uBh6SB9gq4vjbnKa4G:not(#se-none) {
+  background: var(--se-bg);
+}
+
+.IbaDJeXoUV46mwyWeP42O._3BeKk1O8jsZ3W8XtvhB-ci:not(#se-none) {
+  border: 0;
+  border-radius: var(--se-radius-lg);
+  background-color: var(--se-surface);
+  box-shadow: var(--se-shadow-pop);
+}
+
+.tGJeFkznK3-BCMgr4GSHi:not(#se-none) {
+  border-radius: var(--se-radius-pill);
+  background-color: var(--se-surface-2);
+  color: var(--se-text);
+  font-weight: 600;
+}
+
+.nggdu5y4G6UWA-8U8zRNx:not(#se-none) {
+  border-radius: var(--se-radius-md);
+  background-color: var(--se-sidebar);
+}
+
+._3FS5uBh6SB9gq4vjbnKa4G .DialogButton.OKButton:not(#se-none) {
+  background: var(--se-accent) !important;
+  color: var(--se-bg-ink) !important;
+}
+
+/*
+ * Write / edit review dialog (module 79918, inside Steam's generic confirm dialog).
+ * The yes/no question row is styled with the game page's review prompt (client/game-page/overview.css);
+ * here: the game name, the instructions and their links, the text box as the theme's field,
+ * and the visibility / options row.
+ * WriteReviewContainer ._10bN3WMeG0xP9KCqsxx7ea, Header ._27mfPohuGzwxwaotA5Pk9, RatingContainer
+ * ._2SAb6geDpe6toA1GaP0GjH, FormContainer .sK8bmf5vWULFzqtbyJO59, DescribeGame ._2ZLbGVyFKH8FPnr3myxQ_0,
+ * ReviewTextArea ._392iEmqj65Eac9ealm4Pmi, WebLink .C1Doboj64HjGC_c3pKswu, ReviewSettingsContainer
+ * ._2DV7tR-w5VYscyCku6T-Ta, ReviewSettingsRow ._11okUat0uKxVKkTJ_c6M08, ReviewSettingsChecks
+ * ._3ntbowo6E0C1X796jwjZNs, VisibilityMenu ._2r_L15rUTJhrj9LgTXhXFk, Error .ZJkUnK19mQotF9Zz1aLpk.
+ */
+/*
+ * Steam opens it "full size" (DialogContentFullSize), which stretched the dialog across the
+ * window with the form on the left; the dialog now wraps the form.
+ */
+.DialogContent:has(._10bN3WMeG0xP9KCqsxx7ea):not(#se-none) {
+  width: min(760px, calc(100vw - 48px)) !important;
+  max-width: min(760px, calc(100vw - 48px)) !important;
+  min-width: 0 !important;
+}
+
+.ModalPosition_Content:has(._10bN3WMeG0xP9KCqsxx7ea):not(#se-none) {
+  width: auto !important;
+  max-width: calc(100vw - 48px) !important;
+}
+
+.DialogContent:has(._10bN3WMeG0xP9KCqsxx7ea) .DialogContent_InnerWidth:not(#se-none) {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea:not(#se-none) {
+  width: 100%;
+  font: 500 13.5px/1.5 var(--se-font);
+  color: var(--se-text-dim);
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._27mfPohuGzwxwaotA5Pk9:not(#se-none) {
+  margin-bottom: 10px;
+  font: 700 17px/24px var(--se-font);
+  color: var(--se-text-strong);
+}
+
+/* The question: outlined, so the Yes / No pills (surface-2) stand out on it */
+._10bN3WMeG0xP9KCqsxx7ea ._2SAb6geDpe6toA1GaP0GjH:not(#se-none) {
+  padding: 12px 12px 12px 14px !important;
+  border-radius: var(--se-radius-md);
+  background: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._2ZLbGVyFKH8FPnr3myxQ_0:not(#se-none) {
+  margin: 16px 0 10px;
+  color: var(--se-text-muted);
+}
+
+/* Links ("Rules and Guidelines", "Formatting Help"): the theme's text links */
+._10bN3WMeG0xP9KCqsxx7ea a:not(#se-none) {
+  font-weight: 600;
+  color: var(--se-accent);
+  text-decoration: none;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea a:is(:hover, :focus-visible):not(#se-none) {
+  color: var(--se-text-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  outline: none;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._392iEmqj65Eac9ealm4Pmi:not(#se-none) {
+  display: block;
+  width: 100%;
+  min-height: 120px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  font: 400 14px/1.5 var(--se-font);
+  color: var(--se-text);
+  transition: box-shadow var(--se-dur) ease-out;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._392iEmqj65Eac9ealm4Pmi:hover:not(:focus):not(#se-none) {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14);
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._392iEmqj65Eac9ealm4Pmi:focus:not(#se-none) {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong), 0 0 0 3px var(--se-accent-tint);
+}
+
+._10bN3WMeG0xP9KCqsxx7ea .C1Doboj64HjGC_c3pKswu:not(#se-none) {
+  display: block;
+  float: none;
+  width: fit-content;
+  margin: 8px 0 0 auto;
+  font: 600 12.5px/18px var(--se-font);
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._2DV7tR-w5VYscyCku6T-Ta:not(#se-none) {
+  margin-top: 16px;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._11okUat0uKxVKkTJ_c6M08:not(#se-none) {
+  align-items: flex-start;
+  gap: 10px 14px;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._11okUat0uKxVKkTJ_c6M08 > span:not(#se-none) {
+  margin: 0;
+  font: var(--se-label-font);
+  line-height: var(--se-control-h);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._3ntbowo6E0C1X796jwjZNs:not(#se-none) {
+  gap: 4px;
+  margin-top: 2px;
+}
+
+._10bN3WMeG0xP9KCqsxx7ea ._3ntbowo6E0C1X796jwjZNs .DialogCheckbox_Container:not(#se-none),
+._10bN3WMeG0xP9KCqsxx7ea ._3ntbowo6E0C1X796jwjZNs :is(._2sbh8IdfnVytSlMaw49hRb, .GpDzIS6KXIEbHY0uOjeu-, ._1iOA81hI0sXkxzZ9V8GksY):not(#se-none) {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text);
+}
+
+._10bN3WMeG0xP9KCqsxx7ea .ZJkUnK19mQotF9Zz1aLpk:not(#se-none) {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-danger) 35%, transparent);
+  font: 500 13px/1.45 var(--se-font);
+  color: var(--se-danger-text);
+}
+
+/*
+ * Game note window (gamenotes chunk + module 10325 / 76627): the editor as the theme's field,
+ * the formatting toolbar's active state in the accent, and the trash / Close buttons as
+ * regular theme buttons instead of half-transparent glyphs.
+ * NoteEditorArea ._1AL7l2CN6z-vuLfp1iCLa, EditorInput ._1Ve4VFO2EEkeNZdel_Asky, NoteActions
+ * ._1fu6xumTI1nCY5wc6FG_N2, CloseWindowButton .vKXl-xWkUZL5iNvaT5mzW, Toolbar .gdKTXjvFuMeVN2qa6o8EL,
+ * CommandButton ._1dEi5qzSDdPOzoOQXYbNLN, Toggled ._1Iw5xoXQXfmRjgjWTKbm_G.
+ */
+._1AL7l2CN6z-vuLfp1iCLa:not(#se-none) {
+  margin: 0 0 18px;
+  color: var(--se-text);
+}
+
+._1Ve4VFO2EEkeNZdel_Asky:not(#se-none) {
+  border-radius: var(--se-radius-md);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  font: 400 14px/1.55 var(--se-font);
+  transition: box-shadow var(--se-dur) ease-out;
+}
+
+/* Focus: an inset ring only; an outer glow is clipped by the window's scroll area */
+._1Ve4VFO2EEkeNZdel_Asky:focus-within:not(#se-none) {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong);
+}
+
+._1Ve4VFO2EEkeNZdel_Asky > .ProseMirror:not(#se-none) {
+  padding: 14px 16px 64px;
+}
+
+._1Ve4VFO2EEkeNZdel_Asky a:not(#se-none) {
+  border-bottom: 0;
+  color: var(--se-accent);
+}
+
+._1Ve4VFO2EEkeNZdel_Asky a:hover:not(#se-none) {
+  border-bottom: 0;
+  color: var(--se-text-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.gdKTXjvFuMeVN2qa6o8EL:not(#se-none) {
+  padding: 4px 0 14px;
+}
+
+/*
+ * Toolbar rows (module 76627: ToolbarRowOverflowContainer .nXEH21nf47u2OH7BjQKei, ToolbarRow
+ * .LCeIT0gmFTY8fdfaVgk4j, Gap ._19z0fjj7o0n9vAjVjvYZNU): Steam scrolls an overflowing row
+ * sideways with no visible scrollbar, so the last buttons were cut off. They wrap instead,
+ * and the buttons are one compact size.
+ */
+.gdKTXjvFuMeVN2qa6o8EL .nXEH21nf47u2OH7BjQKei:not(#se-none) {
+  overflow: visible;
+  margin-top: 6px;
+}
+
+.gdKTXjvFuMeVN2qa6o8EL .LCeIT0gmFTY8fdfaVgk4j:not(#se-none) {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 4px;
+  width: auto;
+}
+
+.gdKTXjvFuMeVN2qa6o8EL .LCeIT0gmFTY8fdfaVgk4j ._19z0fjj7o0n9vAjVjvYZNU:not(#se-none) {
+  width: 8px;
+}
+
+.gdKTXjvFuMeVN2qa6o8EL button.DialogButton._1dEi5qzSDdPOzoOQXYbNLN:not(#se-none) {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.gdKTXjvFuMeVN2qa6o8EL button.DialogButton._1dEi5qzSDdPOzoOQXYbNLN .SVGIcon_Button:not(#se-none) {
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+button.DialogButton._1dEi5qzSDdPOzoOQXYbNLN._1Iw5xoXQXfmRjgjWTKbm_G:not(#se-none) {
+  outline: 0;
+  background: var(--se-accent-surface) !important;
+  color: var(--se-accent) !important;
+}
+
+._1AL7l2CN6z-vuLfp1iCLa ._1fu6xumTI1nCY5wc6FG_N2:not(#se-none) {
+  inset-inline-end: 10px;
+  bottom: 10px;
+  gap: 8px;
+}
+
+._1AL7l2CN6z-vuLfp1iCLa ._1fu6xumTI1nCY5wc6FG_N2 .DialogButton:not(#se-none) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px;
+  margin: 0;
+  padding: 0 !important;
+  opacity: 1;
+  color: var(--se-text-muted) !important;
+}
+
+._1AL7l2CN6z-vuLfp1iCLa ._1fu6xumTI1nCY5wc6FG_N2 .DialogButton:hover:not(#se-none) {
+  opacity: 1;
+  color: var(--se-text-strong) !important;
+}
+
+._1AL7l2CN6z-vuLfp1iCLa ._1fu6xumTI1nCY5wc6FG_N2 .DialogButton svg:not(#se-none) {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+._1AL7l2CN6z-vuLfp1iCLa ._1fu6xumTI1nCY5wc6FG_N2 .vKXl-xWkUZL5iNvaT5mzW:not(#se-none) {
+  width: auto;
+  margin: 0;
+  padding: 0 14px !important;
+  color: var(--se-text) !important;
+  font: 700 12.5px/32px var(--se-font);
+}

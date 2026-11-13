@@ -1,0 +1,1312 @@
+/*
+ * Game page › activity feed: screenshots, the trading card badge, feed layout, ratings,
+ * comments and the scroll-to-top button.
+ * Game page styles load in order: layout, play-bar, overview, achievements, friends, cards, activity.
+ */
+
+/*
+ * Activity feed
+ * Day labels small and quiet with a 1px divider; each event a card of its own: the
+ * friend's rounded-square avatar and the line ("gxr shared 28 screenshots"), then its content.
+ * Screenshots: the large one beside three small ones, the last small one "+N".
+ */
+/* AppActivityDate: the date with a 1px divider (Rule) running to the right */
+[data-se-sec="activity"] :is(._19LfMT7PFWg2xHOqNjR99q, .AppActivityDate):not(#se-none) {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  margin: 0 2px 10px !important;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  color: var(--se-label-color) !important;
+}
+
+[data-se-sec="activity"] ._3pcPRPvuGH7hEM33zLknZO:not(#se-none),
+[data-se-sec="activity"] .Rule:not(#se-none) {
+  flex: 1;
+  height: 1px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: var(--se-hairline) !important;
+}
+
+/* Every event card is the full width and only as tall as its content */
+[data-se-sec="activity"] :is(.UVeN0kaD3zv1feMj_mMw5, .Event):not(#se-none) {
+  display: block !important;
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+  margin: 0 0 12px !important;
+  padding: 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+[data-se-sec="activity"] .QCKBqF2k_sRLcXJ5qQIEl:not(#se-none),
+[data-se-sec="activity"] .EventHeadline:not(#se-none) {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  margin: 0 !important;
+  padding: 0 !important;
+  font: 500 13.5px/1.4 var(--se-font) !important;
+  color: var(--se-text-dim) !important;
+}
+
+[data-se-sec="activity"] ._1t1iyV4uBG9M9tTM7rCFNu:not(#se-none),
+[data-se-sec="activity"] .ActorName:not(#se-none) {
+  font-weight: 700 !important;
+}
+
+[data-se-sec="activity"] ._1gVy5n_zNp3tXpwU2aV9k8 img:not(#se-none),
+[data-se-sec="activity"] .EventActorAvatar img:not(#se-none) {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: var(--se-avatar-radius) !important;
+  object-fit: cover;
+}
+
+[data-se-sec="activity"] ._1gVy5n_zNp3tXpwU2aV9k8 .avatarStatus:not(#se-none),
+[data-se-sec="activity"] .EventActorAvatar .avatarStatus:not(#se-none),
+[data-se-sec="activity"] ._1gVy5n_zNp3tXpwU2aV9k8 ._3xUpb5DWXPFNcHHIcv-9pe:not(#se-none),
+[data-se-sec="activity"] .EventActorAvatar ._3xUpb5DWXPFNcHHIcv-9pe:not(#se-none),
+[data-se-sec="activity"] ._1gVy5n_zNp3tXpwU2aV9k8 ._3pbKzT087jaL2EeQO1qsaR:not(#se-none),
+[data-se-sec="activity"] .EventActorAvatar ._3pbKzT087jaL2EeQO1qsaR:not(#se-none),
+[data-se-sec="activity"] ._1gVy5n_zNp3tXpwU2aV9k8 .AvatarStatus:not(#se-none),
+[data-se-sec="activity"] .EventActorAvatar .AvatarStatus:not(#se-none) {
+  display: none !important;
+}
+
+[data-se-sec="activity"] ._1gVy5n_zNp3tXpwU2aV9k8 .avatarHolder:not(#se-none),
+[data-se-sec="activity"] .EventActorAvatar .avatarHolder:not(#se-none),
+[data-se-sec="activity"] ._1gVy5n_zNp3tXpwU2aV9k8 ._1_sHcxv9rQdANehiviVZR4:not(#se-none),
+[data-se-sec="activity"] .EventActorAvatar ._1_sHcxv9rQdANehiviVZR4:not(#se-none),
+[data-se-sec="activity"] ._1gVy5n_zNp3tXpwU2aV9k8 .AvatarHolder:not(#se-none),
+[data-se-sec="activity"] .EventActorAvatar .AvatarHolder:not(#se-none) {
+  width: 34px !important;
+  height: 34px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+[data-se-sec="activity"] .NEMXhMlqXOCJwfgWlHXhT:not(#se-none),
+[data-se-sec="activity"] .EventBody:not(#se-none) {
+  margin: 12px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+[data-se-sec="activity"] .NaIUAhNNISCMZymTaSPtz:not(#se-none),
+[data-se-sec="activity"] .EventBodyDivider:not(#se-none) {
+  display: none !important;
+}
+
+[data-se-sec="activity"] .KIhNeYTo-ZKI-HNt72V8R:not(#se-none),
+[data-se-sec="activity"] .ActivityPublishedScreenshot:not(#se-none) {
+  padding: 0 !important;
+  margin: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/*
+ * Screenshots. Every post: the image large at 16:9 on the left, the comments on the
+ * right. Several in a post: the theme's viewer (.se-shot-car), the selected one large
+ * with a counter and a strip of thumbnails under it, five across; Steam's big picture
+ * and thumbnails hidden (they are what a click goes through, so Steam's viewer opens).
+ * The upload time sits at the right end of the headline (.se-ev-time).
+ */
+[data-se-sec="activity"] ._1pdQdoLxwmuMZpXXNHI2Uo:not(#se-none),
+[data-se-sec="activity"] .ScreenshotCarousel:not(#se-none) {
+  display: block !important;
+  height: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: none !important;
+  overflow: visible !important;
+}
+
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="many"] > ._290DqV3rdr3Mjn-Nfyv4My:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="many"] > .ActiveScreenshot:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="many"] > ._1tRKRV0z9mHiZb76QCyqGO:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="many"] > .CarouselThumbs:not(#se-none) {
+  display: none !important;
+}
+
+.se-ev-time {
+  margin-left: auto;
+  padding-left: 12px;
+  white-space: nowrap;
+  font: 500 13px var(--se-font);
+  color: var(--se-text-faint);
+}
+
+.se-shot-car {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.se-shot-main {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  overflow: hidden;
+  background: var(--se-surface-2);
+  cursor: pointer;
+}
+
+.se-shot-main img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.se-shot-main img:not([src]) {
+  visibility: hidden;
+}
+
+.se-shot-count {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: var(--se-radius-pill);
+  display: inline-flex;
+  align-items: center;
+  background: color-mix(in srgb, var(--se-bg-ink) 75%, transparent);
+  font: 700 12.5px var(--se-font);
+  color: var(--se-text);
+}
+
+.se-shot-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 32px) / 5);
+  gap: 8px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding: 3px;
+  margin: -3px;
+}
+
+.se-shot-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.se-shot {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  overflow: hidden;
+  background: var(--se-surface-2);
+  cursor: pointer;
+  opacity: .55;
+  transition: opacity var(--se-dur) ease-out;
+}
+
+.se-shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.se-shot img:not([src]) {
+  visibility: hidden;
+}
+
+.se-shot:hover {
+  opacity: .9;
+}
+
+.se-shot[data-on] {
+  opacity: 1;
+  outline: 2px solid var(--se-accent);
+  outline-offset: 2px;
+}
+
+/* Keyboard focus on the theme's own controls on this page: one ring everywhere */
+.se-shot:focus-visible,
+.se-shot-main:focus-visible,
+.se-shot-open:focus-visible,
+.se-fr-tab:focus-visible,
+.se-fr-stack:focus-visible,
+.se-fr-all:focus-visible,
+.se-dlc-tile:focus-visible,
+.se-assoc-more:focus-visible,
+.se-news-link:focus-visible,
+.se-cm-tabs button:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* One screenshot: picture (60%) and its details (40%) */
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > ._290DqV3rdr3Mjn-Nfyv4My:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > .ActiveScreenshot:not(#se-none) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 22px;
+  align-items: stretch;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border-radius: 0 !important;
+}
+
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > ._290DqV3rdr3Mjn-Nfyv4My > .rRIYiTtpDYzW3EQ2BH-Kw:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > .ActiveScreenshot > .rRIYiTtpDYzW3EQ2BH-Kw:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > ._290DqV3rdr3Mjn-Nfyv4My > .ImageWrapper:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > .ActiveScreenshot > .ImageWrapper:not(#se-none) {
+  position: relative !important;
+  inset: auto !important;
+  aspect-ratio: 16 / 9;
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-md);
+  overflow: hidden;
+  background: var(--se-surface-2);
+  cursor: pointer;
+}
+
+[data-se-sec="activity"] ._1pdQdoLxwmuMZpXXNHI2Uo ._290DqV3rdr3Mjn-Nfyv4My img:not(#se-none),
+[data-se-sec="activity"] ._1pdQdoLxwmuMZpXXNHI2Uo .ActiveScreenshot img:not(#se-none),
+[data-se-sec="activity"] .ScreenshotCarousel ._290DqV3rdr3Mjn-Nfyv4My img:not(#se-none),
+[data-se-sec="activity"] .ScreenshotCarousel .ActiveScreenshot img:not(#se-none) {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  object-fit: cover !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Whatever Steam nests the image in fills the frame too */
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > ._290DqV3rdr3Mjn-Nfyv4My > .rRIYiTtpDYzW3EQ2BH-Kw > :not(img):not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > ._290DqV3rdr3Mjn-Nfyv4My > .ImageWrapper > :not(img):not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > .ActiveScreenshot > .rRIYiTtpDYzW3EQ2BH-Kw > :not(img):not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > .ActiveScreenshot > .ImageWrapper > :not(img):not(#se-none) {
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > ._290DqV3rdr3Mjn-Nfyv4My ._3ljAdVsP0faRHBhKgvOybK:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > .ActiveScreenshot ._3ljAdVsP0faRHBhKgvOybK:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > ._290DqV3rdr3Mjn-Nfyv4My .TimeStamp:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > .ActiveScreenshot .TimeStamp:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > ._290DqV3rdr3Mjn-Nfyv4My ._23HTprMKEMzlqooblsDngK:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > .ActiveScreenshot ._23HTprMKEMzlqooblsDngK:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > ._290DqV3rdr3Mjn-Nfyv4My .ScreenshotCaption:not(#se-none),
+[data-se-sec="activity"] :is(._1pdQdoLxwmuMZpXXNHI2Uo, .ScreenshotCarousel)[data-se-shots="1"] > .ActiveScreenshot .ScreenshotCaption:not(#se-none) {
+  display: none !important;
+}
+
+.se-shot-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 4px 2px;
+}
+
+.se-shot-kicker {
+  text-transform: uppercase;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  color: var(--se-label-color) !important;
+}
+
+.se-shot-game {
+  font: 800 20px/1.25 var(--se-font);
+  color: var(--se-text);
+}
+
+.se-shot-when {
+  font: 500 14px/1.5 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-shot-cap {
+  font: 500 14px/1.5 var(--se-font);
+  color: var(--se-text-dim);
+  overflow-wrap: anywhere;
+}
+
+.se-shot-open {
+  align-self: flex-start;
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--se-control-h);
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: var(--se-radius-pill);
+  background: none;
+  cursor: pointer;
+  font: 600 13px var(--se-font);
+  color: var(--se-text);
+}
+
+.se-shot-open:hover {
+  background: var(--se-hover);
+}
+
+/* Achievements in the feed: rounded icons, the theme's text */
+/* Always five columns, so two or three sit where five would; the theme's copies of Steam's tile look the same */
+[data-se-sec="activity"] :is(.yJLy7HDLJT44C1fcm6lPI, .ActivityAchievementUnlocked):not(#se-none) {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  column-gap: 16px !important;
+  row-gap: 14px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+[data-se-sec="activity"] :is(.yJLy7HDLJT44C1fcm6lPI, .ActivityAchievementUnlocked) > *:not(#se-none) {
+  min-width: 0;
+  grid-column: auto !important;
+}
+
+[data-se-sec="activity"] :is(.yJLy7HDLJT44C1fcm6lPI, .ActivityAchievementUnlocked) img:not(#se-none) {
+  border-radius: var(--se-radius-md) !important;
+}
+
+/*
+ * The trading card badge as a small panel (game-page.js tags BadgeSection with data-se-badge):
+ * the badge in a round frame (gold edge when crafted, a dashed ring with a card mark when not
+ * yet), a small label (Next badge / Your badge / Max level), then its name and level. Any other
+ * picture beside it stays small; the cards keep their grid under it.
+ */
+[data-se-sec="cards"] [data-se-badge]:not(#se-none) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  margin: 0 0 12px !important;
+  padding: 12px 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+[data-se-sec="cards"] [data-se-badge] img:not(#se-none) {
+  flex: 0 0 64px !important;
+  width: 64px !important;
+  max-width: 64px !important;
+  height: 64px !important;
+  object-fit: contain;
+}
+
+[data-se-sec="cards"] [data-se-badge] :is(.RPcyJMJC7chgPFkD4KWtO, ._1zopSLK5O_2X44s_Xy3IO-, .Badge):not(#se-none) {
+  flex: 0 0 52px !important;
+  width: 52px !important;
+  height: 52px !important;
+  max-width: 52px !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  box-sizing: border-box;
+  object-fit: contain;
+}
+
+[data-se-sec="cards"] :is([data-se-badge="crafted"], [data-se-badge="maxed"]) :is(.RPcyJMJC7chgPFkD4KWtO, ._1zopSLK5O_2X44s_Xy3IO-, .Badge):not(#se-none) {
+  padding: 5px !important;
+  background: radial-gradient(circle, color-mix(in srgb, var(--se-gold) 18%, transparent), color-mix(in srgb, var(--se-gold) 4%, transparent) 70%) !important;
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--se-gold) 55%, transparent) !important;
+  border: 0 !important;
+}
+
+[data-se-sec="cards"] [data-se-badge="none"] :is(.RPcyJMJC7chgPFkD4KWtO, ._1zopSLK5O_2X44s_Xy3IO-, .Badge):not(#se-none) {
+  border: 2px dashed rgba(255, 255, 255, .18) !important;
+  background: center / 20px 20px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='7' y='4' width='11' height='15' rx='2' fill='%2398a2ad' fill-opacity='.28' stroke='%2398a2ad' stroke-width='1.6'/%3E%3Cpath d='M5 7.5v10.5a2 2 0 0 0 2 2h8' fill='none' stroke='%2398a2ad' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") !important;
+}
+
+[data-se-sec="cards"] [data-se-badge] :is(._3QrX3TTEetJIRvEW1x2Af2, ._36fG0uZyuCsYavuVvPrzst, .BadgeInfo):not(#se-none) {
+  display: flex !important;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+[data-se-sec="cards"] [data-se-badge] :is(._3QrX3TTEetJIRvEW1x2Af2, ._36fG0uZyuCsYavuVvPrzst, .BadgeInfo)::before {
+  content: 'Your badge';
+  text-transform: uppercase;
+  color: var(--se-gold-text);
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+}
+
+[data-se-sec="cards"] [data-se-badge="none"] :is(._3QrX3TTEetJIRvEW1x2Af2, ._36fG0uZyuCsYavuVvPrzst, .BadgeInfo)::before {
+  content: 'Next badge';
+  color: var(--se-text-faint);
+}
+
+[data-se-sec="cards"] [data-se-badge="maxed"] :is(._3QrX3TTEetJIRvEW1x2Af2, ._36fG0uZyuCsYavuVvPrzst, .BadgeInfo)::before {
+  content: 'Max level';
+}
+
+[data-se-sec="cards"] [data-se-badge] :is(._3ca2d1qaIzPNm79jqRbi0J, .rmU5gSpGCyzzdzzL66_h, .BadgeName):not(#se-none) {
+  margin: 0 !important;
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+[data-se-sec="cards"] [data-se-badge] :is(._2PMlMbFfEmv1xThuy6Vgqv, ._1p820T7Fx7HLM4wdPqJd3Z, .BadgeLevel):not(#se-none) {
+  margin: 0 !important;
+  font: 500 var(--se-fs-sm)/1.3 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+/*
+ * Trading cards grow on hover (native animation): nothing around them clips it,
+ * and the hovered card sits above its neighbors.
+ */
+[data-se-sec="cards"]:not(#se-none),
+[data-se-sec="cards"] ._2r4TK4BAuU-J4FuF_O7v_5:not(#se-none),
+[data-se-sec="cards"] ._31ptFGGMZrSQc5BCX1e5lm:not(#se-none),
+[data-se-sec="cards"] ._5uvIN6jXDXzzck59F-nhv:not(#se-none),
+[data-se-sec="cards"] [data-se-cgrid]:not(#se-none) {
+  overflow: visible !important;
+}
+
+[data-se-sec="cards"] [data-se-cgrid] > :hover {
+  z-index: 10;
+}
+
+/*
+ * Activity feed layout: each day is its heading (the date with a 1px divider running to
+ * the right) over its events; every event card is the full width and only as tall as
+ * its content. "View Latest News" is a link at the right end of the post box.
+ */
+[data-se-sec="activity"] .S2Fu9HxHCA5MaCLGrN2ib:not(#se-none),
+[data-se-sec="activity"] .AppActivityDay:not(#se-none) {
+  display: block !important;
+  margin: 18px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+[data-se-sec="activity"] ._19LfMT7PFWg2xHOqNjR99q ._3pcPRPvuGH7hEM33zLknZO:not(#se-none),
+[data-se-sec="activity"] .AppActivityDate ._3pcPRPvuGH7hEM33zLknZO:not(#se-none),
+[data-se-sec="activity"] ._19LfMT7PFWg2xHOqNjR99q .Rule:not(#se-none),
+[data-se-sec="activity"] .AppActivityDate .Rule:not(#se-none) {
+  margin: 0 !important;
+}
+
+[data-se-sec="activity"] :is(.UVeN0kaD3zv1feMj_mMw5, .Event):is(._2CB_RqM2eU0opie2AJ3Eow, .NoCommentSupport):not(#se-none) {
+  padding-bottom: 14px !important;
+}
+
+.se-news-link {
+  flex: none;
+  margin: 0 4px 0 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  white-space: nowrap;
+  font: 600 12.5px var(--se-font);
+  color: var(--se-accent);
+}
+
+.se-news-link:hover {
+  color: var(--se-text-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+[data-se-sec="activity"] [data-se-empty]:not(#se-none) {
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+}
+
+/*
+ * Achievements in the feed look like those in the Achievements card (the shared icon rules
+ * are with the card's): a 52 px icon, the name and description in the card's type; hovering
+ * opens the theme's tooltip.
+ */
+[data-se-sec="activity"] ._1fEbX-PfpZ2FhkhttWcm-V:not(#se-none) {
+  --icon-size: 52px !important;
+  width: 52px !important;
+  height: 52px !important;
+  flex: none !important;
+}
+
+[data-se-sec="activity"] ._1fEbX-PfpZ2FhkhttWcm-V img:not(#se-none) {
+  width: 100% !important;
+  height: 100% !important;
+  box-shadow: none !important;
+}
+
+[data-se-sec="activity"] ._26QliGU0MSP6WN4r-RtI5q:not(#se-none),
+[data-se-sec="activity"] .PrimaryAchievement:not(#se-none) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px;
+  padding: 6px 4px !important;
+  margin: 0 !important;
+  background: none !important;
+}
+
+[data-se-sec="activity"] ._26QliGU0MSP6WN4r-RtI5q ._39Y01uSRcLiDg5DneTTR0m:not(#se-none),
+[data-se-sec="activity"] .PrimaryAchievement ._39Y01uSRcLiDg5DneTTR0m:not(#se-none) {
+  margin: 0 0 2px !important;
+  font: 700 13.5px/1.3 var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+[data-se-sec="activity"] ._26QliGU0MSP6WN4r-RtI5q ._2gLHbXukQBdrIKhqEYVvOe:not(#se-none),
+[data-se-sec="activity"] .PrimaryAchievement ._2gLHbXukQBdrIKhqEYVvOe:not(#se-none) {
+  font: 500 12.5px/1.4 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+[data-se-sec="activity"] ._3rSv3w2J_INq58pcvME5iJ .SfyYvxDpnz-oGXMDxtqEf:not(#se-none),
+[data-se-sec="activity"] .RemainderContainer .SfyYvxDpnz-oGXMDxtqEf:not(#se-none),
+[data-se-sec="activity"] ._3rSv3w2J_INq58pcvME5iJ .AchievementRemainder:not(#se-none),
+[data-se-sec="activity"] .RemainderContainer .AchievementRemainder:not(#se-none) {
+  inset: 0 !important;
+  border-radius: var(--se-radius-md);
+  filter: blur(2px) brightness(.45) saturate(1.4) !important;
+}
+
+/*
+ * The feed's avatars are drawn like those in Friends who play: 36 px, rounded square, with the
+ * status ring 2 px out (green in game, blue online, dashed when away, gray offline).
+ */
+[data-se-sec="activity"] :is(._1gVy5n_zNp3tXpwU2aV9k8, .EventActorAvatar):not(#se-none) {
+  flex: none;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
+  margin: 0 4px 0 2px !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+[data-se-sec="activity"] ._1gVy5n_zNp3tXpwU2aV9k8 *:not(img):not(#se-none),
+[data-se-sec="activity"] .EventActorAvatar *:not(img):not(#se-none) {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  width: 36px !important;
+  height: 36px !important;
+}
+
+[data-se-sec="activity"] [data-se-fr-status]:not(#se-none) {
+  display: none !important;
+}
+
+/* The status ring colors and style come from the shared [data-se-fr-state] rules (Friends) */
+[data-se-sec="activity"] img[data-se-fr-pic]:not(#se-none) {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: var(--se-avatar-radius) !important;
+  object-fit: cover;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: 2px var(--se-fr-ring-style, solid) var(--se-fr-ring, rgba(255, 255, 255, .16)) !important;
+  outline-offset: 2px;
+}
+
+/*
+ * Ratings and comments (feed events, screenshot comments): pills, thumb first then
+ * comments, each a dual-tone icon and a short number (69.6K), blue-tinted, brighter on
+ * hover; the thumb pill is filled in once you have rated. Steam's "rated by" line and
+ * any other counter come after them.
+ */
+[data-se-rate-bar]:not(#se-none) {
+  display: flex !important;
+  flex-flow: row wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+[data-se-rate-bar] > *:not([data-se-rate]):not(#se-none) {
+  order: 4;
+  margin-left: 4px !important;
+}
+
+[data-se-rate-bar] > ._21jcwMWGCL3FILnsOf5I8W:not(#se-none),
+[data-se-rate-bar] > .ButtonSpacer:not(#se-none) {
+  display: none !important;
+}
+
+[data-se-rate-bar] > ._2lY7z1MtJRmiRJu3ykdYfs:not(#se-none),
+[data-se-rate-bar] > .RatingDetails:not(#se-none) {
+  font: 500 12.5px/1.3 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+[data-se-rate-bar] > [data-se-rate="like"]:not(#se-none) {
+  order: 1;
+}
+
+[data-se-rate-bar] > [data-se-rate="comment"]:not(#se-none) {
+  order: 2;
+}
+
+[data-se-rate-bar] > [data-se-rate="award"]:not(#se-none) {
+  order: 3;
+}
+
+[data-se-rate-bar] > [data-se-rate]:not(#se-none) {
+  display: inline-flex !important;
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  gap: 7px;
+  height: 32px;
+  box-sizing: border-box;
+  padding: 0 13px 0 11px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-accent-tint) !important;
+  border: 1px solid var(--se-accent-tint) !important;
+  transition: background-color var(--se-dur) ease-out, border-color var(--se-dur) ease-out;
+}
+
+[data-se-rate-bar] > [data-se-rate]:hover:not(#se-none) {
+  border-color: var(--se-accent-line) !important;
+}
+
+/* Rated: filled in, so it reads apart from a hover */
+[data-se-rate-bar] > [data-se-rate][data-se-rated]:not(#se-none) {
+  background: var(--se-accent-line) !important;
+  border-color: var(--se-accent-strong) !important;
+}
+
+[data-se-rate-bar] [data-se-rate-icon]:not(#se-none) {
+  width: 17px !important;
+  height: 17px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex: none;
+  overflow: hidden;
+}
+
+[data-se-rate-bar] > [data-se-rate="like"] [data-se-rate-icon]:not(#se-none),
+[data-se-rate-bar] > [data-se-rate="comment"] [data-se-rate-icon]:not(#se-none) {
+  background: center / contain no-repeat;
+}
+
+[data-se-rate-bar] > [data-se-rate="like"] [data-se-rate-icon]:not(#se-none) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10v10H4V10z' fill='%237cc4ff' fill-opacity='.35' stroke='%237cc4ff' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M7 10l4-7c1.6 0 2.6 1.2 2.2 2.8L12.6 9H19a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.8 20H7z' fill='%237cc4ff' fill-opacity='.35' stroke='%237cc4ff' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+[data-se-rate-bar] > [data-se-rate="comment"] [data-se-rate-icon]:not(#se-none) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-9l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z' fill='%237cc4ff' fill-opacity='.35' stroke='%237cc4ff' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+[data-se-rate-bar] > [data-se-rate="like"] [data-se-rate-icon] > *:not(#se-none),
+[data-se-rate-bar] > [data-se-rate="comment"] [data-se-rate-icon] > *:not(#se-none) {
+  display: none !important;
+}
+
+[data-se-rate-bar] ._2lVtDi3eSjGcLfXVsRgoUy:not(#se-none),
+[data-se-rate-bar] .BackgroundEffects:not(#se-none) {
+  display: none !important;
+}
+
+[data-se-rate-bar] [data-se-rate-count]:not(#se-none) {
+  font: 700 0/1 var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+[data-se-rate-bar] [data-se-rate-count]::after {
+  content: attr(data-se-rate-count);
+  font-size: 13.5px;
+}
+
+/*
+ * One screenshot: the image on the left (60%), its comments on the right in Steam's
+ * own thread with the ratings on top, scrolling inside when there are many; with none
+ * yet, a quiet line says so.
+ */
+[data-se-sec="activity"] :is(.UVeN0kaD3zv1feMj_mMw5, .Event)[data-se-shot-side]:not(#se-none) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  column-gap: 22px;
+  row-gap: 14px;
+  align-items: start;
+}
+
+[data-se-shot-side] > *:not(#se-none) {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+[data-se-shot-side] > [data-se-side="media"]:not(#se-none) {
+  grid-column: 1;
+  grid-row: 2;
+  margin: 0 !important;
+}
+
+[data-se-shot-side] > [data-se-side="comments"]:not(#se-none) {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: stretch;
+  contain: size;
+  overflow: hidden !important;
+  min-height: 0;
+  height: auto !important;
+  margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+}
+
+[data-se-shot-side] [data-se-shots="1"] > ._290DqV3rdr3Mjn-Nfyv4My:not(#se-none),
+[data-se-shot-side] [data-se-shots="1"] > .ActiveScreenshot:not(#se-none) {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+[data-se-shot-side] > [data-se-side="comments"] [data-se-rate-bar]:not(#se-none) {
+  visibility: visible !important;
+}
+
+[data-se-shot-side] > [data-se-side="comments"] ._34ZDOJFxOtspOltAZYWy-O:not(#se-none),
+[data-se-shot-side] > [data-se-side="comments"] .CommentThread:not(#se-none) {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+[data-se-shot-side] > [data-se-side="comments"] .EhWKRN0QCGwfB7zcx7DwQ::after,
+[data-se-shot-side] > [data-se-side="comments"] .ActivityCommentThreadMinimized::after {
+  content: 'No comments yet';
+  display: block;
+  margin-top: 2px;
+  font: 500 13.5px/1.4 var(--se-font);
+  color: var(--se-text-faint);
+}
+
+[data-se-shot-side] ._515RL2DZmyqkYq3yOP_m7:not(#se-none),
+[data-se-shot-side] .Comment:not(#se-none) {
+  background: none !important;
+  padding: 10px 0 !important;
+  border-top: 1px solid var(--se-hairline) !important;
+}
+
+[data-se-shot-side] .EHOCB7fzYueAW_VuCa0lR img:not(#se-none),
+[data-se-shot-side] .CommentAvatar img:not(#se-none) {
+  border-radius: var(--se-avatar-radius) !important;
+}
+
+[data-se-shot-side] ._3E5S5GWWoCkWFuhBQjGdHw:not(#se-none),
+[data-se-shot-side] .ActorName:not(#se-none) {
+  font: 700 13.5px var(--se-font) !important;
+}
+
+[data-se-shot-side] ._2310BE4LDI9G7LhkIKV0xI:not(#se-none),
+[data-se-shot-side] .CommentTime:not(#se-none) {
+  font: 500 12px var(--se-font) !important;
+  color: var(--se-text-faint) !important;
+}
+
+[data-se-shot-side] ._3XbaozTrhmZDRbFN7-enHx:not(#se-none),
+[data-se-shot-side] .CommentText:not(#se-none) {
+  font: 500 13.5px/1.5 var(--se-font) !important;
+  color: var(--se-text-dim) !important;
+}
+
+/*
+ * Scroll to top: a 48 px round dark button in the bottom-right corner with an arrow,
+ * ringed in blue by how far down the page you are; it rises in when Steam shows it.
+ */
+.sG1Gf1SWuzJQ8dxDWU6DT:not(#se-none),
+.ScrollToTopButtonPosition:not(#se-none) {
+  left: 0 !important;
+  top: 0 !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: visible !important;
+  z-index: var(--se-z-dropdown);
+  pointer-events: none;
+}
+
+[data-se-top-host]:not(#se-none) {
+  position: relative;
+}
+
+._1J21tLst5SEhBPkVRT53UV:not(#se-none),
+.ScrollToTopButton:not(#se-none) {
+  position: absolute !important;
+  left: var(--se-top-x, -200px) !important;
+  top: var(--se-top-y, -200px) !important;
+  width: 48px;
+  height: 48px !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  text-align: left !important;
+  filter: none !important;
+  transform: translateY(16px) scale(.9);
+  transition: transform var(--se-dur-slow) var(--se-ease), opacity var(--se-dur) ease-out !important;
+}
+
+:is(._1J21tLst5SEhBPkVRT53UV, .ScrollToTopButton):is(._28ZR8gHitOrJaSLxcIAl2p, .Visible):not(#se-none) {
+  transform: none;
+}
+
+._1J21tLst5SEhBPkVRT53UV > div:not(#se-none),
+.ScrollToTopButton > div:not(#se-none) {
+  position: relative;
+  display: block !important;
+  width: 48px;
+  height: 48px;
+  padding: 0 !important;
+  box-sizing: border-box;
+  border-radius: 50% !important;
+  background: color-mix(in srgb, var(--se-surface) 94%, transparent) !important;
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, .8) !important;
+  font-size: 0 !important;
+  letter-spacing: 0 !important;
+  color: transparent !important;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+._1J21tLst5SEhBPkVRT53UV > div::before,
+.ScrollToTopButton > div::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(var(--se-accent) calc(var(--se-scroll, 0) * 360deg), var(--se-track) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+}
+
+._1J21tLst5SEhBPkVRT53UV > div::after,
+.ScrollToTopButton > div::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: center / 19px 19px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 19V6M6 11.5L12 5.5l6 6' fill='none' stroke='%23e6e8eb' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+._1J21tLst5SEhBPkVRT53UV:hover > div:not(#se-none),
+.ScrollToTopButton:hover > div:not(#se-none) {
+  background-color: color-mix(in srgb, var(--se-hover) 96%, transparent) !important;
+}
+
+/* The ratings under a feed event always show (Steam fades them in only on hover). */
+[data-se-sec="activity"] :is(.EhWKRN0QCGwfB7zcx7DwQ, .ActivityCommentThreadMinimized):not(#se-none) {
+  justify-content: flex-start !important;
+  padding-top: 8px !important;
+}
+
+[data-se-sec="activity"] :is(._34ZDOJFxOtspOltAZYWy-O, .CommentThread):not(svg):not(#se-none) {
+  opacity: 1 !important;
+}
+
+/* Awards: the theme's dual-tone medal in place of Steam's ribbon. */
+[data-se-rate-bar] > [data-se-rate="award"] [data-se-rate-icon]:not(#se-none) {
+  background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8.6 13.6 7 21.5l5-2.6 5 2.6-1.6-7.9' fill='%237cc4ff' fill-opacity='.35' stroke='%237cc4ff' stroke-width='1.6' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='9' r='6.2' fill='%237cc4ff' fill-opacity='.35' stroke='%237cc4ff' stroke-width='1.6'/%3E%3Cpath d='m12 6.3.9 1.8 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2L9.1 8.4l2-.3z' fill='%237cc4ff'/%3E%3C/svg%3E");
+}
+
+[data-se-rate-bar] > [data-se-rate="award"] [data-se-rate-icon] > *:not(#se-none) {
+  display: none !important;
+}
+
+/* The ratings row always shows, whatever Steam fades or hides until hover (feed, featured news, anywhere). */
+._1yWgPveQ73QeYCdLcs6oFQ:not(#se-none),
+.RatingBar:not(#se-none),
+[data-se-rate-bar]:not(#se-none),
+._1yWgPveQ73QeYCdLcs6oFQ > *:not(#se-none),
+.RatingBar > *:not(#se-none),
+[data-se-rate-bar] > *:not(#se-none),
+[data-se-sec="activity"] ._3KynfhyRTjRbiUVeqUdUBJ:not(#se-none),
+[data-se-sec="activity"] .RatingContainer:not(#se-none) {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+:is(.EhWKRN0QCGwfB7zcx7DwQ, .ActivityCommentThreadMinimized):not(#se-none) {
+  opacity: 1 !important;
+}
+
+/*
+ * Comments under feed events, in the theme: no gray box, a 1px divider between comments,
+ * round 32 px avatars, the name in bold with the time small and faint, the text in the
+ * theme's dimmer white; the per-comment thumb and delete appear on hover as before.
+ * "View more comments" is a quiet link.
+ */
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread:not(#se-none) {
+  background: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  gap: 0;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG ._3KynfhyRTjRbiUVeqUdUBJ:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread ._3KynfhyRTjRbiUVeqUdUBJ:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .RatingContainer:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .RatingContainer:not(#se-none) {
+  justify-content: flex-start !important;
+  padding: 0 0 6px !important;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG ._515RL2DZmyqkYq3yOP_m7:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread ._515RL2DZmyqkYq3yOP_m7:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .Comment:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .Comment:not(#se-none) {
+  display: flex !important;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 0 !important;
+  margin: 0 !important;
+  background: none !important;
+  border-top: 1px solid var(--se-hairline);
+  color: var(--se-text-dim) !important;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG ._25wbocZtxiwZhUeWpm1pWF:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread ._25wbocZtxiwZhUeWpm1pWF:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .CommentHeader:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .CommentHeader:not(#se-none) {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .EHOCB7fzYueAW_VuCa0lR:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .EHOCB7fzYueAW_VuCa0lR:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .CommentAvatar:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .CommentAvatar:not(#se-none) {
+  flex: none;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: var(--se-avatar-radius) !important;
+  overflow: hidden;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .EHOCB7fzYueAW_VuCa0lR img:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .CommentAvatar img:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .EHOCB7fzYueAW_VuCa0lR img:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .CommentAvatar img:not(#se-none) {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: var(--se-avatar-radius) !important;
+  object-fit: cover;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .EHOCB7fzYueAW_VuCa0lR .avatarStatus:not(img):not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .EHOCB7fzYueAW_VuCa0lR [class*="Status"]:not(img):not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .CommentAvatar .avatarStatus:not(img):not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .CommentAvatar [class*="Status"]:not(img):not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .EHOCB7fzYueAW_VuCa0lR .avatarStatus:not(img):not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .EHOCB7fzYueAW_VuCa0lR [class*="Status"]:not(img):not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .CommentAvatar .avatarStatus:not(img):not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .CommentAvatar [class*="Status"]:not(img):not(#se-none) {
+  display: none !important;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG ._2ZgNKXcKMakhdk_AxI394j:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread ._2ZgNKXcKMakhdk_AxI394j:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .CommenterandTime:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .CommenterandTime:not(#se-none) {
+  margin: 0 0 3px !important;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG ._3E5S5GWWoCkWFuhBQjGdHw:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread ._3E5S5GWWoCkWFuhBQjGdHw:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .ActorName:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .ActorName:not(#se-none) {
+  margin: 0 !important;
+  font: 700 14px/1.3 var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG ._2310BE4LDI9G7LhkIKV0xI:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread ._2310BE4LDI9G7LhkIKV0xI:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .CommentTime:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .CommentTime:not(#se-none) {
+  margin: 0 !important;
+  font: 500 12px/1.3 var(--se-font) !important;
+  color: var(--se-text-faint) !important;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG ._1ltVepCIamdDGwNMNKy3eA:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread ._1ltVepCIamdDGwNMNKy3eA:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .CommentBody:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .CommentBody:not(#se-none) {
+  margin: 0 !important;
+  align-items: center;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG ._3XbaozTrhmZDRbFN7-enHx:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread ._3XbaozTrhmZDRbFN7-enHx:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .CommentText:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .CommentText:not(#se-none) {
+  font: 500 14px/1.5 var(--se-font) !important;
+  color: var(--se-text-dim) !important;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG ._3XbaozTrhmZDRbFN7-enHx img:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .CommentText img:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread ._3XbaozTrhmZDRbFN7-enHx img:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .CommentText img:not(#se-none) {
+  vertical-align: middle;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG ._3XbaozTrhmZDRbFN7-enHx a:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .CommentText a:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread ._3XbaozTrhmZDRbFN7-enHx a:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .CommentText a:not(#se-none) {
+  color: var(--se-accent) !important;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG ._2ftHa0u7C-t3VTf5-DR9cr:hover:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread ._2ftHa0u7C-t3VTf5-DR9cr:hover:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .CommentRatingButton:hover:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .CommentRatingButton:hover:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .n-qlRG1MHN-y7LM_7dvhs:hover:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .n-qlRG1MHN-y7LM_7dvhs:hover:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .DeleteButton:hover:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .DeleteButton:hover:not(#se-none) {
+  background: var(--se-hover) !important;
+  border-radius: var(--se-radius-sm) !important;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .FPxfNOUIyMTxA5iyxVWGX:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .FPxfNOUIyMTxA5iyxVWGX:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .MakeCommentsVisible:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .MakeCommentsVisible:not(#se-none) {
+  margin: 8px 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  font: 700 13px var(--se-font) !important;
+  color: var(--se-accent) !important;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .FPxfNOUIyMTxA5iyxVWGX:hover:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .FPxfNOUIyMTxA5iyxVWGX:hover:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .MakeCommentsVisible:hover:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .MakeCommentsVisible:hover:not(#se-none) {
+  text-decoration: underline;
+}
+
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .qDVWYyMMCo6Li_b5kYqLI:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .qDVWYyMMCo6Li_b5kYqLI:not(#se-none),
+[data-se-sec="activity"] ._39nnaT_CLE0m_WXVIrAwaG .NeedsMaxHeight:not(#se-none),
+[data-se-sec="activity"] .ActivityCommentThread .NeedsMaxHeight:not(#se-none) {
+  overflow-y: auto !important;
+}
+
+/*
+ * The reply box under a post's comments shows only once the comment pill is clicked
+ * (and hides on the next click); the pill stays lit while it is open.
+ */
+[data-se-sec="activity"] ._34ZDOJFxOtspOltAZYWy-O:not([data-se-reply]) ._2Yybx8PCzkzdKoaf-yf0TH:not(#se-none),
+[data-se-sec="activity"] .CommentThread:not([data-se-reply]) ._2Yybx8PCzkzdKoaf-yf0TH:not(#se-none),
+[data-se-sec="activity"] ._34ZDOJFxOtspOltAZYWy-O:not([data-se-reply]) .AddReply:not(#se-none),
+[data-se-sec="activity"] .CommentThread:not([data-se-reply]) .AddReply:not(#se-none) {
+  display: none !important;
+}
+
+[data-se-sec="activity"] [data-se-reply] [data-se-rate-bar] > [data-se-rate="comment"]:not(#se-none) {
+  background: var(--se-accent-tint) !important;
+  border-color: var(--se-accent-line) !important;
+}
+
+[data-se-sec="activity"] [data-se-reply] ._2Yybx8PCzkzdKoaf-yf0TH:not(#se-none),
+[data-se-sec="activity"] [data-se-reply] .AddReply:not(#se-none) {
+  margin-top: 10px !important;
+}
+
+/*
+ * Beside a single screenshot: a column the image's height. The pills on top, then
+ * "Comments · 7" with numbered page tabs, then a page of whole comments filling the rest,
+ * and the reply box docked at the bottom when it is open. Every comment is loaded
+ * (Steam's "view more" is pressed for you, so it is hidden).
+ */
+[data-se-shot-side] > [data-se-side="comments"] > *:not(#se-none),
+[data-se-shot-side] > [data-se-side="comments"] ._34ZDOJFxOtspOltAZYWy-O:not(svg):not(#se-none),
+[data-se-shot-side] > [data-se-side="comments"] .CommentThread:not(svg):not(#se-none),
+[data-se-shot-side] > [data-se-side="comments"] ._39nnaT_CLE0m_WXVIrAwaG:not(#se-none),
+[data-se-shot-side] > [data-se-side="comments"] .ActivityCommentThread:not(#se-none),
+[data-se-shot-side] > [data-se-side="comments"] .EhWKRN0QCGwfB7zcx7DwQ:not(#se-none),
+[data-se-shot-side] > [data-se-side="comments"] .ActivityCommentThreadMinimized:not(#se-none) {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  min-height: 0;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+[data-se-shot-side] > [data-se-side="comments"] ._3KynfhyRTjRbiUVeqUdUBJ:not(#se-none),
+[data-se-shot-side] > [data-se-side="comments"] .RatingContainer:not(#se-none) {
+  flex: none;
+  position: static;
+  padding: 0 0 12px !important;
+}
+
+[data-se-shot-side] > [data-se-side="comments"] [data-se-clist]:not(#se-none) {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  max-height: none !important;
+}
+
+[data-se-shot-side] > [data-se-side="comments"] ._2Yybx8PCzkzdKoaf-yf0TH:not(#se-none),
+[data-se-shot-side] > [data-se-side="comments"] .AddReply:not(#se-none) {
+  flex: none;
+  margin-top: 10px !important;
+}
+
+[data-se-shot-side] > [data-se-side="comments"] .FPxfNOUIyMTxA5iyxVWGX:not(#se-none),
+[data-se-shot-side] > [data-se-side="comments"] .MakeCommentsVisible:not(#se-none) {
+  display: none !important;
+}
+
+/* Comment pages (game-page.js): off-page comments, and ones not paged yet, are hidden */
+[data-se-sec="activity"] [data-se-shot-side] :is(._515RL2DZmyqkYq3yOP_m7, .Comment)[data-se-pg="off"]:not(#se-none) {
+  display: none !important;
+}
+
+.se-cm-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  padding: 0 0 6px;
+}
+
+.se-cm-title {
+  text-transform: uppercase;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  color: var(--se-label-color) !important;
+}
+
+.se-cm-tabs {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.se-cm-tabs button {
+  min-width: var(--se-control-h-sm);
+  height: var(--se-control-h-sm);
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 12.5px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-cm-tabs button:hover:not(:disabled) {
+  background: var(--se-hover);
+  color: var(--se-text);
+}
+
+.se-cm-tabs button[data-on] {
+  background: var(--se-accent-tint);
+  color: var(--se-text);
+}
+
+.se-cm-tabs button:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+.se-cm-tabs button svg {
+  width: 14px;
+  height: 14px;
+}
+
+.se-cm-tabs span {
+  min-width: 44px;
+  text-align: center;
+  font: 700 12.5px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+/* Beside a single screenshot, comments sit a little closer */
+[data-se-sec="activity"] [data-se-shot-side] ._515RL2DZmyqkYq3yOP_m7:not(#se-none),
+[data-se-sec="activity"] [data-se-shot-side] .Comment:not(#se-none) {
+  padding: 8px 0 !important;
+  gap: 10px;
+}
+
+/*
+ * The panel's column starts at the top left, whatever Steam centres (a thread with no
+ * comments yet is drawn as a centered row)
+ */
+[data-se-shot-side] > [data-se-side="comments"] .EhWKRN0QCGwfB7zcx7DwQ ._3KynfhyRTjRbiUVeqUdUBJ:not(#se-none),
+[data-se-shot-side] > [data-se-side="comments"] .ActivityCommentThreadMinimized ._3KynfhyRTjRbiUVeqUdUBJ:not(#se-none),
+[data-se-shot-side] > [data-se-side="comments"] .EhWKRN0QCGwfB7zcx7DwQ .RatingContainer:not(#se-none),
+[data-se-shot-side] > [data-se-side="comments"] .ActivityCommentThreadMinimized .RatingContainer:not(#se-none) {
+  justify-content: flex-start !important;
+}
+
+[data-se-sec="activity"] [data-se-shot-side] [data-se-clist] > :is(._515RL2DZmyqkYq3yOP_m7, .Comment):not([data-se-pg]):not(#se-none) {
+  display: none !important;
+}
+
+/* The panel's place holds even while Steam's comment space is still an empty placeholder */
+[data-se-sec="activity"] [data-se-shot-side] > [data-se-side="comments"][data-se-empty]:not(#se-none) {
+  height: auto !important;
+}

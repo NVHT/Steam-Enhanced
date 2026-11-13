@@ -1,0 +1,240 @@
+/*
+ * Friend Activity Settings (/id/<name>/blotteredit): what shows up in your activity feed, as
+ * one readable column under the shared header card (shared/small-header.css).
+ *
+ *   - Each group ("A player from my friends list", "A group I belong to"...) is a card under a
+ *     section label with an "on" count (activity-settings/page.js).
+ *   - Each setting is a row: its label on the left, a toggle switch on the right; the whole row
+ *     toggles (page.js ties each label to its checkbox).
+ *   - Cancel / Save Changes sit in a bar pinned to the bottom of the window.
+ *
+ * Classes are Steam's (SteamTracking: steamcommunity.com/public/css/skin_1/
+ * group_permissions_edit.css; the page report). Steam repeats id="permissionsBlock" on every
+ * group, so groups are matched as .settingsRight > [id="permissionsBlock"]. Buttons are
+ * shared/ui.css.
+ */
+
+/* ---------- Column ---------- */
+
+html.se-community-activity-settings .pagecontent {
+  padding-bottom: 48px !important;
+}
+
+html.se-community-activity-settings .profile_small_header_bg {
+  margin-top: 28px !important;
+}
+
+html.se-community-activity-settings #subscriptions .maincontent {
+  box-sizing: border-box;
+  float: none !important;
+  width: var(--se-community-width) !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-activity-settings :is(.settingsBlock, .settingsRight) {
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-activity-settings .settingsRight > br {
+  display: none;
+}
+
+/* ---------- Groups ---------- */
+
+html.se-community-activity-settings .permissionBlockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: auto !important;
+  margin: 28px 4px 10px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+html.se-community-activity-settings .permissionBlockHeader:first-child {
+  margin-top: 0 !important;
+}
+
+/* "3 of 10 on" (page.js) */
+html.se-community-activity-settings .se-settings-count {
+  padding: 3px 9px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+  color: var(--se-text-muted);
+  font: 700 var(--se-fs-xs)/1.3 var(--se-font);
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-activity-settings .settingsRight > [id="permissionsBlock"] {
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 4px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+/* ---------- Rows ---------- */
+
+html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt) {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: 16px;
+  width: auto !important;
+  height: auto !important;
+  min-height: 52px;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: none !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt) + :is(.permissionRow, .permissionRowAlt)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  height: 1px;
+  background: var(--se-divider);
+}
+
+html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt):hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt):hover::before,
+html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt):hover + :is(.permissionRow, .permissionRowAlt)::before {
+  opacity: 0;
+}
+
+html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt) > p {
+  flex: 1;
+  min-width: 0;
+  float: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* The label fills the row so a click anywhere toggles */
+html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt) label {
+  display: block;
+  padding: 15px 0;
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-md)/1.4 var(--se-font) !important;
+  cursor: pointer;
+}
+
+html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt) label::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+html.se-community-activity-settings .permissionRadio {
+  order: 2;
+  position: relative;
+  z-index: 1;
+  flex: none;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ---------- Toggle switch ----------
+ * The theme's switch, as in client/settings/controls.css and store/account/page.css: 38x22,
+ * off a dark field with a grey knob, on the accent with a dark knob.
+ */
+
+html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"]) {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  display: block;
+  flex: none;
+  width: 38px;
+  height: 22px;
+  margin: 0 !important;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--se-text-muted);
+  transition: transform var(--se-dur-fast) var(--se-ease), background-color var(--se-dur-fast);
+}
+
+html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"]):checked {
+  background: var(--se-accent);
+  box-shadow: none;
+}
+
+html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"]):checked::after {
+  background: var(--se-on-accent);
+  transform: translateX(16px);
+}
+
+html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"]):focus-visible {
+  outline: 2px solid var(--se-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Save bar ---------- */
+
+html.se-community-activity-settings .settingsRight > div:has(> .btn_green_white_innerfade) {
+  position: sticky;
+  bottom: 16px;
+  z-index: 10;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  width: auto !important;
+  margin: 24px 0 0 !important;
+  padding: 12px !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-panel-bg);
+  box-shadow: var(--se-panel-shadow);
+  backdrop-filter: var(--se-blur-panel);
+}
+
+html.se-community-activity-settings .settingsRight > div:has(> .btn_green_white_innerfade) > * {
+  float: none !important;
+  margin: 0 !important;
+}

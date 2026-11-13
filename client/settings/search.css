@@ -1,0 +1,94 @@
+/*
+ * Settings › search results inside pages.
+ * Settings styles load in order: layout, controls, pages, storage, search, game-properties, finishing.
+ */
+
+/*
+ * Search results: options inside pages (client/settings/settings.js lists them under the search
+ * field; click or Enter opens the page and highlights the option).
+ */
+.se-settings-results {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: -6px 0 12px;
+  padding: 6px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  max-height: 340px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.se-settings-results[hidden] {
+  display: none;
+}
+
+.se-settings-results::-webkit-scrollbar {
+  display: none;
+}
+
+.se-settings-results-head {
+  padding: 4px 8px 4px;
+}
+
+.se-settings-result {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 8px;
+  border-radius: var(--se-radius-sm);
+  cursor: pointer;
+  font: 600 12.5px/16px var(--se-font);
+  color: var(--se-text);
+}
+
+.se-settings-result > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.se-settings-result-page {
+  font: 500 11.5px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-settings-result:hover,
+.se-settings-result[data-se-cur] {
+  background: var(--se-hover);
+}
+
+/* Keyboard focus on the controls this theme adds (results, copy, Workshop's empty state) */
+.se-settings-result:focus-visible,
+.se-copy:focus-visible,
+.se-ws-btn:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-settings-result[data-se-cur] .se-settings-result-page {
+  color: var(--se-accent);
+}
+
+/* The option a search result opened: a short accent glow. */
+@keyframes se-settings-hit {
+  0%,
+  50% {
+    outline-color: var(--se-accent);
+  }
+  100% {
+    outline-color: transparent;
+  }
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-hit] {
+  outline: 2px solid transparent !important;
+  outline-offset: -2px !important;
+  animation: se-settings-hit 2.4s ease-out;
+}

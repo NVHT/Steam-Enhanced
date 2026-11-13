@@ -1,0 +1,124 @@
+/*
+ * Achievement rarity tiers, shared by the game page and the in-game overlay.
+ * Tier by global unlock rate (SE.rarity in core/core.js): Legendary ≤ 5%,
+ * Epic ≤ 15%, Rare ≤ 35%, Uncommon ≤ 60%, Common above. Colors: --se-tier-* in
+ * tokens.css. An element tagged `data-se-tier` gets `--se-tier` and an aura
+ * size; SE.rarity.fx() builds the `.se-ach-fx` layer: one twinkling sparkle per
+ * tier rank when unlocked, and the tier's initial in the corner, so the tier
+ * reads without color. `data-se-tier-locked` keeps only a faded initial.
+ */
+[data-se-tier="legendary"] {
+  --se-tier: var(--se-tier-legendary);
+  --se-tier-aura: 0 0 18px 4px;
+}
+
+[data-se-tier="epic"] {
+  --se-tier: var(--se-tier-epic);
+  --se-tier-aura: 0 0 14px 2px;
+}
+
+[data-se-tier="rare"] {
+  --se-tier: var(--se-tier-rare);
+  --se-tier-aura: 0 0 10px 1px;
+}
+
+[data-se-tier="uncommon"] {
+  --se-tier: var(--se-tier-uncommon);
+  --se-tier-aura: 0 0 6px 0;
+}
+
+[data-se-tier="common"] {
+  --se-tier: var(--se-tier-common);
+  --se-tier-aura: 0 0 5px 0;
+}
+
+.se-ach-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.se-ach-fx b {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  font: 800 13px/1 var(--se-font);
+  color: var(--se-tier);
+  text-shadow: 0 0 3px #0b0d10, 0 1px 2px #0b0d10;
+}
+
+[data-se-tier-locked] .se-ach-fx b {
+  color: color-mix(in srgb, var(--se-tier) 55%, transparent);
+}
+
+/* Four-point sparkles, placed clear of the bottom-right letter. */
+.se-ach-spark {
+  position: absolute;
+  background: var(--se-tier, var(--se-gold));
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  animation: se-ach-twinkle 1.6s ease-in-out infinite;
+}
+
+.se-ach-fx .se-ach-spark:nth-child(1) {
+  left: -10%;
+  top: -10%;
+  width: 25%;
+  height: 25%;
+}
+
+.se-ach-fx .se-ach-spark:nth-child(2) {
+  left: 83%;
+  top: -12%;
+  width: 19%;
+  height: 19%;
+  animation-duration: 1.95s;
+  animation-delay: .3s;
+}
+
+.se-ach-fx .se-ach-spark:nth-child(3) {
+  left: -10%;
+  top: 77%;
+  width: 17%;
+  height: 17%;
+  animation-duration: 2.3s;
+  animation-delay: .6s;
+}
+
+.se-ach-fx .se-ach-spark:nth-child(4) {
+  left: 42%;
+  top: -17%;
+  width: 15%;
+  height: 15%;
+  animation-duration: 2.65s;
+  animation-delay: .9s;
+}
+
+.se-ach-fx .se-ach-spark:nth-child(5) {
+  left: 90%;
+  top: 29%;
+  width: 15%;
+  height: 15%;
+  animation-duration: 3s;
+  animation-delay: 1.2s;
+}
+
+@keyframes se-ach-twinkle {
+  0%, 100% {
+    opacity: .25;
+    transform: scale(.6) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-ach-spark {
+    animation: none;
+    opacity: .8;
+  }
+}

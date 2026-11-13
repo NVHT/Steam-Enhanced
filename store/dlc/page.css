@@ -1,0 +1,1228 @@
+/*
+ * DLC hub (/dlc/<appid>/...): Steam's curator template paints a 220px banner, a small capsule
+ * beside an uppercase name, and a 1270px column of grey-gradient boxes (curator.css,
+ * curator_recommendations.css). Restyled as a store page of the theme:
+ *
+ *  - Hero: the base game's capsule large and rounded, over a blurred wash of its own art
+ *    (dlc/page.js), with "Downloadable content for" as an eyebrow, the game as the title, a
+ *    stats line (add-ons, followers), then Follow as the accent pill beside a Store Page pill.
+ *  - Featured / Lists as tabs; each featured add-on as a spotlight card: its screenshots
+ *    crossfading behind the capsule, name, date and blurb, with a rail of thumbnails.
+ *  - Browse: the tabs as a segmented control with a sliding pill (dlc/page.js), the filters as
+ *    cards of menu rows with count chips, and each add-on as a row card with its price as the
+ *    shared glass chip at the end.
+ *
+ * Shared looks (cards, pill buttons, price chips) come from shared/ui.css, which lists the DLC
+ * parts beside the other store pages'. Rules use html.se-store-dlc:not(#se-none) for ID-level
+ * weight over Steam's sheets.
+ */
+
+/* ---------- Page ---------- */
+
+html.se-store-dlc:not(#se-none) body.dlc_curator {
+  background: var(--se-bg) !important;
+}
+
+/* Steam's 220px banner wash and the boxes' gradient: the hero's art replaces both. */
+html.se-store-dlc:not(#se-none) #page_background_container,
+html.se-store-dlc:not(#se-none) .page_content_ctn.light_container.bezel::before {
+  display: none !important;
+}
+
+html.se-store-dlc:not(#se-none) .page_content_ctn.light_container.bezel {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-dlc:not(#se-none) .creator_grid_ctn {
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  margin-inline: auto !important;
+  padding: 0 0 56px !important;
+  gap: 40px !important;
+}
+
+/* ---------- Hero ---------- */
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] {
+  position: relative;
+  isolation: isolate;
+  height: auto !important;
+  padding: 48px 0 40px !important;
+  overflow: hidden;
+}
+
+/* The capsule's own art, blurred into a wash that fades into the page. */
+html.se-store-dlc:not(#se-none) .se-dlc-hero__art {
+  position: absolute;
+  inset: -80px;
+  z-index: -1;
+  background: var(--se-dlc-art) center / cover no-repeat;
+  filter: blur(60px) saturate(1.5);
+  opacity: .5;
+  pointer-events: none;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(23, 26, 32, .55), transparent 70%),
+    linear-gradient(180deg, transparent 35%, var(--se-bg));
+  pointer-events: none;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_header_ctn,
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] #header_container {
+  height: auto !important;
+  min-height: 0 !important;
+  margin-block: 0 !important;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] #header_container {
+  display: grid;
+  grid-template-columns: clamp(280px, 26vw, 460px) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(24px, 3vw, 44px);
+  background: none !important;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_avatar_image {
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_avatar_image a {
+  position: relative;
+  display: block;
+  border-radius: var(--se-radius-xl);
+  overflow: hidden;
+  box-shadow: var(--se-shadow-lg);
+  transition: translate var(--se-dur) var(--se-ease), box-shadow var(--se-dur-fast);
+}
+
+/* Hairline ring over the art (an inset shadow would sit under the image). */
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_avatar_image a::after,
+html.se-store-dlc:not(#se-none) #RecommendationsRows .store_capsule .capsule::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  pointer-events: none;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_avatar_image a:hover {
+  translate: 0 -3px;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] img.curator_avatar {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 460 / 215;
+  object-fit: cover;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: auto !important;
+  overflow: visible !important;
+  text-shadow: none !important;
+}
+
+/* "Downloadable Content For" */
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_details h4 {
+  margin: 0 !important;
+  color: var(--se-accent) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 700 !important;
+  letter-spacing: .14em !important;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] h2.curator_name {
+  display: -webkit-box;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  overflow: hidden;
+  color: var(--se-white) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-hero) !important;
+  font-weight: 800 !important;
+  letter-spacing: -.02em !important;
+  line-height: 1.05 !important;
+  text-transform: none !important;
+  white-space: normal !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] h2.curator_name a {
+  width: auto !important;
+  height: auto !important;
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+/*
+ * Under the title: the stats line, then one action row. Details wrap as a row so Steam's
+ * Follow controls and the script's Store Page pill sit side by side; the eyebrow, title and
+ * stats each take a full line.
+ */
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_details {
+  flex-flow: row wrap;
+  align-items: center;
+  gap: 12px 10px;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_details > :is(h4, h2, .se-dlc-hero__stats) {
+  flex: 0 0 100%;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_details > h2 {
+  margin-top: -4px !important;
+}
+
+/* "3 add-ons · 1,103,465 followers" */
+html.se-store-dlc:not(#se-none) .se-dlc-hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: -2px 0 8px !important;
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-md);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+html.se-store-dlc:not(#se-none) .se-dlc-hero__stats > span + span::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin: 0 10px;
+  border-radius: 50%;
+  background: var(--se-text-faint);
+  vertical-align: middle;
+}
+
+/* Store Page: a glass pill matching Follow's height, chevron after. */
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .se-dlc-hero__store {
+  height: 40px;
+  padding: 0 16px 0 20px !important;
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line) !important;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 700 !important;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .se-dlc-hero__store:hover {
+  background: var(--se-glass-btn-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store-dlc:not(#se-none) .se-dlc-hero__store::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: translate var(--se-dur-fast) var(--se-ease);
+}
+
+html.se-store-dlc:not(#se-none) .se-dlc-hero__store:hover::after {
+  translate: 2px 0;
+}
+
+/*
+ * Follow: the accent pill with a plus; Following: a glass pill with a tick that turns into a
+ * red cross on hover (clicking it unfollows). Display is left to Steam: it shows one of the two
+ * and hides the other, and any display set here would bring the hidden one back.
+ */
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_controls {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border-radius: 0 !important;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn_stats {
+  display: none !important;
+}
+
+/* Social links row: Steam paints it a bar even with nothing visible in it; dlc/page.js marks it
+   [data-se-empty] then. */
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .socialmedia_accounts[data-se-empty] {
+  display: none !important;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span {
+  box-sizing: border-box;
+  height: 40px !important;
+  padding: 0 22px 0 18px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-accent) !important;
+  box-shadow: 0 8px 24px -10px rgba(124, 196, 255, .6) !important;
+  color: var(--se-on-accent) !important;
+  line-height: 40px !important;
+  text-shadow: none !important;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span:hover {
+  background: var(--se-accent-hover) !important;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span.following {
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line) !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span.following:hover {
+  background: rgba(229, 115, 122, .14) !important;
+  box-shadow: inset 0 0 0 1px rgba(229, 115, 122, .45) !important;
+  color: var(--se-danger) !important;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span[style*="none"] {
+  display: none !important;
+}
+
+/* Steam's checkbox sprite: the icon is drawn below instead. */
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn img {
+  display: none !important;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span > span {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  height: 100% !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  text-shadow: none !important;
+  text-transform: none !important;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span > span::before {
+  content: '';
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  mask: var(--se-dlc-follow-icon) center / contain no-repeat;
+  --se-dlc-follow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span.following > span::before {
+  --se-dlc-follow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span.following:hover > span::before {
+  --se-dlc-follow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E");
+}
+
+/* ---------- Featured / Lists ---------- */
+
+html.se-store-dlc:not(#se-none) .creator_grid_ctn .navigation_bar {
+  align-items: center;
+  gap: 4px;
+  height: auto !important;
+  padding: 0 0 12px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--se-divider) !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-dlc:not(#se-none) .creator_grid_ctn .navigation_bar > a {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill);
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-dlc:not(#se-none) .creator_grid_ctn .navigation_bar > a:hover {
+  background: var(--se-pill) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store-dlc:not(#se-none) .creator_grid_ctn .navigation_bar > a.selected {
+  background: var(--se-selected) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store-dlc:not(#se-none) .creator_grid_ctn .nav_right_side {
+  flex: 1 1 auto;
+  justify-content: flex-end;
+}
+
+html.se-store-dlc:not(#se-none) .creator_grid_ctn .curator_report a {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0 !important;
+  border-radius: 50%;
+  background: none !important;
+  opacity: .55;
+  transition: background-color var(--se-dur-fast), opacity var(--se-dur-fast);
+}
+
+html.se-store-dlc:not(#se-none) .creator_grid_ctn .curator_report a:hover {
+  background: var(--se-pill) !important;
+  opacity: 1;
+}
+
+/* Report: Steam's gear sprite reads as "settings"; a flag says what it does. */
+html.se-store-dlc:not(#se-none) .creator_grid_ctn .curator_report a img {
+  display: none !important;
+}
+
+html.se-store-dlc:not(#se-none) .creator_grid_ctn .curator_report a::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  background: var(--se-text);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 21V4'/%3E%3Cpath d='M5 4h11l-2 4 2 4H5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* ---------- Featured carousels ---------- */
+
+html.se-store-dlc:not(#se-none) .content_highlights,
+html.se-store-dlc:not(#se-none) .content_highlights > .page_content {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-dlc:not(#se-none) .content_highlights .page_section {
+  margin: 0 0 28px !important;
+}
+
+html.se-store-dlc:not(#se-none) .content_highlights .page_section.empty {
+  display: none;
+}
+
+html.se-store-dlc:not(#se-none) .content_highlights .carousel_container {
+  height: auto !important;
+}
+
+html.se-store-dlc:not(#se-none) .content_highlights .carousel_items {
+  height: auto !important;
+}
+
+/*
+ * Spotlight: each featured add-on as one cinematic card. Its screenshots fill the card behind a
+ * dark wash (dlc/page.js crossfades them, on a timer and as you point at the thumbnails); on
+ * the left the capsule, the add-on's name, the release date and the blurb; on the right the
+ * screenshots as a rail of thumbnails, the current one ringed.
+ *
+ *   [ ░░░░░░░░░░░░░░ screenshot ░░░░░░░░░░░░░░░░░░░░░░░░░░ ][ ▣ ]
+ *   [ ┌capsule┐                                            ][ ▢ ]
+ *   [ Name of the add-on                                   ][ ▢ ]
+ *   [ (Release date)  blurb …                              ][ ▢ ]
+ */
+html.se-store-dlc:not(#se-none) .curator_featured > .focus {
+  position: relative;
+  isolation: isolate;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) clamp(180px, 14vw, 260px);
+  min-height: clamp(380px, 30vw, 520px);
+  height: auto !important;
+  overflow: hidden;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured > :not(.focus) {
+  display: none;
+}
+
+/* Stage (dlc/page.js): two layers, the incoming one fading in over the other. */
+html.se-store-dlc:not(#se-none) .se-dlc-spot__stage {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+html.se-store-dlc:not(#se-none) .se-dlc-spot__layer {
+  position: absolute;
+  inset: 0;
+  background: center / cover no-repeat;
+  opacity: 0;
+  scale: 1.04;
+  transition: opacity .8s var(--se-ease), scale 6s linear;
+}
+
+html.se-store-dlc:not(#se-none) .se-dlc-spot__layer[data-on] {
+  opacity: 1;
+  scale: 1;
+}
+
+html.se-store-dlc:not(#se-none) .se-dlc-spot__stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(15, 17, 21, .95) 0%, rgba(15, 17, 21, .78) 34%, rgba(15, 17, 21, .15) 68%, rgba(15, 17, 21, .55) 100%),
+    linear-gradient(0deg, rgba(15, 17, 21, .85), transparent 55%);
+}
+
+/* Left column: capsule, name, date, blurb, bottom-aligned. */
+html.se-store-dlc:not(#se-none) .curator_featured .capsule {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 18px;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: clamp(24px, 2.4vw, 40px) !important;
+  background: none !important;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .capsule > a {
+  position: relative;
+  display: block;
+  width: clamp(240px, 22vw, 400px) !important;
+  height: auto !important;
+  border-radius: var(--se-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--se-shadow-lg);
+  transition: translate var(--se-dur) var(--se-ease);
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .capsule > a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  pointer-events: none;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .capsule > a:hover {
+  translate: 0 -3px;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured img.capimg {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 460 / 215;
+  object-fit: cover;
+}
+
+/* Platforms and price as glass chips along the capsule's bottom edge. */
+html.se-store-dlc:not(#se-none) .curator_featured .price_row {
+  position: absolute !important;
+  inset: auto 10px 10px auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .price_row .app_platforms:empty,
+html.se-store-dlc:not(#se-none) .curator_featured .price_row .discount_block.empty {
+  display: none !important;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .price_row .app_platforms {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-chip);
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .ds_flag {
+  inset: 10px auto auto 10px !important;
+  height: 24px;
+  padding: 0 10px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  color: var(--se-wish) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700;
+  letter-spacing: .06em;
+  line-height: 24px !important;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .ds_flag.ds_owned_flag {
+  color: var(--se-owned) !important;
+}
+
+/* Name (dlc/page.js), date, blurb. */
+html.se-store-dlc:not(#se-none) .curator_featured .curator_review {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 720px;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-lg) !important;
+  font-style: normal !important;
+  line-height: 1.55 !important;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, .6);
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .curator_review::before,
+html.se-store-dlc:not(#se-none) .curator_featured .curator_review::after {
+  content: none !important;
+}
+
+html.se-store-dlc:not(#se-none) .se-dlc-spot__title {
+  order: -2;
+  margin: 0;
+  color: var(--se-white);
+  font-size: var(--se-fs-display);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+html.se-store-dlc:not(#se-none) .se-dlc-spot__title a {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+html.se-store-dlc:not(#se-none) .se-dlc-spot__title a:hover {
+  color: var(--se-accent-hover) !important;
+}
+
+/* The blurb (Steam's bare text), wrapped by dlc/page.js so it can clamp. */
+html.se-store-dlc:not(#se-none) .se-dlc-spot__blurb {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .review_details {
+  order: -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 !important;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .review_direction:empty {
+  display: none;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .curator_review_date {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-chip);
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  color: var(--se-gold) !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 700;
+  text-shadow: none;
+}
+
+/* Right column: the screenshots as a rail of thumbnails. */
+html.se-store-dlc:not(#se-none) .curator_featured .contents {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 14px 14px 14px 0;
+  float: none !important;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .screenshots {
+  display: grid !important;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 10px;
+  height: 100% !important;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .screenshots > div {
+  position: relative;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0;
+  margin: 0 !important;
+  border-radius: var(--se-radius-md);
+  background-position: center !important;
+  background-size: cover !important;
+  opacity: .55;
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line), var(--se-shadow-sm);
+  cursor: pointer;
+  transition: opacity var(--se-dur-fast), box-shadow var(--se-dur-fast), translate var(--se-dur) var(--se-ease);
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .screenshots > div:hover {
+  opacity: .9;
+  translate: -3px 0;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured .screenshots > div[data-se-on] {
+  opacity: 1;
+  box-shadow: inset 0 0 0 2px var(--se-accent), var(--se-shadow-sm);
+}
+
+/* The rotation timer, drawn along the current thumbnail's bottom edge. */
+html.se-store-dlc:not(#se-none) .curator_featured .screenshots > div[data-se-on]::after {
+  content: '';
+  position: absolute;
+  inset: auto 8px 6px;
+  height: 3px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent);
+  transform-origin: left;
+  animation: se-dlc-spot-timer var(--se-dlc-spot-ms, 6000ms) linear forwards;
+}
+
+html.se-store-dlc:not(#se-none) .curator_featured :is(.focus:hover, [data-se-paused]) .screenshots > div[data-se-on]::after {
+  animation-play-state: paused;
+}
+
+@keyframes se-dlc-spot-timer {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Paging dots: a short pill for each item, the current one long and accented. */
+html.se-store-dlc:not(#se-none) .content_highlights .carousel_thumbs {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  height: auto !important;
+  margin: 14px 0 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-dlc:not(#se-none) .content_highlights .carousel_thumbs:empty,
+html.se-store-dlc:not(#se-none) .content_highlights .no_paging .carousel_thumbs {
+  display: none;
+}
+
+html.se-store-dlc:not(#se-none) .content_highlights .carousel_thumbs > * {
+  width: 8px !important;
+  height: 8px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-25, rgba(255, 255, 255, .25)) !important;
+  cursor: pointer;
+  transition: width var(--se-dur) var(--se-ease), background-color var(--se-dur-fast);
+}
+
+html.se-store-dlc:not(#se-none) .content_highlights .carousel_thumbs > .focus {
+  width: 24px !important;
+  background: var(--se-accent) !important;
+}
+
+/* Arrows: round glass buttons over the card's edges. */
+html.se-store-dlc:not(#se-none) .content_highlights .carousel_container .arrow {
+  top: calc(50% - 38px) !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50%;
+  background: var(--se-glass-btn) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line), var(--se-glass-btn-shadow);
+}
+
+html.se-store-dlc:not(#se-none) .content_highlights .carousel_container .arrow:hover {
+  background: var(--se-glass-btn-hover) !important;
+}
+
+html.se-store-dlc:not(#se-none) .content_highlights .carousel_container .arrow.left {
+  left: 12px !important;
+}
+
+html.se-store-dlc:not(#se-none) .content_highlights .carousel_container .arrow.right {
+  right: 12px !important;
+}
+
+/* ---------- Browse: tabs ---------- */
+
+html.se-store-dlc:not(#se-none) .tabbed_ctn,
+html.se-store-dlc:not(#se-none) .tabbed_ctn > .page_content {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-dlc:not(#se-none) .browse_reviews .filter_ctn {
+  height: auto !important;
+}
+
+html.se-store-dlc:not(#se-none) .browse_reviews .browse_tabs {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  width: fit-content !important;
+  max-width: 100%;
+  height: auto !important;
+  margin: 0 0 18px !important;
+  padding: 4px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-dlc:not(#se-none) .browse_reviews .browse_tabs > a {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  margin: 0 !important;
+  padding: 0 18px !important;
+  border-radius: var(--se-radius-pill);
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-shadow: none !important;
+  text-transform: none !important;
+  transition: color var(--se-dur-fast), background-color var(--se-dur-fast);
+}
+
+html.se-store-dlc:not(#se-none) .browse_reviews .browse_tabs > a:hover {
+  color: var(--se-white) !important;
+}
+
+/* Without the script's pill the selected tab carries its own fill. */
+html.se-store-dlc:not(#se-none) .browse_reviews .browse_tabs:not([data-se-dlc-tabs]) > a.selected {
+  background: var(--se-selected) !important;
+}
+
+html.se-store-dlc:not(#se-none) .browse_reviews .browse_tabs > a.selected {
+  color: var(--se-white) !important;
+}
+
+html.se-store-dlc:not(#se-none) .se-dlc-tabs__pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--w, 0);
+  height: 34px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-selected);
+  box-shadow: var(--se-shadow-sm);
+  translate: var(--x, 0) var(--y, 0);
+  pointer-events: none;
+}
+
+html.se-store-dlc:not(#se-none) [data-se-dlc-tabs="ready"] .se-dlc-tabs__pill {
+  transition: translate var(--se-dur) var(--se-ease), width var(--se-dur) var(--se-ease);
+}
+
+html.se-store-dlc:not(#se-none) .se-dlc-tabs__pill[hidden] {
+  display: none;
+}
+
+/* ---------- Browse: filters ---------- */
+
+html.se-store-dlc:not(#se-none) .browse_ctn_background {
+  height: auto !important;
+  background: none !important;
+}
+
+html.se-store-dlc:not(#se-none) .browse_container {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 24px;
+  height: auto !important;
+}
+
+html.se-store-dlc:not(#se-none) .browse_filters {
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex: 0 0 260px;
+  flex-direction: column;
+  gap: 16px;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+html.se-store-dlc:not(#se-none) .browse_filters > div {
+  width: auto !important;
+  height: auto !important;
+}
+
+html.se-store-dlc:not(#se-none) :is(#filtertags_container, #client_filter) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: auto !important;
+  height: auto !important;
+  padding: 10px !important;
+}
+
+html.se-store-dlc:not(#se-none) :is(#filtertags_container, #client_filter) h4 {
+  width: auto !important;
+  height: auto !important;
+  margin: 4px 8px 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-faint) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+  line-height: 1.2 !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store-dlc:not(#se-none) :is(#filtertags_container, #client_filter) > a {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  width: auto !important;
+  height: 36px !important;
+  margin: 0 !important;
+  padding: 0 10px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-md) !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-dlc:not(#se-none) :is(#filtertags_container, #client_filter) > a:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store-dlc:not(#se-none) #filtertags_container > a.selected {
+  background: var(--se-accent-surface) !important;
+  color: var(--se-accent) !important;
+  font-weight: 600;
+}
+
+html.se-store-dlc:not(#se-none) .curator_filter_tag_count {
+  float: none !important;
+  min-width: 26px;
+  margin-inline-start: auto;
+  padding: 3px 8px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+html.se-store-dlc:not(#se-none) #filtertags_container > a.selected .curator_filter_tag_count {
+  background: rgba(124, 196, 255, .16);
+  color: var(--se-accent) !important;
+}
+
+/* Preferences ("Hide ignored items", "Hide items I own"): rows with a switch at the end. */
+html.se-store-dlc:not(#se-none) #client_filter > a::after {
+  content: '';
+  flex: none;
+  width: 30px;
+  height: 18px;
+  margin-inline-start: auto;
+  border-radius: var(--se-radius-pill);
+  background:
+    radial-gradient(circle at 9px 50%, var(--se-text-muted) 0 6px, transparent 6.5px),
+    var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  transition: background var(--se-dur-fast);
+}
+
+html.se-store-dlc:not(#se-none) #client_filter > a:is(.checked, .selected)::after {
+  background:
+    radial-gradient(circle at 21px 50%, var(--se-on-accent) 0 6px, transparent 6.5px),
+    var(--se-accent);
+}
+
+/* Steam's own checkbox sprite in these rows gives way to the switch. */
+html.se-store-dlc:not(#se-none) #client_filter > a > :is(img, .checkbox, span:empty) {
+  display: none !important;
+}
+
+/* ---------- Browse: list ---------- */
+
+html.se-store-dlc:not(#se-none) .browse_content {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto !important;
+  height: auto !important;
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows,
+html.se-store-dlc:not(#se-none) #RecommendationsRows > div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: auto !important;
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation {
+  position: relative;
+  align-items: center;
+  gap: 18px;
+  height: auto !important;
+  padding: 10px 150px 10px 10px !important;
+  border: 0 !important;
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast), translate var(--se-dur) var(--se-ease);
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation:hover {
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12), var(--se-shadow-md) !important;
+  translate: 0 -2px;
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation > div:first-child {
+  flex: none;
+  width: clamp(160px, 15vw, 230px);
+}
+
+/* The capsule anchor stays unpositioned so the price chip can sit at the row's end. */
+html.se-store-dlc:not(#se-none) #RecommendationsRows .store_capsule {
+  position: static !important;
+  display: block;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .store_capsule .capsule {
+  position: relative;
+  width: auto !important;
+  height: auto !important;
+  border-radius: var(--se-radius-md);
+  overflow: hidden;
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .store_capsule .capsule img {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 229 / 107;
+  object-fit: cover;
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation:hover .store_capsule .capsule img {
+  transform: scale(1.05);
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .store_capsule .discount_block {
+  position: absolute !important;
+  inset: 50% 18px auto auto !important;
+  translate: 0 -50%;
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_link {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto !important;
+  height: auto !important;
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_midcol {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: none !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_type_ctn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 4px;
+  font-family: inherit !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_type_ctn .color_created {
+  flex: 1 0 100%;
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 700 !important;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color var(--se-dur-fast);
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation:hover .color_created {
+  color: var(--se-white) !important;
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .curator_review_date {
+  margin: 0 !important;
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 600;
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .app_platforms {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 !important;
+  opacity: .7;
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_desc {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-base) !important;
+  line-height: 1.5 !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Steam wraps the description in decorative quotes; it's a product blurb, not a review. */
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_desc::before,
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_desc::after {
+  content: none !important;
+}
+
+/* Pager and empty state. */
+html.se-store-dlc:not(#se-none) #pager {
+  margin: 16px 0 0 !important;
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-base);
+}
+
+html.se-store-dlc:not(#se-none) #pager a {
+  color: var(--se-accent) !important;
+}
+
+html.se-store-dlc:not(#se-none) #Recommendations_loading {
+  color: var(--se-text-muted);
+}
+
+/* ---------- Narrow windows ---------- */
+
+@media screen and (max-width: 1100px) {
+  /* Thumbnails move under the text as a row. */
+  html.se-store-dlc:not(#se-none) .curator_featured > .focus {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html.se-store-dlc:not(#se-none) .curator_featured .contents {
+    padding: 0 24px 24px;
+  }
+
+  html.se-store-dlc:not(#se-none) .curator_featured .screenshots {
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    grid-auto-rows: auto;
+  }
+
+  html.se-store-dlc:not(#se-none) .curator_featured .screenshots > div {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media screen and (max-width: 910px) {
+  html.se-store-dlc:not(#se-none) [data-se-dlc-hero] #header_container {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html.se-store-dlc:not(#se-none) .browse_container {
+    flex-direction: column;
+  }
+
+  html.se-store-dlc:not(#se-none) .browse_filters {
+    position: static;
+    flex-basis: auto;
+    width: 100% !important;
+  }
+
+  html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation {
+    padding-right: 10px !important;
+    flex-wrap: wrap;
+  }
+
+  html.se-store-dlc:not(#se-none) #RecommendationsRows .store_capsule .discount_block {
+    position: static !important;
+    translate: none;
+    margin-top: 8px !important;
+  }
+}

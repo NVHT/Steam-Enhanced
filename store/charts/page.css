@@ -1,0 +1,1005 @@
+/*
+ * Steam Charts (/charts/...): the store front's look, scoped under html.se-store-charts
+ * (store/loader.js, which also keeps it in step with client-side navigation).
+ *
+ * Steam Charts is a React page whose CSS modules have hashed class names. The ones below come
+ * from SteamTracking (store SSR build of 2026-11-09): DQFHIXx3.css (shell and sidebar),
+ * A9E4BVxE.css (page heading, section titles), D9CORM0n.css (overview: graph, top lists,
+ * weekly / monthly / yearly banners, more links). A store update that renames them leaves
+ * that part in Steam's look until they are refreshed; the shell's own SteamChartsShell class
+ * is stable. Rules use html.se-store-charts:not(#se-none) for ID-level weight.
+ *
+ * The monthly / yearly pages' content (trailer carousel, capsule tiles and carousels, DLC
+ * and library blocks…) is Steam's sale-page renderer, styled for every store page in
+ * shared/sale.css.
+ */
+
+html.se-store-charts {
+  --se-charts-sidebar-w: 220px;
+  --se-charts-max: 1500px;
+  --se-charts-gap: 24px;
+}
+
+/* ---------- Page ---------- */
+
+html.se-store-charts:not(#se-none) body,
+html.se-store-charts:not(#se-none) #StoreTemplate {
+  background: var(--se-bg) !important;
+}
+
+/* The content column: Steam pads it for its 200px sidebar and caps it at 1200px. */
+html.se-store-charts:not(#se-none) .SteamChartsShell {
+  padding-left: calc(var(--se-charts-sidebar-w) + 12px) !important;
+  padding-right: 28px !important;
+  font-family: inherit !important;
+}
+
+html.se-store-charts:not(#se-none) .SteamChartsShell :is(.Y4tvTqCXrtc-, .z5nOrshT4UU-) {
+  max-width: var(--se-charts-max) !important;
+  padding: 0 !important;
+}
+
+/* ---------- Sidebar ---------- */
+
+html.se-store-charts:not(#se-none) .-IN79XL9SlI- {
+  width: var(--se-charts-sidebar-w) !important;
+  padding: 18px 12px 24px !important;
+  background: none !important;
+}
+
+html.se-store-charts:not(#se-none) .-IN79XL9SlI- .XA3dYwtMdc4- + .XA3dYwtMdc4- {
+  margin-top: 14px;
+}
+
+/* Group labels: the theme's small caps, no rule above. */
+html.se-store-charts:not(#se-none) .-IN79XL9SlI- .VGRHH1W2CEA- {
+  margin: 0 0 6px !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+}
+
+html.se-store-charts:not(#se-none) .-IN79XL9SlI- .Tn4B4CyfYls- {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Items: rounded rows that light up, like the store bar's menus. */
+html.se-store-charts:not(#se-none) .-IN79XL9SlI- .Tn4B4CyfYls- a {
+  gap: 12px;
+  height: 38px;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  border-radius: var(--se-radius-md);
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-charts:not(#se-none) .-IN79XL9SlI- .Tn4B4CyfYls- a:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store-charts:not(#se-none) .-IN79XL9SlI- .Tn4B4CyfYls- a.yY5kIMMmcbU- {
+  background: var(--se-selected) !important;
+  color: var(--se-white) !important;
+}
+
+/* Steam's icons, tinted with the text (accent when active). */
+html.se-store-charts:not(#se-none) .-IN79XL9SlI- .Tn4B4CyfYls- a svg {
+  flex: none;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  color: inherit;
+}
+
+html.se-store-charts:not(#se-none) .-IN79XL9SlI- .Tn4B4CyfYls- a svg :is(path, polygon) {
+  fill: currentColor !important;
+}
+
+html.se-store-charts:not(#se-none) .-IN79XL9SlI- .Tn4B4CyfYls- a.yY5kIMMmcbU- svg {
+  color: var(--se-accent);
+}
+
+/* ---------- Heading ---------- */
+
+html.se-store-charts:not(#se-none) .HlR2pryjZOg- {
+  margin-bottom: 6px !important;
+  padding-top: 24px !important;
+}
+
+html.se-store-charts:not(#se-none) .HlR2pryjZOg- h1 {
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-display) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.02em !important;
+  line-height: 1.1 !important;
+  text-transform: none !important;
+}
+
+html.se-store-charts:not(#se-none) :is(.gVg7T-9KFfY-, .BRQQe76HnTs-) {
+  margin-bottom: 36px !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 400 !important;
+}
+
+/* Section titles ("Players Online", "Top Selling Games", "Weekly Oct 27"): the front page's. */
+html.se-store-charts:not(#se-none) :is(.GpbRWedhZd4-, .Kdj9Bbw3CHY-) {
+  margin: 0 0 14px !important;
+  color: var(--se-text-muted) !important;
+  font-weight: 400 !important;
+}
+
+html.se-store-charts:not(#se-none) :is(.GpbRWedhZd4-, .Kdj9Bbw3CHY-) b,
+html.se-store-charts:not(#se-none) :is(.GpbRWedhZd4-, .Kdj9Bbw3CHY-):not(:has(b)) {
+  color: var(--se-text) !important;
+  font-weight: 700 !important;
+}
+
+html.se-store-charts:not(#se-none) :is(.wnzEl6A2mnI-, ._8VVAVAJ3uG0-) {
+  margin-bottom: 40px !important;
+}
+
+/* ---------- Players online graph ---------- */
+
+html.se-store-charts:not(#se-none) .eyc4VnVmsCc- {
+  height: 240px !important;
+  padding: 20px 24px 12px 8px !important;
+}
+
+html.se-store-charts:not(#se-none) .eyc4VnVmsCc- .recharts-cartesian-grid-horizontal line {
+  stroke: rgba(255, 255, 255, .07) !important;
+}
+
+html.se-store-charts:not(#se-none) .eyc4VnVmsCc- .recharts-text {
+  fill: var(--se-text-faint) !important;
+  font-size: var(--se-fs-sm);
+}
+
+/* The two figures: large numbers over small caps labels. */
+html.se-store-charts:not(#se-none) .eyc4VnVmsCc- .UzY-DsdkE1I- {
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-4xl) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-store-charts:not(#se-none) .eyc4VnVmsCc- .r39MVTqKimI- {
+  margin-top: 2px;
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+}
+
+html.se-store-charts:not(#se-none) .eyc4VnVmsCc- .r39MVTqKimI- .F5GDaRarorU- {
+  color: var(--se-cart) !important;
+}
+
+html.se-store-charts:not(#se-none) .eyc4VnVmsCc- .r39MVTqKimI- .tYHZXmg84-w- {
+  color: var(--se-accent) !important;
+}
+
+/* ---------- Top Selling / Most Played ---------- */
+
+html.se-store-charts:not(#se-none) .uX4qL3T--O8- {
+  gap: var(--se-charts-gap);
+}
+
+html.se-store-charts:not(#se-none) .uX4qL3T--O8- .fm1dMrfMpDc-:first-child {
+  margin: 0 !important;
+}
+
+/* The list: a theme card. */
+html.se-store-charts:not(#se-none) .NBN-f1mBrso- {
+  padding: 12px !important;
+}
+
+/* #1: its capsule as a rounded art tile, then the row under it. */
+html.se-store-charts:not(#se-none) .xjiY68vUbWQ- {
+  margin-bottom: 6px;
+  border: 0 !important;
+}
+
+html.se-store-charts:not(#se-none) .xjiY68vUbWQ- img._7DwvRNTA4oI- {
+  display: block;
+  width: 100%;
+  max-width: none !important;
+  height: auto;
+  aspect-ratio: 616 / 353;
+  border-radius: var(--se-radius-lg);
+  object-fit: cover;
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-store-charts:not(#se-none) .xjiY68vUbWQ- > :first-child {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+}
+
+html.se-store-charts:not(#se-none) .xjiY68vUbWQ-:hover img._7DwvRNTA4oI- {
+  transform: scale(1.03);
+}
+
+/* Rows: rank, name (+ note), figure; rounded and lit on hover instead of ruled. */
+html.se-store-charts:not(#se-none) .S0OGjWAy4Co- {
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 8px 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 600;
+  line-height: 1.25 !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-charts:not(#se-none) .S0OGjWAy4Co-:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-charts:not(#se-none) .S0OGjWAy4Co- ._7zmpUGEGDTM- {
+  flex: none;
+  width: 24px !important;
+  margin: 0 !important;
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-lg);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-store-charts:not(#se-none) .xjiY68vUbWQ- .S0OGjWAy4Co- {
+  padding: 12px !important;
+}
+
+html.se-store-charts:not(#se-none) .xjiY68vUbWQ- .S0OGjWAy4Co- ._7zmpUGEGDTM- {
+  color: var(--se-accent) !important;
+  font-size: var(--se-fs-3xl) !important;
+  line-height: 1 !important;
+}
+
+html.se-store-charts:not(#se-none) .xjiY68vUbWQ- .S0OGjWAy4Co- .eT-MIEVrsB8- {
+  font-size: var(--se-fs-lg);
+  font-weight: 700;
+}
+
+/* The figure (players in game) right-aligned, muted. */
+html.se-store-charts:not(#se-none) .S0OGjWAy4Co- > div:last-child {
+  color: var(--se-text-dim);
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-store-charts:not(#se-none) .S0OGjWAy4Co- :is(.hv-Pl2EA7-c-, .kY5DWfq2Oe0-) {
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em !important;
+}
+
+/* "See all 100 …": the store front's pill, full width under the list. */
+html.se-store-charts:not(#se-none) .NBN-f1mBrso- ._4IVE0bUT9m8- {
+  display: flex !important;
+  gap: 8px;
+  height: 40px;
+  margin-top: 8px;
+  padding: 0 16px !important;
+}
+
+html.se-store-charts:not(#se-none) .NBN-f1mBrso- ._4IVE0bUT9m8-::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border: solid currentColor;
+  border-width: 1.75px 1.75px 0 0;
+  transform: rotate(45deg);
+  transition: transform var(--se-dur) var(--se-ease);
+}
+
+html.se-store-charts:not(#se-none) .NBN-f1mBrso- ._4IVE0bUT9m8-:hover {
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+html.se-store-charts:not(#se-none) .NBN-f1mBrso- ._4IVE0bUT9m8-:hover::after {
+  transform: translateX(2px) rotate(45deg);
+}
+
+/* ---------- Weekly / Monthly banners ---------- */
+
+html.se-store-charts:not(#se-none) .RSXs4rVtOK8- {
+  height: 200px !important;
+  isolation: isolate;
+  transition: transform var(--se-dur) var(--se-ease), box-shadow var(--se-dur);
+}
+
+html.se-store-charts:not(#se-none) .RSXs4rVtOK8-:hover {
+  transform: translateY(-3px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14), var(--se-shadow-md) !important;
+}
+
+/* The label over the collage: bold, sentence case, on a soft scrim instead of the inset glow. */
+html.se-store-charts:not(#se-none) .RSXs4rVtOK8- .ztCS0xyYYr0- {
+  z-index: 1;
+  background: radial-gradient(70% 90% at 50% 50%, rgba(10, 12, 16, .55), transparent 80%);
+  box-shadow: none !important;
+  color: var(--se-white) !important;
+  font-size: var(--se-fs-3xl) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, .6) !important;
+  text-transform: none !important;
+}
+
+/* ---------- Best of year ---------- */
+
+html.se-store-charts:not(#se-none) ._5qMqVivZRIU- {
+  height: 160px !important;
+  border-radius: var(--se-radius-xl);
+  background: linear-gradient(90deg, var(--se-surface) 10%, var(--se-accent-surface) 100%) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  transition: transform var(--se-dur) var(--se-ease), box-shadow var(--se-dur);
+}
+
+html.se-store-charts:not(#se-none) ._5qMqVivZRIU-:hover {
+  transform: translateY(-3px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14), var(--se-shadow-md) !important;
+}
+
+html.se-store-charts:not(#se-none) ._5qMqVivZRIU- .uq1fUtBY8NQ- {
+  margin-inline-start: 32px !important;
+  color: var(--se-white);
+  font-size: var(--se-fs-display) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.02em;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, .5) !important;
+}
+
+html.se-store-charts:not(#se-none) ._5qMqVivZRIU- .z6XJAH8Yf70- {
+  margin-inline-end: 32px !important;
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 500 !important;
+  text-shadow: none !important;
+}
+
+/* ---------- More (Hardware, Download, Support) ---------- */
+
+html.se-store-charts:not(#se-none) .Hm1VV1Ltxnc- {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+html.se-store-charts:not(#se-none) .Hm1VV1Ltxnc- a {
+  width: auto !important;
+  height: 36px;
+  padding: 0 16px !important;
+}
+
+/* ---------- Chart tables (Top Sellers, Most Played, weekly / monthly pages) ----------
+ * C6__mwRo.css / CwzwCy-B.css: table.cCE5WXLdwQ4-, rows tr._6-rISlJoUe0-. Styled as the store
+ * front's ranked list: rows of 6px gaps, rounded and lit on hover, faint rank numbers, rounded
+ * capsules, bold names, the shared price chip (shared/sale.js tags the price widget).
+ */
+
+/* Heading row with the country picker: title left, picker right, level. Every picker on the
+   charts pages (country, "By Current Players", "past week") is the same theme field. */
+html.se-store-charts:not(#se-none) .HlR2pryjZOg-._9doljQK-HY8- {
+  align-items: flex-end;
+}
+
+html.se-store-charts:not(#se-none) .SteamChartsShell [role="combobox"] {
+  height: 38px;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-charts:not(#se-none) .SteamChartsShell [role="combobox"]:hover {
+  background: var(--se-hover) !important;
+}
+
+/* Subtitles that carry a picker inline (Most Played, Steam Deck): text and field on one line. */
+html.se-store-charts:not(#se-none) .BRQQe76HnTs-:has([role="combobox"]) {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+html.se-store-charts:not(#se-none) .BRQQe76HnTs- :is(.kYQK8GGNzkk-, .XK8YJcjBiLw-) {
+  margin: 0 !important;
+}
+
+html.se-store-charts:not(#se-none) .BRQQe76HnTs- .-It74tVWgJY- {
+  min-width: 220px !important;
+}
+
+/*
+ * Its list (Steam's design-system select, hashed classes, may render in a portal): matched by
+ * ARIA roles instead. A dark theme panel, rounded rows that light up, the current country in
+ * the accent, scrolling instead of running down the page.
+ */
+html.se-store-charts:not(#se-none) [role="listbox"] {
+  max-height: min(60vh, 520px) !important;
+  margin-top: 6px !important;
+  padding: 6px !important;
+  overflow-y: auto !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg) !important;
+  /* No scrollbar-width here: setting it switches Chromium to the native bar and drops the
+     theme's overlay scrollbar (core/scrollbars.css). */
+  scrollbar-width: auto !important;
+}
+
+html.se-store-charts:not(#se-none) [role="listbox"] [role="option"] {
+  display: flex !important;
+  align-items: center;
+  min-height: 36px;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: transparent !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-charts:not(#se-none) [role="listbox"] [role="option"]:is(:hover, :focus-visible, [data-highlighted], [aria-current="true"]) {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+  outline: none;
+}
+
+html.se-store-charts:not(#se-none) [role="listbox"] [role="option"][aria-selected="true"] {
+  background: var(--se-selected) !important;
+  color: var(--se-white) !important;
+}
+
+/* The selected country's check / accent mark. */
+html.se-store-charts:not(#se-none) [role="listbox"] [role="option"][aria-selected="true"]::after {
+  content: "";
+  width: 9px;
+  height: 5px;
+  margin-left: auto;
+  border: solid var(--se-accent);
+  border-width: 0 0 2px 2px;
+  transform: translateY(-2px) rotate(-45deg);
+}
+
+html.se-store-charts:not(#se-none) [role="listbox"] [role="option"] * {
+  color: inherit !important;
+  font: inherit !important;
+}
+
+/* Steam fades the #1 game's art behind the table's top; kept, but quieter on the theme colour. */
+html.se-store-charts:not(#se-none) .EgLu-UHG0I8- {
+  opacity: .35;
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- {
+  border-spacing: 0 6px !important;
+  color: var(--se-text) !important;
+}
+
+/* Column labels: small caps, faint; Steam's "?" help icons tinted to match. */
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- .znd-X2mGJSY- th {
+  padding-bottom: 4px;
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- .znd-X2mGJSY- th svg {
+  fill: currentColor !important;
+  opacity: .7;
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- {
+  background: none !important;
+  backdrop-filter: none !important;
+}
+
+/* The row's cells share one rounded surface that lights up on hover. */
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- > td {
+  background: transparent;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0-:hover > td {
+  background: var(--se-surface-2);
+}
+
+/* The row's first cell is Steam's zero-width link cell (.PJXSVZxaIEI-), so the rounding goes on
+   the first visible cell after it. */
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- > td:first-child,
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- > td.PJXSVZxaIEI- + td {
+  border-radius: var(--se-radius-lg) 0 0 var(--se-radius-lg);
+}
+
+/* Whole-row link (.HHfkg1UJUQw- > .UCStFKHRE5I-, laid over the row): Steam narrows it to 25% of
+   the row under 1750px wide, leaving most of the row unclickable; it spans the row at every
+   width, rounded with it. */
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- .PJXSVZxaIEI- .HHfkg1UJUQw- {
+  width: 100% !important;
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- > td:last-child {
+  border-radius: 0 var(--se-radius-lg) var(--se-radius-lg) 0;
+}
+
+/* Rank: faint, brighter on hover; the top three in the accent. */
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- .f43kwggd5Os- {
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-xl) !important;
+  font-weight: 700 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0-:hover .f43kwggd5Os- {
+  color: var(--se-text);
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- tbody ._6-rISlJoUe0-:nth-child(-n + 3) .f43kwggd5Os- {
+  color: var(--se-accent);
+}
+
+/* Game: rounded capsule, bold name. */
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- .iV08nNqP--8- {
+  padding: 8px 16px 8px 0 !important;
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- .iV08nNqP--8- a {
+  position: relative;
+  align-items: center;
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- .R5kUVghjNM0- {
+  border-radius: var(--se-radius-sm);
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- .vGOJiIhBnNo- {
+  margin-left: 16px !important;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 700 !important;
+}
+
+/* Item flags on the capsule's corner as the theme's glass chips: "In library" in the accent
+   blue, "On wishlist" (its star icon is a polygon) in pink, as in the store's rows. */
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- .-qtyuB8MIAk- {
+  top: 6px !important;
+  left: 6px !important;
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- .Orilt6rfaTI- {
+  height: 20px;
+  padding: 0 7px !important;
+  color: var(--se-accent) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 600;
+  letter-spacing: .04em;
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- .Orilt6rfaTI-:has(svg polygon) {
+  color: var(--se-wish) !important;
+}
+
+/* Price, change and weeks: muted figures; Steam's up / down colours kept, badges rounded. */
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- :is(.owxxTzCprsc-, .VVPCVBQFI2k-, ._0UyVznhx0AQ-, .AMqeZJOLXaA-, .-pKIiUTXq-w-) {
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-md);
+  font-weight: 600;
+  text-shadow: none !important;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- .VVPCVBQFI2k-.Up {
+  color: var(--se-cart) !important;
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- .VVPCVBQFI2k-.Down {
+  color: #f0a050 !important;
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- .VVPCVBQFI2k- :is(.FXMJgCmo-ew-, ._755rxrliZlU-) {
+  padding: 3px 8px !important;
+  border-radius: var(--se-radius-pill) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 800 !important;
+  letter-spacing: .06em;
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- .VVPCVBQFI2k- .FXMJgCmo-ew- {
+  background: var(--se-accent) !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- ._6-rISlJoUe0- [data-se-price] {
+  margin-left: auto !important;
+}
+
+/* ---------- Weekly / monthly pages: date stepper and "See all" ----------
+ * A9E4BVxE.css .tynMzW2BivY-: previous / next (.n-IZj12HrBI-, ._5lng8kFUn7U- when there is
+ * none) and the range (.gd-i1DME9UI-). The arrows become the store front's round glass
+ * buttons with drawn chevrons; the range a quiet bold line beside them.
+ */
+html.se-store-charts:not(#se-none) .tynMzW2BivY- {
+  gap: 8px;
+  margin-bottom: 24px !important;
+  font-family: inherit !important;
+}
+
+/* Both pagers' arrows: the round buttons, a size smaller on a raised fill. */
+html.se-store-charts:not(#se-none) :is(.tynMzW2BivY- .n-IZj12HrBI- .CYLNhM6Qimg-, .YqWcdxOb1HQ- .lEUeKqj6qis- .V0nSJVwdJYU-) {
+  position: relative;
+  margin: 0 !important;
+  --se-arrow-size: 40px;
+  --se-arrow-chevron: 8px;
+  --se-arrow-bg: var(--se-surface-2);
+  --se-arrow-bg-hover: var(--se-hover);
+  --se-arrow-ring: inset 0 0 0 1px var(--se-glass-chip-line);
+}
+
+/* Steam's triangles give way to chevrons drawn on the circle. */
+html.se-store-charts:not(#se-none) .tynMzW2BivY- :is(._08s9A9T59Mc-, ._4zfV87Y14Ag-) {
+  display: none !important;
+}
+
+html.se-store-charts:not(#se-none) .tynMzW2BivY- .n-IZj12HrBI-._5lng8kFUn7U- {
+  opacity: .35;
+  pointer-events: none;
+}
+
+html.se-store-charts:not(#se-none) .tynMzW2BivY- .gd-i1DME9UI- {
+  min-width: 0 !important;
+  margin-left: 8px !important;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 600 !important;
+}
+
+/* "See all 100" (design-system button): the store front's pill, centred under the table. */
+html.se-store-charts:not(#se-none) .Tc1RM13bONs- {
+  align-items: center;
+  margin-top: 16px !important;
+}
+
+html.se-store-charts:not(#se-none) .Tc1RM13bONs- button {
+  width: auto !important;
+  height: 40px !important;
+  padding: 0 20px !important;
+  gap: 8px;
+}
+
+html.se-store-charts:not(#se-none) .Tc1RM13bONs- button::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border: solid currentColor;
+  border-width: 1.75px 1.75px 0 0;
+  transform: rotate(135deg) translate(-1px, 1px);
+}
+
+/* ---------- Monthly / yearly pages (legacy React app) ----------
+ * /charts/topnewreleases/... and the best-of-year pages still run Steam's older charts app
+ * (#page_root, store.steampowered.com/public/css/applications/store/steamcharts.css on
+ * SteamTracking), with their own hashed classes for the same sidebar and date stepper. They
+ * get the same treatment as the pages above.
+ */
+
+html.se-store-charts:not(#se-none) body.PjNfTdZzbec- .responsive_page_frame {
+  background: var(--se-bg) !important;
+}
+
+/* store-nav.js widens "the page column" it finds; here that is the app root, which then ran
+   past the window. This app lays itself out inside #page_root. */
+html.se-store-charts:not(#se-none) #page_root [data-se-wide] {
+  width: auto !important;
+  margin-inline: 0 !important;
+}
+
+html.se-store-charts:not(#se-none) .page_content_ctn#page_root {
+  padding-right: 28px !important;
+}
+
+/* The blurred collage of the month's games behind the page: kept, quieter. */
+html.se-store-charts:not(#se-none) .-ltR43mR0X4- {
+  opacity: .35;
+}
+
+/* Sidebar (.kGCpjDEp6bU-): the same rounded rows as the newer pages. */
+html.se-store-charts:not(#se-none) .kGCpjDEp6bU- {
+  padding: 18px 12px 24px !important;
+  background: none !important;
+}
+
+html.se-store-charts:not(#se-none) .kGCpjDEp6bU- .G32wdCdumF8- + .G32wdCdumF8- {
+  margin-top: 14px;
+}
+
+html.se-store-charts:not(#se-none) .kGCpjDEp6bU- .kiJjoM-8Yio- {
+  margin: 0 0 6px !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+}
+
+html.se-store-charts:not(#se-none) .kGCpjDEp6bU- ._7dLEN2CpT-A- {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+html.se-store-charts:not(#se-none) .kGCpjDEp6bU- ._7dLEN2CpT-A- a {
+  gap: 12px;
+  height: 38px;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  border-radius: var(--se-radius-md);
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-charts:not(#se-none) .kGCpjDEp6bU- ._7dLEN2CpT-A- a:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store-charts:not(#se-none) .kGCpjDEp6bU- ._7dLEN2CpT-A- a:is(.ncC-B6lB610-, [aria-current="page"]) {
+  background: var(--se-selected) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store-charts:not(#se-none) .kGCpjDEp6bU- ._7dLEN2CpT-A- a > span {
+  display: flex;
+}
+
+html.se-store-charts:not(#se-none) .kGCpjDEp6bU- ._7dLEN2CpT-A- a svg {
+  flex: none;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  color: inherit;
+}
+
+html.se-store-charts:not(#se-none) .kGCpjDEp6bU- ._7dLEN2CpT-A- a svg :is(path, polygon) {
+  fill: currentColor !important;
+}
+
+html.se-store-charts:not(#se-none) .kGCpjDEp6bU- ._7dLEN2CpT-A- a:is(.ncC-B6lB610-, [aria-current="page"]) svg {
+  color: var(--se-accent);
+}
+
+/* Steam's faint logo watermark behind the sidebar. */
+html.se-store-charts:not(#se-none) .kGCpjDEp6bU- svg.zjIN5-z-JrM- {
+  display: none !important;
+}
+
+/* Date stepper (.YqWcdxOb1HQ-): round glass arrows, then the calendar button. */
+html.se-store-charts:not(#se-none) .YqWcdxOb1HQ- {
+  gap: 8px;
+  margin-bottom: 24px !important;
+  font-family: inherit !important;
+}
+
+/* Best-of-year pager (._9fTbvJQq5II-: arrows only, no date): Steam boxes the pair in a dark
+   translucent tile; the arrows stand on their own, centred, as on the monthly pager. */
+html.se-store-charts:not(#se-none) .YqWcdxOb1HQ-._9fTbvJQq5II- {
+  margin-inline: auto !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+}
+
+html.se-store-charts:not(#se-none) .YqWcdxOb1HQ- :is(._8wtllXu9kAY-, .JFpy0tqsydo-) {
+  display: none !important;
+}
+
+html.se-store-charts:not(#se-none) .YqWcdxOb1HQ- .lEUeKqj6qis-._4Hwybg0uOZA- {
+  opacity: .35;
+  pointer-events: none;
+}
+
+html.se-store-charts:not(#se-none) .YqWcdxOb1HQ- .YW7E4duIx8g- {
+  min-width: 0 !important;
+  margin-left: 8px !important;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 600 !important;
+}
+
+html.se-store-charts:not(#se-none) ._2eSm1Y7y2zQ- {
+  justify-content: center;
+  width: 40px !important;
+  height: 40px;
+  margin-left: 0 !important;
+  padding: 0 !important;
+  border-radius: 50%;
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-charts:not(#se-none) ._2eSm1Y7y2zQ-:hover {
+  background: var(--se-hover) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line) !important;
+}
+
+html.se-store-charts:not(#se-none) ._2eSm1Y7y2zQ- svg {
+  width: 18px;
+  height: 18px;
+}
+
+html.se-store-charts:not(#se-none) ._2eSm1Y7y2zQ- svg path {
+  fill: var(--se-text-muted) !important;
+}
+
+html.se-store-charts:not(#se-none) ._2eSm1Y7y2zQ-:hover svg path {
+  fill: var(--se-white) !important;
+}
+
+/* Month picker (calendar button): Steam's context menu holding react-datetime (.rdt*, stable
+   class names). A theme panel with rounded month cells; the current month in the accent. */
+html.se-store-charts:not(#se-none) body > :has(> div > .contextMenuItem .rdtPicker) {
+  padding: 8px !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg) !important;
+}
+
+html.se-store-charts:not(#se-none) .contextMenuItem:has(.rdtPicker) {
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-charts:not(#se-none) .rdtPicker {
+  width: 240px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+}
+
+html.se-store-charts:not(#se-none) .rdtPicker table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 4px;
+}
+
+html.se-store-charts:not(#se-none) .rdtPicker thead th {
+  height: 34px;
+  border: 0 !important;
+  background: none !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 700 !important;
+}
+
+html.se-store-charts:not(#se-none) .rdtPicker thead th {
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  line-height: 34px !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* The year: plain text (react-datetime lights it up as a "switch to years" button). */
+html.se-store-charts:not(#se-none) .rdtPicker .rdtSwitch,
+html.se-store-charts:not(#se-none) .rdtPicker .rdtSwitch:hover {
+  border-radius: var(--se-radius-md) !important;
+  background: none !important;
+  background-image: none !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store-charts:not(#se-none) .rdtPicker :is(.rdtPrev, .rdtNext) {
+  width: 34px !important;
+  min-width: 34px;
+  max-width: 34px;
+  height: 34px !important;
+  border-radius: 50% !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-xl) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-charts:not(#se-none) .rdtPicker :is(.rdtPrev, .rdtNext) span {
+  display: block;
+  line-height: 32px;
+}
+
+html.se-store-charts:not(#se-none) .rdtPicker :is(.rdtPrev, .rdtNext):is(.rdtDisabled, :has(.rdtDisabled)) {
+  opacity: .35;
+  pointer-events: none;
+}
+
+html.se-store-charts:not(#se-none) .rdtPicker :is(.rdtPrev, .rdtNext):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store-charts:not(#se-none) .rdtPicker .rdtMonth {
+  height: 40px;
+  border-radius: var(--se-radius-md) !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-charts:not(#se-none) .rdtPicker .rdtMonth:not(.rdtDisabled):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store-charts:not(#se-none) .rdtPicker .rdtMonth.rdtActive:not(.rdtDisabled) {
+  background: var(--se-accent) !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-store-charts:not(#se-none) .rdtPicker .rdtMonth.rdtDisabled {
+  color: var(--se-text-faint) !important;
+  opacity: .5;
+  cursor: default;
+}
+
+/* Tiers: theme cards tinted by their metal instead of Steam's foil gradients and glows. */
+html.se-store-charts:not(#se-none) :is(.GrtMVCtr-vo-, .gff1kM2EfSA-, .YhTNq9btf6k-, .KDYpaqyoTj8-) {
+  --se-tier: 164, 174, 190;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl) !important;
+  background: linear-gradient(180deg, rgba(var(--se-tier), .22) 0%, rgba(var(--se-tier), .06) 140px, var(--se-surface) 360px) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--se-tier), .35), var(--se-shadow-lg) !important;
+}
+
+html.se-store-charts:not(#se-none) .gff1kM2EfSA- { --se-tier: 240, 192, 96; }
+html.se-store-charts:not(#se-none) .YhTNq9btf6k- { --se-tier: 200, 206, 214; }
+html.se-store-charts:not(#se-none) .KDYpaqyoTj8- { --se-tier: 214, 139, 95; }
+
+/* ---------- Narrow windows: Steam turns the sidebar into a scrolling top strip ---------- */
+
+@media (width <= 1200px) {
+  html.se-store-charts:not(#se-none) .SteamChartsShell {
+    padding-left: 28px !important;
+  }
+
+  html.se-store-charts:not(#se-none) .-IN79XL9SlI- {
+    width: auto !important;
+    padding: 6px 12px !important;
+  }
+
+  html.se-store-charts:not(#se-none) .-IN79XL9SlI- .Tn4B4CyfYls- {
+    flex-direction: row;
+  }
+}

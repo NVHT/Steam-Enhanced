@@ -1,0 +1,113 @@
+/*
+ * Settings › rules that apply across pages: the spacing scale and late overrides.
+ * Settings styles load in order: layout, controls, pages, storage, search, game-properties, finishing.
+ */
+
+/*
+ * One spacing scale on every page: 16px between the title and the
+ * first block and between blocks, a section label 22px under the block above it and
+ * 10px over its own; a paragraph right under the title reads as its sub-line (4px)
+ */
+[data-se-props] .CFTLX2wIKOK3hNV-fS7_V .DialogHeader:not(#se-none):not(#se-p2) {
+  margin-bottom: 16px !important;
+}
+
+[data-se-props] .CFTLX2wIKOK3hNV-fS7_V [data-se-pfirst]:is([data-se-pfirst], #se-none):is([data-se-pfirst], #se-none):not(#se-none):not(#se-p2) {
+  margin-top: 0 !important;
+}
+
+[data-se-props] .CFTLX2wIKOK3hNV-fS7_V:has([data-se-pfirst="sub"]) .DialogHeader:not(#se-none):not(#se-p2) {
+  margin-bottom: 4px !important;
+}
+
+[data-se-props] .CFTLX2wIKOK3hNV-fS7_V [data-se-c~="f"]:not([data-se-c~="s"]):not([data-se-pre]):not([data-se-pfirst]):not([data-se-notice] + *):not(#se-none):not(#se-p2) {
+  margin-top: 16px !important;
+}
+
+[data-se-props] .CFTLX2wIKOK3hNV-fS7_V [data-se-sec] + .HxqeaLbjhdRiSTK8ZFwxJ {
+  margin: -6px 0 10px !important;
+  padding: 0 4px !important;
+  font: 500 12.5px/1.4 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+[data-se-props] .CFTLX2wIKOK3hNV-fS7_V .HxqeaLbjhdRiSTK8ZFwxJ + input {
+  margin: 0 !important;
+}
+
+[data-se-props] .DialogBody .se-ws-empty {
+  margin: 0;
+}
+
+[data-se-props] .CFTLX2wIKOK3hNV-fS7_V [data-se-psub]:is([data-se-psub], #se-none):not(#se-none):not(#se-p2) {
+  margin: 0 !important;
+  padding: 0 !important;
+  font: 500 13.5px/1.45 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+[data-se-props] .CFTLX2wIKOK3hNV-fS7_V [data-se-psub] + [data-se-psub]:is([data-se-psub], #se-none):not(#se-none):not(#se-p2) {
+  margin-top: 4px !important;
+}
+
+[data-se-props] .CFTLX2wIKOK3hNV-fS7_V [data-se-psub] a:not(#se-none),
+[data-se-props] .CFTLX2wIKOK3hNV-fS7_V [data-se-psub] span:not(#se-none) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+[data-se-props] .CFTLX2wIKOK3hNV-fS7_V [data-se-psub] a:hover,
+[data-se-props] .CFTLX2wIKOK3hNV-fS7_V [data-se-psub] span:hover {
+  text-decoration: underline !important;
+}
+
+[data-se-props] .CFTLX2wIKOK3hNV-fS7_V [data-se-psub]:not([data-se-pfirst]) + [data-se-c~="f"]:not(#se-none):not(#se-p2) {
+  margin-top: 16px !important;
+}
+
+/*
+ * Friends & Chat: the nickname example uses the same online ring as friend rows.
+ * Include both Steam avatar modules; keep this scoped to the example setting.
+ */
+[data-se-nickname-preview] .avatarHolder,
+[data-se-nickname-preview] .nibodjvvrm86uCfnnAn4g,
+[data-se-nickname-preview] ._1_sHcxv9rQdANehiviVZR4 {
+  position: relative;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-avatar-radius) !important;
+  overflow: visible !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+[data-se-nickname-preview] .avatarHolder :is(img.avatar, ._3h-QRJGxnVOIExtHD1R0f2, ._3qaudpkfSKoxlwfA-deQLX),
+[data-se-nickname-preview] .nibodjvvrm86uCfnnAn4g :is(img.avatar, ._3h-QRJGxnVOIExtHD1R0f2, ._3qaudpkfSKoxlwfA-deQLX),
+[data-se-nickname-preview] ._1_sHcxv9rQdANehiviVZR4 :is(img.avatar, ._3h-QRJGxnVOIExtHD1R0f2, ._3qaudpkfSKoxlwfA-deQLX) {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: var(--se-avatar-radius) !important;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px var(--se-sidebar), 0 0 0 4px var(--se-online) !important;
+}
+
+[data-se-nickname-preview] .avatarStatus,
+[data-se-nickname-preview] .avatarFrame,
+[data-se-nickname-preview] ._3pbKzT087jaL2EeQO1qsaR,
+[data-se-nickname-preview] ._3xUpb5DWXPFNcHHIcv-9pe,
+[data-se-nickname-preview] .X_mJE4BYV5StDPwZhSiAu {
+  display: none !important;
+}
+
+/*
+ * Diagnostic-confirmed native strip: Steam's online/right selector overrides
+ * the generic hide rule above, so target the actual preview hierarchy.
+ */
+[data-se-nickname-preview] :is(.FakeFriend, ._3oeHwxQTKDkPcxDhz8jbhM).online :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g).online > :is(.avatarStatus, ._3xUpb5DWXPFNcHHIcv-9pe).right {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  background: none !important;
+}

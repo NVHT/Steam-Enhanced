@@ -1,0 +1,1918 @@
+/*
+ * The Steam Awards results pages (/steamawards/2016 ...), Steam's server-rendered layout
+ * (steamawards.css): the year's art behind everything, a gold-ruled title, "Announcing The
+ * Winners", then one wide block per award (trophy, caps title, the winner's header art and
+ * four runner-up capsules) down a 930px column. Restyled as the store front:
+ *  - the page colour, the art cleared; "View Previous Years" as a pill with a theme menu;
+ *  - a centred header: the dates as an eyebrow chip, the title, the lead-in dimmed;
+ *  - the awards as a grid of cards: number and trophy beside the award's name, the winner as
+ *    a rounded art tile with a gold "Winner" chip, the runners-up as a row of small tiles
+ *    ("Your Vote" as a glass chip), the description under them.
+ * steam-awards/page.js marks the page (html.se-store-awards) and adds the chips and numbers.
+ *
+ * Steam's own class names (stable on this server-rendered page). Its elements carry
+ * [data-se-wide] from shared/nav.js, which sizes them to the page width; the rules here
+ * outrank that where the grid needs its own sizes. html.se-store-awards:not(#se-none) for
+ * ID-level weight over steamawards.css.
+ */
+
+/* ---------- Page ---------- */
+
+html.se-store-awards:not(#se-none) body.steamawards {
+  background: var(--se-bg) !important;
+  color: var(--se-text-dim) !important;
+}
+
+html.se-store-awards:not(#se-none) .steamaward_header_background {
+  padding-top: 0 !important;
+  background: none !important;
+  font-family: inherit !important;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_page :is(.mslight, .msblack) {
+  font-family: inherit !important;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_page :is(.steamaward_header_title_rule) {
+  display: none !important;
+}
+
+/* ---------- Previous years ---------- */
+
+/* The row: the page column, the pill at its right end. */
+html.se-store-awards:not(#se-none) div:has(> #steamaward_years_pulldown) {
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding: 24px 0 0 !important;
+  text-align: right !important;
+}
+
+html.se-store-awards:not(#se-none) #steamaward_years_pulldown {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+/* Steam's arrow is a background image; the theme's chevron in the text colour instead. */
+html.se-store-awards:not(#se-none) #steamaward_years_pulldown::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  -webkit-mask: var(--se-awards-chevron) center / contain no-repeat;
+  mask: var(--se-awards-chevron) center / contain no-repeat;
+}
+
+html.se-store-awards:not(#se-none) #steamaward_years_pulldown:is(:hover, .focus) {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store-awards {
+  --se-awards-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* Its menu (Steam's popup_block_new / popup_menu). */
+html.se-store-awards:not(#se-none) #steamaward_years_dropdown {
+  margin-top: 6px;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-awards:not(#se-none) #steamaward_years_dropdown .popup_body {
+  padding: 6px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-panel-bg) !important;
+  backdrop-filter: var(--se-blur-panel);
+  box-shadow: var(--se-panel-shadow) !important;
+}
+
+html.se-store-awards:not(#se-none) #steamaward_years_dropdown .popup_menu_item {
+  display: flex !important;
+  align-items: center;
+  height: 34px;
+  padding: 0 12px !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-base) !important;
+  white-space: nowrap;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-awards:not(#se-none) #steamaward_years_dropdown .popup_menu_item:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+/* ---------- Header ---------- */
+
+html.se-store-awards:not(#se-none) .steamaward_header_area {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: auto !important;
+  height: auto !important;
+  margin: 24px auto 0 !important;
+  padding: 24px 0 8px !important;
+  background: none !important;
+  text-align: center;
+}
+
+html.se-store-awards:not(#se-none) .steamaward_header_area > * {
+  position: static !important;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* Title block: the dates as an eyebrow chip above the title. */
+html.se-store-awards:not(#se-none) .steamaward_header_area .title_ctn {
+  display: flex !important;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 12px;
+}
+
+html.se-store-awards:not(#se-none) .steamaward_dates {
+  display: inline-flex !important;
+  align-items: center;
+  height: 26px;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent-surface) !important;
+  color: var(--se-accent) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+  text-shadow: none !important;
+}
+
+html.se-store-awards:not(#se-none) h1.steamaward_title {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-display) !important;
+  font-weight: 800 !important;
+  letter-spacing: -.02em !important;
+  line-height: 1.08 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/* "Announcing / The Winners" and the lead-in. */
+html.se-store-awards:not(#se-none) .steamaward_header_todaysaward {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+html.se-store-awards:not(#se-none) .steamaward_header_todaysaward :is(.results_announcing, .thewinners) {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.3 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html.se-store-awards:not(#se-none) .steamaward_header_todaysaward .results_announcing {
+  color: var(--se-gold) !important;
+  font-size: var(--se-fs-sm) !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store-awards:not(#se-none) .winners_leadin {
+  max-width: 620px;
+  margin: 10px 0 0 !important;
+  padding: 0 !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-lg) !important;
+  line-height: 1.6 !important;
+}
+
+html.se-store-awards:not(#se-none) .winners_leadin p {
+  margin: 0 !important;
+}
+
+/* ---------- Award grid ---------- */
+
+html.se-store-awards:not(#se-none) .steamawards_page .results_list {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 540px), 1fr));
+  gap: 24px;
+  /* Rows are shared by the cards beside each other (subgrid below); the cards' own bottom
+     margin spaces one row of cards from the next. */
+  row-gap: 0;
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  margin: 40px auto 72px !important;
+  padding: 0 !important;
+}
+
+/* One award: a card. The number and trophy sit on the title row (grid areas). */
+html.se-store-awards:not(#se-none) .results_list .vote_result_ctn {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: 56px minmax(0, 1fr);
+  grid-template-areas:
+    "trophy title"
+    "intro intro"
+    "games games"
+    "about about";
+  align-items: center;
+  align-content: start;
+  gap: 14px 16px;
+  box-sizing: border-box;
+  width: auto !important;
+  min-width: 0;
+  height: auto !important;
+  margin: 0 0 24px !important;
+  padding: 24px !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-md);
+}
+
+/*
+ * Cards side by side line up part for part: each card spans four rows of the list's grid and
+ * takes them as its own (subgrid), so a two-line award name in one card moves the winner art
+ * down in all of them, not just its own. A shorter name centres in the taller title row.
+ */
+@supports (grid-template-rows: subgrid) {
+  html.se-store-awards:not(#se-none) .results_list .vote_result_ctn {
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+  }
+
+  html.se-store-awards:not(#se-none) .results_list .vote_result_ctn > :is(.trophy_image, .awardtitle) {
+    align-self: center;
+  }
+
+  html.se-store-awards:not(#se-none) .results_list .vote_result_ctn > .award_description {
+    align-self: start;
+  }
+}
+
+/* Inner parts lose nav.js's page width; the card sizes them. */
+html.se-store-awards:not(#se-none) .results_list .vote_result_ctn [data-se-wide] {
+  width: auto !important;
+  margin-inline: 0 !important;
+}
+
+/*
+ * steamawards.css places the card's parts for its old fixed column: the trophy pinned above
+ * the block, the title at a fixed height, the art capped at its own widths with a frame. All
+ * of that goes; the grid areas place and size each part.
+ */
+html.se-store-awards:not(#se-none) .results_list .vote_result_ctn > * {
+  position: relative !important;
+  inset: auto !important;
+  float: none !important;
+  min-width: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  transform: none !important;
+}
+
+/* Award number, top-right of the card (steam-awards/page.js). */
+html.se-store-awards:not(#se-none) .results_list .vote_result_ctn[data-se-award-index]::before {
+  content: attr(data-se-award-index);
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+
+html.se-store-awards:not(#se-none) .vote_result_ctn .trophy_image {
+  grid-area: trophy;
+  display: grid !important;
+  place-items: center;
+  width: 56px !important;
+  height: 56px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: radial-gradient(circle at 50% 40%, rgba(240, 192, 96, .18), transparent 70%), var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-awards:not(#se-none) .vote_result_ctn .trophy_image img {
+  position: static !important;
+  inset: auto !important;
+  display: block;
+  transform: none !important;
+  max-width: 40px !important;
+  max-height: 44px !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+html.se-store-awards:not(#se-none) .vote_result_ctn .awardtitle {
+  grid-area: title;
+  margin: 0 !important;
+  padding: 0 36px 0 0 !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-xl) !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+  line-height: 1.3 !important;
+  text-align: left !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html.se-store-awards:not(#se-none) .vote_result_ctn .winner_intro {
+  grid-area: intro;
+  margin: 4px 0 -4px !important;
+  padding: 0 !important;
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+  text-align: left !important;
+  text-transform: uppercase !important;
+}
+
+/* Winner and runners-up: the winner's art on top, the four runners-up in a row under it. */
+html.se-store-awards:not(#se-none) .vote_result_ctn .results_carousel {
+  grid-area: games;
+  display: flex !important;
+  flex-direction: column;
+  gap: 10px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-awards:not(#se-none) .results_carousel :is(.winner, .runnerup) {
+  position: relative !important;
+  inset: auto !important;
+  float: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface-2) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: translate var(--se-dur) var(--se-ease), box-shadow var(--se-dur) var(--se-ease);
+}
+
+html.se-store-awards:not(#se-none) .results_carousel :is(.winner, .runnerup)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  pointer-events: none;
+}
+
+html.se-store-awards:not(#se-none) .results_carousel :is(.winner, .runnerup):hover {
+  translate: 0 -3px;
+  box-shadow: var(--se-shadow-md) !important;
+}
+
+html.se-store-awards:not(#se-none) .results_carousel .winner {
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+}
+
+html.se-store-awards:not(#se-none) .results_carousel :is(.winner, .runnerup) a {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-awards:not(#se-none) .results_carousel :is(.winner, .runnerup) img {
+  position: static !important;
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  height: 100% !important;
+  max-height: none !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  object-fit: cover;
+  transition: scale var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-store-awards:not(#se-none) .results_carousel :is(.winner, .runnerup):hover img {
+  scale: 1.04;
+}
+
+/* The winner's art at Steam's header ratio. */
+html.se-store-awards:not(#se-none) .results_carousel .winner img {
+  aspect-ratio: 460 / 215;
+}
+
+html.se-store-awards:not(#se-none) .results_carousel .runnerups {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+/* Runners-up at Steam's small-capsule ratio. */
+html.se-store-awards:not(#se-none) .results_carousel .runnerup {
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: 231 / 87;
+}
+
+/* Chips on the art: "Winner" (page.js) in gold, Steam's "Your Vote" as a glass chip. */
+html.se-store-awards:not(#se-none) [data-se-award-winner-chip],
+html.se-store-awards:not(#se-none) .results_carousel .your_vote {
+  position: absolute !important;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  display: inline-flex !important;
+  align-items: center;
+  width: auto !important;
+  height: 24px !important;
+  margin: 0 !important;
+  padding: 0 10px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line) !important;
+  color: var(--se-white) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .02em !important;
+  line-height: 1 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+  pointer-events: none;
+}
+
+html.se-store-awards:not(#se-none) [data-se-award-winner-chip] {
+  gap: 6px;
+  color: var(--se-gold) !important;
+}
+
+/* A small star before "Winner". */
+html.se-store-awards:not(#se-none) [data-se-award-winner-chip]::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  background: currentColor;
+  -webkit-mask: var(--se-star-mask) center / contain no-repeat;
+  mask: var(--se-star-mask) center / contain no-repeat;
+}
+
+/* On the small runner-up tiles the chip hugs the corner. */
+html.se-store-awards:not(#se-none) .results_carousel .runnerup .your_vote {
+  top: 6px;
+  left: 6px;
+  height: 20px !important;
+  padding: 0 8px !important;
+  font-size: var(--se-fs-xs) !important;
+}
+
+html.se-store-awards:not(#se-none) .vote_result_ctn .award_description {
+  grid-area: about;
+  margin: 2px 0 0 !important;
+  padding: 0 !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 400 !important;
+  line-height: 1.55 !important;
+  text-align: left !important;
+}
+
+html.se-store-awards:not(#se-none) .vote_result_ctn .award_description p {
+  margin: 0 !important;
+}
+
+/* ==========================================================================
+ * 2017–2018 layout (body.steamawards_landing, winter2018_steamawards.css): a header with
+ * the stacked title beside the trailer, a "Categories" strip of award cards, then a full-width
+ * band per award (title and blurb beside the winner's art and a big trophy, the nominees in a
+ * row, a "Next Award" button). Restyled as the store front:
+ *  - the header as one card: "Winners" as the gold eyebrow, the stacked title, the blurb,
+ *    the trailer as a rounded 16:9 panel beside it;
+ *  - the award cards as a grid of art tiles with the award and its winner over a scrim;
+ *  - each award as a card: the trophy as a badge beside the title, the winner as an art tile
+ *    with a gold "Winner" chip, the nominees as a row of tiles (the losers dimmed until
+ *    hovered), "Next Award" as a pill.
+ * ========================================================================== */
+
+/*
+ * Every year paints its own art somewhere around the content (2018 a purple gradient on the
+ * page, 2020 a gold glow on the wrappers behind the header): the page, its frame and every
+ * section wrapper go to the page colour, their pseudo-elements with them. The cards below
+ * draw their own surfaces.
+ */
+html.se-store-awards:not(#se-none) body,
+html.se-store-awards:not(#se-none) :is(.responsive_page_frame, .responsive_page_content, .responsive_page_template_content) {
+  background-color: var(--se-bg) !important;
+  background-image: none !important;
+}
+
+html.se-store-awards:not(#se-none) div.steamawards_page,
+html.se-store-awards:not(#se-none) div.steamawards_page > :not(.steamawards_header_ctn),
+html.se-store-awards:not(#se-none) div.steamawards_page > :not(.steamawards_header_ctn) > :not(.steamawards_header_ctn, .vote_result_ctn, .steamawards_card) {
+  background: none !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none;
+}
+
+html.se-store-awards:not(#se-none) :is(body, div.steamawards_page, div.steamawards_page > *)::before,
+html.se-store-awards:not(#se-none) :is(body, div.steamawards_page, div.steamawards_page > *)::after {
+  background: none !important;
+}
+
+html.se-store-awards:not(#se-none) body.steamawards,
+html.se-store-awards:not(#se-none) div.steamawards_page {
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+}
+
+/* ---------- Header ---------- */
+
+html.se-store-awards:not(#se-none) .steamawards_header_ctn {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 56px);
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  height: auto !important;
+  margin: 24px auto 48px !important;
+  padding: clamp(24px, 3vw, 44px) !important;
+  border-radius: var(--se-radius-xl);
+  background: radial-gradient(80% 120% at 0% 0%, rgba(240, 192, 96, .08), transparent 60%), var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg);
+}
+
+html.se-store-awards:not(#se-none) .steamawards_header_ctn > * {
+  position: static !important;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 2021 boxes the text in purple with a black frame: the header card is the only surface. */
+html.se-store-awards:not(#se-none) .steamawards_header_text,
+html.se-store-awards:not(#se-none) .steamawards_header_text > :is(.steamawards_header_title:not(.purple_title), .steamawards_header_desc) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_header_text {
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_header_title {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-hero) !important;
+  font-weight: 800 !important;
+  letter-spacing: -.03em !important;
+  line-height: 1 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/* "Winners": the eyebrow, above the title. */
+html.se-store-awards:not(#se-none) .steamawards_header_title.purple_title {
+  order: -1;
+  display: inline-flex !important;
+  align-items: center;
+  height: 26px;
+  padding: 0 12px !important;
+  border-radius: var(--se-radius-pill);
+  background: rgba(240, 192, 96, .14) !important;
+  color: var(--se-gold) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_header_desc {
+  display: flex !important;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 560px;
+  margin: 4px 0 0 !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 400 !important;
+  line-height: 1.6 !important;
+}
+
+/* 2019–2021: "Presenting your winners!" (.steamawards_header_subtitle) is the eyebrow too. */
+html.se-store-awards:not(#se-none) .steamawards_header_subtitle {
+  order: -1;
+  display: inline-flex !important;
+  align-items: center;
+  width: auto !important;
+  height: 26px !important;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  border-radius: var(--se-radius-pill);
+  background: rgba(240, 192, 96, .14) !important;
+  color: var(--se-gold) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+  text-shadow: none !important;
+}
+
+/*
+ * Years with a trophy render instead of the trailer (2021): Steam's art is a tall strip
+ * (846x2205) meant to run down behind the page. It's shown whole in a panel the height of
+ * the header text, on a soft gold glow.
+ */
+html.se-store-awards:not(#se-none) .steamawards_header_ctn > .steamawards_header_trophy {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  justify-self: stretch;
+  width: 100% !important;
+  max-width: none !important;
+  height: clamp(320px, 26vw, 460px) !important;
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+  background: radial-gradient(45% 60% at 50% 45%, rgba(240, 192, 96, .16), transparent 70%), var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_header_trophy img {
+  position: static !important;
+  display: block;
+  width: auto !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  margin: 0 !important;
+  object-fit: contain;
+  transform: none !important;
+}
+
+/* The player fills its half of the header whatever width each year's CSS gives it. */
+html.se-store-awards:not(#se-none) .steamawards_header_ctn > .steamawards_header_video {
+  justify-self: stretch;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_header_video {
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+  background: #000 !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg) !important;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_header_video video {
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+  max-height: none !important;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+/* ---------- "Categories" and the award cards ---------- */
+
+html.se-store-awards:not(#se-none) #sectionTitle {
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  height: auto !important;
+  margin: 0 auto 16px !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_shortcuts_ctn {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+  gap: 16px;
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  height: auto !important;
+  margin: 0 auto 56px !important;
+  padding: 0 !important;
+}
+
+/* "Scroll down to see the winners": the page says it by itself. */
+html.se-store-awards:not(#se-none) .steamawards_shortcuts_ctn #scroll_card {
+  display: none !important;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_card {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-end;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  min-height: 190px;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-shadow-md);
+  cursor: pointer;
+  transition: translate var(--se-dur) var(--se-ease), box-shadow var(--se-dur) var(--se-ease);
+}
+
+html.se-store-awards:not(#se-none) .steamawards_card:hover {
+  translate: 0 -3px;
+  box-shadow: var(--se-shadow-lg);
+}
+
+/* The award's art, filling the card, under a scrim for the text. */
+html.se-store-awards:not(#se-none) .steamawards_card .steamaward_card_background {
+  position: absolute !important;
+  inset: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  background-position: center !important;
+  background-size: cover !important;
+  transition: scale var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-store-awards:not(#se-none) .steamawards_card:hover .steamaward_card_background {
+  scale: 1.05;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background: linear-gradient(to top, rgba(12, 14, 18, .94) 0%, rgba(12, 14, 18, .55) 55%, rgba(12, 14, 18, .1) 100%);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  pointer-events: none;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_card .award_card_title {
+  position: relative !important;
+  z-index: 2;
+  display: flex !important;
+  flex-direction: column;
+  gap: 4px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 16px 18px !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_card .award_card_title > * {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_card .award_card_year {
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_card .award_card_voted {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 4px !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 600 !important;
+}
+
+html.se-store-awards:not(#se-none) .steamawards_card .award_card_youvoted_txt {
+  color: var(--se-gold) !important;
+}
+
+/* ---------- One award ---------- */
+
+html.se-store-awards:not(#se-none) .steamaward_categories_ctn {
+  display: flex !important;
+  flex-direction: column;
+  gap: 24px;
+  width: auto !important;
+  margin: 0 0 24px !important;
+  padding: 0 !important;
+}
+
+html.se-store-awards:not(#se-none) .vote_category_bg {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-store-awards:not(#se-none) .vote_category_ctn {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  padding: 32px !important;
+  /* 2021 draws a black frame round each award; the hairline ring replaces it. */
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-md);
+}
+
+/* Title and blurb beside the winner. */
+html.se-store-awards:not(#se-none) .vote_category_ctn .category_top_row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 460px);
+  align-items: start;
+  gap: 32px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* The title block; the trophy rides beside it where there is one (below). */
+html.se-store-awards:not(#se-none) .vote_category_ctn .category_title_ctn {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Room for the trophy badge only where the award has one (2020 shows none). */
+html.se-store-awards:not(#se-none) .vote_category_ctn:has(.category_winner_trophy) .category_title_ctn {
+  min-height: 96px;
+  padding-left: 112px !important;
+}
+
+html.se-store-awards:not(#se-none) .vote_category_ctn .category_year {
+  width: auto !important;
+  margin: 0 !important;
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+  line-height: 1.2 !important;
+}
+
+html.se-store-awards:not(#se-none) .vote_category_ctn .category_title {
+  width: auto !important;
+  margin: 0 !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-headline) !important;
+  font-weight: 800 !important;
+  letter-spacing: -.02em !important;
+  line-height: 1.15 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html.se-store-awards:not(#se-none) .vote_category_ctn .category_desc {
+  width: auto !important;
+  max-width: 640px;
+  margin: 4px 0 0 !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 400 !important;
+  line-height: 1.6 !important;
+}
+
+html.se-store-awards:not(#se-none) .vote_category_ctn .category_winner_ctn {
+  position: static !important;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* The winner: art tile, then "Winner" and the name. */
+/* Static, so the trophy inside it places from the award card, not from the art. */
+html.se-store-awards:not(#se-none) .category_winner_ctn > a {
+  position: static !important;
+  display: flex !important;
+  flex-direction: column;
+  gap: 12px;
+  width: auto !important;
+  height: auto !important;
+  text-decoration: none !important;
+}
+
+html.se-store-awards:not(#se-none) .category_winner_ctn > a > img:not(.category_winner_trophy) {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 460 / 215;
+  object-fit: cover;
+  border-radius: var(--se-radius-lg);
+  box-shadow: var(--se-shadow-md);
+  transition: translate var(--se-dur) var(--se-ease);
+}
+
+html.se-store-awards:not(#se-none) .category_winner_ctn > a:hover > img:not(.category_winner_trophy) {
+  translate: 0 -3px;
+}
+
+html.se-store-awards:not(#se-none) .category_winner_ctn .winner_description_ctn {
+  position: static !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-awards:not(#se-none) .category_winner_ctn .winner_header {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px !important;
+  border-radius: var(--se-radius-pill);
+  background: rgba(240, 192, 96, .14) !important;
+  color: var(--se-gold) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .02em !important;
+  line-height: 1 !important;
+  text-transform: none !important;
+}
+
+html.se-store-awards:not(#se-none) .category_winner_ctn .winner_header::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  background: currentColor;
+  -webkit-mask: var(--se-star-mask) center / contain no-repeat;
+  mask: var(--se-star-mask) center / contain no-repeat;
+}
+
+html.se-store-awards:not(#se-none) .category_winner_ctn .winner_name {
+  width: auto !important;
+  margin: 0 !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/* The trophy: a badge on the card's top-left, beside the title. */
+html.se-store-awards:not(#se-none) .vote_category_ctn .category_winner_trophy {
+  position: absolute !important;
+  top: 32px !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: 32px !important;
+  z-index: 1;
+  width: 88px !important;
+  height: 88px !important;
+  margin: 0 !important;
+  padding: 8px;
+  box-sizing: border-box;
+  object-fit: contain;
+  border-radius: var(--se-radius-lg);
+  background: radial-gradient(circle at 50% 40%, rgba(240, 192, 96, .2), transparent 70%), var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  transform: none !important;
+}
+
+/* Nominees: a row of tiles; Steam greys the ones that didn't win. */
+html.se-store-awards:not(#se-none) .vote_category_ctn .category_nominations_ctn {
+  /* A wrapping row: the nominees share its whole width, however many there are; the footer
+     takes a line of its own. */
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 14px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 20px 0 0 !important;
+  box-shadow: inset 0 1px 0 var(--se-hairline);
+}
+
+html.se-store-awards:not(#se-none) .category_nominations_ctn > div.category_nomination {
+  position: relative !important;
+  flex: 1 1 160px;
+  min-width: 0;
+  max-width: none !important;
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transition: opacity var(--se-dur);
+}
+
+html.se-store-awards:not(#se-none) .category_nominations_ctn > div.category_nomination.grayed_out_nomination {
+  opacity: .55 !important;
+}
+
+html.se-store-awards:not(#se-none) .category_nominations_ctn > div.category_nomination:hover,
+html.se-store-awards:not(#se-none) .category_nominations_ctn > div.category_nomination:has(> div[data-se-vote]) {
+  opacity: 1 !important;
+}
+
+html.se-store-awards:not(#se-none) .category_nominations_ctn img.category_nomination {
+  box-sizing: border-box;
+  padding: 0 !important;
+  border: 0 !important;
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: auto !important;
+  aspect-ratio: 460 / 215;
+  margin: 0 !important;
+  object-fit: cover;
+  border-radius: var(--se-radius-md);
+  filter: none !important;
+  box-shadow: var(--se-shadow-md);
+}
+
+/* 2019–2021 mark the winning nominee (.currently_featured_app): taller, its art padded and
+   framed. The winner already leads the award above, so here it's a nominee like the rest. */
+html.se-store-awards:not(#se-none) .category_nominations_ctn > div.currently_featured_app {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+html.se-store-awards:not(#se-none) .category_nominations_ctn > div.currently_featured_app :is(.nomination_app_link, img.category_nomination) {
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: none !important;
+}
+
+/* Steam's link holds the art at its old 181px; it fills the tile instead. */
+html.se-store-awards:not(#se-none) .category_nominations_ctn .nomination_app_link {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* The line under each nominee is Steam's vote label: on every nominee, shown only on the one
+   you picked. steam-awards/page.js marks the one actually showing text ([data-se-vote]); it
+   becomes a glass chip on the art's corner, the rest stay hidden. */
+html.se-store-awards:not(#se-none) .category_nominations_ctn > div.category_nomination > div {
+  display: none !important;
+}
+
+html.se-store-awards:not(#se-none) .category_nominations_ctn > div.category_nomination > div[data-se-vote] {
+  position: absolute !important;
+  top: 8px !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: 8px !important;
+  transform: none !important;
+  z-index: 2;
+  display: inline-flex !important;
+  align-items: center;
+  height: 22px;
+  margin: 0 !important;
+  padding: 0 9px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  color: var(--se-white) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  pointer-events: none;
+}
+
+/* "Next Award: …" as a pill at the row's end. */
+html.se-store-awards:not(#se-none) .category_nominations_footer {
+  flex: 1 0 100%;
+  display: flex !important;
+  justify-content: flex-end;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-awards:not(#se-none) .category_nominations_footer button {
+  height: 36px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-awards:not(#se-none) .category_nominations_footer button > span {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  height: 100% !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  line-height: 1 !important;
+  text-transform: none !important;
+}
+
+html.se-store-awards:not(#se-none) .category_nominations_footer button > span > span {
+  color: var(--se-white) !important;
+}
+
+html.se-store-awards:not(#se-none) .category_nominations_footer button:hover {
+  background: var(--se-hover) !important;
+}
+
+/*
+ * Awards whose nominees aren't games (Best Developer: studios' square logos), marked
+ * [data-se-avatars] by steam-awards/page.js: square tiles with Steam's label under each (the
+ * studio's name, or "Your Vote" on yours), and the winner's logo as a square beside its name
+ * rather than stretched to game-art width.
+ */
+html.se-store-awards:not(#se-none) [data-se-avatars] .category_nominations_ctn > div.category_nomination {
+  flex: 1 1 120px;
+  max-width: 200px !important;
+  align-items: center;
+  text-align: center;
+}
+
+html.se-store-awards:not(#se-none) [data-se-avatars] .category_nominations_ctn img.category_nomination {
+  aspect-ratio: 1 !important;
+  border-radius: var(--se-radius-lg);
+}
+
+html.se-store-awards:not(#se-none) [data-se-avatars] .category_nominations_ctn > div.category_nomination > div {
+  position: static !important;
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  text-align: center !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-store-awards:not(#se-none) [data-se-avatars] .category_nominations_ctn > div.category_nomination > div span {
+  position: static !important;
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+}
+
+html.se-store-awards:not(#se-none) [data-se-avatars] .category_winner_ctn > a {
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
+}
+
+html.se-store-awards:not(#se-none) [data-se-avatars] .category_winner_ctn > a > img:not(.category_winner_trophy) {
+  flex: none;
+  width: 140px !important;
+  aspect-ratio: 1 !important;
+}
+
+/* Game art steam-awards/page.js swapped for the 616x353 capsule ([data-se-hires]): tiles
+   take that capsule's ratio, so nothing of it is cropped. */
+html.se-store-awards:not(#se-none) img[data-se-hires] {
+  aspect-ratio: 616 / 353 !important;
+}
+
+/* ---------- FAQ ----------
+ * "Frequently Asked Questions" (.faq_section: a blue gradient band, two floated columns of
+ * questions): the page colour, the section title in the theme's style, and the two columns
+ * ("Voting FAQ", "Trading Card FAQ") as cards side by side, each question over its answer
+ * with a hairline between entries.
+ */
+html.se-store-awards:not(#se-none) .steamawards_page .faq_section {
+  margin: 0 !important;
+  padding: 56px 0 72px !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+}
+
+html.se-store-awards:not(#se-none) .faq_section .page_content {
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+html.se-store-awards:not(#se-none) .faq_section .faq_qa_intro {
+  margin: 0 0 20px !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+html.se-store-awards:not(#se-none) .faq_section .faq_qa_intro h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+  line-height: 1.25 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html.se-store-awards:not(#se-none) .faq_section .badge_tasks {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 24px;
+  align-items: start;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-awards:not(#se-none) .faq_section .badge_tasks > :not(.badge_tasks_left, .badge_tasks_right) {
+  display: none !important;
+}
+
+html.se-store-awards:not(#se-none) .faq_section :is(.badge_tasks_left, .badge_tasks_right) {
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 8px 24px !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-awards:not(#se-none) .faq_section :is(.badge_tasks_left, .badge_tasks_right) > br {
+  display: none;
+}
+
+html.se-store-awards:not(#se-none) .faq_section h3 {
+  margin: 16px 0 4px !important;
+  padding: 0 !important;
+  color: var(--se-gold) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+  text-shadow: none !important;
+}
+
+html.se-store-awards:not(#se-none) .faq_section .faqentry {
+  margin: 0 !important;
+  padding: 16px 0 !important;
+  background: none !important;
+}
+
+html.se-store-awards:not(#se-none) .faq_section .faqentry + .faqentry {
+  box-shadow: inset 0 1px 0 var(--se-hairline);
+}
+
+html.se-store-awards:not(#se-none) .faq_section .faq_q {
+  margin: 0 0 6px !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  text-transform: none !important;
+}
+
+html.se-store-awards:not(#se-none) .faq_section .faq_a {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 400 !important;
+  line-height: 1.6 !important;
+}
+
+html.se-store-awards:not(#se-none) .faq_section .faq_a a {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+html.se-store-awards:not(#se-none) .faq_section .faq_a a:hover {
+  color: var(--se-white) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.se-store-awards:not(#se-none) .results_carousel :is(.winner, .runnerup, .winner img, .runnerup img) {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+ * 2022 on: the React store's awards page (html.se-store-awards-react, set by
+ * steam-awards/page.js once it renders). Every class is a hash (live store CSS of
+ * 2026-11-09): the purple gradient page, a header over the year's art, the chat-sticker
+ * strip, one block per award over its own art (heading, blurb, "Show Finalists", the
+ * winner's capsule) and the FAQ. Restyled like the other years: the page colour, a header
+ * card, each award as a card with its art as a faint backdrop, the winner as an art tile with
+ * the gold "Winner" chip, and the FAQ as cards.
+ * ========================================================================== */
+
+html.se-store-awards-react:not(#se-none),
+html.se-store-awards-react:not(#se-none) body,
+html.se-store-awards-react:not(#se-none) .P0s12fkKEIs- {
+  background: var(--se-bg) !important;
+}
+
+html.se-store-awards-react:not(#se-none) .P0s12fkKEIs- {
+  color: var(--se-text-dim) !important;
+}
+
+/* ---------- Header ---------- */
+
+html.se-store-awards-react:not(#se-none) .-cTSKfskpos- {
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) .-cTSKfskpos-::before,
+html.se-store-awards-react:not(#se-none) .-cTSKfskpos-::after {
+  display: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) .MvsY4Bq8ols- {
+  box-sizing: border-box;
+  height: auto !important;
+  margin: 24px auto 24px !important;
+  padding: clamp(28px, 3vw, 44px) !important;
+  border-radius: var(--se-radius-xl);
+  background: radial-gradient(80% 120% at 0% 0%, rgba(240, 192, 96, .08), transparent 60%), var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg);
+}
+
+html.se-store-awards-react:not(#se-none) .w7LPBEGPUek- {
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  width: auto !important;
+  max-width: 760px;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) .w7LPBEGPUek- > * {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-awards-react:not(#se-none) .vq-TV5hiXq4- {
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-hero) !important;
+  font-weight: 800 !important;
+  letter-spacing: -.03em !important;
+  line-height: 1 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/* "PRESENTING YOUR WINNERS!": the gold eyebrow above the title. */
+html.se-store-awards-react:not(#se-none) .nRkGEBQPS4M-.DERH3pnJH54- {
+  order: -1;
+  display: inline-flex !important;
+  align-items: center;
+  height: 26px !important;
+  padding: 0 12px !important;
+  border-radius: var(--se-radius-pill);
+  background: rgba(240, 192, 96, .14) !important;
+  color: var(--se-gold) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store-awards-react:not(#se-none) .nRkGEBQPS4M-:not(.DERH3pnJH54-) {
+  max-width: 620px;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 400 !important;
+  line-height: 1.6 !important;
+  text-transform: none !important;
+}
+
+/* ---------- Stickers strip ---------- */
+
+html.se-store-awards-react:not(#se-none) .r4VTHrw5rtA- {
+  background: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) .zUohhAMbsyY- {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  box-sizing: border-box;
+  height: auto !important;
+  margin: 0 auto 40px !important;
+  padding: 20px 24px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-awards-react:not(#se-none) .WmRawSTgG5g- {
+  margin: 0 !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+}
+
+html.se-store-awards-react:not(#se-none) .Jl9fHos2os0- {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: auto !important;
+}
+
+/* ---------- Awards ---------- */
+
+/* The awards span the page column like the header and stickers cards (Steam insets them). */
+html.se-store-awards-react:not(#se-none) #Categories {
+  display: flex !important;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  height: auto !important;
+  margin: 0 auto 56px !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) #Categories > .Panel {
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  translate: none !important;
+}
+
+/* One award: a card with its art as a faint backdrop. */
+html.se-store-awards-react:not(#se-none) .nq--NajqR5k- {
+  position: relative !important;
+  inset: auto !important;
+  isolation: isolate;
+  /* Steam slides each award in from the side and leaves it offset; it sits in line instead. */
+  width: auto !important;
+  max-width: none !important;
+  transform: none !important;
+  translate: none !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-md);
+}
+
+html.se-store-awards-react:not(#se-none) .nq--NajqR5k- .HTGoPvAVSu8- {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -1;
+  width: auto !important;
+  height: auto !important;
+  background-position: center !important;
+  background-size: cover !important;
+  opacity: .22;
+  -webkit-mask: linear-gradient(to right, #000 0%, transparent 75%);
+  mask: linear-gradient(to right, #000 0%, transparent 75%);
+}
+
+/* Steam's glow strip, wider than the page. */
+html.se-store-awards-react:not(#se-none) .nq--NajqR5k- ._2bRaIO4Dr5I- {
+  display: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) .WwSX9zRNtRc- {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 520px);
+  align-items: center;
+  gap: 32px;
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 32px !important;
+  background: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) ._04YnfX662G4- {
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) .HkMLGz3ygk4- {
+  display: flex !important;
+  flex-direction: column;
+  gap: 8px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-awards-react:not(#se-none) .yMTtqxdIyFc- {
+  width: auto !important;
+  margin: 0 !important;
+  color: var(--se-text-faint) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+  line-height: 1.2 !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store-awards-react:not(#se-none) .CHImQyHvMqI- {
+  width: auto !important;
+  margin: 0 !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-headline) !important;
+  font-weight: 800 !important;
+  letter-spacing: -.02em !important;
+  line-height: 1.15 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) ._7EmD5ERShQY- {
+  width: auto !important;
+  max-width: 640px;
+  height: auto !important;
+  max-height: none !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  color: var(--se-text-muted) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 400 !important;
+  line-height: 1.6 !important;
+}
+
+/* "Show Finalists": the theme's pill, under the blurb (Steam pushes it to the far end). */
+html.se-store-awards-react:not(#se-none) ._04YnfX662G4- .DialogButton {
+  position: static !important;
+  align-self: flex-start !important;
+  float: none !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 36px !important;
+  margin: 4px 0 0 !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-awards-react:not(#se-none) ._04YnfX662G4- .DialogButton:is(:hover, :focus-visible) {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+/* The winner: the capsule as a rounded art tile, "Winner" as a gold chip on its corner. */
+html.se-store-awards-react:not(#se-none) .uGz-NI-yWYM-,
+html.se-store-awards-react:not(#se-none) .kKJRutf6pAo- {
+  position: relative !important;
+  inset: auto !important;
+  justify-self: stretch;
+  /* Steam scales the winner down inside its column; it fills the column instead. */
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  transform: none !important;
+  translate: none !important;
+  scale: none !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) .kKJRutf6pAo- {
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+  box-shadow: var(--se-shadow-md);
+  transition: translate var(--se-dur) var(--se-ease);
+}
+
+html.se-store-awards-react:not(#se-none) .kKJRutf6pAo-:hover {
+  translate: 0 -3px;
+}
+
+html.se-store-awards-react:not(#se-none) .kKJRutf6pAo- > a {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+  transform: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) .kKJRutf6pAo- img {
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+  aspect-ratio: 616 / 353;
+  object-fit: cover;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+html.se-store-awards-react:not(#se-none) .kKJRutf6pAo-::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  pointer-events: none;
+}
+
+html.se-store-awards-react:not(#se-none) .rSEHbCmQM2s- {
+  position: absolute !important;
+  top: 12px !important;
+  left: 12px !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 4;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  width: auto !important;
+  height: 26px !important;
+  margin: 0 !important;
+  padding: 0 11px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line) !important;
+  color: var(--se-gold) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 700 !important;
+  letter-spacing: .02em !important;
+  line-height: 1 !important;
+  text-transform: none !important;
+  transform: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) .rSEHbCmQM2s-::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  background: currentColor;
+  -webkit-mask: var(--se-star-mask) center / contain no-repeat;
+  mask: var(--se-star-mask) center / contain no-repeat;
+}
+
+/* ---------- FAQ ---------- */
+
+html.se-store-awards-react:not(#se-none) ._3-phieokkrw- {
+  height: auto !important;
+  margin: 0 auto 72px !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) .fgP1V-Un4bE- {
+  margin: 0 0 20px !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+  text-transform: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) .WR9SXDHNA3I- {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 600px), 1fr));
+  gap: 16px;
+  height: auto !important;
+}
+
+html.se-store-awards-react:not(#se-none) ._0H-xu92LdYE- {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 18px 22px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-awards-react:not(#se-none) .ZXN6hW5Lex4- {
+  margin: 0 0 6px !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  text-transform: none !important;
+}
+
+html.se-store-awards-react:not(#se-none) .i5XsEuAlH74- {
+  margin: 0 !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 400 !important;
+  line-height: 1.6 !important;
+}
+
+html.se-store-awards-react:not(#se-none) .i5XsEuAlH74- a {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.se-store-awards-react:not(#se-none) .kKJRutf6pAo- {
+    transition: none;
+  }
+}

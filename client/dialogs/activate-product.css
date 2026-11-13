@@ -1,0 +1,499 @@
+/*
+ * Activate a Product (styles for client/dialogs/activate-product.js).
+ *
+ * Without the script the dialog already reads as the theme's: one 500 px column in place of
+ * Steam's fixed 564/600 px widths (the modal frame shrinks to it and scrolls in a short window),
+ * a large monospace code field and the examples in a framed card. Once the script has built the
+ * view ([data-se-ap-built] on the dialog) the examples give way to labelled
+ * format rows, and [data-se-ap] names the view on screen. Icons stay neutral; text carries tone.
+ *
+ * Size: a fixed 520 px column (never a stretchy width), and EnterCode about as tall as Steam's
+ * own (~400 px).
+ *
+ * EnterCode, one column:
+ *   [ Enter your product code                        ]
+ *   [ By entering your code you will be registering… ]
+ *   [ (key)  XXXXX-XXXXX-XXXXX                   (×) ]
+ *   [ (✓) Standard key format · 15 characters  Enter ]
+ *   [ Standard key   AAAAA-BBBBB-CCCCC           15 ]
+ *   [ Extended key   AAAAA-…-EEEEE               25 ]
+ *   [ Retail CD/DVD  237ABCDGHJLPRST 23          17 ]
+ *   [                             Confirm ][ Cancel  ]
+ *
+ * ActivateProductDialog _2siQZCB9yAOkiG8N-zRZEe, HeaderContainer _2IWpfqj8UL5hUs7n-pxnUy,
+ * InfoIconContainer _3sqYFYR9Cl3T6Iy-0a3EJ2, ProductActivationInfoContainerDesktop
+ * _2V8QeCkR06XqFUJO_GDTVP, InfoBody _1fFighONx9alttArw-qWFo, InfoExampleHeader
+ * _3kLa_RUiNSrm_Nr6tz7blu, InfoExample _2sEmBD0BnXW-eo2PlLcaLV, CodeInput _2JbjuHCSB0QxUPIMEQbqAi,
+ * SSAPopupContainer _1owkFCglLGehIqHVK5lK9M, AgreementPrompt _2YRcWxZcevUI1t94cXgVax,
+ * SSAContainer _3m3ry1aX6zf5f8KT9_7RU5, ResultBody _1aSkOCX_EmlK4A7z7HBIj,
+ * ResultAcceptButton _2Zs0BojLb-Un2w18hzddNl, ProductName _2yUw38WTqPyZaPo3WENI46.
+ *
+ * Big Picture (.GamepadMode) keeps Steam's dialog.
+ */
+
+._2siQZCB9yAOkiG8N-zRZEe:not(.GamepadMode *):not(#se-none) {
+  --ap-good: #67d48a;
+  --ap-mono: "Cascadia Mono", "Cascadia Code", Consolas, "SFMono-Regular", ui-monospace, monospace;
+  /*
+   * Shrink to the column, never stretch: Steam measures the dialog in an unconstrained host
+   * before showing it, and a stretched width there reads as "too wide" and pops it out
+   */
+  width: fit-content !important;
+  max-width: none !important;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+/* The column's width; the dialog and Steam's modal frame shrink to it */
+._2siQZCB9yAOkiG8N-zRZEe:not(.GamepadMode *) > .DialogContent_InnerWidth:not(#se-none) {
+  box-sizing: border-box;
+  width: 520px;
+  max-width: none;
+  min-width: 0;
+}
+
+/* ---------- EnterCode: one column ---------- */
+
+._2siQZCB9yAOkiG8N-zRZEe:not(.GamepadMode *) :is(.se-ap-form, div:has(> ._2IWpfqj8UL5hUs7n-pxnUy)):not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* The info card's parts join the column, so the description can sit under the title */
+._2siQZCB9yAOkiG8N-zRZEe:not(.GamepadMode *) ._2V8QeCkR06XqFUJO_GDTVP:not(#se-none) {
+  display: contents;
+}
+
+/* Title row: Steam's heading */
+._2siQZCB9yAOkiG8N-zRZEe:not(.GamepadMode *) ._2IWpfqj8UL5hUs7n-pxnUy:not(#se-none) {
+  order: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: auto;
+  margin: 0 0 6px;
+  padding: 0;
+  gap: 10px;
+}
+
+._2siQZCB9yAOkiG8N-zRZEe:not(.GamepadMode *) ._2IWpfqj8UL5hUs7n-pxnUy > .DialogHeader:not(#se-none) {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Description: under the title */
+._2siQZCB9yAOkiG8N-zRZEe:not(.GamepadMode *) ._1fFighONx9alttArw-qWFo:not(#se-none) {
+  order: 2;
+  max-width: none;
+  margin: 0 0 14px;
+  padding: 0;
+  text-align: start;
+  font: 400 13px/1.5 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+/* ---------- Code field ---------- */
+
+._2siQZCB9yAOkiG8N-zRZEe:not(.GamepadMode *) .DialogInput_Wrapper:has(._2JbjuHCSB0QxUPIMEQbqAi):not(#se-none) {
+  order: 3;
+  position: relative;
+  width: auto;
+  margin: 0 !important;
+}
+
+._2siQZCB9yAOkiG8N-zRZEe:not(.GamepadMode *) input._2JbjuHCSB0QxUPIMEQbqAi:not(#se-none) {
+  box-sizing: border-box;
+  width: 100%;
+  height: 44px;
+  padding-inline: 46px 46px !important;
+  border-radius: var(--se-radius-md) !important;
+  font: 600 16px/1 var(--ap-mono) !important;
+  letter-spacing: .14em !important;
+  text-transform: uppercase;
+  color: var(--se-text-strong) !important;
+  caret-color: var(--se-accent);
+  outline: none !important;
+}
+
+._2siQZCB9yAOkiG8N-zRZEe:not(.GamepadMode *) input._2JbjuHCSB0QxUPIMEQbqAi::placeholder {
+  color: var(--se-white-14);
+  letter-spacing: .14em;
+}
+
+/* Field ring follows the status: green on a known format, amber on an unusual one */
+._2siQZCB9yAOkiG8N-zRZEe:has(.se-ap-status[data-tone="ok"]) input._2JbjuHCSB0QxUPIMEQbqAi:not(#se-none):not(#se-none) {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ap-good) 55%, transparent), 0 0 0 3px color-mix(in srgb, var(--ap-good) 14%, transparent) !important;
+}
+
+._2siQZCB9yAOkiG8N-zRZEe:has(.se-ap-status[data-tone="unusual"]) input._2JbjuHCSB0QxUPIMEQbqAi:focus:not(#se-none):not(#se-none) {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-warning) 50%, transparent), 0 0 0 3px color-mix(in srgb, var(--se-warning) 12%, transparent) !important;
+}
+
+.se-ap-glyph {
+  position: absolute;
+  inset-inline-start: 16px;
+  top: 50%;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  translate: 0 -50%;
+  color: var(--se-text-faint);
+  pointer-events: none;
+  transition: color var(--se-dur) ease-out;
+}
+
+.DialogInput_Wrapper:focus-within > .se-ap-glyph {
+  color: var(--se-text-dim);
+}
+
+button.se-ap-clear:not(#se-none) {
+  position: absolute;
+  inset-inline-end: 12px;
+  top: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: transparent;
+  color: var(--se-text-faint);
+  cursor: pointer;
+  translate: 0 -50%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--se-dur) ease-out, visibility 0s linear var(--se-dur), background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+._2siQZCB9yAOkiG8N-zRZEe[data-se-ap-filled] button.se-ap-clear:not(#se-none) {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+button.se-ap-clear:not(#se-none):hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+button.se-ap-clear svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- Status ---------- */
+
+.se-ap-status {
+  order: 4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 18px;
+  margin: 8px 2px 14px;
+  font: 500 12.5px/1.3 var(--se-font);
+  color: var(--se-text-faint);
+  transition: color var(--se-dur) ease-out;
+}
+
+.se-ap-status > svg {
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  color: var(--se-text-faint); /* icons stay neutral: the text carries the tone */
+}
+
+.se-ap-status-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.se-ap-status-meta {
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-faint);
+}
+
+.se-ap-status-meta:not(:empty)::before {
+  content: '·';
+  margin-inline-end: 8px;
+}
+
+.se-ap-status[data-tone="partial"] {
+  color: var(--se-text-dim);
+}
+
+.se-ap-status[data-tone="ok"] {
+  color: var(--ap-good);
+}
+
+.se-ap-status[data-tone="unusual"] {
+  color: var(--se-warning);
+}
+
+.se-ap-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-inline-start: auto;
+  font-weight: 500;
+  color: var(--se-text-faint);
+  opacity: 0;
+  transition: opacity var(--se-dur) ease-out;
+}
+
+.se-ap-status:is([data-tone="ok"], [data-tone="unusual"]) .se-ap-hint {
+  opacity: 1;
+}
+
+.se-ap-hint kbd {
+  padding: 2px 6px;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-white-04);
+  box-shadow: inset 0 0 0 1px var(--se-white-10), inset 0 -1px 0 var(--se-white-10);
+  font: 600 11px/1.2 var(--se-font);
+  color: var(--se-text-dim);
+}
+
+/* ---------- Formats ---------- */
+
+/* Steam's "Example product codes" label: the labelled rows say it (and keep the dialog short) */
+._2siQZCB9yAOkiG8N-zRZEe:not(.GamepadMode *) ._3kLa_RUiNSrm_Nr6tz7blu:not(#se-none) {
+  display: none !important;
+}
+
+/* Built: the cards stand in for Steam's sample lines */
+._2siQZCB9yAOkiG8N-zRZEe[data-se-ap-built] ._2sEmBD0BnXW-eo2PlLcaLV {
+  display: none !important;
+}
+
+/* Unbuilt: Steam's sample lines, monospace, in one framed card */
+._2siQZCB9yAOkiG8N-zRZEe:not([data-se-ap-built]):not(.GamepadMode *) ._2sEmBD0BnXW-eo2PlLcaLV:not(#se-none) {
+  order: 6;
+  padding: 4px 14px;
+  background: var(--se-bg);
+  font: 500 12.5px/1.6 var(--ap-mono) !important;
+  letter-spacing: .06em !important;
+  text-transform: none;
+  color: var(--se-text-muted) !important;
+}
+
+._2siQZCB9yAOkiG8N-zRZEe:not([data-se-ap-built]):not(.GamepadMode *) ._3kLa_RUiNSrm_Nr6tz7blu + ._2sEmBD0BnXW-eo2PlLcaLV:not(#se-none) {
+  padding-top: 10px;
+  border-start-start-radius: var(--se-radius-md);
+  border-start-end-radius: var(--se-radius-md);
+}
+
+._2siQZCB9yAOkiG8N-zRZEe:not([data-se-ap-built]):not(.GamepadMode *) ._2sEmBD0BnXW-eo2PlLcaLV:last-child:not(#se-none) {
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-end-start-radius: var(--se-radius-md);
+  border-end-end-radius: var(--se-radius-md);
+}
+
+.se-ap-formats {
+  order: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 0 16px;
+  padding: 3px;
+  border-radius: var(--se-radius-ml);
+  background: var(--se-bg);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+/* One row per format: label | sample | length */
+.se-ap-format {
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 14px;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: var(--se-radius-sm);
+  cursor: text;
+  transition: background-color var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out, opacity var(--se-dur) ease-out;
+}
+
+.se-ap-format-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 12.5px/1.2 var(--se-font);
+  color: var(--se-text);
+}
+
+.se-ap-format-code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 500 12.5px/1.3 var(--ap-mono);
+  letter-spacing: .04em;
+  color: var(--se-text-muted);
+}
+
+.se-ap-format-len {
+  font: 500 11.5px/1.2 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-faint);
+}
+
+.se-ap-format[data-state="possible"] {
+  background: var(--se-white-04);
+}
+
+.se-ap-format[data-state="possible"] .se-ap-format-label {
+  color: var(--se-accent);
+}
+
+.se-ap-format[data-state="match"] {
+  background: color-mix(in srgb, var(--ap-good) 10%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ap-good) 35%, transparent);
+}
+
+.se-ap-format[data-state="match"] .se-ap-format-label {
+  color: var(--ap-good);
+}
+
+.se-ap-format[data-state="muted"] {
+  opacity: .4;
+}
+
+/* Footer (and anything else Steam adds) last */
+._2siQZCB9yAOkiG8N-zRZEe:not(.GamepadMode *) :is(.se-ap-form, div:has(> ._2IWpfqj8UL5hUs7n-pxnUy)) > :not(._2IWpfqj8UL5hUs7n-pxnUy, ._2V8QeCkR06XqFUJO_GDTVP, .DialogInput_Wrapper, .se-ap-status):not(#se-none) {
+  order: 9;
+}
+
+/* ---------- Results ---------- */
+
+._2siQZCB9yAOkiG8N-zRZEe:is([data-se-ap="success"], [data-se-ap="failure"], [data-se-ap="result"]):not(#se-none) {
+  text-align: center;
+}
+
+._2siQZCB9yAOkiG8N-zRZEe:is([data-se-ap="success"], [data-se-ap="failure"], [data-se-ap="result"]) .DialogHeader:not(#se-none) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 6px 0 10px !important;
+  text-align: center;
+  font: 700 20px/1.35 var(--se-font) !important;
+}
+
+/* Badge over the headline: a neutral disc (::before) under its glyph (::after) */
+._2siQZCB9yAOkiG8N-zRZEe:is([data-se-ap="success"], [data-se-ap="failure"], [data-se-ap="result"]) .DialogHeader::before {
+  content: '';
+  width: 64px;
+  height: 64px;
+  margin-bottom: 18px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-04);
+  box-shadow: inset 0 0 0 1px var(--se-white-10);
+}
+
+._2siQZCB9yAOkiG8N-zRZEe:is([data-se-ap="success"], [data-se-ap="failure"], [data-se-ap="result"]) .DialogHeader::after {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  translate: -50% 0;
+  background: var(--se-text-dim);
+  -webkit-mask: var(--ap-glyph) center / contain no-repeat;
+}
+
+._2siQZCB9yAOkiG8N-zRZEe[data-se-ap="success"] {
+  --ap-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='8' width='18' height='12' rx='2.5' fill='black' fill-opacity='.3' stroke='none'/%3E%3Crect x='3' y='8' width='18' height='12' rx='2.5'/%3E%3Cpath d='M7 8V6.5A2.5 2.5 0 0 1 9.5 4h5A2.5 2.5 0 0 1 17 6.5V8M9 14l2 2 4-4'/%3E%3C/svg%3E");
+}
+
+._2siQZCB9yAOkiG8N-zRZEe:is([data-se-ap="failure"], [data-se-ap="result"]) {
+  --ap-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5' fill='black' fill-opacity='.3' stroke='none'/%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7.6v5.2M12 16.2v.2'/%3E%3C/svg%3E");
+}
+
+._2siQZCB9yAOkiG8N-zRZEe[data-se-ap="success"] ._2yUw38WTqPyZaPo3WENI46 {
+  color: var(--se-accent);
+}
+
+._2siQZCB9yAOkiG8N-zRZEe ._1aSkOCX_EmlK4A7z7HBIj:not(#se-none) {
+  max-width: 42ch;
+  margin: 0 auto 24px;
+  text-align: center;
+  font: 400 13.5px/1.55 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+._2siQZCB9yAOkiG8N-zRZEe button._2Zs0BojLb-Un2w18hzddNl:not(#se-none) {
+  display: block;
+  width: auto;
+  min-width: 180px;
+  margin: 0 auto 4px !important;
+  padding-inline: 24px;
+}
+
+/* ---------- Busy ---------- */
+
+._2siQZCB9yAOkiG8N-zRZEe[data-se-ap="busy"]:not(#se-none) {
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+}
+
+/* ---------- Subscriber Agreement ---------- */
+
+._2siQZCB9yAOkiG8N-zRZEe ._2YRcWxZcevUI1t94cXgVax:not(#se-none) {
+  margin: 4px 0 14px;
+  color: var(--se-text-muted) !important;
+}
+
+._2siQZCB9yAOkiG8N-zRZEe ._3m3ry1aX6zf5f8KT9_7RU5:not(#se-none) {
+  max-height: min(46vh, 420px);
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-bg);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  overflow-y: auto;
+  font: 400 12.5px/1.6 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+._2siQZCB9yAOkiG8N-zRZEe ._3m3ry1aX6zf5f8KT9_7RU5 :is(h1, h2, h3, h4, strong, b) {
+  color: var(--se-text);
+}
+
+._2siQZCB9yAOkiG8N-zRZEe ._3m3ry1aX6zf5f8KT9_7RU5 a {
+  color: var(--se-accent);
+}
+
+/* ---------- Icons ---------- */
+
+.se-ap svg,
+.se-ap.se-ap-glyph {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.se-ap svg .d,
+.se-ap.se-ap-glyph .d {
+  fill: currentColor;
+  fill-opacity: .3;
+  stroke: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-ap,
+  .se-ap *,
+  ._2siQZCB9yAOkiG8N-zRZEe input._2JbjuHCSB0QxUPIMEQbqAi {
+    transition: none !important;
+  }
+}

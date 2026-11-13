@@ -1,0 +1,10 @@
+/*
+ * Images that have nothing to show yet draw as nothing, keeping their box, so the browser's
+ * broken-image icon never shows:
+ * - [data-se-img-broken]: a failed image, until a source loads (core/images.js, any image);
+ * - [data-se-art-wait]: theme art still working through its copies (local, then the CDN)
+ *   until one loads (client/home/home-stage.js, client/library/collections.js).
+ */
+img:is([data-se-img-broken], [data-se-art-wait]) {
+  visibility: hidden !important;
+}

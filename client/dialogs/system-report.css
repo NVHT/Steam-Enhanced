@@ -1,0 +1,1091 @@
+/*
+ * System Report, as built by client/dialogs/system-report.js. Applies only once the script has
+ * built the layout ([data-se-sysreport]); until then utility/base.css gives the stock dialog the
+ * theme's title and footer.
+ *
+ * Layout (900 × 800 window, resizable down to 600 × 300):
+ *   [ title ................................................. ]
+ *   [ description: Steam's status line ...................... ]
+ *   [ spec tiles: processor, graphics, memory, system ....... ]
+ *   [ chips ......................... ][ filter ][ ⇕ ][ Details | Raw ]
+ *   [ section cards, or the raw report (scrolls) ............ ]
+ *   [ maker · entries · size ][ ......... ][ Submit ][ Copy ][ Close ]
+ * SystemReportDialog _2TAQYpbxatDYN3Ex76KX5u, SystemReportContainer _7jaC6UFFrvcKq2UlJr1Pb.
+ * Every element from the root to DialogBody carries [data-se-sysreport-chain] and fills its parent.
+ */
+
+/* Steam centres dialog content: stretch it to the window instead */
+[data-se-sysreport]:not(#se-none) {
+  align-items: stretch;
+  justify-content: flex-start;
+  white-space: normal;
+}
+
+[data-se-sysreport-chain]:not(#se-none) {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+[data-se-sysreport] .DialogBody[data-se-sysreport-chain]:not(#se-none) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto;
+  column-gap: 16px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+[data-se-sysreport] .DialogBody > .DialogBodyText:not(#se-none) {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Steam's status line ("has gathered…", "please wait…", "Uploading…") under the title */
+[data-se-sysreport] .DialogBodyText > div[id]:not(#se-none) {
+  display: block;
+  flex: none;
+  margin-top: -4px;
+  font: 400 13px/1.45 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+/* Steam's report box stays mounted for React, out of sight */
+[data-se-sysreport] ._7jaC6UFFrvcKq2UlJr1Pb:not(#se-none) {
+  display: none !important;
+}
+
+[data-se-sysreport] .DialogBody > .DialogFooter:not(#se-none) {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: center;
+}
+
+[data-se-sysreport] .DialogFooter button.DialogButton:not(#se-none) {
+  flex: none;
+  width: auto;
+  min-width: 96px;
+}
+
+/* Shared */
+.se-sysreport[hidden],
+.se-sysreport [hidden] {
+  display: none !important;
+}
+
+.se-sysreport svg {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.se-sysreport svg .d {
+  fill: currentColor;
+  fill-opacity: .3;
+  stroke: none;
+}
+
+/* Zero-specificity reset, so each control's own class sets its colours */
+:where(.se-sysreport) button {
+  appearance: none;
+  margin: 0;
+  border: 0;
+  font-family: var(--se-font);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+  transition:
+    background-color var(--se-dur) ease-out,
+    box-shadow var(--se-dur) ease-out,
+    color var(--se-dur) ease-out,
+    opacity var(--se-dur) ease-out;
+}
+
+.se-sysreport :is(button, input, summary):focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* Steam's native tooltip: its hit box covers the control */
+[data-se-sysreport-tip] {
+  position: relative;
+}
+
+.se-sysreport-tip {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: inherit;
+}
+
+.se-sysreport-tip > *,
+.se-sysreport-tip-hitbox {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The copied check: hidden until [data-copied] */
+.se-sysreport :is(.se-sysreport-spec, .se-sysreport-row) > svg:last-of-type {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.6;
+  color: var(--se-text-strong);
+  opacity: 0;
+}
+
+.se-sysreport :is(.se-sysreport-spec, .se-sysreport-row)[data-copied] > svg:last-of-type {
+  opacity: 1;
+}
+
+/* View */
+.se-sysreport-view {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  container-type: inline-size;
+}
+
+/* Spec tiles: two columns, four once the window is wide enough */
+.se-sysreport-specs {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@container (min-width: 760px) {
+  .se-sysreport-specs[data-count="4"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Four across below 1000px: a smaller icon chip, so the names keep their room */
+@container (min-width: 760px) and (max-width: 999px) {
+  .se-sysreport-specs[data-count="4"] .se-sysreport-spec {
+    gap: 8px;
+    padding: 0 10px 0 8px;
+  }
+
+  .se-sysreport-specs[data-count="4"] .se-sysreport-spec-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+  }
+
+  .se-sysreport-specs[data-count="4"] .se-sysreport-spec-icon svg {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+@container (min-width: 760px) {
+
+
+  .se-sysreport-specs[data-count="3"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.se-sysreport-spec {
+  position: relative;
+  min-width: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px 0 10px;
+  border-radius: var(--se-radius-ml);
+  background: var(--se-bg);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text);
+}
+
+.se-sysreport-spec:hover {
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-white-10);
+}
+
+.se-sysreport-spec-icon,
+.se-sysreport-card-icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-white-04);
+  color: var(--se-text-dim);
+}
+
+.se-sysreport-spec-icon {
+  width: 34px;
+  height: 34px;
+}
+
+.se-sysreport-spec-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.se-sysreport-spec-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.se-sysreport-spec-text > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-sysreport-spec-label {
+  font: 700 8.5px/10px var(--se-font);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--se-text-faint);
+}
+
+.se-sysreport-spec-value {
+  font: 700 13px/16px var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.se-sysreport-spec-sub {
+  font: 500 10.5px/12px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-sysreport-spec-sub:empty {
+  display: none;
+}
+
+/* Toolbar */
+.se-sysreport-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.se-sysreport-chips {
+  position: relative; /* offset parent for the scroll spy */
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
+}
+
+.se-sysreport-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.se-sysreport-chip {
+  flex: none;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px 0 8px;
+  border-radius: var(--se-radius-pill);
+  background: none;
+  font: 600 11px/1 var(--se-font);
+  color: var(--se-text-muted);
+  white-space: nowrap;
+}
+
+.se-sysreport-chip svg {
+  width: 13px;
+  height: 13px;
+}
+
+.se-sysreport-chip:hover {
+  background: var(--se-surface-2);
+  color: var(--se-text);
+}
+
+.se-sysreport-chip[data-active] {
+  background: var(--se-surface-2);
+  color: var(--se-text-strong);
+}
+
+.se-sysreport-filter {
+  flex: none;
+  width: 168px;
+  height: 28px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px 0 10px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-faint);
+  cursor: text;
+  -webkit-app-region: no-drag;
+  transition: box-shadow var(--se-dur) ease-out;
+}
+
+.se-sysreport-filter:focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-white-14);
+  color: var(--se-text-muted);
+}
+
+.se-sysreport-filter > svg {
+  width: 13px;
+  height: 13px;
+}
+
+.se-sysreport-filter input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  font: 500 12px/1 var(--se-font);
+  color: var(--se-text);
+}
+
+.se-sysreport-filter input::placeholder {
+  color: var(--se-text-faint);
+}
+
+.se-sysreport-filter input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.se-sysreport .se-sysreport-filter input:focus-visible {
+  outline: 0;
+}
+
+.se-sysreport-filter-clear {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--se-white-10);
+  color: var(--se-text-dim);
+  visibility: hidden;
+}
+
+.se-sysreport-filter[data-filled] .se-sysreport-filter-clear {
+  visibility: visible;
+}
+
+.se-sysreport-filter-clear svg {
+  width: 10px;
+  height: 10px;
+  stroke-width: 2.6;
+}
+
+.se-sysreport-filter-clear:hover {
+  background: var(--se-white-14);
+  color: var(--se-text-strong);
+}
+
+.se-sysreport-tool {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-muted);
+}
+
+.se-sysreport-tool:hover {
+  background: var(--se-surface-2);
+  color: var(--se-text-strong);
+}
+
+.se-sysreport-tool-icon {
+  display: flex;
+}
+
+.se-sysreport-tool svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Details | Raw */
+.se-sysreport-modes {
+  flex: none;
+  height: 28px;
+  box-sizing: border-box;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-sysreport-mode {
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px 0 8px;
+  border-radius: var(--se-radius-pill);
+  background: none;
+  font: 600 11px/1 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-sysreport-mode svg {
+  width: 13px;
+  height: 13px;
+}
+
+.se-sysreport-mode:hover:not(:disabled) {
+  color: var(--se-text);
+}
+
+.se-sysreport-mode[data-active] {
+  background: var(--se-surface-2);
+  color: var(--se-text-strong);
+}
+
+.se-sysreport-mode:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+/* Section cards */
+.se-sysreport-list {
+  position: relative; /* offset parent for the scroll spy */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  outline: 0;
+  user-select: text;
+}
+
+.se-sysreport-card {
+  flex: none;
+  padding: 10px 8px 6px;
+  border-radius: var(--se-radius-ml);
+  background: var(--se-bg);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-sysreport-card-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 4px 6px;
+}
+
+.se-sysreport-card-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+}
+
+.se-sysreport-card-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.se-sysreport-card-title {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 700 12.5px/16px var(--se-font);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--se-text-strong);
+}
+
+.se-sysreport-count {
+  flex: none;
+  min-width: 18px;
+  height: 16px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-04);
+  font: 700 9.5px/16px var(--se-font);
+  text-align: center;
+  color: var(--se-text-faint);
+}
+
+.se-sysreport-card-copy {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  padding: 0;
+  border-radius: var(--se-radius-sm);
+  background: none;
+  color: var(--se-text-faint);
+  opacity: 0;
+}
+
+.se-sysreport-card-copy svg {
+  width: 13px;
+  height: 13px;
+}
+
+.se-sysreport-card:hover .se-sysreport-card-copy,
+.se-sysreport-card-copy:focus-visible,
+.se-sysreport-card-copy[data-copied] {
+  opacity: 1;
+}
+
+.se-sysreport-card-copy:hover,
+.se-sysreport-card-copy[data-copied] {
+  background: var(--se-surface-2);
+  color: var(--se-text-strong);
+}
+
+/* Label/value rows */
+.se-sysreport-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.se-sysreport-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(110px, 36%) minmax(0, 1fr) 14px;
+  align-items: baseline;
+  column-gap: 12px;
+  width: 100%;
+  min-height: 28px;
+  box-sizing: border-box;
+  padding: 6px 6px 6px 8px;
+  border-radius: var(--se-radius-sm);
+  background: none;
+  font: 500 12px/16px var(--se-font);
+  user-select: text;
+}
+
+.se-sysreport-row + .se-sysreport-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8px;
+  right: 8px;
+  height: 1px;
+  background: var(--se-hairline);
+}
+
+.se-sysreport-row:hover {
+  background: var(--se-white-04);
+}
+
+.se-sysreport-row:hover::before,
+.se-sysreport-row:hover + .se-sysreport-row::before {
+  opacity: 0;
+}
+
+.se-sysreport-row > svg:last-of-type {
+  align-self: center;
+}
+
+.se-sysreport-row-label {
+  min-width: 0;
+  color: var(--se-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.se-sysreport-row-value {
+  min-width: 0;
+  font-weight: 600;
+  color: var(--se-text);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.se-sysreport-row-value[data-kind="mono"] {
+  font-family: Consolas, "Cascadia Mono", "SF Mono", monospace;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: .01em;
+}
+
+.se-sysreport-row-value:is([data-kind="placeholder"], [data-kind="empty"]) {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--se-text-faint);
+}
+
+/* Yes / No as small pills */
+.se-sysreport-row-value:is([data-kind="yes"], [data-kind="no"]) {
+  justify-self: start;
+  padding: 0 8px;
+  border-radius: var(--se-radius-pill);
+  font: 700 10.5px/18px var(--se-font);
+}
+
+.se-sysreport-row-value[data-kind="yes"] {
+  background: var(--se-accent-tint);
+  color: var(--se-accent);
+}
+
+.se-sysreport-row-value[data-kind="no"] {
+  background: var(--se-white-04);
+  color: var(--se-text-muted);
+}
+
+/* Identifiers: blurred, with an eye, until clicked */
+.se-sysreport-row[data-private]:not([data-revealed]) .se-sysreport-row-value {
+  filter: blur(4.5px);
+  user-select: none;
+}
+
+.se-sysreport-row[data-private]:not([data-revealed]):not([data-copied]) > svg:last-of-type {
+  color: var(--se-text-faint);
+  opacity: 1;
+}
+
+.se-sysreport-row[data-private]:not([data-revealed]):hover > svg:last-of-type {
+  color: var(--se-text-strong);
+}
+
+/* Instruction sets: one chip per flag, supported ones lit */
+.se-sysreport-flags {
+  margin: 0 4px 8px;
+  padding: 8px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-white-04);
+}
+
+.se-sysreport-flags-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 2px 8px;
+}
+
+.se-sysreport-flags-title {
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.se-sysreport-flags-count {
+  font: 600 11px/14px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-sysreport-flags-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 4px;
+}
+
+.se-sysreport-flag {
+  min-width: 0;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px 0 6px;
+  border-radius: var(--se-radius-xs);
+  background: transparent;
+  font: 600 10.5px/1 Consolas, "Cascadia Mono", "SF Mono", monospace;
+  letter-spacing: .02em;
+  color: var(--se-text-faint);
+  white-space: nowrap;
+}
+
+.se-sysreport-flag > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-sysreport-flag svg {
+  width: 11px;
+  height: 11px;
+  stroke-width: 2.6;
+}
+
+.se-sysreport-flag[data-on] {
+  background: var(--se-bg);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text);
+}
+
+.se-sysreport-flag[data-on] svg {
+  color: var(--se-accent);
+}
+
+.se-sysreport-flag:hover {
+  background: var(--se-surface-2);
+  color: var(--se-text-strong);
+}
+
+.se-sysreport-flag[data-copied] {
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+}
+
+/* Nested blocks: collapsible groups */
+.se-sysreport-group {
+  margin: 2px 0;
+}
+
+.se-sysreport-group-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 28px;
+  padding: 0 8px 0 6px;
+  border-radius: var(--se-radius-sm);
+  font: 600 12px/16px var(--se-font);
+  color: var(--se-text-dim);
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+.se-sysreport-group-head::-webkit-details-marker {
+  display: none;
+}
+
+.se-sysreport-group-head:hover {
+  background: var(--se-white-04);
+  color: var(--se-text-strong);
+}
+
+.se-sysreport-group-head > svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.4;
+  color: var(--se-text-faint);
+  transition: transform var(--se-dur) ease-out;
+}
+
+.se-sysreport-group[open] > .se-sysreport-group-head > svg {
+  transform: rotate(90deg);
+}
+
+.se-sysreport-group-title {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-sysreport-group-body {
+  margin: 0 0 4px 12px;
+  padding-left: 6px;
+  box-shadow: inset 1px 0 0 var(--se-hairline);
+}
+
+/* Raw: the report as written */
+.se-sysreport-raw {
+  --se-sysreport-gutter: 3ch;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-radius: var(--se-radius-ml);
+  background: var(--se-bg);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  outline: 0;
+  font: 400 12px/18px Consolas, "Cascadia Mono", "SF Mono", monospace;
+  color: var(--se-text-dim);
+  user-select: text;
+  tab-size: 4;
+}
+
+.se-sysreport-raw-line {
+  position: relative;
+  flex: none;
+  width: max-content;
+  min-width: 100%;
+  box-sizing: border-box;
+  padding: 0 16px 0 calc(var(--se-sysreport-gutter) + 30px);
+  white-space: pre;
+}
+
+.se-sysreport-raw-line::before {
+  content: attr(data-n);
+  position: absolute;
+  left: 0;
+  width: calc(var(--se-sysreport-gutter) + 14px);
+  text-align: right;
+  color: var(--se-text-faint);
+  opacity: .6;
+  user-select: none;
+}
+
+.se-sysreport-raw-line:hover {
+  background: var(--se-white-04);
+}
+
+.se-sysreport-raw-line[data-hit] {
+  background: var(--se-accent-tint);
+}
+
+.se-sysreport-raw-k {
+  color: var(--se-text);
+}
+
+.se-sysreport-raw-v {
+  color: var(--se-accent);
+}
+
+.se-sysreport-raw-n {
+  color: var(--se-gold-text);
+}
+
+.se-sysreport-raw-b,
+.se-sysreport-raw-c {
+  color: var(--se-text-faint);
+}
+
+.se-sysreport-raw-c {
+  font-style: italic;
+}
+
+/* Filter matches */
+.se-sysreport mark {
+  border-radius: 3px;
+  background: var(--se-white-25);
+  color: var(--se-text-strong);
+}
+
+.se-sysreport-empty {
+  margin: 0;
+  padding: 28px 12px;
+  font: 500 12px/16px var(--se-font);
+  text-align: center;
+  color: var(--se-text-faint);
+}
+
+.se-sysreport-raw .se-sysreport-empty {
+  font-family: var(--se-font);
+}
+
+/* Loading: skeletons while Steam gathers the report */
+.se-sysreport-loading {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: 56px 28px minmax(0, 1fr);
+  gap: 8px;
+  overflow: hidden;
+}
+
+.se-sysreport-skeleton {
+  border-radius: var(--se-radius-ml);
+  background:
+    linear-gradient(100deg, transparent 30%, var(--se-white-04) 50%, transparent 70%) 0 0 / 200% 100%,
+    var(--se-bg);
+  animation: se-sysreport-shimmer 1.4s linear infinite;
+}
+
+.se-sysreport-skeleton:nth-child(3) {
+  grid-column: 1 / -1;
+  width: 60%;
+  border-radius: var(--se-radius-pill);
+}
+
+.se-sysreport-skeleton:nth-child(4) {
+  grid-column: 1 / -1;
+}
+
+@keyframes se-sysreport-shimmer {
+  from {
+    background-position: 150% 0, 0 0;
+  }
+
+  to {
+    background-position: -50% 0, 0 0;
+  }
+}
+
+/* Uploading: an indeterminate bar along the top of the view, the report dimmed under it */
+.se-sysreport-busy {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  overflow: hidden;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-04);
+  pointer-events: none;
+}
+
+.se-sysreport-busy-bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 30%;
+  border-radius: inherit;
+  background: var(--se-accent);
+  animation: se-sysreport-busy 1.1s ease-in-out infinite;
+}
+
+@keyframes se-sysreport-busy {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(340%);
+  }
+}
+
+/* Footer line: maker · entries · size */
+.se-sysreport-status {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: center;
+  min-width: 0;
+  padding-top: 16px; /* matches the footer's (utility/base.css) */
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  font: 500 12px/16px var(--se-font);
+  color: var(--se-text-faint);
+  white-space: nowrap;
+}
+
+.se-sysreport-status > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-sysreport-status > span:first-child {
+  flex: 0 1 auto;
+}
+
+.se-sysreport-status > span:not(:first-child) {
+  flex: none;
+}
+
+.se-sysreport-status > span + span::before {
+  content: "";
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  margin: 0 9px 2px;
+  border-radius: 50%;
+  background: var(--se-text-faint);
+  vertical-align: middle;
+}
+
+/* States */
+[data-se-sysreport]:not([data-se-sysreport-ready]) .se-sysreport-view > :not(.se-sysreport-loading),
+[data-se-sysreport][data-se-sysreport-ready] .se-sysreport-loading,
+[data-se-sysreport]:not([data-se-sysreport-busy]) .se-sysreport-busy,
+[data-se-sysreport][data-se-sysreport-mode="raw"] :is(.se-sysreport-specs, .se-sysreport-chips, .se-sysreport-tool, .se-sysreport-list),
+[data-se-sysreport]:not([data-se-sysreport-mode="raw"]) .se-sysreport-raw,
+[data-se-sysreport]:not([data-se-sysreport-parsed]) :is(.se-sysreport-specs, .se-sysreport-chips, .se-sysreport-tool) {
+  display: none !important;
+}
+
+/* Raw keeps the toolbar's controls to the right */
+[data-se-sysreport][data-se-sysreport-mode="raw"] .se-sysreport-filter {
+  margin-left: auto;
+}
+
+[data-se-sysreport][data-se-sysreport-busy] :is(.se-sysreport-list, .se-sysreport-raw, .se-sysreport-specs, .se-sysreport-bar) {
+  opacity: .45;
+  pointer-events: none;
+}
+
+/* Narrow windows: the chips give way first, then the mode labels */
+@container (max-width: 640px) {
+  .se-sysreport-filter {
+    width: 132px;
+  }
+
+  .se-sysreport-mode > span {
+    display: none;
+  }
+
+  .se-sysreport-mode {
+    padding: 0 8px;
+  }
+}
+
+/* Short windows: slimmer tiles, so the report keeps most of the height */
+@media (max-height: 560px) {
+  .se-sysreport-spec {
+    height: 40px;
+  }
+
+  .se-sysreport-spec-sub {
+    display: none !important;
+  }
+
+  .se-sysreport-spec-icon {
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 7px;
+  }
+
+  .se-sysreport-spec-icon svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(.se-sysreport) button,
+  .se-sysreport-group-head,
+  .se-sysreport-group-head > svg {
+    transition: none;
+  }
+
+  .se-sysreport-skeleton,
+  .se-sysreport-busy-bar {
+    animation: none;
+  }
+}

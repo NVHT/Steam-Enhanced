@@ -1,0 +1,867 @@
+/*
+ * Individual Collection and All Collections page styles.
+ *
+ * Styles the blurred cover-art header banner (`.se-cb-*`), Grid view cover
+ * metadata strips (`.se-cc-*`), fanned collection cards, and the sortable
+ * List view table (`.se-clist`). Paired with `client/library/collections.js`.
+ */
+/* The banner (both pages) */
+[data-se-cpage] {
+  --se-cb-h: 250px;
+  --se-cb-pad: 34px;
+}
+
+._2q70uOe6xM3-c5XIVfBLe6[data-se-cpage]:not(#se-none) {
+  position: relative;
+  padding: 0 0 24px;
+  border-color: transparent;
+}
+
+.u1xD3KJEgksF_J_5TLZzO[data-se-cpage]:not(#se-none) {
+  padding: 0 0 24px;
+}
+
+[data-se-cbanner]:not(#se-none) {
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-end;
+  align-items: center;
+  column-gap: 10px;
+  height: var(--se-cb-h);
+  margin: 0 0 6px;
+  padding: 0 var(--se-cb-pad) 22px calc(var(--se-cb-pad) + 86px + 20px);
+  overflow: hidden;
+  text-transform: none;
+  color: var(--se-text);
+}
+
+[data-se-cbanner] > * {
+  order: 1;
+}
+
+.se-cb-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.se-cb-blur {
+  position: absolute;
+  inset: -40px;
+  display: flex;
+  filter: blur(36px) saturate(1.2);
+  opacity: .55;
+}
+
+.se-cb-blurimg {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+}
+
+[data-se-cbanner="all"] .se-cb-blur {
+  filter: blur(30px) saturate(1.2);
+  opacity: .5;
+}
+
+.se-cb-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(23, 26, 32, .15) 0%, rgba(23, 26, 32, .55) 55%, var(--se-bg) 100%);
+}
+
+.se-cb-icon {
+  position: absolute;
+  left: var(--se-cb-pad);
+  bottom: 22px;
+  width: 86px;
+  height: 86px;
+  border-radius: var(--se-radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--se-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  backdrop-filter: blur(8px);
+  color: var(--se-accent);
+}
+
+[data-se-cbanner] > .se-cb-eyebrow {
+  order: 0;
+  flex: 0 0 100%;
+  font: var(--se-label-font);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--se-accent);
+}
+
+/* The name: Steam's CollectionName / Your collections' Label */
+[data-se-cbanner] ._2oJt3qYLAqr6xMjnpmBFLN:not(#se-none),
+[data-se-cbanner] ._3ONu7-h8EhRcUI72YoSVbD:not(#se-none) {
+  min-width: 0;
+  max-width: 100%;
+  margin: 2px 0 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 800 38px/1.1 var(--se-font), sans-serif;
+  letter-spacing: -.01em;
+  text-transform: none;
+  color: var(--se-text);
+}
+
+/* The pencil (rename), Your collections' info icon and the dynamic-collection button sit beside it */
+[data-se-cbanner] > :not([class*="se-cb-"]):not(._2oJt3qYLAqr6xMjnpmBFLN):not(._3ONu7-h8EhRcUI72YoSVbD) {
+  margin-bottom: 12px;
+}
+
+[data-se-cbanner] ._12pDikfkuNH_o3MHKU1skz:not(#se-none) {
+  margin: 0;
+  align-self: center;
+}
+
+[data-se-cbanner] ._12pDikfkuNH_o3MHKU1skz svg {
+  fill: var(--se-text-faint) !important;
+  color: var(--se-text-faint) !important;
+}
+
+[data-se-cbanner] ._12pDikfkuNH_o3MHKU1skz:hover svg {
+  fill: var(--se-text) !important;
+  color: var(--se-text) !important;
+}
+
+[data-se-cbanner] ._8JUfQypf4Uxt2i_hxBk_t:not(#se-none) {
+  border-radius: var(--se-radius-sm);
+}
+
+[data-se-cbanner] ._2cTiGDjpUyBonh9hRHHcwz:not(#se-none) {
+  font: 600 13px/16px var(--se-font), sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* The totals replace Steam's "(8)" and the rule */
+[data-se-cbanner] ._3Xgxj6vaGiKSEal2iaSrYl,
+[data-se-cbanner] ._1grg9gmk1v5ri4iOuDymaz,
+[data-se-cbanner] ._2wbrxC_eBJa8BqRcsMJhlb {
+  display: none !important;
+}
+
+[data-se-cbanner] > .se-cb-stats {
+  order: 5;
+  flex: 0 0 100%;
+  display: flex;
+  gap: 30px;
+}
+
+.se-cb-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.se-cb-value {
+  font: 800 20px/1.2 var(--se-font), sans-serif;
+  color: var(--se-text);
+}
+
+.se-cb-label {
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+/* Controls on the right: the theme's (view switch …) and Steam's sort bar beside them */
+.se-cb-ctrl {
+  position: absolute;
+  right: var(--se-cb-pad);
+  bottom: 22px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+[data-se-cpage="collection"] .rz1mrOnj9WN6UErES7qsq {
+  position: static !important;
+}
+
+[data-se-cpage="collection"] .rz1mrOnj9WN6UErES7qsq > .BpxCzVzPf5Y8EFlz5bZrP:not(#se-none) {
+  position: absolute;
+  z-index: 3;
+  top: calc(var(--se-cb-h) - 22px - 34px);
+  right: calc(var(--se-cb-pad) + var(--se-cb-ctrl-w, 76px) + 10px);
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* What follows the banner keeps the page's side margins */
+[data-se-cpage="collection"] > :not([data-se-cbanner]):not(.se-clist),
+[data-se-cpage="all"] > :not([data-se-cbanner]):not(.se-clist) {
+  margin-left: var(--se-cb-pad);
+  margin-right: var(--se-cb-pad);
+}
+
+[data-se-cpage="collection"] .rz1mrOnj9WN6UErES7qsq {
+  padding-top: 8px;
+}
+
+/* Segmented controls (.se-seg: view switch, Your collections' sort): client/library/sort-segments.css */
+.se-cb-new:focus-visible,
+.se-cl-btn:focus-visible,
+.se-clist-row:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-cb-filter {
+  box-sizing: border-box;
+  width: 180px;
+  height: 34px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-faint);
+}
+
+.se-cb-filter:focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+}
+
+.se-cb-filter input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--se-text);
+  font: normal 500 13px var(--se-font), sans-serif;
+}
+
+.se-cb-filter input::placeholder {
+  color: var(--se-text-faint);
+}
+
+.se-cb-new {
+  height: 34px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  color: var(--se-accent);
+  font: 700 13px/1 var(--se-font), sans-serif;
+  cursor: pointer;
+}
+
+.se-cb-new:hover {
+  background: color-mix(in srgb, var(--se-accent) 22%, transparent);
+}
+
+/* Your collections: filter, sort and New collection belong to the list */
+[data-se-cpage="all"]:not([data-se-view="list"]) .se-cb-filter,
+[data-se-cpage="all"]:not([data-se-view="list"]) .se-cb-sort,
+[data-se-cpage="all"]:not([data-se-view="list"]) .se-cb-new {
+  display: none;
+}
+
+/* Grid: a collection's covers as cards */
+[data-se-cpage="collection"] .WYgDg9NyCcMIVuMyZ_NBC._3ANruIVwRSgaU7L1eWRnf8:not(#se-none) {
+  position: relative;
+  border-radius: var(--se-radius-lg);
+  box-shadow: inset 0 0 0 1px var(--se-hairline), 0 16px 30px -16px rgba(0, 0, 0, .9);
+}
+
+.se-cc-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 30px 12px 11px;
+  background: linear-gradient(180deg, transparent, rgba(15, 17, 21, .94));
+  pointer-events: none;
+}
+
+.se-cc-name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 800 13.5px/1.3 var(--se-font), sans-serif;
+  color: var(--se-text);
+}
+
+.se-cc-hours {
+  flex: none;
+  margin-left: auto;
+  font: 700 12px/1.3 var(--se-font), sans-serif;
+  color: var(--se-text-muted);
+}
+
+.se-cc-badges {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.se-cc-badges:empty {
+  display: none;
+}
+
+.se-cc-chip {
+  box-sizing: border-box;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: var(--se-radius-pill);
+  /* No backdrop blur: drawn once per cover, a blur each made shelves scroll heavily */
+  background: var(--se-chip-hover);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+  font: 700 11px/20px var(--se-font), sans-serif;
+  color: var(--se-text-dim);
+}
+
+/*
+ * Friends playing: the theme's pill (client/library/library.css), here in the card's corner; native
+ * pill at the cover's foot would sit under the strip
+ */
+[data-se-cpage="collection"] .WYgDg9NyCcMIVuMyZ_NBC:has(> .se-cc-badges) ._3dncOt2dhpnFYQn-WYQ3Mb._1To_QGbZaU8E2oNA55J2Ye {
+  display: none !important;
+}
+
+/*
+ * Steam's note for the current sort (LibraryItemBoxSubscript, beside the cover) is shown in
+ * the strip instead of the hours (client/library/collections.js); Metacritic keeps its color as a small pill
+ */
+[data-se-cpage="collection"] .WYgDg9NyCcMIVuMyZ_NBC[data-se-note] ~ ._1LJqx_qFOC8199RBQO5kU8 {
+  display: none !important;
+}
+
+.se-cc-hours[data-mc],
+.se-cl-mc {
+  min-width: 26px;
+  padding: 0 6px;
+  border-radius: var(--se-radius-pill);
+  box-sizing: border-box;
+  text-align: center;
+  font: 800 11.5px/18px var(--se-font), sans-serif;
+  color: var(--se-bg-ink);
+}
+
+:is(.se-cc-hours, .se-cl-mc)[data-mc="good"] {
+  background: var(--se-mc-good);
+}
+
+:is(.se-cc-hours, .se-cl-mc)[data-mc="mixed"] {
+  background: var(--se-mc-mixed);
+}
+
+:is(.se-cc-hours, .se-cl-mc)[data-mc="bad"] {
+  background: var(--se-mc-bad);
+}
+
+.se-cl-mc {
+  display: inline-block;
+}
+
+/* The cover's Install / Play button sits above the strip */
+[data-se-cpage="collection"] :is(._8YrRmy_c6O0FCxFT8gjqo, ._3AjoLnMNKxYmNTGTJCLfgs)[data-se-cover-btn]:not(#se-none) {
+  bottom: 46px !important;
+}
+
+/* Grid: Your collections' tiles as cards */
+._3IWn-2rn7x98o5fDd0rAxb:not(._2_dwxMdH27kBf-gQ3Wrk7z):not(#se-none) {
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), 0 16px 30px -16px rgba(0, 0, 0, .9);
+}
+
+._3IWn-2rn7x98o5fDd0rAxb:not(._2_dwxMdH27kBf-gQ3Wrk7z):not(#se-none):is(:hover, :focus) {
+  box-shadow: var(--se-shadow-ring);
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5:not(#se-none) {
+  perspective: none;
+}
+
+/* A soft blur of the collection's most-played game behind the covers */
+._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5 .akZKnBQkmOCFmiD2JWwfo:not(#se-none) {
+  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  filter: blur(24px) saturate(1.3);
+  opacity: .4;
+  mix-blend-mode: normal;
+  z-index: 0;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._2I7jw4GCsxatT6FjGyk7c8 {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Three of its covers, fanned */
+._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5 ._3n796D6GS1fdlXhRnRUfRv:not(#se-none) {
+  inset: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: block;
+  -webkit-mask-image: none;
+  mask-image: none;
+  z-index: 1;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5 ._3vMgn8Qn1EVGWMwVbRBBUA:not(#se-none) {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  margin: 0;
+  transform: none;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5 ._2UWA0lTcI8lQgQsbWucD8x:not(#se-none) {
+  position: absolute;
+  inset: 0;
+  display: block;
+  transform: none !important;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5 ._2zbkblS0wKex2zlrf1kmkQ:not(#se-none) {
+  position: absolute;
+  top: 12.5%;
+  left: 33.5%;
+  width: 33%;
+  margin: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  overflow: hidden;
+  filter: none;
+  transform-origin: 50% 120%;
+  box-shadow: 0 10px 20px -8px rgba(0, 0, 0, .9), 0 0 0 1px rgba(255, 255, 255, .08);
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._2zbkblS0wKex2zlrf1kmkQ:nth-child(n+4) {
+  display: none !important;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5 ._2zbkblS0wKex2zlrf1kmkQ:nth-child(1):not(#se-none) {
+  left: 14.5%;
+  transform: rotate(-9deg);
+  z-index: 1;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5 ._2zbkblS0wKex2zlrf1kmkQ:nth-child(2):not(#se-none) {
+  left: 33.5%;
+  transform: none;
+  z-index: 3;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5 ._2zbkblS0wKex2zlrf1kmkQ:nth-child(3):not(#se-none) {
+  left: 52.5%;
+  transform: rotate(9deg);
+  z-index: 2;
+}
+
+/* One or two games: centered, or a pair */
+._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5._3R8nXajfnNy5rZnEzeV1MR ._2zbkblS0wKex2zlrf1kmkQ:nth-child(1):not(#se-none) {
+  left: 33.5%;
+  transform: none;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5.Bd6i4gNn_kJb7zE-pfKSI ._2zbkblS0wKex2zlrf1kmkQ:nth-child(1):not(#se-none) {
+  left: 22%;
+  transform: rotate(-6deg);
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5.Bd6i4gNn_kJb7zE-pfKSI ._2zbkblS0wKex2zlrf1kmkQ:nth-child(2):not(#se-none) {
+  left: 45%;
+  transform: rotate(6deg);
+}
+
+._3IWn-2rn7x98o5fDd0rAxb:hover ._2ERAQD94mxjbyV0G5P9ic5 ._2zbkblS0wKex2zlrf1kmkQ:nth-child(1):not(#se-none) {
+  transform: rotate(-12deg) translateX(-4%);
+}
+
+._3IWn-2rn7x98o5fDd0rAxb:hover ._2ERAQD94mxjbyV0G5P9ic5 ._2zbkblS0wKex2zlrf1kmkQ:nth-child(3):not(#se-none) {
+  transform: rotate(12deg) translateX(4%);
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._1Nb1zAXqh_mFJMZDAHu6L6 {
+  display: block;
+  width: 100%;
+}
+
+/* The name and count on a dark strip */
+._3IWn-2rn7x98o5fDd0rAxb:not(._2_dwxMdH27kBf-gQ3Wrk7z) ._1J1LQ0vGtpM3n0xw7XwQM6:not(#se-none) {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  box-sizing: border-box;
+  padding: 30px 12px 11px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(180deg, transparent, rgba(15, 17, 21, .94));
+  text-align: start;
+  text-transform: none;
+  text-shadow: none;
+  letter-spacing: 0;
+  font: 800 13.5px/1.3 var(--se-font), sans-serif;
+  color: var(--se-text);
+}
+
+._3IWn-2rn7x98o5fDd0rAxb:not(._2_dwxMdH27kBf-gQ3Wrk7z) ._1J1LQ0vGtpM3n0xw7XwQM6 > div:first-child {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb:not(._2_dwxMdH27kBf-gQ3Wrk7z) ._1J1LQ0vGtpM3n0xw7XwQM6 > :not(:first-child) {
+  flex: none;
+  margin-left: auto;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._36QQLBgXFUVTOhU9jMkCWD:not(#se-none) {
+  font: 700 12px/1.3 var(--se-font), sans-serif;
+  letter-spacing: 0;
+  text-shadow: none;
+  color: var(--se-text-muted);
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._36QQLBgXFUVTOhU9jMkCWD[data-se-count] {
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._36QQLBgXFUVTOhU9jMkCWD[data-se-count]::after {
+  content: attr(data-se-count);
+  font: 700 12px/1.3 var(--se-font), sans-serif;
+  color: var(--se-text-muted);
+}
+
+._3IWn-2rn7x98o5fDd0rAxb[data-se-coll="favorite"] ._1J1LQ0vGtpM3n0xw7XwQM6 > div:first-child::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  vertical-align: -2px;
+  background: var(--se-accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb._3W8lKTPeGjQw_u3gHgyNWd ._1J1LQ0vGtpM3n0xw7XwQM6:not(#se-none) {
+  padding: 24px 9px 8px;
+  font-size: 12px;
+}
+
+/* The dynamic-collection mark moves to the top corner */
+._3IWn-2rn7x98o5fDd0rAxb .sZaUDqkKPd-EtHyaNfoKG svg:not(#se-none) {
+  top: 8px;
+  bottom: auto;
+  right: 8px;
+  border-radius: var(--se-radius-xs);
+  background-color: var(--se-chip-hover);
+}
+
+/* New collection */
+._3IWn-2rn7x98o5fDd0rAxb._2_dwxMdH27kBf-gQ3Wrk7z:not(#se-none) {
+  flex-direction: column;
+  gap: 8px;
+  border-radius: var(--se-radius-lg) !important;
+  background: transparent !important;
+  box-shadow: inset 0 0 0 2px var(--se-hairline) !important;
+  color: var(--se-text-muted);
+}
+
+._3IWn-2rn7x98o5fDd0rAxb._2_dwxMdH27kBf-gQ3Wrk7z:not(#se-none):hover {
+  box-shadow: inset 0 0 0 2px var(--se-accent-line) !important;
+  background: color-mix(in srgb, var(--se-accent) 5%, transparent) !important;
+  color: var(--se-accent);
+}
+
+._3IWn-2rn7x98o5fDd0rAxb._2_dwxMdH27kBf-gQ3Wrk7z .g0-tUEN69PBXlaY8cML51:not(#se-none) {
+  position: static;
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  color: inherit;
+  transform: none;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb._2_dwxMdH27kBf-gQ3Wrk7z ._1J1LQ0vGtpM3n0xw7XwQM6:not(#se-none) {
+  position: static;
+  width: auto;
+  padding: 0;
+  text-align: center;
+  text-transform: none;
+  text-shadow: none;
+  letter-spacing: 0;
+  font: 700 13.5px/1.3 var(--se-font), sans-serif;
+  color: inherit;
+}
+
+/* List view (both pages) */
+[data-se-cpage="collection"][data-se-view="list"] .rz1mrOnj9WN6UErES7qsq > :not(.BpxCzVzPf5Y8EFlz5bZrP) {
+  display: none !important;
+}
+
+[data-se-cpage="all"][data-se-view="list"] > :not([data-se-cbanner]):not(.se-clist) {
+  display: none !important;
+}
+
+[data-se-cpage]:not([data-se-view="list"]) > .se-clist {
+  display: none;
+}
+
+.se-clist {
+  margin: 8px var(--se-cb-pad, 34px) 0;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  overflow: hidden;
+  user-select: none;
+}
+
+.se-clist-head,
+.se-clist-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+}
+
+.se-clist-head {
+  height: 36px;
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.se-clist-row {
+  min-height: 56px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-top: 1px solid var(--se-hairline);
+  cursor: pointer;
+  transition: background var(--se-dur) ease-out;
+}
+
+.se-clist-row:hover {
+  background: color-mix(in srgb, var(--se-accent) 6%, transparent);
+}
+
+.se-clist-empty {
+  padding: 20px 16px;
+  border-top: 1px solid var(--se-hairline);
+  color: var(--se-text-muted);
+  font: 500 13px var(--se-font), sans-serif;
+}
+
+.se-cl-thumb {
+  flex: 0 0 52px;
+  display: flex;
+  justify-content: center;
+}
+
+.se-cl-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.se-cl-hours,
+.se-cl-games {
+  flex: 0 0 80px;
+}
+
+.se-cl-sort {
+  flex: 0 0 110px;
+}
+
+.se-clist-row .se-cl-sort {
+  font: 600 13px var(--se-font), sans-serif;
+  color: var(--se-text-dim);
+}
+
+/* The grid's sections (Recent, 2018, Over 100 hours …) as group titles */
+.se-clist-group {
+  padding: 16px 16px 8px;
+  border-top: 1px solid var(--se-hairline);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-text-dim);
+  background: rgba(255, 255, 255, .015);
+}
+
+.se-cl-date,
+.se-cl-inst {
+  flex: 0 0 110px;
+}
+
+.se-cl-size {
+  flex: 0 0 90px;
+}
+
+.se-cl-act {
+  flex: 0 0 100px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.se-clist-row .se-cl-hours,
+.se-clist-row .se-cl-games {
+  font: 600 13px var(--se-font), sans-serif;
+  color: var(--se-text-dim);
+}
+
+.se-clist-row .se-cl-date,
+.se-clist-row .se-cl-size,
+.se-clist-row .se-cl-inst {
+  font: 500 13px var(--se-font), sans-serif;
+  color: var(--se-text-muted);
+}
+
+.se-cl-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 600 14px/1.35 var(--se-font), sans-serif;
+  color: var(--se-text);
+}
+
+.se-clist-row[data-installed="false"] .se-cl-name {
+  color: var(--se-text-dim);
+}
+
+.se-cl-sub {
+  font: 500 12px/1.35 var(--se-font), sans-serif;
+  color: var(--se-text-faint);
+}
+
+.se-cl-sub.se-cl-friends {
+  color: var(--se-running);
+}
+
+.se-cl-sub.se-cl-friends::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin: 0 6px 1px 1px;
+  border-radius: 50%;
+  background: var(--se-running);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--se-running) 25%, transparent);
+}
+
+.se-cl-fav {
+  display: flex;
+  color: var(--se-accent);
+}
+
+.se-cl-cover {
+  display: block;
+  width: 36px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: var(--se-radius-sm);
+}
+
+.se-clist-row[data-installed="false"] .se-cl-cover {
+  opacity: .6;
+  filter: saturate(.5);
+}
+
+.se-cl-stack {
+  position: relative;
+  width: 52px;
+  height: 56px;
+}
+
+.se-cl-stack .se-cl-cover {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  opacity: .7;
+}
+
+.se-cl-stack .se-cl-cover:last-child {
+  top: 0;
+  left: 14px;
+  opacity: 1;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, .6);
+}
+
+.se-cl-btn {
+  height: 30px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  color: var(--se-text-dim);
+  font: 700 12.5px/1 var(--se-font), sans-serif;
+  cursor: pointer;
+}
+
+.se-cl-btn:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.se-cl-btn.se-cl-play {
+  background: var(--se-play);
+  color: var(--se-text-strong);
+}
+
+.se-cl-btn.se-cl-play:hover {
+  background: var(--se-play-hover);
+}
+
+/* Match the Library cover hover ring in collection game grids. */
+.WYgDg9NyCcMIVuMyZ_NBC._3ANruIVwRSgaU7L1eWRnf8:is(:hover, ._2YsY_x7hLyKlUqjX9bhn0R) {
+  box-shadow: var(--se-shadow-ring) !important;
+}

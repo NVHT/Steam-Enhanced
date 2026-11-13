@@ -1,0 +1,535 @@
+/*
+ * Steam Settings and Game Properties window styles (`PagedSettingsDialog`).
+ *
+ * Styles the 248px navigation sidebar, live cross-page search results, grouped
+ * option cards (`[data-se-c]`), compact segmented radio controls, custom
+ * switches and sliders, keyboard shortcut badges, Storage drive usage cards,
+ * and Game Properties tabs (`html[data-se-props]`). Paired with
+ * `client/settings/settings.js`.
+ *
+ * This file: the sidebar, the page frame, titles, cards and rows. Settings styles load in
+ * order: layout, controls, pages, storage, search, game-properties, finishing.
+ */
+/* Sidebar */
+._2kwFFHckg8jvnwJfg9-la8 {
+  /* PageListColumn */
+  width: 248px !important;
+  min-width: 248px !important;
+  max-width: 248px !important;
+  flex: 0 0 248px !important;
+  box-sizing: border-box !important;
+  padding: 22px 14px !important;
+  background: var(--se-sidebar) !important;
+  box-shadow: inset -1px 0 0 var(--se-hairline) !important;
+}
+
+._2rjVTGz8aLvqOdz5v2gq5C {
+  /* Title */
+  margin: 0 0 14px !important;
+  padding: 0 8px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  font: 700 18px/24px var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text) !important;
+}
+
+._2rjVTGz8aLvqOdz5v2gq5C[data-se-title] {
+  font-size: 0 !important;
+  height: 24px !important;
+  line-height: 24px !important;
+  overflow: hidden;
+}
+
+._2rjVTGz8aLvqOdz5v2gq5C[data-se-title]::before {
+  content: attr(data-se-title);
+  font: 700 18px/24px var(--se-font);
+}
+
+.se-settings-search {
+  /* Added by client/settings/settings.js under the title */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  margin: 0 0 14px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-faint);
+}
+
+.se-settings-search:focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong), 0 0 0 3px var(--se-accent-tint);
+}
+
+.se-settings-search svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+}
+
+.se-settings-search svg .se-fill {
+  fill: currentColor;
+  fill-opacity: .32;
+  stroke: none;
+}
+
+.se-settings-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--se-text);
+  font: 500 13px var(--se-font);
+  padding: 0;
+}
+
+.se-settings-search input::placeholder {
+  color: var(--se-text-faint);
+}
+
+._18QCu-7MTzd51UpVbYysDy {
+  /* PageList: padded so the accent bar at the column edge is not clipped */
+  margin: 0 -14px !important;
+  padding: 0 14px 14px !important;
+}
+
+/* The uppercase label: sidebar groups, section labels and the search results' head */
+._18QCu-7MTzd51UpVbYysDy[data-se-label]::before,
+._1Hye7o1wYIfc9TE9QKRW4T[data-se-label]::before,
+.CFTLX2wIKOK3hNV-fS7_V [data-se-sec]:not(#se-none),
+.se-settings-results-head {
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase !important;
+  color: var(--se-label-color) !important;
+}
+
+._18QCu-7MTzd51UpVbYysDy[data-se-label]::before,
+._1Hye7o1wYIfc9TE9QKRW4T[data-se-label]::before {
+  /* Group labels */
+  content: attr(data-se-label);
+  display: block;
+  padding: 0 10px 4px;
+}
+
+._1Hye7o1wYIfc9TE9QKRW4T {
+  /* PageListSeparator */
+  height: auto !important;
+  margin: 10px 0 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+}
+
+._1Hye7o1wYIfc9TE9QKRW4T:not([data-se-label])::before {
+  content: '';
+  display: block;
+  height: 1px;
+  margin: 0 10px 6px;
+  background: var(--se-hairline);
+}
+
+._1-vlriAtKYDViAEunue4VO {
+  /* PageListItem */
+  position: relative;
+  box-sizing: border-box !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  margin: 0 0 2px !important;
+  padding: 0 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 11px;
+  border-radius: var(--se-radius-sm) !important;
+  background: transparent !important;
+  color: var(--se-text-dim) !important;
+  font: 500 13.5px var(--se-font) !important;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+._1-vlriAtKYDViAEunue4VO:hover:not(._2DpXjzK3WWsOtUWUrcuOG7) {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+._1-vlriAtKYDViAEunue4VO._2DpXjzK3WWsOtUWUrcuOG7 {
+  background: var(--se-accent-tint) !important;
+  color: var(--se-text) !important;
+  font-weight: 600 !important;
+}
+
+._1-vlriAtKYDViAEunue4VO::before {
+  display: none !important;
+}
+
+._1rD8X96FdnksZLvRRlEiCR {
+  /* PageListItem_Icon */
+  position: relative;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  margin: 0 !important;
+  flex: 0 0 18px;
+  color: var(--se-text-muted) !important;
+}
+
+._1rD8X96FdnksZLvRRlEiCR svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+._1-vlriAtKYDViAEunue4VO:hover ._1rD8X96FdnksZLvRRlEiCR {
+  color: var(--se-text-strong) !important;
+}
+
+._1-vlriAtKYDViAEunue4VO._2DpXjzK3WWsOtUWUrcuOG7 ._1rD8X96FdnksZLvRRlEiCR {
+  color: var(--se-accent) !important;
+}
+
+/* Our duotone icon replaces Steam's (client/settings/settings.js sets data-se-icon on the item). */
+._1-vlriAtKYDViAEunue4VO[data-se-icon] ._1rD8X96FdnksZLvRRlEiCR > * {
+  visibility: hidden !important;
+}
+
+._1-vlriAtKYDViAEunue4VO[data-se-icon] ._1rD8X96FdnksZLvRRlEiCR::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  -webkit-mask: var(--se-ic) center / 18px 18px no-repeat;
+  mask: var(--se-ic) center / 18px 18px no-repeat;
+}
+
+._2PPbMrzl8PKBwpkjYs9b0i {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* PageListItem_Title */
+._1-vlriAtKYDViAEunue4VO._2DpXjzK3WWsOtUWUrcuOG7 ._2PPbMrzl8PKBwpkjYs9b0i {
+  color: var(--se-text) !important;
+}
+
+[data-se-filtering] ._1Hye7o1wYIfc9TE9QKRW4T,
+._18QCu-7MTzd51UpVbYysDy[data-se-filtering]::before {
+  display: none !important;
+}
+
+._1-vlriAtKYDViAEunue4VO[data-se-miss] {
+  display: none !important;
+}
+
+/* Page */
+.CFTLX2wIKOK3hNV-fS7_V {
+  /* PageContent: vertical scrolling only */
+  overflow-x: hidden !important;
+  background: var(--se-bg) !important;
+  padding: 30px 36px 36px !important;
+  box-sizing: border-box !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V > .DialogContent_InnerWidth {
+  max-width: 100% !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.OX7USkJ5dDP_icD00Gal6 {
+  overflow-x: hidden !important;
+  min-width: 0 !important;
+}
+
+/*
+ * No sideways scrolling anywhere in a page: inner scrollers client/settings/settings.js finds overflowing
+ * sideways lose that axis, and no horizontal scrollbar is drawn.
+ */
+.CFTLX2wIKOK3hNV-fS7_V [data-se-noxs] {
+  overflow-x: hidden !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V::-webkit-scrollbar:horizontal,
+.CFTLX2wIKOK3hNV-fS7_V *::-webkit-scrollbar:horizontal,
+.OX7USkJ5dDP_icD00Gal6::-webkit-scrollbar:horizontal {
+  height: 0 !important;
+  display: none !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .DialogHeader:not(#se-none) {
+  /* Page title */
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  font: 700 24px/30px var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text) !important;
+  background: none !important;
+}
+
+/*
+ * A sub-page title (Controller › Advanced Settings): the back button as a 34px control,
+ * the title beside it at the same size and position as every page title.
+ */
+.CFTLX2wIKOK3hNV-fS7_V .DialogHeader:has(> button):not(#se-none) {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .DialogHeader > button.DialogButton:not(#se-none):not(#se-p2) {
+  flex: none;
+  width: var(--se-control-h) !important;
+  min-width: 0 !important;
+  height: var(--se-control-h) !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) !important;
+  color: var(--se-text-muted) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .DialogHeader > button.DialogButton:not(#se-none):not(#se-p2):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .DialogHeader > button.DialogButton > * {
+  display: flex !important;
+  padding: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .DialogHeader > button.DialogButton svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .DialogHeader[data-se-sub]::after {
+  /* One-line description under it */
+  content: attr(data-se-sub);
+  display: block;
+  margin-top: 4px;
+  font: 500 13.5px/18px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+/* Native wrappers and spacers: no padding, fades or extra gaps. */
+.CFTLX2wIKOK3hNV-fS7_V .DialogBody,
+.CFTLX2wIKOK3hNV-fS7_V .DialogInnerBody,
+.CFTLX2wIKOK3hNV-fS7_V .DialogControlsSection,
+.CFTLX2wIKOK3hNV-fS7_V .SettingsGroup,
+.CFTLX2wIKOK3hNV-fS7_V ._2nsOY93EAdTBmNbFplfuTi,
+.CFTLX2wIKOK3hNV-fS7_V ._3ieNQBmzS7FqrMOF-wJCSp {
+  padding: 0 !important;
+  margin: 0 !important;
+  background: none !important;
+  border: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .aFxOaYcllWYkCfVYQJFs0,
+.CFTLX2wIKOK3hNV-fS7_V .SettingsDialogBodyFade {
+  -webkit-mask: none !important;
+  mask: none !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3pM_dXquibd9REIjArfe7m,
+.CFTLX2wIKOK3hNV-fS7_V ._1CKqeionAAvKdDW0HUi_H5,
+.CFTLX2wIKOK3hNV-fS7_V ._25reh3iVTlhf0RJj3E7Q_z,
+.CFTLX2wIKOK3hNV-fS7_V ._2hHn-hNYrwsojBDweiCguk {
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Section labels: uppercase label above a card (client/settings/settings.js marks them [data-se-sec]). */
+.CFTLX2wIKOK3hNV-fS7_V [data-se-sec]:not(#se-none) {
+  display: block !important;
+  margin: 22px 0 10px !important;
+  padding: 0 4px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  background: none !important;
+  border: 0 !important;
+}
+
+/* A paragraph right under a section label is its sub-line. */
+.CFTLX2wIKOK3hNV-fS7_V [data-se-secsub]:not(#se-none) {
+  margin: -6px 0 10px !important;
+  padding: 0 4px !important;
+  font: 500 12.5px/1.45 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-secsub] a {
+  color: var(--se-accent) !important;
+}
+
+/*
+ * Cards and rows
+ * [data-se-c] = a card row; [data-se-c~="f"] = first in its card; [data-se-c~="l"] = last.
+ */
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c]:not(#se-none) {
+  position: relative;
+  box-sizing: border-box !important;
+  min-height: 64px !important;
+  margin: 0 !important;
+  padding: 12px 18px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-color: var(--se-surface) !important;
+  background-image: linear-gradient(rgba(255, 255, 255, .06), rgba(255, 255, 255, .06)) !important;
+  background-size: calc(100% - 36px) 1px !important;
+  background-position: 18px 0 !important;
+  background-repeat: no-repeat !important;
+  box-shadow: inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c][data-se-c~="f"]:not(#se-none) {
+  margin-top: 22px !important;
+  background-image: none !important;
+  border-top-left-radius: var(--se-radius-lg) !important;
+  border-top-right-radius: var(--se-radius-lg) !important;
+  box-shadow: inset 0 1px 0 var(--se-hairline), inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c][data-se-c~="f"][data-se-c~="s"]:not(#se-none) {
+  margin-top: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c][data-se-c~="l"]:not(#se-none) {
+  border-bottom-left-radius: var(--se-radius-lg) !important;
+  border-bottom-right-radius: var(--se-radius-lg) !important;
+  box-shadow: inset 0 -1px 0 var(--se-hairline), inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c][data-se-c~="f"][data-se-c~="l"]:not(#se-none) {
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .eKmEXJCm_lgme24Fp_HWt[data-se-c] {
+  /* Field as a row */
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .eKmEXJCm_lgme24Fp_HWt::after {
+  display: none !important;
+}
+
+/* Steam's separators */
+.CFTLX2wIKOK3hNV-fS7_V .eKmEXJCm_lgme24Fp_HWt._2HuzvKQ2QMUJ-JJOeApaF1:hover {
+  background-color: var(--se-hover) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2tALpM7z8naXJ35Pp5fNAG {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* FieldLeftColumn */
+.CFTLX2wIKOK3hNV-fS7_V .PSZtxj2h3MlyYv-c9dgke {
+  /* FieldRightColumn */
+  flex: 0 0 auto !important;
+  margin: 0 0 0 auto !important;
+  padding: 0 !important;
+  max-width: 60% !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2VcTlXFC64Jtg9gvtT6cmY {
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+/* FieldLabelRow */
+.CFTLX2wIKOK3hNV-fS7_V ._3jMlJm4PQCA8SfNlUR99Fo {
+  /* FieldLabel */
+  font: 600 14px/19px var(--se-font) !important;
+  color: var(--se-text) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  padding: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1W1to_azoBRG95oNAFpf9Q {
+  /* FieldDescription */
+  margin: 3px 0 0 !important;
+  padding: 0 !important;
+  font: 500 12.5px/1.4 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1W1to_azoBRG95oNAFpf9Q a {
+  color: var(--se-accent) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .eKmEXJCm_lgme24Fp_HWt.aIeh3X5T2M074RLW1qn6_ ._3jMlJm4PQCA8SfNlUR99Fo,
+.CFTLX2wIKOK3hNV-fS7_V .eKmEXJCm_lgme24Fp_HWt.aIeh3X5T2M074RLW1qn6_ ._1W1to_azoBRG95oNAFpf9Q {
+  color: var(--se-text-faint) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1aw7cA3mAZfWt8idAlVJWi {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* FieldChildrenWithIcon */
+.CFTLX2wIKOK3hNV-fS7_V ._2o2fXzn99OddeqZMjbDuxQ {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* FieldChildrenInner */
+/*
+ * Children shown below the label (sliders, pickers): label and description on the
+ * left, the control on the right, like every other row.
+ */
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c] ._2tALpM7z8naXJ35Pp5fNAG:has(> ._1aw7cA3mAZfWt8idAlVJWi) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 18px;
+  align-items: center;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c] ._2tALpM7z8naXJ35Pp5fNAG:has(> ._1aw7cA3mAZfWt8idAlVJWi) > ._2VcTlXFC64Jtg9gvtT6cmY {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c] ._2tALpM7z8naXJ35Pp5fNAG:has(> ._1aw7cA3mAZfWt8idAlVJWi) > ._1W1to_azoBRG95oNAFpf9Q {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-c] ._2tALpM7z8naXJ35Pp5fNAG > ._1aw7cA3mAZfWt8idAlVJWi {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin: 0 !important;
+  padding: 0 !important;
+  justify-content: flex-end;
+}

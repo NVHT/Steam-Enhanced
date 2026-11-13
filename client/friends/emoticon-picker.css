@@ -1,0 +1,236 @@
+/*
+ * Emoticon picker, redesigned: one theme card. From the top: the tabs as a segmented
+ * control, the search field, then the emoticons in a grid of soft tiles under small labels.
+ * Every part is marked by client/friends/emoticon-picker.js (the picker's own CSS module
+ * classes can't be relied on), so every rule keys on those marks. Loaded in every window, as
+ * Steam may open the picker in a popup of its own.
+ */
+
+/* Steam's slate popup frame around the picker: only the theme's card shows */
+[data-se-epicker-frame]:not(#se-none) {
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+[data-se-epicker]:not(#se-none) {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px;
+  box-sizing: border-box;
+  padding: 10px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-sidebar) !important;
+  box-shadow: var(--se-shadow-pop) !important;
+  font-family: var(--se-font), sans-serif !important;
+  color: var(--se-text) !important;
+}
+
+[data-se-epicker] > [data-se-epicker-part] {
+  flex: none;
+  margin: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+[data-se-epicker] > [data-se-epicker-part="tabs"] {
+  order: -2;
+  padding: 0 !important;
+}
+
+[data-se-epicker] > [data-se-epicker-part="search"] {
+  order: -1;
+  padding: 0 !important;
+}
+
+[data-se-epicker] > [data-se-epicker-part="body"] {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0 2px !important;
+}
+
+/* Steam's rules between the parts (empty dividers) */
+[data-se-epicker] > :not([data-se-epicker-part]):empty {
+  display: none !important;
+}
+
+/* Tabs: a segmented track; the open one a raised tile with its icon in the accent */
+[data-se-epicker] [data-se-epicker-strip]:not(#se-none) {
+  display: flex !important;
+  gap: 2px;
+  margin: 0 !important;
+  padding: 3px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+/*
+ * Steam's sliding underline: invisible, but kept in place, as emoticon-picker.js reads which
+ * tab it sits under
+ */
+[data-se-epicker] [data-se-epicker-strip] > :not([data-se-epicker-tab]) {
+  visibility: hidden !important;
+}
+
+[data-se-epicker] [data-se-epicker-part="tabs"] :is(hr, [role="separator"]) {
+  display: none !important;
+}
+
+[data-se-epicker] [data-se-epicker-tab]:not(#se-none) {
+  position: relative;
+  display: flex !important;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text-faint) !important;
+  opacity: 1 !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+[data-se-epicker] [data-se-epicker-tab]::before,
+[data-se-epicker] [data-se-epicker-tab]::after {
+  display: none !important;
+}
+
+/* Steam's own hover and selection boxes inside a tab: the tab itself is the only tile */
+[data-se-epicker] [data-se-epicker-tab] *,
+[data-se-epicker] [data-se-epicker-tab] *::before,
+[data-se-epicker] [data-se-epicker-tab] *::after {
+  background: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+[data-se-epicker] [data-se-epicker-tab] svg {
+  width: 18px !important;
+  height: 18px !important;
+  color: inherit !important;
+}
+
+[data-se-epicker] [data-se-epicker-tab] svg[fill]:not([fill="none"]),
+[data-se-epicker] [data-se-epicker-tab] svg :is(path, circle, rect, polygon, ellipse, line, polyline)[fill]:not([fill="none"]) {
+  fill: currentColor !important;
+}
+
+[data-se-epicker] [data-se-epicker-tab] svg[stroke]:not([stroke="none"]),
+[data-se-epicker] [data-se-epicker-tab] svg :is(path, circle, rect, polygon, ellipse, line, polyline)[stroke]:not([stroke="none"]) {
+  stroke: currentColor !important;
+}
+
+[data-se-epicker] [data-se-epicker-tab]:not(#se-none):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+[data-se-epicker] [data-se-epicker-tab][data-se-active]:not(#se-none) {
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent-line), 0 2px 6px -2px rgba(0, 0, 0, .6) !important;
+  color: var(--se-accent) !important;
+}
+
+/*
+ * Search: the theme's field with a magnifier. The doubled attribute outranks the theme's
+ * dialog field skin (client/dialogs/dialogs.css), which Steam's input also carries.
+ */
+[data-se-epicker] input[data-se-epicker-search][data-se-epicker-search]:not(#se-none),
+[data-se-epicker] input[data-se-epicker-search][data-se-epicker-search]:not(#se-none):is(:hover, :focus, :focus-within) {
+  box-sizing: border-box;
+  width: 100% !important;
+  min-height: 0 !important;
+  height: var(--se-control-h) !important;
+  margin: 0 !important;
+  padding: 0 12px 0 34px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  outline: 0 !important;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f7984' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='6.5' fill='%236f7984' fill-opacity='.32' stroke='none'/%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M20 20l-4.2-4.2'/%3E%3C/svg%3E") 11px center / 15px no-repeat,
+    var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  font: 400 13px var(--se-font), sans-serif !important;
+  color: var(--se-text) !important;
+  transition: box-shadow var(--se-dur) ease-out;
+}
+
+[data-se-epicker] input[data-se-epicker-search][data-se-epicker-search]:not(#se-none):hover:not(:focus) {
+  box-shadow: inset 0 0 0 1px var(--se-white-14) !important;
+}
+
+[data-se-epicker] input[data-se-epicker-search][data-se-epicker-search]:not(#se-none):focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong), 0 0 0 3px var(--se-accent-tint) !important;
+}
+
+[data-se-epicker] input[data-se-epicker-search]::placeholder {
+  color: var(--se-text-faint) !important;
+}
+
+/* Its wrapper, when Steam boxes the field: no second box around the theme's */
+[data-se-epicker] [data-se-epicker-part="search"]:not(input),
+[data-se-epicker] [data-se-epicker-part="search"] :has(> input[data-se-epicker-search]) {
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Section labels ("Recent emoticons"): the theme's small label */
+[data-se-epicker] [data-se-label]:not(#se-none) {
+  margin: 4px 4px 6px !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  color: var(--se-label-color) !important;
+}
+
+/* Emoticons: soft square tiles; the emoticon lifts on hover */
+[data-se-epicker] [data-se-epicker-item]:not(#se-none) {
+  border-radius: var(--se-radius-sm) !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+[data-se-epicker] [data-se-epicker-item]:not(#se-none):hover {
+  background-color: var(--se-hover) !important;
+}
+
+[data-se-epicker] :is([data-se-epicker-tab], [data-se-epicker-item]):focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* Steam's own hover box inside a tile: the tile is the only one */
+[data-se-epicker] [data-se-epicker-item] :not(img) {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+[data-se-epicker] [data-se-epicker-item] img,
+[data-se-epicker] img[data-se-epicker-item] {
+  transition: scale var(--se-dur-fast) var(--se-ease);
+}
+
+[data-se-epicker] [data-se-epicker-item]:hover img,
+[data-se-epicker] img[data-se-epicker-item]:hover {
+  scale: 1.15;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-se-epicker] [data-se-epicker-item] img,
+  [data-se-epicker] img[data-se-epicker-item] {
+    transition: none;
+  }
+}

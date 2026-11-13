@@ -1,0 +1,1122 @@
+/*
+ * The explore lists, New On Steam (/explore/new/) and Upcoming (/explore/upcoming/), in the
+ * store front's look; both pages share one classic template. Scoped under html.se-store-explore
+ * (store/loader.js); explore/page.js adds the data-se-explore-* tags used here. Game
+ * rows are styled by shared/rows.css (shared/rows.js tags them here too). Steam's own classes
+ * (newonsteam.css, comingsoon.css, home.css, discoveryqueue.css on SteamTracking) are classic server-rendered
+ * ones, stable across store builds.
+ *
+ * Rules use html.se-store-explore:not(#se-none) for ID-level weight over Steam's page CSS.
+ */
+
+html.se-store-explore {
+  --se-explore-gap: 16px;
+}
+
+/* ---------- Page ---------- */
+
+html.se-store-explore:not(#se-none) body,
+html.se-store-explore:not(#se-none) body.v6:is(.newonsteam, .comingsoon),
+html.se-store-explore:not(#se-none) .responsive_page_template_content {
+  background: var(--se-bg) !important;
+}
+
+/* Steam paints the featured game's store background behind the whole page; the page colour instead. */
+html.se-store-explore:not(#se-none) .game_page_background {
+  background: none !important;
+}
+
+/* Steam's tinted section backdrops: the page colour shows through, like the front page. */
+html.se-store-explore:not(#se-none) :is(.home_ctn, .page_header_ctn, .top_capsules) {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Section headings ("Your New Release Queue", "Under $10"...): the front page's 22px titles. */
+html.se-store-explore:not(#se-none) :is(.home_ctn, .page_content, .home_page_content) > :is(h2, .home_page_content_title):not([data-se-explore-title]) {
+  margin: 40px 0 14px !important;
+}
+
+/* A heading's link reads as the heading; its subtitle is muted; Steam's small icon goes. */
+html.se-store-explore:not(#se-none) :is(.home_ctn, .page_content, .home_page_content) > h2 a {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+html.se-store-explore:not(#se-none) :is(.home_ctn, .page_content, .home_page_content) > h2 .home_actions_icon {
+  display: none !important;
+}
+
+html.se-store-explore:not(#se-none) :is(.home_ctn, .page_content, .home_page_content) > h2 .header_inline {
+  margin-left: 10px;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+/* ---------- Heading ---------- */
+
+/* Steam pulls the next block up under its header (margin-bottom: -50px); the header flows. */
+html.se-store-explore:not(#se-none) [data-se-explore-head] {
+  margin-bottom: 0 !important;
+  padding-top: 18px !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-head] .breadcrumbs,
+html.se-store-explore:not(#se-none) [data-se-explore-head] .breadcrumbs a {
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-sm) !important;
+  text-decoration: none !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-head] .breadcrumbs a:hover {
+  color: var(--se-text) !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-title] {
+  margin: 6px 0 0 !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-display) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.02em !important;
+  line-height: 1.1 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/* ---------- Header capsules: a feature pair ---------- */
+
+html.se-store-explore:not(#se-none) .top_capsules {
+  margin: 22px 0 0 !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-feature] {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+  gap: var(--se-explore-gap) !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-feature] > * {
+  min-width: 0 !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-cap] {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--se-radius-xl) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  isolation: isolate;
+  text-decoration: none !important;
+  /* Only the art is in flow; stray text (Steam's strip, whitespace) must not add a line box
+     under it. Every overlay sets its own size. */
+  font-size: 0 !important;
+  line-height: 0 !important;
+  transition: transform var(--se-dur) var(--se-ease), box-shadow var(--se-dur);
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-cap-art] {
+  display: block;
+  width: 100% !important;
+  height: auto;
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+/* Bottom scrim so the price chip always reads; top scrim for the label. */
+html.se-store-explore:not(#se-none) [data-se-explore-cap]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(8, 10, 14, .45) 0%, transparent 28%),
+    linear-gradient(0deg, rgba(8, 10, 14, .55) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-cap]:is(:hover, :focus-visible) {
+  transform: translateY(-3px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14), var(--se-shadow-md) !important;
+  outline: none;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-cap]:is(:hover, :focus-visible) [data-se-explore-cap-art] {
+  transform: scale(1.03);
+}
+
+/* Label: glass chip with an accent dot, top-left (store front's deal banner). */
+html.se-store-explore:not(#se-none) [data-se-explore-cap-label] {
+  position: absolute !important;
+  top: 14px !important;
+  left: 14px !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: 2;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 7px;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 5px 11px 5px 9px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  color: var(--se-white) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .06em;
+  line-height: 14px !important;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-cap-label]::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--se-accent);
+  box-shadow: 0 0 8px var(--se-accent);
+}
+
+/*
+ * Steam's strip under the art: its text is the label chip now, so the strip dissolves (no box,
+ * text hidden) and only its price is left, on the art's corner.
+ */
+html.se-store-explore:not(#se-none) [data-se-explore-cap-info] {
+  display: contents !important;
+  color: transparent !important;
+  font-size: 0 !important;
+}
+
+/* No price yet (upcoming): Steam's empty price block would leave a strip under the art. */
+html.se-store-explore:not(#se-none) [data-se-explore-cap] .discount_block.empty {
+  display: none !important;
+}
+
+/* "On wishlist": glass chip on the top-right, clear of the label on the top-left. */
+html.se-store-explore:not(#se-none) [data-se-explore-cap] .ds_flag {
+  position: absolute !important;
+  bottom: auto !important;
+  top: 14px !important;
+  right: 14px !important;
+  left: auto !important;
+  z-index: 2;
+  padding: 4px 10px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  color: var(--se-wish) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 600 !important;
+  line-height: 14px !important;
+  letter-spacing: .04em;
+}
+
+/* Steam dims owned / ignored capsules; wishlisted ones stay bright. */
+html.se-store-explore:not(#se-none) [data-se-explore-cap].ds_flagged:not(.ds_wishlist) [data-se-explore-cap-art] {
+  opacity: .4;
+}
+
+/* "•••" options: top-right, below the flag's row. */
+html.se-store-explore:not(#se-none) [data-se-explore-cap] .ds_options {
+  position: absolute !important;
+  top: 46px !important;
+  right: 14px !important;
+  left: auto !important;
+  z-index: 2;
+}
+
+/* Price: the shared chip (shared/ui.css), on the art's bottom-right corner. */
+html.se-store-explore:not(#se-none) [data-se-explore-cap] [data-se-price] {
+  position: absolute !important;
+  inset: auto 14px 14px auto !important;
+  z-index: 2;
+  float: none !important;
+  color: var(--se-text) !important; /* the strip around it hides its own text */
+  font-size: var(--se-fs-sm) !important;
+  line-height: normal !important;
+}
+
+/* ---------- New Release Queue ---------- */
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] {
+  padding-bottom: 0 !important;
+}
+
+/*
+ * Steam fans four capsules out from the left, absolutely placed for its 940px column (home.css
+ * .dq_static_pos_2..5), which strands them on the left of the widened page. Here they are a
+ * four-column row of art tiles across a theme card, first in the queue first, the rest dimmed
+ * by Steam's own overlays, with the call to action centred over the row.
+ */
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_static {
+  position: relative;
+  margin-top: 0 !important;
+  padding: 16px !important;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--se-explore-gap);
+  height: auto !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_item {
+  position: relative !important;
+  inset: auto !important;
+  z-index: auto !important;
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: 460 / 215;
+  border-radius: var(--se-radius-lg);
+  overflow: hidden;
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  transition: transform var(--se-dur) var(--se-ease);
+}
+
+/* Queue order left to right; anything Steam keeps off-stage (the other positions) stays hidden. */
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_static_pos_2 { order: 1; }
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_static_pos_3 { order: 2; }
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_static_pos_4 { order: 3; }
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_static_pos_5 { order: 4; }
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_item:not(.dq_static_pos_2, .dq_static_pos_3, .dq_static_pos_4, .dq_static_pos_5) {
+  display: none !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_item :is(img, .dq_item_cap) {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_item_overlay {
+  border-radius: inherit;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_item_price {
+  display: none !important;
+}
+
+/* A soft shade over the row so the centred button always reads. */
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_static::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: radial-gradient(60% 90% at 50% 50%, rgba(10, 12, 16, .55), transparent 75%);
+  pointer-events: none;
+  transition: opacity var(--se-dur);
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_static:hover .dq_item {
+  transform: translateY(-2px);
+}
+
+/* "Click here to begin exploring": the whole card is the link; its message is a centred button. */
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay {
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 30;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay_position {
+  position: absolute !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay_bg {
+  width: auto !important;
+  height: auto !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay_bg::before {
+  display: none !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay_message {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px !important;
+  height: 44px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-accent);
+  color: var(--se-on-accent) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 600 !important;
+  line-height: 44px !important;
+  box-shadow: var(--se-shadow-md);
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay:hover .discovery_queue_overlay_message {
+  background: var(--se-accent-hover);
+  color: var(--se-on-accent) !important;
+}
+
+/* The arrow, as on the hero's call to action. */
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay_message::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border: solid currentColor;
+  border-width: 2px 2px 0 0;
+  transform: rotate(45deg);
+  transition: transform var(--se-dur-fast);
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay:hover .discovery_queue_overlay_message::after {
+  transform: translateX(3px) rotate(45deg);
+}
+
+/* Signed-in "begin exploring" and "Start another queue": the same accent button. */
+html.se-store-explore:not(#se-none) [data-se-explore-queue] :is(.begin_exploring, .discover_queue_empty_refresh_btn) {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: auto !important;
+  height: 44px;
+  margin: 0 !important;
+  padding: 0 20px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-accent) !important;
+  background-image: none !important;
+  color: var(--se-on-accent) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 600 !important;
+  line-height: 44px !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] :is(.begin_exploring, .discover_queue_empty_refresh_btn) * {
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .begin_exploring::after {
+  display: none !important; /* Steam's rotated arrow block */
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-queue] :is(.begin_exploring, .discover_queue_empty_refresh_btn):hover {
+  background: var(--se-accent-hover) !important;
+}
+
+/* Queue finished: a centred note on the card. */
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discover_queue_empty {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 28px 20px !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-md) !important;
+  text-align: center;
+}
+
+/* ---------- Price bands ("Under $10", "Under $5") ---------- */
+
+/* Steam's wrapping strip of fixed-width boxes becomes a fluid grid of art tiles. */
+html.se-store-explore:not(#se-none) .home_specials_grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--se-explore-gap) !important;
+  white-space: normal !important;
+  overflow: visible !important;
+}
+
+html.se-store-explore:not(#se-none) .home_specials_grid > [data-se-slot] {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  float: none !important;
+}
+
+/* The price under the art rides its corner instead (the tile is the link itself). */
+html.se-store-explore:not(#se-none) .home_specials_grid [data-se-tile] > [data-se-price] {
+  position: absolute !important;
+  inset: auto 12px 12px auto !important;
+  z-index: 3;
+  margin: 0 !important;
+}
+
+/* ---------- Bucket rows ("New Top Sellers", "Recommended New Releases"...) ----------
+ * Markup: .bucket > h2 (+ span.header_inline) and
+ * .store_horizontal_autoslider_ctn > .bucket_contents > a.store_capsule. shared/rows.js tags
+ * them as rows (tiles, art, price chip); here they become a scrolling row of five large tiles
+ * with the store front's round arrows (explore/page.js) in place of Steam's scrollbar.
+ */
+
+html.se-store-explore:not(#se-none) .bucket {
+  margin: 40px 0 0 !important;
+}
+
+html.se-store-explore:not(#se-none) .bucket > h2 {
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: flex-start !important;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin: 0 0 14px !important;
+}
+
+html.se-store-explore:not(#se-none) .bucket > h2 .header_inline {
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html.se-store-explore:not(#se-none) .bucket .store_horizontal_autoslider_ctn {
+  --se-explore-row-cols: 5;
+  position: relative;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+/* An arrow at the row's start or end is hidden by explore/page.js (shared/rows.css forces display). */
+html.se-store-explore:not(#se-none) .bucket [data-se-arrow][hidden] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/*
+ * Steam's own scroll handles and bar (the blue strip with ◀ ▶ under each row, rendered beside
+ * the row as well as inside it) give way to the round arrows.
+ */
+html.se-store-explore:not(#se-none) .bucket .store_horizontal_autoslider_ctn > :not(.bucket_contents, [data-se-arrow]),
+html.se-store-explore:not(#se-none) .bucket > :not(h2, .store_horizontal_autoslider_ctn) {
+  display: none !important;
+}
+
+html.se-store-explore:not(#se-none) .bucket .bucket_contents {
+  display: flex !important;
+  gap: var(--se-explore-gap);
+  height: auto !important;
+  /* Room for the hover lift and shadow, which the scroller would otherwise clip. */
+  margin: -8px 0 -24px !important;
+  padding: 8px 0 24px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  white-space: normal !important;
+}
+
+html.se-store-explore:not(#se-none) .bucket .bucket_contents::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+html.se-store-explore:not(#se-none) .bucket .bucket_contents > .store_capsule {
+  flex: 0 0 calc((100% - (var(--se-explore-row-cols) - 1) * var(--se-explore-gap)) / var(--se-explore-row-cols));
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  scroll-snap-align: start;
+}
+
+/*
+ * Steam sizes the art box with a padding-top ratio and lays the image over it absolutely;
+ * with the image back in flow that padding doubled the tile's height (empty band above the
+ * art). The box takes its height from aspect-ratio alone.
+ */
+html.se-store-explore:not(#se-none) .bucket .store_capsule .capsule {
+  position: relative;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  aspect-ratio: 460 / 215;
+}
+
+html.se-store-explore:not(#se-none) .bucket .store_capsule .capsule > img {
+  position: static !important;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+/* "On wishlist": glass chip on the top-right, as on the store front. */
+html.se-store-explore:not(#se-none) .bucket .store_capsule .ds_flag {
+  top: 10px !important;
+  right: 10px !important;
+  left: auto !important;
+  z-index: 3;
+  padding: 3px 9px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  color: var(--se-wish) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 600 !important;
+  letter-spacing: .04em;
+}
+
+/* The "•••" options button: on the art's top-left corner instead of a strip under it. */
+html.se-store-explore:not(#se-none) .bucket .store_capsule .ds_options {
+  position: absolute !important;
+  top: 10px !important;
+  left: 10px !important;
+  z-index: 3;
+}
+
+/* Steam dims flagged (owned / ignored) capsules; wishlisted ones stay bright. */
+html.se-store-explore:not(#se-none) .bucket .store_capsule.ds_flagged:not(.ds_wishlist) .capsule > img {
+  opacity: .4;
+}
+
+/* ---------- Tabbed list ("Popular New Releases" / "New Releases") ----------
+ * Classic markup: .home_tab_col > .home_tabs_row_ctn (div.home_tab tabs, TabSelect) and
+ * .home_tabs_content > .tab_content > .tab_content_items > a.tab_item. Styled as the store
+ * front's ranked list: segmented tabs, numbered rows with tag chips (explore/page.js) and the
+ * shared price chip.
+ */
+
+/*
+ * Two columns: the list, and Steam's right column ("Under $10", "Under $5") beside it. Steam
+ * floats them at fixed widths; a flex row lets the list take the room the side column leaves.
+ */
+html.se-store-explore:not(#se-none) .page_content:has(> [data-se-explore-tabs]) {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+html.se-store-explore:not(#se-none) .page_content:has(> [data-se-explore-tabs]) > div[style*="clear"] {
+  display: none !important;
+}
+
+html.se-store-explore:not(#se-none) .page_content:has(> [data-se-explore-tabs]) > :not([data-se-explore-tabs], input) {
+  flex: 0 0 clamp(340px, 30%, 520px);
+  float: none !important;
+  width: auto !important;
+  min-width: 0;
+  margin-inline: 0 !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] {
+  flex: 1 1 auto;
+  min-width: 0;
+  float: none !important;
+  width: auto !important;
+  margin: 40px 0 0 !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tab_bg {
+  display: none !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tabs_row_ctn {
+  display: inline-flex;
+  width: auto !important;
+  max-width: 100%;
+  margin: 0 0 20px !important;
+  padding: 4px !important;
+  border-radius: var(--se-radius-lg) !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .store_horizontal_minislider_ctn {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .store_horizontal_minislider_ctn > :is(.slider_left, .slider_right) {
+  display: none !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tabs_row {
+  display: flex !important;
+  gap: 4px;
+  overflow: visible !important;
+  white-space: nowrap;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tab {
+  display: inline-flex !important;
+  align-items: center;
+  height: 34px;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: transparent !important;
+  color: var(--se-text-muted) !important;
+  cursor: pointer;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600;
+  transition: color var(--se-dur-fast), background-color var(--se-dur-fast);
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tab .tab_content {
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  text-transform: none !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tab:hover {
+  color: var(--se-text) !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tab.active {
+  background: var(--se-selected) !important;
+  color: var(--se-white) !important;
+}
+
+/* Rows */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_content_items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  counter-reset: se-explore-rank;
+}
+
+/* Upcoming lists its rows straight in .tab_content (no .tab_content_items); Steam toggles
+   that box's display, so it stays a block and the rows space themselves. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tabs_content > .tab_content {
+  counter-reset: se-explore-rank;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_content > .tab_item + .tab_item {
+  margin-top: 6px !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: 16px;
+  height: auto !important;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 8px 12px 8px 8px !important;
+  border-radius: var(--se-radius-lg);
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--se-text);
+  text-decoration: none !important;
+  counter-increment: se-explore-rank;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item:is(:hover, :focus-visible) {
+  background: var(--se-surface-2) !important;
+  outline: none;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item::before {
+  content: counter(se-explore-rank);
+  order: -2;
+  flex: none;
+  width: 28px;
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-xl);
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item:hover::before {
+  color: var(--se-text);
+}
+
+/* Steam places the art and price absolutely and pads the text past them; all back in the row. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item :is(.tab_item_cap, .tab_item_discount, .tab_item_content, .release_date, .prepurchase_price_ctn) {
+  position: static !important;
+  inset: auto !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item_cap {
+  order: -1;
+  flex: none;
+  float: none !important;
+  width: 152px !important;
+  height: auto !important;
+  aspect-ratio: 184 / 69;
+  margin: 0 !important;
+  border-radius: var(--se-radius-md);
+  overflow: hidden;
+  background: rgba(0, 0, 0, .25);
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item_cap_img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item_content {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex !important;
+  flex-direction: column;
+  gap: 5px;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item_name {
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item_details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Steam's comma-joined tag line gives way to explore/page.js's chips. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item[data-se-explore-row] .tab_item_top_tags {
+  display: none !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .platform_img {
+  flex: none;
+  opacity: .55;
+}
+
+
+
+/* Price: the shared chip, right-aligned in a fixed column so prices line up row to row. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item_discount {
+  order: 2;
+  flex: none;
+  float: none !important;
+  margin: 0 0 0 auto !important;
+}
+
+/* Upcoming: release date, then Pre-Purchase over the price, at the row's end. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] {
+  --se-explore-price-w: 190px;
+}
+
+/* A row with no price yet keeps its date in the same column as the others. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item:not(:has(.tab_item_discount)) .release_date {
+  margin-right: calc(var(--se-explore-price-w) + 16px) !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .release_date {
+  order: 1;
+  flex: none;
+  width: 96px;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-sm) !important;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .prepurchase_price_ctn {
+  order: 2;
+  flex: none;
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  width: var(--se-explore-price-w) !important; /* fixed column: dates line up row to row */
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .prepurchase_price_ctn .tab_item_discount {
+  margin: 0 !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item > div[style*="clear"] {
+  display: none !important;
+}
+
+/* The "•••" options button: on the art's top-right corner. Art starts at 8 + 28 + 16px. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .ds_options {
+  position: absolute !important;
+  top: 12px !important;
+  left: calc(52px + 152px - 30px) !important;
+  right: auto !important;
+  z-index: 2;
+  margin: 0 !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .ds_flag {
+  top: 12px !important;
+  left: 56px !important;
+  z-index: 2;
+  padding: 2px 7px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-chip) !important;
+  color: var(--se-wish) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 600 !important;
+}
+
+/* A bucket heading's "Browse All" (span.right): the same pill, at the row's far end. */
+html.se-store-explore:not(#se-none) .bucket > h2 .right {
+  float: none !important;
+  align-self: center;
+  margin-left: auto !important;
+}
+
+/* Steam paints the side column itself with the preview's light blue gradient (a strip shows
+   above the card); the column stays clear. */
+html.se-store-explore:not(#se-none) .home_rightcol {
+  background: none !important;
+  background-image: none !important;
+}
+
+/* ---------- Preview card (#tab_preview_container) ----------
+ * Upcoming's right column: Steam's preview of the list's focused row (title, reviews, tags,
+ * four screenshots) on a light blue gradient. Here a theme card like the store front's
+ * spotlight, as tall as the list: the first screenshot edge to edge, the details, then the
+ * other screenshots stacked. Steam still swaps .focus between rows as you point at them.
+ */
+/*
+ * The card runs the list's full height: the row stretches both columns, the side column
+ * hands its height to the card, and the card's screenshots share whatever is left. Steam's
+ * scroll-follow (an inline margin-top it updates on scroll) is off; the card no longer moves.
+ */
+html.se-store-explore:not(#se-none) .page_content:has(> [data-se-explore-tabs]):has(#tab_preview_container) {
+  align-items: stretch;
+}
+
+html.se-store-explore:not(#se-none) .home_rightcol:has(> #tab_preview_container) {
+  display: flex !important;
+  flex-direction: column;
+  height: auto !important;
+  margin-top: 40px !important; /* level with the list's tabs */
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container {
+  position: relative !important;
+  inset: auto !important;
+  flex: 1 1 auto;
+  min-height: 640px;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  background-image: none !important;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_preview:not(.focus) {
+  display: none !important;
+}
+
+/* The focused preview fills the card: hero, title, reviews, tags, then the remaining
+   screenshots stacked full width, sharing the height that is left. */
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_preview.focus {
+  position: absolute !important;
+  inset: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 12px;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 16px 16px !important;
+  background: none !important;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_preview > * {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .screenshot {
+  grid-column: 1 / -1;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0;
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background-size: cover !important;
+  background-position: center !important;
+  background-color: var(--se-on-accent);
+}
+
+/* The first shot is the card's hero, edge to edge at the top. */
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_preview > .screenshot:not(.screenshot ~ .screenshot) {
+  order: -1;
+  grid-column: 1 / -1;
+  aspect-ratio: 16 / 9;
+  margin: 0 -16px 4px !important;
+  border-radius: 0;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_title {
+  display: block;
+  height: auto !important;
+  padding: 0 !important;
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Reviews: the label muted, the verdict in its colour. */
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_review_summary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_review_summary .title {
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .game_review_summary {
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .game_review_summary.positive { color: var(--se-accent) !important; }
+html.se-store-explore:not(#se-none) #tab_preview_container .game_review_summary.mixed { color: var(--se-gold) !important; }
+html.se-store-explore:not(#se-none) #tab_preview_container .game_review_summary.negative { color: var(--se-danger) !important; }
+html.se-store-explore:not(#se-none) #tab_preview_container .game_review_summary.no_reviews { color: var(--se-text-muted) !important; }
+
+/* Tags: the list rows' chips, as links. */
+html.se-store-explore:not(#se-none) #tab_preview_container .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .tags a {
+  box-shadow: none !important;
+}
+
+/* ---------- Block footers ("Browse all: Under $10 · Under $5"), "See more" and heading links ----------
+ * Steam's dark strip with blue fade buttons becomes a muted label and the store front's pill
+ * buttons, sitting on the page under the block.
+ */
+
+html.se-store-explore:not(#se-none) :is(.home_block_footer, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  height: auto !important;
+  margin: 16px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-base) !important;
+  line-height: 1.2 !important;
+}
+
+html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) a > span {
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: inherit !important;
+}
+
+/* The store front's chevron. */
+html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) a::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border: solid currentColor;
+  border-width: 1.75px 1.75px 0 0;
+  transform: rotate(45deg);
+  transition: transform var(--se-dur) var(--se-ease);
+}
+
+html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) a:hover::after {
+  transform: translateX(2px) rotate(45deg);
+}
+
+/* ---------- Narrow windows ---------- */
+
+@media (max-width: 1400px) {
+  html.se-store-explore:not(#se-none) .bucket .store_horizontal_autoslider_ctn {
+    --se-explore-row-cols: 4;
+  }
+}
+
+@media (max-width: 910px) {
+  html.se-store-explore:not(#se-none) [data-se-explore-feature] {
+    grid-template-columns: 1fr;
+  }
+
+  html.se-store-explore:not(#se-none) .bucket .store_horizontal_autoslider_ctn {
+    --se-explore-row-cols: 2;
+  }
+
+  html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html.se-store-explore:not(#se-none) [data-se-explore-queue] :is(.dq_static_pos_4, .dq_static_pos_5) {
+    display: none !important;
+  }
+}

@@ -1,0 +1,749 @@
+/*
+ * Steam Replay (/replay/<steamid>/<year>, yearinreview.css): a long React page in Steam's
+ * navy, with its own type. The year's art wall, the highlight share cards and the charts are
+ * Replay's own and stay as they are; around them, the page takes the store's look:
+ *  - the page colour, the theme's type for section titles and lead-ins;
+ *  - the panels (How You Compare rows, the spider graph, By the Numbers, devices, the
+ *    streak, the game explorer) as theme cards;
+ *  - Timeline / Grid as a segmented control, "Show more", Share, the privacy picker and the
+ *    other years as pills; the FAQ as cards in two columns.
+ * Every class is a hash (live store CSS of 2026-11-09); store/loader.js
+ * sets html.se-store-replay. html.se-store-replay:not(#se-none) for weight over yearinreview.css.
+ */
+
+/* ---------- Palette ----------
+ * Neutral greys on Replay: the store's surfaces carry a slight blue cast, which sat badly
+ * beside Replay's art and charts (cards, tiles and hovers read as blue). Same steps, no hue.
+ */
+html.se-store-replay:not(#se-none) {
+  --se-bg: #17181b;
+  --se-surface: #1f2023;
+  --se-surface-2: #27282c;
+  --se-hover: #303136;
+  --se-selected: #3a3b41;
+  --se-field: #141517;
+  --se-panel-bg: #1f2023;
+  --se-glass: rgba(18, 18, 20, .8);
+  --se-glass-chip: rgba(12, 12, 14, .62);
+  --se-glass-btn: rgba(26, 26, 29, .78);
+  --se-glass-btn-hover: rgba(52, 52, 58, .9);
+}
+
+/* ---------- Page ---------- */
+
+html.se-store-replay:not(#se-none) body,
+html.se-store-replay:not(#se-none) :is(.responsive_page_frame, .responsive_page_content, .page_content_ctn, .KoPRGmgJJqo-) {
+  background-color: var(--se-bg) !important;
+}
+
+html.se-store-replay:not(#se-none) .KoPRGmgJJqo- {
+  color: var(--se-text-dim);
+}
+
+/*
+ * Section backgrounds: Replay washes each section in its own purple / blue gradient (How You
+ * Compare, top games, playtime, streak, explorer), through the section wrappers and extra
+ * full-width colour layers. The wrappers go to the page colour and the colour layers away.
+ * The art wall (.ugL-G4FTy2w-) and the top games' own art (.QSp4obZnVo0-) stay.
+ */
+html.se-store-replay:not(#se-none) :is(.msW7t3zPawc-, .JM6qKRW4grY-, .nFWRruBwpxI-, .xan-F7AKHTg-, .Md96G4kZDAE-, .Tyh9FPCHRrc-, .yVvCXO9ZLwg-, ._2m4YMjqffsc-, ._4RT2F1qWDf0-) {
+  background: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html.se-store-replay:not(#se-none) :is(.msW7t3zPawc-, .JM6qKRW4grY-, .xan-F7AKHTg-, .Md96G4kZDAE-, .yVvCXO9ZLwg-, ._2m4YMjqffsc-)::before,
+html.se-store-replay:not(#se-none) :is(.msW7t3zPawc-, .JM6qKRW4grY-, .xan-F7AKHTg-, .Md96G4kZDAE-, .yVvCXO9ZLwg-, ._2m4YMjqffsc-)::after {
+  background: none !important;
+}
+
+/* The streak's and the explorer's colour layers. */
+html.se-store-replay:not(#se-none) :is(.ttuzGl2s44c-, ._0Di7EGWRhhg-) {
+  display: none !important;
+}
+
+/* Section titles ("Here are a few of your highlights...", "How You Compare", "Your Playtime by
+   Month", ...) and their lead-ins. */
+html.se-store-replay:not(#se-none) .jKX9urC1MxY- {
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-headline) !important;
+  font-weight: 800 !important;
+  letter-spacing: -.02em !important;
+  line-height: 1.2 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html.se-store-replay:not(#se-none) .bXtzee8AefM- {
+  color: var(--se-text-muted) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html.se-store-replay:not(#se-none) :is(.qFjJzWZ5t6U-, .zt5AycfIbtY-, .ocrq1-0nW8Y-, .aXiQBfYGO9I-, .smzKi1RTbdQ-) {
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+html.se-store-replay:not(#se-none) :is(.lBH0gHt22Fc-, ._3mHbUC3OZ1w-, .-cwbu3H1bWI-) {
+  color: var(--se-text-muted) !important;
+  font-family: inherit !important;
+  text-shadow: none !important;
+}
+
+/* ---------- Cards ---------- */
+
+/* How You Compare: each comparison row; the spider graph and By the Numbers; the devices,
+   streak and explorer panels. */
+html.se-store-replay:not(#se-none) .r-PiY57GlY8-,
+html.se-store-replay:not(#se-none) .Lj6zc-CzUcI-,
+html.se-store-replay:not(#se-none) .PMUu6aR8bT0- > .NTDxIz9hpZQ-,
+html.se-store-replay:not(#se-none) ._8yz-q4EfKbc- > .finR-g0jShM-,
+html.se-store-replay:not(#se-none) .hvOxlXCSt2s-,
+html.se-store-replay:not(#se-none) ._1zHgawHGZQ8- > .maZLLs320ng- {
+  box-sizing: border-box;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl) !important;
+  background: var(--se-surface) !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-md) !important;
+}
+
+/* Each comparison row fits its section (Steam lets it run past the right edge). */
+html.se-store-replay:not(#se-none) .r-PiY57GlY8- {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 0 16px !important;
+  overflow: hidden;
+}
+
+html.se-store-replay:not(#se-none) .r-PiY57GlY8- ._54a2wTltSQo- {
+  flex: 1 1 auto !important;
+  box-sizing: border-box;
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+html.se-store-replay:not(#se-none) :is(.Lj6zc-CzUcI-, .PMUu6aR8bT0- > .NTDxIz9hpZQ-, ._8yz-q4EfKbc- > .finR-g0jShM-) {
+  padding: 24px !important;
+}
+
+html.se-store-replay:not(#se-none) .hvOxlXCSt2s- {
+  padding: 18px 20px !important;
+}
+
+html.se-store-replay:not(#se-none) ._1zHgawHGZQ8- > .maZLLs320ng- {
+  margin-bottom: 14px !important;
+  padding: 16px 18px !important;
+}
+
+/* Side by side panels keep a gap between them. */
+html.se-store-replay:not(#se-none) :is(.PMUu6aR8bT0-, ._8yz-q4EfKbc-) {
+  gap: 24px;
+}
+
+/* The highlight share cards and other art tiles: rounded, with a hairline ring. */
+html.se-store-replay:not(#se-none) .ojW6P77M2CU- {
+  overflow: hidden;
+  border-radius: var(--se-radius-xl) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg) !important;
+}
+
+/* Medians ("Steam Median 11"): a pill. */
+html.se-store-replay:not(#se-none) .aKnZAgIhrq0- {
+  display: inline-flex !important;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-pill) !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 600 !important;
+}
+
+/* By the Numbers rows: a hairline between them, the figure in the text colour. */
+html.se-store-replay:not(#se-none) .gdGCZIz-fdM- + .gdGCZIz-fdM- {
+  box-shadow: inset 0 1px 0 var(--se-hairline);
+}
+
+html.se-store-replay:not(#se-none) ._2AcQ3eLZpqQ- {
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+}
+
+html.se-store-replay:not(#se-none) .aBL1S716KHI- {
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800 !important;
+}
+
+/* Month labels in the timeline ("May"). */
+html.se-store-replay:not(#se-none) .lvInkGaT6tc- {
+  color: var(--se-text-faint) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 700 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+/* ---------- Controls ---------- */
+
+/* Timeline View / Grid View: a segmented control. */
+html.se-store-replay:not(#se-none) .xhff4YTQuUs- {
+  display: inline-flex !important;
+  gap: 4px;
+  width: auto !important;
+  height: auto !important;
+  margin-bottom: 20px !important;
+  padding: 4px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-replay:not(#se-none) .xhff4YTQuUs- .KxbX2VmSNpY- {
+  display: inline-flex !important;
+  align-items: center;
+  height: 34px !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-replay:not(#se-none) .xhff4YTQuUs- .KxbX2VmSNpY-:not(.ActiveTab):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store-replay:not(#se-none) .xhff4YTQuUs- .KxbX2VmSNpY-.ActiveTab {
+  background: var(--se-selected) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-white) !important;
+}
+
+/* Hide Steam's tab underline. */
+html.se-store-replay:not(#se-none) .xhff4YTQuUs- .KxbX2VmSNpY-::after {
+  display: none !important;
+}
+
+/* Pills: Show more, Share, the other years. */
+html.se-store-replay:not(#se-none) :is(a.dUBouRPf5BM-, .j8A4NpxJ0t0-, a.JSoZ402xLkY-) {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-replay:not(#se-none) :is(a.dUBouRPf5BM-, .j8A4NpxJ0t0-, a.JSoZ402xLkY-):is(:hover, :focus-visible) {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store-replay:not(#se-none) .j8A4NpxJ0t0- svg {
+  width: 14px !important;
+  height: 14px !important;
+  fill: currentColor !important;
+}
+
+html.se-store-replay:not(#se-none) .j8A4NpxJ0t0- span {
+  color: inherit !important;
+  font: inherit !important;
+}
+
+/* The other years: a row of pills. */
+html.se-store-replay:not(#se-none) .uvsrpXUQL6E- {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Privacy picker (Steam's DialogDropDown): the theme's field. */
+html.se-store-replay:not(#se-none) .KoPRGmgJJqo- .DialogDropDown {
+  height: 40px !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+}
+
+/* "Private": the field's text at the controls' size, not Steam's large type. */
+html.se-store-replay:not(#se-none) .KoPRGmgJJqo- .DialogDropDown .DialogDropDown_CurrentDisplay {
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 500 !important;
+}
+
+html.se-store-replay:not(#se-none) .KoPRGmgJJqo- .DialogDropDown .DialogDropDown_Arrow svg {
+  width: 14px !important;
+  height: 14px !important;
+  fill: var(--se-text-muted) !important;
+}
+
+html.se-store-replay:not(#se-none) .KoPRGmgJJqo- .DialogDropDown:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-replay:not(#se-none) .wzkr-U2Espw- {
+  color: var(--se-text-muted) !important;
+  font-family: inherit !important;
+}
+
+/* ---------- FAQ ---------- */
+
+html.se-store-replay:not(#se-none) ._6ALXCVcszOs- {
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  margin-inline: auto !important;
+  padding-bottom: 72px !important;
+}
+
+html.se-store-replay:not(#se-none) ._6ALXCVcszOs- > .jKX9urC1MxY- {
+  margin-bottom: 20px !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700 !important;
+  text-align: left !important;
+}
+
+html.se-store-replay:not(#se-none) .fGLzTigSNnY- {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 560px), 1fr));
+  gap: 16px;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+html.se-store-replay:not(#se-none) .X-87SlZ9MKU- {
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 18px 22px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-store-replay:not(#se-none) ._38wDSMap-gY- {
+  margin: 0 0 6px !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-md) !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  text-transform: none !important;
+}
+
+html.se-store-replay:not(#se-none) .bXJ94GBFl3U- {
+  color: var(--se-text-muted) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 400 !important;
+  line-height: 1.6 !important;
+}
+
+html.se-store-replay:not(#se-none) .bXJ94GBFl3U- a {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+/* ---------- How You Compare ---------- */
+
+/* The icon cell beside each comparison: the raised surface, not Steam's darker slab. */
+html.se-store-replay:not(#se-none) .r-PiY57GlY8- ._1paAUH9-U80- {
+  background: var(--se-surface-2) !important;
+}
+
+/* "New, Recent, and Classic Games" spans the section like the rows above it. */
+html.se-store-replay:not(#se-none) :is(._93HCZZaF-GQ-, ._93HCZZaF-GQ- > .Lj6zc-CzUcI-) {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
+}
+
+/* ---------- Top games ---------- */
+
+/* "Visit Store Page", "View In Library", "View All Achievements": pills. */
+html.se-store-replay:not(#se-none) :is(a._3zY6l-RwMbM-, a.cOnRdqZh5ak-) {
+  display: inline-flex !important;
+  align-items: center;
+  height: 36px !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-glass-btn) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line) !important;
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-replay:not(#se-none) :is(a._3zY6l-RwMbM-, a.cOnRdqZh5ak-):is(:hover, :focus-visible) {
+  background: var(--se-glass-btn-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store-replay:not(#se-none) .ulgSRWu9qlw- {
+  gap: 8px;
+}
+
+/* The box Steam puts behind "View All Achievements". */
+html.se-store-replay:not(#se-none) .zDLaFJWW2Nk- {
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Your Achievements: the title in small caps, the row as a card, the count as a raised tile,
+   the icons as rounded tiles (no white frames). */
+html.se-store-replay:not(#se-none) .N5WJoNh0dWc- {
+  color: var(--se-text-muted) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 700 !important;
+  letter-spacing: .1em !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store-replay:not(#se-none) .JIuGrMQYevI- {
+  border: 0 !important;
+  border-radius: var(--se-radius-xl) !important;
+  background: rgba(15, 17, 21, .55) !important;
+  backdrop-filter: var(--se-blur-panel);
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+html.se-store-replay:not(#se-none) .WzRwXnpcz6g- {
+  gap: 8px;
+}
+
+html.se-store-replay:not(#se-none) ._4AJ91mlqTEg- {
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+html.se-store-replay:not(#se-none) .OetAU-ImB-A- {
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800 !important;
+}
+
+html.se-store-replay:not(#se-none) .qRqoeOi-LW0- {
+  color: var(--se-text-muted) !important;
+  font-family: inherit !important;
+}
+
+html.se-store-replay:not(#se-none) :is(.wlHDLgvcDaY-, .wlHDLgvcDaY- .dc7pWlMQLmU-) {
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: none !important;
+}
+
+html.se-store-replay:not(#se-none) .wlHDLgvcDaY- img {
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+/* ---------- Game capsules (timeline, grid, streak) ---------- */
+
+html.se-store-replay:not(#se-none) a.I9igJfhUSos- {
+  overflow: hidden;
+  border-radius: var(--se-radius-lg) !important;
+}
+
+html.se-store-replay:not(#se-none) a.I9igJfhUSos- > img {
+  border-radius: var(--se-radius-lg) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  transition: scale var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-store-replay:not(#se-none) a.I9igJfhUSos-:hover > img {
+  scale: 1.03;
+}
+
+/* Share of playtime ("66%"): a glass chip instead of Steam's white box. */
+html.se-store-replay:not(#se-none) .x6rpHBjxzTg- {
+  height: 24px !important;
+  padding: 0 9px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line) !important;
+  color: var(--se-white) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-sm) !important;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700 !important;
+  line-height: 24px !important;
+}
+
+/* "First played in 2022": a glass chip on the art's top edge, readable on any art. */
+html.se-store-replay:not(#se-none) .v6qwr186rUA- {
+  display: inline-flex !important;
+  align-items: center;
+  width: auto !important;
+  height: 22px !important;
+  margin: 8px auto 0 !important;
+  padding: 0 9px !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-glass-chip) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line) !important;
+  color: var(--se-white) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .06em !important;
+  line-height: 1 !important;
+  text-shadow: none !important;
+  white-space: nowrap;
+}
+
+html.se-store-replay:not(#se-none) .onO-DMSltE0- {
+  display: flex !important;
+  justify-content: center;
+  background: none !important;
+}
+
+/* ---------- Share ---------- */
+
+/* The share panels (privacy picker and Share; profile showcase): theme cards, their contents
+   centred under their headings. */
+html.se-store-replay:not(#se-none) .PmXhnAChGR0- {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  /* From the top, so side-by-side panels have their headings on one line. */
+  justify-content: flex-start;
+  gap: 12px;
+  box-sizing: border-box;
+  padding: 20px 24px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl) !important;
+  background: var(--se-surface) !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-md) !important;
+}
+
+/* Each panel's controls sit on its bottom edge (the heading stays at the top), so the privacy
+   row and "Add Profile Showcase" line up across the two panels. */
+html.se-store-replay:not(#se-none) .PmXhnAChGR0- > :last-child:not(:first-child) {
+  margin-top: auto !important;
+}
+
+html.se-store-replay:not(#se-none) .PmXhnAChGR0-:not(:has(.ql9xSqCdaH0-)) :is(a, button, [role="button"]) {
+  box-sizing: border-box;
+  height: 40px !important;
+}
+
+/* The panels side by side: the same height. */
+html.se-store-replay:not(#se-none) .QsTph6fo6tE- {
+  align-items: stretch !important;
+  gap: 24px;
+}
+
+/* Privacy picker and Share on one baseline: the button level with the field, not centred on
+   the field and its label together; both 40px tall. */
+html.se-store-replay:not(#se-none) .ql9xSqCdaH0- {
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center;
+  gap: 12px;
+}
+
+html.se-store-replay:not(#se-none) .ql9xSqCdaH0- > * {
+  margin: 0 !important;
+}
+
+html.se-store-replay:not(#se-none) .ql9xSqCdaH0- .j8A4NpxJ0t0- {
+  height: 40px !important;
+}
+
+/* The privacy picker's menu (on <body>: .DialogMenuPosition, its list ._DialogInputContainer,
+   each choice a role="option" button): the theme's pop-up panel with rows that light up. */
+html.se-store-replay:not(#se-none) .DialogMenuPosition > ._DialogInputContainer {
+  margin: 6px 0 !important;
+  padding: 6px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-panel-bg) !important;
+  backdrop-filter: var(--se-blur-panel);
+  box-shadow: var(--se-panel-shadow) !important;
+  font-family: inherit !important;
+}
+
+html.se-store-replay:not(#se-none) .DialogMenuPosition > ._DialogInputContainer > [role="option"] {
+  display: flex !important;
+  align-items: center;
+  width: 100% !important;
+  height: 36px !important;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 500 !important;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-replay:not(#se-none) .DialogMenuPosition > ._DialogInputContainer > [role="option"]:is(:hover, :focus-visible) {
+  outline: 0;
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+/* The current choice: the accent text and a tick. */
+html.se-store-replay:not(#se-none) .DialogMenuPosition > ._DialogInputContainer > [role="option"][aria-selected="true"] {
+  justify-content: space-between;
+  color: var(--se-accent) !important;
+  font-weight: 600 !important;
+}
+
+html.se-store-replay:not(#se-none) .DialogMenuPosition > ._DialogInputContainer > [role="option"][aria-selected="true"]::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* ---------- Friends' Replays ---------- */
+
+html.se-store-replay:not(#se-none) .nFsP-fXNWUA- {
+  color: var(--se-text) !important;
+  font-family: inherit !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+  text-transform: none !important;
+}
+
+html.se-store-replay:not(#se-none) .c1gySWWvs3I- {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 10px;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+html.se-store-replay:not(#se-none) a.Wdvtmz-DIUA- {
+  box-sizing: border-box;
+  width: auto !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface) !important;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text-dim) !important;
+  font-family: inherit !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-store-replay:not(#se-none) a.Wdvtmz-DIUA-:is(:hover, :focus-visible) {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store-replay:not(#se-none) a.Wdvtmz-DIUA- img {
+  border-radius: var(--se-radius-sm);
+}
+
+/* Steam's blue on the friends block lives on more than the tile: the section and grid
+   wrappers, the tile's inner parts and its pseudo-elements carry gradients and tints. All
+   of them go; the tile's own surface is the only colour left. */
+html.se-store-replay:not(#se-none) :is(._30hJH5z6jtk-, .c1gySWWvs3I-),
+html.se-store-replay:not(#se-none) a.Wdvtmz-DIUA- * {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+html.se-store-replay:not(#se-none) a.Wdvtmz-DIUA- img {
+  background: none !important;
+}
+
+html.se-store-replay:not(#se-none) :is(._30hJH5z6jtk-, .c1gySWWvs3I-, a.Wdvtmz-DIUA-, a.Wdvtmz-DIUA- *)::before,
+html.se-store-replay:not(#se-none) :is(._30hJH5z6jtk-, .c1gySWWvs3I-, a.Wdvtmz-DIUA-, a.Wdvtmz-DIUA- *)::after {
+  background: none !important;
+  box-shadow: none !important;
+  opacity: 0 !important;
+}
+
+html.se-store-replay:not(#se-none) a.Wdvtmz-DIUA- {
+  filter: none !important;
+  outline: 0 !important;
+}

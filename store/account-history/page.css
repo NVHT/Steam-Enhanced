@@ -1,0 +1,284 @@
+/*
+ * Purchase History (/account/history/), as rebuilt by account-history/page.js:
+ *
+ *   [ Home › Account › Purchase History                            ]
+ *   [ connorn3794's Purchase History                               ]
+ *   [ ⌕ search ………… ][ All ][ Purchase ][ Market Transactions ] 85  ]
+ *   [ ⓘ Problem with a transaction? Select it below to get help.    ]
+ *   [ DATE    ITEMS                    TYPE      PRICE  …  TOTAL    ]  ← sticky
+ *   [ Nov 3   Mafia: Definitive …      Purchase  -42%   …  $5.79    ]
+ *   [         +4 more                  Visa **32 $9.99 $5.79        ]
+ *   [            ( Load More Transactions )                         ]
+ *
+ * Header and page colour come from account/page.css (the page carries .se-store-account too);
+ * the toolbar, table card and sticky header from account/table.css.
+ * Steam's page (account.css): #main_content > .wallet_history_click_hint,
+ * table.wallet_history_table (th/td .wht_date, .wht_items, .wht_type > .wth_payment,
+ * .wht_base_price > .wht_base_price_discounted > .wht_discount_pct + span.wht_original_price /
+ * .wht_discounted_price, .wht_tax, .wht_shipping, .wht_total, .wht_wallet_change,
+ * .wht_wallet_balance), .load_more_history_area > #load_more_button. Rules use
+ * html.se-store-account-history:not(#se-none) for ID-level weight over Steam's rules.
+ */
+
+/* ---------- Header ---------- */
+
+html.se-store-account-history:not(#se-none) .page_header_ctn .breadcrumb_current_page {
+  color: var(--se-text-dim);
+}
+
+html.se-store-account-history:not(#se-none) .wallet_history_click_hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  float: none !important;
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-base)/1.4 var(--se-font) !important;
+}
+
+html.se-store-account-history:not(#se-none) .wallet_history_click_hint > svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: var(--se-text-faint);
+}
+
+.wallet_history_click_hint > svg .d {
+  fill: currentColor;
+  fill-opacity: .3;
+  stroke: none;
+}
+
+/* The hint reads under the toolbar */
+html.se-store-account-history[data-se-history-ready]:not(#se-none) #main_content {
+  display: flex !important;
+  flex-direction: column;
+  padding-bottom: 64px !important;
+}
+
+html.se-store-account-history[data-se-history-ready]:not(#se-none) #main_content > .wallet_history_click_hint {
+  order: 1;
+}
+
+html.se-store-account-history[data-se-history-ready]:not(#se-none) #main_content > :is(table.wallet_history_table, .se-table-empty) {
+  order: 2;
+}
+
+html.se-store-account-history[data-se-history-ready]:not(#se-none) #main_content > .load_more_history_area {
+  order: 3;
+}
+
+html.se-store-account-history[data-se-history-ready]:not(#se-none) #main_content > :not(.se-table-toolbar, .wallet_history_click_hint, table, .se-table-empty, .load_more_history_area) {
+  order: 4;
+}
+
+/* ---------- Table ---------- */
+
+html.se-store-account-history:not(#se-none) table.wallet_history_table tr.wallet_table_row {
+  cursor: pointer; /* opens Steam's help for the transaction */
+}
+
+/* Money columns line up on the right */
+html.se-store-account-history:not(#se-none) table.wallet_history_table :is(th, td):is(.wht_base_price, .wht_baseprice, .wht_tax, .wht_shipping, .wht_total, .wht_wallet, .wht_wallet_change, .wht_wallet_balance) {
+  text-align: right !important;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Date */
+html.se-store-account-history:not(#se-none) table.wallet_history_table td.wht_date {
+  color: var(--se-text-muted) !important;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Items: the first line leads, the rest follow quieter */
+html.se-store-account-history:not(#se-none) table.wallet_history_table td.wht_items {
+  width: 100%;
+  color: var(--se-text) !important;
+  font-weight: 600;
+}
+
+html.se-store-account-history:not(#se-none) td.wht_items > div {
+  margin: 0 0 3px;
+}
+
+html.se-store-account-history:not(#se-none) td.wht_items > div:not(:first-child) {
+  color: var(--se-text-dim);
+  font-weight: 500;
+}
+
+html.se-store-account-history:not(#se-none) td.wht_items:not([data-se-history-open]) > [data-se-history-extra] {
+  display: none;
+}
+
+html.se-store-account-history:not(#se-none) .se-history-more {
+  margin-top: 6px;
+  height: 26px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+  color: var(--se-accent);
+  font: 600 var(--se-fs-sm)/1 var(--se-font);
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-account-history:not(#se-none) .se-history-more:hover {
+  background: var(--se-accent-surface);
+}
+
+/* Type, with the payment as chips under it */
+html.se-store-account-history:not(#se-none) table.wallet_history_table td.wht_type {
+  color: var(--se-text) !important;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+html.se-store-account-history:not(#se-none) .wth_payment {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: auto !important;
+  height: auto !important;
+  margin-top: 6px;
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-sm)/1 var(--se-font) !important;
+}
+
+html.se-store-account-history:not(#se-none) .wth_payment:not(:has(> div)) {
+  display: inline-flex !important;
+  flex-direction: row;
+}
+
+html.se-store-account-history:not(#se-none) .wth_payment:not(:has(> div)),
+html.se-store-account-history:not(#se-none) .wth_payment > div {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 22px !important; /* Steam pads the total column's credit note */
+  padding: 0 9px !important;
+  line-height: 1 !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+/* Stacked payments line up on the right like the column; a single chip rides text-align */
+html.se-store-account-history:not(#se-none) td.wht_total .wth_payment:has(> div) {
+  align-items: flex-end;
+}
+
+/* Price: the store's discount badge over was/now */
+html.se-store-account-history:not(#se-none) .wht_base_price_discounted {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto !important;
+  height: auto !important;
+  background: none !important;
+}
+
+html.se-store-account-history:not(#se-none) .wht_discount_pct {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-cart) !important;
+  color: var(--se-on-accent) !important;
+  font: 800 var(--se-fs-sm)/1 var(--se-font) !important;
+}
+
+html.se-store-account-history:not(#se-none) .wht_base_price_discounted > div:not(.wht_discount_pct) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.25;
+}
+
+html.se-store-account-history:not(#se-none) .wht_original_price {
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-sm);
+  text-decoration: line-through;
+}
+
+html.se-store-account-history:not(#se-none) .wht_discounted_price {
+  color: var(--se-text) !important;
+}
+
+/* Total */
+html.se-store-account-history:not(#se-none) table.wallet_history_table td.wht_total {
+  color: var(--se-text) !important;
+  font-weight: 700;
+}
+
+/* Wallet: credits in green, spends quiet; the balance after them in the text colour */
+html.se-store-account-history:not(#se-none) td.wht_wallet_change[data-se-history-change="up"] {
+  color: var(--se-prepurchase) !important;
+  font-weight: 700;
+}
+
+html.se-store-account-history:not(#se-none) td.wht_wallet_change[data-se-history-change="down"] {
+  color: var(--se-text-muted) !important;
+}
+
+html.se-store-account-history:not(#se-none) td.wht_wallet_balance {
+  color: var(--se-text) !important;
+}
+
+/* ---------- Load more ---------- */
+
+html.se-store-account-history:not(#se-none) .load_more_history_area {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-account-history:not(#se-none) #load_more_button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
+  height: 40px !important;
+  margin: 0 !important;
+  padding: 0 24px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1 var(--se-font) !important;
+  text-shadow: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-store-account-history:not(#se-none) #load_more_button > span {
+  padding: 0 !important;
+  background: none !important;
+  font: inherit !important;
+  line-height: inherit !important;
+}
+
+html.se-store-account-history:not(#se-none) #load_more_button:hover {
+  background: var(--se-hover) !important;
+}
+
+/* ---------- Narrow windows: tax, shipping and the wallet columns give way ---------- */
+
+@media (max-width: 1100px) {
+  html.se-store-account-history:not(#se-none) table.wallet_history_table :is(th, td):is(.wht_tax, .wht_shipping, .wht_wallet, .wht_wallet_change, .wht_wallet_balance) {
+    display: none;
+  }
+}
