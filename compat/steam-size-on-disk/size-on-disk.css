@@ -22,21 +22,22 @@
  * to Playtime keeps order 0, the size 1, everything after Playtime 2. A stat is matched as a
  * child or as the child holding it, since Steam may wrap them.
  *   size      GameStat + LastPlayed holding a GameStatIcon + PlaytimeIcon. Steam's own Last
- *             Played (and Cloud Status) carry the same classes and Panel but no PlaytimeIcon.
+ *             Played (and Cloud Status) carry the same classes and Panel but no PlaytimeIcon;
+ *             ProtonDB Library Badges' stat has one too, marked .pdb-stat-icon, and is left out.
  *   Playtime  GameStat + Playtime, without an id (the Player Count plugin's badge borrows the
  *             class; client/game-page/player-count.js places it)
  */
 ._1mDAVT4sTzFRwJtlKCw2Ws > :is(
-  ._1kiZKVbDe-9Ikootk57kpA._3pS8kMrtScuY1Qf-W8tmRV:has(> ._1GZdosVXnfrf69yU8DWASl),
-  :has(> ._1kiZKVbDe-9Ikootk57kpA._3pS8kMrtScuY1Qf-W8tmRV:has(> ._1GZdosVXnfrf69yU8DWASl))
+  ._1kiZKVbDe-9Ikootk57kpA._3pS8kMrtScuY1Qf-W8tmRV:has(> ._1GZdosVXnfrf69yU8DWASl:not(.pdb-stat-icon)),
+  :has(> ._1kiZKVbDe-9Ikootk57kpA._3pS8kMrtScuY1Qf-W8tmRV:has(> ._1GZdosVXnfrf69yU8DWASl:not(.pdb-stat-icon)))
 ) {
   order: 1;
 }
 
 ._1mDAVT4sTzFRwJtlKCw2Ws > :is(._1aKegVl9_lSdNAyWYZQlr9:not([id]), :has(> ._1aKegVl9_lSdNAyWYZQlr9:not([id])))
   ~ :not(
-    ._1kiZKVbDe-9Ikootk57kpA._3pS8kMrtScuY1Qf-W8tmRV:has(> ._1GZdosVXnfrf69yU8DWASl),
-    :has(> ._1kiZKVbDe-9Ikootk57kpA._3pS8kMrtScuY1Qf-W8tmRV:has(> ._1GZdosVXnfrf69yU8DWASl))
+    ._1kiZKVbDe-9Ikootk57kpA._3pS8kMrtScuY1Qf-W8tmRV:has(> ._1GZdosVXnfrf69yU8DWASl:not(.pdb-stat-icon)),
+    :has(> ._1kiZKVbDe-9Ikootk57kpA._3pS8kMrtScuY1Qf-W8tmRV:has(> ._1GZdosVXnfrf69yU8DWASl:not(.pdb-stat-icon)))
   ) {
   order: 2;
 }

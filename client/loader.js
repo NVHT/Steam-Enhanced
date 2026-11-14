@@ -139,6 +139,7 @@
     ['content', 'compat/extendium/', ['manager.js']],
     ['desktop', 'compat/steam-size-on-disk/', ['size-on-disk.css', 'size-on-disk.js']],
     ['main', 'compat/playercount-badge/', ['playercount-badge.css']],
+    ['main', 'compat/protondb-library-badges/', ['protondb-library-badges.css', 'protondb-library-badges.js']],
     // Game page and achievements
     ['achievements', 'core/', ['achievement-tiers.css']],
     ['main', 'client/game-page/', [
