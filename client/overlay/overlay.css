@@ -4,10 +4,11 @@
  * Restyles Steam's desktop overlay in the Steam Enhanced look. The top-left
  * column gains a game card and Game Overview's content (Achievements,
  * Friends, Screenshots, Guides, Recent News) plus tabbed views, built by
- * `overlay.js`. Steam's toolbars and top-right Back to Game are hidden: the
- * column covers them, and widget windows open centred at a fixed size.
+ * the overlay scripts (client/overlay/*.js). Steam's toolbars and top-right
+ * Back to Game are hidden: the column covers them, and widget windows open
+ * centred at a fixed size.
  *
- * Rules on Steam's markup are gated on `html[data-se-ov]`, which `overlay.js`
+ * Rules on Steam's markup are gated on `html[data-se-ov]`, which `main.js`
  * sets while `--se-overlay` is not `off`; the `.se-ov-*` elements only exist
  * while it is set. Keyboard-only and pinned-preview states keep Steam's own
  * presentation.
@@ -221,8 +222,8 @@ html[data-se-ov] .se-ov-time:focus-visible {
 
 /* ---------- Top section: Game Overview sections ---------- */
 
-/* Flat sections (no card) under the buttons, built by `overlay.js`. They take
-   the height left on screen (`--se-ov-avail`, measured by `overlay.js`) and
+/* Flat sections (no card) under the buttons, built by `dom.js`. They take
+   the height left on screen (`--se-ov-avail`, measured by `main.js`) and
    scroll inside it; a fade marks more content below. */
 html[data-se-ov] .se-ov-overview {
   flex: 1 1 auto;
@@ -1883,7 +1884,7 @@ html[data-se-ov] .fi6UDkxJq66MLo2z9wabQ ._2LJMRr1_5XUK4wlt7YMyPi {
 /* ---------- Toolbar ---------- */
 
 /* Every toolbar location: its widgets are tabs in the column. The buttons
-   stay in the DOM (display: none still takes .click()), so overlay.js can
+   stay in the DOM (display: none still takes .click()), so widgets.js can
    open Steam's own windows and copy their icons. */
 html[data-se-ov] ._3OzkVrQFFPv0aV41N4MrHV {
   display: none !important;

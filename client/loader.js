@@ -8,14 +8,18 @@
  * order. Stubs and loader may run in either order. To add a feature, list its files here; only
  * a new window group needs a skin.json change (and a full Steam restart).
  *
- * A feature split into parts lists only its entry, <folder>/index.js, which loads as an ES module
- * and imports its parts itself (they reach core's runtime through core/se.js). Every other script
- * is a classic one.
+ * A feature split into parts is listed part by part, in the order its parts run. The parts are
+ * classic scripts sharing one namespace object (window.__steamEnhanced<Feature>Parts): each
+ * takes what earlier parts published, looks up later parts' names when it calls them, and
+ * publishes what others use; a value parts reassign lives on the namespace's `live`. Not ES
+ * modules: in Steam's popup windows a module's imports can stall (they did for the toasts),
+ * and a module's strict mode throws on writes to Steam's objects that a classic script skips,
+ * which the theme's patching relies on (the Steam menu). Every script here is a classic one.
  *
  * The list order is the cascade. Each stylesheet's <link> carries its list position and goes in
  * among the theme's other links by that position, whichever group asked for it first. So rules
- * that tie on specificity resolve the same in every window. Scripts don't depend on order: each
- * one waits for core's `se-core` event.
+ * that tie on specificity resolve the same in every window. Scripts run in list order (a split
+ * feature's parts rely on it), each once core's `se-core` event has fired.
  *
  * Files load with the loader's own query string, so whatever cache-busting Millennium puts on
  * this file carries over to every file.
@@ -47,7 +51,17 @@
     ['main', 'core/plugin-rpc.js'],
     ['notify', 'client/friends/friend-notification-clicks.js'],
     ['overlay', 'client/overlay/overlay.css'],
-    ['overlay', 'client/overlay/overlay.js'],
+    ['overlay', 'client/overlay/context.js'],
+    ['overlay', 'client/overlay/data.js'],
+    ['overlay', 'client/overlay/sources.js'],
+    ['overlay', 'client/overlay/widgets.js'],
+    ['overlay', 'client/overlay/dom.js'],
+    ['overlay', 'client/overlay/render.js'],
+    ['overlay', 'client/overlay/friends.js'],
+    ['overlay', 'client/overlay/notes.js'],
+    ['overlay', 'client/overlay/browser.js'],
+    ['overlay', 'client/overlay/achievements.js'],
+    ['overlay', 'client/overlay/main.js'],
     ['all', 'client/overlay/overlay-popups.css'],
     ['main', 'client/friends/friends-background.js'],
     ['all', 'core/font.css'],
@@ -55,7 +69,15 @@
     ['all', 'core/images.css'],
     ['all', 'core/images.js'],
     ['toasts', 'client/toasts/toasts.css'],
-    ['toasts', 'client/toasts/toasts.js'],
+    ['toasts', 'client/toasts/context.js'],
+    ['toasts', 'client/toasts/config.js'],
+    ['toasts', 'client/toasts/steam.js'],
+    ['toasts', 'client/toasts/stage.js'],
+    ['toasts', 'client/toasts/hub.js'],
+    ['toasts', 'client/toasts/placement.js'],
+    ['toasts', 'client/toasts/scan.js'],
+    ['toasts', 'client/toasts/compact.js'],
+    ['toasts', 'client/toasts/main.js'],
     ['content', 'client/startup/startup.css'],
     ['content', 'client/startup/startup.js'],
     ['content', 'client/startup/sign-in.css'],
@@ -75,7 +97,16 @@
     ['main', 'client/header/header-tooltips.js'],
     ['main', 'client/navigation/sidebar-icons.css'],
     ['main', 'client/navigation/sidebar-icons.js'],
-    ['main', 'client/header/steam-menu.js'],
+    ['main', 'client/header/menu/shared.js'],
+    ['main', 'client/header/menu/api.js'],
+    ['main', 'client/header/menu/menus.js'],
+    ['main', 'client/header/menu/account.js'],
+    ['main', 'client/header/menu/actions.js'],
+    ['main', 'client/header/menu/hover.js'],
+    ['main', 'client/header/menu/popups.js'],
+    ['main', 'client/header/menu/placement.js'],
+    ['main', 'client/header/menu/patch.js'],
+    ['main', 'client/header/menu/main.js'],
     ['main', 'client/navigation/nav-rail.css'],
     ['main', 'client/navigation/nav-rail.js'],
     ['main', 'client/library/library.css'],
@@ -86,15 +117,40 @@
     ['main', 'client/library/collections.css'],
     ['main', 'client/library/collections.js'],
     ['main', 'client/downloads/downloads.css'],
-    ['main', 'client/downloads/downloads.js'],
+    ['main', 'client/downloads/page/shared.js'],
+    ['main', 'client/downloads/page/native.js'],
+    ['main', 'client/downloads/page/library.js'],
+    ['main', 'client/downloads/page/backdrop.js'],
+    ['main', 'client/downloads/page/read.js'],
+    ['main', 'client/downloads/page/hero.js'],
+    ['main', 'client/downloads/page/transfer.js'],
+    ['main', 'client/downloads/page/queue.js'],
+    ['main', 'client/downloads/page/drag.js'],
+    ['main', 'client/downloads/page/pass.js'],
+    ['main', 'client/downloads/page/debug.js'],
+    ['main', 'client/downloads/page/main.js'],
     ['main', 'client/friends/friends-dock.css'],
-    ['main', 'client/friends/friends-dock.js'],
+    ['main', 'client/friends/dock/templates.js'],
+    ['main', 'client/friends/dock/data.js'],
+    ['main', 'client/friends/dock/ui.js'],
+    ['main', 'client/friends/dock/routing.js'],
+    ['main', 'client/friends/dock/flyouts.js'],
+    ['main', 'client/friends/dock/embed.js'],
+    ['main', 'client/friends/dock/dock.js'],
+    ['main', 'client/friends/dock/chat-popup.js'],
+    ['main', 'client/friends/dock/main.js'],
     ['main', 'client/library/sort-segments.css'],
     ['main', 'client/library/sort-segments.js'],
     ['main', 'client/home/home-polish.css'],
     ['main', 'client/home/home-polish.js'],
     ['main', 'client/home/home-stage.css'],
-    ['main', 'client/home/home-stage.js'],
+    ['main', 'client/home/stage/util.js'],
+    ['main', 'client/home/stage/tray.js'],
+    ['main', 'client/home/stage/picks.js'],
+    ['main', 'client/home/stage/stage.js'],
+    ['main', 'client/home/stage/data.js'],
+    ['main', 'client/home/stage/news.js'],
+    ['main', 'client/home/stage/main.js'],
     ['all', 'client/dialogs/dialogs.css'],
     ['content', 'client/dialogs/install.css'],
     ['content', 'client/dialogs/eula.css'],
@@ -117,7 +173,10 @@
     ['content', 'client/dialogs/system-info.css'],
     ['content', 'client/dialogs/system-info.js'],
     ['content', 'client/dialogs/system-report.css'],
-    ['content', 'client/dialogs/system-report.js'],
+    ['content', 'client/dialogs/system-report/shared.js'],
+    ['content', 'client/dialogs/system-report/parse.js'],
+    ['content', 'client/dialogs/system-report/view.js'],
+    ['content', 'client/dialogs/system-report/main.js'],
     ['content', 'client/dialogs/add-non-steam.css'],
     ['content', 'client/dialogs/add-non-steam.js'],
     ['desktop', 'client/dialogs/activate-product.css'],
@@ -128,8 +187,8 @@
     ['desktop', 'client/dialogs/eula.js'],
     ['desktop', 'client/dialogs/uninstall.css'],
     ['desktop', 'client/dialogs/uninstall.js'],
-    ['main', 'compat/plugins/hltb-for-steam.css'],
-    ['main', 'compat/plugins/hltb-for-steam.js'],
+    ['main', 'compat/hltb-for-steam/hltb-for-steam.css'],
+    ['main', 'compat/hltb-for-steam/hltb-for-steam.js'],
     ['achievements', 'core/achievement-tiers.css'],
     ['main', 'client/game-page/layout.css'],
     ['main', 'client/game-page/play-bar.css'],
@@ -138,7 +197,15 @@
     ['main', 'client/game-page/friends.css'],
     ['main', 'client/game-page/cards.css'],
     ['main', 'client/game-page/activity.css'],
-    ['main', 'client/game-page/game-page.js'],
+    ['main', 'client/game-page/util.js'],
+    ['main', 'client/game-page/achievements.js'],
+    ['main', 'client/game-page/layout.js'],
+    ['main', 'client/game-page/friends.js'],
+    ['main', 'client/game-page/activity.js'],
+    ['main', 'client/game-page/cards.js'],
+    ['main', 'client/game-page/page.js'],
+    ['main', 'client/game-page/play-bar.js'],
+    ['main', 'client/game-page/main.js'],
     ['main', 'client/achievements/achievements-page.css'],
     ['main', 'client/achievements/achievements-page.js'],
     ['main', 'client/game-page/spotlights.css'],
@@ -165,7 +232,15 @@
     ['desktop', 'client/settings/search.css'],
     ['desktop', 'client/settings/game-properties.css'],
     ['desktop', 'client/settings/finishing.css'],
-    ['desktop', 'client/settings/settings.js'],
+    ['desktop', 'client/settings/dialog/shared.js'],
+    ['desktop', 'client/settings/dialog/options.js'],
+    ['desktop', 'client/settings/dialog/search.js'],
+    ['desktop', 'client/settings/dialog/window.js'],
+    ['desktop', 'client/settings/dialog/sidebar.js'],
+    ['desktop', 'client/settings/dialog/layout.js'],
+    ['desktop', 'client/settings/dialog/props-pages.js'],
+    ['desktop', 'client/settings/dialog/props.js'],
+    ['desktop', 'client/settings/dialog/main.js'],
     ['desktop', 'client/settings/millennium.css'],
     ['desktop', 'client/settings/millennium-pages.js'],
     ['main', 'client/settings/millennium-window.js'],
@@ -425,8 +500,7 @@
   const addScript = (file) => {
     const script = document.createElement('script');
     script.src = asset(file);
-    if (file.endsWith('/index.js')) script.type = 'module'; // a split feature's entry
-    else script.async = false; // run in list order, as Millennium would
+    script.async = false; // run in list order: a split feature's parts rely on it
     script.dataset.seFile = file;
     track(script);
     head.append(script);

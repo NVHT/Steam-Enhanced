@@ -3,7 +3,7 @@
  *
  * The game downloading paints the whole page: its hero art, blurred and darkened, sits behind
  * everything (`.se-dl-backdrop`). Over it, one column: the transfer in progress (`.se-dlh`,
- * built by `client/downloads/downloads.js` from Steam's own block, which stays mounted out of
+ * built by `client/downloads/page/hero.js` from Steam's own block, which stays mounted out of
  * sight): eyebrow, the game's logo, sizes and time left, progress with the percentage and
  * Pause, three stat cards and the speed graph. The queue follows in a panel below. Panels are
  * translucent over the art; with nothing downloading the page keeps its plain ground.
@@ -149,7 +149,7 @@
 }
 
 /*
- * The transfer in progress (.se-dlh, drawn by client/downloads/downloads.js).
+ * The transfer in progress (.se-dlh, drawn by client/downloads/page/hero.js).
  * Steam's own block stays mounted as its data source, out of sight: laid out at a fixed width
  * so its graph can still be measured, but invisible, unfocusable (focus would scroll the page
  * to it) and unread (the hero is read instead). Scripted clicks still reach its buttons.
@@ -1028,7 +1028,7 @@
 
 /*
  * A row's actions (start now, remove, Play): the box holding them (data-se-dl-bar, found by
- * client/downloads/downloads.js) is pinned to the row's end and always shown; the row keeps
+ * client/downloads/page/queue.js) is pinned to the row's end and always shown; the row keeps
  * room for it (--dl-actions-w, in the row's padding), so the state text never runs under it.
  */
 ._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-bar] {
@@ -1057,7 +1057,7 @@
 }
 
 /*
- * Reordering (client/downloads/downloads.js): a grip at each Up Next card's start. The dragged
+ * Reordering (client/downloads/page/drag.js): a grip at each Up Next card's start. The dragged
  * card lifts and follows the pointer, the others slide aside, a line marks where it lands, and
  * the transfer at the top lights up when it would start now.
  */
@@ -1196,7 +1196,7 @@
 
 /*
  * Page buttons (settings, row actions, section actions): one tile set. client/downloads/
- * downloads.js tags each (data-se-dl-action) and adds the theme's dual-tone icon; Steam's own
+ * page/queue.js tags each (data-se-dl-action) and adds the theme's dual-tone icon; Steam's own
  * icon is hidden and everything Steam nests inside dissolves, so the tile alone sets the size.
  *   neutral 36px tile · Download (blue) and Play (green): labelled buttons of one size, like the
  *   game page's Install and Play · remove turns red
@@ -1384,7 +1384,7 @@
   color: var(--se-accent) !important;
 }
 
-/* Library games beside the Downloads queue and transfer details (host marked by downloads.js). */
+/* Library games beside the Downloads queue and transfer details (host marked by page/library.js). */
 [data-se-dl-host][data-se-dl-host] { /* doubled: keeps the old :has() rule's weight over Steam's classes */
   display: flex;
   flex-direction: row;

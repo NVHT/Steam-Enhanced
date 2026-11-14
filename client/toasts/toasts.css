@@ -1,5 +1,5 @@
 /*
- * Stage toasts (client/toasts/toasts.js), in Steam's notificationtoasts_ window.
+ * Stage toasts (client/toasts/), in Steam's notificationtoasts_ window.
  *
  * A miniature Library Home stage, drawn in the Home stage's style (home-stage.css): a glass
  * tray, hero art under the stage's grade with a slow push-in, stage-sized numbers and the
@@ -47,7 +47,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   display: flex;
   justify-content: center;
   pointer-events: none;
-  /* Set by toasts.js only when the window can't be made big enough for the tray. */
+  /* Set by placement.js only when the window can't be made big enough for the tray. */
   transform: scale(var(--se-tst-scale, 1));
   transform-origin: 50% 100%;
   color: var(--se-text);
@@ -60,7 +60,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 .se-tst-tray {
   position: relative;
-  width: 420px; /* BASE_W in toasts.js */
+  width: 420px; /* BASE_W in config.js */
   box-sizing: border-box;
   padding: 6px;
   border-radius: var(--se-radius-xl);
@@ -69,7 +69,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   box-shadow: inset 0 0 0 1px var(--se-divider), 0 6px 18px -6px var(--se-black-80);
   pointer-events: auto;
   transition: box-shadow .4s ease;
-  /* Drawn at 420 px, scaled as a whole (art, text, buttons, strip) to the size toasts.js sets. */
+  /* Drawn at 420 px, scaled as a whole (art, text, buttons, strip) to the size config.js sets. */
   zoom: var(--se-tst-zoom, 1);
 }
 
@@ -879,9 +879,9 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 /*
  * Steam keeps its toast window where and how big it made it, so the toast is styled in place:
- * the tray's glass, an accent wash from the art side, the kind's eyebrow and glyph (toasts.js),
+ * the tray's glass, an accent wash from the art side, the kind's eyebrow and glyph (compact.js),
  * and a countdown on Steam's own --toast-duration. Scoped to <html> carrying data-se-tst-compact,
- * which only toasts.js sets, and only once the toast has been read.
+ * which only compact.js sets, and only once the toast has been read.
  */
 html[data-se-tst-compact] { --c: var(--se-accent); }
 html[data-se-tst-compact="on"] { --c: var(--se-online); }

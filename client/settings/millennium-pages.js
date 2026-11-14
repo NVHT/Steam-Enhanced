@@ -1,9 +1,9 @@
 /*
  * Millennium Settings page enhancements.
  *
- * Driven by settings.js: it tags [data-se-mill-page] on the active page and calls
+ * Driven by client/settings/dialog/: it tags [data-se-mill-page] on the active page and calls
  * hooks.before / hooks.after from inside its own pass, so there is no second observer.
- * - Rows (in settings.js's pass): the theme in use, initials, the plugin table and save bar.
+ * - Rows (in the dialog's pass): the theme in use, initials, the plugin table and save bar.
  * - Themes: adds an installed count + search bar, applies skin.json header_image
  *   previews, and exposes a "Theme settings" shortcut on the active theme.
  * - Plugins: adds an All / On / Off segmented filter and search input.
@@ -186,8 +186,8 @@
   }
 
   /*
-   * Rows, from inside settings.js's pass: `before` runs ahead of its card steps (and returns the
-   * page's sub-line), `after` once the cards are drawn; `api` reaches settings.js's pre-labels.
+   * Rows, from inside the dialog's pass: `before` runs ahead of its card steps (and returns the
+   * page's sub-line), `after` once the cards are drawn; `api` reaches the dialog's pre-labels.
    */
   function isActiveTheme(field) {
     const p = SE.fromProps(field, 6, (q) => (q.theme && 'activeTheme' in q ? q : undefined));
@@ -680,7 +680,7 @@
   }
 
   // Sizes `el` (through the custom property `name`) to reach the page's bottom padding, minus
-  // `reserve` px for what sits under it. Runs in the rAF pass, after settings.js's writes.
+  // `reserve` px for what sits under it. Runs in the rAF pass, after the dialog's writes.
   function fillHeight(el, content, name, min, reserve = 0) {
     const box = content.getBoundingClientRect();
     const foot =
@@ -928,7 +928,7 @@
 
   function start() {
     tagEditor();
-    // settings.js only drives this module while a Millennium page is up; this watch notices it
+    // client/settings/dialog/ only drives this module while a Millennium page is up; this watch notices it
     // going away so leave() resets filters and stops the Quick CSS poll.
     editorWatch = SE.watch(() => {
       tagEditor();
@@ -936,7 +936,7 @@
     }, { throttle: 250 });
     addEventListener('resize', schedule);
     schedule();
-    window.__steamEnhancedSettings?.refresh?.(); // in case settings.js's first pass ran before the hooks existed
+    window.__steamEnhancedSettings?.refresh?.(); // in case the dialog's first pass ran before the hooks existed
   }
 
   window.__steamEnhancedMillPages = {

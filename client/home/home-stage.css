@@ -1,7 +1,7 @@
 /*
  * Library Home hero stage and three-column bottom shelf tray.
  *
- * Scoped to `[data-se-hs]` (managed by `client/home/home-stage.js`). Places
+ * Scoped to `[data-se-hs]` (managed by `client/home/stage/`). Places
  * the selected recent game on a full-bleed hero stage with container-query
  * typography, stats, and an 8-game selector strip, above a glass tray housing
  * What's New, Favorites, and Collections side by side.
@@ -50,7 +50,7 @@ html[data-se-hs-scroll-lock] > body[data-se-hs-scroll-lock] {
 
 /*
  * Never native home under the stage: a Library Home Steam has just drawn, and a row it
- * adds to one, stay out of sight until home-stage.js has placed them (normally before the
+ * adds to one, stay out of sight until stage/stage.js has placed them (normally before the
  * frame is painted, so this only covers a frame the script misses). [data-se-hs-on] is set
  * on the window while the stage is in use. A new Home is caught from .LibraryHome and what
  * follows it, which needs no document-wide :has().
@@ -124,7 +124,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
  * The game's block grows with the stage. Sizes are clamped between their
  * size on a ~1400 px stage and their size on a 2400 px one, in container units (cqw, cqh),
  * so a big window gets a big logo, big buttons and big cards rather than a small cluster.
- * The stage's height is set by home-stage.js, so it can be a size container.
+ * The stage's height is set by stage/stage.js, so it can be a size container.
  */
 .se-hs-stage {
   position: relative;
@@ -516,7 +516,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
  * the one showing ringed and lifted, its timer filling
  */
 .se-hs-strip {
-  /* Cards shown; read by home-stage.js so the cycle stays on visible cards */
+  /* Cards shown; read by stage/stage.js so the cycle stays on visible cards */
   --se-hs-cols: 8;
   display: grid;
   grid-template-columns: repeat(var(--se-hs-cols), minmax(0, 1fr));
@@ -1290,7 +1290,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   /*
-   * Rows set by home-stage.js: as many as the games need and the tray holds, each up to a
+   * Rows set by stage/tray.js: as many as the games need and the tray holds, each up to a
    * little taller than a capsule
    */
   grid-template-rows: repeat(var(--se-hs-frows, 2), minmax(0, var(--se-hs-frowh, 1fr)));
@@ -1439,7 +1439,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 
 /*
  * Collections: name and count on the left, three
- * whole covers fanned on the right. --se-hs-ch (a card's height) is set by home-stage.js.
+ * whole covers fanned on the right. --se-hs-ch (a card's height) is set by stage/tray.js.
  */
 .se-hs-coll .se-hs-hall {
   margin: 0;
@@ -1641,7 +1641,7 @@ html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
 
 /*
  * Narrow windows (under 1100 px): the tray's rows stack, each on its own glass. Set by
- * client/home/home-stage.js from a (max-width: 1100px) media query, applied only while the
+ * client/home/stage/stage.js from a (max-width: 1100px) media query, applied only while the
  * window is usable (a minimized window's tiny size never flips the layout).
  */
 [data-se-hs][data-se-hs-narrow][data-se-hs-n]:not(#se-none) {

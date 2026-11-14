@@ -4,7 +4,7 @@
 
   /*
    * Open the friend's chat in the Friends dock for the friend-message notification `target`
-   * belongs to. Returns true when it did. Shared with the Stage toasts (client/toasts/toasts.js),
+   * belongs to. Returns true when it did. Shared with the Stage toasts (client/toasts/),
    * which forward their own clicks here.
    */
   function forward(target) {
