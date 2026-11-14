@@ -168,6 +168,21 @@ Spinners under 40 px fall back to `sweep`.
 </details>
 
 <details>
+<summary><b>Window entrance</b> &nbsp;<code>--se-entrance</code></summary>
+<br>
+
+Windows stay on the theme background until they've loaded (the main window until the Library has finished building), so Steam's own look never flashes. How they then appear:
+
+| Value | Look |
+| --- | --- |
+| `splash` *(default)* | The main window plays the Steam Enhanced splash (the wireframe Library and the card with a Library bar) while the Library builds, picking up where the startup window leaves off. The bar reaches *Ready* in gold just as the finished Library appears. Other windows use `logo`. |
+| `logo` | The Steam Enhanced mark breathes while the window loads, then grows and dissolves into it. |
+| `fade` | The window fades in. |
+| `none` | The window appears at once. |
+
+</details>
+
+<details>
 <summary><b>Home stage, overlay and toasts</b></summary>
 <br>
 
