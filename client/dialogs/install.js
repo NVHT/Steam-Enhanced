@@ -18,8 +18,8 @@
  *
  * Big Picture (.GamepadMode) keeps Steam's dialog.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedInstall?.destroy();
+((SE) => {
+  window.__seInstall?.destroy();
 
   /* InstallRequestModal CSS module (58879) */
   const C = {
@@ -38,38 +38,24 @@
   const NOTICE = 'data-se-inst-notice';
   const MAX_DEPTH = 12;
 
-  const views = new Set();
-  const viewOf = new WeakMap();
-
   /* ---------- Helpers ---------- */
 
-  const attempt = (fn, fallback) => {
-    try {
-      return fn();
-    } catch (err) {
-      console.warn('[Steam Enhanced] Install:', err);
-      return fallback;
-    }
-  };
+  const attempt = SE.attempt('Install');
 
   const { el } = SE;
 
   const { setText } = SE;
 
-  const setStyle = (node, name, value) => {
-    if (node.style.getPropertyValue(name) !== value) node.style.setProperty(name, value);
-  };
-
   const isOurs = SE.inside(`.${OURS}`);
 
-  const num = value => {
+  const num = (value) => {
     const n = Number(value);
     return Number.isFinite(n) && n >= 0 ? n : null;
   };
 
   /* Bytes as Steam shows them: binary units, two decimals from GB up */
   const UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-  const bytes = value => {
+  const bytes = (value) => {
     let n = Math.max(0, value);
     let unit = 0;
     while (n >= 1024 && unit < UNITS.length - 1) {
@@ -94,9 +80,9 @@
     return null;
   };
 
-  const readRequest = node => propsUp(node, p => p.installRequest && Array.isArray(p.installRequest.rgApps))?.installRequest ?? null;
+  const readRequest = (node) => propsUp(node, (p) => p.installRequest && Array.isArray(p.installRequest.rgApps))?.installRequest ?? null;
 
-  const readOption = node => propsUp(node, p => p.folder && typeof p.folder === 'object' && 'nSpaceRequired' in p);
+  const readOption = (node) => propsUp(node, (p) => p.folder && typeof p.folder === 'object' && 'nSpaceRequired' in p);
 
   /* ---------- Hero art ---------- */
 
@@ -127,7 +113,7 @@
 
   /* ---------- Drive cards ---------- */
 
-  const buildDrive = option => {
+  const buildDrive = (option) => {
     const usage = el('div', `${OURS} ${OURS}-usage`);
     const path = el('div', `${OURS}-path`);
     const bar = el('div', `${OURS}-bar`);
@@ -159,8 +145,8 @@
       if (capacity && free != null && capacity >= free) {
         const taken = capacity - free;
         SE.attr(bar, 'hidden', null);
-        setStyle(used, '--w', pct(taken, capacity));
-        setStyle(need, '--w', pct(Math.min(required, free), capacity));
+        SE.cssVar(used, '--w', pct(taken, capacity));
+        SE.cssVar(need, '--w', pct(Math.min(required, free), capacity));
         bar.setAttribute('aria-label', `${bytes(taken)} of ${bytes(capacity)} used`);
         setText(captionUsed, `${bytes(taken)} of ${bytes(capacity)} used`);
       } else {
@@ -184,15 +170,13 @@
 
   /* ---------- View ---------- */
 
-  const createView = root => {
+  const createView = (root) => {
     const cleanups = [];
     const drives = new Map();
     let art = null;
     let artApp = 0;
-    let frame = 0;
 
     const sync = () => {
-      frame = 0;
       if (!root.isConnected) return;
       const anchor = root.querySelector(C.apps) ?? root.querySelector(C.selector);
       const request = anchor && attempt(() => readRequest(anchor), null);
@@ -241,60 +225,43 @@
       }
     };
 
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(sync);
-    };
-
     /* Drive picks flip FolderOption's Active class; free space and notices are text */
-    const observer = new MutationObserver(records => {
-      if (records.some(record => !isOurs(record.target) && ![...record.addedNodes, ...record.removedNodes].every(isOurs))) schedule();
-    });
-    observer.observe(root, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['class'] });
-    cleanups.push(() => observer.disconnect());
+    const change = SE.onChange(root, sync, { attributes: ['class'], characterData: true, ignore: isOurs });
+    cleanups.push(change.disconnect);
 
     sync();
 
     return {
       root,
       destroy() {
-        if (frame) cancelAnimationFrame(frame);
         for (const fn of cleanups.splice(0)) attempt(fn);
         for (const drive of drives.values()) attempt(drive.destroy);
         drives.clear();
         art?.remove();
         for (const name of [ROOT, ACTION, NOTICE, 'data-se-inst-art']) SE.unmark(root, name);
-        views.delete(this);
-        viewOf.delete(root);
       },
     };
   };
 
   /* ---------- Lifecycle ---------- */
 
-  const rootOf = node => node.closest(C.modal) ?? node.closest('.DialogContent');
+  const rootOf = (node) => node.closest(C.modal) ?? node.closest('.DialogContent');
 
-  const scan = () => {
-    for (const view of [...views]) if (!view.root.isConnected) view.destroy();
-    for (const node of document.querySelectorAll(`${C.apps}, ${C.selector}`)) {
-      if (node.closest('.GamepadMode')) continue;
-      const root = rootOf(node);
-      if (!root || viewOf.has(root)) continue;
-      const view = attempt(() => createView(root), null);
-      if (!view) continue;
-      views.add(view);
-      viewOf.set(root, view);
-    }
-  };
+  const mounted = SE.mount(
+    'Install',
+    () =>
+      [...document.querySelectorAll(`${C.apps}, ${C.selector}`)]
+        .filter(node => !node.closest('.GamepadMode'))
+        .map(rootOf),
+    createView,
+    { throttle: 120, scope: `${C.apps}, ${C.selector}`, ignore: isOurs }
+  );
 
-  const watcher = SE.watch(scan, { throttle: 120, ignore: isOurs });
-  scan();
-
-  window.__steamEnhancedInstall = {
+  window.__seInstall = {
     destroy() {
-      watcher.disconnect();
-      for (const view of [...views]) view.destroy();
+      mounted.destroy();
       document.querySelectorAll(`.${OURS}`).forEach(node => node.remove());
-      delete window.__steamEnhancedInstall;
+      delete window.__seInstall;
     },
   };
-});
+})(window.__se);

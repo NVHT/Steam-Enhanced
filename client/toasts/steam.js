@@ -3,8 +3,8 @@
  *
  * Part of client/toasts/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedToastsParts;
+((SE) => {
+  const ns = window.__seToastsParts;
   if (!ns) return;
   const { rarity, run } = SE;
   const { CLASS_RULES, KINDS, TYPE_KINDS, field } = ns;
@@ -20,15 +20,15 @@
    * Minified names change between Steam builds, so components are matched by their props.
    */
   const FIBER_DEPTH = 24;
-  const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v) && !v.$$typeof && !v.nodeType;
+  const isObj = (v) => !!v && typeof v === 'object' && !Array.isArray(v) && !v.$$typeof && !v.nodeType;
 
   /*
    * The toast an element belongs to: the `notification` prop of the component that stacks it.
    * It may be an object or a plain id, so entries are kept in a Map (not a WeakMap) by that value.
    */
   const NO_ID = Object.freeze({ noId: true });
-  const toastIn = p => ('notification' in p && ('toastIndex' in p || 'toastCount' in p) ? p : undefined);
-  const keyOf = el => {
+  const toastIn = (p) => ('notification' in p && ('toastIndex' in p || 'toastCount' in p) ? p : undefined);
+  const keyOf = (el) => {
     if (!el || el === document.body) return null;
     const stack = run(() => SE.fromProps(el, FIBER_DEPTH, toastIn));
     return stack ? (stack.notification ?? NO_ID) : null;
@@ -36,9 +36,9 @@
 
   // Props of the first component below `src` that matches.
   const below = (src, test) => run(() => SE.findDown(src, test, 800)) || null;
-  const templateOf = src => below(src, p => typeof p.onActivate === 'function' && ('title' in p || 'body' in p));
-  const groupOf = src => below(src, p => isObj(p.group) && 'location' in p)?.group || null;
-  const stackOf = src => run(() => SE.fromProps(src, FIBER_DEPTH, toastIn)) || null;
+  const templateOf = (src) => below(src, (p) => typeof p.onActivate === 'function' && ('title' in p || 'body' in p));
+  const groupOf = (src) => below(src, (p) => isObj(p.group) && 'location' in p)?.group || null;
+  const stackOf = (src) => run(() => SE.fromProps(src, FIBER_DEPTH, toastIn)) || null;
 
   // The notification itself: the group's newest (as friend-notification-clicks.js reads it), else the toast's.
   const noteOf = (key, src) => {
@@ -75,31 +75,31 @@
   }
 
   // A plain URL from a template prop (Steam passes either a URL or an element).
-  const urlOf = v => (typeof v === 'string' && /^(https?:|\/|data:image\/(?!gif))/.test(v) ? v : '');
+  const urlOf = (v) => (typeof v === 'string' && /^(https?:|\/|data:image\/(?!gif))/.test(v) ? v : '');
 
   const steamClient = () =>
-    SE.global('SteamClient', sc => typeof sc?.Apps?.GetMyAchievementsForApp === 'function') || window.SteamClient || null;
+    SE.global('SteamClient', (sc) => typeof sc?.Apps?.GetMyAchievementsForApp === 'function') || window.SteamClient || null;
 
   /* ---------- Reading a Steam toast ---------- */
 
   const BUTTONS = 'button, [role="button"], .DialogButton';
-  const shown = el => el.getClientRects().length > 0;
-  const isInline = el => /^(inline|contents)$/.test(getComputedStyle(el).display);
+  const shown = (el) => el.getClientRects().length > 0;
+  const isInline = (el) => /^(inline|contents)$/.test(getComputedStyle(el).display);
   const blockOf = (el, stop) => {
     let cur = el;
     while (cur && cur !== stop && isInline(cur)) cur = cur.parentElement;
     return cur || stop;
   };
-  const clean = s => s.replace(/\s+/g, ' ').replace(/\s+([,.:;!?])/g, '$1').trim();
+  const clean = (s) => s.replace(/\s+/g, ' ').replace(/\s+([,.:;!?])/g, '$1').trim();
 
   // Text lines (one per block), images and buttons, in the order Steam draws them.
   function read(src) {
     // Steam wraps the whole toast in a role="button" element (its click target): that one
     // isn't an action button. Real buttons are <button>s, or role="button"s holding less text.
     const all = clean(src.textContent || '');
-    const isAction = el =>
+    const isAction = (el) =>
       el.matches('button, .DialogButton') || (el.matches(BUTTONS) && clean(el.textContent || '') !== all);
-    const actionOf = el => {
+    const actionOf = (el) => {
       for (let cur = el; cur && cur !== src; cur = cur.parentElement) if (cur.matches(BUTTONS) && isAction(cur)) return cur;
       return null;
     };
@@ -146,14 +146,14 @@
   }
 
   // A friend's 32-bit account id from their 64-bit SteamID (individual accounts only).
-  const accountIdOf = v => {
+  const accountIdOf = (v) => {
     if (!/^\d{17,20}$/.test(String(v || ''))) return 0;
     const id = BigInt(String(v));
     return ((id >> 52n) & 15n) === 1n ? Number(id & 0xffffffffn) : 0;
   };
 
   // A Steam app id (non-Steam game ids are 64-bit and have no art).
-  const appIdOf = v => {
+  const appIdOf = (v) => {
     const n = Number(v);
     return Number.isInteger(n) && n > 0 && n <= 0xffffffff ? n : 0;
   };
@@ -179,7 +179,7 @@
     const k = KINDS[kind];
     const appid =
       appIdOf(field(data, 'appid', 'game_id', 'gameid', 'app_id') || field(note, 'appid')) ||
-      appIdOf(run(() => SE.fromProps(src, FIBER_DEPTH, p => (Number(p.appid) > 0 ? Number(p.appid) : undefined)))) ||
+      appIdOf(run(() => SE.fromProps(src, FIBER_DEPTH, (p) => (Number(p.appid) > 0 ? Number(p.appid) : undefined)))) ||
       // A friend's game: their persona status carries it (the toast itself has none).
       appIdOf(field(tpl?.personaStatus, 'm_unGamePlayedAppID', 'm_gameid', 'unGamePlayedAppID', 'gameid', 'appid')) ||
       (kind === 'playing' ? appByName(`${seen.title} ${seen.text}`) : 0);
@@ -227,7 +227,7 @@
   const GUARD_MS = 60 * 1000;          // past Steam's own time, unless hovered
   const origMs = new WeakMap();        // notification → Steam's original duration
 
-  const steamMs = key => (key && typeof key === 'object' && origMs.has(key) ? origMs.get(key) : Number(field(key, 'nToastDurationMS')) || 0);
+  const steamMs = (key) => (key && typeof key === 'object' && origMs.has(key) ? origMs.get(key) : Number(field(key, 'nToastDurationMS')) || 0);
 
   function holdTimer(key) {
     if (!key || typeof key !== 'object' || origMs.has(key)) return;
@@ -236,7 +236,7 @@
     origMs.set(key, ms);
     run(() => { key.nToastDurationMS = HOLD_MS; });
   }
-  const held = key => !!key && typeof key === 'object' && run(() => key.nToastDurationMS) === HOLD_MS;
+  const held = (key) => !!key && typeof key === 'object' && run(() => key.nToastDurationMS) === HOLD_MS;
 
   // Put Steam's duration back for a toast left native (it can't be read), and close it on time.
   function letGo(key, src, born) {
@@ -322,4 +322,4 @@
   }
 
   Object.assign(ns, { FIBER_DEPTH, GUARD_MS, describe, enrichAchievement, held, holdTimer, hoverSteam, inDock, keyOf, letGo, noteOf, onEarlyMutation, templateOf });
-});
+})(window.__se);

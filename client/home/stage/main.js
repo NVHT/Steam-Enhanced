@@ -13,13 +13,13 @@
  *   --se-home-stage-tray (percentage of viewport height)
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
- * window.__steamEnhancedHomeStageParts (values parts reassign live on its `live`): util.js
+ * window.__seHomeStageParts (values parts reassign live on its `live`): util.js
  * (shared helpers), tray.js, picks.js, stage.js (the stage and the layout pass), data.js,
  * news.js, and this one, main.js, which watches Home, runs one layout pass per frame and undoes
  * everything in destroy().
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedHomeStageParts;
+((SE) => {
+  const ns = window.__seHomeStageParts;
   if (!ns) return;
   const {
     cancelNewsOpen, cancelPass, forgetStage, layout, narrow, placePick, reducedMotion,
@@ -27,7 +27,7 @@
   } = ns;
   const { live } = ns;
 
-  window.__steamEnhancedHomeStage?.destroy();
+  window.__seHomeStage?.destroy();
 
   let watcher = null;
   let sizes = null;
@@ -118,7 +118,7 @@
     schedule();
   }
 
-  window.__steamEnhancedHomeStage = {
+  window.__seHomeStage = {
     destroy() {
       cancelNewsOpen();
       watcher?.disconnect();
@@ -133,7 +133,7 @@
       setOn(false);
       forgetStage();
       removeEventListener('DOMContentLoaded', start);
-      delete window.__steamEnhancedHomeStage;
+      delete window.__seHomeStage;
     },
   };
 
@@ -144,4 +144,4 @@
   } else {
     addEventListener('DOMContentLoaded', start, { once: true });
   }
-});
+})(window.__se);

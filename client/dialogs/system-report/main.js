@@ -3,8 +3,8 @@
  *
  * Part of client/dialogs/system-report/ (see shared.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSystemReportParts;
+((SE) => {
+  const ns = window.__seSystemReportParts;
   if (!ns) return;
   const { BUILT, CHAIN, CONTAINER, ROOT, createView, views } = ns;
 
@@ -17,7 +17,7 @@
     for (let node = body; node && node !== root; node = node.parentElement) SE.mark(node, CHAIN);
   };
 
-  const build = root => {
+  const build = (root) => {
     const container = root.querySelector(CONTAINER);
     const body = container?.closest('.DialogBody');
     const text = container?.parentElement;
@@ -45,16 +45,17 @@
     }
   };
 
-  const watcher = SE.watch(scan, { throttle: 100, scope: ROOT, ignore: node => !!node.closest?.('.se-sysreport') });
+  const watcher = SE.watch(scan, { throttle: 100, scope: ROOT, ignore: (node) => !!node.closest?.('.se-sysreport') });
   scan();
 
-  window.__steamEnhancedSystemReport = {
+  window.__seSystemReport = {
     destroy() {
       watcher.disconnect();
       for (const view of [...views]) view.destroy();
       document.querySelectorAll('.se-sysreport').forEach(node => node.remove());
       document.querySelectorAll(`[${BUILT}]`).forEach(node => SE.unmark(node, BUILT));
       document.querySelectorAll(`[${CHAIN}]`).forEach(node => SE.unmark(node, CHAIN));
-      delete window.__steamEnhancedSystemReport;
+      delete window.__seSystemReport;
     },
-  };});
+  };
+})(window.__se);

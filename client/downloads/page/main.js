@@ -2,10 +2,10 @@
  * Wires the page: the drag guards, Steam's overview subscription, the watcher and poll, the
  * debug hotkey, and the page's API (destroy()).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedDownloadsParts;
+((SE) => {
+  const ns = window.__seDownloadsParts;
   if (!ns) return;
-  const { ITEM, NATIVE_DRAG_EVENTS, PAGE_SELECTOR, QUEUE, RBD_HANDLE, ROW, SORT_SECTION, TRACKED_ATTRS, copyText, debugKey, dropPending, findPauseHandler, finishDrag, holdNativeDrag, library, loadThemeVersion, mountedNodes, openGame, rbdHandles, schedule, searchGames, steamDownloads, syncLibrary, update, watchPending } = ns;
+  const { ITEM, NATIVE_DRAG_EVENTS, PAGE_SELECTOR, QUEUE, RBD_HANDLE, ROW, SORT_SECTION, TRACKED_ATTRS, debugKey, dropPending, findPauseHandler, finishDrag, holdNativeDrag, library, loadThemeVersion, mountedNodes, openGame, rbdHandles, schedule, searchGames, steamDownloads, syncLibrary, update, watchPending } = ns;
   const { live } = ns;
 
   for (const type of NATIVE_DRAG_EVENTS) addEventListener(type, holdNativeDrag, true);
@@ -29,7 +29,7 @@
   schedule();
   addEventListener('keydown', debugKey, true);
 
-  window.__steamEnhancedDownloads = {
+  window.__seDownloads = {
     get library() { return library.isConnected ? library : null; },
     // Support: copies Steam's transfer block and queue markup, and lists the download API
     async debug() {
@@ -49,7 +49,7 @@
         transfer: row?.outerHTML.replace(/<svg[\s\S]*?<\/svg>/g, '<svg/>').slice(0, 20000),
         queue: page?.querySelector(QUEUE)?.outerHTML.replace(/<svg[\s\S]*?<\/svg>/g, '<svg/>').slice(0, 20000),
       };
-      copyText(JSON.stringify(report, null, 2));
+      SE.copy(JSON.stringify(report, null, 2));
       return report;
     },
     searchGames,
@@ -78,7 +78,7 @@
           el.removeAttribute(attrName);
         }
       }
-      delete window.__steamEnhancedDownloads;
+      delete window.__seDownloads;
     },
   };
-});
+})(window.__se);

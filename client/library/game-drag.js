@@ -16,8 +16,8 @@
  *   by the card under it.
  * Styled in client/library/game-drag.css.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedGameDrag?.destroy();
+((SE) => {
+  window.__seGameDrag?.destroy();
   if (!document.body) return;
 
   const { C, esc } = SE;
@@ -47,10 +47,10 @@
 
   /* ---------- Finding Steam's zones ---------- */
 
-  const rgb = value => (/rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/.exec(value) || []).slice(1).map(Number);
+  const rgb = (value) => (/rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/.exec(value) || []).slice(1).map(Number);
 
   /* A dashed outline on the element or its ::before, as Steam draws a drop zone */
-  const dashedColor = el => {
+  const dashedColor = (el) => {
     for (const pseudo of [null, '::before']) {
       const style = getComputedStyle(el, pseudo);
       if (style.borderTopStyle === 'dashed') return style.borderTopColor;
@@ -59,7 +59,7 @@
     return null;
   };
 
-  const classify = color => {
+  const classify = (color) => {
     const [r = 0, g = 0, b = 0] = rgb(color);
     return r > g + 40 && r > b + 40 ? 'remove' : 'add';
   };
@@ -74,7 +74,7 @@
    * Reads only: returns [el, kind] for a zone, or null. Zones are adopted after a whole pass,
    * so marking one never forces a style recalc in the middle of the reads.
    */
-  const consider = el => {
+  const consider = (el) => {
     if (session.zones.has(el) || el.closest(`${ENTRY}, .se-gd-ghost, .se-gd-tray`)) return null;
     if (el.parentElement?.closest(`[${ZONE}]`)) return null;
     /* Hidden by a previous drag and not yet released: still a zone */
@@ -86,7 +86,7 @@
   };
 
   /* In document order, so an outer zone is marked before any zone-like box inside it */
-  const adoptAll = found => {
+  const adoptAll = (found) => {
     for (const [el, kind] of found) {
       if (!session.zones.has(el) && !el.parentElement?.closest(`[${ZONE}]`)) adopt(el, kind);
     }
@@ -104,9 +104,9 @@
   };
 
   /* Everything in the library except the rows and covers (hundreds, never a zone) */
-  const scanAll = root => {
+  const scanAll = (root) => {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
-      acceptNode: node => (node.matches(`${ENTRY}, ${COVER}`) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+      acceptNode: (node) => (node.matches(`${ENTRY}, ${COVER}`) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
     });
     const found = [];
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
@@ -116,7 +116,7 @@
     adoptAll(found);
   };
 
-  const onMutations = records => {
+  const onMutations = (records) => {
     if (!session) return;
     const found = [];
     for (const record of records) {
@@ -153,7 +153,7 @@
     card.dataset.kind = kind;
     card.innerHTML = '<i class="se-gd-icon" aria-hidden="true"></i><div class="se-gd-words"></div>';
     fillCard(card, zone);
-    for (const [type, handler] of CARD_EVENTS) card.addEventListener(type, event => handler(event, zone, card));
+    for (const [type, handler] of CARD_EVENTS) card.addEventListener(type, (event) => handler(event, zone, card));
     return card;
   };
 
@@ -181,7 +181,7 @@
     return copy.defaultPrevented;
   };
 
-  const setOver = card => {
+  const setOver = (card) => {
     if (!session || session.over === card) return;
     session.over?.removeAttribute(OVER);
     session.over = card;
@@ -224,7 +224,7 @@
 
   /* ---------- Tray layout ---------- */
 
-  const scrollerOf = entry => {
+  const scrollerOf = (entry) => {
     for (let node = entry.parentElement, i = 0; node && node !== document.body && i < SCROLL_CLIMB; node = node.parentElement, i++) {
       const { overflowY } = getComputedStyle(node);
       if ((overflowY === 'auto' || overflowY === 'scroll') && node.scrollHeight > node.clientHeight) return node;
@@ -232,13 +232,13 @@
     return null;
   };
 
-  const listArea = entry => {
+  const listArea = (entry) => {
     const area = scrollerOf(entry) || entry.closest(LIST);
     return area ? { area, head: entry.closest(LIST)?.querySelector(LIST_HEAD) || null } : null;
   };
 
   /* The rows' box (under the list column's Home/search header, if the box includes it) */
-  const measureList = list => {
+  const measureList = (list) => {
     if (!list?.area.isConnected) return null;
     const box = list.area.getBoundingClientRect();
     const head = list.head?.isConnected ? list.head.getBoundingClientRect() : null;
@@ -302,7 +302,7 @@
   /* The page-wide image scan is the costly part of the search: at most this often */
   const IMAGE_SCAN_MS = 120;
 
-  const isSelected = entry =>
+  const isSelected = (entry) =>
     Boolean(entry.matches(SELECTED) || entry.closest(SELECTED) || entry.querySelector(SELECTED));
 
   /* Rows are virtualized: only drawn rows can be counted, so the count is a floor */
@@ -335,12 +335,12 @@
     y >= rect.top - GHOST_REACH &&
     y <= rect.bottom + GHOST_REACH;
 
-  const excluded = el => Boolean(el.closest(`${ENTRY}, [${ZONE}], .se-gd-ghost, .se-gd-tray, [${STEAM_GHOST}]`));
+  const excluded = (el) => Boolean(el.closest(`${ENTRY}, [${ZONE}], .se-gd-ghost, .se-gd-tray, [${STEAM_GHOST}]`));
 
-  const hasArt = el => el.tagName === 'IMG' || el.tagName === 'CANVAS' || getComputedStyle(el).backgroundImage.includes('url(');
+  const hasArt = (el) => el.tagName === 'IMG' || el.tagName === 'CANVAS' || getComputedStyle(el).backgroundImage.includes('url(');
 
   /* The element that moves: the nearest fixed (or pointer-transparent absolute) ancestor */
-  const movingLayer = el => {
+  const movingLayer = (el) => {
     for (let node = el, i = 0; node && node !== document.body && i <= GHOST_CLIMB; node = node.parentElement, i++) {
       const style = getComputedStyle(node);
       if (style.position === 'fixed') return node;
@@ -371,7 +371,7 @@
     return null;
   };
 
-  const onBodyMutations = records => {
+  const onBodyMutations = (records) => {
     if (!session) return;
     for (const record of records) {
       for (const node of record.addedNodes) {
@@ -411,7 +411,7 @@
   /* ---------- Session ---------- */
 
   /* Steam fades its zones out after a drag; they stay hidden until gone or past that fade */
-  const releaseLater = zones => {
+  const releaseLater = (zones) => {
     const timer = setTimeout(() => {
       releaseTimers.delete(timer);
       for (const zone of zones) {
@@ -441,7 +441,7 @@
   };
 
   /* Bubble phase on window: Steam's own dragstart (React, at its root) has already run */
-  const onDragStart = event => {
+  const onDragStart = (event) => {
     if (!event.isTrusted) return;
     end();
     const entry = event.target?.closest?.(ENTRY) || event.target?.querySelector?.(ENTRY);
@@ -495,7 +495,7 @@
   };
 
   /* The theme's own handed-on events (untrusted) are not the user's pointer */
-  const onDragOver = event => {
+  const onDragOver = (event) => {
     if (!session || !event.isTrusted) return;
     if (!event.target?.closest?.('.se-gd-card')) setOver(null);
     track(event.clientX, event.clientY);
@@ -507,18 +507,18 @@
    */
   const leftWindow = ({ clientX: x, clientY: y }) => x <= 0 || y <= 0 || x >= innerWidth - 1 || y >= innerHeight - 1;
 
-  const onDragLeave = event => {
+  const onDragLeave = (event) => {
     if (!session || !event.isTrusted || event.relatedTarget || !leftWindow(event)) return;
     setOver(null);
     session.ghost.setAttribute('data-se-away', '');
   };
 
   /* A drop on a card ends the session in the card's handler, after handing it on */
-  const onDrop = event => {
+  const onDrop = (event) => {
     if (event.isTrusted && !event.target?.closest?.('.se-gd-card')) end();
   };
 
-  const onDragEnd = event => {
+  const onDragEnd = (event) => {
     if (event.isTrusted) end();
   };
 
@@ -542,7 +542,7 @@
 
   for (const [type, fn, capture] of listeners) window.addEventListener(type, fn, capture);
 
-  window.__steamEnhancedGameDrag = {
+  window.__seGameDrag = {
     destroy() {
       end();
       for (const timer of releaseTimers) clearTimeout(timer);
@@ -550,7 +550,7 @@
       for (const [type, fn, capture] of listeners) window.removeEventListener(type, fn, capture);
       for (const el of document.querySelectorAll('.se-gd-ghost, .se-gd-tray')) el.remove();
       for (const el of document.querySelectorAll(`[${ZONE}]`)) el.removeAttribute(ZONE);
-      delete window.__steamEnhancedGameDrag;
+      delete window.__seGameDrag;
     },
   };
-});
+})(window.__se);

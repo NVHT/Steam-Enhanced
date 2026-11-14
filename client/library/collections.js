@@ -6,14 +6,11 @@
  * installation/friend badges to native cover cards; in List mode, renders a sortable
  * table alongside the hidden native grid.
  */
-(window.__se
-  ? (init) => init(window.__se)
-  : (init) => addEventListener('se-core', () => init(window.__se), { once: true })
-)((SE) => {
+((SE) => {
   const { C, run, isInstalled, navigate, findDown, coverURLs } = SE;
   /* A grid's games are re-read at most this often (friends playing, install state) */
   const GAMES_TTL = 3500;
-  window.__steamEnhancedCollections?.destroy();
+  window.__seCollections?.destroy();
 
   const PAGE = C.OuterContainer_Container;
   const HEADER = C.OuterContainer_Header;
@@ -276,7 +273,7 @@
     if (forcedView.has(kind)) return forcedView.get(kind);
     try {
       return localStorage.getItem(viewKey(kind)) === 'list' ? 'list' : 'grid';
-    } catch (_) {
+    } catch {
       return 'grid';
     }
   }
@@ -284,7 +281,7 @@
   function setView(kind, v) {
     try {
       localStorage.setItem(viewKey(kind), v);
-    } catch (_) {}
+    } catch {}
     schedule();
   }
 
@@ -803,7 +800,7 @@
   const timer = SE.poll(schedule, 4000, { active: () => SE.visible('[data-se-view="list"]') });
   schedule();
 
-  window.__steamEnhancedCollections = {
+  window.__seCollections = {
     destroy() {
       watcher?.disconnect();
       timer?.disconnect();
@@ -822,4 +819,4 @@
       }
     },
   };
-});
+})(window.__se);

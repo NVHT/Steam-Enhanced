@@ -4,8 +4,8 @@
  *
  * Part of client/settings/dialog/ (see shared.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSettingsParts;
+((SE) => {
+  const ns = window.__seSettingsParts;
   if (!ns) return;
   const { C, fromProps, attr: setAttr } = SE;
   const {
@@ -207,4 +207,4 @@
     loadNext();
   }
   Object.assign(ns, { propsPage, propsSidebar, resetProps });
-});
+})(window.__se);

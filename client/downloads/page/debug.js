@@ -1,6 +1,8 @@
-/* Support: copying the page's markup, the theme version, and the debug hotkey's toast. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedDownloadsParts;
+/*
+ * Support: copying the page's markup, the theme version, and the debug hotkey's toast.
+ */
+((SE) => {
+  const ns = window.__seDownloadsParts;
   if (!ns) return;
   const { PAGE_SELECTOR, mountedNodes } = ns;
 
@@ -20,38 +22,10 @@
     'data-now',
   ];
 
-  // Clipboard: the async API when the page may use it, else a selected textarea
-  function copyText(text) {
-    const fallback = () => {
-      const area = document.createElement('textarea');
-      area.value = text;
-      area.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
-      document.body.append(area);
-      area.select();
-      const ok = SE.run(() => document.execCommand('copy'));
-      area.remove();
-      return !!ok;
-    };
-    const writing = SE.run(() => navigator.clipboard.writeText(text));
-    if (writing?.catch) writing.catch(fallback);
-    else fallback();
-  }
-
   // The skin's manifest is the source of the version: fetched once, when the page first shows,
   // so a report made later needs no wait
   let themeVersion = null;
-  const loadThemeVersion = () => (themeVersion ||= (async () => {
-    try {
-      const asset = [...document.querySelectorAll('script[src], link[href]')]
-        .map((el) => el.src || el.href)
-        .find((url) => /\/core\/(?:core\.js|tokens\.css)(?:[?#]|$)/.test(url));
-      const response = await fetch(new URL('../skin.json', asset), { cache: 'no-store' });
-      const version = (await response.json())?.version;
-      return typeof version === 'string' && version ? version : 'unknown';
-    } catch (_) {
-      return 'unknown';
-    }
-  })());
+  const loadThemeVersion = () => (themeVersion ||= SE.themeVersion().then((version) => version || 'unknown'));
 
   // Ctrl+Shift+D on the Downloads page: copies the support report, no console needed
   function toast(message) {
@@ -71,8 +45,8 @@
     if (!document.querySelector(PAGE_SELECTOR)) return;
     event.preventDefault();
     event.stopPropagation();
-    window.__steamEnhancedDownloads?.debug().then((report) => toast(`Steam Enhanced ${report.build}: download info copied`));
+    window.__seDownloads?.debug().then((report) => toast(`Steam Enhanced ${report.build}: download info copied`));
   };
 
-  Object.assign(ns, { TRACKED_ATTRS, copyText, debugKey, loadThemeVersion });
-});
+  Object.assign(ns, { TRACKED_ATTRS, debugKey, loadThemeVersion });
+})(window.__se);

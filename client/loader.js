@@ -1,254 +1,171 @@
 /*
  * Client loader: which theme files each Steam window gets.
  *
- * Millennium matches windows, this file picks files. skin.json injects core/core.js and this
- * loader into every window (".*"), plus one stub per window group (client/windows/<group>.js).
- * Each group's regex lives only in skin.json. A stub adds its group's name to
- * window.__seWindows, and the loader adds every file listed for the groups present, in list
- * order. Stubs and loader may run in either order. To add a feature, list its files here; only
- * a new window group needs a skin.json change (and a full Steam restart).
+ * skin.json injects core/core.js and this loader into every window (".*"); this file decides
+ * the rest. It sorts the window into groups by its title (GROUPS below) and adds every file
+ * listed for those groups, in list order. To add a feature or a window group, edit this file
+ * only: no skin.json change, no Steam restart.
  *
  * A feature split into parts is listed part by part, in the order its parts run. The parts are
- * classic scripts sharing one namespace object (window.__steamEnhanced<Feature>Parts): each
- * takes what earlier parts published, looks up later parts' names when it calls them, and
- * publishes what others use; a value parts reassign lives on the namespace's `live`. Not ES
- * modules: in Steam's popup windows a module's imports can stall (they did for the toasts),
- * and a module's strict mode throws on writes to Steam's objects that a classic script skips,
- * which the theme's patching relies on (the Steam menu). Every script here is a classic one.
+ * classic scripts sharing one namespace object (window.__se<Feature>Parts): each takes what
+ * earlier parts published, looks up later parts' names when it calls them, and publishes what
+ * others use; a value parts reassign lives on the namespace's `live`. Not ES modules: in Steam's
+ * popup windows a module's imports can stall (they did for the toasts), and a module's strict
+ * mode throws on writes to Steam's objects that a classic script skips, which the theme's
+ * patching relies on (the Steam menu). Every script here is a classic one.
  *
  * The list order is the cascade. Each stylesheet's <link> carries its list position and goes in
- * among the theme's other links by that position, whichever group asked for it first. So rules
- * that tie on specificity resolve the same in every window. Scripts run in list order (a split
- * feature's parts rely on it), each once core's `se-core` event has fired.
+ * among the theme's other links by that position, so rules that tie on specificity resolve the
+ * same in every window. Scripts run in list order (a split feature's parts rely on it), and only
+ * once core/core.js has published the runtime (window.__se): every script can take it as given.
  *
  * Files load with the loader's own query string, so whatever cache-busting Millennium puts on
  * this file carries over to every file.
  *
- * Web pages: skin.json's patches match web views by URL, so this loader and the content and
- * desktop stubs also run on Store, Community and other web pages. Those have their own loaders
- * (core/core.js starts them); here they get only WEB_FILES, the window-agnostic basics. Client
- * windows are served from steamloopback.host or are about:blank popups of it.
- *
- * Groups (regexes in skin.json):
- *   all           every client window (no stub: this file)
- *   main          the main Steam window
- *   content       every window but menus and notification toasts
- *   desktop       content windows minus the overlay, Big Picture, Quick Access, Main Menu,
- *                 the Games List and browser find bars
- *   overlay       the in-game overlay
- *   toasts        notification toasts
- *   notify        windows a friend notification can be clicked in (main, toasts, overlay, menus)
- *   achievements  the main window and the overlay
+ * Web pages: skin.json's patches match web views too, so this loader also runs on Store,
+ * Community and other web pages. Those have their own loaders (core/core.js starts them); here
+ * they get only WEB_FILES, the window-agnostic basics. Client windows are served from
+ * steamloopback.host or are about:blank popups of it.
  */
 (() => {
-  if (window.__seClient) {
-    window.__seClient.flush();
-    return;
-  }
+  if (window.__seClient) return;
 
-  /** @type {[group: string, file: string][]} */
-  const FILES = [
-    ['main', 'core/plugin-rpc.js'],
-    ['notify', 'client/friends/friend-notification-clicks.js'],
-    ['overlay', 'client/overlay/overlay.css'],
-    ['overlay', 'client/overlay/context.js'],
-    ['overlay', 'client/overlay/data.js'],
-    ['overlay', 'client/overlay/sources.js'],
-    ['overlay', 'client/overlay/widgets.js'],
-    ['overlay', 'client/overlay/dom.js'],
-    ['overlay', 'client/overlay/render.js'],
-    ['overlay', 'client/overlay/friends.js'],
-    ['overlay', 'client/overlay/notes.js'],
-    ['overlay', 'client/overlay/browser.js'],
-    ['overlay', 'client/overlay/achievements.js'],
-    ['overlay', 'client/overlay/main.js'],
-    ['all', 'client/overlay/overlay-popups.css'],
-    ['main', 'client/friends/friends-background.js'],
-    ['all', 'core/font.css'],
-    ['all', 'core/tokens.css'],
-    ['all', 'core/images.css'],
-    ['all', 'core/images.js'],
-    ['toasts', 'client/toasts/toasts.css'],
-    ['toasts', 'client/toasts/context.js'],
-    ['toasts', 'client/toasts/config.js'],
-    ['toasts', 'client/toasts/steam.js'],
-    ['toasts', 'client/toasts/stage.js'],
-    ['toasts', 'client/toasts/hub.js'],
-    ['toasts', 'client/toasts/placement.js'],
-    ['toasts', 'client/toasts/scan.js'],
-    ['toasts', 'client/toasts/compact.js'],
-    ['toasts', 'client/toasts/main.js'],
-    ['content', 'client/startup/startup.css'],
-    ['content', 'client/startup/startup.js'],
-    ['content', 'client/startup/sign-in.css'],
-    ['main', 'client/entrance/entrance.css'],
-    ['main', 'client/entrance/entrance.js'],
-    ['content', 'client/spinner/spinner.css'],
-    ['content', 'client/spinner/spinner.js'],
-    ['desktop', 'core/native-tooltips.js'],
-    ['main', 'client/library/artwork.css'],
-    ['main', 'client/game-page/always-open-game-details.js'],
-    ['main', 'client/home/news-hub.js'],
-    ['main', 'client/header/header-actions.css'],
-    ['main', 'client/header/header-actions.js'],
-    ['main', 'client/browser/url-bar.css'],
-    ['main', 'client/browser/url-bar.js'],
-    ['main', 'core/icons.css'],
-    ['main', 'client/header/header-tooltips.js'],
-    ['main', 'client/navigation/sidebar-icons.css'],
-    ['main', 'client/navigation/sidebar-icons.js'],
-    ['main', 'client/header/menu/shared.js'],
-    ['main', 'client/header/menu/api.js'],
-    ['main', 'client/header/menu/menus.js'],
-    ['main', 'client/header/menu/account.js'],
-    ['main', 'client/header/menu/actions.js'],
-    ['main', 'client/header/menu/hover.js'],
-    ['main', 'client/header/menu/popups.js'],
-    ['main', 'client/header/menu/placement.js'],
-    ['main', 'client/header/menu/patch.js'],
-    ['main', 'client/header/menu/main.js'],
-    ['main', 'client/navigation/nav-rail.css'],
-    ['main', 'client/navigation/nav-rail.js'],
-    ['main', 'client/library/library.css'],
-    ['main', 'client/library/game-list.css'],
-    ['main', 'client/library/game-list.js'],
-    ['main', 'client/library/game-drag.css'],
-    ['main', 'client/library/game-drag.js'],
-    ['main', 'client/library/collections.css'],
-    ['main', 'client/library/collections.js'],
-    ['main', 'client/downloads/downloads.css'],
-    ['main', 'client/downloads/page/shared.js'],
-    ['main', 'client/downloads/page/native.js'],
-    ['main', 'client/downloads/page/library.js'],
-    ['main', 'client/downloads/page/backdrop.js'],
-    ['main', 'client/downloads/page/read.js'],
-    ['main', 'client/downloads/page/hero.js'],
-    ['main', 'client/downloads/page/transfer.js'],
-    ['main', 'client/downloads/page/queue.js'],
-    ['main', 'client/downloads/page/drag.js'],
-    ['main', 'client/downloads/page/pass.js'],
-    ['main', 'client/downloads/page/debug.js'],
-    ['main', 'client/downloads/page/main.js'],
-    ['main', 'client/friends/friends-dock.css'],
-    ['main', 'client/friends/dock/templates.js'],
-    ['main', 'client/friends/dock/data.js'],
-    ['main', 'client/friends/dock/ui.js'],
-    ['main', 'client/friends/dock/routing.js'],
-    ['main', 'client/friends/dock/flyouts.js'],
-    ['main', 'client/friends/dock/embed.js'],
-    ['main', 'client/friends/dock/dock.js'],
-    ['main', 'client/friends/dock/chat-popup.js'],
-    ['main', 'client/friends/dock/main.js'],
-    ['main', 'client/library/sort-segments.css'],
-    ['main', 'client/library/sort-segments.js'],
-    ['main', 'client/home/home-polish.css'],
-    ['main', 'client/home/home-polish.js'],
-    ['main', 'client/home/home-stage.css'],
-    ['main', 'client/home/stage/util.js'],
-    ['main', 'client/home/stage/tray.js'],
-    ['main', 'client/home/stage/picks.js'],
-    ['main', 'client/home/stage/stage.js'],
-    ['main', 'client/home/stage/data.js'],
-    ['main', 'client/home/stage/news.js'],
-    ['main', 'client/home/stage/main.js'],
-    ['all', 'client/dialogs/dialogs.css'],
-    ['content', 'client/dialogs/install.css'],
-    ['content', 'client/dialogs/eula.css'],
-    ['all', 'client/dialogs/hover-cards.css'],
-    ['all', 'client/friends/friend-hover.css'],
-    ['all', 'client/friends/friend-hover.js'],
-    ['main', 'client/dialogs/hover-cards.js'],
-    ['all', 'client/header/notifications.css'],
-    ['all', 'client/header/notifications.js'],
-    ['all', 'client/dialogs/window-controls.css'],
-    ['content', 'client/dialogs/utility/base.css'],
-    ['content', 'client/dialogs/utility/servers.css'],
-    ['content', 'client/dialogs/utility/media.css'],
-    ['content', 'client/dialogs/utility/library-tools.css'],
-    ['content', 'client/dialogs/utility/modals.css'],
-    ['content', 'client/dialogs/utility/friends.css'],
-    ['content', 'client/dialogs/utility/standalone.css'],
-    ['content', 'client/dialogs/about-steam.css'],
-    ['content', 'client/dialogs/about-steam.js'],
-    ['content', 'client/dialogs/system-info.css'],
-    ['content', 'client/dialogs/system-info.js'],
-    ['content', 'client/dialogs/system-report.css'],
-    ['content', 'client/dialogs/system-report/shared.js'],
-    ['content', 'client/dialogs/system-report/parse.js'],
-    ['content', 'client/dialogs/system-report/view.js'],
-    ['content', 'client/dialogs/system-report/main.js'],
-    ['content', 'client/dialogs/add-non-steam.css'],
-    ['content', 'client/dialogs/add-non-steam.js'],
-    ['desktop', 'client/dialogs/activate-product.css'],
-    ['desktop', 'client/dialogs/activate-product.js'],
-    ['desktop', 'client/dialogs/backups.css'],
-    ['desktop', 'client/dialogs/backups.js'],
-    ['desktop', 'client/dialogs/install.js'],
-    ['desktop', 'client/dialogs/eula.js'],
-    ['desktop', 'client/dialogs/uninstall.css'],
-    ['desktop', 'client/dialogs/uninstall.js'],
-    ['main', 'compat/hltb-for-steam/hltb-for-steam.css'],
-    ['main', 'compat/hltb-for-steam/hltb-for-steam.js'],
-    ['achievements', 'core/achievement-tiers.css'],
-    ['main', 'client/game-page/layout.css'],
-    ['main', 'client/game-page/play-bar.css'],
-    ['main', 'client/game-page/overview.css'],
-    ['main', 'client/game-page/achievements.css'],
-    ['main', 'client/game-page/friends.css'],
-    ['main', 'client/game-page/cards.css'],
-    ['main', 'client/game-page/activity.css'],
-    ['main', 'client/game-page/util.js'],
-    ['main', 'client/game-page/achievements.js'],
-    ['main', 'client/game-page/layout.js'],
-    ['main', 'client/game-page/friends.js'],
-    ['main', 'client/game-page/activity.js'],
-    ['main', 'client/game-page/cards.js'],
-    ['main', 'client/game-page/page.js'],
-    ['main', 'client/game-page/play-bar.js'],
-    ['main', 'client/game-page/main.js'],
-    ['main', 'client/achievements/achievements-page.css'],
-    ['main', 'client/achievements/achievements-page.js'],
-    ['main', 'client/game-page/spotlights.css'],
-    ['desktop', 'client/friends/chat/chat-tooltips.js'],
-    ['desktop', 'client/friends/friends.css'],
-    ['desktop', 'client/friends/friends-list.js'],
-    ['desktop', 'client/friends/chat/tabs.css'],
-    ['desktop', 'client/friends/chat/header.css'],
-    ['desktop', 'client/friends/chat/messages.css'],
-    ['desktop', 'client/friends/chat/input.css'],
-    ['desktop', 'client/friends/chat/voice.css'],
-    ['desktop', 'client/friends/chat/members.css'],
-    ['desktop', 'client/friends/chat/icons.css'],
-    ['desktop', 'client/friends/chat/groups.css'],
-    ['desktop', 'client/friends/chat/chat.js'],
-    ['all', 'core/scrollbars.css'],
-    ['all', 'core/scrollbars.js'],
-    ['all', 'client/friends/emoticon-picker.css'],
-    ['all', 'client/friends/emoticon-picker.js'],
-    ['desktop', 'client/settings/layout.css'],
-    ['desktop', 'client/settings/controls.css'],
-    ['desktop', 'client/settings/pages.css'],
-    ['desktop', 'client/settings/storage.css'],
-    ['desktop', 'client/settings/search.css'],
-    ['desktop', 'client/settings/game-properties.css'],
-    ['desktop', 'client/settings/finishing.css'],
-    ['desktop', 'client/settings/dialog/shared.js'],
-    ['desktop', 'client/settings/dialog/options.js'],
-    ['desktop', 'client/settings/dialog/search.js'],
-    ['desktop', 'client/settings/dialog/window.js'],
-    ['desktop', 'client/settings/dialog/sidebar.js'],
-    ['desktop', 'client/settings/dialog/layout.js'],
-    ['desktop', 'client/settings/dialog/props-pages.js'],
-    ['desktop', 'client/settings/dialog/props.js'],
-    ['desktop', 'client/settings/dialog/main.js'],
-    ['desktop', 'client/settings/millennium.css'],
-    ['desktop', 'client/settings/millennium-pages.js'],
-    ['main', 'client/settings/millennium-window.js'],
-    ['main', 'client/settings/library-manager.css'],
-    ['main', 'client/settings/library-manager.js'],
-    ['main', 'client/game-page/player-count.js'],
-    ['main', 'client/game-page/player-count.css'],
+  /*
+   * Window groups, by document.title (Millennium matched this window by the same title):
+   *   all           every client window
+   *   main          the main Steam window
+   *   content       every window but menus and notification toasts
+   *   desktop       content windows minus the overlay, Big Picture, Quick Access, Main Menu,
+   *                 the Games List and browser find bars
+   *   overlay       the in-game overlay
+   *   toasts        notification toasts
+   *   notify        windows a friend notification can be clicked in (main, toasts, overlay, menus)
+   *   achievements  the main window and the overlay
+   */
+  const GROUPS = {
+    main: /^Steam$/,
+    content: /^(?!.*(?:Menu|Supernav)$|notificationtoasts_)/,
+    desktop:
+      /^(?!Steam Games List$|.*(?:Menu|Supernav)$|notificationtoasts_|SP Overlay:|OverlayBrowser_|OverlayTab\d+_|SteamBrowser_Find$|Steam Big Picture Mode$|QuickAccess_|MainMenu_)/,
+    overlay: /^SP Overlay:/,
+    toasts: /^notificationtoasts_/,
+    notify: /^(?:Steam$|notificationtoasts_|SP Overlay:)|Menu$/,
+    achievements: /^(?:Steam$|SP Overlay:)/,
+  };
+
+  /*
+   * [group, folder, files]: a feature's files, in list order. The list order is the cascade
+   * (stylesheets) and the run order (scripts).
+   */
+  /** @type {[group: string, folder: string, files: string[]][]} */
+  const FEATURES = [
+    // Shared runtime pieces
+    ['all', 'core/', ['font.css', 'tokens.css', 'images.css', 'images.js']],
+    ['main', 'core/', ['plugin-rpc.js']],
+    ['notify', 'client/friends/', ['friend-notification-clicks.js']],
+    // In-game overlay
+    ['overlay', 'client/overlay/', [
+      'overlay.css', 'context.js', 'data.js', 'sources.js', 'widgets.js', 'dom.js', 'render.js',
+      'friends.js', 'notes.js', 'browser.js', 'achievements.js', 'main.js',
+    ]],
+    ['all', 'client/overlay/', ['overlay-popups.css']],
+    ['main', 'client/friends/', ['friends-background.js']],
+    // Notification toasts
+    ['toasts', 'client/toasts/', [
+      'toasts.css', 'context.js', 'config.js', 'steam.js', 'stage.js', 'hub.js', 'placement.js',
+      'scan.js', 'compact.js', 'main.js',
+    ]],
+    // Startup, sign-in, entrance, spinner
+    ['content', 'client/startup/', ['startup.css', 'startup.js', 'sign-in.css']],
+    ['main', 'client/entrance/', ['entrance.css', 'entrance.js']],
+    ['content', 'client/spinner/', ['spinner.css', 'spinner.js']],
+    ['desktop', 'core/', ['native-tooltips.js']],
+    // Library, title bar and navigation
+    ['main', 'client/library/', ['artwork.css']],
+    ['main', 'client/game-page/', ['always-open-game-details.js']],
+    ['main', 'client/home/', ['news-hub.js']],
+    ['main', 'client/header/', ['header-actions.css', 'header-actions.js']],
+    ['main', 'client/browser/', ['url-bar.css', 'url-bar.js']],
+    ['main', 'client/navigation/', ['icons.css']],
+    ['main', 'client/header/', ['header-tooltips.js']],
+    ['main', 'client/navigation/', ['sidebar-icons.css', 'sidebar-icons.js']],
+    ['main', 'client/header/menu/', [
+      'shared.js', 'api.js', 'menus.js', 'account.js', 'actions.js', 'hover.js', 'popups.js',
+      'placement.js', 'patch.js', 'main.js',
+    ]],
+    ['main', 'client/navigation/', ['nav-rail.css', 'nav-rail.js']],
+    ['main', 'client/library/', [
+      'library.css', 'game-list.css', 'game-list.js', 'game-drag.css', 'game-drag.js',
+      'collections.css', 'collections.js',
+    ]],
+    // Downloads page
+    ['main', 'client/downloads/', ['downloads.css']],
+    ['main', 'client/downloads/page/', [
+      'shared.js', 'native.js', 'library.js', 'backdrop.js', 'read.js', 'hero.js', 'transfer.js',
+      'queue.js', 'drag.js', 'pass.js', 'debug.js', 'main.js',
+    ]],
+    // Friends dock
+    ['main', 'client/friends/', ['friends-dock.css']],
+    ['main', 'client/friends/dock/', [
+      'templates.js', 'data.js', 'ui.js', 'routing.js', 'flyouts.js', 'embed.js', 'dock.js',
+      'chat-popup.js', 'main.js',
+    ]],
+    ['main', 'client/library/', ['sort-segments.css', 'sort-segments.js']],
+    // Library Home
+    ['main', 'client/home/', ['home-polish.css', 'home-polish.js', 'home-stage.css']],
+    ['main', 'client/home/stage/', ['util.js', 'tray.js', 'picks.js', 'stage.js', 'data.js', 'news.js', 'main.js']],
+    // Menus, hover cards, notifications, dialogs
+    ['all', 'client/dialogs/', ['dialogs.css']],
+    ['content', 'client/dialogs/', ['install.css', 'eula.css']],
+    ['all', 'client/dialogs/', ['hover-cards.css']],
+    ['all', 'client/friends/', ['friend-hover.css', 'friend-hover.js']],
+    ['main', 'client/dialogs/', ['hover-cards.js']],
+    ['all', 'client/header/', ['notifications.css', 'notifications.js']],
+    ['all', 'client/dialogs/', ['window-controls.css']],
+    ['content', 'client/dialogs/utility/', [
+      'base.css', 'servers.css', 'media.css', 'library-tools.css', 'modals.css', 'friends.css',
+      'standalone.css',
+    ]],
+    ['content', 'client/dialogs/', ['about-steam.css', 'about-steam.js', 'system-info.css', 'system-info.js', 'system-report.css']],
+    ['content', 'client/dialogs/system-report/', ['shared.js', 'parse.js', 'view.js', 'main.js']],
+    ['content', 'client/dialogs/', ['add-non-steam.css', 'add-non-steam.js']],
+    ['desktop', 'client/dialogs/', [
+      'activate-product.css', 'activate-product.js', 'backups.css', 'backups.js', 'install.js',
+      'eula.js', 'uninstall.css', 'uninstall.js',
+    ]],
+    // Plugin integrations
+    ['main', 'compat/hltb-for-steam/', ['hltb-for-steam.css', 'hltb-for-steam.js']],
+    // Game page and achievements
+    ['achievements', 'core/', ['achievement-tiers.css']],
+    ['main', 'client/game-page/', [
+      'layout.css', 'play-bar.css', 'overview.css', 'achievements.css', 'friends.css', 'cards.css',
+      'activity.css', 'spotlights.css', 'player-count.css', 'util.js', 'achievements.js',
+      'layout.js', 'friends.js', 'activity.js', 'cards.js', 'page.js', 'play-bar.js', 'main.js',
+    ]],
+    ['main', 'client/achievements/', ['achievements-page.css', 'achievements-page.js']],
+    // Friends list and chat windows
+    ['desktop', 'client/friends/', ['chat/chat-tooltips.js', 'friends.css', 'friends-list.js']],
+    ['desktop', 'client/friends/chat/', [
+      'tabs.css', 'header.css', 'messages.css', 'input.css', 'voice.css', 'members.css', 'icons.css',
+      'groups.css', 'chat.js',
+    ]],
+    ['all', 'core/', ['scrollbars.css', 'scrollbars.js']],
+    ['all', 'client/friends/', ['emoticon-picker.css', 'emoticon-picker.js']],
+    // Settings, game properties, Millennium, storage
+    ['desktop', 'client/settings/', [
+      'layout.css', 'controls.css', 'pages.css', 'storage.css', 'search.css', 'game-properties.css',
+      'finishing.css',
+    ]],
+    ['desktop', 'client/settings/dialog/', [
+      'shared.js', 'options.js', 'search.js', 'window.js', 'sidebar.js', 'layout.js', 'props-pages.js',
+      'props.js', 'main.js',
+    ]],
+    ['desktop', 'client/settings/', ['millennium.css', 'millennium-pages.js']],
+    ['main', 'client/settings/', ['millennium-window.js', 'library-manager.css', 'library-manager.js']],
+    ['main', 'client/game-page/', ['player-count.js']],
   ];
+  /** [group, file] in list order */
+  const FILES = FEATURES.flatMap(([group, folder, files]) => files.map((file) => [group, folder + file]));
 
   /** What web pages take from this list: the broken-image guard, scrollbars, emoticon picker. */
   const WEB_FILES = new Set([
@@ -279,15 +196,17 @@
   const root = document.documentElement;
   const head = document.head ?? root;
   const groups = new Set(['all']);
+  if (!onWeb) {
+    for (const [group, test] of Object.entries(GROUPS)) if (test.test(document.title)) groups.add(group);
+  }
   const added = new Set();
 
   /*
    * No flash of Steam's own look. `blocking="render"` only holds a first paint the loader beats,
    * and Millennium may inject it after <body> exists. So, as core/core.js does on web pages,
-   * the window waits under a cover until every file from the early flushes has loaded (scripts
-   * run, so features have started; a stub that flushes meanwhile still counts), then for the
-   * main thread's first idle moment, so the theme's first DOM work is done before anything
-   * shows. [data-se-styled] then lifts the cover. If a file never settles, a CSS timer lifts it
+   * the window waits under a cover until every file it was given has loaded (scripts run, so
+   * features have started), then for the main thread's first idle moment, so the theme's first
+   * DOM work is done before anything shows. [data-se-styled] then lifts the cover. If a file never settles, a CSS timer lifts it
    * anyway at FALLBACK_MS. Menus aren't guarded: they open often and get little from the theme.
    *
    * The main window waits longer. Steam first shows its own loading spinner there, then builds
@@ -310,11 +229,11 @@
    */
   const MENU = /(?:Menu|Supernav)$/.test(document.title); // menus and the store's dropdowns
   const TRANSPARENT = /^(?:SP Overlay:|notificationtoasts_|OverlayBrowser_|OverlayTab\d+_|QuickAccess_|MainMenu_)/;
-  const MAIN = document.title === 'Steam'; // the main window (skin.json's "main" group)
+  const MAIN = groups.has('main');
   const LOGO_MS = 250;
   const SETTLE_STEP_MS = 150;
   const SETTLE_QUIET_MS = 450;
-  const SETTLE_MAX_MS = 4500;
+  const SETTLE_MAX_MS = 3000;
   const SETTLE_BURST = 6; // new elements per step that still count as building
   const FALLBACK_MS = MAIN ? SETTLE_MAX_MS + 500 : 1500;
   const LIFT_MS = 300;
@@ -533,17 +452,34 @@
     head.append(script);
   };
 
-  const flush = () => {
-    for (const group of (window.__seWindows ??= []).splice(0)) groups.add(group);
+  /*
+   * Stylesheets go in at once. Scripts wait for core/core.js's runtime (window.__se), which
+   * Millennium normally injects first; the wait holds the cover like any pending file.
+   */
+  const load = () => {
+    const scripts = [];
     FILES.forEach(([group, file], order) => {
       if (!groups.has(group) || added.has(file) || (onWeb && !WEB_FILES.has(file))) return;
       added.add(file);
       if (file.endsWith('.css')) addStylesheet(file, order);
-      else addScript(file);
+      else scripts.push(file);
     });
+    if (window.__se) {
+      scripts.forEach(addScript);
+      return;
+    }
+    pending++;
+    addEventListener(
+      'se-core',
+      () => {
+        scripts.forEach(addScript);
+        if (--pending === 0) settle();
+      },
+      { once: true }
+    );
   };
 
-  window.__seClient = { flush, groups, files: added };
-  flush();
+  window.__seClient = { groups, files: added };
+  load();
   if (!pending) settle(); // nothing to wait for
 })();

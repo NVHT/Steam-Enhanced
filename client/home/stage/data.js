@@ -2,8 +2,8 @@
  * Library Home data: recently played games, their art, achievements, store review summary
  * (cached for a week) and live player counts.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedHomeStageParts;
+((SE) => {
+  const ns = window.__seHomeStageParts;
   if (!ns) return;
   const { appStore, client, collectionStore, paintGame } = ns;
   const { live } = ns;
@@ -80,13 +80,13 @@
   const infoCache = (() => {
     try {
       return JSON.parse(localStorage.getItem(INFO_KEY) || '{}') || {};
-    } catch (_) {
+    } catch {
       return {};
     }
   })();
   try {
     localStorage.removeItem('se-home-desc');
-  } catch (_) {}
+  } catch {}
 
   const infoAsked = new Set();
   let langAsk = null;
@@ -146,7 +146,7 @@
         for (const k of keys.slice(60)) delete infoCache[k];
         try {
           localStorage.setItem(INFO_KEY, JSON.stringify(infoCache));
-        } catch (_) {}
+        } catch {}
         if (live.apps[live.selected]?.appid === id) paintGame();
       })
       .catch(() => {});
@@ -159,7 +159,7 @@
   function playersOf(id) {
     const hit = players.get(id);
     if (hit && Date.now() - hit.at < 60000) return hit.count;
-    const ask = window.__steamEnhancedPlayerCount?.count;
+    const ask = window.__sePlayerCount?.count;
     if (typeof ask !== 'function' || hit?.busy) return hit?.count ?? null;
     players.set(id, { ...hit, busy: true });
     Promise.resolve(ask(id)).then(
@@ -175,4 +175,4 @@
   Object.assign(ns, {
     CDN, achievementsOf, decode, heroURLs, infoOf, logoURLs, playersOf, recentApps,
   });
-});
+})(window.__se);

@@ -28,7 +28,7 @@
  * above the window's text.
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
- * window.__steamEnhancedToastsParts (values parts reassign live on its `live`):
+ * window.__seToastsParts (values parts reassign live on its `live`):
  * - context.js    which window this is (this one: outside a toast window nothing goes on)
  * - config.js     attributes, sizes, toast kinds and their glyphs, the settings
  * - steam.js      reading Steam's toasts: React props, text, buttons, achievements
@@ -39,7 +39,7 @@
  * - compact.js    the compact style
  * - main.js       start, the debug helpers, and the API (destroy())
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
+((SE) => {
   window.__seToasts?.destroy();
   const root = document.documentElement;
 
@@ -47,7 +47,7 @@
   const names = [window.name || '', document.title || ''];
   if (!names.some(n => /^notificationtoasts_/.test(n))) return;
 
-  const ns = (window.__steamEnhancedToastsParts = { live: {} });
+  const ns = (window.__seToastsParts = { live: {} });
   const { live } = ns;
   live.dismissedByUs = false;
   live.placeGuard = null;
@@ -80,4 +80,4 @@
     : 'desktop';
 
   Object.assign(ns, { IN_GAME, SURFACE, root });
-});
+})(window.__se);

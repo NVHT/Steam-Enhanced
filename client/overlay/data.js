@@ -3,8 +3,8 @@
  *
  * Part of client/overlay/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedOverlayParts;
+((SE) => {
+  const ns = window.__seOverlayParts;
   if (!ns) return;
   const { contextGlobal, exportOf } = ns;
 
@@ -12,7 +12,7 @@
 
   const LOAD_TIMEOUT_MS = 10_000;
 
-  const withTimeout = promise => {
+  const withTimeout = (promise) => {
     let timer = 0;
     const timeout = new Promise((_, reject) => {
       timer = setTimeout(() => reject(new Error('timeout')), LOAD_TIMEOUT_MS);
@@ -40,7 +40,7 @@
                 entry.error = null;
                 entry.due = Date.now() + ttl;
               },
-              err => {
+              (err) => {
                 entry.error = String(err?.message || err);
                 entry.due = Date.now() + retry;
               }
@@ -80,15 +80,15 @@
   // One SE.findModule pass resolves every part of an API.
   const servicePart = (name, methods) => [
     [`${name}.${methods[0]}#1`],
-    value => methods.every(method => typeof value?.[method] === 'function'),
+    (value) => methods.every(method => typeof value?.[method] === 'function'),
   ];
-  const requestPart = className => [
+  const requestPart = (className) => [
     [className],
-    value => typeof value === 'function' && value.prototype.getClassName() === className,
+    (value) => typeof value === 'function' && value.prototype.getClassName() === className,
   ];
   const MESSAGE_PART = [
     ['InitFromPacket', 'SerializeBody'],
-    value =>
+    (value) =>
       typeof value?.Init === 'function' &&
       typeof value.InitFromPacket === 'function' &&
       typeof value.prototype?.Body === 'function' &&
@@ -129,4 +129,4 @@
   };
 
   Object.assign(ns, { LOAD_TIMEOUT_MS, callService, createCache, defineApi, requestPart, servicePart });
-});
+})(window.__se);

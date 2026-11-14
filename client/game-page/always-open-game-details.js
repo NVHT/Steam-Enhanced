@@ -11,10 +11,10 @@
  * loads, and an urgent update there let React hide the whole app (a black main window for
  * about a second) until it arrived. A transition keeps the current page on screen instead.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
+((SE) => {
   const { C } = SE;
-  if (window.__steamEnhancedGameDetails) return;
-  const state = (window.__steamEnhancedGameDetails = {});
+  if (window.__seGameDetails) return;
+  const state = (window.__seGameDetails = {});
 
   const PANEL = `.${C.AppGameInfoContainer}.${C.AppDetailsCollapsed}`;
 
@@ -29,7 +29,7 @@
   // loaded yet) is retried after RETRY_MS instead of being remembered for good.
   const findTransition = () => {
     if (transition || performance.now() - transitionMissAt < RETRY_MS) return transition;
-    const fromMillennium = SE.global('SP_REACT', react => typeof react.startTransition === 'function');
+    const fromMillennium = SE.global('SP_REACT', (react) => typeof react.startTransition === 'function');
     if (fromMillennium) return (transition = fromMillennium.startTransition);
     // Without Millennium's handle: Steam's React is the copy that its react-dom loaded.
     for (const req of SE.requires()) {
@@ -57,7 +57,7 @@
       // Every later page now renders open by itself: watch only as a slow safety net, in case
       // Steam replaces the Set.
       watchPanels(2000);
-    } catch (_) {}
+    } catch {}
   };
 
   const panelOwner = (panel) => {
@@ -114,9 +114,9 @@
     if (patchedSet) delete patchedSet.has;
     patchedSet = null;
     removeEventListener('DOMContentLoaded', start);
-    delete window.__steamEnhancedGameDetails;
+    delete window.__seGameDetails;
   };
 
   if (document.body) start();
   else addEventListener('DOMContentLoaded', start, { once: true });
-});
+})(window.__se);

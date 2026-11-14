@@ -2,8 +2,8 @@
  * Chat routing: whether a chat opens in the dock, the overlay or Steam's own window, and the
  * error shown when it can't open.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedFriendsDockParts;
+((SE) => {
+  const ns = window.__seFriendsDockParts;
   if (!ns) return;
   const { app, ctx, flyoutOwnedTabs, friendsOf, groupsOf, schedule, state, store } = ns;
   const { live } = ns;
@@ -409,7 +409,7 @@
         if (p.target[p.name] !== p.wrapper) continue;
         if (p.own) Object.defineProperty(p.target, p.name, p.own);
         else delete p.target[p.name];
-      } catch (_) {}
+      } catch {}
     }
     routingPatches.length = 0;
     routingApp = null;
@@ -435,7 +435,7 @@
       try {
         Object.defineProperty(target, name, { configurable: true, writable: true, value: wrapper });
         routingPatches.push({ target, name, own: ownDesc, wrapper });
-      } catch (_) {}
+      } catch {}
     };
 
     const navigateWithChat = function (original, args) {
@@ -872,4 +872,4 @@
     openFriendNotification, overlayChatContexts, pendingOverlayChats, reportChatError,
     requestChatHandoff, resolveGroupFromRow, restoreChatRouting, resumeOverlayChat,
   });
-});
+})(window.__se);

@@ -1,8 +1,8 @@
 /*
  * Store/Community browser clicks, game group flyouts, and syncing the dock with Steam's chat tabs.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedFriendsDockParts;
+((SE) => {
+  const ns = window.__seFriendsDockParts;
   if (!ns) return;
   const {
     app, closeMirroredChat, flyoutOwnedTabs, overlayChatContexts, pendingOverlayChats,
@@ -208,7 +208,7 @@
     if (state.chatContext) {
       try {
         state.chatContext.data.SetFriendsListSingleWindowMode(state.chatContext.previous);
-      } catch (_) {}
+      } catch {}
       state.chatContext = null;
     }
     ns.place();
@@ -244,4 +244,4 @@
     browserClickListeners, closeChat, closeGroupPanels, disposeGroupFlyouts, syncBrowserClicks,
     syncChatTabs, syncGroupFlyouts,
   });
-});
+})(window.__se);

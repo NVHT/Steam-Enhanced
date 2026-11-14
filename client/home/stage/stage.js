@@ -2,8 +2,8 @@
  * The hero stage (games, art, logo, counters, Play / Install, the strip and its cycle) and the
  * layout pass that places the stage and the tray on Home, measures them and tears them down.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedHomeStageParts;
+((SE) => {
+  const ns = window.__seHomeStageParts;
   if (!ns) return;
   const {
     artImg, boxOf, clearMarks, client, closePick, compact, cycleSeconds, dropAllOwn, dropOwn,
@@ -546,4 +546,4 @@
   Object.assign(ns, {
     forgetStage, layout, marked, paintGame, restartCycle, select, setOn, teardown,
   });
-});
+})(window.__se);

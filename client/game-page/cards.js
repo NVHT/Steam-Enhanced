@@ -2,8 +2,8 @@
  * Left-column cards and card headings: the heading links, DLC grid (from details.vecDLC),
  * Trading Card badge state and the hidden Community card.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedGamePageParts;
+((SE) => {
+  const ns = window.__seGamePageParts;
   if (!ns) return;
   const { BODY, day, drop, HEADING, own, placePopup, SEEK, sharedParent, srcOf, steamClient } = ns;
 
@@ -261,4 +261,4 @@
     LEFT_CARDS, LINKED, placeBadge, placeDlcAll, placeHeadingLinks, placeHideCommunity,
     placeLeftCards,
   });
-});
+})(window.__se);

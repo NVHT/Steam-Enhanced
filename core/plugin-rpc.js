@@ -1,6 +1,8 @@
-/* Millennium backend calls for theme features that run outside a plugin realm. */
+/*
+ * Millennium backend calls for theme features that run outside a plugin realm.
+ */
 (() => {
-  window.__steamEnhancedPluginRpc?.destroy();
+  window.__sePluginRpc?.destroy();
 
   const bindingName = 'MILLENNIUM_PRIVATE_INTERNAL_FOREIGN_FUNCTION_INTERFACE_DO_NOT_USE';
   const timeoutMs = 60000;
@@ -67,12 +69,12 @@
         const binder = owner[bindingName];
         if (typeof binder?.call === 'function' && typeof binder.__handleResponse === 'function') return binder;
         if (!binder) return createBinder(owner);
-      } catch (_) {}
+      } catch {}
     }
     throw new Error('Millennium backend bridge is unavailable');
   }
 
-  window.__steamEnhancedPluginRpc = {
+  window.__sePluginRpc = {
     call(plugin, method, args) {
       if (destroyed) return Promise.reject(new Error('Theme backend bridge was disposed'));
       return new Promise((resolve, reject) => {
@@ -87,7 +89,7 @@
         entry.timer = setTimeout(() => finish(new Error('Millennium backend request timed out')), timeoutMs);
         try {
           Promise.resolve(resolveBinder().call(0, plugin, method, args, undefined, true))
-            .then(value => finish(null, value), error => finish(error));
+            .then(value => finish(null, value), (error) => finish(error));
         } catch (error) {
           finish(error);
         }
@@ -101,7 +103,7 @@
       }
       calls.clear();
       fallback?.release();
-      delete window.__steamEnhancedPluginRpc;
+      delete window.__sePluginRpc;
     },
   };
   dispatchEvent(new Event('se-plugin-rpc-ready'));

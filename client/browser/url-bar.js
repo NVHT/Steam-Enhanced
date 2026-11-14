@@ -20,7 +20,7 @@
  * Parts get [data-se-urlbar="bar | text | url | reload | lock | status"], re-tagged in the same
  * task Steam redraws them (before paint, so its own reload and icons never flash).
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
+((SE) => {
   const KEY = '__seUrlBar';
   window[KEY]?.destroy?.();
 
@@ -43,15 +43,15 @@
 
   /** { URLBar: 'hash', ... } from the bundle that defines the address bar's classes. */
   const fromBundles = () =>
-    SE.findModule('se-urlbar-classes', src => {
+    SE.findModule('se-urlbar-classes', (src) => {
       if (!src.includes('URLBarReplacement:"') || !src.includes('URLBarText:"')) return null;
       const found = {};
       for (const [, name, hash] of src.matchAll(PAIR)) found[name] = hash;
       return found.URLBar && found.URL ? found : null;
     });
 
-  const firstClass = el => el?.classList?.[0] || null; // Steam's module class comes first
-  const hasIcon = el => el.tagName === 'svg' || !!el.querySelector('svg, img');
+  const firstClass = (el) => el?.classList?.[0] || null; // Steam's module class comes first
+  const hasIcon = (el) => el.tagName === 'svg' || !!el.querySelector('svg, img');
 
   /** Same shape as fromBundles(), read off the live bar. */
   let domScannedAt = -Infinity;
@@ -62,7 +62,7 @@
     let url;
     try {
       url = document.evaluate(ADDRESS, document.body, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    } catch (_) {
+    } catch {
       return null;
     }
     const text = url?.parentElement;
@@ -109,12 +109,12 @@
     const b = SE.global('MainWindowBrowserManager')?.m_browser;
     return b ? [b, b.m_browserView, b.m_browser].filter(Boolean) : [];
   };
-  const method = name => views().find(t => typeof t[name] === 'function');
-  const invoke = name => {
+  const method = (name) => views().find(t => typeof t[name] === 'function');
+  const invoke = (name) => {
     const target = method(name);
     try {
       target?.[name]();
-    } catch (_) {}
+    } catch {}
   };
   /** The first non-empty value among the view's candidate fields. */
   const field = (...names) => {
@@ -143,7 +143,7 @@
   ];
 
   const build = () => {
-    const group = side => {
+    const group = (side) => {
       const el = document.createElement('div');
       el.className = 'se-urlbar-group';
       el.dataset.side = side;
@@ -304,10 +304,10 @@
   const LOAD_CAP_MS = 8000;
   const LOAD_BEAT_MS = 700;
   let load = { href: null, kind: '', title: null, since: -Infinity };
-  const startLoad = kind => {
+  const startLoad = (kind) => {
     load = { ...load, kind, title: pageTitle(), since: performance.now() };
   };
-  const setLoading = href => {
+  const setLoading = (href) => {
     const flag = field('m_bLoading', 'm_bIsLoading', 'm_bPageLoading');
     let loading = flag;
     if (typeof flag !== 'boolean') {
@@ -323,7 +323,7 @@
 
   /* ---------- Actions ---------- */
 
-  const onButton = event => {
+  const onButton = (event) => {
     const btn = event.target.closest('.se-urlbar-btn');
     if (!btn || btn.disabled || !ui) return;
     event.preventDefault();
@@ -343,7 +343,7 @@
       case 'external':
         try {
           openExternal()(ui.url.textContent.trim());
-        } catch (_) {}
+        } catch {}
         break;
       case 'copy': {
         // Steam's URL div copies and shows "Copied!" at the click point; hand it the click.
@@ -378,14 +378,14 @@
   const FADE_MS = 1100;
   const CLICK_MS = 700; // room for an async clipboard write
   const confirmations = new Map(); // element -> { key, timer, observer }
-  const keyOf = el => `${el.style.top}|${el.style.left}|${el.textContent}`;
+  const keyOf = (el) => `${el.style.top}|${el.style.left}|${el.textContent}`;
   let lastKey = '';
   let playedAt = -Infinity;
   let click = { at: -Infinity, copy: false };
 
   // Only the URL div (laid over the identity) and our Copy button copy.
-  const isCopy = target => !!target?.closest?.(`[${ATTR}="url"], .se-urlbar-btn[data-action="copy"]`);
-  const onPointer = event => {
+  const isCopy = (target) => !!target?.closest?.(`[${ATTR}="url"], .se-urlbar-btn[data-action="copy"]`);
+  const onPointer = (event) => {
     click = { at: performance.now(), copy: isCopy(event.target) };
   };
 
@@ -406,7 +406,7 @@
     play(el, entry);
   };
 
-  const onCopyClick = event => {
+  const onCopyClick = (event) => {
     if (!isCopy(event.target)) return;
     const clickedAt = performance.now();
     setTimeout(() => {
@@ -416,7 +416,7 @@
     }, 80);
   };
 
-  const track = el => {
+  const track = (el) => {
     if (confirmations.has(el)) return;
     const entry = { key: '', timer: 0, observer: null };
     entry.observer = new MutationObserver(() => {
@@ -428,7 +428,7 @@
     decide(el, entry);
   };
 
-  const forget = el => {
+  const forget = (el) => {
     const entry = confirmations.get(el);
     if (!entry) return;
     clearTimeout(entry.timer);
@@ -476,4 +476,4 @@
       delete window[KEY];
     },
   };
-});
+})(window.__se);

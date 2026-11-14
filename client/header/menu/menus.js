@@ -1,6 +1,8 @@
-/* Native submenus and the labels Steam localizes (View, Friends, Games, Help). */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSteamMenuParts;
+/*
+ * Native submenus and the labels Steam localizes (View, Friends, Games, Help).
+ */
+((SE) => {
+  const ns = window.__seSteamMenuParts;
   if (!ns) return;
   const { live } = ns;
 
@@ -74,4 +76,4 @@
   }
   const isLabel = (group, label, english) => labelsFor(group).has(label.toLowerCase()) || english.test(label);
   Object.assign(ns, { Submenu, isLabel, normalizeMenuLabel });
-});
+})(window.__se);

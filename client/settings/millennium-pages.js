@@ -13,12 +13,9 @@
  * - Updates: formats ISO release timestamps into localized dates.
  * - General: tags the About section for side-by-side card layout.
  */
-(window.__se
-  ? (init) => init(window.__se)
-  : (init) => addEventListener('se-core', () => init(window.__se), { once: true })
-)((SE) => {
+((SE) => {
   const { C, run, esc, attr: setAttr } = SE;
-  window.__steamEnhancedMillPages?.destroy();
+  window.__seMillPages?.destroy();
 
   const CONTENT = `.${C.PagedSettingsDialog_PageContent}`;
   const ROOT = '.MillenniumSettings';
@@ -319,7 +316,7 @@
       if (fn) {
         try {
           add(fn.constructor('return globalThis')());
-        } catch (_) {}
+        } catch {}
       }
     }
     for (const el of [watchToggle(), page]) {
@@ -341,7 +338,7 @@
         try {
           const n = w[k];
           if (n && n !== w) queue.push(n);
-        } catch (_) {}
+        } catch {}
       }
     }
     realmCache = { list: out, until: now + 5000 };
@@ -936,10 +933,10 @@
     }, { throttle: 250 });
     addEventListener('resize', schedule);
     schedule();
-    window.__steamEnhancedSettings?.refresh?.(); // in case the dialog's first pass ran before the hooks existed
+    window.__seSettings?.refresh?.(); // in case the dialog's first pass ran before the hooks existed
   }
 
-  window.__steamEnhancedMillPages = {
+  window.__seMillPages = {
     hooks: { before, after },
     destroy() {
       editorWatch?.disconnect();
@@ -957,7 +954,7 @@
       unlock();
       document.documentElement.removeAttribute('data-se-qce');
       removeEventListener('resize', schedule);
-      delete window.__steamEnhancedMillPages;
+      delete window.__seMillPages;
     },
   };
 
@@ -966,4 +963,4 @@
   } else {
     addEventListener('DOMContentLoaded', start, { once: true });
   }
-});
+})(window.__se);

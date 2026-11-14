@@ -2,8 +2,8 @@
  * Library Home: what every part shares: Steam's selectors, the --se-home-stage* settings,
  * Steam's stores, theme art images, formatters and icons, and the frame pass (index.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = (window.__steamEnhancedHomeStageParts = { live: {} });
+((SE) => {
+  const ns = (window.__seHomeStageParts = { live: {} });
 
   const { C } = SE;
 
@@ -165,4 +165,4 @@
     dayLabel, enabled, hours, imgTag, narrow, onImgError, onImgLoad, partnerEventStore,
     reducedMotion, schedule, setHTML, setPass, trayShare, when,
   });
-});
+})(window.__se);

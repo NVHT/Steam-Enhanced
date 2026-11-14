@@ -178,14 +178,14 @@
         if (!rule.selectorText) continue;
         try {
           if (el.matches(rule.selectorText)) found.push(`/* ${source} */ ${short(rule.cssText, 400)}`);
-        } catch (_) {} // selectors this engine rejects
+        } catch {} // selectors this engine rejects
       }
     };
     for (const sheet of document.styleSheets) {
       const source = sheet.href ? sheet.href.split('/').pop().split('?')[0] : sheet.ownerNode?.dataset?.seFeature || 'inline <style>';
       try {
         visit(sheet.cssRules, source);
-      } catch (_) {
+      } catch {
         blocked++;
       }
     }
@@ -380,7 +380,7 @@
     try {
       await navigator.clipboard.writeText(text);
       return true;
-    } catch (_) {
+    } catch {
       // Fallback for windows without clipboard permission.
       ui.text.select();
       try {

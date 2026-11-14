@@ -1,6 +1,8 @@
-/* Replace native browser title attributes in Friends & Chat windows with Steam React tooltips. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedChatTooltips?.destroy();
+/*
+ * Replace native browser title attributes in Friends & Chat windows with Steam React tooltips.
+ */
+((SE) => {
+  window.__seChatTooltips?.destroy();
 
   const mounts = new Map();
   const savedTitles = new WeakMap();
@@ -34,7 +36,7 @@
     const nodes = document.querySelectorAll(TARGET_SELECTOR);
     if (!nodes.length) return;
 
-    const native = window.__steamEnhancedNativeTooltips?.resolve();
+    const native = window.__seNativeTooltips?.resolve();
     if (!native) return;
     const { React, DOM, Tooltip } = native;
 
@@ -94,7 +96,7 @@
     update();
   };
 
-  window.__steamEnhancedChatTooltips = {
+  window.__seChatTooltips = {
     destroy() {
       gate?.disconnect();
       observer?.disconnect();
@@ -106,10 +108,10 @@
         }
       }
       removeEventListener('DOMContentLoaded', start);
-      delete window.__steamEnhancedChatTooltips;
+      delete window.__seChatTooltips;
     },
   };
 
   if (document.body) start();
   else addEventListener('DOMContentLoaded', start, { once: true });
-});
+})(window.__se);

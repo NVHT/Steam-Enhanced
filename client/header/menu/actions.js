@@ -1,6 +1,8 @@
-/* The added menus: View/Friends/Games/Help as submenus, and restart/reload actions. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSteamMenuParts;
+/*
+ * The added menus: View/Friends/Games/Help as submenus, and restart/reload actions.
+ */
+((SE) => {
+  const ns = window.__seSteamMenuParts;
   if (!ns) return;
   const { owners } = SE;
   const { SUBMENU_NAMES, Submenu, configurations, movedGroups, normalizeMenuLabel } = ns;
@@ -162,4 +164,4 @@
     }
   }
   Object.assign(ns, { AdditionalMenus, SteamClientActions, groupSeparator, placeGroup });
-});
+})(window.__se);

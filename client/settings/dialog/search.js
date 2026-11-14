@@ -4,8 +4,8 @@
  *
  * Part of client/settings/dialog/ (see shared.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSettingsParts;
+((SE) => {
+  const ns = window.__seSettingsParts;
   if (!ns) return;
   const { C, attr: setAttr } = SE;
   const { ACTIVE, BY_NAME, FIELD, ITEM, LABEL, LIST, OPTIONS, PAGES, TEXT, text } = ns;
@@ -15,7 +15,7 @@
   let learned = {};
   try {
     learned = JSON.parse(localStorage.getItem(LEARNED_KEY) || '{}') || {};
-  } catch (_) {
+  } catch {
     learned = {};
   }
   let pendingHit = null;
@@ -188,7 +188,7 @@
     learned[name] = labels;
     try {
       localStorage.setItem(LEARNED_KEY, JSON.stringify(learned));
-    } catch (_) {}
+    } catch {}
   }
   Object.assign(ns, { filter, learn, norm, pageNameOf, revealHit });
-});
+})(window.__se);

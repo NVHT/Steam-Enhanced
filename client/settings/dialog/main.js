@@ -4,8 +4,8 @@
  *
  * Part of client/settings/dialog/ (see shared.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSettingsParts;
+((SE) => {
+  const ns = window.__seSettingsParts;
   if (!ns) return;
   const { fromProps, attr: setAttr } = SE;
   const {
@@ -28,7 +28,7 @@
   };
 
   function millHook(name, content, key) {
-    const fn = window.__steamEnhancedMillPages?.hooks?.[name];
+    const fn = window.__seMillPages?.hooks?.[name];
     if (typeof fn !== 'function') return null;
     try {
       return fn(content, key, millApi);
@@ -159,9 +159,15 @@
   }
 
   function start() {
-    // Sync: the cards and labels must be in place before Steam's re-render paints. The main
-    // window's high-traffic chrome (top bar, game list, friends dock) never holds a dialog.
-    live.observer = SE.watch(onMutate, { attributes: ['class'], sync: true, ignore: SE.inSide });
+    // Sync: the cards and labels must be in place before Steam's re-render paints. Only the
+    // dialog's own parts (page list, page, title) count, and their coming and going: the rest
+    // of the window (the main window's Library, top bar, friends dock) never wakes it.
+    live.observer = SE.watch(onMutate, {
+      attributes: ['class'],
+      sync: true,
+      scope: `${LIST}, ${CONTENT}, ${TITLE}`,
+      ignore: SE.inSide,
+    });
     document.addEventListener('visibilitychange', onVisibility);
     addEventListener('resize', schedule);
     schedule();
@@ -189,7 +195,7 @@
     for (const m of ['data-se-settings', 'data-se-mill', 'data-se-props']) document.documentElement.removeAttribute(m);
   }
 
-  window.__steamEnhancedSettings = {
+  window.__seSettings = {
     refresh: schedule,
     destroy() {
       live.observer?.disconnect();
@@ -203,7 +209,7 @@
       unmarkAll();
       document.removeEventListener('visibilitychange', onVisibility);
       removeEventListener('resize', schedule);
-      delete window.__steamEnhancedSettings;
+      delete window.__seSettings;
     },
   };
 
@@ -213,4 +219,4 @@
     addEventListener('DOMContentLoaded', start, { once: true });
   }
   Object.assign(ns, { schedule });
-});
+})(window.__se);

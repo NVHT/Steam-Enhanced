@@ -1,6 +1,8 @@
-/* The queue rows' action buttons: icons, tagging and the per-row action bar. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedDownloadsParts;
+/*
+ * The queue rows' action buttons: icons, tagging and the per-row action bar.
+ */
+((SE) => {
+  const ns = window.__seDownloadsParts;
   if (!ns) return;
   const { C } = SE;
   const { LINKS_ROW, ROW, SEL, SVG_NS, mountedNodes, setAttr, textOf } = ns;
@@ -138,4 +140,4 @@
   }
 
   Object.assign(ns, { ITEM, QUEUE, RBD_HANDLE, ROW_ART, tagActions });
-});
+})(window.__se);

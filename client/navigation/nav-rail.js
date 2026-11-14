@@ -1,7 +1,9 @@
-/* Navigation rail routing, extra rail shortcuts, title-bar library search, and game-list toggle. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
+/*
+ * Navigation rail routing, extra rail shortcuts, title-bar library search, and game-list toggle.
+ */
+((SE) => {
   const { C, railMode, mainWindow, navigate: goLibrary } = SE;
-  window.__steamEnhancedRailNav?.destroy?.();
+  window.__seRailNav?.destroy?.();
 
   const SEARCH_INPUT = `.${C.GameListHomeAndSearch_Container} .${C.ContainerHide_Container} input`;
   const FILTERS = `.${C.GameListHomeAndSearch_Container} .${C.AdvancedSearchButton}`;
@@ -17,7 +19,7 @@
     return box?.classList.contains('Visible') ? pane : null;
   };
 
-  const dismissFilters = pane => {
+  const dismissFilters = (pane) => {
     for (let fiber = SE.fiber(pane), depth = 0; fiber && depth < 20; fiber = fiber.return, depth++) {
       const instance = fiber.stateNode;
       if (typeof instance?.CloseAdvancedSearch === 'function') {
@@ -103,7 +105,7 @@
   function currentRoutePath() {
     try {
       return mainWindow()?.LocationPathName || '';
-    } catch (_) {
+    } catch {
       return '';
     }
   }
@@ -114,7 +116,7 @@
     const manager = browserManager();
     try {
       return manager?.m_URLRequested || manager?.m_URL || '';
-    } catch (_) {
+    } catch {
       return '';
     }
   }
@@ -126,17 +128,17 @@
         manager.ShowURL(url);
         return;
       }
-    } catch (_) {}
+    } catch {}
     try {
       window.SteamClient.URL.ExecuteSteamURL(`steam://openurl/${url}`);
-    } catch (_) {}
+    } catch {}
   }
 
   function navigateToLibraryRoute(route) {
     if (goLibrary(route)) return true;
     try {
       window.SteamClient?.URL?.ExecuteSteamURL('steam://nav/library');
-    } catch (_) {}
+    } catch {}
     return false;
   }
 
@@ -232,7 +234,7 @@
     button.setAttribute('aria-label', extra.label);
     button.appendChild(document.createElement('span'));
     button.addEventListener('click', () => activateTarget(extra));
-    button.addEventListener('keydown', event => {
+    button.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
         activateTarget(extra);
@@ -275,7 +277,7 @@
   }
 
   // Title-bar library search and filter button
-  const setNativeSearchValue = value => {
+  const setNativeSearchValue = (value) => {
     const native = document.querySelector(SEARCH_INPUT);
     if (!native || native.value === value) return;
     const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(native), 'value')?.set;
@@ -287,7 +289,7 @@
   let lastPointerDownAt = 0;
   let filterWasOpenOnDown = null;
 
-  const onPointerDown = event => {
+  const onPointerDown = (event) => {
     lastPointerDownAt = performance.now();
     filterWasOpenOnDown = filtersBtn?.contains(event.target) ? !!visibleFilterPanel() : null;
   };
@@ -315,16 +317,16 @@
       searchInput.focus({ preventScroll: true });
       try {
         searchInput.setSelectionRange(caretPos, caretPos);
-      } catch (_) {}
+      } catch {}
     };
 
     searchInput.addEventListener('input', () => {
       const value = searchInput.value;
       lastTypedAt = performance.now();
       searchBar.classList.toggle('se-has-text', !!value);
-      if (window.__steamEnhancedDownloads?.library) {
+      if (window.__seDownloads?.library) {
         cancelMountWait();
-        window.__steamEnhancedDownloads.searchGames(value);
+        window.__seDownloads.searchGames(value);
         return;
       }
       whenLibraryMounted(() => {
@@ -340,17 +342,17 @@
       requestAnimationFrame(retainSearchFocus);
     });
 
-    searchInput.addEventListener('keydown', event => {
+    searchInput.addEventListener('keydown', (event) => {
       event.stopPropagation();
       if (event.key === 'Escape') {
         searchInput.value = '';
         searchBar.classList.remove('se-has-text');
-        const downloads = window.__steamEnhancedDownloads;
+        const downloads = window.__seDownloads;
         if (downloads?.library) downloads.searchGames('');
         else setNativeSearchValue('');
         searchInput.blur();
       } else if (event.key === 'Enter') {
-        const downloads = window.__steamEnhancedDownloads;
+        const downloads = window.__seDownloads;
         if (downloads?.library) {
           if (downloads.openFirstGame()) searchInput.blur();
           return;
@@ -364,10 +366,10 @@
     });
 
     for (const type of ['keyup', 'keypress']) {
-      searchInput.addEventListener(type, event => event.stopPropagation());
+      searchInput.addEventListener(type, (event) => event.stopPropagation());
     }
 
-    filtersBtn.addEventListener('click', event => {
+    filtersBtn.addEventListener('click', (event) => {
       const wasOpen = event.detail === 0 ? null : filterWasOpenOnDown;
       filterWasOpenOnDown = null;
       whenLibraryMounted(() => {
@@ -389,7 +391,7 @@
     if (!searchBar) buildSearchBar();
     if (searchBar.parentElement !== topBar) topBar.appendChild(searchBar);
 
-    const downloads = window.__steamEnhancedDownloads;
+    const downloads = window.__seDownloads;
     filtersBtn.hidden = Boolean(downloads?.library);
     const native = downloads?.library?.querySelector('input') || document.querySelector(SEARCH_INPUT);
     if (native && document.activeElement !== searchInput && native.value !== searchInput.value) {
@@ -428,26 +430,26 @@
   let listHidden = (() => {
     try {
       return localStorage.getItem(HIDE_KEY) === '1';
-    } catch (_) {
+    } catch {
       return false;
     }
   })();
 
   const isListHidden = () => listHidden;
 
-  const setListHidden = hidden => {
+  const setListHidden = (hidden) => {
     listHidden = hidden;
     try {
       localStorage.setItem(HIDE_KEY, hidden ? '1' : '0');
-    } catch (_) {}
+    } catch {}
   };
 
   // The list's width is fixed in CSS (--se-list-w, core/tokens.css); only its edges are tracked.
-  const setTopVisible = on => topBtn?.toggleAttribute('data-se-on', !!on);
+  const setTopVisible = (on) => topBtn?.toggleAttribute('data-se-on', !!on);
 
   // Scroll doesn't bubble, so this listens in the capture phase and takes whichever
   // tall scroller inside the list fired: no hashed class to chase for the virtual list.
-  const onListScroll = event => {
+  const onListScroll = (event) => {
     const el = event.target;
     if (!(el instanceof Element) || el.clientHeight < 200 || !el.closest(LIST_SELECTOR)) return;
     topScroller = el;
@@ -465,9 +467,9 @@
 
   function totalLibraryGameCount() {
     if (Date.now() - countCache.at < 5000) return countCache.count;
-    const apps = SE.global('appStore', store => Array.isArray(store.allApps))?.allApps;
+    const apps = SE.global('appStore', (store) => Array.isArray(store.allApps))?.allApps;
     const collections = SE.global('collectionStore');
-    const isHidden = id => !!SE.run(() => collections.BIsHidden(id));
+    const isHidden = (id) => !!SE.run(() => collections.BIsHidden(id));
     const count = apps
       ? apps.filter(
           app =>
@@ -508,7 +510,7 @@
     const hidden = isListHidden();
     document.body.classList.toggle('se-list-hidden', hidden);
 
-    const downloadsList = window.__steamEnhancedDownloads?.library;
+    const downloadsList = window.__seDownloads?.library;
     const list = downloadsList || document.querySelector(LIST_SELECTOR);
     if (list !== listWatchedNode && window.ResizeObserver) {
       listResizeObserver ??= new ResizeObserver(schedule);
@@ -547,7 +549,7 @@
         try {
           const cached = localStorage.getItem(VIEW_COUNT_KEY);
           if (cached) lastViewCount = Number(cached);
-        } catch (_) {}
+        } catch {}
       }
       if (count === null) count = lastViewCount;
       if (count === null && /^(all )?games$/.test(viewLabel)) {
@@ -613,7 +615,7 @@
     hoveredElement = event.target instanceof Element ? event.target : null;
   }
 
-  const resolveTitleBarControl = el => {
+  const resolveTitleBarControl = (el) => {
     if (!el?.isConnected) return null;
     const rect = el.getBoundingClientRect();
     return rect.top < titleBarBottom() - 2 &&
@@ -713,7 +715,7 @@
       lastViewCount = total;
       try {
         localStorage.setItem(VIEW_COUNT_KEY, String(total));
-      } catch (_) {}
+      } catch {}
       schedule();
     }
   }
@@ -837,7 +839,7 @@
     schedule();
   }
 
-  window.__steamEnhancedRailNav = {
+  window.__seRailNav = {
     destroy() {
       observer?.disconnect();
       timer?.disconnect();
@@ -851,10 +853,10 @@
       document.removeEventListener('mouseover', onMouseOver, true);
       tipObserver?.disconnect();
       cleanup(true);
-      delete window.__steamEnhancedRailNav;
+      delete window.__seRailNav;
     },
   };
 
   if (document.body) start();
   else addEventListener('DOMContentLoaded', start, { once: true });
-});
+})(window.__se);

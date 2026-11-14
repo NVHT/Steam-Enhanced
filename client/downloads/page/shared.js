@@ -3,7 +3,7 @@
  * game's art behind the page and its logo over it, and mounts the Library list beside it.
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
- * window.__steamEnhancedDownloadsParts (values parts reassign live on its `live`):
+ * window.__seDownloadsParts (values parts reassign live on its `live`):
  * - shared.js    copy, selectors and the attribute helper (this one; it also closes a
  *                previous Downloads and skips windows without a body)
  * - native.js    Steam's own Library list beside the page
@@ -18,10 +18,10 @@
  * - debug.js     support helpers
  * - main.js      the drag guards, Steam's overview subscription, the watchers, and the API
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  window.__steamEnhancedDownloads?.destroy();
+((SE) => {
+  window.__seDownloads?.destroy();
   if (!document.body) return;
-  const ns = (window.__steamEnhancedDownloadsParts = { live: {} });
+  const ns = (window.__seDownloadsParts = { live: {} });
   const { C } = SE;
   const { live } = ns;
   live.overviewSubscription = null;
@@ -44,4 +44,4 @@
   const setAttr = (el, name, val) => SE.attr(el, name, val || null);
 
   Object.assign(ns, { COPY, LINKS_ROW, PAGE_SELECTOR, ROW, setAttr });
-});
+})(window.__se);

@@ -2,8 +2,8 @@
  * The theme's game list beside the page (when Steam's own can't be shown): search, batched
  * rows, "more" on scroll. Builds its element and wires its own listeners on load.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedDownloadsParts;
+((SE) => {
+  const ns = window.__seDownloadsParts;
   if (!ns) return;
   const { live } = ns;
 
@@ -129,4 +129,4 @@
   filterGames();
 
   Object.assign(ns, { library, openGame, searchGames, syncLibrary });
-});
+})(window.__se);

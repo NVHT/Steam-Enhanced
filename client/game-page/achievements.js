@@ -2,8 +2,8 @@
  * Achievements card and achievements in the activity feed: progress rings, rarity tiers,
  * icon rows that fill the card, unlock tooltips, the progress banner and the latest unlock.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedGamePageParts;
+((SE) => {
+  const ns = window.__seGamePageParts;
   if (!ns) return;
   const { day, drop, own, parseCount, placePopup, schedule, steamClient, when } = ns;
   const { live } = ns;
@@ -90,11 +90,28 @@
 
   const hideTip = () => tip?.removeAttribute('data-on');
 
+  // Tip listeners sit on Steam's own nodes too, which outlive the feature: each is recorded so
+  // destroy() can take it off (unbindTips), and a re-run binds afresh.
+  const tipBindings = new Map(); // node -> [type, listener][]
+  function bind(el, type, fn) {
+    el.addEventListener(type, fn);
+    let list = tipBindings.get(el);
+    if (!list) {
+      if (tipBindings.size >= 200) for (const node of tipBindings.keys()) if (!node.isConnected) tipBindings.delete(node);
+      tipBindings.set(el, (list = []));
+    }
+    list.push([type, fn]);
+  }
+  function unbindTips() {
+    for (const [el, list] of tipBindings) for (const [type, fn] of list) el.removeEventListener(type, fn);
+    tipBindings.clear();
+  }
   function withTip(el, anchor) {
-    el.addEventListener('mouseenter', () => showTip(el, anchor?.() || el));
-    el.addEventListener('mouseleave', hideTip);
-    el.addEventListener('focusin', () => showTip(el, anchor?.() || el));
-    el.addEventListener('focusout', hideTip);
+    const show = () => showTip(el, anchor?.() || el);
+    bind(el, 'mouseenter', show);
+    bind(el, 'mouseleave', hideTip);
+    bind(el, 'focusin', show);
+    bind(el, 'focusout', hideTip);
   }
 
   const ACH_ROW = `.${C.IconRow}`;
@@ -378,7 +395,7 @@
   function listOf(parts) {
     try {
       return new Intl.ListFormat(undefined, { style: 'long', type: 'conjunction' }).format(parts);
-    } catch (_) {
+    } catch {
       return parts.join(', ');
     }
   }
@@ -626,15 +643,15 @@
         host.__seAch = a;
         muteHost(host);
         tipHosts.add(host);
-        if (host.__seTipped) continue;
-        host.__seTipped = true;
-        host.addEventListener('mouseenter', () => muteHost(host));
+        if (tipBindings.has(host)) continue;
+        bind(host, 'mouseenter', () => muteHost(host));
         withTip(host, () => (icon.isConnected ? icon : host));
       }
     }
     for (const h of tipHosts) {
       if (!h.isConnected) tipHosts.delete(h);
     }
+    for (const el of tipBindings.keys()) if (!el.isConnected) tipBindings.delete(el);
     if (!live.muteAll && tipHosts.size) {
       live.muteAll = () => {
         for (const h of tipHosts) muteHost(h);
@@ -695,7 +712,8 @@
   }
 
   Object.assign(ns, {
+    unbindTips,
     achRows, appIdOf, banners, placeAchBanner, placeAchFeatured, placeAchIcons, placeAchRings,
     placeFeedAchAll, tipHosts, topChecked,
   });
-});
+})(window.__se);

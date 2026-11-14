@@ -13,17 +13,17 @@
  * - finished with no pixels: decode() tells a failure from an image without an intrinsic size
  *   (an SVG), which must stay visible.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedImages?.destroy();
+((SE) => {
+  window.__seImages?.destroy();
   if (!document.documentElement) return;
 
   const BROKEN = 'data-se-img-broken';
   const watched = new WeakSet();
 
-  const onError = event => event.currentTarget.setAttribute(BROKEN, '');
-  const onLoad = event => event.currentTarget.removeAttribute(BROKEN);
+  const onError = (event) => event.currentTarget.setAttribute(BROKEN, '');
+  const onLoad = (event) => event.currentTarget.removeAttribute(BROKEN);
 
-  const settle = img => {
+  const settle = (img) => {
     if (!img.getAttribute('src') && !img.getAttribute('srcset')) return;
     if (img.naturalWidth) {
       if (img.complete) img.removeAttribute(BROKEN);
@@ -42,7 +42,7 @@
     );
   };
 
-  const watch = img => {
+  const watch = (img) => {
     if (!watched.has(img)) {
       watched.add(img);
       img.addEventListener('error', onError);
@@ -51,7 +51,7 @@
     settle(img);
   };
 
-  const scan = node => {
+  const scan = (node) => {
     if (node.nodeType !== 1) return;
     if (node.tagName === 'IMG') watch(node);
     else for (const img of node.getElementsByTagName('img')) watch(img);
@@ -77,7 +77,7 @@
   // The shared watcher attaches to <body> at DOMContentLoaded; catch what rendered before that.
   if (!document.body) addEventListener('DOMContentLoaded', () => scan(document.documentElement), { once: true });
 
-  window.__steamEnhancedImages = {
+  window.__seImages = {
     destroy() {
       watcher.disconnect();
       for (const img of document.images) {
@@ -85,7 +85,7 @@
         img.removeEventListener('load', onLoad);
         img.removeAttribute(BROKEN);
       }
-      delete window.__steamEnhancedImages;
+      delete window.__seImages;
     },
   };
-});
+})(window.__se);

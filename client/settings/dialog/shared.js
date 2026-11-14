@@ -12,7 +12,7 @@
  *   disk usage bar, DLC counts, and Workshop empty states).
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
- * window.__steamEnhancedSettingsParts (values parts reassign live on its `live`). The parts:
+ * window.__seSettingsParts (values parts reassign live on its `live`). The parts:
  * - shared.js       selectors, page and group tables, row icons, text helpers
  * - options.js      the search catalogue's built-in entries
  * - search.js       the settings search bar: catalogue, scoring, results, jumping to a hit
@@ -23,8 +23,8 @@
  * - props.js        Game Properties: the page pass, the cover, the sidebar
  * - main.js         the update pass, watchers, start, and the API (destroy())
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = (window.__steamEnhancedSettingsParts = { live: {} });
+((SE) => {
+  const ns = (window.__seSettingsParts = { live: {} });
   const { C } = SE;
   const { live } = ns;
   live.search = undefined;
@@ -35,7 +35,7 @@
   live.observer = undefined;
   live.scanTimer = 0;
 
-  window.__steamEnhancedSettings?.destroy?.();
+  window.__seSettings?.destroy?.();
 
   const LIST = `.${C.PagedSettingsDialog_PageList}`;
   const ITEM = `.${C.PagedSettingsDialog_PageListItem}`;
@@ -131,4 +131,4 @@
     PRE_LABELS, PROPS_SIZE, ROW_ICONS, SECTION, SEP, SIZE, TEXT, TILE_SUBS, TITLE, UPDATE_TIMING,
     fieldLabel, text,
   });
-});
+})(window.__se);

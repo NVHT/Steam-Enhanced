@@ -3,8 +3,8 @@
  * (--se-span) so the two-column grid stacks cards without gaps; places the HowLongToBeat card
  * (compat/hltb-for-steam/hltb-for-steam.js) among them.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedGamePageParts;
+((SE) => {
+  const ns = window.__seGamePageParts;
   if (!ns) return;
   const { appIdOf, drop, own, schedule } = ns;
   const { live } = ns;
@@ -128,13 +128,13 @@
       for (const step of [tagSections, live.hltb?.place, placeSpans]) {
         try {
           step?.(c);
-        } catch (_) {}
+        } catch {}
       }
     }
   }
 
   function attachHltb() {
-    const integration = window.__steamEnhancedHltb;
+    const integration = window.__seHltb;
     if (!integration) return;
     live.hltb?.destroy();
     live.hltb = integration.createCard({
@@ -156,4 +156,4 @@
     APP_BUTTONS, ASSOCIATION, BODY, CONTAINER, HEADING, NAME, RIGHT_CONTROLS, SEEK, attachHltb,
     layout, sized,
   });
-});
+})(window.__se);

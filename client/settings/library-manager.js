@@ -5,11 +5,8 @@
  * modal layout with a searchable theme/plugin navigation list, active item
  * header, empty state, and theme reload footer.
  */
-(window.__se
-  ? (init) => init(window.__se)
-  : (init) => addEventListener('se-core', () => init(window.__se), { once: true })
-)((SE) => {
-  window.__steamEnhancedLibraryManager?.destroy();
+((SE) => {
+  window.__seLibraryManager?.destroy();
 
   const { esc } = SE;
   const made = new Set();
@@ -201,7 +198,7 @@
             o.SteamClient.Browser.RestartJSContext();
             return;
           }
-        } catch (_) {}
+        } catch {}
       }
     });
 
@@ -314,7 +311,7 @@
     update();
   }
 
-  window.__steamEnhancedLibraryManager = {
+  window.__seLibraryManager = {
     destroy() {
       observer?.disconnect();
       clearTimeout(switchTimer);
@@ -324,7 +321,7 @@
       drawer?.removeAttribute('data-se-open');
       drawer?.removeAttribute('data-se-shown');
       drawer?.removeAttribute('data-se-lmx');
-      delete window.__steamEnhancedLibraryManager;
+      delete window.__seLibraryManager;
     },
   };
 
@@ -333,4 +330,4 @@
   } else {
     addEventListener('DOMContentLoaded', start, { once: true });
   }
-});
+})(window.__se);

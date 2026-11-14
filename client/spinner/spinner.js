@@ -1,6 +1,8 @@
-/* Mount custom loading spinners over SteamLogoThrobber and startup loader containers. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedSpinner?.destroy();
+/*
+ * Mount custom loading spinners over SteamLogoThrobber and startup loader containers.
+ */
+((SE) => {
+  window.__seSpinner?.destroy();
   if (!document.body) return;
 
   const KINDS = {
@@ -24,8 +26,8 @@
   };
 
   // Recent covers and the wall crops come from startup.js (loaded before this file, same windows).
-  const startupArt = () => window.__steamEnhancedStartup?.art;
-  const toCssUrl = url => startupArt()?.cssUrl(url) ?? `url("${url}")`;
+  const startupArt = () => window.__seStartup?.art;
+  const toCssUrl = (url) => startupArt()?.cssUrl(url) ?? `url("${url}")`;
 
   let coverCache = { at: 0, list: [] };
 
@@ -46,7 +48,7 @@
     card.style.backgroundPosition = [...urls.map(() => 'center'), crops[index % crops.length]].join(', ');
   };
 
-  const buildSpinner = kind => {
+  const buildSpinner = (kind) => {
     const spec = KINDS[kind];
     const container = document.createElement('div');
     container.className = 'se-spinner';
@@ -130,7 +132,7 @@
   const watcher = SE.watch(scan);
   scan();
 
-  window.__steamEnhancedSpinner = {
+  window.__seSpinner = {
     destroy() {
       watcher?.disconnect();
       for (const el of document.querySelectorAll('.se-spinner')) {
@@ -140,4 +142,4 @@
       SE.unmark(docRoot, 'data-se-spinner-kind');
     },
   };
-});
+})(window.__se);

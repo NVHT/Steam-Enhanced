@@ -3,8 +3,8 @@
  *
  * Part of client/overlay/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedOverlayParts;
+((SE) => {
+  const ns = window.__seOverlayParts;
   if (!ns) return;
   const { el } = SE;
   const { ACH_TABS, VIEWS, achIcon, buildBar, button, fmtPct, formatDate, friendGroups, friendsInGame, friendsPlayedRecently, friendsState, guidesCache, newsCache, recentCache, renderAchievements, renderFriends, renderFriendsView, renderGuides, renderNews, renderNotesView, renderScreenshots, renderToolViews, scheduleRender, screenshotsCache, setText, tierOf } = ns;
@@ -17,7 +17,7 @@
 
   // A view that has nothing to show (a game without achievements) falls back
   // to the overview.
-  const setView = next => {
+  const setView = (next) => {
     const known = VIEWS.some(({ id }) => id === next);
     const target = !known || (next === 'achievements' && !live.achData?.total) ? 'overview' : next;
     if (target === live.view) return;
@@ -29,7 +29,7 @@
     scheduleRender();
   };
 
-  const setListState = patch => {
+  const setListState = (patch) => {
     Object.assign(listState, patch);
     if (live.ui) renderAchList(live.ui.overview.list, live.achData);
   };
@@ -50,13 +50,13 @@
     }
   };
 
-  const tierCounts = items =>
+  const tierCounts = (items) =>
     SE.rarity.TIERS.map(tier => {
       const all = items.filter(item => tierOf(item.pct) === tier);
       return { tier, total: all.length, unlocked: all.filter(item => item.achieved).length };
     }).filter(count => count.total);
 
-  const buildAchRow = item => {
+  const buildAchRow = (item) => {
     const row = el('li', 'se-ov-achl-row');
     if (!item.achieved) row.dataset.locked = '';
     const text = el('div', 'se-ov-achl-text');
@@ -136,7 +136,7 @@
   };
 
   // A box's width inside its padding (the wrap pads for clipped effects).
-  const contentWidth = node => {
+  const contentWidth = (node) => {
     const style = getComputedStyle(node);
     return node.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
   };
@@ -160,4 +160,4 @@
   };
 
   Object.assign(ns, { VIEW_ATTR, listState, renderOverview, setListState, setView });
-});
+})(window.__se);

@@ -1,7 +1,9 @@
-/* Populate direct-chat headers, group-chat layout attributes, and composer placeholders. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  const previousDocuments = window.__steamEnhancedChat?.documents?.() || [];
-  window.__steamEnhancedChat?.destroy();
+/*
+ * Populate direct-chat headers, group-chat layout attributes, and composer placeholders.
+ */
+((SE) => {
+  const previousDocuments = window.__seChat?.documents?.() || [];
+  window.__seChat?.destroy();
   if (!document.body) return;
 
   const { C, run } = SE;
@@ -15,7 +17,7 @@
   const LIST_TOGGLE = 'data-se-list-toggle';
   const SCOPE = '.friendsui-container, .multiChatDialog';
   const COMPACT = run(() => new Intl.NumberFormat(undefined, { notation: 'compact', maximumFractionDigits: 1 }));
-  const compactNum = n => run(() => COMPACT.format(n)) || String(n);
+  const compactNum = (n) => run(() => COMPACT.format(n)) || String(n);
 
   const ICONS = {
     voice:
@@ -31,7 +33,7 @@
       '<circle class="dot" cx="18" cy="12" r="1.5"/>',
   };
 
-  const createIcon = name => {
+  const createIcon = (name) => {
     const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('viewBox', '0 0 24 24');
     svg.setAttribute('aria-hidden', 'true');
@@ -46,16 +48,16 @@
     btn.setAttribute('data-se-chat-tip', label);
     btn.setAttribute('aria-label', label);
     btn.append(createIcon(name));
-    btn.addEventListener('click', event => {
+    btn.addEventListener('click', (event) => {
       event.stopPropagation();
       onClick(btn, event);
     });
     return btn;
   };
 
-  const resolveChatModel = win => SE.fromProps(win, 40, p => p.chatView?.chat || null);
+  const resolveChatModel = (win) => SE.fromProps(win, 40, (p) => p.chatView?.chat || null);
 
-  const readPersonaStatus = persona => {
+  const readPersonaStatus = (persona) => {
     if (!persona) return { cls: 'offline', text: '' };
     if (run(() => persona.is_ingame)) {
       return {
@@ -89,7 +91,7 @@
     tab.dispatchEvent(event);
   };
 
-  const toggleVoiceCall = win => {
+  const toggleVoiceCall = (win) => {
     const chat = resolveChatModel(win);
     if (chat && typeof chat.ToggleVoiceChat === 'function') {
       run(() => chat.ToggleVoiceChat());
@@ -98,7 +100,7 @@
     win.querySelector('.ChatMessageEntryVoice .VoiceToggle, .ChatMessageEntryVoice button')?.click();
   };
 
-  const buildDirectChatHeader = win => {
+  const buildDirectChatHeader = (win) => {
     const head = document.createElement('div');
     head.className = 'se-chat-head';
 
@@ -124,14 +126,14 @@
       createHeaderTile('invite', 'Invite to a group chat', () =>
         win.querySelector('.inviteAnotherFriendButton')?.click()
       ),
-      createHeaderTile('more', 'More', btn => openActiveTabContextMenu(win, btn))
+      createHeaderTile('more', 'More', (btn) => openActiveTabContextMenu(win, btn))
     );
 
     head.append(avatarBox, whoBox, actions);
     return head;
   };
 
-  const syncDirectChatHeader = win => {
+  const syncDirectChatHeader = (win) => {
     const header = win.querySelector(':scope > .chatHeader:not(.titleBarContainer)');
     if (!header) return null;
     const chat = resolveChatModel(win);
@@ -232,7 +234,7 @@
 
     const stats = header.querySelector('.chatRoomGroupStats');
     if (stats) {
-      const parseDigits = el => {
+      const parseDigits = (el) => {
         const match = el && el.textContent.replace(/[\s.,\u00a0\u202f']/g, '').match(/\d+/);
         return match ? +match[0] : null;
       };
@@ -251,7 +253,7 @@
   let frame = 0;
 
   // Live collections: cheap enough to read on every mutation, before the frame paints.
-  const markDialogs = doc => {
+  const markDialogs = (doc) => {
     const dialogs = doc.getElementsByClassName('multiChatDialog');
     if (!dialogs.length) return false;
     const listToggle = doc.getElementsByClassName('friendListCollapse').length > 0;
@@ -319,7 +321,7 @@
   const markWatcher = SE.watch(onAnyMutation, { attributes: ['class'] });
   onAnyMutation();
 
-  window.__steamEnhancedChat = {
+  window.__seChat = {
     documents: () => [...attachedDocuments.keys()],
     detachDocument(doc) {
       attachedDocuments.get(doc)?.disconnect();
@@ -368,13 +370,13 @@
           el.removeAttribute('data-se-placeholder');
         }
       }
-      delete window.__steamEnhancedChat;
+      delete window.__seChat;
     },
   };
 
   for (const doc of previousDocuments) {
     if (doc.body && !doc.defaultView?.closed) {
-      window.__steamEnhancedChat.attachDocument(doc);
+      window.__seChat.attachDocument(doc);
     }
   }
-});
+})(window.__se);

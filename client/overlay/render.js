@@ -3,8 +3,8 @@
  *
  * Part of client/overlay/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedOverlayParts;
+((SE) => {
+  const ns = window.__seOverlayParts;
   if (!ns) return;
   const { el } = SE;
   const { GUIDES_URL, GUIDE_URL, HEADER_ART, ICON, NEWS_URL, achIcon, achievementsFromStore, buildBar, button, createCache, duration, img, loadAchievements, loadGuides, loadNews, loadRecentPlayers, loadScreenshots, resolveAchievementStore } = ns;
@@ -53,7 +53,7 @@
   };
 
   const dateFormat = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
-  const formatDate = seconds => (seconds > 0 ? dateFormat.format(seconds * 1000) : '');
+  const formatDate = (seconds) => (seconds > 0 ? dateFormat.format(seconds * 1000) : '');
 
   const renderAchievements = (part, appid) => {
     const store = appid ? resolveAchievementStore() : null;
@@ -61,7 +61,7 @@
     if (data !== undefined) live.achData = data;
     const visible = !!data && data.total > 0;
     const signature = visible ? JSON.stringify([data.unlocked, data.total, data.rows]) : '';
-    commit(part, visible, signature, body => {
+    commit(part, visible, signature, (body) => {
       setText(part.meta, `${data.unlocked} / ${data.total}`);
       const list = el('ul', 'se-ov-ach-list');
       for (const row of data.rows) {
@@ -104,13 +104,13 @@
 
     const visible = total > 0;
     const signature = visible ? JSON.stringify([shownIn, shownRecent, more, inGame.length, recent.length]) : '';
-    commit(part, visible, signature, body => {
+    commit(part, visible, signature, (body) => {
       setText(
         part.meta,
         [inGame.length && `${inGame.length} in-game`, recent.length && `${recent.length} recent`].filter(Boolean).join(' · ')
       );
       const row = el('div', 'se-ov-avatars');
-      const avatar = friend => {
+      const avatar = (friend) => {
         const node = button('se-ov-avatar', { steamid: friend.steamid, status: friend.status });
         if (friend.away) node.dataset.away = '';
         node.title = friend.name;
@@ -128,7 +128,7 @@
   const renderScreenshots = (part, data) => {
     const visible = !!data?.shots.length;
     const signature = visible ? JSON.stringify(data) : '';
-    commit(part, visible, signature, body => {
+    commit(part, visible, signature, (body) => {
       const grid = el('div', 'se-ov-shots');
       for (const shot of data.shots) {
         const tile = button('se-ov-shot', { widget: 'Screenshots' });
@@ -143,7 +143,7 @@
   const renderGuides = (part, appid, guides) => {
     const visible = !!guides?.length;
     const signature = visible ? JSON.stringify([appid, guides]) : '';
-    commit(part, visible, signature, body => {
+    commit(part, visible, signature, (body) => {
       part.head.querySelector('.se-ov-sec-link').dataset.url = GUIDES_URL(appid);
       const list = el('ul', 'se-ov-guides');
       for (const guide of guides) {
@@ -164,7 +164,7 @@
   const renderNews = (part, appid, news) => {
     const visible = !!news?.length;
     const signature = visible ? JSON.stringify([appid, news]) : '';
-    commit(part, visible, signature, body => {
+    commit(part, visible, signature, (body) => {
       part.head.querySelector('.se-ov-sec-link').dataset.url = NEWS_URL(appid);
       const [lead, ...rest] = news;
       const featured = button('se-ov-news-lead', { url: lead.url });
@@ -216,14 +216,14 @@
       try {
         const saved = JSON.parse(localStorage.getItem(TIMER_KEY));
         if (saved && typeof saved === 'object') return { start: Number(saved.start) || 0, acc: Number(saved.acc) || 0 };
-      } catch (_) {}
+      } catch {}
       return { start: 0, acc: 0 };
     };
     let state = read();
     const save = () => {
       try {
         localStorage.setItem(TIMER_KEY, JSON.stringify(state));
-      } catch (_) {}
+      } catch {}
       scheduleRender();
     };
     return {
@@ -242,16 +242,16 @@
     };
   })();
 
-  const clockText = ms => {
+  const clockText = (ms) => {
     const total = Math.floor(ms / 1000);
-    const pad = n => String(n).padStart(2, '0');
+    const pad = (n) => String(n).padStart(2, '0');
     return `${pad(Math.floor(total / 3600))}:${pad(Math.floor(total / 60) % 60)}:${pad(total % 60)}`;
   };
 
   const clockFormat = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
   const dayFormat = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 
-  const renderTime = part => {
+  const renderTime = (part) => {
     const elapsed = timer.elapsed();
     const running = timer.running();
     const mode = running ? 'running' : elapsed > 0 ? 'paused' : 'clock';
@@ -276,4 +276,4 @@
   };
 
   Object.assign(ns, { VIEWS, achievementsCache, caches, formatDate, guidesCache, newsCache, recentCache, renderAchievements, renderFriends, renderGuides, renderNews, renderScreenshots, renderTabs, renderTime, scheduleRender, screenshotsCache, setStat, setText, timer });
-});
+})(window.__se);

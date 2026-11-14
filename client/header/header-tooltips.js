@@ -1,14 +1,16 @@
-/* Attach native Steam React tooltips to header, rail, and sidebar icon buttons. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
+/*
+ * Attach native Steam React tooltips to header, rail, and sidebar icon buttons.
+ */
+((SE) => {
   const { C, railMode } = SE;
-  window.__steamEnhancedHeaderTooltips?.destroy();
+  window.__seHeaderTooltips?.destroy();
 
   const mounts = new Map();
   const pageIcons = new Set(['store', 'library', 'community', 'profile']);
   let isRail = false;
 
   // Controls that open hover menus must not host a nested tooltip root.
-  const ownsDropdown = node => {
+  const ownsDropdown = (node) => {
     const icon = node.getAttribute('data-se-icon');
     if (
       icon === 'steam' ||
@@ -22,7 +24,7 @@
 
   const RAIL_LABELS = { profile: 'Profile', community: 'Discussions' };
 
-  const labelFor = node =>
+  const labelFor = (node) =>
     node.getAttribute('data-se-tip') ||
     (isRail && RAIL_LABELS[node.getAttribute('data-se-icon')]) ||
     node.getAttribute('aria-label');
@@ -47,7 +49,7 @@
             return first && first.eSource !== 1;
           });
         }
-      } catch (_) {}
+      } catch {}
     }
     return null;
   };
@@ -65,21 +67,21 @@
         trayCallbacks = callbacks;
         traySubscription = callbacks.Register(schedule);
         break;
-      } catch (_) {}
+      } catch {}
     }
   };
 
   const mutedNodes = new Set();
   const MUTE_EVENTS = ['mouseover', 'mouseout', 'pointerover', 'pointerout'];
-  const stopHoverPropagation = event => event.stopPropagation();
+  const stopHoverPropagation = (event) => event.stopPropagation();
 
-  const muteNode = node => {
+  const muteNode = (node) => {
     if (mutedNodes.has(node)) return;
     for (const type of MUTE_EVENTS) node.addEventListener(type, stopHoverPropagation);
     mutedNodes.add(node);
   };
 
-  const unmuteNode = node => {
+  const unmuteNode = (node) => {
     for (const type of MUTE_EVENTS) node.removeEventListener(type, stopHoverPropagation);
     node.removeAttribute('data-se-tip');
     mutedNodes.delete(node);
@@ -154,7 +156,7 @@
     ].filter(node => !ownsDropdown(node));
     if (!candidates.length) return;
 
-    const native = window.__steamEnhancedNativeTooltips?.resolve();
+    const native = window.__seNativeTooltips?.resolve();
     if (!native) return;
     const { React, DOM, Tooltip } = native;
 
@@ -216,7 +218,7 @@
     schedule();
   };
 
-  window.__steamEnhancedHeaderTooltips = {
+  window.__seHeaderTooltips = {
     hasNotifications,
     destroy() {
       observer?.disconnect();
@@ -232,10 +234,10 @@
       }
       mounts.clear();
       removeEventListener('DOMContentLoaded', start);
-      delete window.__steamEnhancedHeaderTooltips;
+      delete window.__seHeaderTooltips;
     },
   };
 
   if (document.body) start();
   else addEventListener('DOMContentLoaded', start, { once: true });
-});
+})(window.__se);

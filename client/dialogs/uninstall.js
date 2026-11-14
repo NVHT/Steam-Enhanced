@@ -17,8 +17,8 @@
  *
  * Big Picture (.GamepadMode) keeps Steam's dialog.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedUninstall?.destroy();
+((SE) => {
+  window.__seUninstall?.destroy();
 
   /* UninstallDialog CSS module (3867) */
   const C = {
@@ -36,19 +36,9 @@
     drive: '<rect class="d" x="3" y="13" width="18" height="7" rx="2"/><path d="M3 15l2.6-9.2A2.5 2.5 0 0 1 8 4h8a2.5 2.5 0 0 1 2.4 1.8L21 15"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 16.5h.01M10.5 16.5h3"/>',
   };
 
-  const views = new Set();
-  const viewOf = new WeakMap();
-
   /* ---------- Helpers ---------- */
 
-  const attempt = (fn, fallback) => {
-    try {
-      return fn();
-    } catch (err) {
-      console.warn('[Steam Enhanced] Uninstall:', err);
-      return fallback;
-    }
-  };
+  const attempt = SE.attempt('Uninstall');
 
   const { el } = SE;
 
@@ -56,14 +46,14 @@
 
   const isOurs = SE.inside(`.${OURS}`);
 
-  const num = value => {
+  const num = (value) => {
     const n = Number(value);
     return Number.isFinite(n) && n >= 0 ? n : null;
   };
 
   /* Bytes as Steam shows them: binary units, two decimals from GB up */
   const UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-  const bytes = value => {
+  const bytes = (value) => {
     let n = Math.max(0, value);
     let unit = 0;
     while (n >= 1024 && unit < UNITS.length - 1) {
@@ -90,7 +80,7 @@
 
   /* ---------- Reading Steam's state ---------- */
 
-  const readApps = node => {
+  const readApps = (node) => {
     let fiber = SE.liveFiber?.(node);
     for (let depth = 0; fiber && depth < MAX_DEPTH; fiber = fiber.return, depth++) {
       const apps = fiber.memoizedProps?.rgApps;
@@ -99,10 +89,10 @@
     return [];
   };
 
-  const overview = appid => attempt(() => SE.appStore?.()?.GetAppOverviewByAppID(appid), null);
+  const overview = (appid) => attempt(() => SE.appStore?.()?.GetAppOverviewByAppID(appid), null);
 
   /* Steam's own label (module 88769 Cj): "Windows (C:)", else the drive, else the folder */
-  const driveName = folder => {
+  const driveName = (folder) => {
     const drive = folder.strDriveName || '';
     if (folder.strUserLabel) return drive.length > 1 && drive.length < 4 ? `${folder.strUserLabel} (${drive})` : folder.strUserLabel;
     return drive || folder.strFolderPath || '';
@@ -129,8 +119,8 @@
   };
 
   /* Steam's per-app details (what the game page's Storage section shows), when loaded */
-  const details = appid =>
-    attempt(() => SE.global?.('appDetailsStore', store => typeof store.GetAppDetails === 'function')?.GetAppDetails(appid), null);
+  const details = (appid) =>
+    attempt(() => SE.global?.('appDetailsStore', (store) => typeof store.GetAppDetails === 'function')?.GetAppDetails(appid), null);
 
   /*
    * The first positive number among an object's size fields: the named ones in order, then any
@@ -156,7 +146,7 @@
   const OVERVIEW_SIZES = ['size_on_disk'];
 
   /* An app's overview, plus each client's data (per_client_data) where Steam keeps its install size */
-  const overviewSize = appid => {
+  const overviewSize = (appid) => {
     const app = overview(appid);
     const direct = sizeIn(app, OVERVIEW_SIZES);
     if (direct) return direct;
@@ -175,7 +165,7 @@
    * { folder, size }: the library folder holding the first app (or null if none answers), with
    * the apps' sizes summed. The folder comes from its app list, else from the app's details.
    */
-  const readDisk = async appids => {
+  const readDisk = async (appids) => {
     const folders = await readFolders();
     const entries = new Map();
     let home = null;
@@ -287,20 +277,18 @@
 
   /* ---------- View ---------- */
 
-  const createView = root => {
+  const createView = (root) => {
     const nodes = [];
-    let frame = 0;
     let built = false;
 
     const sync = () => {
-      frame = 0;
       if (!root.isConnected || built) return;
       const body = root.querySelector('.DialogBodyText');
       if (!body || root.querySelector(C.error)) return;
       const appids = attempt(() => readApps(body), []);
       if (!appids.length) return;
       built = true;
-      observer.disconnect();
+      change.disconnect();
 
       const host = root.closest('.DialogContent');
       if (host) nodes.push(attempt(() => buildArt(host, appids[0]), null));
@@ -308,53 +296,35 @@
       SE.attr(root, ROOT, '');
     };
 
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(sync);
-    };
-
     /* The body mounts after the frame on some opens */
-    const observer = new MutationObserver(records => {
-      if (records.some(record => ![...record.addedNodes].every(isOurs))) schedule();
-    });
-    observer.observe(root, { childList: true, subtree: true });
+    const change = SE.onChange(root, sync, { ignore: isOurs });
 
     sync();
 
     return {
       root,
       destroy() {
-        if (frame) cancelAnimationFrame(frame);
-        observer.disconnect();
+        change.disconnect();
         for (const node of nodes) node?.remove();
         SE.unmark(root, ROOT);
-        views.delete(this);
-        viewOf.delete(root);
       },
     };
   };
 
   /* ---------- Lifecycle ---------- */
 
-  const scan = () => {
-    for (const view of [...views]) if (!view.root.isConnected) view.destroy();
-    for (const root of document.querySelectorAll(C.root)) {
-      if (viewOf.has(root) || root.closest('.GamepadMode')) continue;
-      const view = attempt(() => createView(root), null);
-      if (!view) continue;
-      views.add(view);
-      viewOf.set(root, view);
-    }
-  };
+  const mounted = SE.mount(
+    'Uninstall',
+    () => [...document.querySelectorAll(C.root)].filter(root => !root.closest('.GamepadMode')),
+    createView,
+    { throttle: 120, scope: C.root, ignore: isOurs }
+  );
 
-  const watcher = SE.watch(scan, { throttle: 120, ignore: isOurs });
-  scan();
-
-  window.__steamEnhancedUninstall = {
+  window.__seUninstall = {
     destroy() {
-      watcher.disconnect();
-      for (const view of [...views]) view.destroy();
+      mounted.destroy();
       document.querySelectorAll(`.${OURS}`).forEach(node => node.remove());
-      delete window.__steamEnhancedUninstall;
+      delete window.__seUninstall;
     },
   };
-});
+})(window.__se);

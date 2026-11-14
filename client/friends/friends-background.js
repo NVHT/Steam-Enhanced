@@ -1,5 +1,8 @@
-/* Suppress automatic desktop Friends popup window creation on startup while preserving overlay and manual opens. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
+/*
+ * Suppress automatic desktop Friends popup window creation on startup while preserving overlay and
+ * manual opens.
+ */
+((SE) => {
   window.__seFriendsBackground?.destroy();
 
   let destroyed = false;
@@ -20,7 +23,7 @@
     patchedRestores.set(ui, { own, wrapper });
   }
 
-  const patchFriendsApp = app => {
+  const patchFriendsApp = (app) => {
     if (!app || patchedApps.has(app) || typeof app.ShowPopupFriendsListAtStartup !== 'function') {
       return;
     }
@@ -46,10 +49,10 @@
         value: blocked,
       });
       patchedApps.set(app, { own, blocked });
-    } catch (_) {}
+    } catch {}
   };
 
-  const restoreApp = app => {
+  const restoreApp = (app) => {
     const saved = patchedApps.get(app);
     if (!saved) return;
     try {
@@ -57,7 +60,7 @@
         if (saved.own) Object.defineProperty(app, 'ShowPopupFriendsListAtStartup', saved.own);
         else delete app.ShowPopupFriendsListAtStartup;
       }
-    } catch (_) {}
+    } catch {}
     patchedApps.delete(app);
   };
 
@@ -87,7 +90,7 @@
 
         let currentValue = descriptor?.value;
         const get = () => currentValue;
-        const set = nextValue => {
+        const set = (nextValue) => {
           if (currentValue !== nextValue) restoreApp(currentValue);
           currentValue = nextValue;
           patchFriendsApp(nextValue);
@@ -100,7 +103,7 @@
           set,
         });
         patchedOwners.set(owner, { descriptor, get, set });
-      } catch (_) {}
+      } catch {}
     }
 
     for (const app of [...patchedApps.keys()]) {
@@ -134,7 +137,7 @@
           } else {
             delete owner.g_FriendsUIApp;
           }
-        } catch (_) {}
+        } catch {}
       }
       for (const app of [...patchedApps.keys()]) restoreApp(app);
       for (const [ui, { own, wrapper }] of patchedRestores) {
@@ -150,4 +153,4 @@
       delete window.__seFriendsBackground;
     },
   };
-});
+})(window.__se);

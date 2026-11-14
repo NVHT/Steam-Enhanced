@@ -2,8 +2,8 @@
  * The tray under the stage: the theme's own panels, the Favorites and Collections grids sized
  * to the room they get, and marking Steam's Home rows by kind.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedHomeStageParts;
+((SE) => {
+  const ns = window.__seHomeStageParts;
   if (!ns) return;
   const {
     ADD_SHELF, appStore, client, COLLECTION_TILE, collectionStore, COVER, ICON_PICK, ICON_PLAY,
@@ -403,4 +403,4 @@
     boxOf, clearMarks, dropAllOwn, dropOwn, fitColl, fitFav, isFavorites, kindOf, mark, own,
     paintColl, paintFav, scrollerOf, shelfId, userCollections,
   });
-});
+})(window.__se);

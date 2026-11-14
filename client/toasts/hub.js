@@ -3,8 +3,8 @@
  *
  * Part of client/toasts/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedToastsParts;
+((SE) => {
+  const ns = window.__seToastsParts;
   if (!ns) return;
   const { mark, run, unmark } = SE;
   const { GUARD_MS, IN_GAME, SRC_ATTR, STALE_MAX_MS, SURFACE, enrichAchievement, letGo, prepare, ready, render, teardown } = ns;
@@ -32,7 +32,7 @@
   const CLOSE_MS = 900;          // the tray's close animation, with margin
   const HANDOFF_MS = 60;         // the old stage steps down this long after the new one draws
 
-  const alive = w => !!w && run(() => !w.closed) === true;
+  const alive = (w) => !!w && run(() => !w.closed) === true;
 
   const home = () => ns.shared();
 
@@ -66,14 +66,14 @@
     return h;
   }
 
-  const entryById = id => hub().entries.find(e => e.id === id) || null;
+  const entryById = (id) => hub().entries.find(e => e.id === id) || null;
   const activeEntry = () => {
     const h = hub();
     return h.entries.find(e => e.id === h.active && !e.done) || null;
   };
   const openEntries = () => hub().entries.filter(e => !e.done);
   const isStage = () => hub().stage === window;
-  const elapsed = h => Math.max(0, (h.pausedAt || Date.now()) - h.startedAt);
+  const elapsed = (h) => Math.max(0, (h.pausedAt || Date.now()) - h.startedAt);
 
   function register() {
     const h = hub();
@@ -331,4 +331,4 @@
   }
 
   Object.assign(ns, { activeEntry, add, alive, byKey, closed, elapsed, entryById, finish, history, hub, isStage, notify, openEntries, pendingKeys, play, register, skipped, slotFor, sync, wake });
-});
+})(window.__se);

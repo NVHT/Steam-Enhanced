@@ -37,12 +37,6 @@
  * discussions.css, forums.css) and the page report.
  */
 
-const versioned = (file) => {
-  const url = new URL(file, import.meta.url);
-  url.search = new URL(import.meta.url).search;
-  return url.href;
-};
-const { titleTips } = await import(versioned('../shared/tips.js'));
 
 // Elements whose `title` moves to the theme's tooltip
 const TIP_TARGETS = '#discussions_tab_contents [title]:not(input, textarea, select, iframe)';
@@ -181,7 +175,8 @@ const lineIcon = (name) => {
 const isTyping = (target) =>
   target instanceof Element && Boolean(target.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"]'));
 
-export default (dom) => {
+export default async (dom) => {
+  const { titleTips } = await dom.importNear(import.meta.url, '../shared/tips.js');
   const $ = dom.scope();
   const { el, mark, unmark, setVar, squash } = dom;
 

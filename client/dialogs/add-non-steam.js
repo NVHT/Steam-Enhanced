@@ -23,8 +23,8 @@
  * read through appDetailsStore where this window can reach it (Steam's main window), else
  * SteamClient.Apps.RegisterForAppDetails.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedAddNonSteam?.destroy();
+((SE) => {
+  window.__seAddNonSteam?.destroy();
 
   /* AddNonSteamGameDialog CSS module (sp.js 92445) */
   const C = {
@@ -72,21 +72,11 @@
     library: '<rect class="d" x="4" y="3" width="6" height="18" rx="1.5"/><rect x="4" y="3" width="6" height="18" rx="1.5"/><rect x="12" y="6" width="5" height="15" rx="1.5"/><path d="M19.5 7.5l2 13"/>',
   };
 
-  const views = new Set();
-  const viewOf = new WeakMap();
-
   /* ---------- Helpers ---------- */
 
-  const attempt = (fn, fallback) => {
-    try {
-      return fn();
-    } catch (err) {
-      console.warn('[Steam Enhanced] Add a Non-Steam Game:', err);
-      return fallback;
-    }
-  };
+  const attempt = SE.attempt('Add a Non-Steam Game');
 
-  const clean = text => String(text ?? '').replace(/\s+/g, ' ').trim();
+  const clean = (text) => String(text ?? '').replace(/\s+/g, ' ').trim();
 
   const { el } = SE;
 
@@ -111,21 +101,21 @@
   };
 
   /* An executable path as a comparable key: no quotes, backslashes, case-folded (Windows paths) */
-  const pathKey = path => String(path ?? '').trim().replace(/^"(.*)"$/, '$1').replace(/\//g, '\\').toLowerCase();
+  const pathKey = (path) => String(path ?? '').trim().replace(/^"(.*)"$/, '$1').replace(/\//g, '\\').toLowerCase();
 
   /* ---------- Reading Steam's state ---------- */
 
-  const isSelected = row => !!row.querySelector('.DialogCheckbox.Active');
+  const isSelected = (row) => !!row.querySelector('.DialogCheckbox.Active');
 
   /* The app behind a row ({ strAppName, strExePath, strArguments, strCmdline }) */
-  const appOf = row => SE.fromProps?.(row, 3, p => (p.app?.strCmdline != null ? p.app : undefined)) ?? null;
+  const appOf = (row) => SE.fromProps?.(row, 3, (p) => (p.app?.strCmdline != null ? p.app : undefined)) ?? null;
 
   /*
    * The dialog component's selection: the one Set in its hooks (command lines). Read from the
    * live fiber so it is this render's Set, not the previous one. The popup's objects come from
    * Steam's main window, so the type check can't use instanceof.
    */
-  const readSelection = root => {
+  const readSelection = (root) => {
     let fiber = SE.liveFiber?.(root);
     for (let depth = 0; fiber && depth < MAX_DEPTH; fiber = fiber.return, depth++) {
       if (typeof fiber.type !== 'function') continue;
@@ -143,7 +133,7 @@
    * alternate, so the direction is read from the drawn path: its tip sits above the middle of
    * the 36-unit box for "up" (M17.98 10.23) and below it for "down" (M17.98 26.54).
    */
-  const readSort = header => {
+  const readSort = (header) => {
     for (const [key, selector] of [['name', C.name], ['path', C.path]]) {
       const arrow = header?.querySelector(`:scope > ${selector} ${C.arrow}`);
       if (!arrow) continue;
@@ -154,21 +144,21 @@
   };
 
   /* A command line ("C:\dir\app.exe" --flag, or unquoted without arguments) to { exe, args } */
-  const parseCmdline = cmdline => {
+  const parseCmdline = (cmdline) => {
     const text = String(cmdline ?? '').trim();
     const quoted = text.match(/^"([^"]*)"\s*(.*)$/);
     return quoted ? { exe: quoted[1], args: quoted[2] } : { exe: text, args: '' };
   };
 
   /* "C:\Program Files\7-Zip\7zFM.exe" (quoted or not) to { dir, file } */
-  const splitPath = path => {
+  const splitPath = (path) => {
     const bare = String(path ?? '').trim().replace(/^"(.*)"$/, '$1');
     const cut = Math.max(bare.lastIndexOf('\\'), bare.lastIndexOf('/')) + 1;
     return { dir: bare.slice(0, cut), file: bare.slice(cut) };
   };
 
   /* Letter group for a name: A–Z (any script's letters, upper-cased), everything else "#" */
-  const groupOf = name => {
+  const groupOf = (name) => {
     const first = clean(name).charAt(0);
     return /\p{L}/u.test(first) ? first.toLocaleUpperCase() : '#';
   };
@@ -184,7 +174,7 @@
    * One per view. set(node, label) gives a node a tip, relabels it (live, if showing) or, with
    * no label, takes it away. Hover is delegated from the dialog root.
    */
-  const createTips = root => {
+  const createTips = (root) => {
     const doc = root.ownerDocument;
     const win = doc.defaultView;
     const labels = new Map();
@@ -213,11 +203,11 @@
     })) {
       pop.style.setProperty(name, value, 'important');
     }
-    const body = el('div', SE.C?.TextToolTip ?? '_2FxbHJzYoH024ko7zqcJOf');
+    const body = el('div', SE.C.TextToolTip);
     pop.append(body);
     doc.body.append(pop);
 
-    const place = node => {
+    const place = (node) => {
       const box = node.getBoundingClientRect();
       const tip = pop.getBoundingClientRect();
       const gap = 6;
@@ -238,7 +228,7 @@
       attempt(() => pop.hidePopover?.());
     };
 
-    const show = node => {
+    const show = (node) => {
       shownFor = node;
       body.textContent = labels.get(node);
       attempt(() => pop.showPopover?.());
@@ -246,14 +236,14 @@
       pop.setAttribute('data-shown', '');
     };
 
-    const owner = target => {
+    const owner = (target) => {
       for (let node = target; node && node !== root.parentNode; node = node.parentElement) {
         if (labels.has(node)) return node;
       }
       return null;
     };
 
-    const onOver = event => {
+    const onOver = (event) => {
       const node = owner(event.target);
       if (node === shownFor || (node && timer && node === pending)) return;
       hide();
@@ -265,7 +255,7 @@
       }, 300);
     };
 
-    const onOut = event => {
+    const onOut = (event) => {
       if (owner(event.relatedTarget) === (shownFor ?? pending)) return;
       pending = null;
       hide();
@@ -316,7 +306,7 @@
     for (const win of SE.owners?.() ?? [window]) {
       try {
         if (win.appStore && win.SteamClient?.Apps) return win;
-      } catch (_) {}
+      } catch {}
     }
     return null;
   };
@@ -326,7 +316,7 @@
     new Promise(resolve => {
       let handle = null;
       let done = false;
-      const finish = exe => {
+      const finish = (exe) => {
         if (done) return;
         done = true;
         clearTimeout(timer);
@@ -335,7 +325,7 @@
         resolve(exe || null);
       };
       const timer = setTimeout(() => finish(null), DETAILS_TIMEOUT_MS);
-      const onDetails = details => {
+      const onDetails = (details) => {
         if (details?.strShortcutExe != null) finish(details.strShortcutExe);
       };
       const store = win.appDetailsStore;
@@ -368,7 +358,7 @@
     !args && (HELPER_FILE.test(file.replace(/\.[^.]+$/, '')) || HELPER_NAME.test(name));
 
   /* Adds the path line and the In Library tag once per row; returns what the view needs */
-  const decorate = row => {
+  const decorate = (row) => {
     const known = rowInfo.get(row);
     if (known && row.querySelector(`:scope > .${OURS}-path`)) return known;
     const app = appOf(row);
@@ -405,7 +395,7 @@
 
   /* ---------- View ---------- */
 
-  const createView = root => {
+  const createView = (root) => {
     const header = root.querySelector(`:scope > ${C.header}`);
     const list = root.querySelector(`:scope > ${C.list}`);
     const footer = root.querySelector(`:scope > ${C.footer}`);
@@ -414,7 +404,6 @@
     let view = 'all';
     let hideHelpers = storage.get(HELPERS_KEY, '1') === '1';
     let owned = new Set();
-    let frame = 0;
     const tips = createTips(root);
     cleanups.push(tips.destroy);
 
@@ -424,9 +413,9 @@
     };
 
     const rows = () => [...list.querySelectorAll(`:scope > ${C.row}`)];
-    const isOwned = row => owned.has(rowInfo.get(row)?.exe);
-    const isHidden = row => hideHelpers && !!rowInfo.get(row)?.helper && !isSelected(row);
-    const shown = row => (view === 'all' || isSelected(row)) && !isHidden(row);
+    const isOwned = (row) => owned.has(rowInfo.get(row)?.exe);
+    const isHidden = (row) => hideHelpers && !!rowInfo.get(row)?.helper && !isSelected(row);
+    const shown = (row) => (view === 'all' || isSelected(row)) && !isHidden(row);
     const shownRows = () => rows().filter(shown);
     const searchInput = () => root.querySelector(':scope > .DialogInput_Wrapper input');
     const addButton = () =>
@@ -542,7 +531,6 @@
     };
 
     const update = () => {
-      frame = 0;
       if (!root.isConnected) return;
       const all = rows();
       for (const row of all) decorate(row);
@@ -624,9 +612,11 @@
       SE.attr?.(addButton(), 'data-se-count', selectedCount > 0 ? selectedCount.toLocaleString() : null);
     };
 
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
+    // Rows and the loader are child-list changes; selection is the checkbox's class; `d`: the
+    // sort caret flips by redrawing its path, with no class change
+    const change = SE.onChange(root, update, { attributes: ['class', 'd'], characterData: true, ignore: isOurs });
+    const { schedule } = change;
+    cleanups.push(change.disconnect);
 
     /* ---------- Keyboard ---------- */
 
@@ -640,7 +630,7 @@
       next.scrollIntoView({ block: 'nearest' });
     };
 
-    listen(list, 'keydown', event => {
+    listen(list, 'keydown', (event) => {
       const row = event.target.closest?.(C.row);
       switch (event.key) {
         case 'ArrowDown':
@@ -665,7 +655,7 @@
       event.preventDefault();
     });
 
-    listen(root, 'keydown', event => {
+    listen(root, 'keydown', (event) => {
       if (!(event.ctrlKey || event.metaKey) || event.altKey || event.shiftKey) return;
       const key = event.key.toLowerCase();
       const typing = event.target.matches?.('input, textarea');
@@ -691,15 +681,6 @@
     browse?.after(summary);
     SE.mark(root, BUILT);
 
-    // Rows and the loader are child-list changes; selection is the checkbox's class
-    const observer = new MutationObserver(records => {
-      if (records.some(record => !isOurs(record.target) && !(record.type === 'childList' && [...record.addedNodes, ...record.removedNodes].every(isOurs)))) {
-        schedule();
-      }
-    });
-    // `d`: the sort caret flips by redrawing its path, with no class change
-    observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'd'], characterData: true });
-    cleanups.push(() => observer.disconnect());
     // A resize changes which paths are cut short
     const resizer = new ResizeObserver(schedule);
     resizer.observe(list);
@@ -724,7 +705,6 @@
       root,
       update,
       destroy() {
-        if (frame) cancelAnimationFrame(frame);
         for (const fn of cleanups.splice(0)) attempt(fn);
         for (const node of nodes) node.remove();
         for (const row of root.querySelectorAll(C.row)) {
@@ -739,8 +719,6 @@
         for (const name of [BUILT, 'data-se-ns-view', 'data-se-ns-sort', 'data-se-ns-loading', 'data-se-ns-helpers']) {
           SE.unmark(root, name);
         }
-        views.delete(this);
-        viewOf.delete(root);
       },
     };
   };
@@ -748,31 +726,23 @@
   /* ---------- Mounting ---------- */
 
   /* Steam's layout, checked before anything is added: the parts the view drives must be there */
-  const isComplete = root =>
+  const isComplete = (root) =>
     !!root.querySelector(`:scope > ${C.header}`) &&
     !!root.querySelector(`:scope > ${C.list}`) &&
     !!root.querySelector(`:scope > ${C.footer}`);
 
-  const scan = () => {
-    for (const view of [...views]) if (!view.root.isConnected) view.destroy();
-    for (const root of document.querySelectorAll(C.root)) {
-      if (viewOf.has(root) || !isComplete(root)) continue;
-      const view = attempt(() => createView(root), null);
-      if (!view) continue;
-      views.add(view);
-      viewOf.set(root, view);
-    }
-  };
+  const mounted = SE.mount(
+    'Add a Non-Steam Game',
+    () => [...document.querySelectorAll(C.root)].filter(isComplete),
+    createView,
+    { throttle: 100, scope: C.root, ignore: isOurs }
+  );
 
-  const watcher = SE.watch(scan, { throttle: 100, scope: C.root, ignore: isOurs });
-  scan();
-
-  window.__steamEnhancedAddNonSteam = {
+  window.__seAddNonSteam = {
     destroy() {
-      watcher.disconnect();
-      for (const view of [...views]) view.destroy();
+      mounted.destroy();
       document.querySelectorAll(`.${OURS}`).forEach(node => node.remove());
-      delete window.__steamEnhancedAddNonSteam;
+      delete window.__seAddNonSteam;
     },
   };
-});
+})(window.__se);

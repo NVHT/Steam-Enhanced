@@ -3,8 +3,8 @@
  *
  * Part of client/toasts/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedToastsParts;
+((SE) => {
+  const ns = window.__seToastsParts;
   if (!ns) return;
   const { esc, run } = SE;
   const { IN_GAME, describe, icon, keyOf, root, sane, shared, stillAfter, token } = ns;
@@ -165,4 +165,4 @@
   }
 
   Object.assign(ns, { COMPACT_ATTR, EYEBROW, startCompact, uninstallCentre });
-});
+})(window.__se);

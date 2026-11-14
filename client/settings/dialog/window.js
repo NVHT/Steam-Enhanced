@@ -3,8 +3,8 @@
  *
  * Part of client/settings/dialog/ (see shared.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSettingsParts;
+((SE) => {
+  const ns = window.__seSettingsParts;
   if (!ns) return;
   const { fromProps } = SE;
   const { SIZE, pageNameOf } = ns;
@@ -45,7 +45,7 @@
         const y = (s.availTop || 0) + Math.round((availH - h) / 2);
         win.MoveTo(x, y, window.devicePixelRatio || true);
       }
-    } catch (_) {}
+    } catch {}
   }
   Object.assign(ns, { isSteamSettings, sizeWindow });
-});
+})(window.__se);

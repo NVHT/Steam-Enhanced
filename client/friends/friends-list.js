@@ -1,12 +1,14 @@
-/* Annotate Friends list group counts, active game players, and group chat previews. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedFriendsList?.destroy();
+/*
+ * Annotate Friends list group counts, active game players, and group chat previews.
+ */
+((SE) => {
+  window.__seFriendsList?.destroy();
   if (!document.body) return;
 
   const { C, run, attr } = SE;
   const setAttr = (el, name, value) => attr(el, name, value || null);
 
-  const resolveFriendsApp = () => SE.global('g_FriendsUIApp', app => app.FriendStore);
+  const resolveFriendsApp = () => SE.global('g_FriendsUIApp', (app) => app.FriendStore);
 
   const LIST_SELECTOR = '.friendlist:not(.GamepadMode)';
   /* The list and the Friends & Chat frame around it (banners sit outside the list itself) */
@@ -14,8 +16,8 @@
   const PLAYER_NAME_CLS = C.playerName;
   const COUNT_RE = /^\(\s*(\d[\d.,\s]*?)\s*\)$/;
 
-  const normalize = text => (text || '').replace(/\s+/g, ' ').trim().toLowerCase();
-  const formatPlayerSummary = names =>
+  const normalize = (text) => (text || '').replace(/\s+/g, ' ').trim().toLowerCase();
+  const formatPlayerSummary = (names) =>
     names.slice(0, 2).join(', ') + (names.length > 2 ? ` +${names.length - 2}` : '');
   const compareNames = (a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' });
 
@@ -46,7 +48,7 @@
 
   const lastSeenPlayers = new Map();
 
-  const resolveChatGroup = el => {
+  const resolveChatGroup = (el) => {
     for (let f = SE.fiber(el), i = 0; f && i < 12; f = f.return, i++) {
       const group = f.memoizedProps?.group;
       if (group && typeof group === 'object' && 'voiceRoomList' in group) return group;
@@ -54,13 +56,13 @@
     return null;
   };
 
-  const stripBBCode = text =>
+  const stripBBCode = (text) =>
     String(text || '')
       .replace(/\[\/?[^\]]*\]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
 
-  const formatLastMessage = group =>
+  const formatLastMessage = (group) =>
     run(() => {
       const room = group.room_with_last_message;
       const body = stripBBCode(room && room.GetLastMessage());
@@ -71,7 +73,7 @@
       return sender ? `${sender}: ${body}` : body;
     }) || '';
 
-  const activeVoiceChannelName = group =>
+  const activeVoiceChannelName = (group) =>
     run(() => {
       for (const room of group.voiceRoomList) {
         if (!room.voice_active_contains_self && room.voice_active_member_list?.member_count > 0) {
@@ -99,9 +101,9 @@
   const BANNER_SKIP = '.statusHeaderGlow, .avatarHolder, .playerAvatar, .ContextMenuButton, [class^="se-"], [class*=" se-"]';
   let bannerScanAt = -Infinity;
 
-  const hasOwnText = el => [...el.childNodes].some(node => node.nodeType === 3 && node.textContent.trim());
+  const hasOwnText = (el) => [...el.childNodes].some(node => node.nodeType === 3 && node.textContent.trim());
 
-  const opaque = color => {
+  const opaque = (color) => {
     const alpha = /rgba\([^)]*,\s*([\d.]+)\s*\)/.exec(color);
     return color !== 'transparent' && (!alpha || Number(alpha[1]) > .5);
   };
@@ -131,7 +133,7 @@
     return null;
   };
 
-  const markBanners = list => {
+  const markBanners = (list) => {
     /* The banner sits above the list's own container, across the top of Friends & Chat */
     const host = list.closest('.chat_main, .friendsui-container') || list.closest('.friendsListContainer') || list;
     const boundary = host.querySelector('.quickAccessFriends, .socialTabSearchContainer, .friendGroup');
@@ -157,7 +159,7 @@
   const STRAY_MAX = 36;
   const STRAY_REACH = 56;
 
-  const markDockStrays = host => {
+  const markDockStrays = (host) => {
     const banner = host.querySelector(`[${BANNER}="connection"]`);
     if (!banner) return;
     const edge = banner.getBoundingClientRect();
@@ -254,7 +256,7 @@
   });
   if (document.getElementsByClassName('friendlist').length) start();
 
-  window.__steamEnhancedFriendsList = {
+  window.__seFriendsList = {
     destroy() {
       gate.disconnect();
       watcher?.disconnect();
@@ -270,7 +272,7 @@
       for (const el of document.querySelectorAll(`${LIST_SELECTOR} .voiceRoomDragBar[data-se-count]`)) {
         el.removeAttribute('data-se-count');
       }
-      delete window.__steamEnhancedFriendsList;
+      delete window.__seFriendsList;
     },
   };
-});
+})(window.__se);

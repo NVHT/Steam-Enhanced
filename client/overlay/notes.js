@@ -3,8 +3,8 @@
  *
  * Part of client/overlay/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedOverlayParts;
+((SE) => {
+  const ns = window.__seOverlayParts;
   if (!ns) return;
   const { el } = SE;
   const { exportOf, scheduleRender, setText } = ns;
@@ -28,7 +28,7 @@
   let saveTimer = 0;
   let pendingSave = null;
 
-  const isNotesStore = value =>
+  const isNotesStore = (value) =>
     !!value &&
     typeof value.GetGameNotesList === 'function' &&
     typeof value.SaveGameNotes === 'function' &&
@@ -41,7 +41,7 @@
         id,
         req,
         ['GameNotesCloudStore', 'GetGameNotesList'],
-        value => typeof value?.Get === 'function' && typeof value.prototype?.GetGameNotesList === 'function'
+        (value) => typeof value?.Get === 'function' && typeof value.prototype?.GetGameNotesList === 'function'
       )
     );
 
@@ -52,8 +52,8 @@
     return notesStoreRef;
   };
 
-  const noteKey = appid => ({ appid });
-  const savedOk = result => result === EOK_SAVE || result === true;
+  const noteKey = (appid) => ({ appid });
+  const savedOk = (result) => result === EOK_SAVE || result === true;
 
   // BBCode <-> the editor's HTML, for the tags the editor can write. A note
   // using anything else opens read-only, so saving can never drop content.
@@ -66,12 +66,12 @@
     ['code', 'Code', '<span class="se-ov-format-code">&lt;/&gt;</span>'],
   ]);
 
-  const unsupportedTags = bbcode =>
+  const unsupportedTags = (bbcode) =>
     [...String(bbcode).matchAll(/\[\/?([a-z0-9*]+)/gi)].map(m => m[1].toLowerCase()).filter(tag => !(tag in NOTE_TAGS));
 
-  const escapeHtml = text => text.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const escapeHtml = (text) => text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
-  const bbToHtml = bbcode => {
+  const bbToHtml = (bbcode) => {
     const html = escapeHtml(String(bbcode || ''))
       .replace(/\[url=([^\]]+)\]/gi, (_, href) => `<a href="${href}">`)
       .replace(/\[\/url\]/gi, '</a>')
@@ -81,8 +81,8 @@
 
   const BB_FOR = Object.freeze({ B: 'b', STRONG: 'b', I: 'i', EM: 'i', U: 'u', S: 'strike', STRIKE: 'strike', DEL: 'strike', CODE: 'code' });
 
-  const htmlToBb = root => {
-    const walk = node => {
+  const htmlToBb = (root) => {
+    const walk = (node) => {
       if (node.nodeType === 3) return node.nodeValue.replace(/\u00a0/g, ' ');
       if (node.nodeType !== 1) return '';
       const inner = [...node.childNodes].map(walk).join('');
@@ -110,7 +110,7 @@
 
   const activeNote = () => notes.list?.find(note => note.id === notes.activeId) || null;
 
-  const loadNotesFor = async appid => {
+  const loadNotesFor = async (appid) => {
     const store = notesStore();
     if (!store) {
       notes.error = 'store';
@@ -191,7 +191,7 @@
     notes.status = notes.readOnly ? 'This note uses formatting only Steam’s editor can change.' : '';
   };
 
-  const pickNote = async id => {
+  const pickNote = async (id) => {
     await flushSave();
     notes.activeId = id;
     const part = live.ui?.overview.tools.notes;
@@ -219,7 +219,7 @@
     await flushSave();
   };
 
-  const askDeleteNote = show => {
+  const askDeleteNote = (show) => {
     const part = live.ui?.overview.tools.notes;
     if (part) part.confirm.hidden = !show || !activeNote();
   };
@@ -247,7 +247,7 @@
     scheduleRender();
   };
 
-  const formatNote = command => {
+  const formatNote = (command) => {
     const part = live.ui?.overview.tools.notes;
     if (!part || notes.readOnly || !activeNote()) return;
     part.editor.focus();
@@ -311,4 +311,4 @@
   };
 
   Object.assign(ns, { FORMAT_TOOLS, askDeleteNote, deleteNote, flushSave, formatNote, newNote, noteEdited, notes, notesStore, pickNote, renderNotesView });
-});
+})(window.__se);

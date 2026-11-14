@@ -1,6 +1,8 @@
-/* Steam's download store, the live overview, and pressing Steam's own controls (pause). */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedDownloadsParts;
+/*
+ * Steam's download store, the live overview, and pressing Steam's own controls (pause).
+ */
+((SE) => {
+  const ns = window.__seDownloadsParts;
   if (!ns) return;
   const { LINKS_ROW, SEL } = ns;
   const { live } = ns;
@@ -74,4 +76,4 @@
   }
 
   Object.assign(ns, { clickTarget, downloadOverview, findPauseHandler, handlerOf, press, steamDownloads, togglePause });
-});
+})(window.__se);

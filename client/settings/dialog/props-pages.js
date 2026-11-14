@@ -4,8 +4,8 @@
  *
  * Part of client/settings/dialog/ (see shared.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSettingsParts;
+((SE) => {
+  const ns = window.__seSettingsParts;
   if (!ns) return;
   const { C, attr: setAttr } = SE;
   const { FIELD, text } = ns;
@@ -97,23 +97,6 @@
     return null;
   }
 
-  function copyText(t) {
-    try {
-      if (navigator.clipboard?.writeText) {
-        navigator.clipboard.writeText(t);
-        return;
-      }
-    } catch (_) {}
-    const a = document.createElement('textarea');
-    a.value = t;
-    document.body.append(a);
-    a.select();
-    try {
-      document.execCommand('copy');
-    } catch (_) {}
-    a.remove();
-  }
-
   const COPY_SVG =
     '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>';
 
@@ -179,7 +162,7 @@
         c.innerHTML = COPY_SVG;
         c.addEventListener('click', (e) => {
           e.stopPropagation();
-          copyText(c.parentElement?.getAttribute('data-se-v') || '');
+          SE.copy(c.parentElement?.getAttribute('data-se-v') || '');
           c.setAttribute('data-done', '');
           setTimeout(() => c.removeAttribute('data-done'), 1200);
         });
@@ -248,4 +231,4 @@
     OWN, P, PRE_FOR, PROPS_BLOCK, PROPS_NAMES, PROPS_ROOT, ROW_FOR, bytesOf, fmtBytes,
     propsFilesPage, propsGeneralPage, propsUpdatesPage, propsWorkshopPage,
   });
-});
+})(window.__se);

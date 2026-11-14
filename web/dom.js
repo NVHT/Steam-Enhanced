@@ -72,6 +72,24 @@ export const importNear = (base, file) => {
   return import(url.href);
 };
 
+/** Copy text to the clipboard: the async API, else a selected textarea. Resolves true once copied. */
+export const copy = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {}
+  const field = Object.assign(document.createElement('textarea'), { value: text, readOnly: true });
+  field.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+  document.body.append(field);
+  field.select();
+  let copied = false;
+  try {
+    copied = document.execCommand('copy');
+  } catch {}
+  field.remove();
+  return copied;
+};
+
 /* ---------- Price chip ---------- */
 
 const PERCENT = /^-?\d+%$/;

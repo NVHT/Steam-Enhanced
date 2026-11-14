@@ -1,6 +1,8 @@
-/* Reading Steam's transfer block: selectors, icons, text and number helpers, the pause button. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedDownloadsParts;
+/*
+ * Reading Steam's transfer block: selectors, icons, text and number helpers, the pause button.
+ */
+((SE) => {
+  const ns = window.__seDownloadsParts;
   if (!ns) return;
   const { C } = SE;
   const { LINKS_ROW } = ns;
@@ -115,4 +117,4 @@
   }
 
   Object.assign(ns, { ICON, SEL, STAT_ICON, SVG_NS, findPause, readTransfer, round, setHidden, setText, textOf });
-});
+})(window.__se);

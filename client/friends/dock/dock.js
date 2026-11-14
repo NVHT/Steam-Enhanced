@@ -2,8 +2,8 @@
  * The dock element: its own panel, rendering and patching, and placement beside the Library or
  * Store/Community view.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedFriendsDockParts;
+((SE) => {
+  const ns = window.__seFriendsDockParts;
   if (!ns) return;
   const {
     app, chatError, closedSections, DEAD_AVATAR_LIMIT, deadAvatars, groupInitials, hideFly,
@@ -217,4 +217,4 @@
   }
 
   Object.assign(ns, { dock, fly, onAvatarError, onLibrary, onSearch, onStore, own, place, render });
-});
+})(window.__se);

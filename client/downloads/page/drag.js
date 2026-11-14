@@ -1,6 +1,8 @@
-/* Reordering the queue: grips, keyboard moves, and the pointer drag (with Steam's own held off). */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedDownloadsParts;
+/*
+ * Reordering the queue: grips, keyboard moves, and the pointer drag (with Steam's own held off).
+ */
+((SE) => {
+  const ns = window.__seDownloadsParts;
   if (!ns) return;
   const { C } = SE;
   const { ITEM, PAGE_SELECTOR, QUEUE, RBD_HANDLE, ROW, ROW_ART, appIdFromArt, clickTarget, handlerOf, mountedNodes, press, setAttr, steamDownloads } = ns;
@@ -224,4 +226,4 @@
   };
 
   Object.assign(ns, { NATIVE_DRAG_EVENTS, SORT_SECTION, dropPending, finishDrag, holdNativeDrag, rbdHandles, syncGrips, watchPending });
-});
+})(window.__se);

@@ -1,9 +1,11 @@
-/* Proxy bottom-bar actions into the header / navigation rail while keeping native components mounted. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
+/*
+ * Proxy bottom-bar actions into the header / navigation rail while keeping native components
+ * mounted.
+ */
+((SE) => {
   const { C } = SE;
-  if (window.__steamEnhancedHeaderActions?.version === '1.90.14') return;
-  window.__steamEnhancedHeaderActions?.destroy?.();
-  const state = (window.__steamEnhancedHeaderActions = { version: '1.90.14' });
+  window.__seHeaderActions?.destroy?.();
+  const state = (window.__seHeaderActions = {});
 
   const ANNOUNCEMENT_SELECTOR = `.${C.AnnouncementsButton}:not(.se-header-action):not(.se-native-header-button), .AnnouncementsButton:not(.se-header-action):not(.se-native-header-button)`;
   const PROXY_ACTIONS = [
@@ -54,7 +56,7 @@
     button.innerHTML = `<svg class="${C.Icon}" viewBox="0 0 24 24" aria-hidden="true"></svg>`;
     if (onActivate) {
       button.addEventListener('click', onActivate);
-      button.addEventListener('keydown', event => {
+      button.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
           onActivate(event);
@@ -64,8 +66,8 @@
     return button;
   }
 
-  const clampPercent = value => (Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : null);
-  const parsePercent = text => {
+  const clampPercent = (value) => (Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : null);
+  const parsePercent = (text) => {
     const match = /(\d+(?:[.,]\d+)?)\s*%/.exec(text || '');
     return match ? clampPercent(Number(match[1].replace(',', '.'))) : null;
   };
@@ -211,7 +213,7 @@
     stripKey = key;
 
     const candidates = new Set();
-    const dividerClass = window.__steamEnhancedNativeTooltips?.resolve()?.libraryDivider;
+    const dividerClass = window.__seNativeTooltips?.resolve()?.libraryDivider;
     if (dividerClass) {
       for (const divider of document.getElementsByClassName(dividerClass)) {
         candidates.add(divider);
@@ -367,7 +369,7 @@
     const button = makeActionButton(action.key, '');
     const entry = { button, source: null, signature: '' };
 
-    const forwardNative = event => {
+    const forwardNative = (event) => {
       const handler = SE.props(entry.source)?.onClick;
       if (typeof handler === 'function') {
         const forwarded = new Proxy(event, {
@@ -392,27 +394,27 @@
       }
     };
 
-    button.addEventListener('click', event => {
-      if (action.key === 'friends' && window.__steamEnhancedFriendsDock?.toggle) {
+    button.addEventListener('click', (event) => {
+      if (action.key === 'friends' && window.__seFriendsDock?.toggle) {
         event.preventDefault();
         event.stopPropagation();
-        window.__steamEnhancedFriendsDock.toggle();
+        window.__seFriendsDock.toggle();
       } else {
         forwardNative(event);
       }
     });
 
     if (action.key === 'friends') {
-      button.addEventListener('contextmenu', event => {
+      button.addEventListener('contextmenu', (event) => {
         event.preventDefault();
         event.stopPropagation();
-        const dock = window.__steamEnhancedFriendsDock;
+        const dock = window.__seFriendsDock;
         if (dock?.openWindow) dock.openWindow(() => forwardNative(event));
         else forwardNative(event);
       });
     }
 
-    button.addEventListener('keydown', event => {
+    button.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
         button.click();
@@ -603,9 +605,9 @@
       if (value) document.body.style.setProperty(property, value);
       else document.body.style.removeProperty(property);
     }
-    delete window.__steamEnhancedHeaderActions;
+    delete window.__seHeaderActions;
   };
 
   if (document.body) start();
   else addEventListener('DOMContentLoaded', start, { once: true });
-});
+})(window.__se);

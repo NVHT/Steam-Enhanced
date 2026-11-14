@@ -16,8 +16,8 @@
  * - data-se-epicker-search: the search field;
  * - data-se-label: a section title (short uppercase text).
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedEmoticonPicker?.destroy();
+((SE) => {
+  window.__seEmoticonPicker?.destroy();
   if (!document.body) return;
   /* Toasts and the gamepad UIs never hold the desktop picker (Big Picture draws its own) */
   if (/^(?:notificationtoasts_|Steam Big Picture Mode$|QuickAccess_|MainMenu_)/.test(document.title)) return;
@@ -47,14 +47,14 @@
   /* Images known not to be in a picker (chat messages): skipped on later passes */
   const elsewhere = new WeakSet();
 
-  const fits = r => r.width > 0 && r.width <= MAX_W && r.height <= MAX_H;
-  const hasOwnText = el => [...el.childNodes].some(node => node.nodeType === 3 && node.textContent.trim());
+  const fits = (r) => r.width > 0 && r.width <= MAX_W && r.height <= MAX_H;
+  const hasOwnText = (el) => [...el.childNodes].some(node => node.nodeType === 3 && node.textContent.trim());
 
   /*
    * From an emoticon image up to the box that also holds the search field, at popup size.
    * An image whose boxes outgrow a popup before reaching one (a chat message) is remembered.
    */
-  const pickerOf = img => {
+  const pickerOf = (img) => {
     if (img.closest(MESSAGES)) {
       elsewhere.add(img);
       return null;
@@ -77,7 +77,7 @@
     return null;
   };
 
-  const markFrames = root => {
+  const markFrames = (root) => {
     const r = root.getBoundingClientRect();
     for (let node = root.parentElement, i = 0; node && node !== document.body && i < FRAME_CLIMB; node = node.parentElement, i++) {
       const p = node.getBoundingClientRect();
@@ -96,7 +96,7 @@
    * is the only one (Steam paints its own on one of those wrappers)
    */
   const TILE_CLIMB = 4;
-  const tileOf = img => {
+  const tileOf = (img) => {
     let tile = img;
     for (let i = 0; i < TILE_CLIMB; i++) {
       const parent = tile.parentElement;
@@ -107,7 +107,7 @@
   };
 
   /* The tabs: the element holding the most children drawn with an icon (and no artwork) */
-  const findStrip = root => {
+  const findStrip = (root) => {
     const counts = new Map();
     for (const svg of root.querySelectorAll('svg')) {
       let tab = svg;
@@ -145,7 +145,7 @@
     return marked.length === 1 ? marked[0] : underlinedTab(strip, tabs);
   };
 
-  const sync = root => {
+  const sync = (root) => {
     SE.mark(root, ROOT);
     markFrames(root);
 
@@ -196,14 +196,14 @@
   const watcher = SE.watch(update, { throttle: 50 });
   update();
 
-  window.__steamEnhancedEmoticonPicker = {
+  window.__seEmoticonPicker = {
     destroy() {
       watcher.disconnect();
       const selector = ATTRS.map(name => `[${name}]`).join(', ');
       for (const el of document.querySelectorAll(selector)) {
         for (const name of ATTRS) el.removeAttribute(name);
       }
-      delete window.__steamEnhancedEmoticonPicker;
+      delete window.__seEmoticonPicker;
     },
   };
-});
+})(window.__se);

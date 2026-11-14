@@ -2,8 +2,8 @@
  * The chat flyout: Steam's chat in a native popup window or a portal, its geometry and
  * navigation, and the minimized chat chip.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedFriendsDockParts;
+((SE) => {
+  const ns = window.__seFriendsDockParts;
   if (!ns) return;
   const {
     avatar, chatError, chatErrorText, closeGroupPanels, desktopChatFocused, disposeGroupFlyouts,
@@ -45,7 +45,7 @@
       const values = [exp];
       try {
         values.push(...Object.values(exp || {}));
-      } catch (_) {}
+      } catch {}
       for (const value of values) {
         if (typeof value?.createPortal === 'function') found.createPortal ||= value.createPortal;
         if (typeof value?.flushSync === 'function') found.flushSync ||= value.flushSync;
@@ -449,8 +449,8 @@
       doc.documentElement.style.setProperty('--se-chat-host-height', `${entry.height}px`);
     }
 
-    window.__steamEnhancedChat?.attachDocument(doc);
-    entry.detachChatEnhancements = () => window.__steamEnhancedChat?.detachDocument(doc);
+    window.__seChat?.attachDocument(doc);
+    entry.detachChatEnhancements = () => window.__seChat?.detachDocument(doc);
 
     node.className = 'se-fdock se-fd-popup-host';
     node.dataset.mode = 'rail';
@@ -733,4 +733,4 @@
     resetMinimized, resizeChatPopup, restoreChat, restoreChatRenderer, steamBar, steamHost,
     syncChatOverlay, updateChatChip,
   });
-});
+})(window.__se);

@@ -1,6 +1,8 @@
-/* Steam menu (see shared.js): the menu's API (destroy()) and starting once the body exists. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSteamMenuParts;
+/*
+ * Steam menu (see shared.js): the menu's API (destroy()) and starting once the body exists.
+ */
+((SE) => {
+  const ns = window.__seSteamMenuParts;
   if (!ns) return;
   const {
     anchors, avatarLayouts, cancelHoverClose, closeAfterHover, enterMenuPopup, hoverDocuments,
@@ -9,7 +11,7 @@
   } = ns;
   const { live } = ns;
 
-  window.__steamEnhancedSteamMenu = {
+  window.__seSteamMenu = {
     destroy() {
       clearInterval(live.timer);
       live.popupPoll?.disconnect();
@@ -54,7 +56,7 @@
       patched.clear();
       live.manager?.OnMenusChanged?.Dispatch?.();
       document.body?.classList.remove('se-steam-menu-ready');
-      delete window.__steamEnhancedSteamMenu;
+      delete window.__seSteamMenu;
     },
   };
 
@@ -63,4 +65,4 @@
   } else {
     addEventListener('DOMContentLoaded', start, { once: true });
   }
-});
+})(window.__se);

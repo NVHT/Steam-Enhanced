@@ -10,9 +10,9 @@
  * Loaded in every window: Steam can draw the popup in a window of its own, where only this
  * file (and core.js) runs.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
+((SE) => {
   const { C } = SE;
-  window.__steamEnhancedFriendHover?.destroy();
+  window.__seFriendHover?.destroy();
 
   /* Versioned: an older build cached the export with both class names */
   const CACHE_KEY = '__seFriendHoverClasses2';
@@ -31,7 +31,7 @@
   ];
 
   /* "_2iiN7AYnLFTRFRiuipiYJz FriendStatusHover" → "_2iiN7AYnLFTRFRiuipiYJz" */
-  const firstClass = value => (typeof value === 'string' ? value.trim().split(/\s+/)[0] || null : null);
+  const firstClass = (value) => (typeof value === 'string' ? value.trim().split(/\s+/)[0] || null : null);
 
   const readHash = (src, name) =>
     new RegExp(`\\\\?["']?\\b${name}\\\\?["']?\\s*:\\s*\\\\?["']([\\w-]+)`).exec(src)?.[1] || null;
@@ -45,7 +45,7 @@
       const exp = [mod, mod?.default].find(e => typeof e?.FriendStatusHover === 'string');
       hover = firstClass(exp?.FriendStatusHover);
       row = firstClass(exp?.FriendStatusHoverRow);
-    } catch (_) {}
+    } catch {}
     hover ||= readHash(src, 'FriendStatusHover');
     row ||= readHash(src, 'FriendStatusHoverRow');
     if (!hover || !row) return null;
@@ -60,10 +60,10 @@
   };
 
   /* Elements that hold their own text, in document order */
-  const textHolders = root => {
+  const textHolders = (root) => {
     const out = [];
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-      acceptNode: node => (node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT),
+      acceptNode: (node) => (node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT),
     });
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
       const el = node.parentElement;
@@ -72,7 +72,7 @@
     return out;
   };
 
-  const tagRow = row => {
+  const tagRow = (row) => {
     SE.mark(row, 'data-se-fh-row');
     const avatar = row.querySelector('img');
     if (avatar) SE.mark(avatar, 'data-se-fh-av');
@@ -90,7 +90,7 @@
   };
 
   /* The popup has a window to itself when nothing else of the client is drawn in it */
-  const ownsWindow = hover =>
+  const ownsWindow = (hover) =>
     !document.querySelector(CLIENT_CHROME) && hover.getBoundingClientRect().width >= innerWidth * 0.6;
 
   const findHovers = () => {
@@ -123,7 +123,7 @@
   const watcher = SE.watch(update, { throttle: 100 });
   update();
 
-  window.__steamEnhancedFriendHover = {
+  window.__seFriendHover = {
     destroy() {
       watcher.disconnect();
       SE.unmark(document.documentElement, 'data-se-fh-window');
@@ -132,4 +132,4 @@
       }
     },
   };
-});
+})(window.__se);

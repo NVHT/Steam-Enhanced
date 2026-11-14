@@ -3,8 +3,8 @@
  *
  * Part of client/dialogs/system-report/ (see shared.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSystemReportParts;
+((SE) => {
+  const ns = window.__seSystemReportParts;
   if (!ns) return;
   const { el } = SE;
   const {
@@ -16,10 +16,10 @@
 
   /* ---------- Raw view ---------- */
 
-  const escapeHTML = SE.esc ?? (text => String(text).replace(/[&<>"']/g, ch => `&#${ch.charCodeAt(0)};`));
+  const escapeHTML = SE.esc ?? (text => String(text).replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`));
 
   /* One line of KeyValues to highlighted HTML: first string the key, the second the value */
-  const highlightLine = line => {
+  const highlightLine = (line) => {
     let html = '';
     let from = 0;
     let strings = 0;
@@ -36,7 +36,7 @@
   /* ---------- Steam tooltips (as system-info.js mounts them) ---------- */
 
   const nativeTooltips = () =>
-    attempt(() => SE.global?.('__steamEnhancedNativeTooltips', api => typeof api?.resolve === 'function')?.resolve() ?? null, null);
+    attempt(() => SE.global?.('__seNativeTooltips', (api) => typeof api?.resolve === 'function')?.resolve() ?? null, null);
 
   const mountTip = ({ React, DOM, Tooltip }, node, label, direction) => {
     const host = el('span', 'se-sysreport-tip');
@@ -65,10 +65,10 @@
   /* ---------- Reading Steam's dialog ---------- */
 
   /* The full report from the Text component's props; the shown (maybe cut) text otherwise */
-  const readReport = container => {
+  const readReport = (container) => {
     const box = container.querySelector(TEXT_BOX);
     if (!box) return null;
-    const full = SE.fromProps?.(box, 6, props => (typeof props.sReport === 'string' ? props.sReport : undefined));
+    const full = SE.fromProps?.(box, 6, (props) => (typeof props.sReport === 'string' ? props.sReport : undefined));
     return full ?? box.querySelector(TEXT)?.textContent ?? null;
   };
 
@@ -110,7 +110,7 @@
     const fixedTips = [];
     const specTips = [];
     const contentTips = [];
-    const dropTips = bucket => {
+    const dropTips = (bucket) => {
       for (const unmount of bucket.splice(0)) attempt(unmount);
     };
     cleanups.push(() => {
@@ -122,7 +122,7 @@
     });
 
     /* Copied feedback: the node shows a check for a moment */
-    const flash = node => {
+    const flash = (node) => {
       clearTimeout(timers.get(node));
       node.setAttribute('data-copied', '');
       timers.set(node, setTimeout(() => {
@@ -220,7 +220,7 @@
 
     /* ---------- Render: summary ---------- */
 
-    const renderSpecs = tiles => {
+    const renderSpecs = (tiles) => {
       dropTips(specTips);
       specs.replaceChildren(
         ...tiles.map(tile => {
@@ -239,7 +239,7 @@
 
     /* ---------- Render: rows ---------- */
 
-    const valueKind = node => {
+    const valueKind = (node) => {
       const value = clean(node.value);
       if (!value) return { text: 'Empty', kind: 'empty' };
       if (/(?:Size|Space|Bytes|Capacity)$/i.test(node.key) && /^\d{7,}$/.test(value)) return { text: bytes(Number(value)), kind: '', exact: Number(value).toLocaleString() };
@@ -340,7 +340,7 @@
       return group;
     };
 
-    const shortTitle = title => SHORT_TITLES[title] ?? title;
+    const shortTitle = (title) => SHORT_TITLES[title] ?? title;
 
     const renderCards = () => {
       dropTips(contentTips);
@@ -456,7 +456,7 @@
       node.replaceChildren(...parts);
     };
 
-    const filterDetails = query => {
+    const filterDetails = (query) => {
       // Groups open to show matches, and go back to how they were once the filter is cleared
       if (query && !openSnapshot) openSnapshot = groups.map(group => group.open);
       const shownGroups = new Set();
@@ -516,7 +516,7 @@
       spy();
     };
 
-    const filterRaw = query => {
+    const filterRaw = (query) => {
       let shown = 0;
       for (const line of rawLines) {
         const hit = !query || line.text.includes(query);
@@ -537,7 +537,7 @@
       else filterDetails(query);
     };
 
-    const setFilter = value => {
+    const setFilter = (value) => {
       filter = value.trim();
       if (input.value !== value) input.value = value;
       applyFilter();
@@ -554,7 +554,7 @@
       toggleIcon.replaceChildren(icon(open ? 'collapse' : 'expand'));
       toggleAll.setAttribute('aria-label', open ? 'Collapse all' : 'Expand all');
     };
-    const setAllOpen = open => {
+    const setAllOpen = (open) => {
       for (const group of groups) if (!group.hidden) group.open = open;
       syncToggleAll();
     };
@@ -602,14 +602,14 @@
     }
 
     const reducedMotion = () => win.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    const scrollToCard = index => {
+    const scrollToCard = (index) => {
       const card = cards[index]?.card;
       if (!card) return;
       list.scrollTo({ top: card.offsetTop, behavior: reducedMotion() ? 'auto' : 'smooth' }); // list is the offset parent
     };
 
     // Vertical wheel scrolls the chip strip sideways
-    listen(chips, 'wheel', event => {
+    listen(chips, 'wheel', (event) => {
       if (Math.abs(event.deltaY) <= Math.abs(event.deltaX) || chips.scrollWidth <= chips.clientWidth) return;
       event.preventDefault();
       chips.scrollLeft += event.deltaY;
@@ -618,7 +618,7 @@
     /* ---------- Keys ---------- */
 
     // Ctrl+F filters; Esc clears the filter before Steam gets it (Steam's Esc closes the dialog)
-    listen(doc, 'keydown', event => {
+    listen(doc, 'keydown', (event) => {
       if (event.defaultPrevented) return;
       const mod = (event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey;
       if (mod && event.key.toLowerCase() === 'f') {
@@ -652,4 +652,4 @@
     };
   };
   Object.assign(ns, { createView });
-});
+})(window.__se);

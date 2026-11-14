@@ -1,6 +1,8 @@
-/* Annotate notification tray summary rows and notification cards with type and day metadata. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedNotifications?.destroy();
+/*
+ * Annotate notification tray summary rows and notification cards with type and day metadata.
+ */
+((SE) => {
+  window.__seNotifications?.destroy();
 
   const { C } = SE;
   const MENU_CLS = C.NotificationsMenu;
@@ -36,10 +38,10 @@
     }
   };
 
-  const annotateSummaryRow = row => {
-    const countItem = SE.fromProps(row, 8, p => (typeof p.countItem === 'string' ? p.countItem : undefined));
-    const count = SE.fromProps(row, 8, p => (typeof p.count === 'number' ? p.count : undefined));
-    const body = SE.fromProps(row, 4, p => (typeof p.body === 'string' ? p.body : undefined));
+  const annotateSummaryRow = (row) => {
+    const countItem = SE.fromProps(row, 8, (p) => (typeof p.countItem === 'string' ? p.countItem : undefined));
+    const count = SE.fromProps(row, 8, (p) => (typeof p.count === 'number' ? p.count : undefined));
+    const body = SE.fromProps(row, 4, (p) => (typeof p.body === 'string' ? p.body : undefined));
 
     setKindAttrs(row, SUMMARY_KINDS[countItem]);
 
@@ -64,9 +66,9 @@
     }
   };
 
-  const computeDayKey = date => date.getFullYear() * 400 + date.getMonth() * 32 + date.getDate();
+  const computeDayKey = (date) => date.getFullYear() * 400 + date.getMonth() * 32 + date.getDate();
 
-  const formatDayLabel = date => {
+  const formatDayLabel = (date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const target = new Date(date);
@@ -84,10 +86,10 @@
     return target.toLocaleDateString(undefined, opts);
   };
 
-  const annotateNotificationItems = list => {
+  const annotateNotificationItems = (list) => {
     let prevDayKey = null;
     const dayStarts = list.map(item => {
-      const group = SE.fromProps(item, 3, p =>
+      const group = SE.fromProps(item, 3, (p) =>
         p.group && Array.isArray(p.group.notifications) ? p.group : undefined
       );
       const first = group?.notifications?.[0];
@@ -124,9 +126,9 @@
   });
   update();
 
-  window.__steamEnhancedNotifications = {
+  window.__seNotifications = {
     destroy() {
       watcher.disconnect();
     },
   };
-});
+})(window.__se);

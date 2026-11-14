@@ -1,6 +1,8 @@
-/* Patching Steam's menu instances, keeping them patched, and start(). */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSteamMenuParts;
+/*
+ * Patching Steam's menu instances, keeping them patched, and start().
+ */
+((SE) => {
+  const ns = window.__seSteamMenuParts;
   if (!ns) return;
   const { C } = SE;
   const {
@@ -16,7 +18,7 @@
     let nativeWindow;
     try {
       nativeWindow = originalGet.constructor('return globalThis')();
-    } catch (_) {}
+    } catch {}
 
     return function () {
       const element = originalGet.call(this);
@@ -232,4 +234,4 @@
     inspectPopups();
   }
   Object.assign(ns, { patchInstance, start, unpatchInstance });
-});
+})(window.__se);

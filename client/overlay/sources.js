@@ -3,8 +3,8 @@
  *
  * Part of client/overlay/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedOverlayParts;
+((SE) => {
+  const ns = window.__seOverlayParts;
   if (!ns) return;
   const { LOAD_TIMEOUT_MS, accountIdOf, callService, contextGlobal, contextWindows, defineApi, exportOf, requestPart, selfSteamId, servicePart } = ns;
   const { live } = ns;
@@ -20,12 +20,12 @@
   ]);
 
   // Same maths as Steam's own progress bars: current / max, from zero.
-  const progressOf = a => Math.min(1, Math.max(0, Math.min(a.flCurrentProgress, a.flMaxProgress) / a.flMaxProgress));
-  const hasProgress = a => a.flMaxProgress > 1 && a.flCurrentProgress > 0;
+  const progressOf = (a) => Math.min(1, Math.max(0, Math.min(a.flCurrentProgress, a.flMaxProgress) / a.flMaxProgress));
+  const hasProgress = (a) => a.flMaxProgress > 1 && a.flCurrentProgress > 0;
 
   // Every achievement, normalized for the list view. Locked hidden ones keep
   // their secret, as in Steam. `pct` is the global unlock rate (rarity tier).
-  const toItem = a => {
+  const toItem = (a) => {
     const secret = !a.bAchieved && !!a.bHidden;
     const tracked = !a.bAchieved && !a.bHidden && hasProgress(a);
     return {
@@ -46,7 +46,7 @@
     };
   };
 
-  const summarizeAchievements = list => {
+  const summarizeAchievements = (list) => {
     const unlocked = list.filter(a => a.bAchieved);
     const inProgress = list
       .filter(a => !a.bAchieved && !a.bHidden && hasProgress(a))
@@ -78,7 +78,7 @@
 
   const resolveAchievementStore = () =>
     SE.findModule('overlay:achievement-store', (src, id, req) =>
-      exportOf(src, id, req, ['GetMyAchievementsForApp', 'm_mapMyAchievements'], value => typeof value?.GetMyAchievements === 'function')
+      exportOf(src, id, req, ['GetMyAchievementsForApp', 'm_mapMyAchievements'], (value) => typeof value?.GetMyAchievements === 'function')
     );
 
   // undefined while loading, null when the game has none.
@@ -96,7 +96,7 @@
   };
 
   // Fallback when the store can't be found: ask Steam directly.
-  const loadAchievements = async appid => {
+  const loadAchievements = async (appid) => {
     const apps = contextGlobal('SteamClient')?.Apps;
     if (typeof apps?.GetMyAchievementsForApp !== 'function') throw new Error('unavailable');
     const res = await apps.GetMyAchievementsForApp(String(appid));
@@ -114,8 +114,8 @@
     Request: requestPart('CPlayer_GetFriendsGameplayInfo_Request'),
   });
 
-  const loadRecentPlayers = async appid => {
-    const body = await callService(resolveGameplayApi, 'GetFriendsGameplayInfo', 'Request', req => req.set_appid(appid));
+  const loadRecentPlayers = async (appid) => {
+    const body = await callService(resolveGameplayApi, 'GetFriendsGameplayInfo', 'Request', (req) => req.set_appid(appid));
     return [...(body.in_game || []), ...(body.played_recently || [])]
       .map(entry => ({ steamid: String(entry.steamid), minutes: Number(entry.minutes_played) || 0 }))
       .sort((a, b) => b.minutes - a.minutes);
@@ -125,7 +125,7 @@
 
   // Same states as the theme's friend rings: in game, online, offline, plus
   // away / snooze (drawn dashed).
-  const toFriend = state => {
+  const toFriend = (state) => {
     const persona = SE.run(() => state.persona) || {};
     return {
       steamid: String(state.steamid64),
@@ -136,7 +136,7 @@
     };
   };
 
-  const friendsInGame = appid =>
+  const friendsInGame = (appid) =>
     (SE.run(() => friendStore().GetFriendsInGame(appid)) || [])
       .filter(state => !state.is_blocked)
       .map(toFriend);
@@ -170,14 +170,14 @@
 
   // Field names vary between client builds: the app id from the first id-like
   // field, the image from the first URL-like string.
-  const shotAppId = shot => Number(shot?.nAppID ?? shot?.unAppID ?? shot?.appid ?? shot?.strGameID) || 0;
-  const shotUrl = shot =>
+  const shotAppId = (shot) => Number(shot?.nAppID ?? shot?.unAppID ?? shot?.appid ?? shot?.strGameID) || 0;
+  const shotUrl = (shot) =>
     (typeof shot?.strUrl === 'string' && shot.strUrl) ||
     Object.values(shot || {}).find(value => typeof value === 'string' && URL_RE.test(value)) ||
     '';
-  const shotTime = shot => Number(shot?.nCreated ?? shot?.rtCreated ?? shot?.unCreated) || 0;
+  const shotTime = (shot) => Number(shot?.nCreated ?? shot?.rtCreated ?? shot?.unCreated) || 0;
 
-  const loadScreenshots = async appid => {
+  const loadScreenshots = async (appid) => {
     const api = screenshotsApi();
     let list = null;
     const errors = [];
@@ -227,7 +227,7 @@
   const FILETYPE_ALL_GUIDES = 10;
   const QUERY_RANKED_BY_VOTE = 0;
   const GUIDE_URL = 'https://steamcommunity.com/sharedfiles/filedetails/?id=';
-  const GUIDES_URL = appid => `https://steamcommunity.com/app/${appid}/guides/`;
+  const GUIDES_URL = (appid) => `https://steamcommunity.com/app/${appid}/guides/`;
 
   // PublishedFile.QueryFiles (top rated) and GetUserFiles (your favorites):
   // the same community data Game Overview lists.
@@ -237,7 +237,7 @@
     User: requestPart('CPublishedFile_GetUserFiles_Request'),
   });
 
-  const toGuide = favorite => file => ({
+  const toGuide = (favorite) => (file) => ({
     id: String(file.publishedfileid),
     title: String(file.title || '').trim(),
     favorite,
@@ -247,11 +247,11 @@
   // fetched from Steam's context with the user's session and parsed.
   const COMMUNITY = 'https://steamcommunity.com';
   const GUIDE_PAGES = Object.freeze({
-    favorites: appid => `${COMMUNITY}/my/myworkshopfiles/?appid=${appid}&browsefilter=myfavorites&section=guides`,
-    top: appid => `${COMMUNITY}/app/${appid}/guides/?browsefilter=toprated`,
+    favorites: (appid) => `${COMMUNITY}/my/myworkshopfiles/?appid=${appid}&browsefilter=myfavorites&section=guides`,
+    top: (appid) => `${COMMUNITY}/app/${appid}/guides/?browsefilter=toprated`,
   });
 
-  const fetchText = async url => {
+  const fetchText = async (url) => {
     const win = contextWindows()[0];
     const res = await win.fetch(url, { credentials: 'include', signal: AbortSignal.timeout(LOAD_TIMEOUT_MS) });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -274,7 +274,7 @@
     return list;
   };
 
-  const loadGuidesFromWeb = async appid => {
+  const loadGuidesFromWeb = async (appid) => {
     const [favorites, top] = await Promise.allSettled([
       fetchText(GUIDE_PAGES.favorites(appid)).then(html => parseGuidePage(html, true)),
       fetchText(GUIDE_PAGES.top(appid)).then(html => parseGuidePage(html, false)),
@@ -283,16 +283,16 @@
     return [favorites, top].flatMap(result => (result.status === 'fulfilled' ? result.value : []));
   };
 
-  const mergeGuides = list => {
+  const mergeGuides = (list) => {
     const seen = new Set();
     return list.filter(guide => guide.title && !seen.has(guide.id) && seen.add(guide.id)).slice(0, GUIDE_ROWS);
   };
 
-  const loadGuidesFromService = async appid => {
+  const loadGuidesFromService = async (appid) => {
     const steamid = selfSteamId();
     const [favorites, top] = await Promise.allSettled([
       steamid
-        ? callService(resolveGuidesApi, 'GetUserFiles', 'User', req => {
+        ? callService(resolveGuidesApi, 'GetUserFiles', 'User', (req) => {
             req.set_steamid(steamid);
             req.set_appid(appid);
             req.set_type('myfavorites');
@@ -301,7 +301,7 @@
             req.set_return_details?.(true);
           })
         : Promise.reject(new Error('no user')),
-      callService(resolveGuidesApi, 'QueryFiles', 'Query', req => {
+      callService(resolveGuidesApi, 'QueryFiles', 'Query', (req) => {
         req.set_appid(appid);
         req.set_query_type(QUERY_RANKED_BY_VOTE);
         req.set_filetype(FILETYPE_ALL_GUIDES);
@@ -323,7 +323,7 @@
 
   // Favorites first, then top guides that aren't favorites, untitled ones
   // dropped. The service first; the web pages when it fails or comes back empty.
-  const loadGuides = async appid => {
+  const loadGuides = async (appid) => {
     let list = [];
     try {
       list = mergeGuides(await loadGuidesFromService(appid));
@@ -340,7 +340,7 @@
   const NEWS_ENDPOINT = 'https://store.steampowered.com/events/ajaxgetpartnereventspageable/';
   const CLAN_IMAGES = 'https://clan.akamai.steamstatic.com/images/';
   // Posts without a capsule (most patch notes) show the game's store header.
-  const HEADER_ART = appid => `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${appid}/header.jpg`;
+  const HEADER_ART = (appid) => `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${appid}/header.jpg`;
   // The community announcement pages, not the store's News Hub: the News Hub
   // never finishes loading in the overlay's browser. `/ogg/<appid>` addresses
   // the game's official group by app id (`/games/` wants the group's vanity name).
@@ -349,15 +349,15 @@
   // EProtoClanEventType, the ones a game posts as news.
   const EVENT_LABEL = Object.freeze({ 12: 'Patch notes', 13: 'Update', 14: 'Major update', 15: 'Release', 28: 'News' });
 
-  const parseJson = text => {
+  const parseJson = (text) => {
     try {
       return JSON.parse(text);
-    } catch (_) {
+    } catch {
       return null;
     }
   };
 
-  const toNews = appid => event => {
+  const toNews = (appid) => (event) => {
     const body = event.announcement_body || {};
     const title = String(event.event_name || body.headline || '').trim();
     if (!title) return null;
@@ -376,7 +376,7 @@
 
   // The store's partner events feed, fetched from Steam's own context with the
   // user's store session, like the theme's News Hub.
-  const loadNews = async appid => {
+  const loadNews = async (appid) => {
     const win = contextWindows()[0];
     const url = new URL(NEWS_ENDPOINT);
     url.search = new URLSearchParams({ clan_accountid: 0, appid, offset: 0, count: NEWS_COUNT });
@@ -388,4 +388,4 @@
   };
 
   Object.assign(ns, { ACH_TABS, GUIDES_URL, GUIDE_URL, HEADER_ART, NEWS_URL, achievementsFromStore, checkNewScreenshot, friendStore, friendsInGame, friendsPlayedRecently, loadAchievements, loadGuides, loadNews, loadRecentPlayers, loadScreenshots, resolveAchievementStore, resolveGameplayApi, resolveGuidesApi, screenshotsApi, shotAppId, shotUrl, toFriend });
-});
+})(window.__se);

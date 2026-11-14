@@ -124,21 +124,6 @@ const pathOf = (link) => {
 };
 
 /** Clipboard API first; the hidden-textarea fallback covers web views that refuse it. */
-const copyText = async (text) => {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    const field = Object.assign(document.createElement('textarea'), { value: text, readOnly: true });
-    field.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
-    document.body.append(field);
-    field.select();
-    const ok = document.execCommand('copy');
-    field.remove();
-    return ok;
-  }
-};
-
 const cache = {
   read() {
     try {
@@ -200,7 +185,7 @@ export default async (dom) => {
     const copy = dom.el('button', { class: 'se-account-id-btn', type: 'button', 'aria-label': `Copy ${label}`, title: `Copy ${label}` }, svg('copy'));
     let reset = 0;
     $.listen(copy, 'click', async () => {
-      if (!(await copyText(steamId)) || !$.alive) return;
+      if (!(await dom.copy(steamId)) || !$.alive) return;
       copy.replaceChildren(svg('check'));
       copy.dataset.copied = '';
       clearTimeout(reset);

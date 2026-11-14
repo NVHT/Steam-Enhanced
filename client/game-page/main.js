@@ -11,13 +11,13 @@
  *   the activity feed, and formats rating/award pills.
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
- * window.__steamEnhancedGamePageParts (values parts reassign live on its `live`): util.js
+ * window.__seGamePageParts (values parts reassign live on its `live`): util.js
  * (shared helpers), achievements.js, layout.js, friends.js, activity.js, cards.js, page.js,
  * play-bar.js, and this one, main.js, which runs every part's steps in one pass per frame and
  * undoes them all in destroy().
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedGamePageParts;
+((SE) => {
+  const ns = window.__seGamePageParts;
   if (!ns) return;
   const {
     achRows, attachHltb, banners, cancelPass, CONTAINER, layout, LEFT_CARDS, LINKED, LOGO_CROP,
@@ -26,13 +26,13 @@
     placeFeedAchAll, placeFeedEvents, placeFeedShots, placeFriends, placeHeadingLinks,
     placeHideCommunity, placeLabels, placeLeftCards, placeMoreNames, placeNewsLink,
     placePlayBarIcons, placeRatings, placeReviewPrompt, placeScrollTop, placeStatKinds,
-    RIGHT_CONTROLS, schedule, setPass, sized, sizeLogos, stopLogos, tipHosts,
+    RIGHT_CONTROLS, schedule, setPass, sized, sizeLogos, stopLogos, tipHosts, unbindTips,
   } = ns;
   const { live } = ns;
 
   const { C } = SE;
 
-  window.__steamEnhancedGamePage?.destroy();
+  window.__seGamePage?.destroy();
 
   let observer;
 
@@ -74,7 +74,7 @@
   function run(step) {
     try {
       step();
-    } catch (_) {}
+    } catch {}
   }
 
   function update() {
@@ -165,7 +165,7 @@
     'data-se-clist',
   ];
 
-  window.__steamEnhancedGamePage = {
+  window.__seGamePage = {
     destroy() {
       stopLogos();
       document.removeEventListener('load', onLogoLoad, true);
@@ -177,6 +177,7 @@
       live.sizer?.disconnect();
       live.achSizer?.disconnect();
       if (live.muteAll) document.removeEventListener('pointerout', live.muteAll, true);
+      unbindTips();
       cancelPass();
       for (const id of [live.fitQueued, live.scrollFrame]) if (id) cancelAnimationFrame(id);
       clearTimeout(live.shotRetry);
@@ -198,7 +199,7 @@
       sized.clear();
       document.querySelectorAll('[style*="--se-pct"]').forEach((el) => el.style.removeProperty('--se-pct'));
       removeEventListener('DOMContentLoaded', start);
-      delete window.__steamEnhancedGamePage;
+      delete window.__seGamePage;
     },
   };
 
@@ -209,4 +210,4 @@
   } else {
     addEventListener('DOMContentLoaded', start, { once: true });
   }
-});
+})(window.__se);

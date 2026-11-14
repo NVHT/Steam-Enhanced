@@ -3,8 +3,8 @@
  *
  * Part of client/overlay/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedOverlayParts;
+((SE) => {
+  const ns = window.__seOverlayParts;
   if (!ns) return;
   const { el } = SE;
   const { GUIDES_URL, ICON, NEWS_URL, WIDGET, button, desktopOverlay, openToolWidget, root, scheduleRender, setText } = ns;
@@ -23,13 +23,13 @@
   const openBrowser = () =>
     openToolWidget('browser') || SE.run(() => desktopOverlay().SetWindowVisibility(WIDGET.browser, 1));
 
-  const closeWebTab = id => {
+  const closeWebTab = (id) => {
     SE.run(() => desktopOverlay().RemoveWebPageRequest(id));
     scheduleRender();
   };
 
   // A typed address opens as typed (https:// added); anything else searches.
-  const addressUrl = text => {
+  const addressUrl = (text) => {
     const value = text.trim();
     if (!value) return '';
     if (/^https?:\/\//i.test(value)) return value;
@@ -37,7 +37,7 @@
     return `https://www.google.com/search?q=${encodeURIComponent(value)}`;
   };
 
-  const gameLinks = appid => [
+  const gameLinks = (appid) => [
     ['Store page', `https://store.steampowered.com/app/${appid}/`],
     ['Community hub', `https://steamcommunity.com/app/${appid}/`],
     ['Discussions', `https://steamcommunity.com/app/${appid}/discussions/`],
@@ -45,11 +45,11 @@
     ['News', NEWS_URL(appid)],
   ];
 
-  const tabLabel = url => {
+  const tabLabel = (url) => {
     try {
       const u = new URL(url);
       return { host: u.hostname.replace(/^www\./, ''), path: (u.pathname + u.search).replace(/\/$/, '') || '/' };
-    } catch (_) {
+    } catch {
       return { host: url, path: '' };
     }
   };
@@ -107,19 +107,19 @@
       max: 140,
       fallback: 120,
       unit: '%',
-      toCss: value => String(value / 100),
-      fromStored: stored => stored * 100,
-      toStored: value => value / 100,
+      toCss: (value) => String(value / 100),
+      fromStored: (stored) => stored * 100,
+      toStored: (value) => value / 100,
     },
   });
 
-  const readBackdrop = key => {
+  const readBackdrop = (key) => {
     const spec = BACKDROP[key];
     try {
       const raw = localStorage.getItem(spec.storageKey);
       const value = raw === null ? NaN : Math.round(spec.fromStored(Number(raw)));
       if (value >= spec.min && value <= spec.max) return value;
-    } catch (_) {}
+    } catch {}
     return null;
   };
 
@@ -137,11 +137,11 @@
     applyBackdrop(key, value);
     try {
       localStorage.setItem(spec.storageKey, String(spec.toStored(value)));
-    } catch (_) {}
+    } catch {}
     scheduleRender();
   };
 
-  const renderSettingsView = part => {
+  const renderSettingsView = (part) => {
     for (const [key, spec] of Object.entries(BACKDROP)) {
       const { range, value } = part.sliders[key];
       const current = readBackdrop(key) ?? spec.fallback;
@@ -151,4 +151,4 @@
   };
 
   Object.assign(ns, { BACKDROP, addressUrl, applyBackdrops, closeWebTab, openBrowser, renderBrowserView, renderSettingsView, setBackdrop });
-});
+})(window.__se);

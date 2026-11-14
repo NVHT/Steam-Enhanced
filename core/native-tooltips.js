@@ -1,6 +1,8 @@
-/* Webpack module discovery for Steam's native React tooltip component. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  if (window.__steamEnhancedNativeTooltips) return;
+/*
+ * Webpack module discovery for Steam's native React tooltip component.
+ */
+((SE) => {
+  if (window.__seNativeTooltips) return;
 
   // Modules that held React, ReactDOM and the tooltip in recent builds: tried before a scan
   const KNOWN_MODULE_IDS = [63696, 7470, 47438];
@@ -9,13 +11,13 @@
   const load = (req, id) => {
     try {
       return req(id);
-    } catch (_) {
+    } catch {
       return null;
     }
   };
-  const exportsOf = mod => [mod, mod?.default].filter(Boolean);
-  const isTooltipSource = src => src.includes('tool-tip-source') && src.includes('toolTipContent');
-  const complete = found => !!(found.React && found.DOM && found.Tooltip);
+  const exportsOf = (mod) => [mod, mod?.default].filter(Boolean);
+  const isTooltipSource = (src) => src.includes('tool-tip-source') && src.includes('toolTipContent');
+  const complete = (found) => !!(found.React && found.DOM && found.Tooltip);
 
   const inspect = (found, mod) => {
     for (const exp of exportsOf(mod)) {
@@ -44,7 +46,7 @@
       }
       if (!isTooltipSource(src)) return null;
       inspect(found, load(req, id));
-      for (const dep of new Set(Array.from(src.matchAll(DEPENDENCY), match => match[1]))) {
+      for (const dep of new Set(Array.from(src.matchAll(DEPENDENCY), (match) => match[1]))) {
         if (req.m?.[dep]) inspect(found, load(req, dep));
       }
       return complete(found) ? found : null;
@@ -74,5 +76,5 @@
     return cachedApi;
   };
 
-  window.__steamEnhancedNativeTooltips = { resolve };
-});
+  window.__seNativeTooltips = { resolve };
+})(window.__se);

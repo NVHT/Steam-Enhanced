@@ -3,8 +3,8 @@
  *
  * Part of client/toasts/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedToastsParts;
+((SE) => {
+  const ns = window.__seToastsParts;
   if (!ns) return;
   const { run } = SE;
   const { IN_GAME, root } = ns;
@@ -125,7 +125,7 @@
   const icon = (name, cls = '') =>
     `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ICONS.steam}</svg>`;
 
-  const token = name => getComputedStyle(root).getPropertyValue(name).trim().toLowerCase();
+  const token = (name) => getComputedStyle(root).getPropertyValue(name).trim().toLowerCase();
   const enabled = () => token('--se-toasts') !== 'off' && !(IN_GAME && token('--se-toasts-ingame') === 'off');
   // The Stage unless compact is asked for (decided once: a window shows one toast).
   const COMPACT = token('--se-toasts-style') === 'compact';
@@ -143,4 +143,4 @@
   };
 
   Object.assign(ns, { ADOPT_TIMEOUT_MS, BOX, CLASS_RULES, COMPACT, KINDS, ON_ATTR, PRUNE_MS, SRC_ATTR, STALE_MAX_MS, TYPE_KINDS, WAIT_ATTR, ZOOM, enabled, field, icon, token });
-});
+})(window.__se);

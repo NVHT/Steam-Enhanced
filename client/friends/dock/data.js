@@ -2,8 +2,8 @@
  * Shared data: user-facing copy, Steam's FriendStore lookups, saved settings, and the `state`
  * object every part reads and writes.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedFriendsDockParts;
+((SE) => {
+  const ns = window.__seFriendsDockParts;
   if (!ns) return;
   const { groupAvatarURL } = ns;
 
@@ -142,14 +142,14 @@
     get: (k, d) => {
       try {
         return localStorage.getItem(k) ?? d;
-      } catch (_) {
+      } catch {
         return d;
       }
     },
     set: (k, v) => {
       try {
         localStorage.setItem(k, v);
-      } catch (_) {}
+      } catch {}
     },
   };
 
@@ -197,4 +197,4 @@
     COPY, STATE, ago, app, closedSections, ctx, flyoutOwnedTabs, friendsOf, groupsOf, importOf,
     managerTimers, openGames, read, state, store,
   });
-});
+})(window.__se);

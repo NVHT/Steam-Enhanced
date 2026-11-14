@@ -1,6 +1,8 @@
-/* The downloading game's art behind the page and its logo over it. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedDownloadsParts;
+/*
+ * The downloading game's art behind the page and its logo over it.
+ */
+((SE) => {
+  const ns = window.__seDownloadsParts;
   if (!ns) return;
   const { setAttr } = ns;
 
@@ -47,4 +49,4 @@
   }
 
   Object.assign(ns, { appIdFromArt, logoURLs, mountedNodes, syncBackdrop });
-});
+})(window.__se);

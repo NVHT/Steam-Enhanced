@@ -1,7 +1,8 @@
 /*
  * System Report, as built by client/dialogs/system-report/. Applies only once the script has
  * built the layout ([data-se-sysreport]); until then utility/base.css gives the stock dialog the
- * theme's title and footer.
+ * theme's title and footer. Parts drawn the same as System Information's (spec icons, chips,
+ * filter, section cards, empty state) share its rules in system-info.css, which loads first.
  *
  * Layout (900 × 800 window, resizable down to 600 × 300):
  *   [ title ................................................. ]
@@ -226,17 +227,6 @@
   box-shadow: inset 0 0 0 1px var(--se-white-10);
 }
 
-.se-sysreport-spec-icon,
-.se-sysreport-card-icon {
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--se-radius-sm);
-  background: var(--se-white-04);
-  color: var(--se-text-dim);
-}
-
 .se-sysreport-spec-icon {
   width: 34px;
   height: 34px;
@@ -245,14 +235,6 @@
 .se-sysreport-spec-icon svg {
   width: 18px;
   height: 18px;
-}
-
-.se-sysreport-spec-text {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
 }
 
 .se-sysreport-spec-text > span {
@@ -290,33 +272,8 @@
   gap: 8px;
 }
 
-.se-sysreport-chips {
-  position: relative; /* offset parent for the scroll spy */
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
-}
-
 .se-sysreport-chips::-webkit-scrollbar {
   display: none;
-}
-
-.se-sysreport-chip {
-  flex: none;
-  height: 26px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 10px 0 8px;
-  border-radius: var(--se-radius-pill);
-  background: none;
-  font: 600 11px/1 var(--se-font);
-  color: var(--se-text-muted);
-  white-space: nowrap;
 }
 
 .se-sysreport-chip svg {
@@ -332,24 +289,6 @@
 .se-sysreport-chip[data-active] {
   background: var(--se-surface-2);
   color: var(--se-text-strong);
-}
-
-.se-sysreport-filter {
-  flex: none;
-  width: 168px;
-  height: 28px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 4px 0 10px;
-  border-radius: var(--se-radius-pill);
-  background: var(--se-field);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
-  color: var(--se-text-faint);
-  cursor: text;
-  -webkit-app-region: no-drag;
-  transition: box-shadow var(--se-dur) ease-out;
 }
 
 .se-sysreport-filter:focus-within {
@@ -384,20 +323,6 @@
 
 .se-sysreport .se-sysreport-filter input:focus-visible {
   outline: 0;
-}
-
-.se-sysreport-filter-clear {
-  width: 20px;
-  height: 20px;
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border-radius: 50%;
-  background: var(--se-white-10);
-  color: var(--se-text-dim);
-  visibility: hidden;
 }
 
 .se-sysreport-filter[data-filled] .se-sysreport-filter-clear {
@@ -488,27 +413,6 @@
 }
 
 /* Section cards */
-.se-sysreport-list {
-  position: relative; /* offset parent for the scroll spy */
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  outline: 0;
-  user-select: text;
-}
-
-.se-sysreport-card {
-  flex: none;
-  padding: 10px 8px 6px;
-  border-radius: var(--se-radius-ml);
-  background: var(--se-bg);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
-}
-
 .se-sysreport-card-head {
   display: flex;
   align-items: center;
@@ -525,46 +429,6 @@
 .se-sysreport-card-icon svg {
   width: 14px;
   height: 14px;
-}
-
-.se-sysreport-card-title {
-  min-width: 0;
-  margin: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font: 700 12.5px/16px var(--se-font);
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--se-text-strong);
-}
-
-.se-sysreport-count {
-  flex: none;
-  min-width: 18px;
-  height: 16px;
-  padding: 0 5px;
-  box-sizing: border-box;
-  border-radius: var(--se-radius-pill);
-  background: var(--se-white-04);
-  font: 700 9.5px/16px var(--se-font);
-  text-align: center;
-  color: var(--se-text-faint);
-}
-
-.se-sysreport-card-copy {
-  width: 24px;
-  height: 24px;
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: auto;
-  padding: 0;
-  border-radius: var(--se-radius-sm);
-  background: none;
-  color: var(--se-text-faint);
-  opacity: 0;
 }
 
 .se-sysreport-card-copy svg {
@@ -897,14 +761,6 @@
   border-radius: 3px;
   background: var(--se-white-25);
   color: var(--se-text-strong);
-}
-
-.se-sysreport-empty {
-  margin: 0;
-  padding: 28px 12px;
-  font: 500 12px/16px var(--se-font);
-  text-align: center;
-  color: var(--se-text-faint);
 }
 
 .se-sysreport-raw .se-sysreport-empty {

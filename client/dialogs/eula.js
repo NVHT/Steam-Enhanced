@@ -17,8 +17,8 @@
  *
  * Big Picture (.GamepadMode) keeps Steam's dialog.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedEula?.destroy();
+((SE) => {
+  window.__seEula?.destroy();
 
   /* EulaModalDialog CSS module (70446) */
   const C = {
@@ -46,19 +46,9 @@
     clock: '<circle class="d" cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
   };
 
-  const views = new Set();
-  const viewOf = new WeakMap();
-
   /* ---------- Helpers ---------- */
 
-  const attempt = (fn, fallback) => {
-    try {
-      return fn();
-    } catch (err) {
-      console.warn('[Steam Enhanced] EULA:', err);
-      return fallback;
-    }
-  };
+  const attempt = SE.attempt('EULA');
 
   const { el } = SE;
 
@@ -83,7 +73,7 @@
 
   /* ---------- Reading Steam's state ---------- */
 
-  const readAppId = node => {
+  const readAppId = (node) => {
     let fiber = SE.liveFiber?.(node);
     for (let depth = 0; fiber && depth < MAX_DEPTH; fiber = fiber.return, depth++) {
       const props = fiber.memoizedProps;
@@ -92,9 +82,9 @@
     return 0;
   };
 
-  const appName = appid => attempt(() => SE.appStore?.()?.GetAppOverviewByAppID(appid)?.display_name, '') || '';
+  const appName = (appid) => attempt(() => SE.appStore?.()?.GetAppOverviewByAppID(appid)?.display_name, '') || '';
 
-  const scrolls = node => {
+  const scrolls = (node) => {
     if (node.scrollHeight - node.clientHeight <= END_SLACK) return false;
     const { overflowY } = getComputedStyle(node);
     return overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay';
@@ -104,7 +94,7 @@
    * The element that actually scrolls the agreement: Steam's scroll panel wraps EULAContent in
    * its own scroller, so walk from the text up to EULAScrolling and take the first that scrolls.
    */
-  const scrollerOf = scrolling => {
+  const scrollerOf = (scrolling) => {
     for (let node = scrolling.querySelector(C.text); node; node = node.parentElement) {
       if (scrolls(node)) return node;
       if (node === scrolling) break;
@@ -117,7 +107,7 @@
    * them that clip or scroll), else the window. Wrappers inside the dialog don't count: they
    * hug the footer and would always read as overflowing.
    */
-  const clipBottom = root => {
+  const clipBottom = (root) => {
     const doc = root.ownerDocument;
     let bottom = doc.defaultView.innerHeight;
     for (let cur = root; cur && cur !== doc.documentElement; cur = cur.parentElement) {
@@ -159,7 +149,7 @@
 
   /* ---------- Toolbar: reading time, progress, jump ---------- */
 
-  const buildTools = content => {
+  const buildTools = (content) => {
     const tools = el('div', `${OURS} ${OURS}-tools`);
 
     const time = el('span', `${OURS}-time`);
@@ -195,7 +185,7 @@
 
   /* ---------- View ---------- */
 
-  const createView = root => {
+  const createView = (root) => {
     const cleanups = [];
     let art = null;
     let game = null;
@@ -205,7 +195,6 @@
     let scroller = null; // what scrolls inside it
     let scrollCleanup = null;
     let words = -1;
-    let frame = 0;
 
     const content = () => root.querySelector(C.content);
 
@@ -274,7 +263,7 @@
       root.style.removeProperty(PANEL);
     });
 
-    const bindScroller = scrolling => {
+    const bindScroller = (scrolling) => {
       if (scrolling && scrolling === watched) {
         // Steam may only start scrolling an inner wrapper once the text has laid out
         const next = scrollerOf(scrolling);
@@ -291,7 +280,7 @@
       scheduleFit();
 
       /* scroll doesn't bubble: capture it on the panel, from whichever element inside scrolls */
-      const onScroll = event => {
+      const onScroll = (event) => {
         const target = event.target;
         if (target !== scroller && target.nodeType === 1 && scrolling.contains(target)) scroller = target;
         measure();
@@ -317,7 +306,6 @@
     };
 
     const sync = () => {
-      frame = 0;
       if (!root.isConnected) return;
       const box = content();
       SE.attr(root, ROOT, box ? '' : null);
@@ -368,23 +356,16 @@
       measure();
     };
 
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(sync);
-    };
-
     /* Loading, errors and language switches swap the agreement's nodes and text */
-    const observer = new MutationObserver(records => {
-      if (records.some(record => !isOurs(record.target) && ![...record.addedNodes, ...record.removedNodes].every(isOurs))) schedule();
-    });
-    observer.observe(root, { childList: true, subtree: true, characterData: true });
-    cleanups.push(() => observer.disconnect());
+    const change = SE.onChange(root, sync, { characterData: true, ignore: isOurs });
+    const { schedule } = change;
+    cleanups.push(change.disconnect);
 
     sync();
 
     return {
       root,
       destroy() {
-        if (frame) cancelAnimationFrame(frame);
         for (const fn of cleanups.splice(0)) attempt(fn);
         scrollCleanup?.();
         art?.remove();
@@ -392,36 +373,27 @@
         tools?.tools.remove();
         tools?.fade.remove();
         for (const name of [ROOT, READ, EDGE, 'data-se-eula-game', 'data-se-eula-tools']) SE.unmark(root, name);
-        views.delete(this);
-        viewOf.delete(root);
       },
     };
   };
 
   /* ---------- Lifecycle ---------- */
 
-  const scan = () => {
-    for (const view of [...views]) if (!view.root.isConnected) view.destroy();
-    for (const node of document.querySelectorAll(C.content)) {
-      if (node.closest('.GamepadMode')) continue;
-      const root = node.closest(C.modal) ?? node.closest('.DialogContent');
-      if (!root || viewOf.has(root)) continue;
-      const view = attempt(() => createView(root), null);
-      if (!view) continue;
-      views.add(view);
-      viewOf.set(root, view);
-    }
-  };
+  const mounted = SE.mount(
+    'EULA',
+    () =>
+      [...document.querySelectorAll(C.content)]
+        .filter(node => !node.closest('.GamepadMode'))
+        .map(node => node.closest(C.modal) ?? node.closest('.DialogContent')),
+    createView,
+    { throttle: 120, scope: C.content, ignore: isOurs }
+  );
 
-  const watcher = SE.watch(scan, { throttle: 120, ignore: isOurs });
-  scan();
-
-  window.__steamEnhancedEula = {
+  window.__seEula = {
     destroy() {
-      watcher.disconnect();
-      for (const view of [...views]) view.destroy();
+      mounted.destroy();
       document.querySelectorAll(`.${OURS}`).forEach(node => node.remove());
-      delete window.__steamEnhancedEula;
+      delete window.__seEula;
     },
   };
-});
+})(window.__se);

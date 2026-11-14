@@ -1,6 +1,8 @@
-/* Startup status progress strip, configurable background layers, and sign-in form tagging. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedStartup?.destroy();
+/*
+ * Startup status progress strip, configurable background layers, and sign-in form tagging.
+ */
+((SE) => {
+  window.__seStartup?.destroy();
   if (!document.body) return;
 
   const { C } = SE;
@@ -69,12 +71,12 @@
 
     const heroLayers = repeat(
       SKELETON_GAMES,
-      i => `<div class="se-sl-hero" style="animation-delay:${i * 4.5 - SKELETON_GAMES * 4.5}s"></div>`
+      (i) => `<div class="se-sl-hero" style="animation-delay:${i * 4.5 - SKELETON_GAMES * 4.5}s"></div>`
     );
 
     const stripItems = repeat(
       SKELETON_GAMES,
-      i => `<span style="animation-delay:${i * 4.5 - SKELETON_GAMES * 4.5}s"></span>`
+      (i) => `<span style="animation-delay:${i * 4.5 - SKELETON_GAMES * 4.5}s"></span>`
     );
 
     const newsHeadlines = repeat(2, () =>
@@ -83,7 +85,7 @@
         .join('')
     );
 
-    const favCapsules = repeat(6, i => `<span style="animation-delay:${i * 0.35}s"><s></s></span>`);
+    const favCapsules = repeat(6, (i) => `<span style="animation-delay:${i * 0.35}s"><s></s></span>`);
     const collCards = [40, 32, 46]
       .map(
         w =>
@@ -155,16 +157,16 @@
         if (win.loginStore && typeof win.loginStore.loginState === 'number') {
           return win.loginStore;
         }
-      } catch (_) {}
+      } catch {}
     }
     return null;
   };
 
-  const readLoginStatus = statusBox => {
+  const readLoginStatus = (statusBox) => {
     const store = resolveLoginStore();
     const state = store
       ? store.loginState
-      : SE.fromProps(statusBox, 12, p => (typeof p.loginState === 'number' ? p.loginState : undefined));
+      : SE.fromProps(statusBox, 12, (p) => (typeof p.loginState === 'number' ? p.loginState : undefined));
     const pct = store && typeof store.loginPercentage === 'number' ? store.loginPercentage : 0;
     return {
       phase: LOGIN_PHASES[state] || '',
@@ -234,12 +236,12 @@
   /*
    * Recent games' hero and capsule art. Read live from the library when this window can reach
    * it; the main window also caches it in localStorage so it is there on the next cold start.
-   * spinner.js reads it through window.__steamEnhancedStartup.art.
+   * spinner.js reads it through window.__seStartup.art.
    */
   const ownAppStore = () => {
     try {
       return window.appStore?.allApps ? window.appStore : null;
-    } catch (_) {
+    } catch {
       return null;
     }
   };
@@ -248,7 +250,7 @@
     const store = SE.appStore();
     if (!store?.allApps) return [];
     const collections = SE.global('collectionStore');
-    const isHidden = appid => SE.run(() => collections.BIsHidden(appid)) || false;
+    const isHidden = (appid) => SE.run(() => collections.BIsHidden(appid)) || false;
     const recentApps =
       SE.run(() =>
         store.allApps
@@ -281,7 +283,7 @@
     }
     try {
       localStorage.setItem(ART_STORAGE_KEY, JSON.stringify({ at: Date.now(), games }));
-    } catch (_) {}
+    } catch {}
     artSaveTimer = setTimeout(persistRecentArt, 10 * 60000);
   };
 
@@ -289,7 +291,7 @@
     try {
       const parsed = JSON.parse(localStorage.getItem(ART_STORAGE_KEY) || 'null');
       return Array.isArray(parsed?.games) ? parsed.games : [];
-    } catch (_) {
+    } catch {
       return [];
     }
   };
@@ -299,7 +301,7 @@
     return live.length ? live : readCachedArt();
   };
 
-  const toCssUrl = url => `url("${String(url).replace(/["\\\n]/g, ch => encodeURIComponent(ch))}")`;
+  const toCssUrl = (url) => `url("${String(url).replace(/["\\\n]/g, (ch) => encodeURIComponent(ch))}")`;
 
   const applySlideBackground = (el, urlList, fallbackCrop, wallSize) => {
     el.style.backgroundImage = [...urlList.map(toCssUrl), 'var(--se-startup-wall)'].join(', ');
@@ -307,7 +309,7 @@
     el.style.backgroundPosition = [...urlList.map(() => 'center'), fallbackCrop].join(', ');
   };
 
-  const resolveWallImage = host => {
+  const resolveWallImage = (host) => {
     const computedBg = getComputedStyle(host).backgroundImage;
     if (computedBg && computedBg !== 'none') return computedBg;
     return host.classList.contains(CLS.china)
@@ -346,7 +348,7 @@
     bgLayerKind = '';
   };
 
-  const mountBackgroundLayer = kind => {
+  const mountBackgroundLayer = (kind) => {
     const host = document.querySelector(`.${CLS.animatedBg}`);
     if (kind === 'steam' || !host) {
       removeBackgroundLayer();
@@ -407,7 +409,7 @@
       tablist.append(btn);
     }
 
-    tablist.addEventListener('keydown', event => {
+    tablist.addEventListener('keydown', (event) => {
       if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
       event.preventDefault();
       const next = activeSigninTab === 'password' ? 'qr' : 'password';
@@ -418,7 +420,7 @@
     return tablist;
   };
 
-  const syncSigninTabBar = cardNode => {
+  const syncSigninTabBar = (cardNode) => {
     SE.mark(cardNode, 'data-se-signin-tab', activeSigninTab);
     for (const btn of signinTabs.children) {
       const isSelected = btn.dataset.tab === activeSigninTab;
@@ -427,7 +429,7 @@
     }
   };
 
-  const selectSigninTab = tabId => {
+  const selectSigninTab = (tabId) => {
     activeSigninTab = tabId;
     if (signinTabs?.parentNode) syncSigninTabBar(signinTabs.parentNode);
   };
@@ -465,7 +467,7 @@
     }
   };
 
-  const annotateSigninForm = form => {
+  const annotateSigninForm = (form) => {
     const cardNode = form.parentElement;
     const columnNode = cardNode?.parentElement;
     if (!cardNode || !columnNode) return;
@@ -643,13 +645,13 @@
 
   artSaveTimer = setTimeout(persistRecentArt, 15000);
 
-  window.__steamEnhancedStartup = {
+  window.__seStartup = {
     destroy() {
       clearTimeout(artSaveTimer);
       stopWatching();
       resetStartupState();
-      delete window.__steamEnhancedStartup;
+      delete window.__seStartup;
     },
     art: { recentGames, cssUrl: toCssUrl, WALL_CROPS },
   };
-});
+})(window.__se);

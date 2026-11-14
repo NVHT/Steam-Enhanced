@@ -1,8 +1,8 @@
 /*
  * Page-wide parts: the scroll-to-top button and the review prompt.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedGamePageParts;
+((SE) => {
+  const ns = window.__seGamePageParts;
   if (!ns) return;
   const { drop, own, topChecked } = ns;
   const { live } = ns;
@@ -169,4 +169,4 @@
   }
 
   Object.assign(ns, { onAnyScroll, onResizeTop, placeReviewPrompt, placeScrollTop });
-});
+})(window.__se);

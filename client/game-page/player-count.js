@@ -1,6 +1,8 @@
-/* Concurrent player count badge via Steam CM protobuf transport with Web API fallback. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedPlayerCount?.destroy();
+/*
+ * Concurrent player count badge via Steam CM protobuf transport with Web API fallback.
+ */
+((SE) => {
+  window.__sePlayerCount?.destroy();
 
   const { C } = SE;
   const CACHE_TTL_MS = 60000;
@@ -16,7 +18,7 @@
   // The row's fiber walk is cached until the row or the route changes (React reuses the row).
   let resolved = { target: null, route: '', id: 0 };
 
-  const isValidAppId = id => Number.isSafeInteger(id) && id > 0 && id <= 4294967295;
+  const isValidAppId = (id) => Number.isSafeInteger(id) && id > 0 && id <= 4294967295;
 
   const routePath = () => {
     for (const owner of SE.owners()) {
@@ -26,16 +28,16 @@
           owner.location?.pathname ||
           '';
         if (/\/app\/\d+(?:\/|$)/.test(path)) return path;
-      } catch (_) {}
+      } catch {}
     }
     return '';
   };
 
-  const resolveSelectedAppId = target => {
+  const resolveSelectedAppId = (target) => {
     const route = routePath();
     if (route && resolved.target === target && resolved.route === route) return resolved.id;
 
-    const fromRow = SE.fromProps(target, 80, p => {
+    const fromRow = SE.fromProps(target, 80, (p) => {
       const id = Number(
         p.overview?.appid ?? p.appOverview?.appid ?? p.app?.appid ?? p.appid ?? p.appId
       );
@@ -117,7 +119,7 @@
         let src;
         try {
           src = Function.prototype.toString.call(factory);
-        } catch (_) {
+        } catch {
           continue;
         }
         if (!src.includes('InitFromPacket') || !src.includes('SerializeBody')) continue;
@@ -133,7 +135,7 @@
               return candidate;
             }
           }
-        } catch (_) {}
+        } catch {}
       }
     }
     return null;
@@ -146,7 +148,7 @@
         if (typeof cm?.SendMsgAndAwaitResponse !== 'function') continue;
         const Message = resolveMessageType();
         if (Message) return { cm, Message };
-      } catch (_) {}
+      } catch {}
     }
     return null;
   };
@@ -236,7 +238,7 @@
     currentAppId = 0;
   };
 
-  const renderBadge = entry => {
+  const renderBadge = (entry) => {
     if (!badge || !valueNode) return;
     const text = entry?.error ? 'Request failed' : entry ? numberFormat.format(entry.count) : 'Loading…';
     if (valueNode.textContent !== text) valueNode.textContent = text;
@@ -310,7 +312,7 @@
     renderBadge(entry);
   };
 
-  const positionBadge = target => {
+  const positionBadge = (target) => {
     const achievements = [...target.children].find(
       node =>
         node !== badge &&
@@ -323,7 +325,7 @@
     }
   };
 
-  const mountBadge = target => {
+  const mountBadge = (target) => {
     // A GameStat like its neighbours: client/game-page/play-bar.css draws its icon (--se-stat-icon) like theirs.
     badge = document.createElement('button');
     badge.type = 'button';
@@ -342,7 +344,7 @@
 
     textWrap.append(label, valueNode);
     badge.append(textWrap);
-    badge.addEventListener('click', event => {
+    badge.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
       void refreshBadge();
@@ -394,7 +396,7 @@
   };
   document.addEventListener('visibilitychange', onVisibility);
 
-  const countForApp = async appid => {
+  const countForApp = async (appid) => {
     if (!isValidAppId(appid)) return null;
     const cached = cache.get(appid);
     if (cached && !cached.error && Date.now() - cached.at < CACHE_TTL_MS) {
@@ -406,14 +408,14 @@
       const count = await fetchPlayerCount(appid, controller.signal);
       storeCacheEntry(appid, { count, at: Date.now() });
       return count;
-    } catch (_) {
+    } catch {
       return null;
     } finally {
       clearTimeout(timeoutId);
     }
   };
 
-  window.__steamEnhancedPlayerCount = {
+  window.__sePlayerCount = {
     count: countForApp,
     destroy() {
       destroyed = true;
@@ -422,9 +424,9 @@
       document.removeEventListener('visibilitychange', onVisibility);
       unmountBadge();
       cache.clear();
-      delete window.__steamEnhancedPlayerCount;
+      delete window.__sePlayerCount;
     },
   };
 
   update();
-});
+})(window.__se);

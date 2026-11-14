@@ -238,15 +238,15 @@ python3 dev/classmap.py rehash <path-to-extracted-steamui> .
 
 ```text
 Steam-Enhanced/
-├── skin.json     Millennium manifest: one match rule per window group
+├── skin.json     Millennium manifest: core.js and the client loader, in every window
 ├── core/         Shared runtime (SE), tokens, font, icons, scrollbars, tooltips, plugin bridge
-├── client/       Client features, one folder per area; loader.js maps window groups to files
+├── client/       Client features, one folder per area; loader.js sorts windows into groups and maps them to files
 ├── web/          Shared by the web sites: site loader, runtime (dom.js), base styles
 ├── store/        Store redesigns, one folder per page, loaded by store/loader.js
 ├── community/    Community redesigns, one folder per page plus shared/
 ├── help/         Steam Support pages
 ├── compat/       Plugin integrations (HowLongToBeat)
-├── dev/          Element inspector (Ctrl+Shift+E), classmap.py, spinner_svg.py
+├── dev/          Element inspector (Ctrl+Shift+E), classmap.py, colors.py, css-check.py, spinner_svg.py
 └── assets/       Logos, Millennium header and splash
 ```
 

@@ -19,17 +19,17 @@
  * report as gathered.
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
- * window.__steamEnhancedSystemReportParts:
+ * window.__seSystemReportParts:
  * - shared.js  selectors, icons, categories, small helpers (copy, storage, bytes)
  * - parse.js   reading the KeyValues report into sections, values and the spec summary
  * - view.js    the rebuilt view: highlighting, tooltips, and createView
  * - main.js    finding the dialog, building the view, the watcher and destroy()
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = (window.__steamEnhancedSystemReportParts = { live: {} });
+((SE) => {
+  const ns = (window.__seSystemReportParts = { live: {} });
   const { el } = SE;
 
-  window.__steamEnhancedSystemReport?.destroy();
+  window.__seSystemReport?.destroy();
 
   const ROOT = '._2TAQYpbxatDYN3Ex76KX5u'; // SystemReportDialog
   const CONTAINER = '._7jaC6UFFrvcKq2UlJr1Pb'; // SystemReportContainer
@@ -114,16 +114,9 @@
 
   /* ---------- Helpers ---------- */
 
-  const attempt = (fn, fallback) => {
-    try {
-      return fn();
-    } catch (err) {
-      console.warn('[Steam Enhanced] System Report:', err);
-      return fallback;
-    }
-  };
+  const attempt = SE.attempt('System Report');
 
-  const clean = text => String(text ?? '').replace(/\s+/g, ' ').trim();
+  const clean = (text) => String(text ?? '').replace(/\s+/g, ' ').trim();
 
   const { icon } = SE.icons(ICONS, 'info');
 
@@ -136,29 +129,15 @@
     return node;
   };
 
-  const copyText = async (text, win = window) => {
-    try {
-      await win.navigator.clipboard.writeText(text);
-      return;
-    } catch (_) {}
-    const doc = win.document;
-    const area = doc.createElement('textarea');
-    area.value = text;
-    area.setAttribute('readonly', '');
-    area.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
-    doc.body.append(area);
-    area.select();
-    doc.execCommand('copy');
-    area.remove();
-  };
+  const copyText = (text, win) => SE.copy(text, win);
 
   const storage = {
-    get: key => attempt(() => localStorage.getItem(key), null),
+    get: (key) => attempt(() => localStorage.getItem(key), null),
     set: (key, value) => attempt(() => localStorage.setItem(key, value)),
   };
 
   const BYTE_UNITS = ['KB', 'MB', 'GB', 'TB', 'PB'];
-  const bytes = count => {
+  const bytes = (count) => {
     let value = count;
     let unit = -1;
     while (value >= 1024 && unit < BYTE_UNITS.length - 1) {
@@ -169,9 +148,9 @@
   };
 
   /* "AudioDevices" -> "Audio device", for naming the entries of a list block */
-  const singular = key => ns.humanize(key).replace(/ies$/, 'y').replace(/(?<!s)s$/, '');
+  const singular = (key) => ns.humanize(key).replace(/ies$/, 'y').replace(/(?<!s)s$/, '');
 
-  const kb = text => {
+  const kb = (text) => {
     const size = new Blob([text]).size / 1024;
     return size >= 1024 ? `${(size / 1024).toFixed(1)} MB` : `${size >= 10 ? Math.round(size) : size.toFixed(1)} KB`;
   };
@@ -181,4 +160,4 @@
     TEXT, TEXT_BOX, TIP_RETRIES, TIP_RETRY_MS, attempt, button, bytes, clean, copyText, icon, kb,
     singular, storage, views,
   });
-});
+})(window.__se);

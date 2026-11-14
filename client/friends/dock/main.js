@@ -1,9 +1,9 @@
 /*
  * Builds the dock's elements and wires every listener in the order the single file did, then
- * starts the watchers and exposes window.__steamEnhancedFriendsDock.
+ * starts the watchers and exposes window.__seFriendsDock.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedFriendsDockParts;
+((SE) => {
+  const ns = window.__seFriendsDockParts;
   if (!ns) return;
   const {
     app, browserClickListeners, cancelChatNavigation, chatBack, chatChip, chatError, chatErrorText,
@@ -231,7 +231,7 @@
   syncBrowserClicks();
   place();
 
-  window.__steamEnhancedFriendsDock = {
+  window.__seFriendsDock = {
     prepareModal: keepLibraryManagers,
     toggle() {
       if (state.destroyed) return undefined;
@@ -316,7 +316,7 @@
       state.geometryCache = null;
       delete document.body.dataset.seFdock;
       document.body.removeAttribute('data-se-store-list');
-      delete window.__steamEnhancedFriendsDock;
+      delete window.__seFriendsDock;
     },
   };
-});
+})(window.__se);

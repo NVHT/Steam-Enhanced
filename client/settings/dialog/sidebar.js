@@ -3,8 +3,8 @@
  *
  * Part of client/settings/dialog/ (see shared.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSettingsParts;
+((SE) => {
+  const ns = window.__seSettingsParts;
   if (!ns) return;
   const { attr: setAttr } = SE;
   const {
@@ -91,4 +91,4 @@
     return !frag.querySelector('button, input, img, svg, [role], canvas, video');
   }
   Object.assign(ns, { adjacent, millPageOf, sidebar });
-});
+})(window.__se);

@@ -4,9 +4,10 @@
  * Millennium injects core.js into every web view, so this needs no dedicated skin.json rules
  * (new rules only take effect after a full Steam restart). Requested with ?v=<theme version>
  * so the web view's cache never mixes builds; the loader passes the same version on to every
- * file. skin.json is read uncached from a fresh URL every time; if it can't be read, files
- * load unversioned and cache normally. Until the loader has styled the page, a guard hides
- * Steam's own look (see below).
+ * file. The version comes from the last visit (localStorage) so the page needn't wait; skin.json
+ * is read uncached on every load all the same, and a changed version swaps the build in place.
+ * If skin.json can't be read on a first visit, files load unversioned and cache normally.
+ * Until the loader has styled the page, a guard hides Steam's own look (see below).
  *
  * Live reload (development): when dev/live-reload.json says {"enabled": true} (git-ignored,
  * so released builds never poll), an open page re-reads skin.json every LIVE_MS while visible.
@@ -23,6 +24,20 @@
   };
   const site = SITES[location.hostname];
   if (!site) return;
+
+  // Store and Community pages tell their host (the Friends dock's chat flyout) when they take
+  // or lose focus, so the flyout knows a click inside it isn't a click away.
+  if (site.global !== '__seHelp' && !window.__seBrowserChatClicks) {
+    const relay = (event) => {
+      if (!event.isTrusted || event.target !== window) return;
+      try {
+        window.SteamClient?.BrowserView?.PostMessageToParent('SteamEnhanced.ChatBrowserFocus', event.type);
+      } catch {}
+    };
+    addEventListener('focus', relay);
+    addEventListener('blur', relay);
+    window.__seBrowserChatClicks = true;
+  }
   const { loader } = site;
   const coreSrc = document.currentScript?.src ||
     [...document.scripts].find((script) => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;
@@ -147,7 +162,7 @@
     document.querySelector('script[data-se-feature="loader"]')?.remove();
     load(version);
     dropWhenReady(stale);
-    console.info(`[Steam Enhanced] live reload: ${version}`);
+    console.info(`[Steam Enhanced] now running ${version}`);
   };
 
   const poll = async () => {
@@ -171,12 +186,49 @@
       })
       .catch(() => {});
 
+  /*
+   * The build to load: the version last seen on this site, so the page doesn't wait on a
+   * skin.json round trip. skin.json is still read on every load; if it names another version
+   * (the theme was updated), that build swaps in once the first one has started, as live reload
+   * does. First visit: wait for skin.json, as before.
+   */
+  const VERSION_KEY = 'se-theme-version';
+  let seen = null;
+  try {
+    seen = localStorage.getItem(VERSION_KEY);
+  } catch {}
+  const remember = (version) => {
+    try {
+      if (version) localStorage.setItem(VERSION_KEY, version);
+    } catch {}
+  };
+  // The first build's loader has run start() (its site global exists), or 5 s have passed
+  const started = (since = performance.now()) =>
+    new Promise((resolve) => {
+      const check = () =>
+        window[site.global] || performance.now() - since > 5000 ? resolve() : setTimeout(check, 50);
+      check();
+    });
+
+  if (seen) {
+    current = seen;
+    load(seen);
+  }
   readVersion()
-    .then((version) => {
-      current = version;
-      load(version);
-    })
-    .catch(() => load(null))
+    .then(
+      (version) => {
+        remember(version);
+        if (!seen) {
+          current = version;
+          load(version);
+        } else if (version && version !== seen) {
+          started().then(() => swap(version));
+        }
+      },
+      () => {
+        if (!seen) load(null);
+      }
+    )
     .finally(startLiveReload);
 })();
 
@@ -515,7 +567,7 @@
   const run = (fn, ...args) => {
     try {
       return fn(...args);
-    } catch (_) {
+    } catch {
       return undefined;
     }
   };
@@ -524,7 +576,7 @@
   let fiberKeyHint = '';
   let propsKeyHint = '';
 
-  const fiberKey = el => {
+  const fiberKey = (el) => {
     if (!el) return undefined;
     if (fiberKeyHint && el[fiberKeyHint] !== undefined) return fiberKeyHint;
     const key = Object.keys(el).find(
@@ -534,12 +586,12 @@
     return key;
   };
 
-  const fiber = el => {
+  const fiber = (el) => {
     const key = fiberKey(el);
     return key ? el[key] : null;
   };
 
-  const liveFiber = target => {
+  const liveFiber = (target) => {
     const nodeFiber = target && (target.nodeType ? fiber(target) : target);
     if (!nodeFiber) return null;
     let rootFiber = nodeFiber;
@@ -550,7 +602,7 @@
       : nodeFiber;
   };
 
-  const props = el => {
+  const props = (el) => {
     if (!el) return null;
     if (propsKeyHint && el[propsKeyHint] !== undefined) return el[propsKeyHint];
     const key = Object.keys(el).find(
@@ -591,7 +643,7 @@
       for (const rel of ['opener', 'parent']) {
         try {
           if (win[rel]) wins.add(win[rel]);
-        } catch (_) {}
+        } catch {}
       }
     }
     return wins;
@@ -602,18 +654,18 @@
       try {
         const instance = win.SteamUIStore?.WindowStore?.MainWindowInstance;
         if (instance) return instance;
-      } catch (_) {}
+      } catch {}
     }
     return null;
   };
 
-  const navigate = route => {
+  const navigate = (route) => {
     const main = mainWindow();
     if (main && typeof main.Navigate === 'function') {
       try {
         main.Navigate(route);
         return true;
-      } catch (_) {}
+      } catch {}
     }
     return false;
   };
@@ -628,7 +680,7 @@
       let names;
       try {
         names = Object.getOwnPropertyNames(win).filter(k => k.startsWith('webpackChunk'));
-      } catch (_) {
+      } catch {
         continue;
       }
       for (const globalName of names) {
@@ -636,7 +688,7 @@
         if (!Array.isArray(chunks)) continue;
         let req = requireCache.get(chunks);
         if (!req && chunks.push !== Array.prototype.push) {
-          chunks.push([['se-core-' + Math.random().toString(36).slice(2)], {}, r => { req = r; }]);
+          chunks.push([['se-core-' + Math.random().toString(36).slice(2)], {}, (r) => { req = r; }]);
           if (req) requireCache.set(chunks, req);
         }
         if (req && !list.includes(req)) list.push(req);
@@ -662,12 +714,12 @@
         let src;
         try {
           src = Function.prototype.toString.call(req.m[id]);
-        } catch (_) {
+        } catch {
           continue;
         }
         try {
           value = test(src, id, req) || null;
-        } catch (_) {
+        } catch {
           value = null;
         }
         if (value) break outer;
@@ -684,7 +736,7 @@
       try {
         const value = win[name];
         if (value && (!test || test(value))) return value;
-      } catch (_) {}
+      } catch {}
     }
     return null;
   };
@@ -735,7 +787,7 @@
    * names the icon used for an unknown name.
    */
   const icons = (map, fallback) => {
-    const markup = name => map[name] ?? (fallback ? map[fallback] : '') ?? '';
+    const markup = (name) => map[name] ?? (fallback ? map[fallback] : '') ?? '';
     return {
       icon(name, className) {
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -762,12 +814,12 @@
     "'": '&#39;',
   };
 
-  const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, ch => HTML_ENTITIES[ch]);
+  const esc = (value) => String(value == null ? '' : value).replace(/[&<>"']/g, (ch) => HTML_ENTITIES[ch]);
 
-  const isInstalled = app => {
+  const isInstalled = (app) => {
     try {
       return !!app.per_client_data && [...app.per_client_data].some(client => client.installed);
-    } catch (_) {
+    } catch {
       return !!app?.installed;
     }
   };
@@ -777,7 +829,7 @@
   const coverURLs = (app, store) => {
     const appStore = store || resolveAppStore();
     const urls = [];
-    const push = val => {
+    const push = (val) => {
       if (Array.isArray(val)) urls.push(...val.filter(Boolean));
       else if (typeof val === 'string' && val) urls.push(val);
     };
@@ -823,8 +875,8 @@
     Object.freeze({ id: 'uncommon', name: 'Uncommon', max: 60, rank: 2 }),
     Object.freeze({ id: 'common', name: 'Common', max: Infinity, rank: 1 }),
   ]);
-  const tierOf = pct => (typeof pct === 'number' && Number.isFinite(pct) ? TIERS.find(t => pct <= t.max) : null);
-  const fmtPct = pct => (pct > 0 && pct < 0.1 ? '<0.1' : pct.toFixed(1));
+  const tierOf = (pct) => (typeof pct === 'number' && Number.isFinite(pct) ? TIERS.find(t => pct <= t.max) : null);
+  const fmtPct = (pct) => (pct > 0 && pct < 0.1 ? '<0.1' : pct.toFixed(1));
   // The layer over a tiered icon (styles: core/achievement-tiers.css): one sparkle
   // per tier rank when unlocked, and the tier's initial so it reads without color.
   const tierFx = (tier, locked) => {
@@ -847,7 +899,7 @@
   let observerConfigKey = '';
   let scheduledFrame = 0;
 
-  const hasRecordChanged = record => {
+  const hasRecordChanged = (record) => {
     if (record.type === 'attributes') {
       const target = record.target;
       const current = target.getAttributeNS
@@ -898,7 +950,7 @@
       touchesScope(sub.scope, record);
   };
 
-  const invokeSubscriber = sub => {
+  const invokeSubscriber = (sub) => {
     sub.last = performance.now();
     try {
       sub.fn();
@@ -914,7 +966,7 @@
     for (const sub of due) invokeSubscriber(sub);
   };
 
-  const enqueueSubscriber = sub => {
+  const enqueueSubscriber = (sub) => {
     if (sub.throttle) {
       if (sub.timer) return;
       const remaining = sub.last + sub.throttle - performance.now();
@@ -1062,10 +1114,10 @@
 
   // One predicate per selector, so verdicts are shared between subscribers using the same one.
   const insideCache = new Map();
-  const inside = selector => {
+  const inside = (selector) => {
     let test = insideCache.get(selector);
     if (!test) {
-      test = node => {
+      test = (node) => {
         const el = node?.nodeType === 1 ? node : node?.parentElement;
         return !!el?.closest?.(selector);
       };
@@ -1077,7 +1129,7 @@
   // High-frequency chrome regions excluded by content-area observers.
   const SIDE = `.${C.TopBar}, .${C.GameListHomeAndSearch_Container}, .se-fdock, .se-fd-fly, .se-fd-menu`;
 
-  const visible = target => {
+  const visible = (target) => {
     const nodes = typeof target === 'string' ? document.querySelectorAll(target) : [target];
     return [...nodes].some(
       el => el?.isConnected && !el.closest('[hidden]') && el.getClientRects().length > 0
@@ -1148,6 +1200,129 @@
     };
   };
 
+  /* ---------- Small shared helpers ---------- */
+
+  // A labelled try: attempt(fn, fallback) runs fn and, if it throws, warns under `label` and
+  // returns `fallback`. One per feature: const attempt = SE.attempt('Install');
+  const attempt = (label) => (fn, fallback) => {
+    try {
+      return fn();
+    } catch (err) {
+      console.warn(`[Steam Enhanced] ${label}:`, err);
+      return fallback;
+    }
+  };
+
+  // Copies text to the clipboard of `win`: the async API, else a selected textarea (some Steam
+  // windows refuse the API). Resolves true once copied.
+  const copy = async (text, win = window) => {
+    try {
+      await win.navigator.clipboard.writeText(text);
+      return true;
+    } catch {}
+    const doc = win.document;
+    const area = doc.createElement('textarea');
+    area.value = text;
+    area.readOnly = true;
+    area.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;pointer-events:none';
+    (doc.body ?? doc.documentElement).append(area);
+    area.select();
+    let copied = false;
+    try {
+      copied = doc.execCommand('copy');
+    } catch {}
+    area.remove();
+    return copied;
+  };
+
+  // The theme's version, from its own skin.json: fetched once per window. Resolves null if the
+  // manifest can't be read.
+  const coreSrc =
+    document.currentScript?.src ||
+    [...document.scripts].find(script => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;
+  let versionRequest = null;
+  const themeVersion = () =>
+    (versionRequest ??= coreSrc
+      ? fetch(new URL('../skin.json', coreSrc), { cache: 'no-store' })
+          .then(response => response.json())
+          .then(skin => (typeof skin?.version === 'string' && skin.version ? skin.version : null))
+          .catch(() => null)
+      : Promise.resolve(null));
+
+  /*
+   * Runs fn at most once per frame while `root`'s subtree changes. Changes on or inside nodes
+   * `ignore(node)` claims (the theme's own) don't count. options: attributes (names to watch),
+   * characterData. Returns { schedule, disconnect }; schedule() queues a run by hand.
+   */
+  const onChange = (root, fn, { attributes = null, characterData = false, ignore = null } = {}) => {
+    let frame = 0;
+    const theirs = (node) => !ignore || !ignore(node);
+    const schedule = () => {
+      if (!frame) {
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          fn();
+        });
+      }
+    };
+    const observer = new MutationObserver(records => {
+      const changed = records.some(
+        record =>
+          theirs(record.target) &&
+          (record.type !== 'childList' || [...record.addedNodes, ...record.removedNodes].some(theirs))
+      );
+      if (changed) schedule();
+    });
+    observer.observe(root, {
+      childList: true,
+      subtree: true,
+      characterData,
+      ...(attributes ? { attributes: true, attributeFilter: attributes } : {}),
+    });
+    return {
+      schedule,
+      disconnect() {
+        observer.disconnect();
+        if (frame) cancelAnimationFrame(frame);
+        frame = 0;
+      },
+    };
+  };
+
+  /*
+   * One view per root. find() lists the roots on the page; create(root) builds a view (an object
+   * with destroy()) or returns nothing to try that root again on the next scan. Scans run on
+   * page changes (SE.watch with `options`), and a view whose root has left the page is
+   * destroyed. Returns { views, scan, destroy }; views maps root -> view.
+   */
+  const mount = (label, find, create, options = {}) => {
+    const tryIt = attempt(label);
+    const views = new Map();
+    const scan = () => {
+      for (const [root, view] of views) {
+        if (root.isConnected) continue;
+        views.delete(root);
+        tryIt(() => view.destroy());
+      }
+      for (const root of tryIt(find, [])) {
+        if (!root || views.has(root)) continue;
+        const view = tryIt(() => create(root), null);
+        if (view) views.set(root, view);
+      }
+    };
+    const watcher = watch(scan, options);
+    scan();
+    return {
+      views,
+      scan,
+      destroy() {
+        watcher.disconnect();
+        for (const view of views.values()) tryIt(() => view.destroy());
+        views.clear();
+      },
+    };
+  };
+
   window.__se = {
     C,
     run,
@@ -1180,6 +1355,11 @@
     visible,
     poll,
     inside,
+    attempt,
+    copy,
+    themeVersion,
+    onChange,
+    mount,
     SIDE,
     inSide: inside(SIDE),
   };

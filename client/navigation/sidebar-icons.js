@@ -2,9 +2,9 @@
  * Collapse the Library sidebar header controls into a 7-slot icon bar. Header counts are
  * owned by client/library/game-list.js.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
+((SE) => {
   const { C } = SE;
-  window.__steamEnhancedSidebarIcons?.destroy();
+  window.__seSidebarIcons?.destroy();
 
   const roots = new Map();
   let observer;
@@ -37,7 +37,7 @@
       setOpen(root, entry, open);
       if (open) search.querySelector('input')?.focus();
     });
-    entry.onKey = event => {
+    entry.onKey = (event) => {
       if (event.key === 'Escape' && !search.querySelector('input')?.value) {
         setOpen(root, entry, false);
         button.focus();
@@ -83,16 +83,16 @@
     update();
   };
 
-  window.__steamEnhancedSidebarIcons = {
+  window.__seSidebarIcons = {
     destroy() {
       observer?.disconnect();
       for (const [root, entry] of roots) restoreRoot(root, entry);
       roots.clear();
       removeEventListener('DOMContentLoaded', start);
-      delete window.__steamEnhancedSidebarIcons;
+      delete window.__seSidebarIcons;
     },
   };
 
   if (document.body) start();
   else addEventListener('DOMContentLoaded', start, { once: true });
-});
+})(window.__se);

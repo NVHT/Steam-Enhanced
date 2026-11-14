@@ -1,7 +1,8 @@
 /*
  * System Information, as built by client/dialogs/system-info.js. Applies only once the script
  * has built the layout ([data-se-sysinfo]); until then utility/base.css gives the stock dialog
- * the theme's title and footer.
+ * the theme's title and footer. The parts System Report draws the same way (spec icons, chips,
+ * filter, section cards, empty state) are styled here for both; system-report.css keeps the rest.
  *
  * Grid on the dialog root (600 × 500 window, resizable):
  *   [ title ........................................... ]
@@ -212,7 +213,9 @@ button.se-sysinfo:focus-visible {
 }
 
 .se-sysinfo-spec-icon,
-.se-sysinfo-card-icon {
+.se-sysinfo-card-icon,
+.se-sysreport-spec-icon,
+.se-sysreport-card-icon {
   flex: none;
   display: flex;
   align-items: center;
@@ -232,7 +235,8 @@ button.se-sysinfo:focus-visible {
   height: 18px;
 }
 
-.se-sysinfo-spec-text {
+.se-sysinfo-spec-text,
+.se-sysreport-spec-text {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -275,7 +279,8 @@ button.se-sysinfo:focus-visible {
   gap: 10px;
 }
 
-.se-sysinfo-chips {
+.se-sysinfo-chips,
+.se-sysreport-chips {
   position: relative; /* offset parent for the scroll spy */
   flex: 1;
   min-width: 0;
@@ -290,7 +295,8 @@ button.se-sysinfo:focus-visible {
   display: none;
 }
 
-.se-sysinfo-chip {
+.se-sysinfo-chip,
+.se-sysreport-chip {
   flex: none;
   height: 26px;
   display: inline-flex;
@@ -319,7 +325,8 @@ button.se-sysinfo:focus-visible {
   color: var(--se-text-strong);
 }
 
-.se-sysinfo-filter {
+.se-sysinfo-filter,
+.se-sysreport-filter {
   flex: none;
   width: 168px;
   height: 28px;
@@ -371,7 +378,8 @@ button.se-sysinfo:focus-visible {
   outline: 0;
 }
 
-.se-sysinfo-filter-clear {
+.se-sysinfo-filter-clear,
+.se-sysreport-filter-clear {
   width: 20px;
   height: 20px;
   flex: none;
@@ -401,7 +409,8 @@ button.se-sysinfo:focus-visible {
 }
 
 /* Section cards */
-.se-sysinfo-list {
+.se-sysinfo-list,
+.se-sysreport-list {
   position: relative; /* offset parent for the scroll spy */
   flex: 1;
   min-height: 0;
@@ -414,7 +423,8 @@ button.se-sysinfo:focus-visible {
   user-select: text;
 }
 
-.se-sysinfo-card {
+.se-sysinfo-card,
+.se-sysreport-card {
   flex: none;
   padding: 10px 8px 6px;
   border-radius: var(--se-radius-ml);
@@ -440,7 +450,8 @@ button.se-sysinfo:focus-visible {
   height: 14px;
 }
 
-.se-sysinfo-card-title {
+.se-sysinfo-card-title,
+.se-sysreport-card-title {
   min-width: 0;
   margin: 0;
   overflow: hidden;
@@ -452,7 +463,8 @@ button.se-sysinfo:focus-visible {
   color: var(--se-text-strong);
 }
 
-.se-sysinfo-card-count {
+.se-sysinfo-card-count,
+.se-sysreport-count {
   flex: none;
   min-width: 18px;
   height: 16px;
@@ -465,7 +477,8 @@ button.se-sysinfo:focus-visible {
   color: var(--se-text-faint);
 }
 
-.se-sysinfo-card-copy {
+.se-sysinfo-card-copy,
+.se-sysreport-card-copy {
   width: 24px;
   height: 24px;
   flex: none;
@@ -618,7 +631,8 @@ button.se-sysinfo:focus-visible {
   color: var(--se-text-strong);
 }
 
-.se-sysinfo-empty {
+.se-sysinfo-empty,
+.se-sysreport-empty {
   margin: 0;
   padding: 28px 12px;
   font: 500 12px/16px var(--se-font);

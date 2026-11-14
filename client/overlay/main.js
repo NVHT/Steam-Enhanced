@@ -3,8 +3,8 @@
  *
  * Part of client/overlay/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedOverlayParts;
+((SE) => {
+  const ns = window.__seOverlayParts;
   if (!ns) return;
   const { ATTR, LOGO_ATTR, SCROLL_ATTR, SEL, TICK_MS, VIEW_ATTR, WINDOW_TICK_MS, achievementsCache, applyBackdrops, applyTrim, buildCard, caches, centerWidgets, checkNewScreenshot, contextWindows, enabled, flushSave, friendStore, friendsInGame, guidesCache, newsCache, notes, notesStore, readStats, recentCache, renderOverview, renderTabs, renderTime, replacedButtons, resolveAchievementStore, resolveGameplayApi, resolveGuidesApi, root, scheduleRender, screenshotsApi, screenshotsCache, setStat, setText, setView, shotAppId, shotUrl, syncToolbar, toolButtons, windowsDebug } = ns;
   const { live } = ns;
@@ -14,7 +14,7 @@
   const BOTTOM_GAP = 32;
   const FIT_MIN = 160;
 
-  const updateScrollHint = wrap => {
+  const updateScrollHint = (wrap) => {
     const more = wrap.scrollHeight - wrap.clientHeight - wrap.scrollTop > 1;
     SE.attr(wrap, SCROLL_ATTR, more ? '' : null);
   };
@@ -123,7 +123,7 @@
   SE.run(prefetch);
 
   // Method and field names of the stores the next views would use.
-  const namesOf = obj => {
+  const namesOf = (obj) => {
     const names = new Set();
     for (let p = obj, depth = 0; p && p !== Object.prototype && depth < 4; p = Object.getPrototypeOf(p), depth++) {
       for (const name of Object.getOwnPropertyNames(p)) names.add(name);
@@ -132,7 +132,7 @@
   };
   // An object's names plus, for each array field, the fields of its first item
   // (e.g. a chat's message list).
-  const shapeOf = obj => {
+  const shapeOf = (obj) => {
     if (!obj) return null;
     const arrays = {};
     for (const name of namesOf(obj)) {
@@ -221,4 +221,4 @@
   };
 
   Object.assign(ns, { namesOf, sync, updateScrollHint });
-});
+})(window.__se);

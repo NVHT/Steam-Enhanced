@@ -2,8 +2,8 @@
  * What's New column: Steam's news cards read into items, their kinds and sources, the featured
  * card and its carousel, opening a card, and Steam's official news feed.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedHomeStageParts;
+((SE) => {
+  const ns = window.__seHomeStageParts;
   if (!ns) return;
   const {
     client, dayLabel, decode, ICON_FILTER, NEWS_CARD, NEWS_DATE, NEWS_GAME, NEWS_HEADING,
@@ -288,7 +288,7 @@
       let event;
       try {
         event = await resolveOfficialEvent(it);
-      } catch (_) {
+      } catch {
         // A failed event lookup can still use the original link.
       }
       if (request !== newsOpenRequest) return;
@@ -305,7 +305,7 @@
             event_to_show: { appid, eventid: event.GID, clanSteamID },
           });
           return;
-        } catch (_) {
+        } catch {
           // A client without the Library event route can still use the link.
         }
       }
@@ -681,4 +681,4 @@
   Object.assign(ns, {
     NEWS_SUBS, NEWS_TYPES, cancelNewsOpen, paintNews, resetCardEvents, resetNews,
   });
-});
+})(window.__se);

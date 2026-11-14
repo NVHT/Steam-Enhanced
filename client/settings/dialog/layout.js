@@ -4,8 +4,8 @@
  *
  * Part of client/settings/dialog/ (see shared.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSettingsParts;
+((SE) => {
+  const ns = window.__seSettingsParts;
   if (!ns) return;
   const { C, attr: setAttr } = SE;
   const {
@@ -232,4 +232,4 @@
     sticky.forEach((el) => setAttr(el, 'data-se-sticky', ''));
   }
   Object.assign(ns, { cards, pickers, preLabels, rows, scheduleScan, sections });
-});
+})(window.__se);

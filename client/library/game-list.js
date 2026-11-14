@@ -5,9 +5,9 @@
  * library's headers ("(12)" → data-se-count="12"), drawn by the CSS without the brackets.
  * Styled in client/library/game-list.css.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
+((SE) => {
   const { C } = SE;
-  window.__steamEnhancedGameList?.destroy();
+  window.__seGameList?.destroy();
 
   /* Collection headers in the list carry the count in their own element */
   const SECTION_COUNT = `.${C.HoverOverlay_Container} .${C.SectionCount}`;
@@ -26,7 +26,7 @@
   const counted = new Set();
 
   /* "1% (310.2 Mbps)" → { value: 1, pct: "1%", rate: "310.2 Mbps" } */
-  const parseLabel = text => {
+  const parseLabel = (text) => {
     const match = /(\d+(?:[.,]\d+)?)\s*%/.exec(text || '');
     if (!match) return null;
     const value = Math.max(0, Math.min(100, parseFloat(match[1].replace(',', '.'))));
@@ -35,7 +35,7 @@
   };
 
   /* What a row is doing, and how its tooltip reads */
-  const statusOf = row => {
+  const statusOf = (row) => {
     const text = (row.querySelector(LABEL_SELECTOR)?.textContent || '').trim();
     const progress = parseLabel(text);
     if (progress) {
@@ -54,7 +54,7 @@
     return null;
   };
 
-  const dropIcon = icon => {
+  const dropIcon = (icon) => {
     icon.remove();
     icons.delete(icon);
   };
@@ -140,7 +140,7 @@
   const watcher = SE.watch(update, { characterData: true, attributes: ['class'], throttle: 150 });
   update();
 
-  window.__steamEnhancedGameList = {
+  window.__seGameList = {
     destroy() {
       watcher.disconnect();
       for (const entry of activeEntries) SE.cssVar(entry, '--se-dl-pct', null);
@@ -151,4 +151,4 @@
       counted.clear();
     },
   };
-});
+})(window.__se);

@@ -14,7 +14,7 @@
  *               rows.css/js: the game rows of the front page and Explore
  *   front/      the store front (/)
  *   app/        game pages (/app/<id>/...); summary.js and hero.js import their helpers
- *               (viewer, trailers, player, highlights, deck, titles) themselves
+ *               (viewer, trailers, player, highlights, deck) themselves, preloaded
  *   explore/    New On Steam (/explore/new/), Upcoming (/explore/upcoming/)
  *   charts/     Steam Charts (/charts/...)
  *   labs/       Steam Labs (/labs/)
@@ -82,8 +82,13 @@ start({
     { css: 'shared/rows.css', js: 'shared/rows.js', on: ['rows'] },
     { css: 'front/sections.css', on: ['front'] },
     { css: 'front/tabs.css', js: 'front/tabs.js', on: ['front'] },
-    { css: 'app/hero.css', js: 'app/hero.js', on: ['app'] },
-    { css: 'app/summary.css', js: 'app/summary.js', on: ['app'] },
+    { css: 'app/hero.css', js: 'app/hero.js', preload: ['app/deck.js'], on: ['app'] },
+    {
+      css: 'app/summary.css',
+      js: 'app/summary.js',
+      preload: ['app/viewer.js', 'app/trailers.js', 'app/player.js', 'app/highlights.js'],
+      on: ['app'],
+    },
     { css: 'app/about.css', js: 'app/about.js', on: ['app'] },
     { css: 'app/hidden.css', on: ['app'] },
     { css: 'app/purchase.css', js: 'app/purchase.js', on: ['app'] },
@@ -100,8 +105,8 @@ start({
     { css: 'legal/legal.css', js: 'legal/legal.js', on: ['legal'] },
     { css: 'account/page.css', js: 'account/page.js', on: ['account'] },
     { css: 'account/table.css', on: ['accountHistory', 'accountLicenses'] },
-    { css: 'account/history/page.css', js: 'account/history/page.js', on: ['accountHistory'] },
-    { css: 'account/licenses/page.css', js: 'account/licenses/page.js', on: ['accountLicenses'] },
+    { css: 'account/history/page.css', js: 'account/history/page.js', preload: ['account/table.js'], on: ['accountHistory'] },
+    { css: 'account/licenses/page.css', js: 'account/licenses/page.js', preload: ['account/table.js'], on: ['accountLicenses'] },
     { css: 'account/funds/page.css', js: 'account/funds/page.js', on: ['addFunds'] },
     { css: 'account/redeem/page.css', on: ['redeem'] },
     { css: 'account/phone/page.css', js: 'account/phone/page.js', on: ['phone'] },

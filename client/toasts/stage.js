@@ -3,8 +3,8 @@
  *
  * Part of client/toasts/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedToastsParts;
+((SE) => {
+  const ns = window.__seToastsParts;
   if (!ns) return;
   const { esc, mark, rarity, run, unmark } = SE;
   const { IN_GAME, PRUNE_MS, ZOOM, icon } = ns;
@@ -174,7 +174,7 @@
   let ambientSeq = 0;
   const ambientHTML = () => AMBIENT_SVG.replaceAll('se-tst-glow-ID', `se-tst-glow-${++ambientSeq}`);
 
-  const artURLs = m => {
+  const artURLs = (m) => {
     const hero = m.appid && m.artKind !== 'ambient' ? SE.heroURLs(m.appid, SE.appStore()) : [];
     if (m.artKind === 'image' && m.shot) return [m.shot, ...hero];
     if (m.artKind === 'app' || m.artKind === 'image') return hero;
@@ -414,4 +414,4 @@
   }
 
   Object.assign(ns, { prepare, ready, render, teardown });
-});
+})(window.__se);

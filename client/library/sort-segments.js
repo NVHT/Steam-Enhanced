@@ -1,7 +1,9 @@
-/* Convert Library shelf and collection sort dropdowns into a 4-part segmented control. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
+/*
+ * Convert Library shelf and collection sort dropdowns into a 4-part segmented control.
+ */
+((SE) => {
   const { C, fiber: fiberOf, fromProps } = SE;
-  window.__steamEnhancedSortSegments?.destroy();
+  window.__seSortSegments?.destroy();
 
   const SORT_HOST_SELECTOR = `.${C.DragInProgress_SortingDropDown}, .${C.LibraryImageBackgroundGlow_SortingDropDown}`;
   const SEGMENTS = [
@@ -15,19 +17,19 @@
     hours: 'Hours',
   };
 
-  const readSortState = host => {
-    const ownerProps = fromProps(host, 8, p =>
+  const readSortState = (host) => {
+    const ownerProps = fromProps(host, 8, (p) =>
       typeof p.onSortChangeCallback === 'function' ? p : null
     );
     const dropdown = host.querySelector('.DialogDropDown');
-    const menuProps = dropdown && fromProps(dropdown, 8, p => (Array.isArray(p.rgOptions) ? p : null));
+    const menuProps = dropdown && fromProps(dropdown, 8, (p) => (Array.isArray(p.rgOptions) ? p : null));
     if (!ownerProps || !menuProps || menuProps.rgOptions.length !== 10) return null;
     return { own: ownerProps, options: menuProps.rgOptions, dd: dropdown };
   };
 
   const mountedHosts = new Map();
 
-  const dropdownController = dd => {
+  const dropdownController = (dd) => {
     for (let f = fiberOf(dd), i = 0; f && i < 16; f = f.return, i++) {
       const instance = f.stateNode;
       if (
@@ -57,7 +59,7 @@
 
   let closingClick = null;
 
-  const onTriggerPointerDown = event => {
+  const onTriggerPointerDown = (event) => {
     if (event.button !== 0) return;
     closingClick = null;
     for (const host of mountedHosts.keys()) {
@@ -78,7 +80,7 @@
     }
   };
 
-  const onTriggerClick = event => {
+  const onTriggerClick = (event) => {
     const pending = closingClick;
     closingClick = null;
     if (
@@ -94,7 +96,7 @@
     event.stopImmediatePropagation();
   };
 
-  const mountSegments = host => {
+  const mountSegments = (host) => {
     const state = readSortState(host);
     if (!state) return;
 
@@ -110,7 +112,7 @@
       btn.textContent = COPY[seg.key];
       btn.title = state.options[seg.index].label;
       btn.setAttribute('role', 'radio');
-      btn.addEventListener('click', event => {
+      btn.addEventListener('click', (event) => {
         event.stopPropagation();
         const current = readSortState(host);
         if (!current || btn.getAttribute('aria-checked') === 'true') return;
@@ -148,7 +150,7 @@
   const doneWords = () => {
     if (doneLabels) return doneLabels;
     doneLabels = new Set(['Done']);
-    const localize = SE.global('LocalizeString', fn => typeof fn === 'function');
+    const localize = SE.global('LocalizeString', (fn) => typeof fn === 'function');
     for (const token of ['#Button_Done', '#Done']) {
       const word = SE.run(localize, token);
       if (typeof word === 'string' && word && word !== token) doneLabels.add(word.trim());
@@ -209,7 +211,7 @@
     update();
   };
 
-  window.__steamEnhancedSortSegments = {
+  window.__seSortSegments = {
     destroy() {
       document.removeEventListener('pointerdown', onTriggerPointerDown, true);
       document.removeEventListener('click', onTriggerClick, true);
@@ -225,10 +227,10 @@
       }
       markedReorderRows.clear();
       removeEventListener('DOMContentLoaded', start);
-      delete window.__steamEnhancedSortSegments;
+      delete window.__seSortSegments;
     },
   };
 
   if (document.body) start();
   else addEventListener('DOMContentLoaded', start, { once: true });
-});
+})(window.__se);

@@ -1,7 +1,10 @@
-/* Library Home layout alignments: deduplicate date headers, align shelf edges, and measure cover action buttons. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
+/*
+ * Library Home layout alignments: deduplicate date headers, align shelf edges, and measure cover
+ * action buttons.
+ */
+((SE) => {
   const { C } = SE;
-  window.__steamEnhancedHomePolish?.destroy();
+  window.__seHomePolish?.destroy();
 
   const NEWS_SELECTOR = `.${C.UpdatesContainer}`;
   const DATE_SELECTOR = `.${C.NewUpdates_EventTime}, .${C.BasicHomeUpdates_EventTime}`;
@@ -58,7 +61,7 @@
     }
   };
 
-  const offsetLeftFromRoot = el => {
+  const offsetLeftFromRoot = (el) => {
     let x = 0;
     for (let cur = el; cur; cur = cur.offsetParent) {
       x += cur.offsetLeft + (cur.clientLeft || 0);
@@ -94,7 +97,7 @@
     return measurements;
   };
 
-  const applyShelfShifts = measurements => {
+  const applyShelfShifts = (measurements) => {
     for (const [container, appliedShift, targetShift] of measurements) {
       if (targetShift !== appliedShift) {
         if (targetShift) container.style.setProperty('--se-cover-shift', `${targetShift}px`);
@@ -111,7 +114,7 @@
   const hoverBound = new WeakSet();
   const clickBound = new WeakSet();
 
-  const findCoverContext = btn => {
+  const findCoverContext = (btn) => {
     let el = btn.parentElement;
     for (let depth = 0; el && depth < 6; depth++, el = el.parentElement) {
       const cover = el.querySelector(COVER_BOX_SELECTOR);
@@ -168,7 +171,7 @@
     return plan;
   };
 
-  const placeCoverButtons = plan => {
+  const placeCoverButtons = (plan) => {
     const CSS_VARS = ['--se-cl', '--se-cb', '--se-cw'];
     for (const { btn, isUninstalledIcon, context, coords } of plan) {
       const { item } = context;
@@ -193,7 +196,7 @@
         clickBound.add(item);
         item.addEventListener(
           'click',
-          event => {
+          (event) => {
             const icon = item.querySelector('[data-se-cover-btn]');
             if (!icon || event.target === icon || icon.contains(event.target)) return;
             const rect = icon.getBoundingClientRect();
@@ -234,7 +237,7 @@
       deduplicateEventDates();
       applyShelfShifts(shifts);
       placeCoverButtons(plan);
-    } catch (_) {}
+    } catch {}
   };
 
   const schedule = () => {
@@ -257,7 +260,7 @@
     schedule();
   };
 
-  window.__steamEnhancedHomePolish = {
+  window.__seHomePolish = {
     destroy() {
       observer?.disconnect();
       io?.disconnect();
@@ -286,10 +289,10 @@
         }
       }
       removeEventListener('DOMContentLoaded', start);
-      delete window.__steamEnhancedHomePolish;
+      delete window.__seHomePolish;
     },
   };
 
   if (document.body) start();
   else addEventListener('DOMContentLoaded', start, { once: true });
-});
+})(window.__se);

@@ -5,10 +5,7 @@
  * popup modal instead of navigating the main Library viewport, and exposes an
  * FFI / Library Manager bridge (`__seMillBridge`) to the popup window.
  */
-(window.__se
-  ? (init) => init(window.__se)
-  : (init) => addEventListener('se-core', () => init(window.__se), { once: true })
-)((SE) => {
+((SE) => {
   const { C } = SE;
   const SETTINGS_ROUTE = '/millennium/settings';
   const isSettingsRoute = (route) =>
@@ -70,7 +67,7 @@
             return value;
           }
         }
-      } catch (_) {}
+      } catch {}
     }
     return null;
   }
@@ -136,10 +133,10 @@
     popupDocuments.delete(doc);
     try {
       dispose?.();
-    } catch (_) {}
+    } catch {}
     try {
       doc.removeEventListener('click', onPopupTabClick, true);
-    } catch (_) {}
+    } catch {}
   }
 
   // Walking the fibers for every realm is costly and ffi()/core() ask on each call, so the list
@@ -160,14 +157,14 @@
             const w = f.stateNode.containerInfo.ownerDocument?.defaultView;
             if (w && !out.includes(w)) out.push(w);
           }
-        } catch (_) {}
+        } catch {}
       }
       for (let i = 0; i < out.length && out.length < 16; i++) {
         for (const k of ['opener', 'parent', 'top']) {
           try {
             const n = out[i][k];
             if (n && !out.includes(n)) out.push(n);
-          } catch (_) {}
+          } catch {}
         }
       }
       windowCache = { list: out, until: now + 2000 };
@@ -184,7 +181,7 @@
           ) {
             return binder.call(0, 'core', name, args, undefined, true);
           }
-        } catch (_) {}
+        } catch {}
       }
       return Promise.reject(new Error('Millennium is not reachable'));
     },
@@ -203,21 +200,21 @@
               cancelable: true,
             })
           );
-        } catch (_) {}
+        } catch {}
       }
       try {
         window.focus();
-      } catch (_) {}
+      } catch {}
       try {
         SE.mainWindow()?.BringToFront?.();
-      } catch (_) {}
+      } catch {}
     },
     core() {
       for (const o of millBridge.windows()) {
         try {
           const c = o.PLUGIN_LIST?.core;
           if (c) return c;
-        } catch (_) {}
+        } catch {}
       }
       return null;
     },
@@ -265,7 +262,7 @@
         }
         api.showModal = wrapped;
         if (api.showModal === wrapped) dialogHosts.set(api, { wrapped, descriptor });
-      } catch (_) {}
+      } catch {}
     }
   }
 
@@ -275,7 +272,7 @@
         if (api.showModal !== wrapped) continue;
         if (descriptor) Object.defineProperty(api, 'showModal', descriptor);
         else delete api.showModal;
-      } catch (_) {}
+      } catch {}
     }
     dialogHosts.clear();
   }
@@ -295,7 +292,7 @@
           }
           try {
             doc.defaultView.__seMillBridge = millBridge;
-          } catch (_) {}
+          } catch {}
           if (popupDocuments.has(doc)) continue;
           popupDocuments.add(doc);
           try {
@@ -305,7 +302,7 @@
           }
           doc.addEventListener('click', onPopupTabClick, true);
         }
-      } catch (_) {}
+      } catch {}
     }
     if (popupDocuments.size) {
       if (!dialogHosts.size) installDialogHosts();
@@ -340,7 +337,7 @@
             .map((candidate) => {
               try {
                 return candidate.settingsStore?.m_ClientSettings;
-              } catch (_) {
+              } catch {
                 return null;
               }
             })
@@ -349,7 +346,7 @@
           store.start_page = original;
           storage.removeItem('millennium-original-start-page');
         }
-      } catch (_) {}
+      } catch {}
     }
   }
 
@@ -366,7 +363,7 @@
           ? guardedRoutes.get(entry)
           : entry?.component;
         if (typeof component === 'function' || component?.$$typeof) return component;
-      } catch (_) {}
+      } catch {}
     }
     return null;
   }
@@ -419,14 +416,14 @@
           entry.component = PopupOnlySettings;
           if (entry.component === PopupOnlySettings) guardedRoutes.set(entry, component);
         }
-      } catch (_) {}
+      } catch {}
       for (const getStore of [
         () => owner.SteamUIStore,
         () => owner.SteamUIStore?.WindowStore?.MainWindowInstance,
       ]) {
         try {
           guardNavigation(getStore());
-        } catch (_) {}
+        } catch {}
       }
     }
   }
@@ -435,14 +432,14 @@
     for (const [entry, component] of guardedRoutes) {
       try {
         if (entry.component === PopupOnlySettings) entry.component = component;
-      } catch (_) {}
+      } catch {}
     }
     for (const [store, { wrapped, descriptor }] of guardedNavigation) {
       try {
         if (store.Navigate !== wrapped) continue;
         if (descriptor) Object.defineProperty(store, 'Navigate', descriptor);
         else delete store.Navigate;
-      } catch (_) {}
+      } catch {}
     }
     guardedRoutes.clear();
     guardedNavigation.clear();
@@ -459,7 +456,7 @@
     try {
       const registry = value?.m_mapModalManager;
       return typeof registry?.get(window)?.ShowLegacyPopupModal === 'function' ? registry : null;
-    } catch (_) {
+    } catch {
       return null;
     }
   };
@@ -535,7 +532,7 @@
         stopPopupTracking();
         try {
           stale.Close();
-        } catch (_) {}
+        } catch {}
       }
     }
     if (popup) {
@@ -545,12 +542,12 @@
         try {
           doc.defaultView?.focus();
           break;
-        } catch (_) {}
+        } catch {}
       }
       return true;
     }
 
-    window.__steamEnhancedFriendsDock?.prepareModal?.();
+    window.__seFriendsDock?.prepareModal?.();
     const component = settingsComponent();
     const runtime = findRuntime();
     if (!component || !runtime) {
@@ -635,7 +632,7 @@
       removeRouteGuards();
       try {
         popup?.Close();
-      } catch (_) {}
+      } catch {}
       popup = null;
       stopPopupTracking();
       errorNotice?.remove();
@@ -643,4 +640,4 @@
       delete window.__seMillenniumWindow;
     },
   };
-});
+})(window.__se);

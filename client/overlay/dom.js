@@ -3,8 +3,8 @@
  *
  * Part of client/overlay/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedOverlayParts;
+((SE) => {
+  const ns = window.__seOverlayParts;
   if (!ns) return;
   const { el } = SE;
   const { ACH_TABS, ICON, SEL, VIEW_ICON, openChat, openToolWidget, openUrl, openWidget } = ns;
@@ -25,7 +25,7 @@
     return node;
   };
 
-  const buildStat = label => {
+  const buildStat = (label) => {
     const cell = el('div', 'se-ov-stat');
     const value = el('div', 'se-ov-stat-value');
     value.append(el('b'), el('small'));
@@ -50,7 +50,7 @@
     return { box, input };
   };
 
-  const buildBar = ratio => {
+  const buildBar = (ratio) => {
     const bar = el('div', 'se-ov-bar');
     const fill = el('i');
     fill.style.width = `${(ratio * 100).toFixed(1)}%`;
@@ -150,7 +150,7 @@
         return [id, { tab }];
       })
     );
-    rail.addEventListener('click', event => {
+    rail.addEventListener('click', (event) => {
       const tab = event.target.closest('[data-view]');
       if (tab) ns.setView(tab.dataset.view);
     });
@@ -183,7 +183,7 @@
     value.append(b, small);
     cell.append(label, value);
     cell.addEventListener('click', () => (ns.timer.running() ? ns.timer.pause() : ns.timer.start()));
-    cell.addEventListener('contextmenu', event => {
+    cell.addEventListener('contextmenu', (event) => {
       event.preventDefault();
       ns.timer.reset();
     });
@@ -202,7 +202,7 @@
     return { panel, list, sig: '' };
   };
 
-  const sectionLabel = text => el('h3', 'se-ov-friends-group', text);
+  const sectionLabel = (text) => el('h3', 'se-ov-friends-group', text);
 
   // Remote Play Together, drawn in the column: you as host with hosting
   // state; inviting opens Steam's own window.
@@ -295,7 +295,7 @@
       tool.title = label;
       tool.innerHTML = glyph;
       // Keep the editor's selection when a tool is pressed.
-      tool.addEventListener('mousedown', event => event.preventDefault());
+      tool.addEventListener('mousedown', (event) => event.preventDefault());
       tools.append(tool);
     }
 
@@ -340,7 +340,7 @@
     go.setAttribute('aria-label', 'Open');
     go.innerHTML = ICON.chevron;
     form.append(icon, input, go);
-    form.addEventListener('submit', event => {
+    form.addEventListener('submit', (event) => {
       event.preventDefault();
       const target = ns.addressUrl(input.value);
       if (!target) return;
@@ -408,7 +408,7 @@
     // One delegated handler: avatars open chat, `data-widget` opens an overlay
     // widget, `data-url` a web page, `data-view` switches the column, and the
     // list's tabs and tier chips filter it.
-    wrap.addEventListener('click', event => {
+    wrap.addEventListener('click', (event) => {
       const target = event.target.closest(
         '[data-steamid], [data-widget], [data-url], [data-view], [data-ach-tab], [data-ach-tier], [data-tool], [data-offline], [data-pad-switch], [data-pad-layout], [data-web-open], [data-web-close], [data-steam-settings], [data-format], [data-note-new], [data-note-delete], [data-note-delete-yes], [data-note-delete-no]'
       );
@@ -433,14 +433,14 @@
       else if (achTab) ns.setListState({ tab: achTab });
       else if (achTier !== undefined) ns.setListState({ tier: ns.listState.tier === achTier ? null : achTier });
     });
-    wrap.addEventListener('input', event => {
+    wrap.addEventListener('input', (event) => {
       const { search } = event.target.dataset;
       if (search === 'achievements') ns.setListState({ query: event.target.value });
       else if (search === 'friends') ns.setFriendsState({ query: event.target.value });
       else if (event.target.dataset.backdrop) ns.setBackdrop(event.target.dataset.backdrop, Number(event.target.value));
       else if (event.target.closest('[data-note-field]')) ns.noteEdited();
     });
-    wrap.addEventListener('change', event => {
+    wrap.addEventListener('change', (event) => {
       if (event.target.dataset.notePick !== undefined) ns.pickNote(event.target.value);
     });
     // The bottom fade shows only while more content sits below.
@@ -495,7 +495,7 @@
   const SAMPLE_MAX = 320;
   const trims = new Map();
 
-  const measureTrim = src =>
+  const measureTrim = (src) =>
     new Promise(resolve => {
       const image = new Image();
       image.crossOrigin = 'anonymous';
@@ -538,4 +538,4 @@
   };
 
   Object.assign(ns, { achIcon, applyTrim, buildBar, buildCard, button, fmtPct, img, tierOf });
-});
+})(window.__se);

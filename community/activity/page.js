@@ -20,12 +20,6 @@
  *
  * The feed loads more as you scroll: new blocks are handled as they arrive.
  */
-const versioned = (file) => {
-  const url = new URL(file, import.meta.url);
-  url.search = new URL(import.meta.url).search;
-  return url.href;
-};
-const { iconFor, duoIcon } = await import(versioned('../shared/icons.js'));
 
 const WIDE = '(min-width: 911px)';
 const ART_WIDTH = 1520; // the feed's width at 2x
@@ -43,7 +37,8 @@ const KINDS = [
   ['blotter_daily_rollup', 'rollup', 'Activity'],
 ];
 
-export default (dom) => {
+export default async (dom) => {
+  const { iconFor, duoIcon } = await dom.importNear(import.meta.url, '../shared/icons.js');
   const $ = dom.scope();
   const { el, mark, unmark } = dom;
 

@@ -18,8 +18,8 @@
  *
  * Big Picture (.GamepadMode) keeps Steam's dialog.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedActivateProduct?.destroy();
+((SE) => {
+  window.__seActivateProduct?.destroy();
 
   /* ActivateProductDialog CSS module (sp.js 28694) */
   const C = {
@@ -69,21 +69,11 @@
     clear: '<path d="M7.5 7.5l9 9M16.5 7.5l-9 9"/>',
   };
 
-  const views = new Set();
-  const viewOf = new WeakMap();
-
   /* ---------- Helpers ---------- */
 
-  const attempt = (fn, fallback) => {
-    try {
-      return fn();
-    } catch (err) {
-      console.warn('[Steam Enhanced] Activate a Product:', err);
-      return fallback;
-    }
-  };
+  const attempt = SE.attempt('Activate a Product');
 
-  const clean = text => String(text ?? '').replace(/\s+/g, ' ').trim();
+  const clean = (text) => String(text ?? '').replace(/\s+/g, ' ').trim();
 
   const { el } = SE;
 
@@ -94,12 +84,12 @@
 
   const isOurs = SE.inside(`.${OURS}`);
 
-  const isGamepad = root => !!root.closest('.GamepadMode');
+  const isGamepad = (root) => !!root.closest('.GamepadMode');
 
   /* ---------- Code shapes ---------- */
 
   /* What the server sees: no zero-width characters, trimmed, one space at most, upper case */
-  const normalize = text =>
+  const normalize = (text) =>
     String(text ?? '')
       .replace(/[​-‍⁠﻿]/g, '')
       .replace(/[‐-―−]/g, '-') // typographic dashes from PDFs and e-mails
@@ -107,10 +97,10 @@
       .replace(/\s+/g, ' ')
       .toUpperCase();
 
-  const shapeOf = code => code.replace(/[A-Z0-9]/g, 'X');
+  const shapeOf = (code) => code.replace(/[A-Z0-9]/g, 'X');
 
   /* Whole-code characters (letters and digits) a template holds */
-  const charsIn = template => template.replace(/[^X]/g, '').length;
+  const charsIn = (template) => template.replace(/[^X]/g, '').length;
 
   /*
    * { tone, format, possible } for a normalized code:
@@ -119,7 +109,7 @@
    *   partial  the start of one or more known formats (`possible`)
    *   unusual  none of them; Steam still gets the final say
    */
-  const classify = code => {
+  const classify = (code) => {
     if (!code) return { tone: 'idle', format: null, possible: [] };
     const shape = shapeOf(code);
     const exact = FORMATS.find(f => f.template === shape);
@@ -128,12 +118,12 @@
     return possible.length ? { tone: 'partial', format: null, possible } : { tone: 'unusual', format: null, possible: [] };
   };
 
-  const formatOfSample = sample => FORMATS.find(f => f.template === shapeOf(sample)) ?? null;
+  const formatOfSample = (sample) => FORMATS.find(f => f.template === shapeOf(sample)) ?? null;
 
   /* ---------- Reading Steam's state ---------- */
 
   /* The dialog's { eState, ... } hook, read from the live fiber so it's this render's value */
-  const readState = root => {
+  const readState = (root) => {
     let fiber = SE.liveFiber?.(root);
     for (let depth = 0; fiber && depth < MAX_DEPTH; fiber = fiber.return, depth++) {
       if (typeof fiber.type !== 'function') continue;
@@ -147,7 +137,7 @@
   };
 
   /* The view on screen: from Steam's state, else from what's mounted */
-  const viewName = root => {
+  const viewName = (root) => {
     const state = attempt(() => readState(root), null);
     if (state && STATES[state.eState]) return STATES[state.eState];
     if (root.querySelector(C.header)) return 'code';
@@ -157,7 +147,7 @@
   };
 
   /* Steam's samples, de-duplicated (English lists the Standard and Extended pair twice) */
-  const readSamples = info => {
+  const readSamples = (info) => {
     const seen = new Set();
     const samples = [];
     for (const node of info.querySelectorAll(C.example)) {
@@ -282,7 +272,7 @@
     };
 
     /* Pasted codes arrive trimmed and upper-cased, with typographic dashes made plain */
-    const onPaste = event => {
+    const onPaste = (event) => {
       const text = event.clipboardData?.getData('text');
       if (text == null) return;
       const code = normalize(text);
@@ -317,10 +307,9 @@
 
   /* ---------- View ---------- */
 
-  const createView = root => {
+  const createView = (root) => {
     const cleanups = [];
     let code = null; // the built EnterCode view, while it's mounted
-    let frame = 0;
 
     const teardownCode = () => {
       if (!code) return;
@@ -330,7 +319,6 @@
     };
 
     const sync = () => {
-      frame = 0;
       const name = viewName(root);
       SE.attr(root, STATE, name);
 
@@ -345,54 +333,36 @@
       }
     };
 
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(sync);
-    };
-
     // Each view swap is a child-list change of the dialog's content
-    const observer = new MutationObserver(records => {
-      if (records.some(record => ![...record.addedNodes, ...record.removedNodes].every(isOurs))) schedule();
-    });
-    observer.observe(root, { childList: true, subtree: true });
-    cleanups.push(() => observer.disconnect());
+    const change = SE.onChange(root, sync, { ignore: isOurs });
+    cleanups.push(change.disconnect);
 
     sync();
 
     return {
       root,
       destroy() {
-        if (frame) cancelAnimationFrame(frame);
         teardownCode();
         for (const fn of cleanups.splice(0)) attempt(fn);
         SE.unmark(root, STATE);
-        views.delete(this);
-        viewOf.delete(root);
       },
     };
   };
 
   /* ---------- Lifecycle ---------- */
 
-  const scan = () => {
-    for (const view of [...views]) if (!view.root.isConnected) view.destroy();
-    for (const root of document.querySelectorAll(C.root)) {
-      if (viewOf.has(root) || isGamepad(root)) continue;
-      const view = attempt(() => createView(root), null);
-      if (!view) continue;
-      views.add(view);
-      viewOf.set(root, view);
-    }
-  };
+  const mounted = SE.mount(
+    'Activate a Product',
+    () => [...document.querySelectorAll(C.root)].filter(root => !isGamepad(root)),
+    createView,
+    { throttle: 100, scope: C.root, ignore: isOurs }
+  );
 
-  const watcher = SE.watch(scan, { throttle: 100, scope: C.root, ignore: isOurs });
-  scan();
-
-  window.__steamEnhancedActivateProduct = {
+  window.__seActivateProduct = {
     destroy() {
-      watcher.disconnect();
-      for (const view of [...views]) view.destroy();
+      mounted.destroy();
       document.querySelectorAll(`.${OURS}`).forEach(node => node.remove());
-      delete window.__steamEnhancedActivateProduct;
+      delete window.__seActivateProduct;
     },
   };
-});
+})(window.__se);

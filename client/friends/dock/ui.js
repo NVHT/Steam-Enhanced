@@ -1,8 +1,8 @@
 /*
  * Native list clicks, context menus, the hover flyout, and the per-frame sync pass.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedFriendsDockParts;
+((SE) => {
+  const ns = window.__seFriendsDockParts;
   if (!ns) return;
   const { app, COPY, ctx, flyHTML, state, statusLabel, store } = ns;
   const { live } = ns;
@@ -304,4 +304,4 @@
     onNativeFriendClick, openChat, openGroup, pressRow, schedule, setMode, showFly, statusMenu,
     steamURL, sync,
   });
-});
+})(window.__se);

@@ -2,8 +2,8 @@
  * Header: play bar icons, stat kinds, the "and N more" developer names, labels and the game
  * logo sized to its visible pixels (--se-logo-crop).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedGamePageParts;
+((SE) => {
+  const ns = window.__seGamePageParts;
   if (!ns) return;
   const { APP_BUTTONS, ASSOCIATION, drop, NAME, own, RIGHT_CONTROLS, srcOf } = ns;
 
@@ -36,7 +36,7 @@
   function placePlayBarIcons() {
     for (const controls of document.querySelectorAll(RIGHT_CONTROLS)) {
       if (!controls.querySelector(APP_BUTTONS)) continue;
-      const widget = window.__steamEnhancedHltb?.widgetSelector;
+      const widget = window.__seHltb?.widgetSelector;
       const walk = (el) => {
         for (const child of el.children) {
           if (widget && child.matches(widget)) continue;
@@ -246,4 +246,4 @@
     LOGO_CROP, onLogoLoad, placeLabels, placeMoreNames, placePlayBarIcons, placeStatKinds,
     sizeLogos, stopLogos,
   });
-});
+})(window.__se);

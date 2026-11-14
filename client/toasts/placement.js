@@ -3,8 +3,8 @@
  *
  * Part of client/toasts/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedToastsParts;
+((SE) => {
+  const ns = window.__seToastsParts;
   if (!ns) return;
   const { mark, run, unmark } = SE;
   const { BOX, IN_GAME, SURFACE, isStage } = ns;
@@ -26,7 +26,7 @@
    */
   const scWindow = () => window.SteamClient?.Window;
   const dpr = () => window.devicePixelRatio || 1;
-  const sane = r => Number.isFinite(r) && r > 0.2 && r < 5;
+  const sane = (r) => Number.isFinite(r) && r > 0.2 && r < 5;
 
   // The ratio is the same for every toast window, so it's kept in Steam's shared context
   // (this window's opener) once measured; later toasts land in one move.
@@ -35,14 +35,14 @@
   // v3: measured with the display's dpi and a strict x/y check (earlier values may be off).
   const MOVE_RATIO = `__seToastMoveRatio.v3:${SURFACE}`;
   const getRatio = () => run(() => shared()[MOVE_RATIO]) || null;
-  const setRatio = r => run(() => { shared()[MOVE_RATIO] = r; });
+  const setRatio = (r) => run(() => { shared()[MOVE_RATIO] = r; });
   // Steam passes the display's scale with every move; the theme's own moves do the same.
   const DPI = () => window.devicePixelRatio || 1;
 
   // Steam moves the window a moment after MoveTo returns: wait until it really has moved
   // (Steam's own small corner adjustments don't count).
   const MOVED = 40;
-  const movedFrom = from => Math.abs(window.screenX - from.x) > MOVED || Math.abs(window.screenY - from.y) > MOVED;
+  const movedFrom = (from) => Math.abs(window.screenX - from.x) > MOVED || Math.abs(window.screenY - from.y) > MOVED;
   async function settle(from, t, ms = 1200) {
     for (const end = Date.now() + ms; Date.now() < end; ) {
       await sleep(50);
@@ -68,7 +68,7 @@
 
   const MOVERS = [
     // Through Steam's own moves (see holdSpot); skipped while MoveTo isn't wrapped.
-    { name: "Steam's moves", steam: true, hold: true, move: t => spotMove(t) },
+    { name: "Steam's moves", steam: true, hold: true, move: (t) => spotMove(t) },
     {
       name: 'SteamClient MoveTo',
       steam: true,
@@ -108,7 +108,7 @@
 
   let placeWarned = false;
 
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
   async function applyMove(i, t) {
     await Promise.resolve(run(() => MOVERS[i].move(t))).catch(() => {});
   }
@@ -118,10 +118,10 @@
    * holds, but applies the display scale itself (asked for 544 it gives 816 at 150%): the first
    * resize is measured and that ratio divided out, as for MoveTo, and shared with later toasts.
    */
-  const sized = t => Math.abs(window.innerWidth - t.w) <= 4 && Math.abs(window.innerHeight - t.h) <= 4;
+  const sized = (t) => Math.abs(window.innerWidth - t.w) <= 4 && Math.abs(window.innerHeight - t.h) <= 4;
   const SIZE_RATIO = `__seToastSizeRatio:${SURFACE}`;
   const getSizeRatio = () => run(() => shared()[SIZE_RATIO]) || null;
-  const setSizeRatio = r => run(() => { shared()[SIZE_RATIO] = r; });
+  const setSizeRatio = (r) => run(() => { shared()[SIZE_RATIO] = r; });
   async function resized(from, t, ms = 900) {
     for (const end = Date.now() + ms; Date.now() < end; ) {
       await sleep(50);
@@ -218,7 +218,7 @@
   }
 
   const fullArea = () => window.innerWidth >= screen.availWidth - 8 && window.innerHeight >= screen.availHeight / 2;
-  const landed = t => Math.abs(window.screenX - t.x) <= 4 && Math.abs(window.screenY - t.y) <= 4;
+  const landed = (t) => Math.abs(window.screenX - t.x) <= 4 && Math.abs(window.screenY - t.y) <= 4;
 
   /*
    * Where the tray sits in the window: its own small window → just above the bottom pad;
@@ -463,4 +463,4 @@
   }
 
   Object.assign(ns, { MOVERS, SIZERS, fit, getRatio, getSizeRatio, holdSpot, onWindowResize, place, sane, shared, sizeAttempts, stillAfter, watchPlace });
-});
+})(window.__se);

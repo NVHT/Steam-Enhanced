@@ -1,6 +1,8 @@
-/* Where a menu opens: anchored beside the rail or under its button. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSteamMenuParts;
+/*
+ * Where a menu opens: anchored beside the rail or under its button.
+ */
+((SE) => {
+  const ns = window.__seSteamMenuParts;
   if (!ns) return;
   const { C } = SE;
   const { isSteam, patched } = ns;
@@ -100,4 +102,4 @@
     anchors, applyPlacement, menuAnchor, placementFor, refreshPosition, sidebarAnchor,
     syncOpenState,
   });
-});
+})(window.__se);

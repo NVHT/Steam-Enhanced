@@ -1,6 +1,8 @@
-/* The update pass: decorates the visible page once per frame when scheduled. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedDownloadsParts;
+/*
+ * The update pass: decorates the visible page once per frame when scheduled.
+ */
+((SE) => {
+  const ns = window.__seDownloadsParts;
   if (!ns) return;
   const { C } = SE;
   const { COPY, PAGE_SELECTOR, appIdFromArt, enableNativeLibrary, mountedNodes, rbdHandles, setAttr, syncBackdrop, syncGrips, syncHero, syncLibrary, tagActions } = ns;
@@ -47,4 +49,4 @@
   };
 
   Object.assign(ns, { schedule, update });
-});
+})(window.__se);

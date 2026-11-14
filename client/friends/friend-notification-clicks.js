@@ -1,5 +1,7 @@
-/* Forward friend-message notification clicks to Steam Enhanced's main window. */
-(window.__se ? init => init(window.__se) : init => addEventListener('se-core', () => init(window.__se), { once: true }))(SE => {
+/*
+ * Forward friend-message notification clicks to Steam Enhanced's main window.
+ */
+((SE) => {
   window.__seFriendNotificationClicks?.destroy();
 
   /*
@@ -42,4 +44,4 @@
       delete window.__seFriendNotificationClicks;
     },
   };
-});
+})(window.__se);

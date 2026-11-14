@@ -17,7 +17,7 @@
  *
  * Title: the name is set on one line, or on a big line and a gold line (with a maker's
  * possessive, "Sid Meier's", as a small line above), by splitTitle() below; per-game
- * exceptions live in app/titles.js.
+ * exceptions live in TITLE_OVERRIDES (below).
  *
  * The franchise banner ("the entire <name> collection") is a chip on its own row above the tags.
  *
@@ -95,19 +95,22 @@ const readPrefix = (name) => {
   return person && !words.some((word) => NOT_A_NAME.has(word.toLowerCase().replace(/\.$/, ''))) ? person : null;
 };
 
-const loadOverrides = async (dom) => {
-  try {
-    return (await dom.importNear(import.meta.url, './titles.js')).default ?? {};
-  } catch (error) {
-    console.error('[Steam Enhanced] app/titles.js failed:', error);
-    return {};
-  }
-};
+/*
+ * Title overrides: how a game's name is set when the automatic split gets it wrong. Keyed by
+ * Steam app ID (the number in the store URL, /app/<id>/).
+ *
+ *   'First line | Second line'   split exactly at the bar (the second line is the gold one)
+ *   'Whole Name'                 no bar: one line, never split
+ *
+ * The text you write is what shows (capitalised by the hero), so it can also tidy a name,
+ * e.g. drop a trademark sign. Spaces around the bar don't matter.
+ */
+const TITLE_OVERRIDES = {};
 
 export default async (dom) => {
   const { el, setText, mark, squash, ready, scope } = dom;
-  const [overrides, { readDeck, findDeckBlock, findLearnMore }] = await Promise.all([
-    loadOverrides(dom),
+  const overrides = TITLE_OVERRIDES;
+  const [{ readDeck, findDeckBlock, findLearnMore }] = await Promise.all([
     dom.importNear(import.meta.url, './deck.js'),
     ready(),
   ]);
@@ -227,7 +230,7 @@ export default async (dom) => {
 
   /**
    * Name -> { prefix, big, gold }. In order:
-   *   1. an override in app/titles.js ('First | Second', or no bar for one line), as written
+   *   1. an override in TITLE_OVERRIDES ('First | Second', or no bar for one line), as written
    *   2. clean-up: trademark marks go; a trailing (bracketed) note is kept for the gold line
    *   3. a maker's possessive ("Sid Meier's") becomes the prefix line above
    *   4. names that fit the hero, single words and unspaced scripts (CJK) stay on one line

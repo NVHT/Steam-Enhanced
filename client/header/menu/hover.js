@@ -1,6 +1,8 @@
-/* Hover-to-open between root menu buttons, and the rail's side buttons. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSteamMenuParts;
+/*
+ * Hover-to-open between root menu buttons, and the rail's side buttons.
+ */
+((SE) => {
+  const ns = window.__seSteamMenuParts;
   if (!ns) return;
   const { SIDE_HOVER, hoverDocuments, patched, sideButtons } = ns;
   const { live } = ns;
@@ -25,7 +27,7 @@
     for (const doc of hoverDocuments) {
       try {
         if (doc.body?.matches(':hover')) return true;
-      } catch (_) {}
+      } catch {}
     }
     return false;
   };
@@ -166,7 +168,7 @@
     live.mainPointer = { x: event.clientX, y: event.clientY };
     cancelHoverClose();
     const button = event.currentTarget;
-    if (button === sideButtons.get('bell') && window.__steamEnhancedHeaderTooltips?.hasNotifications() === false) {
+    if (button === sideButtons.get('bell') && window.__seHeaderTooltips?.hasNotifications() === false) {
       return;
     }
     const open = [...patched].some(([instance, saved]) => instance.visible && sideFor(saved.button) === button);
@@ -200,4 +202,4 @@
     closeAfterHover, enterMenuPopup, leaveMenuPopup, onMainMouseMove, openMillenniumWindow,
     openOnHover, openSideOnHover, sideFor,
   });
-});
+})(window.__se);

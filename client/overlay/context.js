@@ -23,7 +23,7 @@
  * so the column is filled the moment it opens.
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
- * window.__steamEnhancedOverlayParts (values parts reassign live on its `live`):
+ * window.__seOverlayParts (values parts reassign live on its `live`):
  * - context.js       selectors, icons, and Steam's shared context (this one)
  * - data.js          the async data cache and Steam's protobuf services
  * - sources.js       achievements, friends, screenshots, guides and news data
@@ -36,8 +36,8 @@
  * - achievements.js  the full achievements list
  * - main.js          fitting to the screen, start, debug() and the API (destroy())
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = (window.__steamEnhancedOverlayParts = { live: {} });
+((SE) => {
+  const ns = (window.__seOverlayParts = { live: {} });
   const { C } = SE;
   const { live } = ns;
   live.achData = null;
@@ -80,7 +80,7 @@
   // tone (TONE), the detail on top full strength (FILL); both follow `color`.
   const TONE = 'fill="currentColor" fill-opacity=".38"';
   const FILL = 'fill="currentColor"';
-  const icon24 = body => `<svg viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
+  const icon24 = (body) => `<svg viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
   const VIEW_ICON = Object.freeze({
     overview: icon24(`<rect x="3" y="3" width="8" height="10" rx="2.2" ${FILL}/><rect x="13" y="3" width="8" height="6" rx="2.2" ${TONE}/><rect x="13" y="11" width="8" height="10" rx="2.2" ${FILL}/><rect x="3" y="15" width="8" height="6" rx="2.2" ${TONE}/>`),
     achievements: icon24(`<path d="M7.2 2.5h3.3l2.3 6.2H9.5zM16.8 2.5h-3.3l-2.3 6.2h3.3z" ${TONE}/><circle cx="12" cy="15.3" r="6.2" ${TONE}/><path d="m12 11.3 1.25 2.55 2.8.4-2.03 1.98.48 2.79L12 17.7l-2.5 1.32.48-2.79-2.03-1.98 2.8-.4z" ${FILL}/>`),
@@ -107,7 +107,7 @@
       (a, b) => Number(!!SE.run(() => b.SteamUIStore)) - Number(!!SE.run(() => a.SteamUIStore))
     );
 
-  const contextGlobal = key => {
+  const contextGlobal = (key) => {
     for (const win of contextWindows()) {
       const value = SE.run(() => win[key]);
       if (value) return value;
@@ -145,7 +145,7 @@
 
   const desktopOverlay = () => SE.run(() => findInstance()?.DesktopOverlay) || null;
 
-  const overviewOf = appid => (appid ? SE.run(() => SE.appStore()?.GetAppOverviewByAppID(appid)) || null : null);
+  const overviewOf = (appid) => (appid ? SE.run(() => SE.appStore()?.GetAppOverviewByAppID(appid)) || null : null);
 
   const readStats = () => {
     const ov = desktopOverlay();
@@ -162,20 +162,20 @@
   };
 
   // Minutes under an hour stay in minutes; longer spans read in hours.
-  const duration = minutes => {
+  const duration = (minutes) => {
     if (!Number.isFinite(minutes) || minutes < 0) return { value: '–', unit: '' };
     if (minutes < 60) return { value: String(minutes), unit: 'min' };
     return { value: (minutes / 60).toFixed(1), unit: 'hrs' };
   };
 
   // Widget ids and visibility values from Steam's DesktopOverlay enums.
-  const openWidget = id => SE.run(() => desktopOverlay()?.SetWindowVisibility(id, 1));
+  const openWidget = (id) => SE.run(() => desktopOverlay()?.SetWindowVisibility(id, 1));
 
   // Web pages open as a new tab in the overlay's own browser:
   // DesktopOverlay.AddWebPageRequest(url, activate) adds the tab, saves it and
   // shows the Browser widget. Outside an overlay (or if that ever fails), Steam's
   // URL handler opens the page in the client instead.
-  const openUrl = url => {
+  const openUrl = (url) => {
     const overlay = desktopOverlay();
     if (typeof overlay?.AddWebPageRequest === 'function') {
       try {
@@ -190,7 +190,7 @@
 
   // Steam's own overlay path for a friend's chat: the chat window opens in
   // this overlay (and still goes through the theme's chat routing).
-  const openChat = steamid64 => {
+  const openChat = (steamid64) => {
     const accountId = SE.run(() => Number(BigInt(steamid64) & 0xffffffffn));
     if (!accountId) return;
     const browserInfo = SE.run(() => findInstance().params.browserInfo);
@@ -198,7 +198,7 @@
     if (friend && browserInfo) SE.run(() => friend.OpenChatDialog(browserInfo));
   };
 
-  const accountIdOf = steamid64 => SE.run(() => Number(BigInt(steamid64) & 0xffffffffn)) || 0;
+  const accountIdOf = (steamid64) => SE.run(() => Number(BigInt(steamid64) & 0xffffffffn)) || 0;
 
   const selfSteamId = () =>
     SE.run(() => contextGlobal('App').m_CurrentUser.strSteamID) ||
@@ -206,4 +206,4 @@
     '';
 
   Object.assign(ns, { ATTR, ICON, LOGO_ATTR, SCROLL_ATTR, SEL, TICK_MS, TOOLBAR_ACTIVE, VIEW_ICON, accountIdOf, contextGlobal, contextWindows, desktopOverlay, duration, enabled, exportOf, openChat, openUrl, openWidget, overviewOf, readStats, root, selfSteamId });
-});
+})(window.__se);

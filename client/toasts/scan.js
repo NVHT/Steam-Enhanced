@@ -3,8 +3,8 @@
  *
  * Part of client/toasts/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedToastsParts;
+((SE) => {
+  const ns = window.__seToastsParts;
   if (!ns) return;
   const { mark, run, unmark } = SE;
   const { ADOPT_TIMEOUT_MS, ON_ATTR, SRC_ATTR, WAIT_ATTR, activeEntry, add, alive, byKey, closed, describe, entryById, finish, fit, held, hoverSteam, hub, inDock, isStage, keyOf, letGo, notify, openEntries, pendingKeys, play, root, skipped, slotFor, sync, templateOf, watchPlace } = ns;
@@ -198,4 +198,4 @@
   }
 
   Object.assign(ns, { busy, onDockAnimationEnd, onDockClick, onPageHide, onTrayHover, step });
-});
+})(window.__se);

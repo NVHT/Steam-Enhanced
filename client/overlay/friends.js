@@ -3,8 +3,8 @@
  *
  * Part of client/overlay/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedOverlayParts;
+((SE) => {
+  const ns = window.__seOverlayParts;
   if (!ns) return;
   const { el } = SE;
   const { button, contextGlobal, friendStore, img, openToolWidget, overviewOf, readStats, scheduleRender, setText, toFriend } = ns;
@@ -15,12 +15,12 @@
   const friendsState = { query: '', offline: false };
   const OFFLINE_MAX = 200;
 
-  const setFriendsState = patch => {
+  const setFriendsState = (patch) => {
     Object.assign(friendsState, patch);
     scheduleRender();
   };
 
-  const gameName = appid => (appid ? SE.run(() => SE.appStore().GetAppOverviewByAppID(appid).display_name) || '' : '');
+  const gameName = (appid) => (appid ? SE.run(() => SE.appStore().GetAppOverviewByAppID(appid).display_name) || '' : '');
 
   // Every friend with what the list shows: status, and what they're playing.
   const allFriends = () =>
@@ -220,4 +220,4 @@
   };
 
   Object.assign(ns, { friendGroups, friendsState, openControllerLayout, renderFriendsView, renderToolViews, setFriendsState, toggleSteamInput });
-});
+})(window.__se);

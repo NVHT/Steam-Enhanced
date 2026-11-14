@@ -1,6 +1,8 @@
-/* The hero: building it, the speed graph, stats, links and logo, and syncing it each pass. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedDownloadsParts;
+/*
+ * The hero: building it, the speed graph, stats, links and logo, and syncing it each pass.
+ */
+((SE) => {
+  const ns = window.__seDownloadsParts;
   if (!ns) return;
   const { COPY, ICON, ROW, SEL, STAT_ICON, findPause, logoURLs, mountedNodes, readTransfer, round, setAttr, setHidden, setText, textOf } = ns;
 
@@ -336,4 +338,4 @@
   }
 
   Object.assign(ns, { syncHero });
-});
+})(window.__se);

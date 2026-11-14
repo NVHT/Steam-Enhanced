@@ -1,4 +1,6 @@
-/* HowLongToBeat data and progress card for the Steam library game page. */
+/*
+ * HowLongToBeat data and progress card for the Steam library game page.
+ */
 (() => {
   const LOCAL_PLUGIN = 'hltb-for-steam';
   const STORE_PLUGIN = 'hltb-for-millennium';
@@ -70,7 +72,7 @@
     let activePlugin;
 
     async function requestHltb(plugin, appid, name, refresh = false) {
-      let result = await window.__steamEnhancedPluginRpc.call(
+      let result = await window.__sePluginRpc.call(
         plugin, 'GetHltbData', [appid, name || null, refresh]
       );
       for (let depth = 0; typeof result === 'string' && depth < 2; depth++) result = JSON.parse(result);
@@ -136,9 +138,9 @@
         return;
       }
       const cached = hltbResults.get(appid);
-      if ((!cached || cached.expires <= Date.now()) && window.__steamEnhancedPluginRpc) {
+      if ((!cached || cached.expires <= Date.now()) && window.__sePluginRpc) {
         const name = appStore?.()?.GetAppOverviewByAppID(appid)?.display_name ||
-          fromProps(c, 120, p => p.overview?.display_name || p.appOverview?.display_name);
+          fromProps(c, 120, (p) => p.overview?.display_name || p.appOverview?.display_name);
         loadHltb(appid, name);
       }
       const times = [
@@ -180,6 +182,6 @@
     };
   }
 
-  window.__steamEnhancedHltb = { createCard, widgetSelector: WIDGET };
+  window.__seHltb = { createCard, widgetSelector: WIDGET };
   dispatchEvent(new Event('se-hltb-ready'));
 })();

@@ -1,6 +1,8 @@
-/* The account menu: online status, Do Not Disturb, profile rename, the avatar section. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSteamMenuParts;
+/*
+ * The account menu: online status, Do Not Disturb, profile rename, the avatar section.
+ */
+((SE) => {
+  const ns = window.__seSteamMenuParts;
   if (!ns) return;
   const { C, owners } = SE;
   const {
@@ -314,4 +316,4 @@
     avatarLayouts.set(node, obs);
   }
   Object.assign(ns, { AccountStatusMenu, initializeAvatarMenu });
-});
+})(window.__se);

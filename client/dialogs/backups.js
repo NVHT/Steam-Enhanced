@@ -21,9 +21,9 @@
  *
  * Big Picture (.GamepadMode) keeps Steam's dialogs.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedBackups?.destroy();
-  window.__steamEnhancedRestoreBackup?.destroy(); // the Restore-only module this replaces
+((SE) => {
+  window.__seBackups?.destroy();
+  window.__seRestoreBackup?.destroy(); // the Restore-only module this replaces
 
   /* BackupAppsDialog CSS module (sp.js 32609) */
   const C = {
@@ -54,19 +54,9 @@
     game: '<rect class="d" x="3" y="7" width="18" height="11" rx="4"/><rect x="3" y="7" width="18" height="11" rx="4"/><path d="M7.5 11v3M6 12.5h3M15.5 12h.01M17.5 13.5h.01"/>',
   };
 
-  const views = new Set();
-  const viewOf = new WeakMap();
-
   /* ---------- Helpers ---------- */
 
-  const attempt = (fn, fallback) => {
-    try {
-      return fn();
-    } catch (err) {
-      console.warn('[Steam Enhanced] Backups:', err);
-      return fallback;
-    }
-  };
+  const attempt = SE.attempt('Backups');
 
   const { el } = SE;
 
@@ -78,14 +68,14 @@
   const isOurs = SE.inside(`.${OURS}`);
 
   /* "D:\Backups\Portal 2\" to { name: "Portal 2", parent: "D:\Backups\" } */
-  const splitFolder = path => {
+  const splitFolder = (path) => {
     const bare = String(path ?? '').trim().replace(/[\\/]+$/, '');
     const cut = Math.max(bare.lastIndexOf('\\'), bare.lastIndexOf('/')) + 1;
     return { name: bare.slice(cut) || bare, parent: bare.slice(0, cut) };
   };
 
   /* Bytes as Steam shows sizes: 1 decimal from GB down, none for bytes */
-  const formatBytes = value => {
+  const formatBytes = (value) => {
     const bytes = Number(value);
     if (!Number.isFinite(bytes) || bytes < 0) return '';
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -117,7 +107,7 @@
   /* ---------- Reading Steam's state ---------- */
 
   /* The dialog's class instance ({ state, props }) and which dialog it is */
-  const readInstance = root => {
+  const readInstance = (root) => {
     for (let fiber = SE.fiber?.(root), depth = 0; fiber && depth < MAX_DEPTH; fiber = fiber.return, depth++) {
       const instance = fiber.stateNode;
       const state = instance?.state;
@@ -133,17 +123,17 @@
     for (const win of SE.owners?.() ?? [window]) {
       try {
         if (win.appStore?.GetAppOverviewByAppID) return win;
-      } catch (_) {}
+      } catch {}
     }
     return null;
   };
 
-  const overviewOf = appid => attempt(() => storeWindow()?.appStore.GetAppOverviewByAppID(appid), null);
+  const overviewOf = (appid) => attempt(() => storeWindow()?.appStore.GetAppOverviewByAppID(appid), null);
 
-  const appName = appid => overviewOf(appid)?.display_name || `App ${appid}`;
+  const appName = (appid) => overviewOf(appid)?.display_name || `App ${appid}`;
 
   /* Game names from Restore's strName: an array, or a string Steam joined */
-  const gameNames = value => {
+  const gameNames = (value) => {
     const list = Array.isArray(value) ? value : String(value ?? '').split(/\s*[\n;]\s*/);
     return [...new Set(list.map(name => String(name ?? '').trim()).filter(Boolean))];
   };
@@ -165,7 +155,7 @@
     face.append(glyph, text);
     content.prepend(face);
 
-    const onClick = event => {
+    const onClick = (event) => {
       if (!browse || event.target.closest(C.browse) || browse.disabled) return;
       browse.click();
     };
@@ -216,12 +206,12 @@
   const createView = (root, kind) => {
     const cleanups = [];
     const nodes = [];
-    let frame = 0;
     let card = null;
 
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
+    // Steps swap child lists; progress moves the bar's inline width; names change as text
+    const change = SE.onChange(root, update, { attributes: ['style'], characterData: true, ignore: isOurs });
+    const { schedule } = change;
+    cleanups.push(change.disconnect);
 
     const syncCard = (hint, folder) => {
       const content = root.querySelector(C.content);
@@ -251,7 +241,7 @@
 
     nodes.push(apps, meta, found);
 
-    const updateBackup = instance => {
+    const updateBackup = (instance) => {
       const { state, props } = instance;
       const step = STEPS[state.eStep] ?? 'choose';
       SE.attr(root, STEP, step);
@@ -289,7 +279,7 @@
       }
     };
 
-    const updateRestore = instance => {
+    const updateRestore = (instance) => {
       const { state } = instance;
       SE.attr(root, PICKED, state.strFolder ? '' : null);
       syncCard('Pick the folder that holds the backup’s sku.sis file', state.strFolder);
@@ -307,21 +297,11 @@
     };
 
     function update() {
-      frame = 0;
       const current = attempt(() => readInstance(root), null);
       if (!current) return;
       if (kind === 'backup') attempt(() => updateBackup(current.instance));
       else attempt(() => updateRestore(current.instance));
     }
-
-    // Steps swap child lists; progress moves the bar's inline width; names change as text
-    const observer = new MutationObserver(records => {
-      if (records.some(record => !isOurs(record.target) && !(record.type === 'childList' && [...record.addedNodes, ...record.removedNodes].every(isOurs)))) {
-        schedule();
-      }
-    });
-    observer.observe(root, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['style'] });
-    cleanups.push(() => observer.disconnect());
 
     SE.mark(root, KIND, kind);
     update();
@@ -329,41 +309,31 @@
     return {
       root,
       destroy() {
-        if (frame) cancelAnimationFrame(frame);
         for (const fn of cleanups.splice(0)) attempt(fn);
         card?.destroy();
         for (const node of nodes) node.remove();
         for (const name of [KIND, STEP, PICKED]) SE.unmark(root, name);
-        views.delete(this);
-        viewOf.delete(root);
       },
     };
   };
 
   /* ---------- Lifecycle ---------- */
 
-  const scan = () => {
-    for (const view of [...views]) if (!view.root.isConnected) view.destroy();
-    for (const root of document.querySelectorAll(C.root)) {
-      if (viewOf.has(root) || root.closest('.GamepadMode')) continue;
+  const mounted = SE.mount(
+    'Backups',
+    () => [...document.querySelectorAll(C.root)].filter(root => !root.closest('.GamepadMode')),
+    (root) => {
       const found = attempt(() => readInstance(root), null);
-      if (!found) continue;
-      const view = attempt(() => createView(root, found.kind), null);
-      if (!view) continue;
-      views.add(view);
-      viewOf.set(root, view);
-    }
-  };
+      return found ? createView(root, found.kind) : null;
+    },
+    { throttle: 100, scope: C.root, ignore: isOurs }
+  );
 
-  const watcher = SE.watch(scan, { throttle: 100, scope: C.root, ignore: isOurs });
-  scan();
-
-  window.__steamEnhancedBackups = {
+  window.__seBackups = {
     destroy() {
-      watcher.disconnect();
-      for (const view of [...views]) view.destroy();
+      mounted.destroy();
       document.querySelectorAll(`.${OURS}`).forEach(node => node.remove());
-      delete window.__steamEnhancedBackups;
+      delete window.__seBackups;
     },
   };
-});
+})(window.__se);

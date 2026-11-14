@@ -7,7 +7,7 @@
  * account menu when the vertical rail is active.
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
- * window.__steamEnhancedSteamMenuParts (values parts reassign live on its `live`). Not strict
+ * window.__seSteamMenuParts (values parts reassign live on its `live`). Not strict
  * mode on purpose: patching writes to Steam's own menu objects (options, anchor, Show/TakeFocus,
  * CreateContextMenuInstance), some of which can be read-only, and such a write must be skipped,
  * not throw and leave a menu half-patched.
@@ -22,8 +22,8 @@
  * - patch.js      patching Steam's menu instances, start()
  * - main.js       the API (destroy()) and the start
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = (window.__steamEnhancedSteamMenuParts = { live: {} });
+((SE) => {
+  const ns = (window.__seSteamMenuParts = { live: {} });
   const { C } = SE;
   const { live } = ns;
   live.renameDialogOpener = undefined;
@@ -41,7 +41,7 @@
   live.timer = undefined;
   live.popupPoll = undefined;
 
-  window.__steamEnhancedSteamMenu?.destroy();
+  window.__seSteamMenu?.destroy();
 
   const ROOT_BTN_SELECTOR = `.${C.RootMenuBar} .${C.RootMenuButton}`;
   const SUBMENU_NAMES = ['View', 'Friends', 'Games', 'Help'];
@@ -62,4 +62,4 @@
     ROOT_BTN_SELECTOR, SIDE_HOVER, SUBMENU_NAMES, avatarLayouts, hoverDocuments, movedGroups,
     patched, popupObservers, sideButtons, sidebarManagers,
   });
-});
+})(window.__se);

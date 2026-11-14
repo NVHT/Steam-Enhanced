@@ -3,8 +3,8 @@
  *
  * Part of client/dialogs/system-report/ (see shared.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSystemReportParts;
+((SE) => {
+  const ns = window.__seSystemReportParts;
   if (!ns) return;
   const { ACRONYM, CATEGORIES, OTHER, PLACEHOLDER, clean } = ns;
 
@@ -12,7 +12,7 @@
    * "ComputerManufacturer" -> "Computer manufacturer", "CPUFamily" -> "CPU family", "IsLaptop" ->
    * "Laptop". Keys that aren't identifiers (paths, device names) stay as written.
    */
-  const humanize = key => {
+  const humanize = (key) => {
     if (!/^[A-Za-z][\w.]*$/.test(String(key))) return String(key);
     const words = String(key)
       .replace(/[_.]+/g, ' ')
@@ -31,7 +31,7 @@
    * [$PLATFORM] conditionals (skipped). Backslashes are literal (paths), except \" that doesn't end
    * a token. Tolerant: returns what parsed before any error, and where the error was.
    */
-  const parseKV = text => {
+  const parseKV = (text) => {
     const n = text.length;
     let i = 0;
 
@@ -79,7 +79,7 @@
       return { type: 's', value: text.slice(start, i) };
     };
 
-    const list = depth => {
+    const list = (depth) => {
       const out = [];
       for (;;) {
         const key = token();
@@ -105,7 +105,7 @@
 
     // On an error the partial tree still holds every entry read up to it
     const root = { key: '', children: [] };
-    const read = depth => {
+    const read = (depth) => {
       const out = [];
       for (;;) {
         const key = token();
@@ -132,19 +132,19 @@
     }
   };
 
-  const isBlock = node => Array.isArray(node.children);
-  const leafCount = node => (isBlock(node) ? node.children.reduce((sum, child) => sum + leafCount(child), 0) : 1);
+  const isBlock = (node) => Array.isArray(node.children);
+  const leafCount = (node) => (isBlock(node) ? node.children.reduce((sum, child) => sum + leafCount(child), 0) : 1);
 
   /* ---------- Model ---------- */
 
-  const categoryOf = key => CATEGORIES.find(cat => cat.test.test(key)) ?? null;
+  const categoryOf = (key) => CATEGORIES.find(cat => cat.test.test(key)) ?? null;
 
   /*
    * Report tree to sections: root values grouped by category (a key no rule claims joins the one
    * before it), each root block its own section. A single wrapping block ("systemreport") is
    * unwrapped first.
    */
-  const toSections = root => {
+  const toSections = (root) => {
     let top = root.children;
     while (top.length === 1 && isBlock(top[0])) top = top[0].children;
 
@@ -186,19 +186,19 @@
     return map;
   };
 
-  const gb = mb => {
+  const gb = (mb) => {
     const value = Number(mb) / 1024;
     if (!Number.isFinite(value) || value <= 0) return '';
     return `${value >= 10 ? Math.round(value) : Number(value.toFixed(1))} GB`;
   };
 
-  const ghz = mhz => {
+  const ghz = (mhz) => {
     const value = Number(mhz) / 1000;
     return Number.isFinite(value) && value > 0 ? `${value.toFixed(2)} GHz` : '';
   };
 
   /* "AMD Ryzen 7 9800X3D 8-Core Processor" -> "AMD Ryzen 7 9800X3D"; trademarks and clocks go */
-  const tidyCPU = name =>
+  const tidyCPU = (name) =>
     clean(
       name
         .replace(/\((?:R|TM|C)\)|[®™]/gi, '')
@@ -210,7 +210,7 @@
   const join = (...parts) => parts.filter(Boolean).join(' · ');
 
   /* Headline facts by well-known keys; a tile whose value isn't in the report is left out */
-  const summarise = values => {
+  const summarise = (values) => {
     const pick = (...keys) => keys.map(key => values.get(key.toLowerCase())).find(value => value && !PLACEHOLDER.test(value)) ?? '';
     const cpuName = pick('CPUBrand', 'CPUName', 'ProcessorName', 'CPU');
     const cores = pick('PhysicalProcessors', 'PhysicalCores', 'NumCores');
@@ -244,8 +244,8 @@
         : [`${indent}${node.key}: ${clean(node.value)}`],
     );
 
-  const sectionText = section => [section.title, ...entryLines(section.entries, '  ')].join('\n');
+  const sectionText = (section) => [section.title, ...entryLines(section.entries, '  ')].join('\n');
   Object.assign(ns, {
     humanize, indexValues, isBlock, leafCount, parseKV, sectionText, summarise, toSections,
   });
-});
+})(window.__se);

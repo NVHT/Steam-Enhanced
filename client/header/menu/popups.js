@@ -1,6 +1,8 @@
-/* Watching menu popups and patching the sidebar's own menu managers. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSteamMenuParts;
+/*
+ * Watching menu popups and patching the sidebar's own menu managers.
+ */
+((SE) => {
+  const ns = window.__seSteamMenuParts;
   if (!ns) return;
   const { C, owners } = SE;
   const {
@@ -43,7 +45,7 @@
             popupObservers.set(doc, obs);
           }
           placeGroup(doc);
-        } catch (_) {}
+        } catch {}
       }
     }
 
@@ -158,4 +160,4 @@
   Object.assign(ns, {
     bindManager, inspectPopups, instanceManager, isSteam, patchSidebarMenus, restorePopups,
   });
-});
+})(window.__se);

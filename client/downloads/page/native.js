@@ -1,6 +1,8 @@
-/* The native Library switch: opens Steam's own Library list beside the page when it can. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedDownloadsParts;
+/*
+ * The native Library switch: opens Steam's own Library list beside the page when it can.
+ */
+((SE) => {
+  const ns = window.__seDownloadsParts;
   if (!ns) return;
   const { live } = ns;
 
@@ -62,4 +64,4 @@
   }
 
   Object.assign(ns, { enableNativeLibrary });
-});
+})(window.__se);

@@ -2,8 +2,8 @@
  * Game Details page: helpers every part shares (owned nodes, formatters, popup placement,
  * Steam client lookup) and the frame pass that runs every step (index.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = (window.__steamEnhancedGamePageParts = { live: {} });
+((SE) => {
+  const ns = (window.__seGamePageParts = { live: {} });
 
   /*
    * Class names of everything this module inserts. destroy() finds the nodes by class, so
@@ -33,7 +33,7 @@
     try {
       if (!formatters.has(key)) formatters.set(key, new Intl.DateTimeFormat(undefined, opts));
       return formatters.get(key).format(new Date(rt * 1000));
-    } catch (_) {
+    } catch {
       return '';
     }
   };
@@ -90,4 +90,4 @@
     cancelPass, day, drop, formatTime, own, ownClasses, parseCount, placePopup, schedule, setPass,
     sharedParent, srcOf, steamClient, when,
   });
-});
+})(window.__se);

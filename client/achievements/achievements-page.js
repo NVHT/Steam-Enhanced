@@ -7,13 +7,10 @@
  * SE.rarity.fx layer (sparkles and the tier's initial). Styles: core/achievement-tiers.css and
  * client/achievements/achievements-page.css. Spoiler-covered hidden achievements stay plain.
  */
-(window.__se
-  ? (init) => init(window.__se)
-  : (init) => addEventListener('se-core', () => init(window.__se), { once: true })
-)((SE) => {
+((SE) => {
   const { C, mark, unmark, fromProps } = SE;
   const { tierOf, fx } = SE.rarity;
-  window.__steamEnhancedAchievementsPage?.destroy();
+  window.__seAchievementsPage?.destroy();
 
   const TABLE = `.${C.AchievementsTable}`;
   const ICON = `${TABLE} .${C.HiddenLabel_AchievementIconWrapper}`;
@@ -48,7 +45,7 @@
     for (const el of document.querySelectorAll(ICON)) {
       try {
         decorate(el);
-      } catch (_) {}
+      } catch {}
     }
   }
 
@@ -60,7 +57,7 @@
   });
   update();
 
-  window.__steamEnhancedAchievementsPage = {
+  window.__seAchievementsPage = {
     destroy() {
       observer.disconnect();
       for (const el of document.querySelectorAll(`${TABLE} .${FX}`)) el.remove();
@@ -71,4 +68,4 @@
       }
     },
   };
-});
+})(window.__se);

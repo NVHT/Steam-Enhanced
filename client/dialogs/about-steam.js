@@ -23,8 +23,8 @@
  * Tooltips are Steam's own React tooltip (core/native-tooltips.js, from this window or the main
  * one), retried until webpack has it; `title` stands in only if it never turns up.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedAboutSteam?.destroy();
+((SE) => {
+  window.__seAboutSteam?.destroy();
 
   const DIALOG = '.DialogContent.FFIKUQ7BGKw6vO1voazlr';
   const HEADER = '._3QhXBKJwISpG-AmpbOQgLQ';
@@ -76,14 +76,7 @@
 
   /* ---------- Steam and storage access ---------- */
 
-  const attempt = (fn, fallback) => {
-    try {
-      return fn();
-    } catch (err) {
-      console.warn('[Steam Enhanced] About Steam:', err);
-      return fallback;
-    }
-  };
+  const attempt = SE.attempt('About Steam');
 
   /** A bound SteamClient method, or null when this client doesn't have it. */
   const steamFn = (namespace, method) => {
@@ -96,14 +89,14 @@
 
   const bringMainToFront = () => attempt(() => SE.mainWindow?.()?.BrowserWindow?.SteamClient?.Window?.BringToFront?.());
 
-  const openSettings = page => {
+  const openSettings = (page) => {
     const nav = steamNavigator();
     if (typeof nav?.Settings === 'function' && attempt(() => (nav.Settings(page), true), false)) return true;
     return openLink(`steam://open/settings/${page.toLowerCase()}`);
   };
 
   /** A Steam news post in the client's event overlay, else the client's store view, else a link. */
-  const openNewsPost = post => {
+  const openNewsPost = (post) => {
     const nav = steamNavigator();
     if (post?.gid && typeof nav?.Home === 'function' &&
         attempt(() => (nav.Home({ partnerEvent: { appid: STEAM_NEWS_APP, gid: post.gid } }), true), false)) {
@@ -117,7 +110,7 @@
     return openLink(post?.url ?? LINKS.steamNews);
   };
 
-  const openLink = url => {
+  const openLink = (url) => {
     const execute = steamFn('URL', 'ExecuteSteamURL');
     if (execute) return attempt(() => (execute(url.startsWith('steam://') ? url : `steam://openurl/${url}`), true), false);
     if (url.startsWith('steam://')) return false;
@@ -126,12 +119,12 @@
   };
 
   const store = {
-    get: key => attempt(() => localStorage.getItem(key), null),
+    get: (key) => attempt(() => localStorage.getItem(key), null),
     set: (key, value) => attempt(() => localStorage.setItem(key, value)),
   };
 
   /** Steam's updater store, built by the main window the first time anything asks for updates. */
-  const updater = () => SE.global('UpdateStore', s => !!s?.m_updater)?.m_updater ?? null;
+  const updater = () => SE.global('UpdateStore', (s) => !!s?.m_updater)?.m_updater ?? null;
 
   const readUpdateState = () => {
     const u = updater();
@@ -158,7 +151,7 @@
     for (const win of SE.owners?.() ?? [window]) {
       try {
         if (win.SteamUIStore && typeof win.fetch === 'function') return win.fetch.bind(win);
-      } catch (_) {}
+      } catch {}
     }
     return window.fetch.bind(window);
   };
@@ -203,7 +196,7 @@
   const BB_BLOCK = new Set(['h1', 'h2', 'h3', 'p', 'list', 'olist', '*', 'quote', 'hr', 'table', 'tr', ...BB_MEDIA]);
 
   /* [url=x], [url="x"] and [url href="x"] all name the link */
-  const bbHref = arg => {
+  const bbHref = (arg) => {
     const raw = (arg || '').trim();
     const quoted = raw.match(/(?:^|\s)href\s*=\s*"([^"]*)"/i)?.[1] ?? raw.replace(/^=?\s*["']?|["']$/g, '');
     return /^https?:\/\//i.test(quoted) ? quoted : '';
@@ -215,14 +208,14 @@
     let skip = 0; // depth inside media tags
     const top = () => stack[stack.length - 1];
     const inList = () => /^(?:ul|ol)$/i.test(top().node.tagName || '');
-    const text = chunk => {
+    const text = (chunk) => {
       if (skip || !chunk || (inList() && !chunk.trim())) return;
       chunk.split('\n').forEach((line, i) => {
         if (i && !inList()) top().node.append(document.createElement('br'));
         if (line) top().node.append(line);
       });
     };
-    const close = tag => {
+    const close = (tag) => {
       const index = stack.map(entry => entry.tag).lastIndexOf(tag);
       if (index > 0) stack.length = index;
     };
@@ -268,7 +261,7 @@
         const href = bbHref(arg);
         if (href) {
           node.href = href;
-          node.addEventListener('click', event => {
+          node.addEventListener('click', (event) => {
             event.preventDefault();
             onLink(href);
           });
@@ -283,13 +276,13 @@
     return root;
   };
 
-  const formatDay = time =>
+  const formatDay = (time) =>
     time ? new Date(time).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '';
 
   /* ---------- Facts ---------- */
 
   /* Each fact is a label span followed by loose text up to the next <br>. */
-  const readFacts = body => {
+  const readFacts = (body) => {
     const facts = [];
     let current = null;
     for (const node of body.childNodes) {
@@ -318,7 +311,7 @@
     version: /version/i,
   };
 
-  const classifyFacts = facts => {
+  const classifyFacts = (facts) => {
     const byKey = {};
     const rest = [];
     for (const fact of facts) {
@@ -332,7 +325,7 @@
   };
 
   /* "Wed, Oct 21, 2026 4:11 PM UTC -07:00" -> { main: "Oct 21, 2026", sub: "4:11 PM", time: ms } */
-  const splitDate = value => {
+  const splitDate = (value) => {
     const match = value.match(/^(?:[^\d,]+,\s*)?(.*?\d{4})\s+(.+?)(?:\s+UTC.*)?$/);
     const iso = value
       .replace(/^[^\d,]+,\s*/, '')
@@ -342,14 +335,14 @@
   };
 
   /* English labels get the short form the layout was drawn for; other languages keep Steam's. */
-  const heroLabel = label => (/^steam client version$/i.test(label) ? 'Steam version' : label);
+  const heroLabel = (label) => (/^steam client version$/i.test(label) ? 'Steam version' : label);
   const TILE_LABELS = { 'client build date': 'Client build', 'web build date': 'Web build', 'beta branch': 'Branch' };
-  const tileLabel = label => {
+  const tileLabel = (label) => {
     const short = label.replace(/^Steam\s+/i, '');
     return TILE_LABELS[short.toLowerCase()] ?? short;
   };
 
-  const ago = seconds => {
+  const ago = (seconds) => {
     if (seconds < 45) return 'just now';
     const min = Math.round(seconds / 60);
     if (min < 60) return `${min} min ago`;
@@ -363,7 +356,7 @@
     return `${Math.round(day / 365)} yr ago`;
   };
 
-  const buildAge = time => {
+  const buildAge = (time) => {
     if (time == null) return '';
     const seconds = Math.max(0, (Date.now() - time) / 1000);
     return seconds < 86400 ? 'Today' : ago(seconds);
@@ -375,38 +368,15 @@
 
   /* The skin's own manifest is the source of the version: read once, when the dialog first opens. */
   const loadThemeVersion = () =>
-    (versionRequest ||= (async () => {
-      const asset = [...document.querySelectorAll('link[href], script[src]')]
-        .map(node => node.href || node.src)
-        .find(url => /\/core\/(?:tokens\.css|core\.js)(?:[?#]|$)/.test(url));
-      if (!asset) return;
-      try {
-        const response = await fetch(new URL('../skin.json', asset), { cache: 'no-store' });
-        const version = (await response.json())?.version;
-        if (typeof version === 'string' && version) themeVersion = version;
-      } catch (_) {}
+    (versionRequest ||= SE.themeVersion().then(version => {
+      if (version) themeVersion = version;
       for (const node of document.querySelectorAll('.se-about-theme-version')) node.textContent = versionText();
-    })());
+    }));
 
   /* ---------- DOM helpers ---------- */
 
-  const copyText = async text => {
-    try {
-      await navigator.clipboard.writeText(text);
-      return;
-    } catch (_) {}
-    const area = document.createElement('textarea');
-    area.value = text;
-    area.setAttribute('readonly', '');
-    area.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
-    document.body.append(area);
-    area.select();
-    document.execCommand('copy');
-    area.remove();
-  };
-
   // button -> { timer, hint, text }: each keeps its own original text, so quick clicks never stick.
-  const restoreFlash = button => {
+  const restoreFlash = (button) => {
     const flash = flashes.get(button);
     if (!flash) return;
     clearTimeout(flash.timer);
@@ -439,7 +409,7 @@
 
   /** Steam's React, ReactDOM and tooltip component, from this window or the main one. */
   const nativeTooltips = () =>
-    attempt(() => SE.global('__steamEnhancedNativeTooltips', api => typeof api?.resolve === 'function')?.resolve() ?? null, null);
+    attempt(() => SE.global('__seNativeTooltips', (api) => typeof api?.resolve === 'function')?.resolve() ?? null, null);
 
   /*
    * Steam's own tooltip on `node`, mounted into a hit box that covers it (as
@@ -505,7 +475,7 @@
     /* Hero: Steam's version, click to copy */
     const heroHint = el('span', 'se-about-hero-label', version ? heroLabel(version.label) : 'Steam version');
     const hero = button('se-about-hero', [heroHint, el('span', 'se-about-hero-value', version?.value ?? '')], () => {
-      copyText(version?.value ?? '');
+      SE.copy(version?.value ?? '');
       flash(hero, heroHint);
     });
     tip(hero, 'Click to copy');
@@ -612,7 +582,7 @@
           if (action.run()) flash(node, sub, 'Opening…');
           return;
         }
-        copyText(fact?.value ?? '');
+        SE.copy(fact?.value ?? '');
         flash(node, sub);
       });
       tip(node, action ? action.title : date && parts.sub ? `${parts.main} at ${parts.sub}` : 'Click to copy', 'top');
@@ -653,10 +623,10 @@
     const notesBody = el('div', 'se-about-notes-body');
     panel.append(bar, notesBody);
 
-    const showMessage = message => notesBody.replaceChildren(el('p', 'se-about-notes-message', message));
+    const showMessage = (message) => notesBody.replaceChildren(el('p', 'se-about-notes-message', message));
 
     /* Steam's title strip sits over the panel's bar and takes its clicks: hand them through while open */
-    const setNotesOpen = open => {
+    const setNotesOpen = (open) => {
       panel.hidden = !open;
       SE.attr(doc.documentElement, 'data-se-about-notes', open || null);
     };
@@ -694,13 +664,13 @@
     /* Copy all */
     const copyAllLabel = el('span', null, 'Copy all');
     const copyAll = button('se-about-copyall', [icon('copy'), copyAllLabel], () => {
-      copyText([`Steam Enhanced ${versionText()}`.trim(), ...facts.map(fact => `${fact.label}: ${fact.value}`)].join('\n'));
+      SE.copy([`Steam Enhanced ${versionText()}`.trim(), ...facts.map(fact => `${fact.label}: ${fact.value}`)].join('\n'));
       flash(copyAll, copyAllLabel);
     });
     tip(copyAll, 'Copy all (Ctrl+C)', 'top');
 
     /* Keys: Esc closes the notes, then the dialog; Ctrl+C with nothing selected copies all. */
-    listen(doc, 'keydown', event => {
+    listen(doc, 'keydown', (event) => {
       if (event.defaultPrevented) return;
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -735,6 +705,7 @@
     for (const node of nodes) node.classList.add('se-about');
 
     return {
+      dialog,
       nodes,
       destroy() {
         for (const fn of cleanups.splice(0)) attempt(fn);
@@ -749,7 +720,7 @@
 
   const viewOf = new WeakMap();
 
-  const build = dialog => {
+  const build = (dialog) => {
     const inner = dialog.querySelector(':scope > .DialogContent_InnerWidth');
     const header = inner?.querySelector(HEADER);
     const body = inner?.querySelector(BODY);
@@ -769,6 +740,7 @@
   };
 
   const scan = () => {
+    for (const view of [...views]) if (!view.dialog.isConnected) view.destroy();
     for (const dialog of document.querySelectorAll(DIALOG)) {
       const inner = dialog.querySelector(':scope > .DialogContent_InnerWidth');
       if (dialog.hasAttribute(BUILT) && inner?.querySelector(':scope > .se-about-hero')) continue;
@@ -776,17 +748,17 @@
     }
   };
 
-  const watcher = SE.watch(scan, { throttle: 100 });
+  const watcher = SE.watch(scan, { throttle: 100, scope: DIALOG });
   scan();
 
-  window.__steamEnhancedAboutSteam = {
+  window.__seAboutSteam = {
     destroy() {
       watcher.disconnect();
       for (const view of [...views]) view.destroy();
       for (const button of [...flashes.keys()]) restoreFlash(button);
       document.querySelectorAll('.se-about').forEach(node => node.remove());
       document.querySelectorAll(`[${BUILT}]`).forEach(node => SE.unmark(node, BUILT));
-      delete window.__steamEnhancedAboutSteam;
+      delete window.__seAboutSteam;
     },
   };
-});
+})(window.__se);

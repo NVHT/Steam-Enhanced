@@ -106,7 +106,7 @@ export default (dom) => {
     let entries = {};
     try {
       entries = JSON.parse(localStorage.getItem(key) ?? '{}') ?? {};
-    } catch (_) {}
+    } catch {}
     const now = Date.now();
     for (const [appid, entry] of Object.entries(entries)) {
       if (!entry || now - entry.at > (isHit(entry) ? TTL_MS : MISS_TTL_MS)) delete entries[appid];
@@ -117,7 +117,7 @@ export default (dom) => {
         entries[appid] = { ...entry, at: Date.now() };
         try {
           localStorage.setItem(key, JSON.stringify(entries));
-        } catch (_) {} // private mode / quota: the in-memory copy still serves this visit
+        } catch {} // private mode / quota: the in-memory copy still serves this visit
       },
     };
   };
@@ -153,7 +153,7 @@ export default (dom) => {
       const art = { logo: url(file(assets?.library_logo)), hero: url(file(assets?.library_hero)) };
       artCache.set(appid, art);
       return art;
-    } catch (_) {
+    } catch {
       return {}; // network/CSP failure: not cached, so the next visit retries
     }
   };
@@ -170,7 +170,7 @@ export default (dom) => {
       };
       detailsCache.set(appid, details);
       return details;
-    } catch (_) {
+    } catch {
       return {};
     }
   };
@@ -416,7 +416,7 @@ export default (dom) => {
       renderWish(slide);
       try {
         await wishlist.set(slide.appid, next);
-      } catch (_) {
+      } catch {
         wished.set(slide.appid, !next); // roll back
       } finally {
         heart.disabled = false;

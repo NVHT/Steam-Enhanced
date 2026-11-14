@@ -3,8 +3,8 @@
  *
  * Part of client/settings/dialog/ (see shared.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSettingsParts;
+((SE) => {
+  const ns = window.__seSettingsParts;
   if (!ns) return;
 
   // Pre-indexed English option labels for cross-page search before pages have been visited.
@@ -234,4 +234,4 @@
     ],
   };
   Object.assign(ns, { OPTIONS });
-});
+})(window.__se);

@@ -7,19 +7,19 @@
  * The text itself is left to React; a line without a colon (some languages) is left unsplit
  * and shows as written.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedHoverCards?.destroy();
+((SE) => {
+  window.__seHoverCards?.destroy();
 
   const PLAYTIME = '._1VGPO4xU5sgRK6DFt4t74O';
   const LINE = `${PLAYTIME} > div:not(.MIHa_O-B1JXrzkoGc255n)`;
   const SPLIT = /^(.*\S)\s*[:：]\s*(\S.*)$/s;
   const ATTRS = ['data-se-src', 'data-se-label', 'data-se-value'];
 
-  const clear = el => {
+  const clear = (el) => {
     for (const name of ATTRS) SE.unmark(el, name);
   };
 
-  const split = el => {
+  const split = (el) => {
     const text = el.textContent.trim();
     if (el.getAttribute('data-se-src') === text) return;
     const match = text.match(SPLIT);
@@ -39,7 +39,7 @@
   // Only mutations that add or touch a card's playtime block count: the main window's text
   // changes (download speeds, timers) would otherwise rescan the whole document every frame.
   const inPlaytime = SE.inside(PLAYTIME);
-  const touchesPlaytime = record =>
+  const touchesPlaytime = (record) =>
     inPlaytime(record.target) ||
     [...record.addedNodes].some(node => node.nodeType === 1 && (node.matches(PLAYTIME) || node.querySelector(PLAYTIME)));
 
@@ -47,10 +47,10 @@
   const watcher = SE.watch(records => records.some(touchesPlaytime) && scan(), { characterData: true, records: true });
   scan();
 
-  window.__steamEnhancedHoverCards = {
+  window.__seHoverCards = {
     destroy() {
       watcher?.disconnect();
       for (const el of document.querySelectorAll(`${LINE}[data-se-src]`)) clear(el);
     },
   };
-});
+})(window.__se);

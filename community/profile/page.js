@@ -28,12 +28,6 @@
  *
  * Classes are Steam's (SteamTracking: steamcommunity.com/public/css/skin_1/profilev2.css).
  */
-const versioned = (file) => {
-  const url = new URL(file, import.meta.url);
-  url.search = new URL(import.meta.url).search;
-  return url.href;
-};
-const { iconFor, duoIcon } = await import(versioned('../shared/icons.js'));
 
 const WIDE = '(min-width: 911px)';
 const COPIED_MS = 1400;
@@ -54,7 +48,8 @@ const toCssUrl = (url) => `url(${JSON.stringify(url)})`;
 const count = (text) => Number(String(text).replace(/[^\d]/g, '')) || 0;
 const capitalize = (text) => text.charAt(0).toLocaleUpperCase() + text.slice(1);
 
-export default (dom) => {
+export default async (dom) => {
+  const { iconFor, duoIcon } = await dom.importNear(import.meta.url, '../shared/icons.js');
   const $ = dom.scope();
   const { el, mark, unmark, squash, setText, setVar } = dom;
   const wide = window.matchMedia(WIDE);

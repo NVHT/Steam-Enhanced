@@ -2,8 +2,8 @@
  * Pickers for the tray columns (Favorites, What's New sources, Collections): reading and
  * saving the choice, the popup, its keyboard and placement.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedHomeStageParts;
+((SE) => {
+  const ns = window.__seHomeStageParts;
   if (!ns) return;
   const {
     appStore, collectionStore, hours, imgTag, onImgError, onImgLoad, schedule, userCollections,
@@ -51,7 +51,7 @@
     try {
       const v = JSON.parse(localStorage.getItem(key) || 'null');
       return Array.isArray(v) ? v.map(String) : null;
-    } catch (_) {
+    } catch {
       return null;
     }
   }
@@ -60,7 +60,7 @@
     try {
       if (ids) localStorage.setItem(key, JSON.stringify(ids));
       else localStorage.removeItem(key);
-    } catch (_) {}
+    } catch {}
   }
 
   function appById(id) {
@@ -325,4 +325,4 @@
     appById, closePick, collPicker, collectionApps, favPicker, hoursText, newsPicker, placePick,
     readPick, sorted, wideURLs,
   });
-});
+})(window.__se);

@@ -19,9 +19,9 @@
  */
 #se-entrance {
   --u: min(calc(100vw / 1920), calc(100vh / 1080));
-  --ent-line: rgba(124, 196, 255, .3);
-  --ent-line-soft: rgba(124, 196, 255, .18);
-  --ent-line-strong: rgba(124, 196, 255, .55);
+  --ent-line: var(--se-accent-line);
+  --ent-line-soft: color-mix(in srgb, var(--se-accent) 18%, transparent);
+  --ent-line-strong: var(--se-accent-strong);
   --ent-bg: #0f1115;
   position: fixed;
   inset: 0;
@@ -73,7 +73,7 @@
   display: flex;
   overflow: hidden;
   border-radius: calc(26 * var(--u));
-  box-shadow: inset 0 0 0 calc(2 * var(--u)) rgba(124, 196, 255, .28);
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) color-mix(in srgb, var(--se-accent) 28%, transparent);
 }
 
 /* A slow light sweeping across the frame */
@@ -81,7 +81,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(100deg, transparent 40%, rgba(124, 196, 255, .09) 50%, transparent 60%);
+  background: linear-gradient(100deg, transparent 40%, color-mix(in srgb, var(--se-accent) 9%, transparent) 50%, transparent 60%);
   animation: se-ent-sweep 5s linear infinite;
 }
 
@@ -156,7 +156,7 @@
   width: calc(44 * var(--u));
   height: calc(44 * var(--u));
   border-radius: calc(12 * var(--u));
-  background: rgba(124, 196, 255, .1);
+  background: color-mix(in srgb, var(--se-accent) 10%, transparent);
 }
 
 #se-entrance .se-ent-rail-on::before {
@@ -192,7 +192,7 @@
   width: calc(28 * var(--u));
   height: calc(28 * var(--u));
   border-radius: 50%;
-  background: conic-gradient(var(--se-accent) 64%, rgba(124, 196, 255, .2) 0);
+  background: conic-gradient(var(--se-accent) 64%, color-mix(in srgb, var(--se-accent) 20%, transparent) 0);
   -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 3 * var(--u)), #000 calc(100% - 3 * var(--u)));
   mask: radial-gradient(closest-side, transparent calc(100% - 3 * var(--u)), #000 calc(100% - 3 * var(--u)));
 }
@@ -250,8 +250,8 @@
   margin: calc(-6 * var(--u)) calc(-10 * var(--u));
   padding: 0 calc(10 * var(--u));
   border-radius: calc(10 * var(--u));
-  background: rgba(124, 196, 255, .1);
-  box-shadow: inset 0 0 0 calc(2 * var(--u)) rgba(124, 196, 255, .35);
+  background: color-mix(in srgb, var(--se-accent) 10%, transparent);
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) color-mix(in srgb, var(--se-accent) 35%, transparent);
 }
 
 #se-entrance .se-ent-row[data-sel]::before {
@@ -270,7 +270,7 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 calc(2 * var(--u)) rgba(124, 196, 255, .75), 0 0 calc(24 * var(--u)) calc(-6 * var(--u)) rgba(124, 196, 255, .6);
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) color-mix(in srgb, var(--se-accent) 75%, transparent), 0 0 calc(24 * var(--u)) calc(-6 * var(--u)) color-mix(in srgb, var(--se-accent) 60%, transparent);
   opacity: 0;
   animation: se-ent-pulse 3s ease-in-out infinite;
 }
@@ -311,7 +311,7 @@
   left: calc(36 * var(--u));
   height: calc(2 * var(--u));
   overflow: hidden;
-  background: rgba(124, 196, 255, .15);
+  background: color-mix(in srgb, var(--se-accent) 15%, transparent);
 }
 
 #se-entrance .se-ent-dlbar::after {
@@ -353,7 +353,7 @@
 
 #se-entrance .se-ent-tray > b {
   border-radius: calc(16 * var(--u));
-  box-shadow: inset 0 0 0 calc(2 * var(--u)) rgba(124, 196, 255, .2);
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) color-mix(in srgb, var(--se-accent) 20%, transparent);
 }
 
 /* Friends */
@@ -448,7 +448,7 @@
 #se-entrance .se-ent-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(calc(420 * var(--u)) calc(360 * var(--u)) at 50% 37%, rgba(124, 196, 255, .18), rgba(124, 196, 255, 0) 70%);
+  background: radial-gradient(calc(420 * var(--u)) calc(360 * var(--u)) at 50% 37%, color-mix(in srgb, var(--se-accent) 18%, transparent), color-mix(in srgb, var(--se-accent) 0%, transparent) 70%);
   animation: se-ent-glow 4s ease-in-out infinite;
 }
 
@@ -466,7 +466,7 @@
   align-items: center;
   gap: calc(30 * var(--u));
   translate: -50% -50%;
-  transition: scale .5s cubic-bezier(.4, 0, .2, 1);
+  transition: scale var(--se-dur-slower) cubic-bezier(.4, 0, .2, 1);
 }
 
 #se-entrance[data-phase="leave"] .se-ent-centre {
@@ -481,7 +481,7 @@
   border-radius: calc(48 * var(--u));
   background: linear-gradient(160deg, #2a313b, #171b21);
   box-shadow:
-    inset 0 calc(1 * var(--u)) 0 rgba(255, 255, 255, .07),
+    inset 0 calc(1 * var(--u)) 0 var(--se-white-07),
     0 calc(30 * var(--u)) calc(70 * var(--u)) calc(-20 * var(--u)) rgba(0, 0, 0, .95);
   animation: se-ent-float 6s ease-in-out infinite;
 }
@@ -500,11 +500,11 @@
 }
 
 #se-entrance .se-ent-track {
-  box-shadow: inset 0 0 0 calc(5 * var(--u)) rgba(255, 255, 255, .06);
+  box-shadow: inset 0 0 0 calc(5 * var(--u)) var(--se-hairline);
 }
 
 #se-entrance .se-ent-ring {
-  background: conic-gradient(from 0deg, transparent 0 50%, rgba(124, 196, 255, .1) 62%, rgba(124, 196, 255, .5) 86%, var(--se-accent) 99%, transparent 100%);
+  background: conic-gradient(from 0deg, transparent 0 50%, color-mix(in srgb, var(--se-accent) 10%, transparent) 62%, color-mix(in srgb, var(--se-accent) 50%, transparent) 86%, var(--se-accent) 99%, transparent 100%);
   -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5 * var(--u)), #000 calc(100% - 4.5 * var(--u)));
   mask: radial-gradient(farthest-side, transparent calc(100% - 5 * var(--u)), #000 calc(100% - 4.5 * var(--u)));
   animation: se-ent-spin 1.4s linear infinite;
@@ -514,7 +514,7 @@
 /* Ready: the sweep gives way to a whole ring */
 #se-entrance .se-ent-tile::after {
   content: "";
-  box-shadow: inset 0 0 0 calc(4.5 * var(--u)) var(--se-accent), 0 0 calc(24 * var(--u)) calc(-4 * var(--u)) rgba(124, 196, 255, .55);
+  box-shadow: inset 0 0 0 calc(4.5 * var(--u)) var(--se-accent), 0 0 calc(24 * var(--u)) calc(-4 * var(--u)) var(--se-accent-strong);
   opacity: 0;
   transition: opacity .4s;
 }
@@ -578,7 +578,7 @@
 }
 
 #se-entrance .se-ent-title {
-  color: #fff;
+  color: var(--se-text-strong);
   font: 400 calc(84 * var(--u)) / 1 var(--se-font);
   letter-spacing: -.02em;
 }
@@ -597,7 +597,7 @@
   height: calc(6 * var(--u));
   overflow: hidden;
   border-radius: calc(3 * var(--u));
-  background: rgba(124, 196, 255, .12);
+  background: color-mix(in srgb, var(--se-accent) 12%, transparent);
 }
 
 #se-entrance .se-ent-bar > span {

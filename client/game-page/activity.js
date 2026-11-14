@@ -2,8 +2,8 @@
  * Activity feed: the emoticon dot, screenshot carousels with their comments and viewer,
  * event avatars, the news link and the rating / award pills.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedGamePageParts;
+((SE) => {
+  const ns = window.__seGamePageParts;
   if (!ns) return;
   const { drop, emptyOf, formatTime, frState, own, schedule, srcOf } = ns;
   const { live } = ns;
@@ -237,7 +237,7 @@
     const appid = fromProps(car, 10, (p) => p.event?.appid || undefined);
     try {
       return (appid && SE.appStore()?.GetAppOverviewByAppID(appid)?.display_name) || '';
-    } catch (_) {
+    } catch {
       return '';
     }
   }
@@ -610,7 +610,7 @@
           // Steam fills the bar on hover; a stand-in event wakes it once without a real pointer.
           try {
             fn({ type: 'mouseenter', target: n, currentTarget: n, preventDefault() {}, stopPropagation() {} });
-          } catch (_) {}
+          } catch {}
           break;
         }
       }
@@ -642,4 +642,4 @@
     onCommentPill, onEmoClick, placeEmoDot, placeFeedEvents, placeFeedShots, placeNewsLink,
     placeRatings,
   });
-});
+})(window.__se);

@@ -19,8 +19,8 @@
  * Identifiers (IP address, MAC and disk serial hashes) are blurred until clicked and left out of
  * Copy specs, so the specs can be pasted anywhere.
  */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
-  window.__steamEnhancedSystemInfo?.destroy();
+((SE) => {
+  window.__seSystemInfo?.destroy();
 
   const ROOT = '._3v2Gg_GCpLHpHQDLFQ7cvI.hYVp3sXyS0uYfJnzVoK-m';
   const SECTION = '.RRhNQ2haTbK9z71YoH2R3';
@@ -96,16 +96,9 @@
 
   /* ---------- Helpers ---------- */
 
-  const attempt = (fn, fallback) => {
-    try {
-      return fn();
-    } catch (err) {
-      console.warn('[Steam Enhanced] System Information:', err);
-      return fallback;
-    }
-  };
+  const attempt = SE.attempt('System Information');
 
-  const clean = text => String(text ?? '').replace(/\s+/g, ' ').trim();
+  const clean = (text) => String(text ?? '').replace(/\s+/g, ' ').trim();
 
   const { el } = SE;
 
@@ -120,27 +113,12 @@
     return node;
   };
 
-  const copyText = async text => {
-    try {
-      await navigator.clipboard.writeText(text);
-      return;
-    } catch (_) {}
-    const area = document.createElement('textarea');
-    area.value = text;
-    area.setAttribute('readonly', '');
-    area.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
-    document.body.append(area);
-    area.select();
-    document.execCommand('copy');
-    area.remove();
-  };
-
   /* ---------- Reading Steam's sections ---------- */
 
-  const keyOf = name => (typeof name === 'string' ? name.replace(KEY_PREFIX, '') : '');
+  const keyOf = (name) => (typeof name === 'string' ? name.replace(KEY_PREFIX, '') : '');
 
   /* Literal arguments of a survey entry; `#` arguments are localisation tokens, not text. */
-  const argsOf = entry =>
+  const argsOf = (entry) =>
     (Array.isArray(entry?.vecArgs) ? entry.vecArgs : [])
       .map(arg => clean(arg))
       .filter(arg => arg && !arg.startsWith('#'));
@@ -162,9 +140,9 @@
     return match ? { label: match[1].trim(), value: match[2].trim() } : { label: '', value: text };
   };
 
-  const readSection = node => {
+  const readSection = (node) => {
     const heading = node.querySelector(':scope > h3');
-    const data = SE.fromProps?.(node, 8, props => props.surveyData) ?? null;
+    const data = SE.fromProps?.(node, 8, (props) => props.surveyData) ?? null;
     const entries = Array.isArray(data?.vecEntries) ? data.vecEntries : [];
     const rows = [...node.children]
       .filter(child => child !== heading)
@@ -182,23 +160,23 @@
     return { key: keyOf(data?.strSectionName), title, rows };
   };
 
-  const readSections = root => [...root.querySelectorAll(SECTION)].map(readSection).filter(section => section.title || section.rows.length);
+  const readSections = (root) => [...root.querySelectorAll(SECTION)].map(readSection).filter(section => section.title || section.rows.length);
 
   /* ---------- Summary ---------- */
 
-  const gb = mb => {
+  const gb = (mb) => {
     const value = Number(mb) / 1024;
     if (!Number.isFinite(value) || value <= 0) return '';
     return `${value >= 10 ? Math.round(value) : Number(value.toFixed(1))} GB`;
   };
 
-  const ghz = mhz => {
+  const ghz = (mhz) => {
     const value = Number(mhz) / 1000;
     return Number.isFinite(value) && value > 0 ? `${value.toFixed(2)} GHz` : '';
   };
 
   /* "AMD Ryzen 7 9800X3D 8-Core Processor" -> "AMD Ryzen 7 9800X3D"; trademarks and clocks go */
-  const tidyCPU = name =>
+  const tidyCPU = (name) =>
     clean(
       name
         .replace(/\((?:R|TM|C)\)|[®™]/gi, '')
@@ -213,7 +191,7 @@
    * The headline facts, from the entries' own arguments (language-neutral numbers). Returns
    * { tiles, meta }; a tile with no value is left out.
    */
-  const summarise = sections => {
+  const summarise = (sections) => {
     const byKey = new Map();
     for (const section of sections) for (const row of section.rows) if (row.key && !byKey.has(row.key)) byKey.set(row.key, row);
     const arg = (key, i = 0) => byKey.get(key)?.args[i] ?? '';
@@ -264,7 +242,7 @@
 
   /* ---------- Copy specs ---------- */
 
-  const specsText = sections =>
+  const specsText = (sections) =>
     sections
       .map(section => {
         const rows = section.rows.filter(row => !row.private).map(row => `  ${row.label ? `${row.label}: ${row.value}` : row.value}`);
@@ -276,7 +254,7 @@
   /* ---------- Steam tooltips (as about-steam.js mounts them) ---------- */
 
   const nativeTooltips = () =>
-    attempt(() => SE.global?.('__steamEnhancedNativeTooltips', api => typeof api?.resolve === 'function')?.resolve() ?? null, null);
+    attempt(() => SE.global?.('__seNativeTooltips', (api) => typeof api?.resolve === 'function')?.resolve() ?? null, null);
 
   const mountTip = ({ React, DOM, Tooltip }, node, label, direction) => {
     const host = el('span', 'se-sysinfo-tip');
@@ -304,7 +282,7 @@
 
   /* ---------- View ---------- */
 
-  const createView = root => {
+  const createView = (root) => {
     const doc = root.ownerDocument;
     const win = doc.defaultView;
     const cleanups = [];
@@ -339,7 +317,7 @@
     };
     const specTips = [];
     const cardTips = [];
-    const dropTips = bucket => {
+    const dropTips = (bucket) => {
       for (const unmount of bucket.splice(0)) attempt(unmount);
     };
     cleanups.push(() => {
@@ -350,7 +328,7 @@
     });
 
     /* Copied feedback: the node shows a check for a moment */
-    const flash = node => {
+    const flash = (node) => {
       clearTimeout(timers.get(node));
       node.setAttribute('data-copied', '');
       timers.set(node, setTimeout(() => {
@@ -409,7 +387,7 @@
     let sections = [];
     const copyAll = button('se-sysinfo-copyall', [icon('copy'), copyLabel], () => {
       if (!sections.length) return;
-      copyText(specsText(sections));
+      SE.copy(specsText(sections));
       flash(copyAll);
       copyLabel.textContent = 'Copied';
       clearTimeout(copyAll.labelTimer);
@@ -424,7 +402,7 @@
     let signature = '';
     let filter = '';
 
-    const renderMeta = items => {
+    const renderMeta = (items) => {
       meta.replaceChildren(
         ...items.map(item => {
           const chip = el('span', 'se-sysinfo-meta-item');
@@ -435,7 +413,7 @@
       meta.hidden = !items.length;
     };
 
-    const renderSpecs = tiles => {
+    const renderSpecs = (tiles) => {
       dropTips(specTips);
       specs.replaceChildren(
         ...tiles.map(tile => {
@@ -448,7 +426,7 @@
             el('span', 'se-sysinfo-spec-sub', tile.sub),
           );
           const node = button('se-sysinfo-spec', [chip, text, icon('check')], () => {
-            copyText(tile.full || tile.value);
+            SE.copy(tile.full || tile.value);
             flash(node);
           });
           tip(specTips, node, tile.full && tile.full !== tile.value ? `${tile.full}. Click to copy` : 'Click to copy');
@@ -459,10 +437,10 @@
       SE.attr?.(specs, 'data-count', tiles.length || null);
     };
 
-    const renderRow = row => {
+    const renderRow = (row) => {
       if (!row.label) {
         const pill = button('se-sysinfo-pill', [el('span', 'se-sysinfo-pill-text', row.value), icon('check')], () => {
-          copyText(row.value);
+          SE.copy(row.value);
           flash(pill);
         });
         return { node: pill, row };
@@ -474,7 +452,7 @@
           node.setAttribute('data-revealed', '');
           return;
         }
-        copyText(row.value);
+        SE.copy(row.value);
         flash(node);
       });
       if (row.private) node.setAttribute('data-private', '');
@@ -492,7 +470,7 @@
         const title = el('h3', 'se-sysinfo-card-title', section.title);
         const count = el('span', 'se-sysinfo-card-count', String(section.rows.length));
         const copy = button('se-sysinfo-card-copy', [icon('copy')], () => {
-          copyText(specsText([section]));
+          SE.copy(specsText([section]));
           flash(copy);
         }, 'Copy section');
         tip(cardTips, copy, 'Copy section');
@@ -516,7 +494,7 @@
       spy();
     };
 
-    const shortTitle = title => SHORT_TITLES.find(([re]) => re.test(title))?.[1] ?? title;
+    const shortTitle = (title) => SHORT_TITLES.find(([re]) => re.test(title))?.[1] ?? title;
 
     /* Steam's sections, read again whenever they change; the view only redraws on new content */
     const update = () => {
@@ -587,7 +565,7 @@
       spy();
     };
 
-    const setFilter = value => {
+    const setFilter = (value) => {
       filter = value.trim();
       if (input.value !== value) input.value = value;
       applyFilter();
@@ -637,14 +615,14 @@
     }
 
     const reducedMotion = () => win.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    const scrollToCard = index => {
+    const scrollToCard = (index) => {
       const card = cards[index]?.card;
       if (!card) return;
       list.scrollTo({ top: card.offsetTop, behavior: reducedMotion() ? 'auto' : 'smooth' }); // list is the offset parent
     };
 
     /* Vertical wheel scrolls the chip strip sideways */
-    listen(chips, 'wheel', event => {
+    listen(chips, 'wheel', (event) => {
       if (Math.abs(event.deltaY) <= Math.abs(event.deltaX) || chips.scrollWidth <= chips.clientWidth) return;
       event.preventDefault();
       chips.scrollLeft += event.deltaY;
@@ -653,7 +631,7 @@
     /* ---------- Keys ---------- */
 
     // Ctrl+F filters; Esc clears the filter, then closes; Ctrl+C with nothing selected copies the specs
-    listen(doc, 'keydown', event => {
+    listen(doc, 'keydown', (event) => {
       if (event.defaultPrevented) return;
       const mod = (event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey;
       if (mod && event.key.toLowerCase() === 'f') {
@@ -694,13 +672,13 @@
   const viewOf = new WeakMap();
 
   /* System Information is the one survey layout with a node between the body text and the footer */
-  const isSystemInfo = root => {
+  const isSystemInfo = (root) => {
     const footer = root.querySelector(':scope > .DialogFooter');
     const before = footer?.previousElementSibling;
     return !!before && !before.matches('.DialogBodyText, .DialogHeader');
   };
 
-  const build = root => {
+  const build = (root) => {
     viewOf.get(root)?.destroy();
     root.querySelectorAll(':scope > .se-sysinfo').forEach(node => node.remove());
     const view = createView(root);
@@ -722,16 +700,16 @@
     }
   };
 
-  const watcher = SE.watch(scan, { throttle: 100, scope: ROOT, ignore: node => !!node.closest?.('.se-sysinfo') });
+  const watcher = SE.watch(scan, { throttle: 100, scope: ROOT, ignore: (node) => !!node.closest?.('.se-sysinfo') });
   scan();
 
-  window.__steamEnhancedSystemInfo = {
+  window.__seSystemInfo = {
     destroy() {
       watcher.disconnect();
       for (const view of [...views]) view.destroy();
       document.querySelectorAll('.se-sysinfo').forEach(node => node.remove());
       document.querySelectorAll(`[${BUILT}]`).forEach(node => SE.unmark(node, BUILT));
-      delete window.__steamEnhancedSystemInfo;
+      delete window.__seSystemInfo;
     },
   };
-});
+})(window.__se);

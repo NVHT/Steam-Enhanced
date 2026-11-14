@@ -1,8 +1,9 @@
-/* Demand-paged News Hub feed for Library Home What's New carousel. */
-(window.__se ? fn => fn(window.__se) : fn => addEventListener('se-core', () => fn(window.__se), { once: true }))(SE => {
+/*
+ * Demand-paged News Hub feed for Library Home What's New carousel.
+ */
+((SE) => {
   const { C } = SE;
-  if (window.__steamEnhancedNewsHub?.version === '1.7.5') return;
-  window.__steamEnhancedNewsHub?.destroy?.();
+  window.__seNewsHub?.destroy?.();
 
   const WINDOW_SECONDS = 7 * 24 * 60 * 60;
   const CARD_BATCH = 24;
@@ -11,8 +12,7 @@
   const CAROUSEL_SELECTOR = `.${C.EventRowCarousel}, [class*="EventRowCarousel"]`;
   const CONTAINER_SELECTOR = `.${C.UpdatesContainer}`;
 
-  const state = (window.__steamEnhancedNewsHub = {
-    version: '1.7.5',
+  const state = (window.__seNewsHub = {
     events: new Map(),
     documents: new Map(),
     feeds: [],
@@ -49,7 +49,7 @@
         .map(app => app.appid)
     );
 
-  const isWithinWindow = entry => {
+  const isWithinWindow = (entry) => {
     const current = nowSeconds();
     return entry.time >= current - WINDOW_SECONDS && entry.time <= current;
   };
@@ -347,7 +347,7 @@
           owner = candidate;
           break;
         }
-      } catch (_) {}
+      } catch {}
     }
 
     eventStore = owner?.libraryEventStore;
@@ -428,10 +428,10 @@
       }
     }
     if (eventStore) notifyEventStore();
-    delete window.__steamEnhancedNewsHub;
+    delete window.__seNewsHub;
   };
 
   // Until Home is first opened: a visibility-aware poll that idles at core's slow rate.
   initPoll = SE.poll(tryInit, 1000, { active: () => !!document.querySelector('.LibraryHome') });
   tryInit();
-});
+})(window.__se);

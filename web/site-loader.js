@@ -6,7 +6,9 @@
  *     the CSS applies from the first paint
  *   - adds each matched stylesheet in list order (the cascade)
  *   - starts each matched script: an ES module whose default export is `init(dom)`, given the
- *     shared runtime (web/dom.js), returning its destroy function (or a promise of one)
+ *     shared runtime (web/dom.js), returning its destroy function (or a promise of one). A
+ *     file's `preload` lists the modules its script imports itself: they download alongside it
+ *     instead of after it.
  *   - re-evaluates on client-side navigation (React Router): a page newly entered gets its
  *     files; a page-scoped script whose pages no longer match is destroyed, and starts again
  *     if one comes back. Stylesheets stay: they are scoped to their page class.
@@ -34,7 +36,7 @@ const settled = (link) =>
  *   siteClass: string,                                      class on <html> for every page
  *   global: string,                                         window property for destroy()
  *   pages: Record<string, { test: (path: string) => boolean, root: string | null }>,
- *   files: { css?: string, js?: string, on?: string[] }[],  in cascade order
+ *   files: { css?: string, js?: string, preload?: string[], on?: string[] }[],  in cascade order
  * }} config
  */
 export const start = ({ base, siteClass, global, pages, files }) => {
@@ -52,6 +54,8 @@ export const start = ({ base, siteClass, global, pages, files }) => {
   const sheets = new Set();
   /** @type {Map<string, Promise<(() => void) | null>>} running scripts → their destroy */
   const running = new Map();
+  /** @type {Map<string, Promise<void>>} scripts being destroyed → when that is done */
+  const stopping = new Map();
   /** Scripts that returned no destroy: they stay for the page's life. */
   const permanent = new Set();
   const firstPass = []; // the first page's stylesheets and scripts, until it is revealed
@@ -59,10 +63,19 @@ export const start = ({ base, siteClass, global, pages, files }) => {
   let lastStylesheet = null;
   let dom = null;
 
-  const startScript = (file) => {
+  const preload = (file) => {
+    const href = asset(file);
+    if (head.querySelector(`link[rel="modulepreload"][href="${href}"]`)) return;
+    head.append(Object.assign(document.createElement('link'), { rel: 'modulepreload', href }));
+  };
+
+  const startScript = (file, imports = []) => {
+    imports.forEach(preload);
     dom ??= import(asset('./dom.js', import.meta.url));
+    const previous = stopping.get(file); // a quick leave-and-return: its destroy runs first
     const run = (async () => {
       try {
+        await previous;
         const [runtime, feature] = await Promise.all([dom, import(asset(file))]);
         const destroy = await feature.default(runtime);
         if (typeof destroy === 'function') return destroy;
@@ -79,12 +92,17 @@ export const start = ({ base, siteClass, global, pages, files }) => {
   const stopScript = (file) => {
     const run = running.get(file);
     running.delete(file);
-    run?.then((destroy) => {
+    if (!run) return;
+    const done = run.then((destroy) => {
       try {
         destroy?.();
       } catch (error) {
         console.error(`[Steam Enhanced] ${file} destroy failed:`, error);
       }
+    });
+    stopping.set(file, done);
+    done.then(() => {
+      if (stopping.get(file) === done) stopping.delete(file);
     });
   };
 
@@ -116,7 +134,7 @@ export const start = ({ base, siteClass, global, pages, files }) => {
       if (active && file.css && !sheets.has(file.css)) addStylesheet(file.css);
       if (!file.js || permanent.has(file.js)) continue;
       if (active && !running.has(file.js)) {
-        const run = startScript(file.js);
+        const run = startScript(file.js, file.preload);
         if (!revealed) firstPass.push(run);
       } else if (!active && running.has(file.js)) {
         stopScript(file.js);

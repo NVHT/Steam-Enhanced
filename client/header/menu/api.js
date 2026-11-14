@@ -1,6 +1,8 @@
-/* Finding Steam's menu API (ContextMenuManager, React, the menu components) in its bundles. */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedSteamMenuParts;
+/*
+ * Finding Steam's menu API (ContextMenuManager, React, the menu components) in its bundles.
+ */
+((SE) => {
+  const ns = window.__seSteamMenuParts;
   if (!ns) return;
   const { ROOT_BTN_SELECTOR } = ns;
 
@@ -19,7 +21,7 @@
   function sourceOf(req, id) {
     try {
       return Function.prototype.toString.call(req.m[id]);
-    } catch (_) {
+    } catch {
       return '';
     }
   }
@@ -124,7 +126,7 @@
       let m;
       try {
         m = req(id);
-      } catch (_) {
+      } catch {
         continue;
       }
       if (!React && isReact(m)) React = m;
@@ -170,11 +172,11 @@
       try {
         const found = resolveFromKnown(req);
         if (found) return found;
-      } catch (_) {}
+      } catch {}
     }
     try {
       return resolveFromSource() || undefined;
-    } catch (_) {
+    } catch {
       return undefined;
     }
   }
@@ -223,4 +225,4 @@
     return found;
   }
   Object.assign(ns, { configurations, contextManager, exportNames, resolveMenuApi, retainedMenu });
-});
+})(window.__se);

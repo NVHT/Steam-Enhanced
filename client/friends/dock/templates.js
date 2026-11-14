@@ -11,7 +11,7 @@
  *   browser surfaces are active.
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
- * window.__steamEnhancedFriendsDockParts (values parts reassign live on its `live`):
+ * window.__seFriendsDockParts (values parts reassign live on its `live`):
  * - templates.js   icons, avatars and the panel/rail/flyout markup
  * - data.js        copy, Steam lookups, saved settings and the shared `state`
  * - ui.js          native list clicks, menus, the hover flyout and the frame pass
@@ -27,10 +27,10 @@
  * This part: markup, meaning icons, avatars (with dead-image fallbacks), and the panel, rail
  * and flyout HTML. It also closes a previous dock and skips windows without a body.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  window.__steamEnhancedFriendsDock?.destroy();
+((SE) => {
+  window.__seFriendsDock?.destroy();
   if (!document.body) return;
-  const ns = (window.__steamEnhancedFriendsDockParts = { live: {} });
+  const ns = (window.__seFriendsDockParts = { live: {} });
 
   const { esc, run } = SE;
 
@@ -213,4 +213,4 @@
     COLLAPSE_ICON, DEAD_AVATAR_LIMIT, avatar, deadAvatars, flyHTML, groupAvatar, groupAvatarURL,
     groupInitials, panelHTML, railHTML, statusLabel, svg, usableAvatar,
   });
-});
+})(window.__se);

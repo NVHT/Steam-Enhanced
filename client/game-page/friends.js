@@ -1,8 +1,8 @@
 /*
  * "Friends who play" card: group tabs, avatar stacks, status rings and the footer.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedGamePageParts;
+((SE) => {
+  const ns = window.__seGamePageParts;
   if (!ns) return;
   const { BODY, drop, own, schedule, sharedParent, srcOf } = ns;
 
@@ -213,4 +213,4 @@
   }
 
   Object.assign(ns, { emptyOf, frState, placeFriends });
-});
+})(window.__se);

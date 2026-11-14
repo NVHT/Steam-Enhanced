@@ -3,8 +3,8 @@
  *
  * Part of client/toasts/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedToastsParts;
+((SE) => {
+  const ns = window.__seToastsParts;
   if (!ns) return;
   const { mark, run, unmark } = SE;
   const { ADOPT_TIMEOUT_MS, COMPACT, COMPACT_ATTR, EYEBROW, FIBER_DEPTH, KINDS, MOVERS, ON_ATTR, SIZERS, SRC_ATTR, WAIT_ATTR, alive, busy, byKey, elapsed, enabled, getRatio, getSizeRatio, held, history, holdSpot, holdTimer, hub, inDock, keyOf, noteOf, onEarlyMutation, onPageHide, onWindowResize, pendingKeys, ready, register, root, sizeAttempts, skipped, startCompact, step, teardown, templateOf, uninstallCentre, wake } = ns;
@@ -42,8 +42,8 @@
   function placement() {
     const own = [...byKey.values()];
     const src = own.find(e => !e.done)?.src || own[0]?.src;
-    const popup = src && run(() => SE.fromProps(src, FIBER_DEPTH, p => ('registerPopup' in p && p.popup ? p.popup : undefined)));
-    const members = o => {
+    const popup = src && run(() => SE.fromProps(src, FIBER_DEPTH, (p) => ('registerPopup' in p && p.popup ? p.popup : undefined)));
+    const members = (o) => {
       const out = new Set();
       for (let x = o, i = 0; x && x !== Object.prototype && i < 4; x = Object.getPrototypeOf(x), i++) {
         for (const k of Object.getOwnPropertyNames(x)) out.add(k);
@@ -87,7 +87,7 @@
   // What every toast window is doing, from this one's point of view.
   function stageInfo() {
     const h = hub();
-    const name = w => (w === window ? 'this window' : run(() => w.name) || '?');
+    const name = (w) => (w === window ? 'this window' : run(() => w.name) || '?');
     return {
       stage: h.stage ? name(h.stage) : null,
       windows: h.wins.map(w => ({ name: name(w), alive: alive(w), ready: !!run(() => w.__seToasts?.ready?.()) })),
@@ -157,4 +157,4 @@
   };
 
   Object.assign(ns, { probe });
-});
+})(window.__se);

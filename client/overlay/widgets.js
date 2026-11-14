@@ -3,8 +3,8 @@
  *
  * Part of client/overlay/ (see context.js).
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedOverlayParts;
+((SE) => {
+  const ns = window.__seOverlayParts;
   if (!ns) return;
   const { SEL, TOOLBAR_ACTIVE, desktopOverlay } = ns;
 
@@ -25,7 +25,7 @@
     settings: 'Settings',
   });
 
-  const toolbarButton = id => document.querySelector(`${SEL.toolbarButton}.${WIDGET[id]}`);
+  const toolbarButton = (id) => document.querySelector(`${SEL.toolbarButton}.${WIDGET[id]}`);
 
   // A widget the column replaces: Steam may still open it (with the overlay, a
   // hotkey, a saved layout), so it's closed the way its toolbar button would,
@@ -61,7 +61,7 @@
   );
 
   // Open Steam's own widget for a view, through its (hidden) toolbar button.
-  const openToolWidget = id => {
+  const openToolWidget = (id) => {
     if (id === 'remote' && SE.run(() => (desktopOverlay().ShowRemotePlayTogether(), true))) return true;
     const target = toolButtons[id]?.current();
     if (target && !target.classList.contains(TOOLBAR_ACTIVE)) target.click();
@@ -98,12 +98,12 @@
 
   // Widget windows carry Steam's OverlayPopupBody class on <body>.
   const OVERLAY_POPUP_BODY = '_1UJDmU3N-pkv7oTJ_Zf9nK';
-  const isWindow = value => !!SE.run(() => value && typeof value.moveTo === 'function' && !!value.document);
-  const isWidgetWindow = win =>
+  const isWindow = (value) => !!SE.run(() => value && typeof value.moveTo === 'function' && !!value.document);
+  const isWidgetWindow = (win) =>
     isWindow(win) && win !== window && !!SE.run(() => win.document.body.classList.contains(OVERLAY_POPUP_BODY));
 
   // The Window inside one of Steam's popup objects, whichever field holds it.
-  const windowOf = popup => {
+  const windowOf = (popup) => {
     if (!popup) return null;
     if (isWindow(popup)) return popup;
     for (const key of ['m_popup', 'window', 'm_window', 'browserWindow', 'BrowserWindow']) {
@@ -158,14 +158,14 @@
     return { x, y, w, h };
   };
 
-  const windowRect = win => SE.run(() => ({ x: win.screenX, y: win.screenY, w: win.outerWidth, h: win.outerHeight }));
+  const windowRect = (win) => SE.run(() => ({ x: win.screenX, y: win.screenY, w: win.outerWidth, h: win.outerHeight }));
 
   // Overlay popups ignore the DOM's moveTo/resizeTo; their own
   // SteamClient.Window API works. Positions are screen DIPs, the same units
   // as this window's CSS pixels and every window's screenX/outerWidth; the
   // popup's devicePixelRatio only reflects Steam's UI zoom, so it isn't used.
   // The DOM calls are a fallback for windows without that API.
-  const placeWindow = win => {
+  const placeWindow = (win) => {
     const target = windowTarget();
     const at = windowRect(win);
     const near = (a, b) => Number.isFinite(a) && Math.abs(a - b) <= WINDOW_SLACK;
@@ -229,4 +229,4 @@
   };
 
   Object.assign(ns, { WIDGET, WINDOW_TICK_MS, centerWidgets, openToolWidget, replacedButtons, syncToolbar, toolButtons, windowsDebug });
-});
+})(window.__se);

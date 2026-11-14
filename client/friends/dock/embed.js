@@ -2,8 +2,8 @@
  * Mounting Steam's own Friends & Chat tree in the dock, guarding its modal managers and the
  * main window title.
  */
-(window.__se ? (fn) => fn(window.__se) : (fn) => addEventListener('se-core', () => fn(window.__se), { once: true }))((SE) => {
-  const ns = window.__steamEnhancedFriendsDockParts;
+((SE) => {
+  const ns = window.__seFriendsDockParts;
   if (!ns) return;
   const {
     app, COLLAPSE_ICON, COPY, disposeGroupFlyouts, flyoutOwnedTabs, importOf, managerTimers, state,
@@ -73,7 +73,7 @@
         } else if (r.own && current !== r.own) {
           r.native.set.call(r.map, window, r.own);
         }
-      } catch (_) {}
+      } catch {}
     }
   }
 
@@ -101,7 +101,7 @@
             } else if (value) {
               r.own = value;
             }
-          } catch (_) {}
+          } catch {}
         }
         return native.set.call(this, key, value);
       };
@@ -109,7 +109,7 @@
       if (ownDesc && !ownDesc.configurable) continue;
       try {
         Object.defineProperty(map, 'set', { configurable: true, writable: true, value: r.set });
-      } catch (_) {
+      } catch {
         continue;
       }
       r.saved = ownDesc;
@@ -125,7 +125,7 @@
         if (r.map.set !== r.set) continue;
         if (r.saved) Object.defineProperty(r.map, 'set', r.saved);
         else delete r.map.set;
-      } catch (_) {}
+      } catch {}
     }
     libraryManagers = null;
   }
@@ -207,7 +207,7 @@
       if (state.chatContext) {
         try {
           state.chatContext.data.SetFriendsListSingleWindowMode(state.chatContext.previous);
-        } catch (_) {}
+        } catch {}
         state.chatContext = null;
       }
       delete ns.dock.dataset.chat;
@@ -272,4 +272,4 @@
     disposeSteam, findEmbed, keepLibraryManagers, releaseFlyoutTabs, showSteam,
     unguardLibraryManagers,
   });
-});
+})(window.__se);
