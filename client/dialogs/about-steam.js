@@ -424,20 +424,9 @@
     flashes.set(button, { hint, text, timer: setTimeout(() => restoreFlash(button), COPIED_MS) });
   };
 
-  const el = (tag, className, text) => {
-    const node = document.createElement(tag);
-    if (className) node.className = className;
-    if (text != null) node.textContent = text;
-    return node;
-  };
+  const { el } = SE;
 
-  const icon = name => {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('aria-hidden', 'true');
-    svg.innerHTML = ICONS[name];
-    return svg;
-  };
+  const { icon } = SE.icons(ICONS);
 
   const button = (className, children, onClick, { label } = {}) => {
     const node = el('button', className);

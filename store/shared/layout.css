@@ -1,0 +1,81 @@
+/*
+ * Store layout: the page width and Steam's tooltips on every store page. Tokens are
+ * core/tokens.css; motion, focus and the footer are web/base.css.
+ */
+/* ---------- Page width: every store page fills the window like the front page ---------- */
+
+/*
+ * Steam sizes store pages to a 940px or 1200px column (store.css: body.v6 .page_content,
+ * #store_header .content, --store-page-width). Same fluid width as the front page instead:
+ * the window minus a gutter, capped for very wide screens. Steam's own 2025 widestore layout
+ * already sizes the inner columns in percent, so widening these containers is enough.
+ */
+html.se-store {
+  --se-page-gutter: 28px;
+  --se-page-max: 1760px;
+  --se-page-width: min(100vw - 2 * var(--se-page-gutter), var(--se-page-max));
+}
+
+html.se-store body.v6,
+html.se-store body.v6.widestore,
+html.se-store body.v6.narrowstore {
+  --store-page-width: var(--se-page-width) !important;
+}
+
+html.se-store body.v6 .page_content,
+html.se-store body.v6.narrowstore .page_content,
+html.se-store div#store_header .content,
+html.se-store .widestore div#store_header .content {
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  margin-inline: auto !important;
+}
+
+html.se-store div#store_header {
+  min-width: 0 !important;
+}
+
+/* Any other centered page column shared/nav.js finds (React pages, hubs, sale pages). */
+html.se-store [data-se-wide] {
+  box-sizing: border-box !important;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  margin-inline: auto !important;
+}
+
+/* Hub pages built from the front page's section blocks (sales, tags, genres...). */
+html.se-store .home_pagecontent_ctn {
+  box-sizing: border-box !important;
+  width: min(100%, var(--se-page-max) + 2 * var(--se-page-gutter)) !important;
+  max-width: none !important;
+  padding-inline: var(--se-page-gutter) !important;
+}
+
+html.se-store .home_pagecontent_ctn > div,
+html.se-store .home_page_content {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* The capsule spans the page column on every store page, not just the front page. */
+html.se-store [data-se-nav="bar"] {
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+}
+
+/* ---------- Tooltips ----------
+ * Steam's store tooltips (store.css .store_tooltip: light grey box) as the theme's dark popover,
+ * on every store page.
+ */
+html.se-store:not(#se-none) .store_tooltip {
+  max-width: 300px;
+  padding: 8px 12px;
+  color: var(--se-text);
+  font-size: var(--se-fs-sm);
+  line-height: 1.45;
+}
+
+html.se-store:not(#se-none) .store_tooltip a {
+  color: var(--se-accent);
+}

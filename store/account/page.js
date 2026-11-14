@@ -190,18 +190,7 @@ export default async (dom) => {
   await dom.ready();
   const $ = dom.scope();
   const root = document.documentElement;
-  const added = [];
-  const add = (node) => (added.push(node), node);
-  const moves = [];
-  const move = (node, target) => {
-    moves.push([node, node.parentNode, node.nextSibling]);
-    target.append(node);
-  };
-  const marks = [];
-  const mark = (node, name, value = '') => {
-    dom.mark(node, name, value);
-    marks.push([node, name]);
-  };
+  const { mark, move, owned: add } = $;
 
   /* ---------- Header: Steam ID chip, on every account page ---------- */
 
@@ -351,23 +340,11 @@ export default async (dom) => {
         dom.unmark(node, MODERN);
         node.style?.removeProperty('--se-account-icon');
       }
-      for (const node of added.reverse()) node.remove();
       dom.unmark(root, 'data-se-account-ready');
     };
   }
 
-  const restore = () => {
-    for (const [node, name] of marks.reverse()) dom.unmark(node, name);
-    while (moves.length) {
-      const [node, parent, next] = moves.pop();
-      parent.insertBefore(node, next?.parentNode === parent ? next : null);
-    }
-    for (const node of added.reverse()) node.remove();
-  };
-  if (!nav || !content) return () => {
-    $.destroy();
-    restore();
-  };
+  if (!nav || !content) return () => $.destroy();
 
   /* ---------- Sidebar: an icon per link ---------- */
 
@@ -623,6 +600,5 @@ export default async (dom) => {
   return () => {
     $.destroy();
     for (const [node, text] of texts) node.textContent = text;
-    restore();
   };
 };

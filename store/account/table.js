@@ -1,6 +1,6 @@
 /*
  * Account tables (Purchase History, Licenses): the parts both share, imported by their page
- * scripts (account-history/page.js, account-licenses/page.js); styled by account/table.css.
+ * scripts (account/history/page.js, account/licenses/page.js); styled by account/table.css.
  *
  *   - a toolbar over the table: a search field, one chip per row type found so far (the page's
  *     own words, so in its language), and a count of what the filter shows
@@ -29,7 +29,7 @@ const svg = (name) => {
 };
 
 /**
- * @param dom    the store runtime (shared/dom.js)
+ * @param dom    the web runtime (web/dom.js)
  * @param $      the page's scope; listeners and the observer are released with it
  * @param opts   table       the <table>
  *               head        what sticks: the <thead>, or the header <tr> when Steam puts it in the body

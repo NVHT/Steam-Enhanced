@@ -60,33 +60,14 @@
     }
   };
 
-  const el = (tag, className, text) => {
-    const node = document.createElement(tag);
-    if (className) node.className = className;
-    if (text != null) node.textContent = text;
-    return node;
-  };
+  const { el } = SE;
 
-  const setText = (node, value) => {
-    if (node && node.textContent !== value) node.textContent = value;
-  };
+  const { setText } = SE;
 
-  const icon = name => {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('aria-hidden', 'true');
-    svg.dataset.icon = name;
-    svg.innerHTML = ICONS[name];
-    return svg;
-  };
+  const { icon, setIcon } = SE.icons(ICONS);
 
-  const setIcon = (svg, name) => {
-    if (svg.dataset.icon === name) return;
-    svg.dataset.icon = name;
-    svg.innerHTML = ICONS[name];
-  };
 
-  const isOurs = node => !!(node?.nodeType === 1 ? node : node?.parentElement)?.closest?.(`.${OURS}`);
+  const isOurs = SE.inside(`.${OURS}`);
 
   /* Tries each URL in turn; drops the image (and calls onFail) when none loads */
   const loadFirst = (img, urls, onLoad, onFail) => {

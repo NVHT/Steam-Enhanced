@@ -95,16 +95,9 @@ const readPrefix = (name) => {
   return person && !words.some((word) => NOT_A_NAME.has(word.toLowerCase().replace(/\.$/, ''))) ? person : null;
 };
 
-/** A sibling module, requested with this build's ?v= so the web view never mixes builds. */
-const sibling = (file) => {
-  const url = new URL(file, import.meta.url);
-  url.search = new URL(import.meta.url).search;
-  return import(url.href);
-};
-
-const loadOverrides = async () => {
+const loadOverrides = async (dom) => {
   try {
-    return (await sibling('./titles.js')).default ?? {};
+    return (await dom.importNear(import.meta.url, './titles.js')).default ?? {};
   } catch (error) {
     console.error('[Steam Enhanced] app/titles.js failed:', error);
     return {};
@@ -113,7 +106,11 @@ const loadOverrides = async () => {
 
 export default async (dom) => {
   const { el, setText, mark, squash, ready, scope } = dom;
-  const [overrides, { readDeck, findDeckBlock, findLearnMore }] = await Promise.all([loadOverrides(), sibling('./deck.js'), ready()]);
+  const [overrides, { readDeck, findDeckBlock, findLearnMore }] = await Promise.all([
+    loadOverrides(dom),
+    dom.importNear(import.meta.url, './deck.js'),
+    ready(),
+  ]);
 
   const life = scope();
   const appId = /^\/app\/(\d+)/i.exec(location.pathname)?.[1];

@@ -195,7 +195,32 @@
   };
 
   let ui = null;
+
+  /*
+   * Title, history and loading have no events to listen to, so they are polled while the bar
+   * exists: every FAST_MS while something is changing (BUSY_MS after a navigation or a button,
+   * or while the view reports loading), else every IDLE_MS, which only catches a page that
+   * retitles itself. Address changes are observed, not polled (urlObserver), and wake the fast
+   * pace. A hidden window skips the reads.
+   */
+  const FAST_MS = 300;
+  const IDLE_MS = 2000;
+  const BUSY_MS = 8000;
   let ticker = 0;
+  let busyUntil = 0;
+  const tick = () => {
+    ticker = 0;
+    if (!ui) return;
+    if (document.visibilityState === 'visible') refresh();
+    const busy = performance.now() < busyUntil || ui.text.hasAttribute(LOADING);
+    ticker = setTimeout(tick, busy ? FAST_MS : IDLE_MS);
+  };
+  const wake = () => {
+    busyUntil = performance.now() + BUSY_MS;
+    if (!ui) return;
+    clearTimeout(ticker);
+    ticker = setTimeout(tick, FAST_MS);
+  };
 
   const mount = () => {
     const bar = [...tagged].find(n => n.getAttribute(ATTR) === 'bar');
@@ -214,14 +239,14 @@
     ui.nav.addEventListener('click', onButton);
     ui.tools.addEventListener('click', onButton);
     urlObserver.observe(url, { characterData: true, childList: true, subtree: true });
-    // Title, history and loading have no events to listen to; poll while the bar exists.
-    ticker = setInterval(() => document.visibilityState === 'visible' && refresh(), 300);
     refresh();
+    wake();
   };
 
   const unmount = () => {
     if (!ui) return;
-    clearInterval(ticker);
+    clearTimeout(ticker);
+    ticker = 0;
     urlObserver.disconnect();
     for (const el of [ui.nav, ui.tools, ui.identity, ui.progress]) el.remove();
     SE.unmark(ui.text, LOADING);
@@ -266,7 +291,10 @@
       else ui.img.removeAttribute('src');
     }
   };
-  const urlObserver = new MutationObserver(() => refresh());
+  const urlObserver = new MutationObserver(() => {
+    refresh();
+    wake();
+  });
 
   /*
    * The load line. The view's own loading flag when it has one. Otherwise a navigation (the
@@ -332,6 +360,7 @@
       }
     }
     setTimeout(refresh, 150);
+    wake();
   };
 
   /*

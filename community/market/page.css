@@ -18,7 +18,7 @@
  *
  * Ids and classes are Steam's (SteamTracking: steamcommunity.com/public/css/skin_1/
  * economy_market.css, economy.css; the page report). The page frame and pill buttons are
- * shared/ui.css, tokens and the footer store/shared/base.css.
+ * shared/ui.css, tokens core/tokens.css, the footer web/base.css.
  */
 
 html.se-community-market {
@@ -290,7 +290,7 @@ html.se-community-market .se-mkt-stat {
   font: 600 var(--se-fs-sm)/1 var(--se-font);
   cursor: pointer;
   backdrop-filter: var(--se-blur-chip);
-  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-community-market .se-mkt-stat:hover {
@@ -330,7 +330,7 @@ html.se-community-market .se-mkt-art {
   opacity: .5;
   pointer-events: none;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 45%);
-  animation: se-mkt-art-in var(--se-dur-slow) var(--se-ease) both;
+  animation: se-mkt-art-in var(--se-dur-slower) var(--se-ease) both;
 }
 
 html.se-community-market .se-mkt-art-tile {
@@ -496,7 +496,7 @@ html.se-community-market:not(#se-none) a.item_market_action_button {
   text-decoration: none !important;
   text-shadow: none !important;
   white-space: nowrap;
-  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-community-market:not(#se-none) a.item_market_action_button:hover {
@@ -622,7 +622,7 @@ html.se-community-market:not(#se-none) a.market_tab_well_tab {
   color: var(--se-text-muted) !important;
   font: 600 var(--se-fs-base)/1 var(--se-font) !important;
   text-decoration: none !important;
-  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-community-market:not(#se-none) a.market_tab_well_tab:hover {
@@ -722,7 +722,7 @@ html.se-community-market .se-mkt-tabs-pill {
   background: var(--se-accent);
   box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--se-accent) 75%, transparent);
   transform: translateX(var(--x, 0));
-  transition: transform var(--se-dur) var(--se-ease), width var(--se-dur) var(--se-ease), opacity var(--se-dur-fast);
+  transition: transform var(--se-dur-slow) var(--se-ease), width var(--se-dur-slow) var(--se-ease), opacity var(--se-dur);
 }
 
 html.se-community-market .se-mkt-tabs-divider {
@@ -747,7 +747,7 @@ html.se-community-market .se-mkt-tab {
   font: 600 var(--se-fs-base)/1 var(--se-font);
   white-space: nowrap;
   cursor: pointer;
-  transition: color var(--se-dur-fast), background-color var(--se-dur-fast);
+  transition: color var(--se-dur), background-color var(--se-dur);
 }
 
 html.se-community-market .se-mkt-tab:hover {
@@ -788,7 +788,7 @@ html.se-community-market .se-mkt-tab-count {
   color: var(--se-text-muted);
   font: 800 var(--se-fs-xs)/1 var(--se-font);
   font-variant-numeric: tabular-nums;
-  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-community-market .se-mkt-tab[aria-selected="true"] .se-mkt-tab-count {
@@ -999,7 +999,7 @@ html.se-community-market:not(#se-none) .market_listing_row {
   border-radius: var(--se-radius-md);
   background: none !important;
   box-shadow: none !important;
-  transition: background-color var(--se-dur-fast);
+  transition: background-color var(--se-dur);
 }
 
 html.se-community-market:not(#se-none) :is(a.market_listing_row_link:hover .market_listing_row, .market_listing_row:hover) {
@@ -1026,7 +1026,7 @@ html.se-community-market:not(#se-none) .market_listing_row .market_listing_item_
     var(--se-field) !important;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-q, #fff) 18%, transparent);
   object-fit: contain;
-  transition: transform var(--se-dur) var(--se-ease);
+  transition: transform var(--se-dur-slow) var(--se-ease);
 }
 
 html.se-community-market :is(a.market_listing_row_link:hover, .market_listing_row:hover) .market_listing_item_img {
@@ -1426,7 +1426,7 @@ html.se-community-market:not(#se-none) .market_paging_controls .pagebtn {
   color: var(--se-text) !important;
   font: 700 var(--se-fs-sm)/1 var(--se-font) !important;
   text-decoration: none !important;
-  transition: background-color var(--se-dur-fast);
+  transition: background-color var(--se-dur);
 }
 
 html.se-community-market:not(#se-none) .market_paging_controls .pagebtn:not(.disabled):hover {
@@ -1448,7 +1448,7 @@ html.se-community-market:not(#se-none) .market_paging_pagelink {
   border-radius: var(--se-radius-pill);
   color: var(--se-text-muted) !important;
   cursor: pointer;
-  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-community-market:not(#se-none) .market_paging_pagelink:hover {
@@ -1607,7 +1607,7 @@ html.se-community-market:not(#se-none) #market_search input {
   color: var(--se-text) !important;
   font: 500 var(--se-fs-base)/1 var(--se-font) !important;
   outline: 0 !important;
-  transition: box-shadow var(--se-dur-fast);
+  transition: box-shadow var(--se-dur);
 }
 
 html.se-community-market:not(#se-none) #market_search input:focus {
@@ -1630,7 +1630,7 @@ html.se-community-market:not(#se-none) .market_search_advanced_button {
   color: var(--se-text-dim) !important;
   font: 600 var(--se-fs-sm)/1 var(--se-font) !important;
   cursor: pointer;
-  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-community-market:not(#se-none) .market_search_advanced_button:hover {
@@ -1682,7 +1682,7 @@ html.se-community-market .se-mkt-filter-input {
   color: var(--se-text);
   font: 500 var(--se-fs-sm)/1 var(--se-font);
   outline: 0;
-  transition: box-shadow var(--se-dur-fast);
+  transition: box-shadow var(--se-dur);
 }
 
 html.se-community-market .se-mkt-filter-input::placeholder {
@@ -1750,7 +1750,7 @@ html.se-community-market:not(#se-none) a.game_button {
   background: none !important;
   color: var(--se-text-dim) !important;
   text-decoration: none !important;
-  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-community-market:not(#se-none) a.game_button:hover {

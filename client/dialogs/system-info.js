@@ -107,20 +107,9 @@
 
   const clean = text => String(text ?? '').replace(/\s+/g, ' ').trim();
 
-  const el = (tag, className, text) => {
-    const node = document.createElement(tag);
-    if (className) node.className = className;
-    if (text != null) node.textContent = text;
-    return node;
-  };
+  const { el } = SE;
 
-  const icon = name => {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('aria-hidden', 'true');
-    svg.innerHTML = ICONS[name] ?? ICONS.info;
-    return svg;
-  };
+  const { icon } = SE.icons(ICONS, 'info');
 
   const button = (className, children, onClick, label) => {
     const node = el('button', className);

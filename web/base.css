@@ -1,0 +1,47 @@
+/*
+ * Web base: what every page on every site the theme loads on shares (Store, Community,
+ * Support: html.se-store, .se-community, .se-help, set by each site's loader before any
+ * stylesheet). Tokens are core/tokens.css, loaded just before this file.
+ */
+
+/* ---------- Motion and focus ---------- */
+
+/* Reduced motion: no animation or transition anywhere the theme reaches. */
+@media (prefers-reduced-motion: reduce) {
+  html:is(.se-store, .se-community, .se-help) *,
+  html:is(.se-store, .se-community, .se-help) *::before,
+  html:is(.se-store, .se-community, .se-help) *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* One keyboard focus ring for every control, Steam's and the theme's (text fields keep their own). */
+html:is(.se-store, .se-community, .se-help):not(#se-none) :is(a, button, select, [role="button"], [tabindex]):not(input, textarea):focus-visible {
+  outline: 2px solid var(--se-accent) !important;
+  outline-offset: 2px;
+}
+
+/* ---------- Footer ----------
+ * Steam's footer (#footer; its hashed React classes vary, the id and the --footer-bg-color
+ * hook it reads don't): the theme's page colour under a hairline, instead of Steam's
+ * translucent blue. The same React footer closes Community and Support pages, so it applies
+ * on every site the theme loads on.
+ */
+html:is(.se-store, .se-community, .se-help):not(#se-none) #footer {
+  --footer-bg-color: var(--se-bg);
+  background-color: var(--se-bg) !important;
+  box-shadow: inset 0 1px 0 var(--se-hairline);
+  color: var(--se-text-faint);
+}
+
+html.se-store:not(#se-none) #footer a {
+  color: var(--se-text-muted);
+  transition: color var(--se-dur);
+}
+
+html.se-store:not(#se-none) #footer a:hover {
+  color: var(--se-text);
+}

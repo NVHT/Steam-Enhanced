@@ -906,12 +906,7 @@
 
   /* ---------- DOM ---------- */
 
-  const el = (tag, className, text) => {
-    const node = document.createElement(tag);
-    if (className) node.className = className;
-    if (text != null) node.textContent = text;
-    return node;
-  };
+  const { el } = SE;
 
   const button = (className, attrs = {}) => {
     const node = el('button', className);

@@ -1,0 +1,404 @@
+/*
+ * Family View (/parental/...), with account/parental/page.js:
+ *
+ *   [ Home › Account › Family View                                  ]
+ *   [ Family View                                                   ]
+ *   [ Family View can be used to restrict access to content …       ]
+ *   [ FAMILY VIEW IS CURRENTLY  ( Disabled )   Learn more: click here ]
+ *   [ Set up Family View                                             ]
+ *   [ Select what your protected account can access …                ]
+ *   [ LIBRARY CONTENT                                                ]
+ *   [ ▣ Only games I choose                                    (•)   ]
+ *   [ ▣ All games                                              ( )   ]
+ *   [ ONLINE CONTENT & FEATURES                                      ]
+ *   [ ▣ Steam store                                          [■—]    ]
+ *   [                                                     ( Next )   ]
+ *
+ * Header, page colour and Steam ID chip come from account/page.css (the page carries
+ * .se-store-account too). This page has no store bar and no responsive frame: body >
+ * .page_header_ctn, .page_content_ctn > #main_content > .parental_settings_description,
+ * .leftcol > .parental_settings_box (.accountInfoBlock > .parental_settings_current_status,
+ * .parental_settings_content > h2, .parental_settings_instructions, .parental_settings_form >
+ * form > .feature_row (input + label), button). Later steps (games, email, PIN) are more forms
+ * of the same parts and get the same look. Rules use html.se-store-parental:not(#se-none) for
+ * ID-level weight over Steam's rules (styles_parental.css).
+ */
+
+/* ---------- Frame ---------- */
+
+html.se-store-parental:not(#se-none) .page_content_ctn {
+  background: none !important;
+}
+
+html.se-store-parental:not(#se-none) #main_content {
+  display: flex !important;
+  flex-direction: column;
+  gap: 20px;
+  height: auto !important;
+  padding: 0 0 64px !important;
+}
+
+html.se-store-parental:not(#se-none) #main_content > :is(.leftcol, .rightcol) {
+  width: auto !important;
+  max-width: 760px;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+html.se-store-parental:not(#se-none) #main_content > div:not([class]) {
+  display: none !important; /* float clearers */
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_description {
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-lg)/1.6 var(--se-font) !important;
+}
+
+/* ---------- The card ---------- */
+
+html.se-store-parental:not(#se-none) .parental_settings_box {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
+  overflow: clip;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-md)/1.55 var(--se-font) !important;
+}
+
+/* Status strip across the card's top */
+html.se-store-parental:not(#se-none) .parental_settings_box .accountInfoBlock {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 18px 28px !important;
+  border: 0 !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 -1px 0 var(--se-divider);
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_current_status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 20px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_current_status > p {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_status_title2 {
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_status_title1 {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-base)/1 var(--se-font) !important;
+  text-transform: none !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_current_status > div:not(.inner_rule) {
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-base)/1.4 var(--se-font) !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_current_status .inner_rule {
+  display: none !important; /* the strip's own edge divides it */
+}
+
+/* Step content */
+html.se-store-parental:not(#se-none) .parental_settings_content {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 24px 28px 28px !important;
+  background: none !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_content h2 {
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-2xl)/1.3 var(--se-font) !important;
+  letter-spacing: -.01em;
+  text-transform: none !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_content .parental_settings_instructions {
+  margin: 0 0 18px !important;
+  padding: 0 !important;
+  color: var(--se-text-dim) !important;
+  font: 400 var(--se-fs-md)/1.6 var(--se-font) !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_followsteps {
+  margin-top: 6px !important;
+  color: var(--se-text-muted) !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_box a:not([class*="btn"]) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+  transition: color var(--se-dur);
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_box a:not([class*="btn"]):hover {
+  color: var(--se-accent-hover) !important;
+}
+
+/* ---------- The form ---------- */
+
+html.se-store-parental:not(#se-none) .parental_settings_form {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_form form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_form br {
+  display: none;
+}
+
+/* Section labels in the form ("Library content", "Online content & features") */
+html.se-store-parental:not(#se-none) .parental_settings_form .parental_settings_instructions {
+  margin: 14px 0 4px !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_form form > :first-child .parental_settings_instructions,
+html.se-store-parental:not(#se-none) .parental_settings_form form > .parental_settings_instructions:first-child {
+  margin-top: 0 !important;
+}
+
+html.se-store-parental:not(#se-none) #libraryradio {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: auto !important;
+}
+
+/* Rows: chip, label, then the input as a switch (checkbox) or a dot (radio) */
+html.se-store-parental:not(#se-none) .feature_row {
+  display: flex !important;
+  align-items: center;
+  gap: 14px;
+  min-height: 52px;
+  margin: 0 !important;
+  padding: 8px 16px 8px 10px !important;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  cursor: pointer;
+  transition: background-color var(--se-dur), box-shadow var(--se-dur);
+}
+
+html.se-store-parental:not(#se-none) .feature_row:hover {
+  background: var(--se-hover);
+}
+
+html.se-store-parental:not(#se-none) .feature_row:has(> input:checked) {
+  box-shadow: inset 0 0 0 1px var(--se-accent-surface);
+}
+
+.se-parental-chip {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-pill);
+  color: var(--se-text-faint);
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+.feature_row:has(> input:checked) > .se-parental-chip {
+  background: var(--se-accent-surface);
+  color: var(--se-accent);
+}
+
+.se-parental-chip svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.se-parental-chip svg .d {
+  fill: currentColor;
+  fill-opacity: .3;
+  stroke: none;
+}
+
+html.se-store-parental:not(#se-none) .feature_row > label {
+  flex: 1;
+  order: 1;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1.35 var(--se-font) !important;
+  cursor: pointer;
+}
+
+html.se-store-parental:not(#se-none) .feature_row > input:is([type="checkbox"], [type="radio"]) {
+  order: 2;
+  flex: none;
+  position: relative;
+  margin: 0 !important;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  cursor: pointer;
+  transition: background-color var(--se-dur), box-shadow var(--se-dur);
+}
+
+/* Switch */
+html.se-store-parental:not(#se-none) .feature_row > input[type="checkbox"] {
+  width: 38px;
+  height: 22px;
+  border-radius: var(--se-radius-pill);
+}
+
+html.se-store-parental:not(#se-none) .feature_row > input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--se-text-muted);
+  transition: transform var(--se-dur) var(--se-ease), background-color var(--se-dur);
+}
+
+html.se-store-parental:not(#se-none) .feature_row > input[type="checkbox"]:checked {
+  background: var(--se-accent);
+  box-shadow: none;
+}
+
+html.se-store-parental:not(#se-none) .feature_row > input[type="checkbox"]:checked::after {
+  background: var(--se-on-accent);
+  transform: translateX(16px);
+}
+
+/* Radio */
+html.se-store-parental:not(#se-none) .feature_row > input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+html.se-store-parental:not(#se-none) .feature_row > input[type="radio"]:checked {
+  box-shadow: inset 0 0 0 6px var(--se-accent);
+  background: var(--se-on-accent);
+}
+
+html.se-store-parental:not(#se-none) .feature_row > input:focus-visible {
+  outline: 2px solid var(--se-accent);
+  outline-offset: 2px;
+}
+
+/* Text fields of later steps (email, PIN) */
+html.se-store-parental:not(#se-none) .parental_settings_box :is(input:is([type="text"], [type="email"], [type="password"], [type="number"], [type="tel"]), select, textarea) {
+  box-sizing: border-box;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text);
+  font: 500 var(--se-fs-md)/1.4 var(--se-font);
+  outline: none;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_box :is(input, select, textarea):focus-visible {
+  box-shadow: inset 0 0 0 1px var(--se-accent);
+}
+
+/* ---------- Buttons: Steam's blue one is the step's action ---------- */
+
+html.se-store-parental:not(#se-none) .parental_settings_box :is(button, a)[class*="btn_"] {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-end;
+  height: 38px;
+  margin: 14px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  cursor: pointer;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur);
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_box :is(button, a)[class*="btn_"] > span {
+  padding: 0 22px !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: 700 var(--se-fs-md)/38px var(--se-font) !important;
+  text-shadow: none !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_box :is(button, a)[class*="btn_"]:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_box :is(button, a):is(.btn_blue_white_innerfade, .btn_green_white_innerfade, .btnv6_green_white_innerfade) {
+  background: var(--se-accent) !important;
+  box-shadow: none;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-store-parental:not(#se-none) .parental_settings_box :is(button, a):is(.btn_blue_white_innerfade, .btn_green_white_innerfade, .btnv6_green_white_innerfade):hover {
+  background: var(--se-accent-hover) !important;
+}

@@ -18,8 +18,8 @@ export default (dom) => {
 
   const ATTR = 'data-se-nav';
   const PANEL_ATTR = 'data-se-p';
-  const PAGE_GUTTER = 28; // shared/base.css --se-page-gutter
-  const PAGE_MAX = 1760; // shared/base.css --se-page-max
+  const PAGE_GUTTER = 28; // shared/layout.css --se-page-gutter
+  const PAGE_MAX = 1760; // shared/layout.css --se-page-max
 
   const tag = (node, role) => mark(node, ATTR, role);
 

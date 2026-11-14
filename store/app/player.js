@@ -17,48 +17,25 @@
  * rests; any movement brings it back.
  */
 
-/*
- * The library's files, tried in order (the ES module's default export, else the UMD build's
- * global). The .js name comes first: Millennium's file server doesn't label .mjs as
- * JavaScript, and Chromium refuses a module served under any other type. A file that still
- * fails that check is fetched and imported from a Blob carrying the right type.
- */
-const VENDOR = ['../vendor/hls.min.js', '../vendor/hls.min.mjs'];
+/** hls.js, ES module build. Served as .js: Millennium's file server doesn't label .mjs as JavaScript. */
+const VENDOR = '../vendor/hls.min.js';
 /** How long a source may take to show its first frame's metadata before the next is tried. */
 const LOAD_TIMEOUT_MS = 10000;
 const IDLE_MS = 2200;
 const STEP_S = 10;
 
-/** hls.js, imported once from the theme's vendor folder (ES module, else the UMD build). */
+/** hls.js, imported once from the theme's vendor folder. */
 let hlsLibrary = null;
-
-/** Import a module whose server sends the wrong MIME type: re-serve its text as JavaScript. */
-const importAsScript = async (href) => {
-  const response = await fetch(href);
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const blob = URL.createObjectURL(new Blob([await response.text()], { type: 'text/javascript' }));
-  try {
-    return await import(blob);
-  } finally {
-    URL.revokeObjectURL(blob);
-  }
-};
 
 const loadHls = () => {
   hlsLibrary ??= (async () => {
-    const search = new URL(import.meta.url).search;
-    for (const file of VENDOR) {
-      const url = new URL(file, import.meta.url);
-      url.search = search;
-      for (const load of [(href) => import(href), importAsScript]) {
-        try {
-          const module = await load(url.href);
-          const Hls = module.default ?? globalThis.Hls;
-          if (Hls?.isSupported?.()) return Hls;
-        } catch (error) {
-          console.debug('[Steam Enhanced] hls.js not loaded from', file, error);
-        }
-      }
+    const url = new URL(VENDOR, import.meta.url);
+    url.search = new URL(import.meta.url).search;
+    try {
+      const { default: Hls } = await import(url.href);
+      if (Hls?.isSupported?.()) return Hls;
+    } catch (error) {
+      console.debug('[Steam Enhanced] hls.js not loaded', error);
     }
     console.warn('[Steam Enhanced] hls.js unavailable; trailers fall back to Steam\'s player');
     return null;

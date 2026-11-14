@@ -19,11 +19,11 @@
  *     theme's tooltip style.
  *
  * Classes are Steam's (SteamTracking: steamcommunity.com/public/css/skin_1/globalv2.css,
- * buttons.css, profilev2.css, forums.css). Tokens come from store/shared/base.css.
+ * buttons.css, profilev2.css, forums.css). Tokens come from core/tokens.css.
  */
 
 html.se-community-ui {
-  /* The store's page width (store/shared/base.css): the window minus a gutter, capped */
+  /* The store's page width (store/shared/layout.css, same values): the window minus a gutter, capped */
   --se-page-gutter: 28px;
   --se-page-max: 1760px;
   --se-community-width: min(100vw - 2 * var(--se-page-gutter), var(--se-page-max));
@@ -53,29 +53,11 @@ html.se-community-ui :is(.pagecontent, #BG_bottom, #mainContents) {
 }
 
 html.se-community-ui :is(a.whiteLink, .whiteLink a) {
-  transition: color var(--se-dur-fast);
+  transition: color var(--se-dur);
 }
 
 html.se-community-ui :is(a.whiteLink, .whiteLink a):hover {
   color: var(--se-accent) !important;
-}
-
-/* ---------- Motion and focus ---------- */
-
-@media (prefers-reduced-motion: reduce) {
-  html.se-community-ui *,
-  html.se-community-ui *::before,
-  html.se-community-ui *::after {
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-html.se-community-ui:not(#se-none) :is(a, button, select, [role="button"], [tabindex]):not(input, textarea):focus-visible {
-  outline: 2px solid var(--se-accent) !important;
-  outline-offset: 2px;
 }
 
 /* ---------- Pill buttons ---------- */
@@ -109,7 +91,7 @@ html.se-community-ui :is(
   text-shadow: none !important;
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color var(--se-dur-fast), color var(--se-dur-fast), box-shadow var(--se-dur-fast), filter var(--se-dur-fast);
+  transition: background-color var(--se-dur), color var(--se-dur), box-shadow var(--se-dur), filter var(--se-dur);
 }
 
 html.se-community-ui :is(
@@ -270,7 +252,7 @@ html.se-community-ui :is(.commentthread_paging, .forum_paging_controls, .pageLin
   color: var(--se-text) !important;
   font: 700 var(--se-fs-sm)/1 var(--se-font) !important;
   text-decoration: none !important;
-  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-community-ui :is(.commentthread_paging, .forum_paging_controls, .pageLinks) .pagebtn:not(.disabled):hover {
@@ -301,7 +283,7 @@ html.se-community-ui :is(.commentthread_pagelink, .forum_paging_pagelink) {
   letter-spacing: 0;
   text-decoration: none !important;
   cursor: pointer;
-  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-community-ui :is(.commentthread_pagelink, .forum_paging_pagelink):hover {
@@ -417,7 +399,7 @@ html.se-community-ui :is(.commentthread_textarea, .forumtopic_reply_textarea, .c
   font: 400 var(--se-fs-md)/1.5 var(--se-font) !important;
   outline: 0 !important;
   resize: vertical;
-  transition: box-shadow var(--se-dur-fast);
+  transition: box-shadow var(--se-dur);
 }
 
 html.se-community-ui :is(.commentthread_textarea, .forumtopic_reply_textarea, .commentthread_comment_edit_textarea_ctn textarea):focus {
@@ -491,7 +473,7 @@ html.se-community-ui .commentthread_subscribe_checkbox {
   border-radius: 5px;
   background: var(--se-field) !important;
   box-shadow: inset 0 0 0 1.5px var(--se-text-faint);
-  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+  transition: background-color var(--se-dur), box-shadow var(--se-dur);
 }
 
 html.se-community-ui .commentthread_subscribe_checkbox .commentthread_subscribe_check {
@@ -507,7 +489,7 @@ html.se-community-ui .commentthread_subscribe_checkbox .commentthread_subscribe_
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12.5l5 5L20 6.5'/%3E%3C/svg%3E") center / contain no-repeat;
   opacity: 0;
   transform: scale(.6);
-  transition: opacity var(--se-dur-fast), transform var(--se-dur-fast) var(--se-ease);
+  transition: opacity var(--se-dur), transform var(--se-dur) var(--se-ease);
 }
 
 html.se-community-ui .commentthread_subscribe_ctn.checked .commentthread_subscribe_checkbox {
@@ -541,7 +523,7 @@ html.se-community-ui .commentthread_count .commentthread_subscribe_hint_q {
   color: var(--se-text-muted) !important;
   font: 700 10px/1 var(--se-font) !important;
   cursor: help;
-  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-community-ui .commentthread_count .commentthread_subscribe_hint_q:hover {
@@ -695,7 +677,7 @@ html.se-community-ui .commentthread_comment_actions {
   float: none !important;
   margin: 0 !important;
   opacity: 0;
-  transition: opacity var(--se-dur-fast);
+  transition: opacity var(--se-dur);
 }
 
 html.se-community-ui .commentthread_comment:is(:hover, :focus-within) .commentthread_comment_actions {
@@ -885,7 +867,7 @@ html.se-community-ui .emoticon_option {
   border-radius: var(--se-radius-sm);
   background: none !important;
   cursor: pointer;
-  transition: background-color var(--se-dur-fast), transform var(--se-dur-fast) var(--se-ease);
+  transition: background-color var(--se-dur), transform var(--se-dur) var(--se-ease);
 }
 
 html.se-community-ui .emoticon_option:hover {
@@ -946,7 +928,7 @@ html.se-community-ui .se-tip {
   white-space: pre-line;
   overflow-wrap: anywhere;
   pointer-events: none;
-  animation: se-tip-in var(--se-dur-fast) var(--se-ease);
+  animation: se-tip-in var(--se-dur) var(--se-ease);
 }
 
 html.se-community-ui .se-tip[hidden] {

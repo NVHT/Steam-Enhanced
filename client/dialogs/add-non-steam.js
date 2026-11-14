@@ -88,25 +88,11 @@
 
   const clean = text => String(text ?? '').replace(/\s+/g, ' ').trim();
 
-  const el = (tag, className, text) => {
-    const node = document.createElement(tag);
-    if (className) node.className = className;
-    if (text != null) node.textContent = text;
-    return node;
-  };
+  const { el } = SE;
 
-  /* Writes text only when it differs: a rewrite swaps the text node out from under the pointer */
-  const setText = (node, value) => {
-    if (node && node.textContent !== value) node.textContent = value;
-  };
+  const { setText } = SE;
 
-  const icon = name => {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('aria-hidden', 'true');
-    svg.innerHTML = ICONS[name];
-    return svg;
-  };
+  const { icon } = SE.icons(ICONS);
 
   const button = (className, onClick) => {
     const node = el('button', className);
@@ -117,7 +103,7 @@
 
   const nextFrame = () => new Promise(resolve => requestAnimationFrame(() => resolve()));
 
-  const isOurs = node => !!(node?.nodeType === 1 ? node : node?.parentElement)?.closest?.(`.${OURS}`);
+  const isOurs = SE.inside(`.${OURS}`);
 
   const storage = {
     get: (key, fallback) => attempt(() => localStorage.getItem(key) ?? fallback, fallback),

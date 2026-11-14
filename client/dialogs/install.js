@@ -52,22 +52,15 @@
     }
   };
 
-  const el = (tag, className, text) => {
-    const node = document.createElement(tag);
-    if (className) node.className = className;
-    if (text != null) node.textContent = text;
-    return node;
-  };
+  const { el } = SE;
 
-  const setText = (node, value) => {
-    if (node && node.textContent !== value) node.textContent = value;
-  };
+  const { setText } = SE;
 
   const setStyle = (node, name, value) => {
     if (node.style.getPropertyValue(name) !== value) node.style.setProperty(name, value);
   };
 
-  const isOurs = node => !!(node?.nodeType === 1 ? node : node?.parentElement)?.closest?.(`.${OURS}`);
+  const isOurs = SE.inside(`.${OURS}`);
 
   const num = value => {
     const n = Number(value);

@@ -1,10 +1,10 @@
 /*
  * Support loader: which files Steam Support pages get (help.steampowered.com). The mechanics
- * are core/site-loader.js; this is the config. core/core.js loads this module with
+ * are web/site-loader.js; this is the config. core/core.js loads this module with
  * ?v=<theme version>, and every file (the site loader included) is requested with the same one.
  *
- * Support is one wizard that swaps its content in place, so its look is site-wide: the store's
- * tokens (store/shared/base.css) and help/site.css + help/site.js on every page. <html> gets
+ * Support is one wizard that swaps its content in place, so its look is site-wide: tokens
+ * (core/tokens.css), web/base.css, and help/site.css + help/site.js on every page. <html> gets
  * .se-help.
  */
 const versioned = (file) => {
@@ -12,7 +12,7 @@ const versioned = (file) => {
   url.search = new URL(import.meta.url).search;
   return url.href;
 };
-const { start } = await import(versioned('../core/site-loader.js'));
+const { start } = await import(versioned('../web/site-loader.js'));
 
 start({
   base: import.meta.url,
@@ -20,7 +20,8 @@ start({
   global: '__seHelp',
   pages: {},
   files: [
-    { css: '../store/shared/base.css' },
+    { css: '../core/tokens.css' },
+    { css: '../web/base.css' },
     { css: 'site.css', js: 'site.js' },
   ],
 });

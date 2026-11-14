@@ -1,10 +1,10 @@
 /*
  * Community loader: which files each Steam Community page gets (steamcommunity.com). The
- * mechanics are core/site-loader.js; this is the config. core/core.js loads this module with
+ * mechanics are web/site-loader.js; this is the config. core/core.js loads this module with
  * ?v=<theme version>, and every file (the site loader included) is requested with the same one.
  *
- * <html> gets .se-community and one class per matched page (.se-community-dmca ...). The
- * store's tokens (store/shared/base.css) cover this site too. Every redesigned classic page
+ * <html> gets .se-community and one class per matched page (.se-community-dmca ...). Tokens
+ * (core/tokens.css) and the shared web base (web/base.css) load first on every page. Every redesigned classic page
  * also matches `ui` (.se-community-ui): the shared frame, buttons, avatars and comments.
  *
  * Layout:
@@ -26,7 +26,7 @@ const versioned = (file) => {
   url.search = new URL(import.meta.url).search;
   return url.href;
 };
-const { start } = await import(versioned('../core/site-loader.js'));
+const { start } = await import(versioned('../web/site-loader.js'));
 
 // /id/<name> or /profiles/<steamid>, then the rest of the path ('' on the profile itself)
 const PROFILE = /^\/(?:id|profiles)\/[^/]+(\/.*)?$/i;
@@ -68,7 +68,8 @@ start({
     market: { test: isMarket, root: 'se-community-market' },
   },
   files: [
-    { css: '../store/shared/base.css' },
+    { css: '../core/tokens.css' },
+    { css: '../web/base.css' },
     { css: 'shared/ui.css', on: ['ui'] },
     { css: 'shared/small-header.css', on: ['inventory', 'activitySettings', 'editProfile'] },
     { css: 'dmca/page.css', js: 'dmca/page.js', on: ['dmca'] },

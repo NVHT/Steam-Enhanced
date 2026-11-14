@@ -16,8 +16,13 @@
  * Files load with the loader's own query string, so whatever cache-busting Millennium puts on
  * this file carries over to every file.
  *
+ * Web pages: skin.json's patches match web views by URL, so this loader and the content and
+ * desktop stubs also run on Store, Community and other web pages. Those have their own loaders
+ * (core/core.js starts them); here they get only WEB_FILES, the window-agnostic basics. Client
+ * windows are served from steamloopback.host or are about:blank popups of it.
+ *
  * Groups (regexes in skin.json):
- *   all           every window and web view (no stub: this file)
+ *   all           every client window (no stub: this file)
  *   main          the main Steam window
  *   content       every window but menus and notification toasts
  *   desktop       content windows minus the overlay, Big Picture, Quick Access, Main Menu,
@@ -41,6 +46,7 @@
     ['overlay', 'client/overlay/overlay.js'],
     ['all', 'client/overlay/overlay-popups.css'],
     ['main', 'client/friends/friends-background.js'],
+    ['all', 'core/font.css'],
     ['all', 'core/tokens.css'],
     ['all', 'core/images.css'],
     ['all', 'core/images.js'],
@@ -84,8 +90,8 @@
     ['main', 'client/home/home-stage.css'],
     ['main', 'client/home/home-stage.js'],
     ['all', 'client/dialogs/dialogs.css'],
-    ['all', 'client/dialogs/install.css'],
-    ['all', 'client/dialogs/eula.css'],
+    ['content', 'client/dialogs/install.css'],
+    ['content', 'client/dialogs/eula.css'],
     ['all', 'client/dialogs/hover-cards.css'],
     ['all', 'client/friends/friend-hover.css'],
     ['all', 'client/friends/friend-hover.js'],
@@ -163,6 +169,17 @@
     ['main', 'client/game-page/player-count.css'],
   ];
 
+  /** What web pages take from this list: the broken-image guard, scrollbars, emoticon picker. */
+  const WEB_FILES = new Set([
+    'core/images.css',
+    'core/images.js',
+    'core/scrollbars.css',
+    'core/scrollbars.js',
+    'client/friends/emoticon-picker.css',
+    'client/friends/emoticon-picker.js',
+  ]);
+  const onWeb = /^https?:$/.test(location.protocol) && location.hostname !== 'steamloopback.host';
+
   const self =
     document.currentScript?.src ||
     [...document.scripts].find((script) => /\/client\/loader\.js(?:[?#]|$)/.test(script.src))?.src;
@@ -208,7 +225,7 @@
   const flush = () => {
     for (const group of (window.__seWindows ??= []).splice(0)) groups.add(group);
     FILES.forEach(([group, file], order) => {
-      if (!groups.has(group) || added.has(file)) return;
+      if (!groups.has(group) || added.has(file) || (onWeb && !WEB_FILES.has(file))) return;
       added.add(file);
       if (file.endsWith('.css')) addStylesheet(file, order);
       else addScript(file);

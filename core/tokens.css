@@ -1,21 +1,9 @@
 /*
- * Theme font: Xmind, a variable font (wght 100-900) bundled in core/fonts/ (SIL OFL 1.1, see
- * core/fonts/OFL.txt), so every weight is real rather than synthesised and works offline.
- * The Google Fonts copy is only a backup: the bundled face is declared after it and wins, and
- * Chromium falls back to the earlier face of the same family only if the bundled file fails.
- * Its file is never downloaded while the bundled one loads. Beyond both: Motiva Sans, Arial.
+ * Design tokens and feature switches: the one source for the client windows (client/loader.js)
+ * and the Store, Community and Support web pages (their loaders). Feature code uses these and
+ * nothing raw: colours, type scale, radii, elevation, blur and motion each have one value here.
+ * The font face and the theme-wide font rule are core/font.css.
  */
-@import url("https://fonts.googleapis.com/css2?family=Xmind:wght@100..900&display=swap");
-
-@font-face {
-  font-family: "Xmind";
-  src: url("fonts/Xmind-Variable.woff2") format("woff2");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Global design tokens and user-configurable feature flags. */
 :root {
   /* Surface hierarchy (darkest to lightest) */
   --se-bg: #171a20;
@@ -25,6 +13,8 @@
   --se-hover: #2c3440;
   --se-selected: #33404f;
   --se-hairline: rgba(255, 255, 255, .06);
+  --se-divider: rgba(255, 255, 255, .08);
+  --se-pill: rgba(255, 255, 255, .06);
   --se-track: #3a424d;
   --se-border-strong: #4a525e;
   --se-field: #15181d;
@@ -38,7 +28,9 @@
   --se-text-dim: #b8c0c8;
   --se-text-faint: #6f7984;
   --se-text-strong: #fff;
+  --se-white: #fff;
   --se-bg-ink: #0f1115;
+  --se-on-accent: #0f1115; /* text and icons on an accent fill */
 
   /* Semantic & status accents */
   --se-accent: #7cc4ff;
@@ -72,6 +64,23 @@
   --se-glass: rgba(16, 18, 23, .8);
   --se-danger-text: #ffb0b3;
   --se-play: #3a8a22;
+
+  /* Store item flags: on wishlist, in library, in cart; pre-purchase pill; live broadcast */
+  --se-wish: #ff8fb8;
+  --se-owned: #cfe8ff;
+  --se-cart: #a4d007;
+  --se-prepurchase: #b5df20;
+  --se-prepurchase-bg: rgba(164, 208, 7, .14);
+  --se-live: #ff4d5e;
+
+  /* Glass: chips on art (flags, DLC, price, titles) and round buttons (carousel arrows) */
+  --se-glass-chip: rgba(10, 12, 16, .62);
+  --se-glass-chip-line: rgba(255, 255, 255, .1);
+  --se-glass-btn: rgba(23, 26, 32, .78);
+  --se-glass-btn-hover: rgba(44, 52, 64, .9);
+  --se-glass-btn-line: rgba(255, 255, 255, .12);
+  --se-blur-chip: blur(10px) saturate(1.4);
+  --se-blur-panel: blur(16px);
 
   /* Achievement rarity tiers, by global unlock rate */
   --se-tier-legendary: #f0c060;
@@ -110,6 +119,13 @@
   /* Hovered cover/card: accent ring plus lift */
   --se-shadow-tooltip: 0 10px 24px -8px rgba(0, 0, 0, .8), inset 0 0 0 1px var(--se-hairline);
   --se-shadow-ring: 0 0 0 2px var(--se-accent), 0 18px 30px -12px rgba(0, 0, 0, .85);
+  --se-shadow-sm: 0 6px 16px -8px rgba(0, 0, 0, .9);
+  --se-shadow-md: 0 18px 40px -16px rgba(0, 0, 0, .9);
+  --se-shadow-lg: 0 24px 48px -16px rgba(0, 0, 0, .9);
+  --se-glass-btn-shadow: var(--se-shadow-sm);
+  /* Pop-up panels (menus, dropdowns, tooltips, hover cards): one recipe everywhere */
+  --se-panel-bg: rgba(31, 36, 43, .96);
+  --se-panel-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg);
   --se-play-hover: #44a028;
   --se-play-glow: rgba(80, 180, 50, .55);
 
@@ -123,11 +139,12 @@
   --se-focus-outline: 2px solid var(--se-accent);
   --se-focus-offset: 2px;
 
-  /* Motion */
+  /* Motion: fast (hover, press), base (state), slow (panels), slower (page-scale) */
   --se-ease: cubic-bezier(.2, .8, .2, 1);
   --se-dur-fast: .12s;
   --se-dur: .15s;
   --se-dur-slow: .25s;
+  --se-dur-slower: .5s;
 
   /* Stacking layers */
   --se-z-raised: 1;
@@ -143,14 +160,20 @@
   --se-label-font: 700 11px/14px var(--se-font);
   --se-label-spacing: .1em;
   --se-label-color: var(--se-text-faint);
-  /* Type scale (px): 10.5 / 11 / 12 / 13 / 14 / 16 / 20 */
+  /* Type scale (px): 10.5 / 11 / 12 / 13 / 14 / 16 / 18 / 20 / 24 / 30, then fluid titles */
   --se-fs-2xs: 10.5px;
   --se-fs-xs: 11px;
   --se-fs-sm: 12px;
-  --se-fs-md: 13px;
-  --se-fs-lg: 14px;
-  --se-fs-xl: 16px;
+  --se-fs-base: 13px;
+  --se-fs-md: 14px;
+  --se-fs-lg: 16px;
+  --se-fs-xl: 18px;
   --se-fs-2xl: 20px;
+  --se-fs-3xl: 24px;
+  --se-fs-4xl: 30px;
+  --se-fs-headline: clamp(24px, 2.2vw, 32px); /* section titles */
+  --se-fs-display: clamp(30px, 3vw, 44px); /* page titles */
+  --se-fs-hero: clamp(38px, 4vw, 60px); /* hero titles */
 
   /* Startup background: library | hero | mosaic | wall | plain | dots | steam */
   --se-startup-background: library;
@@ -194,10 +217,6 @@
   --se-icon-settings-tune: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round'%3E%3Cpath d='M4 7h9M17 7h3M4 17h3M11 17h9'/%3E%3Ccircle cx='15' cy='7' r='2.4' fill='%23000' fill-opacity='.32'/%3E%3Ccircle cx='9' cy='17' r='2.4' fill='%23000' fill-opacity='.32'/%3E%3C/svg%3E");
   --se-icon-settings: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Cpath%20d%3D%22M12.22%202h-.44a2%202%200%200%200-2%202v.18a2%202%200%200%201-1%201.73l-.43.25a2%202%200%200%201-2%200l-.15-.08a2%202%200%200%200-2.73.73l-.22.38a2%202%200%200%200%20.73%202.73l.15.1a2%202%200%200%201%201%201.72v.51a2%202%200%200%201-1%201.74l-.15.09a2%202%200%200%200-.73%202.73l.22.38a2%202%200%200%200%202.73.73l.15-.08a2%202%200%200%201%202%200l.43.25a2%202%200%200%201%201%201.73V20a2%202%200%200%200%202%202h.44a2%202%200%200%200%202-2v-.18a2%202%200%200%201%201-1.73l.43-.25a2%202%200%200%201%202%200l.15.08a2%202%200%200%200%202.73-.73l.22-.39a2%202%200%200%200-.73-2.73l-.15-.08a2%202%200%200%201-1-1.74v-.5a2%202%200%200%201%201-1.74l.15-.09a2%202%200%200%200%20.73-2.73l-.22-.38a2%202%200%200%200-2.73-.73l-.15.08a2%202%200%200%201-2%200l-.43-.25a2%202%200%200%201-1-1.73V4a2%202%200%200%200-2-2z%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M12.22%202h-.44a2%202%200%200%200-2%202v.18a2%202%200%200%201-1%201.73l-.43.25a2%202%200%200%201-2%200l-.15-.08a2%202%200%200%200-2.73.73l-.22.38a2%202%200%200%200%20.73%202.73l.15.1a2%202%200%200%201%201%201.72v.51a2%202%200%200%201-1%201.74l-.15.09a2%202%200%200%200-.73%202.73l.22.38a2%202%200%200%200%202.73.73l.15-.08a2%202%200%200%201%202%200l.43.25a2%202%200%200%201%201%201.73V20a2%202%200%200%200%202%202h.44a2%202%200%200%200%202-2v-.18a2%202%200%200%201%201-1.73l.43-.25a2%202%200%200%201%202%200l.15.08a2%202%200%200%200%202.73-.73l.22-.39a2%202%200%200%200-.73-2.73l-.15-.08a2%202%200%200%201-1-1.74v-.5a2%202%200%200%201%201-1.74l.15-.09a2%202%200%200%200%20.73-2.73l-.22-.38a2%202%200%200%200-2.73-.73l-.15.08a2%202%200%200%201-2%200l-.43-.25a2%202%200%200%201-1-1.73V4a2%202%200%200%200-2-2z%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%223%22%2F%3E%3C%2Fsvg%3E");
   --se-icon-stat-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E");
-}
-
-/* The theme font on every element of every client window (Store/Community web views get the
- * same rule from compat/webkit.css). Code-like text opts out with its own !important. */
-* {
-  font-family: var(--se-font) !important;
+  /* Star icon (wishlist) as a mask, drawn in the text colour */
+  --se-star-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z'/%3E%3C/svg%3E");
 }

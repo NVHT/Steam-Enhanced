@@ -37,7 +37,7 @@
     box.style.cssText =
       'position:fixed;top:70px;right:24px;z-index:var(--se-z-max);max-width:480px;padding:18px;' +
       'border-radius:var(--se-radius-ml);background:var(--se-surface);box-shadow:var(--se-shadow-pop);' +
-      'color:var(--se-text);font:var(--se-fs-lg)/1.5 var(--se-font)';
+      'color:var(--se-text);font:var(--se-fs-md)/1.5 var(--se-font)';
     const text = document.createElement('div');
     text.textContent = `Millennium popup: ${failure || 'Popup runtime unavailable.'}`;
     const close = document.createElement('button');

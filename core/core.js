@@ -45,15 +45,30 @@
   }
   const reveal = () => root.setAttribute('data-se-styled', '');
 
+  // Every site's loader imports web/site-loader.js, which imports web/dom.js: preloading both
+  // with the loader starts all three downloads at once instead of one after another. The URLs
+  // must match the imports exactly (same ?v=) for the browser to reuse them.
+  const PRELOAD = ['../web/site-loader.js', '../web/dom.js'];
+
   const load = (version) => {
-    const url = new URL(loader, coreSrc);
-    if (version) url.searchParams.set('v', version);
+    const versioned = (file) => {
+      const url = new URL(file, coreSrc);
+      if (version) url.searchParams.set('v', version);
+      return url.href;
+    };
+    const head = document.head ?? document.documentElement;
+    for (const file of PRELOAD) {
+      const href = versioned(file);
+      if (head.querySelector(`link[rel="modulepreload"][href="${href}"]`)) continue;
+      head.append(Object.assign(document.createElement('link'), { rel: 'modulepreload', href }));
+    }
+    const url = new URL(versioned(loader));
     const script = document.createElement('script');
     script.type = 'module';
     script.src = url.href;
     script.dataset.seFeature = 'loader';
     script.addEventListener('error', reveal, { once: true });
-    (document.head ?? document.documentElement).append(script);
+    head.append(script);
   };
   // Never from cache, and a fresh URL each time: a version bump leaves skin.json the same size,
   // and a size-based validator would answer "not modified" and hand back the old version.
@@ -700,6 +715,45 @@
     else mark(el, name, String(value));
   };
 
+  // A theme element: tag, optional class, optional text.
+  const el = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text != null) node.textContent = text;
+    return node;
+  };
+
+  // Writes text only when it differs: a rewrite swaps the text node out from under the pointer.
+  const setText = (node, value) => {
+    if (node && node.textContent !== value) node.textContent = value;
+  };
+
+  /*
+   * Inline SVG icons from a name -> markup map (24-unit viewBox):
+   *   const { icon, setIcon } = SE.icons(ICONS, 'info');
+   * icon(name, className?) makes one; setIcon(svg, name) swaps an icon in place. `fallback`
+   * names the icon used for an unknown name.
+   */
+  const icons = (map, fallback) => {
+    const markup = name => map[name] ?? (fallback ? map[fallback] : '') ?? '';
+    return {
+      icon(name, className) {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('aria-hidden', 'true');
+        if (className) svg.setAttribute('class', className);
+        svg.dataset.icon = name;
+        svg.innerHTML = markup(name);
+        return svg;
+      },
+      setIcon(svg, name) {
+        if (svg.dataset.icon === name) return;
+        svg.dataset.icon = name;
+        svg.innerHTML = markup(name);
+      },
+    };
+  };
+
   const HTML_ENTITIES = {
     '&': '&amp;',
     '<': '&lt;',
@@ -1012,7 +1066,7 @@
     let test = insideCache.get(selector);
     if (!test) {
       test = node => {
-        const el = node.nodeType === 1 ? node : node.parentElement;
+        const el = node?.nodeType === 1 ? node : node?.parentElement;
         return !!el?.closest?.(selector);
       };
       insideCache.set(selector, test);
@@ -1115,6 +1169,9 @@
     unmark,
     attr,
     esc,
+    el,
+    setText,
+    icons,
     isInstalled,
     coverURLs,
     heroURLs,

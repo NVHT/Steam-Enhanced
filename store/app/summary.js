@@ -33,20 +33,13 @@
  */
 const ROOT_FLAG = 'se-app-summary-on';
 
-/** A sibling module, requested with this build's ?v= so the web view never mixes builds. */
-const sibling = (file) => {
-  const url = new URL(file, import.meta.url);
-  url.search = new URL(import.meta.url).search;
-  return import(url.href);
-};
-
 export default async (dom) => {
   const { el, squash, ready, scope } = dom;
   const [{ createViewer }, { readTrailers, readTrailerMedia, openTrailer }, { createPlayer }, { createHighlights }] = await Promise.all([
-    sibling('./viewer.js'),
-    sibling('./trailers.js'),
-    sibling('./player.js'),
-    sibling('./highlights.js'),
+    dom.importNear(import.meta.url, './viewer.js'),
+    dom.importNear(import.meta.url, './trailers.js'),
+    dom.importNear(import.meta.url, './player.js'),
+    dom.importNear(import.meta.url, './highlights.js'),
     ready(),
   ]);
 
