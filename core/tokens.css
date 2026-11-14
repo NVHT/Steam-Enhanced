@@ -33,9 +33,10 @@
   --se-on-accent: var(--se-bg-ink); /* text and icons on an accent fill */
 
   /* Semantic & status accents */
-  --se-accent: #7cc4ff;
-  --se-accent-hover: #9ad2ff;
-  --se-accent-surface: #24384b;
+  /* The accent is a theme setting: --se-color-accent, from core/colors.css (skin.json RootColors) */
+  --se-accent: var(--se-color-accent, #7cc4ff);
+  --se-accent-hover: color-mix(in srgb, var(--se-accent), #fff 25%);
+  --se-accent-surface: color-mix(in srgb, var(--se-accent) 18%, var(--se-bg));
   --se-gold: #f0c060;
   --se-gold-text: #f3cf86;
   --se-gold-light: #ffd98a;
@@ -43,9 +44,9 @@
   --se-running: #6cc24a;
   --se-online: #4cb4ff;
   --se-offline: #6b7480;
-  --se-accent-tint: rgba(124, 196, 255, .14);
-  --se-accent-line: rgba(124, 196, 255, .3);
-  --se-accent-strong: rgba(124, 196, 255, .55);
+  --se-accent-tint: color-mix(in srgb, var(--se-accent) 14%, transparent);
+  --se-accent-line: color-mix(in srgb, var(--se-accent) 30%, transparent);
+  --se-accent-strong: color-mix(in srgb, var(--se-accent) 55%, transparent);
   --se-danger: #e5737a;
   --se-warning: #f0c060;
   /* Status accents beyond the core set */

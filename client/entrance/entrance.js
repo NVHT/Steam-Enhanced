@@ -75,7 +75,7 @@
     `<span class="se-ent-lines">${txt(w1)}${txt(w2, `;background:${line2}`)}</span></span>`;
   const GREEN = 'rgba(108, 194, 74, .6)';
   const BLUE = 'rgba(76, 180, 255, .6)';
-  const LINE = 'rgba(124, 196, 255, .3)';
+  const LINE = 'var(--se-accent-line, rgba(124, 196, 255, .3))';
   const friends =
     '<div class="se-ent-friends">' +
     `<span class="se-ent-me"><b></b><span class="se-ent-lines">${txt(110)}${txt(60, `;background:${BLUE}`)}</span><s></s><i></i><i></i><i></i></span>` +

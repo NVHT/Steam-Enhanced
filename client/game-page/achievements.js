@@ -383,13 +383,10 @@
 
   // Replaces Steam's ring + bar with one banner: "In progress" while unlocking, "Mastered" at 100%.
   const CUP = 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4';
-  const BLUE = [124, 196, 255]; // --se-accent
-  const GOLD = [240, 192, 96]; // --se-gold
-
-  // Theme blue while in progress, easing into gold as the game nears 100%.
+  // Theme accent while in progress, easing into gold as the game nears 100%.
   const bannerAccent = (t) => {
     const k = Math.min(1, Math.max(0, t)) ** 3;
-    return `rgb(${BLUE.map((b, i) => Math.round(b + (GOLD[i] - b) * k)).join(', ')})`;
+    return `color-mix(in srgb, var(--se-accent, #7cc4ff), var(--se-gold, #f0c060) ${Math.round(k * 100)}%)`;
   };
 
   function listOf(parts) {

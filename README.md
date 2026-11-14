@@ -132,7 +132,9 @@ Every web page fills the window and shares the theme's cards, pills, glass chips
 
 ## ✦ Make it yours
 
-Every colour, radius, elevation and feature switch lives on `:root` in **`core/tokens.css`**. Change a value and restart Steam.
+The main switches and the accent colour are in **Millennium → Themes → Steam Enhanced → Edit**. Change one and restart Steam.
+
+Every colour, radius, elevation and feature switch also lives on `:root` in **`core/tokens.css`**, for anything the settings don't cover. Change a value and restart Steam.
 
 <details>
 <summary><b>Startup background</b> &nbsp;<code>--se-startup-background</code></summary>
