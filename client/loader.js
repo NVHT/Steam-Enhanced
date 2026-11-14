@@ -137,6 +137,7 @@
     ['main', 'compat/hltb-for-steam/', ['hltb-for-steam.css', 'hltb-for-steam.js']],
     ['all', 'compat/extendium/', ['extendium.css']],
     ['content', 'compat/extendium/', ['manager.js']],
+    ['desktop', 'compat/steam-size-on-disk/', ['size-on-disk.css', 'size-on-disk.js']],
     // Game page and achievements
     ['achievements', 'core/', ['achievement-tiers.css']],
     ['main', 'client/game-page/', [

@@ -1,0 +1,241 @@
+/*
+ * Size on Disk (github.com/k0d13/steam-size-on-disk)
+ *
+ *   1. Play bar stat: the plugin's size on a game's library page, moved to right after
+ *      Playtime. It's built like Last Played with an icon; client/game-page/play-bar.css
+ *      already gives it the drive icon.
+ *   2. Installed Files (non-Steam games, Game Properties): the plugin's folder picker as one
+ *      card, the size in a tile like Steam's own Installed Files page. Paired with
+ *      size-on-disk.js, which tags the parts ([data-se-sod], [data-se-sod-part]).
+ *   3. Settings panel (Millennium › Plugins › Size on Disk): theme surfaces and type.
+ *
+ * Game Properties' own pass (client/settings/dialog/props.js) styles a page's first text blocks
+ * as its subtitle with id-weighted selectors, so the panel's rules carry four ids and
+ * !important where they meet those.
+ */
+
+/* ---------- 1. Play bar stat ---------- */
+
+/*
+ * The plugin puts its stat just before Achievements, which can land it ahead of Playtime. It goes
+ * right after Playtime instead, by flex order in GameStatsSection (a flex row): everything up
+ * to Playtime keeps order 0, the size 1, everything after Playtime 2. A stat is matched as a
+ * child or as the child holding it, since Steam may wrap them.
+ *   size      GameStat + LastPlayed holding a GameStatIcon + PlaytimeIcon. Steam's own Last
+ *             Played (and Cloud Status) carry the same classes and Panel but no PlaytimeIcon.
+ *   Playtime  GameStat + Playtime, without an id (the Player Count plugin's badge borrows the
+ *             class; client/game-page/player-count.js places it)
+ */
+._1mDAVT4sTzFRwJtlKCw2Ws > :is(
+  ._1kiZKVbDe-9Ikootk57kpA._3pS8kMrtScuY1Qf-W8tmRV:has(> ._1GZdosVXnfrf69yU8DWASl),
+  :has(> ._1kiZKVbDe-9Ikootk57kpA._3pS8kMrtScuY1Qf-W8tmRV:has(> ._1GZdosVXnfrf69yU8DWASl))
+) {
+  order: 1;
+}
+
+._1mDAVT4sTzFRwJtlKCw2Ws > :is(._1aKegVl9_lSdNAyWYZQlr9:not([id]), :has(> ._1aKegVl9_lSdNAyWYZQlr9:not([id])))
+  ~ :not(
+    ._1kiZKVbDe-9Ikootk57kpA._3pS8kMrtScuY1Qf-W8tmRV:has(> ._1GZdosVXnfrf69yU8DWASl),
+    :has(> ._1kiZKVbDe-9Ikootk57kpA._3pS8kMrtScuY1Qf-W8tmRV:has(> ._1GZdosVXnfrf69yU8DWASl))
+  ) {
+  order: 2;
+}
+
+/* ---------- 2. Installed Files ---------- */
+
+/*
+ *   ┌──────────────────────────────────────────────────────────┐
+ *   │ FOLDER                                                   │
+ *   │ Set the folder this app is installed in, …               │
+ *   │ [ C:\Games\Something ........... ] [Change] [Clear]      │
+ *   │ ──────────────────────────────────────────────────────── │
+ *   │ [drive] 12.3 GB                            [Recalculate] │
+ *   │         across 456 files                                 │
+ *   └──────────────────────────────────────────────────────────┘
+ */
+[data-se-sod]:not(#a):not(#b):not(#c):not(#d) {
+  --se-sod-i-drive: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='13' width='17' height='6' rx='2'/%3E%3Cpath d='M5 13l2.5-7h9L19 13'/%3E%3Cpath d='M16.5 16h.01'/%3E%3C/svg%3E");
+
+  display: grid !important;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  column-gap: 14px;
+  row-gap: 0;
+  align-items: center;
+  margin: 0 !important;
+  padding: 18px !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim);
+  font: 400 var(--se-fs-sm)/1.5 var(--se-font);
+}
+
+[data-se-sod] > [data-se-sod-part]:not(#a):not(#b):not(#c):not(#d) {
+  grid-column: 1 / -1;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Section labels */
+[data-se-sod] > :is([data-se-sod-part="title"], [data-se-sod-part="title-size"]):not(#a):not(#b):not(#c):not(#d) {
+  text-transform: uppercase;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  color: var(--se-label-color) !important;
+}
+
+[data-se-sod] > [data-se-sod-part="desc"]:not(#a):not(#b):not(#c):not(#d) {
+  margin-top: 6px !important;
+  color: var(--se-text-muted) !important;
+  font: 400 var(--se-fs-sm)/1.5 var(--se-font) !important;
+}
+
+/* Path and its buttons */
+[data-se-sod] > [data-se-sod-part="folder"]:not(#a):not(#b):not(#c):not(#d) {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px !important;
+}
+
+[data-se-sod] > [data-se-sod-part="folder"] > :first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0 !important;
+}
+
+[data-se-sod] [data-se-sod-part="folder"] input {
+  font-family: ui-monospace, Consolas, monospace !important;
+  font-size: var(--se-fs-xs) !important;
+  color: var(--se-text) !important;
+  text-overflow: ellipsis;
+}
+
+[data-se-sod] :is([data-se-sod-part="folder"], [data-se-sod-part="actions"]) button.DialogButton:not(#se-none) {
+  flex: none;
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+}
+
+/* The size: under a hairline, a drive tile, the figure large, Recalculate at the right */
+[data-se-sod] > [data-se-sod-part="title-size"]:not(#a):not(#b):not(#c):not(#d) {
+  margin-top: 18px !important;
+  padding-top: 18px !important;
+  border-top: 1px solid var(--se-hairline) !important;
+}
+
+[data-se-sod][data-se-sod-sized]::before,
+[data-se-sod][data-se-sod-sized]::after {
+  content: '';
+  grid-row: 5;
+  grid-column: 1;
+  width: 34px;
+  height: 34px;
+  margin-top: 12px;
+}
+
+[data-se-sod][data-se-sod-sized]::before {
+  border-radius: var(--se-radius-sm);
+  background: var(--se-accent-tint);
+}
+
+[data-se-sod][data-se-sod-sized]::after {
+  background: var(--se-accent);
+  -webkit-mask: var(--se-sod-i-drive) center / 18px 18px no-repeat;
+}
+
+[data-se-sod] > [data-se-sod-part="size"]:not(#a):not(#b):not(#c):not(#d) {
+  grid-row: 5;
+  grid-column: 2;
+  margin-top: 12px !important;
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-sm)/1.4 var(--se-font) !important;
+}
+
+[data-se-sod] > [data-se-sod-part="size"][data-se-big]:not(#a):not(#b):not(#c):not(#d) {
+  display: flex !important;
+  flex-direction: column;
+  font-size: 0 !important;
+}
+
+[data-se-sod] > [data-se-sod-part="size"][data-se-big]::before {
+  content: attr(data-se-big);
+  color: var(--se-text);
+  font: 800 22px/1.2 var(--se-font);
+}
+
+[data-se-sod] > [data-se-sod-part="size"][data-se-big]::after {
+  content: attr(data-se-rest);
+  color: var(--se-text-muted);
+  font: 500 12.5px/1.4 var(--se-font);
+}
+
+[data-se-sod] > [data-se-sod-part="actions"]:not(#a):not(#b):not(#c):not(#d) {
+  grid-row: 5;
+  grid-column: 3;
+  display: flex !important;
+  gap: 8px;
+  margin-top: 12px !important;
+}
+
+/* ---------- 3. Settings panel ---------- */
+
+.sod-panel:not(#se-none) {
+  gap: 18px;
+  color: var(--se-text-dim);
+  font: 400 var(--se-fs-sm)/1.5 var(--se-font);
+}
+
+.sod-panel .sod-heading:not(#se-none) {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  color: var(--se-label-color);
+}
+
+.sod-panel :is(.sod-list, .sod-card):not(#se-none) {
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.sod-panel .sod-row:not(#se-none) {
+  gap: 16px;
+  min-height: 60px;
+  padding: 12px 18px;
+}
+
+.sod-panel .sod-row-text > :first-child {
+  color: var(--se-text);
+  font: 500 var(--se-fs-base)/1.4 var(--se-font);
+}
+
+.sod-panel .sod-dim:not(#se-none) {
+  color: var(--se-text-muted);
+  font: 400 var(--se-fs-sm)/1.5 var(--se-font);
+}
+
+.sod-panel .sod-card:not(#se-none) {
+  gap: 12px;
+  padding: 18px;
+}
+
+/* Ko-fi keeps its red, on the theme's button shape */
+.sod-panel .sod-kofi > .sod-kofi-button:not(#se-none) {
+  height: var(--se-control-h);
+  border-radius: var(--se-radius-sm) !important;
+  background: #d63c39 !important;
+  color: #fff !important;
+}
+
+.sod-panel .sod-kofi > .sod-kofi-button:not(#se-none):is(:hover, .gpfocus) {
+  background: #c2302d !important;
+}
