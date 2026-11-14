@@ -312,18 +312,21 @@
     renderBadge(entry);
   };
 
-  const positionBadge = (target) => {
+  /** Puts a player count stat (ours or the Player Count plugin's) just before Achievements. */
+  const placeBeforeAchievements = (target, stat) => {
     const achievements = [...target.children].find(
       node =>
-        node !== badge &&
+        node !== stat &&
         (node.classList.contains(C.MiniAchievements) || node.querySelector(`.${C.MiniAchievements}`))
     );
     if (achievements) {
-      if (badge.nextElementSibling !== achievements) target.insertBefore(badge, achievements);
-    } else if (target.lastElementChild !== badge) {
-      target.append(badge);
+      if (stat.nextElementSibling !== achievements) target.insertBefore(stat, achievements);
+    } else if (target.lastElementChild !== stat) {
+      target.append(stat);
     }
   };
+
+  const positionBadge = (target) => placeBeforeAchievements(target, badge);
 
   const mountBadge = (target) => {
     // A GameStat like its neighbours: client/game-page/play-bar.css draws its icon (--se-stat-icon) like theirs.
@@ -360,9 +363,20 @@
       abortActiveRequest();
       return;
     }
-    // Defer to the standalone Player Count plugin if present.
-    if (document.getElementById('playercount-badge')) {
+    // Defer to the standalone Player Count plugin if present, putting its badge where ours goes
+    // (it appends it last). Its own node, not React's, so it can be moved; but with the ProtonDB
+    // badge in the row the plugin keeps it right before that one, so it's left there.
+    // Its title ("Open SteamDB charts") becomes Steam's own tooltip, like the header's
+    // (client/header/header-tooltips.js shows one for any [data-se-tip]), not the OS one.
+    const plugin = document.getElementById('playercount-badge');
+    if (plugin) {
       unmountBadge();
+      const row = plugin.parentElement;
+      if (row && !row.querySelector('#protondb-status-badge')) placeBeforeAchievements(row, plugin);
+      if (plugin.title) {
+        SE.mark(plugin, 'data-se-tip', plugin.title);
+        plugin.removeAttribute('title');
+      }
       return;
     }
 

@@ -1,0 +1,25 @@
+/*
+ * Player Count (github.com/swindlesmccoop/playercount-badge): the plugin's "Players" stat in a
+ * game's play bar (#playercount-badge), made the same as the theme's own player count
+ * (client/game-page/player-count.js, which steps aside while the plugin's badge is up).
+ *
+ * The badge is a GameStat with Playtime's class. client/game-page/play-bar.css already gives it
+ * the people icon; client/game-page/layout.css collapses the plugin's own icon. Here:
+ *   - colour: the plugin tints the stat and its number by player count (red, gold, grey,
+ *     bronze, blue) inline; it takes the bar's text colours like every other stat
+ *   - focus: the theme badge's ring (the badge opens SteamDB's charts); no hover highlight
+ * Its place, before Achievements where the theme puts its own (the plugin appends it last), and
+ * Steam's tooltip in place of the OS one are set by client/game-page/player-count.js.
+ */
+._1U7LKpx70kEsz3jJwAFOi- #playercount-badge:not(#se-none) {
+  color: var(--se-text) !important;
+}
+
+._1U7LKpx70kEsz3jJwAFOi- #playercount-badge [data-playercount-value]:not(#se-none) {
+  color: inherit !important;
+}
+
+#playercount-badge:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}

@@ -105,6 +105,16 @@
   --se-stat-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 18h10a4 4 0 0 0 .5-8 6 6 0 0 0-11.5 1.5A3.3 3.3 0 0 0 7 18z'/%3E%3Cpath d='M9.5 13.5l2 2 3.5-3.5'/%3E%3C/svg%3E");
 }
 
+/*
+ * Achievements always last in the stats row, after anything plugins add (Size on Disk, Player
+ * Count, ProtonDB). By flex order: other stats stay 0-2 (compat/steam-size-on-disk orders its
+ * stat after Playtime); the id outranks those rules.
+ */
+._1mDAVT4sTzFRwJtlKCw2Ws > :is(.UAhWiMg9Q2VPsQQBj_ikT, :has(.UAhWiMg9Q2VPsQQBj_ikT)):not(#se-none) {
+  /* MiniAchievements */
+  order: 9;
+}
+
 /* Even spacing: every stat the same 26 px apart, no extra margins or padding around the cloud tile */
 ._1U7LKpx70kEsz3jJwAFOi- ._1YbtIWcfkQJOysLXQbwzRf:not(#se-none),
 ._1U7LKpx70kEsz3jJwAFOi- ._1mDAVT4sTzFRwJtlKCw2Ws:not(#se-none) {

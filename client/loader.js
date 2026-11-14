@@ -138,6 +138,7 @@
     ['all', 'compat/extendium/', ['extendium.css']],
     ['content', 'compat/extendium/', ['manager.js']],
     ['desktop', 'compat/steam-size-on-disk/', ['size-on-disk.css', 'size-on-disk.js']],
+    ['main', 'compat/playercount-badge/', ['playercount-badge.css']],
     // Game page and achievements
     ['achievements', 'core/', ['achievement-tiers.css']],
     ['main', 'client/game-page/', [
