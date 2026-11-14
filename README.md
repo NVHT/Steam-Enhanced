@@ -177,7 +177,7 @@ Spinners under 40 px fall back to `sweep`.
 | `--se-home-stage-cycle` | `9` | Seconds between hero transitions. `0` stops cycling. |
 | `--se-home-stage-tray` | `30` | Minimum window height kept for the glass tray, in percent (0–70). |
 | `--se-overlay` | `on` | `off` restores Steam's in-game overlay. |
-| `--se-overlay-dim` | `0.9` | Backdrop darkness behind the overlay (0–1). |
+| `--se-overlay-dim` | `1.2` | Backdrop darkness behind the overlay (0.4–1.4): edges are black from 1, the whole game is hidden at 1.4. The overlay's Darkness slider overrides it per user. |
 | `--se-toasts` | `on` | `off` restores Steam's toasts, desktop and in game. |
 | `--se-toasts-style` | `stage` | `stage` plays toasts on a mini Home stage; `compact` restyles Steam's toasts as cards. |
 | `--se-toasts-position` | `center` | Compact toasts only: `center` or `corner`. |

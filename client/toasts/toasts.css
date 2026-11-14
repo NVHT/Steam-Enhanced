@@ -66,7 +66,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   border-radius: var(--se-radius-xl);
   /* No backdrop blur: the toast window is transparent, so there is nothing behind to blur */
   background: rgba(16, 18, 23, .82);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), 0 6px 18px -6px rgba(0, 0, 0, .75);
+  box-shadow: inset 0 0 0 1px var(--se-divider), 0 6px 18px -6px var(--se-black-80);
   pointer-events: auto;
   transition: box-shadow .4s ease;
   /* Drawn at 420 px, scaled as a whole (art, text, buttons, strip) to the size toasts.js sets. */
@@ -144,11 +144,11 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 #se-tst [data-se-tier="common"] { --c: var(--se-tier-common); --se-tst-aura: 0 0 5px 0; --se-tst-gl: 8%; }
 
 .se-tst-tray[data-se-tier="legendary"] {
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent), 0 0 28px -10px color-mix(in srgb, var(--c) 40%, transparent), 0 6px 18px -6px rgba(0, 0, 0, .75);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent), 0 0 28px -10px color-mix(in srgb, var(--c) 40%, transparent), 0 6px 18px -6px var(--se-black-80);
 }
 
 .se-tst-tray[data-se-tier="epic"] {
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent), 0 0 24px -12px color-mix(in srgb, var(--c) 30%, transparent), 0 6px 18px -6px rgba(0, 0, 0, .75);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent), 0 0 24px -12px color-mix(in srgb, var(--c) 30%, transparent), 0 6px 18px -6px var(--se-black-80);
 }
 
 /* ---------- Stage and layers (crossfade, like the Home stage's art layers) ---------- */
@@ -200,12 +200,12 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 .se-tst-wf-ln {
   fill: none;
-  stroke: rgba(124, 196, 255, .2);
+  stroke: color-mix(in srgb, var(--se-accent) 20%, transparent);
   stroke-width: 1;
 }
 
 .se-tst-wf-line {
-  fill: rgba(124, 196, 255, .2);
+  fill: color-mix(in srgb, var(--se-accent) 20%, transparent);
 }
 
 .se-tst-wf-on {
@@ -261,7 +261,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 @keyframes se-tst-wf-card {
-  0%, 45%, 100% { stroke: rgba(124, 196, 255, .2); fill: transparent; }
+  0%, 45%, 100% { stroke: color-mix(in srgb, var(--se-accent) 20%, transparent); fill: transparent; }
   15%, 30% { stroke: color-mix(in srgb, var(--c) 80%, transparent); fill: color-mix(in srgb, var(--c) 10%, transparent); }
 }
 
@@ -417,7 +417,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   /* Opaque enough to hold on the art without a nested backdrop blur */
   background: rgba(16, 18, 23, .78);
   color: var(--c);
-  box-shadow: 0 10px 22px -8px rgba(0, 0, 0, .85), inset 0 0 0 1px rgba(255, 255, 255, .14);
+  box-shadow: 0 10px 22px -8px var(--se-black-90), inset 0 0 0 1px var(--se-white-14);
 }
 
 .se-tst-tile > svg {
@@ -428,7 +428,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 /* Presence: an outline round the avatar, a gap of the tray's glass between. */
 .se-tst-tile[data-presence] {
   --se-tst-status: var(--se-online);
-  box-shadow: 0 0 0 2px rgba(16, 18, 23, .9), 0 0 0 4px var(--se-tst-status), 0 10px 22px -8px rgba(0, 0, 0, .85);
+  box-shadow: 0 0 0 2px rgba(16, 18, 23, .9), 0 0 0 4px var(--se-tst-status), 0 10px 22px -8px var(--se-black-90);
 }
 
 .se-tst-tile[data-presence="ingame"] {
@@ -445,7 +445,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 /* Achievement icon: the tier's aura and color, as on the game page. */
 .se-tst-layer[data-se-tier] .se-tst-tile {
   background: color-mix(in srgb, var(--c) 22%, var(--se-surface));
-  box-shadow: var(--se-tst-aura) color-mix(in srgb, var(--c) 60%, transparent), inset 0 0 0 1px rgba(255, 255, 255, .08);
+  box-shadow: var(--se-tst-aura) color-mix(in srgb, var(--c) 60%, transparent), inset 0 0 0 1px var(--se-divider);
 }
 
 .se-tst-fx {
@@ -496,13 +496,13 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--c);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, .8);
+  text-shadow: 0 1px 4px var(--se-black-80);
 }
 
 .se-tst-tt {
   font: 800 19px/23px var(--se-font);
   color: var(--se-text-strong);
-  text-shadow: 0 2px 14px rgba(0, 0, 0, .6);
+  text-shadow: 0 2px 14px var(--se-black-60);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -510,8 +510,8 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 .se-tst-ds {
   font: 400 13px/17px var(--se-font);
-  color: #d0d7de;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
+  color: var(--se-on-art);
+  text-shadow: 0 1px 3px var(--se-black-90);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -611,15 +611,15 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 .se-tst-stat b {
   font: 800 26px/1 var(--se-font);
   /* The tier's color, lifted toward white so even Common's grey reads on bright art. */
-  color: color-mix(in srgb, var(--c) 62%, #fff);
+  color: color-mix(in srgb, var(--c) 62%, var(--se-text-strong));
   /* A tight dark edge first, so the number holds on bright art; then the soft lift. */
-  text-shadow: 0 0 2px rgba(0, 0, 0, .9), 0 1px 3px rgba(0, 0, 0, .85), 0 2px 18px rgba(0, 0, 0, .6);
+  text-shadow: 0 0 2px var(--se-black-90), 0 1px 3px var(--se-black-90), 0 2px 18px var(--se-black-60);
 }
 
 .se-tst-stat small {
   font-size: .55em;
   font-weight: 600;
-  color: #d0d7de;
+  color: var(--se-on-art);
 }
 
 .se-tst-pill {
@@ -674,7 +674,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 .se-tst-trk {
-  stroke: rgba(255, 255, 255, .12);
+  stroke: var(--se-white-12);
 }
 
 .se-tst-arc {
@@ -785,7 +785,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   border: 0;
   border-radius: var(--se-radius-sm);
   background: color-mix(in srgb, var(--c) 30%, var(--se-surface));
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+  box-shadow: inset 0 0 0 1px var(--se-divider);
   cursor: pointer;
   transition: transform .25s cubic-bezier(.3, 1.4, .6, 1), box-shadow .2s;
 }
@@ -908,7 +908,7 @@ html[data-se-tst-compact] .DesktopToastPopup {
   background:
     linear-gradient(90deg, color-mix(in srgb, var(--c) 20%, transparent), transparent 58%),
     rgba(16, 18, 23, .94) !important;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08) !important;
+  box-shadow: inset 0 0 0 1px var(--se-divider) !important;
   font-family: var(--se-font), 'Motiva Sans', sans-serif !important;
 }
 
@@ -961,7 +961,7 @@ html[data-se-tst-compact] .StandardLogoDimensions:not(img):not(#se-none) {
   border-radius: var(--se-radius-md) !important;
   outline: 0 !important;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, .08),
+    inset 0 0 0 1px var(--se-divider),
     0 0 0 1px var(--se-tst-cmp-ring, color-mix(in srgb, var(--c) 35%, transparent)) !important;
 }
 

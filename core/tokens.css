@@ -14,11 +14,11 @@
   --se-selected: #33404f;
   --se-hairline: rgba(255, 255, 255, .06);
   --se-divider: rgba(255, 255, 255, .08);
-  --se-pill: rgba(255, 255, 255, .06);
+  --se-pill: var(--se-hairline);
   --se-track: #3a424d;
   --se-border-strong: #4a525e;
   --se-field: #15181d;
-  --se-check: rgba(255, 255, 255, .07);
+  --se-check: var(--se-white-07);
   --se-chip: rgba(12, 14, 18, .55);
   --se-chip-hover: rgba(12, 14, 18, .75);
 
@@ -28,9 +28,9 @@
   --se-text-dim: #b8c0c8;
   --se-text-faint: #6f7984;
   --se-text-strong: #fff;
-  --se-white: #fff;
+  --se-white: var(--se-text-strong);
   --se-bg-ink: #0f1115;
-  --se-on-accent: #0f1115; /* text and icons on an accent fill */
+  --se-on-accent: var(--se-bg-ink); /* text and icons on an accent fill */
 
   /* Semantic & status accents */
   --se-accent: #7cc4ff;
@@ -75,10 +75,10 @@
 
   /* Glass: chips on art (flags, DLC, price, titles) and round buttons (carousel arrows) */
   --se-glass-chip: rgba(10, 12, 16, .62);
-  --se-glass-chip-line: rgba(255, 255, 255, .1);
+  --se-glass-chip-line: var(--se-white-10);
   --se-glass-btn: rgba(23, 26, 32, .78);
   --se-glass-btn-hover: rgba(44, 52, 64, .9);
-  --se-glass-btn-line: rgba(255, 255, 255, .12);
+  --se-glass-btn-line: var(--se-white-12);
   --se-blur-chip: blur(10px) saturate(1.4);
   --se-blur-panel: blur(16px);
 
@@ -129,11 +129,28 @@
   --se-play-hover: #44a028;
   --se-play-glow: rgba(80, 180, 50, .55);
 
-  /* White overlays on dark surfaces, weakest to strongest */
+  /* White overlays on dark surfaces, weakest to strongest (.06 is --se-hairline, .08 --se-divider).
+     Translucent text over art (.3 and up) stays as written. */
+  --se-white-02: rgba(255, 255, 255, .02);
+  --se-white-03: rgba(255, 255, 255, .03);
   --se-white-04: rgba(255, 255, 255, .04);
+  --se-white-07: rgba(255, 255, 255, .07);
   --se-white-10: rgba(255, 255, 255, .1);
+  --se-white-12: rgba(255, 255, 255, .12);
   --se-white-14: rgba(255, 255, 255, .14);
+  --se-white-18: rgba(255, 255, 255, .18);
   --se-white-25: rgba(255, 255, 255, .25);
+
+  /* Black for shadows and scrims, weakest to strongest */
+  --se-black-15: rgba(0, 0, 0, .15);
+  --se-black-20: rgba(0, 0, 0, .2);
+  --se-black-30: rgba(0, 0, 0, .3);
+  --se-black-40: rgba(0, 0, 0, .4);
+  --se-black-50: rgba(0, 0, 0, .5);
+  --se-black-60: rgba(0, 0, 0, .6);
+  --se-black-70: rgba(0, 0, 0, .7);
+  --se-black-80: rgba(0, 0, 0, .8);
+  --se-black-90: rgba(0, 0, 0, .9);
 
   /* Keyboard focus: one ring everywhere, drawn as an outline so it never fights box-shadow */
   --se-focus-outline: 2px solid var(--se-accent);
@@ -186,7 +203,7 @@
   --se-home-stage-cycle: 9;
   --se-home-stage-tray: 30;
 
-  /* In-game overlay restyle: on | off; backdrop dim: 0-1.4 (edges black at 1, all black at 1.4) */
+  /* In-game overlay restyle: on | off; backdrop dim: 0.4-1.4 (edges black at 1, all black at 1.4) */
   --se-overlay: on;
   --se-overlay-dim: 1.2;
 
