@@ -115,7 +115,7 @@ Every web page fills the window and shares the theme's cards, pills, glass chips
 
 | Required | Optional |
 | --- | --- |
-| The Steam desktop client and [Millennium](https://steambrew.app), with theme JavaScript on. | **HLTB for Millennium** for completion times. Keep it enabled; its *Show in Library* option can be off. |
+| The Steam desktop client and [Millennium](https://steambrew.app), with theme JavaScript on. | **HLTB for Millennium** for completion times. Keep it enabled; its *Show in Library* option can be off.<br>**[Extendium](https://github.com/BossSloth/Extendium)** for Chrome extensions; its toolbar and manager are themed. |
 
 1. Exit Steam completely.
 2. Extract the release into `<Steam>/millennium/themes/`, so the manifest sits at `<Steam>/millennium/themes/Steam-Enhanced/skin.json`.
@@ -247,7 +247,7 @@ Steam-Enhanced/
 ├── store/        Store redesigns, one folder per page, loaded by store/loader.js
 ├── community/    Community redesigns, one folder per page plus shared/
 ├── help/         Steam Support pages
-├── compat/       Plugin integrations (HowLongToBeat)
+├── compat/       Plugin integrations (HowLongToBeat, Extendium)
 ├── dev/          Element inspector (Ctrl+Shift+E), classmap.py, colors.py, css-check.py, spinner_svg.py
 └── assets/       Logos, Millennium header and splash
 ```

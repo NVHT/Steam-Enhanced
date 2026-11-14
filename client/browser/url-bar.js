@@ -52,6 +52,13 @@
 
   const firstClass = (el) => el?.classList?.[0] || null; // Steam's module class comes first
   const hasIcon = (el) => el.tagName === 'svg' || !!el.querySelector('svg, img');
+  /*
+   * Parts other plugins add to the bar (Extendium's extensions strip). They hold icons too, so the
+   * DOM read must not take them for Steam's reload button, which would hide them; mount() moves
+   * them into the field's end group (adopt).
+   */
+  const FOREIGN = '.extensions-bar-container';
+  const steamPart = (el) => !el.matches(FOREIGN);
 
   /** Same shape as fromBundles(), read off the live bar. */
   let domScannedAt = -Infinity;
@@ -70,7 +77,7 @@
     if (!firstClass(url) || !firstClass(text) || !firstClass(bar)) return null;
     if (bar.getBoundingClientRect().height > 64) return null; // a strip, not some text block on a page
     const found = { URL: firstClass(url), URLBarText: firstClass(text), URLBar: firstClass(bar) };
-    const reload = [...bar.children].find(el => el !== text && hasIcon(el));
+    const reload = [...bar.children].find(el => el !== text && steamPart(el) && hasIcon(el));
     if (firstClass(reload)) found.ReloadButton = firstClass(reload);
     const [status, lock] = [...text.children].filter(el => el !== url && hasIcon(el)).map(firstClass);
     if (status) found.StatusIcon = status;
@@ -93,6 +100,7 @@
     }
     for (const [part, nodes] of collections) {
       for (const node of nodes) {
+        if (!steamPart(node)) continue;
         SE.mark(node, ATTR, part);
         tagged.add(node);
       }
@@ -130,7 +138,18 @@
     const value = field('m_strTitle', 'm_title', 'm_strPageTitle');
     return typeof value === 'string' ? value.trim() : null; // null: the view reports no title
   };
-  const openExternal = () => SE.global('SteamClient')?.System?.OpenInSystemBrowser;
+  /*
+   * Open in the system browser. SteamClient.System.OpenInSystemBrowser isn't in every client
+   * build, so it falls back to Steam's own steam://openurl_external/ link, which every build
+   * handles (through SteamClient.URL when it's there, else as a navigation Steam intercepts).
+   */
+  const openExternal = (href) => {
+    const client = SE.global('SteamClient');
+    if (typeof client?.System?.OpenInSystemBrowser === 'function') return client.System.OpenInSystemBrowser(href);
+    const link = `steam://openurl_external/${href}`;
+    if (typeof client?.URL?.ExecuteSteamURL === 'function') return client.URL.ExecuteSteamURL(link);
+    window.open(link, '_blank');
+  };
 
   /* ---------- Our parts ---------- */
 
@@ -230,12 +249,14 @@
     const reload = bar.querySelector(`[${ATTR}="reload"]`);
     if (ui?.text === text && ui.url === url && ui.nav.isConnected && ui.tools.isConnected && ui.identity.isConnected) {
       ui.reload = reload;
+      adopt(bar);
       return;
     }
     unmount();
     ui = { ...build(), text, url, reload, last: '' };
     text.prepend(ui.nav);
     text.append(ui.identity, ui.tools, ui.progress);
+    adopt(bar);
     ui.nav.addEventListener('click', onButton);
     ui.tools.addEventListener('click', onButton);
     urlObserver.observe(url, { characterData: true, childList: true, subtree: true });
@@ -243,8 +264,27 @@
     wake();
   };
 
+  /*
+   * Other plugins' parts (Extendium's extensions strip) go at the start of the end group, before
+   * copy / reload / open, so the field holds every control. They're moved, not copied: the plugin
+   * keeps its own React root in there and finds it again by class. Before the group is removed
+   * (unmount) they go back to the bar, so a redraw doesn't throw the plugin's root away.
+   */
+  const adopt = (bar) => {
+    for (const el of bar.querySelectorAll(FOREIGN)) {
+      if (el.parentElement !== ui.tools) ui.tools.prepend(el);
+    }
+  };
+  const release = () => {
+    const bar = ui.text.parentElement;
+    for (const el of ui.tools.querySelectorAll(FOREIGN)) {
+      if (bar?.isConnected) bar.append(el);
+    }
+  };
+
   const unmount = () => {
     if (!ui) return;
+    release();
     clearTimeout(ticker);
     ticker = 0;
     urlObserver.disconnect();
@@ -271,7 +311,7 @@
     toggle(ui.buttons.back, 'disabled', field('m_bCanGoBack', 'm_canGoBack') === false);
     toggle(ui.buttons.forward, 'disabled', field('m_bCanGoForward', 'm_canGoForward') === false);
     toggle(ui.buttons.reload, 'hidden', !ui.reload && !method('Reload'));
-    toggle(ui.buttons.external, 'hidden', !web || typeof openExternal() !== 'function');
+    toggle(ui.buttons.external, 'hidden', !web);
 
     const key = `${href}\u0001${title}`;
     if (key === ui.last) return;
@@ -342,7 +382,7 @@
         break;
       case 'external':
         try {
-          openExternal()(ui.url.textContent.trim());
+          openExternal(ui.url.textContent.trim());
         } catch {}
         break;
       case 'copy': {
