@@ -2058,3 +2058,13 @@ html[data-se-ov] :is(.se-ov-chip-btn, .se-ov-web-open, .se-ov-web-close):focus-v
   font-variant-numeric: tabular-nums;
   text-align: end;
 }
+
+/* ---------- Modals (Exit game? and other prompts) ---------- */
+
+/* Steam's veil under a modal is 80% black, which over the overlay's own
+   backdrop leaves the dialog on solid black. A light veil with blur keeps
+   the overlay readable behind it. */
+html[data-se-ov] .ModalOverlayBackground:not(#se-none) {
+  background: rgba(15, 17, 21, .45) !important;
+  backdrop-filter: var(--se-blur-panel);
+}

@@ -47,5 +47,37 @@
       }
     } catch {}
   }
-  Object.assign(ns, { isSteamSettings, sizeWindow });
+  /*
+   * The page fills its window. The in-game overlay's Settings window is sized by the overlay
+   * (client/overlay/widgets.js), wider than Steam lays its dialog out, which left a blank column
+   * at the right. Every box from the page up to <body> stretches (`data-se-fill`), and empty
+   * boxes beside that chain step aside (`data-se-fill-spare`). Desktop windows already fill
+   * theirs, so nothing is marked there.
+   */
+  const FILL = 'data-se-fill';
+  const SPARE = 'data-se-fill-spare';
+  const FILL_SLACK = 16;
+  const isSpare = (el) =>
+    !el.textContent.trim() && !el.querySelector('button, svg, img, input, [role="button"], [tabindex]');
+
+  function unfillWindow() {
+    for (const el of document.querySelectorAll(`[${FILL}], [${SPARE}]`)) {
+      el.removeAttribute(FILL);
+      el.removeAttribute(SPARE);
+    }
+  }
+
+  function fillWindow(content) {
+    if (!content || document.title === 'Steam') return;
+    const gap = innerWidth - content.getBoundingClientRect().right;
+    if (gap <= FILL_SLACK || content.hasAttribute(FILL)) return;
+    for (let el = content; el && el !== document.body; el = el.parentElement) {
+      el.setAttribute(FILL, '');
+      for (const sib of el.parentElement?.children || []) {
+        if (sib !== el && !sib.hasAttribute(SPARE) && isSpare(sib)) sib.setAttribute(SPARE, '');
+      }
+    }
+  }
+
+  Object.assign(ns, { fillWindow, isSteamSettings, sizeWindow, unfillWindow });
 })(window.__se);
