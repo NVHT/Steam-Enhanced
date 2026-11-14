@@ -308,6 +308,7 @@
    * Transparent windows (overlay, toasts, Big Picture side menus) can't take a cover over the
    * game: their body is just hidden until ready, then shown.
    */
+  const MENU = /(?:Menu|Supernav)$/.test(document.title); // menus and the store's dropdowns
   const TRANSPARENT = /^(?:SP Overlay:|notificationtoasts_|OverlayBrowser_|OverlayTab\d+_|QuickAccess_|MainMenu_)/;
   const MAIN = document.title === 'Steam'; // the main window (skin.json's "main" group)
   const LOGO_MS = 250;
@@ -321,7 +322,7 @@
   let pending = 0;
   let revealed =
     onWeb || // core/core.js guards web pages
-    /(?:Menu|Supernav)$/.test(document.title) ||
+    MENU ||
     root.hasAttribute('data-se-styled') ||
     !!document.getElementById('se-guard');
 
@@ -480,6 +481,31 @@
     el.addEventListener('error', done, { once: true });
   };
 
+  /*
+   * Menus: Steam sizes a menu's popup window to the menu as it first measures it, which in a new
+   * submenu window is before the theme's stylesheets and font are in, so the window came out too
+   * short (last items cut off) or too tall. Steam measures again whenever the menu's DOM changes
+   * (its MutationObserver), so once each sheet and the font have loaded, an empty comment put in
+   * and taken straight out has it size the window to the themed menu.
+   */
+  let remeasureQueued = false;
+  const remeasureMenu = () => {
+    if (remeasureQueued) return;
+    remeasureQueued = true;
+    requestAnimationFrame(() => {
+      remeasureQueued = false;
+      const host = document.querySelector('[role="menuitem"], [class*="MenuItem"]')?.parentElement;
+      if (!host) return;
+      const mark = document.createComment('');
+      host.append(mark);
+      mark.remove();
+    });
+  };
+  if (MENU) {
+    document.fonts?.addEventListener?.('loadingdone', remeasureMenu);
+    document.fonts?.ready.then(remeasureMenu);
+  }
+
   /** Puts a stylesheet among the theme's own by list position, so the cascade matches the list. */
   const addStylesheet = (file, order) => {
     const link = document.createElement('link');
@@ -488,6 +514,7 @@
     link.setAttribute('blocking', 'render'); // no flash of Steam's own look on a window's first paint
     link.dataset.seFile = file;
     link.dataset.seOrder = String(order);
+    if (MENU) link.addEventListener('load', remeasureMenu, { once: true });
     if (file === 'core/tokens.css') link.addEventListener('load', readEntrance, { once: true });
     const theme = [...head.querySelectorAll(':scope > link[data-se-order]')];
     const next = theme.find((el) => Number(el.dataset.seOrder) > order);
