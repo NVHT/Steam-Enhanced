@@ -1,0 +1,863 @@
+/*
+ * Achievement Manager (github.com/madmaxgrey/AchievementManager)
+ *
+ *   1. The window (titled "Achievement Manager") in all four of the plugin's designs, on the
+ *      theme's surfaces: Classic (a navigation column and one card per achievement), Showcase
+ *      (a tile grid), Table and Split (a list and a detail pane).
+ *   2. The button the plugin puts beside "View My Achievements" on the game page. The theme
+ *      hides Steam's button behind its own heading link, so the plugin finds nothing to stand
+ *      beside; client/game-page/cards.js adds an "Achievement Manager" heading link instead.
+ *      The rules below cover the plugin's own button, should it place one.
+ *
+ * achievement-manager.js tags every achievement with the theme's rarity tier ([data-se-tier],
+ * as on the game page): the rate, the bar and Split's tier label take the tier's colour.
+ *
+ * The plugin's stylesheet is a <style> inside its window's root, after the theme's links, and
+ * uses !important in places: rules here carry an id (:not(#se-none)) and !important where they
+ * meet those. Steam's own parts inside (text fields, dropdowns, switches, buttons) are themed
+ * by client/dialogs and client/settings.
+ */
+
+/* ---------- 1. The window ---------- */
+
+/* Rarity tiers: --se-tier and --se-tier-aura per [data-se-tier] from core/achievement-tiers.css */
+
+/*
+ * The window's title bar is a drag region over the top of the window, where the heads put their
+ * controls (Showcase's Achievements / Stats tabs, Classic's sort): clicks there moved the window.
+ * Controls opt out of it.
+ */
+.amw-root :is(button, input, [role="button"], .DialogDropDown, .v8oJcDOQF6xmlVTw4VhOr, .amx-seg, .amw-tools) {
+  -webkit-app-region: no-drag;
+}
+
+/* Ground: the plugin paints a copy of the window's colour behind itself */
+.amw-backdrop:not(#se-none) {
+  background: var(--se-bg) !important;
+}
+
+/*
+ * Where a page's content starts: below the window's title bar (64 px), which lies over the top of
+ * the window and takes every click there, so a control under it (the heads' tabs and sort) could
+ * not be clicked. As in the Extendium manager.
+ */
+.amw-root:not(#se-none) {
+  --se-am-top: 64px;
+
+  background: var(--se-bg);
+  color: var(--se-text-dim);
+  font-family: var(--se-font);
+}
+
+/* Loading and error screens */
+.amw-root .amw-center:not(#se-none) {
+  gap: 18px;
+}
+
+.amw-root .amw-center:not(#se-none) .amw-msg {
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm)/1.5 var(--se-font);
+  opacity: 1;
+}
+
+.amw-root .amw-empty:not(#se-none) {
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm)/1.5 var(--se-font);
+  opacity: 1;
+}
+
+/* Status line: theme tones */
+.amw-root :is(.amw-status, .amx-status):not(#se-none) {
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm)/18px var(--se-font);
+  opacity: 1;
+}
+
+.amw-root :is(.amw-status.amw-ok, .amx-ok):not(#se-none) { color: var(--se-running); }
+.amw-root :is(.amw-status.amw-bad, .amx-bad):not(#se-none) { color: var(--se-danger-text); }
+.amw-root :is(.amw-status.amw-warn, .amx-warn):not(#se-none) { color: var(--se-warning); }
+
+/*
+ * Achievement icons as on the game page: rounded, a hairline edge, the tier's aura when unlocked,
+ * grey when locked (the plugin's own dimming is replaced). The sparkles and initial are a layer
+ * over each icon (.se-am-fx, achievement-manager.js), styled by core/achievement-tiers.css.
+ */
+.amw-root .amw-rowicon:not(#se-none) {
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: 0 0 0 1px var(--se-divider);
+  object-fit: cover;
+  transition: filter var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out;
+}
+
+.amw-root [data-se-tier]:not([data-se-tier-locked]) img.amw-rowicon:not(#se-none) {
+  box-shadow: 0 0 0 1px var(--se-divider), var(--se-tier-aura) color-mix(in srgb, var(--se-tier) 60%, transparent);
+}
+
+.amw-root [data-se-tier-locked] img.amw-rowicon:not(#se-none) {
+  opacity: 1 !important;
+  filter: grayscale(1) brightness(.7);
+}
+
+.amw-root [data-se-tier-locked]:hover img.amw-rowicon:not(#se-none) {
+  filter: grayscale(.4) brightness(.9);
+}
+
+.amw-root :is(.amw-row, .amx-tile, .amx-trow, .amx-srow, .amx-pane)[data-se-tier] {
+  position: relative;
+}
+
+/* Sparkles hold still off screen (achievement-manager.js marks the on-screen ones) */
+.amw-root .se-am-fx .se-ach-spark {
+  animation-play-state: paused;
+}
+
+.amw-root [data-se-am-on] > .se-am-fx .se-ach-spark {
+  animation-play-state: running;
+}
+
+.amw-root .se-am-fx {
+  position: absolute;
+  z-index: 1;
+  border-radius: var(--se-radius-md);
+  pointer-events: none;
+}
+
+/* The table's icons are small: a smaller initial, no sparkles */
+.amw-root .amx-trow .se-am-fx .se-ach-spark {
+  display: none;
+}
+
+.amw-root .amx-trow .se-am-fx b {
+  right: 1px;
+  bottom: 0;
+  font-size: 9px;
+}
+
+.amw-root .amw-rowicon-none:not(#se-none) {
+  border: 0;
+  background: var(--se-surface-2);
+}
+
+.amw-root .amw-protecticon:not(#se-none) {
+  color: var(--se-text-faint);
+  opacity: 1;
+}
+
+/*
+ * Steam's dropdowns (sort, filter) and text fields as in the Settings window: the theme styles
+ * them inside Settings pages only (client/settings/controls.css), so the same rules here.
+ */
+.amw-root :is(.v8oJcDOQF6xmlVTw4VhOr, .DialogDropDown):not(#se-none):not(#se-dd) {
+  min-width: 150px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 10px 0 12px !important;
+  justify-content: space-between !important;
+  text-align: left !important;
+  background: var(--se-surface-2) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  font: 500 13px var(--se-font) !important;
+  color: var(--se-text) !important;
+  box-shadow: none !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+.amw-root :is(.v8oJcDOQF6xmlVTw4VhOr, .DialogDropDown):not(#se-none):not(#se-dd):hover {
+  background: var(--se-hover) !important;
+}
+
+.amw-root ._3OHR1e3u08hK7hMx4fFy_L {
+  /* DropDownControlButtonContents */
+  width: 100%;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+
+.amw-root .DialogDropDown_CurrentDisplay {
+  font: 500 13px var(--se-font) !important;
+  color: var(--se-text) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.amw-root :is(._3OHR1e3u08hK7hMx4fFy_L, .DialogDropDown) svg {
+  width: 12px !important;
+  height: 12px !important;
+  flex: 0 0 12px;
+  color: var(--se-text-muted) !important;
+  fill: currentColor;
+}
+
+.amw-root :is(.DialogTextInputBase, ._3ZR32BdxJUNwAA6Fu6n00p):not(#se-none) {
+  height: 34px !important;
+  padding: 0 12px !important;
+  box-sizing: border-box !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font: 500 13px var(--se-font) !important;
+}
+
+/* Stat number box: the theme's field */
+.amw-root .amw-spin:not(#se-none) {
+  height: var(--se-control-h);
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  transition: box-shadow var(--se-dur-fast);
+}
+
+.amw-root .amw-spin:not(#se-none):hover {
+  box-shadow: inset 0 0 0 1px var(--se-white-14);
+}
+
+.amw-root .amw-spin:not(#se-none):focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong), 0 0 0 3px var(--se-accent-tint);
+}
+
+.amw-root .amw-spin.amw-spin-bad:not(#se-none) {
+  box-shadow: inset 0 0 0 1px var(--se-danger);
+}
+
+.amw-root .amw-spinfield:not(#se-none) {
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-sm) var(--se-font) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.amw-root .amw-step:not(#se-none) {
+  width: 32px;
+  border-left: 1px solid var(--se-hairline) !important;
+  color: var(--se-text-muted) !important;
+  font-size: 16px;
+}
+
+.amw-root .amw-step:not(#se-none):hover:enabled {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.amw-root .amw-statwhy:not(#se-none) {
+  color: var(--se-danger-text);
+}
+
+/*
+ * No search: a game's list is short enough to scan, and the filters and sort cover the rest. The
+ * row it sat in keeps the sort (Classic) or the filters (the others), or goes when that was all.
+ */
+.amw-root :is(.amw-search, .amx-search):not(#se-none) {
+  display: none !important;
+}
+
+.amw-root .amw-tools:not(#se-none) {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.amw-root .amw-tools .amw-sort:not(#se-none) {
+  width: 200px;
+}
+
+/*
+ * Classic: with the search gone the sort was alone on a row of its own under the head. It moves
+ * up into the head's row instead, at the right, level with the ring's lower edge (clear of the
+ * window's controls above), and the head keeps room for it.
+ */
+.amw-root .amw-main:not(#se-none) {
+  position: relative;
+}
+
+.amw-root .amw-main > .amw-tools:has(.amw-sort):not(#se-none) {
+  position: absolute;
+  top: calc(var(--se-am-top) + 18px);
+  right: 28px;
+  z-index: 1;
+  padding: 0;
+}
+
+.amw-root .amw-main:has(> .amw-tools .amw-sort) > .amw-head:not(#se-none) {
+  padding-right: 248px;
+}
+
+.amw-root :is(.amw-tools, .amx-row):not(:has(> :not(.amw-search, .amx-search))):not(#se-none) {
+  display: none !important;
+}
+
+/* ===== Classic ===== */
+
+/*
+ * The navigation column is built from the Settings window's parts (PageListColumn, Title,
+ * PageList, PageListItem), so it takes the theme's Settings sidebar as is
+ * (client/settings/layout.css): 248 px, the game's name as its title, 34 px rows, the accent
+ * tint on the open one. Added here, as in Settings: the open row's accent bar, a duotone icon per row
+ * (achievement-manager.js tags them [data-se-am-nav]), the separator, the counts and the note.
+ */
+.amw-root .amw-nav-item[data-se-am-nav="ach"] { --se-am-ic: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Cpath%20d%3D%22M7%204h10v5a5%205%200%200%201-10%200z%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M7%204h10v5a5%205%200%200%201-10%200z%22%2F%3E%3Cpath%20d%3D%22M7%206H4.5a2.5%202.5%200%200%200%202.6%203.6M17%206h2.5a2.5%202.5%200%200%201-2.6%203.6M12%2014v3.5M8%2020.5h8M9.5%2017.5h5%22%2F%3E%3C%2Fsvg%3E"); }
+.amw-root .amw-nav-item[data-se-am-nav="stats"] { --se-am-ic: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Crect%20x%3D%224%22%20y%3D%2212%22%20width%3D%224%22%20height%3D%228%22%20rx%3D%221.2%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%227%22%20width%3D%224%22%20height%3D%2213%22%20rx%3D%221.2%22%2F%3E%3Crect%20x%3D%2216%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2216%22%20rx%3D%221.2%22%2F%3E%3C%2Fg%3E%3Crect%20x%3D%224%22%20y%3D%2212%22%20width%3D%224%22%20height%3D%228%22%20rx%3D%221.2%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%227%22%20width%3D%224%22%20height%3D%2213%22%20rx%3D%221.2%22%2F%3E%3Crect%20x%3D%2216%22%20y%3D%224%22%20width%3D%224%22%20height%3D%2216%22%20rx%3D%221.2%22%2F%3E%3C%2Fsvg%3E"); }
+.amw-root .amw-nav-item[data-se-am-nav="all"] { --se-am-ic: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Crect%20x%3D%224%22%20y%3D%224%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%222%22%2F%3E%3Crect%20x%3D%2213%22%20y%3D%224%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%222%22%2F%3E%3Crect%20x%3D%224%22%20y%3D%2213%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%222%22%2F%3E%3Crect%20x%3D%2213%22%20y%3D%2213%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%222%22%2F%3E%3C%2Fg%3E%3Crect%20x%3D%224%22%20y%3D%224%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%222%22%2F%3E%3Crect%20x%3D%2213%22%20y%3D%224%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%222%22%2F%3E%3Crect%20x%3D%224%22%20y%3D%2213%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%222%22%2F%3E%3Crect%20x%3D%2213%22%20y%3D%2213%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%222%22%2F%3E%3C%2Fsvg%3E"); }
+.amw-root .amw-nav-item[data-se-am-nav="unlocked"] { --se-am-ic: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Crect%20x%3D%225%22%20y%3D%2210.5%22%20width%3D%2214%22%20height%3D%2210%22%20rx%3D%222.5%22%2F%3E%3C%2Fg%3E%3Crect%20x%3D%225%22%20y%3D%2210.5%22%20width%3D%2214%22%20height%3D%2210%22%20rx%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M8%2010.5V7.5a4%204%200%200%201%207.6-1.7%22%2F%3E%3Cpath%20d%3D%22M12%2014.5v2%22%2F%3E%3C%2Fsvg%3E"); }
+.amw-root .amw-nav-item[data-se-am-nav="locked"] { --se-am-ic: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Crect%20x%3D%225%22%20y%3D%2210.5%22%20width%3D%2214%22%20height%3D%2210%22%20rx%3D%222.5%22%2F%3E%3C%2Fg%3E%3Crect%20x%3D%225%22%20y%3D%2210.5%22%20width%3D%2214%22%20height%3D%2210%22%20rx%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M8%2010.5V7.5a4%204%200%200%201%208%200v3%22%2F%3E%3Cpath%20d%3D%22M12%2014.5v2%22%2F%3E%3C%2Fsvg%3E"); }
+.amw-root .amw-nav-item[data-se-am-nav="changed"] { --se-am-ic: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Cpath%20d%3D%22M15.5%204.5l4%204L9%2019H5v-4z%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M15.5%204.5l4%204L9%2019H5v-4z%22%2F%3E%3Cpath%20d%3D%22M13%207l4%204%22%2F%3E%3C%2Fsvg%3E"); }
+
+/* Settings' rows draw Steam's icon element; these have none, so the icon is ::after, first */
+.amw-root .amw-nav-item[data-se-am-nav]::after {
+  content: '';
+  order: -1;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-am-ic) center / 18px 18px no-repeat;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+.amw-root .amw-nav-item[data-se-am-nav]:hover::after {
+  background: var(--se-text-strong);
+}
+
+.amw-root .amw-nav-item[data-se-am-nav].amw-on::after {
+  background: var(--se-accent);
+}
+
+/*
+ * The open row's accent bar at the column's edge, as in Settings (client/settings/game-properties.css
+ * draws it there with ::after, which carries the icon here; Settings hides ::before, so this
+ * outranks that).
+ */
+.amw-root .amw-nav-item.amw-on:not(#se-none)::before {
+  content: '';
+  display: block !important;
+  position: absolute;
+  left: -14px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--se-accent);
+}
+
+.amw-root .amw-nav-item .amw-label:not(#se-none) {
+  flex: 1 1 auto;
+}
+
+.amw-root .amw-count:not(#se-none) {
+  margin-inline-start: 8px;
+  color: var(--se-text-faint);
+  font: 600 var(--se-fs-xs) var(--se-font);
+  font-variant-numeric: tabular-nums;
+  opacity: 1;
+}
+
+.amw-root .amw-nav-item.amw-on .amw-count:not(#se-none) {
+  color: var(--se-text-muted);
+}
+
+/* As Settings' PageListSeparator */
+.amw-root .amw-navsep:not(#se-none) {
+  height: 1px;
+  margin: 10px 10px 8px;
+  background: var(--se-hairline);
+}
+
+.amw-root .amw-side-note:not(#se-none) {
+  padding: 12px 10px 0;
+  color: var(--se-text-faint);
+  font: 500 var(--se-fs-xs)/1.5 var(--se-font);
+  opacity: 1;
+}
+
+.amw-root .amw-side:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+}
+
+.amw-root .amw-main:not(#se-none) {
+  background: var(--se-bg) !important;
+}
+
+.amw-root .amw-head:not(#se-none) {
+  padding: var(--se-am-top) 72px 10px 28px;
+}
+
+.amw-root .amw-title:not(#se-none) {
+  color: var(--se-text);
+  font: 700 var(--se-fs-2xl)/1.25 var(--se-font);
+}
+
+.amw-root .amw-head .amw-sub:not(#se-none) {
+  margin-top: 4px;
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm)/1.4 var(--se-font);
+  opacity: 1;
+}
+
+.amw-root .amw-bar:not(#se-none) {
+  padding: 0 28px 14px;
+}
+
+.amw-root .amw-tools:not(#se-none) {
+  padding: 0 28px 14px;
+}
+
+.amw-root .amw-list:not(#se-none) {
+  padding: 4px 28px 24px !important;
+}
+
+/* One card per achievement / stat */
+.amw-root .amw-row:not(#se-none) {
+  gap: 14px;
+  margin: 0 0 8px;
+  padding: 12px 16px 12px 12px;
+  border: 0;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  transition: box-shadow var(--se-dur-fast), background-color var(--se-dur-fast);
+}
+
+.amw-root .amw-row:not(#se-none):hover {
+  box-shadow: inset 0 0 0 1px var(--se-white-12);
+}
+
+.amw-root .amw-row.amw-row-changed:not(#se-none) {
+  background: color-mix(in srgb, var(--se-accent) 7%, var(--se-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 45%, transparent);
+}
+
+.amw-root .amw-row .amw-rowicon:not(#se-none) {
+  width: 44px;
+  height: 44px;
+}
+
+.amw-root .amw-rowtitle:not(#se-none) {
+  color: var(--se-text);
+  font: 600 var(--se-fs-base)/1.35 var(--se-font);
+}
+
+.amw-root .amw-row-off .amw-rowtitle:not(#se-none) {
+  color: var(--se-text-dim);
+}
+
+.amw-root .amw-rowdesc:not(#se-none) {
+  margin-top: 3px;
+  color: var(--se-text-muted);
+  font: 400 var(--se-fs-xs)/1.45 var(--se-font);
+}
+
+.amw-root .amw-rowpct:not(#se-none) {
+  margin-top: 3px;
+  color: var(--se-tier, var(--se-text-faint));
+  font: 600 var(--se-fs-xs)/1.4 var(--se-font);
+}
+
+.amw-root .amw-foot:not(#se-none) {
+  gap: 10px;
+  padding: 14px 28px 18px;
+  border-top: 1px solid var(--se-hairline);
+}
+
+.amw-root .amw-actions:not(#se-none) {
+  gap: 8px;
+}
+
+/*
+ * Progress: the theme's achievement ring (the play bar's: gold over a quiet track) with the share
+ * inside, beside the head's title, in place of Steam's progress bar. achievement-manager.js
+ * reads the share from the head's "12 of 42 unlocked (28.6%)" line.
+ */
+/* Classic's bar (.amw-bar), and Showcase's: the wrapper without a class right after the head */
+.amw-root .amw-bar:not(#se-none),
+.amw-root .amx-wrap > .amx-head + div:not([class]):not(#se-none) {
+  display: none !important;
+}
+
+.amw-root :is(.amw-head, .amx-head)[data-se-am-pct] {
+  --se-am-ring: 52px;
+  position: relative;
+}
+
+.amw-root :is(.amw-head, .amx-head)[data-se-am-pct]::before {
+  content: '';
+  flex: none;
+  width: var(--se-am-ring);
+  height: var(--se-am-ring);
+  border-radius: 50%;
+  background: conic-gradient(var(--se-gold) calc(var(--se-am-pct, 0) * 1%), var(--se-white-12) 0);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 5.5px), #000 calc(100% - 5px), #000 calc(100% - .5px), transparent 100%);
+}
+
+.amw-root :is(.amw-head, .amx-head)[data-se-am-pct]::after {
+  content: attr(data-se-am-pct) '%';
+  display: grid;
+  place-items: center;
+  width: var(--se-am-ring);
+  height: var(--se-am-ring);
+  color: var(--se-text);
+  font: 800 var(--se-fs-xs)/1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+}
+
+.amw-root :is(.amw-head, .amx-head)[data-se-am-pct="100"]::after {
+  color: var(--se-gold);
+}
+
+/* Classic: ring, then title over the line, in a grid */
+.amw-root .amw-head[data-se-am-pct]:not(#se-none) {
+  display: grid;
+  grid-template-columns: var(--se-am-ring) minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: center;
+  padding-bottom: 18px;
+}
+
+.amw-root .amw-head[data-se-am-pct]::before,
+.amw-root .amw-head[data-se-am-pct]::after {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+}
+
+.amw-root .amw-head[data-se-am-pct] > * {
+  grid-column: 2;
+  align-self: end;
+}
+
+.amw-root .amw-head[data-se-am-pct] > * + * {
+  align-self: start;
+}
+
+/* The others: a flex row, the ring first, its share laid over it */
+.amw-root .amx-head[data-se-am-pct] {
+  --se-am-ring: 44px;
+}
+
+.amw-root .amx-head[data-se-am-pct]::after {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--se-fs-2xs);
+}
+
+/* ===== Showcase, Table, Split: shared ===== */
+
+.amw-root .amx-wrap:not(#se-none) {
+  gap: 14px;
+  padding: var(--se-am-top) 28px 18px;
+  color: var(--se-text-dim);
+  font: 400 var(--se-fs-sm) var(--se-font);
+}
+
+.amw-root .amx-head:not(#se-none) {
+  gap: 12px;
+}
+
+.amw-root .amx-title:not(#se-none) {
+  color: var(--se-text);
+  font: 700 var(--se-fs-2xl)/1.25 var(--se-font);
+}
+
+.amw-root .amx-subtitle:not(#se-none) {
+  margin-top: 4px;
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm)/1.4 var(--se-font);
+  opacity: 1;
+}
+
+.amw-root .amx-pill:not(#se-none) {
+  padding: 3px 10px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent-surface);
+  color: var(--se-accent);
+  font: 700 var(--se-fs-2xs)/16px var(--se-font);
+}
+
+/* A toggled option button (filter, view): the accent, like the theme's segmented controls */
+.amw-root button.DialogButton.amx-btn.amx-on:not(#se-none) {
+  background: var(--se-accent-surface) !important;
+  box-shadow: none !important;
+  color: var(--se-accent) !important;
+}
+
+.amw-root .amx-ctitle:not(#se-none) {
+  color: var(--se-text);
+  font-weight: 600;
+}
+
+.amw-root .amx-sub:not(#se-none) {
+  color: var(--se-text-muted);
+  font: 400 var(--se-fs-xs)/1.45 var(--se-font);
+  opacity: 1;
+}
+
+/* Round tick: the accent when ticked */
+.amw-root .amx-check:not(#se-none) {
+  border: 0;
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1.5px var(--se-white-25);
+  color: var(--se-bg-ink);
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+.amw-root .amx-check.amx-checked:not(#se-none) {
+  background: var(--se-accent);
+  box-shadow: none;
+}
+
+/* Rarity: the bar and its rate in the tier's colour */
+.amw-root .amx-rarity:not(#se-none) {
+  color: var(--se-tier, var(--se-text-muted));
+  font: 600 var(--se-fs-2xs) var(--se-font);
+  opacity: 1;
+}
+
+.amw-root .amx-rbar:not(#se-none) {
+  background: var(--se-white-07);
+}
+
+.amw-root .amx-rfill:not(#se-none) {
+  background: var(--se-tier, var(--se-accent));
+  opacity: 1;
+}
+
+.amw-root .amx-foot:not(#se-none) {
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--se-hairline);
+}
+
+.amw-root .amx-statusnote:not(#se-none) {
+  color: var(--se-text-faint);
+  opacity: 1;
+}
+
+/*
+ * Showcase / Table: the Achievements / Stats tabs at the start of the toolbar row, the filters and
+ * sort at its end (achievement-manager.js measures the row: [data-se-am-tabs], --se-am-tabs-top).
+ */
+/* Always positioned, so the row's offsetTop is measured from the wrap from the first pass */
+.amw-root .amx-wrap:not(#se-none) {
+  position: relative;
+}
+
+.amw-root .amx-wrap[data-se-am-tabs] > .amx-head > .amx-seg:not(#se-none) {
+  position: absolute;
+  top: var(--se-am-tabs-top, 0);
+  left: var(--se-am-tabs-left, 0);
+  z-index: 1;
+}
+
+.amw-root .amx-wrap[data-se-am-tabs] > .amx-head + .amx-row:not(#se-none) {
+  justify-content: flex-end;
+}
+
+/* ===== Showcase ===== */
+
+.amw-root .amx-grid:not(#se-none) {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.amw-root .amx-tile:not(#se-none) {
+  gap: 10px;
+  padding: 14px;
+  border: 0;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  transition: box-shadow var(--se-dur-fast), background-color var(--se-dur-fast);
+}
+
+.amw-root .amx-tile:not(#se-none):hover {
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-white-12);
+}
+
+.amw-root .amx-tile:not(#se-none):focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.amw-root .amx-tile.amx-changed:not(#se-none) {
+  background: color-mix(in srgb, var(--se-accent) 7%, var(--se-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 45%, transparent);
+}
+
+.amw-root .amx-tile.amx-off .amx-ctitle:not(#se-none) {
+  color: var(--se-text-dim);
+}
+
+.amw-root .amx-tdesc:not(#se-none) {
+  color: var(--se-text-muted);
+  font: 400 var(--se-fs-xs)/1.45 var(--se-font);
+  opacity: 1;
+}
+
+/* ===== Table ===== */
+
+.amw-root .amx-trow:not(#se-none) {
+  padding: 6px 10px;
+  border-radius: var(--se-radius-sm);
+}
+
+.amw-root .amx-trow.amx-hd:not(#se-none) {
+  padding: 0 10px 8px;
+  border-bottom: 1px solid var(--se-hairline);
+  border-radius: 0;
+  text-transform: uppercase;
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  color: var(--se-label-color);
+  opacity: 1;
+}
+
+.amw-root .amx-trow.amx-hd .amx-sortable:not(#se-none):hover {
+  color: var(--se-text);
+}
+
+.amw-root .amx-body > .amx-trow:nth-child(even):not(#se-none) {
+  background: var(--se-white-02);
+}
+
+.amw-root .amx-body > .amx-trow:not(.amx-hd, #se-none):hover {
+  background: var(--se-white-04);
+}
+
+.amw-root .amx-trow.amx-changed:not(#se-none) {
+  box-shadow: inset 3px 0 0 var(--se-accent);
+}
+
+.amw-root .amx-trow.amx-sel:not(#se-none) {
+  background: var(--se-accent-tint) !important;
+}
+
+.amw-root .amx-cell:not(#se-none) {
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.amw-root .amx-bulk:not(#se-none) {
+  gap: 8px;
+}
+
+/* ===== Split ===== */
+
+.amw-root .amx-split:not(#se-none) {
+  gap: 18px;
+}
+
+.amw-root .amx-srow:not(#se-none) {
+  gap: 10px;
+  padding: 6px 10px 6px 6px;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  transition: background-color var(--se-dur-fast);
+}
+
+.amw-root .amx-srow:not(#se-none):hover {
+  background: var(--se-hover);
+}
+
+.amw-root .amx-srow.amx-picked:not(#se-none) {
+  background: var(--se-accent-surface);
+  box-shadow: none;
+}
+
+.amw-root .amx-srow.amx-picked .amx-ctitle:not(#se-none) {
+  color: var(--se-accent);
+}
+
+.amw-root .amx-srow.amx-changed:not(#se-none) {
+  box-shadow: inset 3px 0 0 var(--se-accent);
+}
+
+.amw-root .amx-srow:not(#se-none):focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.amw-root .amx-pane:not(#se-none) {
+  gap: 16px;
+  padding: 24px;
+  border: 0;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.amw-root .amx-pane .amw-rowicon:not(#se-none) {
+  border-radius: var(--se-radius-md);
+  box-shadow: 0 0 0 1px var(--se-hairline);
+}
+
+.amw-root .amx-pane .amx-ctitle:not(#se-none) {
+  font: 700 var(--se-fs-xl)/1.3 var(--se-font);
+}
+
+/* The rarity label: the theme's tier name (achievement-manager.js) in its colour */
+.amw-root .amx-tier:not(#se-none) {
+  padding: 2px 10px;
+  border-radius: var(--se-radius-pill);
+  background: color-mix(in srgb, var(--se-tier, var(--se-text-muted)) 16%, transparent);
+  color: var(--se-tier, var(--se-text-muted));
+  font: 700 var(--se-fs-2xs)/16px var(--se-font);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.amw-root .amx-tier[data-se-tier-name]:not(#se-none) {
+  font-size: 0;
+}
+
+.amw-root .amx-tier[data-se-tier-name]::after {
+  content: attr(data-se-tier-name);
+  font-size: var(--se-fs-2xs);
+}
+
+.amw-root .amx-panedesc:not(#se-none) {
+  color: var(--se-text-dim);
+  font: 400 var(--se-fs-sm)/1.5 var(--se-font);
+  opacity: 1;
+}
+
+.amw-root .amx-facts:not(#se-none) {
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-xs)/1.5 var(--se-font);
+  opacity: 1;
+}
+
+/* ---------- 2. Game page button ---------- */
+
+/*
+ * The plugin pins its copy beside "View My Achievements" with inline absolute positioning,
+ * measured against the button's offset parent. In the theme's achievements card that put it
+ * out of sight, so it goes back into the flow instead: right before the original (or right
+ * after it, when the plugin chose "below"), the same height, 20 px apart.
+ */
+[data-achievement-manager]:is([data-amw-mode="left"], [data-amw-mode="below"]):not(#se-none) {
+  position: static !important;
+  inset: auto !important;
+  display: inline-flex !important;
+  align-items: center;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 20px 0 0 !important;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+[data-achievement-manager][data-amw-mode="below"]:not(#se-none) {
+  margin: 0 0 0 20px !important;
+}
+
+[data-achievement-manager][data-amw-mode="inside"]:not(#se-none) {
+  margin-top: 12px !important;
+}

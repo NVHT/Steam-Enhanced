@@ -30,9 +30,10 @@
     for (const sec of document.querySelectorAll(LINKED.map((k) => `[data-se-sec="${k}"]`).join(', '))) {
       const head = sec.querySelector(HEADING);
       const btn = head && mainButton(sec, head);
-      let link = sec.querySelector('.se-ach-view');
+      let link = sec.querySelector('.se-ach-view:not(.se-ach-manager)');
       if (!btn) {
         drop(link);
+        drop(sec.querySelector('.se-ach-manager'));
         continue;
       }
       if (!link) {
@@ -57,7 +58,69 @@
         mark(head, 'data-se-has-link');
       }
       mark(btn, 'data-se-replaced');
+      if (sec.dataset.seSec === 'achievements') placeAchManager(head, link, btn);
     }
+  }
+
+  /*
+   * Achievement Manager plugin (compat/achievement-manager): its button goes beside Steam's
+   * "View My Achievements", which the theme hides behind its own heading link, so the plugin
+   * finds nothing to stand beside. The theme gives it a second heading link instead, before
+   * View My Achievements, that opens the plugin: its own API (__achievementManager.open) when the
+   * theme can reach it, else its steam://achievementmanager/open/<appid> link. Only while the plugin is on (Millennium marks <html> with its id), and never next to a
+   * button the plugin placed itself.
+   */
+  const AM_PLUGIN = 'achievement-manager';
+  const validId = (v) => {
+    const id = Number(v);
+    return Number.isSafeInteger(id) && id > 0 ? id : undefined;
+  };
+  // The game: from Steam's button's props, else the library route (/app/<id>)
+  const amAppId = (btn) =>
+    (btn && fromProps(btn, 60, (p) => validId(p.appid || p.appID || p.unAppID || p.overview?.appid || p.details?.unAppID))) ||
+    [...SE.owners()]
+      .map((o) => {
+        try {
+          return /\/app\/(\d+)/.exec(o.MainWindowBrowserManager?.m_lastLocation?.pathname || o.location?.pathname || '')?.[1];
+        } catch {
+          return undefined;
+        }
+      })
+      .map(validId)
+      .find(Boolean);
+  // The plugin's own API (window.__achievementManager in Steam's shared context), else its steam:// link
+  const amName = (btn) =>
+    (btn && fromProps(btn, 60, (p) => p.overview?.display_name || p.details?.strDisplayName || undefined)) || '';
+  const amOpen = (id, name) => {
+    const api = SE.global('__achievementManager', (a) => typeof a?.open === 'function');
+    if (api) return api.open(id, name);
+    SE.global('SteamClient')?.URL?.ExecuteSteamURL?.(`steam://achievementmanager/open/${id}`);
+  };
+
+  function placeAchManager(head, link, btn) {
+    let am = head.querySelector(':scope > .se-ach-manager');
+    const on = document.documentElement.classList.contains(AM_PLUGIN) && !document.querySelector('[data-achievement-manager]');
+    if (!on) {
+      drop(am);
+      return;
+    }
+    if (!am) {
+      am = own('button', 'se-ach-view se-ach-manager');
+      am.type = 'button';
+      am.textContent = 'Achievement Manager';
+      am.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = amAppId(am.__seBtn);
+        if (!id) return console.warn('[Steam Enhanced] Achievement Manager: no game found for this page');
+        try {
+          amOpen(id, amName(am.__seBtn));
+        } catch (err) {
+          console.warn('[Steam Enhanced] Achievement Manager: could not open', err);
+        }
+      });
+    }
+    am.__seBtn = btn;
+    if (am.nextElementSibling !== link) head.insertBefore(am, link);
   }
 
   const LEFT_CARDS = ['dlc', 'additionalcontent', 'cards', 'screenshots', 'workshop'];

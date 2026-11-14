@@ -75,11 +75,18 @@
     );
   }
 
+  /*
+   * Plugin windows built from the settings dialog's parts, so they match whatever a theme does to
+   * it, but aren't Settings: no search, sidebar sections or sizing there. Achievement Manager
+   * (compat/achievement-manager) uses the page list for its filters.
+   */
+  const NOT_SETTINGS = '.amw-root';
+
   function update() {
     live.frame = 0;
     const list = document.querySelector(LIST);
     const root = document.documentElement;
-    if (!list) {
+    if (!list || list.closest(NOT_SETTINGS)) {
       resetProps();
       setAttr(root, 'data-se-mill', null);
       return;
