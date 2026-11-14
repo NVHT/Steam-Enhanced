@@ -70,6 +70,7 @@ start({
   files: [
     { css: '../core/tokens.css' },
     { css: '../web/base.css' },
+    { css: '../core/spinner.css' },
     { css: 'shared/ui.css', on: ['ui'] },
     { css: 'shared/small-header.css', on: ['inventory', 'activitySettings', 'editProfile'] },
     { css: 'dmca/page.css', js: 'dmca/page.js', on: ['dmca'] },

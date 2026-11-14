@@ -234,9 +234,8 @@
   };
 
   /*
-   * Recent games' hero and capsule art. Read live from the library when this window can reach
+   * Recent games' hero art. Read live from the library when this window can reach
    * it; the main window also caches it in localStorage so it is there on the next cold start.
-   * spinner.js reads it through window.__seStartup.art.
    */
   const ownAppStore = () => {
     try {
@@ -268,7 +267,6 @@
     return recentApps.map(app => ({
       id: app.appid,
       hero: SE.heroURLs(app.appid, store).filter(url => !url.endsWith('/header.jpg')),
-      cover: SE.coverURLs(app, store),
     }));
   };
 
@@ -294,11 +292,6 @@
     } catch {
       return [];
     }
-  };
-
-  const recentGames = () => {
-    const live = liveRecentGames();
-    return live.length ? live : readCachedArt();
   };
 
   const toCssUrl = (url) => `url("${String(url).replace(/["\\\n]/g, (ch) => encodeURIComponent(ch))}")`;
@@ -652,6 +645,5 @@
       resetStartupState();
       delete window.__seStartup;
     },
-    art: { recentGames, cssUrl: toCssUrl, WALL_CROPS },
   };
 })(window.__se);

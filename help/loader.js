@@ -22,6 +22,7 @@ start({
   files: [
     { css: '../core/tokens.css' },
     { css: '../web/base.css' },
+    { css: '../core/spinner.css' },
     { css: 'site.css', js: 'site.js' },
   ],
 });

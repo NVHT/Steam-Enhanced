@@ -70,7 +70,7 @@ Steam Enhanced rebuilds the Steam client around your library: a navigation rail,
   <tr>
     <td valign="top">
       <h3>Startup</h3>
-      <sub>A Network, Steam, Library step strip, seven startup backgrounds and a family of loading spinners.</sub>
+      <sub>A Network, Steam, Library step strip, seven startup backgrounds, and five loading spinner styles that apply everywhere: client, Store and Community.</sub>
     </td>
     <td valign="top">
       <h3>About Steam</h3>
@@ -153,19 +153,18 @@ Every colour, radius, elevation and feature switch also lives on `:root` in **`c
 </details>
 
 <details>
-<summary><b>Loading spinner</b> &nbsp;<code>--se-spinner</code></summary>
+<summary><b>Loading spinner</b></summary>
 <br>
+
+One spinner for every loader: client windows, the Splash entrance, Store, Community and Support. The style applies everywhere at once.
 
 | Value | Look |
 | --- | --- |
-| `sweep` *(default)* | A conic arc with a glowing lead dot around the Steam Enhanced mark. |
-| `deck` | Three of your game covers shuffling front to back. |
-| `flip` | A two-sided card flipping through recent covers. |
-| `stack` | Four covers dropping onto a stack. |
-| `ring` | A solid accent arc around the mark. |
-| `steam` | Steam's own throbber. |
-
-Spinners under 40 px fall back to `sweep`.
+| `Refined` *(default)* | A wider arc with a rounded, lit head on a thin track, turning with a slight ease. |
+| `Comet` | A short tail led by a bright dot, around a gently floating Steam Enhanced mark. |
+| `Elastic` | A solid arc that stretches ahead and catches up. |
+| `Breathe` | Refined, with the mark breathing and a soft halo. |
+| `Classic` | A fading tail with a flat head. |
 
 </details>
 

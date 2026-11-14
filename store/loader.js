@@ -72,6 +72,7 @@ start({
   files: [
     { css: '../core/tokens.css' },
     { css: '../web/base.css' },
+    { css: '../core/spinner.css' },
     { css: 'shared/layout.css' },
     { css: 'shared/ui.css' },
     { css: 'shared/modals.css' },

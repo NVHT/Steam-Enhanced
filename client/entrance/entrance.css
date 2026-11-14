@@ -491,7 +491,10 @@
   50% { translate: 0 calc(-8 * var(--u)); }
 }
 
-#se-entrance .se-ent-track,
+/*
+ * The ring is the theme's loading spinner (core/spinner.css: .se-spin-arc draws its track, arc
+ * and dots), so it follows the "Loading spinner" setting. Its band is 5 design px of its radius.
+ */
 #se-entrance .se-ent-ring,
 #se-entrance .se-ent-tile::after {
   position: absolute;
@@ -499,15 +502,7 @@
   border-radius: 50%;
 }
 
-#se-entrance .se-ent-track {
-  box-shadow: inset 0 0 0 calc(5 * var(--u)) var(--se-hairline);
-}
-
 #se-entrance .se-ent-ring {
-  background: conic-gradient(from 0deg, transparent 0 50%, color-mix(in srgb, var(--se-accent) 10%, transparent) 62%, color-mix(in srgb, var(--se-accent) 50%, transparent) 86%, var(--se-accent) 99%, transparent 100%);
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5 * var(--u)), #000 calc(100% - 4.5 * var(--u)));
-  mask: radial-gradient(farthest-side, transparent calc(100% - 5 * var(--u)), #000 calc(100% - 4.5 * var(--u)));
-  animation: se-ent-spin 1.4s linear infinite;
   transition: opacity .4s;
 }
 
@@ -525,10 +520,6 @@
 
 #se-entrance:is([data-phase="ready"], [data-phase="leave"]) .se-ent-tile::after {
   opacity: 1;
-}
-
-@keyframes se-ent-spin {
-  to { rotate: 360deg; }
 }
 
 #se-entrance .se-ent-mark {

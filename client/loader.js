@@ -75,10 +75,10 @@
       'toasts.css', 'context.js', 'config.js', 'steam.js', 'stage.js', 'hub.js', 'placement.js',
       'scan.js', 'compact.js', 'main.js',
     ]],
-    // Startup, sign-in, entrance, spinner
+    // Loading spinner (also holds the mark), then startup, sign-in, entrance
+    ['content', 'core/', ['spinner.css']],
     ['content', 'client/startup/', ['startup.css', 'startup.js', 'sign-in.css']],
     ['main', 'client/entrance/', ['entrance.css', 'entrance.js']],
-    ['content', 'client/spinner/', ['spinner.css', 'spinner.js']],
     ['desktop', 'core/', ['native-tooltips.js']],
     // Library, title bar and navigation
     ['main', 'client/library/', ['artwork.css']],

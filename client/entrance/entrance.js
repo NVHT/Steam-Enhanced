@@ -93,7 +93,7 @@
 
   const centre =
     '<div class="se-ent-centre">' +
-    '<div class="se-ent-tile"><span class="se-ent-track"></span><span class="se-ent-ring"></span>' +
+    '<div class="se-ent-tile"><span class="se-ent-ring se-spin-arc"></span>' +
     '<span class="se-ent-mark"></span><span class="se-ent-spark"></span></div>' +
     '<div class="se-ent-word"><div class="se-ent-kicker">STEAM</div><div class="se-ent-title">Enhanced</div></div>' +
     '<div class="se-ent-progress"><div class="se-ent-bar"><span></span></div>' +
