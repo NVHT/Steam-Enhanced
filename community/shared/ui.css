@@ -2,7 +2,8 @@
  * Community UI: what every redesigned Community page shares (html.se-community-ui, set by
  * community/loader.js on the inventory, profile, activity, discussions and hub pages).
  *
- *   - Page frame: the theme's page colour behind Steam's frames, and one page width.
+ *   - Page frame: the theme's page colour on the root (behind the page scrollbar) and behind
+ *     Steam's frames, and one page width.
  *   - Pill buttons: Steam's classic button classes (.btn_*, .btnv6_*, .btn_profile_action) as
  *     the theme's pills; the green "do it" buttons as the accent.
  *   - Avatars: rounded squares with Steam's status colour as a ring; avatar frames hidden so
@@ -14,6 +15,8 @@
  *   - Duotone icons (shared/icons.js): a soft back layer and a strong front layer in the link's
  *     own colour; the Steam icon they replace is hidden.
  *   - Popup menus, the emoticon picker, page buttons, focus ring and reduced motion.
+ *   - Tooltips: Steam's (.community_tooltip) and the title tooltips (shared/tips.js) in the
+ *     theme's tooltip style.
  *
  * Classes are Steam's (SteamTracking: steamcommunity.com/public/css/skin_1/globalv2.css,
  * buttons.css, profilev2.css, forums.css). Tokens come from store/shared/base.css.
@@ -30,6 +33,12 @@ html.se-community-ui {
 }
 
 /* ---------- Page frame ---------- */
+
+/* The root too: scrollbar tracks are transparent (core/scrollbars.css), and the page's own
+   scrollbar gutter shows the root's background, which is otherwise the window's black */
+html.se-community-ui {
+  background-color: var(--se-bg) !important;
+}
 
 html.se-community-ui body,
 html.se-community-ui :is(.responsive_page_frame, .responsive_page_content, .responsive_page_template_content) {
@@ -897,4 +906,56 @@ html.se-community-ui .emoticon_hover {
   border-radius: var(--se-radius-md) !important;
   background: var(--se-panel-bg) !important;
   box-shadow: var(--se-panel-shadow) !important;
+}
+
+/* ---------- Tooltips ----------
+ * Steam's own tooltips (.community_tooltip, opened as a manual popover, so the browser's
+ * default popover box shows through Steam's styles) and the theme's title tooltips
+ * (.se-tip, shared/tips.js: the browser's `title` box can't be styled) look the same.
+ */
+html.se-community-ui .community_tooltip {
+  box-sizing: border-box;
+  max-width: 360px;
+  margin: 0 !important;
+  padding: 10px 13px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-shadow-tooltip, 0 10px 24px -8px rgba(0, 0, 0, .8), inset 0 0 0 1px var(--se-hairline)) !important;
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-sm)/1.5 var(--se-font) !important;
+  text-shadow: none !important;
+  overflow-wrap: anywhere;
+}
+
+html.se-community-ui .community_tooltip a {
+  color: var(--se-accent) !important;
+}
+
+html.se-community-ui .se-tip {
+  position: fixed;
+  z-index: var(--se-z-toast, 10000);
+  box-sizing: border-box;
+  max-width: 340px;
+  padding: 9px 12px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-shadow-tooltip, 0 10px 24px -8px rgba(0, 0, 0, .8), inset 0 0 0 1px var(--se-hairline));
+  color: var(--se-text);
+  font: 500 var(--se-fs-sm)/1.5 var(--se-font);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+  animation: se-tip-in var(--se-dur-fast) var(--se-ease);
+}
+
+html.se-community-ui .se-tip[hidden] {
+  display: none;
+}
+
+@keyframes se-tip-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
 }

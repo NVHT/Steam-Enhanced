@@ -121,12 +121,15 @@ const EXPAND = /full\s*-?\s*screen|expand|enlarge|maximi[sz]e/i;
 
 const nextFrame = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-/** Select trailer `index`, open Steam's overlay on it, and start it playing. */
+/**
+ * Open Steam's overlay, select trailer `index` in it, and start it playing. The overlay opens
+ * first: app/about.js pauses any play that starts while it is closed, and Steam starts loading
+ * a trailer the moment it is selected, so selecting first left its stream paused mid-load
+ * (stuck at 0:00 behind Steam's spinner).
+ */
 export const openTrailer = async (index, carousel = findCarousel()) => {
   const player = carousel?.querySelector('[popover]');
   if (!player) return false;
-  selectTrailer(index, carousel);
-  await nextFrame(); // React swaps the slide on its next render
 
   if (!player.matches(':popover-open')) {
     const expand = [...player.querySelectorAll('button, [role="button"]')].find((button) =>
@@ -142,6 +145,9 @@ export const openTrailer = async (index, carousel = findCarousel()) => {
     }
     await nextFrame();
   }
+
+  selectTrailer(index, carousel);
+  await nextFrame(); // React swaps the slide on its next render
 
   // The slide on screen holds the selected trailer's video; the track keeps the others mounted.
   const video = [...player.querySelectorAll('video')].find((node) => {

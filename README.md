@@ -106,7 +106,7 @@ Every web page fills the window and shares the theme's cards, pills, glass chips
 | **Browse** | New &amp; Upcoming, Charts, Labs, DLC, Next Fest (with a live countdown), Steam Awards and Replay, plus sale and event pages. |
 | **Account** | One settings page with a sticky sidebar: Account details, Purchase History and Licenses with search and filters, Add Funds, Redeem, phone, country and Family View. |
 | **Legal** | The Subscriber Agreement and Privacy Policy as documents with a contents sidebar and progress bar. |
-| **Community** | Profiles as glass cards over their own background, a three-column Activity feed, Hubs, Discussions and a 5 × 5 inventory grid with rarity glows. |
+| **Community** | Profiles as glass cards over their own background, a three-column Activity feed, Hubs, Discussions, a 5 × 5 inventory grid with rarity glows and a Community Market with a wallet hero, ranked listings and a game filter. |
 | **Support** | Every help.steampowered.com page, from the wizard to refunds and account recovery. |
 
 <br>

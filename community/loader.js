@@ -17,7 +17,9 @@
  *   inventory/     Item inventory (/id/<name>/inventory)
  *   edit-profile/  Edit Profile (/id/<name>/edit/info, /edit/avatar... every tab)
  *   hub/           Community Hub (/app/<id> and its tabs)
- *   discussions/   Discussions (/discussions/, hub and group forums, topics)
+ *   discussions/   Discussions (/discussions/, hub and group forums, topics); home.css/js:
+ *                  the Discussions home (/discussions/) on top of page.css
+ *   market/        Community Market home (/market/)
  */
 const versioned = (file) => {
   const url = new URL(file, import.meta.url);
@@ -43,8 +45,10 @@ const isHub = (path) => /^\/app\/\d+(?:\/|$)/i.test(path);
 const isDiscussions = (path) =>
   /^\/discussions(?:\/|$)/i.test(path) ||
   /^\/(?:app\/\d+|groups\/[^/]+)\/(?:discussions|tradingforum|eventcomments)(?:\/|$)/i.test(path);
+const isDiscussionsHome = (path) => /^\/discussions\/?$/i.test(path);
+const isMarket = (path) => /^\/market\/?$/i.test(path);
 
-const classic = [isProfile, isActivity, isActivitySettings, isInventory, isEditProfile, isHub, isDiscussions];
+const classic = [isProfile, isActivity, isActivitySettings, isInventory, isEditProfile, isHub, isDiscussions, isMarket];
 
 start({
   base: import.meta.url,
@@ -60,6 +64,8 @@ start({
     editProfile: { test: isEditProfile, root: 'se-community-edit-profile' },
     hub: { test: isHub, root: 'se-community-hub' },
     discussions: { test: isDiscussions, root: 'se-community-discussions' },
+    discussionsHome: { test: isDiscussionsHome, root: 'se-community-discussions-home' },
+    market: { test: isMarket, root: 'se-community-market' },
   },
   files: [
     { css: '../store/shared/base.css' },
@@ -73,5 +79,7 @@ start({
     { css: 'edit-profile/page.css', js: 'edit-profile/page.js', on: ['editProfile'] },
     { css: 'hub/page.css', js: 'hub/page.js', on: ['hub'] },
     { css: 'discussions/page.css', js: 'discussions/page.js', on: ['discussions'] },
+    { css: 'discussions/home.css', js: 'discussions/home.js', on: ['discussionsHome'] },
+    { css: 'market/page.css', js: 'market/page.js', on: ['market'] },
   ],
 });

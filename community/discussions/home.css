@@ -1,0 +1,1756 @@
+/*
+ * Discussions home (/discussions/): the landing page as the theme's own. Loads after
+ * discussions/page.css, which still styles the shared parts (search field, side boxes).
+ *
+ *   - Width: every band at the store's page width.
+ *   - Hero: centered title, the theme's search pill with a "/" key hint, a "Popular" row of
+ *     forum chips and a stats row; under them a row of four cards: Steam's three intro
+ *     paragraphs (bold lead as the title, an icon each) and Links & Resources in the same style.
+ *   - Tabs: Steam Forums / Game Forums / Tools & Servers as a segmented control with a sliding
+ *     pill (home.js).
+ *   - Recent games: art cards (store header art from home.js under a fade), the game's tall
+ *     library cover in place of its small icon, name and thread count; unread as a "New" pill.
+ *     "More game forums" sits beside the title.
+ *   - Game Forums tab: the controls as pills, Games You've Recently Played as a row of art
+ *     cards, the hubs as a grid of cards.
+ *   - Forum list: a grid of forum cards (a neutral duotone-icon tile from home.js, the
+ *     name, a thread count chip and the last post); unread forums read bright and bold,
+ *     read ones muted. Steam Feature Discussions below it as a second card grid with theme line
+ *     icons.
+ *
+ * Classes and ids are Steam's (SteamTracking: steamcommunity.com/public/css/skin_1/
+ * discussions.css, forums.css, groupv2.css) and the page report. Avatars, buttons and
+ * duotone icons are shared/ui.css.
+ */
+
+html.se-community-discussions-home {
+  --se-dsc-side: 360px;
+}
+
+/* ---------- Width ---------- */
+
+html.se-community-discussions-home .pagecontent.discussions_page {
+  width: auto !important;
+  padding-bottom: 72px !important;
+}
+
+html.se-community-discussions-home .pagecontent.discussions_page :is(.grouppage_content_area, #discussions_tab_contents) {
+  box-sizing: border-box;
+  width: var(--se-community-width) !important;
+  max-width: none !important;
+  margin-inline: auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-discussions-home #discussions_tab_contents > .grouppage_content_area {
+  width: auto !important;
+}
+
+html.se-community-discussions-home .pagecontent.discussions_page .maincontent {
+  box-sizing: border-box;
+  float: none !important;
+  width: auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* ---------- Hero ----------
+ * Centered: the title, search, popular chips and stats down the middle, then one row of four
+ * cards: Steam's three intro paragraphs (each paragraph's bold lead as its title, with an icon)
+ * and Links & Resources. Steam's wrappers (.leftcol, .group_content, the intro) are
+ * display: contents, so their children sit straight on the hero's grid. Scoped to the page's
+ * first band (.discussions_page > .grouppage_content_area): the Game Forums tab has its own
+ * .leftcol / .rightcol pair.
+ */
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent:has(> .leftcol ~ .rightcol) {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: start;
+  gap: 0 16px;
+  margin: 28px 0 28px !important;
+  padding: 52px 40px 40px !important;
+  border-radius: var(--se-radius-xl);
+  background:
+    radial-gradient(60% 90% at 50% 0%, color-mix(in srgb, var(--se-accent) 14%, transparent), transparent 70%),
+    var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg);
+  overflow: hidden;
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent:has(> .leftcol ~ .rightcol) > .leftcol,
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .group_content,
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .steam_discussions_intro {
+  display: contents !important;
+}
+
+/* Down the middle: title, search, popular chips and stats */
+html.se-community-discussions-home .group_content > h2.large_title {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  justify-self: center;
+  margin: 0 0 26px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-4xl)/1.15 var(--se-font) !important;
+  letter-spacing: -.02em;
+  text-align: center;
+  text-transform: none !important;
+}
+
+html.se-community-discussions-home .group_content > :is(.se-dsc-search, .global_discussion_search_ctn) {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-self: center;
+  width: min(760px, 100%);
+  max-width: none;
+}
+
+html.se-community-discussions-home .group_content > .se-dsc-hero-extras {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  justify-items: center;
+}
+
+/* The row of cards: Steam's three paragraphs, then Links & Resources */
+html.se-community-discussions-home .steam_discussions_intro > p,
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent > .rightcol {
+  grid-row: 4;
+  align-self: stretch;
+  margin: 40px 0 0 !important;
+}
+
+html.se-community-discussions-home .steam_discussions_intro > p {
+  position: relative;
+  box-sizing: border-box;
+  max-width: none;
+  padding: 72px 22px 22px !important;
+  border-radius: var(--se-radius-lg);
+  background: rgba(255, 255, 255, .03);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-muted) !important;
+  font: 400 var(--se-fs-md)/1.6 var(--se-font) !important;
+}
+
+html.se-community-discussions-home .steam_discussions_intro > p::before,
+html.se-community-discussions-home .steam_discussions_intro > p::after {
+  content: "";
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  width: 36px;
+  height: 36px;
+}
+
+html.se-community-discussions-home .steam_discussions_intro > p::before {
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-discussions-home .steam_discussions_intro > p::after {
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-dsc-icon) center / 20px no-repeat;
+  mask: var(--se-dsc-icon) center / 20px no-repeat;
+}
+
+html.se-community-discussions-home .steam_discussions_intro > p:nth-of-type(1) { --se-dsc-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='8' r='3.5' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M2.5 20c.6-3.6 3.2-5.8 6.5-5.8s5.9 2.2 6.5 5.8'/%3E%3Cpath d='M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.6c1.7.8 2.7 2.7 3 5.4'/%3E%3C/svg%3E"); }
+html.se-community-discussions-home .steam_discussions_intro > p:nth-of-type(2) { --se-dsc-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M15.5 15.5 20 20'/%3E%3C/svg%3E"); }
+html.se-community-discussions-home .steam_discussions_intro > p:nth-of-type(3) { --se-dsc-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23000' fill-opacity='.32' d='M12 3 4.5 6v5.5c0 4.6 3.2 8.2 7.5 9.5 4.3-1.3 7.5-4.9 7.5-9.5V6z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E"); }
+
+html.se-community-discussions-home .steam_discussions_intro > p b {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--se-white) !important;
+  font: 700 var(--se-fs-lg)/1.35 var(--se-font);
+}
+
+html.se-community-discussions-home .steam_discussions_intro a {
+  color: var(--se-accent) !important;
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent > .rightcol {
+  position: static !important;
+  grid-column: 4;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Search: the theme's own field (home.js) in place of Steam's, which is hidden only while
+   the theme's is in place */
+html.se-community-discussions-home .global_discussion_search_ctn[data-se-dsc-search] {
+  display: none !important;
+}
+
+html.se-community-discussions-home .se-dsc-search {
+  position: relative;
+  height: 48px;
+  margin: 0;
+}
+
+html.se-community-discussions-home .se-dsc-search-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 48px;
+  margin: 0;
+  padding: 0 96px 0 20px;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline), 0 8px 20px -12px rgba(0, 0, 0, .7);
+  color: var(--se-text);
+  font: 500 var(--se-fs-lg)/1 var(--se-font);
+  outline: 0;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-community-discussions-home .se-dsc-search-input::placeholder {
+  color: var(--se-text-faint);
+}
+
+html.se-community-discussions-home .se-dsc-search-input:focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent), 0 0 0 4px var(--se-accent-tint);
+}
+
+html.se-community-discussions-home .se-dsc-search-go {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--se-pill);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-muted);
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-discussions-home .se-dsc-search-go::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M15.5 15.5 20 20'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M15.5 15.5 20 20'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+html.se-community-discussions-home .se-dsc-search-go:hover {
+  background: var(--se-hover);
+  color: var(--se-white);
+}
+
+html.se-community-discussions-home .se-dsc-key {
+  position: absolute;
+  top: 12px;
+  right: 52px;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0 6px;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-pill);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .35), inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-muted);
+  font: 700 var(--se-fs-sm)/1 var(--se-font);
+  pointer-events: none;
+  transition: opacity var(--se-dur-fast);
+}
+
+html.se-community-discussions-home .se-dsc-search-input:is(:focus, :not(:placeholder-shown)) ~ .se-dsc-key {
+  opacity: 0;
+}
+
+/* Links & Resources: the same card as the paragraphs (icon tile with a book, white title,
+   body links) */
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox {
+  position: relative;
+  flex: 1;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: 72px 22px 22px !important;
+  border-radius: var(--se-radius-lg);
+  background: rgba(255, 255, 255, .03) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox::before,
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox::after {
+  content: "";
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  width: 36px;
+  height: 36px;
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox::before {
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox::after {
+  background: var(--se-text-muted);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23000' fill-opacity='.32' d='M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z'/%3E%3Cpath d='M5 19.5A1.5 1.5 0 0 0 6.5 21H19M9 7.5h6'/%3E%3C/svg%3E") center / 20px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23000' fill-opacity='.32' d='M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z'/%3E%3Cpath d='M5 19.5A1.5 1.5 0 0 0 6.5 21H19M9 7.5h6'/%3E%3C/svg%3E") center / 20px no-repeat;
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox .rightbox_content_header {
+  margin: 0 0 6px !important;
+  color: var(--se-white) !important;
+  font: 700 var(--se-fs-lg)/1.35 var(--se-font) !important;
+  letter-spacing: 0;
+  text-transform: none !important;
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox .rule {
+  display: none;
+}
+
+html.se-community-discussions-home .discussions_links {
+  display: grid;
+  gap: 2px;
+  width: auto !important;
+  height: auto !important;
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .discussions_links .weblink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 3px 0;
+  color: var(--se-text-muted) !important;
+  font: 400 var(--se-fs-md)/1.6 var(--se-font) !important;
+  transition: color var(--se-dur-fast);
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .discussions_links .weblink:hover {
+  color: var(--se-accent) !important;
+}
+
+html.se-community-discussions-home .discussions_links .weblink a {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+/* The whole row is the link */
+html.se-community-discussions-home .discussions_links .weblink a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+/* An arrow that slides in on hover */
+html.se-community-discussions-home .discussions_links .weblink::after {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h13M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h13M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity var(--se-dur-fast);
+}
+
+html.se-community-discussions-home .discussions_links .weblink:hover::after {
+  opacity: 1;
+  transform: none;
+}
+
+/* Steam's sprite icons */
+html.se-community-discussions-home .discussions_links :is(.discussions_link_icon, img) {
+  display: none !important;
+}
+
+/* Popular forums and stats under the search */
+html.se-community-discussions-home .se-dsc-hero-extras {
+  display: grid;
+  gap: 26px;
+  margin-top: 20px;
+}
+
+html.se-community-discussions-home .se-dsc-popular {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+html.se-community-discussions-home .se-dsc-popular-label {
+  margin-right: 4px;
+  color: var(--se-text-faint);
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+html.se-community-discussions-home a.se-dsc-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim) !important;
+  font: 600 var(--se-fs-sm)/1 var(--se-font);
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-community-discussions-home a.se-dsc-chip:hover {
+  background: var(--se-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  color: var(--se-accent) !important;
+}
+
+html.se-community-discussions-home .se-dsc-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0;
+}
+
+html.se-community-discussions-home .se-dsc-stat {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 0 32px;
+}
+
+html.se-community-discussions-home .se-dsc-stat + .se-dsc-stat {
+  border-left: 1px solid var(--se-divider);
+}
+
+html.se-community-discussions-home .se-dsc-stat-n {
+  color: var(--se-white);
+  font: 800 var(--se-fs-2xl)/1.1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.01em;
+}
+
+html.se-community-discussions-home .se-dsc-stat-label {
+  color: var(--se-text-faint);
+  font: var(--se-label-font, 700 11px/14px var(--se-font));
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* ---------- Tabs ---------- */
+
+html.se-community-discussions-home .pagecontent.discussions_page > .discussions_header.maincontent {
+  position: relative;
+  display: flex !important;
+  gap: 2px;
+  width: fit-content !important;
+  height: auto !important;
+  margin: 0 0 24px calc((100% - var(--se-community-width)) / 2) !important;
+  padding: 4px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-discussions-home .discussions_header > a.group_tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex !important;
+  align-items: center;
+  float: none !important;
+  height: 36px !important;
+  margin: 0 !important;
+  padding: 0 18px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill);
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-md)/1 var(--se-font) !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  transition: color var(--se-dur-fast);
+}
+
+html.se-community-discussions-home .discussions_header > a.group_tab,
+html.se-community-discussions-home .discussions_header > a.group_tab.active {
+  top: auto !important;
+  box-sizing: border-box;
+  line-height: 1 !important;
+  vertical-align: top;
+}
+
+html.se-community-discussions-home .discussions_header > a.group_tab > span {
+  position: static !important;
+  display: block !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: 1 !important;
+}
+
+/* Steam's tab art (the active tab's lip) */
+html.se-community-discussions-home .discussions_header > a.group_tab::before,
+html.se-community-discussions-home .discussions_header > a.group_tab::after,
+html.se-community-discussions-home .discussions_header > a.group_tab > span::before,
+html.se-community-discussions-home .discussions_header > a.group_tab > span::after {
+  display: none !important;
+}
+
+html.se-community-discussions-home .discussions_header > a.group_tab:hover {
+  color: var(--se-text) !important;
+}
+
+html.se-community-discussions-home .discussions_header > a.group_tab.active {
+  color: var(--se-white) !important;
+}
+
+/* Without the script: the open tab carries its own pill */
+html.se-community-discussions-home .discussions_header:not([data-se-dsc-tabs]) > a.group_tab.active {
+  background: var(--se-accent-surface) !important;
+}
+
+html.se-community-discussions-home .se-dsc-tabs-pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: var(--w, 0);
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent-surface);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  transform: translateX(var(--x, 0));
+  transition: transform var(--se-dur-slow) var(--se-ease), width var(--se-dur-slow) var(--se-ease), opacity var(--se-dur);
+}
+
+/* ---------- Tab panel: recent games, then the forums ---------- */
+
+html.se-community-discussions-home .discussion_tab_content_area {
+  display: grid !important;
+  grid-template-columns: repeat(var(--se-dsc-recent, 4), minmax(0, 1fr));
+  gap: 14px;
+  margin: 0 !important;
+}
+
+html.se-community-discussions-home .discussion_tab_content_area > * {
+  grid-column: 1 / -1;
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-discussions-home .discussion_tab_content_area > a.recent_game_discussion {
+  grid-column: auto;
+}
+
+html.se-community-discussions-home .discussion_tab_content_area > :is(.discussion_tab_content_rule, div:not([class]):empty) {
+  display: none !important;
+}
+
+/* Title and "More game forums" share the first row */
+html.se-community-discussions-home .discussion_tab_content_area > h2:first-of-type,
+html.se-community-discussions-home .discussion_tab_content_area > .discussions_view_more_link {
+  grid-row: 1;
+  align-self: center;
+}
+
+html.se-community-discussions-home .discussion_tab_content_area > h2:first-of-type,
+html.se-community-discussions-home .forum_list_left > h2.discussion_primary_header {
+  justify-self: start;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-white) !important;
+  font: 700 var(--se-fs-xl)/1.3 var(--se-font) !important;
+  letter-spacing: -.005em;
+  text-transform: none !important;
+}
+
+html.se-community-discussions-home .discussion_tab_content_area > .discussions_view_more_link {
+  justify-self: end;
+  float: none !important;
+}
+
+html.se-community-discussions-home .discussions_view_more_link a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: var(--se-radius-pill);
+  color: var(--se-accent) !important;
+  font: 700 var(--se-fs-sm)/1 var(--se-font) !important;
+  letter-spacing: .02em;
+  text-decoration: none !important;
+  text-transform: none !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-community-discussions-home .discussions_view_more_link a::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
+  transform: rotate(-90deg);
+}
+
+html.se-community-discussions-home .discussions_view_more_link a:hover {
+  background: var(--se-accent-tint);
+}
+
+/* ---------- Recent game cards ---------- */
+
+html.se-community-discussions-home a.recent_game_discussion:not(.quasi_official_group) {
+  position: relative;
+  isolation: isolate;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "icon name"
+    "icon count";
+  align-content: end;
+  column-gap: 12px;
+  row-gap: 2px;
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  min-height: 156px;
+  margin: 0 !important;
+  padding: 16px !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  text-decoration: none !important;
+  overflow: hidden;
+  transition: box-shadow var(--se-dur);
+}
+
+/* Art under a fade (home.js sets --se-dsc-art once it has loaded) */
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-art]::before,
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-art]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-art]::before {
+  background: var(--se-dsc-art, none) center / cover no-repeat;
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity var(--se-dur-slow), transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-art="ready"]::before {
+  opacity: .7;
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-art]::after {
+  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--se-surface) 70%, transparent) 45%, var(--se-surface) 100%);
+}
+
+html.se-community-discussions-home a.recent_game_discussion:not(.quasi_official_group):hover {
+  box-shadow: inset 0 0 0 1px var(--se-white-14, rgba(255, 255, 255, .14)), var(--se-shadow-lg);
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-art="ready"]:hover::before {
+  opacity: .9;
+  transform: scale(1.06);
+}
+
+html.se-community-discussions-home a.recent_game_discussion > * {
+  float: none !important;
+  margin: 0 !important;
+  position: static !important;
+}
+
+html.se-community-discussions-home a.recent_game_discussion .playerAvatar {
+  grid-area: icon;
+  align-self: center;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-pill) !important;
+  box-shadow: 0 6px 14px -6px rgba(0, 0, 0, .8);
+  overflow: hidden;
+}
+
+html.se-community-discussions-home a.recent_game_discussion .playerAvatar img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  object-fit: cover;
+}
+
+/* Cover: the game's tall library art (home.js) in place of Steam's 32px icon */
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-cover] .playerAvatar {
+  align-self: end;
+  width: 56px !important;
+  height: 84px !important;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-pill) var(--se-dsc-cover) center / cover no-repeat !important;
+  box-shadow: inset 0 0 0 1px var(--se-white-14, rgba(255, 255, 255, .14)), 0 10px 22px -8px rgba(0, 0, 0, .9);
+  transition: transform var(--se-dur) var(--se-ease);
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-cover] .playerAvatar img {
+  opacity: 0;
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-cover]:hover .playerAvatar {
+  transform: translateY(-3px) rotate(-2deg);
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-cover] :is(.recent_game_discussion_name, .recent_game_discussion_count) {
+  align-self: end;
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-cover] .recent_game_discussion_count {
+  margin-bottom: 4px !important;
+}
+
+html.se-community-discussions-home a.recent_game_discussion .recent_game_discussion_name {
+  grid-area: name;
+  width: auto !important;
+  overflow: hidden;
+  color: var(--se-white) !important;
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font) !important;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .6);
+  white-space: nowrap;
+}
+
+html.se-community-discussions-home a.recent_game_discussion .recent_game_discussion_count {
+  grid-area: count;
+  width: auto !important;
+  overflow: hidden;
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-sm)/1.3 var(--se-font) !important;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Unread: Steam renders its indicator on every card; home.js tags the cards whose indicator
+   holds a real icon ([data-se-dsc-unread]) and the theme draws that as a dot */
+html.se-community-discussions-home a.recent_game_discussion > .recent_game_discussions_unread_indicator {
+  display: none !important;
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-unread] > .recent_game_discussions_unread_indicator {
+  position: absolute !important;
+  top: 12px;
+  right: 12px;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  line-height: 0 !important;
+}
+
+/* Unread: a "New" pill in the corner (a dot means little when nearly everything is unread;
+   over art, a labelled pill reads where a colour change wouldn't) */
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-unread] > .recent_game_discussions_unread_indicator::before,
+html.se-community-discussions-home .discussions_recentlyplayed.unread a::before {
+  content: "New";
+  display: block;
+  padding: 3px 8px;
+  border-radius: var(--se-radius-pill);
+  background: color-mix(in srgb, var(--se-bg) 70%, transparent);
+  box-shadow: inset 0 0 0 1px var(--se-white-14, rgba(255, 255, 255, .14));
+  color: var(--se-white);
+  font: 700 var(--se-fs-2xs, 10.5px)/1.2 var(--se-font);
+  letter-spacing: .06em;
+  text-shadow: none;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+
+html.se-community-discussions-home .recent_game_discussions_unread_indicator img {
+  display: none !important;
+}
+
+/* ---------- Forum list: Steam Forums, then Steam Feature Discussions, both as card grids ---------- */
+
+html.se-community-discussions-home .forum_list_ctn {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 36px;
+  width: auto !important;
+  margin-top: 18px !important;
+}
+
+html.se-community-discussions-home .forum_list_ctn > * {
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+html.se-community-discussions-home .forum_list_ctn > div:not([class]):empty {
+  display: none;
+}
+
+html.se-community-discussions-home .forum_list_left {
+  display: grid;
+  gap: 14px;
+}
+
+/* The column labels: each card labels itself */
+html.se-community-discussions-home .forum_list_left > .discussions_forumlist_header {
+  display: none !important;
+}
+
+/* Cards: a grid that fills the column */
+html.se-community-discussions-home .discussions_forumlist {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* A card: [tile] name over threads and last post */
+html.se-community-discussions-home .discussions_forum_row {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: 44px auto minmax(0, 1fr);
+  grid-template-areas:
+    "icon name name"
+    "icon count last";
+  align-items: center;
+  gap: 4px 14px;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-community-discussions-home .discussions_forum_row:hover {
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-white-14, rgba(255, 255, 255, .14)), var(--se-shadow-md);
+}
+
+html.se-community-discussions-home .discussions_forum_row > *,
+html.se-community-discussions-home .discussions_forumlist_content > * {
+  float: none !important;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+/* The card link: Steam's spacer image as an overlay over the whole card */
+html.se-community-discussions-home .discussions_forumlist_linkoverlay {
+  position: absolute !important;
+  inset: 0;
+  z-index: 1;
+  width: auto !important;
+  height: auto !important;
+  border-radius: inherit;
+}
+
+html.se-community-discussions-home .discussions_forumlist_linkoverlay a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+html.se-community-discussions-home .discussions_forumlist_linkoverlay img {
+  display: none !important;
+}
+
+html.se-community-discussions-home .discussions_forumlist_content {
+  display: contents !important;
+}
+
+/* Tile: a theme duotone icon or the forum's first letter (home.js); Steam's envelope (its unread
+   mark) only without the script */
+html.se-community-discussions-home .discussions_forumlist_icon {
+  grid-area: icon;
+  display: grid !important;
+  place-items: center;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill);
+}
+
+html.se-community-discussions-home .discussions_forumlist_icon img {
+  display: block;
+  max-width: 26px;
+  max-height: 26px;
+  object-fit: contain;
+}
+
+html.se-community-discussions-home .discussions_forumlist_icon:has(> .se-dsc-mono) {
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-discussions-home .discussions_forumlist_icon:has(> .se-dsc-mono) img {
+  display: none !important;
+}
+
+html.se-community-discussions-home .se-dsc-mono {
+  display: grid;
+  place-items: center;
+  color: var(--se-text-muted);
+  transition: color var(--se-dur-fast);
+  font: 800 var(--se-fs-xl)/1 var(--se-font);
+  text-transform: uppercase;
+}
+
+html.se-community-discussions-home .se-dsc-mono svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+html.se-community-discussions-home .discussions_forum_row:hover .se-dsc-mono {
+  color: var(--se-white);
+}
+
+html.se-community-discussions-home .discussions_forumlist_forumname {
+  grid-area: name;
+  min-width: 0;
+  overflow: hidden;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-lg)/1.3 var(--se-font) !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+html.se-community-discussions-home .discussions_forum_row.unread .discussions_forumlist_forumname {
+  color: var(--se-white) !important;
+  font-weight: 700 !important;
+}
+
+html.se-community-discussions-home .discussions_forum_row:hover .discussions_forumlist_forumname {
+  color: var(--se-white) !important;
+}
+
+/* A forum with a description: shown under the name */
+html.se-community-discussions-home .discussions_forumlist_forumname > * {
+  overflow: hidden;
+  color: var(--se-text-faint) !important;
+  font: 500 var(--se-fs-sm)/1.4 var(--se-font) !important;
+  text-overflow: ellipsis;
+}
+
+html.se-community-discussions-home .discussions_forum_row > .discussions_forumlist_topiccount {
+  grid-area: count;
+  justify-self: start;
+  padding: 2px 9px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+  color: var(--se-text-muted) !important;
+  font: 700 var(--se-fs-xs)/1.4 var(--se-font) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-discussions-home .discussions_forum_row > .discussions_forumlist_lastpost {
+  grid-area: last;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--se-text-faint) !important;
+  font: 500 var(--se-fs-sm)/1.4 var(--se-font) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ---------- Feature discussions: a card grid like the forums ----------
+ * The header reads as a section title like "Steam Forums" (home.js lower-cases Steam's
+ * all-caps text so CSS can capitalise it); each group is a card in the forum cards' type with
+ * a theme line icon (home.js) in the same neutral tile.
+ */
+
+html.se-community-discussions-home .forum_list_right {
+  position: static !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+  height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-discussions-home .forum_list_right > .discussions_forumlist_header {
+  grid-column: 1 / -1;
+  display: block !important;
+  height: auto !important;
+  margin: 0 0 2px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-discussions-home .forum_list_right > .discussions_forumlist_header > * {
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-white) !important;
+  font: 700 var(--se-fs-xl)/1.3 var(--se-font) !important;
+  letter-spacing: -.005em;
+  text-transform: none;
+}
+
+html.se-community-discussions-home .forum_list_right > .discussions_forumlist_header > [data-se-dsc-case] {
+  text-transform: capitalize;
+}
+
+html.se-community-discussions-home a.recent_game_discussion.quasi_official_group {
+  display: grid !important;
+  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-areas:
+    "icon name"
+    "icon count";
+  align-items: center;
+  gap: 4px 14px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 16px !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast), box-shadow var(--se-dur-fast);
+}
+
+html.se-community-discussions-home a.recent_game_discussion.quasi_official_group:hover {
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-white-14, rgba(255, 255, 255, .14)), var(--se-shadow-md);
+}
+
+html.se-community-discussions-home a.quasi_official_group > * {
+  float: none !important;
+  position: static !important;
+  margin: 0 !important;
+}
+
+html.se-community-discussions-home a.quasi_official_group .playerAvatar {
+  grid-area: icon;
+  display: grid !important;
+  place-items: center;
+  width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  overflow: hidden;
+}
+
+html.se-community-discussions-home a.quasi_official_group .playerAvatar img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  object-fit: cover;
+}
+
+/* The theme's icon (home.js) in place of Steam's group picture */
+html.se-community-discussions-home a.quasi_official_group .playerAvatar:has(> .se-dsc-glyph) img {
+  display: none !important;
+}
+
+html.se-community-discussions-home .se-dsc-glyph {
+  display: grid;
+  place-items: center;
+  color: var(--se-text-muted);
+  font: 800 var(--se-fs-xl)/1 var(--se-font);
+  text-transform: uppercase;
+  transition: color var(--se-dur-fast);
+}
+
+html.se-community-discussions-home .se-dsc-glyph svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+html.se-community-discussions-home a.quasi_official_group:hover .se-dsc-glyph {
+  color: var(--se-white);
+}
+
+html.se-community-discussions-home a.quasi_official_group .recent_game_discussion_name {
+  grid-area: name;
+  width: auto !important;
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font) !important;
+  text-shadow: none !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+html.se-community-discussions-home a.quasi_official_group .recent_game_discussion_count {
+  grid-area: count;
+  width: auto !important;
+  overflow: hidden;
+  color: var(--se-text-faint) !important;
+  font: 500 var(--se-fs-sm)/1.4 var(--se-font) !important;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-discussions-home a.quasi_official_group:hover .recent_game_discussion_name {
+  color: var(--se-white) !important;
+}
+
+/* ---------- Game Forums tab (#forum_list_games) ----------
+ * Controls (Browse Hubs by, game search) as one row of pills; the hubs as a two-up grid of
+ * cards (banner, name and thread total in the header, compact topic rows, "View all" link);
+ * Games You've Recently Played above them as a row of art cards, like the Steam Forums tab's
+ * recent games. Topic rows themselves are discussions/page.css.
+ */
+
+html.se-community-discussions-home #forum_list_games > .maincontent {
+  grid-template-columns: minmax(0, 1fr) !important;
+  row-gap: 28px !important;
+  margin-top: 0 !important;
+}
+
+html.se-community-discussions-home #forum_list_games > .maincontent > .discussions_game_controls { grid-row: 1; }
+html.se-community-discussions-home #forum_list_games > .maincontent > .rightcol { grid-row: 2; }
+html.se-community-discussions-home #forum_list_games > .maincontent > .leftcol { grid-row: 3; grid-column: 1 !important; }
+
+/* Controls */
+html.se-community-discussions-home .discussions_game_controls {
+  grid-column: 1 / -1;
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-discussions-home .discussions_game_controls > * {
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-discussions-home .discussions_game_browseoption {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-faint) !important;
+  font: 600 var(--se-fs-sm)/1 var(--se-font) !important;
+  white-space: nowrap;
+}
+
+html.se-community-discussions-home #quicklistselect {
+  position: relative;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-discussions-home #quicklistselect_active {
+  display: flex !important;
+  align-items: center;
+  box-sizing: border-box;
+  width: auto !important;
+  height: 44px !important;
+  padding: 0 44px 0 18px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-md)/1 var(--se-font) !important;
+  text-transform: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-community-discussions-home #quicklistselect:hover #quicklistselect_active {
+  background: var(--se-surface-2) !important;
+}
+
+html.se-community-discussions-home #quicklistselect_arrow {
+  position: absolute !important;
+  top: 50%;
+  right: 16px;
+  width: 14px !important;
+  height: 14px !important;
+  margin-top: -7px;
+  background: var(--se-text-muted) !important;
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
+  pointer-events: none;
+}
+
+html.se-community-discussions-home #quicklistselect_options {
+  z-index: var(--se-z-dropdown, 100);
+  box-sizing: border-box;
+  width: max-content !important;
+  min-width: 240px;
+  margin-top: 6px !important;
+  padding: 6px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-shadow-pop) !important;
+}
+
+/* Steam's inner panel (popup_body): the theme's popup is the panel */
+html.se-community-discussions-home #quicklistselect_options :not(.option, .popup_menu_item, .option *, .popup_menu_item *) {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-community-discussions-home #quicklistselect_options :is(.option, .popup_menu_item) {
+  padding: 8px 12px !important;
+  border-radius: var(--se-radius-sm);
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font: 500 var(--se-fs-md)/1.3 var(--se-font) !important;
+  text-transform: none !important;
+  cursor: pointer;
+}
+
+html.se-community-discussions-home #quicklistselect_options :is(.option, .popup_menu_item):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+/* Game search: Steam's box art (forums.css: the container's background and its ::before strip)
+   gone; the field a pill; Steam's magnifier image inside it on the right */
+html.se-community-discussions-home .discussions_game_searchoption {
+  position: relative;
+  flex: 1;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-discussions-home #game_search_form .discussionSearchTextContainer {
+  position: relative !important;
+  display: block !important;
+  width: auto !important;
+  height: 44px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-discussions-home #game_search_form .discussionSearchTextContainer::before,
+html.se-community-discussions-home #game_search_form .discussionSearchTextContainer::after {
+  content: none !important;
+  display: none !important;
+}
+
+html.se-community-discussions-home #game_search_form .discussionSearchText {
+  position: static !important;
+  inset: auto !important;
+  display: block !important;
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 44px !important;
+  margin: 0 !important;
+  padding: 0 48px 0 20px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-md)/1 var(--se-font) !important;
+  outline: 0 !important;
+  transform: none !important;
+}
+
+html.se-community-discussions-home #game_search_form .discussionSearchText::placeholder {
+  color: var(--se-text-faint);
+  font-style: normal;
+}
+
+html.se-community-discussions-home #game_search_form .discussionSearchText:focus {
+  box-shadow: inset 0 0 0 1px var(--se-text-faint) !important;
+}
+
+html.se-community-discussions-home #game_search_form .discussionSearchTextSubmitImg {
+  position: absolute !important;
+  top: 50% !important;
+  right: 16px !important;
+  left: auto !important;
+  margin: 0 !important;
+  opacity: .55;
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition: opacity var(--se-dur-fast);
+}
+
+html.se-community-discussions-home #game_search_form .discussionSearchTextSubmitImg:hover {
+  opacity: .9;
+}
+
+/* Suggestions: one popup the field's width (Steam places it inline; the search option is its
+   containing block), Steam's inner panels flattened, rows that highlight */
+html.se-community-discussions-home #game_select_suggestions_ctn {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: var(--se-z-dropdown, 100);
+  box-sizing: border-box;
+  width: auto !important;
+  max-height: 420px;
+  margin: 0 !important;
+  padding: 6px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-shadow-pop) !important;
+  overflow-y: auto;
+}
+
+/* Steam can leave the popup open with no rows (after the field is cleared): hide it then */
+html.se-community-discussions-home #game_select_suggestions_ctn:not(:has(:is(a, .match, .popup_menu_item))) {
+  display: none !important;
+}
+
+html.se-community-discussions-home #game_select_suggestions_ctn :not(a, .match, .popup_menu_item, a *, .match *, .popup_menu_item *) {
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-community-discussions-home #game_select_suggestions_ctn :is(a, .match, .popup_menu_item) {
+  display: block;
+  padding: 9px 12px !important;
+  border-radius: var(--se-radius-sm);
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font: 500 var(--se-fs-md)/1.35 var(--se-font) !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-discussions-home #game_select_suggestions_ctn :is(a, .match, .popup_menu_item):is(:hover, .focus, .selected, .active) {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+/* Hubs: a two-up grid of cards */
+html.se-community-discussions-home #game_results_area {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+  align-items: start;
+  gap: 16px;
+}
+
+html.se-community-discussions-home #game_results_area > div:not([class]):empty {
+  display: none;
+}
+
+html.se-community-discussions-home .discussions_game_ctn {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  overflow: hidden;
+}
+
+/* Header: [banner] name ... thread total */
+html.se-community-discussions-home .discussions_game_header {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "logo name count";
+  align-items: center;
+  gap: 14px;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 14px 16px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--se-divider) !important;
+  background: rgba(255, 255, 255, .02) !important;
+}
+
+html.se-community-discussions-home .discussions_game_header > * {
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-discussions-home .discussions_game_logo {
+  grid-area: logo;
+  line-height: 0;
+}
+
+html.se-community-discussions-home .discussions_game_logo img {
+  display: block;
+  width: 96px !important;
+  height: 36px !important;
+  border-radius: var(--se-radius-xs);
+  object-fit: cover;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-discussions-home .discussions_game_header > .ellipsis {
+  grid-area: name;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-discussions-home .discussions_game_header > .ellipsis a {
+  color: var(--se-white) !important;
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font) !important;
+  text-decoration: none !important;
+}
+
+html.se-community-discussions-home .discussions_game_discussioncount {
+  grid-area: count;
+  display: grid;
+  justify-items: end;
+  color: var(--se-text-faint) !important;
+  font: 500 var(--se-fs-xs)/1.3 var(--se-font) !important;
+  text-align: right;
+  white-space: nowrap;
+}
+
+html.se-community-discussions-home .discussions_game_discussioncount br {
+  display: none;
+}
+
+html.se-community-discussions-home .discussions_total_count {
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-md)/1.3 var(--se-font) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Topics: compact rows inside the card */
+html.se-community-discussions-home .discussions_game_topics {
+  width: auto !important;
+  padding: 6px !important;
+  background: none !important;
+}
+
+/* Compact rows: no icon tile (Steam's envelope only repeats the unread dot, at two sizes), the
+   title over its author, the chips and time on the right */
+html.se-community-discussions-home .discussions_game_topics .forum_topic {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  grid-template-areas:
+    "name details"
+    "op   details" !important;
+  column-gap: 16px !important;
+  padding: 11px 14px !important;
+}
+
+html.se-community-discussions-home .discussions_game_topics .forum_topic_icon {
+  display: none !important;
+}
+
+html.se-community-discussions-home .discussions_game_topics .forum_topic_name.op_hidden {
+  grid-row: 1 / -1;
+}
+
+html.se-community-discussions-home .discussions_game_topics :is(.forum_topic_reply_count, .forum_topic_award_count) {
+  padding: 3px 9px !important;
+}
+
+html.se-community-discussions-home .discussions_game_topics .forum_topic_lastpost {
+  min-width: 0;
+}
+
+/* Footer: "View all" as a link with an arrow */
+html.se-community-discussions-home .discussions_game_footer {
+  display: flex !important;
+  justify-content: flex-end;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 10px 16px 12px !important;
+  border: 0 !important;
+  border-top: 1px solid var(--se-divider) !important;
+  background: none !important;
+}
+
+html.se-community-discussions-home .discussions_game_footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--se-text-muted) !important;
+  font: 700 var(--se-fs-sm)/1 var(--se-font) !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  transition: color var(--se-dur-fast);
+}
+
+html.se-community-discussions-home .discussions_game_footer a::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h13M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h13M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+html.se-community-discussions-home .discussions_game_footer a:hover {
+  color: var(--se-white) !important;
+}
+
+/* Games You've Recently Played: a section title and a row of art cards (the Steam Forums
+   tab's recent game cards: store art under a fade, the tall cover, the name; home.js) */
+html.se-community-discussions-home #forum_list_games > .maincontent > .rightcol {
+  position: static !important;
+  grid-column: 1 !important;
+  width: auto !important;
+}
+
+html.se-community-discussions-home #forum_list_games .rightbox {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-community-discussions-home #forum_list_games .rightbox_content_header {
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  color: var(--se-white) !important;
+  font: 700 var(--se-fs-xl)/1.3 var(--se-font) !important;
+  letter-spacing: -.005em;
+  text-transform: none !important;
+}
+
+html.se-community-discussions-home #forum_list_games .rightbox_content_header[data-se-dsc-case] {
+  text-transform: capitalize !important;
+}
+
+html.se-community-discussions-home .discussions_recentlyplayedbox {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+html.se-community-discussions-home .discussions_recentlyplayed {
+  position: relative;
+  isolation: isolate;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  grid-auto-rows: 0;
+  align-items: end;
+  gap: 0 12px;
+  box-sizing: border-box;
+  height: 156px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 16px !important;
+  line-height: normal !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  text-align: left !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  overflow: hidden;
+  transition: box-shadow var(--se-dur);
+}
+
+html.se-community-discussions-home .discussions_recentlyplayed[data-se-dsc-art]::before,
+html.se-community-discussions-home .discussions_recentlyplayed[data-se-dsc-art]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+html.se-community-discussions-home .discussions_recentlyplayed[data-se-dsc-art]::before {
+  background: var(--se-dsc-art, none) center / cover no-repeat;
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity var(--se-dur-slow), transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-community-discussions-home .discussions_recentlyplayed[data-se-dsc-art="ready"]::before {
+  opacity: .7;
+}
+
+html.se-community-discussions-home .discussions_recentlyplayed[data-se-dsc-art]::after {
+  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--se-surface) 70%, transparent) 45%, var(--se-surface) 100%);
+}
+
+html.se-community-discussions-home .discussions_recentlyplayed:hover {
+  box-shadow: inset 0 0 0 1px var(--se-white-14, rgba(255, 255, 255, .14)), var(--se-shadow-lg);
+}
+
+html.se-community-discussions-home .discussions_recentlyplayed[data-se-dsc-art="ready"]:hover::before {
+  opacity: .9;
+  transform: scale(1.06);
+}
+
+/* Anything else Steam puts in the row: out of the card's single row */
+html.se-community-discussions-home .discussions_recentlyplayed > :not(img, a) {
+  display: none !important;
+}
+
+/* Steam's envelope: the cover once home.js has it, hidden until then */
+html.se-community-discussions-home .discussions_recentlyplayed > img {
+  display: none !important;
+}
+
+html.se-community-discussions-home .discussions_recentlyplayed[data-se-dsc-cover] > img {
+  grid-area: 1 / 1;
+  display: block !important;
+  align-self: end;
+  content: var(--se-dsc-cover);
+  width: 56px !important;
+  height: 84px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm);
+  object-fit: cover;
+  box-shadow: 0 0 0 1px var(--se-white-14, rgba(255, 255, 255, .14)), 0 10px 22px -8px rgba(0, 0, 0, .9);
+  transition: transform var(--se-dur) var(--se-ease);
+}
+
+html.se-community-discussions-home .discussions_recentlyplayed[data-se-dsc-cover]:hover > img {
+  transform: translateY(-3px) rotate(-2deg);
+}
+
+html.se-community-discussions-home .discussions_recentlyplayed a {
+  grid-area: 1 / 2;
+  align-self: end;
+  justify-self: start;
+  float: none !important;
+  text-align: left !important;
+  min-width: 0;
+  margin-bottom: 4px !important;
+  overflow: hidden;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--se-white) !important;
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font) !important;
+  text-decoration: none !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .6);
+  white-space: normal;
+}
+
+/* The whole card is the link */
+html.se-community-discussions-home .discussions_recentlyplayed a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* Unread: the "New" pill (above), placed in the corner; the card's own ::before/::after are
+   the art */
+html.se-community-discussions-home .discussions_recentlyplayed.unread a::before {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+/* ---------- Narrow windows ---------- */
+
+@media (max-width: 1400px) {
+  html.se-community-discussions-home .discussion_tab_content_area {
+    grid-template-columns: repeat(min(2, var(--se-dsc-recent, 2)), minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1100px) {
+  html.se-community-discussions-home .forum_list_ctn,
+  html.se-community-discussions-home #forum_list_games > .maincontent {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+
+  html.se-community-discussions-home #game_results_area {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent:has(> .leftcol ~ .rightcol) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  html.se-community-discussions-home .steam_discussions_intro > p,
+  html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent > .rightcol {
+    grid-row: auto;
+    grid-column: auto;
+    margin: 0 !important;
+  }
+
+  html.se-community-discussions-home .group_content > h2.large_title {
+    margin-bottom: 10px !important;
+  }
+
+}

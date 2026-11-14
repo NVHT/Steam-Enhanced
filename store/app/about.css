@@ -63,6 +63,13 @@ html.se-app-about-on [data-se-about] > .leftcol {
   pointer-events: none;
 }
 
+/* The column above is pointer-events: none, which its descendants inherit, so Steam's overlay
+   (raised into the top layer, but still in that subtree) would let every click fall through
+   to the page. It takes them back while open. */
+html.se-app-about-on [data-se-about] > .leftcol [popover]:popover-open {
+  pointer-events: auto;
+}
+
 /* ---------- Steam's player: the trailer only, as a theme card ----------
  * The React carousel (.gamehighlight_desktopcarousel) is two wrapper divs around: the player
  * (the one element with [popover], also Steam's "Trailers & Screenshots" overlay), two hidden

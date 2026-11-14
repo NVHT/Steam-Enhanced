@@ -4,7 +4,8 @@
  * header above is hub/page.css.
  *
  *   - Topic lists: one card of rows, the title over its author, a reply-count chip and the last
- *     post time on the right; pinned and locked topics get chips, unread ones an accent dot.
+ *     post time on the right; pinned and locked topics get chips. Unread topics read bright and
+ *     bold, read ones muted (no dot: nearly every topic is unread, so a dot says nothing).
  *   - Topics: the opening post as a card (title as a heading, author row, body), replies as
  *     the shared comment rows with an "OP" chip on the starter's replies (discussions/page.js).
  *   - Side column: search as a pill field, boxes as cards, Start a New Discussion as the
@@ -105,7 +106,7 @@ html.se-community-discussions .forum_topic {
   height: auto !important;
   min-height: 0 !important;
   margin: 0 !important;
-  padding: 12px 16px 12px 22px !important;
+  padding: 12px 16px !important;
   border: 0 !important;
   border-radius: var(--se-radius-md);
   background: none !important;
@@ -185,8 +186,8 @@ html.se-community-discussions .forum_topic_name {
   gap: 8px;
   min-width: 0;
   overflow: hidden;
-  color: var(--se-text) !important;
-  font: 600 var(--se-fs-md)/1.4 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-md)/1.4 var(--se-font) !important;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -195,22 +196,14 @@ html.se-community-discussions .forum_topic_name.op_hidden {
   grid-row: 1 / -1;
 }
 
-html.se-community-discussions .forum_topic.unread .forum_topic_name {
+/* Unread: bright and bold; read topics stay muted. Hover brightens either. */
+html.se-community-discussions .forum_topic.unread .forum_topic_name,
+html.se-community-discussions .forum_topic:hover .forum_topic_name {
   color: var(--se-white) !important;
-  font-weight: 700 !important;
 }
 
-/* Unread: accent dot at the row's edge */
-html.se-community-discussions .forum_topic.unread::after {
-  content: "";
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  width: 6px;
-  height: 6px;
-  margin-top: -3px;
-  border-radius: 50%;
-  background: var(--se-accent);
+html.se-community-discussions .forum_topic.unread .forum_topic_name {
+  font-weight: 700 !important;
 }
 
 html.se-community-discussions .forum_topic_op {
@@ -251,16 +244,24 @@ html.se-community-discussions :is(.forum_topic_reply_count, .forum_topic_award_c
   font-variant-numeric: tabular-nums;
 }
 
+/* Steam's images (a grey bubble, a blue award ribbon): the theme's duotone icons in the chip's
+   own colour */
 html.se-community-discussions :is(.forum_topic_reply_count, .forum_topic_award_count) img {
-  width: 13px;
-  height: auto;
-  margin: 0 !important;
-  opacity: .65;
+  display: none !important;
 }
 
-html.se-community-discussions .forum_topic_award_count img {
-  opacity: 1;
+html.se-community-discussions :is(.forum_topic_reply_count, .forum_topic_award_count)::before {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: var(--se-dsc-chip-icon) center / contain no-repeat;
+  mask: var(--se-dsc-chip-icon) center / contain no-repeat;
 }
+
+html.se-community-discussions .forum_topic_reply_count { --se-dsc-chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23000' fill-opacity='.32' d='M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-9l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z'/%3E%3C/svg%3E"); }
+html.se-community-discussions .forum_topic_award_count { --se-dsc-chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='9' r='6' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M8.5 13.9 7 22l5-3 5 3-1.5-8.1'/%3E%3C/svg%3E"); }
 
 html.se-community-discussions .forum_topic_lastpost {
   min-width: 132px;
@@ -768,4 +769,39 @@ html.se-community-discussions .rightbox .weblink {
 
 html.se-community-discussions .rightbox .weblink img {
   opacity: .7;
+}
+
+/* ---------- Topic preview tooltip ----------
+ * Steam's hover preview on a topic row (data-tooltip-forum; its body is .topic_hover_text, the
+ * "Posted by / Last post" lines follow): the theme's tooltip. Matched by its content, so the
+ * wrapper's class doesn't matter; the ids are Steam's (aria-describedby="tooltip-N").
+ */
+html.se-community-discussions :is(.forum_topic_tooltip, .community_tooltip, [id^="tooltip-"]):has(.topic_hover_text) {
+  max-width: 380px;
+  padding: 12px 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-shadow-tooltip, 0 10px 24px -8px rgba(0, 0, 0, .8), inset 0 0 0 1px var(--se-hairline)) !important;
+  color: var(--se-text-faint) !important;
+  font: 500 var(--se-fs-sm)/1.5 var(--se-font) !important;
+  text-shadow: none !important;
+}
+
+html.se-community-discussions :is(.forum_topic_tooltip, .community_tooltip, [id^="tooltip-"]):has(.topic_hover_text) :not(a, .topic_hover_text, .topic_hover_text *) {
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-community-discussions .topic_hover_text {
+  margin: 0 0 10px !important;
+  color: var(--se-text) !important;
+  font: 400 var(--se-fs-md)/1.55 var(--se-font) !important;
+}
+
+html.se-community-discussions :is(.forum_topic_tooltip, .community_tooltip, [id^="tooltip-"]):has(.topic_hover_text) :is(a, b, strong, .whiteLink) {
+  color: var(--se-text-dim) !important;
+  font-weight: 600;
+  text-decoration: none !important;
 }

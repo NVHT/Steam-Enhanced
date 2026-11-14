@@ -7,9 +7,7 @@
  *   player.unload();  player.destroy();
  *
  * Steam streams trailers as HLS (and DASH). HLS plays natively where the browser can, else
- * through hls.js, which the theme doesn't ship: drop the library's ES module build into
- * store/vendor/ as hls.min.mjs (or hls.mjs, or the UMD hls.min.js) and it is
- * imported on first use.
+ * through hls.js (ES module build, store/vendor/hls.min.js), imported on first use.
  * A plain MP4 / WebM plays as is. load() resolves false when nothing here can play the trailer,
  * so the caller can fall back to Steam's own player.
  *
@@ -20,11 +18,12 @@
  */
 
 /*
- * The library's files, tried in order. Either build works under any of these names (the ES
- * module's default export, else the UMD build's global). A .js name is tried first because the
- * theme's file server may not label .mjs as JavaScript, which browsers refuse as a module.
+ * The library's files, tried in order (the ES module's default export, else the UMD build's
+ * global). The .js name comes first: Millennium's file server doesn't label .mjs as
+ * JavaScript, and Chromium refuses a module served under any other type. A file that still
+ * fails that check is fetched and imported from a Blob carrying the right type.
  */
-const VENDOR = ['../vendor/hls.min.mjs', '../vendor/hls.mjs', '../vendor/hls.min.js'];
+const VENDOR = ['../vendor/hls.min.js', '../vendor/hls.min.mjs'];
 /** How long a source may take to show its first frame's metadata before the next is tried. */
 const LOAD_TIMEOUT_MS = 10000;
 const IDLE_MS = 2200;
@@ -32,19 +31,36 @@ const STEP_S = 10;
 
 /** hls.js, imported once from the theme's vendor folder (ES module, else the UMD build). */
 let hlsLibrary = null;
+
+/** Import a module whose server sends the wrong MIME type: re-serve its text as JavaScript. */
+const importAsScript = async (href) => {
+  const response = await fetch(href);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const blob = URL.createObjectURL(new Blob([await response.text()], { type: 'text/javascript' }));
+  try {
+    return await import(blob);
+  } finally {
+    URL.revokeObjectURL(blob);
+  }
+};
+
 const loadHls = () => {
   hlsLibrary ??= (async () => {
+    const search = new URL(import.meta.url).search;
     for (const file of VENDOR) {
-      try {
-        const url = new URL(file, import.meta.url);
-        url.search = new URL(import.meta.url).search;
-        const module = await import(url.href);
-        const Hls = module.default ?? globalThis.Hls;
-        if (Hls?.isSupported?.()) return Hls;
-      } catch (error) {
-        console.debug('[Steam Enhanced] hls.js not loaded from', file, error);
+      const url = new URL(file, import.meta.url);
+      url.search = search;
+      for (const load of [(href) => import(href), importAsScript]) {
+        try {
+          const module = await load(url.href);
+          const Hls = module.default ?? globalThis.Hls;
+          if (Hls?.isSupported?.()) return Hls;
+        } catch (error) {
+          console.debug('[Steam Enhanced] hls.js not loaded from', file, error);
+        }
       }
     }
+    console.warn('[Steam Enhanced] hls.js unavailable; trailers fall back to Steam\'s player');
     return null;
   })();
   return hlsLibrary;

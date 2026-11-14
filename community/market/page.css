@@ -1,0 +1,1888 @@
+/*
+ * Community Market home (/market/): a wide two-column page in the theme's look.
+ *
+ *   - Hero: Steam's banner as a glass card. The title, the subtitle under it, live activity chips (page.js), and the wallet card on the right with the avatar,
+ *     balance, View Inventory and "Sell an item" (moved in by page.js). A fanned wall of the
+ *     popular items' art (page.js) fades in behind it.
+ *   - Beta note: a slim info strip.
+ *   - Main column: My Market Activity as a segmented control, then the sell listings and buy
+ *     orders as two cards with empty states (a card with rows takes the full width). Below,
+ *     Popular / Newly Listed / Recently Sold as a second segmented control over one listing
+ *     card: ranked rows (popular items) with the item art on its rarity glow (--se-q,
+ *     page.js), name and game, quantity and the starting price.
+ *   - Sidebar: a sticky card with search, advanced options, the game filter (page.js) and
+ *     Browse by Game as icon rows; then the FAQ links.
+ *
+ * Layout applies above Steam's responsive breakpoint (910px); below it Steam's mobile layout
+ * stays, in the theme's colours.
+ *
+ * Ids and classes are Steam's (SteamTracking: steamcommunity.com/public/css/skin_1/
+ * economy_market.css, economy.css; the page report). The page frame and pill buttons are
+ * shared/ui.css, tokens and the footer store/shared/base.css.
+ */
+
+html.se-community-market {
+  --se-mkt-side: clamp(300px, 20vw, 360px);
+  --se-mkt-gap: 24px;
+  --se-mkt-tile: 48px;
+  --se-mkt-row-gap: 12px;
+  --se-mkt-lead: calc(var(--se-mkt-tile) + var(--se-mkt-row-gap)); /* row content before the name */
+  --se-mkt-qty-w: 120px;
+  --se-mkt-price-w: 130px;
+  --se-mkt-icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M16 16l4.5 4.5'/%3E%3C/svg%3E");
+  --se-mkt-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  --se-mkt-icon-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-opacity='.35' d='M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20z'/%3E%3Cpath d='M11 10.5h2V17h-2zM12 6.5a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6z'/%3E%3C/svg%3E");
+  /* Empty-state icons, drawn in their final colour (--se-text-faint) */
+  --se-mkt-icon-tag: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236f7984'%3E%3Cpath fill-opacity='.4' d='M2.5 4.5a2 2 0 0 1 2-2h7.2a2 2 0 0 1 1.4.6l8.3 8.3a2 2 0 0 1 0 2.8l-7.3 7.3a2 2 0 0 1-2.8 0L3.1 13.2a2 2 0 0 1-.6-1.4z'/%3E%3Cpath d='M8 6a2 2 0 1 1 0 4 2 2 0 0 1 0-4z'/%3E%3C/svg%3E");
+  --se-mkt-icon-cart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236f7984'%3E%3Cpath fill-opacity='.4' d='M5.5 6h16l-2 8.5a2 2 0 0 1-2 1.5H8.3a2 2 0 0 1-2-1.6z'/%3E%3Cpath d='M1.5 3h3.2l3.1 13H19v2H6.2L3.1 5H1.5zM9 19.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM17 19.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z'/%3E%3C/svg%3E");
+}
+
+/* ---------- Page ---------- */
+
+@media (min-width: 911px) {
+  html.se-community-market .pagecontent {
+    padding-bottom: 72px !important;
+  }
+
+  html.se-community-market:not(#se-none) :is(.market_header_bg, #BG_bottom) {
+    box-sizing: border-box;
+    width: var(--se-community-width) !important;
+    max-width: none !important;
+    margin-inline: auto !important;
+    padding: 0 !important;
+  }
+
+  html.se-community-market:not(#se-none) #BG_bottom {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) var(--se-mkt-side);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "note note"
+      "tabs side"
+      "panel side";
+    column-gap: var(--se-mkt-gap);
+    align-items: start;
+  }
+
+  /* Steam's floats: their children are placed in #BG_bottom's grid instead */
+  /* Steam's floats and wrappers: their children are placed in #BG_bottom's grid instead */
+  html.se-community-market:not(#se-none) :is(#mainContents, #sellListings) {
+    display: contents !important;
+  }
+
+  /*
+   * The open panel (listings or your activity) ends level with the sidebar's last card: it
+   * adds no height of its own (contain: size), so the sidebar sets the row and the panel
+   * fills it, scrolling inside.
+   */
+  html.se-community-market:not(#se-none) :is(#myListings, #sellListings > .market_content_block) {
+    grid-area: panel;
+    align-self: stretch;
+    contain: size;
+    min-height: 360px;
+    margin: 0 !important;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  /*
+   * The rows share the panel's height, so the list always ends at its bottom: each row grows
+   * from its own height up to a cap; past the panel, it scrolls. Steam hides the inactive
+   * tables with an inline display: none, which still wins over this flex.
+   */
+  html.se-community-market:not(#se-none) :is(#popularItemsTable, #sellListingsTable, #soldListingTable) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* The rows take what is left after the header and "Find more" (basis 0), whatever height
+     Steam gives the list itself, so "Find more" always sits at the bottom of the card */
+  html.se-community-market:not(#se-none) :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > [id$="Rows"] {
+    display: flex;
+    flex: 1 1 0 !important;
+    flex-direction: column;
+    height: auto !important;
+    min-height: min-content !important;
+  }
+
+  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > [id$="Rows"] > :is(a.market_listing_row_link, .market_listing_row) {
+    display: flex;
+    flex: 1 1 0;
+    min-height: calc(var(--se-mkt-tile) + 12px);
+    max-height: 96px;
+  }
+
+  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > :is(.market_listing_table_showmore, .market_listing_table_header) {
+    flex: none;
+  }
+
+  /* Steam's empty spacers (clear divs, line breaks) would add height under "Find more" */
+  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > :is(div:empty, br) {
+    display: none !important;
+  }
+
+  html.se-community-market .market_home_main_listing_table a.market_listing_row_link > .market_listing_row {
+    flex: 1;
+  }
+
+  /* Your activity: the open part fills the panel too (history's pager sits at its bottom);
+     the listing and buy-order cards stay at their own height at the top */
+  html.se-community-market:not(#se-none) #myListings {
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  html.se-community-market #myListings > :is(#tabContentsMyListings, #tabContentsMyMarketHistory) {
+    flex: 1 0 auto;
+  }
+
+  html.se-community-market #tabContentsMyListings {
+    align-content: start;
+  }
+
+  html.se-community-market:not(#se-none) #tabContentsMyMarketHistory {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* The column header stays in view while the rows scroll */
+  html.se-community-market:not(#se-none) .market_home_main_listing_table .market_listing_table_header {
+    position: sticky;
+    z-index: 2;
+    top: -8px;
+    margin: -8px -8px 4px !important;
+    padding: 12px 22px 8px !important;
+    background: var(--se-surface) !important;
+  }
+
+  html.se-community-market .se-mkt-tabs { grid-area: tabs; }
+
+  html.se-community-market #marketBetaNoteCtn { grid-area: note; }
+  html.se-community-market #myMarketTabs { grid-area: tabs; }
+  html.se-community-market #sideBar { grid-area: side; }
+
+  html.se-community-market #mainContents > div:not([id]) {
+    grid-column: 1 / -1;
+  }
+
+  html.se-community-market #BG_bottom > br {
+    display: none;
+  }
+}
+
+/* ---------- Hero ---------- */
+
+html.se-community-market:not(#se-none) .market_header_bg {
+  height: auto !important;
+  margin-top: 24px !important;
+  margin-bottom: 20px !important;
+  background: none !important;
+}
+
+html.se-community-market:not(#se-none) #BG_top {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "title wallet"
+    "stats wallet";
+  align-items: center;
+  gap: 18px 32px;
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 34px 36px !important;
+  border-radius: var(--se-radius-xl);
+  background:
+    radial-gradient(90% 160% at 0% 0%, color-mix(in srgb, var(--se-accent) 15%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--se-surface-2), var(--se-surface)) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-md);
+  overflow: hidden;
+}
+
+html.se-community-market #BG_top > :not(.se-mkt-art) {
+  position: relative;
+  z-index: 1;
+}
+
+html.se-community-market:not(#se-none) h1.market_header {
+  grid-area: title;
+  min-width: 0;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  font: inherit !important;
+}
+
+html.se-community-market h1.market_header > a {
+  display: block;
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_header_logo {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_header_text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-market .market_header_text > br {
+  display: none;
+}
+
+html.se-community-market:not(#se-none) .market_title_text {
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-display)/1.1 var(--se-font) !important;
+  letter-spacing: -.01em;
+  text-shadow: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_subtitle_text {
+  max-width: 620px;
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-md)/1.5 var(--se-font) !important;
+  text-shadow: none !important;
+}
+
+/* Activity chips (page.js) */
+html.se-community-market .se-mkt-stats {
+  grid-area: stats;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+html.se-community-market .se-mkt-stats:empty {
+  display: none;
+}
+
+html.se-community-market .se-mkt-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 14px 0 5px;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  color: var(--se-text-dim);
+  font: 600 var(--se-fs-sm)/1 var(--se-font);
+  cursor: pointer;
+  backdrop-filter: var(--se-blur-chip);
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-market .se-mkt-stat:hover {
+  background: var(--se-hover);
+  color: var(--se-white);
+}
+
+html.se-community-market .se-mkt-stat-n {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent-surface);
+  color: var(--se-accent);
+  font: 800 var(--se-fs-xs)/1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-market .se-mkt-stat[data-se-mkt-empty] .se-mkt-stat-n {
+  background: var(--se-pill);
+  color: var(--se-text-faint);
+}
+
+/* Hero art: popular items fanned behind the wallet (page.js) */
+html.se-community-market .se-mkt-art {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: -40px;
+  display: grid;
+  grid-template-columns: repeat(3, 112px);
+  gap: 14px;
+  transform: translateY(-50%) rotate(-10deg);
+  opacity: .5;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 45%);
+  animation: se-mkt-art-in var(--se-dur-slow) var(--se-ease) both;
+}
+
+html.se-community-market .se-mkt-art-tile {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 112px;
+  height: 112px;
+  padding: 14px;
+  border-radius: var(--se-radius-lg);
+  background:
+    radial-gradient(circle at 50% 60%, color-mix(in srgb, var(--se-q, var(--se-accent)) 26%, transparent), transparent 70%),
+    var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-market .se-mkt-art-tile:nth-child(3n + 2) {
+  transform: translateY(28px);
+}
+
+html.se-community-market .se-mkt-art-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@keyframes se-mkt-art-in {
+  from { opacity: 0; translate: 24px 0; }
+}
+
+/* Wallet card */
+html.se-community-market:not(#se-none) #BG_top .user_info {
+  grid-area: wallet;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 14px 14px 14px 14px !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-glass) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line), var(--se-shadow-sm);
+  backdrop-filter: var(--se-blur-chip);
+}
+
+/* The theme's avatar: a rounded square (--se-avatar-radius) with the status ring as a 2px gap,
+   then a 2px line */
+html.se-community-market:not(#se-none) .user_info .iconHolder_online {
+  display: block;
+  flex: none;
+  float: none !important;
+  box-sizing: border-box;
+  width: 44px !important;
+  height: 44px !important;
+  margin: 4px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-avatar-radius, 23%);
+  background: none !important;
+  outline: 2px solid var(--se-online, #4cb4ff); /* the theme's online blue (core/tokens.css), not Steam's cyan */
+  outline-offset: 2px;
+}
+
+html.se-community-market .user_info .avatarIcon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  line-height: 0;
+}
+
+html.se-community-market .user_info .avatarIcon img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: var(--se-avatar-radius, 23%);
+  object-fit: cover;
+}
+
+html.se-community-market:not(#se-none) .user_info .user_info_text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  float: none !important;
+  width: auto !important;
+  min-width: 140px;
+  margin: 0 !important;
+  padding: 0 4px 0 0 !important;
+}
+
+html.se-community-market .user_info_text > br {
+  display: none;
+}
+
+html.se-community-market:not(#se-none) #marketWalletBalance {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
+  letter-spacing: .08em;
+  text-decoration: none !important;
+  text-transform: uppercase;
+}
+
+html.se-community-market:not(#se-none) #marketWalletBalanceAmount {
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-3xl)/1.15 var(--se-font) !important;
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-market:not(#se-none) .user_info_text > a:not(#marketWalletBalance) {
+  width: fit-content;
+  color: var(--se-accent) !important;
+  font: 600 var(--se-fs-sm)/1.3 var(--se-font) !important;
+  text-decoration: none !important;
+}
+
+html.se-community-market:not(#se-none) .user_info_text > a:not(#marketWalletBalance):hover {
+  color: var(--se-accent-hover) !important;
+}
+
+/* "Sell an item" in the wallet card (page.js); in Steam's tab row until moved */
+html.se-community-market:not(#se-none) .pick_and_sell_button {
+  float: none !important;
+  margin: 0 !important;
+}
+
+/* Steam pins the wrapper absolutely, 8px off the bottom right, with a zero line-height
+   (economy_market.css .pick_and_sell_button): back in the card's row, sized to the button and
+   centred */
+html.se-community-market:not(#se-none) .pick_and_sell_button[data-se-mkt-sell] {
+  position: static !important;
+  inset: auto !important;
+  display: flex !important;
+  align-items: center;
+  align-self: center;
+  width: auto !important;
+  height: auto !important;
+  margin-left: 6px !important;
+  line-height: normal !important;
+}
+
+/* ---------- Action buttons (Sell an item, Buy, Remove...) ---------- */
+
+html.se-community-market:not(#se-none) a.item_market_action_button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  width: auto !important;
+  height: 36px !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line) !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-base)/1 var(--se-font) !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+  white-space: nowrap;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-market:not(#se-none) a.item_market_action_button:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-community-market:not(#se-none) a.item_market_action_button_green {
+  background: var(--se-accent) !important;
+  box-shadow: 0 8px 22px -10px color-mix(in srgb, var(--se-accent) 80%, transparent) !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-community-market:not(#se-none) a.item_market_action_button_green:hover {
+  background: var(--se-accent-hover) !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-community-market:not(#se-none) .item_market_action_button_contents {
+  display: contents !important;
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: inherit !important;
+}
+
+html.se-community-market :is(.item_market_action_button_preload, .item_market_action_button_edge, .item_market_action_button_left, .item_market_action_button_right) {
+  display: none !important;
+}
+
+/* ---------- Beta note ---------- */
+
+html.se-community-market:not(#se-none) #marketBetaNoteCtn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: auto !important;
+  margin: 0 0 20px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-market:not(#se-none) .marketBetaNoteText {
+  position: relative;
+  margin: 0 !important;
+  padding: 10px 16px 10px 42px !important;
+  border-radius: var(--se-radius-md);
+  background: color-mix(in srgb, var(--se-accent) 8%, transparent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 18%, transparent);
+  color: var(--se-text-dim) !important;
+  font: 500 var(--se-fs-sm)/1.45 var(--se-font) !important;
+}
+
+html.se-community-market .marketBetaNoteText::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  width: 18px;
+  margin-top: -9px;
+  height: 18px;
+  background: var(--se-accent);
+  -webkit-mask: var(--se-mkt-icon-info) center / contain no-repeat;
+}
+
+html.se-community-market:not(#se-none) .marketBetaNoteText a {
+  color: var(--se-accent) !important;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+/* ---------- Segmented tabs (My Market Activity; Popular / Newly Listed / Recently Sold) ---------- */
+
+html.se-community-market:not(#se-none) #myMarketTabs {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: auto !important;
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_large_tab_well {
+  position: static !important;
+  height: auto !important;
+  margin: 0 0 14px !important;
+  background: none !important;
+}
+
+html.se-community-market .market_large_tab_well > img {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_tab_well_tabs {
+  position: static !important;
+  display: inline-flex;
+  gap: 4px;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 4px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-market:not(#se-none) a.market_tab_well_tab {
+  display: inline-flex !important;
+  align-items: center;
+  flex: none !important;
+  float: none !important;
+  box-sizing: border-box;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 34px !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  border-radius: var(--se-radius-pill);
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-base)/1 var(--se-font) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-market:not(#se-none) a.market_tab_well_tab:hover {
+  background: var(--se-white-04, rgba(255, 255, 255, .04)) !important;
+  color: var(--se-text) !important;
+}
+
+html.se-community-market:not(#se-none) a.market_tab_well_tab.market_tab_well_tab_active {
+  background: var(--se-accent) !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-community-market :is(.market_tab_well_tab_left, .market_tab_well_tab_right, .market_tab_well_tab_preload) {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_tab_well_tab_contents {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: inherit !important;
+  text-shadow: none !important;
+}
+
+/* Counts: "( 0 )" as a chip */
+html.se-community-market .my_market_header_count {
+  font-size: 0 !important;
+}
+
+html.se-community-market .my_market_header_count > span {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+  color: var(--se-text-muted);
+  font: 700 var(--se-fs-xs)/1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-market .market_tab_well_tab_active .my_market_header_count > span {
+  background: rgba(15, 17, 21, .16);
+  color: inherit;
+}
+
+/* ---------- One tab bar (page.js) ----------
+ * Steam's two bars as one theme-built bar: listings, a divider, then your activity. A pill
+ * slides under the open tab (--x / --w from page.js). Steam's bars are hidden while it is in
+ * place; its buttons click Steam's tabs, and [data-se-mkt-view] on #BG_bottom shows only the
+ * open side's panel.
+ */
+
+html.se-community-market #BG_bottom:has(> .se-mkt-tabs) :is(#myMarketTabs, .market_large_tab_well) {
+  display: none !important;
+}
+
+html.se-community-market #BG_bottom[data-se-mkt-view="browse"] #myListings,
+html.se-community-market #BG_bottom[data-se-mkt-view="activity"] #sellListings > .market_content_block {
+  display: none !important;
+}
+
+html.se-community-market .se-mkt-tabs {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  justify-self: start;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 16px;
+  padding: 5px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-sm);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+html.se-community-market .se-mkt-tabs-pill {
+  position: absolute;
+  z-index: -1;
+  top: 5px;
+  bottom: 5px;
+  left: 0;
+  width: var(--w, 0);
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent);
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--se-accent) 75%, transparent);
+  transform: translateX(var(--x, 0));
+  transition: transform var(--se-dur) var(--se-ease), width var(--se-dur) var(--se-ease), opacity var(--se-dur-fast);
+}
+
+html.se-community-market .se-mkt-tabs-divider {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  margin: 0 8px;
+  background: var(--se-divider);
+}
+
+html.se-community-market .se-mkt-tab {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px 0 14px;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: none;
+  color: var(--se-text-muted);
+  font: 600 var(--se-fs-base)/1 var(--se-font);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--se-dur-fast), background-color var(--se-dur-fast);
+}
+
+html.se-community-market .se-mkt-tab:hover {
+  background: var(--se-white-04, rgba(255, 255, 255, .04));
+  color: var(--se-text);
+}
+
+html.se-community-market .se-mkt-tab[aria-selected="true"] {
+  background: none;
+  color: var(--se-on-accent);
+}
+
+html.se-community-market .se-mkt-tab-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--se-mkt-tab-icon) center / contain no-repeat;
+  opacity: .85;
+}
+
+html.se-community-market .se-mkt-tab[data-se-mkt-icon="popular"] { --se-mkt-tab-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12.5 2.5c.6 3.2 2.4 4.9 4.1 6.6A7.7 7.7 0 0 1 19 14.7 7 7 0 0 1 5 14.8c0-2.6 1.2-4.3 2.6-5.6.2 1.7.9 2.9 2.2 3.6-.5-4.2.7-7.8 2.7-10.3z'/%3E%3C/svg%3E"); }
+html.se-community-market .se-mkt-tab[data-se-mkt-icon="new"] { --se-mkt-tab-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M11 2h2l1.6 5.4L20 9v2l-5.4 1.6L13 18h-2l-1.6-5.4L4 11V9l5.4-1.6zM18.5 15l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z'/%3E%3C/svg%3E"); }
+html.se-community-market .se-mkt-tab[data-se-mkt-icon="sold"] { --se-mkt-tab-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm4.3 6.3L10.5 14l-2.8-2.8-1.4 1.4 4.2 4.2 7.2-7.1z'/%3E%3C/svg%3E"); }
+html.se-community-market .se-mkt-tab[data-se-mkt-icon="listings"] { --se-mkt-tab-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2.5 4.5a2 2 0 0 1 2-2h7.2a2 2 0 0 1 1.4.6l8.3 8.3a2 2 0 0 1 0 2.8l-7.3 7.3a2 2 0 0 1-2.8 0L3.1 13.2a2 2 0 0 1-.6-1.4zM8 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z'/%3E%3C/svg%3E"); }
+html.se-community-market .se-mkt-tab[data-se-mkt-icon="history"] { --se-mkt-tab-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 1-9.4 13.4l1.9-.7A8 8 0 1 0 6.3 6.3L8.5 8.5H2.5v-6l2.4 2.4A10 10 0 0 1 12 2zm-1 5h2v4.6l3.3 2-1 1.7L11 12.7z'/%3E%3C/svg%3E"); }
+
+html.se-community-market .se-mkt-tab-count {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 20px;
+  height: 20px;
+  margin-right: -6px;
+  padding: 0 7px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+  color: var(--se-text-muted);
+  font: 800 var(--se-fs-xs)/1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-market .se-mkt-tab[aria-selected="true"] .se-mkt-tab-count {
+  background: rgba(15, 17, 21, .18);
+  color: var(--se-on-accent);
+}
+
+/* ---------- My listings / buy orders ---------- */
+
+html.se-community-market:not(#se-none) #myListings {
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* !important: Steam's tab switch shows this with an inline display: block */
+html.se-community-market #tabContentsMyListings {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+html.se-community-market #tabContentsMyListings[style*="display: none"] {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) :is(#myListings .my_listing_section, #tabContentsMyMarketHistory) {
+  box-sizing: border-box;
+  min-width: 0;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 18px 20px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-market #tabContentsMyListings > .my_listing_section:has(.market_listing_row) {
+  grid-column: 1 / -1;
+}
+
+html.se-community-market:not(#se-none) h3.my_market_header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-md)/1.3 var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html.se-community-market .my_market_header_active {
+  color: inherit !important;
+}
+
+/* Empty states */
+/* The icon sits in the padding: the message is text with an inline link, which a flex row
+   would split apart */
+html.se-community-market:not(#se-none) #myListings .market_listing_table_message {
+  position: relative;
+  display: block;
+  margin: 0 !important;
+  padding: 24px 16px 24px 70px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-base)/1.5 var(--se-font) !important;
+  text-align: left !important;
+}
+
+html.se-community-market #myListings .market_listing_table_message::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  margin-top: -20px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-mkt-icon-cart) center / 22px 22px no-repeat, var(--se-pill);
+}
+
+html.se-community-market #tabContentsMyActiveMarketListingsTable .market_listing_table_message::before {
+  background-image: var(--se-mkt-icon-tag);
+}
+
+html.se-community-market #myListings .market_listing_table_message a {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+/* ---------- Listing tables ---------- */
+
+html.se-community-market:not(#se-none) #sellListings {
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-market:not(#se-none) .market_home_main_listing_table {
+  box-sizing: border-box;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 8px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-market #popularItemsTable {
+  --se-mkt-lead: calc(24px + var(--se-mkt-tile) + 2 * var(--se-mkt-row-gap)); /* rank, art */
+}
+
+html.se-community-market:not(#se-none) .market_listing_table_header {
+  display: flex;
+  align-items: center;
+  height: auto !important;
+  margin: 0 0 4px !important;
+  padding: 8px 14px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--se-divider) !important;
+  background: none !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+html.se-community-market .market_listing_table_header > div:not(.market_listing_price_listings_block, .market_listing_right_cell, .market_listing_left_cell) {
+  text-align: left !important;
+  order: 1;
+  flex: 1;
+  min-width: 0;
+  float: none !important;
+  width: auto !important;
+  padding-left: var(--se-mkt-lead) !important;
+}
+
+html.se-community-market .market_listing_header_namespacer {
+  display: none !important;
+}
+
+/* A spacer after the name pushes the columns right. Newly Listed / Recently Sold headers have
+   "NAME" as bare text (no element of its own), so the header itself carries the name's lead. */
+html.se-community-market .market_listing_table_header {
+  gap: var(--se-mkt-row-gap); /* the rows' gap, so the columns line up */
+}
+
+html.se-community-market .market_listing_table_header::before {
+  content: "";
+  order: 2;
+  flex: 1;
+}
+
+html.se-community-market:not(#se-none) .market_listing_table_header:not(:has(> div:not(.market_listing_right_cell, .market_listing_price_listings_block, .market_listing_left_cell))) {
+  padding-left: calc(22px + var(--se-mkt-lead)) !important;
+}
+
+/* Steam draws column separators and a brighter sorted column: one plain label colour, no lines */
+html.se-community-market:not(#se-none) .market_listing_table_header :is(div, span, a) {
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text-faint) !important;
+  font: inherit !important;
+  letter-spacing: inherit !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+}
+
+html.se-community-market .market_listing_table_header :is(div, span, a)::before,
+html.se-community-market .market_listing_table_header :is(div, span, a)::after {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_table_header a:hover {
+  color: var(--se-text) !important;
+}
+
+/* Rows: [rank] art | name and game | (seller) | quantity | price | (actions) */
+html.se-community-market a.market_listing_row_link {
+  display: block;
+  border-radius: var(--se-radius-md);
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_row {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-mkt-row-gap);
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 6px 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: none !important;
+  box-shadow: none !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-community-market:not(#se-none) :is(a.market_listing_row_link:hover .market_listing_row, .market_listing_row:hover) {
+  background: var(--se-hover) !important;
+}
+
+html.se-community-market .market_listing_row > div:not([class]) {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_row .market_listing_item_img {
+  order: 0;
+  flex: none;
+  box-sizing: border-box;
+  width: var(--se-mkt-tile) !important;
+  height: var(--se-mkt-tile) !important;
+  float: none !important;
+  margin: 0 !important;
+  padding: 5px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background:
+    radial-gradient(circle at 50% 62%, color-mix(in srgb, var(--se-q, #fff) 24%, transparent), transparent 72%),
+    var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-q, #fff) 18%, transparent);
+  object-fit: contain;
+  transition: transform var(--se-dur) var(--se-ease);
+}
+
+html.se-community-market :is(a.market_listing_row_link:hover, .market_listing_row:hover) .market_listing_item_img {
+  transform: scale(1.06);
+}
+
+html.se-community-market:not(#se-none) .market_listing_item_name_block {
+  order: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-market .market_listing_item_name_block > br {
+  display: none;
+}
+
+/* White, not Steam's quality colour (some are too dark on the theme's surfaces): the quality
+   shows as the art's glow instead */
+html.se-community-market:not(#se-none) .market_listing_item_name {
+  display: block;
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-md)/1.3 var(--se-font) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-market:not(#se-none) .market_listing_game_name {
+  overflow: hidden;
+  color: var(--se-text-faint) !important;
+  font: 500 var(--se-fs-sm)/1.3 var(--se-font) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Right-hand cells: Steam floats them in reverse; the theme orders them left to right */
+html.se-community-market:not(#se-none) :is(.market_listing_right_cell, .market_listing_price_listings_block) {
+  float: none !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: right;
+}
+
+html.se-community-market .market_listing_price_listings_block {
+  order: 3;
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+
+html.se-community-market .market_listing_seller { order: 2; }
+html.se-community-market .market_listing_listed_date { order: 2; }
+html.se-community-market .market_listing_num_listings { order: 0; }
+html.se-community-market .market_listing_their_price,
+html.se-community-market .market_listing_my_price { order: 4; }
+html.se-community-market :is(.market_listing_action_buttons, .market_listing_edit_buttons, .market_listing_cancel_button) { order: 5; flex: none; }
+
+/* Buy Now column: one width in the header and the rows, so PRICE sits over the prices.
+   Steam's column is 74px tall with side padding, and its button wrapper drops 25px with a
+   zero line-height (economy_market.css .market_listing_action_buttons, .market_listing_buy_button):
+   all reset so the button centres on the row. */
+html.se-community-market:not(#se-none) .market_listing_action_buttons {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+  width: 120px !important;
+  height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  line-height: normal !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_buy_button {
+  margin: 0 !important;
+  line-height: normal !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_buy_button .item_market_action_button_contents {
+  width: auto !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_num_listings {
+  flex: none;
+  width: var(--se-mkt-qty-w) !important;
+  color: var(--se-text-muted);
+  font: 600 var(--se-fs-base)/1.3 var(--se-font);
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-market:not(#se-none) :is(.market_listing_their_price, .market_listing_my_price) {
+  flex: none;
+  width: var(--se-mkt-price-w) !important;
+}
+
+/* The price cell centres its price on the row: Steam's trailing line breaks (and the hidden
+   fee prices around them) would otherwise sit under it and lift it above the Buy Now button */
+html.se-community-market:not(#se-none) .market_listing_row :is(.market_listing_their_price, .market_listing_my_price) {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  align-self: center;
+}
+
+/* Steam gives each value a 10px top and bottom margin and the cells a 73px line-height
+   (.market_table_value, .market_home_main_listing_table .market_listing_right_cell) */
+html.se-community-market:not(#se-none) .market_listing_row :is(.market_listing_right_cell, .market_table_value) {
+  line-height: normal !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_row .market_listing_right_cell > .market_table_value {
+  margin: 0 !important;
+  vertical-align: middle;
+}
+
+html.se-community-market .market_listing_row :is(.market_listing_their_price, .market_listing_my_price) br {
+  display: none !important;
+}
+
+/* Steam left-aligns the recent listings' prices (.market_listing_price): right, under PRICE */
+html.se-community-market:not(#se-none) :is(.market_listing_their_price, .market_listing_my_price, .market_listing_num_listings),
+html.se-community-market:not(#se-none) :is(.market_listing_their_price, .market_listing_my_price) :is(.market_table_value, .market_listing_price) {
+  text-align: right !important;
+}
+
+html.se-community-market .market_listing_table_header :is(.market_listing_num_listings, .market_listing_their_price) {
+  color: inherit;
+  font: inherit;
+}
+
+/* "Starting at:" as a caption over the price */
+html.se-community-market:not(#se-none) .market_listing_row :is(.market_listing_their_price, .market_listing_my_price) .market_table_value {
+  display: block;
+  color: var(--se-text-faint) !important;
+  font: 600 var(--se-fs-xs)/1.3 var(--se-font) !important;
+}
+
+html.se-community-market .market_listing_row .market_table_value > br {
+  display: none;
+}
+
+/* Newly Listed / Recently Sold, history and your listings show .market_listing_price; the
+   fee variants Steam keeps beside it stay hidden as Steam has them (inline display: none) */
+html.se-community-market:not(#se-none) .market_listing_row .market_table_value > :is(.normal_price, .sale_price, span[title], .market_listing_price) {
+  display: block;
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-lg)/1.3 var(--se-font) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-market .market_listing_num_listings_qty {
+  color: var(--se-text-dim);
+}
+
+/* Rank on popular items: the top three in gold */
+html.se-community-market #popularItemsRows {
+  counter-reset: se-mkt-rank;
+}
+
+html.se-community-market #popularItemsRows .market_listing_row::before {
+  content: counter(se-mkt-rank);
+  counter-increment: se-mkt-rank;
+  order: -1;
+  flex: none;
+  width: 24px;
+  color: var(--se-text-faint);
+  font: 800 var(--se-fs-base)/1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+html.se-community-market #popularItemsRows > a:nth-of-type(-n + 3) .market_listing_row::before {
+  color: var(--se-gold);
+}
+
+/* "Find more" */
+html.se-community-market:not(#se-none) .market_listing_table_showmore {
+  margin: 6px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_table_showmore a {
+  width: 100% !important;
+  height: 34px;
+}
+
+/* Empty table message (newly listed / recently sold while loading) */
+html.se-community-market:not(#se-none) #sellListings .market_listing_table_message {
+  padding: 28px !important;
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-base)/1.5 var(--se-font) !important;
+  text-align: center;
+}
+
+/* ---------- My Market History ----------
+ * Steam's history rows add a +/- column, Listed On / Acted On dates and who acted with you,
+ * each floated at a fixed width (economy_market.css): laid out in the row's flex line instead,
+ * with a pager under them.
+ */
+
+/* The header has its own +/- cell (and the gap after it), so its name lead is the art alone */
+html.se-community-market #tabContentsMyMarketHistory .market_listing_table_header {
+  --se-mkt-lead: calc(var(--se-mkt-tile) + var(--se-mkt-row-gap));
+}
+
+/* The rows share the card's height like the listing tables: each grows from its own height
+   up to a cap, and the pager stays at the bottom */
+html.se-community-market:not(#se-none) #tabContentsMyMarketHistory > [id$="Table"] {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+html.se-community-market:not(#se-none) #tabContentsMyMarketHistory [id$="Rows"] {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: min-content;
+}
+
+html.se-community-market:not(#se-none) #tabContentsMyMarketHistory [id$="Rows"] > .market_listing_row {
+  box-sizing: border-box;
+  flex: 1 1 0;
+  height: auto !important;
+  min-height: calc(var(--se-mkt-tile) + 12px) !important;
+  max-height: 96px;
+  padding-block: 6px !important;
+}
+
+/* Who you traded with: Steam fills the cell with empty markup when there is no one to show.
+   page.js marks the card [data-se-mkt-partners] only when some row names someone; otherwise
+   the column (and its header cell) takes no room */
+html.se-community-market #tabContentsMyMarketHistory:not([data-se-mkt-partners]) .market_listing_whoactedwith {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_left_cell {
+  float: none !important;
+  margin: 0 !important;
+  line-height: normal !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_gainorloss {
+  order: -1;
+  flex: none;
+  width: 24px !important;
+  height: auto !important;
+  color: var(--se-cart) !important;
+  font: 800 var(--se-fs-xl)/1 var(--se-font) !important;
+  text-align: center !important;
+}
+
+/* Gained (+, bought) or lost (−, sold), from page.js [data-se-mkt-gain]: a round badge with a
+   real plus or minus sign in place of Steam's text */
+html.se-community-market:not(#se-none) .market_listing_gainorloss[data-se-mkt-gain] {
+  display: inline-grid !important;
+  place-items: center;
+  height: 24px !important;
+  border-radius: 50%;
+  font-size: 0 !important;
+}
+
+html.se-community-market .market_listing_gainorloss[data-se-mkt-gain]::before {
+  font: 800 15px/1 var(--se-font);
+}
+
+html.se-community-market:not(#se-none) .market_listing_gainorloss[data-se-mkt-gain="+"] {
+  background: color-mix(in srgb, var(--se-cart) 16%, transparent);
+  color: var(--se-cart) !important;
+}
+
+html.se-community-market .market_listing_gainorloss[data-se-mkt-gain="+"]::before {
+  content: "+";
+}
+
+html.se-community-market:not(#se-none) .market_listing_gainorloss[data-se-mkt-gain="-"] {
+  background: color-mix(in srgb, var(--se-accent) 16%, transparent);
+  color: var(--se-accent) !important;
+}
+
+html.se-community-market .market_listing_gainorloss[data-se-mkt-gain="-"]::before {
+  content: "\2212";
+}
+
+html.se-community-market:not(#se-none) .market_listing_row .market_listing_item_img_container {
+  order: 0;
+  flex: none;
+  float: none !important;
+  width: var(--se-mkt-tile) !important;
+  height: var(--se-mkt-tile) !important;
+  margin: 0 !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_listed_date {
+  flex: none;
+  width: 104px !important;
+  min-height: 0 !important;
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-sm)/1.3 var(--se-font);
+  text-align: right !important;
+}
+
+html.se-community-market .market_listing_listed_date_combined {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_whoactedwith {
+  order: 2;
+  display: flex !important;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 180px !important;
+  padding: 0 !important;
+  color: var(--se-text-dim) !important;
+  font: 500 var(--se-fs-sm)/1.3 var(--se-font);
+  text-align: left !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_whoactedwith .market_listing_owner_avatar {
+  flex: none;
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_whoactedwith_name_block {
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.3 !important;
+}
+
+/* Steam frames the history table inside the card: one card only */
+html.se-community-market:not(#se-none) #tabContentsMyMarketHistory :is(.market_content_block, .market_home_listing_table, [id$="Table"]) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Pager: "Showing 1-10 of N results" on the left, round page buttons on the right */
+html.se-community-market .market_paging_summary {
+  order: -1;
+}
+
+html.se-community-market:not(#se-none) #tabContentsMyMarketHistory :is(.market_paging, [id$="_ctn"]) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: auto 0 0 !important; /* at the bottom of the card when it fills the panel */
+  padding: 14px 4px 0 !important;
+  background: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_paging_summary {
+  float: none !important;
+  margin: 0 !important;
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-sm)/1.3 var(--se-font) !important;
+}
+
+html.se-community-market:not(#se-none) .market_paging_controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  float: none !important;
+  margin: 0 0 0 auto !important;
+  color: var(--se-text-faint);
+  font: 700 var(--se-fs-sm)/1 var(--se-font);
+}
+
+html.se-community-market:not(#se-none) .market_paging_controls .pagebtn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--se-pill) !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-sm)/1 var(--se-font) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast);
+}
+
+html.se-community-market:not(#se-none) .market_paging_controls .pagebtn:not(.disabled):hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-community-market:not(#se-none) .market_paging_controls .pagebtn.disabled {
+  opacity: .3;
+}
+
+html.se-community-market:not(#se-none) .market_paging_pagelink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: var(--se-radius-pill);
+  color: var(--se-text-muted) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-market:not(#se-none) .market_paging_pagelink:hover {
+  background: var(--se-pill);
+  color: var(--se-text) !important;
+}
+
+html.se-community-market:not(#se-none) .market_paging_pagelink.active {
+  background: var(--se-accent);
+  color: var(--se-on-accent) !important;
+}
+
+/* ---------- Sidebar ---------- */
+
+html.se-community-market:not(#se-none) #sideBar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  float: none !important;
+  box-sizing: border-box;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+@media (min-width: 911px) {
+  /* Capped at the window, so an expanded game list scrolls here instead of stretching the panel */
+  html.se-community-market:not(#se-none) #sideBar {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    border-radius: var(--se-radius-lg);
+  }
+}
+
+html.se-community-market:not(#se-none) :is(#findItems, #moreInfo) {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_search_sidebar_contents {
+  box-sizing: border-box;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 18px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-market:not(#se-none) #escrow_description {
+  width: auto !important;
+  margin: 0 0 18px !important;
+  padding: 10px 12px !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-white-04, rgba(255, 255, 255, .04)) !important;
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-xs)/1.5 var(--se-font) !important;
+}
+
+html.se-community-market:not(#se-none) .escrow_description_link {
+  display: block;
+  width: auto !important;
+  height: auto !important;
+}
+
+html.se-community-market:not(#se-none) #escrow_description a {
+  color: var(--se-accent) !important;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_search_sidebar_section_tip_small {
+  display: block;
+  margin: 0 0 8px !important;
+  padding: 0 2px !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font, 700 11px/14px var(--se-font)) !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Search */
+html.se-community-market:not(#se-none) .market_search_box_container {
+  width: auto !important;
+  margin: 0 0 20px !important;
+}
+
+html.se-community-market #market_search {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+html.se-community-market:not(#se-none) .market_search_input_container {
+  display: block;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-market .market_search_sidebar_search_box div {
+  border-color: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html.se-community-market .market_search_sidebar_search_box > div {
+  position: relative;
+}
+
+/* Steam's React box sizes its wrappers in px (259px): every wrapper around the input fills the card */
+html.se-community-market:not(#se-none) .market_search_sidebar_search_box :is(div:has(input), input) {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+html.se-community-market:not(#se-none) #market_search_advanced_show {
+  float: none !important;
+  width: auto !important;
+}
+
+html.se-community-market .market_search_sidebar_search_box > div::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 14px;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  background: var(--se-text-faint);
+  -webkit-mask: var(--se-mkt-icon-search) center / contain no-repeat;
+  pointer-events: none;
+}
+
+html.se-community-market:not(#se-none) #market_search input {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 38px !important;
+  padding: 0 14px 0 38px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-base)/1 var(--se-font) !important;
+  outline: 0 !important;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-community-market:not(#se-none) #market_search input:focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent) !important;
+}
+
+html.se-community-market:not(#se-none) .market_search_advanced_button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  box-sizing: border-box;
+  width: auto !important;
+  height: 34px !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line);
+  color: var(--se-text-dim) !important;
+  font: 600 var(--se-fs-sm)/1 var(--se-font) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-market:not(#se-none) .market_search_advanced_button:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-community-market:not(#se-none) .market_search_advanced_button .btn_details_arrow {
+  flex: none;
+  width: 12px !important;
+  height: 12px !important;
+  margin: 0 !important;
+  background: currentColor !important;
+  -webkit-mask: var(--se-mkt-icon-chevron) center / contain no-repeat;
+  position: static !important; /* Steam floats it outside the button */
+  float: none !important;
+  opacity: .7;
+}
+
+/* Game filter (page.js) */
+html.se-community-market .se-mkt-filter {
+  position: relative;
+  display: block;
+  margin: 0 0 8px;
+}
+
+html.se-community-market .se-mkt-filter::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  background: var(--se-text-faint);
+  -webkit-mask: var(--se-mkt-icon-search) center / contain no-repeat;
+  pointer-events: none;
+}
+
+html.se-community-market .se-mkt-filter-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 34px;
+  padding: 0 12px 0 34px;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text);
+  font: 500 var(--se-fs-sm)/1 var(--se-font);
+  outline: 0;
+  transition: box-shadow var(--se-dur-fast);
+}
+
+html.se-community-market .se-mkt-filter-input::placeholder {
+  color: var(--se-text-faint);
+}
+
+html.se-community-market .se-mkt-filter-input:focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent);
+}
+
+html.se-community-market .se-mkt-filter-input::-webkit-search-cancel-button {
+  filter: invert(.6);
+  cursor: pointer;
+}
+
+html.se-community-market .se-mkt-filter-none {
+  margin: 8px 0 0;
+  padding: 18px 8px;
+  color: var(--se-text-faint);
+  font: 500 var(--se-fs-sm)/1.4 var(--se-font);
+  text-align: center;
+}
+
+html.se-community-market .se-mkt-filter-none[hidden] {
+  display: none;
+}
+
+/* While filtering: every list open, the matches only, no "Show more" */
+html.se-community-market [data-se-mkt-filtering] :is(.market_more_games, .market_unvetted_games) {
+  display: block !important;
+}
+
+html.se-community-market [data-se-mkt-filtering] .market_show_more_games,
+html.se-community-market [data-se-mkt-filtering] .market_unvetted_games:not(:has(a.game_button:not([data-se-mkt-hide]))) {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) a.game_button[data-se-mkt-hide] {
+  display: none !important;
+}
+
+/* Browse by Game */
+html.se-community-market:not(#se-none) .market_search_game_button_group {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-market:not(#se-none) #browseItems {
+  width: auto !important;
+  margin: 0 !important;
+}
+
+html.se-community-market:not(#se-none) a.game_button {
+  display: flex !important;
+  align-items: center;
+  float: none !important;
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 6px 8px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+html.se-community-market:not(#se-none) a.game_button:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+/* Steam frames the contents span (economy.css .game_button > span: gradient, border-image) */
+html.se-community-market:not(#se-none) .game_button > span {
+  border: 0 !important;
+  border-image: none !important;
+}
+
+html.se-community-market:not(#se-none) .game_button_contents {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  line-height: normal !important;
+}
+
+html.se-community-market:not(#se-none) .game_button_game_icon {
+  display: block !important;
+  flex: none;
+  float: none !important;
+  width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  border-radius: 7px;
+  background: var(--se-white-04, rgba(255, 255, 255, .04)) !important;
+  overflow: hidden;
+}
+
+/* Steam places the icon absolutely over the button (economy.css .game_button_game_icon > img):
+   back in its tile instead, or it stretches across the name */
+html.se-community-market:not(#se-none) .game_button_game_icon > img {
+  position: static !important;
+  inset: auto !important;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+html.se-community-market:not(#se-none) .game_button_game_name {
+  display: block !important;
+  flex: 1;
+  min-width: 0;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  color: inherit !important;
+  max-width: none !important;
+  font: 600 var(--se-fs-base)/1.3 var(--se-font) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-market:not(#se-none) .market_show_more_games {
+  margin: 8px 0 0 !important;
+}
+
+html.se-community-market:not(#se-none) .market_show_more_games a {
+  width: 100% !important;
+}
+
+html.se-community-market .market_show_more_games .ico16 {
+  display: none;
+}
+
+html.se-community-market:not(#se-none) .market_unvetted_games {
+  margin-top: 10px !important;
+  padding-top: 10px !important;
+  border-top: 1px solid var(--se-divider);
+}
+
+/* More info: FAQ and group links */
+html.se-community-market:not(#se-none) #moreInfo .market_search_sidebar_contents {
+  color: var(--se-text-muted) !important;
+  font: 500 var(--se-fs-sm)/1.6 var(--se-font) !important;
+}
+
+html.se-community-market:not(#se-none) #moreInfo a {
+  color: var(--se-accent) !important;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+html.se-community-market:not(#se-none) #moreInfo a:hover {
+  color: var(--se-accent-hover) !important;
+}
+
+/* ---------- Narrow windows ---------- */
+
+@media (max-width: 1280px) {
+  html.se-community-market:not(#se-none) #BG_top {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "title"
+      "stats"
+      "wallet";
+  }
+
+  html.se-community-market:not(#se-none) #BG_top .user_info {
+    justify-self: start;
+  }
+
+  html.se-community-market {
+    --se-mkt-qty-w: 96px;
+    --se-mkt-price-w: 108px;
+  }
+}
+
+@media (max-width: 910px) {
+  html.se-community-market .se-mkt-stats {
+    padding-left: 0;
+  }
+
+  html.se-community-market .se-mkt-art {
+    display: none;
+  }
+
+  html.se-community-market:not(#se-none) #BG_top {
+    padding: 22px !important;
+  }
+}
