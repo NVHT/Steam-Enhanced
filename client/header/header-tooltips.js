@@ -1,15 +1,20 @@
 /*
- * Attach native Steam React tooltips to header, rail, and sidebar icon buttons.
+ * Tips for the title bar, rail, sidebar and dock buttons: the theme's own tip, drawn for real
+ * as a popup-layer panel (core/popup-layer.js): in the page, or in a popup window above a Store
+ * or Community page (the dock's tips open over it). One listener for the whole window; a button
+ * opts in by being a theme button or carrying [data-se-tip] (its text), [data-se-tip-dir] its
+ * side. Steam's own tips on the buttons the theme labels are muted. The tip wears the skin
+ * client/dialogs/dialogs.css gives Steam's tooltips (.se-tip), so every tip looks the same.
  */
 ((SE) => {
   const { C, railMode } = SE;
   window.__seHeaderTooltips?.destroy();
+  const layer = SE.layer;
 
-  const mounts = new Map();
   const pageIcons = new Set(['store', 'library', 'community', 'profile']);
   let isRail = false;
 
-  // Controls that open hover menus must not host a nested tooltip root.
+  // Controls that open hover menus show the menu, not a tip.
   const ownsDropdown = (node) => {
     const icon = node.getAttribute('data-se-icon');
     if (
@@ -71,33 +76,25 @@
     }
   };
 
-  const mutedNodes = new Set();
-  const MUTE_EVENTS = ['mouseover', 'mouseout', 'pointerover', 'pointerout'];
-  const stopHoverPropagation = (event) => event.stopPropagation();
-
-  const muteNode = (node) => {
-    if (mutedNodes.has(node)) return;
-    for (const type of MUTE_EVENTS) node.addEventListener(type, stopHoverPropagation);
-    mutedNodes.add(node);
-  };
-
-  const unmuteNode = (node) => {
-    for (const type of MUTE_EVENTS) node.removeEventListener(type, stopHoverPropagation);
-    node.removeAttribute('data-se-tip');
-    mutedNodes.delete(node);
-  };
+  /*
+   * Buttons whose own Steam tip is muted (the theme tips them): the title bar's Big Picture and
+   * Announcements buttons in the rail, and the bell (and its tooltip source). Muted by hiding
+   * Steam's tooltips while the pointer is on one ([data-se-tip-muted] on <body>, dialogs.css),
+   * decided at each hover: Steam re-renders these buttons, so nothing is tied to an element, and
+   * every event goes on to Steam, whose tip opens and closes as it always does. (Stopping the
+   * events instead cut React's enter and leave apart and left Steam's tip open for good.)
+   */
+  const BELL = `.${C.FocusNavigationRoot_TitleBarControls} :is(.${C.NotificationsButton}, .tool-tip-source:has(.${C.NotificationsButton}))`;
+  const muted = (target) =>
+    Boolean(target.closest?.(BELL)) || (railMode() && NATIVE_TIPS.some(([selector]) => target.closest?.(selector)));
 
   const titleBarHeight = () => {
     const bar = document.querySelector(`.${C.TopBar}`);
     return bar ? bar.getBoundingClientRect().bottom - 2 : 48;
   };
 
-  /*
-   * Which side a tooltip opens on. Only the rail needs a measurement (a control below the
-   * title bar opens right), so it's taken once per mount and again only when the layout
-   * changes (rail mode or a window resize), not on every DOM change.
-   */
-  let layoutKey = '';
+  // Which side a tip opens on: the dock's to the left, the rail's below the title bar to the
+  // right, the rest below; a button can name its own.
   const directionFor = (node, barBottom) =>
     node.getAttribute('data-se-tip-dir') ||
     (node.closest('.se-fdock')
@@ -106,33 +103,116 @@
         ? 'right'
         : 'bottom');
 
+  // Labels for the buttons the theme tips in place of Steam: data-se-tip, read by labelFor.
   function syncNativeTips() {
-    const activeSet = new Set();
-    if (isRail) {
-      for (const [selector, label] of NATIVE_TIPS) {
-        const node = document.querySelector(selector);
-        if (!node) continue;
-        activeSet.add(node);
-        if (node.getAttribute('data-se-tip') !== label) node.setAttribute('data-se-tip', label);
-        muteNode(node);
-      }
+    for (const [selector, label] of NATIVE_TIPS) {
+      const node = document.querySelector(selector);
+      if (node) SE.attr(node, 'data-se-tip', isRail ? label : null);
     }
-
     const bell = document.querySelector(`.${C.FocusNavigationRoot_TitleBarControls} .${C.NotificationsButton}`);
-    if (bell) {
-      const label = hasNotifications() === false ? 'Notifications' : null;
-      if (label && bell.getAttribute('data-se-tip') !== label) bell.setAttribute('data-se-tip', label);
-      if (!label) bell.removeAttribute('data-se-tip');
-      for (const node of new Set([bell, bell.closest('.tool-tip-source')].filter(Boolean))) {
-        activeSet.add(node);
-        muteNode(node);
-      }
-    }
+    if (bell) SE.attr(bell, 'data-se-tip', hasNotifications() === false ? 'Notifications' : null);
+  }
 
-    for (const node of mutedNodes) {
-      if (!activeSet.has(node)) unmuteNode(node);
+  const CANDIDATES = '.se-menu-icon, .se-header-action, .se-sidebar-tip, [data-se-tip]';
+
+  let tip = null;
+  // Steam's own tooltip delay (nDelayShowMS, --se-tip-delay), as these tips had
+  const intent = SE.hoverIntent((node) => show(node), '--se-tip-delay');
+
+  // Where the tip goes beside its button: on `direction`'s side, centred on the button.
+  function spotFor(node, direction) {
+    const r = node.getBoundingClientRect();
+    const gap = SE.px('--se-space-2');
+    return (w, h) => {
+      const midX = r.left + r.width / 2 - w / 2;
+      const midY = r.top + r.height / 2 - h / 2;
+      if (direction === 'left') return { left: r.left - gap - w, top: midY };
+      if (direction === 'right') return { left: r.right + gap, top: midY };
+      if (direction === 'top') return { left: midX, top: r.top - gap - h };
+      return { left: midX, top: r.bottom + gap };
+    };
+  }
+
+  function hide() {
+    intent.cancel();
+    tip?.release();
+    tip = null;
+  }
+
+  function show(source) {
+    const label = source.isConnected && labelFor(source);
+    if (!label || !layer) return;
+    tip = layer.panel({ sheets: ['client/dialogs/dialogs.css'] });
+    tip?.show(spotFor(source, directionFor(source, titleBarHeight)), (container) => {
+      const el = container.ownerDocument.createElement('div');
+      el.className = 'se-tip';
+      el.setAttribute('role', 'tooltip');
+      el.textContent = label;
+      container.append(el);
+    });
+  }
+
+  // The button a hover or keyboard focus lands on, when it has a tip to show.
+  const tipped = (target) => {
+    const node = target.closest?.(CANDIDATES);
+    return node && !ownsDropdown(node) && labelFor(node) ? node : null;
+  };
+
+  function onOver(event) {
+    const node = event.target.closest?.(CANDIDATES);
+    if (node && node === intent.node) return;
+    hide();
+    if (tipped(event.target)) intent.enter(node);
+  }
+
+  function onOut(event) {
+    if (intent.left(event)) hide();
+  }
+
+  // Keyboard focus shows the tip as a hover does (pointer focus doesn't: the hover already did).
+  function onFocus(event) {
+    const node = tipped(event.target);
+    if (!node || node === intent.node || !node.matches(':focus-visible')) return;
+    hide();
+    intent.enter(node);
+  }
+
+  function onBlur(event) {
+    if (intent.node && intent.node.contains(event.target)) hide();
+  }
+
+  function onKey(event) {
+    if (event.key === 'Escape' && (tip || intent.node)) hide();
+  }
+
+  const MUTE_ATTR = 'data-se-tip-muted';
+  const STEAM_TIPS = `.${C.TextToolTip}, .${C.ToolTipCustom}`;
+
+  /*
+   * Leaving a muted button: Steam's tip for it is still in the page for a moment (it closes after
+   * the hover ends), so it is marked on its own before <body> stops hiding Steam's tips; otherwise
+   * it shows for those frames. Tips opened later are new nodes, and show as usual.
+   */
+  function setMuted(on) {
+    if (on || !document.body.hasAttribute(MUTE_ATTR)) {
+      SE.attr(document.body, MUTE_ATTR, on ? '' : null);
+      return;
+    }
+    for (const tip of document.querySelectorAll(STEAM_TIPS)) tip.setAttribute(MUTE_ATTR, '');
+    document.body.removeAttribute(MUTE_ATTR);
+  }
+
+  // The window's hover (capture, on the document: seen whatever Steam's own listeners do).
+  function onHover(event) {
+    if (event.type === 'mouseover') {
+      setMuted(muted(event.target));
+      onOver(event);
+    } else {
+      onOut(event);
     }
   }
+
+  const HOVER_EVENTS = ['mouseover', 'mouseout'];
 
   let observer;
   let frame = 0;
@@ -142,65 +222,9 @@
     isRail = railMode();
     watchTray();
     syncNativeTips();
-
-    for (const [node, entry] of mounts) {
-      if (!node.isConnected || !entry.host.isConnected || ownsDropdown(node) || !labelFor(node)) {
-        entry.root.unmount();
-        entry.host.remove();
-        mounts.delete(node);
-      }
-    }
-
-    const candidates = [
-      ...document.querySelectorAll('.se-menu-icon, .se-header-action, .se-sidebar-tip, [data-se-tip]'),
-    ].filter(node => !ownsDropdown(node));
-    if (!candidates.length) return;
-
-    const native = window.__seNativeTooltips?.resolve();
-    if (!native) return;
-    const { React, DOM, Tooltip } = native;
-
-    const key = `${isRail}|${innerWidth}x${innerHeight}`;
-    const relayout = key !== layoutKey;
-    layoutKey = key;
-    let bar;
-    const barBottom = () => (bar ??= titleBarHeight());
-
-    for (const node of candidates) {
-      const label = labelFor(node);
-      if (!label) continue;
-
-      let entry = mounts.get(node);
-      if (!entry) {
-        const host = document.createElement('span');
-        host.className = 'se-header-tooltip-host';
-        node.appendChild(host);
-        entry = { host, root: DOM.createRoot(host), label: null, direction: null, dir: null, dirAttr: null };
-        mounts.set(node, entry);
-      }
-      const dirAttr = node.getAttribute('data-se-tip-dir');
-      if (relayout || entry.dir === null || dirAttr !== entry.dirAttr) {
-        entry.dir = directionFor(node, barBottom);
-        entry.dirAttr = dirAttr;
-      }
-      const direction = entry.dir;
-
-      if (entry.label === label && entry.direction === direction) continue;
-      entry.label = label;
-      entry.direction = direction;
-      entry.root.render(
-        React.createElement(Tooltip, {
-          toolTipContent: label,
-          bTopmost: true,
-          nDelayShowMS: 200,
-          direction,
-          nBodyAlignment: 0.5,
-          nBodyDistance: 6,
-          bPortalToBody: true,
-          children: React.createElement('span', { className: 'se-header-tooltip-hitbox' }),
-        })
-      );
-    }
+    // A button that went away, or now opens a menu, takes its tip with it.
+    const source = intent.node;
+    if (source && (!source.isConnected || ownsDropdown(source))) hide();
   };
 
   const schedule = () => {
@@ -209,30 +233,37 @@
 
   const start = () => {
     // Core already batches non-sync watchers into one frame; the throttle keeps hover-driven
-    // class churn from re-querying the whole document more than ten times a second.
+    // class churn from re-reading the title bar more than ten times a second.
     observer = SE.watch(update, {
-      attributes: ['aria-label', 'class', 'data-se-icon', 'data-se-tip', 'data-se-tip-dir'],
+      attributes: ['aria-label', 'class', 'data-se-icon', 'data-se-tip'],
       throttle: 100,
     });
-    addEventListener('resize', schedule);
     schedule();
   };
+
+  for (const type of HOVER_EVENTS) document.addEventListener(type, onHover, true);
+  document.addEventListener('focusin', onFocus, true);
+  document.addEventListener('focusout', onBlur, true);
+  document.addEventListener('keydown', onKey, true);
+  // A press acts on the button: its tip goes, as Steam's did.
+  document.addEventListener('pointerdown', hide, true);
 
   window.__seHeaderTooltips = {
     hasNotifications,
     destroy() {
       observer?.disconnect();
-      removeEventListener('resize', schedule);
+      for (const type of HOVER_EVENTS) document.removeEventListener(type, onHover, true);
+      document.removeEventListener('focusin', onFocus, true);
+      document.removeEventListener('focusout', onBlur, true);
+      document.removeEventListener('keydown', onKey, true);
+      document.removeEventListener('pointerdown', hide, true);
       traySubscription?.Unregister();
       traySubscription = null;
       trayCallbacks = null;
       if (frame) cancelAnimationFrame(frame);
-      for (const node of [...mutedNodes]) unmuteNode(node);
-      for (const entry of mounts.values()) {
-        entry.root.unmount();
-        entry.host.remove();
-      }
-      mounts.clear();
+      hide();
+      SE.unmark(document.body, MUTE_ATTR);
+      for (const [selector] of NATIVE_TIPS) SE.unmark(document.querySelector(selector), 'data-se-tip');
       removeEventListener('DOMContentLoaded', start);
       delete window.__seHeaderTooltips;
     },

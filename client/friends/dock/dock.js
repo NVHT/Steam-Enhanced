@@ -11,7 +11,7 @@
   } = ns;
   const { live } = ns;
 
-  const { C, mainWindow, run } = SE;
+  const { C } = SE;
 
   const dock = document.createElement('aside');
 
@@ -41,10 +41,8 @@
     return `${node.tagName}|${node.getAttribute('class') || ''}`;
   }
 
-  const foreign = (node) => node.nodeType === 1 && node.classList.contains('se-header-tooltip-host');
-
   function reconcile(host, desired) {
-    const existing = [...host.childNodes].filter((node) => !foreign(node));
+    const existing = [...host.childNodes];
     const pool = new Map();
     for (const node of existing) {
       const key = panelKey(node);
@@ -80,7 +78,6 @@
         reconcile(node, next);
       }
       kept.add(node);
-      while (cursor && foreign(cursor)) cursor = cursor.nextSibling;
       if (node !== cursor) host.insertBefore(node, cursor);
       cursor = node.nextSibling;
     }
@@ -159,26 +156,9 @@
     if (state.flyGame) showFly(state.flyGame, true);
   }
 
-  function onLibrary() {
-    const p = run(() => mainWindow()?.LocationPathName);
-    return p ? /^\/library\b/.test(p) : Boolean(document.querySelector(`.${C.GameListHomeAndSearch_Container}`));
-  }
-
+  const onLibrary = SE.libraryShown;
+  const onStore = SE.browserShown;
   const localSelector = `.${C.LocalContentContainer}`;
-
-  function onStore() {
-    const path = run(() => mainWindow()?.LocationPathName) || '';
-    if (/^\/(?:store|community|browser)(?:\/|$)/i.test(path)) return true;
-    const local = document.querySelector(localSelector);
-    if (local?.hidden || local?.style.display === 'none') return true;
-    if (path) return false;
-    for (const owner of SE.owners()) {
-      const manager = run(() => owner.MainWindowBrowserManager);
-      const url = run(() => manager?.m_URLRequested || manager?.m_URL) || '';
-      if (/^https?:\/\//i.test(url) && !onLibrary()) return true;
-    }
-    return false;
-  }
 
   live.localObserver = undefined;
   let watchedLocal;

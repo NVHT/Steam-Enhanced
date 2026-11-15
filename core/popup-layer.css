@@ -1,0 +1,97 @@
+/*
+ * Popup layer windows (core/popup-layer.js): a borderless, transparent window that is only
+ * its content. The !important rules beat the sizes and surface Steam's context-menu styles
+ * and inline styles give a menu window.
+ */
+html.se-layer-document,
+html.se-layer-document body {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+/*
+ * A window copies the main window's page classes, and with them its page-level chrome drawn
+ * on html/body pseudo-elements (the rail's backdrop: client/navigation/nav-rail.css). That
+ * chrome belongs to the main window, not to a popup.
+ */
+html.se-layer-document::before,
+html.se-layer-document::after,
+html.se-layer-document body::before,
+html.se-layer-document body::after {
+  content: none !important;
+}
+
+/* Sized from --se-layer-width/height (set per window), not from Steam's first layout */
+html.se-layer-document .se-layer-popup {
+  box-sizing: border-box !important;
+  width: var(--se-layer-width) !important;
+  height: var(--se-layer-height) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+/* The anchor Steam measures a layer window from: never drawn */
+.se-layer-anchor {
+  position: fixed;
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/*
+ * A window's content box: the main window's viewport, shifted so the content lands at the
+ * window's origin. The transform makes it the containing block of the content's fixed boxes.
+ */
+.se-layer-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--se-wrap-w);
+  height: var(--se-wrap-h);
+  transform: translate(var(--se-wrap-x), var(--se-wrap-y));
+  pointer-events: none;
+}
+
+/*
+ * Content sizes to itself, as it does in the page (a fixed box shrinks to fit): here it sits
+ * in a box as wide as the main window, where it would stretch.
+ */
+.se-layer-wrap > * {
+  width: fit-content;
+  pointer-events: auto;
+}
+
+/*
+ * No drop shadow in a window, as Steam does for its own popup windows (HoverPositionPopup): the
+ * window is only as big as the card, so a shadow is cut square at its edges and darkens the
+ * corners outside the card's rounded ones. !important, and the cards' own weight plus one: the
+ * "Playing now" card's shadow carries !important (client/friends/friend-hover.css).
+ */
+html.se-layer-document .se-layer-wrap > *:not(#se-none) {
+  box-shadow: none !important;
+}
+
+/* A panel drawn in the main window (no browser view in the way): moved to its spot */
+.se-layer-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--se-z-popover);
+  transform: translate(var(--se-page-x), var(--se-page-y));
+  pointer-events: none;
+}
+
+.se-layer-page > * {
+  pointer-events: auto;
+}

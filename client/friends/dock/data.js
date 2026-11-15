@@ -7,7 +7,7 @@
   if (!ns) return;
   const { groupAvatarURL } = ns;
 
-  const { run } = SE;
+  const { importOf, run } = SE;
 
   const COPY = {
     playing: 'Playing now',
@@ -37,13 +37,6 @@
   const app = () => SE.global('g_FriendsUIApp', (a) => a.FriendStore);
 
   const ctx = (a) => run(() => a.GetDefaultBrowserContext());
-
-  // webpack `alias = req(123)` import inside a module's source, resolved to that module.
-  const importOf = (src, alias, req) => {
-    const name = alias.replace(/[$]/g, '\\$&');
-    const hit = new RegExp(`(?:^|[^\\w$])${name}\\s*=\\s*[\\w$]+\\(\\s*(\\d+)\\s*\\)`).exec(src);
-    return hit ? run(() => req(hit[1])) : null;
-  };
 
   const STATE = {
     0: 'offline',

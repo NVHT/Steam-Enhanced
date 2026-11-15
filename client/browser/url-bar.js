@@ -177,7 +177,10 @@
       el.type = 'button';
       el.className = 'se-urlbar-btn';
       el.dataset.action = action;
-      el.title = label;
+      // The theme's tip (client/header/header-tooltips.js), below: the bar sits under the
+      // title bar, where the rail's buttons open theirs to the side.
+      el.setAttribute('data-se-tip', label);
+      el.setAttribute('data-se-tip-dir', 'bottom');
       el.setAttribute('aria-label', label);
       (side === 'start' ? nav : tools).append(el);
       buttons[action] = el;

@@ -7,7 +7,7 @@
   if (!ns) return;
   const {
     avatar, chatError, chatErrorText, closeGroupPanels, desktopChatFocused, disposeGroupFlyouts,
-    dock, findEmbed, findFriend, findGroup, groupAvatar, importOf, interactionEvents,
+    dock, findEmbed, findFriend, findGroup, groupAvatar, interactionEvents,
     keepLibraryManagers, markDockInteraction, onStore, place, requestChatHandoff, schedule, state,
     STATE, usableAvatar,
   } = ns;
@@ -31,68 +31,8 @@
   const chipChevron = document.createElement('span');
 
   live.chatPopup = null;
-  let popupRuntime = null;
+  const layer = SE.layer;
   let popupFailure = false;
-  let popupRuntimeFailure = '';
-
-  // React, the window's context-menu manager and ReactDOM's createPortal/flushSync, for the Store popup.
-  function findChatPopupRuntime() {
-    if (popupRuntime) return popupRuntime;
-    const found = {};
-    const complete = () =>
-      found.React && found.manager && found.createPortal && found.flushSync ? { ...found } : null;
-    const inspect = (exp) => {
-      const values = [exp];
-      try {
-        values.push(...Object.values(exp || {}));
-      } catch {}
-      for (const value of values) {
-        if (typeof value?.createPortal === 'function') found.createPortal ||= value.createPortal;
-        if (typeof value?.flushSync === 'function') found.flushSync ||= value.flushSync;
-        if (!found.React && typeof value?.createElement === 'function' && typeof value?.useState === 'function') {
-          found.React = value;
-        }
-        if (!found.manager) {
-          const candidate = run(() => value?.m_mapManagers?.get(window));
-          if (typeof candidate?.CreateContextMenuInstance === 'function') found.manager = candidate;
-        }
-      }
-    };
-
-    for (const req of SE.requires()) {
-      for (const module of Object.values(req.c || {})) inspect(module?.exports);
-    }
-    popupRuntime =
-      complete() ||
-      SE.findModule('friends-dock:popup-runtime', (source, id, req) => {
-        if (
-          (!found.manager && source.includes('GetContextMenuManagerFromWindow') && source.includes('m_mapManagers')) ||
-          (!found.React && source.includes('createElement') && source.includes('useState') && source.includes('Fragment'))
-        ) {
-          run(() => inspect(req(id)));
-        }
-        if ((!found.createPortal || !found.flushSync) && source.includes('.createPortal')) {
-          for (const call of source.matchAll(/([\w$]+)\.createPortal\b/g)) {
-            inspect(importOf(source, call[1], req));
-            if (found.createPortal && found.flushSync) break;
-          }
-          if (!found.createPortal || !found.flushSync) run(() => inspect(req(id)));
-        }
-        return complete();
-      });
-
-    popupRuntimeFailure = popupRuntime
-      ? ''
-      : [
-          !found.React && 'React',
-          !found.manager && 'context-menu manager',
-          !found.createPortal && 'ReactDOM portal',
-          !found.flushSync && 'ReactDOM synchronous commit',
-        ]
-          .filter(Boolean)
-          .join(', ');
-    return popupRuntime;
-  }
 
   let portalTarget = null;
   let chatRenderer = null;
@@ -218,9 +158,7 @@
   function returnChatHost(entry) {
     if (entry.restored) return;
     entry.restored = true;
-    run(() => entry.restorePositioner?.());
     clearTimeout(entry.portalTimer);
-    run(() => entry.doc?.defaultView?.removeEventListener('beforeunload', entry.onClose));
     try {
       setChatPortal(null);
     } catch (error) {
@@ -242,9 +180,7 @@
     if (!entry) return;
     live.chatPopup = null;
     returnChatHost(entry);
-    run(() => entry.handle?.Hide());
-    run(() => entry.manager?.ReleaseHiddenMenu?.(entry.handle));
-    entry.anchor?.remove();
+    layer?.finish(entry);
   }
 
   function chatGeometry(minimized) {
@@ -274,25 +210,6 @@
     return { width, height, edge, bottom, left, top };
   }
 
-  function positionChatPopup(entry) {
-    if (entry.restored || live.chatPopup !== entry) return;
-    const nativeWindow = entry.doc?.defaultView?.SteamClient?.Window;
-    if (typeof nativeWindow?.PositionWindowRelative !== 'function') return;
-    entry.restoreDetails ||= Promise.resolve().then(() => window.SteamClient.Window.GetWindowRestoreDetails());
-    entry.restoreDetails
-      .then((details) => {
-        entry.restoreDetails = null;
-        if (entry.restored || live.chatPopup !== entry) return;
-        const geometry = chatGeometry(entry.minimized);
-        const left = Math.max(geometry.edge, dock.getBoundingClientRect().left - geometry.edge - entry.width);
-        const top = Math.max(0, innerHeight - geometry.bottom - entry.height);
-        nativeWindow.PositionWindowRelative(details, left, top, entry.width, entry.height);
-      })
-      .catch(() => {
-        entry.restoreDetails = null;
-      });
-  }
-
   function resizeChatPopup(entry, minimized, geometry) {
     entry.minimized = minimized;
     entry.width = geometry.width;
@@ -300,55 +217,19 @@
     entry.left = geometry.left;
     entry.top = geometry.top;
 
+    // The host sizes itself from these (friends-dock.css .se-fd-popup-host); the window from
+    // layer.place below.
     const node = entry.node;
-    const root = entry.doc.documentElement;
-    if (!entry.restorePositioner) {
-      for (let fiber = SE.fiber(node); fiber; fiber = fiber.return) {
-        const instance = fiber.stateNode;
-        if (typeof instance?.PositionMenu !== 'function' || typeof instance?.PositionPopupWindow !== 'function') {
-          continue;
-        }
-        const ownDesc = Object.getOwnPropertyDescriptor(instance, 'PositionPopupWindow');
-        if (ownDesc && !ownDesc.configurable) break;
-        const position = () => positionChatPopup(entry);
-        Object.defineProperty(instance, 'PositionPopupWindow', {
-          configurable: true,
-          writable: true,
-          value: position,
-        });
-        entry.restorePositioner = () => {
-          if (instance.PositionPopupWindow !== position) return;
-          if (ownDesc) Object.defineProperty(instance, 'PositionPopupWindow', ownDesc);
-          else delete instance.PositionPopupWindow;
-        };
-        break;
-      }
-    }
-
-    for (const element of [node, root]) {
-      element.style.setProperty('--se-chat-host-width', `${entry.width}px`);
-      element.style.setProperty('--se-chat-host-height', `${entry.height}px`);
-    }
+    node.style.setProperty('--se-chat-host-width', `${entry.width}px`);
+    node.style.setProperty('--se-chat-host-height', `${entry.height}px`);
     node.style.setProperty('--se-chat-height', `${entry.height}px`);
 
-    const menuElement = entry.handle?.m_element;
-    if (menuElement?.style) {
-      menuElement.style.setProperty('width', `${entry.width}px`, 'important');
-      menuElement.style.setProperty('height', `${entry.height}px`, 'important');
-      menuElement.style.setProperty('min-width', '0px', 'important');
-      menuElement.style.setProperty('min-height', '0px', 'important');
-    }
+    if (minimized) node.dataset.chatMinimized = '1';
+    else delete node.dataset.chatMinimized;
 
-    if (minimized) {
-      node.dataset.chatMinimized = '1';
-      root.dataset.seChatMinimized = '1';
-    } else {
-      delete node.dataset.chatMinimized;
-      delete root.dataset.seChatMinimized;
-    }
-
-    entry.sizeSignal.replaceChildren(entry.doc.createTextNode(''));
-    positionChatPopup(entry);
+    const left = Math.max(geometry.edge, dock.getBoundingClientRect().left - geometry.edge - entry.width);
+    const top = Math.max(0, innerHeight - geometry.bottom - entry.height);
+    layer.place(entry, { left, top, width: entry.width, height: entry.height });
   }
 
   let restoringChat = false;
@@ -423,31 +304,13 @@
   }
 
   function mountChatPopupDocument(node, entry, runtime) {
-    if (!node || live.chatPopup !== entry || entry.restored || entry.doc) return;
+    if (live.chatPopup !== entry || entry.restored) return;
     const doc = node.ownerDocument;
-    entry.doc = doc;
-    entry.node = node;
 
-    // Copied even when a `.*` patch may already reach the popup: a duplicate href is skipped below.
-    for (const sheet of document.querySelectorAll('link[rel="stylesheet"]')) {
-      if (!/(?:core\/(?:tokens|icons|scrollbars)|client\/friends\/(?:friends|friends-dock|chat\/[a-z-]+))\.css(?:[?#]|$)/.test(sheet.href)) {
-        continue;
-      }
-      if ([...doc.querySelectorAll('link[rel="stylesheet"]')].some((link) => link.href === sheet.href)) continue;
-      const copy = sheet.cloneNode(true);
-      copy.href = sheet.href;
-      doc.head.appendChild(copy);
-    }
-
-    doc.documentElement.classList.add('se-chat-popup-document');
-    delete doc.documentElement.dataset.seChatMinimized;
-    doc.documentElement.style.removeProperty('--se-chat-host-width');
-    doc.documentElement.style.removeProperty('--se-chat-host-height');
-    if (entry.minimized) {
-      doc.documentElement.dataset.seChatMinimized = '1';
-      doc.documentElement.style.setProperty('--se-chat-host-width', `${entry.width}px`);
-      doc.documentElement.style.setProperty('--se-chat-host-height', `${entry.height}px`);
-    }
+    // Copied even when a `.*` patch may already reach the popup: a duplicate href is skipped.
+    layer.copyStyles(doc, (href) =>
+      /(?:core\/(?:tokens|icons|scrollbars)|client\/friends\/(?:friends|friends-dock|chat\/[a-z-]+))\.css(?:[?#]|$)/.test(href)
+    );
 
     window.__seChat?.attachDocument(doc);
     entry.detachChatEnhancements = () => window.__seChat?.detachDocument(doc);
@@ -500,11 +363,7 @@
     };
     queueMicrotask(attach);
 
-    entry.sizeSignal = doc.createElement('span');
-    entry.sizeSignal.hidden = true;
-    node.append(entry.sizeSignal);
-    resizeChatPopup(entry, entry.minimized, entry);
-    doc.defaultView.addEventListener('beforeunload', entry.onClose);
+    resizeChatPopup(entry, entry.minimized, chatGeometry(entry.minimized));
   }
 
   function syncChatOverlay(enabled) {
@@ -550,101 +409,57 @@
     closeChatPopup();
     if (popupFailure) return;
     keepLibraryManagers();
-    const runtime = findChatPopupRuntime();
+    const runtime = layer?.runtime();
     if (!runtime) {
       popupFailure = true;
-      chatErrorText.textContent = `Steam chat popup unavailable (${popupRuntimeFailure}). Return to Library to use the flyout.`;
+      chatErrorText.textContent = `Steam chat popup unavailable (${layer?.missing() || 'popup layer'}). Return to Library to use the flyout.`;
       chatError.hidden = false;
       return;
     }
-    if (runtime.manager.ActiveMenu?.visible) return;
+    if (layer.menuOpen()) return;
 
-    const { width, height, edge, bottom, left, top } = geometry;
-    const anchor = document.createElement('span');
-    anchor.setAttribute('aria-hidden', 'true');
-    anchor.style.cssText = 'position:fixed;visibility:hidden;pointer-events:none;width:0;height:0';
-    anchor.getBoundingClientRect = () => {
-      const anchorLeft = dock.getBoundingClientRect().left - edge;
-      return new DOMRect(Math.max(edge, anchorLeft), Math.max(0, innerHeight - bottom), 0, 0);
-    };
-    document.body.appendChild(anchor);
-
-    const entry = {
-      minimized,
-      width,
-      height,
-      left,
-      top,
-      anchor,
-      manager: runtime.manager,
-      handle: null,
-      restored: false,
-      doc: null,
-      modalRef: { current: null },
-      menuRef: { current: null },
-    };
-
-    entry.onClose = () => {
+    /*
+     * The chat takes the popup layer's ready window (opened while the Store shows), so it
+     * shows at once, and its state rides on that window's entry: one object for the window
+     * and the chat (layer.place, the hide callback, flyouts.js's visibility check).
+     */
+    const { width, height, left, top } = geometry;
+    let entry = null;
+    const onClose = () => {
       if (live.chatPopup !== entry) return;
       live.chatPopup = null;
       returnChatHost(entry);
-      entry.anchor.remove();
-      queueMicrotask(() => run(() => entry.manager.ReleaseHiddenMenu?.(entry.handle)));
+      layer.finish(entry);
       queueMicrotask(() => {
         if (state.destroyed || dock.dataset.chat !== '1') return;
         if (!live.chatPopup) place();
       });
     };
-
-    const mount = (node) => mountChatPopupDocument(node, entry, runtime);
-    try {
-      live.chatPopup = entry;
-      entry.handle = runtime.manager.CreateContextMenuInstance(
-        runtime.React.createElement('div', { ref: mount }),
-        anchor,
-        undefined,
-        undefined,
-        {
-          bForcePopup: true,
-          bStandalone: true,
-          bDisableMouseOverlay: true,
-          bOverlapHorizontal: false,
-          bOverlapVertical: true,
-          bPreferPopLeft: true,
-          bPreferPopTop: true,
-          bFitToWindow: true,
-          bShiftToFitWindow: true,
-          bGrowToElementWidth: false,
-          bSkipFocusWhenReady: true,
-          bNoFocusWhenShown: true,
-          strClassName: 'se-chat-context-popup',
-          title: 'Steam Enhanced Chat Flyout Menu',
-        }
-      );
-      if (
-        typeof entry.handle?.Show !== 'function' ||
-        typeof entry.handle?.Hide !== 'function' ||
-        typeof entry.handle?.SetOnHideCallback !== 'function'
-      ) {
-        throw new Error('No native context-popup handle');
-      }
-      entry.handle.TakeFocus = () => {};
-      const cancel = entry.handle.OnCancel;
-      if (typeof cancel === 'function') {
-        entry.handle.OnCancel = function (...args) {
-          if (live.chatPopup === entry) return undefined;
-          return cancel.apply(this, args);
-        };
-      }
-      entry.handle.SetOnHideCallback(entry.onClose);
-      entry.handle.Show();
-    } catch (error) {
-      closeChatPopup();
+    entry = layer.take({
+      // Steam can mount a new window inside take(): the chat goes in once it has its entry.
+      mounted: () => entry && live.chatPopup === entry && mountChatPopupDocument(entry.node, entry, runtime),
+      restyled() {},
+      lost: onClose,
+    });
+    if (!entry) {
       popupFailure = true;
       chatErrorText.textContent = 'Unable to create the Steam chat popup. Return to Library to use the flyout.';
       chatError.hidden = false;
-      console.warn('[Steam Enhanced] native chat popup', error);
+      return;
     }
+    Object.assign(entry, {
+      minimized,
+      width,
+      height,
+      left,
+      top,
+      restored: false,
+      modalRef: { current: null },
+      menuRef: { current: null },
+    });
+    live.chatPopup = entry;
+    // A ready window is up already; a new one mounts the chat when it comes up (mounted).
+    if (entry.node) mountChatPopupDocument(entry.node, entry, runtime);
   }
 
   const TAB_NAME = ['.ChatTabName', '.chatTabName', C.ChatTabContent_ChatRoomName, C.playerName]
@@ -653,13 +468,11 @@
     .join(', ');
 
   let chipSignature = '';
-  let chipCountSeen = -1;
 
   function resetMinimized() {
     delete dock.dataset.chatMinimized;
     chatChip.hidden = true;
     chipSignature = '';
-    chipCountSeen = -1;
   }
 
   function updateChatChip() {
@@ -691,7 +504,6 @@
     const art = isGroup ? usableAvatar(url) : url;
     const status = friend ? STATE[run(() => friend.persona.m_ePersonaState)] || 'online' : 'online';
     const sigStr = JSON.stringify([name, art, status, isGroup, count]);
-    chipCountSeen = count;
     if (sigStr === chipSignature) return;
     chipSignature = sigStr;
     chipName.textContent = name;

@@ -110,7 +110,9 @@
       btn.className = 'se-seg-btn';
       btn.dataset.seg = seg.key;
       btn.textContent = COPY[seg.key];
-      btn.title = state.options[seg.index].label;
+      // The theme's tip, below (rail buttons under the title bar open theirs to the side)
+      btn.setAttribute('data-se-tip', state.options[seg.index].label);
+      btn.setAttribute('data-se-tip-dir', 'bottom');
       btn.setAttribute('role', 'radio');
       btn.addEventListener('click', (event) => {
         event.stopPropagation();

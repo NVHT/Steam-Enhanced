@@ -191,18 +191,7 @@
     return img;
   }
 
-  const isApp = (v) => v && typeof v === 'object' && typeof v.appid === 'number' && 'display_name' in v;
-
-  const appOf = (box) =>
-    SE.fromProps(box, 16, (q) => {
-      for (const k of ['app', 'overview', 'appOverview']) {
-        if (isApp(q[k])) return q[k];
-      }
-      for (const v of Object.values(q)) {
-        if (isApp(v)) return v;
-      }
-      return null;
-    });
+  const { appOf } = SE;
 
   const mostPlayed = (apps, n) =>
     apps
@@ -489,7 +478,9 @@
         if (fr) {
           const d = el('span', 'se-friends-pill');
           d.append(el('i'), el('b', '', num(fr)));
-          d.title = COPY.friendsSub(fr);
+          // The theme's tip, below (rail buttons under the title bar open theirs to the side)
+          d.setAttribute('data-se-tip', COPY.friendsSub(fr));
+          d.setAttribute('data-se-tip-dir', 'bottom');
           badges.appendChild(d);
         }
       }

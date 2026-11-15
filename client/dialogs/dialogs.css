@@ -508,11 +508,13 @@ body.ContextMenuPopupBody div:has(._2yAm5LY_eu-Vg_52l0HFlM) {
 /*
  * Tooltips
  * Steam has two tooltip skins: a light gray one (TextToolTip, used for short
- * labels such as the rail's) and a slate one (ToolTipCustom, for longer notes
- * like "Show only ready to play games"). Both now use the theme's dark surface.
+ * labels) and a slate one (ToolTipCustom, for longer notes like "Show only ready
+ * to play games"). Both now use the theme's dark surface, and so does the theme's
+ * own tip (.se-tip, client/header/header-tooltips.js): one tooltip look.
  */
 ._2FxbHJzYoH024ko7zqcJOf,
-._3XGRklQrZMakU2xaYB0cLD {
+._3XGRklQrZMakU2xaYB0cLD,
+.se-tip {
   padding: 6px 10px !important;
   border: 0 !important;
   border-radius: var(--se-radius-sm) !important;
@@ -521,6 +523,16 @@ body.ContextMenuPopupBody div:has(._2yAm5LY_eu-Vg_52l0HFlM) {
   text-shadow: none !important;
   font: 500 12.5px/1.45 var(--se-font) !important;
   box-shadow: var(--se-shadow-tooltip) !important;
+}
+
+/*
+ * Steam's own tips, hidden while the pointer is on a button the theme tips instead, and a tip
+ * still closing after it left one (client/header/header-tooltips.js sets the attributes).
+ */
+/* !important: another rule in this file sets display with !important */
+body[data-se-tip-muted] :is(._2FxbHJzYoH024ko7zqcJOf, ._3XGRklQrZMakU2xaYB0cLD),
+:is(._2FxbHJzYoH024ko7zqcJOf, ._3XGRklQrZMakU2xaYB0cLD)[data-se-tip-muted] {
+  display: none !important;
 }
 
 :is(._3XGRklQrZMakU2xaYB0cLD) :is(._1LhVfNukndDa_XWzq0vdg1) {
@@ -973,7 +985,7 @@ div.ModalPosition_TopBar:not(#se-none) {
   opacity: 0;
   transform: scale(1.06);
   filter: saturate(1.1);
-  transition: opacity var(--se-dur-slow) var(--se-ease), transform 1.2s var(--se-ease);
+  transition: opacity var(--se-dur-slow) var(--se-ease), transform var(--se-dur-ambient) var(--se-ease);
 }
 
 .se-dialog-art[data-ready] img {
