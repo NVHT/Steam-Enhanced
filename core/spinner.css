@@ -1,6 +1,6 @@
 /*
  * The theme's one loading spinner, everywhere: client windows (client/loader.js, "content"
- * group) and every web site (store, community and help loaders).
+ * group) and every web site (store, community, help and checkout loaders).
  *
  * One drawing, five styles. The drawing below is a single recipe; a style is only a set of
  * --se-spin-* tokens (and its picture, --se-spinner-image). Refined is the default, set here; the
@@ -16,8 +16,8 @@
  * Three ways in:
  *   - An element of the theme's own that is the turning part itself: .se-spin-arc (the Splash
  *     entrance's ring). It gets the drawing below and sizes and places itself.
- *   - Any box (Steam's throbbers, the theme's own .se-loader): drawn by its ::before (the turning
- *     part: track, arc, head and tail dots) and ::after (the mark), with Steam's own content kept
+ *   - Any box (Steam's throbbers): drawn by its ::before (the turning part: track, arc, head
+ *     and tail dots) and ::after (the mark), with Steam's own content kept
  *     (its space holds) but not drawn. Both animate transforms only, so they run on the
  *     compositor and stay smooth while the page is busy loading, which is when a spinner shows.
  *   - An <img> (Steam's spinner and throbber pictures): can't take pseudo-elements, so it gets
@@ -58,8 +58,7 @@
 :is(
   .SteamLogoThrobber,
   html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v,
-  html:is(.se-store, .se-community, .se-help) :is(.LoadingThrobber, .throbber),
-  .se-loader
+  html:is(.se-store, .se-community, .se-help, .se-checkout) :is(.LoadingThrobber, .throbber)
 ):not(#se-none) {
   position: relative;
 }
@@ -67,7 +66,7 @@
 /* Steam's own drawing keeps its space but isn't drawn. */
 :is(
   .SteamLogoThrobber,
-  html:is(.se-store, .se-community, .se-help) :is(.LoadingThrobber, .throbber)
+  html:is(.se-store, .se-community, .se-help, .se-checkout) :is(.LoadingThrobber, .throbber)
 ):not(#se-none) > * {
   visibility: hidden !important;
   animation: none !important;
@@ -76,14 +75,12 @@
 :is(
   .SteamLogoThrobber,
   html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v,
-  html:is(.se-store, .se-community, .se-help) :is(.LoadingThrobber, .throbber),
-  .se-loader
+  html:is(.se-store, .se-community, .se-help, .se-checkout) :is(.LoadingThrobber, .throbber)
 ):not(#se-none)::before,
 :is(
   .SteamLogoThrobber,
   html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v,
-  html:is(.se-store, .se-community, .se-help) :is(.LoadingThrobber, .throbber),
-  .se-loader
+  html:is(.se-store, .se-community, .se-help, .se-checkout) :is(.LoadingThrobber, .throbber)
 ):not(#se-none)::after {
   content: "";
   position: absolute;
@@ -103,8 +100,7 @@
 :is(
   .SteamLogoThrobber,
   html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v,
-  html:is(.se-store, .se-community, .se-help) :is(.LoadingThrobber, .throbber),
-  .se-loader
+  html:is(.se-store, .se-community, .se-help, .se-checkout) :is(.LoadingThrobber, .throbber)
 ):not(#se-none)::before {
   z-index: 2;
   height: 100%;
@@ -113,8 +109,7 @@
 :is(
   .SteamLogoThrobber,
   html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v,
-  html:is(.se-store, .se-community, .se-help) :is(.LoadingThrobber, .throbber),
-  .se-loader
+  html:is(.se-store, .se-community, .se-help, .se-checkout) :is(.LoadingThrobber, .throbber)
 ):not(#se-none)::before,
 .se-spin-arc:not(#se-none) {
   --_w: max(2px, var(--se-spin-w));
@@ -149,8 +144,7 @@
 :is(
   .SteamLogoThrobber,
   html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v,
-  html:is(.se-store, .se-community, .se-help) :is(.LoadingThrobber, .throbber),
-  .se-loader
+  html:is(.se-store, .se-community, .se-help, .se-checkout) :is(.LoadingThrobber, .throbber)
 ):not(#se-none)::after {
   z-index: 1;
   height: 70%;
@@ -159,17 +153,38 @@
 }
 
 /* Web throbbers have no size of their own once their bars are hidden. */
-html:is(.se-store, .se-community, .se-help) :is(.LoadingThrobber, .throbber):not(#se-none) {
+html:is(.se-store, .se-community, .se-help, .se-checkout) :is(.LoadingThrobber, .throbber):not(#se-none) {
   width: var(--se-spinner-size, 48px) !important;
   height: var(--se-spinner-size, 48px) !important;
   margin-inline: auto !important;
   background: none !important;
 }
 
+/*
+ * The drawing is as tall as its box, and on the web some boxes are whole areas: the Community's
+ * React pages fill their content area with a .SteamLogoThrobber while they load, which drew a
+ * spinner as tall as the window. On web pages the drawing stops at --se-spinner-max, centred in
+ * whatever box it gets; the client's throbbers keep their own sizes.
+ */
+html:is(.se-store, .se-community, .se-help, .se-checkout) :is(.SteamLogoThrobber, .LoadingThrobber, .throbber):not(#se-none)::before {
+  height: min(100%, var(--se-spinner-max));
+}
+
+html:is(.se-store, .se-community, .se-help, .se-checkout) :is(.SteamLogoThrobber, .LoadingThrobber, .throbber):not(#se-none)::after {
+  height: calc(min(100%, var(--se-spinner-max)) * .7);
+}
+
 /* ---------- Pictures ---------- */
 
+/*
+ * The picture has no size of its own (an SVG with only a viewBox), so an <img> without width
+ * and height attributes would stretch to its line's full width: the Community hub's "Loading"
+ * row drew one as wide as the page. Capped like the boxes; sized ones keep their size.
+ */
 img:is([src*="steam_spinner.png"], [src*="throbber"]):not(#se-none) {
   content: var(--se-spinner-image);
+  max-width: var(--se-spinner-max);
+  max-height: var(--se-spinner-max);
 }
 
 /* ---------- Motion ---------- */
@@ -207,12 +222,12 @@ img:is([src*="steam_spinner.png"], [src*="throbber"]):not(#se-none) {
 /* Reduced motion slows the turn rather than stopping it (a still spinner says nothing is
    happening) and holds the mark. Outranks web/base.css, which stops every animation. */
 @media (prefers-reduced-motion: reduce) {
-  html:not(#se-none) :is(.SteamLogoThrobber, ._3CN5DkgNMvdtT9fJhNOj_v, .LoadingThrobber, .throbber, .se-loader)::before,
+  html:not(#se-none) :is(.SteamLogoThrobber, ._3CN5DkgNMvdtT9fJhNOj_v, .LoadingThrobber, .throbber)::before,
   html:not(#se-none) .se-spin-arc {
     animation-duration: 3s !important;
     animation-iteration-count: infinite !important;
   }
-  html:not(#se-none) :is(.SteamLogoThrobber, ._3CN5DkgNMvdtT9fJhNOj_v, .LoadingThrobber, .throbber, .se-loader)::after {
+  html:not(#se-none) :is(.SteamLogoThrobber, ._3CN5DkgNMvdtT9fJhNOj_v, .LoadingThrobber, .throbber)::after {
     animation: none !important;
   }
 }

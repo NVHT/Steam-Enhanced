@@ -82,6 +82,17 @@
   --se-glass-btn-line: var(--se-white-12);
   --se-blur-chip: blur(10px) saturate(1.4);
   --se-blur-panel: blur(16px);
+  /* Glass round buttons on art ("•••" options, share): the dots, light at rest, ink on accent */
+  --se-icon-dots-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='6' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='18' cy='12' r='1.8'/%3E%3C/svg%3E");
+  --se-icon-dots-ink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230f1115'%3E%3Ccircle cx='6' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='18' cy='12' r='1.8'/%3E%3C/svg%3E");
+  /* Icon and glyph sizes */
+  --se-dot: 8px; /* a status dot */
+  --se-icon-xs: 12px;
+  --se-icon-sm: 14px;
+  --se-icon-md: 16px;
+  --se-icon-glyph: 18px; /* a glyph inside a round button */
+  --se-icon-lg: 22px;
+  --se-icon-xl: 24px;
 
   /* Achievement rarity tiers, by global unlock rate */
   --se-tier-legendary: #f0c060;
@@ -89,6 +100,16 @@
   --se-tier-rare: #5fb2ff;
   --se-tier-uncommon: #7bc46a;
   --se-tier-common: #8d97a2;
+
+  /* Spacing scale: a 4px base (half a step for hairline gaps inside a stacked label) */
+  --se-space-half: 2px;
+  --se-space-1: 4px;
+  --se-space-2: 8px;
+  --se-space-3: 12px;
+  --se-space-4: 16px;
+  --se-space-5: 24px;
+  --se-space-6: 32px;
+  --se-space-7: 48px;
 
   /* Radii, sizing, and elevation */
   --se-radius-xs: 4px;
@@ -106,14 +127,36 @@
   --se-control: var(--se-surface-2);
   --se-control-h: 34px;
   --se-control-h-sm: 28px;
+  --se-hit: 32px; /* the smallest hit target any control may have */
+  --se-check: var(--se-icon-md); /* checkbox and radio box (its label carries the hit target) */
+  --se-field-h: 36px; /* text fields and the price chip's height on the web */
+  --se-tile-lg: 56px; /* big round buttons on art (a video's play button) */
+  --se-spinner-max: 96px; /* a web page's spinner, whatever box it fills */
   --se-tile: 40px;
   --se-tile-sm: 30px;
   --se-tile-icon: 20px;
+  --se-control-h-lg: 44px; /* a hero's buy row: price, call to action, wishlist */
+  /*
+   * Store price chip (store/shared/ui.css): one size everywhere, so a chip with a discount
+   * badge is as tall as one without. A host can set a larger variant (the front page's hero).
+   */
+  --se-price-h: 36px;
+  --se-price-radius: var(--se-radius-md);
+  --se-price-pct-h: 24px;
+  --se-price-pct-inset: 6px;
+  --se-price-pct-pad: 7px;
+  --se-price-pct-pad-lg: 10px;
+  --se-price-pct-radius: 7px;
+  --se-price-pct-ink: #0f1a00; /* text on the --se-cart badge */
+  --se-price-size: var(--se-fs-md);
+  --se-price-was-size: 11.5px;
+  --se-price-pct-size: var(--se-fs-base);
   /* Friends dock width, shared with the game page's left column */
   --se-fd-w: 350px;
   /* Library game list width: fixed, the same as the Friends dock */
   --se-list-w: var(--se-fd-w);
   --se-fd-rail: 60px;
+  --se-fd-fly-lift: 6px; /* a dock card sits this far above its tile, head level with it */
   --se-shadow-card: 0 10px 24px -12px rgba(0, 0, 0, .8);
   --se-shadow-pop: 0 18px 40px -10px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 255, 255, .07);
   --se-shadow-hero: 0 20px 50px -20px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .06);
@@ -156,6 +199,7 @@
   /* Keyboard focus: one ring everywhere, drawn as an outline so it never fights box-shadow */
   --se-focus-outline: 2px solid var(--se-accent);
   --se-focus-offset: 2px;
+  --se-halo-w: 3px; /* a soft ring around a selected or live element */
 
   /* Motion: fast (hover, press), base (state), slow (panels), slower (page-scale) */
   --se-ease: cubic-bezier(.2, .8, .2, 1);
@@ -163,10 +207,19 @@
   --se-dur: .15s;
   --se-dur-slow: .25s;
   --se-dur-slower: .5s;
+  --se-press-scale: .97; /* a pressed control (:active), the same everywhere */
+  --se-dur-ambient: 1.2s; /* slow art drift (the age check's backdrop settling in) */
+  /* Hover intent: how long the pointer rests before a card opens; tips wait as Steam's do */
+  --se-hover-delay: .15s;
+  --se-tip-delay: .2s;
 
   /* Stacking layers */
+  --se-z-under: -1; /* behind its parent's content: washes and art layers */
   --se-z-raised: 1;
+  --se-z-raised-2: 2;
+  --se-z-raised-3: 3;
   --se-z-sticky: 20;
+  --se-z-flyout: 40; /* the dock's game card, above the sticky bars */
   --se-z-dropdown: 100;
   --se-z-popover: 1000;
   --se-z-drag: 9000;
@@ -175,7 +228,8 @@
 
   /* Typography */
   --se-font: "Xmind", "Motiva Sans", Arial, sans-serif;
-  --se-label-font: 700 11px/14px var(--se-font);
+  --se-label-lh: 14px;
+  --se-label-font: 700 var(--se-fs-xs)/var(--se-label-lh) var(--se-font);
   --se-label-spacing: .1em;
   --se-label-color: var(--se-text-faint);
   /* Type scale (px): 10.5 / 11 / 12 / 13 / 14 / 16 / 18 / 20 / 24 / 30, then fluid titles */
@@ -242,6 +296,10 @@
   --se-icon-settings-tune: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round'%3E%3Cpath d='M4 7h9M17 7h3M4 17h3M11 17h9'/%3E%3Ccircle cx='15' cy='7' r='2.4' fill='%23000' fill-opacity='.32'/%3E%3Ccircle cx='9' cy='17' r='2.4' fill='%23000' fill-opacity='.32'/%3E%3C/svg%3E");
   --se-icon-settings: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Cpath%20d%3D%22M12.22%202h-.44a2%202%200%200%200-2%202v.18a2%202%200%200%201-1%201.73l-.43.25a2%202%200%200%201-2%200l-.15-.08a2%202%200%200%200-2.73.73l-.22.38a2%202%200%200%200%20.73%202.73l.15.1a2%202%200%200%201%201%201.72v.51a2%202%200%200%201-1%201.74l-.15.09a2%202%200%200%200-.73%202.73l.22.38a2%202%200%200%200%202.73.73l.15-.08a2%202%200%200%201%202%200l.43.25a2%202%200%200%201%201%201.73V20a2%202%200%200%200%202%202h.44a2%202%200%200%200%202-2v-.18a2%202%200%200%201%201-1.73l.43-.25a2%202%200%200%201%202%200l.15.08a2%202%200%200%200%202.73-.73l.22-.39a2%202%200%200%200-.73-2.73l-.15-.08a2%202%200%200%201-1-1.74v-.5a2%202%200%200%201%201-1.74l.15-.09a2%202%200%200%200%20.73-2.73l-.22-.38a2%202%200%200%200-2.73-.73l-.15.08a2%202%200%200%201-2%200l-.43-.25a2%202%200%200%201-1-1.73V4a2%202%200%200%200-2-2z%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M12.22%202h-.44a2%202%200%200%200-2%202v.18a2%202%200%200%201-1%201.73l-.43.25a2%202%200%200%201-2%200l-.15-.08a2%202%200%200%200-2.73.73l-.22.38a2%202%200%200%200%20.73%202.73l.15.1a2%202%200%200%201%201%201.72v.51a2%202%200%200%201-1%201.74l-.15.09a2%202%200%200%200-.73%202.73l.22.38a2%202%200%200%200%202.73.73l.15-.08a2%202%200%200%201%202%200l.43.25a2%202%200%200%201%201%201.73V20a2%202%200%200%200%202%202h.44a2%202%200%200%200%202-2v-.18a2%202%200%200%201%201-1.73l.43-.25a2%202%200%200%201%202%200l.15.08a2%202%200%200%200%202.73-.73l.22-.39a2%202%200%200%200-.73-2.73l-.15-.08a2%202%200%200%201-1-1.74v-.5a2%202%200%200%201%201-1.74l.15-.09a2%202%200%200%200%20.73-2.73l-.22-.38a2%202%200%200%200-2.73-.73l-.15.08a2%202%200%200%201-2%200l-.43-.25a2%202%200%200%201-1-1.73V4a2%202%200%200%200-2-2z%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%223%22%2F%3E%3C%2Fsvg%3E");
   --se-icon-stat-default: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7.5V12l3 2'/%3E%3C/svg%3E");
+  /* Back to top: a dual-tone block arrow up to a bar, as a mask */
+  --se-icon-arrow-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8.5 6.5 14H10v5.5h4V14h3.5z' fill='white' fill-opacity='.32' stroke='none'/%3E%3Cpath d='M12 8.5 6.5 14H10v5.5h4V14h3.5zM6 4.5h12'/%3E%3C/svg%3E");
+  /* Check icon (in library) as a mask, drawn in the text colour */
+  --se-check-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.5l5 5L19.5 7'/%3E%3C/svg%3E");
   /* Star icon (wishlist) as a mask, drawn in the text colour */
   --se-star-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z'/%3E%3C/svg%3E");
 }

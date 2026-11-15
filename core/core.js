@@ -1,6 +1,7 @@
 /*
  * Web pages: load the site's loader from the theme folder core.js was served from; it decides
- * which files each page gets: store/loader.js, community/loader.js or help/loader.js.
+ * which files each page gets: store/loader.js, community/loader.js, help/loader.js or
+ * checkout/loader.js.
  * Millennium injects core.js into every web view, so this needs no dedicated skin.json rules
  * (new rules only take effect after a full Steam restart). Requested with ?v=<theme version>
  * so the web view's cache never mixes builds; the loader passes the same version on to every
@@ -21,6 +22,7 @@
     'store.steampowered.com': { loader: '../store/loader.js', global: '__seStore' },
     'steamcommunity.com': { loader: '../community/loader.js', global: '__seCommunity' },
     'help.steampowered.com': { loader: '../help/loader.js', global: '__seHelp' },
+    'checkout.steampowered.com': { loader: '../checkout/loader.js', global: '__seCheckout' },
   };
   const site = SITES[location.hostname];
   if (!site) return;
@@ -362,6 +364,7 @@
     CurrentUserProfileBackground_AvatarAndLabel: 'lqhIkQ_wpSeJd6Y8bYFCo',
     Desc: '_2gLHbXukQBdrIKhqEYVvOe',
     DetailsAndType: 'Bku7JSkuQ7NyWi6M4w1sl',
+    DetailsSection: '_1dg8hJMsAYISbeQUxcCJcv',
     Disabled: 'aIeh3X5T2M074RLW1qn6_',
     Disk: 'HifZB5TP6WNuubp1dzyxS',
     DiskGraph_Button: '_3Tfp8-wTAttW3WVa_X9JVC',
@@ -525,6 +528,7 @@
     SingleStat: '_26UBk-6weCeV-VClfXNWJZ',
     SpinnerLoaderContainer: '_3CN5DkgNMvdtT9fJhNOj_v',
     State: '_2ns4wnmgr4XBzARpwn2NZ1',
+    StatusAndStats: '_1YbtIWcfkQJOysLXQbwzRf',
     StatusIcon: '_2-J2nMJ1zmDok8-jqXlf1e',
     SteamChina: '_3CERUTDGnY-gTdzXj_vKEW',
     SteamCloudUsage: '_2Dfy8vuNMdABIKGO2KHbVF',
@@ -621,6 +625,19 @@
     }
     return undefined;
   };
+
+  // The app (overview) a Library element was drawn for: a game row, a cover, a hover card.
+  const isApp = (v) => v && typeof v === 'object' && typeof v.appid === 'number' && 'display_name' in v;
+  const appOf = (el) =>
+    fromProps(el, 16, (q) => {
+      for (const k of ['app', 'overview', 'appOverview']) {
+        if (isApp(q[k])) return q[k];
+      }
+      for (const v of Object.values(q)) {
+        if (isApp(v)) return v;
+      }
+      return null;
+    });
 
   const findDown = (el, predicate, limit = 600) => {
     const start = fiber(el);
@@ -730,6 +747,13 @@
     return value;
   };
 
+  // The module a bundle binds to `alias` (`alias = req(123)` in `src`), loaded from that bundle.
+  const importOf = (src, alias, req) => {
+    const name = alias.replace(/[$]/g, '\\$&');
+    const hit = new RegExp(`(?:^|[^\\w$])${name}\\s*=\\s*[\\w$]+\\(\\s*(\\d+)\\s*\\)`).exec(src);
+    return hit ? run(() => req(hit[1])) : null;
+  };
+
   // The first truthy `name` global across this window and its opener/parent chain.
   const global = (name, test) => {
     for (const win of owners()) {
@@ -751,7 +775,68 @@
     }
   };
 
+  // A token's value from core/tokens.css, read off the root: px as a number, a duration in ms.
+  const token = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const px = (name) => parseFloat(token(name)) || 0;
+  const ms = (name) => {
+    const value = token(name);
+    const n = parseFloat(value) || 0;
+    return /ms$/.test(value) ? n : n * 1000;
+  };
+
+  /*
+   * Hover intent: a popup that opens after the pointer rests on its trigger, so a pointer
+   * passing over a list opens nothing. delay: a duration token's name (read at each wait, so the
+   * stylesheet needn't be in yet when a feature starts) or ms; --se-hover-delay by default. enter(node, ...args) starts
+   * the wait for node; show(node, ...args) runs once it ends. left(event) is true when a
+   * mouseout takes the pointer out of the current node.
+   */
+  const hoverIntent = (show, delay) => {
+    let node = null;
+    let timer = 0;
+    const cancel = () => {
+      clearTimeout(timer);
+      timer = 0;
+      node = null;
+    };
+    return {
+      get node() {
+        return node;
+      },
+      enter(next, ...args) {
+        cancel();
+        node = next;
+        timer = setTimeout(() => {
+          timer = 0;
+          show(next, ...args);
+        }, typeof delay === 'number' ? delay : ms(delay || '--se-hover-delay'));
+      },
+      cancel,
+      left: (event) => Boolean(node && node.contains(event.target) && !node.contains(event.relatedTarget)),
+    };
+  };
+
   const railMode = () => !!document.body?.classList.contains('se-header-actions-ready');
+
+  // The main window's view: its Library, or a Store/Community page in the native browser view.
+  const libraryShown = () => {
+    const path = run(() => mainWindow()?.LocationPathName);
+    return path ? /^\/library\b/.test(path) : Boolean(document.querySelector(`.${C.GameListHomeAndSearch_Container}`));
+  };
+
+  const browserShown = () => {
+    const path = run(() => mainWindow()?.LocationPathName) || '';
+    if (/^\/(?:store|community|browser)(?:\/|$)/i.test(path)) return true;
+    const local = document.querySelector(`.${C.LocalContentContainer}`);
+    if (local?.hidden || local?.style.display === 'none') return true;
+    if (path) return false;
+    for (const owner of owners()) {
+      const manager = run(() => owner.MainWindowBrowserManager);
+      const url = run(() => manager?.m_URLRequested || manager?.m_URL) || '';
+      if (/^https?:\/\//i.test(url) && !libraryShown()) return true;
+    }
+    return false;
+  };
 
   const mark = (el, name, value = '') => {
     if (el && el.getAttribute(name) !== value) el.setAttribute(name, value);
@@ -1330,16 +1415,24 @@
     liveFiber,
     props,
     fromProps,
+    appOf,
     findDown,
     owners,
     mainWindow,
     navigate,
     requires,
     findModule,
+    importOf,
     global,
     appStore: resolveAppStore,
     cssVar,
+    token,
+    px,
+    ms,
+    hoverIntent,
     railMode,
+    libraryShown,
+    browserShown,
     mark,
     unmark,
     attr,
