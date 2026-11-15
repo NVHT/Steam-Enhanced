@@ -89,9 +89,14 @@
     }
   };
 
-  /* The popup has a window to itself when nothing else of the client is drawn in it */
+  /*
+   * The popup has a window to itself when nothing else of the client is drawn in it. A popup
+   * layer window (core/popup-layer.js) holds a copy at its own size: the card keeps its look.
+   */
   const ownsWindow = (hover) =>
-    !document.querySelector(CLIENT_CHROME) && hover.getBoundingClientRect().width >= innerWidth * 0.6;
+    !document.documentElement.classList.contains('se-layer-document') &&
+    !document.querySelector(CLIENT_CHROME) &&
+    hover.getBoundingClientRect().width >= innerWidth * 0.6;
 
   const findHovers = () => {
     const found = [...document.querySelectorAll(GLOBAL_HOVER)];

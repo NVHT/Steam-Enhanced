@@ -93,6 +93,10 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
   --se-fd-ring: var(--se-border-strong);
 }
 
+.se-fd-av[data-state="ingame"] {
+  --se-fd-ring: var(--se-running);
+}
+
 .se-fd-av[data-state="offline"] img {
   filter: grayscale(.6);
   opacity: .6;
@@ -105,6 +109,16 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
 
 .se-fd-fly .se-fd-av {
   box-shadow: 0 0 0 2px var(--se-surface), 0 0 0 4px var(--se-running);
+}
+
+/* The friend card's line under its head (rich presence, last online) */
+.se-fd-card .se-fd-flybody {
+  padding: var(--se-space-2) var(--se-space-3);
+}
+
+/* On a card's head the gap ring is the head's surface, not the dock's */
+.se-fd-card .se-fd-av {
+  box-shadow: 0 0 0 2px var(--se-surface-2), 0 0 0 4px var(--se-fd-ring, var(--se-border-strong));
 }
 
 .se-fd-av:is([data-state="away"], [data-state="snooze"]) {
@@ -245,7 +259,7 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
   text-align: left;
 }
 
-.se-fd-menu button:is(:hover, :focus-visible) {
+.se-fd-menu button:is(:hover, :focus-visible, [data-se-active]) {
   background: var(--se-selected) !important;
   color: var(--se-text-strong) !important;
 }
@@ -402,12 +416,18 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
   color: var(--se-running) !important;
 }
 
-.se-fd-row .se-fd-sub[data-state="online"] {
+.se-fd-row .se-fd-sub[data-state="online"],
+.se-fd-card .se-fd-sub[data-state="online"] {
   color: var(--se-online);
 }
 
-.se-fd-row .se-fd-sub:is([data-state="away"], [data-state="snooze"]) {
+.se-fd-row .se-fd-sub:is([data-state="away"], [data-state="snooze"]),
+.se-fd-card .se-fd-sub:is([data-state="away"], [data-state="snooze"]) {
   color: color-mix(in srgb, var(--se-online) 70%, transparent);
+}
+
+.se-fd-card .se-fd-sub[data-state="ingame"] {
+  color: var(--se-running);
 }
 
 .se-fd-row:has(.se-fd-av[data-state="offline"]) .se-fd-name {
@@ -506,20 +526,26 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
 }
 
 /* A game's card beside the rail */
-.se-fd-fly {
-  position: fixed;
-  right: calc(var(--se-fd-rail) + 12px);
-  z-index: calc(var(--se-z-sticky) + 20);
+/* The dock's cards: the game flyout and the friend card */
+.se-fd-fly,
+.se-fd-card {
   width: 260px;
   border-radius: var(--se-radius-lg);
   overflow: hidden;
   background: var(--se-surface);
   box-shadow: var(--se-shadow-pop);
+  font-family: var(--se-font);
+  color: var(--se-text);
+}
+
+.se-fd-fly {
+  position: fixed;
+  right: calc(var(--se-fd-rail) + var(--se-space-3));
+  z-index: var(--se-z-flyout);
   opacity: 0;
   transform: translateX(6px);
   pointer-events: none;
   transition: opacity var(--se-dur-fast) var(--se-ease), transform var(--se-dur-fast) var(--se-ease);
-  font-family: var(--se-font);
 }
 
 .se-fd-fly.se-fd-show {
@@ -1335,25 +1361,9 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
 }
 
 /*
- * The native popup changes only the containing surface. Chat/chip appearance,
- * dimensions, header spacing and control positions use the same rules above.
+ * The native popup (core/popup-layer.js) changes only the containing surface. Chat/chip
+ * appearance, dimensions, header spacing and control positions use the same rules above.
  */
-html.se-chat-popup-document,
-html.se-chat-popup-document body {
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  background: transparent !important;
-}
-
-.se-chat-context-popup {
-  padding: 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  overflow: hidden !important;
-}
-
 .se-fdock.se-fd-popup-host {
   position: relative !important;
   inset: auto !important;
@@ -1364,23 +1374,20 @@ html.se-chat-popup-document body {
   background: transparent;
 }
 
-/*
- * Size the native wrapper from the active layout so Steam can resize the
- * existing popup between the chip and chat without remounting its content.
- */
-html.se-chat-popup-document .se-chat-context-popup {
-  box-sizing: border-box !important;
-  width: var(--se-chat-host-width) !important;
-  height: var(--se-chat-host-height) !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  max-width: none !important;
-  max-height: none !important;
-}
-
 .se-fdock.se-fd-popup-host[data-chat-minimized="1"] .se-fd-chat-chip {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+}
+
+/*
+ * The theme renders the friend card (client/friends/dock/friend-card.js) in place of Steam's
+ * hover, which is hidden: its box (miniProfileHover) and card (miniProfile), by the hashes
+ * client/dialogs/hover-cards.css styles them by. The theme's rendering is the same card: kept,
+ * in the page (.se-layer-page) and in a popup layer window (which copies <body>'s attributes).
+ */
+/* !important: display can come inline from Steam's markup or scripts */
+html:not(.se-layer-document) body[data-se-friend-card] :is(._2AWayy-K0ZoNKv_Fr3CT_R, ._2QPdq7GZ_03AD1ioPixVXW):not(.se-layer-page *) {
+  display: none !important;
 }

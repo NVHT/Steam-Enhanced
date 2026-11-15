@@ -154,7 +154,13 @@
    */
   let mountWait = null;
 
+  /*
+   * Library search acts on the library, so on a Store or Community page it brings the library
+   * forward first: its list stays mounted under the page, where results can't be seen. (Filters
+   * there opens over the page instead, and comes here only when it can't.)
+   */
   function whenLibraryMounted(callback) {
+    if (SE.browserShown()) navigateToLibraryRoute('/library/home');
     if (document.querySelector(SEARCH_INPUT)) {
       callback();
       return;
@@ -372,16 +378,20 @@
     filtersBtn.addEventListener('click', (event) => {
       const wasOpen = event.detail === 0 ? null : filterWasOpenOnDown;
       filterWasOpenOnDown = null;
-      whenLibraryMounted(() => {
-        const nativeBtn = document.querySelector(FILTERS);
-        if (!nativeBtn) return;
-        const pane = visibleFilterPanel();
-        if (wasOpen || pane) {
-          if (pane) dismissFilters(pane);
-          return;
-        }
-        nativeBtn.click();
-      });
+      const library = () =>
+        whenLibraryMounted(() => {
+          const nativeBtn = document.querySelector(FILTERS);
+          if (!nativeBtn) return;
+          const pane = visibleFilterPanel();
+          if (wasOpen || pane) {
+            if (pane) dismissFilters(pane);
+            return;
+          }
+          nativeBtn.click();
+        });
+      // Over a Store or Community page, Steam's panel is drawn above it (filters-panel.js).
+      if (SE.browserShown() && SE.filtersPanel?.toggle(library)) return;
+      library();
     });
   }
 
@@ -398,7 +408,7 @@
       searchInput.value = native.value;
       searchBar.classList.toggle('se-has-text', !!native.value);
     }
-    SE.mark(filtersBtn, 'aria-pressed', String(!!visibleFilterPanel()));
+    SE.mark(filtersBtn, 'aria-pressed', String(Boolean(visibleFilterPanel() || SE.filtersPanel?.open)));
   }
 
   function onGlobalKeyDown(event) {

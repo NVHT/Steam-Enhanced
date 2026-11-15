@@ -121,35 +121,75 @@
     ns.place();
   }
 
-  const menu = document.createElement('div');
+  /*
+   * The dock's menus (status, a friend's), as popup-layer panels (core/popup-layer.js): in the
+   * page on the Library, in a popup window above a Store or Community page.
+   */
+  live.menuPanel = null;
+  // What a dock popup in a window is styled by
+  const DOCK_SHEETS = { sheets: ['client/friends/friends-dock.css'] };
+  const menuOpen = () => Boolean(live.menuPanel && !live.menuPanel.released);
 
   function hideMenu() {
-    menu.remove();
-    menu.textContent = '';
+    live.menuPanel?.release();
+    live.menuPanel = null;
+    live.menuItems = [];
+    live.menuIndex = -1;
   }
 
-  function showMenu(items, x, y) {
-    menu.textContent = '';
-    for (const it of items) {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.setAttribute('role', 'menuitem');
-      if (it.state) b.dataset.state = it.state;
-      b.innerHTML = `${it.state ? '<i></i>' : ''}<span></span>`;
-      b.lastChild.textContent = it.label;
-      b.addEventListener('click', (e) => {
-        e.stopPropagation();
-        hideMenu();
-        it.run();
-      });
-      menu.appendChild(b);
+  /*
+   * Keyboard: in the page the menu takes focus; a popup window never does, so the main window
+   * hears the keys (onKeyMenu) and moves a highlight ([data-se-active]) through the items.
+   */
+  live.menuItems = [];
+  live.menuIndex = -1;
+
+  function highlight(index) {
+    const items = live.menuItems;
+    if (!items.length) return;
+    live.menuIndex = (index + items.length) % items.length;
+    const item = items[live.menuIndex];
+    if (item.ownerDocument === document) {
+      item.focus({ preventScroll: true });
+      return;
     }
-    document.body.appendChild(menu);
-    const w = menu.offsetWidth;
-    const h = menu.offsetHeight;
-    menu.style.left = `${Math.max(8, Math.min(x, innerWidth - w - 8))}px`;
-    menu.style.top = `${Math.max(8, Math.min(y, innerHeight - h - 8))}px`;
-    menu.querySelector('button')?.focus({ preventScroll: true });
+    items.forEach((other) => SE.attr(other, 'data-se-active', other === item ? '' : null));
+  }
+
+  // At (x, y), kept a margin inside the main window as the menu always has been.
+  function showMenu(items, x, y) {
+    hideMenu();
+    const panel = SE.layer?.panel(DOCK_SHEETS);
+    if (!panel) return;
+    live.menuPanel = panel;
+    const margin = SE.px('--se-space-2');
+    const spot = (w, h) => ({
+      left: Math.max(margin, Math.min(x, innerWidth - w - margin)),
+      top: Math.max(margin, Math.min(y, innerHeight - h - margin)),
+    });
+    panel.show(spot, (container) => {
+      const doc = container.ownerDocument;
+      const menu = doc.createElement('div');
+      menu.className = 'se-fd-menu';
+      menu.setAttribute('role', 'menu');
+      for (const it of items) {
+        const b = doc.createElement('button');
+        b.type = 'button';
+        b.setAttribute('role', 'menuitem');
+        if (it.state) b.dataset.state = it.state;
+        b.innerHTML = `${it.state ? '<i></i>' : ''}<span></span>`;
+        b.lastChild.textContent = it.label;
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          hideMenu();
+          it.run();
+        });
+        menu.appendChild(b);
+      }
+      container.append(menu);
+      live.menuItems = [...menu.children];
+      highlight(0);
+    });
   }
 
   const PERSONA = { online: 1, away: 3, invisible: 7 };
@@ -170,7 +210,7 @@
   }
 
   function statusMenu(btn) {
-    if (menu.isConnected) {
+    if (menuOpen()) {
       hideMenu();
       return;
     }
@@ -223,6 +263,52 @@
     }
   }
 
+  /*
+   * Over a browser page the flyout is drawn for real in a popup window (a popup-layer panel,
+   * core/popup-layer.js): the dock's own element, in the main window, would sit under the
+   * page's browser view. Same markup and listeners as the dock's own. Returns false when no
+   * window could open, and the dock's element shows instead.
+   */
+  live.flyPanel = null;
+
+  function showFlyPanel(key, html, tile) {
+    let entry = live.flyPanel;
+    if (entry && !entry.panel.released && entry.key === key && entry.html === html) return true;
+    if (!entry || entry.panel.released) {
+      const panel = SE.layer?.panel(DOCK_SHEETS);
+      if (!panel) return false;
+      entry = live.flyPanel = { panel, key: '', html: '' };
+    }
+    entry.key = key;
+    entry.html = html;
+    ns.fly.classList.remove('se-fd-show');
+    const right = ns.dock.getBoundingClientRect().left - SE.px('--se-space-3');
+    const top = tile.getBoundingClientRect().top - SE.px('--se-fd-fly-lift');
+    entry.panel.show({ right, top }, (container) => {
+      container.insertAdjacentHTML('beforeend', `<div class="se-fd-fly se-fd-show">${html}</div>`);
+      const card = container.lastElementChild;
+      for (const type of ns.interactionEvents) card.addEventListener(type, ns.markDockInteraction, true);
+      card.addEventListener('keydown', pressRow);
+      card.addEventListener('mouseenter', () => clearTimeout(state.flyTimer));
+      card.addEventListener('mouseleave', () => hideFly());
+      card.addEventListener('click', (event) => {
+        const row = event.target.closest('[data-friend]');
+        if (!row) return;
+        event.stopPropagation();
+        openChat(row.dataset.friend);
+      });
+      card.addEventListener('contextmenu', (event) => {
+        const row = event.target.closest('[data-friend]');
+        if (!row) return;
+        event.preventDefault();
+        // Menus are placed in main-window pixels: the card's corner there, plus the point in it.
+        const box = card.getBoundingClientRect();
+        friendMenu(row.dataset.friend, right - box.width + event.clientX - box.left, top + event.clientY - box.top);
+      });
+    });
+    return true;
+  }
+
   function showFly(key, keep) {
     const g = state.data?.games.find((x) => x.key === key);
     const tile = ns.dock.querySelector(`.se-fd-railgame[data-game="${CSS.escape(key)}"]`);
@@ -230,13 +316,19 @@
     clearTimeout(state.flyTimer);
     state.flyGame = key;
     const html = flyHTML(g);
+    if (SE.browserShown() && showFlyPanel(key, html, tile)) return undefined;
+    live.flyPanel?.panel.release();
+    live.flyPanel = null;
     if (!keep || ns.fly.dataset.key !== key || ns.fly.dataset.html !== html) {
       ns.fly.innerHTML = html;
       ns.fly.dataset.key = key;
       ns.fly.dataset.html = html;
     }
+    // Reads first (the tile, the card's height, the tokens), then the one write.
     const r = tile.getBoundingClientRect();
-    ns.fly.style.top = `${Math.max(8, Math.min(r.top - 6, innerHeight - ns.fly.offsetHeight - 8))}px`;
+    const margin = SE.px('--se-space-2');
+    const top = Math.max(margin, Math.min(r.top - SE.px('--se-fd-fly-lift'), innerHeight - ns.fly.offsetHeight - margin));
+    ns.fly.style.top = `${top}px`;
     ns.fly.classList.add('se-fd-show');
     return undefined;
   }
@@ -246,6 +338,8 @@
     const go = () => {
       state.flyGame = null;
       ns.fly.classList.remove('se-fd-show');
+      live.flyPanel?.panel.release();
+      live.flyPanel = null;
     };
     if (now) go();
     else state.flyTimer = setTimeout(go, 220);
@@ -278,9 +372,16 @@
   }
 
   function onKeyMenu(event) {
-    if (event.key === 'Escape' && menu.isConnected) hideMenu();
+    if (!menuOpen()) return;
+    const step = { ArrowDown: 1, ArrowUp: -1 }[event.key];
+    if (event.key === 'Escape') hideMenu();
+    else if (step) highlight(live.menuIndex + step);
+    // In the page the focused button hears Enter itself; in a popup window it's pressed here.
+    else if ((event.key === 'Enter' || event.key === ' ') && live.menuItems[live.menuIndex]?.ownerDocument !== document) {
+      live.menuItems[live.menuIndex]?.click();
+    } else return;
+    event.preventDefault();
   }
-
 
   live.frame = 0;
 
@@ -300,7 +401,7 @@
   }
 
   Object.assign(ns, {
-    closeMenu, hideFly, hideMenu, menu, onContext, onKeyMenu, onNativeChannelClick,
+    closeMenu, hideFly, hideMenu, onContext, onKeyMenu, onNativeChannelClick,
     onNativeFriendClick, openChat, openGroup, pressRow, schedule, setMode, showFly, statusMenu,
     steamURL, sync,
   });

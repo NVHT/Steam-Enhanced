@@ -20,6 +20,7 @@
  * - embed.js       mounting Steam's own Friends & Chat tree
  * - dock.js        the dock element, rendering and placement
  * - chat-popup.js  the chat flyout: popup window, portal, geometry, minimize chip
+ * - friend-card.js the friend card on an avatar hovered in the open panel
  * - main.js        builds the elements and wires every listener in the original order,
  *                  then starts the watchers and exposes the dock's API
  * Parts only declare; main.js is the one place that does work at load.
@@ -203,14 +204,31 @@
     );
   }
 
-  // Non-Steam games (appid 0) have no store header: the card keeps its plain surface.
+  // A card head's banner: the game's store header. Non-Steam games (appid 0) have none, and
+  // the head keeps its plain surface.
+  const headArt = (appid) =>
+    appid ? ` style="--art:url('https://shared.steamstatic.com/store_item_assets/steam/apps/${Number(appid)}/header.jpg')"` : '';
+
   const flyHTML = (g) =>
-    `<div class="se-fd-flyhead"${g.appid ? ` style="--art:url('https://shared.steamstatic.com/store_item_assets/steam/apps/${g.appid}/header.jpg')"` : ''}>` +
+    `<div class="se-fd-flyhead"${headArt(g.appid)}>` +
     `${gameIcon(g, 30)}<div><div class="se-fd-name">${esc(g.name)}</div><div class="se-fd-sub se-fd-green">${esc(ns.COPY.friendsIn(g.friends.length))}</div></div></div>` +
     `<div class="se-fd-flybody">${g.friends.map((f) => friendRow(f, f.rp, true)).join('')}</div>`;
 
+  /*
+   * The friend card (an avatar hovered in the open panel; client/friends/dock/friend-card.js):
+   * the game flyout's card, headed by the friend. f: { name, avatar, state, appid, status,
+   * detail }, state 'ingame' while playing.
+   */
+  const friendCardHTML = (f) =>
+    `<div class="se-fd-card">` +
+    `<div class="se-fd-flyhead"${headArt(f.appid)}>${avatar(f.avatar, f.state, 44)}` +
+    `<div class="se-fd-text"><div class="se-fd-name">${esc(f.name)}</div>` +
+    `<div class="se-fd-sub" data-state="${f.state}">${esc(f.status)}</div></div></div>` +
+    (f.detail ? `<div class="se-fd-flybody"><div class="se-fd-sub">${esc(f.detail)}</div></div>` : '') +
+    `</div>`;
+
   Object.assign(ns, {
-    COLLAPSE_ICON, DEAD_AVATAR_LIMIT, avatar, deadAvatars, flyHTML, groupAvatar, groupAvatarURL,
+    COLLAPSE_ICON, DEAD_AVATAR_LIMIT, avatar, deadAvatars, flyHTML, friendCardHTML, groupAvatar, groupAvatarURL,
     groupInitials, panelHTML, railHTML, statusLabel, svg, usableAvatar,
   });
 })(window.__se);

@@ -60,8 +60,8 @@
   /** @type {[group: string, folder: string, files: string[]][]} */
   const FEATURES = [
     // Shared runtime pieces
-    ['all', 'core/', ['font.css', 'tokens.css', 'images.css', 'images.js']],
-    ['main', 'core/', ['plugin-rpc.js']],
+    ['all', 'core/', ['font.css', 'tokens.css', 'motion.css', 'images.css', 'images.js', 'popup-layer.css']],
+    ['main', 'core/', ['plugin-rpc.js', 'popup-layer.js']],
     ['notify', 'client/friends/', ['friend-notification-clicks.js']],
     // In-game overlay
     ['overlay', 'client/overlay/', [
@@ -93,7 +93,7 @@
       'shared.js', 'api.js', 'menus.js', 'account.js', 'actions.js', 'hover.js', 'popups.js',
       'placement.js', 'patch.js', 'main.js',
     ]],
-    ['main', 'client/navigation/', ['nav-rail.css', 'nav-rail.js']],
+    ['main', 'client/navigation/', ['nav-rail.css', 'nav-rail.js', 'filters-panel.js']],
     ['main', 'client/library/', [
       'library.css', 'game-list.css', 'game-list.js', 'game-drag.css', 'game-drag.js',
       'collections.css', 'collections.js',
@@ -108,8 +108,9 @@
     ['main', 'client/friends/', ['friends-dock.css']],
     ['main', 'client/friends/dock/', [
       'templates.js', 'data.js', 'ui.js', 'routing.js', 'flyouts.js', 'embed.js', 'dock.js',
-      'chat-popup.js', 'main.js',
+      'chat-popup.js', 'friend-card.js', 'main.js',
     ]],
+    ['main', 'client/friends/', ['playing-card.js']],
     ['main', 'client/library/', ['sort-segments.css', 'sort-segments.js']],
     // Library Home
     ['main', 'client/home/', ['home-polish.css', 'home-polish.js', 'home-stage.css']],

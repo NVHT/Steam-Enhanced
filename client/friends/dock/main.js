@@ -10,7 +10,7 @@
     chatMinimize, chipAvatar, chipChevron, chipCount, chipName, chipText, closeChat,
     closeChatPopup, closedSections, closeMenu, deadAvatars, dismissChatError, disposeSteam, dock,
     fly, flyoutOwnedTabs, gameInForeground, hideFly, hideMenu, installChatRouting,
-    interactionEvents, keepLibraryManagers, markDesktopInteraction, markDockInteraction, menu,
+    interactionEvents, keepLibraryManagers, markDesktopInteraction, markDockInteraction,
     minimizeChat, onAvatarError, onContext, onDesktopChatFocus, onKeyMenu, onLibrary,
     onNativeChannelClick, onNativeFriendClick, onSearch, onStore, openChat, openFriendNotification,
     openGames, openGroup, own, pendingOverlayChats, place, pressRow, releaseFlyoutTabs, render,
@@ -104,8 +104,8 @@
   steamHost.addEventListener('click', onNativeFriendClick, true);
   steamHost.addEventListener('dblclick', onNativeFriendClick, true);
   steamHost.addEventListener('click', onNativeChannelClick);
-  menu.className = 'se-fd-menu';
-  menu.setAttribute('role', 'menu');
+  steamHost.addEventListener('mouseover', ns.friendCard.over);
+  steamHost.addEventListener('mouseout', ns.friendCard.out);
   dock.addEventListener('click', (e) => {
     if (steamHost.contains(e.target)) return;
     const el = e.target.closest('[data-act], [data-game], [data-friend], [data-group], [data-section]');
@@ -275,7 +275,7 @@
       browserClickListeners.clear();
       cancelChatNavigation();
       clearTimeout(state.statusTimer);
-      clearTimeout(state.flyTimer);
+      hideFly(true);
       watcher.disconnect();
       chatWatcher.disconnect();
       live.localObserver?.disconnect();
@@ -304,6 +304,9 @@
       steamHost.removeEventListener('click', onNativeFriendClick, true);
       steamHost.removeEventListener('dblclick', onNativeFriendClick, true);
       steamHost.removeEventListener('click', onNativeChannelClick);
+      steamHost.removeEventListener('mouseover', ns.friendCard.over);
+      steamHost.removeEventListener('mouseout', ns.friendCard.out);
+      ns.friendCard.dispose();
       dock.remove();
       fly.remove();
       own.textContent = '';
