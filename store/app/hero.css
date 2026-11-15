@@ -7,6 +7,9 @@
 /* ---------- Page ---------- */
 
 /* The theme's page colour under the whole page, instead of Steam's blue and per-game backdrop. */
+/* !important: Steam's own rules (game_gamepad.css, game_mob.css, home_gamepad.css) set
+   background-image at equal or higher weight; another rule in this file sets background-color,
+   background-image with !important */
 html.se-store-app body.v6.app,
 html.se-store-app .game_page_background.game {
   background-color: var(--se-bg) !important;
@@ -14,6 +17,7 @@ html.se-store-app .game_page_background.game {
 }
 
 /* The hero carries the art; Steam's generated backdrop stays mounted but unseen. */
+/* !important: Steam's own rules (game_mob.css) set display at equal or higher weight */
 html.se-app-hero-on .page_top_area > .game_page_background_ctn {
   display: none !important;
 }
@@ -25,6 +29,8 @@ html.se-app-hero-on .page_top_area {
 }
 
 /* Breadcrumbs at the left, Community Hub at the right, in the page column at the top of the art. */
+/* !important: Steam's own rules (game_gamepad.css) set padding at equal or higher weight;
+   min-height can come inline from Steam's markup or scripts */
 html.se-app-hero-on .page_top_area > .page_title_area {
   position: absolute;
   inset: 20px 0 auto;
@@ -42,6 +48,7 @@ html.se-app-hero-on .page_title_area > * {
   pointer-events: auto;
 }
 
+/* !important: margin, padding can come inline from Steam's markup or scripts */
 html.se-app-hero-on .page_title_area .breadcrumbs {
   margin: 0 !important;
   padding: 0 !important;
@@ -53,6 +60,7 @@ html.se-app-hero-on .page_title_area .breadcrumbs {
  * text (or separator spans): font-size 0 on the row drops those, the links restore their size,
  * and a chevron after each button but the last stands in for them.
  */
+/* !important: padding can come inline from Steam's markup or scripts */
 html.se-app-hero-on .page_title_area .breadcrumbs .blockbg {
   display: flex;
   flex-wrap: wrap;
@@ -60,14 +68,18 @@ html.se-app-hero-on .page_title_area .breadcrumbs .blockbg {
   /* No gap: the " > " text nodes are anonymous flex items too, so spacing goes on the pills. */
   row-gap: 6px;
   padding: 0 !important;
-  background: none !important;
-  font-size: 0 !important;
+  background: none;
+  font-size: 0;
 }
 
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-app-hero-on .page_title_area .breadcrumbs .blockbg > :not(a) {
   display: none !important;
 }
 
+/* !important: Steam's own rules (Dq5j1Kab.css, Sftekees.css, apphub.css) set color,
+   text-decoration at equal or higher weight; the theme's shared rules (store/app/summary.css,
+   store/shared/modals.css, store/shared/ui.css) set color, text-decoration with !important */
 html.se-app-hero-on .page_title_area .breadcrumbs .blockbg > a {
   display: inline-flex;
   align-items: center;
@@ -90,6 +102,9 @@ html.se-app-hero-on .page_title_area .breadcrumbs .blockbg > a:not(:first-of-typ
   margin-left: 22px;
 }
 
+/* !important: Steam's own rules (Sftekees.css, broadcast_watch.css, cart.css) set color at equal
+   or higher weight; the theme's shared rules (store/app/summary.css, store/shared/modals.css,
+   store/shared/ui.css) set color with !important */
 html.se-app-hero-on .page_title_area .breadcrumbs .blockbg > a:hover {
   background: var(--se-glass-btn-hover);
   color: var(--se-white) !important;
@@ -106,6 +121,8 @@ html.se-app-hero-on .page_title_area .breadcrumbs .blockbg > a:not(:last-of-type
   pointer-events: none;
 }
 
+/* !important: another rule in this file sets background, height, margin, min-height, padding with
+   !important */
 html.se-app-hero-on .page_title_area .apphub_HomeHeaderContent,
 html.se-app-hero-on .page_title_area .apphub_HeaderStandardTop {
   height: auto !important;
@@ -116,21 +133,25 @@ html.se-app-hero-on .page_title_area .apphub_HeaderStandardTop {
 }
 
 /* The hero's title replaces Steam's. */
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-app-hero-on #appHubAppName {
   display: none !important;
 }
 
+/* !important: Steam's own rules (apphub_gamepad.css, game_gamepad.css, game_mob.css) set display
+   at equal or higher weight; margin can come inline from Steam's markup or scripts */
 html.se-app-hero-on .apphub_OtherSiteInfo {
   display: flex !important;
   align-items: center;
   gap: 8px;
-  float: none !important;
+  float: none;
   margin: 0 !important;
 }
 
 /* ---------- Share / Embed / Report (app/hero.js), round glass icons before Community Hub ---------- */
 
 /* Steam's row in the right column, which ours click. */
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-app-hero-on [data-se-tools-source] {
   display: none !important;
 }
@@ -191,6 +212,10 @@ html.se-app-hero-on [data-se-tools-source] {
 }
 
 /* Community Hub: a round glass button, like the theme's other buttons on art. */
+/* !important: Steam's own rules (B2WHDg87.css, CcPUUgaw.css, DIQ1eQa6.css) set background,
+   border-radius, display, padding at equal or higher weight; the theme's shared rules
+   (store/shared/sale.css, store/shared/ui.css) set background, border-radius, display, padding
+   with !important */
 html.se-app-hero-on .apphub_OtherSiteInfo > a {
   display: inline-flex !important;
   align-items: center;
@@ -203,10 +228,17 @@ html.se-app-hero-on .apphub_OtherSiteInfo > a {
   transition: background var(--se-dur);
 }
 
+/* !important: Steam's own rules (CcPUUgaw.css, comingsoon.css, game.css) set background at equal
+   or higher weight; the theme's shared rules (store/shared/sale.css, store/shared/ui.css) set
+   background with !important */
 html.se-app-hero-on .apphub_OtherSiteInfo > a:hover {
   background: var(--se-glass-btn-hover) !important;
 }
 
+/* !important: Steam's own rules (BOEXziHF.css, Dq5j1Kab.css, apppageroutes.css) set background,
+   border-radius, color, font-size, line-height, padding at equal or higher weight; the theme's
+   shared rules (store/app/summary.css, store/shared/modals.css, store/shared/rows.css) set
+   background, border-radius, color, font-size, line-height, padding with !important */
 html.se-app-hero-on .apphub_OtherSiteInfo > a > span {
   padding: 0 16px !important;
   border-radius: inherit !important;
@@ -237,6 +269,8 @@ html.se-app-hero-on .apphub_OtherSiteInfo > a > span {
   text-align: center;
 }
 
+/* !important: the theme's shared rules (store/app/summary.css, store/shared/ui.css) set display
+   with !important */
 .se-app-hero [hidden] {
   display: none !important;
 }
@@ -250,7 +284,7 @@ html.se-app-hero-on .apphub_OtherSiteInfo > a > span {
   background-repeat: no-repeat;
   opacity: 0;
   transform: scale(1.04);
-  transition: opacity var(--se-dur-slower) var(--se-ease), transform 1.2s var(--se-ease);
+  transition: opacity var(--se-dur-slower) var(--se-ease), transform var(--se-dur-ambient) var(--se-ease);
 }
 
 .se-app-hero__art[data-se-loaded] {
@@ -368,6 +402,7 @@ html.se-app-hero-on .apphub_OtherSiteInfo > a > span {
   gap: 6px;
 }
 
+/* !important: another rule in this file sets color with !important */
 .se-app-hero__chip {
   display: inline-flex;
   align-items: center;
@@ -382,17 +417,19 @@ html.se-app-hero-on .apphub_OtherSiteInfo > a > span {
   color: var(--se-text-dim) !important;
   font-size: var(--se-fs-sm);
   font-weight: 600;
-  text-decoration: none !important;
+  text-decoration: none;
   white-space: nowrap;
   transition: background var(--se-dur), color var(--se-dur);
 }
 
+/* !important: another rule in this file sets color with !important */
 a.se-app-hero__chip:hover {
   background: var(--se-glass-btn-hover);
   color: var(--se-text) !important;
 }
 
 /* Review summary and Deck status take their tone's colour. */
+/* !important: another rule in this file sets color with !important */
 .se-app-hero__chip[data-se-tone] {
   --tone: var(--se-text-dim);
   background: color-mix(in srgb, var(--tone) 14%, var(--se-glass-chip));
@@ -423,6 +460,7 @@ a.se-app-hero__chip[data-se-tone]:hover {
 }
 
 /* Steam's Deck section: the chip shows its status and opens its details (app/hero.js). */
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-app-hero-on [data-se-deck-source] {
   display: none !important;
 }
@@ -436,11 +474,13 @@ button.se-app-hero__chip {
   cursor: pointer;
 }
 
+/* !important: another rule in this file sets color with !important */
 button.se-app-hero__chip:hover {
   background: var(--se-glass-btn-hover);
   color: var(--se-text) !important;
 }
 
+/* !important: another rule in this file sets color with !important */
 button.se-app-hero__chip[data-se-tone]:hover {
   background: color-mix(in srgb, var(--tone) 24%, var(--se-glass-chip));
   color: var(--tone) !important;
@@ -453,17 +493,20 @@ button.se-app-hero__chip:focus-visible {
 
 /* Steam's age rating, Metacritic, achievements, Points Shop and franchise boxes: their chips
    show them (app/hero.js). */
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-app-hero-on [data-se-chip-source] {
   display: none !important;
 }
 
 /* The same blocks before app/hero.js reaches them (Steam renders them late, in React): the
    panel that directly holds the achievements or Points Shop link. */
+/* !important: another rule in this file sets display with !important */
 html.se-app-hero-on .game_meta_data :is(div:has(> a[href*="steamcommunity.com/achievements/"]), div:has(> a[href*="/points/shop/app/"])) {
   display: none !important;
 }
 
 /* Franchise chip: its own row above the tags. Chips carry no icons: the label says it all. */
+/* !important: another rule in this file sets color with !important */
 .se-app-hero__chip[data-se-kind="franchise"] {
   color: var(--se-text) !important;
 }
@@ -475,6 +518,7 @@ html.se-app-hero-on .game_meta_data :is(div:has(> a[href*="steamcommunity.com/ac
  * device tabs (Steam Deck, Steam Machine, SteamOS, Steam Frame) as pills, and the theme's
  * text colours. Found by structure and Steam's stable names (ActiveTab, role="button").
  */
+/* !important: Steam's own rules (C6L1nUf2.css, js.css) set background at equal or higher weight */
 html.se-store .DeckVerifiedModalDialog :is(.ModalPosition_Content, .DialogContent):not(#se-none) {
   background: var(--se-surface) !important;
 }
@@ -484,11 +528,11 @@ html.se-store .DeckVerifiedModalDialog .DialogContent_InnerWidth > :not(#se-none
 }
 
 html.se-store .DeckVerifiedModalDialog .DialogContent_InnerWidth > :not(#se-none)::before {
-  background-image: linear-gradient(var(--se-surface), transparent) !important;
+  background-image: linear-gradient(var(--se-surface), transparent);
 }
 
 html.se-store .DeckVerifiedModalDialog .DialogContent_InnerWidth > :not(#se-none)::after {
-  background-image: linear-gradient(transparent, var(--se-surface)) !important;
+  background-image: linear-gradient(transparent, var(--se-surface));
 }
 
 html.se-store .DeckVerifiedModalDialog .DialogContent_InnerWidth b {
@@ -501,22 +545,24 @@ html.se-store .DeckVerifiedModalDialog :has(> .ActiveTab) {
   gap: 6px;
 }
 
+/* !important: another rule in this file sets background, color with !important */
 html.se-store .DeckVerifiedModalDialog :has(> .ActiveTab) > [role="button"]:not(#se-none) {
-  border: 0 !important;
-  border-radius: var(--se-radius-pill) !important;
+  border: 0;
+  border-radius: var(--se-radius-pill);
   background: var(--se-pill) !important;
-  box-shadow: none !important;
+  box-shadow: none;
   color: var(--se-text-dim) !important;
   transition: background var(--se-dur), color var(--se-dur);
 }
 
+/* !important: another rule in this file sets background, color with !important */
 html.se-store .DeckVerifiedModalDialog :has(> .ActiveTab) > [role="button"]:not(#se-none):hover {
   background: var(--se-hover) !important;
   color: var(--se-text) !important;
 }
 
 html.se-store .DeckVerifiedModalDialog :has(> .ActiveTab) > .ActiveTab:not(#se-none) {
-  background: var(--se-accent-surface) !important;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 45%, transparent) !important;
-  color: var(--se-accent-hover) !important;
+  background: var(--se-accent-surface);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 45%, transparent);
+  color: var(--se-accent-hover);
 }

@@ -14,6 +14,8 @@ html.se-store-front {
 
 /* ---------- Page ---------- */
 
+/* !important: Steam's own rules (styles_about.css) set background at equal or higher weight; the
+   theme's shared rules (store/shared/sale.css) set background with !important */
 html.se-store-front body,
 html.se-store-front .responsive_page_template_content {
   background: var(--se-bg) !important;
@@ -34,6 +36,9 @@ html.se-store-front body.v6 {
   --store-page-width: min(100vw - 2 * var(--se-page-gutter), var(--se-page-max));
 }
 
+/* !important: Steam's own rules (autumn_year_sale.css, home_gamepad.css, spring_year_sale.css) set
+   max-width, width at equal or higher weight; the theme's shared rules (store/shared/layout.css)
+   set box-sizing, max-width, padding-inline, width with !important */
 html.se-store-front .home_pagecontent_ctn {
   box-sizing: border-box !important;
   width: min(100%, var(--se-page-max) + 2 * var(--se-page-gutter)) !important;
@@ -41,6 +46,9 @@ html.se-store-front .home_pagecontent_ctn {
   padding-inline: var(--se-page-gutter) !important;
 }
 
+/* !important: Steam's own rules (contenthub.css, divingbell.css, game_gamepad.css) set max-width,
+   width at equal or higher weight; the theme's shared rules (store/shared/layout.css,
+   store/shared/nav.css) set max-width, width with !important */
 html.se-store-front .home_pagecontent_ctn > div,
 html.se-store-front .home_page_content,
 html.se-store-front .personal_calendar_ctn,
@@ -50,12 +58,15 @@ html.se-store-front .personal_calendar_background {
 }
 
 /* The store bar's capsule lines up with the hero and sections below it. */
+/* !important: the theme's shared rules (store/shared/layout.css) set max-width, width with
+   !important */
 html.se-store-front [data-se-nav="bar"] {
   width: min(var(--se-page-max), 100% - 2 * var(--se-page-gutter)) !important;
   max-width: none !important;
 }
 
 /* Steam's carousel stays mounted for its own scripts; the hero replaces it. */
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-cinema-on #home_maincap_v7 {
   display: none !important;
 }
@@ -67,11 +78,13 @@ html.se-cinema-on #home_maincap_v7 {
  * band, its art and the gutter offset it adds all go; art in any other shape is found where it
  * paints and tagged [data-se-takeover-art] by front/hero.js.
  */
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-cinema-on.se-takeover :is(.home_page_takeover_link, #page_background_holder, .page_background_holder, .fullscreen-bg, .menu_takeover_background, [data-se-takeover-art]) {
   display: none !important;
 }
 
 /* Pseudo-elements can't sit inside :is(), so the list is spelled out. */
+/* !important: another rule in this file sets background-image with !important */
 html.se-cinema-on.se-takeover [data-se-takeover-bg],
 html.se-cinema-on.se-takeover [data-se-takeover-bg]::before,
 html.se-cinema-on.se-takeover [data-se-takeover-bg]::after {
@@ -79,13 +92,14 @@ html.se-cinema-on.se-takeover [data-se-takeover-bg]::after {
 }
 
 html.se-cinema-on.se-takeover [data-se-takeover-fill] {
-  background-color: transparent !important;
+  background-color: transparent;
 }
 
 html.se-cinema-on.se-takeover .home_page_body_ctn.has_takeover {
-  background: none !important;
+  background: none;
 }
 
+/* !important: margin-top can come inline from Steam's markup or scripts */
 html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
   margin-top: 0 !important;
 }
@@ -194,8 +208,8 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
   padding: 4px 0;
   border: 0;
   border-radius: 0;
-  background: none !important;
-  box-shadow: none !important;
+  background: none;
+  box-shadow: none;
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -489,15 +503,35 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
 
 /* Price, call to action, wishlist */
 .se-cinema__buy {
+  /* One height for the price chip, the button and the heart, so the row reads as one control. */
+  --se-cinema-buy-h: var(--se-control-h-lg);
+  --se-price-h: var(--se-cinema-buy-h);
+  --se-price-radius: var(--se-radius-md);
+  /* The shared chip (shared/ui.css) at button height: an even 8px around the badge, type a
+     step up. */
+  --se-price-pct-inset: var(--se-space-2);
+  --se-price-pct-h: calc(var(--se-cinema-buy-h) - 2 * var(--se-price-pct-inset));
+  --se-price-pct-pad: var(--se-price-pct-pad-lg);
+  --se-price-pct-radius: var(--se-radius-sm);
+  --se-price-pct-size: var(--se-fs-md);
+  --se-price-size: var(--se-fs-lg);
+  --se-price-was-size: var(--se-fs-xs);
   grid-column: buy;
-  display: flex;
+  /* Price and button as two equal boxes (each as wide as the wider one), then the heart. */
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
   align-items: center;
   gap: 10px;
 }
 
-.se-cinema__price {
-  margin-right: 6px;
+.se-cinema__buy:has(> .se-cinema__price[hidden]) {
+  grid-template-columns: 1fr auto;
 }
+
+.se-cinema__price {
+  justify-content: center;
+}
+
 
 .se-cinema__price[hidden] {
   display: none;
@@ -508,62 +542,83 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
 .se-cinema__cta {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  height: 44px;
-  padding: 0 18px 0 20px;
+  height: var(--se-cinema-buy-h);
+  padding: 0 var(--se-space-5);
   border-radius: var(--se-radius-md);
   background: var(--se-accent);
-  color: var(--se-on-accent) !important;
+  color: var(--se-on-accent);
   font-size: var(--se-fs-md);
+  font-weight: 700;
   white-space: nowrap;
-  text-decoration: none !important;
-  transition: background var(--se-dur);
+  text-decoration: none;
+  transition: transform var(--se-dur) var(--se-ease);
 }
 
-.se-cinema__cta:hover {
-  background: var(--se-accent-hover);
+/* Same hover as the store's other accent buttons (front/tabs.css .se-tabs__view): a touch
+   brighter, never a different colour. */
+.se-cinema__cta:is(:hover, :focus-visible) {
+  filter: brightness(1.1);
+}
+
+.se-cinema__cta:active {
+  filter: brightness(.95);
+  transform: scale(.98);
 }
 
 /* The arrow nudges on hover; the button itself never changes size. */
 
 .se-cinema__wish {
+  --se-cinema-heart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20.5s-8-4.9-8-11A4.5 4.5 0 0 1 12 6.6 4.5 4.5 0 0 1 20 9.5c0 6.1-8 11-8 11z' fill='black' fill-opacity='.32' stroke='black' stroke-width='1.75' stroke-linejoin='round'/%3E%3C/svg%3E");
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: var(--se-cinema-buy-h);
+  height: var(--se-cinema-buy-h);
   padding: 0;
   border: 0;
   border-radius: var(--se-radius-md);
   background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
   color: var(--se-text-dim);
   cursor: pointer;
-  transition: background var(--se-dur), color var(--se-dur);
+  transition: transform var(--se-dur) var(--se-ease);
 }
 
 .se-cinema__wish[hidden] {
   display: none;
 }
 
+/* The theme's duotone heart (24px grid, 1.75 stroke, 32% fill, as in client/navigation/icons.css);
+   solid once wishlisted. */
 .se-cinema__wish::before {
   content: "";
-  width: 18px;
-  height: 18px;
+  width: var(--se-tile-icon);
+  height: var(--se-tile-icon);
   background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z'/%3E%3C/svg%3E") center / contain no-repeat;
-}
-
-.se-cinema__wish[aria-pressed="true"]::before {
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z'/%3E%3C/svg%3E");
-}
-
-.se-cinema__wish:hover,
-.se-cinema__wish:focus-visible {
-  background: var(--se-hover);
-  color: var(--se-text);
-  outline: none;
+  -webkit-mask: var(--se-cinema-heart) center / contain no-repeat;
+  mask: var(--se-cinema-heart) center / contain no-repeat;
 }
 
 .se-cinema__wish[aria-pressed="true"] {
+  --se-cinema-heart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20.5s-8-4.9-8-11A4.5 4.5 0 0 1 12 6.6 4.5 4.5 0 0 1 20 9.5c0 6.1-8 11-8 11z' fill='black' stroke='black' stroke-width='1.75' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* Hover previews what the button does: the wishlist pink. */
+.se-cinema__wish:is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--se-wish) 14%, var(--se-surface-2));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-wish) 35%, transparent);
+  color: var(--se-wish);
+}
+
+.se-cinema__wish:active {
+  transform: scale(.94);
+}
+
+/* Wishlisted: pink heart on a pink-tinted tile, so the state reads without hovering. */
+.se-cinema__wish[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--se-wish) 18%, var(--se-surface-2));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-wish) 40%, transparent);
   color: var(--se-wish);
 }
 

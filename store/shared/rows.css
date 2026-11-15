@@ -19,15 +19,17 @@ html.se-store-rows {
 /* ---------- Shared pieces ---------- */
 
 /* Pill button with a chevron: "See More", "Explore more", "Customize, Explore by Tag, & More". */
+/* !important: the theme's shared rules (store/shared/ui.css) set background, border, box-shadow,
+   color, line-height, padding, text-decoration with !important */
 html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLKwjtCwE- :is(a, button), .title_grid .see_more_link > a) * {
   padding: 0 !important;
   background: none !important;
   border: 0 !important;
   box-shadow: none !important;
   color: inherit !important;
-  -webkit-text-fill-color: currentColor !important;
+  -webkit-text-fill-color: currentColor;
   text-decoration: none !important;
-  font: inherit !important;
+  font: inherit;
   line-height: inherit !important;
 }
 
@@ -47,6 +49,8 @@ html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLK
 }
 
 /* Round glass carousel arrows, riding the edges of the row. */
+/* !important: the theme's shared rules (store/shared/sale.css) set margin, min-width, z-index with
+   !important */
 html.se-store-rows:not(#se-none) :is([data-se-arrow], :is(.CarouselBtnLeft, .CarouselBtnRight)) {
   z-index: 4 !important;
   min-width: 0 !important;
@@ -55,6 +59,8 @@ html.se-store-rows:not(#se-none) :is([data-se-arrow], :is(.CarouselBtnLeft, .Car
 }
 
 /* Steam's React arrow is a full-height 50px column; it becomes a circle on the row's middle. */
+/* !important: the theme's shared rules (store/shared/sale.css) set bottom, position, top with
+   !important */
 html.se-store-rows:not(#se-none) :is([data-se-arrow], .CarouselBtnLeft, .CarouselBtnRight) {
   position: absolute !important;
   top: 50% !important;
@@ -64,11 +70,11 @@ html.se-store-rows:not(#se-none) :is([data-se-arrow], .CarouselBtnLeft, .Carouse
 }
 
 html.se-store-rows:not(#se-none) :is([data-se-arrow="prev"], .CarouselBtnLeft) {
-  inset-inline-start: -22px !important;
+  inset-inline-start: -22px;
 }
 
 html.se-store-rows:not(#se-none) :is([data-se-arrow="next"], .CarouselBtnRight) {
-  inset-inline-end: -22px !important;
+  inset-inline-end: -22px;
 }
 
 /*
@@ -76,19 +82,22 @@ html.se-store-rows:not(#se-none) :is([data-se-arrow="next"], .CarouselBtnRight) 
  * drawn here. Its inner element stays, stretched over the circle, since it can be the part
  * that takes the click.
  */
+/* !important: height, inset, margin, opacity, position, width can come inline from Steam's markup
+   or scripts */
 html.se-store-rows:not(#se-none) [data-se-arrow] > * {
   position: absolute !important;
   inset: 0 !important;
   width: auto !important;
   height: auto !important;
   margin: 0 !important;
-  border: 0 !important;
-  border-radius: inherit !important;
-  background: none !important;
-  box-shadow: none !important;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  box-shadow: none;
   opacity: 0 !important;
 }
 
+/* !important: inset, opacity, position can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) :is(.CarouselBtnLeft, .CarouselBtnRight) > * {
   position: absolute !important;
   inset: 0 !important;
@@ -101,6 +110,8 @@ html.se-store-rows:not(#se-none) :is(.CarouselBtnLeft, .CarouselBtnRight)[disabl
 }
 
 /* Page dots: small dots, the current page a wide accent pill. */
+/* !important: the theme's shared rules (store/front/sections.css) set gap, margin-top with
+   !important; display, padding can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-) {
   display: flex !important;
   justify-content: center;
@@ -110,27 +121,33 @@ html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-
   padding: 0 !important;
 }
 
+/* !important: height, margin, opacity, padding, width can come inline from Steam's markup or
+   scripts */
 html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-) > * {
   flex: none;
   width: 8px !important;
   height: 8px !important;
   margin: 0 !important;
   padding: 0 !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-pill) !important;
-  background: var(--se-white-18) !important;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-18);
   opacity: 1 !important;
   transition: width var(--se-dur-slow) var(--se-ease), background-color var(--se-dur-slow);
 }
 
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-) > * > * {
   display: none !important;
 }
 
 html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-) > :hover {
-  background: rgba(255, 255, 255, .4) !important;
+  background: rgba(255, 255, 255, .4);
 }
 
+/* !important: Steam's own rules (buttons.css) set background at equal or higher weight; the
+   theme's shared rules (store/account/page.css, store/explore/page.css, store/front/tabs.css) set
+   background with !important; width can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-) > :is(.carousel__dot--selected, .focus, .active) {
   width: 26px !important;
   background: var(--se-accent) !important;
@@ -138,23 +155,26 @@ html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-
 
 /* ---------- Content rows (shared/rows.js tags) ---------- */
 
+/* !important: margin-top can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-shelf] {
   position: relative;
   margin-top: 40px !important;
-  background: none !important;
+  background: none;
 }
 
+/* !important: display, margin, padding can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-shelf-head] {
   display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
+  align-items: center;
+  justify-content: space-between;
   gap: 16px;
   min-height: 32px;
   margin: 0 0 14px !important;
   padding: 0 !important;
-  background: none !important;
+  background: none;
 }
 
+/* !important: margin can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) :is([data-se-shelf-title], .title_grid .home_section_title) {
   display: flex;
   align-items: center;
@@ -163,18 +183,34 @@ html.se-store-rows:not(#se-none) :is([data-se-shelf-title], .title_grid .home_se
 }
 
 /* Steam's backdrop (the blue panel) becomes a quiet theme card. */
+/* !important: padding can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-shelf-panel] {
   padding: 20px !important;
-  border: 0 !important;
-  background-image: none !important;
+  border: 0;
+  background-image: none;
 }
 
-/* Steam Deck row: the icon in the heading stays, tinted to the accent. */
+/*
+ * Steam Deck row (the one heading with an icon): Steam's white logo gives way to the theme's
+ * duotone handheld glyph (the store bar's Hardware icon, shared/nav.css) in the accent. Steam's
+ * art is swapped out, not removed (React owns it): an <img> shows a blank image, an <svg>
+ * hides its shapes; the glyph is the element's own masked fill.
+ */
 html.se-store-rows:not(#se-none) [data-se-shelf-title] :is(img, svg) {
-  width: 22px;
-  height: 22px;
+  flex: none;
+  width: var(--se-fs-3xl);
+  height: var(--se-fs-3xl);
+  margin-inline-end: var(--se-space-2);
+  vertical-align: middle;
+  content: linear-gradient(transparent, transparent);
+  background: var(--se-accent);
   filter: none;
-  color: var(--se-accent);
+  -webkit-mask: var(--se-ni-hardware) center / contain no-repeat;
+  mask: var(--se-ni-hardware) center / contain no-repeat;
+}
+
+html.se-store-rows:not(#se-none) [data-se-shelf-title] svg > * {
+  visibility: hidden;
 }
 
 html.se-store-rows:not(#se-none) [data-se-slot] {
@@ -185,8 +221,8 @@ html.se-store-rows:not(#se-none) [data-se-tile] {
   position: relative;
   display: block;
   overflow: hidden;
-  border-radius: var(--se-radius-xl) !important;
-  background: var(--se-surface-2) !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface-2);
   box-shadow: inset 0 0 0 1px var(--se-hairline);
   isolation: isolate;
   transition: transform var(--se-dur-slow) var(--se-ease), box-shadow var(--se-dur-slow);
@@ -237,6 +273,8 @@ html.se-store-rows:not(#se-none) [data-se-tile]:has(> img[data-se-tile-art])::af
 }
 
 /* The strip under the art collapses: its price rides the art's corner instead. */
+/* !important: height, inset, margin, min-height, padding, position, width can come inline from
+   Steam's markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-price-bar] {
   position: absolute !important;
   inset: auto 12px 12px auto !important;
@@ -246,8 +284,8 @@ html.se-store-rows:not(#se-none) [data-se-price-bar] {
   height: auto !important;
   margin: 0 !important;
   padding: 0 !important;
-  background: none !important;
-  box-shadow: none !important;
+  background: none;
+  box-shadow: none;
   pointer-events: none;
 }
 
@@ -260,6 +298,8 @@ html.se-store-rows:not(#se-none) [data-se-price-bar] {
 }
 
 /* A price moved into the art box rides its bottom-right corner. */
+/* !important: the theme's shared rules (store/explore/page.css, store/shared/ui.css) set inset,
+   position with !important */
 html.se-store-rows:not(#se-none) [data-se-tile-art] > [data-se-price] {
   position: absolute !important;
   inset: auto 12px 12px auto !important;
@@ -271,6 +311,8 @@ html.se-store-rows:not(#se-none) [data-se-tile-art] > [data-se-price] {
 
 /* Games with no price yet (upcoming): Steam still renders an empty .discount_block, a blank
    strip under the art. shared/rows.js never tags it; it is taken out of the tile here. */
+/* !important: Steam's own rules (contenthub.css) set display at equal or higher weight; the
+   theme's shared rules (store/dlc/page.css, store/explore/page.css) set display with !important */
 html.se-store-rows:not(#se-none) [data-se-tile] .discount_block.empty {
   display: none !important;
 }
@@ -282,13 +324,15 @@ html.se-store-rows:not(#se-none) :is([data-se-shelf-title], .title_grid .home_se
 }
 
 /* Deep-dive rows: the key tags under the art become pills on the tile. */
+/* !important: margin, padding can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-tile] .capsule_row_ctn {
-  border: 0 !important;
+  border: 0;
   margin: 0 !important;
   padding: 12px !important;
-  background: none !important;
+  background: none;
 }
 
+/* !important: display, margin, padding can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-tile] .deep_dive_key_tags {
   display: flex !important;
   flex-wrap: wrap;
@@ -297,7 +341,7 @@ html.se-store-rows:not(#se-none) [data-se-tile] .deep_dive_key_tags {
   overflow: hidden;
   margin: 0 !important;
   padding: 0 !important;
-  background: none !important;
+  background: none;
 }
 
 html.se-store-rows:not(#se-none) [data-se-tile] .deep_dive_tag {
@@ -311,14 +355,16 @@ html.se-store-rows:not(#se-none) [data-se-tile] .deep_dive_tag {
  * Follow button (.creator_capsule_ctn). Steam paints each with its own blue or pink gradient;
  * here they sit on the tile like the deep-dive tags.
  */
+/* !important: another rule in this file sets padding with !important; margin can come inline from
+   Steam's markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-tile] :is(.recently_updated_desc, .curator_capsule_ctn, .creator_capsule_ctn) {
   margin: 0 !important;
   padding: 12px 14px 14px !important;
-  border: 0 !important;
-  background: none !important;
-  color: var(--se-text-dim) !important;
-  font-size: var(--se-fs-sm) !important;
-  line-height: 1.45 !important;
+  border: 0;
+  background: none;
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-sm);
+  line-height: 1.45;
 }
 
 html.se-store-rows:not(#se-none) [data-se-tile] :is(.curator_capsule_ctn, .creator_capsule_ctn) {
@@ -326,48 +372,55 @@ html.se-store-rows:not(#se-none) [data-se-tile] :is(.curator_capsule_ctn, .creat
 }
 
 /* These carry their own padding; the strip around them adds none. */
+/* !important: another rule in this file sets padding with !important */
 html.se-store-rows:not(#se-none) [data-se-tile] .capsule_row_ctn:has(> :is(.recently_updated_desc, .curator_capsule_ctn, .creator_capsule_ctn)) {
   padding: 0 !important;
 }
 
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-tile] .curator_capsule_link {
   display: inline-flex !important;
   align-items: center;
   gap: 9px;
   min-width: 0;
-  color: var(--se-text) !important;
-  text-decoration: none !important;
+  color: var(--se-text);
+  text-decoration: none;
 }
 
+/* !important: height, width can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-tile] .curator_capsule_avatar {
   flex: none;
   width: 30px !important;
   height: 30px !important;
-  border-radius: 50% !important;
+  border-radius: 50%;
   box-shadow: 0 0 0 1px var(--se-hairline);
   object-fit: cover;
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-store-rows:not(#se-none) [data-se-tile] .curator_capsule_name {
   overflow: hidden;
   color: var(--se-text) !important;
-  font-size: var(--se-fs-base) !important;
-  font-weight: 700 !important;
+  font-size: var(--se-fs-base);
+  font-weight: 700;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-store-rows:not(#se-none) [data-se-tile] .curator_capsule_link:hover .curator_capsule_name {
   color: var(--se-accent) !important;
 }
 
 html.se-store-rows:not(#se-none) [data-se-tile] .curator_capsule_blurb {
-  color: var(--se-text-dim) !important;
-  font-size: var(--se-fs-sm) !important;
-  line-height: 1.45 !important;
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-sm);
+  line-height: 1.45;
 }
 
 /* Follow / Following: a small pill; following carries the accent. */
+/* !important: the theme's shared rules (store/shared/ui.css) set color, font-size, padding with
+   !important; width can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn {
   height: 28px;
   width: 112px !important;
@@ -376,9 +429,13 @@ html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn {
   font-size: var(--se-fs-sm) !important;
 }
 
+/* !important: Steam's own rules (shared_gamepad.css, store.css) set background, border, color at
+   equal or higher weight; the theme's shared rules (store/account/funds/page.css,
+   store/account/history/page.css, store/account/page.css) set background, border, color, display,
+   font, padding with !important */
 html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn > span {
   display: inline-flex !important;
-  flex-direction: row !important;
+  flex-direction: row;
   white-space: nowrap;
   align-items: center;
   gap: 6px;
@@ -390,6 +447,9 @@ html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn > span {
 }
 
 /* One width for both states, each with its own icon (+ / tick) in place of Steam's checkbox image. */
+/* !important: Steam's own rules (game_gamepad.css, game_mob.css) set display at equal or higher
+   weight; the theme's shared rules (store/account/page.css, store/account/phone/page.css,
+   store/app/summary.css) set display with !important */
 html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn img {
   display: none !important;
 }
@@ -407,6 +467,8 @@ html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn.following > 
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");
 }
 
+/* !important: the theme's shared rules (store/dlc/page.css, store/shared/ui.css) set background,
+   box-shadow, color with !important */
 html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn.following {
   background: var(--se-accent-surface) !important;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 35%, transparent) !important;
@@ -418,10 +480,13 @@ html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn.following {
  * strip under the art. Both ride the art instead: Pre-Purchase as a small green pill over the
  * price chip (bottom-right), the avatars as a row of round chips bottom-left.
  */
+/* !important: the theme's shared rules (store/shared/ui.css) set background-color,
+   background-position, bottom, padding with !important; left, position, right, top can come inline
+   from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-tile] .prepurchase_tag {
   position: absolute !important;
   right: 12px !important;
-  bottom: calc(12px + var(--se-price-h, 32px) + 6px) !important;
+  bottom: calc(12px + var(--se-price-h) + 6px) !important;
   left: auto !important;
   top: auto !important;
   z-index: 4;
@@ -435,6 +500,7 @@ html.se-store-rows:not(#se-none) [data-se-tile] .prepurchase_tag {
 }
 
 /* No price yet: the pill takes the price's corner. */
+/* !important: another rule in this file sets bottom with !important */
 html.se-store-rows:not(#se-none) [data-se-tile]:not(:has([data-se-price])) .prepurchase_tag {
   bottom: 12px !important;
 }
@@ -443,6 +509,8 @@ html.se-store-rows:not(#se-none) [data-se-slot]:hover [data-se-tile] .prepurchas
   translate: 0 -3px;
 }
 
+/* !important: bottom, display, left, margin, padding, position, width can come inline from Steam's
+   markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-tile] .curated_app_curators {
   position: absolute !important;
   left: 12px !important;
@@ -453,15 +521,16 @@ html.se-store-rows:not(#se-none) [data-se-tile] .curated_app_curators {
   width: auto !important;
   margin: 0 !important;
   padding: 0 !important;
-  background: none !important;
+  background: none;
 }
 
 html.se-store-rows:not(#se-none) [data-se-tile] .curated_app_curators > div:not(.steam_curator_for_app) {
   display: none !important; /* Steam's float clearer */
 }
 
+/* !important: height, margin, width can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-tile] .steam_curator_for_app {
-  float: none !important;
+  float: none;
   width: 26px !important;
   height: 26px !important;
   margin: 0 !important;
@@ -470,6 +539,7 @@ html.se-store-rows:not(#se-none) [data-se-tile] .steam_curator_for_app {
   box-shadow: 0 0 0 2px var(--se-glass-chip), var(--se-shadow-sm);
 }
 
+/* !important: height, width can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) [data-se-tile] .steam_curator_for_app_img {
   display: block;
   width: 100% !important;
@@ -478,6 +548,8 @@ html.se-store-rows:not(#se-none) [data-se-tile] .steam_curator_for_app_img {
 }
 
 /* "LIVE" badge: a glass chip with a pulsing red dot, top-left. */
+/* !important: display, left, margin, padding, position, top can come inline from Steam's markup or
+   scripts */
 html.se-store-rows:not(#se-none) [data-se-tile] .broadcast_live_stream_icon {
   position: absolute !important;
   top: 10px !important;
@@ -489,12 +561,12 @@ html.se-store-rows:not(#se-none) [data-se-tile] .broadcast_live_stream_icon {
   height: 24px;
   margin: 0 !important;
   padding: 0 10px 0 9px !important;
-  background-image: none !important;
-  color: var(--se-white) !important;
-  font-size: var(--se-fs-xs) !important;
-  font-weight: 700 !important;
+  background-image: none;
+  color: var(--se-white);
+  font-size: var(--se-fs-xs);
+  font-weight: 700;
   letter-spacing: .08em;
-  line-height: 1 !important;
+  line-height: 1;
   text-transform: uppercase;
 }
 
@@ -567,7 +639,9 @@ html.se-store-rows:not(#se-none) .UcrgejVf5aA- ._3bO01VgrZH0- {
   color: var(--se-white);
 }
 
-/* Classic flags (.ds_flag) in the rows and calendar: the same chip. Discounts & Events places its own (front/sections.css). */
+/* Classic flags (.ds_flag) in the rows and calendar (look: shared/ui.css). Discounts & Events places its own (front/sections.css). */
+/* !important: the theme's shared rules (store/app/summary.css, store/dlc/page.css,
+   store/explore/page.css) set bottom, left, position, right, top, width with !important */
 html.se-store-rows:not(#se-none) :is([data-se-slot], .nHdn-Ea4zSg-) .ds_flag {
   position: absolute !important;
   width: auto !important;
@@ -576,74 +650,16 @@ html.se-store-rows:not(#se-none) :is([data-se-slot], .nHdn-Ea4zSg-) .ds_flag {
   right: 10px !important;
   left: auto !important;
   z-index: 4;
-  height: auto !important;
-  padding: 4px 10px !important;
-  color: var(--se-white) !important;
-  font-size: var(--se-fs-xs) !important;
-  font-weight: 700 !important;
-  letter-spacing: .06em;
-  line-height: 14px !important;
-}
-
-html.se-store-rows:not(#se-none) :is([data-se-slot], .nHdn-Ea4zSg-) .ds_flag.ds_wishlist_flag {
-  color: var(--se-wish) !important;
-}
-
-/*
- * The chip's background replaces Steam's star image, so the star comes back as a mask in
- * the text colour. Also covers the tabbed lists' flags (front/tabs.css).
- */
-html.se-store-rows:not(#se-none) :is([data-se-slot], .nHdn-Ea4zSg-, [data-se-tabs] .tab_row_item) .ds_flag.ds_wishlist_flag::before {
-  content: "";
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  margin-inline-end: .45em;
-  vertical-align: -.14em;
-  background: currentColor;
-  -webkit-mask: var(--se-star-mask) center / contain no-repeat;
-  mask: var(--se-star-mask) center / contain no-repeat;
-}
-
-html.se-store-rows:not(#se-none) :is([data-se-slot], .nHdn-Ea4zSg-) .ds_flag.ds_owned_flag {
-  color: var(--se-owned) !important;
 }
 
 /* Steam dims owned/ignored art behind a flag; the chip alone says it. */
+/* !important: the theme's shared rules (store/front/tabs.css, store/search/page.css,
+   store/shared/nav.css) set opacity with !important */
 html.se-store-rows:not(#se-none) :is([data-se-slot], .nHdn-Ea4zSg-) .ds_flagged img {
   opacity: 1 !important;
 }
 
-/* ---------- "•••" options button and its menu (store.css .ds_options) ---------- */
-
-/* The button: a glass circle with three dots, top-right like the flags; accent on hover. */
-html.se-store-rows:not(#se-none) .ds_options {
-  top: 8px;
-  inset-inline-end: 8px;
-  padding: 0;
-}
-
-html.se-store-rows:not(#se-none) *:hover > .ds_options,
-html.se-store-rows:not(#se-none) .ds_hover.ds_options {
-  inset-inline-end: 8px;
-}
-
-html.se-store-rows:not(#se-none) .ds_options > div {
-  position: static;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='6' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='18' cy='12' r='1.8'/%3E%3C/svg%3E") center / 18px no-repeat,
-    var(--se-glass-chip);
-  backdrop-filter: var(--se-blur-chip);
-  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line), var(--se-shadow-sm);
-  transition: background-color var(--se-dur);
-}
-
-html.se-store-rows:not(#se-none) .ds_options:hover > div {
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230f1115'%3E%3Ccircle cx='6' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='18' cy='12' r='1.8'/%3E%3C/svg%3E") center / 18px no-repeat,
-    var(--se-accent);
-}
+/* ---------- "•••" options button (look and menu: shared/ui.css) ---------- */
 
 /*
  * While the button shows, a flag in the same corner steps aside. Steam adds both to the
@@ -658,31 +674,11 @@ html.se-store-rows:not(#se-none) :is(.ds_flag, .UcrgejVf5aA-) {
   transition: translate var(--se-dur-slow) var(--se-ease);
 }
 
-/* The menu: the theme's popover. */
-html.se-store-rows:not(#se-none) .ds_options_tooltip {
-  padding: 6px;
-  color: var(--se-text-dim);
-}
-
-html.se-store-rows:not(#se-none) .ds_options_tooltip > .option {
-  margin: 0;
-  padding: 9px 14px;
-  border-radius: var(--se-radius-sm);
-  color: var(--se-text-dim);
-  font-size: var(--se-fs-base);
-  font-weight: 500;
-  transition: background-color var(--se-dur), color var(--se-dur);
-}
-
-html.se-store-rows:not(#se-none) .ds_options_tooltip > .option:hover {
-  background: var(--se-hover);
-  color: var(--se-white);
-}
-
 /* ---------- Page end ----------
  * The endless "more content" area under the last row (Steam's autoloader, switched off by
  * shared/rows.js): gone with its loading, "no more" and sign-in notes, so the footer ends the page.
  */
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) :is(#content_more, #content_loading, #content_none, #content_callout, #content_login) {
   display: none !important;
 }

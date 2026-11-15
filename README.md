@@ -138,6 +138,9 @@ Every web page fills the window and shares the theme's cards, pills, glass chips
 | **Legal** | The Subscriber Agreement and Privacy Policy as documents with a contents sidebar and progress bar. |
 | **Community** | Profiles as glass cards over their own background, a three-column Activity feed, Hubs, Discussions, a 5 × 5 inventory grid with rarity glows and a Community Market with a wallet hero, ranked listings and a game filter. |
 | **Support** | Every help.steampowered.com page, from the wizard to refunds and account recovery. |
+| **Search** | Results as cards with aligned date, review and price columns, one toolbar card for search and sort, and filters as folding cards with accent checkboxes. |
+| **Wishlist** | Item cards with the rounded capsule, review facts and tag pills, the shared price chip beside Add to Cart, one toolbar card for search, sort and options, and active filters as chips. |
+| **Checkout** | The cart and checkout as one flow: item cards, a sticky total, payment details and Steam Points as cards, and Purchase as the one primary button. |
 
 <br>
 
@@ -257,6 +260,7 @@ Steam-Enhanced/
 ├── store/        Store redesigns, one folder per page, loaded by store/loader.js
 ├── community/    Community redesigns, one folder per page plus shared/
 ├── help/         Steam Support pages
+├── checkout/     Steam checkout pages
 ├── compat/       Plugin integrations (HowLongToBeat, Extendium, Size on Disk, Player Count, ProtonDB, Achievement Manager, SteamGridDB)
 ├── options/      Setting overrides that Millennium applies when you pick them
 ├── dev/          Element inspector (Ctrl+Shift+E), classmap.py, colors.py, css-check.py, spinner_svg.py

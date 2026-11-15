@@ -19,6 +19,10 @@
  *   charts/     Steam Charts (/charts/...)
  *   labs/       Steam Labs (/labs/)
  *   dlc/        DLC hub of a game (/dlc/<appid>/...)
+ *   agecheck/   Age check gate (/agecheck/app|sub|bundle/<id>)
+ *   cart/       Shopping cart (/cart/)
+ *   wishlist/   Wishlist (/wishlist/id/<name>/, /wishlist/profiles/<steamid>/)
+ *   search/     Search results (/search/)
  *   nextfest/   Steam Next Fest (/sale/nextfest/)
  *   awards/     The Steam Awards: results.* (/steamawards/2016 ...), archive.* (/steamawards/archive)
  *   replay/     Steam Replay (/replay/<steamid>/<year>)
@@ -52,6 +56,10 @@ start({
     charts: { test: (path) => /^\/charts(?:\/|$)/i.test(path), root: 'se-store-charts' },
     labs: { test: (path) => /^\/labs\/?$/i.test(path), root: 'se-store-labs' },
     dlc: { test: (path) => /^\/dlc\/\d+(?:\/|$)/i.test(path), root: 'se-store-dlc' },
+    agecheck: { test: (path) => /^\/agecheck\/(?:app|sub|bundle)\/\d+(?:\/|$)/i.test(path), root: 'se-store-agecheck' },
+    cart: { test: (path) => /^\/cart\/?$/i.test(path), root: 'se-store-cart' },
+    search: { test: (path) => /^\/search\/?$/i.test(path), root: 'se-store-search' },
+    wishlist: { test: (path) => /^\/wishlist\/(?:id|profiles)\/[^/]+\/?$/i.test(path), root: 'se-store-wishlist' },
     nextfest: { test: (path) => /^\/sale\/nextfest\/?$/i.test(path), root: 'se-store-nextfest' },
     // Its script sets .se-store-awards itself: it measures Steam's own layout first.
     awards: { test: (path) => /^\/steamawards\/\d{4}\/?$/i.test(path), root: null },
@@ -97,6 +105,10 @@ start({
     { css: 'charts/page.css', on: ['charts'] },
     { css: 'labs/page.css', js: 'labs/page.js', on: ['labs'] },
     { css: 'dlc/page.css', js: 'dlc/page.js', on: ['dlc'] },
+    { css: 'agecheck/page.css', js: 'agecheck/page.js', on: ['agecheck'] },
+    { css: 'cart/page.css', js: 'cart/page.js', on: ['cart'] },
+    { css: 'wishlist/page.css', js: 'wishlist/page.js', on: ['wishlist'] },
+    { css: 'search/page.css', js: 'search/page.js', on: ['search'] },
     { css: 'nextfest/page.css', js: 'nextfest/page.js', on: ['nextfest'] },
     { css: 'awards/results.css', js: 'awards/results.js', on: ['awards'] },
     { css: 'awards/archive.css', js: 'awards/archive.js', on: ['awardsArchive'] },

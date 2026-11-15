@@ -126,10 +126,47 @@ export const tagPrice = (price) => {
   }
 };
 
-export const untagPrices = () => {
-  for (const node of document.querySelectorAll(PRICE_PARTS.map((name) => `[${name}]`).join(', '))) {
+const PRICE_SELECTOR = PRICE_PARTS.map((name) => `[${name}]`).join(', ');
+
+/** Untag one price widget and its parts (other features' prices elsewhere stay tagged). */
+export const untagPrice = (price) => {
+  for (const node of [price, ...price.querySelectorAll(PRICE_SELECTOR)]) {
     for (const name of PRICE_PARTS) node.removeAttribute(name);
   }
+};
+
+export const untagPrices = () => {
+  for (const node of document.querySelectorAll(PRICE_SELECTOR)) {
+    for (const name of PRICE_PARTS) node.removeAttribute(name);
+  }
+};
+
+/* ---------- Game art ---------- */
+
+/** A game's library hero on Steam's CDN, in the order to try the hosts. */
+export const heroURLs = (appid) => [
+  `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${appid}/library_hero.jpg`,
+  `https://cdn.cloudflare.steamstatic.com/steam/apps/${appid}/library_hero.jpg`,
+];
+
+const preload = (url) =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => (img.naturalWidth > 1 ? resolve(url) : reject(new Error('empty')));
+    img.onerror = reject;
+    img.src = url;
+  });
+
+/** The first of `urls` that loads as a real image (not Steam's 1×1 placeholder), else null. */
+export const firstLoaded = async (urls) => {
+  for (const url of urls) {
+    try {
+      return await preload(url);
+    } catch {
+      // the next one
+    }
+  }
+  return null;
 };
 
 /* ---------- One observer for every feature ---------- */

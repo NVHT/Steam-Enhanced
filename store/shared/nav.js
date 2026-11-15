@@ -233,7 +233,7 @@ export default (dom) => {
    * class (main.css), else structurally: the floating ancestor of the "Advanced Search" link,
    * looked for only while the field has focus, the only time the box exists.
    */
-  const SUGGESTIONS_POSITION = '.ybF-Nf0hQ3w-';
+  const SUGGESTIONS_POSITION = '.ybF-Nf0hQ3w-, .ThAcZyxR3bU-';
   const searchForm = () => document.querySelector(`[${ATTR}="search-form"]`);
 
   const findSuggestions = (form) => {
@@ -511,6 +511,18 @@ export default (dom) => {
   life.listen(document, 'pointerout', (event) => {
     if (!event.relatedTarget && openItem()) scheduleClose();
   }, true);
+
+  /*
+   * Tiles whose art is still loading are classified on a later pass, but an image finishing
+   * (or a panel finishing its slide open) changes no DOM, so nothing else would bring that pass
+   * until the pointer moved. load/error don't bubble: caught in the capture phase.
+   */
+  const onPanelSettled = (event) => {
+    if (insideMenu(event.target)) schedulePanels();
+  };
+  life.listen(document, 'load', onPanelSettled, true);
+  life.listen(document, 'error', onPanelSettled, true);
+  life.listen(document, 'transitionend', onPanelSettled, true);
 
   update();
 

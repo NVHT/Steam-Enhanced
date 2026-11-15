@@ -20,31 +20,35 @@
 /* ---------- Page ---------- */
 
 html.se-store-dlc:not(#se-none) body.dlc_curator {
-  background: var(--se-bg) !important;
+  background: var(--se-bg);
 }
 
 /* Steam's 220px banner wash and the boxes' gradient: the hero's art replaces both. */
+/* !important: another rule in this file sets display with !important */
 html.se-store-dlc:not(#se-none) #page_background_container,
 html.se-store-dlc:not(#se-none) .page_content_ctn.light_container.bezel::before {
   display: none !important;
 }
 
 html.se-store-dlc:not(#se-none) .page_content_ctn.light_container.bezel {
-  background: none !important;
-  box-shadow: none !important;
+  background: none;
+  box-shadow: none;
 }
 
+/* !important: margin-inline, max-width, padding, width can come inline from Steam's markup or
+   scripts */
 html.se-store-dlc:not(#se-none) .creator_grid_ctn {
   box-sizing: border-box;
   width: var(--se-page-width) !important;
   max-width: none !important;
   margin-inline: auto !important;
   padding: 0 0 56px !important;
-  gap: 40px !important;
+  gap: 40px;
 }
 
 /* ---------- Hero ---------- */
 
+/* !important: height, padding can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] {
   position: relative;
   isolation: isolate;
@@ -75,6 +79,7 @@ html.se-store-dlc:not(#se-none) [data-se-dlc-hero]::after {
   pointer-events: none;
 }
 
+/* !important: another rule in this file sets height, margin-block, min-height with !important */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_header_ctn,
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] #header_container {
   height: auto !important;
@@ -87,11 +92,12 @@ html.se-store-dlc:not(#se-none) [data-se-dlc-hero] #header_container {
   grid-template-columns: clamp(280px, 26vw, 460px) minmax(0, 1fr);
   align-items: center;
   gap: clamp(24px, 3vw, 44px);
-  background: none !important;
+  background: none;
 }
 
+/* !important: height, padding, width can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_avatar_image {
-  float: none !important;
+  float: none;
   width: auto !important;
   height: auto !important;
   padding: 0 !important;
@@ -121,27 +127,32 @@ html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_avatar_image a:hover
   translate: 0 -3px;
 }
 
+/* !important: height, width can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] img.curator_avatar {
   display: block;
   width: 100% !important;
   height: auto !important;
   aspect-ratio: 460 / 215;
   object-fit: cover;
-  border: 0 !important;
-  border-radius: 0 !important;
+  border: 0;
+  border-radius: 0;
 }
 
+/* !important: width can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_details {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 12px;
   width: auto !important;
-  overflow: visible !important;
-  text-shadow: none !important;
+  overflow: visible;
+  text-shadow: none;
 }
 
 /* "Downloadable Content For" */
+/* !important: Steam's own rules (game_gamepad.css) set color at equal or higher weight; another
+   rule in this file sets color, font-family, font-size, font-weight, letter-spacing, margin with
+   !important */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_details h4 {
   margin: 0 !important;
   color: var(--se-accent) !important;
@@ -153,24 +164,29 @@ html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_details h4 {
   text-transform: uppercase;
 }
 
+/* !important: height, margin, width can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] h2.curator_name {
   display: -webkit-box;
   width: auto !important;
   height: auto !important;
   margin: 0 !important;
   overflow: hidden;
-  color: var(--se-white) !important;
-  font-family: inherit !important;
-  font-size: var(--se-fs-hero) !important;
-  font-weight: 800 !important;
-  letter-spacing: -.02em !important;
-  line-height: 1.05 !important;
-  text-transform: none !important;
-  white-space: normal !important;
+  color: var(--se-white);
+  font-family: inherit;
+  font-size: var(--se-fs-hero);
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.05;
+  text-transform: none;
+  white-space: normal;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
+/* !important: Steam's own rules (cart.css, game_gamepad.css, game_mob.css) set color,
+   text-decoration at equal or higher weight; the theme's shared rules (store/shared/modals.css,
+   store/shared/nav.css, store/shared/sale.css) set color, height, text-decoration, width with
+   !important */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] h2.curator_name a {
   width: auto !important;
   height: auto !important;
@@ -193,11 +209,14 @@ html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_details > :is(h4, h2
   flex: 0 0 100%;
 }
 
+/* !important: Steam's own rules (contenthub.css, salesectionfactory.css) set margin-top at equal
+   or higher weight */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .curator_details > h2 {
   margin-top: -4px !important;
 }
 
 /* "3 add-ons · 1,103,465 followers" */
+/* !important: margin can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .se-dlc-hero__stats {
   display: flex;
   flex-wrap: wrap;
@@ -221,6 +240,8 @@ html.se-store-dlc:not(#se-none) .se-dlc-hero__stats > span + span::before {
 }
 
 /* Store Page: a glass pill matching Follow's height, chevron after. */
+/* !important: the theme's shared rules (store/shared/ui.css) set background, box-shadow, color,
+   font-size, font-weight, padding with !important */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .se-dlc-hero__store {
   height: 40px;
   padding: 0 16px 0 20px !important;
@@ -232,6 +253,8 @@ html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .se-dlc-hero__store {
   font-weight: 700 !important;
 }
 
+/* !important: the theme's shared rules (store/shared/ui.css) set background, color with !important
+   */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .se-dlc-hero__store:hover {
   background: var(--se-glass-btn-hover) !important;
   color: var(--se-white) !important;
@@ -255,29 +278,36 @@ html.se-store-dlc:not(#se-none) .se-dlc-hero__store:hover::after {
  * red cross on hover (clicking it unfollows). Display is left to Steam: it shows one of the two
  * and hides the other, and any display set here would bring the hidden one back.
  */
+/* !important: margin, padding can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_controls {
   margin: 0 !important;
   padding: 0 !important;
-  background: none !important;
-  border-radius: 0 !important;
+  background: none;
+  border-radius: 0;
 }
 
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn_stats {
   display: none !important;
 }
 
 /* Social links row: Steam paints it a bar even with nothing visible in it; dlc/page.js marks it
    [data-se-empty] then. */
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .socialmedia_accounts[data-se-empty] {
   display: none !important;
 }
 
+/* !important: Steam's own rules (shared_gamepad.css, store.css) set background, border,
+   box-shadow, color, text-shadow at equal or higher weight; the theme's shared rules
+   (store/shared/modals.css, store/shared/rows.css, store/shared/sale.css) set background, border,
+   color, height, line-height, padding, text-shadow with !important */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span {
   box-sizing: border-box;
   height: 40px !important;
   padding: 0 22px 0 18px !important;
   border: 0 !important;
-  border-radius: var(--se-radius-pill) !important;
+  border-radius: var(--se-radius-pill);
   background: var(--se-accent) !important;
   box-shadow: 0 8px 24px -10px color-mix(in srgb, var(--se-accent) 60%, transparent) !important;
   color: var(--se-on-accent) !important;
@@ -288,10 +318,15 @@ html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span {
   transition: background-color var(--se-dur), color var(--se-dur), box-shadow var(--se-dur);
 }
 
+/* !important: Steam's own rules (shared_gamepad.css) set background at equal or higher weight; the
+   theme's shared rules (store/shared/modals.css, store/shared/rows.css) set background with
+   !important */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span:hover {
   background: var(--se-accent-hover) !important;
 }
 
+/* !important: the theme's shared rules (store/shared/rows.css) set background, box-shadow, color
+   with !important */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span.following {
   background: var(--se-glass-chip) !important;
   backdrop-filter: var(--se-blur-chip);
@@ -299,21 +334,31 @@ html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span.following 
   color: var(--se-text) !important;
 }
 
+/* !important: the theme's shared rules (store/shared/rows.css) set background, box-shadow, color
+   with !important */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span.following:hover {
   background: rgba(229, 115, 122, .14) !important;
   box-shadow: inset 0 0 0 1px rgba(229, 115, 122, .45) !important;
   color: var(--se-danger) !important;
 }
 
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span[style*="none"] {
   display: none !important;
 }
 
 /* Steam's checkbox sprite: the icon is drawn below instead. */
+/* !important: Steam's own rules (game_gamepad.css, game_mob.css) set display at equal or higher
+   weight; the theme's shared rules (store/shared/nav.css, store/shared/rows.css) set display with
+   !important */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn img {
   display: none !important;
 }
 
+/* !important: Steam's own rules (game_mob.css, shared_gamepad.css, store.css) set background,
+   border, color, font-size, text-shadow at equal or higher weight; the theme's shared rules
+   (store/shared/modals.css, store/shared/rows.css, store/shared/sale.css) set background, border,
+   color, display, height, line-height, padding, text-shadow with !important */
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span > span {
   display: inline-flex !important;
   align-items: center;
@@ -323,12 +368,12 @@ html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span > span {
   border: 0 !important;
   background: none !important;
   color: inherit !important;
-  font-family: inherit !important;
+  font-family: inherit;
   font-size: var(--se-fs-md) !important;
-  font-weight: 700 !important;
+  font-weight: 700;
   line-height: 1 !important;
   text-shadow: none !important;
-  text-transform: none !important;
+  text-transform: none;
 }
 
 html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span > span::before {
@@ -351,17 +396,23 @@ html.se-store-dlc:not(#se-none) [data-se-dlc-hero] .follow_btn > span.following:
 
 /* ---------- Featured / Lists ---------- */
 
+/* !important: height, padding can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .creator_grid_ctn .navigation_bar {
   align-items: center;
   gap: 4px;
   height: auto !important;
   padding: 0 0 12px !important;
-  border: 0 !important;
-  border-bottom: 1px solid var(--se-divider) !important;
-  background: none !important;
-  box-shadow: none !important;
+  border: 0;
+  border-bottom: 1px solid var(--se-divider);
+  background: none;
+  box-shadow: none;
 }
 
+/* !important: Steam's own rules (apppageroutes.css, cart.css, game_gamepad.css) set color,
+   font-size, margin, padding at equal or higher weight; the theme's shared rules
+   (store/shared/modals.css, store/shared/nav.css, store/shared/sale.css) set background, border,
+   color, font-family, font-size, font-weight, letter-spacing, margin, padding, text-transform with
+   !important */
 html.se-store-dlc:not(#se-none) .creator_grid_ctn .navigation_bar > a {
   display: inline-flex;
   align-items: center;
@@ -380,11 +431,15 @@ html.se-store-dlc:not(#se-none) .creator_grid_ctn .navigation_bar > a {
   transition: background-color var(--se-dur), color var(--se-dur);
 }
 
+/* !important: Steam's own rules (game_gamepad.css, game_mob.css) set color at equal or higher
+   weight; the theme's shared rules (store/shared/modals.css, store/shared/sale.css,
+   store/shared/ui.css) set background, color with !important */
 html.se-store-dlc:not(#se-none) .creator_grid_ctn .navigation_bar > a:hover {
   background: var(--se-pill) !important;
   color: var(--se-white) !important;
 }
 
+/* !important: another rule in this file sets background, color with !important */
 html.se-store-dlc:not(#se-none) .creator_grid_ctn .navigation_bar > a.selected {
   background: var(--se-selected) !important;
   color: var(--se-white) !important;
@@ -395,6 +450,9 @@ html.se-store-dlc:not(#se-none) .creator_grid_ctn .nav_right_side {
   justify-content: flex-end;
 }
 
+/* !important: Steam's own rules (game_mob.css, shared_gamepad.css) set padding at equal or higher
+   weight; the theme's shared rules (store/shared/sale.css, store/shared/ui.css) set background,
+   padding with !important */
 html.se-store-dlc:not(#se-none) .creator_grid_ctn .curator_report a {
   display: inline-grid;
   place-items: center;
@@ -407,12 +465,17 @@ html.se-store-dlc:not(#se-none) .creator_grid_ctn .curator_report a {
   transition: background-color var(--se-dur), opacity var(--se-dur);
 }
 
+/* !important: the theme's shared rules (store/shared/sale.css, store/shared/ui.css) set background
+   with !important */
 html.se-store-dlc:not(#se-none) .creator_grid_ctn .curator_report a:hover {
   background: var(--se-pill) !important;
   opacity: 1;
 }
 
 /* Report: Steam's gear sprite reads as "settings"; a flag says what it does. */
+/* !important: Steam's own rules (game_gamepad.css, game_mob.css) set display at equal or higher
+   weight; the theme's shared rules (store/shared/nav.css, store/shared/rows.css) set display with
+   !important */
 html.se-store-dlc:not(#se-none) .creator_grid_ctn .curator_report a img {
   display: none !important;
 }
@@ -427,6 +490,8 @@ html.se-store-dlc:not(#se-none) .creator_grid_ctn .curator_report a::before {
 
 /* ---------- Featured carousels ---------- */
 
+/* !important: the theme's shared rules (store/shared/layout.css) set height, margin, padding,
+   width with !important */
 html.se-store-dlc:not(#se-none) .content_highlights,
 html.se-store-dlc:not(#se-none) .content_highlights > .page_content {
   width: auto !important;
@@ -435,6 +500,7 @@ html.se-store-dlc:not(#se-none) .content_highlights > .page_content {
   padding: 0 !important;
 }
 
+/* !important: margin can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .content_highlights .page_section {
   margin: 0 0 28px !important;
 }
@@ -443,10 +509,12 @@ html.se-store-dlc:not(#se-none) .content_highlights .page_section.empty {
   display: none;
 }
 
+/* !important: height can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .content_highlights .carousel_container {
   height: auto !important;
 }
 
+/* !important: height can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .content_highlights .carousel_items {
   height: auto !important;
 }
@@ -462,6 +530,7 @@ html.se-store-dlc:not(#se-none) .content_highlights .carousel_items {
  *   [ Name of the add-on                                   ][ ▢ ]
  *   [ (Release date)  blurb …                              ][ ▢ ]
  */
+/* !important: display, height can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .curator_featured > .focus {
   position: relative;
   isolation: isolate;
@@ -508,12 +577,14 @@ html.se-store-dlc:not(#se-none) .se-dlc-spot__stage::after {
 }
 
 /* Left column: capsule, name, date, blurb, bottom-aligned. */
+/* !important: the theme's shared rules (store/shared/ui.css) set background, height, width with
+   !important; margin, padding can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .curator_featured .capsule {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   gap: 18px;
-  float: none !important;
+  float: none;
   width: auto !important;
   height: auto !important;
   margin: 0 !important;
@@ -521,6 +592,8 @@ html.se-store-dlc:not(#se-none) .curator_featured .capsule {
   background: none !important;
 }
 
+/* !important: the theme's shared rules (store/shared/nav.css, store/shared/sale.css) set height,
+   width with !important */
 html.se-store-dlc:not(#se-none) .curator_featured .capsule > a {
   position: relative;
   display: block;
@@ -545,6 +618,7 @@ html.se-store-dlc:not(#se-none) .curator_featured .capsule > a:hover {
   translate: 0 -3px;
 }
 
+/* !important: height, width can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .curator_featured img.capimg {
   display: block;
   width: 100% !important;
@@ -554,6 +628,8 @@ html.se-store-dlc:not(#se-none) .curator_featured img.capimg {
 }
 
 /* Platforms and price as glass chips along the capsule's bottom edge. */
+/* !important: height, margin, padding, position, width can come inline from Steam's markup or
+   scripts */
 html.se-store-dlc:not(#se-none) .curator_featured .price_row {
   position: absolute !important;
   inset: auto 10px 10px auto;
@@ -564,9 +640,11 @@ html.se-store-dlc:not(#se-none) .curator_featured .price_row {
   height: auto !important;
   margin: 0 !important;
   padding: 0 !important;
-  background: none !important;
+  background: none;
 }
 
+/* !important: Steam's own rules (contenthub.css) set display at equal or higher weight; the
+   theme's shared rules (store/shared/rows.css) set display with !important */
 html.se-store-dlc:not(#se-none) .curator_featured .price_row .app_platforms:empty,
 html.se-store-dlc:not(#se-none) .curator_featured .price_row .discount_block.empty {
   display: none !important;
@@ -583,26 +661,27 @@ html.se-store-dlc:not(#se-none) .curator_featured .price_row .app_platforms {
   box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
 }
 
+/* Item flags (look: shared/ui.css). Featured: the art's top-left corner. */
+/* !important: the theme's shared rules (store/shared/sale.css, store/shared/ui.css) set inset,
+   line-height, padding with !important */
 html.se-store-dlc:not(#se-none) .curator_featured .ds_flag {
   inset: 10px auto auto 10px !important;
   height: 24px;
   padding: 0 10px !important;
-  border-radius: var(--se-radius-pill);
-  background: var(--se-glass-chip) !important;
-  backdrop-filter: var(--se-blur-chip);
-  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
-  color: var(--se-wish) !important;
-  font-size: var(--se-fs-xs) !important;
-  font-weight: 700;
-  letter-spacing: .06em;
   line-height: 24px !important;
 }
 
-html.se-store-dlc:not(#se-none) .curator_featured .ds_flag.ds_owned_flag {
-  color: var(--se-owned) !important;
+/* List: the capsule's top-left corner, measured from the row's padding like the options button. */
+/* !important: the theme's shared rules (store/shared/rows.css, store/shared/sale.css) set inset,
+   position with !important */
+html.se-store-dlc:not(#se-none) #RecommendationsRows .ds_flag {
+  position: absolute !important;
+  inset: var(--se-space-4) auto auto var(--se-space-4) !important;
+  z-index: var(--se-z-raised-2);
 }
 
 /* Name (dlc/page.js), date, blurb. */
+/* !important: height, margin, padding can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .curator_featured .curator_review {
   display: flex;
   flex-direction: column;
@@ -611,15 +690,16 @@ html.se-store-dlc:not(#se-none) .curator_featured .curator_review {
   height: auto !important;
   margin: 0 !important;
   padding: 0 !important;
-  background: none !important;
-  color: var(--se-text-dim) !important;
-  font-family: inherit !important;
-  font-size: var(--se-fs-lg) !important;
-  font-style: normal !important;
-  line-height: 1.55 !important;
+  background: none;
+  color: var(--se-text-dim);
+  font-family: inherit;
+  font-size: var(--se-fs-lg);
+  font-style: normal;
+  line-height: 1.55;
   text-shadow: 0 1px 12px var(--se-black-60);
 }
 
+/* !important: another rule in this file sets content with !important */
 html.se-store-dlc:not(#se-none) .curator_featured .curator_review::before,
 html.se-store-dlc:not(#se-none) .curator_featured .curator_review::after {
   content: none !important;
@@ -636,11 +716,17 @@ html.se-store-dlc:not(#se-none) .se-dlc-spot__title {
   text-wrap: balance;
 }
 
+/* !important: Steam's own rules (cart.css, game_gamepad.css, game_mob.css) set color,
+   text-decoration at equal or higher weight; the theme's shared rules (store/shared/modals.css,
+   store/shared/ui.css) set color, text-decoration with !important */
 html.se-store-dlc:not(#se-none) .se-dlc-spot__title a {
   color: inherit !important;
   text-decoration: none !important;
 }
 
+/* !important: Steam's own rules (cart.css, game_gamepad.css, game_mob.css) set color at equal or
+   higher weight; the theme's shared rules (store/shared/modals.css, store/shared/ui.css) set color
+   with !important */
 html.se-store-dlc:not(#se-none) .se-dlc-spot__title a:hover {
   color: var(--se-accent-hover) !important;
 }
@@ -653,6 +739,7 @@ html.se-store-dlc:not(#se-none) .se-dlc-spot__blurb {
   -webkit-line-clamp: 3;
 }
 
+/* !important: margin can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .curator_featured .review_details {
   order: -1;
   display: flex;
@@ -661,10 +748,14 @@ html.se-store-dlc:not(#se-none) .curator_featured .review_details {
   margin: 0 !important;
 }
 
-html.se-store-dlc:not(#se-none) .curator_featured .review_direction:empty {
-  display: none;
+/* Steam's thumb slot holds only whitespace on DLC hubs: :empty misses it, and its width plus
+   the gap pushed the date chip in from the title's edge. */
+/* !important: display can come inline from Steam's markup or scripts */
+html.se-store-dlc:not(#se-none) .curator_featured .review_direction:not(:has(*)) {
+  display: none !important;
 }
 
+/* !important: another rule in this file sets color, font-size, margin with !important */
 html.se-store-dlc:not(#se-none) .curator_featured .curator_review_date {
   display: inline-flex;
   align-items: center;
@@ -674,6 +765,7 @@ html.se-store-dlc:not(#se-none) .curator_featured .curator_review_date {
   background: var(--se-glass-chip);
   backdrop-filter: var(--se-blur-chip);
   box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  margin: 0 !important;
   color: var(--se-gold) !important;
   font-size: var(--se-fs-sm) !important;
   font-weight: 700;
@@ -681,14 +773,16 @@ html.se-store-dlc:not(#se-none) .curator_featured .curator_review_date {
 }
 
 /* Right column: the screenshots as a rail of thumbnails. */
+/* !important: height, margin, width can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .curator_featured .contents {
   width: auto !important;
   height: auto !important;
   margin: 0 !important;
   padding: 14px 14px 14px 0;
-  float: none !important;
+  float: none;
 }
 
+/* !important: display, height can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .curator_featured .screenshots {
   display: grid !important;
   grid-auto-rows: minmax(0, 1fr);
@@ -696,6 +790,8 @@ html.se-store-dlc:not(#se-none) .curator_featured .screenshots {
   height: 100% !important;
 }
 
+/* !important: the theme's shared rules (store/shared/layout.css, store/shared/modals.css,
+   store/shared/nav.css) set height, margin, width with !important */
 html.se-store-dlc:not(#se-none) .curator_featured .screenshots > div {
   position: relative;
   width: auto !important;
@@ -703,8 +799,8 @@ html.se-store-dlc:not(#se-none) .curator_featured .screenshots > div {
   min-height: 0;
   margin: 0 !important;
   border-radius: var(--se-radius-md);
-  background-position: center !important;
-  background-size: cover !important;
+  background-position: center;
+  background-size: cover;
   opacity: .55;
   box-shadow: inset 0 0 0 1px var(--se-glass-chip-line), var(--se-shadow-sm);
   cursor: pointer;
@@ -743,6 +839,7 @@ html.se-store-dlc:not(#se-none) .curator_featured :is(.focus:hover, [data-se-pau
 }
 
 /* Paging dots: a short pill for each item, the current one long and accented. */
+/* !important: height, margin, padding can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .content_highlights .carousel_thumbs {
   display: flex;
   justify-content: center;
@@ -757,22 +854,27 @@ html.se-store-dlc:not(#se-none) .content_highlights .no_paging .carousel_thumbs 
   display: none;
 }
 
+/* !important: height, margin, width can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .content_highlights .carousel_thumbs > * {
   width: 8px !important;
   height: 8px !important;
   margin: 0 !important;
   border-radius: var(--se-radius-pill);
-  background: var(--se-white-25) !important;
+  background: var(--se-white-25);
   cursor: pointer;
   transition: width var(--se-dur-slow) var(--se-ease), background-color var(--se-dur);
 }
 
+/* !important: the theme's shared rules (store/shared/ui.css) set background with !important; width
+   can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .content_highlights .carousel_thumbs > .focus {
   width: 24px !important;
   background: var(--se-accent) !important;
 }
 
 /* Arrows: round glass buttons over the card's edges. */
+/* !important: another rule in this file sets background with !important; height, top, width can
+   come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .content_highlights .carousel_container .arrow {
   top: calc(50% - 38px) !important;
   width: 40px !important;
@@ -783,20 +885,25 @@ html.se-store-dlc:not(#se-none) .content_highlights .carousel_container .arrow {
   box-shadow: inset 0 0 0 1px var(--se-glass-btn-line), var(--se-glass-btn-shadow);
 }
 
+/* !important: another rule in this file sets background with !important */
 html.se-store-dlc:not(#se-none) .content_highlights .carousel_container .arrow:hover {
   background: var(--se-glass-btn-hover) !important;
 }
 
+/* !important: left can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .content_highlights .carousel_container .arrow.left {
   left: 12px !important;
 }
 
+/* !important: right can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .content_highlights .carousel_container .arrow.right {
   right: 12px !important;
 }
 
 /* ---------- Browse: tabs ---------- */
 
+/* !important: the theme's shared rules (store/shared/layout.css) set height, margin, padding,
+   width with !important */
 html.se-store-dlc:not(#se-none) .tabbed_ctn,
 html.se-store-dlc:not(#se-none) .tabbed_ctn > .page_content {
   width: auto !important;
@@ -805,10 +912,21 @@ html.se-store-dlc:not(#se-none) .tabbed_ctn > .page_content {
   padding: 0 !important;
 }
 
+/* curator_recommendations.css washes the browse block in a translucent white panel; the tabs,
+   filter cards and row cards carry their own surfaces, so the wrapper stays bare. */
+html.se-store-dlc:not(#se-none) .tabbed_ctn > .page_content.browse_reviews {
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* !important: height can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .browse_reviews .filter_ctn {
   height: auto !important;
 }
 
+/* !important: height, margin, padding, width can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .browse_reviews .browse_tabs {
   position: relative;
   display: flex;
@@ -824,6 +942,11 @@ html.se-store-dlc:not(#se-none) .browse_reviews .browse_tabs {
   box-shadow: inset 0 0 0 1px var(--se-hairline);
 }
 
+/* !important: Steam's own rules (apppageroutes.css, cart.css, game_gamepad.css) set color,
+   font-size, margin, padding at equal or higher weight; the theme's shared rules
+   (store/shared/modals.css, store/shared/nav.css, store/shared/sale.css) set background, color,
+   font-family, font-size, font-weight, letter-spacing, margin, padding, text-transform with
+   !important */
 html.se-store-dlc:not(#se-none) .browse_reviews .browse_tabs > a {
   position: relative;
   z-index: 1;
@@ -839,20 +962,25 @@ html.se-store-dlc:not(#se-none) .browse_reviews .browse_tabs > a {
   font-size: var(--se-fs-md) !important;
   font-weight: 600 !important;
   letter-spacing: 0 !important;
-  text-shadow: none !important;
+  text-shadow: none;
   text-transform: none !important;
   transition: color var(--se-dur), background-color var(--se-dur);
 }
 
+/* !important: Steam's own rules (game_gamepad.css, game_mob.css) set color at equal or higher
+   weight; the theme's shared rules (store/shared/modals.css, store/shared/ui.css) set color with
+   !important */
 html.se-store-dlc:not(#se-none) .browse_reviews .browse_tabs > a:hover {
   color: var(--se-white) !important;
 }
 
 /* Without the script's pill the selected tab carries its own fill. */
+/* !important: another rule in this file sets background with !important */
 html.se-store-dlc:not(#se-none) .browse_reviews .browse_tabs:not([data-se-dlc-tabs]) > a.selected {
   background: var(--se-selected) !important;
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-store-dlc:not(#se-none) .browse_reviews .browse_tabs > a.selected {
   color: var(--se-white) !important;
 }
@@ -880,11 +1008,13 @@ html.se-store-dlc:not(#se-none) .se-dlc-tabs__pill[hidden] {
 
 /* ---------- Browse: filters ---------- */
 
+/* !important: height can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .browse_ctn_background {
   height: auto !important;
-  background: none !important;
+  background: none;
 }
 
+/* !important: display, height can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .browse_container {
   display: flex !important;
   align-items: flex-start;
@@ -892,6 +1022,7 @@ html.se-store-dlc:not(#se-none) .browse_container {
   height: auto !important;
 }
 
+/* !important: height, padding, width can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .browse_filters {
   position: sticky;
   top: 16px;
@@ -904,11 +1035,14 @@ html.se-store-dlc:not(#se-none) .browse_filters {
   padding: 0 !important;
 }
 
+/* !important: the theme's shared rules (store/shared/layout.css, store/shared/nav.css) set height,
+   width with !important */
 html.se-store-dlc:not(#se-none) .browse_filters > div {
   width: auto !important;
   height: auto !important;
 }
 
+/* !important: height, padding, width can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) :is(#filtertags_container, #client_filter) {
   display: flex;
   flex-direction: column;
@@ -918,22 +1052,30 @@ html.se-store-dlc:not(#se-none) :is(#filtertags_container, #client_filter) {
   padding: 10px !important;
 }
 
+/* !important: Steam's own rules (game_gamepad.css) set color at equal or higher weight; another
+   rule in this file sets color, font-family, font-size, font-weight, letter-spacing, margin with
+   !important; height, padding, width can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) :is(#filtertags_container, #client_filter) h4 {
   width: auto !important;
   height: auto !important;
   margin: 4px 8px 8px !important;
   padding: 0 !important;
-  border: 0 !important;
-  background: none !important;
+  border: 0;
+  background: none;
   color: var(--se-text-faint) !important;
   font-family: inherit !important;
   font-size: var(--se-fs-xs) !important;
   font-weight: 700 !important;
   letter-spacing: .1em !important;
-  line-height: 1.2 !important;
-  text-transform: uppercase !important;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
+/* !important: Steam's own rules (apppageroutes.css, game_gamepad.css, game_mob.css) set color,
+   display, font-size, line-height, margin, padding at equal or higher weight; the theme's shared
+   rules (store/shared/modals.css, store/shared/nav.css, store/shared/sale.css) set background,
+   border, color, display, font-family, font-size, height, line-height, margin, padding,
+   text-decoration, width with !important */
 html.se-store-dlc:not(#se-none) :is(#filtertags_container, #client_filter) > a {
   position: relative;
   display: flex !important;
@@ -954,31 +1096,37 @@ html.se-store-dlc:not(#se-none) :is(#filtertags_container, #client_filter) > a {
   transition: background-color var(--se-dur), color var(--se-dur);
 }
 
+/* !important: Steam's own rules (game_gamepad.css, game_mob.css) set color at equal or higher
+   weight; the theme's shared rules (store/shared/modals.css, store/shared/sale.css,
+   store/shared/ui.css) set background, color with !important */
 html.se-store-dlc:not(#se-none) :is(#filtertags_container, #client_filter) > a:hover {
   background: var(--se-hover) !important;
   color: var(--se-white) !important;
 }
 
+/* !important: another rule in this file sets background, color with !important */
 html.se-store-dlc:not(#se-none) #filtertags_container > a.selected {
   background: var(--se-accent-surface) !important;
   color: var(--se-accent) !important;
   font-weight: 600;
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-store-dlc:not(#se-none) .curator_filter_tag_count {
-  float: none !important;
+  float: none;
   min-width: 26px;
   margin-inline-start: auto;
   padding: 3px 8px;
   border-radius: var(--se-radius-pill);
   background: var(--se-pill);
   color: var(--se-text-muted) !important;
-  font-size: var(--se-fs-xs) !important;
+  font-size: var(--se-fs-xs);
   font-weight: 700;
   line-height: 1.2;
   text-align: center;
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-store-dlc:not(#se-none) #filtertags_container > a.selected .curator_filter_tag_count {
   background: color-mix(in srgb, var(--se-accent) 16%, transparent);
   color: var(--se-accent) !important;
@@ -1006,12 +1154,14 @@ html.se-store-dlc:not(#se-none) #client_filter > a:is(.checked, .selected)::afte
 }
 
 /* Steam's own checkbox sprite in these rows gives way to the switch. */
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) #client_filter > a > :is(img, .checkbox, span:empty) {
   display: none !important;
 }
 
 /* ---------- Browse: list ---------- */
 
+/* !important: height, width can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) .browse_content {
   flex: 1 1 auto;
   min-width: 0;
@@ -1019,6 +1169,7 @@ html.se-store-dlc:not(#se-none) .browse_content {
   height: auto !important;
 }
 
+/* !important: the theme's shared rules (store/shared/nav.css) set height with !important */
 html.se-store-dlc:not(#se-none) #RecommendationsRows,
 html.se-store-dlc:not(#se-none) #RecommendationsRows > div {
   display: flex;
@@ -1027,28 +1178,44 @@ html.se-store-dlc:not(#se-none) #RecommendationsRows > div {
   height: auto !important;
 }
 
+/* !important: height, padding can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation {
   position: relative;
   align-items: center;
   gap: 18px;
   height: auto !important;
   padding: 10px 150px 10px 10px !important;
-  border: 0 !important;
+  border: 0;
   transition: background-color var(--se-dur), box-shadow var(--se-dur), translate var(--se-dur-slow) var(--se-ease);
 }
 
+/* !important: the theme's shared rules (store/shared/ui.css) set background, box-shadow with
+   !important */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation:hover {
   background: var(--se-surface-2) !important;
   box-shadow: inset 0 0 0 1px var(--se-white-12), var(--se-shadow-md) !important;
   translate: 0 -2px;
 }
 
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation {
+  --se-dlc-cap: clamp(10rem, 15vw, 14.375rem);
+}
+
 html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation > div:first-child {
   flex: none;
-  width: clamp(160px, 15vw, 230px);
+  width: var(--se-dlc-cap);
+}
+
+/* Options button: on the capsule's top-right corner. The capsule anchor is unpositioned (the
+   price chip needs the row), so the corner is measured from the row's 10px padding. */
+html.se-store-dlc:not(#se-none) #RecommendationsRows .ds_options {
+  top: var(--se-space-4);
+  inset-inline: calc(var(--se-space-3) + var(--se-dlc-cap) - var(--se-space-6)) auto !important; /* Steam can set it inline */
 }
 
 /* The capsule anchor stays unpositioned so the price chip can sit at the row's end. */
+/* !important: height, margin, padding, position, width can come inline from Steam's markup or
+   scripts */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .store_capsule {
   position: static !important;
   display: block;
@@ -1056,9 +1223,10 @@ html.se-store-dlc:not(#se-none) #RecommendationsRows .store_capsule {
   height: auto !important;
   margin: 0 !important;
   padding: 0 !important;
-  background: none !important;
+  background: none;
 }
 
+/* !important: another rule in this file sets height, width with !important */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .store_capsule .capsule {
   position: relative;
   width: auto !important;
@@ -1067,6 +1235,9 @@ html.se-store-dlc:not(#se-none) #RecommendationsRows .store_capsule .capsule {
   overflow: hidden;
 }
 
+/* !important: Steam's own rules (contenthub.css, home.css, news.css) set height at equal or higher
+   weight; the theme's shared rules (store/shared/nav.css, store/shared/sale.css) set height, width
+   with !important */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .store_capsule .capsule img {
   display: block;
   width: 100% !important;
@@ -1080,21 +1251,24 @@ html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation:hover .stor
   transform: scale(1.05);
 }
 
+/* !important: inset, position can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .store_capsule .discount_block {
   position: absolute !important;
   inset: 50% 18px auto auto !important;
   translate: 0 -50%;
 }
 
+/* !important: height, width can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_link {
   flex: 1 1 auto;
   min-width: 0;
   width: auto !important;
   height: auto !important;
-  color: inherit !important;
-  text-decoration: none !important;
+  color: inherit;
+  text-decoration: none;
 }
 
+/* !important: height, max-height, padding can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_midcol {
   display: flex;
   flex-direction: column;
@@ -1110,27 +1284,30 @@ html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_type_ctn {
   align-items: center;
   column-gap: 10px;
   row-gap: 4px;
-  font-family: inherit !important;
-  letter-spacing: 0 !important;
-  text-transform: none !important;
+  font-family: inherit;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_type_ctn .color_created {
   flex: 1 0 100%;
   overflow: hidden;
   color: var(--se-text) !important;
-  font-size: var(--se-fs-lg) !important;
-  font-weight: 700 !important;
+  font-size: var(--se-fs-lg);
+  font-weight: 700;
   line-height: 1.3;
   text-overflow: ellipsis;
   white-space: nowrap;
   transition: color var(--se-dur);
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation:hover .color_created {
   color: var(--se-white) !important;
 }
 
+/* !important: another rule in this file sets color, font-size, margin with !important */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .curator_review_date {
   margin: 0 !important;
   color: var(--se-text-faint) !important;
@@ -1138,37 +1315,73 @@ html.se-store-dlc:not(#se-none) #RecommendationsRows .curator_review_date {
   font-weight: 600;
 }
 
+/* !important: margin can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .app_platforms {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--se-space-2);
   margin: 0 !important;
-  opacity: .7;
+}
+
+/*
+ * Platform icons: Steam's 20px sprite blurs at high DPI. Windows and soundtrack get crisp masks
+ * in the text colour; the brand marks Steam draws for the rest (mac, Linux, VR) keep their
+ * sprite, flattened to the same tone.
+ */
+/* !important: height, margin, width can come inline from Steam's markup or scripts */
+html.se-store-dlc:not(#se-none) .platform_img {
+  flex: none;
+  width: var(--se-icon-md) !important;
+  height: var(--se-icon-md) !important;
+  margin: 0 !important;
+  background-size: contain;
+  opacity: .75;
+  filter: grayscale(1) brightness(1.4);
+}
+
+html.se-store-dlc:not(#se-none) .platform_img:is(.win, .music) {
+  background: var(--se-text-dim);
+  filter: none;
+  -webkit-mask: var(--se-dlc-platform) center / contain no-repeat;
+  mask: var(--se-dlc-platform) center / contain no-repeat;
+}
+
+html.se-store-dlc:not(#se-none) .platform_img.win {
+  --se-dlc-platform: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 4.8 10.5 3.8v7.5H3zM12 3.6l9-1.2v8.9h-9zM3 12.7h7.5v7.5L3 19.2zM12 12.7h9v8.9l-9-1.2z'/%3E%3C/svg%3E");
+}
+
+html.se-store-dlc:not(#se-none) .platform_img.music {
+  --se-dlc-platform: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 3v12.5a3.5 3.5 0 1 1-2-3.16V7.3l-9 1.6v8.6a3.5 3.5 0 1 1-2-3.16V5.5z'/%3E%3C/svg%3E");
 }
 
 html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_desc {
   display: -webkit-box;
   overflow: hidden;
-  color: var(--se-text-dim) !important;
-  font-size: var(--se-fs-base) !important;
-  line-height: 1.5 !important;
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-base);
+  line-height: 1.5;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
 /* Steam wraps the description in decorative quotes; it's a product blurb, not a review. */
+/* !important: another rule in this file sets content with !important */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_desc::before,
 html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation_desc::after {
   content: none !important;
 }
 
 /* Pager and empty state. */
+/* !important: margin can come inline from Steam's markup or scripts */
 html.se-store-dlc:not(#se-none) #pager {
   margin: 16px 0 0 !important;
   color: var(--se-text-muted);
   font-size: var(--se-fs-base);
 }
 
+/* !important: Steam's own rules (game_gamepad.css, game_mob.css) set color at equal or higher
+   weight; the theme's shared rules (store/shared/modals.css, store/shared/ui.css) set color with
+   !important */
 html.se-store-dlc:not(#se-none) #pager a {
   color: var(--se-accent) !important;
 }
@@ -1209,17 +1422,20 @@ html.se-store-dlc:not(#se-none) #Recommendations_loading {
     flex-direction: column;
   }
 
+  /* !important: width can come inline from Steam's markup or scripts */
   html.se-store-dlc:not(#se-none) .browse_filters {
     position: static;
     flex-basis: auto;
     width: 100% !important;
   }
 
+  /* !important: padding-right can come inline from Steam's markup or scripts */
   html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation {
     padding-right: 10px !important;
     flex-wrap: wrap;
   }
 
+  /* !important: margin-top, position can come inline from Steam's markup or scripts */
   html.se-store-dlc:not(#se-none) #RecommendationsRows .store_capsule .discount_block {
     position: static !important;
     translate: none;

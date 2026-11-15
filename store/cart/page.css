@@ -1,0 +1,532 @@
+/*
+ * Shopping cart (/cart/): Steam's React cart is a 1200px column of black-wash boxes, a yellow
+ * notice strip, underlined text links and a plain total box. Restyled as a checkout page of
+ * the theme:
+ *
+ *  - A display title over a breadcrumb; Steam's notices as a warning card with an icon.
+ *  - Each item as a card: the capsule rounded on the left, the name, platform and any "price
+ *    changed" chip, the price large at the end, and the item's actions (gift, remove) as
+ *    quiet text buttons.
+ *  - The summary as a sticky card: "Estimated total" over the amount in display size, the tax
+ *    note, Continue to payment in the accent, full width; the licence note as a quiet card
+ *    under it.
+ *  - Continue Shopping / Continue to payment / Remove all as one action row under the list;
+ *    the recommendations as a section with capsule cards and the shared price chip
+ *    (cart/page.js tags the prices).
+ *
+ * Parts are tagged by cart/page.js ([data-se-cart~="<part>"]), whose map is the only home of
+ * the cart's hashed classes (its store build's CSS chunks). Rules use
+ * html.se-store-cart:not(#se-none) for ID-level weight over Steam's.
+ */
+
+/* ---------- Page ---------- */
+
+/* Steam's art wash behind the page: gone */
+html.se-store-cart:not(#se-none) [data-se-cart~="wash"] {
+  display: none !important; /* overrides Steam's inline background */
+}
+
+/*
+ * Steam paints a navy panel (fill, gradient, edge shadow) on one of the wrappers around its old
+ * 1200px cart column. Every wrapper between the store template and the cart goes flat, so the
+ * page colour shows through edge to edge whichever wrapper Steam paints in a given build.
+ */
+html.se-store-cart:not(#se-none) #StoreTemplate :has([data-se-cart~="page"]),
+html.se-store-cart:not(#se-none) #StoreTemplate :has([data-se-cart~="page"])::before,
+html.se-store-cart:not(#se-none) #StoreTemplate :has([data-se-cart~="page"])::after {
+  background: none !important; /* overrides Steam's module background */
+  box-shadow: none;
+}
+
+/* !important: margin, max-width, padding, width can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="page"] {
+  box-sizing: border-box;
+  /* The store's page column (shared/layout.css), so the cart lines up with the nav bar and every other store page */
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  margin: 0 auto var(--se-space-7) !important;
+  padding: var(--se-space-6) 0 0 !important;
+  color: var(--se-text-dim);
+  font: 500 var(--se-fs-base)/1.5 var(--se-font);
+}
+
+/* !important: Steam's own rules (cart.css, game_gamepad.css, game_mob.css) set color at equal or
+   higher weight; the theme's shared rules (store/shared/modals.css, store/shared/ui.css) set color
+   with !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="page"] a:hover {
+  color: var(--se-accent) !important;
+}
+
+/* Breadcrumb, then the title */
+html.se-store-cart:not(#se-none) [data-se-cart~="crumbs"] {
+  margin-bottom: var(--se-space-2);
+  color: var(--se-text-faint);
+  font: 600 var(--se-fs-sm)/1.4 var(--se-font);
+}
+
+/* !important: Steam's own rules (cart.css, game_gamepad.css, game_mob.css) set color at equal or
+   higher weight; the theme's shared rules (store/shared/modals.css, store/shared/ui.css) set color
+   with !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="crumbs"] a {
+  color: var(--se-text-muted) !important;
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="crumbs"] [data-se-cart~="crumb-current"] {
+  color: var(--se-text-faint);
+}
+
+/* !important: margin can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="title"] {
+  margin: 0 0 var(--se-space-5) !important;
+  color: var(--se-white);
+  font: 800 var(--se-fs-display)/1.1 var(--se-font);
+  letter-spacing: -.02em;
+}
+
+/* Notices ("prices have changed"): a warning card with an info mark */
+/* !important: margin, padding can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="notice"] {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--se-space-3);
+  margin: 0 0 var(--se-space-5) !important;
+  padding: var(--se-space-4) var(--se-space-4) !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-gold-surface);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-gold) 30%, transparent);
+  color: var(--se-gold-text);
+  font: 600 var(--se-fs-base)/1.5 var(--se-font);
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="notice"]::before {
+  content: "";
+  flex: none;
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  margin-top: 1px;
+  background: currentColor;
+  -webkit-mask: var(--se-cart-info) center / contain no-repeat;
+  mask: var(--se-cart-info) center / contain no-repeat;
+}
+
+html.se-store-cart {
+  --se-cart-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-1 9v6h2v-6zm0-4v2h2V7z'/%3E%3C/svg%3E");
+}
+
+/* ---------- Layout: the items, then the summary column ---------- */
+
+html.se-store-cart:not(#se-none) [data-se-cart~="layout"] {
+  align-items: flex-start;
+  gap: var(--se-space-6);
+}
+
+/* !important: max-width can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="layout"] [data-se-cart~="main"] {
+  flex: 1 1 auto;
+  gap: var(--se-space-4);
+  max-width: none !important;
+}
+
+/* !important: max-width can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="layout"] [data-se-cart~="side"] {
+  flex: 0 0 380px;
+  max-width: none !important;
+}
+
+/* ---------- Items ---------- */
+
+html.se-store-cart:not(#se-none) [data-se-cart~="items"] {
+  gap: var(--se-space-3);
+}
+
+/* !important: another rule in this file sets background with !important; padding can come inline
+   from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="item"] {
+  padding: var(--se-space-4) !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-sm);
+}
+
+/* !important: another rule in this file sets background with !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="item"]:hover {
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-white-12), var(--se-shadow-md);
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="item"]:active {
+  transform: scale(var(--se-press-scale));
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="item-body"] {
+  align-items: stretch;
+  gap: var(--se-space-4);
+}
+
+/* !important: height, width can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="capsule"] {
+  width: 13.75rem !important;
+  height: auto !important;
+  background: none;
+}
+
+/* !important: Steam's own rules (autumn_year_sale.css, contenthub.css, game.css) set height,
+   max-width, width at equal or higher weight; the theme's shared rules (store/shared/nav.css,
+   store/shared/sale.css) set height, max-width, width with !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="capsule"] img {
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+  aspect-ratio: 460 / 215;
+  border-radius: var(--se-radius-md);
+  box-shadow: 0 0 0 1px var(--se-hairline);
+  object-fit: cover;
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="item-body"] [data-se-cart~="details"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  min-width: 0;
+}
+
+/* !important: margin-top can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="item-body"] [data-se-cart~="platforms"] {
+  gap: var(--se-space-2);
+  margin-top: 0 !important;
+  font-size: var(--se-fs-base);
+}
+
+/* The bottom row (price, actions) sits at the card's foot */
+/* !important: margin-top can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="item-body"] [data-se-cart~="details"] > :last-child {
+  margin-top: auto !important;
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="item-body"] [data-se-cart~="item-foot"] {
+  color: var(--se-white);
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font);
+}
+
+/* !important: the theme's shared rules (store/shared/nav.css) set color with !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="item-body"] [data-se-cart~="item-icons"] svg {
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  color: var(--se-text-faint) !important;
+  fill: currentColor;
+}
+
+/* "The price of this item has changed": a small gold chip */
+html.se-store-cart:not(#se-none) [data-se-cart~="price-changed"] {
+  display: inline-flex;
+  align-items: center;
+  height: var(--se-icon-lg);
+  padding: 0 var(--se-space-2);
+  border-radius: var(--se-radius-pill);
+  background: var(--se-gold-surface);
+  color: var(--se-gold-text);
+  font: 700 var(--se-fs-xs)/1 var(--se-font);
+}
+
+/* The price, large, at the row's end */
+html.se-store-cart:not(#se-none) [data-se-cart~="item-body"] [data-se-cart~="price"] {
+  align-items: center;
+  margin-inline-start: auto;
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="item-body"] [data-se-cart~="price"] :is(div, span) {
+  background: none;
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="item-body"] [data-se-cart~="price-was"] {
+  color: var(--se-white);
+  font: 800 var(--se-fs-xl)/1.2 var(--se-font);
+}
+
+/* Item actions (Remove, gift options): quiet text buttons, no underline */
+/* !important: another rule in this file sets color with !important; margin can come inline from
+   Steam's markup or scripts */
+html.se-store-cart:not(#se-none) :is([data-se-cart~="item-action"], [data-se-cart~="item-action"], [data-se-cart~="item-action"], [data-se-cart~="item-action"]) {
+  display: inline-flex;
+  align-items: center;
+  height: var(--se-control-h-sm);
+  margin: 0 !important;
+  padding: 0 var(--se-space-3);
+  border-radius: var(--se-radius-pill);
+  color: var(--se-text-muted) !important;
+  font: 600 var(--se-fs-sm)/1 var(--se-font);
+  text-decoration: none;
+}
+
+/* !important: another rule in this file sets color with !important */
+html.se-store-cart:not(#se-none) :is([data-se-cart~="item-action"], [data-se-cart~="item-action"], [data-se-cart~="item-action"], [data-se-cart~="item-action"]):hover {
+  background: var(--se-hover);
+  color: var(--se-white) !important;
+}
+
+html.se-store-cart:not(#se-none) :is([data-se-cart~="item-action"], [data-se-cart~="item-action"], [data-se-cart~="item-action"], [data-se-cart~="item-action"]):active {
+  transform: scale(var(--se-press-scale));
+}
+
+/* The gift / recipient picker */
+/* !important: the theme's shared rules (store/shared/ui.css) set background, border,
+   border-radius, box-shadow, padding with !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="item-body"] div[role="combobox"] {
+  box-sizing: border-box;
+  min-width: 10rem; /* fits the longest choice ("For my account: private"), so the menu can match it */
+  height: var(--se-hit);
+  padding: 0 var(--se-space-3) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line) !important;
+  color: var(--se-text);
+  font: 600 var(--se-fs-sm)/var(--se-hit) var(--se-font);
+}
+
+/* Its menu: as wide as the picker (cart/page.js sets --se-cart-pick-w while one is open) */
+html.se-store-cart:not(#se-none) [data-se-cart-pick] {
+  box-sizing: border-box;
+  min-width: var(--se-cart-pick-w) !important; /* overrides Steam's inline menu width */
+}
+
+/* ---------- Action row under the list ---------- */
+
+html.se-store-cart:not(#se-none) [data-se-cart~="actions"] {
+  gap: var(--se-space-4);
+  padding: var(--se-space-1) var(--se-space-half) 0;
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="actions"] [data-se-cart~="actions-group"] {
+  align-items: center;
+  gap: var(--se-space-3);
+}
+
+/* !important: Steam's own rules (home_gamepad.css, store.css) set color, font at equal or higher
+   weight; the theme's shared rules (store/shared/modals.css, store/shared/rows.css,
+   store/shared/sale.css) set color, font with !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="remove-all"] span {
+  color: var(--se-text-faint) !important;
+  font: 600 var(--se-fs-sm)/1 var(--se-font) !important;
+  cursor: pointer;
+}
+
+/* !important: Steam's own rules (store.css) set color at equal or higher weight; the theme's
+   shared rules (store/shared/modals.css, store/shared/rows.css, store/shared/sale.css) set color
+   with !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="remove-all"] span:hover {
+  color: var(--se-danger-text) !important;
+}
+
+/* Every button on the page (Steam's Button module): the theme's pill */
+/* !important: another rule in this file sets background, box-shadow, color, height with
+   !important; display, padding can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="page"] [data-se-cart~="button"] {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: var(--se-tile) !important;
+  padding: 0 var(--se-space-5) !important;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line) !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-base)/1 var(--se-font);
+  text-decoration: none;
+}
+
+/* !important: another rule in this file sets background, color with !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="page"] [data-se-cart~="button"]:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="page"] [data-se-cart~="button"]:active {
+  transform: scale(var(--se-press-scale));
+}
+
+/* Continue to payment (in both places Steam puts it): the accent */
+/* !important: another rule in this file sets background, box-shadow, color with !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="continue"] > [data-se-cart~="button"] {
+  background: var(--se-accent) !important;
+  box-shadow: none !important;
+  color: var(--se-on-accent) !important;
+}
+
+/* !important: another rule in this file sets background, color with !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="continue"] > [data-se-cart~="button"]:hover {
+  background: var(--se-accent-hover) !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="continue"] > [data-se-cart~="button"]:active {
+  transform: scale(var(--se-press-scale));
+}
+
+/* Disabled or still working (Steam sets aria-disabled while the cart updates): quiet, no press */
+/* !important: another rule in this file sets color with !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="page"] [data-se-cart~="button"]:is(:disabled, [aria-disabled="true"]),
+html.se-store-cart:not(#se-none) [data-se-cart~="continue"] > [data-se-cart~="button"]:is(:disabled, [aria-disabled="true"]) {
+  background: var(--se-surface-2) !important; /* beats the pill and accent fills above */
+  color: var(--se-text-faint) !important;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---------- Summary ---------- */
+
+html.se-store-cart:not(#se-none) [data-se-cart~="summary"] {
+  gap: var(--se-space-4);
+}
+
+/* !important: padding can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="summary-card"] {
+  gap: var(--se-space-1);
+  padding: var(--se-space-5) !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-md);
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="summary-card"] [data-se-cart~="total-row"] {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--se-space-1);
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="total-label"] {
+  color: var(--se-text-faint);
+  font: 700 var(--se-fs-xs)/1.4 var(--se-font);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="total"] {
+  color: var(--se-white);
+  font: 800 var(--se-fs-4xl)/1.1 var(--se-font);
+  letter-spacing: -.02em;
+}
+
+/* !important: margin can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="tax-note"] {
+  margin: var(--se-space-1) 0 var(--se-space-4) !important;
+  color: var(--se-text-faint);
+  font: 500 var(--se-fs-xs)/1.5 var(--se-font);
+}
+
+/* !important: another rule in this file sets height with !important; width can come inline from
+   Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="summary-card"] [data-se-cart~="continue"] > [data-se-cart~="button"] {
+  width: 100% !important;
+  height: var(--se-control-h-lg) !important;
+  font-size: var(--se-fs-md);
+}
+
+/* The licence note: a quiet card */
+/* !important: padding can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="licence"] {
+  gap: var(--se-space-1);
+  padding: var(--se-space-5) !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-white-02);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  text-align: center;
+}
+
+/* !important: Steam's own rules (autumn_year_sale.css, recommended.css, spring_year_sale.css) set
+   width at equal or higher weight; the theme's shared rules (store/shared/nav.css,
+   store/shared/sale.css) set width with !important; margin-bottom can come inline from Steam's
+   markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="licence"] img {
+  width: 56% !important;
+  margin-bottom: var(--se-space-3) !important;
+  opacity: .85;
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="licence"] [data-se-cart~="licence-title"] {
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm)/1.5 var(--se-font);
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="licence"] [data-se-cart~="licence-text"] {
+  color: var(--se-text-faint);
+  font: 500 var(--se-fs-xs)/1.5 var(--se-font);
+}
+
+/* !important: Steam's own rules (cart.css, game_gamepad.css, game_mob.css) set color at equal or
+   higher weight; the theme's shared rules (store/shared/modals.css, store/shared/ui.css) set color
+   with !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="licence"] [data-se-cart~="licence-text"] a {
+  color: var(--se-accent) !important;
+}
+
+/* ---------- Recommendations ---------- */
+
+/* !important: margin-top can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="recs"] {
+  margin-top: var(--se-space-6) !important;
+}
+
+/* !important: margin-bottom can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="recs-title"] {
+  margin-bottom: var(--se-space-4) !important;
+  color: var(--se-text);
+  font: 700 var(--se-fs-2xl)/1.25 var(--se-font);
+  letter-spacing: -.01em;
+  text-transform: none;
+}
+
+/* !important: margin-bottom can come inline from Steam's markup or scripts */
+html.se-store-cart:not(#se-none) [data-se-cart~="rec-grid"] {
+  gap: var(--se-space-4);
+  margin-bottom: 0 !important;
+  padding: var(--se-space-half);
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="rec-grid"] [data-se-cart~="rec"] {
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  transition: translate var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="rec-grid"] [data-se-cart~="rec"]:hover {
+  translate: 0 calc(-1 * var(--se-space-1));
+  box-shadow: inset 0 0 0 1px var(--se-white-12), var(--se-shadow-md);
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="rec-grid"] [data-se-cart~="rec"]:active {
+  transform: scale(var(--se-press-scale));
+}
+
+html.se-store-cart:not(#se-none) [data-se-cart~="rec-grid"] .CapsuleImageCtn img {
+  display: block;
+  width: 100%;
+}
+
+/* The bar under the art: no wash, the price chip at its end */
+/* !important: the theme's shared rules (store/shared/sale.css) set background, padding with
+   !important */
+html.se-store-cart:not(#se-none) [data-se-cart~="rec-grid"] .CapsuleBottomBar {
+  justify-content: flex-end;
+  padding: var(--se-space-3) !important;
+  background: none !important;
+}
+
+/* ---------- Narrow windows: Steam stacks the columns and hides the summary ---------- */
+
+@media (max-width: 840px) {
+  /* !important: padding, width can come inline from Steam's markup or scripts */
+  html.se-store-cart:not(#se-none) [data-se-cart~="page"] {
+    width: auto !important;
+    padding: var(--se-space-5) var(--se-space-4) 0 !important;
+  }
+
+  /* !important: width can come inline from Steam's markup or scripts */
+  html.se-store-cart:not(#se-none) [data-se-cart~="capsule"] {
+    width: 10rem !important;
+  }
+}

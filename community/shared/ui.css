@@ -14,7 +14,8 @@
  *   - Friend rows (.friendBlock): avatar, name and status as one hoverable row.
  *   - Duotone icons (shared/icons.js): a soft back layer and a strong front layer in the link's
  *     own colour; the Steam icon they replace is hidden.
- *   - Popup menus, the emoticon picker, page buttons, focus ring and reduced motion.
+ *   - Popup menus, the "•••" content options on uploads, the emoticon picker, page buttons,
+ *     focus ring and reduced motion.
  *   - Tooltips: Steam's (.community_tooltip) and the title tooltips (shared/tips.js) in the
  *     theme's tooltip style.
  *
@@ -37,9 +38,11 @@ html.se-community-ui {
 /* The root too: scrollbar tracks are transparent (core/scrollbars.css), and the page's own
    scrollbar gutter shows the root's background, which is otherwise the window's black */
 html.se-community-ui {
-  background-color: var(--se-bg) !important;
+  background-color: var(--se-bg);
 }
 
+/* !important: the theme's shared rules (community/profile/page.css) set background-color with
+   !important */
 html.se-community-ui body,
 html.se-community-ui :is(.responsive_page_frame, .responsive_page_content, .responsive_page_template_content) {
   background-color: var(--se-bg) !important;
@@ -48,20 +51,23 @@ html.se-community-ui :is(.responsive_page_frame, .responsive_page_content, .resp
 }
 
 html.se-community-ui :is(.pagecontent, #BG_bottom, #mainContents) {
-  background-color: transparent !important;
-  background-image: none !important;
+  background-color: transparent;
+  background-image: none;
 }
 
 html.se-community-ui :is(a.whiteLink, .whiteLink a) {
   transition: color var(--se-dur);
 }
 
+/* !important: the theme's shared rules (community/inventory/page.css, community/market/page.css)
+   set color with !important */
 html.se-community-ui :is(a.whiteLink, .whiteLink a):hover {
   color: var(--se-accent) !important;
 }
 
 /* ---------- Pill buttons ---------- */
 
+/* !important: display, padding can come inline from Steam's markup or scripts */
 html.se-community-ui :is(
   .btn_profile_action,
   [class*="btnv6_"],
@@ -81,14 +87,14 @@ html.se-community-ui :is(
   box-sizing: border-box;
   height: 36px;
   padding: 0 16px !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-pill) !important;
-  background: var(--se-pill) !important;
-  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line) !important;
-  color: var(--se-text) !important;
-  font: 600 var(--se-fs-base)/1 var(--se-font) !important;
-  text-decoration: none !important;
-  text-shadow: none !important;
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-pill);
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line);
+  color: var(--se-text);
+  font: 600 var(--se-fs-base)/1 var(--se-font);
+  text-decoration: none;
+  text-shadow: none;
   white-space: nowrap;
   cursor: pointer;
   transition: background-color var(--se-dur), color var(--se-dur), box-shadow var(--se-dur), filter var(--se-dur);
@@ -106,17 +112,23 @@ html.se-community-ui :is(
   .btn_grey_grey,
   .btn_black
 ):hover {
-  background: var(--se-hover) !important;
-  color: var(--se-white) !important;
+  background: var(--se-hover);
+  color: var(--se-white);
 }
 
+/* !important: padding can come inline from Steam's markup or scripts */
 html.se-community-ui :is(.btn_small, .btn_small_thin, .btn_small_tall) {
   height: 30px;
   padding: 0 13px !important;
-  font-size: var(--se-fs-sm) !important;
+  font-size: var(--se-fs-sm);
 }
 
 /* Steam paints the face on an inner span: the button is the face instead */
+/* !important: Steam's own rules (buttons.css, clanimagepicker.css, community_gamepad.css) set
+   background, border, color, display, line-height, padding at equal or higher weight; the theme's
+   shared rules (community/activity/page.css, community/discussions/home.css,
+   community/dmca/page.css) set background, border, color, display, font, line-height, padding with
+   !important */
 html.se-community-ui :is(
   .btn_profile_action,
   [class*="btnv6_"],
@@ -139,12 +151,16 @@ html.se-community-ui :is(
 }
 
 /* Primary: Steam's green buttons (Add Friend, Post Comment, Post, Submit...) */
+/* !important: Steam's own rules (shared_gamepad.css) set background, color at equal or higher
+   weight; another rule in this file sets background, color with !important */
 html.se-community-ui:not(#se-none) :is(.btn_green_white_innerfade, .btnv6_green_white_innerfade, .btn_green_steamui) {
   background: var(--se-accent) !important;
-  box-shadow: none !important;
+  box-shadow: none;
   color: var(--se-on-accent) !important;
 }
 
+/* !important: Steam's own rules (shared_gamepad.css) set background, color at equal or higher
+   weight; another rule in this file sets background, color with !important */
 html.se-community-ui:not(#se-none) :is(.btn_green_white_innerfade, .btnv6_green_white_innerfade, .btn_green_steamui):hover {
   background: var(--se-accent-hover) !important;
   color: var(--se-on-accent) !important;
@@ -157,6 +173,7 @@ html.se-community-ui :is(.btn_disabled, .btn_profile_action_disabled, [disabled]
 }
 
 /* Icon-only buttons (Steam's "..." more, reward, equipped items) stay round */
+/* !important: another rule in this file sets padding with !important */
 html.se-community-ui .btn_profile_action:has(> span:empty),
 html.se-community-ui #profile_action_dropdown_link {
   width: 36px;
@@ -165,6 +182,8 @@ html.se-community-ui #profile_action_dropdown_link {
 
 /* ---------- Avatars: rounded squares, status as a ring ---------- */
 
+/* !important: the theme's shared rules (community/discussions/home.css,
+   community/profile/page.css, community/shared/small-header.css) set background with !important */
 html.se-community-ui .playerAvatar {
   --se-status: var(--se-status-offline);
   border-radius: var(--se-radius-sm);
@@ -190,14 +209,19 @@ html.se-community-ui .playerAvatar > a {
 
 /* Avatar frames (Steam's animated profile items) are left out, so every avatar has the same
    rounded shape and status ring */
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-community-ui .profile_avatar_frame {
   display: none !important;
 }
 
 /* ---------- Popup menus (profile "...", forum actions) ---------- */
 
+/* !important: Steam's own rules (shared_global.css) set background, border, box-shadow at equal or
+   higher weight; another rule in this file sets background, border, border-radius, box-shadow with
+   !important */
 html.se-community-ui .popup_block_new,
-html.se-community-ui .popup_body.popup_menu {
+html.se-community-ui .popup_body.popup_menu,
+html.se-community-ui .ugc_options_tooltip {
   border: 0 !important;
   border-radius: var(--se-radius-md) !important;
   background: var(--se-panel-bg) !important;
@@ -205,11 +229,19 @@ html.se-community-ui .popup_body.popup_menu {
   backdrop-filter: var(--se-blur-panel);
 }
 
-html.se-community-ui .popup_body.popup_menu {
+/* !important: Steam's own rules (profilev2.css, shared_global.css) set padding at equal or higher
+   weight; another rule in this file sets padding with !important */
+html.se-community-ui .popup_body.popup_menu,
+html.se-community-ui .ugc_options_tooltip {
   padding: 6px !important;
 }
 
-html.se-community-ui .popup_menu .popup_menu_item {
+/* !important: Steam's own rules (economy_market.css, profilev2.css, profilev2_gamepad.css) set
+   color, display, font, padding at equal or higher weight; the theme's shared rules
+   (community/activity/page.css, community/discussions/home.css, community/hub/page.css) set
+   background, color, display, font, padding, text-decoration with !important */
+html.se-community-ui .popup_menu .popup_menu_item,
+html.se-community-ui .ugc_options_tooltip > .option {
   display: flex !important;
   align-items: center;
   gap: 10px;
@@ -221,13 +253,33 @@ html.se-community-ui .popup_menu .popup_menu_item {
   text-decoration: none !important;
 }
 
-html.se-community-ui .popup_menu .popup_menu_item:hover {
+/* !important: Steam's own rules (shared_gamepad.css, shared_global.css) set color at equal or
+   higher weight; the theme's shared rules (community/activity/page.css,
+   community/discussions/home.css, community/hub/page.css) set background, color with !important */
+html.se-community-ui .popup_menu .popup_menu_item:hover,
+html.se-community-ui .ugc_options_tooltip > .option:hover {
   background: var(--se-hover) !important;
   color: var(--se-white) !important;
 }
 
+html.se-community-ui .popup_menu .popup_menu_item:active,
+html.se-community-ui .ugc_options_tooltip > .option:active {
+  transform: scale(var(--se-press-scale));
+}
+
 html.se-community-ui .popup_menu .popup_menu_item img {
   opacity: .8;
+}
+
+/* ---------- Content options (shared_global.css .ugc_options: the menu on user uploads) ----------
+ * The theme's "•••" button (web/base.css) on the item's top-right corner; its menu is the
+ * popup panel and menu rows above.
+ */
+/* !important: padding can come inline from Steam's markup or scripts */
+html.se-community-ui .ugc_options {
+  top: var(--se-space-3);
+  inset-inline-end: var(--se-space-3);
+  padding: 0 !important;
 }
 
 /* ---------- Page buttons (comment and forum paging) ----------
@@ -235,6 +287,10 @@ html.se-community-ui .popup_menu .popup_menu_item img {
  * the accent, Steam's "..." centred between them.
  */
 
+/* !important: Steam's own rules (community_gamepad.css, globalv2.css, shared_global.css) set
+   border-radius, color, display, font, text-decoration at equal or higher weight; the theme's
+   shared rules (community/inventory/page.css, community/market/page.css) set background, border,
+   border-radius, color, display, font, padding, text-decoration with !important */
 html.se-community-ui :is(.commentthread_paging, .forum_paging_controls, .pageLinks) .pagebtn {
   display: inline-flex !important;
   flex: none;
@@ -255,6 +311,8 @@ html.se-community-ui :is(.commentthread_paging, .forum_paging_controls, .pageLin
   transition: background-color var(--se-dur), color var(--se-dur);
 }
 
+/* !important: the theme's shared rules (community/inventory/page.css, community/market/page.css)
+   set background with !important */
 html.se-community-ui :is(.commentthread_paging, .forum_paging_controls, .pageLinks) .pagebtn:not(.disabled):hover {
   background: var(--se-hover) !important;
 }
@@ -269,6 +327,8 @@ html.se-community-ui :is(.commentthread_pagelinks, .forum_paging_pagelinks) {
   letter-spacing: .1em;
 }
 
+/* !important: Steam's own rules (forums.css) set text-decoration at equal or higher weight;
+   another rule in this file sets color with !important */
 html.se-community-ui :is(.commentthread_pagelink, .forum_paging_pagelink) {
   display: inline-flex;
   align-items: center;
@@ -279,18 +339,22 @@ html.se-community-ui :is(.commentthread_pagelink, .forum_paging_pagelink) {
   padding: 0 8px;
   border-radius: var(--se-radius-pill);
   color: var(--se-text-muted) !important;
-  font: 700 var(--se-fs-sm)/1 var(--se-font) !important;
+  font: 700 var(--se-fs-sm)/1 var(--se-font);
   letter-spacing: 0;
   text-decoration: none !important;
   cursor: pointer;
   transition: background-color var(--se-dur), color var(--se-dur);
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-community-ui :is(.commentthread_pagelink, .forum_paging_pagelink):hover {
   background: var(--se-pill);
   color: var(--se-text) !important;
 }
 
+/* !important: Steam's own rules (buttons.css, monacoeditor.css, shared_gamepad.css) set color at
+   equal or higher weight; the theme's shared rules (community/discussions/home.css,
+   community/hub/page.css, community/inventory/page.css) set color with !important */
 html.se-community-ui :is(.commentthread_pagelink, .forum_paging_pagelink).active {
   background: var(--se-accent);
   color: var(--se-on-accent) !important;
@@ -303,41 +367,50 @@ html.se-community-ui .commentthread_area {
   font-family: var(--se-font);
 }
 
+/* !important: Steam's own rules (community_gamepad.css) set background, padding at equal or higher
+   weight; the theme's shared rules (community/activity/page.css) set display with !important;
+   margin can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_header {
   display: flex !important;
   align-items: center;
   gap: 12px;
   margin: 0 0 12px !important;
   padding: 0 !important;
-  border: 0 !important;
+  border: 0;
   background: none !important;
 }
 
 html.se-community-ui :is(.commentthread_header_label, .comment_header_label, .commentthread_header_and_count) {
-  color: var(--se-text) !important;
-  font: 700 var(--se-fs-lg)/1.3 var(--se-font) !important;
-  text-transform: none !important;
-  letter-spacing: 0 !important;
+  color: var(--se-text);
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font);
+  text-transform: none;
+  letter-spacing: 0;
 }
 
+/* !important: Steam's own rules (profilev2.css) set font-weight at equal or higher weight */
 html.se-community-ui .commentthread_count {
-  color: var(--se-text-faint) !important;
+  color: var(--se-text-faint);
   font-weight: 600 !important;
 }
 
+/* !important: Steam's own rules (profilev2.css) set display at equal or higher weight; another
+   rule in this file sets display with !important; margin-left can come inline from Steam's markup
+   or scripts */
 html.se-community-ui .commentthread_paging {
   display: flex !important;
   align-items: center;
   gap: 4px;
   margin-left: auto !important;
-  float: none !important;
+  float: none;
 }
 
 /* A single page: Steam leaves the arrows in place with no page links between them */
+/* !important: another rule in this file sets display with !important */
 html.se-community-ui .commentthread_paging:not(.has_pages):has(.commentthread_pagelinks:empty) {
   display: none !important;
 }
 
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_pagelinks_ctn {
   display: flex !important;
   align-items: center;
@@ -351,12 +424,15 @@ html.se-community-ui .commentthread_pagelinks {
 }
 
 /* Entry box: avatar beside the field when Steam renders one, the buttons under it */
+/* !important: the theme's shared rules (community/activity/page.css, community/profile/page.css)
+   set margin with !important; padding can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_entry {
   margin: 0 0 8px !important;
   padding: 0 !important;
-  background: none !important;
+  background: none;
 }
 
+/* !important: display, height can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_entry:has(> :is(.commentthread_user_avatar, .blotter_poststatus_avatar)) {
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr);
@@ -366,9 +442,10 @@ html.se-community-ui .commentthread_entry:has(> :is(.commentthread_user_avatar, 
 
 html.se-community-ui .commentthread_entry:has(> :is(.commentthread_user_avatar, .blotter_poststatus_avatar)) > * {
   grid-column: 2;
-  float: none !important;
+  float: none;
 }
 
+/* !important: margin, position can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_entry > :is(.commentthread_user_avatar, .blotter_poststatus_avatar) {
   grid-column: 1;
   grid-row: 1;
@@ -378,6 +455,10 @@ html.se-community-ui .commentthread_entry > :is(.commentthread_user_avatar, .blo
   margin: 1px 0 0 !important;
 }
 
+/* !important: Steam's own rules (community_gamepad.css) set background, border, margin, padding at
+   equal or higher weight; the theme's shared rules (community/activity/page.css,
+   community/profile/page.css) set margin with !important; min-height can come inline from Steam's
+   markup or scripts */
 html.se-community-ui .commentthread_entry_quotebox {
   min-height: 0 !important;
   margin: 0 0 10px !important;
@@ -386,6 +467,9 @@ html.se-community-ui .commentthread_entry_quotebox {
   background: none !important;
 }
 
+/* !important: the theme's shared rules (community/discussions/page.css, community/dmca/page.css,
+   web/base.css) set background, border, border-radius, box-shadow, color, font, outline, padding
+   with !important; width can come inline from Steam's markup or scripts */
 html.se-community-ui :is(.commentthread_textarea, .forumtopic_reply_textarea, .commentthread_comment_edit_textarea_ctn textarea) {
   box-sizing: border-box;
   width: 100% !important;
@@ -402,23 +486,28 @@ html.se-community-ui :is(.commentthread_textarea, .forumtopic_reply_textarea, .c
   transition: box-shadow var(--se-dur);
 }
 
+/* !important: the theme's shared rules (community/discussions/page.css) set box-shadow with
+   !important */
 html.se-community-ui :is(.commentthread_textarea, .forumtopic_reply_textarea, .commentthread_comment_edit_textarea_ctn textarea):focus {
   box-shadow: inset 0 0 0 1px var(--se-accent) !important;
 }
 
+/* !important: Steam's own rules (forums_gamepad.css) set display at equal or higher weight */
 html.se-community-ui .commentthread_entry_submitlink {
   display: flex !important;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  float: none !important;
+  float: none;
 }
 
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_entry_error:empty {
   display: none !important;
 }
 
 /* Header: "Comments" with the total as a chip, subscribe toggle muted */
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_header_and_count {
   display: flex !important;
   align-items: center;
@@ -427,8 +516,8 @@ html.se-community-ui .commentthread_header_and_count {
 }
 
 html.se-community-ui .commentthread_count_label {
-  color: var(--se-text) !important;
-  font: 700 var(--se-fs-md)/1.3 var(--se-font) !important;
+  color: var(--se-text);
+  font: 700 var(--se-fs-md)/1.3 var(--se-font);
 }
 
 html.se-community-ui .commentthread_count_label > span[id$="_totalcount"] {
@@ -441,12 +530,13 @@ html.se-community-ui .commentthread_count_label > span[id$="_totalcount"] {
 }
 
 html.se-community-ui .commentthread_count :is(.commentthread_subscribe_desc, .commentthread_subscribe_hint) {
-  color: var(--se-text-faint) !important;
-  font: 500 var(--se-fs-xs)/1.3 var(--se-font) !important;
+  color: var(--se-text-faint);
+  font: 500 var(--se-fs-xs)/1.3 var(--se-font);
 }
 
 /* Subscribe toggle: the theme's checkbox (a rounded square, the accent with a check when on)
    in place of Steam's checkbox art; the "( ? )" hint as a small round button */
+/* !important: Steam's own rules (community_gamepad.css) set display at equal or higher weight */
 html.se-community-ui .commentthread_subscribe_ctn {
   display: inline-flex !important;
   align-items: center;
@@ -455,9 +545,12 @@ html.se-community-ui .commentthread_subscribe_ctn {
 }
 
 html.se-community-ui .commentthread_subscribe_ctn:hover .commentthread_subscribe_desc {
-  color: var(--se-text) !important;
+  color: var(--se-text);
 }
 
+/* !important: Steam's own rules (community_gamepad.css) set border, height, width at equal or
+   higher weight; another rule in this file sets background with !important; display, margin,
+   min-width, padding, position can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_subscribe_checkbox {
   display: inline-grid !important;
   flex: none;
@@ -476,6 +569,8 @@ html.se-community-ui .commentthread_subscribe_checkbox {
   transition: background-color var(--se-dur), box-shadow var(--se-dur);
 }
 
+/* !important: display, height, inset, margin, padding, position, width can come inline from
+   Steam's markup or scripts */
 html.se-community-ui .commentthread_subscribe_checkbox .commentthread_subscribe_check {
   position: absolute !important;
   inset: 0 !important;
@@ -484,14 +579,15 @@ html.se-community-ui .commentthread_subscribe_checkbox .commentthread_subscribe_
   height: 10px !important;
   margin: auto !important;
   padding: 0 !important;
-  border: 0 !important;
-  background: var(--se-on-accent) !important;
+  border: 0;
+  background: var(--se-on-accent);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12.5l5 5L20 6.5'/%3E%3C/svg%3E") center / contain no-repeat;
   opacity: 0;
   transform: scale(.6);
   transition: opacity var(--se-dur), transform var(--se-dur) var(--se-ease);
 }
 
+/* !important: another rule in this file sets background with !important */
 html.se-community-ui .commentthread_subscribe_ctn.checked .commentthread_subscribe_checkbox {
   background: var(--se-accent) !important;
   box-shadow: none;
@@ -503,15 +599,17 @@ html.se-community-ui .commentthread_subscribe_ctn.checked .commentthread_subscri
 }
 
 /* The hint is "( ? )": its own text (the brackets) at size 0, the "?" kept */
+/* !important: display, margin-left can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_count .commentthread_subscribe_hint {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
   margin-left: 6px !important;
-  font-size: 0 !important;
-  line-height: 0 !important;
+  font-size: 0;
+  line-height: 0;
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-community-ui .commentthread_count .commentthread_subscribe_hint_q {
   display: inline-flex;
   align-items: center;
@@ -521,11 +619,12 @@ html.se-community-ui .commentthread_count .commentthread_subscribe_hint_q {
   border-radius: 50%;
   background: var(--se-pill);
   color: var(--se-text-muted) !important;
-  font: 700 10px/1 var(--se-font) !important;
+  font: 700 10px/1 var(--se-font);
   cursor: help;
   transition: background-color var(--se-dur), color var(--se-dur);
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-community-ui .commentthread_count .commentthread_subscribe_hint_q:hover {
   background: var(--se-hover);
   color: var(--se-text) !important;
@@ -534,6 +633,9 @@ html.se-community-ui .commentthread_count .commentthread_subscribe_hint_q:hover 
 /* Comments. Current markup has the avatar inside the author row
    (.commentthread_comment_content > .commentthread_comment_author > .commentthread_comment_avatar);
    older markup has it beside the content. Both are laid out as avatar | name · time, then text. */
+/* !important: Steam's own rules (community_gamepad.css, forums.css, forums_gamepad.css) set
+   background, border, height, margin, padding at equal or higher weight; the theme's shared rules
+   (community/profile/page.css) set background, border, border-top, padding with !important */
 html.se-community-ui .commentthread_comment {
   position: relative;
   display: flex;
@@ -546,17 +648,21 @@ html.se-community-ui .commentthread_comment {
   background: none !important;
 }
 
+/* !important: another rule in this file sets border-top with !important */
 html.se-community-ui .commentthread_comment:first-child {
   border-top: 0 !important;
 }
 
+/* !important: Steam's own rules (community_gamepad.css) set position at equal or higher weight;
+   margin can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_comment_avatar {
   position: relative !important;
   flex: none;
-  float: none !important;
+  float: none;
   margin: 0 !important;
 }
 
+/* !important: margin, padding can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_comment_content {
   flex: 1;
   min-width: 0;
@@ -564,6 +670,9 @@ html.se-community-ui .commentthread_comment_content {
   padding: 0 !important;
 }
 
+/* !important: Steam's own rules (community_gamepad.css, forums.css) set display, margin at equal
+   or higher weight; the theme's shared rules (community/profile/page.css) set display with
+   !important; height, min-height, padding can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_comment_author {
   display: flex !important;
   align-items: center;
@@ -572,31 +681,41 @@ html.se-community-ui .commentthread_comment_author {
   height: auto !important;
   margin: 0 0 4px !important;
   padding: 0 40px 0 0 !important;
-  border: 0 !important;
-  background: none !important;
+  border: 0;
+  background: none;
 }
 
+/* !important: margin-bottom can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_comment_author:has(> .commentthread_comment_avatar) {
   position: relative;
   margin-bottom: 2px !important;
 }
 
 /* Friend indicator: Steam lays it over the avatar (it tinted the whole picture): left out */
+/* !important: the theme's shared rules (community/profile/page.css) set display with !important */
 html.se-community-ui .commentthread_comment_friendindicator {
   display: none !important;
 }
 
 /* The space between the entry box and the first comment */
+/* !important: Steam's own rules (forums_gamepad.css) set margin, padding at equal or higher
+   weight; the theme's shared rules (community/activity/page.css) set margin, padding with
+   !important */
 html.se-community-ui .commentthread_comment_container {
   margin: 0 !important;
   padding: 0 !important;
 }
 
+/* !important: Steam's own rules (forums_gamepad.css) set margin at equal or higher weight; the
+   theme's shared rules (community/activity/page.css, community/profile/page.css) set margin,
+   padding with !important */
 html.se-community-ui .commentthread_comments {
   margin: 0 !important;
   padding: 0 !important;
 }
 
+/* !important: the theme's shared rules (community/profile/page.css) set display with !important;
+   margin, width can come inline from Steam's markup or scripts */
 html.se-community-ui .author_name_group {
   flex: 1;
   display: flex !important;
@@ -605,7 +724,7 @@ html.se-community-ui .author_name_group {
   gap: 2px 10px;
   min-width: 0;
   width: auto !important;
-  float: none !important;
+  float: none;
   margin: 0 !important;
 }
 
@@ -619,23 +738,30 @@ html.se-community-ui .author_name_group .flex_row {
   gap: 6px;
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-community-ui .commentthread_author_link {
   color: var(--se-text) !important;
-  font: 700 var(--se-fs-base)/1.3 var(--se-font) !important;
-  text-decoration: none !important;
+  font: 700 var(--se-fs-base)/1.3 var(--se-font);
+  text-decoration: none;
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-community-ui .commentthread_author_link:hover {
   color: var(--se-accent) !important;
 }
 
+/* !important: Steam's own rules (community_gamepad.css, forums_gamepad.css) set color at equal or
+   higher weight */
 html.se-community-ui .commentthread_comment_timestamp {
   color: var(--se-text-faint) !important;
-  font: 500 var(--se-fs-xs)/1.3 var(--se-font) !important;
+  font: 500 var(--se-fs-xs)/1.3 var(--se-font);
 }
 
+/* !important: Steam's own rules (community_gamepad.css, forums_gamepad.css) set color, font at
+   equal or higher weight; the theme's shared rules (community/profile/page.css) set color with
+   !important; padding can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_comment_text {
-  float: none !important;
+  float: none;
   padding: 0 !important;
   color: var(--se-text-dim) !important;
   font: 400 var(--se-fs-md)/1.6 var(--se-font) !important;
@@ -643,24 +769,31 @@ html.se-community-ui .commentthread_comment_text {
 }
 
 /* Text lines up with the name when the avatar sits in the author row */
+/* !important: margin-left can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_comment_content:has(> .commentthread_comment_author > .commentthread_comment_avatar) > :not(.commentthread_comment_author) {
   margin-left: 48px !important;
 }
 
+/* !important: margin-top can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_comment_author > .commentthread_comment_avatar + * {
   margin-top: -2px !important;
 }
 
 /* Reactions row: only takes room when it has reactions */
+/* !important: margin-top, padding can come inline from Steam's markup or scripts */
 html.se-community-ui .comment_footer_ctn {
   margin-top: 6px !important;
   padding: 0 !important;
 }
 
+/* !important: display can come inline from Steam's markup or scripts */
 html.se-community-ui .comment_footer_ctn:not(:has(:not(div:empty))) {
   display: none !important;
 }
 
+/* !important: Steam's own rules (BfjkgwPa.css, C6L1nUf2.css, Ceuw-a-k.css) set color at equal or
+   higher weight; the theme's shared rules (community/activity/page.css,
+   community/discussions/home.css, community/discussions/page.css) set color with !important */
 html.se-community-ui .commentthread_comment_text a {
   color: var(--se-accent) !important;
 }
@@ -670,11 +803,12 @@ html.se-community-ui .commentthread_comment_text img.emoticon {
 }
 
 /* Actions (report, delete...) show on hover */
+/* !important: margin, position can come inline from Steam's markup or scripts */
 html.se-community-ui .commentthread_comment_actions {
   position: absolute !important;
   top: 14px;
   right: 0;
-  float: none !important;
+  float: none;
   margin: 0 !important;
   opacity: 0;
   transition: opacity var(--se-dur);
@@ -715,6 +849,10 @@ html.se-community-ui [data-se-op] .commentthread_author_link::before {
 
 /* ---------- Friend rows (profile side column, activity side column) ---------- */
 
+/* !important: Steam's own rules (globalv2.css, profile.css, profilev2.css) set float, height,
+   margin, padding, width at equal or higher weight; the theme's shared rules
+   (community/activity/page.css, community/profile/page.css) set background, margin, padding with
+   !important; display can come inline from Steam's markup or scripts */
 html.se-community-ui .friendBlock {
   position: relative;
   display: flex !important;
@@ -729,6 +867,7 @@ html.se-community-ui .friendBlock {
   background: none !important;
 }
 
+/* !important: position can come inline from Steam's markup or scripts */
 html.se-community-ui .friendBlockLinkOverlay {
   position: absolute !important;
   inset: 0;
@@ -736,10 +875,15 @@ html.se-community-ui .friendBlockLinkOverlay {
   border-radius: inherit;
 }
 
+/* !important: another rule in this file sets background with !important */
 html.se-community-ui .friendBlock:hover {
   background: var(--se-hover) !important;
 }
 
+/* !important: Steam's own rules (apphub_gamepad.css, chat.css, community_gamepad.css) set float,
+   height, margin, width at equal or higher weight; the theme's shared rules
+   (community/discussions/home.css, community/hub/page.css, community/profile/page.css) set height,
+   margin, padding, width with !important */
 html.se-community-ui .friendBlock .playerAvatar {
   flex: none;
   float: none !important;
@@ -749,6 +893,10 @@ html.se-community-ui .friendBlock .playerAvatar {
   padding: 1px !important;
 }
 
+/* !important: Steam's own rules (BZPioAp_.css, BrIybpw5.css, apppartnereventspage.css) set height,
+   width at equal or higher weight; the theme's shared rules (community/activity/page.css,
+   community/discussions/home.css, community/discussions/page.css) set height, width with
+   !important */
 html.se-community-ui .friendBlock .playerAvatar img {
   width: 30px !important;
   height: 30px !important;
@@ -757,27 +905,30 @@ html.se-community-ui .friendBlock .playerAvatar img {
 html.se-community-ui .friendBlockContent {
   min-width: 0;
   overflow: hidden;
-  color: var(--se-text) !important;
-  font: 600 var(--se-fs-base)/1.3 var(--se-font) !important;
+  color: var(--se-text);
+  font: 600 var(--se-fs-base)/1.3 var(--se-font);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-community-ui .friendSmallText {
   color: var(--se-text-faint) !important;
-  font: 500 var(--se-fs-xs)/1.3 var(--se-font) !important;
+  font: 500 var(--se-fs-xs)/1.3 var(--se-font);
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-community-ui .friendBlock.in-game .friendSmallText {
   color: var(--se-status-ingame) !important;
 }
 
+/* !important: another rule in this file sets color with !important */
 html.se-community-ui .friendBlock.online .friendSmallText {
   color: var(--se-status-online) !important;
 }
 
 html.se-community-ui .friendSmallText [class^="linkFriend_"] {
-  color: inherit !important;
+  color: inherit;
 }
 
 /* ---------- Duotone icons (shared/icons.js) ---------- */
@@ -813,6 +964,8 @@ html.se-community-ui .se-duo .p {
 }
 
 /* The Steam icon a duotone one replaced */
+/* !important: the theme's shared rules (community/discussions/home.css,
+   community/edit-profile/page.css) set display with !important */
 html.se-community-ui [data-se-duo]:not([data-se-duo=""]) img:not(.se-duo img) {
   display: none !important;
 }
@@ -831,45 +984,51 @@ html.se-community-ui .emoticon_popup_ctn {
   z-index: 200;
 }
 
+/* !important: padding can come inline from Steam's markup or scripts */
 html.se-community-ui .emoticon_popup {
   box-sizing: border-box;
   max-width: min(440px, 90vw);
   padding: 8px !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-lg) !important;
-  background: var(--se-panel-bg) !important;
-  box-shadow: var(--se-panel-shadow) !important;
+  border: 0;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-panel-bg);
+  box-shadow: var(--se-panel-shadow);
   backdrop-filter: var(--se-blur-panel);
 }
 
+/* !important: padding can come inline from Steam's markup or scripts */
 html.se-community-ui .emoticon_popup :is(.emoticon_popup_content, .emoticon_popup_scroll, .emoticon_popup_inner) {
   display: flex;
   flex-wrap: wrap;
   gap: 2px;
   max-height: 260px;
   padding: 0 !important;
-  border: 0 !important;
-  background: none !important;
+  border: 0;
+  background: none;
   overflow-y: auto;
   scrollbar-width: thin;
 }
 
+/* !important: Steam's own rules (globalv2.css) set height, margin, width at equal or higher
+   weight; another rule in this file sets background with !important; display, padding can come
+   inline from Steam's markup or scripts */
 html.se-community-ui .emoticon_option {
   display: flex !important;
   align-items: center;
   justify-content: center;
-  float: none !important;
+  float: none;
   width: 36px !important;
   height: 36px !important;
   margin: 0 !important;
   padding: 0 !important;
-  border: 0 !important;
+  border: 0;
   border-radius: var(--se-radius-sm);
   background: none !important;
   cursor: pointer;
   transition: background-color var(--se-dur), transform var(--se-dur) var(--se-ease);
 }
 
+/* !important: another rule in this file sets background with !important */
 html.se-community-ui .emoticon_option:hover {
   background: var(--se-hover) !important;
   transform: scale(1.12);
@@ -884,10 +1043,10 @@ html.se-community-ui .emoticon_option img {
 
 /* Hover preview Steam shows for the pointed emoticon */
 html.se-community-ui .emoticon_hover {
-  border: 0 !important;
-  border-radius: var(--se-radius-md) !important;
-  background: var(--se-panel-bg) !important;
-  box-shadow: var(--se-panel-shadow) !important;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-panel-bg);
+  box-shadow: var(--se-panel-shadow);
 }
 
 /* ---------- Tooltips ----------
@@ -895,21 +1054,25 @@ html.se-community-ui .emoticon_hover {
  * default popover box shows through Steam's styles) and the theme's title tooltips
  * (.se-tip, shared/tips.js: the browser's `title` box can't be styled) look the same.
  */
+/* !important: margin, padding can come inline from Steam's markup or scripts */
 html.se-community-ui .community_tooltip {
   box-sizing: border-box;
   max-width: 360px;
   margin: 0 !important;
   padding: 10px 13px !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-md) !important;
-  background: var(--se-surface-2) !important;
-  box-shadow: var(--se-shadow-tooltip) !important;
-  color: var(--se-text) !important;
-  font: 500 var(--se-fs-sm)/1.5 var(--se-font) !important;
-  text-shadow: none !important;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-shadow-tooltip);
+  color: var(--se-text);
+  font: 500 var(--se-fs-sm)/1.5 var(--se-font);
+  text-shadow: none;
   overflow-wrap: anywhere;
 }
 
+/* !important: Steam's own rules (BfjkgwPa.css, C6L1nUf2.css, Ceuw-a-k.css) set color at equal or
+   higher weight; the theme's shared rules (community/activity/page.css,
+   community/discussions/home.css, community/discussions/page.css) set color with !important */
 html.se-community-ui .community_tooltip a {
   color: var(--se-accent) !important;
 }

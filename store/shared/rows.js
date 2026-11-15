@@ -20,6 +20,7 @@
  *   data-se-tile-art            the capsule art    data-se-price-bar    the strip under it
  *   data-se-price               the price widget (dom.tagPrice)
  *   data-se-arrow="prev|next"   carousel arrows    data-se-pips         the page dots
+ *   data-se-upto="-80%"         an event's "Up to -80%" chip, data-se-upto-label its "Up to"
  */
 export default (dom) => {
   const { mark, scope, tagPrice } = dom;
@@ -216,17 +217,45 @@ export default (dom) => {
     if (container) for (const carousel of container.querySelectorAll(CAROUSEL)) tagShelf(carousel);
   };
 
+  /*
+   * Discounts & Events: an event's chip is one text line ("Up to -80%"), not a price widget.
+   * Its label and percentage go into attributes so front/sections.css can draw them as the
+   * shared chip's caption and discount badge; Steam's own text node is left untouched (React
+   * owns it).
+   */
+  const EVENT_CHIP = '#module_discounts_and_events .cV6I71ujCms- > *';
+  const UP_TO = /^(.*?)\s*(-\d+\s*%)$/;
+  const tagEventChips = () => {
+    for (const chip of document.querySelectorAll(EVENT_CHIP)) {
+      const match = !chip.childElementCount && UP_TO.exec(chip.textContent.trim());
+      if (!match) {
+        dom.unmark(chip, 'data-se-upto');
+        dom.unmark(chip, 'data-se-upto-label');
+        continue;
+      }
+      mark(chip, 'data-se-upto', match[2].replace(/\s+/g, ''));
+      mark(chip, 'data-se-upto-label', match[1]);
+    }
+  };
+
   life.observe((records) => {
     const container = root();
     const added = records.flatMap((record) => [...record.addedNodes]).filter((node) => container?.contains(node));
     for (const carousel of carouselsIn(added)) tagShelf(carousel);
+    if (isFront && added.length) tagEventChips();
   });
-  dom.ready().then(() => life.alive && scanAll());
+  dom.ready().then(() => {
+    if (!life.alive) return;
+    scanAll();
+    if (isFront) tagEventChips();
+  });
   scanAll();
+  if (isFront) tagEventChips();
 
   const ATTRS = [
     'data-se-shelf', 'data-se-shelf-head', 'data-se-shelf-title', 'data-se-shelf-more', 'data-se-shelf-panel',
     'data-se-slot', 'data-se-tile', 'data-se-tile-art', 'data-se-price-bar', 'data-se-arrow', 'data-se-pips',
+    'data-se-upto', 'data-se-upto-label',
   ];
 
   return () => {
