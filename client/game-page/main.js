@@ -25,7 +25,7 @@
     placeAchFeatured, placeAchIcons, placeAchRings, placeBadge, placeDlcAll, placeEmoDot,
     placeFeedAchAll, placeFeedEvents, placeFeedShots, placeFriends, placeHeadingLinks,
     placeHideCommunity, placeLabels, placeLeftCards, placeMoreNames, placeNewsLink,
-    placePlayBarIcons, placeRatings, placeReviewPrompt, placeScrollTop, placeStatKinds,
+    placePlayBarIcons, placeRatings, placeReviewPrompt, placeScrollTop, placeStatKinds, placeStatus,
     RIGHT_CONTROLS, schedule, setPass, sized, sizeLogos, stopLogos, tipHosts, unbindTips,
   } = ns;
   const { live } = ns;
@@ -64,6 +64,7 @@
     [placeReviewPrompt],
     [placePlayBarIcons],
     [placeStatKinds],
+    [placeStatus],
     [placeMoreNames],
     [placeLabels],
   ];
@@ -130,6 +131,7 @@
     'data-se-has-link',
     'data-se-icon',
     'data-se-stat',
+    'data-se-status',
     'data-se-label',
     'data-se-hidden',
     'data-se-cgrid',

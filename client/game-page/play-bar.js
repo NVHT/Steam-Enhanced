@@ -1,6 +1,6 @@
 /*
- * Header: play bar icons, stat kinds, the "and N more" developer names, labels and the game
- * logo sized to its visible pixels (--se-logo-crop).
+ * Header: play bar icons, stat kinds, the game status, the "and N more" developer names,
+ * labels and the game logo sized to its visible pixels (--se-logo-crop).
  */
 ((SE) => {
   const ns = window.__seGamePageParts;
@@ -81,6 +81,48 @@
       const kind = statKind(el);
       if (kind) mark(el, 'data-se-stat', kind);
       else unmark(el, 'data-se-stat');
+    }
+  }
+
+  /*
+   * Game status (Launching, Installing, Update Queued…): Steam's DetailsSection, one markup for
+   * every state. Its kind comes from the overview's display_status (EDisplayStatus): busy states
+   * turn the theme's spinner ring (.se-spin-arc, so they follow the Loading spinner setting), the
+   * rest get a still icon by data-se-status (play-bar.css).
+   */
+  const STATUS = `.${C.StatusAndStats} > .${C.DetailsSection}`;
+  const STATUS_KINDS = new Map([
+    ...[1, 2, 3, 5, 6, 7, 8, 36].map((s) => [s, 'busy']),
+    ...[19, 23].map((s) => [s, 'queued']),
+    ...[18, 22].map((s) => [s, 'paused']),
+    ...[20, 24].map((s) => [s, 'required']),
+    ...[38, 39].map((s) => [s, 'error']),
+    ...[12, 14, 17, 21, 25, 26].map((s) => [s, 'blocked']),
+  ]);
+  const SPIN = 'se-status-spin';
+
+  function statusKind(section) {
+    const overview = SE.fromProps(section, 6, (p) => p.overview);
+    if (!overview) return 'busy';
+    if (overview.BIsAppBlocked?.()) return 'blocked';
+    return STATUS_KINDS.get(overview.selected_per_client_data?.display_status) ?? 'info';
+  }
+
+  function placeStatus() {
+    for (const section of document.querySelectorAll(STATUS)) {
+      const kind = statusKind(section);
+      mark(section, 'data-se-status', kind);
+      let spin = section.querySelector(`:scope > .${SPIN}`);
+      if (kind !== 'busy') {
+        drop(spin);
+        continue;
+      }
+      // Appended last: React inserts its own children before ours, and the grid places them all.
+      if (!spin) {
+        spin = own('span', `${SPIN} se-spin-arc`);
+        spin.setAttribute('aria-hidden', 'true');
+      }
+      if (section.lastElementChild !== spin) section.appendChild(spin);
     }
   }
 
@@ -244,6 +286,6 @@
 
   Object.assign(ns, {
     LOGO_CROP, onLogoLoad, placeLabels, placeMoreNames, placePlayBarIcons, placeStatKinds,
-    sizeLogos, stopLogos,
+    placeStatus, sizeLogos, stopLogos,
   });
 })(window.__se);

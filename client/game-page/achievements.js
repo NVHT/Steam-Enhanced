@@ -637,12 +637,17 @@
           const card = icon.closest('[data-se-ach-lead]');
           if (card) decorateLead(card, a);
         }
-        host.__seAch = a;
+        /*
+         * Steam's hover target is only the icon (AchievementHoverContainer); the tip opens from
+         * the whole tile, name and description included (the description is clipped to two lines).
+         */
+        const tile = (feed ? icon.closest(FEED_ACH) : icon.closest(`.${C.Featured}`)) || host;
+        host.__seAch = tile.__seAch = a;
         muteHost(host);
         tipHosts.add(host);
-        if (tipBindings.has(host)) continue;
-        bind(host, 'mouseenter', () => muteHost(host));
-        withTip(host, () => (icon.isConnected ? icon : host));
+        if (tipBindings.has(tile)) continue;
+        bind(tile, 'mouseenter', () => muteHost(host));
+        withTip(tile, () => (icon.isConnected ? icon : tile));
       }
     }
     for (const h of tipHosts) {

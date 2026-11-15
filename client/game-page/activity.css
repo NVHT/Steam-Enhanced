@@ -730,17 +730,18 @@
   overflow: hidden;
 }
 
-[data-se-rate-bar] > [data-se-rate="like"] [data-se-rate-icon]:not(#se-none),
-[data-se-rate-bar] > [data-se-rate="comment"] [data-se-rate-icon]:not(#se-none) {
-  background: center / contain no-repeat;
+/* Icons in the count's color, no tint of their own: dual-tone masks over currentColor */
+[data-se-rate-bar] [data-se-rate-icon]:not(#se-none) {
+  background: var(--se-text);
+  -webkit-mask: var(--se-rate-icon) center / contain no-repeat;
 }
 
 [data-se-rate-bar] > [data-se-rate="like"] [data-se-rate-icon]:not(#se-none) {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10v10H4V10z' fill='%237cc4ff' fill-opacity='.35' stroke='%237cc4ff' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M7 10l4-7c1.6 0 2.6 1.2 2.2 2.8L12.6 9H19a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.8 20H7z' fill='%237cc4ff' fill-opacity='.35' stroke='%237cc4ff' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --se-rate-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10v10H4V10z' fill='white' fill-opacity='.35' stroke='white' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M7 10l4-7c1.6 0 2.6 1.2 2.2 2.8L12.6 9H19a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.8 20H7z' fill='white' fill-opacity='.35' stroke='white' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 [data-se-rate-bar] > [data-se-rate="comment"] [data-se-rate-icon]:not(#se-none) {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-9l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z' fill='%237cc4ff' fill-opacity='.35' stroke='%237cc4ff' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --se-rate-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-9l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z' fill='white' fill-opacity='.35' stroke='white' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 [data-se-rate-bar] > [data-se-rate="like"] [data-se-rate-icon] > *:not(#se-none),
@@ -927,7 +928,10 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: center / 19px 19px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 19V6M6 11.5L12 5.5l6 6' fill='none' stroke='%23e6e8eb' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  /* Dual-tone, like the theme's other icons: a block arrow (32% fill under its outline) to a bar */
+  background: var(--se-text);
+  -webkit-mask: var(--se-icon-arrow-top) center / var(--se-tile-icon) no-repeat;
+  mask: var(--se-icon-arrow-top) center / var(--se-tile-icon) no-repeat;
 }
 
 ._1J21tLst5SEhBPkVRT53UV:hover > div:not(#se-none),
@@ -945,9 +949,9 @@
   opacity: 1 !important;
 }
 
-/* Awards: the theme's dual-tone medal in place of Steam's ribbon. */
+/* Awards: the theme's dual-tone medal in place of Steam's ribbon (drawn by the mask above). */
 [data-se-rate-bar] > [data-se-rate="award"] [data-se-rate-icon]:not(#se-none) {
-  background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8.6 13.6 7 21.5l5-2.6 5 2.6-1.6-7.9' fill='%237cc4ff' fill-opacity='.35' stroke='%237cc4ff' stroke-width='1.6' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='9' r='6.2' fill='%237cc4ff' fill-opacity='.35' stroke='%237cc4ff' stroke-width='1.6'/%3E%3Cpath d='m12 6.3.9 1.8 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2L9.1 8.4l2-.3z' fill='%237cc4ff'/%3E%3C/svg%3E");
+  --se-rate-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8.6 13.6 7 21.5l5-2.6 5 2.6-1.6-7.9' fill='white' fill-opacity='.35' stroke='white' stroke-width='1.6' stroke-linejoin='round'/%3E%3Ccircle cx='12' cy='9' r='6.2' fill='white' fill-opacity='.35' stroke='white' stroke-width='1.6'/%3E%3Cpath d='m12 6.3.9 1.8 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2L9.1 8.4l2-.3z' fill='white'/%3E%3C/svg%3E");
 }
 
 [data-se-rate-bar] > [data-se-rate="award"] [data-se-rate-icon] > *:not(#se-none) {

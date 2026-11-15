@@ -387,3 +387,52 @@
   background: var(--se-accent-tint);
   border-color: var(--se-accent-line);
 }
+
+/*
+ * Screenshot tiles (ClickableScreenshot ._3JNo1hUKCpMJiJSM2dD5Kq: the game page's post-game summary,
+ * the media manager): the share button (ScreenshotShareIcon .gOv9M_tdWa0CEJbaLhOKY) as a frosted round
+ * button with the theme's dual-tone share icon (outline over a 32% fill); Steam's solid icon is
+ * hidden. Quiet at rest, full on the tile's hover, as Steam has it.
+ */
+.gOv9M_tdWa0CEJbaLhOKY:not(#se-none) {
+  top: var(--se-space-2);
+  right: var(--se-space-2);
+  width: var(--se-hit);
+  height: var(--se-hit);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--se-bg) 62%, transparent);
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  filter: none;
+  opacity: .6;
+  cursor: pointer;
+  transition: opacity var(--se-dur) var(--se-ease);
+}
+
+._3JNo1hUKCpMJiJSM2dD5Kq:is(:hover, :focus-visible) .gOv9M_tdWa0CEJbaLhOKY:not(#se-none) {
+  opacity: 1;
+}
+
+.gOv9M_tdWa0CEJbaLhOKY:not(#se-none):hover {
+  background: var(--se-hover);
+}
+
+.gOv9M_tdWa0CEJbaLhOKY:not(#se-none):active {
+  transform: scale(var(--se-press-scale));
+}
+
+.gOv9M_tdWa0CEJbaLhOKY > *:not(#se-none) {
+  display: none;
+}
+
+.gOv9M_tdWa0CEJbaLhOKY::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--se-text);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4z' fill='white' fill-opacity='.32' stroke='none'/%3E%3Cpath d='M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4M12 15V3.5M8 7.5l4-4 4 4'/%3E%3C/svg%3E") center / var(--se-icon-md) var(--se-icon-md) no-repeat;
+}
+
+.gOv9M_tdWa0CEJbaLhOKY:hover::before {
+  background: var(--se-text-strong);
+}
