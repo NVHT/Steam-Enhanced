@@ -29,10 +29,39 @@
 
 <br>
 
-Steam Enhanced rebuilds the Steam client around your library: a navigation rail, a cinematic Home stage, two-column game pages, a Friends dock that stays in reach and an overlay that matches. The store, Community and Support pages follow in the same look.
+Steam Enhanced rebuilds the Steam client around your library: a navigation rail, a cinematic Home stage, two-column game pages, a Friends dock that stays in reach and an overlay that matches. The Store, Community and Support pages follow in the same look.
 
 > [!NOTE]
 > Steam still runs underneath. Your library, data and settings behave exactly as Steam intends.
+
+<br>
+
+## ✦ Install
+
+> [!IMPORTANT]
+> **Requires** the [Steam](https://store.steampowered.com/about/) desktop client and [Millennium](https://steambrew.app), with theme JavaScript on.
+
+1. Download the [latest release](https://github.com/NVHT/Steam-Enhanced/releases/latest).
+2. Exit Steam from **Steam → Exit**.
+3. Extract the `Steam-Enhanced` folder into `<Steam>/millennium/themes/`, so you end up with `themes/Steam-Enhanced/skin.json`.
+4. Start Steam, go to **Millennium → Themes** and select **Steam Enhanced**.
+
+> [!TIP]
+> **Updating?** With Steam closed, delete the old `Steam-Enhanced` folder before extracting. Merging leaves stale files behind.
+
+### Optional plugins
+
+| Plugin | What it adds | Shows up in |
+| --- | --- | --- |
+| **[HLTB for Millennium](https://github.com/jcdoll/hltb-millennium-plugin)**<br><sub><code>jcdoll/hltb-millennium-plugin</code></sub> | HowLongToBeat completion times for each game | Game page |
+| **[Extendium](https://github.com/BossSloth/Extendium)**<br><sub><code>BossSloth/Extendium</code></sub> | Chrome extensions inside Steam's browser | Steam's browser |
+| **[Size on Disk](https://github.com/k0d13/steam-size-on-disk)**<br><sub><code>k0d13/steam-size-on-disk</code></sub> | How much disk space each installed game takes | Game page · Settings |
+| **[Player Count](https://github.com/swindlesmccoop/playercount-badge)**<br><sub><code>swindlesmccoop/playercount-badge</code></sub> | Live player counts, replacing the theme's own | Game page |
+| **[ProtonDB Library Badges](https://github.com/Yohlo/protondb-library-badges)**<br><sub><code>Yohlo/protondb-library-badges</code></sub> | ProtonDB compatibility tiers for Linux and Steam Deck | Game page · Library |
+| **[Achievement Manager](https://github.com/madmaxgrey/AchievementManager)**<br><sub><code>madmaxgrey/AchievementManager</code></sub> | Unlock and lock achievements | Game page · Its own window |
+
+> [!NOTE]
+> Built for a Steam window at least **1920 px** wide, or **1600 px** with the Friends dock collapsed. That's your screen width divided by display scaling: 1920×1080 at 100%, 2560×1440 up to 125%, 4K up to 200%. Narrower windows work, but parts of Library Home may hide.
 
 <br>
 
@@ -85,7 +114,7 @@ Steam Enhanced rebuilds the Steam client around your library: a navigation rail,
 
 **Everywhere else**
 
-| | |
+| Area | What changes |
 | --- | --- |
 | **Navigation rail** | One root menu, title-bar library search, and Restart Steam / Reload UI above Exit. |
 | **Notifications** | Grouped by day, opened by hovering the bell. |
@@ -99,7 +128,7 @@ Steam Enhanced rebuilds the Steam client around your library: a navigation rail,
 
 Every web page fills the window and shares the theme's cards, pills, glass chips and type.
 
-| | |
+| Area | What changes |
 | --- | --- |
 | **Store front** | A cinema hero from Featured &amp; Recommended with game tabs and a glass info bar, ranked lists beside a spotlight card, and a capsule store bar with hover menus of art tiles. |
 | **Game pages** | A title card over the hero art, one summary band with screenshots and features, the trailer as a card with a picker, and About This Game in a reader window. |
@@ -108,25 +137,6 @@ Every web page fills the window and shares the theme's cards, pills, glass chips
 | **Legal** | The Subscriber Agreement and Privacy Policy as documents with a contents sidebar and progress bar. |
 | **Community** | Profiles as glass cards over their own background, a three-column Activity feed, Hubs, Discussions, a 5 × 5 inventory grid with rarity glows and a Community Market with a wallet hero, ranked listings and a game filter. |
 | **Support** | Every help.steampowered.com page, from the wizard to refunds and account recovery. |
-
-<br>
-
-## ✦ Install
-
-| Required | Optional |
-| --- | --- |
-| The Steam desktop client and [Millennium](https://steambrew.app), with theme JavaScript on. | **HLTB for Millennium** for completion times. Keep it enabled; its *Show in Library* option can be off.<br>**[Extendium](https://github.com/BossSloth/Extendium)** for Chrome extensions; its toolbar and manager are themed.<br>**[Size on Disk](https://github.com/k0d13/steam-size-on-disk)** for a game's size in its play bar; its Installed Files page and settings are themed.<br>**[Player Count](https://github.com/swindlesmccoop/playercount-badge)** in place of the theme's own player count; its badge matches it.<br>**[ProtonDB Library Badges](https://github.com/Yohlo/protondb-library-badges)** for ProtonDB tiers in the play bar and the game list.<br>**[Achievement Manager](https://github.com/madmaxgrey/AchievementManager)**: its window is themed in all four designs, with the theme's rarity tiers. |
-
-1. Exit Steam completely.
-2. Extract the release into `<Steam>/millennium/themes/`, so the manifest sits at `<Steam>/millennium/themes/Steam-Enhanced/skin.json`.
-3. Launch Steam, open **Millennium → Themes** and pick **Steam Enhanced**.
-4. Turn on theme JavaScript and restart Steam.
-
-> [!IMPORTANT]
-> Built for a Steam window at least **1920 px** wide, or **1600 px** with the Friends dock collapsed. That's your screen width divided by display scaling: 1920×1080 at 100%, 2560×1440 up to 125%, 4K up to 200%. Narrower windows work, but parts of Library Home may hide.
-
-> [!TIP]
-> **Updating?** With Steam closed, delete the old `Steam-Enhanced` folder before extracting. Merging leaves stale files behind.
 
 <br>
 
@@ -153,7 +163,7 @@ Every colour, radius, elevation and feature switch also lives on `:root` in **`c
 </details>
 
 <details>
-<summary><b>Loading spinner</b></summary>
+<summary><b>Loading spinner</b> &nbsp;<sub>(Millennium setting)</sub></summary>
 <br>
 
 One spinner for every loader: client windows, the Splash entrance, Store, Community and Support. The style applies everywhere at once.
@@ -217,7 +227,7 @@ Check that `skin.json` sits at `millennium/themes/Steam-Enhanced/skin.json`.
 <summary><b>Interactive features are missing</b></summary>
 <br>
 
-Turn on theme JavaScript in Millennium's settings, then restart Steam.
+Theme JavaScript is off (see the [requirements](#-install)). Turn it on in Millennium's settings, then restart Steam.
 
 </details>
 
@@ -247,6 +257,7 @@ Steam-Enhanced/
 ├── community/    Community redesigns, one folder per page plus shared/
 ├── help/         Steam Support pages
 ├── compat/       Plugin integrations (HowLongToBeat, Extendium, Size on Disk, Player Count, ProtonDB, Achievement Manager)
+├── options/      Setting overrides that Millennium applies when you pick them
 ├── dev/          Element inspector (Ctrl+Shift+E), classmap.py, colors.py, css-check.py, spinner_svg.py
 └── assets/       Logos, Millennium header and splash
 ```
