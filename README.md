@@ -59,6 +59,7 @@ Steam Enhanced rebuilds the Steam client around your library: a navigation rail,
 | **[Player Count](https://github.com/swindlesmccoop/playercount-badge)**<br><sub><code>swindlesmccoop/playercount-badge</code></sub> | Live player counts, replacing the theme's own | Game page |
 | **[ProtonDB Library Badges](https://github.com/Yohlo/protondb-library-badges)**<br><sub><code>Yohlo/protondb-library-badges</code></sub> | ProtonDB compatibility tiers for Linux and Steam Deck | Game page · Library |
 | **[Achievement Manager](https://github.com/madmaxgrey/AchievementManager)**<br><sub><code>madmaxgrey/AchievementManager</code></sub> | Unlock and lock achievements | Game page · Its own window |
+| **[SteamGridDB](https://github.com/DevsNate/SteamGridDB-Millennium)**<br><sub><code>DevsNate/SteamGridDB-Millennium</code></sub> | Custom grids, heroes, logos and icons from SteamGridDB | Its own window |
 
 > [!NOTE]
 > Built for a Steam window at least **1920 px** wide, or **1600 px** with the Friends dock collapsed. That's your screen width divided by display scaling: 1920×1080 at 100%, 2560×1440 up to 125%, 4K up to 200%. Narrower windows work, but parts of Library Home may hide.
@@ -256,7 +257,7 @@ Steam-Enhanced/
 ├── store/        Store redesigns, one folder per page, loaded by store/loader.js
 ├── community/    Community redesigns, one folder per page plus shared/
 ├── help/         Steam Support pages
-├── compat/       Plugin integrations (HowLongToBeat, Extendium, Size on Disk, Player Count, ProtonDB, Achievement Manager)
+├── compat/       Plugin integrations (HowLongToBeat, Extendium, Size on Disk, Player Count, ProtonDB, Achievement Manager, SteamGridDB)
 ├── options/      Setting overrides that Millennium applies when you pick them
 ├── dev/          Element inspector (Ctrl+Shift+E), classmap.py, colors.py, css-check.py, spinner_svg.py
 └── assets/       Logos, Millennium header and splash

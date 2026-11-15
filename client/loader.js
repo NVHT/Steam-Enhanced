@@ -142,6 +142,7 @@
     ['main', 'compat/protondb-library-badges/', ['protondb-library-badges.css', 'protondb-library-badges.js']],
     ['desktop', 'core/', ['achievement-tiers.css']],
     ['desktop', 'compat/achievement-manager/', ['achievement-manager.css', 'achievement-manager.js']],
+    ['desktop', 'compat/steamgriddb/', ['steamgriddb.css', 'steamgriddb.js']],
     // Game page and achievements
     ['achievements', 'core/', ['achievement-tiers.css']],
     ['main', 'client/game-page/', [
