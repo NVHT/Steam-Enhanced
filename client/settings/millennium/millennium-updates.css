@@ -1,0 +1,186 @@
+/*
+ * Continues millennium.css (in order, see client/loader.js): Millennium Settings › Updates.
+ *
+ * A status card over the list of everything Millennium checks (`.se-upd`, drawn by
+ * millennium-updates.js). Millennium's own page stays mounted beneath it, hidden: its update
+ * cards still run the downloads.
+ */
+.MillenniumSettings [data-se-mill-page="updates"] .DialogBody[data-se-upd] > :not(.se-upd):not(#se-none):not(#se-p2) {
+  display: none !important;
+}
+
+.se-upd {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+/* The status card */
+.se-upd-hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 22px var(--se-space-5);
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-upd-mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text);
+}
+
+.MillenniumSettings .se-upd-mark .se-micon {
+  width: 28px;
+  height: 28px;
+}
+
+.se-upd[data-state="current"] .se-upd-mark {
+  background: color-mix(in srgb, var(--se-running) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-running) 30%, transparent);
+}
+
+.se-upd[data-state="available"] .se-upd-mark {
+  background: var(--se-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+}
+
+.se-upd[data-state="error"] .se-upd-mark {
+  background: var(--se-danger-surface);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-danger) 30%, transparent);
+}
+
+.se-upd[data-state="checking"] .se-upd-mark .se-micon {
+  animation: se-mspin 1.2s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-upd[data-state="checking"] .se-upd-mark .se-micon {
+    animation: none;
+  }
+}
+
+.se-upd-hero-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.se-upd-hero-text b {
+  font: 800 var(--se-fs-2xl) / 1.2 var(--se-font);
+  letter-spacing: -.01em;
+  color: var(--se-text-strong);
+}
+
+.se-upd-hero-text span {
+  font: 500 var(--se-fs-md) / 1.4 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-upd-hero-text small {
+  margin-top: 4px;
+  font: 500 var(--se-fs-sm) / 1 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-upd-hero-text small:empty {
+  display: none;
+}
+
+/* The list */
+.se-upd-list {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-upd-list > header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--se-hairline);
+}
+
+.se-upd-count {
+  font: 600 var(--se-fs-sm) / 1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-muted);
+}
+
+.se-upd-rows {
+  max-height: var(--se-upd-rows-h, none);
+  overflow-y: auto;
+}
+
+.se-upd-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--se-hairline);
+}
+
+.se-upd-row:last-child {
+  border-bottom: 0;
+}
+
+.MillenniumSettings .se-upd-row .se-mtile {
+  width: 36px;
+  height: 36px;
+}
+
+.se-upd-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.se-upd-name {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-width: 0;
+}
+
+.se-upd-name b {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 700 var(--se-fs-md) / 20px var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.se-upd-sub {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 500 var(--se-fs-sm) / 16px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-upd-act {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  min-width: 112px;
+}

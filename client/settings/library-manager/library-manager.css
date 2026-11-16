@@ -1,0 +1,935 @@
+/*
+ * Millennium Library Manager window.
+ *
+ * Turns `.MillenniumDesktopSidebar[data-se-lmx]` into a centered window: head across the top,
+ * the plugin and theme list on the left, and on the right either the overview (nothing open) or
+ * the open item's header, tab strip, Millennium's editor and the reload bar. Paired with
+ * `client/settings/library-manager/library-manager.js`.
+ */
+
+/* The window: centered over a dimmed Steam, fading in and out */
+.MillenniumDesktopSidebar[data-se-lmx]:not(#se-none) {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: min(var(--se-window-w), calc(100% - 2 * var(--se-space-7))) !important;
+  height: min(var(--se-window-h), calc(100% - 2 * var(--se-space-7))) !important;
+  display: grid !important;
+  grid-template-columns: var(--se-side-col) minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "head head"
+    "list item"
+    "list tabs"
+    "list body"
+    "list bar";
+  overflow: hidden !important;
+  border-radius: var(--se-radius-xl) !important;
+  background: var(--se-surface) !important;
+  color: var(--se-text);
+  font-family: var(--se-font);
+  box-shadow: var(--se-shadow-pop), var(--se-shadow-lg) !important;
+  opacity: 0;
+  transform: translate(-50%, -48%) scale(.98) !important;
+  transition: opacity var(--se-dur-slow) var(--se-ease), transform var(--se-dur-slow) var(--se-ease) !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx][data-se-open]:not(#se-none) {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+
+/* Closed (Millennium hides it): out of the way */
+.MillenniumDesktopSidebar[data-se-lmx]:not([data-se-shown]):not(#se-none) {
+  display: none !important;
+}
+
+.MillenniumDesktopSidebar_Overlay:not(#se-none) {
+  background: var(--se-black-60) !important;
+}
+
+/* Millennium's own title row: the window's head takes its place */
+.MillenniumDesktopSidebar[data-se-lmx] > .MillenniumDesktopSidebar_Title {
+  display: none !important;
+}
+
+/* ---------- Shared bits ---------- */
+
+.se-lmx-ib,
+.se-lmx-btn,
+.se-lmx-tabs button,
+.se-lmx-bar button,
+.se-lmx-item {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: var(--se-font);
+}
+
+.se-lmx-ib:focus-visible,
+.se-lmx-btn:focus-visible,
+.se-lmx-bar button:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* Inside scrolling or clipped strips, so the ring is drawn inside */
+.se-lmx-item:focus-visible,
+.se-lmx-tabs button:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: calc(-1 * var(--se-focus-offset));
+}
+
+.se-lmx-ib:active,
+.se-lmx-btn:active,
+.se-lmx-bar button:active,
+.se-lmx-item:active:not([disabled]) {
+  transform: scale(var(--se-press-scale));
+}
+
+.se-lmx-ib {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-control-h);
+  height: var(--se-control-h);
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  color: var(--se-text-dim);
+  transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.se-lmx-ib:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+/* The shared icons, masked: Millennium (as on the nav rail) and the title bar's close */
+.se-lmx-ib::before {
+  content: "";
+  width: var(--se-tile-icon);
+  height: var(--se-tile-icon);
+  background: currentColor;
+  -webkit-mask: var(--se-lmx-icon) center / contain no-repeat;
+  mask: var(--se-lmx-icon) center / contain no-repeat;
+}
+
+.se-lmx-ib[data-act="settings"] {
+  --se-lmx-icon: var(--se-icon-millennium);
+}
+
+/* Close: the title bar's close button, red on hover */
+.se-lmx-ib[data-act="close"] {
+  --se-lmx-icon: var(--se-icon-window-close);
+  width: var(--se-tile-sm);
+  height: var(--se-tile-sm);
+  border-radius: var(--se-radius-sm);
+  background: transparent;
+  color: var(--se-text-muted);
+}
+
+.se-lmx-ib[data-act="close"]::before {
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+}
+
+.se-lmx-ib[data-act="close"]:hover {
+  background: color-mix(in srgb, var(--se-danger) 90%, transparent);
+  color: var(--se-text-strong);
+}
+
+/* The primary button (one per view): Customize, Reload Steam */
+.se-lmx-btn,
+.se-lmx-bar button {
+  display: inline-flex;
+  align-items: center;
+  height: var(--se-control-h-sm);
+  padding: 0 var(--se-space-3);
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-base);
+  font-weight: 600;
+  transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.se-lmx-btn:hover,
+.se-lmx-bar button:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.se-lmx-btn[data-primary],
+.se-lmx-bar button[data-primary] {
+  background: var(--se-accent);
+  color: var(--se-on-accent);
+  font-weight: 700;
+}
+
+.se-lmx-btn[data-primary]:hover,
+.se-lmx-bar button[data-primary]:hover {
+  background: var(--se-accent-hover);
+  color: var(--se-on-accent);
+}
+
+.se-lmx-btn[data-primary] {
+  height: var(--se-control-h);
+  padding: 0 var(--se-space-4);
+  border-radius: var(--se-radius-md);
+  font-size: var(--se-fs-md);
+}
+
+/* The search field: "Find a setting" */
+.se-lmx-field {
+  display: flex;
+  align-items: center;
+  gap: var(--se-search-gap);
+  height: var(--se-search-h);
+  padding: 0 var(--se-search-pad);
+  box-sizing: border-box;
+  border-radius: var(--se-search-radius);
+  background: var(--se-search-bg);
+  box-shadow: var(--se-search-edge);
+  color: var(--se-search-icon-color);
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-lmx-field:hover:not(:focus-within) {
+  box-shadow: var(--se-search-edge-hover);
+}
+
+.se-lmx-field:focus-within {
+  box-shadow: var(--se-search-edge-focus);
+}
+
+.se-lmx-field input {
+  all: unset;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  color: var(--se-search-text);
+  font: var(--se-search-font);
+  line-height: var(--se-search-h);
+}
+
+.se-lmx-field input::placeholder {
+  /* !important: Steam's own placeholder rule sets a brighter colour and italics */
+  color: var(--se-search-placeholder) !important;
+  font-style: normal !important;
+}
+
+.se-lmx-field input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.se-lmx-label {
+  padding: var(--se-space-3) var(--se-space-3) var(--se-space-1);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-text-muted);
+}
+
+.se-lmx-note {
+  padding: var(--se-space-3);
+  font-size: var(--se-fs-base);
+  color: var(--se-text-muted);
+}
+
+/* Duotone icons (every icon here): outline plus a soft fill, in the text colour */
+.se-lmx-head .se-duo,
+.se-lmx-list .se-duo,
+.se-lmx-ph .se-duo,
+.se-lmx-overview .se-duo,
+.se-lmx-bar .se-duo {
+  fill: currentColor;
+  fill-opacity: var(--se-icon-duo);
+}
+
+/* Icon tile: a palette for themes, a puzzle piece for plugins. Neutral: icons carry no colour */
+.se-lmx-tile {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-tile-sm);
+  height: var(--se-tile-sm);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  color: var(--se-text-dim);
+}
+
+.se-lmx-item[data-on] .se-lmx-tile,
+.se-lmx-hero .se-lmx-tile {
+  background: var(--se-white-07);
+  color: var(--se-text-strong);
+}
+
+.se-lmx-tile svg {
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+}
+
+.se-lmx-tile-lg {
+  width: var(--se-tile-lg);
+  height: var(--se-tile-lg);
+  border-radius: var(--se-radius-lg);
+}
+
+.se-lmx-tile-lg svg {
+  width: var(--se-icon-xl);
+  height: var(--se-icon-xl);
+}
+
+/* ---------- Head ---------- */
+
+.se-lmx-head {
+  grid-area: head;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  padding: var(--se-space-4) var(--se-space-5);
+  box-shadow: inset 0 -1px 0 var(--se-hairline);
+}
+
+.se-lmx-titles {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-half);
+}
+
+.se-lmx-titles b {
+  font-size: var(--se-fs-2xl);
+  font-weight: 800;
+  letter-spacing: -.01em;
+  color: var(--se-text-strong);
+}
+
+.se-lmx-titles span {
+  font-size: var(--se-fs-base);
+  color: var(--se-text-muted);
+}
+
+/* ---------- List ---------- */
+
+.se-lmx-list {
+  grid-area: list;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  padding: var(--se-space-4) var(--se-space-3);
+  overflow-y: auto;
+  background: var(--se-sidebar);
+  box-shadow: inset -1px 0 0 var(--se-hairline);
+}
+
+/* The list's All / Themes / Plugins filter: the shared segmented control (client/shared/segmented.css), full width */
+.se-lmx-list > .se-seg {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Overview: back to the overview, above the list */
+.se-lmx-item[data-overview] {
+  flex: none;
+  margin-bottom: var(--se-space-1);
+}
+
+.se-lmx-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-half);
+}
+
+.se-lmx-item {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  width: 100%;
+  min-height: var(--se-hit);
+  padding: var(--se-space-2);
+  border-radius: var(--se-radius-md);
+  transition: background var(--se-dur) var(--se-ease);
+}
+
+.se-lmx-item:hover:not([disabled]) {
+  background: var(--se-hover);
+}
+
+.se-lmx-item[data-on] {
+  background: var(--se-selected);
+}
+
+/* Nothing to open: shown plainly, not as a link */
+.se-lmx-item[disabled] {
+  cursor: default;
+}
+
+.se-lmx-item[data-off] .se-lmx-tile,
+.se-lmx-item[data-off] .se-lmx-text {
+  opacity: .55;
+}
+
+.se-lmx-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-half);
+}
+
+.se-lmx-name {
+  font-size: var(--se-fs-md);
+  font-weight: 700;
+  color: var(--se-text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-lmx-meta {
+  font-size: var(--se-fs-sm);
+  color: var(--se-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* A plugin's state: a presence dot on its tile's corner (on: running green, off: grey) */
+.se-lmx-tile[data-state] {
+  position: relative;
+}
+
+.se-lmx-tile[data-state]::after {
+  content: "";
+  position: absolute;
+  right: calc(-1 * var(--se-space-half));
+  bottom: calc(-1 * var(--se-space-half));
+  width: var(--se-dot);
+  height: var(--se-dot);
+  border-radius: 50%;
+  background: var(--se-running);
+  box-shadow: 0 0 0 var(--se-space-half) var(--se-sidebar);
+}
+
+.se-lmx-tile[data-state="off"]::after {
+  background: var(--se-offline);
+}
+
+/* The ring matches the row behind it */
+.se-lmx-item:hover:not([disabled]) .se-lmx-tile[data-state]::after {
+  box-shadow: 0 0 0 var(--se-space-half) var(--se-hover);
+}
+
+.se-lmx-item[data-on] .se-lmx-tile[data-state]::after {
+  box-shadow: 0 0 0 var(--se-space-half) var(--se-selected);
+}
+
+.se-lmx-go {
+  flex: none;
+  display: inline-flex;
+  color: var(--se-text-muted);
+  transition: transform var(--se-dur) var(--se-ease);
+}
+
+.se-lmx-go svg {
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+}
+
+.se-lmx-item:hover .se-lmx-go {
+  transform: translateX(var(--se-space-half));
+}
+
+.se-lmx-item[data-on] .se-lmx-go {
+  color: var(--se-text-strong);
+}
+
+/* ---------- Overview (nothing open) ---------- */
+
+.se-lmx-overview {
+  /* Item, tabs and body rows: the reload bar stays below it */
+  grid-row: 2 / 5;
+  grid-column: 2;
+  min-height: 0;
+  display: none;
+  flex-direction: column;
+  gap: var(--se-space-4);
+  padding: var(--se-space-4) var(--se-space-6) var(--se-space-6);
+  overflow-y: auto;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx]:not([data-focused-item-type]) > .se-lmx-overview {
+  display: flex;
+}
+
+.se-lmx-overview > .se-lmx-label {
+  padding: var(--se-space-2) 0 0;
+}
+
+.se-lmx-hero {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-5);
+  padding: var(--se-space-5);
+  border-radius: var(--se-radius-lg);
+  background: linear-gradient(120deg, var(--se-accent-surface), color-mix(in srgb, var(--se-kind-violet) 14%, var(--se-surface)) 55%, var(--se-surface-2));
+  box-shadow: inset 0 0 0 1px var(--se-white-07);
+}
+
+.se-lmx-hero-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+}
+
+.se-lmx-kicker {
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-accent);
+}
+
+.se-lmx-hero-text b {
+  font-size: var(--se-fs-3xl);
+  font-weight: 800;
+  color: var(--se-text-strong);
+}
+
+.se-lmx-hero-text span:last-child {
+  font-size: var(--se-fs-base);
+  color: var(--se-text-dim);
+}
+
+.se-lmx-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--se-space-3);
+}
+
+.se-lmx-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  padding: var(--se-space-4);
+  border-radius: var(--se-radius-ml);
+  background: var(--se-surface-2);
+}
+
+.se-lmx-stat b {
+  font-size: var(--se-fs-4xl);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--se-text-strong);
+}
+
+.se-lmx-stat span {
+  font-size: var(--se-fs-sm);
+  color: var(--se-text-muted);
+}
+
+/* ---------- The open item: header, find, tabs ---------- */
+
+.se-lmx-ph {
+  grid-area: item;
+  position: relative;
+  z-index: var(--se-z-dropdown);
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-4);
+  min-width: 0;
+  padding: var(--se-space-5) var(--se-space-6) var(--se-space-4);
+}
+
+.se-lmx-ph .se-lmx-tile {
+  width: var(--se-tile);
+  height: var(--se-tile);
+  border-radius: var(--se-radius-ml);
+}
+
+.se-lmx-ph .se-lmx-tile svg {
+  width: var(--se-icon-lg);
+  height: var(--se-icon-lg);
+}
+
+.se-lmx-ph-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+}
+
+.se-lmx-ph-text b {
+  font-size: var(--se-fs-2xl);
+  font-weight: 800;
+  color: var(--se-text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-lmx-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-1);
+}
+
+.se-lmx-chip {
+  padding: var(--se-space-half) var(--se-space-2);
+  border-radius: var(--se-radius-xs);
+  background: var(--se-surface-2);
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-sm);
+}
+
+.se-lmx-chip[data-kind] {
+  background: var(--se-accent-tint);
+  color: var(--se-accent);
+  font-weight: 600;
+}
+
+.se-lmx-find {
+  position: relative;
+  flex: 0 1 calc(var(--se-side-col) * .75);
+  min-width: 0;
+  display: none;
+}
+
+.se-lmx-ph[data-find] .se-lmx-find {
+  display: block;
+}
+
+.se-lmx-results {
+  position: absolute;
+  top: calc(100% + var(--se-space-1));
+  right: 0;
+  width: var(--se-side-col);
+  max-height: var(--se-menu-max-h);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-half);
+  padding: var(--se-space-1);
+  box-sizing: border-box;
+  border-radius: var(--se-radius-ml);
+  background: var(--se-panel-bg);
+  box-shadow: var(--se-panel-shadow);
+}
+
+.se-lmx-results[hidden] {
+  display: none;
+}
+
+.se-lmx-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-half);
+  padding: var(--se-space-2) var(--se-space-3);
+  border-radius: var(--se-radius-sm);
+  cursor: pointer;
+}
+
+.se-lmx-result:hover,
+.se-lmx-result[aria-selected="true"] {
+  background: var(--se-selected);
+}
+
+.se-lmx-result b {
+  font-size: var(--se-fs-md);
+  color: var(--se-text-strong);
+}
+
+.se-lmx-result span {
+  font-size: var(--se-fs-sm);
+  color: var(--se-text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.se-lmx-tabs {
+  grid-area: tabs;
+  display: none;
+  gap: var(--se-space-1);
+  padding: 0 var(--se-space-6);
+  overflow-x: auto;
+  scrollbar-width: none;
+  box-shadow: inset 0 -1px 0 var(--se-hairline);
+}
+
+.MillenniumDesktopSidebar[data-se-lmx-tabs] > .se-lmx-tabs:not([hidden]) {
+  display: flex;
+}
+
+.se-lmx-tabs button {
+  flex: none;
+  height: var(--se-field-h);
+  padding: 0 var(--se-space-3);
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-base);
+  font-weight: 600;
+  transition: color var(--se-dur) var(--se-ease), box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-lmx-tabs button:hover {
+  color: var(--se-text-strong);
+}
+
+.se-lmx-tabs button[data-on] {
+  color: var(--se-text-strong);
+  font-weight: 700;
+  box-shadow: inset 0 -2px 0 var(--se-accent);
+}
+
+/* Nothing open: the overview stands in for the item's parts */
+.MillenniumDesktopSidebar[data-se-lmx]:not([data-focused-item-type]) > .MillenniumDesktopSidebar_Content:not(#se-none):not(#se-p2),
+.MillenniumDesktopSidebar[data-se-lmx]:not([data-focused-item-type]) > .se-lmx-ph:not(#se-none):not(#se-p2) {
+  display: none !important;
+}
+
+/* ---------- Millennium's editor ---------- */
+
+.MillenniumDesktopSidebar[data-se-lmx] > .MillenniumDesktopSidebar_Content:not(#se-none) {
+  grid-area: body;
+  min-height: 0;
+  height: auto !important;
+  overflow-y: auto !important;
+  padding: var(--se-space-2) var(--se-space-6) var(--se-space-5) !important;
+  display: block !important;
+}
+
+/* Its tab menu: replaced by the strip; kept (beside the name) when the strip can't drive it */
+.MillenniumDesktopSidebar[data-se-lmx-tabs] .MillenniumDesktopSidebar_EditorHeader:not(#se-none) {
+  display: none !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx]:not([data-se-lmx-tabs]) .MillenniumDesktopSidebar_EditorHeader:not(#se-none) {
+  margin: 0 0 var(--se-space-3) !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent:not(#se-none) {
+  padding: 0 !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .DialogBody:not(#se-none) {
+  padding: 0 !important;
+  margin: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+}
+
+/* A setting row: label and description left, its control right, a hairline between rows */
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .eKmEXJCm_lgme24Fp_HWt:not(#se-none) {
+  margin: 0 !important;
+  padding: var(--se-space-4) var(--se-space-2) !important;
+  border-radius: var(--se-radius-sm);
+  background: transparent !important;
+  box-shadow: inset 0 -1px 0 var(--se-hairline) !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .eKmEXJCm_lgme24Fp_HWt:last-child:not(#se-none) {
+  box-shadow: none !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .eKmEXJCm_lgme24Fp_HWt::after {
+  display: none !important;
+}
+
+/* A found setting: a brief accent wash */
+.MillenniumDesktopSidebar[data-se-lmx] .eKmEXJCm_lgme24Fp_HWt[data-se-lmx-flash] {
+  animation: se-lmx-flash var(--se-dur-ambient) var(--se-ease);
+}
+
+@keyframes se-lmx-flash {
+  0%,
+  35% {
+    background-color: var(--se-accent-tint);
+  }
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent ._3jMlJm4PQCA8SfNlUR99Fo:not(#se-none) {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-2);
+  font: 700 var(--se-fs-md) / 1.35 var(--se-font) !important;
+  color: var(--se-text-strong) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  padding: 0 !important;
+}
+
+/* Off its default: an accent dot after the name */
+.MillenniumDesktopSidebar[data-se-lmx] ._3jMlJm4PQCA8SfNlUR99Fo[data-se-lmx-changed]::after {
+  content: "";
+  flex: none;
+  width: var(--se-dot);
+  height: var(--se-dot);
+  border-radius: 50%;
+  background: var(--se-accent);
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent ._1W1to_azoBRG95oNAFpf9Q:not(#se-none) {
+  margin-top: var(--se-space-1) !important;
+  font: 500 var(--se-fs-sm) / 1.45 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .DialogDropDown:not(#se-none):not(#se-p2),
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .DialogButton:not(#se-none):not(#se-p2) {
+  min-height: 0 !important;
+  height: var(--se-control-h) !important;
+  padding: 0 var(--se-space-3) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-white-07) !important;
+  color: var(--se-text) !important;
+  font: 600 var(--se-fs-base) / var(--se-control-h) var(--se-font) !important;
+}
+
+/* Value and arrow on one centred line (Steam stacks the arrow below the label's baseline) */
+.MillenniumDesktopSidebar[data-se-lmx] .DialogDropDown:not(#se-none):not(#se-p2) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: var(--se-space-3);
+  min-width: calc(var(--se-side-col) / 2) !important;
+  box-sizing: border-box !important;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .DialogDropDown_CurrentDisplay {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: normal !important;
+}
+
+/* A few short values: the segmented control stands in; the dropdown stays as Millennium's source */
+.MillenniumDesktopSidebar[data-se-lmx] .DialogDropDown[data-se-lmx-seg]:not(#se-none):not(#se-p2) {
+  display: none !important;
+}
+
+/* A setting with a few short values: the shared segmented control, sized to its labels */
+.se-seg.se-lmx-choice {
+  flex: none;
+}
+
+/* An On / Off pair: a switch, drawn like the client's own (client/settings/controls.css) */
+.se-lmx-switch {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  flex: none;
+  width: var(--se-switch-w);
+  height: var(--se-switch-h);
+  border-radius: var(--se-radius-pill);
+  background: var(--se-selected);
+  cursor: pointer;
+  transition: background var(--se-dur) var(--se-ease), box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-lmx-switch::after {
+  content: "";
+  position: absolute;
+  top: calc((var(--se-switch-h) - var(--se-switch-knob)) / 2);
+  left: calc((var(--se-switch-h) - var(--se-switch-knob)) / 2);
+  width: var(--se-switch-knob);
+  height: var(--se-switch-knob);
+  border-radius: 50%;
+  background: var(--se-text-muted);
+  transition: transform var(--se-dur) var(--se-ease), background var(--se-dur) var(--se-ease);
+}
+
+.se-lmx-switch:hover {
+  box-shadow: 0 0 0 calc(var(--se-space-1) - 1px) var(--se-hairline);
+}
+
+.se-lmx-switch:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-lmx-switch[aria-checked="true"] {
+  background: var(--se-accent);
+}
+
+.se-lmx-switch[aria-checked="true"]::after {
+  background: var(--se-bg-ink);
+  transform: translateX(calc(var(--se-switch-w) - var(--se-switch-h)));
+}
+
+/* Its arrow: an icon, so in the text colour, not accent (!important: Steam colours and sizes it) */
+.MillenniumDesktopSidebar[data-se-lmx] .DialogDropDown svg {
+  flex: none;
+  position: static !important;
+  align-self: center !important;
+  width: var(--se-icon-xs) !important;
+  height: var(--se-icon-xs) !important;
+  margin: 0 !important;
+  color: var(--se-text-muted) !important;
+  fill: currentColor;
+}
+
+.MillenniumDesktopSidebar[data-se-lmx] .DialogDropDown:hover:not(#se-none):not(#se-p2),
+.MillenniumDesktopSidebar[data-se-lmx] .MillenniumDesktopSidebar_EditorContent .DialogButton:hover:not(#se-none):not(#se-p2) {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+/* ---------- Reload bar: a theme setting changed ---------- */
+
+.se-lmx-bar {
+  grid-area: bar;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  margin: 0 var(--se-space-5) var(--se-space-4);
+  padding: var(--se-space-2) var(--se-space-2) var(--se-space-2) var(--se-space-4);
+  border-radius: var(--se-radius-ml);
+  background: var(--se-glass);
+  box-shadow: inset 0 0 0 1px var(--se-white-07), var(--se-shadow-md);
+  animation: se-lmx-rise var(--se-dur-slow) var(--se-ease);
+}
+
+.se-lmx-bar[hidden] {
+  display: none;
+}
+
+@keyframes se-lmx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--se-space-2));
+  }
+}
+
+.se-lmx-bar svg {
+  flex: none;
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  color: var(--se-text-dim);
+}
+
+.se-lmx-bar span {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--se-fs-base);
+  color: var(--se-text);
+}

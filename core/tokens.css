@@ -96,6 +96,7 @@
   --se-icon-glyph: 18px; /* a glyph inside a round button */
   --se-icon-lg: 22px;
   --se-icon-xl: 24px;
+  --se-icon-duo: .32; /* a duotone icon's soft fill (fill-opacity), under its outline */
 
   /* Achievement rarity tiers, by global unlock rate */
   --se-tier-legendary: #f0c060;
@@ -148,6 +149,9 @@
   --se-search-text: var(--se-text);
   --se-search-placeholder: var(--se-text-faint);
   --se-search-font: 500 var(--se-fs-md) var(--se-font);
+  --se-switch-w: 38px; /* an on/off switch: track and knob */
+  --se-switch-h: 22px;
+  --se-switch-knob: 16px;
   --se-check-size: var(--se-icon-md); /* checkbox and radio box (its label carries the hit target) */
   --se-field-h: 36px; /* text fields and the price chip's height on the web */
   --se-tile-lg: 56px; /* big round buttons on art (a video's play button) */
@@ -161,6 +165,8 @@
   --se-reader-share: 58%; /* a list-and-reader page: the reader's share of the width */
   --se-card-art: 28px; /* a friend card's footer: the featured badge and the level */
   --se-control-h-lg: 44px; /* a hero's buy row: price, call to action, wishlist */
+  --se-window-w: 1080px; /* a centered tool window over the client (the Library Manager) */
+  --se-window-h: 680px;
   /*
    * Store price chip (web/store/shared/ui.css): one size everywhere, so a chip with a discount
    * badge is as tall as one without. A host can set a larger variant (the front page's hero).
@@ -271,6 +277,7 @@
 
   /* Typography */
   --se-font: "SN Pro", "Motiva Sans", Arial, sans-serif; /* the "Font" setting (options/appearance/) */
+  --se-font-mono: "Cascadia Mono", Consolas, "Courier New", monospace; /* logs, timestamps, file paths */
   --se-label-lh: 14px;
   --se-label-font: 700 var(--se-fs-xs)/var(--se-label-lh) var(--se-font);
   --se-label-spacing: .1em;
@@ -404,6 +411,10 @@
   --se-icon-check-ink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f1115' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E");
   --se-icon-exclude: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M8 12h8'/%3E%3C/svg%3E");
   --se-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  --se-icon-folder: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3.5 7.5A1.5 1.5 0 0 1 5 6h4.2l2 2.2H19a1.5 1.5 0 0 1 1.5 1.5v8.3A1.5 1.5 0 0 1 19 19.5H5A1.5 1.5 0 0 1 3.5 18z' fill-opacity='.32'/%3E%3Cpath d='M3.5 7.5A1.5 1.5 0 0 1 5 6h4.2l2 2.2H19a1.5 1.5 0 0 1 1.5 1.5v8.3A1.5 1.5 0 0 1 19 19.5H5A1.5 1.5 0 0 1 3.5 18z' fill='none' stroke='%23000' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --se-icon-install: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3.5' y='13' width='17' height='7.5' rx='2' fill-opacity='.32'/%3E%3Cpath d='M12 3.5v10M7.8 9.5L12 13.7l4.2-4.2M3.5 15v3.5a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2V15' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --se-icon-millennium: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 18.5V7l4 5 4-6.5 4 6.5 4-5v11.5z' fill='%23000' fill-opacity='.32' stroke='none'/%3E%3Cpath d='M4 18.5V7l4 5 4-6.5 4 6.5 4-5v11.5'/%3E%3C/svg%3E"); /* Millennium: the nav rail's button, the Library Manager's head */
+  --se-icon-window-close: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E"); /* a window's close: the title bar, the Library Manager */
   --se-icon-close-sm: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E");
   --se-icon-collapse: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Cpath%20d%3D%22M14%204.5h3a3.5%203.5%200%200%201%203.5%203.5v8a3.5%203.5%200%200%201-3.5%203.5h-3z%22%2F%3E%3C%2Fg%3E%3Crect%20x%3D%223.5%22%20y%3D%224.5%22%20width%3D%2217%22%20height%3D%2215%22%20rx%3D%223.5%22%2F%3E%3Cpath%20d%3D%22M14%204.5v15M7.5%209.5l2.5%202.5-2.5%202.5%22%2F%3E%3C%2Fsvg%3E");
   --se-icon-emoji-hover: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='%23e6e8eb' fill-opacity='.28'/%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='%23e6e8eb' stroke-width='1.8'/%3E%3Cpath d='M8.4 14.1a4.3 4.3 0 0 0 7.2 0' fill='none' stroke='%23e6e8eb' stroke-width='1.8' stroke-linecap='round'/%3E%3Ccircle cx='9.2' cy='9.9' r='1.25' fill='%23e6e8eb'/%3E%3Ccircle cx='14.8' cy='9.9' r='1.25' fill='%23e6e8eb'/%3E%3C/svg%3E");

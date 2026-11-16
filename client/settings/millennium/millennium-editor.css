@@ -1,12 +1,12 @@
 /* Continues millennium.css (in order, see client/loader.js): . */
 
 /* Quick CSS: the editor on the page */
-.MillenniumSettings [data-se-mill-page="quickcss"] .DialogBody[data-se-qc] > :not(.se-qc):not(.se-qc-open) {
+.MillenniumSettings [data-se-mill-page="quickcss"] .DialogBody[data-se-qc] > :not(.se-qc) {
   display: none !important;
 }
 
 .se-qc {
-  --se-qc-font: 13px/22px "Cascadia Mono", Consolas, "Courier New", monospace;
+  --se-qc-font: 13px/22px var(--se-font-mono);
   display: flex;
   flex-direction: column;
   height: var(--se-fill-h, 520px);
@@ -33,34 +33,55 @@
   color: var(--se-text-muted);
 }
 
+/* The bar, one row: the file's name and its save-state tag, then the tools */
 .se-qc-bar {
-  height: 40px;
-  gap: 12px;
-  padding: 0 10px 0 14px;
+  height: 52px;
+  gap: 14px;
+  padding: 0 12px 0 16px;
   box-shadow: inset 0 -1px 0 var(--se-hairline);
   font: 600 12px var(--se-font);
 }
 
+.se-qc-name {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .se-qc-file {
-  font: 500 12.5px "Cascadia Mono", Consolas, monospace !important;
-  color: var(--se-text);
+  font: 700 var(--se-fs-md) / 1 var(--se-font-mono) !important;
+  color: var(--se-text-strong);
 }
 
 .se-qc-state {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-hairline);
+  font: 700 var(--se-fs-xs) / 1 var(--se-font);
+  color: var(--se-text-dim);
 }
 
 .se-qc-state i {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--se-text-faint);
 }
 
 .se-qc-state[data-state="saved"] {
-  color: var(--se-running);
+  background: color-mix(in srgb, var(--se-running) 14%, transparent);
+  color: color-mix(in srgb, var(--se-running), var(--se-white) 25%);
+}
+
+.se-qc-state[data-state="saving"] {
+  background: var(--se-accent-tint);
+  color: var(--se-accent-hover);
 }
 
 .se-qc-state[data-state="saved"] i {
@@ -72,6 +93,7 @@
 }
 
 .se-qc-state[data-state="error"] {
+  background: color-mix(in srgb, var(--se-danger) 18%, transparent);
   color: var(--se-danger-text);
 }
 
@@ -83,15 +105,24 @@
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
+}
+
+.se-qc-tools [hidden] {
+  display: none;
+}
+
+.se-qc-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--se-divider);
 }
 
 .se-qc-watch {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  padding: 0 6px;
-  font: 600 12.5px var(--se-font);
+  gap: 10px;
+  font: 600 var(--se-fs-base) var(--se-font);
   color: var(--se-text-dim);
 }
 
@@ -138,6 +169,36 @@
   min-height: 0;
   display: flex;
   overflow: hidden;
+}
+
+/* An empty file: a quiet note in the middle of the editor (clicks go through to it) */
+.se-qc-empty {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-space-2);
+  padding: var(--se-space-5);
+  pointer-events: none;
+  text-align: center;
+}
+
+.se-qc-empty[hidden] {
+  display: none;
+}
+
+.se-qc-empty b {
+  font: 800 var(--se-fs-lg) / 1.2 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.se-qc-empty > span:last-child {
+  max-width: 52ch;
+  font: 500 var(--se-fs-base) / 1.5 var(--se-font);
+  color: var(--se-text-muted);
 }
 
 .se-qc-cur {
@@ -219,8 +280,17 @@
   caret-color: var(--se-accent);
 }
 
+/* The theme's `* { font-family }` would set the coloured spans in the UI font, so the colours
+   drift off the text area's monospace glyphs (and the selection under them). */
+.se-qc-hl * {
+  font: inherit !important;
+}
+
+/* The text area's own text stays invisible when selected: only the highlight layer shows. */
 .se-qc-ta::selection {
   background: color-mix(in srgb, var(--se-accent) 24%, transparent);
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 .se-qc-hl .c {

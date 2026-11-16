@@ -1,6 +1,10 @@
-/* Continues millennium.css (in order, see client/loader.js): . */
-
-/* Logs: the sources beside the open log */
+/*
+ * Continues millennium.css (in order, see client/loader.js): Millennium Settings › Logs.
+ *
+ * The sources as tabs, a toolbar, and the open log as a table (`.se-logv`, drawn by
+ * millennium-logs.js). Millennium's own viewer stays mounted beneath it, hidden: it holds the logs.
+ * The page fills the window and keeps still; the table scrolls inside itself.
+ */
 .MillenniumSettings .CFTLX2wIKOK3hNV-fS7_V[data-se-mill-page="logs"]:not(#se-none):not(#se-p2) {
   overflow-y: hidden !important;
 }
@@ -9,366 +13,231 @@
   overflow: hidden !important;
 }
 
-.MillenniumSettings [data-se-mill-page="logs"] .DialogBody:has(> .se-logs-src):not(#se-none):not(#se-p2) {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: stretch;
-  gap: 14px;
-}
-
-.MillenniumSettings [data-se-mill-page="logs"] .DialogBody:has(> .se-logs-src) > .DialogControlsSection:not(#se-none):not(#se-p2) {
+.MillenniumSettings [data-se-mill-page="logs"] .DialogBody[data-se-logv] > :not(.se-logv):not(#se-none):not(#se-p2) {
   display: none !important;
 }
 
-.MillenniumSettings [data-se-mill-page="logs"] .MillenniumLogs_TextContainer:not(#se-none) {
-  flex: 1;
-  min-width: 0;
-}
-
-.MillenniumSettings .MillenniumLogs_NavContainer > .DialogButton:first-child:not(#se-none):not(#se-p2) {
-  display: none !important;
-}
-
-/* Back: the list is always there */
-.MillenniumSettings .MillenniumLogs_NavContainer {
-  flex-wrap: wrap;
-}
-
-.MillenniumSettings .MillenniumLogs_HeaderTextTypeContainer:not(#se-none):not(#se-p2) {
-  display: none !important;
-}
-
-.se-logs-src {
-  flex: none;
-  width: 220px;
-  margin-top: 18px;
-  padding: 10px;
-  box-sizing: border-box;
+.se-logv {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  overflow: auto;
-  align-self: stretch;
-  border-radius: var(--se-radius-lg);
-  background: var(--se-surface);
+  gap: var(--se-space-3);
+  margin-top: 18px;
+  font-family: var(--se-font);
+}
+
+/* Sources */
+.se-logv-tabs {
+  position: relative;
+  display: flex;
+  gap: var(--se-space-1);
+  padding: var(--se-space-1);
+  overflow-x: auto;
+  border-radius: var(--se-radius-ml);
+  background: var(--se-field);
   box-shadow: inset 0 0 0 1px var(--se-hairline);
+  scrollbar-width: none;
 }
 
-.se-logs-head {
-  padding: 6px 10px 8px;
+.se-logv-tabs::-webkit-scrollbar {
+  display: none;
 }
 
-.se-logs-src button {
+.se-logv-tabs button {
   all: unset;
   box-sizing: border-box;
-  display: flex;
+  flex: 1 0 auto;
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 38px;
-  padding: 0 10px;
-  border-radius: var(--se-radius-sm);
-  cursor: pointer;
-  color: var(--se-text-dim);
-  font: 600 13px/1.3 var(--se-font);
-}
-
-.se-logs-src button > span {
-  flex: 1;
-  min-width: 0;
+  justify-content: center;
+  gap: var(--se-space-2);
+  height: var(--se-control-h);
+  padding: 0 14px;
+  border-radius: var(--se-radius-md);
+  color: var(--se-text-muted);
+  font: 600 var(--se-fs-base) / 1 var(--se-font);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
-.se-logs-src button:hover {
+.se-logv-tabs button:hover {
+  background: var(--se-surface);
+  color: var(--se-text);
+}
+
+.se-logv-tabs button[data-on] {
   background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
   color: var(--se-text-strong);
 }
 
-.se-logs-src button[data-on] {
-  background: var(--se-accent-tint);
-  color: var(--se-text-strong);
-}
-
-.se-logs-src button:focus-visible {
-  /* Inset: the list scrolls and would clip a ring drawn outside */
+.se-logv-tabs button:focus-visible {
   outline: var(--se-focus-outline);
-  outline-offset: calc(-1 * var(--se-focus-offset));
+  outline-offset: -2px;
 }
 
-.se-logs-src b {
+.se-logv-tabs b {
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
   box-sizing: border-box;
-  border-radius: var(--se-radius-md);
-  font: 800 11px/18px var(--se-font);
+  border-radius: var(--se-radius-xs);
+  font: 700 var(--se-fs-xs) / 18px var(--se-font);
   text-align: center;
 }
 
-.se-logs-src b[data-k="warning"] {
-  background: color-mix(in srgb, var(--se-warning) 16%, transparent);
-  color: var(--se-warning);
-}
-
-.se-logs-src b[data-k="error"] {
-  background: color-mix(in srgb, var(--se-danger) 16%, transparent);
+.se-logv-tabs b[data-k="error"] {
+  background: color-mix(in srgb, var(--se-danger) 18%, transparent);
   color: var(--se-danger-text);
 }
 
-.MillenniumSettings .se-logs-level button {
-  height: 24px;
-  font-size: var(--se-fs-sm);
+.se-logv-tabs b[data-k="warning"] {
+  background: var(--se-gold-surface);
+  color: var(--se-gold-text);
 }
 
-/* Each line on its own, a mark at the left of warnings and errors */
-.MillenniumSettings .MillenniumLogs_Text > span {
-  display: block;
-  padding-left: 10px;
-  margin-left: -10px;
-  box-shadow: inset 2px 0 0 transparent;
-}
-
-.MillenniumSettings .MillenniumLogs_Text > span[style*="255, 200, 44"] {
-  box-shadow: inset 2px 0 0 var(--se-warning);
-}
-
-.MillenniumSettings .MillenniumLogs_Text > span[style*="255, 68, 68"] {
-  box-shadow: inset 2px 0 0 var(--se-danger);
-}
-
-.MillenniumSettings [data-se-level="error"] .MillenniumLogs_Text > span:not([style*="255, 68, 68"]),
-.MillenniumSettings [data-se-level="warning"] .MillenniumLogs_Text > span:not([style*="255, 200, 44"]) {
-  display: none;
-}
-
-.MillenniumSettings [data-se-mill-page="logs"] .MillenniumLogs_TextContainer:has(.se-logs-foot) .MillenniumLogs_Text:not(#se-none) {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.se-logs-foot {
+/* Toolbar: search, level, then text size and copy */
+.se-logv-tools {
   display: flex;
   align-items: center;
-  height: 32px;
-  margin-top: -14px;
-  padding: 0 14px;
-  border-radius: 0 0 var(--se-radius-ml) var(--se-radius-ml);
-  background: var(--se-sidebar);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
-  font: 500 12px var(--se-font);
-  color: var(--se-text-muted);
+  gap: 10px;
 }
 
-.se-logs-empty {
-  flex: 1;
-  min-width: 0;
-  margin-top: 18px;
+.MillenniumSettings .se-logv-tools .se-mfilter {
+  width: 260px;
+  margin-left: 0;
+}
+
+.se-logv-icons {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+
+/* The log: a table that reaches the window's foot (--se-logv-h), its line count underneath */
+.se-logv-panel {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  box-sizing: border-box;
-  min-height: calc(100vh - 190px);
-  padding: 24px;
+  height: var(--se-logv-h, 420px);
+  overflow: hidden;
   border-radius: var(--se-radius-lg);
-  text-align: center;
   background: var(--se-surface);
   box-shadow: inset 0 0 0 1px var(--se-hairline);
-  font: 500 13px/18px var(--se-font);
-  color: var(--se-text-muted);
 }
 
-.se-logs-empty svg {
-  width: 40px;
-  height: 40px;
-  margin-bottom: 6px;
-  padding: 10px;
-  box-sizing: border-box;
-  border-radius: var(--se-radius-ml);
-  background: var(--se-surface-2);
-  color: var(--se-accent);
-}
-
-.se-logs-empty b {
-  font: 700 15px/20px var(--se-font);
-  color: var(--se-text);
-}
-
-/* Updates: "up to date" and errors as one status card; Download in the accent */
-.MillenniumSettings [data-se-mill-page="updates"] .MillenniumPlaceholder_Container:not(#se-none):not(#se-p2) {
-  display: grid !important;
-  grid-template-columns: 44px minmax(0, 1fr) auto;
-  grid-template-rows: auto auto;
-  column-gap: 16px;
-  row-gap: 2px !important;
-  align-items: center !important;
-  justify-items: start !important;
-  text-align: left !important;
+.se-logv-body {
+  flex: 1;
   min-height: 0;
-  padding: 16px 18px !important;
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  display: grid;
+  grid-template-columns: max-content max-content minmax(0, 1fr) max-content;
+  align-content: start;
+  column-gap: 14px;
+  overflow: auto;
+  font-size: var(--se-logv-font, 13px);
+  user-select: text;
 }
 
-.MillenniumSettings [data-se-mill-page="updates"] .MillenniumPlaceholder_Icon:not(#se-none):not(#se-p2) {
-  grid-column: 1;
-  grid-row: 1 / 3;
-  width: 44px !important;
-  height: 44px !important;
-  padding: 11px !important;
-  margin: 0 !important;
-  border-radius: var(--se-radius-ml);
-  background: color-mix(in srgb, var(--se-running) 14%, transparent);
-  color: var(--se-running) !important;
+.se-logv-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: baseline;
+  padding: 5px var(--se-space-4);
+  border-bottom: 1px solid color-mix(in srgb, var(--se-hairline) 60%, transparent);
+  line-height: 1.5;
 }
 
-.MillenniumSettings [data-se-mill-page="updates"] .MillenniumPlaceholder_Header:not(#se-none):not(#se-p2) {
-  grid-column: 2;
-  grid-row: 1;
-  align-self: end;
-  font: 800 16px/22px var(--se-font) !important;
+.se-logv-row:hover {
+  background: color-mix(in srgb, var(--se-text) 3%, transparent);
 }
 
-.MillenniumSettings [data-se-mill-page="updates"] .MillenniumPlaceholder_Text:not(#se-none):not(#se-p2) {
-  grid-column: 2;
-  grid-row: 2;
-  align-self: start;
-  font: 500 13px/18px var(--se-font) !important;
-  white-space: pre-line;
+.se-logv-row[data-lv="warning"] {
+  background: color-mix(in srgb, var(--se-warning) 5%, transparent);
 }
 
-.MillenniumSettings [data-se-mill-page="updates"] .MillenniumPlaceholder_Buttons:not(#se-none):not(#se-p2) {
-  grid-column: 3;
-  grid-row: 1 / 3;
-  margin: 0 !important;
+.se-logv-row[data-lv="error"] {
+  background: color-mix(in srgb, var(--se-danger) 8%, transparent);
 }
 
-.MillenniumSettings .MillenniumUpdates_Field .MillenniumIconButtonWithText:not(#se-none):not(#se-p2) {
-  height: 30px !important;
-  padding: 0 14px !important;
-  gap: 7px !important;
-  border-radius: var(--se-radius-sm) !important;
-  background: var(--se-accent) !important;
-  color: var(--se-bg-ink) !important;
-  box-shadow: none !important;
-  font: 700 12.5px/30px var(--se-font) !important;
-}
-
-.MillenniumSettings .MillenniumUpdates_Field .MillenniumIconButtonWithText svg {
-  width: 15px !important;
-  height: 15px !important;
-  color: currentColor !important;
-}
-
-.MillenniumSettings .MillenniumUpdates_Field .MillenniumUpdates_ExpandButton:not(#se-none):not(#se-p2) {
-  position: relative;
-  flex: none !important;
-  display: inline-flex !important;
-  width: 30px !important;
-  min-width: 30px !important;
-  height: 30px !important;
-  min-height: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  font-size: 0 !important;
-  border-radius: var(--se-radius-sm) !important;
-  background: var(--se-surface-2) !important;
-  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
-  color: var(--se-text-dim) !important;
-}
-
-.MillenniumSettings .MillenniumUpdates_Field .MillenniumUpdates_ExpandButton:hover:not(#se-none):not(#se-p2) {
-  background: var(--se-hover) !important;
-  color: var(--se-text-strong) !important;
-}
-
-.MillenniumSettings .MillenniumUpdates_Field .MillenniumUpdates_ExpandButton > svg {
-  display: none !important;
-}
-
-.MillenniumSettings .MillenniumUpdates_Field .MillenniumUpdates_ExpandButton::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: 16px;
-  height: 16px;
-  background: currentColor;
-  transition: transform .2s var(--se-ease);
-  -webkit-mask: var(--se-ic-mmenu) center / 16px 16px no-repeat;
-  mask: var(--se-ic-mmenu) center / 16px 16px no-repeat;
-}
-
-.MillenniumSettings .MillenniumUpdates_Field[data-expanded="true"] .MillenniumUpdates_ExpandButton::after {
-  transform: rotate(180deg);
-}
-
-.MillenniumSettings .MillenniumUpdates_Field .tool-tip-source:not(#se-none) {
-  display: inline-flex !important;
-  align-items: center;
-}
-
-.MillenniumSettings .MillenniumUpdates_Field ._2o2fXzn99OddeqZMjbDuxQ:not(#se-none) {
-  align-items: center !important;
-  gap: 8px !important;
-}
-
-.MillenniumSettings .MillenniumUpdates_Description {
-  font: 500 12.5px/1.5 var(--se-font);
-  color: var(--se-text-muted);
-}
-
-.MillenniumSettings .MillenniumUpdates_Description b {
-  color: var(--se-text-dim);
-  font-weight: 700;
-}
-
-/* General: About as a card beside the settings */
-.MillenniumSettings [data-se-mill-page="general"] .DialogBody[data-se-general]:not(#se-none):not(#se-p2) {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 270px;
-  column-gap: 18px;
-  align-items: start;
-}
-
-.MillenniumSettings [data-se-mill-page="general"] .DialogBody[data-se-general] > * {
-  grid-column: 1;
-  min-width: 0;
-}
-
-.MillenniumSettings [data-se-mill-page="general"] .DialogBody[data-se-general] > [data-se-about] {
-  grid-column: 2;
-  grid-row: 1 / span 12;
+.se-logv-row[data-head] {
   position: sticky;
   top: 0;
+  z-index: 1;
+  padding-top: var(--se-space-3);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--se-hairline);
+  background: var(--se-surface);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+  user-select: none;
 }
 
-.MillenniumSettings [data-se-about] .eKmEXJCm_lgme24Fp_HWt:not(#se-none):not(#se-p2) {
-  min-height: 40px !important;
-  padding-top: 8px !important;
-  padding-bottom: 8px !important;
-}
-
-.MillenniumSettings [data-se-about] .eKmEXJCm_lgme24Fp_HWt ._3jMlJm4PQCA8SfNlUR99Fo:not(#se-none) {
-  font: 500 12.5px/17px var(--se-font) !important;
-  color: var(--se-text-muted) !important;
-}
-
-.MillenniumSettings [data-se-about] .eKmEXJCm_lgme24Fp_HWt .PSZtxj2h3MlyYv-c9dgke:not(#se-none) {
-  font: 600 12.5px/17px var(--se-font);
-  color: var(--se-text);
+.se-logv-row[data-head] > :last-child {
   text-align: right;
 }
 
-@media (max-width: 900px) {
-  .MillenniumSettings [data-se-mill-page="general"] .DialogBody[data-se-general]:not(#se-none):not(#se-p2) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .MillenniumSettings [data-se-mill-page="general"] .DialogBody[data-se-general] > [data-se-about] {
-    grid-column: 1;
-    grid-row: auto;
-    position: static;
-  }
+.se-logv-time,
+.se-logv-where {
+  font-family: var(--se-font-mono);
+  font-size: .9em;
+  color: var(--se-text-muted);
+  white-space: nowrap;
+}
+
+.se-logv-where {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+.se-logv-lv {
+  display: inline-block;
+  padding: 3px 7px;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-hairline);
+  font: 700 10.5px / 1 var(--se-font);
+  font-style: normal;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--se-text-dim);
+}
+
+.se-logv-lv[data-lv="warning"] {
+  background: var(--se-gold-surface);
+  color: var(--se-gold-text);
+}
+
+.se-logv-lv[data-lv="error"] {
+  background: color-mix(in srgb, var(--se-danger) 18%, transparent);
+  color: var(--se-danger-text);
+}
+
+.se-logv-msg {
+  min-width: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--se-text);
+}
+
+.se-logv-empty {
+  grid-column: 1 / -1;
+  padding: var(--se-space-7) var(--se-space-4);
+  text-align: center;
+  font: 500 var(--se-fs-base) / 1.4 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-logv-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 var(--se-space-4);
+  border-top: 1px solid var(--se-hairline);
+  font: 500 var(--se-fs-sm) / 1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-muted);
 }

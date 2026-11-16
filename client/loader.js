@@ -61,7 +61,7 @@
   const FEATURES = [
     // Shared runtime pieces
     ['all', 'core/', ['font.css', 'tokens.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
-    ['all', 'client/shared/', ['popup-layer.css', 'search-field.css']],
+    ['all', 'client/shared/', ['popup-layer.css', 'search-field.css', 'segmented.css']],
     ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'column-resize.css', 'column-resize.js']],
     ['notify', 'client/friends/', ['friend-notification-clicks.js']],
     // In-game overlay
@@ -182,11 +182,12 @@
     ]],
     ['desktop', 'client/settings/millennium/', [
       'millennium.css', 'millennium-window.css', 'millennium-redesign.css', 'millennium-editor.css',
-      'millennium-logs.css',
+      'millennium-plugins.css', 'millennium-updates.css', 'millennium-logs.css', 'millennium-general.css',
+      'millennium-icons.js', 'millennium-plugins.js', 'millennium-updates.js', 'millennium-logs.js',
       'millennium-pages.js',
     ]],
     ['main', 'client/settings/millennium/', ['millennium-window.js']],
-    ['main', 'client/settings/', ['library-manager.css', 'library-manager.js']],
+    ['main', 'client/settings/library-manager/', ['library-manager.css', 'library-manager.js']],
     ['main', 'client/game-page/', ['player-count.js']],
   ];
   /** [group, file] in list order */

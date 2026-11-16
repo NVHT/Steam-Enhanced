@@ -94,6 +94,7 @@
   function onPopupTabClick(event) {
     const target = event.target;
     if (!target || typeof target.closest !== 'function') return;
+
     const root = target.closest('.MillenniumSettings');
     const item = target.closest(`.${C.PagedSettingsDialog_PageListItem}, .PageListItem`);
     if (!root || !item || !root.contains(item)) return;
@@ -186,6 +187,7 @@
       return Promise.reject(new Error('Millennium is not reachable'));
     },
     openLibraryManager(target) {
+      yieldToManager();
       const v = getManagerContext();
       if (typeof v?.openMenu === 'function') {
         v.openMenu(target?.theme ? { theme: target.theme } : undefined);
@@ -202,12 +204,8 @@
           );
         } catch {}
       }
-      try {
-        window.focus();
-      } catch {}
-      try {
-        SE.mainWindow()?.BringToFront?.();
-      } catch {}
+      raiseMain();
+      return true;
     },
     core() {
       for (const o of millBridge.windows()) {
@@ -219,6 +217,32 @@
       return null;
     },
   };
+
+  // The popup is a modal owned by the main window, so it always sits above it: the Library
+  // Manager (in the main window) can only be seen once the popup is closed.
+  function yieldToManager() {
+    if (!popup) return false;
+    const open = popup;
+    popup = null;
+    stopPopupTracking();
+    try {
+      open.Close();
+    } catch {}
+    raiseMain();
+    return true;
+  }
+
+  function raiseMain() {
+    try {
+      window.focus();
+    } catch {}
+    try {
+      SE.mainWindow()?.BringToFront?.();
+    } catch {}
+    try {
+      window.SteamClient?.Window?.BringToFront?.();
+    } catch {}
+  }
 
   function popupDialogParent() {
     for (const doc of popupDocuments) {
@@ -625,6 +649,7 @@
     openDirect,
     showError,
     openLibraryManager: (target) => millBridge.openLibraryManager(target),
+    yieldToManager,
     windows: () => millBridge.windows(),
     destroy() {
       destroyed = true;

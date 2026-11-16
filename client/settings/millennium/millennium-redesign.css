@@ -3,115 +3,188 @@
  * Millennium Settings page-level layouts.
  */
 
-/* Custom Quick CSS editor rules */
-.MillenniumSettings .MillenniumPlugins_PluginField:not(#se-none):not(#se-p2) {
-  position: relative !important;
-  min-height: 58px !important;
-  padding-top: 9px !important;
-  padding-bottom: 9px !important;
-}
-
-.MillenniumSettings .MillenniumPlugins_PluginField > ._2tALpM7z8naXJ35Pp5fNAG:not(#se-none):not(#se-p2) {
-  padding-right: 212px !important;
-}
-
-.MillenniumSettings .MillenniumPlugins_PluginField > .PSZtxj2h3MlyYv-c9dgke:not(#se-none):not(#se-p2) {
-  width: 86px !important;
-  justify-content: flex-end !important;
-}
-
-/* The description stays under each name; the usage chips move into the table (.se-pm). */
-.MillenniumSettings .MillenniumPlugins_PluginField ._1W1to_azoBRG95oNAFpf9Q:not(#se-none):not(#se-p2) {
-  display: block !important;
-  margin-top: 2px !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font: 500 12.5px/17px var(--se-font) !important;
-  color: var(--se-text-muted) !important;
-}
-
-.MillenniumSettings .MillenniumPlugins_PluginLabel .MillenniumPlugins_Metrics:not(#se-none):not(#se-p2) {
-  display: none !important;
-}
-
-.MillenniumSettings .MillenniumPlugins_PluginLabel:not(#se-none):not(#se-p2) {
-  flex-wrap: nowrap !important;
-  gap: 9px !important;
-}
-
-.MillenniumSettings .MillenniumPlugins_PluginLabel .MillenniumItem_Version:not(#se-none):not(#se-p2) {
-  flex: none;
-}
-
-.MillenniumSettings .MillenniumPlugins_PluginLabel .MillenniumItem_Version span:not(#se-none):not(#se-p2) {
-  height: auto !important;
-  padding: 0 !important;
-  background: none !important;
-  font: 500 11.5px/20px var(--se-font) !important;
-  color: var(--se-text-faint) !important;
-}
-
-.se-pm {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 128px;
-  display: flex;
-  align-items: center;
-  pointer-events: none;
-  font: 600 12.5px/1 var(--se-font);
-  color: var(--se-text-dim);
-  font-variant-numeric: tabular-nums;
-}
-
-.se-pm > span {
-  flex: none;
-  width: 112px;
-  white-space: nowrap;
-}
-
-.se-pm > span + span {
-  width: 72px;
-}
-
-.se-pm[data-off] {
-  color: var(--se-text-faint);
-}
-
-/* The uppercase label: the plugin table's heads, the toolbars' headings, Logs' "Sources" */
-.se-pm[data-head] > span::before,
+/* The uppercase label: the toolbars' headings and the redesigned pages' section labels */
 .MillenniumSettings .se-mtool-label,
-.se-logs-head {
+.MillenniumSettings .se-mlabel {
   font: var(--se-label-font);
   letter-spacing: var(--se-label-spacing);
   text-transform: uppercase;
   color: var(--se-label-color);
 }
 
-.se-pm[data-head] > span::before {
-  content: attr(data-col);
-  position: absolute;
-  top: -24px;
+/*
+ * The redesigned pages' pieces (Plugins, Updates, Logs), one of each:
+ * duotone icons, icon tiles, buttons, status chips, the version chip and the spinner.
+ */
+.MillenniumSettings .se-micon {
+  flex: none;
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
 }
 
-.MillenniumSettings .MillenniumPlugins_PluginField .MillenniumIconButton:not(#se-none):not(#se-p2) {
-  background: transparent !important;
-  box-shadow: none !important;
-  color: var(--se-text-faint) !important;
+.MillenniumSettings .se-duo {
+  fill: currentColor;
+  fill-opacity: var(--se-icon-duo);
 }
 
-.MillenniumSettings .MillenniumPlugins_PluginField .MillenniumIconButton:hover:not(#se-none):not(#se-p2) {
-  background: var(--se-hover) !important;
-  color: var(--se-text-strong) !important;
+.MillenniumSettings .se-mtile {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--se-tile);
+  height: var(--se-tile);
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim);
 }
 
-@media (max-width: 760px) {
-  .se-pm > span + span {
-    display: none;
-  }
-  .MillenniumSettings .MillenniumPlugins_PluginField > ._2tALpM7z8naXJ35Pp5fNAG:not(#se-none):not(#se-p2) {
-    padding-right: 140px !important;
+.MillenniumSettings .se-mtile .se-micon {
+  width: var(--se-tile-icon);
+  height: var(--se-tile-icon);
+}
+
+.MillenniumSettings .se-mbtn {
+  all: unset;
+  box-sizing: border-box;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-space-2);
+  height: var(--se-field-h);
+  padding: 0 var(--se-space-4);
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text);
+  font: 700 var(--se-fs-base) / 1 var(--se-font);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.MillenniumSettings .se-mbtn .se-micon {
+  color: var(--se-text-dim);
+}
+
+.MillenniumSettings .se-mbtn:hover:not(:disabled) {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.MillenniumSettings .se-mbtn:active:not(:disabled) {
+  transform: scale(var(--se-press-scale));
+}
+
+.MillenniumSettings .se-mbtn:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.MillenniumSettings .se-mbtn:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+.MillenniumSettings .se-mbtn[data-tone="primary"] {
+  background: var(--se-accent);
+  box-shadow: none;
+  color: var(--se-on-accent);
+}
+
+.MillenniumSettings .se-mbtn[data-tone="primary"] .se-micon {
+  color: currentColor;
+}
+
+.MillenniumSettings .se-mbtn[data-tone="primary"]:hover:not(:disabled) {
+  background: var(--se-accent-hover);
+  color: var(--se-on-accent);
+}
+
+.MillenniumSettings .se-mbtn[data-tone="ghost"] {
+  background: transparent;
+  box-shadow: none;
+  color: var(--se-text-muted);
+}
+
+.MillenniumSettings .se-mbtn[data-size="sm"] {
+  height: var(--se-control-h-sm);
+  padding: 0 var(--se-space-3);
+  border-radius: var(--se-radius-sm);
+  font-size: var(--se-fs-sm);
+}
+
+.MillenniumSettings .se-mbtn[data-size="icon"] {
+  width: var(--se-hit);
+  height: var(--se-hit);
+  padding: 0;
+  border-radius: var(--se-radius-sm);
+}
+
+/* A status chip: Up to date, Update available, Errors in log … */
+.MillenniumSettings .se-mchip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 var(--se-space-2);
+  border-radius: var(--se-radius-xs);
+  background: var(--se-hairline);
+  color: var(--se-text-dim);
+  font: 700 var(--se-fs-xs) / 1 var(--se-font);
+  white-space: nowrap;
+}
+
+.MillenniumSettings .se-mchip .se-micon {
+  width: var(--se-icon-xs);
+  height: var(--se-icon-xs);
+}
+
+.MillenniumSettings .se-mchip[data-tone="ok"] {
+  background: color-mix(in srgb, var(--se-running) 14%, transparent);
+  color: color-mix(in srgb, var(--se-running), var(--se-white) 25%);
+}
+
+.MillenniumSettings .se-mchip[data-tone="accent"] {
+  background: var(--se-accent-tint);
+  color: var(--se-accent-hover);
+}
+
+.MillenniumSettings .se-mchip[data-tone="warning"] {
+  background: var(--se-gold-surface);
+  color: var(--se-gold-text);
+}
+
+.MillenniumSettings .se-mchip[data-tone="error"] {
+  background: color-mix(in srgb, var(--se-danger) 18%, transparent);
+  color: var(--se-danger-text);
+}
+
+.MillenniumSettings .se-mver {
+  flex: none;
+  padding: 3px 6px;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-hairline);
+  color: var(--se-text-muted);
+  font: 600 var(--se-fs-xs) / 1 var(--se-font);
+}
+
+.MillenniumSettings .se-mspin {
+  flex: none;
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-top-color: currentColor;
+  animation: se-mspin .8s linear infinite;
+}
+
+@keyframes se-mspin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -144,52 +217,6 @@
   color: currentColor !important;
 }
 
-.MillenniumSettings .se-mill-act:not(#se-none):not(#se-p2) {
-  position: absolute !important;
-  top: 48px !important;
-  right: 36px !important;
-  z-index: var(--se-z-sticky);
-  display: inline-flex !important;
-  align-items: center;
-  gap: 8px;
-  width: auto !important;
-  min-width: 0 !important;
-  height: 34px !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  padding: 0 14px !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-sm) !important;
-  background: var(--se-surface-2) !important;
-  color: var(--se-text) !important;
-  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
-  font: 700 13px/34px var(--se-font) !important;
-  white-space: nowrap;
-  cursor: pointer;
-  -webkit-app-region: no-drag;
-}
-
-.MillenniumSettings .se-mill-act:hover:not(#se-none):not(#se-p2) {
-  background: var(--se-hover) !important;
-  color: var(--se-text-strong) !important;
-}
-
-.MillenniumSettings .se-mill-act:focus-visible,
-.MillenniumSettings .MillenniumThemes_ThemeItem .DialogButton.se-theme-settings:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: var(--se-focus-offset);
-}
-
-.MillenniumSettings .se-mill-act svg {
-  width: 16px;
-  height: 16px;
-  flex: none;
-}
-
-.MillenniumSettings [data-se-mill-page="quickcss"] .DialogHeader:not(#se-none) {
-  padding-right: 200px !important;
-}
-
 /* Toolbars: a heading or segments on the left, a filter on the right */
 .MillenniumSettings .se-mtool {
   display: flex;
@@ -204,30 +231,77 @@
   padding-left: 4px;
 }
 
+/* Themes' pager: previous, "1 of 2", next */
+.MillenniumSettings .se-mpager {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  margin-left: auto;
+  font: 600 var(--se-fs-sm) / 1 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.MillenniumSettings .se-mpager[hidden] {
+  display: none;
+}
+
+.MillenniumSettings .se-mpager button {
+  all: unset;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: var(--se-control-h-sm);
+  height: var(--se-control-h-sm);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  color: var(--se-text-dim);
+  cursor: pointer;
+  transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.MillenniumSettings .se-mpager button:hover:not(:disabled) {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.MillenniumSettings .se-mpager button:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.MillenniumSettings .se-mpager button:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+.MillenniumSettings .se-mpager svg {
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+}
+
 .MillenniumSettings .se-mfilter {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--se-search-gap);
   flex: none;
-  height: 34px;
+  height: var(--se-search-h);
   width: 220px;
   margin-left: auto;
-  padding: 0 10px;
+  padding: 0 var(--se-search-pad);
   box-sizing: border-box;
-  border-radius: var(--se-radius-sm);
-  background: var(--se-field);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
-  color: var(--se-text-faint);
+  border-radius: var(--se-search-radius);
+  background: var(--se-search-bg);
+  box-shadow: var(--se-search-edge);
+  color: var(--se-search-icon-color);
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.MillenniumSettings .se-mfilter:hover:not(:focus-within) {
+  box-shadow: var(--se-search-edge-hover);
 }
 
 .MillenniumSettings .se-mfilter:focus-within {
-  box-shadow: inset 0 0 0 1px var(--se-accent-line);
-}
-
-.MillenniumSettings .se-mfilter svg {
-  width: 15px;
-  height: 15px;
-  flex: none;
+  box-shadow: var(--se-search-edge-focus);
 }
 
 .MillenniumSettings .se-mfilter input:not(#se-none):not(#se-p2) {
@@ -236,65 +310,24 @@
   min-width: 0;
   height: 100%;
   box-sizing: border-box;
-  color: var(--se-text);
-  font: 500 13px/34px var(--se-font);
+  color: var(--se-search-text);
+  font: var(--se-search-font);
   cursor: text;
+  line-height: var(--se-search-h);
 }
 
 .MillenniumSettings .se-mfilter input::placeholder {
-  color: var(--se-text-faint);
-  font-style: normal;
+  color: var(--se-search-placeholder) !important;
+  font-style: normal !important;
 }
 
 .MillenniumSettings .se-mfilter input::-webkit-search-cancel-button {
   -webkit-appearance: none;
 }
 
-.MillenniumSettings .se-mseg {
-  display: inline-flex;
-  gap: 2px;
-  padding: 3px;
-  border-radius: var(--se-radius-md);
-  background: var(--se-field);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
-}
-
-.MillenniumSettings .se-mseg button {
-  all: unset;
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 26px;
-  padding: 0 11px;
-  border-radius: var(--se-radius-sm);
-  cursor: pointer;
-  color: var(--se-text-muted);
-  font: 700 12.5px/26px var(--se-font);
-}
-
-.MillenniumSettings .se-mseg button:hover {
-  color: var(--se-text-strong);
-}
-
-.MillenniumSettings .se-mseg button[data-on] {
-  background: var(--se-surface-2);
-  color: var(--se-text-strong);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
-}
-
-.MillenniumSettings .se-mseg b {
-  font-weight: 600;
-  color: var(--se-text-faint);
-}
-
-.MillenniumSettings .se-mseg button:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: var(--se-focus-offset);
-}
-
 /* Themes: the theme in use as a large card, the rest as a grid of cards */
 .MillenniumSettings [data-se-mill-page="themes"] .DialogBody:not(#se-none):not(#se-p2) {
+  --se-mtheme-art: 84px; /* a card's picture: two rows of cards fit the window under the theme in use */
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-auto-rows: max-content;
@@ -337,7 +370,7 @@
   grid-column: 1 / -1;
   grid-row: 1;
   width: auto !important;
-  height: 98px !important;
+  height: var(--se-mtheme-art) !important;
   margin: 0 !important;
   border-radius: var(--se-radius-md);
   background: var(--se-thumb, none) center / cover no-repeat, var(--se-field) !important;
@@ -364,11 +397,14 @@
   min-width: 0 !important;
 }
 
-/* A card */
+/*
+ * A card: the picture, then the name and description across the card, then its buttons on a row
+ * of their own, so names are not cut short by the buttons.
+ */
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem:not([data-se-active]):not(#se-none):not(#se-p2) {
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: 98px auto;
-  gap: 10px 8px !important;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: var(--se-mtheme-art) auto auto;
+  gap: var(--se-space-2) !important;
   align-items: center !important;
   padding: 10px !important;
 }
@@ -384,8 +420,14 @@
 }
 
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem:not([data-se-active]) > .PSZtxj2h3MlyYv-c9dgke {
-  grid-column: 2;
-  grid-row: 2;
+  grid-column: 1;
+  grid-row: 3;
+  justify-self: start;
+}
+
+/* A card on another page of the pager (the card's own display: grid would otherwise win) */
+.MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem[data-se-hide]:not(#se-none):not(#se-p2):not(#se-p3) {
+  display: none !important;
 }
 
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem:not([data-se-active]) .MillenniumThemes_ThemeLabel:not(#se-none):not(#se-p2) {
@@ -468,21 +510,6 @@
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem[data-se-active] .MillenniumThemes_Author:not(#se-none) {
   color: var(--se-text-muted);
   font-size: var(--se-fs-base);
-}
-
-.MillenniumSettings .MillenniumThemes_ThemeItem .DialogButton.se-theme-settings[type]:not(#se-none):not(#se-p2) {
-  display: inline-flex !important;
-  align-items: center;
-  gap: 7px;
-  min-width: 0 !important;
-  background: var(--se-accent-tint) !important;
-  color: var(--se-accent) !important;
-  box-shadow: inset 0 0 0 1px var(--se-accent-line) !important;
-}
-
-.MillenniumSettings .MillenniumThemes_ThemeItem .DialogButton.se-theme-settings svg {
-  width: 15px;
-  height: 15px;
 }
 
 /* Plugins: the toolbar sits right on the list */

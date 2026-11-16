@@ -1,0 +1,63 @@
+/*
+ * The segmented control: one row of mutually exclusive buttons on a field-coloured track, the
+ * chosen one raised ([data-on]). Used by the Library Manager (client/settings/library-manager.*)
+ * and the Millennium settings window (Plugins filter, Logs level). Markup:
+ *   <div class="se-seg" role="group" aria-label="…"><button type="button" data-on>All <b>12</b></button>…</div>
+ * A <b> inside a button is its count, in the faint tone. Layout (grid, stretch) belongs to the
+ * caller; this file is the look and the states.
+ */
+.se-seg {
+  display: inline-flex;
+  gap: var(--se-space-half);
+  padding: var(--se-space-half);
+  border-radius: var(--se-radius-md);
+  background: var(--se-field);
+  box-shadow: var(--se-search-edge);
+}
+
+.se-seg button {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--se-control-h-sm);
+  padding: 0 var(--se-space-3);
+  border-radius: var(--se-radius-sm);
+  cursor: pointer;
+  color: var(--se-text-muted);
+  font: 600 var(--se-fs-base) / 1 var(--se-font);
+  text-align: center;
+  white-space: nowrap;
+  transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.se-seg button:hover {
+  color: var(--se-text-strong);
+}
+
+.se-seg button[data-on] {
+  background: var(--se-selected);
+  color: var(--se-text-strong);
+}
+
+.se-seg button:active {
+  transform: scale(var(--se-press-scale));
+}
+
+.se-seg button:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-seg b {
+  font-weight: 500;
+  color: var(--se-text-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-seg button {
+    transition: none;
+  }
+}

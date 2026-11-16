@@ -1,0 +1,429 @@
+/*
+ * Continues millennium.css (in order, see client/loader.js): Millennium Settings › General.
+ *
+ * A status card on top (`.se-mgen-hero`, added by millennium-pages.js) with Millennium's Updates
+ * section as its strip; under it Checks & alerts (On startup, Notifications joined below it) beside
+ * Themes, then Network in one row. Millennium's sections keep their place in the DOM: the grid
+ * below places them by [data-se-mgsec], and their headers are retitled from [data-se-mgtitle] /
+ * [data-se-mgsub]. About is folded into the strip ([data-se-mgbuild]). Sized to fit the window
+ * without scrolling.
+ */
+.MillenniumSettings [data-se-mgen]:not(#se-none):not(#se-p2) {
+  --se-mgen-i-checks: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M10 20.5a2 2 0 0 0 4 0'/%3E%3C/svg%3E");
+  --se-mgen-i-themes: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.5a8.5 8.5 0 1 0 0 17c1 0 1.5-.7 1.5-1.4 0-1.1-.9-1.4-.9-2.4s.8-1.4 1.9-1.4h2a4 4 0 0 0 4-3.8c0-4.4-3.8-8-8.5-8z' fill='%23000' fill-opacity='.32'/%3E%3Ccircle cx='7.75' cy='11.5' r='.6'/%3E%3Ccircle cx='10' cy='7.5' r='.6'/%3E%3Ccircle cx='14.5' cy='7.5' r='.6'/%3E%3C/svg%3E");
+  --se-mgen-i-net: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M3.5 12h17M12 3.5c2.5 2.6 3.5 5.4 3.5 8.5s-1 5.9-3.5 8.5c-2.5-2.6-3.5-5.4-3.5-8.5s1-5.9 3.5-8.5z'/%3E%3C/svg%3E");
+
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "hero hero"
+    "upd upd"
+    "start themes"
+    "notif themes"
+    "net net";
+  /*
+   * The Notifications row is the flexible one: when Themes is taller than Checks & alerts, the
+   * extra goes under Notifications, not between it and On startup. Height stays the content's,
+   * so that row has nothing more to take.
+   */
+  grid-template-rows: auto auto auto 1fr auto;
+  align-items: start;
+  gap: 0 var(--se-space-4);
+  flex: none !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 0 var(--se-space-4) !important;
+}
+
+/*
+ * Spacing between the parts is set here alone (three ids: past every margin the settings
+ * pages give sections, rows and headers): the strip joins the card, Notifications joins
+ * Checks & alerts, and the panels and Network sit a step below.
+ */
+.MillenniumSettings [data-se-mgen] > :is(.se-mgen-hero, [data-se-mgsec]):not(#se-none):not(#se-p2):not(#se-p3) {
+  margin: 0 !important;
+}
+
+.MillenniumSettings [data-se-mgen] > :is([data-se-mgsec="start"], [data-se-mgsec="themes"], [data-se-mgsec="net"]):not(#se-none):not(#se-p2):not(#se-p3) {
+  margin-top: var(--se-space-4) !important;
+}
+
+/*
+ * The card starts where the other settings pages start theirs: below the title's line by a
+ * section label's height and its margins (client/settings/layout.css: 22 above, 10 below).
+ */
+.MillenniumSettings [data-se-mgen] > .se-mgen-hero:not(#se-none):not(#se-p2):not(#se-p3) {
+  margin-top: calc(22px + var(--se-label-lh) + 10px) !important;
+}
+
+.MillenniumSettings [data-se-mgen] > * {
+  min-width: 0;
+  margin: 0 !important;
+}
+
+.MillenniumSettings [data-se-mgen] > [data-se-mgsec="about"]:not(#se-none):not(#se-p2) {
+  display: none !important;
+}
+
+/* ---------- Status card ---------- */
+
+.se-mgen-hero {
+  grid-area: hero;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-4);
+  padding: var(--se-space-4) var(--se-space-5);
+  border-radius: var(--se-radius-lg) var(--se-radius-lg) 0 0;
+  background: linear-gradient(120deg, var(--se-accent-surface), color-mix(in srgb, var(--se-kind-violet) 10%, var(--se-surface)) 60%, var(--se-surface));
+  box-shadow: inset 0 1px 0 var(--se-white-07), inset 1px 0 0 var(--se-white-07), inset -1px 0 0 var(--se-white-07);
+}
+
+.se-mgen-mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--se-tile);
+  height: var(--se-tile);
+  border-radius: var(--se-radius-ml);
+  background: var(--se-white-07);
+  color: var(--se-text-strong);
+}
+
+.se-mgen-mark::before {
+  content: "";
+  width: var(--se-icon-xl);
+  height: var(--se-icon-xl);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-millennium) center / contain no-repeat;
+  mask: var(--se-icon-millennium) center / contain no-repeat;
+}
+
+.se-mgen-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+}
+
+.se-mgen-text b {
+  font: 800 var(--se-fs-xl) / 1.2 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.se-mgen-text span {
+  font: 500 var(--se-fs-base) / 1.3 var(--se-font);
+  color: var(--se-text-dim);
+}
+
+.se-mgen-text span:empty {
+  display: none;
+}
+
+.se-mgen-check {
+  all: unset;
+  box-sizing: border-box;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: var(--se-field-h);
+  padding: 0 var(--se-space-4);
+  border-radius: var(--se-radius-md);
+  background: var(--se-accent);
+  color: var(--se-on-accent);
+  font: 700 var(--se-fs-base) / 1 var(--se-font);
+  cursor: pointer;
+  transition: background var(--se-dur) var(--se-ease);
+}
+
+.se-mgen-check:hover {
+  background: var(--se-accent-hover);
+}
+
+.se-mgen-check:active {
+  transform: scale(var(--se-press-scale));
+}
+
+.se-mgen-check:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* Its strip: Millennium's Updates section, label over control, the build lines on the right */
+.MillenniumSettings [data-se-mgsec="upd"]:not(#se-none):not(#se-p2) {
+  grid-area: upd;
+  display: flex !important;
+  align-items: flex-end;
+  gap: var(--se-space-5);
+  padding: var(--se-space-3) var(--se-space-5) var(--se-space-4) !important;
+  border-radius: 0 0 var(--se-radius-lg) var(--se-radius-lg);
+  background: var(--se-sidebar) !important;
+  box-shadow: inset 0 -1px 0 var(--se-white-07), inset 1px 0 0 var(--se-white-07), inset -1px 0 0 var(--se-white-07), inset 0 1px 0 var(--se-hairline);
+}
+
+.MillenniumSettings [data-se-mgsec="upd"]::after {
+  content: attr(data-se-mgbuild);
+  margin-left: auto;
+  white-space: pre;
+  text-align: right;
+  font: 500 var(--se-fs-sm) / 1.5 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.MillenniumSettings [data-se-mgsec="upd"] > [data-se-sec]:not(#se-none):not(#se-p2),
+.MillenniumSettings [data-se-mgsec="notif"] > [data-se-sec]:not(#se-none):not(#se-p2) {
+  display: none !important;
+}
+
+.MillenniumSettings [data-se-mgsec="upd"] [data-se-c]:not(#se-none):not(#se-p2) {
+  flex: none !important;
+  width: max-content !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: var(--se-space-2) !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Each dropdown as wide as its choice (the settings pages give dropdowns one fixed width) */
+.MillenniumSettings [data-se-mgsec="upd"] [data-se-c] .DialogDropDown:not(#se-none):not(#se-p2):not(#se-p3) {
+  flex: none !important; /* a fixed flex basis would win over the width */
+  width: max-content !important;
+  min-width: calc(var(--se-side-col) / 2) !important;
+  max-width: none !important;
+}
+
+/* The label spans its row, so it starts at the dropdown's left edge */
+.MillenniumSettings [data-se-mgsec="upd"] [data-se-c] :is(._2tALpM7z8naXJ35Pp5fNAG, ._2tALpM7z8naXJ35Pp5fNAG > div, ._3jMlJm4PQCA8SfNlUR99Fo):not(#se-none):not(#se-p2):not(#se-p3) {
+  align-self: stretch !important;
+  width: 100% !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+}
+
+.MillenniumSettings [data-se-mgsec="upd"] [data-se-c] .DialogDropDown_CurrentDisplay:not(#se-none):not(#se-p2):not(#se-p3) {
+  flex: none !important;
+  max-width: none !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+.MillenniumSettings [data-se-mgsec="upd"] [data-se-mgfield="channel"] {
+  order: -1;
+}
+
+/* Label and dropdown stacked at the row's start (Steam pushes the control to the right) */
+.MillenniumSettings [data-se-mgsec="upd"] [data-se-c] :is(._2tALpM7z8naXJ35Pp5fNAG, ._2tALpM7z8naXJ35Pp5fNAG > div, ._3jMlJm4PQCA8SfNlUR99Fo, .PSZtxj2h3MlyYv-c9dgke, .PSZtxj2h3MlyYv-c9dgke > div, .PSZtxj2h3MlyYv-c9dgke > div > div):not(#se-none):not(#se-p2) {
+  flex: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+.MillenniumSettings [data-se-mgsec="upd"] [data-se-c] ._3jMlJm4PQCA8SfNlUR99Fo:not(#se-none):not(#se-p2) {
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase !important;
+  white-space: nowrap;
+  color: var(--se-text-muted) !important;
+}
+
+/* Millennium's long label, renamed: its text hidden, the short name drawn in its place */
+.MillenniumSettings [data-se-mgsec="upd"] [data-se-c] ._3jMlJm4PQCA8SfNlUR99Fo[data-se-mglabel]:not(#se-none):not(#se-p2) {
+  font-size: 0 !important;
+}
+
+.MillenniumSettings [data-se-mgsec="upd"] [data-se-mglabel] > *:not(#se-none):not(#se-p2) {
+  display: none !important;
+}
+
+.MillenniumSettings [data-se-mgsec="upd"] [data-se-mglabel]::before {
+  content: attr(data-se-mglabel);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  color: var(--se-text-muted);
+}
+
+.MillenniumSettings [data-se-mgsec="upd"] [data-se-c] ._1W1to_azoBRG95oNAFpf9Q:not(#se-none):not(#se-p2) {
+  display: none !important;
+}
+
+/* ---------- Panels: Checks & alerts, Themes, Network ---------- */
+
+.MillenniumSettings [data-se-mgsec="start"] { grid-area: start; }
+.MillenniumSettings [data-se-mgsec="notif"] { grid-area: notif; }
+.MillenniumSettings [data-se-mgsec="themes"] { grid-area: themes; }
+.MillenniumSettings [data-se-mgsec="net"] { grid-area: net; }
+
+.MillenniumSettings :is([data-se-mgsec="start"], [data-se-mgsec="notif"], [data-se-mgsec="themes"], [data-se-mgsec="net"]):not(#se-none):not(#se-p2) {
+  position: relative;
+  overflow: hidden;
+  background: var(--se-surface) !important; /* the settings pages clear native wrappers' backgrounds */
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.MillenniumSettings :is([data-se-mgsec="start"], [data-se-mgsec="themes"], [data-se-mgsec="net"]) {
+  border-radius: var(--se-radius-lg);
+}
+
+/* Notifications continues the Checks & alerts card */
+.MillenniumSettings [data-se-mgsec="start"]:has(~ [data-se-mgsec="notif"]) {
+  border-radius: var(--se-radius-lg) var(--se-radius-lg) 0 0;
+  box-shadow: inset 0 1px 0 var(--se-hairline), inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline);
+}
+
+.MillenniumSettings [data-se-mgsec="notif"]:not(#se-none):not(#se-p2) {
+  border-radius: 0 0 var(--se-radius-lg) var(--se-radius-lg);
+  box-shadow: inset 0 -1px 0 var(--se-hairline), inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline);
+}
+
+/* The panel's header: its icon tile (::before) and icon (::after) sit on the section */
+.MillenniumSettings :is([data-se-mgsec="start"], [data-se-mgsec="themes"], [data-se-mgsec="net"])::before {
+  content: "";
+  position: absolute;
+  top: var(--se-space-4);
+  left: var(--se-space-4);
+  width: var(--se-tile-sm);
+  height: var(--se-tile-sm);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+}
+
+.MillenniumSettings :is([data-se-mgsec="start"], [data-se-mgsec="themes"], [data-se-mgsec="net"])::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--se-space-4) + (var(--se-tile-sm) - var(--se-icon-glyph)) / 2);
+  left: calc(var(--se-space-4) + (var(--se-tile-sm) - var(--se-icon-glyph)) / 2);
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: var(--se-text-dim);
+  -webkit-mask: var(--se-mgen-i) center / contain no-repeat;
+  mask: var(--se-mgen-i) center / contain no-repeat;
+}
+
+.MillenniumSettings [data-se-mgsec="start"] { --se-mgen-i: var(--se-mgen-i-checks); }
+.MillenniumSettings [data-se-mgsec="themes"] { --se-mgen-i: var(--se-mgen-i-themes); }
+.MillenniumSettings [data-se-mgsec="net"] { --se-mgen-i: var(--se-mgen-i-net); }
+
+/* Millennium's section header, retitled: the panel's name and its line (its own text hidden) */
+.MillenniumSettings [data-se-mgen] [data-se-mgtitle]:not(#se-none):not(#se-p2) {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--se-space-half);
+  min-height: calc(var(--se-tile-sm) + 2 * var(--se-space-4));
+  margin: 0 !important;
+  padding: var(--se-space-3) var(--se-space-4) var(--se-space-3) calc(var(--se-tile-sm) + 2 * var(--se-space-4) - var(--se-space-1)) !important;
+  box-sizing: border-box;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  color: transparent !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.MillenniumSettings [data-se-mgen] [data-se-mgtitle] > *:not(#se-none):not(#se-p2) {
+  display: none !important;
+}
+
+.MillenniumSettings [data-se-mgen] [data-se-mgtitle]::before {
+  content: attr(data-se-mgtitle);
+  font: 800 var(--se-fs-md) / 1.25 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.MillenniumSettings [data-se-mgen] [data-se-mgtitle]::after {
+  content: attr(data-se-mgsub);
+  font: 500 var(--se-fs-sm) / 1.35 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+/* Rows inside a panel: no card of their own, a hairline above each, compact */
+.MillenniumSettings [data-se-mgen] :is([data-se-mgsec="start"], [data-se-mgsec="notif"], [data-se-mgsec="themes"], [data-se-mgsec="net"]) [data-se-c]:not(#se-none):not(#se-p2) {
+  min-height: calc(var(--se-control-h) + var(--se-space-4)) !important;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-4) !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  background-image: linear-gradient(var(--se-hairline), var(--se-hairline)) !important;
+  background-size: 100% 1px !important;
+  background-position: 0 0 !important;
+  box-shadow: none !important;
+}
+
+.MillenniumSettings [data-se-mgen] [data-se-c] ._3jMlJm4PQCA8SfNlUR99Fo:not(#se-none):not(#se-p2) {
+  font-size: var(--se-fs-md) !important;
+}
+
+.MillenniumSettings [data-se-mgen] [data-se-c] ._1W1to_azoBRG95oNAFpf9Q:not(#se-none):not(#se-p2) {
+  font-size: var(--se-fs-sm) !important;
+  line-height: 1.4 !important;
+}
+
+/* Network: one row, the proxy field wide, then Set username and Set password */
+.MillenniumSettings [data-se-mgsec="net"]:not(#se-none):not(#se-p2) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) max-content max-content;
+  align-items: center;
+}
+
+.MillenniumSettings [data-se-mgsec="net"] > [data-se-mgtitle] {
+  grid-column: 1 / -1;
+}
+
+.MillenniumSettings [data-se-mgsec="net"] [data-se-mgfield]:not(#se-none):not(#se-p2) {
+  min-width: 0;
+  padding: var(--se-space-3) var(--se-space-1) !important;
+}
+
+.MillenniumSettings [data-se-mgsec="net"] [data-se-mgfield="proxy"]:not(#se-none):not(#se-p2) {
+  grid-column: 1;
+  padding-left: var(--se-space-4) !important;
+  padding-right: var(--se-space-2) !important;
+}
+
+.MillenniumSettings [data-se-mgsec="net"] [data-se-mgfield="user"] { grid-column: 2; }
+
+.MillenniumSettings [data-se-mgsec="net"] [data-se-mgfield="pass"]:not(#se-none):not(#se-p2) {
+  grid-column: 3;
+  padding-right: var(--se-space-4) !important;
+}
+
+/* Its labels and notes: the header says it all, and the buttons name themselves */
+.MillenniumSettings [data-se-mgsec="net"] [data-se-mgfield] ._2tALpM7z8naXJ35Pp5fNAG:not(#se-none):not(#se-p2) {
+  display: none !important;
+}
+
+/* The proxy field fills its cell (Steam right-aligns the control at a fixed width) */
+.MillenniumSettings [data-se-mgsec="net"] [data-se-mgfield="proxy"] .PSZtxj2h3MlyYv-c9dgke:not(#se-none):not(#se-p2),
+.MillenniumSettings [data-se-mgsec="net"] [data-se-mgfield="proxy"] .PSZtxj2h3MlyYv-c9dgke div:not(#se-none):not(#se-p2) {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  justify-content: flex-start !important;
+}
+
+.MillenniumSettings [data-se-mgsec="net"] [data-se-mgfield="proxy"] :is(input, .DialogInput, .DialogTextInputBase):not(#se-none):not(#se-p2) {
+  width: 100% !important;
+  max-width: none !important;
+  height: var(--se-control-h) !important;
+}
+
+/* Set username / Set password: as wide as their label (Steam fixes the button's width) */
+.MillenniumSettings [data-se-mgsec="net"] :is([data-se-mgfield="user"], [data-se-mgfield="pass"]) :is(.PSZtxj2h3MlyYv-c9dgke, .PSZtxj2h3MlyYv-c9dgke div, .DialogButton, button):not(#se-none):not(#se-p2) {
+  flex: none !important;
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+.MillenniumSettings [data-se-mgsec="net"] :is([data-se-mgfield="user"], [data-se-mgfield="pass"]) :is(.DialogButton, button):not(#se-none):not(#se-p2) {
+  padding: 0 var(--se-space-4) !important;
+  white-space: nowrap;
+}

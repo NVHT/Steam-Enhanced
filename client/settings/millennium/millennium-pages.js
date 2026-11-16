@@ -3,19 +3,23 @@
  *
  * Driven by client/settings/dialog/: it tags [data-se-mill-page] on the active page and calls
  * hooks.before / hooks.after from inside its own pass, so there is no second observer.
- * - Rows (in the dialog's pass): the theme in use, initials, the plugin table and save bar.
- * - Themes: adds an installed count + search bar, applies skin.json header_image
- *   previews, and exposes a "Theme settings" shortcut on the active theme.
- * - Plugins: adds an All / On / Off segmented filter and search input.
+ * - Rows (in the dialog's pass): the theme in use and initials.
+ * - Themes: adds an installed count and a pager (six a page, so the window never scrolls),
+ *   applies skin.json header_image previews.
  * - Quick CSS: mounts an inline syntax-highlighted CSS editor wired to
  *   Millennium's Core_LoadQuickCss / Core_SaveQuickCss FFI bindings.
- * - Logs: mounts a source selector sidebar and log-level filter pills.
- * - Updates: formats ISO release timestamps into localized dates.
- * - General: tags the About section for side-by-side card layout.
+ * - General: a status card (version, channel, Check for updates) over Checks & alerts, Themes
+ *   and Network, laid out to fit the fixed window.
+ * - Plugins, Updates and Logs are parts of their own (millennium-plugins.js, -updates.js,
+ *   -logs.js), registered on window.__seMillParts with the icons (millennium-icons.js) and run
+ *   from here: before / after in the dialog's pass, step / layout in this file's rAF pass. This
+ *   file hands them its helpers (make, text, core, fillHeight, schedule).
  */
 ((SE) => {
   const { C, run, esc, attr: setAttr } = SE;
   window.__seMillPages?.destroy();
+  const parts = (window.__seMillParts = window.__seMillParts || {});
+  const PARTS = ['plugins', 'updates', 'logs'];
 
   const CONTENT = `.${C.PagedSettingsDialog_PageContent}`;
   const ROOT = '.MillenniumSettings';
@@ -30,26 +34,13 @@
   };
   const text = (el) => (el?.textContent || '').replace(/\s+/g, ' ').trim();
 
-  const ICON_SEARCH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>';
-  const ICON_SLIDERS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>';
-  const ICON_WINDOW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-8.5 8.5M18 14v4.5A1.5 1.5 0 0 1 16.5 20h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg>';
-
-  function filterBox(placeholder, onInput) {
-    const box = make(
-      'label',
-      'se-mfilter',
-      `${ICON_SEARCH}<input type="search" placeholder="${placeholder}" aria-label="${placeholder}">`
-    );
-    const input = box.querySelector('input');
-    input.addEventListener('input', () => onInput(input.value));
-    return box;
-  }
-
-  const matches = (el, q, nameSel) =>
-    !q || text(el.querySelector(nameSel) || el).toLowerCase().includes(q.trim().toLowerCase());
 
   const THEME = '.MillenniumThemes_ThemeItem';
-  let themeQuery = '';
+  // Installed themes (all but the one in use) show a page at a time, so the window never scrolls.
+  const THEMES_PER_PAGE = 6;
+  let themePage = 0;
+  const ICON_PREV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 6.5L9 12l5.5 5.5"/></svg>';
+  const ICON_NEXT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6.5L15 12l-5.5 5.5"/></svg>';
 
   const themeData = (field) =>
     SE.fromProps(field, 8, (p) => (p.theme && typeof p.theme === 'object' && 'activeTheme' in p ? p.theme : null));
@@ -64,21 +55,24 @@
       if (!bar) {
         bar = make('div', 'se-mtool');
         bar.dataset.for = 'themes';
-        bar.innerHTML = '<span class="se-mtool-label"></span>';
-        bar.append(
-          filterBox('Filter themes', (q) => {
-            themeQuery = q;
-            applyThemeFilter(content);
-          })
-        );
+        bar.innerHTML =
+          '<span class="se-mtool-label"></span>' +
+          `<div class="se-mpager" role="group" aria-label="Pages"><button type="button" data-step="-1" aria-label="Previous page">${ICON_PREV}</button>` +
+          `<span aria-live="polite"></span><button type="button" data-step="1" aria-label="Next page">${ICON_NEXT}</button></div>`;
+        bar.querySelector('.se-mpager').addEventListener('click', (e) => {
+          const step = Number(e.target.closest('[data-step]')?.dataset.step);
+          if (!step) return;
+          themePage += step;
+          paginate(content);
+        });
       }
       if (bar.nextElementSibling !== rest[0]) rest[0].before(bar);
       const label = bar.querySelector('.se-mtool-label');
-      const words = `Installed · ${fields.length}`;
+      const words = `Installed · ${rest.length}`;
       if (label.textContent !== words) label.textContent = words;
     }
 
-    applyThemeFilter(content);
+    paginate(content);
 
     for (const f of fields) {
       const data = run(() => themeData(f)?.data) || {};
@@ -92,99 +86,29 @@
         if (want) f.style.setProperty('--se-thumb', want);
         else f.style.removeProperty('--se-thumb');
       }
-
-      let ts = f.querySelector('.se-theme-settings');
-      const configurable = f.hasAttribute('data-se-active') && Boolean(data.Conditions || data.RootColors);
-      if (!configurable) {
-        ts?.remove();
-        continue;
-      }
-      const first = f.querySelector('.DialogButton:not(.MillenniumIconButton)');
-      if (!first) continue;
-      if (!ts) {
-        ts = make('button', 'DialogButton se-theme-settings', `${ICON_SLIDERS}<span>Theme settings</span>`);
-        ts.type = 'button';
-        ts.addEventListener('click', (e) => {
-          e.stopPropagation();
-          openManager({ theme: data.name });
-        });
-      }
-      if (ts.nextElementSibling !== first) first.before(ts);
     }
   }
 
-  function applyThemeFilter(content) {
-    content.querySelectorAll(`${THEME}:not([data-se-active])`).forEach((f) => {
-      setAttr(f, 'data-se-hide', matches(f, themeQuery, '.MillenniumThemes_ThemeLabel') ? null : '');
-    });
-  }
-
-  function openManager(target) {
-    const host = window.__seMillenniumWindow ?? bridge();
-    run(() => host?.openLibraryManager?.(target));
-  }
-
-  const PLUGIN = '.MillenniumPlugins_PluginField';
-  let pluginQuery = '';
-  let pluginMode = 'all';
-
-  function plugins(content) {
-    const fields = [...content.querySelectorAll(PLUGIN)];
-    let bar = content.querySelector('.se-mtool[data-for="plugins"]');
-    if (!fields.length) {
-      bar?.remove();
-      return;
-    }
-    if (!bar) {
-      bar = make('div', 'se-mtool');
-      bar.dataset.for = 'plugins';
-      bar.innerHTML =
-        '<span class="se-mseg" role="group" aria-label="Show">' +
-        ['all', 'on', 'off']
-          .map((m) => `<button type="button" data-mode="${m}">${m === 'all' ? 'All' : m === 'on' ? 'On' : 'Off'} <b></b></button>`)
-          .join('') +
-        '</span>';
-      bar.querySelector('.se-mseg').addEventListener('click', (e) => {
-        const b = e.target.closest('[data-mode]');
-        if (b) {
-          pluginMode = b.dataset.mode;
-          applyPluginFilter(content);
-        }
-      });
-      bar.append(
-        filterBox('Filter plugins', (q) => {
-          pluginQuery = q;
-          applyPluginFilter(content);
-        })
-      );
-    }
-    if (bar.nextElementSibling !== fields[0]) fields[0].before(bar);
-    const on = fields.filter((f) => f.getAttribute('data-se-on') === 'yes').length;
-    const counts = { all: fields.length, on, off: fields.length - on };
-    bar.querySelectorAll('[data-mode]').forEach((b) => {
-      const n = String(counts[b.dataset.mode]);
-      if (b.lastChild.textContent !== n) b.lastChild.textContent = n;
-    });
-    applyPluginFilter(content);
-  }
-
-  function applyPluginFilter(content) {
-    content.querySelectorAll('.se-mtool[data-for="plugins"] [data-mode]').forEach((b) => {
-      setAttr(b, 'data-on', b.dataset.mode === pluginMode ? '' : null);
-      setAttr(b, 'aria-pressed', b.dataset.mode === pluginMode ? 'true' : 'false');
-    });
-    content.querySelectorAll(PLUGIN).forEach((f) => {
-      const state = f.getAttribute('data-se-on');
-      const show =
-        matches(f, pluginQuery, '.MillenniumPlugins_PluginLabel') &&
-        (pluginMode === 'all' || (pluginMode === 'on' ? state === 'yes' : state === 'no'));
-      setAttr(f, 'data-se-hide', show ? null : '');
-    });
+  // Shows one page of the installed themes; the pager says where you are and stops at the ends.
+  function paginate(content) {
+    const rest = [...content.querySelectorAll(`${THEME}:not([data-se-active])`)];
+    const pages = Math.max(1, Math.ceil(rest.length / THEMES_PER_PAGE));
+    themePage = Math.min(Math.max(themePage, 0), pages - 1);
+    rest.forEach((f, i) => setAttr(f, 'data-se-hide', Math.floor(i / THEMES_PER_PAGE) === themePage ? null : ''));
+    const pager = content.querySelector('.se-mtool[data-for="themes"] .se-mpager');
+    if (!pager) return;
+    setAttr(pager, 'hidden', pages > 1 ? null : '');
+    const words = `${themePage + 1} of ${pages}`;
+    const count = pager.querySelector('span');
+    if (count.textContent !== words) count.textContent = words;
+    pager.querySelector('[data-step="-1"]').disabled = themePage === 0;
+    pager.querySelector('[data-step="1"]').disabled = themePage === pages - 1;
   }
 
   /*
    * Rows, from inside the dialog's pass: `before` runs ahead of its card steps (and returns the
    * page's sub-line), `after` once the cards are drawn; `api` reaches the dialog's pre-labels.
+   * Plugins, Updates and Logs hand theirs to their part.
    */
   function isActiveTheme(field) {
     const p = SE.fromProps(field, 6, (q) => (q.theme && 'activeTheme' in q ? q : undefined));
@@ -193,8 +117,6 @@
     }
     return Boolean(field.querySelector(`.${C.FieldIcon} svg`));
   }
-
-  const isOn = (field) => Boolean(field.querySelector(`.${C.Toggle}.${C.On}`));
 
   function before(content, key, api) {
     if (key === 'themes') {
@@ -209,83 +131,12 @@
       }
       return null;
     }
-    if (key === 'plugins') {
-      const fields = [...content.querySelectorAll(PLUGIN)];
-      if (!fields.length) return null;
-      fields.forEach((f, i) => api.pre(f, i ? null : 'Plugin'));
-      const on = fields.filter(isOn).length;
-      let bytes = 0;
-      for (const f of fields) {
-        const n = api.bytesOf(text(f.querySelector('.MillenniumPlugins_Metrics span')));
-        if (n > 0) bytes += n;
-      }
-      return `${fields.length} installed · ${on} on` + (bytes ? ` · ${api.fmtBytes(bytes)} in use` : '');
-    }
+    if (PARTS.includes(key)) return parts[key]?.before?.(content, api) ?? null;
     return null;
   }
 
-  function pluginTable(content) {
-    content.querySelectorAll(PLUGIN).forEach((f, i) => {
-      const chips = [...f.querySelectorAll('.MillenniumPlugins_Metrics span')];
-      const mem = text(chips[0]) || '—';
-      const cpu = (text(chips[1]) || '').replace(/\s*CPU$/i, '') || '—';
-      let cells = f.querySelector(':scope > .se-pm');
-      if (!cells) {
-        cells = make('div', 'se-pm', '<span data-col="Memory"></span><span data-col="CPU"></span>');
-        cells.setAttribute('aria-hidden', 'true');
-      }
-      if (f.lastElementChild !== cells) f.appendChild(cells);
-      const [m, c] = cells.children;
-      if (m.textContent !== mem) m.textContent = mem;
-      if (c.textContent !== cpu) c.textContent = cpu;
-      setAttr(cells, 'data-head', i === 0 ? '' : null);
-      setAttr(cells, 'data-off', chips.length ? null : '');
-      setAttr(f, 'data-se-on', isOn(f) ? 'yes' : 'no');
-    });
-  }
-
-  // Millennium's own Save is hidden; this bar at the list's foot says what saving will do.
-  function saveBar(content) {
-    let bar = content.querySelector('.se-mill-save');
-    const save = content.querySelector('.MillenniumButtonsSection [data-button-type="save"]');
-    const section = save?.closest('.MillenniumButtonsSection');
-    if (!save || !section) {
-      bar?.remove();
-      return;
-    }
-    let count = 0;
-    for (let f = SE.fiber(save); f; f = f.return) {
-      const st = f.stateNode?.state;
-      if (st && Array.isArray(st.updatedPlugins)) {
-        count = st.updatedPlugins.length;
-        break;
-      }
-    }
-    if (!bar) {
-      bar = make('div', 'se-mill-save', '<span></span><button type="button">Save &amp; reload Steam</button>');
-      bar.querySelector('button').addEventListener('click', () => {
-        content.querySelector('.MillenniumButtonsSection [data-button-type="save"]')?.click();
-      });
-    }
-    const rowsList = content.querySelectorAll(PLUGIN);
-    const anchor = rowsList[rowsList.length - 1] || section;
-    if (bar.previousElementSibling !== anchor) anchor.after(bar);
-    const words =
-      count > 1
-        ? `${count} changes take effect after you save and reload Steam.`
-        : count === 1
-          ? '1 change takes effect after you save and reload Steam.'
-          : 'Your changes take effect after you save and reload Steam.';
-    const span = bar.querySelector('span');
-    if (span.textContent !== words) span.textContent = words;
-    bar.hidden = save.disabled || save.matches('.Disabled, [aria-disabled="true"]');
-  }
-
   function after(content, key) {
-    if (key === 'plugins') {
-      pluginTable(content);
-      saveBar(content);
-    }
+    if (PARTS.includes(key)) run(() => parts[key]?.after?.(content));
     if (key === 'themes') {
       const fields = [...content.querySelectorAll(THEME)];
       const rest = fields.filter((f) => !f.hasAttribute('data-se-active'));
@@ -483,9 +334,13 @@
   function buildEditor() {
     const root = make('div', 'se-qc');
     root.innerHTML =
-      '<div class="se-qc-bar"><span class="se-qc-file">quick.css</span><span class="se-qc-state" data-state="loading"><i></i><span>Loading…</span></span>' +
-      '<span class="se-qc-tools"><span class="se-qc-watch">Watch the file<button type="button" class="se-msw" role="switch" aria-checked="false" aria-label="Watch the file for edits made in another editor"></button></span></span></div>' +
-      '<div class="se-qc-main"><div class="se-qc-cur" aria-hidden="true"></div><pre class="se-qc-gutter" aria-hidden="true"></pre>' +
+      '<div class="se-qc-bar"><div class="se-qc-name"><span class="se-qc-file">quick.css</span><span class="se-qc-state" data-state="loading"><i></i><span>Loading…</span></span></div>' +
+      '<span class="se-qc-tools"><span class="se-qc-watch">Watch the file<button type="button" class="se-msw" role="switch" aria-checked="false" aria-label="Watch the file for edits made in another editor"></button></span>' +
+      `<span class="se-qc-sep" aria-hidden="true"></span><button type="button" class="se-mbtn" data-size="icon" data-tone="ghost" data-act="copy" aria-label="Copy all" title="Copy all">${parts.icon?.('copy') || ''}</button></span></div>` +
+      '<div class="se-qc-main"><div class="se-qc-cur" aria-hidden="true"></div>' +
+      '<div class="se-qc-empty" aria-hidden="true" hidden><b>Nothing here yet</b>' +
+      '<span>Type CSS and it applies to every Steam window as you go.</span></div>' +
+      '<pre class="se-qc-gutter" aria-hidden="true"></pre>' +
       '<div class="se-qc-code"><pre class="se-qc-hl" aria-hidden="true"></pre><textarea class="se-qc-ta" spellcheck="false" wrap="off" autocomplete="off" aria-label="Quick CSS"></textarea></div></div>' +
       '<div class="se-qc-foot"><span data-k="rules"></span><span data-k="bytes"></span><span class="se-qc-pos"></span><span>CSS</span></div>';
 
@@ -512,13 +367,17 @@
       setAttr(cur, 'hidden', document.activeElement === ta ? null : '');
     };
 
+    const empty = root.querySelector('.se-qc-empty');
     const paint = () => {
       const v = ta.value;
+      // An empty file says so in the editor; the note goes as soon as there's anything in it.
+      setAttr(empty, 'hidden', v.trim() || !root.dataset.loaded ? '' : null);
       hl.innerHTML = highlight(v);
-      const n = v.split('\n').length;
+      // Line numbers only once there's something to number (an empty file has none).
+      const n = v ? v.split('\n').length : 0;
       if (n !== lines) {
         lines = n;
-        gutter.textContent = `${Array.from({ length: n }, (_, i) => i + 1).join('\n')}\n`;
+        gutter.textContent = n ? `${Array.from({ length: n }, (_, i) => i + 1).join('\n')}\n` : '';
       }
       const rules = (v.match(/[^{}]*{[^}]*}/g) || []).length;
       const bytes = new TextEncoder().encode(v).length;
@@ -557,7 +416,9 @@
             paint();
           }
           saved = v;
+          const first = !root.dataset.loaded;
           root.dataset.loaded = '1';
+          if (first) paint(); // the empty-file note waits for the first load
           ta.readOnly = false;
           state('saved', 'Saved · applied');
         })
@@ -585,7 +446,7 @@
             root.dataset.loaded = '1';
           }
           ta.readOnly = true;
-          state('error', 'Can’t save from here: use Open in a window');
+          state('error', 'Can’t reach Millennium from this window');
         });
 
     ta.addEventListener('input', () => {
@@ -615,6 +476,17 @@
 
     const sw = root.querySelector('.se-msw');
     sw.addEventListener('click', () => watchToggle()?.click());
+    const copy = root.querySelector('[data-act="copy"]');
+    copy.addEventListener('click', () => {
+      Promise.resolve(run(() => SE.copy(ta.value))).then(() => {
+        copy.innerHTML = parts.icon?.('done') || '';
+        copy.title = 'Copied';
+        setTimeout(() => {
+          copy.innerHTML = parts.icon?.('copy') || '';
+          copy.title = 'Copy all';
+        }, 2000);
+      });
+    });
     // Edits made in another editor only apply while Millennium watches the file, so only then
     // is there anything new to read back.
     const poll = SE.poll(
@@ -647,8 +519,6 @@
   const watchToggle = () =>
     document.querySelector(`${CONTENT}[data-se-mill-page="quickcss"] .DialogBody .${C.Toggle}`);
   const watching = () => Boolean(watchToggle()?.classList.contains(C.On));
-  const openWindowButton = () =>
-    [...document.querySelectorAll(`${CONTENT}[data-se-mill-page="quickcss"] .DialogBody .DialogButton:not(.se-qc-open)`)].pop();
 
   function quickCss(content) {
     const body = content.querySelector('.DialogBody');
@@ -660,19 +530,12 @@
     }
     if (qc.root.parentElement !== body) body.append(qc.root);
 
-    let open = content.querySelector('.se-qc-open');
-    if (!open) {
-      open = make('button', 'DialogButton se-qc-open se-mill-act', `${ICON_WINDOW}<span>Open in a window</span>`);
-      open.type = 'button';
-      open.addEventListener('click', () => openWindowButton()?.click());
-    }
-    if (open.parentElement !== body) body.append(open);
-
     const toggle = watchToggle();
     const on = watching();
     setAttr(qc.sw, 'aria-checked', on ? 'true' : 'false');
     setAttr(qc.sw, 'data-on', on ? '' : null);
     setAttr(qc.sw.parentElement, 'hidden', toggle ? null : '');
+    setAttr(qc.root.querySelector('.se-qc-sep'), 'hidden', toggle ? null : '');
     fillHeight(qc.root, content, '--se-fill-h', 260);
   }
 
@@ -687,183 +550,147 @@
     SE.cssVar(el, name, `${h}px`);
   }
 
-  // The open log reaches the bottom of the window, above its line-count foot.
-  function logsHeight(content) {
-    const textEl = content.querySelector('.MillenniumLogs_Text');
-    if (!textEl) return;
-    const foot = textEl.parentElement?.querySelector(':scope > .se-logs-foot');
-    fillHeight(textEl, content, '--se-logs-h', 240, Math.max(0, (foot?.offsetHeight || 0) - 14) + 2);
+  /*
+   * General: a status card (Millennium's version, update channel, Check for updates), with the
+   * Updates section as its strip and About folded into it; then Checks & alerts (On startup with
+   * Notifications under it), Themes, and Network in one row. Millennium's sections stay where
+   * React put them: a grid places them, attributes title them, so its controls keep working.
+   * Sections are found by their English headers; any missing, and the page keeps its old layout.
+   */
+  const GENERAL = [
+    ['start', /^on startup$/i],
+    ['upd', /^updates?$/i],
+    ['notif', /^notifications?$/i],
+    ['themes', /^themes?$/i],
+    ['net', /^network$/i],
+    ['about', /^about$/i],
+  ];
+  const PANELS = {
+    start: ['Checks & alerts', 'What Millennium looks for, and when it tells you'],
+    themes: ['Themes', 'What a theme is allowed to change'],
+    net: ['Network', 'Route Millennium through a proxy: HTTP, HTTPS or SOCKS5. Empty: a direct connection.'],
+  };
+  const PAGE_ITEM = `.${C.PagedSettingsDialog_PageList} .${C.PagedSettingsDialog_PageListItem}`;
+  let checkOnUpdates = false;
+
+  // A row's label, and its value: a dropdown's choice, else the text after the label (About).
+  function fieldsOf(section) {
+    return [...section.querySelectorAll(`.${C.Field}`)].map((f) => {
+      const label = text(f.querySelector(`.${C.FieldLabel}`));
+      const dd = f.querySelector('.DialogDropDown');
+      const value = dd ? text(dd) : text(f).slice(label.length).trim();
+      return { label, value };
+    });
   }
 
-  function logViewer(content) {
-    const el = content.querySelector('.MillenniumLogs_TextContainer, .MillenniumLogsSection, .MillenniumLogs_Text');
-    for (let f = SE.fiber(el); f; f = f.return) {
-      const st = f.stateNode?.state;
-      if (st && typeof st === 'object' && 'logData' in st && 'selectedLog' in st) {
-        return f.stateNode;
-      }
-    }
-    return null;
-  }
+  const valueOf = (fields, re) => fields.find((f) => re.test(f.label))?.value || '';
+  const dayOf = (stamp) => stamp.split(',')[0].trim();
 
-  let logLevel = 'all';
-
-  function logs(content) {
-    const viewer = logViewer(content);
-    const st = viewer?.state;
-    if (!st?.logData?.length) return;
-    const body = content.querySelector('.DialogBody');
-    if (!body) return;
-
-    const box = content.querySelector('.MillenniumLogs_TextContainer');
-    let empty = content.querySelector('.se-logs-empty');
-    if (st.selectedLog) {
-      empty?.remove();
-    } else if (!empty) {
-      empty = make(
-        'div',
-        'se-logs-empty',
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8.5L19 7.5V21H6zM14.5 3v4.5H19M9 12h7M9 16h4.5"/></svg><b>Pick a source</b><span>Its log opens here.</span>'
+  function heroOf(host) {
+    let hero = host.querySelector(':scope > .se-mgen-hero');
+    if (!hero) {
+      hero = make(
+        'article',
+        'se-mgen-hero',
+        '<span class="se-mgen-mark" aria-hidden="true"></span><div class="se-mgen-text"><b></b><span></span></div>' +
+          '<button type="button" class="se-mgen-check">Check for updates</button>'
       );
-    }
-
-    for (let p = content; p && p !== document.body; p = p.parentElement) {
-      if (p.hasAttribute('data-se-lock') || /(auto|scroll)/.test(getComputedStyle(p).overflowY)) {
-        if (p.scrollTop) p.scrollTop = 0;
-        setAttr(p, 'data-se-lock', '');
-      }
-    }
-
-    const header = content.querySelector('.DialogHeader');
-    if (header && !header.querySelector('*') && header.textContent !== 'Logs') {
-      header.textContent = 'Logs';
-    }
-
-    let list = content.querySelector('.se-logs-src');
-    if (!list) {
-      list = make('div', 'se-logs-src');
-      list.setAttribute('role', 'list');
-      list.setAttribute('aria-label', 'Sources');
-      list.addEventListener('click', (e) => {
-        const b = e.target.closest('[data-i]');
-        const v = logViewer(content);
-        const log = v?.state?.logData?.[Number(b?.dataset.i)];
-        if (!log) return;
-        const search = content.querySelector('.MillenniumLogs_NavContainer input');
-        if (search) search.value = '';
-        v.setState({ selectedLog: log, searchedLogs: log.logs, searchQuery: '' });
+      hero.querySelector('.se-mgen-check').addEventListener('click', () => {
+        const item = [...document.querySelectorAll(PAGE_ITEM)].find((i) => /^updates$/i.test(text(i)));
+        if (!item) return;
+        checkOnUpdates = true;
+        item.click();
       });
     }
-    if (body.firstElementChild !== list) body.prepend(list);
-    if (!st.selectedLog && list.nextElementSibling !== empty) list.after(empty);
-
-    const selected = st.selectedLog?.name ?? '';
-    const sig = `${st.logData.map((l) => l.name).join('|')}#${selected}`;
-    if (list.dataset.sig !== sig) {
-      list.dataset.sig = sig;
-      list.innerHTML =
-        '<span class="se-logs-head">Sources</span>' +
-        st.logData
-          .map((l, i) => {
-            const errors = (l.logs || []).filter((x) => x.level === 2).length;
-            const warnings = (l.logs || []).filter((x) => x.level === 1).length;
-            const badge = errors
-              ? `<b data-k="error" aria-label="${errors} errors">${errors}</b>`
-              : warnings
-                ? `<b data-k="warning" aria-label="${warnings} warnings">${warnings}</b>`
-                : '';
-            return `<button type="button" role="listitem" data-i="${i}"${selected && l.name === selected ? ' data-on aria-current="true"' : ''}><span>${SE.esc(l.name)}</span>${badge}</button>`;
-          })
-          .join('');
-    }
-
-    if (!box) return;
-    const nav = content.querySelector('.MillenniumLogs_NavContainer');
-    let seg = content.querySelector('.se-logs-level');
-    if (nav) {
-      if (!seg) {
-        seg = make('span', 'se-mseg se-logs-level');
-        seg.setAttribute('role', 'group');
-        seg.setAttribute('aria-label', 'Level');
-        seg.innerHTML =
-          '<button type="button" data-level="all">All</button><button type="button" data-level="error">Errors <b></b></button><button type="button" data-level="warning">Warnings <b></b></button>';
-        seg.addEventListener('click', (e) => {
-          const b = e.target.closest('[data-level]');
-          if (b) {
-            logLevel = b.dataset.level;
-            logs(content);
-          }
-        });
-      }
-      if (seg.parentElement !== nav || nav.lastElementChild !== seg) nav.append(seg);
-      const counts = { error: st.errorCount || 0, warning: st.warningCount || 0 };
-      seg.querySelectorAll('[data-level]').forEach((b) => {
-        setAttr(b, 'data-on', b.dataset.level === logLevel ? '' : null);
-        setAttr(b, 'aria-pressed', b.dataset.level === logLevel ? 'true' : 'false');
-        const n = b.querySelector('b');
-        if (n && n.textContent !== String(counts[b.dataset.level])) {
-          n.textContent = String(counts[b.dataset.level]);
-        }
-      });
-    }
-
-    setAttr(box, 'data-se-level', logLevel === 'all' ? null : logLevel);
-    let foot = box.querySelector(':scope > .se-logs-foot');
-    if (!foot) foot = make('div', 'se-logs-foot');
-    if (box.lastElementChild !== foot) box.append(foot);
-
-    const n = (st.searchQuery ? st.searchedLogs : st.selectedLog?.logs)?.length || 0;
-    const words = `${n.toLocaleString()} ${n === 1 ? 'line' : 'lines'}`;
-    if (foot.textContent !== words) foot.textContent = words;
-  }
-
-  const ISO = /^\s*(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?)\s*$/;
-
-  function updates(content) {
-    for (const b of content.querySelectorAll('.MillenniumUpdates_Description b')) {
-      const node = b.nextSibling;
-      const m = node?.nodeType === 3 && ISO.exec(node.nodeValue);
-      if (!m) continue;
-      const d = new Date(m[1]);
-      if (isNaN(d)) continue;
-      node.nodeValue = ` ${d.toLocaleString(undefined, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      })}`;
-    }
+    if (host.firstElementChild !== hero) host.prepend(hero);
+    return hero;
   }
 
   function general(content) {
-    const sections = [...content.querySelectorAll('.DialogBody > .DialogControlsSection, .DialogBody .DialogControlsSection')];
-    for (const s of sections) {
-      setAttr(s, 'data-se-about', /^about$/i.test(text(s.firstElementChild)) ? '' : null);
+    const found = {};
+    for (const s of content.querySelectorAll('.DialogBody .DialogControlsSection')) {
+      const t = text(s.querySelector('.DialogControlsSectionHeader') || s.firstElementChild);
+      const key = GENERAL.find(([, re]) => re.test(t))?.[0];
+      if (key && !found[key]) found[key] = s;
     }
-    setAttr(
-      content.querySelector('.DialogBody'),
-      'data-se-general',
-      sections.some((s) => s.hasAttribute('data-se-about')) ? '' : null
-    );
+    const host = found.start?.parentElement;
+    const ok =
+      Boolean(host && found.upd && found.themes && found.about) &&
+      Object.values(found).every((s) => s.parentElement === host);
+    if (!ok) {
+      content.querySelector('.se-mgen-hero')?.remove();
+      for (const el of content.querySelectorAll('[data-se-mgen], [data-se-mgsec]')) {
+        el.removeAttribute('data-se-mgen');
+        el.removeAttribute('data-se-mgsec');
+      }
+      return;
+    }
+
+    setAttr(host, 'data-se-mgen', '');
+    for (const [key, s] of Object.entries(found)) {
+      setAttr(s, 'data-se-mgsec', key);
+      const head = s.querySelector('.DialogControlsSectionHeader') || s.firstElementChild;
+      setAttr(head, 'data-se-mgtitle', PANELS[key]?.[0] || null);
+      setAttr(head, 'data-se-mgsub', PANELS[key]?.[1] || null);
+    }
+
+    // The strip's two rows: short names over their dropdowns, Channel first
+    for (const f of found.upd.querySelectorAll(`.${C.Field}`)) {
+      const label = f.querySelector(`.${C.FieldLabel}`);
+      const name = text(label);
+      const kind = /channel/i.test(name) ? 'channel' : /available|update for/i.test(name) ? 'when' : null;
+      setAttr(f, 'data-se-mgfield', kind);
+      setAttr(label, 'data-se-mglabel', kind === 'channel' ? 'Channel' : kind === 'when' ? 'When an update is ready' : null);
+    }
+
+    // Network's three rows, so the stylesheet can lay them out as one
+    if (found.net) {
+      const NET = [['proxy', /url|proxy$/i], ['user', /user/i], ['pass', /pass/i]];
+      for (const f of found.net.querySelectorAll(`.${C.Field}`)) {
+        const name = text(f.querySelector(`.${C.FieldLabel}`)) || text(f);
+        setAttr(f, 'data-se-mgfield', NET.find(([, re]) => re.test(name))?.[0] || null);
+      }
+    }
+
+    const about = fieldsOf(found.about);
+    const upd = fieldsOf(found.upd);
+    const version = valueOf(about, /millennium version/i) || about[0]?.value || '';
+    const channel = valueOf(upd, /channel/i);
+    const when = valueOf(upd, /available|update for/i);
+    const builds = [
+      [valueOf(about, /client api/i) && `Client API ${valueOf(about, /client api/i)}`, valueOf(about, /browser api/i) && `Browser API ${valueOf(about, /browser api/i)}`],
+      [valueOf(about, /millennium build/i) && `Built ${dayOf(valueOf(about, /millennium build/i))}`, valueOf(about, /loader build/i) && `Loader ${dayOf(valueOf(about, /loader build/i))}`],
+    ]
+      .map((line) => line.filter(Boolean).join(' · '))
+      .filter(Boolean)
+      .join('\n');
+    setAttr(found.upd, 'data-se-mgbuild', builds || null);
+
+    const hero = heroOf(host);
+    const title = hero.querySelector('.se-mgen-text b');
+    const status = hero.querySelector('.se-mgen-text span');
+    const line = [channel && `${channel} channel`, when].filter(Boolean).join(' · ');
+    if (title.textContent !== `Millennium ${version}`.trim()) title.textContent = `Millennium ${version}`.trim();
+    if (status.textContent !== line) status.textContent = line;
   }
 
-  // What each page adds, removed when the window moves to another page.
+  // What each page adds, removed when the window moves to another page (the parts say theirs).
   const PAGE_OWN = {
-    themes: '.se-mtool[data-for="themes"], .se-theme-settings',
-    plugins: '.se-mtool[data-for="plugins"], .se-pm, .se-mill-save',
-    quickcss: '.se-qc, .se-qc-open',
-    logs: '.se-logs-src, .se-logs-level, .se-logs-foot, .se-logs-empty',
+    themes: '.se-mtool[data-for="themes"]',
+    quickcss: '.se-qc',
+    general: '.se-mgen-hero',
   };
   const PAGE_MARKS = {
     themes: ['data-se-active', 'data-se-initial', 'data-se-hide', 'data-se-thumb'],
-    plugins: ['data-se-on', 'data-se-hide'],
     quickcss: ['data-se-qc'],
-    general: ['data-se-general', 'data-se-about'],
-    logs: ['data-se-level'],
+    general: ['data-se-mgen', 'data-se-mgsec', 'data-se-mgtitle', 'data-se-mgsub', 'data-se-mgbuild', 'data-se-mgfield', 'data-se-mglabel'],
   };
-  const PAGE_VARS = { themes: ['--se-thumb'], logs: ['--se-logs-h'] };
-  const ALL_MARKS = [...new Set(Object.values(PAGE_MARKS).flat())];
+  const PAGE_VARS = { themes: ['--se-thumb'] };
+  const ownOf = (key) => PAGE_OWN[key] || parts[key]?.own || '';
+  const marksOf = (key) => PAGE_MARKS[key] || parts[key]?.marks || [];
+  const varsOf = (key) => PAGE_VARS[key] || parts[key]?.vars || [];
+  const allMarks = () => [...new Set([...Object.values(PAGE_MARKS).flat(), ...PARTS.flatMap(marksOf)])];
+  const allVars = () => [...new Set([...Object.values(PAGE_VARS).flat(), ...PARTS.flatMap(varsOf)])];
 
   // data-se-lock sits on the page's scrolling ancestors, which may be outside .MillenniumSettings.
   function unlock() {
@@ -877,14 +704,27 @@
       qc = null;
     }
     if (key === 'logs') unlock();
+    if (key === 'updates') checkOnUpdates = false;
+    run(() => parts[key]?.reset?.());
     const scope = root || document;
-    if (PAGE_OWN[key]) scope.querySelectorAll(PAGE_OWN[key]).forEach((el) => el.remove());
-    const marks = PAGE_MARKS[key] || [];
-    const vars = PAGE_VARS[key] || [];
+    const own = ownOf(key);
+    if (own) scope.querySelectorAll(own).forEach((el) => el.remove());
+    const marks = marksOf(key);
+    const vars = varsOf(key);
     if (!marks.length) return;
     for (const el of scope.querySelectorAll(marks.map((m) => `[${m}]`).join(','))) {
       for (const m of marks) el.removeAttribute(m);
       for (const v of vars) el.style.removeProperty(v);
+    }
+  }
+
+  // Logs fills the window: its page and the scrolling boxes around it stay put (the log scrolls).
+  function lockScroll(content) {
+    for (let p = content; p && p !== document.body; p = p.parentElement) {
+      if (p.hasAttribute('data-se-lock') || /(auto|scroll)/.test(getComputedStyle(p).overflowY)) {
+        if (p.scrollTop) p.scrollTop = 0;
+        setAttr(p, 'data-se-lock', '');
+      }
     }
   }
 
@@ -898,16 +738,17 @@
     if (key !== lastKey) {
       leave(lastKey, content?.closest(ROOT));
       lastKey = key;
-      themeQuery = '';
-      pluginQuery = '';
-      pluginMode = 'all';
-      logLevel = 'all';
+      themePage = 0;
     }
     if (!content) return;
-    const step = { themes, plugins, quickcss: quickCss, logs, general, updates }[key];
     try {
-      step?.(content);
-      if (key === 'logs') logsHeight(content);
+      if (key === 'logs') lockScroll(content);
+      if (key === 'updates') {
+        if (parts.updates?.step(content, { check: checkOnUpdates })) checkOnUpdates = false;
+      } else {
+        ({ themes, quickcss: quickCss, general }[key] || parts[key]?.step)?.(content);
+      }
+      parts[key]?.layout?.(content);
     } catch (e) {
       console.warn('[Steam Enhanced] Millennium page:', key, e);
     }
@@ -916,6 +757,8 @@
   function schedule() {
     if (!frame) frame = requestAnimationFrame(update);
   }
+
+  Object.assign(parts, { make, text, core, fillHeight, schedule });
 
   // Millennium's own Quick CSS editor window: tag <html> instead of an html:has() rule that every
   // window would evaluate on every change. A live collection makes the check a length read.
@@ -944,11 +787,13 @@
       qc?.destroy();
       qc = null;
       document.querySelectorAll(`[${OWN}="mill"]`).forEach((el) => el.remove());
-      const sel = ALL_MARKS.map((m) => `[${m}]`).join(',');
+      const marks = allMarks();
+      const vars = allVars();
+      const sel = marks.map((m) => `[${m}]`).join(',');
       for (const root of document.querySelectorAll(ROOT)) {
         for (const el of root.querySelectorAll(sel)) {
-          for (const m of ALL_MARKS) el.removeAttribute(m);
-          for (const v of Object.values(PAGE_VARS).flat()) el.style.removeProperty(v);
+          for (const m of marks) el.removeAttribute(m);
+          for (const v of vars) el.style.removeProperty(v);
         }
       }
       unlock();
