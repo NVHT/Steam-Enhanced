@@ -25,6 +25,8 @@
   <a href="#-make-it-yours">Make it yours</a>
   &nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="#-troubleshooting">Troubleshooting</a>
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="#-licenses">Licenses</a>
 </p>
 
 <br>
@@ -300,6 +302,20 @@ python3 dev/classmap.py rehash <path-to-extracted-steamui> .
 ```
 
 </details>
+
+<br>
+
+## ✦ Licenses
+
+Steam Enhanced is released under the [MIT License](LICENSE). It bundles a few third-party pieces, each under its own license, kept beside the files it covers:
+
+| Component | Used for | License |
+| --- | --- | --- |
+| [SN Pro](https://github.com/supernotes/sn-pro) · © 2024 The SN Pro Project Authors | Default typeface | SIL Open Font License 1.1 · [`core/fonts/SNPro-OFL.txt`](core/fonts/SNPro-OFL.txt) |
+| [Xmind](https://github.com/lamzhonghang/xmind) · © 2025 The Xmind Project Authors | Optional typeface | SIL Open Font License 1.1 · [`core/fonts/Xmind-OFL.txt`](core/fonts/Xmind-OFL.txt) |
+| [hls.js](https://github.com/video-dev/hls.js) 1.6.15 · © 2017 Dailymotion | Store trailer playback | Apache License 2.0 · [`web/store/vendor/hls.js-LICENSE`](web/store/vendor/hls.js-LICENSE) |
+
+The fonts stay under the OFL and the player under Apache 2.0; the MIT License covers the rest of the theme. Steam and the Steam logo are trademarks of Valve Corporation; Steam Enhanced is an unofficial theme and is not affiliated with Valve.
 
 <br>
 
