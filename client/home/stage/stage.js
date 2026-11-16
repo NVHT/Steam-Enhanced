@@ -9,7 +9,7 @@
     artImg, boxOf, clearMarks, client, closePick, compact, cycleSeconds, dropAllOwn, dropOwn,
     enabled, fitColl, fitFav, hours, ICON_INSTALL, ICON_PLAY, isFavorites, kindOf, mark, narrow,
     NEWS, own, paintColl, paintFav, reducedMotion, schedule, scrollerOf, setHTML, SHELF,
-    SHELF_HEADER, shelfId, trayShare, when,
+    SHELF_HEADER, shelfId, trayShare, trayShown, when,
   } = ns;
   const { live } = ns;
 
@@ -370,7 +370,7 @@
   }
 
   // Writes only, from measureStage()'s numbers.
-  function applyStageDimensions({ measured, content }, trayRows) {
+  function applyStageDimensions({ measured, content }, trayRows, showTray) {
     const now = performance.now();
 
     if (!appliedVh || measured === appliedVh) {
@@ -394,9 +394,12 @@
     const trayH = trayBox ? trayBox + 22 : 0;
 
     SE.cssVar(live.stage, '--se-hs-vh', `${vh}px`);
-    SE.cssVar(live.stage, '--se-hs-h', `${Math.max(340, isNarrow ? Math.round(vh * 0.7) : vh - trayH)}px`);
+    const stageH = isNarrow && showTray ? Math.round(vh * 0.7) : vh - trayH;
+    SE.cssVar(live.stage, '--se-hs-h', `${Math.max(340, stageH)}px`);
 
-    const lock = !isNarrow && trayRows.length > 0 && vh - trayH >= 340;
+    // Locked: the stage and the tray are the whole page, Steam's other Home rows hidden. With the
+    // tray off the stage alone is the page, narrow windows included.
+    const lock = (showTray ? !isNarrow && trayRows.length > 0 : true) && vh - trayH >= 340;
     if (lock) {
       mark(live.scope, 'data-se-hs-lock');
       lockScroll();
@@ -461,15 +464,17 @@
       if (s) kinds.set(s, 'fav');
     }
 
-    // Favorites first: whether it draws decides how many columns the tray has.
-    const favSource = firstOf('fav') || null;
+    // Favorites first: whether it draws decides how many columns the tray has. With the tray
+    // off ("Home stage tray" setting) nothing goes in it, and the stage fills the page alone.
+    const showTray = trayShown();
+    const favSource = (showTray && firstOf('fav')) || null;
     const favShelf = favSource && (favSource.matches(SHELF) ? favSource : favSource.querySelector(SHELF));
     const favId = (favShelf && shelfId(favShelf)) || (favShelf && isFavorites(favShelf) ? 'favorite' : null);
     const favTitle =
       favId === 'favorite'
         ? 'Favorites'
         : (favShelf?.querySelector(SHELF_HEADER)?.textContent || '').replace(/[·•].*$/, '').trim();
-    const favEntry = paintFav(favHost, favId, favTitle);
+    const favEntry = showTray ? paintFav(favHost, favId, favTitle) : null;
     if (favEntry) {
       if (favHost.parentElement !== live.scope) live.scope.appendChild(favHost);
       kinds.set(favHost, 'fav');
@@ -477,7 +482,7 @@
       favHost.remove();
     }
 
-    const trayRows = [firstOf('news'), favEntry ? favHost : null, firstOf('coll')].filter(Boolean);
+    const trayRows = showTray ? [firstOf('news'), favEntry ? favHost : null, firstOf('coll')].filter(Boolean) : [];
     for (const r of [...rows, ...(favEntry ? [favHost] : [])]) {
       let k = kinds.get(r);
       if (r === favSource && favEntry) k = 'favsrc';
@@ -533,7 +538,7 @@
     if (favEntry) fitFav(favEntry, favBox);
     if (collEntry) fitColl(collEntry, collBox);
     if (headsMore !== null) SE.mark(live.newsHeads, 'data-more', headsMore ? 'yes' : 'no');
-    applyStageDimensions(dims, trayRows);
+    applyStageDimensions(dims, trayRows, showTray);
     fitStrip();
   }
 

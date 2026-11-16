@@ -31,7 +31,7 @@
     if (!settings || performance.now() - settingsAt > 2000) {
       const cs = getComputedStyle(document.documentElement);
       settings = Object.fromEntries(
-        ['--se-home-stage', '--se-home-stage-cycle', '--se-home-stage-tray'].map((k) => [k, cs.getPropertyValue(k).trim()])
+        ['--se-home-stage', '--se-home-stage-cycle', '--se-home-stage-tray', '--se-home-stage-tray-panels'].map((k) => [k, cs.getPropertyValue(k).trim()])
       );
       settingsAt = performance.now();
     }
@@ -46,6 +46,8 @@
     const n = parseFloat(setting('--se-home-stage-tray'));
     return Number.isFinite(n) ? Math.min(70, Math.max(0, n)) : 30;
   };
+  // The tray's panels (What's New, Favorites, Collections): off gives the stage the window
+  const trayShown = () => setting('--se-home-stage-tray-panels') !== 'off';
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
   const appStore = () => SE.global('appStore', (s) => !!s.allApps);
@@ -163,6 +165,6 @@
     NEWS_CARD, NEWS_DATE, NEWS_GAME, NEWS_HEADING, NEWS_IMAGE, PLAY_NEXT, RECENT, SHELF,
     SHELF_HEADER, appStore, artImg, cancelPass, client, collectionStore, compact, cycleSeconds,
     dayLabel, enabled, hours, imgTag, narrow, onImgError, onImgLoad, partnerEventStore,
-    reducedMotion, schedule, setHTML, setPass, trayShare, when,
+    reducedMotion, schedule, setHTML, setPass, trayShare, trayShown, when,
   });
 })(window.__se);

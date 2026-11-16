@@ -11,6 +11,7 @@
  *   --se-home-stage (on | off)
  *   --se-home-stage-cycle (seconds)
  *   --se-home-stage-tray (percentage of viewport height)
+ *   --se-home-stage-tray-panels (on | off)
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
  * window.__seHomeStageParts (values parts reassign live on its `live`): util.js

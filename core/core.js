@@ -40,6 +40,10 @@
     addEventListener('blur', relay);
     window.__seBrowserChatClicks = true;
   }
+  // "Web pages" setting, Steam's own: Millennium puts options/web/restyle-off.css in the page's
+  // HTML as a <link>, ahead of this script, and the theme stays out of the page entirely.
+  if (document.querySelector('link[href*="/options/web/restyle-off.css"]')) return;
+
   const { loader } = site;
   const coreSrc = document.currentScript?.src ||
     [...document.scripts].find((script) => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;

@@ -165,6 +165,29 @@ The typeface for the whole theme: client windows, Store, Community, Support and 
 </details>
 
 <details>
+<summary><b>Animations, glass and corners</b> &nbsp;<sub>(Millennium settings)</sub></summary>
+<br>
+
+| Setting | Values | What it does |
+| --- | --- | --- |
+| Animations | `Full` *(default)*, `Reduced` | Reduced: hovers, presses and panels change at once instead of moving. Spinners and the window entrance still play. |
+| Glass effects | `On` *(default)*, `Off` | Off drops the frosted blur everywhere and makes see-through surfaces solid. Lighter on slower PCs. |
+| Corners | `Default`, `Sharp`, `Round` | How rounded every corner is. |
+
+</details>
+
+<details>
+<summary><b>Web pages</b> &nbsp;<sub>(Millennium setting)</sub></summary>
+<br>
+
+| Value | What it does |
+| --- | --- |
+| `Theme` *(default)* | Store, Community, Support and Checkout in the theme's design. |
+| `Steam's own` | Those pages exactly as Steam draws them, in Steam's font. The client stays themed. Restart Steam after changing it. |
+
+</details>
+
+<details>
 <summary><b>Startup background</b> &nbsp;<code>--se-startup-background</code></summary>
 <br>
 
@@ -218,10 +241,13 @@ Windows stay on the theme background until they've loaded (the main window until
 | Token | Default | What it does |
 | --- | --- | --- |
 | `--se-home-stage` | `on` | `off` restores Steam's Library Home (handy for editing shelves). |
-| `--se-home-stage-cycle` | `9` | Seconds between hero transitions. `0` stops cycling. |
-| `--se-home-stage-tray` | `30` | Minimum window height kept for the glass tray, in percent (0–70). |
+| `--se-home-stage-cycle` | `9` | Seconds between hero transitions. `0` stops cycling. Also a setting: Home stage cycling (Slow 15, Fast 5, Off). |
+| `--se-home-stage-tray` | `30` | Minimum window height kept for the glass tray, in percent (0–70). Also a setting: Home stage height (Short 45, Tall 18). |
+| `--se-home-stage-tray-panels` | `on` | `off` drops the tray: the stage alone fills the window, with no Home rows below. Also a setting: Home stage tray. |
+| *(setting)* Home stage strip | `On` | `Off` hides the row of recent-game cards on the stage; the hero still cycles. |
+| *(setting)* Home stage details | `Full` | `Compact` drops the description, `Play only` keeps just the button, `Hidden` leaves the logo over the art. |
 | `--se-overlay` | `on` | `off` restores Steam's in-game overlay. |
-| `--se-overlay-dim` | `1.2` | Backdrop darkness behind the overlay (0.4–1.4): edges are black from 1, the whole game is hidden at 1.4. The overlay's Darkness slider overrides it per user. |
+| `--se-overlay-dim` | `1.2` | Backdrop darkness behind the overlay (0.4–1.4): edges are black from 1, the whole game is hidden at 1.4. Also a setting: Overlay darkness (Light 0.8, Dark 1.4). The overlay's Darkness slider overrides it per user. |
 | `--se-toasts` | `on` | `off` restores Steam's toasts, desktop and in game. |
 | `--se-toasts-style` | `stage` | `stage` plays toasts on a mini Home stage; `compact` restyles Steam's toasts as cards. |
 | `--se-toasts-position` | `center` | Compact toasts only: `center` or `corner`. |

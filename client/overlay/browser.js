@@ -123,6 +123,14 @@
     return null;
   };
 
+  // No value of the user's yet: the slider starts where the backdrop is, the theme's
+  // "Overlay darkness" setting (options/overlay/), read off the window.
+  const themeBackdrop = (key) => {
+    const spec = BACKDROP[key];
+    const value = Math.round(spec.fromStored(parseFloat(getComputedStyle(root).getPropertyValue(spec.cssVar))));
+    return value >= spec.min && value <= spec.max ? value : spec.fallback;
+  };
+
   const applyBackdrop = (key, value) =>
     SE.cssVar(root, BACKDROP[key].cssVar, value == null ? null : BACKDROP[key].toCss(value));
 
@@ -144,7 +152,7 @@
   const renderSettingsView = (part) => {
     for (const [key, spec] of Object.entries(BACKDROP)) {
       const { range, value } = part.sliders[key];
-      const current = readBackdrop(key) ?? spec.fallback;
+      const current = readBackdrop(key) ?? themeBackdrop(key);
       if (document.activeElement !== range) range.value = String(current);
       setText(value, `${current}${spec.unit}`);
     }
