@@ -143,39 +143,41 @@
 }
 
 /*
- * Search: the theme's field with a magnifier. The doubled attribute outranks the theme's
- * dialog field skin (client/dialogs/dialogs.css), which Steam's input also carries.
+ * Search: the theme's search field (--se-search-*). An input has no ::before, so its magnifier is
+ * a background: the one coloured copy of --se-icon-search (muted grey, --se-search-icon-color).
+ * The doubled attribute outranks the theme's dialog field skin (client/dialogs/dialogs.css),
+ * which Steam's input also carries.
  */
 [data-se-epicker] input[data-se-epicker-search][data-se-epicker-search]:not(#se-none),
 [data-se-epicker] input[data-se-epicker-search][data-se-epicker-search]:not(#se-none):is(:hover, :focus, :focus-within) {
   box-sizing: border-box;
   width: 100% !important;
   min-height: 0 !important;
-  height: var(--se-control-h) !important;
+  height: var(--se-search-h) !important;
   margin: 0 !important;
-  padding: 0 12px 0 34px !important;
+  padding: 0 var(--se-search-pad) 0 calc(var(--se-search-pad) + var(--se-search-icon-size) + var(--se-search-gap)) !important;
   border: 0 !important;
-  border-radius: var(--se-radius-sm) !important;
+  border-radius: var(--se-search-radius) !important;
   outline: 0 !important;
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f7984' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='6.5' fill='%236f7984' fill-opacity='.32' stroke='none'/%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M20 20l-4.2-4.2'/%3E%3C/svg%3E") 11px center / 15px no-repeat,
-    var(--se-field) !important;
-  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
-  font: 400 13px var(--se-font), sans-serif !important;
-  color: var(--se-text) !important;
-  transition: box-shadow var(--se-dur) ease-out;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2398a2ad' stroke-width='1.75' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='6.5' fill='%2398a2ad' fill-opacity='.32'/%3E%3Cpath d='M16 16l4 4'/%3E%3C/svg%3E") var(--se-search-pad) center / var(--se-search-icon-size) no-repeat,
+    var(--se-search-bg) !important;
+  box-shadow: var(--se-search-edge) !important;
+  font: var(--se-search-font) !important;
+  color: var(--se-search-text) !important;
+  transition: box-shadow var(--se-dur) var(--se-ease);
 }
 
 [data-se-epicker] input[data-se-epicker-search][data-se-epicker-search]:not(#se-none):hover:not(:focus) {
-  box-shadow: inset 0 0 0 1px var(--se-white-14) !important;
+  box-shadow: var(--se-search-edge-hover) !important;
 }
 
 [data-se-epicker] input[data-se-epicker-search][data-se-epicker-search]:not(#se-none):focus {
-  box-shadow: inset 0 0 0 1px var(--se-accent-strong), 0 0 0 3px var(--se-accent-tint) !important;
+  box-shadow: var(--se-search-edge-focus) !important;
 }
 
 [data-se-epicker] input[data-se-epicker-search]::placeholder {
-  color: var(--se-text-faint) !important;
+  color: var(--se-search-placeholder) !important;
+  font-style: normal !important;
 }
 
 /* Its wrapper, when Steam boxes the field: no second box around the theme's */

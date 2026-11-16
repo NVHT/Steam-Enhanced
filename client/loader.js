@@ -61,7 +61,7 @@
   const FEATURES = [
     // Shared runtime pieces
     ['all', 'core/', ['font.css', 'tokens.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
-    ['all', 'client/shared/', ['popup-layer.css']],
+    ['all', 'client/shared/', ['popup-layer.css', 'search-field.css']],
     ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'column-resize.css', 'column-resize.js']],
     ['notify', 'client/friends/', ['friend-notification-clicks.js']],
     // In-game overlay

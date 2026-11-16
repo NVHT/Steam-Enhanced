@@ -386,8 +386,6 @@
  * theme places the bar itself (section 1).
  */
 .extension-manager-popup:not(#se-none) {
-  --se-ext-i-search: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2211%22%20cy%3D%2211%22%20r%3D%226.5%22%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%2F%3E%3Ccircle%20cx%3D%2211%22%20cy%3D%2211%22%20r%3D%226.5%22%2F%3E%3Cpath%20d%3D%22M16%2016l4%204%22%2F%3E%3C%2Fsvg%3E");
-
   box-sizing: border-box;
   /*
    * The window's title bar (64 px, a drag region that takes clicks) overlaps the top of the
@@ -479,40 +477,42 @@
   content: '';
   position: absolute;
   top: 50%;
-  left: 12px;
-  width: 16px;
-  height: 16px;
-  margin-top: -8px;
-  background: var(--se-text-faint);
-  -webkit-mask: var(--se-ext-i-search) center / contain no-repeat;
+  left: var(--se-search-pad);
+  width: var(--se-search-icon-size);
+  height: var(--se-search-icon-size);
+  margin-top: calc(var(--se-search-icon-size) / -2);
+  background: var(--se-search-icon-color);
+  -webkit-mask: var(--se-icon-search) center / contain no-repeat;
   pointer-events: none;
+  mask: var(--se-icon-search) center / contain no-repeat;
 }
 
 .se-ext-search input {
   box-sizing: border-box;
   width: 100%;
-  height: var(--se-control-h);
-  padding: 0 12px 0 36px;
+  height: var(--se-search-h);
+  padding: 0 var(--se-search-pad) 0 calc(var(--se-search-pad) + var(--se-search-icon-size) + var(--se-search-gap));
   border: 0;
-  border-radius: var(--se-radius-sm);
+  border-radius: var(--se-search-radius);
   outline: none;
-  background: var(--se-field);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
-  color: var(--se-text);
-  font: 500 var(--se-fs-sm) var(--se-font);
-  transition: box-shadow var(--se-dur-fast);
+  background: var(--se-search-bg);
+  box-shadow: var(--se-search-edge);
+  color: var(--se-search-text);
+  font: var(--se-search-font);
+  transition: box-shadow var(--se-dur) var(--se-ease);
 }
 
 .se-ext-search input::placeholder {
-  color: var(--se-text-faint);
+  color: var(--se-search-placeholder) !important;
+  font-style: normal !important;
 }
 
 .se-ext-search input:hover {
-  box-shadow: inset 0 0 0 1px var(--se-white-14);
+  box-shadow: var(--se-search-edge-hover);
 }
 
 .se-ext-search input:focus {
-  box-shadow: inset 0 0 0 1px var(--se-accent-strong), 0 0 0 3px var(--se-accent-tint);
+  box-shadow: var(--se-search-edge-focus);
 }
 
 .se-ext-search input::-webkit-search-cancel-button {

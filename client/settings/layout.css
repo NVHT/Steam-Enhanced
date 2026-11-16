@@ -51,35 +51,24 @@
   /* Added by client/settings/dialog/ under the title */
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 34px;
+  gap: var(--se-search-gap);
+  height: var(--se-search-h);
   margin: 0 0 14px;
-  padding: 0 10px;
+  padding: 0 var(--se-search-pad);
   box-sizing: border-box;
-  border-radius: var(--se-radius-sm);
-  background: var(--se-field);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
-  color: var(--se-text-faint);
+  border-radius: var(--se-search-radius);
+  background: var(--se-search-bg);
+  box-shadow: var(--se-search-edge);
+  color: var(--se-search-icon-color);
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-settings-search:hover:not(:focus-within) {
+  box-shadow: var(--se-search-edge-hover);
 }
 
 .se-settings-search:focus-within {
-  box-shadow: inset 0 0 0 1px var(--se-accent-strong), 0 0 0 3px var(--se-accent-tint);
-}
-
-.se-settings-search svg {
-  width: 15px;
-  height: 15px;
-  flex: 0 0 15px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.75;
-  stroke-linecap: round;
-}
-
-.se-settings-search svg .se-fill {
-  fill: currentColor;
-  fill-opacity: .32;
-  stroke: none;
+  box-shadow: var(--se-search-edge-focus);
 }
 
 .se-settings-search input {
@@ -88,13 +77,14 @@
   border: 0;
   outline: none;
   background: transparent;
-  color: var(--se-text);
-  font: 500 13px var(--se-font);
+  color: var(--se-search-text);
+  font: var(--se-search-font);
   padding: 0;
 }
 
 .se-settings-search input::placeholder {
-  color: var(--se-text-faint);
+  color: var(--se-search-placeholder) !important;
+  font-style: normal !important;
 }
 
 ._18QCu-7MTzd51UpVbYysDy {

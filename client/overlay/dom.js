@@ -38,7 +38,7 @@
   // `data-search`.
   const searchField = (kind, placeholder) => {
     const box = el('label', 'se-ov-achl-searchbox');
-    box.innerHTML = ICON.search;
+    box.innerHTML = '<span class="se-search-icon" aria-hidden="true"></span>';
     const input = el('input', 'se-ov-achl-search');
     input.type = 'text';
     input.placeholder = placeholder;

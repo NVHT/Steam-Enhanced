@@ -229,19 +229,24 @@
 .se-cb-filter {
   box-sizing: border-box;
   width: 180px;
-  height: 34px;
-  padding: 0 12px;
+  height: var(--se-search-h);
+  padding: 0 var(--se-search-pad);
   display: flex;
   align-items: center;
-  gap: 8px;
-  border-radius: var(--se-radius-sm);
-  background: var(--se-field);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
-  color: var(--se-text-faint);
+  gap: var(--se-search-gap);
+  border-radius: var(--se-search-radius);
+  background: var(--se-search-bg);
+  box-shadow: var(--se-search-edge);
+  color: var(--se-search-icon-color);
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-cb-filter:hover:not(:focus-within) {
+  box-shadow: var(--se-search-edge-hover);
 }
 
 .se-cb-filter:focus-within {
-  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  box-shadow: var(--se-search-edge-focus);
 }
 
 .se-cb-filter input {
@@ -252,12 +257,13 @@
   border: 0;
   outline: 0;
   background: transparent;
-  color: var(--se-text);
-  font: normal 500 13px var(--se-font), sans-serif;
+  color: var(--se-search-text);
+  font: var(--se-search-font);
 }
 
 .se-cb-filter input::placeholder {
-  color: var(--se-text-faint);
+  color: var(--se-search-placeholder) !important;
+  font-style: normal !important;
 }
 
 .se-cb-new {

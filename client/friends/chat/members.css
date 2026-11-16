@@ -182,19 +182,35 @@
   box-sizing: border-box;
   display: flex !important;
   align-items: center;
-  gap: 6px;
+  gap: var(--se-search-gap);
   width: 100%;
   height: var(--se-tile-sm) !important;
   margin: 0 !important;
-  padding: 0 3px 0 10px !important;
+  padding: 0 3px 0 var(--se-search-pad) !important;
   border: 0 !important;
-  border-radius: var(--se-radius-sm) !important;
-  background: var(--se-field) !important;
-  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  border-radius: var(--se-search-radius) !important;
+  background: var(--se-search-bg) !important;
+  box-shadow: var(--se-search-edge) !important;
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer .inputContainer:hover:not(:focus-within) {
+  box-shadow: var(--se-search-edge-hover) !important;
 }
 
 .multiChatDialog[data-se-chat] .MemberListOptionsContainer .inputContainer:focus-within {
-  box-shadow: inset 0 0 0 1px var(--se-accent-strong), 0 0 0 3px var(--se-accent-tint) !important;
+  box-shadow: var(--se-search-edge-focus) !important;
+}
+
+/* The search field's magnifier, at its start */
+.multiChatDialog[data-se-chat] .MemberListOptionsContainer .inputContainer::before {
+  content: "";
+  flex: none;
+  width: var(--se-search-icon-size);
+  height: var(--se-search-icon-size);
+  background: var(--se-search-icon-color);
+  -webkit-mask: var(--se-icon-search) center / contain no-repeat;
+  mask: var(--se-icon-search) center / contain no-repeat;
 }
 
 .multiChatDialog[data-se-chat] .MemberListOptionsContainer input {
@@ -208,14 +224,14 @@
   outline: 0 !important;
   background: none !important;
   box-shadow: none !important;
-  font: 500 13px var(--se-font), sans-serif !important;
+  font: var(--se-search-font) !important;
   font-style: normal !important;
-  color: var(--se-text) !important;
+  color: var(--se-search-text) !important;
 }
 
 .multiChatDialog[data-se-chat] .MemberListOptionsContainer input::placeholder {
   font-style: normal !important;
-  color: var(--se-text-faint) !important;
+  color: var(--se-search-placeholder) !important;
   opacity: 1;
 }
 

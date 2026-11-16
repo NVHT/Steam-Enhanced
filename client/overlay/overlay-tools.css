@@ -266,33 +266,30 @@ html[data-se-ov] .se-ov-achl-chip[aria-pressed='true'] {
   font-variant-numeric: tabular-nums;
 }
 
-/* Search: the box carries the look; the field inside is reset so the
-   overlay's input styles can't shrink it. */
+/* Search: the theme's search field (--se-search-*) on the overlay's see-through backing, at
+   36 px; the field inside is reset so the overlay's input styles can't shrink it. */
 .se-ov-achl-searchbox {
   flex: none;
   height: 36px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 12px;
+  gap: var(--se-search-gap);
+  padding: 0 var(--se-search-pad);
   box-sizing: border-box;
-  border-radius: var(--se-radius-md);
+  border-radius: var(--se-search-radius);
   background: rgba(var(--se-ov-ink), 0.7);
   box-shadow: inset 0 0 0 1px var(--se-white-12);
-  color: var(--se-text-dim);
+  color: var(--se-search-icon-color);
   cursor: text;
-  transition: box-shadow var(--se-dur) ease-out;
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-ov-achl-searchbox:hover:not(:focus-within) {
+  box-shadow: var(--se-search-edge-hover);
 }
 
 .se-ov-achl-searchbox:focus-within {
-  box-shadow: inset 0 0 0 1px var(--se-accent);
-  color: var(--se-text);
-}
-
-.se-ov-achl-searchbox svg {
-  flex: none;
-  width: 14px;
-  height: 14px;
+  box-shadow: var(--se-search-edge-focus);
 }
 
 html[data-se-ov] .se-ov-achl-search:not(#se-none) {
@@ -307,15 +304,15 @@ html[data-se-ov] .se-ov-achl-search:not(#se-none) {
   box-shadow: none !important;
   outline: none !important;
   appearance: none;
-  color: var(--se-text-strong) !important;
-  font: 500 13px/1 var(--se-font), 'Motiva Sans', sans-serif !important;
+  color: var(--se-search-text) !important;
+  font: var(--se-search-font) !important;
   font-style: normal !important;
   text-shadow: none;
 }
 
 html[data-se-ov] .se-ov-achl-search:not(#se-none)::placeholder {
-  color: var(--se-text-dim);
-  font-style: normal;
+  color: var(--se-search-placeholder) !important;
+  font-style: normal !important;
   opacity: 1;
 }
 
