@@ -287,6 +287,7 @@
       }
       browserClickListeners.clear();
       cancelChatNavigation();
+      ns.holdChatError();
       clearTimeout(state.statusTimer);
       hideFly(true);
       watcher.disconnect();

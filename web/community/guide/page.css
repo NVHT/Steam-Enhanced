@@ -1,0 +1,1040 @@
+/*
+ * A guide (/sharedfiles/filedetails/?id=<id>): under the hub's header card (hub/page.css), the
+ * guide as a reader.
+ *
+ *   [ hub header card: art, title, stats, friends, section tabs              ]
+ *   [ Guide Index  ][ title card: picture, title, authors ★  ][ Created by   ]
+ *   [  Overview    ][  description, awards, vote / favorite  ][ Category     ]
+ *   [ ▸Introduction][ guide: one card, a heading per section ][ Posted       ]
+ *   [  ... sticky  ][ comments                               ][              ]
+ *
+ * guide/page.js moves the index into the left column and marks the section being read. Rules
+ * that touch Steam's shared item frame (#ig_bottom, #rightContents...) are scoped to a guide
+ * (#ig_bottom with a .guideTop): screenshots and workshop items keep Steam's layout. Buttons,
+ * avatars, friend rows and comments come from shared/ui*.css. Classes are Steam's
+ * (SteamTracking: steamcommunity.com/public/css/skin_1/sharedfiles_guide.css, workshop.css,
+ * workshop_itemdetails.css).
+ */
+
+/* ---------- Frame ---------- */
+
+/* Steam's breadcrumbs, moved under the header card (hub/page.js) */
+/* !important: Steam's own rules (workshop.css) set margin, max-width, padding at equal or higher
+   weight */
+html.se-community-sharedfile .sharedfiles_item_page_header + .breadcrumbs {
+  box-sizing: border-box;
+  width: var(--se-community-width);
+  max-width: none !important;
+  margin: calc(-1 * var(--se-space-3)) auto var(--se-space-4) !important;
+  padding: 0 var(--se-space-2) !important;
+  color: var(--se-text-dim);
+  font: var(--se-type-small);
+}
+
+/* !important: Steam's own rules (workshop.css) set color at equal or higher weight */
+html.se-community-sharedfile .sharedfiles_item_page_header + .breadcrumbs a {
+  color: var(--se-text-dim) !important;
+  font: inherit;
+  text-decoration: none;
+}
+
+/* !important: Steam's own rules (workshop.css) set color at equal or higher weight */
+html.se-community-sharedfile .sharedfiles_item_page_header + .breadcrumbs a:hover {
+  color: var(--se-text) !important;
+}
+
+html.se-community-sharedfile .sharedfiles_item_page_header + .breadcrumbs .breadcrumb_separator {
+  margin-inline: var(--se-space-1);
+  color: var(--se-text-faint);
+}
+
+/* ---------- Layout: index | guide | details ---------- */
+
+@media (min-width: 911px) {
+  /* !important: Steam's own rules (workshop.css) set margin, max-width, padding, width at equal
+     or higher weight */
+  html.se-community-sharedfile #ig_bottom:has(> .guideTop) {
+    display: grid;
+    grid-template-columns: var(--se-side-col) minmax(0, 1fr) var(--se-side-col);
+    grid-template-areas:
+      "index top  side"
+      "index main side";
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    gap: var(--se-space-5);
+    box-sizing: border-box;
+    width: var(--se-community-width) !important;
+    max-width: none !important;
+    margin: 0 auto var(--se-space-7) !important;
+    padding: 0 !important;
+  }
+
+  /* Steam's notices (removed, incompatible) and anything else over the guide */
+  html.se-community-sharedfile #ig_bottom:has(> .guideTop) > :not(.guideTop, #sharedfiles_content_ctn, #GuideTableOfContents) {
+    grid-column: top;
+  }
+
+  /* Its two columns dissolve into the grid above */
+  /* !important: Steam's own rules (workshop_itemdetails.css) set display at equal or higher weight */
+  html.se-community-sharedfile #ig_bottom:has(> .guideTop) > #sharedfiles_content_ctn {
+    display: contents !important;
+  }
+
+  html.se-community-sharedfile #ig_bottom:has(> .guideTop) #profileBlock {
+    grid-area: main;
+  }
+
+  /* !important: Steam's own rules (workshop.css) set float, margin, width at equal or higher
+     weight */
+  html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents {
+    grid-area: side;
+    float: none !important;
+    width: auto !important;
+    min-width: 0;
+    margin: 0 !important;
+  }
+
+  html.se-community-sharedfile #ig_bottom:has(> .guideTop) > #GuideTableOfContents {
+    grid-area: index;
+  }
+
+  /* Narrower windows: no room for three columns. The index goes under the details */
+  @media (max-width: 1279px) {
+    html.se-community-sharedfile #ig_bottom:has(> .guideTop) {
+      grid-template-columns: minmax(0, 1fr) var(--se-side-col);
+      grid-template-areas:
+        "top  side"
+        "main index";
+    }
+  }
+}
+
+/* ---------- Title card ---------- */
+
+/* !important: Steam's own rules (sharedfiles_guide.css) set background, margin, padding at equal
+   or higher weight */
+html.se-community-sharedfile .guideTop {
+  grid-area: top;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-card-bg) !important;
+  box-shadow: var(--se-card-edge);
+}
+
+/* Picture | title       rating
+            | authors
+   description */
+/* !important: Steam's own rules (sharedfiles_guide.css) set padding at equal or higher weight */
+html.se-community-sharedfile .guideTopContent {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "picture title"
+    "picture authors"
+    "about   about";
+  align-items: center;
+  gap: var(--se-space-1) var(--se-space-4);
+  padding: var(--se-space-5) var(--se-space-5) var(--se-space-4) !important;
+}
+
+/* Steam's dotted rule and empty wrappers: the gaps place everything */
+/* !important: display can come inline from Steam's markup or scripts */
+html.se-community-sharedfile .guideTopContent > :is(.dotHR, div:not([class], [id])) {
+  display: none !important;
+}
+
+/* !important: Steam's own rules (sharedfiles_guide.css) set float, height, margin, width at equal
+   or higher weight */
+html.se-community-sharedfile .guidePreviewImage {
+  grid-area: picture;
+  float: none !important;
+  width: var(--se-tile-xl) !important;
+  height: var(--se-tile-xl) !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-control);
+  overflow: hidden;
+  background: var(--se-surface-2);
+}
+
+/* !important: Steam's own rules (sharedfiles_guide.css) set border, max-height, max-width at
+   equal or higher weight */
+html.se-community-sharedfile .guidePreviewImage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none !important;
+  max-height: none !important;
+  border: 0 !important;
+  object-fit: cover;
+}
+
+/* Room on the right for the rating */
+/* !important: Steam's own rules (workshop.css) set color, font, margin at equal or higher weight */
+html.se-community-sharedfile .guideTop .workshopItemTitle {
+  grid-area: title;
+  align-self: end;
+  margin: 0 !important;
+  padding-inline-end: var(--se-side-col);
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-heading) !important;
+  overflow-wrap: anywhere;
+}
+
+/* !important: Steam's own rules (sharedfiles_guide.css) set color at equal or higher weight */
+html.se-community-sharedfile .guideAuthors {
+  grid-area: authors;
+  align-self: start;
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-body);
+}
+
+html.se-community-sharedfile .guideAuthors a {
+  color: var(--se-text);
+}
+
+/* !important: Steam's own rules (sharedfiles_guide.css) set color, font, line-height, margin,
+   padding at equal or higher weight */
+html.se-community-sharedfile .guideTopDescription {
+  grid-area: about;
+  margin: var(--se-space-3) 0 0 !important;
+  padding: var(--se-space-4) 0 0 !important;
+  border-top: 1px solid var(--se-divider);
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+/* Rating: Steam's stars picture and the count, in the card's top corner */
+/* !important: Steam's own rules (workshop.css) set float, margin, padding at equal or higher
+   weight */
+html.se-community-sharedfile .guideTop #detailsHeaderRight {
+  position: absolute;
+  top: var(--se-space-5);
+  inset-inline-end: var(--se-space-5);
+  z-index: var(--se-z-raised);
+  float: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-sharedfile .guideTop .ratingSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--se-space-1);
+}
+
+/* !important: Steam's own rules (workshop.css) set color, font at equal or higher weight */
+html.se-community-sharedfile .guideTop .numRatings {
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-caption) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Actions: awards, vote, award, favorite, share, report ---------- */
+
+/* Steam floats the bar over the page once it scrolls away (FixedElementOnScrollWrapper): it stays
+   in the card, and its stand-in that keeps the page's height goes */
+/* !important: position, top, left come inline from Steam's scripts; Steam's own rules
+   (sharedfiles_guide.css) set position on .fixed_in_scroll */
+html.se-community-sharedfile .guideTop #ScrollingItemControls {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+}
+
+/* !important: display comes inline from Steam's scripts */
+html.se-community-sharedfile :is(#ScrollWrapperPadding_ScrollingItemControls, #ScrollWrapperPadding_GuideTableOfContents) {
+  display: none !important;
+}
+
+/* !important: Steam's own rules (sharedfiles_guide.css, workshop_itemdetails.css) set background,
+   box-shadow, max-width, padding at equal or higher weight */
+html.se-community-sharedfile .guideTop .workshopItemControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--se-space-2);
+  max-width: none !important;
+  padding: var(--se-space-4) var(--se-space-5) !important;
+  border-top: 1px solid var(--se-divider);
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Awards: a row of chips over the buttons, each Steam's award picture and its count. They stay
+   Steam's buttons (a click gives that award; the tips are Steam's) */
+/* !important: Steam's own rules (workshop_itemdetails.css) set float, padding, width at equal or
+   higher weight */
+html.se-community-sharedfile .guideTop .workshopItemRatings {
+  flex-basis: 100%;
+  float: none !important;
+  width: auto !important;
+  padding: 0 0 var(--se-space-2) !important;
+}
+
+/* Nobody has given an award yet: no empty row */
+html.se-community-sharedfile .guideTop .workshopItemRatings:not(:has(.review_award_count:not(:empty))) {
+  display: none;
+}
+
+/* !important: Steam's own rules (user_reviews.css) set margin at equal or higher weight */
+html.se-community-sharedfile .guideTop .review_award_ctn {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  margin: 0 !important;
+}
+
+/* !important: Steam's own rules (user_reviews.css) set background, border-radius, height,
+   padding at equal or higher weight */
+html.se-community-sharedfile .guideTop .review_award {
+  align-items: center;
+  gap: var(--se-space-1);
+  box-sizing: border-box;
+  min-width: var(--se-chip-h);
+  height: var(--se-chip-h) !important;
+  margin: 0 !important;
+  padding: 0 var(--se-space-2) !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-chip-bg) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur);
+}
+
+/* The awards Steam shows (given ones and "more"; every award once "more" is clicked), as flex
+   chips; the rest stay hidden by Steam (workshop_itemdetails.css) */
+html.se-community-sharedfile .guideTop .review_award_ctn > .review_award:is(.purchaseable, .more_btn),
+html.se-community-sharedfile .guideTop .review_award_ctn.show_all_awards > .review_award.unpurchaseable {
+  display: inline-flex;
+}
+
+html.se-community-sharedfile .guideTop .review_award_ctn.show_all_awards > .review_award.more_btn {
+  display: none;
+}
+
+/* !important: another rule in this file sets background with !important */
+html.se-community-sharedfile .guideTop .review_award:hover {
+  background: var(--se-btn-bg-hover) !important;
+}
+
+html.se-community-sharedfile .guideTop .review_award:active {
+  transform: scale(var(--se-press-scale));
+}
+
+/* !important: Steam's own rules (user_reviews.css) set height, margin, width at equal or higher
+   weight */
+html.se-community-sharedfile .guideTop .review_award_icon {
+  display: block;
+  width: var(--se-tile-icon) !important;
+  height: var(--se-tile-icon) !important;
+  margin: 0 !important;
+}
+
+/* !important: Steam's own rules (user_reviews.css) set color, font, margin, padding at equal or
+   higher weight */
+html.se-community-sharedfile .guideTop .review_award_count {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-label) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-sharedfile .guideTop .review_award_count:empty {
+  display: none;
+}
+
+/* Button groups (vote up and down, favorite and share) sit side by side; the divider goes */
+html.se-community-sharedfile .guideTop .workshopItemControlCtn {
+  display: flex;
+  gap: var(--se-space-1);
+}
+
+/* !important: display can come inline from Steam's markup or scripts */
+html.se-community-sharedfile .guideTop .workshopItemControls > :is(.vertical_divider, form) {
+  display: none !important;
+}
+
+/* Report: the row's end */
+html.se-community-sharedfile .guideTop .workshopItemControlCtn:has(#ReportItemBtn) {
+  margin-inline-start: auto;
+}
+
+/* Steam's buttons as the web's one button, each with a drawn icon in place of Steam's sprite */
+/* !important: Steam's own rules (workshop.css, workshop_itemdetails.css) set background, color,
+   height, line-height, margin, padding, width at equal or higher weight */
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-btn-gap);
+  box-sizing: border-box;
+  width: auto !important;
+  min-width: var(--se-btn-h);
+  height: var(--se-btn-h) !important;
+  margin: 0 !important;
+  padding: var(--se-btn-pad) !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-btn-color) !important;
+  font: var(--se-btn-font);
+  line-height: normal !important;
+  text-decoration: none;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+/* !important: Steam's own rules (workshop_itemdetails.css) set background, color on hover at
+   equal or higher weight */
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn:hover {
+  background: var(--se-btn-bg-hover) !important;
+  color: var(--se-btn-color-hover) !important;
+}
+
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn:active {
+  transform: scale(var(--se-press-scale));
+}
+
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* What Steam puts inside (spacers, its label wrappers) sits on the button's line: Steam sizes
+   them on its own 30px line */
+/* !important: Steam's own rules (workshop_itemdetails.css) set height, line-height, margin,
+   padding at equal or higher weight */
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn * {
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: normal !important;
+}
+
+/* Icon-only: vote up, vote down, report. Steam fills the votes with a &nbsp;: its text goes, so
+   the icon centres */
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn:is(.voteUp, .voteDown, .report) {
+  font-size: 0;
+}
+
+/* Icon-only: vote up, vote down, report */
+/* !important: another rule in this file sets padding with !important */
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn:is(.voteUp, .voteDown, .report) {
+  padding: 0 !important;
+}
+
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn:is(.voteUp, .voteDown, .favorite, .share, .report)::before {
+  content: "";
+  flex: none;
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-thumb) center / contain no-repeat;
+  mask: var(--se-icon-thumb) center / contain no-repeat;
+}
+
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn.voteDown::before {
+  rotate: 180deg;
+}
+
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn.favorite::before {
+  -webkit-mask-image: var(--se-star-mask);
+  mask-image: var(--se-star-mask);
+}
+
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn.share::before {
+  -webkit-mask-image: var(--se-icon-link);
+  mask-image: var(--se-icon-link);
+}
+
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn.report::before {
+  -webkit-mask-image: var(--se-icon-flag);
+  mask-image: var(--se-icon-flag);
+}
+
+/* Done states: your vote and your favorite, in the accent (a no in the danger tone) */
+/* !important: another rule in this file sets background, color with !important */
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn:is(.voteUp, .favorite).toggled {
+  background: var(--se-accent-tint) !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  color: var(--se-accent) !important;
+}
+
+/* !important: another rule in this file sets background, color with !important */
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn.voteDown.toggled {
+  background: var(--se-danger-surface) !important;
+  color: var(--se-danger-text) !important;
+}
+
+/* Award: Steam's award picture, sized as an icon */
+/* !important: Steam's own rules (workshop_itemdetails.css) set margin, vertical-align at equal or
+   higher weight */
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn .reward_btn_icon {
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  margin: 0 !important;
+  vertical-align: middle !important;
+}
+
+/* Award: Steam's picture, then the label, like the drawn icons beside it */
+html.se-community-sharedfile .guideTop .workshopItemControls .general_btn > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-btn-gap);
+}
+
+/* Favorite's label: Steam stacks Favorite / Favorited / Unfavorite and swaps them by line height
+   and visibility, so the hidden two still took room. One shows at a time: the selected one, and
+   Unfavorite while hovering a favorited guide */
+html.se-community-sharedfile .guideTop .favoriteOption:not(.selected),
+html.se-community-sharedfile .guideTop .general_btn.favorite.toggled:hover .favoriteOption.selected {
+  display: none;
+}
+
+html.se-community-sharedfile .guideTop .general_btn.favorite.toggled:hover .favoriteOption.removefavorite {
+  display: block;
+}
+
+/* "Added to your favorites" note: under the bar */
+html.se-community-sharedfile .guideTop #JustFavorited {
+  padding: 0 var(--se-space-5) var(--se-space-4);
+  color: var(--se-text-dim);
+  font: var(--se-type-small);
+}
+
+/* ---------- Index ---------- */
+
+/* Sticky beside the guide, scrolling on its own when the guide has many sections. Steam pins it
+   with inline position, top and left once the page scrolls (FixedElementOnScrollWrapper) */
+/* !important: position, top, left, width come inline from Steam's scripts; Steam's own rules
+   (sharedfiles_guide.css, workshop.css) set background, margin, padding, position, width at equal
+   or higher weight */
+html.se-community-sharedfile #GuideTableOfContents {
+  position: sticky !important;
+  top: var(--se-space-5) !important;
+  left: auto !important;
+  box-sizing: border-box;
+  width: auto !important;
+  max-height: calc(100vh - 2 * var(--se-space-5));
+  margin: 0 !important;
+  padding: var(--se-space-2) !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-card-bg) !important;
+  box-shadow: var(--se-card-edge);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* "Guide Index": the details' label, lined up with the rows' text */
+/* !important: Steam's own rules (workshop.css) set color, font, margin, padding at equal or higher
+   weight */
+html.se-community-sharedfile #GuideTableOfContents .rightSectionTopTitle {
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-3) var(--se-space-2) !important;
+  color: var(--se-label-color) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+}
+
+/* Steam's rules between the rows: the rows' own spacing divides them */
+/* !important: display can come inline from Steam's markup or scripts */
+html.se-community-sharedfile #GuideTableOfContents > .hr {
+  display: none !important;
+}
+
+/* !important: Steam's own rules (workshop.css) set margin at equal or higher weight */
+html.se-community-sharedfile #GuideTableOfContents .rightbox_list_option {
+  position: relative;
+  margin: 0 !important;
+  border-radius: var(--se-radius-control);
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-sharedfile #GuideTableOfContents .rightbox_list_option:hover {
+  background: var(--se-hover);
+}
+
+/* Steam's highlight follows the last click; the theme's follows the reading (data-se-current) */
+/* !important: display can come inline from Steam's markup or scripts */
+html.se-community-sharedfile #GuideTableOfContents .rightbox_list_selection_background {
+  display: none !important;
+}
+
+/* A row is its link: the whole row is the hit area. The headings authors set apart with a rule
+   (Steam's <hr> inside the link) stay one line */
+/* !important: Steam's own rules (sharedfiles_guide.css, workshop.css) set color, font, height,
+   padding at equal or higher weight */
+html.se-community-sharedfile #GuideTableOfContents .guideSubSectionSelectionLink {
+  height: auto !important;
+  padding: 0 !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-small) !important;
+}
+
+html.se-community-sharedfile #GuideTableOfContents .guideSubSectionSelectionLink a {
+  display: block;
+  box-sizing: border-box;
+  min-height: var(--se-hit);
+  padding: var(--se-space-2) var(--se-space-3);
+  color: inherit;
+  overflow: hidden;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-sharedfile #GuideTableOfContents .guideSubSectionSelectionLink hr {
+  display: none;
+}
+
+/* A row Steam leaves blank: its section's title (guide/page.js) */
+html.se-community-sharedfile #GuideTableOfContents .guideSubSectionSelectionLink a[data-se-label]::after {
+  content: attr(data-se-label);
+}
+
+/* !important: another rule in this file sets color with !important */
+html.se-community-sharedfile #GuideTableOfContents .rightbox_list_option:hover .guideSubSectionSelectionLink {
+  color: var(--se-text) !important;
+}
+
+/* The section being read: accent text and an accent bar at the row's start */
+/* !important: another rule in this file sets color with !important */
+html.se-community-sharedfile #GuideTableOfContents .rightbox_list_option[data-se-current] .guideSubSectionSelectionLink {
+  color: var(--se-accent) !important;
+}
+
+html.se-community-sharedfile #GuideTableOfContents .rightbox_list_option[data-se-current] {
+  background: var(--se-accent-tint);
+}
+
+html.se-community-sharedfile #GuideTableOfContents .rightbox_list_option[data-se-current]::before {
+  content: "";
+  position: absolute;
+  inset-block: var(--se-space-2);
+  inset-inline-start: 0;
+  width: var(--se-space-half);
+  border-radius: var(--se-radius-xs);
+  background: var(--se-accent);
+}
+
+/* ---------- Details ---------- */
+
+/* Steam floats the column right at a fixed width with its own inset, which shrank it to its
+   content and pushed it off the grid's edge: it fills its track instead */
+/* !important: Steam's own rules (workshop.css) set float, padding, width at equal or higher weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-4);
+  float: none !important;
+  width: auto !important;
+  padding: 0 !important;
+}
+
+/* !important: Steam's own rules (workshop.css) set background, margin, padding at equal or higher
+   weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-2) var(--se-space-3) !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-card-bg) !important;
+  box-shadow: var(--se-card-edge);
+}
+
+/* The panel's sections: spacing and a hairline divide them, Steam's rules go */
+/* !important: Steam's own rules (workshop.css) set background, border, height, margin at equal or
+   higher weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .panel > .hr {
+  height: 0 !important;
+  margin: var(--se-space-1) var(--se-space-3) !important;
+  border: 0 !important;
+  border-top: 1px solid var(--se-divider) !important;
+  background: none !important;
+}
+
+/* !important: Steam's own rules (workshop.css) set color, font, margin, padding at equal or higher
+   weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .rightSectionTopTitle {
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-3) 0 !important;
+  color: var(--se-label-color) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+}
+
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .rightDetailsBlock {
+  padding: 0 var(--se-space-3);
+  color: var(--se-text-muted);
+  font: var(--se-type-small);
+}
+
+/* Created by: the friend rows (shared/ui-friends.css) reach the card's edges */
+/* !important: Steam's own rules (workshop.css) set height, margin, overflow, width at equal or
+   higher weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .rightDetailsBlock:has(> .creatorsBlock) {
+  padding: 0;
+}
+
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .creatorsBlock {
+  display: flex;
+  flex-direction: column;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+/* !important: Steam's own rules (workshop.css) set max-width at equal or higher weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .creatorsBlock .friendBlock {
+  max-width: none !important;
+}
+
+/* Category: "Category:" as a label, each tag a chip. Steam separates the links with bare commas
+   (text nodes): the block's own text goes, the label and chips bring theirs */
+/* !important: Steam's own rules (workshop.css) set padding at equal or higher weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .workshopTags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--se-space-1);
+  padding: var(--se-space-1) 0 !important;
+  font-size: 0;
+}
+
+/* !important: Steam's own rules (workshop.css) set color, font at equal or higher weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .workshopTagsTitle {
+  flex-basis: 100%;
+  padding-bottom: var(--se-space-1);
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-caption) !important;
+}
+
+/* !important: Steam's own rules (workshop.css) set color at equal or higher weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .workshopTags a {
+  display: inline-flex;
+  align-items: center;
+  height: var(--se-chip-h);
+  padding: var(--se-chip-pad);
+  border-radius: var(--se-radius-control);
+  background: var(--se-chip-bg);
+  color: var(--se-text) !important;
+  font: var(--se-chip-font);
+  text-decoration: none;
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .workshopTags a:hover {
+  background: var(--se-btn-bg-hover);
+}
+
+/* Posted / Updated: label left, date right, one line each. Steam floats two columns of lines */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .rightDetailsBlock:has(> .detailsStatsContainerLeft) {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--se-space-3);
+}
+
+/* !important: Steam's own rules (workshop_itemdetails.css) set float at equal or higher weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents :is(.detailsStatsContainerLeft, .detailsStatsContainerRight) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  float: none !important;
+}
+
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .detailsStatsContainerRight {
+  align-items: flex-end;
+  text-align: end;
+}
+
+/* !important: Steam's own rules (workshop_itemdetails.css) set color, padding at equal or higher
+   weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents :is(.detailsStatLeft, .detailsStatRight) {
+  padding: 0 !important;
+  color: var(--se-text-dim) !important;
+}
+
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .detailsStatRight {
+  color: var(--se-text) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The float clearer after the two columns */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .rightDetailsBlock:has(> .detailsStatsContainerLeft) > div:not([class]) {
+  display: none;
+}
+
+/* Visitors and favorites (Steam's stats table): label left, count right, like Posted / Updated */
+/* !important: Steam's own rules (workshop_itemdetails.css) set color at equal or higher weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .stats_table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-small);
+}
+
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .stats_table tr {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  gap: var(--se-space-3);
+  padding: var(--se-space-1) var(--se-space-3);
+}
+
+/* !important: Steam's own rules (workshop_itemdetails.css) set color, padding, width at equal or
+   higher weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .stats_table td {
+  width: auto !important;
+  padding: 0 !important;
+}
+
+/* !important: Steam's own rules (workshop_itemdetails.css) set color at equal or higher weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #rightContents .stats_table tr > td:first-child {
+  color: var(--se-text) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Guide ---------- */
+
+/* !important: Steam's own rules (workshop.css) set margin, padding at equal or higher weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #profileBlock {
+  gap: var(--se-space-5);
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* One card for the whole guide, a heading per section */
+/* The title card's inset, so both cards' text lines up */
+html.se-community-sharedfile .guide.subSections {
+  display: flex;
+  flex-direction: column;
+  padding: var(--se-space-2) var(--se-space-5);
+  border-radius: var(--se-radius-card);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
+}
+
+/* Steam's empty spacer between the sections */
+html.se-community-sharedfile .guide.subSections > div:not([id], [class]):empty {
+  display: none;
+}
+
+/* !important: Steam's own rules (workshop.css, workshop_itemdetails.css) set background, padding
+   at equal or higher weight */
+html.se-community-sharedfile .guide .subSection.detailBox {
+  padding: var(--se-space-5) 0 !important;
+  background: none !important;
+  scroll-margin-top: var(--se-space-5);
+}
+
+html.se-community-sharedfile .guide .subSection.detailBox + div:empty + .subSection.detailBox,
+html.se-community-sharedfile .guide .subSection.detailBox + .subSection.detailBox {
+  border-top: 1px solid var(--se-divider);
+}
+
+/* !important: Steam's own rules (workshop_itemdetails.css) set color, font, margin, padding at
+   equal or higher weight */
+html.se-community-sharedfile .guide .subSectionTitle {
+  margin: 0 0 var(--se-space-3) !important;
+  padding: 0 !important;
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-title-lg) !important;
+  overflow-wrap: anywhere;
+}
+
+/* An author's own rule under a heading (<hr> inside it) */
+html.se-community-sharedfile .guide .subSectionTitle hr {
+  display: none;
+}
+
+/* !important: Steam's own rules (workshop_itemdetails.css) set font, line-height at equal or
+   higher weight */
+html.se-community-sharedfile .guide .subSectionDesc {
+  color: var(--se-text);
+  font: var(--se-type-body-lg) !important;
+  overflow-wrap: anywhere;
+}
+
+/* The comments block (#-1) is Steam's last section: the shared thread style, without its frame */
+/* !important: Steam's own rules (workshop.css) set background, padding at equal or higher weight */
+html.se-community-sharedfile #ig_bottom:has(> .guideTop) #profileBlock > [id="-1"] > .detailBox {
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* ---------- Guide text (Steam's BBCode) ---------- */
+
+html.se-community-sharedfile .guide .subSectionDesc :is(b, strong) {
+  color: var(--se-text-strong);
+}
+
+html.se-community-sharedfile .guide .subSectionDesc a {
+  color: var(--se-accent);
+  text-decoration: none;
+}
+
+html.se-community-sharedfile .guide .subSectionDesc a:hover {
+  color: var(--se-accent-hover);
+  text-decoration: underline;
+}
+
+/* Steam's "[host]" after a link */
+html.se-community-sharedfile .guide .bb_link_host {
+  color: var(--se-text-faint);
+  font: var(--se-type-caption);
+}
+
+/* !important: Steam's own rules (shared_global.css) set color, font, margin at equal or higher
+   weight */
+html.se-community-sharedfile .guide :is(.bb_h1, .bb_h2, .bb_h3) {
+  margin: var(--se-space-2) 0 !important;
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-title) !important;
+}
+
+/* Quotes: a quiet panel with an accent bar; the author line as a caption */
+/* !important: Steam's own rules (shared_global.css) set background, border, margin, padding at
+   equal or higher weight */
+html.se-community-sharedfile .guide .bb_blockquote {
+  margin: var(--se-space-3) 0 !important;
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border: 0 !important;
+  border-inline-start: var(--se-space-half) solid var(--se-accent-line) !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2) !important;
+  color: var(--se-text-muted);
+}
+
+/* !important: Steam's own rules (shared_global.css) set color, font at equal or higher weight */
+html.se-community-sharedfile .guide .bb_quoteauthor {
+  margin-bottom: var(--se-space-1);
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-caption) !important;
+}
+
+/* Tables: rounded, hairline rows, a header tone */
+/* !important: Steam's own rules (shared_global.css) set border, margin at equal or higher weight */
+html.se-community-sharedfile .guide .bb_table {
+  margin: var(--se-space-3) 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control);
+  box-shadow: inset 0 0 0 1px var(--se-divider);
+  overflow: hidden;
+}
+
+/* !important: Steam's own rules (shared_global.css) set border, padding at equal or higher weight */
+html.se-community-sharedfile .guide :is(.bb_table_th, .bb_table_td) {
+  padding: var(--se-space-2) var(--se-space-3) !important;
+  border: 0 !important;
+  border-top: 1px solid var(--se-divider) !important;
+  vertical-align: middle;
+}
+
+/* !important: another rule in this file sets border-top with !important */
+html.se-community-sharedfile .guide .bb_table_tr:first-child > * {
+  border-top: 0 !important;
+}
+
+/* !important: Steam's own rules (shared_global.css) set background, color at equal or higher
+   weight */
+html.se-community-sharedfile .guide .bb_table_th {
+  background: var(--se-surface-2) !important;
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-label);
+}
+
+html.se-community-sharedfile .guide .bb_table .bb_h1 {
+  margin: 0 !important;
+}
+
+/* Lists: Steam's markers, the text's own spacing */
+html.se-community-sharedfile .guide :is(.bb_ul, ol) > li {
+  margin-block: var(--se-space-1);
+}
+
+html.se-community-sharedfile .guide :is(.bb_ul, ol) > li::marker {
+  color: var(--se-text-dim);
+}
+
+/* Pictures and video previews: rounded, the card's own gap from the text beside them */
+/* !important: Steam's own rules (workshop_itemdetails.css) set border, margin at equal or higher
+   weight */
+html.se-community-sharedfile .guide :is(.sharedFilePreviewImage, .sharedFilePreviewYouTubeVideo) {
+  max-width: 100%;
+  margin: var(--se-space-1) var(--se-space-4) var(--se-space-3) 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control);
+}
+
+/* Linked items (another guide, a workshop item): a quiet card */
+/* !important: Steam's own rules (shared_global.css) set background, border, margin at equal or
+   higher weight */
+html.se-community-sharedfile .guide .dynamiclink_box {
+  display: flex;
+  gap: var(--se-space-3);
+  max-width: 100%;
+  margin: var(--se-space-3) 0 !important;
+  padding: var(--se-space-3) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2) !important;
+  box-sizing: border-box;
+  text-decoration: none;
+  transition: background-color var(--se-dur);
+}
+
+/* !important: another rule in this file sets background with !important */
+html.se-community-sharedfile .guide .dynamiclink_box:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-community-sharedfile .guide .dynamiclink_preview {
+  flex: none;
+  border-radius: var(--se-radius-xs);
+}
+
+/* !important: Steam's own rules (shared_global.css) set color, font at equal or higher weight */
+html.se-community-sharedfile .guide .dynamiclink_name {
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-title) !important;
+}
+
+/* !important: Steam's own rules (shared_global.css) set color, font at equal or higher weight */
+html.se-community-sharedfile .guide :is(.dynamiclink_type, .dynamiclink_author, .dynamiclink_description) {
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-small) !important;
+}
+
+/* ---------- Narrow windows (Steam's responsive layout) ---------- */
+
+@media (max-width: 910px) {
+  html.se-community-sharedfile .guideTop .workshopItemTitle {
+    padding-inline-end: 0;
+  }
+
+  html.se-community-sharedfile .guideTop #detailsHeaderRight {
+    position: static;
+    padding: 0 var(--se-space-5) !important;
+  }
+
+  html.se-community-sharedfile #GuideTableOfContents {
+    position: static !important;
+    max-height: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.se-community-sharedfile :is(.guideTop .general_btn, .guideTop .review_award) {
+    transition: none;
+  }
+}

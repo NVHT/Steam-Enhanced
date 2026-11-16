@@ -19,7 +19,9 @@
  * Every tab gets the same hero card. The home tabs (All, Screenshots...) carry Steam's full header
  * (.apphub_HomeHeader: name, stats, friends, footer strip); the forum-style tabs (Discussions...)
  * carry a plain one (.game_title_area > .apphub_HomeHeaderContent > .apphub_HeaderStandardTop:
- * icon, name, Store Page), which takes the same card, art, title and tabs. hub/page.js copies
+ * icon, name, Store Page), which takes the same card, art, title and tabs; so does a shared item's
+ * (a guide, a screenshot, a workshop item: .sharedfiles_item_page_header, /sharedfiles/filedetails/,
+ * whose game hub/page.js reads from the header's links). hub/page.js copies
  * the home tab's stats, friends and footer strip into every other tab's header, so every tab's
  * card has the same rows and the same height.
  *
@@ -50,7 +52,7 @@
 
   /* The forum-style tabs' header sits outside .apphub_Content: it takes the same width itself */
   /* !important: max-width, width can come inline from Steam's markup or scripts */
-  html.se-community-hub .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader)) {
+  html.se-community-hub :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader)) {
     box-sizing: border-box;
     width: var(--se-community-width) !important;
     max-width: none !important;
@@ -82,7 +84,7 @@ html.se-community-hub .apphub_HeaderBottomBG_ctn {
 }
 
 /* !important: margin can come inline from Steam's markup or scripts */
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) {
   position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -98,7 +100,7 @@ html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeH
   overflow: hidden;
 }
 
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > * {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > * {
   grid-column: 1 / -1;
 }
 
@@ -111,7 +113,7 @@ html.se-community-hub .apphub_HomeHeader > :not(.apphub_HomeHeaderContent, .soci
 }
 
 /* The game's hero art (hub/page.js sets --se-hub-art once it has loaded) */
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader)))::before {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader)))::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -121,11 +123,11 @@ html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeH
   pointer-events: none;
 }
 
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader)))[data-se-hub-art]::before {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader)))[data-se-hub-art]::before {
   opacity: 1;
 }
 
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader)))::after {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader)))::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -630,15 +632,15 @@ html.se-community-hub :is(.apphub_sectionTab.active, .se-hub-sort__chip[aria-pre
 /* Steam's mount before its script fills it: no empty row of padding in the footer. The theme's
    own copy (.se-hub-social, hub/page.js) stands in on tabs where Steam draws none, and goes once
    Steam's has links */
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))):has(> .social_links a) > .se-hub-social {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))):has(> .social_links a) > .se-hub-social {
   display: none;
 }
 
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > .social_links:not(:has(a)) {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > .social_links:not(:has(a)) {
   display: none;
 }
 
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) {
   position: relative;
   z-index: var(--se-z-raised);
   grid-column: 1;
@@ -650,7 +652,7 @@ html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeH
 
 /* !important: Steam's own rules (economy_market.css, monacoeditor.css, workshop.css) set height,
    width at equal or higher weight; another rule in this file sets height, width with !important */
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) > div {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) > div {
   display: flex;
   align-items: center;
   gap: var(--se-space-3);
@@ -661,7 +663,7 @@ html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeH
 /* !important: Steam's own rules (broadcast_announce.css, economy_market.css, friends.css) set
    color, height, margin, padding, width at equal or higher weight; another rule in this file sets
    height, width with !important */
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) > div > div:first-child {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) > div > div:first-child {
   width: auto !important;
   height: auto !important;
   margin: 0 !important;
@@ -676,14 +678,14 @@ html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeH
 /* !important: Steam's own rules (economy_market.css, workshop.css, workshop_itemdetails.css) set
    height, width at equal or higher weight; another rule in this file sets height, width with
    !important */
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) > div > div:last-child {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) > div > div:last-child {
   display: flex;
   gap: var(--se-space-2);
   width: auto !important;
   height: auto !important;
 }
 
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) a {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) a {
   display: grid;
   place-items: center;
   width: var(--se-hit);
@@ -695,23 +697,23 @@ html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeH
   color: var(--se-text-dim);
 }
 
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) a:hover {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) a:hover {
   background: var(--se-glass-btn-hover);
   color: var(--se-white);
 }
 
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) a:active {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) a:active {
   transform: scale(var(--se-press-scale));
 }
 
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) a > div {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) a > div {
   display: grid;
   place-items: center;
 }
 
 /* !important: Steam's own rules (BZPioAp_.css, DaLGub-2.css, conference.css) set height, width at
    equal or higher weight */
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) svg {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) svg {
   width: var(--se-icon-md) !important;
   height: var(--se-icon-md) !important;
   fill: currentColor;
@@ -719,7 +721,7 @@ html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeH
 
 /* !important: another rule in this file sets padding with !important; height, width can come
    inline from Steam's markup or scripts */
-html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > div:has(> .apphub_AllContentText) {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > div:has(> .apphub_AllContentText) {
   position: relative;
   z-index: var(--se-z-raised);
   grid-column: 2;
@@ -739,7 +741,7 @@ html.se-community-hub .apphub_AllContentText {
 
 /* The note and its "?" on one centred line, whether the "?" sits in the note or beside it (an
    inline glyph rode the text's baseline and sat low) */
-html.se-community-hub :is(.apphub_AllContentText, :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > div:has(> .apphub_AllContentText)) {
+html.se-community-hub :is(.apphub_AllContentText, :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > div:has(> .apphub_AllContentText)) {
   display: flex;
   align-items: center;
   justify-content: flex-end;

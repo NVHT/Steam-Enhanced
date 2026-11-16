@@ -1,5 +1,6 @@
 /*
- * Store/Community browser clicks, game group flyouts, and syncing the dock with Steam's chat tabs.
+ * Store/Community browser clicks, Community hubs' Group Chat, game group flyouts, and syncing the
+ * dock with Steam's chat tabs.
  */
 ((SE) => {
   const ns = window.__seFriendsDockParts;
@@ -13,6 +14,62 @@
   const { run } = SE;
 
   const browserClickListeners = new Map();
+  const BROWSER_MESSAGES = new Set(['SteamEnhanced.ChatBrowserFocus', 'SteamEnhanced.OpenClanChat']);
+  const CLAN_BASE = 103582791429521408n;
+
+  const RESULT_OK = 1;
+  const RESULT_ACCESS_DENIED = 15;
+
+  /** The dock's chat error, with this reason in place of the generic text. */
+  function groupChatError(reason) {
+    ns.reportChatError();
+    ns.chatErrorText.textContent = reason;
+  }
+
+  /**
+   * A Community hub's Group Chat (web/community/hub/page.js sends the game group's SteamID64).
+   * Steam's own link (steam://friends/joinchat) never reaches the client from the Store/Community
+   * view, so the page hands it here. The group's chat is looked up; a member's opens straight
+   * away, otherwise Steam joins it first (as its own link would). Showing it goes through chat
+   * routing (routing.js), which puts it in the flyout. Steam's join reports a failure only in
+   * its result, so every failure is said in the dock rather than doing nothing.
+   */
+  function openClanChat(steamid) {
+    if (!/^\d{18}$/.test(String(steamid ?? ''))) return;
+    const accountId = BigInt(steamid) - CLAN_BASE;
+    if (accountId <= 0n || accountId > 0xffffffffn) return;
+    const a = app();
+    const clan = run(() => a.FriendStore.ClanStore.GetOrCreateClan(Number(accountId)));
+    const chats = run(() => a.ChatStore);
+    if (typeof clan?.GetChatRoomGroupID !== 'function' || !chats) {
+      groupChatError("Unable to open this group chat: Steam's chat isn't ready.");
+      return;
+    }
+    const browser = run(() => a.UIStore.GetRootChatPerContextData().browser_context) || run(() => a.GetDefaultBrowserContext());
+    Promise.resolve(run(() => clan.GetChatRoomGroupID()))
+      .then((groupId) => {
+        if (state.destroyed) return null;
+        if (!groupId) throw new Error('This group has no chat.');
+        const group = run(() => chats.GetChatRoomGroup(groupId));
+        if (group && run(() => group.BIsCurrentUserAMember())) {
+          a.UIStore.ShowAndOrActivateChatRoomGroup(browser, group, true);
+          return null;
+        }
+        return chats.InviteStore.JoinChatGroup(groupId, null, browser);
+      })
+      .then((joined) => {
+        if (!joined || joined.result === RESULT_OK || state.destroyed) return;
+        // A game's group chat takes its group's members, and following the game is how you join
+        // that group: Steam refuses anyone else
+        groupChatError(joined.result === RESULT_ACCESS_DENIED
+          ? 'Only followers can join this game\'s group chat. Follow it, then open Group Chat again.'
+          : `Steam couldn't join this group chat (error ${joined.result}).`);
+      })
+      .catch((error) => {
+        console.warn('[Steam Enhanced] group chat', error);
+        if (!state.destroyed) groupChatError(`Unable to open this group chat: ${error?.message || error}`);
+      });
+  }
 
   function syncBrowserClicks() {
     const active = new Set();
@@ -24,9 +81,13 @@
       if (browserClickListeners.has(browser)) continue;
 
       const listener = (message, args, requestingURL) => {
-        if (state.destroyed || message !== 'SteamEnhanced.ChatBrowserFocus') return;
+        if (state.destroyed || !BROWSER_MESSAGES.has(message)) return;
         const source = requestingURL || manager.m_URL || manager.m_URLRequested || '';
         if (!/^https:\/\/(?:store\.steampowered\.com|steamcommunity\.com)(?:\/|$)/i.test(source)) return;
+        if (message === 'SteamEnhanced.OpenClanChat') {
+          openClanChat(args);
+          return;
+        }
         if (args === 'blur' && state.focusedBrowserView === browser) state.focusedBrowserView = null;
         if (args === 'focus' && ns.onStore()) {
           state.focusedBrowserView = browser;

@@ -18,13 +18,18 @@
  *   activity-settings/  Friend Activity Settings (/id/<name>/blotteredit)
  *   inventory/     Item inventory (/id/<name>/inventory)
  *   edit-profile/  Edit Profile (/id/<name>/edit/info, /edit/avatar... every tab)
- *   hub/           Community Hub (/app/<id> and its tabs); news.css/js: announcement cards and
+ *   hub/           Community Hub (/app/<id> and its tabs), and the header card of every shared
+ *                  item (/sharedfiles/filedetails/); news.css/js: announcement cards and
  *                  the News tab's reader; guides.css/js: the Guides tab on top of page.css
  *   discussions/   Discussions (/discussions/, hub and group forums, topics); home.css/js:
  *                  the Discussions home (/discussions/) on top of page.css
  *   market/        Community Market home (/market/)
  *   review/        A user's review of a game (/id/<name>/recommended/<appid>), also shown in the
  *                  hub's review popup (?insideModal=1)
+ *   guides-home/   Steam Guides, the page that explains guides (/guides)
+ *   guide/         A guide (/sharedfiles/filedetails/?id=<id>). Every shared item (guides,
+ *                  screenshots, workshop items) gets the hub's header card (hub/); guide/ only
+ *                  restyles the page when it holds a guide
  */
 (() => {
   'use strict';
@@ -50,8 +55,10 @@
   const isDiscussionsHome = (path) => /^\/discussions\/?$/i.test(path);
   const isMarket = (path) => /^\/market\/?$/i.test(path);
   const isReview = (path) => /^\/recommended\/\d+$/i.test(profileRest(path) ?? '');
+  const isSharedFile = (path) => /^\/sharedfiles\/filedetails\/?$/i.test(path);
+  const isGuidesHome = (path) => /^\/guides\/?$/i.test(path);
 
-  const classic = [isProfile, isActivity, isActivitySettings, isInventory, isEditProfile, isHub, isDiscussions, isMarket, isReview];
+  const classic = [isProfile, isActivity, isActivitySettings, isInventory, isEditProfile, isHub, isDiscussions, isMarket, isReview, isSharedFile, isGuidesHome];
 
   window.__seWeb.configure({
     siteClass: 'se-community',
@@ -64,12 +71,14 @@
       activitySettings: { test: isActivitySettings, root: 'se-community-activity-settings' },
       inventory: { test: isInventory, root: 'se-community-inventory' },
       editProfile: { test: isEditProfile, root: 'se-community-edit-profile' },
-      hub: { test: isHub, root: 'se-community-hub' },
+      hub: { test: (path) => isHub(path) || isSharedFile(path), root: 'se-community-hub' },
       hubGuides: { test: isHubGuides, root: 'se-community-hub-guides' },
       discussions: { test: isDiscussions, root: 'se-community-discussions' },
       discussionsHome: { test: isDiscussionsHome, root: 'se-community-discussions-home' },
       market: { test: isMarket, root: 'se-community-market' },
       review: { test: isReview, root: 'se-community-review' },
+      sharedFile: { test: isSharedFile, root: 'se-community-sharedfile' },
+      guidesHome: { test: isGuidesHome, root: 'se-community-guides-home' },
     },
     files: [
       { css: 'shared/ui.css', on: ['ui'] },
@@ -113,6 +122,8 @@
       { css: 'market/history.css', on: ['market'] },
       { css: 'market/sidebar.css', on: ['market'] },
       { css: 'review/page.css', js: 'review/page.js', on: ['review'] },
+      { css: 'guide/page.css', js: 'guide/page.js', on: ['sharedFile'] },
+      { css: 'guides-home/page.css', js: 'guides-home/page.js', on: ['guidesHome'] },
     ],
   });
 })();

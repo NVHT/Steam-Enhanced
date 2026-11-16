@@ -5,15 +5,21 @@
  *    set (--se-hub-art, [data-se-hub-art]) on the header card only once one has loaded, so a
  *    game without hero art keeps the plain card. The card is .apphub_HomeHeader on the home
  *    tabs and the .game_title_area around the plain header on the forum-style tabs.
+ *  - Shared items (/sharedfiles/filedetails/: guides, screenshots, workshop items) carry the
+ *    hub's header too: the game comes from the header's links (appIdOf), and the item's
+ *    breadcrumbs move under the card (moveCrumbs).
  *  - Header parts on every tab: Steam renders the live stats (in-game count, group chat,
  *    Follow, View Stats), the friends who play and "More ways to connect" only on the home
  *    tab. Every other tab fetches the home page, parses just its header and copies the parts
- *    it lacks into its own header. The home tab's feed note ("Most popular community and
- *    official content for the past week") describes only that tab's feed, so it isn't copied (Steam's inline handlers
- *    come along, so Follow, Group Chat and View Stats still work), so every tab's card has the
- *    same rows and height. Parts are cached per game for a few minutes in sessionStorage (only
- *    a complete set), so moving between tabs fetches nothing; the shared observer puts them
- *    back if Steam re-renders the header.
+ *    it lacks into its own header, so every tab's card has the same rows and height. The home
+ *    tab's feed note ("Most popular community and official content for the past week")
+ *    describes only that tab's feed, so it isn't copied. Steam's inline handlers come along,
+ *    but some (Follow) call functions only the home page's inline scripts define: those
+ *    definitions are lifted from the fetched page and defined here when missing. Parts are
+ *    cached per game for a few minutes in sessionStorage (only a complete set), so moving
+ *    between tabs fetches nothing; a click on the stats (Follow) drops the cache so the next
+ *    tab shows the new state. The shared observer puts the parts back if Steam re-renders the
+ *    header. A click anywhere on a stats chip runs its link (chipClicks).
  *  - Friends who play: Steam's "+N" chip shows the total; it is rewritten to the friends
  *    without an avatar shown.
  *  - Social links: Steam's HTML holds only a mount for "More ways to connect" that its script
@@ -41,13 +47,31 @@
   const GRID = '#AppHubCards';
   const CARD = '.apphub_Card';
 
-  const findHeader = () =>
-    document.querySelector('.apphub_HomeHeader') ?? document.querySelector('.game_title_area:has(.apphub_HomeHeaderContent)');
+  // The header card: the home tabs' full header, the forum-style tabs' plain one, or a shared
+  // item's (a guide, a screenshot, a workshop item: /sharedfiles/filedetails/), which carries the
+  // hub's header too
+  const PLAIN_HEADER = ':is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent)';
+  const findHeader = () => document.querySelector('.apphub_HomeHeader') ?? document.querySelector(PLAIN_HEADER);
+
+  // The game: in the path on the hub, else from the header's Store Page link or section tabs
+  const APP_LINK = '.apphub_OtherSiteInfo a[href*="/app/"], .apphub_sectionTab[href*="/app/"]';
+  const currentAppId = () =>
+    location.pathname.match(/^\/app\/(\d+)/)?.[1] ??
+    document.querySelector(APP_LINK)?.getAttribute('href')?.match(/\/app\/(\d+)/)?.[1] ??
+    null;
+
+  /** The game's id, once the header that names it has been parsed. */
+  const appIdOf = async (dom) => {
+    const now = currentAppId();
+    if (now) return now;
+    await dom.ready();
+    return currentAppId();
+  };
 
   /** Hero art behind the header. */
-  const buildArt = (dom, $) => {
-    const appid = location.pathname.match(/^\/app\/(\d+)/)?.[1];
-    if (!appid) return;
+  const buildArt = async (dom, $) => {
+    const appid = await appIdOf(dom);
+    if (!appid || !$.alive) return;
     let art = null;
 
     const apply = () => {
@@ -86,9 +110,64 @@
     return html.slice(start, end > start ? html.lastIndexOf('<', end) : start + 100000);
   };
 
-  /** The home tab's header parts ({ selector: outerHTML }) for one game, cached briefly. */
+  // bump the version when the parts change
+  const partsKey = (appid) => `se-hub-parts:5:${appid}`;
+
+  /** Names of the functions a subtree's inline handlers (on*, javascript: links) call. */
+  const handlerCalls = (root) => {
+    const names = new Set();
+    for (const node of root.querySelectorAll('*')) {
+      for (const { name, value } of node.attributes) {
+        const code = name.startsWith('on') ? value : name === 'href' && /^javascript:/i.test(value) ? value.slice(11) : '';
+        for (const [, fn] of code.matchAll(/(?:^|[^\w$.])([A-Za-z_$][\w$]*)\s*\(/g)) names.add(fn);
+      }
+    }
+    return names;
+  };
+
+  /** End of the block whose "{" is at open: the index after its "}", skipping strings and comments. */
+  const blockEnd = (code, open) => {
+    let depth = 0;
+    for (let i = open; i < code.length; i++) {
+      const ch = code[i];
+      if (ch === '"' || ch === "'" || ch === '`') {
+        for (i++; i < code.length && code[i] !== ch; i++) if (code[i] === '\\') i++;
+      } else if (ch === '/' && code[i + 1] === '/') {
+        i = code.indexOf('\n', i);
+        if (i < 0) return -1;
+      } else if (ch === '/' && code[i + 1] === '*') {
+        i = code.indexOf('*/', i + 2) + 1;
+        if (i <= 0) return -1;
+      } else if (ch === '{') {
+        depth++;
+      } else if (ch === '}' && --depth === 0) {
+        return i + 1;
+      }
+    }
+    return -1;
+  };
+
+  /** Each named function's declaration ({ name: source }) as the page's inline scripts define it. */
+  const inlineDefinitions = (html, names) => {
+    const scripts = [...html.matchAll(/<script\b(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)].map((match) => match[1]);
+    const defs = {};
+    for (const name of names) {
+      const declaration = new RegExp(`\\bfunction\\s+${name.replace(/\$/g, '\\$')}\\s*\\(`);
+      for (const code of scripts) {
+        const start = code.search(declaration);
+        if (start < 0) continue;
+        const end = blockEnd(code, code.indexOf('{', start));
+        if (end > 0) defs[name] = code.slice(start, end);
+        break;
+      }
+    }
+    return defs;
+  };
+
+  /** The home tab's header parts ({ selector: outerHTML }) for one game, plus the inline
+      functions their handlers call (defs), cached briefly. */
   const homeParts = async (appid) => {
-    const key = `se-hub-parts:4:${appid}`; // bump the version when the parts change
+    const key = partsKey(appid);
     try {
       const cached = JSON.parse(sessionStorage.getItem(key));
       if (cached && Date.now() - cached.at < PART_CACHE_MS) return cached.parts;
@@ -96,18 +175,24 @@
       // no cache: fetch
     }
     try {
-      const response = await fetch(`/app/${appid}/`, { credentials: 'same-origin' });
+      // no-store: a Follow made a moment ago must show in the copy
+      const response = await fetch(`/app/${appid}/`, { credentials: 'same-origin', cache: 'no-store' });
       if (!response.ok) return null;
-      const slice = headerSlice(await response.text());
+      const html = await response.text();
+      const slice = headerSlice(html);
       if (!slice) return null;
       const template = document.createElement('template');
       template.innerHTML = slice;
       const parts = {};
+      const calls = new Set();
       for (const selector of CONTENT_PARTS) {
-        parts[selector] = template.content.querySelector(selector)?.outerHTML ?? null;
+        const node = template.content.querySelector(selector);
+        parts[selector] = node?.outerHTML ?? null;
+        if (node) for (const name of handlerCalls(node)) calls.add(name);
       }
       // A page without the stats (an error page, a sign-in wall) is not a set worth keeping
       if (!parts['.apphub_Stats']) return null;
+      parts.defs = inlineDefinitions(html, calls);
       try {
         sessionStorage.setItem(key, JSON.stringify({ at: Date.now(), parts }));
       } catch {
@@ -128,7 +213,7 @@
     return source ? document.importNode(source, true) : null;
   };
 
-  const HEADER_NODES = '.apphub_HomeHeader, .game_title_area';
+  const HEADER_NODES = '.apphub_HomeHeader, .game_title_area, .sharedfiles_item_page_header';
   const SOCIAL_CACHE_MS = 7 * 24 * 60 * 60 * 1000;
   const socialKey = (appid) => `se-hub-social:2:${appid}`;
 
@@ -154,9 +239,9 @@
   };
 
   /** Save the strip's label and links (not its markup) once Steam has rendered it, on any tab. */
-  const keepSocial = (dom, $) => {
-    const appid = location.pathname.match(/^\/app\/(\d+)/)?.[1];
-    if (!appid) return;
+  const keepSocial = async (dom, $) => {
+    const appid = await appIdOf(dom);
+    if (!appid || !$.alive) return;
     const scan = () => {
       const strip = nativeSocial();
       if (!strip) return;
@@ -199,10 +284,87 @@
     ]);
   };
 
+  // Functions defined from the home page's inline scripts: once per document, and kept on
+  // teardown, since Steam's handlers in the copied parts may still call them
+  const definedHandlers = new Set();
+
+  /** Define the copied handlers' functions this page lacks, in the page's own scope. */
+  const defineHandlers = (defs) => {
+    for (const [name, source] of Object.entries(defs ?? {})) {
+      if (definedHandlers.has(name) || typeof window[name] === 'function') continue;
+      definedHandlers.add(name);
+      const script = document.createElement('script');
+      script.textContent = source;
+      document.head.append(script);
+      script.remove(); // the declaration stays global once run
+    }
+  };
+
+  /** A click on the stats (Follow) changes what the home page renders: drop the cached copy on
+      every tab, the home tab included, so the next tab fetches the new state. */
+  const dropPartsOnClick = async (dom, $) => {
+    const appid = await appIdOf(dom);
+    if (!appid || !$.alive) return;
+    const drop = (event) => {
+      if (!event.target.closest?.('.apphub_Stats')) return;
+      try {
+        sessionStorage.removeItem(partsKey(appid));
+      } catch {
+        // storage blocked: nothing cached
+      }
+    };
+    document.addEventListener('click', drop, true);
+    $.add(() => document.removeEventListener('click', drop, true));
+  };
+
+  // A clan's SteamID64 (the game's group): 103582791429521408 + its account id
+  const CLAN_ID = /\b(1035827\d{11})\b/;
+
+  /** The game group's SteamID64, when the link is Group Chat (Steam's
+      javascript:OpenGroupChat( '<clan id>' )); null for any other chip (Follow). Only the link
+      itself is read: a clan id elsewhere in the header must never turn Follow into a chat. */
+  const clanSteamId = (link) =>
+    `${link.getAttribute('href') ?? ''} ${link.getAttribute('onclick') ?? ''}`.match(CLAN_ID)?.[1] ?? null;
+
+  /**
+   * The stats chips look like one button (hub/page.css), but in a chip with a count and a link
+   * ("5,693 in Group Chat") only the link's text took clicks. A click anywhere on a chip runs
+   * its link, on every tab. Group Chat's own link (OpenGroupChat: steam://friends/joinchat)
+   * never reaches the client from the Store/Community view, so the game group's id is handed
+   * to the Friends dock (client/friends/dock/flyouts.js), which opens the chat in its flyout.
+   * Outside the client (no SteamClient) Steam's link runs as it is.
+   */
+  const chipClicks = ($) => {
+    const onClick = (event) => {
+      if (event.button !== 0) return;
+      const chip = event.target.closest?.('.apphub_Stats .apphub_Chat');
+      const link = chip?.querySelector('a');
+      if (!link) return;
+      const steamid = clanSteamId(link);
+      const host = window.SteamClient?.BrowserView;
+      if (steamid && typeof host?.PostMessageToParent === 'function') {
+        event.preventDefault();
+        event.stopPropagation();
+        try {
+          host.PostMessageToParent('SteamEnhanced.OpenClanChat', steamid);
+        } catch {
+          // no host to hand it to
+        }
+        return;
+      }
+      if (event.target.closest('a')) return;
+      event.preventDefault();
+      link.click();
+    };
+    document.addEventListener('click', onClick, true);
+    $.add(() => document.removeEventListener('click', onClick, true));
+  };
+
   /** The home tab's stats, friends and social strip on every other tab. */
-  const buildParts = (dom, $, originals) => {
-    const appid = location.pathname.match(/^\/app\/(\d+)/)?.[1];
-    if (!appid || HOME.test(location.pathname)) return;
+  const buildParts = async (dom, $, originals) => {
+    if (HOME.test(location.pathname)) return;
+    const appid = await appIdOf(dom);
+    if (!appid || !$.alive) return;
     let parts = null;
 
     // Idempotent: adds only what the header lacks, so it can run on every header change
@@ -226,9 +388,22 @@
     homeParts(appid).then((found) => {
       if (!$.alive || !found) return;
       parts = found;
+      defineHandlers(parts.defs);
       apply();
       $.observe(apply, { filter: touchesHeader });
     });
+  };
+
+  /** A shared item's header holds its breadcrumbs (Game > Guides > author's guides): they move
+      under the card, which keeps only the hub's rows. */
+  const moveCrumbs = ($) => {
+    const apply = () => {
+      const header = findHeader();
+      const crumbs = header?.matches('.sharedfiles_item_page_header') && header.querySelector(':scope > .breadcrumbs');
+      if (crumbs) $.move(crumbs, header.parentNode, header.nextSibling);
+    };
+    apply();
+    $.observe(apply, { filter: touchesHeader });
   };
 
   const digits = (text) => Number.parseInt(String(text ?? '').replace(/\D/g, ''), 10);
@@ -470,7 +645,10 @@
     buildArt(dom, $);
     buildMoreFriends($, originals);
     buildParts(dom, $, originals);
+    dropPartsOnClick(dom, $);
+    chipClicks($);
     keepSocial(dom, $);
+    moveCrumbs($);
     const selectReady = Promise.resolve(web.parts.select)
       .catch(() => null); // Steam's own dropdowns stay, in the web dropdown's look (web/shared/select.css)
     buildToolbar(dom, $, selectReady);

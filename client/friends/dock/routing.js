@@ -1,6 +1,6 @@
 /*
  * Chat routing: whether a chat opens in the dock, the overlay or Steam's own window, and the
- * error shown when it can't open.
+ * error shown when it can't open (it goes after a while, held while hovered or focused).
  */
 ((SE) => {
   const ns = window.__seFriendsDockParts;
@@ -21,10 +21,40 @@
     ns.place();
   }
 
+  // A chat error goes by itself after a while, but never while the pointer or focus is on it
+  const CHAT_ERROR_MS = 6000;
+  let chatErrorTimer = 0;
+
+  function hideChatError() {
+    clearTimeout(chatErrorTimer);
+    chatErrorTimer = 0;
+    if (state.destroyed || chatError.hidden) return;
+    chatError.hidden = true;
+    ns.place();
+  }
+
+  function holdChatError() {
+    clearTimeout(chatErrorTimer);
+    chatErrorTimer = 0;
+  }
+
+  function releaseChatError() {
+    holdChatError();
+    if (!chatError.hidden && !chatError.matches(':hover, :focus-within')) {
+      chatErrorTimer = setTimeout(hideChatError, CHAT_ERROR_MS);
+    }
+  }
+
+  chatError.addEventListener('pointerenter', holdChatError);
+  chatError.addEventListener('focusin', holdChatError);
+  chatError.addEventListener('pointerleave', releaseChatError);
+  chatError.addEventListener('focusout', releaseChatError);
+
   function reportChatError() {
     chatErrorText.textContent = 'Unable to open chat here. Right-click Friends & Chat to open its window.';
     chatError.hidden = false;
     revealDock();
+    releaseChatError();
   }
 
   function findFriend(id) {
@@ -866,7 +896,7 @@
   }
 
   Object.assign(ns, {
-    chatError, chatErrorText, closeMirroredChat, desktopChatFocused, dismissChatError, findFriend,
+    chatError, chatErrorText, closeMirroredChat, holdChatError, desktopChatFocused, dismissChatError, findFriend,
     findGroup, gameInForeground, groupUniqueId, installChatRouting, interactionEvents,
     markDesktopInteraction, markDockInteraction, onDesktopChatFocus, openDockChat,
     openFriendNotification, overlayChatContexts, pendingOverlayChats, reportChatError,

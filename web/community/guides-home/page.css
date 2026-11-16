@@ -1,0 +1,668 @@
+/*
+ * Steam Guides (/guides): the page that explains guides, as a set of cards at the page width.
+ *
+ *   [ Steam Guides                                        [ 2,624,669 ] ]
+ *   [ Player-created manuals & references                 [ Guides     ] ]
+ *   [ What are they?      ][ Where do I find them? ][ How do I create one? ]
+ *   [ lead, pictures,     ][ lead, two pictures    ][ lead, 1 2 3 steps,    ]
+ *   [ top-rated guides    ][                       ][ your most-played      ]
+ *   [ Need help?          ][ Have feedback?        ][ Your guides?          ]
+ *
+ * Every block is Steam's, placed and restyled; guides-home/page.js only wraps each section's
+ * header and body in one card. Buttons, links and the page frame come from shared/ui.css. Classes are Steam's (the page's own stylesheet, updatepage_guides.css, which
+ * SteamTracking doesn't track: its rules are beaten by weight, with !important where it pins a
+ * value).
+ */
+
+/* ---------- Frame ---------- */
+
+/* Steam's fixed 948px column (on its own darker band) at the page width, on the page colour; its
+   top spacing (room for the header) stays */
+/* !important: Steam's own rules (updatepage_guides.css) set background, width at equal or higher
+   weight */
+html.se-community-guides-home .main_content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--se-space-5);
+  box-sizing: border-box;
+  width: var(--se-community-width) !important;
+  max-width: none !important;
+  margin-inline: auto !important;
+  padding-bottom: var(--se-space-7);
+  background: none !important;
+  color: var(--se-text);
+  font: var(--se-type-body);
+}
+
+/* Steam's own page art behind the column (a band at the window's edges): the page colour alone */
+/* !important: Steam's own rules (updatepage_guides.css) set background at equal or higher weight */
+html.se-community-guides-home body {
+  background-image: none !important;
+}
+
+/* Wide windows: the three sections side by side, the hero and the footer across all three */
+@media (min-width: 1280px) {
+  html.se-community-guides-home .main_content {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  html.se-community-guides-home .main_content > :is(.page_top, .page_footer) {
+    grid-column: 1 / -1;
+  }
+
+  html.se-community-guides-home .se-guides-section {
+    align-self: stretch;
+  }
+}
+
+/* Steam's float clearers: the gaps place everything */
+/* !important: display can come inline from Steam's markup or scripts */
+html.se-community-guides-home .main_content :is(.preview_images, .guide_examples, .section_body, .page_footer) > div:not([class]) {
+  display: none !important;
+}
+
+html.se-community-guides-home .main_content a {
+  color: var(--se-accent);
+  text-decoration: none;
+  transition: color var(--se-dur);
+}
+
+html.se-community-guides-home .main_content a:hover {
+  color: var(--se-accent-hover);
+}
+
+/* ---------- Hero ---------- */
+
+/* Title and line on the left, the count as a stat tile on the right; the column's full width */
+/* !important: Steam's own rules (updatepage_guides.css) set background, height, margin, padding,
+   width at equal or higher weight */
+html.se-community-guides-home .page_top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-5);
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  margin: var(--se-space-5) 0 0 !important;
+  padding: var(--se-space-6) !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-card-bg) !important;
+  box-shadow: var(--se-elevation-2);
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set float, margin, padding, width at equal
+   or higher weight */
+html.se-community-guides-home .page_top > * {
+  position: static !important;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-guides-home .page_top_text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  min-width: 0;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set color, font at equal or higher weight */
+html.se-community-guides-home .page_title {
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-heading-lg) !important;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set color, font at equal or higher weight */
+html.se-community-guides-home .page_desc {
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+/* The count: the number large, "Guides Created" as a small-caps label under it. Steam writes the
+   label as the block's own text after the number */
+/* !important: Steam's own rules (updatepage_guides.css) set background, color, font, text-align at
+   equal or higher weight */
+html.se-community-guides-home .num_guides_section {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: var(--se-space-1);
+  flex: none;
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2) !important;
+  color: var(--se-label-color) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing);
+  text-align: end !important;
+  text-transform: uppercase;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set background, color, font, height, width
+   at equal or higher weight */
+html.se-community-guides-home .num_guides {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-heading) !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* ---------- Sections: a header and its body as one card ---------- */
+
+/* guides-home/page.js wraps each header and its body in .se-guides-section */
+html.se-community-guides-home .se-guides-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-3);
+  padding: var(--se-space-5) var(--se-space-6) var(--se-space-6);
+  border-radius: var(--se-radius-card);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set background, color, font, height, margin,
+   padding at equal or higher weight */
+html.se-community-guides-home .section_header {
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-title-lg) !important;
+}
+
+/* The section's text flows as Steam wrote it (a lead line, then the paragraph that continues
+   it); its pictures and lists are blocks spaced below */
+/* !important: Steam's own rules (updatepage_guides.css) set background, color, font, margin,
+   padding at equal or higher weight */
+html.se-community-guides-home .section_body {
+  display: flow-root;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body) !important;
+}
+
+/* Steam's line breaks between blocks: the margins space them */
+html.se-community-guides-home .section_body > br {
+  display: none;
+}
+
+html.se-community-guides-home .section_body > :is(.preview_images, .guide_examples, .instructions, .played_apps) {
+  margin-top: var(--se-space-4) !important;
+}
+
+/* A section's opening text (guides-home/page.js): Steam's bold half-sentence finished by the
+   plain text after it, as one paragraph at a readable line length */
+html.se-community-guides-home .se-guides-lead {
+  max-width: 80ch;
+  margin: 0;
+  color: var(--se-text-muted);
+  font: var(--se-type-body-lg);
+  text-wrap: pretty;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set color, display, font, margin at equal or
+   higher weight */
+html.se-community-guides-home .se-guides-lead .section_body_title {
+  display: inline !important;
+  margin: 0 !important;
+  color: var(--se-text-strong) !important;
+  font: inherit !important;
+}
+
+/* Sub-headings between the blocks ("Some examples of top-rated guides:") */
+/* !important: Steam's own rules (updatepage_guides.css) set color, display, font, margin at equal or
+   higher weight */
+html.se-community-guides-home .section_body > .section_body_title {
+  display: block !important;
+  margin: var(--se-space-5) 0 0 !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-title) !important;
+}
+
+/* ---------- Pictures ---------- */
+
+/* !important: Steam's own rules (updatepage_guides.css) set height, margin, padding, width at equal
+   or higher weight */
+/* Steam's pictures are small (294 × 149, the wide ones 454): in a third of the page they stay near
+   that size, two to a row where they fit */
+html.se-community-guides-home .preview_images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: var(--se-space-4);
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set float, height, margin, padding, width
+   at equal or higher weight */
+html.se-community-guides-home .preview_image {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set height, width at equal or higher weight */
+html.se-community-guides-home .preview_image img {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 2 / 1;
+  border-radius: var(--se-radius-control);
+  object-fit: cover;
+  box-shadow: var(--se-card-edge);
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set color, font at equal or higher weight */
+html.se-community-guides-home .small_caption {
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-small) !important;
+}
+
+/* The wide pictures' captions: under the picture, Steam's info icon left out */
+/* !important: Steam's own rules (updatepage_guides.css) set background, height, margin, padding,
+   position, width at equal or higher weight */
+html.se-community-guides-home .caption_with_bg {
+  position: static !important;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* !important: display can come inline from Steam's markup or scripts */
+html.se-community-guides-home .caption_with_bg .info_icon {
+  display: none !important;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set color, float, font at equal or higher
+   weight */
+html.se-community-guides-home .large_caption {
+  float: none !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-title) !important;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set color, float, font at equal or higher
+   weight */
+html.se-community-guides-home .medium_caption {
+  float: none !important;
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-small) !important;
+}
+
+/* ---------- Top-rated guides ---------- */
+
+/* !important: Steam's own rules (updatepage_guides.css) set height, margin, width at equal or higher
+   weight */
+html.se-community-guides-home .guide_examples {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--se-space-2);
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+/* A guide as a row: picture | game, title
+                             | by author */
+/* !important: Steam's own rules (updatepage_guides.css) set background, float, height, margin,
+   padding, width at equal or higher weight */
+html.se-community-guides-home .guide_example {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "picture text"
+    "picture author";
+  align-items: center;
+  column-gap: var(--se-space-3);
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-2) !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2) !important;
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-guides-home .guide_example:hover {
+  background: var(--se-hover) !important;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set float, height, margin, width at equal or
+   higher weight */
+html.se-community-guides-home .guide_preview_image {
+  grid-area: picture;
+  float: none !important;
+  width: var(--se-tile-lg) !important;
+  height: var(--se-tile-lg) !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-xs);
+  object-fit: cover;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set float, height, margin, width at equal or
+   higher weight */
+html.se-community-guides-home .guide_text {
+  grid-area: text;
+  align-self: end;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set color, font at equal or higher weight */
+html.se-community-guides-home .guide_app_name {
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-caption) !important;
+}
+
+/* Steam breaks the line between the game and the title: the title is a block of its own */
+html.se-community-guides-home .guide_text > br {
+  display: none;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set color, font at equal or higher weight */
+html.se-community-guides-home .guide_title {
+  display: block;
+  overflow: hidden;
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-control) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set color, float, font, margin, position at
+   equal or higher weight */
+html.se-community-guides-home .guide_author {
+  grid-area: author;
+  align-self: start;
+  position: static !important;
+  float: none !important;
+  margin: 0 !important;
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-caption) !important;
+}
+
+/* ---------- How do I create a guide? ---------- */
+
+/* The steps first, then your most-played games (Steam writes the panel first) */
+html.se-community-guides-home .section_body:has(> .instructions) {
+  display: flex;
+  flex-direction: column;
+}
+
+html.se-community-guides-home .section_body > .instructions {
+  order: 1;
+}
+
+html.se-community-guides-home .section_body > .played_apps {
+  order: 2;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set float, margin, padding, width at equal
+   or higher weight */
+html.se-community-guides-home .instructions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  counter-reset: se-step;
+}
+
+/* "Getting started": a small-caps label, Steam's rule under it goes */
+/* !important: Steam's own rules (updatepage_guides.css) set border, color, font, margin, padding at
+   equal or higher weight */
+html.se-community-guides-home .instructions > .section_body_title {
+  margin: 0 0 var(--se-space-2) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-label-color) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+}
+
+/* Each step: a numbered title, its text under it, indented to the title */
+/* !important: Steam's own rules (updatepage_guides.css) set background, color, font, height, margin,
+   padding at equal or higher weight */
+html.se-community-guides-home .instructions_title {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  height: auto !important;
+  margin: var(--se-space-2) 0 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-title) !important;
+  counter-increment: se-step;
+}
+
+html.se-community-guides-home .instructions_title::before {
+  content: counter(se-step);
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--se-tile-sm);
+  height: var(--se-tile-sm);
+  border-radius: var(--se-radius-control);
+  background: var(--se-accent-tint);
+  color: var(--se-accent);
+  font: var(--se-type-label);
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set color, font, margin, padding at equal or
+   higher weight */
+html.se-community-guides-home .instructions_text {
+  margin: 0 !important;
+  padding: 0 0 0 calc(var(--se-tile-sm) + var(--se-space-3)) !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body) !important;
+}
+
+/* Your most-played games: a panel of game rows */
+/* !important: Steam's own rules (updatepage_guides.css) set background, color, float, font, height,
+   margin, padding, width at equal or higher weight */
+html.se-community-guides-home .played_apps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-4) !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2) !important;
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-small) !important;
+}
+
+html.se-community-guides-home .played_apps > br {
+  display: none;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set color, font, margin at equal or higher
+   weight */
+html.se-community-guides-home .played_apps_title {
+  margin: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-title) !important;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set height, margin, width at equal or higher
+   weight */
+html.se-community-guides-home .most_played_apps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  width: auto !important;
+  height: auto !important;
+  margin: var(--se-space-1) 0 0 !important;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set height, margin, padding, width at equal
+   or higher weight */
+html.se-community-guides-home .most_played_app {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-guides-home .most_played_app > div:not([class]) {
+  display: none;
+}
+
+/* A game: icon and name as one row, the whole row its link */
+/* !important: Steam's own rules (updatepage_guides.css) set color, display at equal or higher weight */
+html.se-community-guides-home .most_played_app > a {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-3);
+  min-height: var(--se-hit);
+  padding: var(--se-space-1) var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  color: var(--se-text) !important;
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-guides-home .most_played_app > a:hover {
+  background: var(--se-hover);
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set float, height, margin, width at equal or
+   higher weight */
+html.se-community-guides-home .most_played_app_icon {
+  flex: none;
+  float: none !important;
+  width: var(--se-tile-sm) !important;
+  height: var(--se-tile-sm) !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-xs);
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set float, font, height, margin, width at
+   equal or higher weight */
+html.se-community-guides-home .most_played_app_name {
+  display: block;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  overflow: hidden;
+  font: var(--se-type-control) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Footer: help, feedback, your guides ---------- */
+
+/* Steam's accent rule over the footer goes */
+/* !important: Steam's own rules (updatepage_guides.css) set background, border, height, margin,
+   padding at equal or higher weight */
+html.se-community-guides-home .page_footer {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--se-space-5);
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set background, border, float, height,
+   margin, padding, width at equal or higher weight */
+html.se-community-guides-home .footer_section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-5) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-card-bg) !important;
+  box-shadow: var(--se-card-edge);
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set color, font, margin at equal or higher
+   weight */
+html.se-community-guides-home .footer_section_title {
+  margin: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-title) !important;
+}
+
+/* !important: Steam's own rules (updatepage_guides.css) set color, font, width at equal or higher
+   weight */
+html.se-community-guides-home .footer_text {
+  width: auto !important;
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-small) !important;
+}
+
+/* Each footer link on a line of its own, at the text's foot */
+html.se-community-guides-home .footer_text a {
+  display: inline-block;
+  margin-top: var(--se-space-2);
+  font: var(--se-type-control);
+}
+
+/* ---------- Narrow windows ---------- */
+
+@media (max-width: 910px) {
+  html.se-community-guides-home .page_top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  html.se-community-guides-home .num_guides_section {
+    align-items: flex-start;
+  }
+
+  html.se-community-guides-home .page_footer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.se-community-guides-home :is(.main_content a, .guide_example, .most_played_app > a) {
+    transition: none;
+  }
+}
