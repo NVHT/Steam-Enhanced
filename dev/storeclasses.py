@@ -4,7 +4,7 @@ rehashes them can be followed (the web counterpart of classmap.py for the client
 
 Usage:
   python3 storeclasses.py build   <STEAMTRACKING> <THEME_DIR>
-      Index every web hash the theme uses (store/, community/, checkout/, web/: CSS and the
+      Index every web hash the theme uses (web/store/, web/community/, web/checkout/, web/shared/: CSS and the
       page scripts' maps) against a SteamTracking checkout; writes dev/storeclassmap.json.
   python3 storeclasses.py check   <STEAMTRACKING> <THEME_DIR>
       List the theme's hashes a newer SteamTracking no longer has, by Steam file.
@@ -31,7 +31,7 @@ HASH = re.compile(r'(?<![\w-])' + TOKEN)
 # In the theme: a class in a selector (.x) or a string in a page script's map ('.x', `.x`)
 THEME_HASH = re.compile(r'(?<=[.\'"`])' + TOKEN)
 WEB_ROOTS = ('store.steampowered.com', 'steamcommunity.com', 'c')
-THEME_ROOTS = ('store', 'community', 'checkout', 'web')
+THEME_ROOTS = ('web/store', 'web/community', 'web/checkout', 'web/shared')
 # Build-hashed chunk names (c/store.steampowered.com/ssr/BOEXziHF.css) change every deploy
 HASHED_FILE = re.compile(r'^[\w-]{8}\.css$')
 COMMENT = re.compile(r'/\*.*?\*/', re.S)

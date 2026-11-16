@@ -254,15 +254,12 @@ python3 dev/classmap.py rehash <path-to-extracted-steamui> .
 ```text
 Steam-Enhanced/
 ├── skin.json     Millennium manifest: core.js and the client loader, in every window
-├── core/         Shared runtime (SE), tokens, font, icons, scrollbars, tooltips, plugin bridge
-├── client/       Client features, one folder per area; loader.js sorts windows into groups and maps them to files
-├── web/          Shared by the web sites: site loader, runtime (dom.js), base styles
-├── store/        Store redesigns, one folder per page, loaded by store/loader.js
-├── community/    Community redesigns, one folder per page plus shared/
-├── help/         Steam Support pages
-├── checkout/     Steam checkout pages
+├── core/         Shared by client and web: runtime (SE), tokens, font, level badges, scrollbars, spinner
+├── client/       Client features, one folder per area; shared/ for the client-only parts; loader.js maps windows to files
+├── web/          The web sites: shared/ (site loader, runtime, base styles, dropdown), then store/,
+│                 community/, help/ and checkout/, each a config (loader.js) and one folder per page
 ├── compat/       Plugin integrations (HowLongToBeat, Extendium, Size on Disk, Player Count, ProtonDB, Achievement Manager, SteamGridDB)
-├── options/      Setting overrides that Millennium applies when you pick them
+├── options/      Setting overrides that Millennium applies when you pick them, one folder per settings tab
 ├── dev/          Element inspector (Ctrl+Shift+E), classmap.py, colors.py, css-check.py, spinner_svg.py
 └── assets/       Logos, Millennium header and splash
 ```

@@ -3,7 +3,7 @@
 Usage:
   python3 spinner_svg.py <THEME_DIR>
       Rewrite --se-spinner-image in core/spinner.css (the default style) and in each
-      options/spinner-<style>.css, drawn around the mark core/spinner.css holds
+      options/startup/spinner-<style>.css, drawn around the mark core/spinner.css holds
       (--se-brand-mark), so the pictures and the CSS spinner can't drift apart.
 
 A picture is for the places a pseudo-element can't reach (an <img> swapped by `content`, a
@@ -28,7 +28,7 @@ FAR = 70
 MARK = 96 * .7
 DEFAULT = 'refined'  # drawn into core/spinner.css; the others into their option files
 
-# Keep in step with the tokens in core/spinner.css and options/spinner-*.css.
+# Keep in step with the tokens in core/spinner.css and options/startup/spinner-*.css.
 STYLES = {
     'comet': dict(w=6, track=3, length=108, a1=.15, a2=.55, head=ACCENT, dot=4, dot_color='#e4f3ff',
                   turn='1s linear', mark='float'),
@@ -159,7 +159,7 @@ def main(theme):
     if not mark:
         sys.exit(f'spinner_svg: no --se-brand-mark in {core}')
     for name, style in STYLES.items():
-        target = core if name == DEFAULT else root / 'options' / f'spinner-{name}.css'
+        target = core if name == DEFAULT else root / 'options' / 'startup' / f'spinner-{name}.css'
         rewrite(target, build(style, mark.group(1)))
 
 

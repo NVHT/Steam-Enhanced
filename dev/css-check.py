@@ -9,9 +9,18 @@ Flags a raw value equal to a token, so it doesn't creep back:
   - a var(--se-x, fallback) on a token core/tokens.css defines: tokens load everywhere, so the
     fallback is dead
 
+On the web pages (everything under web/), which share one component set
+(core/tokens.css "Web components"), it also flags what made them drift apart:
+  - margin, padding or gap in px off the 4px scale, or on it but not a --se-space-* token
+  - a pill corner (--se-radius-pill): every web corner is rounded (--se-radius-control)
+  - a font shorthand a --se-type-* style already is
+  - a raw z-index the stacking layers name (1, 2, 3, -1)
+  - the hairline edge or an elevation written out (--se-edge, --se-elevation-*)
+  - a focus ring other than --se-focus-outline
+
 The report is the !important budget: how many each file spends. Most beat Steam's own rules
 and inline styles; the ones that only beat the theme's own rules are the ones to remove.
-Skips core/tokens.css, core/font.css and core/images.css (self-contained), store/replay (its
+Skips core/tokens.css, core/font.css and core/images.css (self-contained), web/store/replay (its
 own palette), vendor files and comments.
 """
 import os
@@ -19,7 +28,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SKIP = {'core/tokens.css', 'core/font.css', 'core/images.css', 'store/replay/page.css'}
+SKIP = {'core/tokens.css', 'core/font.css', 'core/images.css', 'web/store/replay/page.css'}
 COMMENT = re.compile(r'/\*.*?\*/', re.S)
 DECL = re.compile(r'(?<![\w-])((?!--)[a-z-]+)\s*:\s*([^;{}]+?)(\s*!important)?(?=\s*[;}])')
 TIME = re.compile(r'(?<![\w.-])\d*\.?\d+m?s(?![\w-])')
@@ -33,7 +42,8 @@ def tokens():
 def unique(defs, prefix):
     seen = {}
     for name, value in defs.items():
-        if name.startswith(prefix):
+        # Aliases (--se-radius-control: var(--se-radius-md)) name a role, not a value
+        if name.startswith(prefix) and not value.startswith('var('):
             seen.setdefault(value, []).append(name)
     return {value: names[0] for value, names in seen.items() if len(names) == 1}
 
@@ -50,6 +60,32 @@ def css_files():
                     yield rel, path
 
 
+WEB = ('web/',)
+SPACING = re.compile(r'^(margin|padding)(-[a-z-]+)?$|^(row-|column-)?gap$')
+PX = re.compile(r'(?<![\w.-])(\d+)px\b')
+Z_LAYERS = {'1': '--se-z-raised', '2': '--se-z-raised-2', '3': '--se-z-raised-3', '-1': '--se-z-under'}
+EDGE = 'inset 0 0 0 1px var(--se-hairline)'
+
+
+def web_hint(prop, value, types, selector_focus):
+    """What a web page should use instead of `value`, or None."""
+    if SPACING.match(prop):
+        for n in PX.findall(value):
+            if int(n) > 1:
+                return f'{n}px: a --se-space-* step (4px scale)'
+    if 'var(--se-radius-pill)' in value:
+        return 'var(--se-radius-control) (web corners are rounded)'
+    if prop == 'font' and value in types:
+        return f'var({types[value]})'
+    if prop == 'z-index' and value in Z_LAYERS:
+        return f'var({Z_LAYERS[value]})'
+    if prop == 'box-shadow' and value.startswith(EDGE):
+        return 'var(--se-edge) / var(--se-elevation-*)'
+    if selector_focus and prop == 'outline' and value not in ('0', 'none') and 'focus-outline' not in value:
+        return 'var(--se-focus-outline)'
+    return None
+
+
 def main():
     report = '--report' in sys.argv
     defs = tokens()
@@ -57,17 +93,24 @@ def main():
     radii = unique(defs, '--se-radius-')
     durations = unique(defs, '--se-dur')
     ease = defs.get('--se-ease', '').replace(' ', '')
+    types = {value: name for name, value in defs.items() if name.startswith('--se-type-')}
     flagged = 0
     budget = []
     for rel, path in sorted(css_files()):
         raw = open(path, encoding='utf-8').read()
         text = COMMENT.sub(lambda m: '\n' * m.group(0).count('\n'), raw)
         budget.append((text.count('!important'), text.count('#se-none'), rel))
+        web = rel.startswith(WEB)
         for match in DECL.finditer(text):
             prop, value = match.group(1), match.group(2).strip()
             line = text.count('\n', 0, match.start()) + 1
             hint = None
-            if prop == 'font-size' and value in sizes:
+            if web:
+                selector = text[text.rfind('}', 0, match.start()) + 1:text.rfind('{', 0, match.start())]
+                hint = web_hint(prop, value, types, ':focus' in selector)
+            if hint:
+                pass
+            elif prop == 'font-size' and value in sizes:
                 hint = f'var({sizes[value]})'
             elif prop == 'border-radius' and value in radii:
                 hint = f'var({radii[value]})'

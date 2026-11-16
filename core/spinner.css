@@ -4,7 +4,7 @@
  *
  * One drawing, five styles. The drawing below is a single recipe; a style is only a set of
  * --se-spin-* tokens (and its picture, --se-spinner-image). Refined is the default, set here; the
- * "Loading spinner" setting (skin.json) adds options/spinner-<style>.css, which overrides the
+ * "Loading spinner" setting (skin.json) adds options/startup/spinner-<style>.css, which overrides the
  * tokens on :root:root, so a change reaches every spinner at once.
  *
  *   refined  rounded lit head on a wider arc, thin track, eased turn  (default)
@@ -220,7 +220,7 @@ img:is([src*="steam_spinner.png"], [src*="throbber"]):not(#se-none) {
 }
 
 /* Reduced motion slows the turn rather than stopping it (a still spinner says nothing is
-   happening) and holds the mark. Outranks web/base.css, which stops every animation. */
+   happening) and holds the mark. Outranks web/shared/base.css, which stops every animation. */
 @media (prefers-reduced-motion: reduce) {
   html:not(#se-none) :is(.SteamLogoThrobber, ._3CN5DkgNMvdtT9fJhNOj_v, .LoadingThrobber, .throbber)::before,
   html:not(#se-none) .se-spin-arc {

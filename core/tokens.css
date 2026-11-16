@@ -64,6 +64,7 @@
   --se-on-art: #d0d7de;
   --se-glass: rgba(16, 18, 23, .8);
   --se-danger-text: #ffb0b3;
+  --se-danger-surface: color-mix(in srgb, var(--se-danger) 16%, var(--se-bg));
   --se-play: #3a8a22;
 
   /* Store item flags: on wishlist, in library, in cart; pre-purchase pill; live broadcast */
@@ -128,16 +129,21 @@
   --se-control-h: 34px;
   --se-control-h-sm: 28px;
   --se-hit: 32px; /* the smallest hit target any control may have */
-  --se-check: var(--se-icon-md); /* checkbox and radio box (its label carries the hit target) */
+  --se-check-size: var(--se-icon-md); /* checkbox and radio box (its label carries the hit target) */
   --se-field-h: 36px; /* text fields and the price chip's height on the web */
   --se-tile-lg: 56px; /* big round buttons on art (a video's play button) */
   --se-spinner-max: 96px; /* a web page's spinner, whatever box it fills */
+  --se-menu-max-h: 20rem; /* a dropdown's open list scrolls past this, never growing the page */
   --se-tile: 40px;
   --se-tile-sm: 30px;
   --se-tile-icon: 20px;
+  --se-tile-xl: 88px; /* a list row's preview picture (hub guides) */
+  --se-side-col: 320px; /* a page's side column beside its main list */
+  --se-reader-share: 58%; /* a list-and-reader page: the reader's share of the width */
+  --se-card-art: 28px; /* a friend card's footer: the featured badge and the level */
   --se-control-h-lg: 44px; /* a hero's buy row: price, call to action, wishlist */
   /*
-   * Store price chip (store/shared/ui.css): one size everywhere, so a chip with a discount
+   * Store price chip (web/store/shared/ui.css): one size everywhere, so a chip with a discount
    * badge is as tall as one without. A host can set a larger variant (the front page's hero).
    */
   --se-price-h: 36px;
@@ -170,6 +176,11 @@
   /* Pop-up panels (menus, dropdowns, tooltips, hover cards): one recipe everywhere */
   --se-panel-bg: rgba(31, 36, 43, .96);
   --se-panel-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg);
+  /* Hover cards (game and friend, client and web): width, inner padding, art banner height */
+  --se-hc-width: 320px;
+  --se-hc-pad: 12px;
+  --se-hc-banner: 132px;
+  --se-hc-broadcast: var(--se-broadcast);
   --se-play-hover: #44a028;
   --se-play-glow: rgba(80, 180, 50, .55);
 
@@ -212,6 +223,14 @@
   /* Hover intent: how long the pointer rests before a card opens; tips wait as Steam's do */
   --se-hover-delay: .15s;
   --se-tip-delay: .2s;
+  /* Scroll to top: the game page's button and the web's, one design */
+  --se-top-size: 48px;
+  --se-top-inset: 28px; /* from the window's corner, where the page places it (web) */
+  --se-top-ring: 3px; /* the progress ring's width */
+  --se-top-rest: translateY(16px) scale(.9); /* hidden, before it rises in */
+  --se-top-face: color-mix(in srgb, var(--se-surface) 94%, transparent);
+  --se-top-face-hover: color-mix(in srgb, var(--se-hover) 96%, transparent);
+  --se-top-shadow: 0 10px 24px -8px var(--se-black-80);
 
   /* Stacking layers */
   --se-z-under: -1; /* behind its parent's content: washes and art layers */
@@ -246,6 +265,75 @@
   --se-fs-headline: clamp(24px, 2.2vw, 32px); /* section titles */
   --se-fs-display: clamp(30px, 3vw, 44px); /* page titles */
   --se-fs-hero: clamp(38px, 4vw, 60px); /* hero titles */
+
+  /*
+   * Web components (store, community, checkout, help). One recipe per component, read by every
+   * page that draws one (web/store/shared/ui.css, web/community/shared/ui.css, web/shared/select.css and the
+   * page files), so a button, chip or card looks the same on every page. Every corner is
+   * rounded (--se-radius-control), never a pill.
+   */
+  /* Control heights: small (chips, tags, compact rows), the default (buttons, fields, dropdowns,
+     segmented controls) and large (buy buttons, hero actions) */
+  --se-ctl-sm: 28px;
+  --se-ctl: 36px;
+  --se-ctl-lg: 44px;
+  --se-radius-control: var(--se-radius-md);
+  --se-radius-control-inner: var(--se-radius-sm); /* a control inside a control (a segment) */
+  --se-radius-card: var(--se-radius-xl);
+  /* Type styles: size, weight and line height together, so no page mixes its own */
+  --se-type-badge: 700 var(--se-fs-xs)/1 var(--se-font);
+  --se-type-caption: 600 var(--se-fs-xs)/1.3 var(--se-font);
+  --se-type-label: 600 var(--se-fs-sm)/1 var(--se-font);
+  --se-type-small: 500 var(--se-fs-sm)/1.4 var(--se-font);
+  --se-type-control: 600 var(--se-fs-base)/1 var(--se-font);
+  --se-type-body: 500 var(--se-fs-base)/1.5 var(--se-font);
+  --se-type-control-lg: 600 var(--se-fs-md)/1 var(--se-font);
+  --se-type-body-lg: 500 var(--se-fs-md)/1.5 var(--se-font);
+  --se-type-title: 700 var(--se-fs-lg)/1.3 var(--se-font);
+  --se-type-title-lg: 700 var(--se-fs-xl)/1.3 var(--se-font);
+  --se-type-heading: 700 var(--se-fs-2xl)/1.3 var(--se-font);
+  --se-type-heading-lg: 700 var(--se-fs-3xl)/1.2 var(--se-font);
+  /* A surface's hairline edge, and the three elevations above it */
+  --se-edge: inset 0 0 0 1px var(--se-hairline);
+  --se-elevation-1: var(--se-edge), var(--se-shadow-sm);
+  --se-elevation-2: var(--se-edge), var(--se-shadow-md);
+  --se-elevation-3: var(--se-edge), var(--se-shadow-lg);
+  /* Buttons: secondary (the default), primary (a view's one main action), ghost (quiet, no face) */
+  --se-btn-h: var(--se-ctl);
+  --se-btn-pad: 0 var(--se-space-4);
+  --se-btn-gap: var(--se-space-2);
+  --se-btn-font: var(--se-type-control);
+  --se-btn-bg: var(--se-pill);
+  --se-btn-bg-hover: var(--se-hover);
+  --se-btn-edge: inset 0 0 0 1px var(--se-glass-btn-line);
+  --se-btn-color: var(--se-text);
+  --se-btn-color-hover: var(--se-white);
+  --se-btn-primary-bg: var(--se-accent);
+  --se-btn-primary-bg-hover: var(--se-accent-hover);
+  --se-btn-primary-color: var(--se-on-accent);
+  --se-btn-disabled-opacity: .45;
+  /* Fields and dropdown buttons */
+  --se-field-bg: var(--se-field);
+  --se-field-edge: var(--se-edge);
+  --se-field-edge-hover: inset 0 0 0 1px var(--se-white-12);
+  --se-field-edge-focus: inset 0 0 0 1px var(--se-accent);
+  /* Chips: tags, filters, flags; on when chosen */
+  --se-chip-h: var(--se-ctl-sm);
+  --se-chip-pad: 0 var(--se-space-3);
+  --se-chip-font: var(--se-type-label);
+  --se-chip-bg: var(--se-pill);
+  --se-chip-bg-on: var(--se-accent-surface);
+  --se-chip-edge-on: inset 0 0 0 1px var(--se-accent-line);
+  /* Menus: dropdown lists, popup menus, suggestion lists (the panel recipe above) */
+  --se-menu-radius: var(--se-radius-control);
+  --se-menu-pad: var(--se-space-2);
+  --se-menu-item-pad: var(--se-space-2) var(--se-space-3);
+  --se-menu-item-radius: var(--se-radius-control-inner);
+  --se-menu-item-font: 500 var(--se-fs-base)/1.3 var(--se-font);
+  /* Cards: the dark surface every grouped block sits on */
+  --se-card-bg: var(--se-surface);
+  --se-card-edge: var(--se-edge);
+  --se-card-pad: var(--se-space-4);
 
   /* Startup background: library | hero | mosaic | wall | plain | dots | steam */
   --se-startup-background: library;
@@ -286,6 +374,10 @@
    */
 
   /* Shared SVG mask data URIs */
+  --se-icon-help: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M9.6 9.3a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1.1.9-1.1 1.6v.5'/%3E%3Cpath d='M12 16.8h.01'/%3E%3C/svg%3E");
+  --se-icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='m20 20-4.4-4.4'/%3E%3C/svg%3E");
+  --se-icon-check-ink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f1115' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+  --se-icon-exclude: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M8 12h8'/%3E%3C/svg%3E");
   --se-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   --se-icon-close-sm: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E");
   --se-icon-collapse: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Cpath%20d%3D%22M14%204.5h3a3.5%203.5%200%200%201%203.5%203.5v8a3.5%203.5%200%200%201-3.5%203.5h-3z%22%2F%3E%3C%2Fg%3E%3Crect%20x%3D%223.5%22%20y%3D%224.5%22%20width%3D%2217%22%20height%3D%2215%22%20rx%3D%223.5%22%2F%3E%3Cpath%20d%3D%22M14%204.5v15M7.5%209.5l2.5%202.5-2.5%202.5%22%2F%3E%3C%2Fsvg%3E");

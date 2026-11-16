@@ -1,11 +1,11 @@
 /*
- * Web pages: load the site's loader from the theme folder core.js was served from; it decides
- * which files each page gets: store/loader.js, community/loader.js, help/loader.js or
- * checkout/loader.js.
+ * Web pages: add the site loader (web/shared/site-loader.js) and the site's config from the
+ * theme folder core.js was served from; the config decides which files each page gets:
+ * web/store/loader.js, web/community/loader.js, web/help/loader.js or web/checkout/loader.js.
  * Millennium injects core.js into every web view, so this needs no dedicated skin.json rules
- * (new rules only take effect after a full Steam restart). Requested with ?v=<theme version>
- * so the web view's cache never mixes builds; the loader passes the same version on to every
- * file. The version comes from the last visit (localStorage) so the page needn't wait; skin.json
+ * (new rules only take effect after a full Steam restart). Both are requested with
+ * ?v=<theme version> so the web view's cache never mixes builds; the site loader passes the same
+ * version on to every file. The version comes from the last visit (localStorage) so the page needn't wait; skin.json
  * is read uncached on every load all the same, and a changed version swaps the build in place.
  * If skin.json can't be read on a first visit, files load unversioned and cache normally.
  * Until the loader has styled the page, a guard hides Steam's own look (see below).
@@ -19,10 +19,10 @@
  */
 (() => {
   const SITES = {
-    'store.steampowered.com': { loader: '../store/loader.js', global: '__seStore' },
-    'steamcommunity.com': { loader: '../community/loader.js', global: '__seCommunity' },
-    'help.steampowered.com': { loader: '../help/loader.js', global: '__seHelp' },
-    'checkout.steampowered.com': { loader: '../checkout/loader.js', global: '__seCheckout' },
+    'store.steampowered.com': { loader: '../web/store/loader.js', global: '__seStore' },
+    'steamcommunity.com': { loader: '../web/community/loader.js', global: '__seCommunity' },
+    'help.steampowered.com': { loader: '../web/help/loader.js', global: '__seHelp' },
+    'checkout.steampowered.com': { loader: '../web/checkout/loader.js', global: '__seCheckout' },
   };
   const site = SITES[location.hostname];
   if (!site) return;
@@ -48,7 +48,7 @@
   // No flash of Steam's own look: until the site's loader has its first stylesheets and page
   // scripts in ([data-se-styled], set by the loader), the page shows only the theme's
   // background. Set here, synchronously, because everything after is async (skin.json, the
-  // loader module, its stylesheets). If the loader never gets there, a CSS timer shows the
+  // site loader and config, their stylesheets). If the loader never gets there, a CSS timer shows the
   // page anyway; visibility stays non-!important so that animation can win.
   const root = document.documentElement;
   if (!root.hasAttribute('data-se-styled') && !document.getElementById('se-guard')) {
@@ -62,11 +62,10 @@
   }
   const reveal = () => root.setAttribute('data-se-styled', '');
 
-  // Every site's loader imports web/site-loader.js, which imports web/dom.js: preloading both
-  // with the loader starts all three downloads at once instead of one after another. The URLs
-  // must match the imports exactly (same ?v=) for the browser to reuse them.
-  const PRELOAD = ['../web/site-loader.js', '../web/dom.js'];
+  const SITE_LOADER = '../web/shared/site-loader.js';
 
+  // The site loader, then the site's config: classic scripts, downloaded together and run in
+  // that order (async = false); the config hands itself to the loader, which then starts.
   const load = (version) => {
     const versioned = (file) => {
       const url = new URL(file, coreSrc);
@@ -74,18 +73,22 @@
       return url.href;
     };
     const head = document.head ?? document.documentElement;
-    for (const file of PRELOAD) {
-      const href = versioned(file);
-      if (head.querySelector(`link[rel="modulepreload"][href="${href}"]`)) continue;
-      head.append(Object.assign(document.createElement('link'), { rel: 'modulepreload', href }));
-    }
-    const url = new URL(versioned(loader));
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.src = url.href;
-    script.dataset.seFeature = 'loader';
-    script.addEventListener('error', reveal, { once: true });
-    head.append(script);
+    const add = (file) =>
+      new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = versioned(file);
+        script.async = false;
+        script.dataset.seFeature = 'loader';
+        script.addEventListener('load', resolve, { once: true });
+        script.addEventListener('error', reject, { once: true });
+        head.append(script);
+      });
+    Promise.all([add(SITE_LOADER), add(loader)])
+      .then(() => window.__seWeb.start(site.global))
+      .catch((error) => {
+        console.error('[Steam Enhanced] site loader failed:', error);
+        reveal();
+      });
   };
   // Never from cache, and a fresh URL each time: a version bump leaves skin.json the same size,
   // and a size-based validator would answer "not modified" and hand back the old version.
@@ -161,7 +164,7 @@
       console.error('[Steam Enhanced] live reload: destroy failed', error);
     }
     if (classes.length) root.classList.add(...classes);
-    document.querySelector('script[data-se-feature="loader"]')?.remove();
+    document.querySelectorAll('script[data-se-feature="loader"]').forEach((script) => script.remove());
     load(version);
     dropWhenReady(stale);
     console.info(`[Steam Enhanced] now running ${version}`);
@@ -236,35 +239,40 @@
 
 /*
  * Element picker (dev/inspector.js), a theming aid: Ctrl+Shift+E in any Steam window or
- * web page. Loaded only on the first press, so it costs nothing until then.
+ * web page. Loaded only on the first press, so it costs nothing until then, or at once when
+ * its "Catch next dialog" wait is armed in this tab (it survives a reload to catch dialogs
+ * a page shows while it loads).
  */
 (() => {
   if (window.__seInspectorHotkey) return;
   window.__seInspectorHotkey = true;
   const coreSrc = document.currentScript?.src ||
     [...document.scripts].find((script) => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;
+  const load = () => {
+    if (!coreSrc) {
+      console.warn('[Steam Enhanced] Element picker: theme folder not found from this window.');
+      return;
+    }
+    const script = document.createElement('script');
+    const url = new URL('../dev/inspector.js', coreSrc);
+    url.searchParams.set('v', String(Date.now()));
+    script.src = url.href;
+    (document.head ?? document.documentElement).append(script);
+  };
   addEventListener(
     'keydown',
     (event) => {
       if (!event.ctrlKey || !event.shiftKey || event.altKey || event.metaKey || event.code !== 'KeyE') return;
       event.preventDefault();
       event.stopPropagation();
-      if (window.__seInspector) {
-        window.__seInspector.toggle();
-        return;
-      }
-      if (!coreSrc) {
-        console.warn('[Steam Enhanced] Element picker: theme folder not found from this window.');
-        return;
-      }
-      const script = document.createElement('script');
-      const url = new URL('../dev/inspector.js', coreSrc);
-      url.searchParams.set('v', String(Date.now()));
-      script.src = url.href;
-      (document.head ?? document.documentElement).append(script);
+      if (window.__seInspector) window.__seInspector.toggle();
+      else load();
     },
     true
   );
+  try {
+    if (sessionStorage.getItem('se-inspector-catch') === '1') load();
+  } catch {} // storage blocked: no armed catch to resume
 })();
 
 /* Shared runtime utilities, React fiber helpers, and CSS module class map. */
@@ -962,7 +970,7 @@
   ]);
   const tierOf = (pct) => (typeof pct === 'number' && Number.isFinite(pct) ? TIERS.find(t => pct <= t.max) : null);
   const fmtPct = (pct) => (pct > 0 && pct < 0.1 ? '<0.1' : pct.toFixed(1));
-  // The layer over a tiered icon (styles: core/achievement-tiers.css): one sparkle
+  // The layer over a tiered icon (styles: client/shared/achievement-tiers.css): one sparkle
   // per tier rank when unlocked, and the tier's initial so it reads without color.
   const tierFx = (tier, locked) => {
     const fx = document.createElement('span');

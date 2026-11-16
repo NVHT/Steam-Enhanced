@@ -146,7 +146,7 @@
 
   /*
    * The icon as on the game page: a tier aura, one twinkling sparkle per tier rank when unlocked
-   * and the tier's initial in the corner (SE.rarity.fx, styled by core/achievement-tiers.css);
+   * and the tier's initial in the corner (SE.rarity.fx, styled by client/shared/achievement-tiers.css);
    * locked ones grey with a faded initial. The icon is the plugin's own <img>, which can't hold
    * the layer, so the layer is a sibling laid over it (.se-am-fx), placed from the icon's box.
    * Locked: the plugin dims a locked icon (inline opacity), or the row says so.
