@@ -1,0 +1,570 @@
+/* Continues page.css (in order, see web/store/loader.js): React pages in the classic frame. */
+
+/* ---------- React pages in the classic frame (Family Management, Security & Devices,
+ * Data & Browsing) ----------
+ * Steam renders their content after load, nested a few <div>s deep: header bars
+ * (.account_header_line, sometimes in a wrapper) each followed by their body. React owns
+ * those nodes, so nothing moves: the column drops the panel card, each bar draws as a card's
+ * top and the element after it as the card's body. Steam's stable dialog classes
+ * (DialogButton, DialogToggleField, ActiveTab) take the theme's controls.
+ */
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) {
+  min-height: 0;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-3);
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-5) var(--se-space-6) var(--se-space-3) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card) var(--se-radius-xl) 0 0;
+  background: var(--se-surface) !important;
+  box-shadow: none; /* a split card: a hairline would show the seam */
+  color: var(--se-text) !important;
+  font: var(--se-type-heading) !important;
+  letter-spacing: -.01em;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line > div {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-3);
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--se-text-dim);
+}
+
+/* The theme's icon chip (page.js sets --se-account-icon, an image in the theme's colour): one
+   pseudo-element, the chip its background colour and the icon its background image */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line[style*="--se-account-icon"] {
+  gap: var(--se-space-4);
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line[style*="--se-account-icon"]::before {
+  content: "";
+  flex: none;
+  order: -1;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill) var(--se-account-icon) center / 20px 20px no-repeat;
+  box-shadow: var(--se-edge);
+}
+
+/* …and Steam's own glyph in the bar steps aside; links (the "?" help) keep theirs */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line[style*="--se-account-icon"] > svg,
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line[style*="--se-account-icon"] > div > svg {
+  display: none;
+}
+
+/* Intro text (Family Management): the card's full width, not Steam's narrow centred column */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) div:has(> p):not(:has(button, .DialogButton)) {
+  width: auto !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  text-align: left !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) div:has(> .DialogButton:not(.Small)) {
+  gap: var(--se-space-3);
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Big dialog buttons (Join / Create a family): tiles with the theme's icon chip, label beside it */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:not(.Small)[style*="--se-account-icon"] {
+  position: relative !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 72px;
+  padding: var(--se-space-4) var(--se-space-5) var(--se-space-4) 4.75rem !important; /* room for the 42px chip at 20px */
+  text-align: left !important;
+  text-transform: none !important;
+  font: var(--se-type-title) !important;
+  letter-spacing: 0 !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:not(.Small)[style*="--se-account-icon"]::after {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: auto !important;
+  left: 20px !important;
+  top: 50% !important;
+  width: 42px !important;
+  height: 42px !important;
+  margin: calc(-1 * var(--se-space-5)) 0 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-pill) var(--se-account-icon) center / 20px 20px no-repeat !important;
+  box-shadow: var(--se-edge) !important;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: background-color var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:not(.Small)[style*="--se-account-icon"]:hover::after {
+  background-color: var(--se-accent-surface) !important;
+}
+
+/* Steam's label sits beside the chip; its glyph row (arrow + people) steps aside */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:not(.Small)[style*="--se-account-icon"] > * {
+  margin: 0 !important;
+  text-align: left !important;
+  text-transform: none !important;
+  font: inherit !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:not(.Small)[style*="--se-account-icon"] > div:has(> svg) {
+  display: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_header_line a {
+  margin-left: auto;
+  color: var(--se-text-faint) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :is(.account_header_line, div:has(> .account_header_line)) + div {
+  box-sizing: border-box;
+  width: auto !important;
+  margin: 0 0 var(--se-space-4) !important;
+  padding: var(--se-space-3) var(--se-space-6) var(--se-space-6) !important;
+  float: none !important;
+  border: 0 !important;
+  border-radius: 0 0 var(--se-radius-xl) var(--se-radius-xl);
+  background: var(--se-surface) !important;
+  box-shadow: none;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) div:has(> .account_header_line) {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* Tabs (Family Management) */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .ActiveTab {
+  color: var(--se-text) !important;
+  box-shadow: inset 0 -2px 0 var(--se-accent);
+}
+
+/* Dialog buttons: big ones as tiles (Join / Create a family), small ones round */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton {
+  border: 0 !important;
+  border-radius: var(--se-radius-card) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-edge) !important;
+  color: var(--se-text) !important;
+  font-family: var(--se-font) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur), box-shadow var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:hover {
+  background: var(--se-hover) !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent-surface) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Primary:not(.Small) {
+  font-weight: 700 !important;
+}
+
+/* A form's own button (Create, Send invite): an accent pill, not a tile */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:not(.Small):not([style*="--se-account-icon"]):not(:has(svg)) {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
+  min-width: 96px !important;
+  height: 38px !important;
+  padding: 0 var(--se-space-5) !important;
+  border-radius: var(--se-radius-control) !important;
+  font: var(--se-type-control-lg) !important;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Primary:not(.Small):not([style*="--se-account-icon"]):not(:has(svg)) {
+  background: var(--se-btn-primary-bg) !important;
+  box-shadow: none !important;
+  color: var(--se-btn-primary-color) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Primary:not(.Small):not([style*="--se-account-icon"]):not(:has(svg)):hover {
+  background: var(--se-btn-primary-bg-hover) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Disabled {
+  opacity: .45;
+  pointer-events: none;
+}
+
+/* Family forms (Join / Create a family): a step title over its help text, then field + button */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) div:has(> p) > div:first-child:not(:has(*)) {
+  margin: var(--se-space-4) 0 var(--se-space-2) !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-title-lg) !important;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) div:has(> input + .DialogButton) {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-3);
+  width: auto !important;
+  max-width: 640px;
+  height: auto !important;
+  margin: var(--se-space-2) 0 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) div:has(> input + .DialogButton) > input {
+  flex: 1;
+  height: 38px !important;
+}
+
+/* Small buttons (a device's expand chevron): a 32px circle that stays inside its row; Steam's
+   focus ring (a pseudo-element and outline) gives way to the theme's */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Small {
+  display: inline-flex !important;
+  flex: none !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+  width: 32px !important;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  outline: none !important;
+  line-height: 1 !important;
+}
+
+/* Its holder: Steam pins the holder (and the button) to 12×12 with !important, sized for its
+   bare chevron; the theme's 32px circle then spills out of it, past the device row. The
+   holder takes the button's size again. */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> .DialogButton.Small) {
+  display: flex !important;
+  flex: none !important;
+  width: auto !important;
+  height: auto !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+/* The row it sits in (a device's location, then the chevron): centred on one line. (A :has()
+   can't nest another, so the row is found through its child: :has(> * > button).) */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> * > .DialogButton.Small) {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--se-space-3);
+}
+
+/* Every item on the line is the chevron's height, its text on that height's middle */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> * > .DialogButton.Small) > * {
+  align-self: center !important;
+  height: 32px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> * > .DialogButton.Small) > :not(:has(> .DialogButton.Small)) {
+  display: block !important;
+  line-height: 32px !important;
+  white-space: nowrap;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Small::before,
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Small::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* A small button with a label instead of a glyph ("Sign out everywhere"): a pill, as wide as
+   its words */
+/* A box that only holds a dialog button: Steam's dark backing goes, the button carries the look */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> .DialogButton:only-child) {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Small:not(:has(svg)) {
+  width: max-content !important;
+  min-width: max-content !important;
+  max-width: none !important;
+  height: 32px !important; /* the row it may share with a chevron is 32px tall */
+  padding: 0 var(--se-space-4) !important;
+  font: var(--se-type-control-lg) !important;
+  white-space: nowrap;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Small svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:focus {
+  outline: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:focus-visible {
+  box-shadow: var(--se-field-edge-focus) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton svg {
+  color: var(--se-text-dim);
+}
+
+/* On/off fields (Data & Browsing): label and description, then a segmented OFF / ON */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-5);
+  margin: 0 !important;
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggle_Label {
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggle_Description {
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body) !important;
+}
+
+/* The control's frame: Steam backs the pill with a square dark box */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField_Control {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField_OptionPanel {
+  display: flex !important;
+  gap: var(--se-space-half);
+  padding: var(--se-space-1) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-field-bg) !important;
+  box-shadow: var(--se-field-edge);
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField_Option {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  height: 26px !important;
+  padding: 0 var(--se-space-3) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-badge) !important;
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField_Option:hover:not(.Active) {
+  color: var(--se-text) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField_Option.Active {
+  background: var(--se-accent) !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogToggleField_Option.Off.Active {
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text) !important;
+}
+
+/* Reject All / Accept All (Data & Browsing): pills */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_settings_container > .Panel.Focusable:has(> .Focusable) {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  height: auto !important;
+  margin: 0 0 var(--se-space-4) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_settings_container > .Panel.Focusable > .Focusable {
+  display: inline-flex !important;
+  align-items: center;
+  height: 34px !important;
+  padding: 0 var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text) !important;
+  font: var(--se-type-control-lg) !important;
+  cursor: pointer;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_settings_container > .Panel.Focusable > .Focusable:hover {
+  background: var(--se-hover) !important;
+}
+
+/* Steam's own blue and grey boxes in these sections (Steam Guard's authenticator panel, its
+   link buttons), marked by page.js: tiles in the theme's surface, buttons as pills */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="tile"] {
+  border: 0 !important;
+  border-radius: var(--se-radius-card) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-edge) !important;
+}
+
+/* One inset for every outer tile, so icons and titles line up from tile to tile (the Steam
+   Guard bar and the device panel each came with Steam's own padding) */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="tile"]:not([data-se-account-tone="tile"] [data-se-account-tone="tile"]) {
+  padding: var(--se-space-3) var(--se-space-4) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="tile"] [data-se-account-tone="tile"],
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="tile"] > .Panel {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="tile"] + [data-se-account-tone="tile"] {
+  margin-top: var(--se-space-2) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="tile"] [data-se-account-tone="tile"] {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="button"] {
+  display: inline-flex !important;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-pill) !important;
+  box-shadow: var(--se-edge) !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-control-lg) !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur);
+}
+
+/* The label in the text colour, whatever element Steam put it in and however it coloured it */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :is([data-se-account-tone="button"], [data-se-account-tone="button"] *) {
+  color: var(--se-text) !important;
+  -webkit-text-fill-color: var(--se-text) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="button"]:hover {
+  background: var(--se-hover) !important;
+}
+
+/* Steam's picture icons (Steam Guard shield, device phone / PC), marked by page.js: the theme's
+   chip. An <img> swaps its picture for the icon; an <svg> hides its paths over a background. */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-glyph] {
+  box-sizing: border-box !important;
+  flex: none !important;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px;
+  border-radius: var(--se-radius-md) !important;
+  box-shadow: var(--se-edge);
+  object-fit: contain;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) img[data-se-account-glyph]:not([data-se-account-glyph="badge"]) {
+  margin: 0 var(--se-space-2) 0 0 !important; /* the same gap as a device's icon and name */
+  vertical-align: middle;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) img[data-se-account-glyph] {
+  content: var(--se-account-icon);
+  padding: var(--se-space-3) !important;
+  background: var(--se-pill) !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) svg[data-se-account-glyph] {
+  background: var(--se-pill) var(--se-account-icon) center / 20px 20px no-repeat !important;
+  overflow: hidden;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) svg[data-se-account-glyph] > * {
+  display: none !important;
+}
+
+/* The status badge over a device icon: a small accent disc with the shield, on the chip's corner */
+/* Its holder: exactly the chip's size (Steam stretches it to the row's height, which dropped
+   the badge to the row's foot), pinned to the row's top so it stays put when the row expands */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> [data-se-account-glyph="badge"]) {
+  position: relative !important;
+  flex: none !important;
+  align-self: flex-start !important;
+  width: 40px !important;
+  height: 40px !important;
+  margin: var(--se-space-1) var(--se-space-3) 0 0 !important; /* lines the name up with the Steam Guard bar's title */
+  padding: 0 !important;
+}
+
+/* The device's text column: no extra inset of Steam's, so the name lines up with the bar's title */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> [data-se-account-glyph="badge"]) + * {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) img[data-se-account-glyph="badge"] {
+  content: var(--se-account-icon);
+  position: absolute !important;
+  right: -4px !important;
+  bottom: -4px !important;
+  left: auto !important;
+  top: auto !important;
+  box-sizing: border-box !important;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: var(--se-space-1) !important;
+  border-radius: 50% !important;
+  background: var(--se-accent) !important;
+  box-shadow: 0 0 0 2px var(--se-surface-2) !important;
+  transform: none !important;
+}

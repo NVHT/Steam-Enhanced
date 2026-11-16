@@ -1,0 +1,321 @@
+/* Continues page.css (in order, see web/store/loader.js): Other pages; Wallet card. */
+
+/* ---------- Other pages: the content column as one card ----------
+ * Store preferences, Language Preferences, Data & Browsing ... are Steam's own forms (and a few
+ * React apps): they keep their markup; the column becomes a card and Steam's controls take the
+ * theme's type, fields and pill buttons.
+ */
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] {
+  display: block !important;
+  min-height: 240px;
+  padding: var(--se-space-6) var(--se-space-6) var(--se-space-6) !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(h1, h2, h3, h4) {
+  margin: 0 0 var(--se-space-3);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--se-text);
+  font-family: var(--se-font);
+  font-weight: 700;
+  letter-spacing: -.01em;
+  text-transform: none;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] h2 {
+  font-size: var(--se-fs-2xl);
+  line-height: 1.3;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(h3, h4) {
+  font-size: var(--se-fs-lg);
+  line-height: 1.4;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(p, li, label, td, th) {
+  color: var(--se-text-dim);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(b, strong) {
+  color: var(--se-text);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] a[href]:not([class*="btn"]) {
+  color: var(--se-accent);
+  text-decoration: none;
+  transition: color var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] a[href]:not([class*="btn"]):hover {
+  color: var(--se-accent-hover);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] hr,
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] .inner_rule {
+  height: 1px;
+  margin: var(--se-space-5) 0;
+  border: 0;
+  background: var(--se-divider);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] table {
+  border-collapse: collapse;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(td, th) {
+  border-color: var(--se-divider);
+}
+
+/* Fields */
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(input:is([type="text"], [type="email"], [type="number"], [type="search"], [type="tel"], [type="password"], :not([type])), select, textarea) {
+  box-sizing: border-box;
+  min-height: var(--se-ctl);
+  padding: 0 var(--se-space-3);
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field-bg);
+  box-shadow: var(--se-field-edge);
+  color: var(--se-text);
+  font: var(--se-type-body-lg);
+  outline: none;
+  transition: box-shadow var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] textarea {
+  padding: var(--se-space-3) var(--se-space-3);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(input, select, textarea):focus-visible {
+  box-shadow: var(--se-field-edge-focus);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] select option {
+  background: var(--se-surface-2);
+  color: var(--se-text);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] input:is([type="checkbox"], [type="radio"]) {
+  accent-color: var(--se-accent);
+}
+
+/* Steam's buttons (buttons.css): pills; the green one is the page's accent action */
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(.btn_green_steamui, .btn_blue_steamui, .btn_grey_steamui, .btn_grey_black, .btnv6_blue_hoverfade, .btnv6_green_white_innerfade, .btn_darkblue_white_innerfade, .btnv6_lightblue_blue, .btnv6_grey_black, .btn_green_white_innerfade) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--se-ctl);
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text) !important;
+  font: var(--se-type-control-lg);
+  text-decoration: none;
+  text-shadow: none;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(.btn_green_steamui, .btn_blue_steamui, .btn_grey_steamui, .btn_grey_black, .btnv6_blue_hoverfade, .btnv6_green_white_innerfade, .btn_darkblue_white_innerfade, .btnv6_lightblue_blue, .btnv6_grey_black, .btn_green_white_innerfade) > span {
+  display: block;
+  padding: 0 var(--se-space-4) !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: 36px !important;
+  text-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(.btn_green_steamui, .btn_blue_steamui, .btn_grey_steamui, .btn_grey_black, .btnv6_blue_hoverfade, .btnv6_green_white_innerfade, .btn_darkblue_white_innerfade, .btnv6_lightblue_blue, .btnv6_grey_black, .btn_green_white_innerfade):hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(.btn_green_steamui, .btnv6_green_white_innerfade, .btn_green_white_innerfade) {
+  background: var(--se-btn-primary-bg) !important;
+  box-shadow: none;
+  color: var(--se-btn-primary-color) !important;
+}
+
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(.btn_green_steamui, .btnv6_green_white_innerfade, .btn_green_white_innerfade):hover {
+  background: var(--se-btn-primary-bg-hover) !important;
+}
+
+/* A sidebar-less settings page (Update Store & Wallet Country): #main_content is the card, its
+   header bar the card's title */
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] {
+  box-sizing: border-box;
+  margin-bottom: 4rem !important;
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] > .account_header_line {
+  height: auto !important;
+  margin: 0 0 var(--se-space-4) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] > .account_header_line > div {
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-heading) !important;
+  letter-spacing: -.01em;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] :is(.account_change_country_content, .account_change_country_block) {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  background: none !important;
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] :is(.spacer, .account_change_country_content > div:empty) {
+  display: none !important;
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] p {
+  margin: 0 0 var(--se-space-3);
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] #other_country_contact_support {
+  margin-top: var(--se-space-4) !important;
+  padding-top: var(--se-space-4) !important;
+  border-top: 1px solid var(--se-divider);
+}
+
+html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"] #other_country_contact_support > br {
+  display: none;
+}
+
+/* ---------- Wallet card (Add funds, Redeem a code) ----------
+ * Steam's .rightcol > .block.accountInfoBlock: .block_header, .block_content > .accountBalance
+ * (label and figure, moved into .se-account-balance by page.js), a.addfunds_linkbar(s), some
+ * in a .wallent_actions_ctn. The pages place the card; this draws it.
+ */
+
+html.se-store-account:not(#se-none) .rightcol .accountInfoBlock {
+  margin: 0 !important;
+  padding: var(--se-space-5) var(--se-space-5) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-store-account:not(#se-none) .rightcol .accountInfoBlock .block_header {
+  height: auto !important;
+  margin: 0 0 var(--se-space-3) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-store-account:not(#se-none) .rightcol .accountInfoBlock .block_header > div {
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase !important;
+}
+
+html.se-store-account:not(#se-none) .rightcol .accountInfoBlock .block_content {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* Balance: Steam's label and figure, moved into the theme's head by page.js */
+html.se-store-account:not(#se-none) .rightcol .se-account-balance {
+  margin: 0 0 var(--se-space-4);
+  padding: 0;
+}
+
+html.se-store-account:not(#se-none) .se-account-balance > :is(.accountLabel, .accountData) {
+  position: static !important;
+  inset: auto !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+  background: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-balance > .accountLabel {
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-balance > .accountData {
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-4xl)/1.1 var(--se-font) !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+}
+
+html.se-store-account:not(#se-none) .wallent_actions_ctn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-account:not(#se-none) a.addfunds_linkbar {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-3);
+  box-sizing: border-box;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 40px;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) a.addfunds_linkbar::after {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  opacity: .5;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+html.se-store-account:not(#se-none) .rightcol .accountInfoBlock .block_content > a.addfunds_linkbar + a.addfunds_linkbar {
+  margin-top: var(--se-space-2) !important;
+}
+
+html.se-store-account:not(#se-none) a.addfunds_linkbar:hover {
+  background: var(--se-hover) !important;
+}
+
+/* Steam's own arrow images inside the link bars */
+html.se-store-account:not(#se-none) a.addfunds_linkbar img {
+  display: none;
+}

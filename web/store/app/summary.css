@@ -1,0 +1,502 @@
+/*
+ * Game page summary strip and action buttons (app/summary.js), right under the hero.
+ * Steam's glance column is hidden once the strip has mounted (html.se-app-summary-on), and the
+ * trailer player is centred in the space it leaves. Tokens: core/tokens.css.
+ *
+ * Continued, by section, in summary-details.css, summary-actions.css, summary-viewer.css (same
+ * folder), listed after this file in web/store/loader.js: together they keep one file's order.
+ */
+
+/* ---------- Page order: hero (Steam's buttons at its foot), strip, then the media ----------
+ * The hero and strip live in .page_top_area with the media; the buttons live in the next
+ * section (.queue_and_playtime). The top area becomes transparent to layout (display:
+ * contents), so its children and the sections after it share one column that `order` sorts.
+ * Steam's elements never move in the DOM, so their scripts and menus see their usual parents.
+ */
+html.se-app-summary-on .page_content_ctn {
+  position: relative; /* anchors Steam's title row over the hero */
+  display: flex;
+  flex-direction: column;
+}
+
+html.se-app-summary-on .page_content_ctn > .page_top_area {
+  display: contents;
+}
+
+html.se-app-summary-on .page_top_area > .game_media_and_summary_ctn {
+  order: 1;
+}
+
+/*
+ * The buttons sit inside the hero's foot, under its chips: the hero grows by the row's height
+ * (--se-app-actions-h, measured by app/summary.js) plus a gap, and the row is pulled up into
+ * that space by the same amount. The margin below it hands the hero's bottom padding back,
+ * so the strip starts at the hero's edge.
+ *
+ * .queue_and_playtime also holds an owned game's library banner, Play / stats and the review
+ * form. It becomes transparent to layout (display: contents) so only the buttons' own
+ * wrapper ([data-se-actions], tagged by app/summary.js) moves into the hero; the rest follow
+ * the strip, above the media.
+ */
+html.se-app-summary-on {
+  --se-app-hero-foot: 52px; /* app/hero.css .se-app-hero bottom padding */
+  --se-app-actions-gap: 22px;
+}
+
+html.se-app-summary-on .se-app-hero {
+  order: -2;
+  padding-bottom: calc(var(--se-app-hero-foot) + var(--se-app-actions-h, var(--se-space-7)) + var(--se-app-actions-gap)) !important;
+}
+
+html.se-app-summary-on .page_content_ctn > .queue_and_playtime {
+  display: contents !important;
+}
+
+html.se-app-summary-on .page_content_ctn > :not(.page_top_area, .queue_and_playtime) {
+  order: 2;
+}
+
+/* ---------- Steam's glance column, replaced by the strip ---------- */
+
+html.se-app-summary-on .game_media_and_summary_ctn .rightcol:has(.glance_ctn) {
+  display: none !important;
+}
+
+html.se-app-summary-on .game_media_and_summary_ctn .leftcol {
+  float: none !important;
+  margin-inline: auto !important;
+}
+
+/* The buttons' band: no backdrop strip, just the row. */
+html.se-app-summary-on .queue_and_playtime > .game_background_lighten {
+  display: none !important;
+}
+
+html.se-app-summary-on .queue_and_playtime .queue_overflow_ctn,
+html.se-app-summary-on .queue_and_playtime #queueCtn {
+  height: auto !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* The buttons' wrapper, pulled up into the hero's foot (see "Page order" above). */
+html.se-app-summary-on .queue_and_playtime > [data-se-actions] {
+  order: -1;
+  position: relative;
+  z-index: var(--se-z-raised);
+  width: auto !important;
+  margin: calc(-1 * (var(--se-app-hero-foot) + var(--se-app-actions-h, var(--se-space-7)))) auto var(--se-app-hero-foot) !important;
+}
+
+/* ---------- An owned game: library banner, Play / stats, review form ----------
+ * Moved by app/summary.js to the top of the user reviews section ([data-se-owned-part]); where
+ * a page has no reviews section they stay after the strip.
+ */
+
+html.se-app-summary-on [data-se-owned-part] {
+  box-sizing: border-box !important;
+  width: var(--se-page-width) !important;
+  max-width: 100% !important;
+  margin: 0 auto var(--se-space-4) !important;
+  padding: var(--se-space-5) var(--se-space-5) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card) !important;
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge) !important;
+  color: var(--se-text-dim);
+}
+
+/* Steam's own Play Now / Install: the hero's Play button clicks it instead (app/summary.js). */
+html.se-app-owned .game_area_already_owned_btn {
+  display: none !important;
+}
+
+/* "In library": a green pill and plain text, not Steam's lime band. */
+html.se-app-summary-on .game_area_already_owned {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-3);
+  height: auto !important;
+}
+
+html.se-app-summary-on .game_area_already_owned,
+html.se-app-summary-on .game_area_already_owned * {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+html.se-app-summary-on .game_area_already_owned .ds_flag {
+  position: static !important;
+  display: inline-flex !important;
+  align-items: center;
+  height: 24px;
+  padding: 0 var(--se-space-3) !important;
+  border-radius: var(--se-radius-control) !important;
+  background: color-mix(in srgb, var(--se-cart) 16%, transparent) !important;
+  box-shadow: none !important;
+  color: var(--se-cart) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+html.se-app-summary-on .game_area_already_owned .already_in_library {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600;
+  line-height: 1.4 !important;
+}
+
+/* Links in these sections: the accent; Steam's dim line separators go. */
+html.se-app-summary-on [data-se-owned-part] a:not([class*="btn"]) {
+  color: var(--se-accent) !important;
+}
+
+html.se-app-summary-on [data-se-owned-part] hr {
+  height: 1px;
+  margin: var(--se-space-4) 0;
+  border: 0;
+  background: var(--se-hairline);
+}
+
+/* Buttons (Play Now, Post review, Yes / No): the theme's pills. */
+html.se-app-summary-on [data-se-owned-part] :is([class*="btnv6_"], [class*="btn_"]):is(a, button, div, span):not([class*="btn_small_thin"]) {
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: none !important;
+  color: var(--se-text) !important;
+  text-shadow: none !important;
+}
+
+html.se-app-summary-on [data-se-owned-part] :is([class*="btnv6_"], [class*="btn_"]):is(a, button, div, span) > span {
+  border-radius: inherit !important;
+  background: none !important;
+  color: inherit !important;
+}
+
+html.se-app-summary-on [data-se-owned-part] :is([class*="btnv6_"], [class*="btn_"]):is(a, button, div, span):hover {
+  background: var(--se-hover) !important;
+}
+
+/* The review box and form fields: the theme's field style. */
+html.se-app-summary-on [data-se-owned-part] :is(textarea, input[type="text"], select) {
+  box-sizing: border-box;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-field-bg) !important;
+  box-shadow: var(--se-field-edge) !important;
+  color: var(--se-text) !important;
+  font: inherit;
+  font-size: var(--se-fs-base);
+}
+
+html.se-app-summary-on [data-se-owned-part] textarea:focus {
+  outline: 0;
+  box-shadow: var(--se-field-edge-focus) !important;
+}
+
+html.se-app-summary-on [data-se-owned-part] input[type="checkbox"] {
+  accent-color: var(--se-accent);
+}
+
+/* ---------- Strip ---------- */
+
+.se-app-summary {
+  box-sizing: border-box;
+  width: var(--se-page-width);
+  margin: 0 auto var(--se-space-5);
+  color: var(--se-text);
+}
+
+.se-app-summary__strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  border-block: 1px solid var(--se-divider);
+}
+
+/* No screenshots: the left column alone. */
+.se-app-summary__strip[data-se-cols="1"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* ---------- Screenshots (middle column): 3 × 2 tiles ---------- */
+
+.se-app-summary__shots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--se-space-2);
+}
+
+.se-app-summary__shot {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  overflow: hidden;
+  background: var(--se-surface-2);
+  cursor: zoom-in;
+}
+
+.se-app-summary__shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+.se-app-summary__shot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--se-edge);
+  transition: box-shadow var(--se-dur);
+  pointer-events: none;
+}
+
+.se-app-summary__shot:hover img {
+  transform: scale(1.05);
+}
+
+.se-app-summary__shot:hover::after {
+  box-shadow: inset 0 0 0 2px var(--se-accent);
+}
+
+/* The last tile when there are more: a dark veil with the count. */
+.se-app-summary__shot-more {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--se-bg) 62%, transparent);
+  color: var(--se-white);
+  font-size: var(--se-fs-xl);
+  font-weight: 800;
+}
+
+.se-app-summary__cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: var(--se-space-4);
+  min-width: 0;
+  padding: var(--se-space-5) var(--se-space-6);
+}
+
+.se-app-summary__cell:first-child {
+  padding-left: 0;
+}
+
+.se-app-summary__cell:last-child {
+  padding-right: 0;
+}
+
+.se-app-summary__cell + .se-app-summary__cell {
+  border-left: 1px solid var(--se-hairline);
+}
+
+.se-app-summary__desc {
+  margin: 0;
+  color: var(--se-text);
+  font-size: var(--se-fs-lg);
+  line-height: 1.65;
+}
+
+.se-app-summary [hidden] {
+  display: none !important;
+}
+
+/* A section title in the strip or the features section: the strip's quieter heading size. */
+.se-app-summary__heading {
+  margin: 0;
+  color: var(--se-white);
+  font-family: inherit;
+  font-size: var(--se-fs-xl);
+  font-weight: 800;
+  letter-spacing: -.01em;
+  line-height: 1.25;
+  text-transform: none;
+}
+
+/* ---------- Highlights (left column, under the overview: app/highlights.js) ----------
+ * The latest news and a curator you follow, side by side, flat on the strip (one alone takes
+ * the row). Steam's own sections further down are hidden while their card shows.
+ */
+html.se-app-summary-on [data-se-highlights-source] {
+  display: none !important;
+}
+
+.se-app-highlights {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--se-space-6);
+}
+
+.se-app-highlights[data-se-count="1"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.se-app-highlights[hidden] {
+  display: none;
+}
+
+/* Flat on the strip, no card: the thumbnail or avatar beside the text; hover lifts the title. */
+.se-app-highlight {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-4);
+  min-width: 0;
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text) !important;
+  text-decoration: none !important;
+}
+
+.se-app-highlight:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: 4px;
+}
+
+a.se-app-highlight :is(.se-app-highlight__title, .se-app-highlight__quote) {
+  transition: color var(--se-dur);
+}
+
+a.se-app-highlight:hover :is(.se-app-highlight__title, .se-app-highlight__quote) {
+  color: var(--se-accent-hover);
+}
+
+.se-app-highlight__thumb {
+  flex: none;
+  width: 112px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--se-radius-sm);
+  object-fit: cover;
+  background: var(--se-surface-2);
+}
+
+.se-app-highlight__avatar {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--se-radius-md);
+  object-fit: cover;
+  background: var(--se-surface-2);
+}
+
+.se-app-highlight__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  min-width: 0;
+}
+
+.se-app-highlight__kicker {
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-xs);
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.se-app-highlight__title {
+  overflow: hidden;
+  color: var(--se-white);
+  font-size: var(--se-fs-md);
+  font-weight: 700;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.se-app-highlight__quote {
+  overflow: hidden;
+  color: var(--se-text);
+  font-size: var(--se-fs-base);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.se-app-highlight__meta {
+  overflow: hidden;
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-sm);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Details row (left column, under the tags) ----------
+ * Relevance · features · languages side by side, set off by a hairline; columns with nothing
+ * to show are hidden and the rest share the row ([data-se-count]).
+ */
+.se-app-summary__details {
+  display: grid;
+  grid-template-columns: repeat(var(--se-cols, 3), minmax(0, 1fr));
+  /* Columns keep their content's height, so app/summary.js can measure and even them out. */
+  align-items: start;
+  gap: var(--se-space-6);
+  margin-top: var(--se-space-1);
+  padding-top: var(--se-space-4);
+  border-top: 1px solid var(--se-hairline);
+}
+
+.se-app-summary__details[data-se-count="2"] { --se-cols: 2; }
+.se-app-summary__details[data-se-count="1"] { --se-cols: 1; }
+
+.se-app-summary__details > .se-app-summary__group {
+  position: relative;
+  gap: var(--se-space-3);
+}
+
+/*
+ * Equal columns (app/summary.js): the tallest is cut to the next tallest's height and fades
+ * out over its "Show all"; opened, the button follows the content as "Show less".
+ */
+.se-app-summary__details > [data-se-cut] {
+  max-height: var(--se-cut);
+  overflow: hidden;
+}
+
+.se-app-summary__details > [data-se-cut]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 72px;
+  background: linear-gradient(transparent, var(--se-bg) 70%);
+  pointer-events: none;
+}
+
+.se-app-summary__more {
+  align-self: flex-start;
+  height: 28px;
+  padding: 0 var(--se-space-3);
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill);
+  color: var(--se-text-dim);
+  font: inherit;
+  font-size: var(--se-fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--se-dur), color var(--se-dur);
+}
+
+.se-app-summary__more:hover {
+  background: var(--se-hover);
+  color: var(--se-text);
+}
+
+.se-app-summary__details > [data-se-cut] > .se-app-summary__more {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: var(--se-z-raised);
+}

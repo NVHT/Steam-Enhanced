@@ -1,0 +1,460 @@
+/*
+ * Continues nav.css (in order, see web/store/loader.js): Dropdown panel; The surface spans
+ * exactly the capsule. shared/nav.js measures the capsule's offset in the; The panel's outer box
+ * spans the whole band width; Steam paints it; Steam sizes the panel's inner boxes for its own
+ * full-width layout; at the capsule's width.
+ */
+
+/* ---------- Dropdown panel: its own surface (the band behind it is transparent now) ---------- */
+
+/*
+ * The surface spans exactly the capsule. shared/nav.js measures the capsule's offset in the
+ * band (--se-nav-bar-x) and the content width that leaves after this box's own padding
+ * (--se-nav-panel-w), so Steam's box-sizing and fixed panel height stay untouched.
+ */
+/*
+ * The panel's outer box spans the whole band width; Steam paints it (dark wash + blur), which
+ * showed as a dark slab beside the dropdown. Only the inner surface (below) is drawn.
+ */
+/* !important: margin-top can come inline from Steam's markup or scripts */
+html.se-store [data-se-nav="panel"] {
+  margin-top: var(--se-space-2) !important;
+  background: transparent;
+  border: 0;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+/*
+ * Steam sizes the panel's inner boxes for its own full-width layout; at the capsule's width
+ * the content wraps taller, so let them grow. The outer panel keeps Steam's inline height
+ * while it animates open and closed (that's what its slide relies on).
+ */
+/* !important: Steam's own rules (divingbell.css, home.css, home_gamepad.css) set height,
+   max-height at equal or higher weight; the theme's shared rules (web/store/account/history/page.css,
+   web/store/account/page.css, web/store/dlc/page.css) set height, max-height with !important */
+html.se-store [data-se-nav="panel"] > div,
+html.se-store [data-se-nav="panel"] > div > div,
+html.se-store [data-se-nav="panel"] > div > div > div {
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* Steam's own fixed-height menu body (Popover, main.css), by its current class too. */
+/* !important: height can come inline from Steam's markup or scripts */
+html.se-store [data-se-nav="band"] :is(.RZQWX-64UNU-, .LJ-XME3yAB0-) {
+  height: auto !important;
+}
+
+/* !important: height, max-height can come inline from Steam's markup or scripts */
+html.se-store [data-se-nav="panel"]:not([style*="px"]) {
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* !important: Steam's own rules (BOEXziHF.css, cart.css, contenthub.css) set background,
+   box-shadow, margin, max-width, min-width, right, width at equal or higher weight; the theme's
+   shared rules (web/store/account/page.css, web/store/awards/results.css, web/store/dlc/page.css) set
+   background, box-shadow, margin, max-width, width with !important; left can come inline from
+   Steam's markup or scripts */
+html.se-store [data-se-nav="panel"] > div {
+  left: 0 !important;
+  right: auto !important;
+  width: var(--se-nav-panel-w, auto) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 0 0 var(--se-nav-bar-x, 0px) !important;
+  padding-inline: var(--se-space-4) !important;  /* Steam pads it out to the page width; the capsule is that width already */
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-elevation-3) !important;
+  overflow: hidden;
+}
+
+/* ---------- Panel contents (data-se-p roles from shared/nav.js) ---------- */
+
+html.se-store {
+  --se-menu-ring: inset 0 0 0 1px var(--se-hairline);
+  --se-menu-ring-hi: inset 0 0 0 1px var(--se-white-14);
+  --se-menu-scrim: linear-gradient(180deg, transparent 35%, rgba(8, 10, 14, .85) 100%);
+  --se-menu-sale: var(--se-cart);
+}
+
+html.se-store [data-se-p="heading"] {
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-xs);
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* !important: height can come inline from Steam's markup or scripts */
+html.se-store [data-se-p="rule"] {
+  height: 1px !important;
+  border: 0;
+  background: var(--se-divider);
+}
+
+/* Plain text links: muted, lighting up into a pill. */
+/* !important: another rule in this file sets color, padding with !important; margin-inline can
+   come inline from Steam's markup or scripts */
+html.se-store [data-se-p="link"] {
+  margin-inline: calc(-1 * var(--se-space-3)) !important;
+  padding: var(--se-space-1) var(--se-space-3) !important;
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-muted) !important;
+  text-decoration: none;
+  transition: color var(--se-dur), background-color var(--se-dur);
+}
+
+html.se-store [data-se-p="link"]:is(:hover, :focus-visible) {
+  background: var(--se-hover);
+  color: var(--se-text);
+  outline: none;
+}
+
+/* Every tile: rounded, hairline ring, lifts on hover. */
+/* !important: another rule in this file sets box-shadow with !important; position can come inline
+   from Steam's markup or scripts */
+html.se-store :is([data-se-p="art"], [data-se-p="stage"], [data-se-p="icon"], [data-se-p="row"], [data-se-p="button"], [data-se-p="mosaic"]) {
+  position: relative !important;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--se-radius-lg);
+  box-shadow: var(--se-menu-ring) !important;
+  text-decoration: none;
+  isolation: isolate;
+  transition: transform var(--se-dur-slow) var(--se-ease), box-shadow var(--se-dur-slow), background-color var(--se-dur);
+}
+
+html.se-store :is([data-se-p="art"], [data-se-p="stage"], [data-se-p="icon"], [data-se-p="button"], [data-se-p="mosaic"]):is(:hover, :focus-visible) {
+  transform: translateY(-2px);
+  box-shadow: var(--se-menu-ring-hi), var(--se-shadow-md);
+  outline: none;
+}
+
+/* Art tiles: dark stage, artwork zooms gently, bottom scrim for the label. */
+html.se-store [data-se-p="art"] {
+  background-color: var(--se-surface-2);
+}
+
+html.se-store [data-se-p="art"] img {
+  transition: transform var(--se-dur-slower) var(--se-ease);
+}
+
+html.se-store [data-se-p="art"]:hover img {
+  transform: scale(1.04);
+}
+
+html.se-store [data-se-p="art"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--se-z-raised);
+  background: var(--se-menu-scrim);
+  pointer-events: none;
+}
+
+/* Hardware: product photos on plain dark stages, label on a scrim. */
+html.se-store [data-se-p="stage"] {
+  background: var(--se-surface-2) !important; /* overrides Steam's pastel card fill */
+}
+
+html.se-store [data-se-p="stage"] * {
+  background-image: none;
+}
+
+html.se-store [data-se-p="stage"] img {
+  filter: drop-shadow(0 12px 18px var(--se-black-60));
+  transition: transform var(--se-dur-slower) var(--se-ease);
+}
+
+html.se-store [data-se-p="stage"]:hover img {
+  transform: translateY(-3px) scale(1.03);
+}
+
+/* Steam's white label boxes: dropped, the text sits on the art. */
+/* !important: padding can come inline from Steam's markup or scripts */
+html.se-store [data-se-p="label"] {
+  position: relative;
+  z-index: var(--se-z-raised-2);
+  padding: 0 !important;
+  background: none;
+  box-shadow: none;
+  color: var(--se-white);
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  text-shadow: 0 1px 12px var(--se-black-80);
+}
+
+html.se-store [data-se-p="label"] * {
+  color: inherit;
+}
+
+/* Icon tiles (Ways to Play, Special Sections): dark, glyph in a neutral badge. */
+html.se-store [data-se-p="icon"] {
+  background: var(--se-surface-2);
+  background-image: none;
+  color: var(--se-text);
+}
+
+html.se-store [data-se-p="icon"]:is(:hover, :focus-visible) {
+  background: var(--se-hover);
+}
+
+html.se-store [data-se-p="icon"] svg {
+  box-sizing: content-box;
+  padding: var(--se-space-3);
+  border-radius: var(--se-radius-lg);
+  background: var(--se-pill);
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line);
+  transition: background-color var(--se-dur), transform var(--se-dur-slow) var(--se-ease);
+}
+
+/*
+ * Steam colours these glyphs on its own shapes and groups (fill and stroke, by class), so every
+ * painted part takes the badge's text colour. :not(#se-none) gives ID-level weight over them.
+ */
+html.se-store:not(#se-none) [data-se-p="icon"] svg {
+  color: var(--se-text) !important; /* overrides Steam's glyph colour */
+}
+
+html.se-store:not(#se-none) [data-se-p="icon"] svg :is(g, path, circle, ellipse, rect, polygon, polyline, line, use) {
+  fill: currentColor !important; /* overrides Steam's per-shape fill */
+}
+
+html.se-store:not(#se-none) [data-se-p="icon"] svg [stroke]:not([stroke="none"]) {
+  stroke: currentColor !important; /* overrides Steam's per-shape stroke */
+}
+
+html.se-store [data-se-p="icon"]:hover svg {
+  background: var(--se-white-12);
+  transform: scale(1.06);
+}
+
+html.se-store [data-se-p="badge"] {
+  background: none;
+}
+
+/* Game rows (recommendations, search results): capsule + text on a quiet tile. */
+/* !important: another rule in this file sets background with !important */
+html.se-store [data-se-p="row"] {
+  background: var(--se-surface-2) !important;
+}
+
+html.se-store [data-se-p="row"]:is(:hover, :focus-visible) {
+  background: var(--se-hover);
+  outline: none;
+}
+
+html.se-store [data-se-p="row"] img {
+  border-radius: var(--se-radius-sm);
+}
+
+/* Filled text links: tag chips and wide buttons. */
+html.se-store [data-se-p="chip"] {
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-menu-ring);
+  color: var(--se-text-muted);
+  text-decoration: none;
+  transition: color var(--se-dur), background-color var(--se-dur), box-shadow var(--se-dur);
+}
+
+html.se-store [data-se-p="chip"]:is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--se-accent) 14%, var(--se-surface-2));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 40%, transparent);
+  color: var(--se-text);
+  outline: none;
+}
+
+/* !important: another rule in this file sets background with !important */
+html.se-store :is([data-se-p="button"], [data-se-p="mosaic"]) {
+  background: var(--se-surface-2) !important;
+  background-image: none;
+  color: var(--se-text);
+}
+
+html.se-store :is([data-se-p="button"], [data-se-p="mosaic"]):is(:hover, :focus-visible) {
+  background: var(--se-hover);
+}
+
+/* One hover per link or tile: Steam paints its own wash/gradient (and a bottom edge) on the
+   inner boxes (a link's label box, a tile's layers) and their pseudo-elements, which showed as
+   a second, inset hover. The link or tile alone carries the surface; the theme's own parts
+   inside it (price chips, badges: anything tagged inside the tagged link or tile) keep theirs. */
+/* !important: Steam's own rules (B95xLloG.css, event.css) set background at equal or higher
+   weight; the theme's shared rules (web/store/shared/sale/sale.css, web/store/shared/ui.css) set background,
+   border-color, box-shadow with !important */
+html.se-store :is([data-se-p="link"], [data-se-p="button"], [data-se-p="mosaic"]) :not(img, svg, svg *, [data-se-p], [data-se-p] [data-se-p] *, [data-se-price], [data-se-price] *, :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-), :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-) *),
+html.se-store :is([data-se-p="link"], [data-se-p="button"], [data-se-p="mosaic"]) :not(img, svg, svg *, [data-se-p], [data-se-p] [data-se-p] *, [data-se-price], [data-se-price] *, :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-), :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-) *)::before,
+html.se-store :is([data-se-p="link"], [data-se-p="button"], [data-se-p="mosaic"]) :not(img, svg, svg *, [data-se-p], [data-se-p] [data-se-p] *, [data-se-price], [data-se-price] *, :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-), :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-) *)::after,
+html.se-store :is([data-se-p="link"], [data-se-p="button"], [data-se-p="mosaic"])::before,
+html.se-store :is([data-se-p="link"], [data-se-p="button"], [data-se-p="mosaic"])::after {
+  background: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+/* Steam's faint capsule mosaic behind the small Browse rows. */
+/* !important: Steam's own rules (Dq5j1Kab.css, apphub_gamepad.css, autumn_year_sale.css) set
+   display at equal or higher weight; the theme's shared rules (web/store/account/page.css,
+   web/store/account/phone/page.css, web/store/app/summary.css) set display with !important */
+html.se-store [data-se-p="mosaic"] img {
+  display: none !important;
+}
+
+/* Blue call-to-action buttons → accent. */
+html.se-store [data-se-p="cta"] {
+  border-radius: var(--se-radius-md);
+  background: var(--se-accent);
+  background-image: none;
+  box-shadow: none;
+  color: var(--se-on-accent);
+}
+
+html.se-store [data-se-p="cta"] * {
+  color: inherit;
+}
+
+/* !important: the theme's shared rules (web/store/charts/page.css) set fill with !important */
+html.se-store [data-se-p="cta"] svg :is(path, polygon) {
+  fill: currentColor !important;
+}
+
+/* Prices. */
+/* !important: padding can come inline from Steam's markup or scripts */
+html.se-store [data-se-p="pct"] {
+  padding: 1px var(--se-space-2) !important;
+  border-radius: var(--se-radius-sm);
+  background: color-mix(in srgb, var(--se-menu-sale) 18%, transparent);
+  color: var(--se-menu-sale);
+  font-weight: 700;
+}
+
+html.se-store [data-se-p="was"] {
+  color: var(--se-text-faint);
+}
+
+/* Panels: Steam's tinted washes and overlays give way to the theme's surfaces. */
+html.se-store [data-se-nav="panel"] :is(.dUvJZktS6bk-, .uQeikjci8I0-, .vQLqomCgKs4-, .q-DP3khZsgc-) {
+  background: none;
+}
+
+/* !important: Steam's own rules (Dz-B1WUw.css) set background at equal or higher weight */
+html.se-store [data-se-nav="panel"] :is(.YEIG5t1R8UY-, .awopm9AseKk-) {
+  background: linear-gradient(270deg, transparent 20%, var(--se-surface) 85%) !important;
+}
+
+html.se-store [data-se-nav="panel"] :is(.tlx2FXGxPBc-, .OQI7NrDyNQM-) {
+  background: var(--se-menu-scrim);
+}
+
+/*
+ * Category tiles: the row's width shared among its tiles. Steam fixes each tile's width and
+ * spreads them apart (space-between); the art then fills the wider tile.
+ */
+html.se-store:not(#se-none) [data-se-nav="panel"] :is(.eyLJRKegBn0-, ._-3FYAnbTP3c-) {
+  justify-content: stretch;
+  gap: var(--se-space-3);
+}
+
+/* !important: Steam's own rules (game_mob.css, unstyledbutton.css) set margin at equal or higher
+   weight; the theme's shared rules (web/store/account/funds/page.css, web/store/awards/archive.css,
+   web/store/awards/results.css) set margin, max-width, width with !important; min-width can come
+   inline from Steam's markup or scripts */
+html.se-store:not(#se-none) [data-se-nav="panel"] :is(.eyLJRKegBn0-, ._-3FYAnbTP3c-) > a {
+  flex: 1 1 0;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+/* !important: Steam's own rules (contenthub.css, home.css, news.css) set height at equal or higher
+   weight; the theme's shared rules (web/store/account/redeem/page.css, web/store/agecheck/page.css,
+   web/store/awards/archive.css) set height, max-width, width with !important */
+html.se-store:not(#se-none) [data-se-nav="panel"] :is(.eyLJRKegBn0-, ._-3FYAnbTP3c-) > a > img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  object-fit: cover;
+}
+
+/*
+ * Game rows (menus and search suggestions): the price chip at the row's end, beside the
+ * title. Under the title it made each row taller than Steam's fixed box, which then
+ * spread the rows apart and cut off the last one.
+ */
+/* !important: another rule in this file sets align-items with !important */
+html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) {
+  align-items: center !important;
+}
+
+/* !important: another rule in this file sets align-items, display, flex, flex-direction, gap,
+   justify-content, min-width with !important */
+html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) :is(.cchAfQhDUvE-, ._6iY2YwtsQR0-) {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: var(--se-space-3) !important;
+}
+
+/* !important: another rule in this file sets display, line-height, white-space with !important */
+html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) :is(.-sYwJqKAVvw-, .kNeH7jZB5vg-) {
+  min-width: 0;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  white-space: normal !important;
+  line-height: 1.3 !important;
+}
+
+/* !important: another rule in this file sets flex, margin with !important */
+html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) :is(.FY3FS-llgYw-, .qy5xFmO5xOU-) {
+  flex: none !important;
+  margin: 0 !important;
+}
+
+/*
+ * Recommended-for-you list: Steam pins each row at 56px and spreads them with
+ * space-between, which leaves wide gaps. Rows share the box's height instead, with a
+ * fixed gap, and the capsule fills its row.
+ */
+html.se-store:not(#se-none) :is(.l8Ot6WpreQ8-, .qLQjwozYKNA-) {
+  justify-content: flex-start;
+  gap: var(--se-space-3);
+}
+
+/* !important: another rule in this file sets height with !important; min-height can come inline
+   from Steam's markup or scripts */
+html.se-store:not(#se-none) :is(.l8Ot6WpreQ8-, .qLQjwozYKNA-) > :is(.QHiQcR8jG10-, .cO0trRuLfzA-) {
+  flex: 1 1 0;
+  height: auto !important;
+  min-height: 56px !important;
+  overflow: hidden;
+}
+
+/* !important: another rule in this file sets width with !important; height can come inline from
+   Steam's markup or scripts */
+html.se-store:not(#se-none) :is(.l8Ot6WpreQ8-, .qLQjwozYKNA-) > :is(.QHiQcR8jG10-, .cO0trRuLfzA-) :is(.Jhq3hD97Ms8-, .JImNxATJ1xc-) {
+  flex: none;
+  align-self: stretch;
+  width: auto !important;
+  height: 100% !important;
+  aspect-ratio: 77 / 29;
+}
+
+/* !important: Steam's own rules (contenthub.css, home.css, news.css) set height at equal or higher
+   weight; the theme's shared rules (web/store/account/redeem/page.css, web/store/agecheck/page.css,
+   web/store/awards/archive.css) set height, width with !important */
+html.se-store:not(#se-none) :is(.l8Ot6WpreQ8-, .qLQjwozYKNA-) > :is(.QHiQcR8jG10-, .cO0trRuLfzA-) :is(.Jhq3hD97Ms8-, .JImNxATJ1xc-) > img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}

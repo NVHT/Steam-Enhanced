@@ -1,0 +1,115 @@
+/*
+ * Store layout: the page width and Steam's tooltips on every store page. Tokens are
+ * core/tokens.css; motion, focus and the footer are web/shared/base.css.
+ */
+/* ---------- Page colour: Steam's React pages ----------
+ * Pages on Steam's React store template (#StoreTemplate: cart, age check and the like) paint
+ * body and root Steam's navy (#1b2838); the theme's page colour instead, as on the front page.
+ * Classic pages keep their own (their redesigns set it).
+ */
+/* !important: another rule in this file sets background-color with !important */
+html.se-store:has(> body > #StoreTemplate),
+html.se-store body:has(> #StoreTemplate),
+html.se-store #StoreTemplate {
+  background-color: var(--se-bg) !important;
+}
+
+/* ---------- Page width: every store page fills the window like the front page ---------- */
+
+/*
+ * Steam sizes store pages to a 940px or 1200px column (store.css: body.v6 .page_content,
+ * #store_header .content, --store-page-width). Same fluid width as the front page instead:
+ * the window minus a gutter, capped for very wide screens. Steam's own 2025 widestore layout
+ * already sizes the inner columns in percent, so widening these containers is enough.
+ */
+html.se-store {
+  --se-page-gutter: 28px;
+  --se-page-max: 1760px;
+  --se-page-width: min(100vw - 2 * var(--se-page-gutter), var(--se-page-max));
+}
+
+/*
+ * --store-page-width also sizes the React store bar and its dropdown panels. Classic pages
+ * set it on body.v6; the React-only pages (age check and the like) have no body.v6, so they
+ * kept Steam's narrow default and the dropdowns' contents shrank inside the full-width bar.
+ * Set on every level Steam sets it from, so each page gets the same width.
+ */
+/* !important: another rule in this file sets --store-page-width with !important */
+html.se-store,
+html.se-store body,
+html.se-store #StoreTemplate {
+  --store-page-width: var(--se-page-width) !important;
+}
+
+/* !important: Steam's own rules (home_gamepad.css, store.css) set max-width, width at equal or
+   higher weight; the theme's shared rules (web/store/awards/results.css, web/store/dlc/page.css,
+   web/store/legal/legal.css) set margin-inline, max-width, width with !important */
+html.se-store body.v6 .page_content,
+html.se-store body.v6.narrowstore .page_content,
+html.se-store div#store_header .content,
+html.se-store .widestore div#store_header .content {
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  margin-inline: auto !important;
+}
+
+/* !important: Steam's own rules (store.css) set min-width at equal or higher weight */
+html.se-store div#store_header {
+  min-width: 0 !important;
+}
+
+/* Any other centered page column shared/nav.js finds (React pages, hubs, sale pages). */
+/* !important: the theme's shared rules (web/store/app/about.css, web/store/awards/results.css,
+   web/store/charts/page.css) set margin-inline, width with !important; max-width can come inline from
+   Steam's markup or scripts */
+html.se-store [data-se-wide] {
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  margin-inline: auto !important;
+}
+
+/* Hub pages built from the front page's section blocks (sales, tags, genres...). */
+/* !important: Steam's own rules (autumn_year_sale.css, home_gamepad.css, spring_year_sale.css) set
+   max-width, width at equal or higher weight; the theme's shared rules (web/store/front/hero.css) set
+   box-sizing, max-width, padding-inline, width with !important */
+html.se-store .home_pagecontent_ctn {
+  box-sizing: border-box !important;
+  width: min(100%, var(--se-page-max) + 2 * var(--se-page-gutter)) !important;
+  max-width: none !important;
+  padding-inline: var(--se-page-gutter) !important;
+}
+
+/* !important: Steam's own rules (contenthub.css, divingbell.css, game_gamepad.css) set max-width,
+   width at equal or higher weight; the theme's shared rules (web/store/account/page.css,
+   web/store/awards/results.css, web/store/dlc/page.css) set max-width, width with !important */
+html.se-store .home_pagecontent_ctn > div,
+html.se-store .home_page_content {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* The capsule spans the page column on every store page, not just the front page. */
+/* !important: the theme's shared rules (web/store/front/hero.css) set max-width, width with !important
+   */
+html.se-store [data-se-nav="bar"] {
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+}
+
+/* ---------- Tooltips ----------
+ * Steam's store tooltips (store.css .store_tooltip: light grey box) as the theme's dark popover,
+ * on every store page.
+ */
+html.se-store:not(#se-none) .store_tooltip {
+  max-width: 300px;
+  padding: var(--se-space-2) var(--se-space-3);
+  color: var(--se-text);
+  font-size: var(--se-fs-sm);
+  line-height: 1.45;
+}
+
+html.se-store:not(#se-none) .store_tooltip a {
+  color: var(--se-accent);
+}

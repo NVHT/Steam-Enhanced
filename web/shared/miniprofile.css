@@ -1,0 +1,393 @@
+/*
+ * Web friend card: the mini profile Steam's shared miniprofile script builds on Store and
+ * Community pages (.miniprofile_hover), drawn as the friend dock's card (Steam's client card,
+ * client/dialogs/hover-cards.css): the profile background as a fading banner, a rounded-square
+ * avatar in a status ring with the name at its foot, the game when playing, the playtime as
+ * tiles (hours large over a small label), then badge and level's ring in one footer tile.
+ * Loaded by web/store/loader.js and web/community/loader.js.
+ *
+ * Classes are Steam's (SteamTracking: steamcommunity.com/public/shared/css/shared_global.css).
+ * `:not(#se-none)` outranks Steam's rules; !important is kept only where the miniprofile script
+ * sets size, margin and position inline or shared_global.css fixes them (328px card, 90px avatar).
+ */
+
+.miniprofile_hover:not(#se-none) {
+  --se-hc-ring: var(--se-offline);
+  width: var(--se-hc-width) !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+.miniprofile_hover:has(:is(.border_color_online, .persona.online)):not(#se-none) {
+  --se-hc-ring: var(--se-online);
+}
+
+.miniprofile_hover:has(:is(.border_color_in-game, .persona.in-game)):not(#se-none) {
+  --se-hc-ring: var(--se-running);
+}
+
+/* Steam's nine-slice shadow images: the card has its own */
+.miniprofile_hover :is(.shadow_ul, .shadow_top, .shadow_ur, .shadow_left, .shadow_right, .shadow_bl, .shadow_bottom, .shadow_br) {
+  display: none !important;
+}
+
+.miniprofile_hover .miniprofile_hover_inner:not(#se-none) {
+  position: relative;
+  inset: auto;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-shadow-pop);
+}
+
+.miniprofile_hover .miniprofile_container:not(#se-none) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: auto !important;
+  min-height: 0 !important;
+  padding: 0 0 var(--se-hc-pad);
+  background: var(--se-surface) !important;
+  color: var(--se-text);
+}
+
+/* Sections in the friend dock card's order (client/dialogs/hover-cards.css): name, game,
+   playtime, then badge and level; Steam may wrap them in .miniprofile_content */
+/* !important: Steam's own rules (shared_global.css) set width at equal or higher weight */
+.miniprofile_hover .miniprofile_content:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  width: auto !important;
+}
+
+.miniprofile_hover :is(.miniprofile_container, .miniprofile_content) > .miniprofile_playersection { order: 1; }
+.miniprofile_hover :is(.miniprofile_container, .miniprofile_content) > :is(.miniprofile_gamesection, .miniprofile_ingamesection) { order: 2; }
+.miniprofile_hover :is(.miniprofile_container, .miniprofile_content) > .miniprofile_playtimesection { order: 3; }
+.miniprofile_hover :is(.miniprofile_container, .miniprofile_content) > .miniprofile_detailssection { order: 4; }
+
+/* Banner: the profile background (video or image), else Steam's blurred avatar, fading into the card */
+.miniprofile_hover :is(.miniprofile_nameplatecontainer, .miniprofile_backgroundblur, .miniprofile_background):not(#se-none) {
+  position: absolute !important;
+  inset: 0 0 auto !important;
+  z-index: 0;
+  width: 100% !important;
+  height: var(--se-hc-banner) !important;
+  margin: 0 !important;
+  overflow: hidden;
+  background-color: var(--se-bg-ink);
+  -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+}
+
+.miniprofile_hover :is(.miniprofile_nameplatecontainer, .miniprofile_background) :is(video, img):not(#se-none) {
+  position: static !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+/* Avatar and name at the banner's foot */
+.miniprofile_hover .miniprofile_playersection:not(#se-none) {
+  position: relative;
+  z-index: var(--se-z-raised);
+  display: flex;
+  align-items: flex-end;
+  gap: var(--se-space-3);
+  height: auto !important;
+  margin: 0 !important;
+  padding: 4.125rem var(--se-space-4) 0 !important;
+  background: none !important;
+  text-shadow: none;
+}
+
+.miniprofile_hover .playersection_avatar_frame {
+  display: none !important;
+}
+
+.miniprofile_hover .playersection_avatar:not(#se-none) {
+  position: static !important;
+  flex: none;
+  width: 64px !important;
+  height: 64px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-avatar-radius);
+  background: var(--se-surface-2) !important;
+  box-shadow: 0 0 0 2px var(--se-surface), 0 0 0 4px var(--se-hc-ring);
+}
+
+.miniprofile_hover .playersection_avatar img:not(#se-none) {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: var(--se-avatar-radius);
+  object-fit: cover;
+}
+
+.miniprofile_hover .player_content:not(#se-none) {
+  position: static !important;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  margin: 0 0 var(--se-space-1) !important;
+  padding: 0 !important;
+}
+
+.miniprofile_hover .persona:not(#se-none) {
+  max-width: 210px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 700 18px/1.25 var(--se-font) !important;
+  letter-spacing: -.01em;
+  color: var(--se-text-strong) !important;
+  text-shadow: 0 2px 12px var(--se-black-60);
+}
+
+/* Online / Offline / Last online…: short text in the ring's color */
+.miniprofile_hover .player_content > :not(.persona):not(#se-none) {
+  max-width: 210px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 600 12.5px/18px var(--se-font) !important;
+  letter-spacing: 0;
+  text-transform: none;
+  text-shadow: 0 1px 8px var(--se-black-60);
+  color: var(--se-hc-ring) !important;
+}
+
+.miniprofile_hover:has(:is(.border_color_offline, .persona.offline)) .player_content > :not(.persona):not(#se-none) {
+  color: var(--se-text-muted) !important;
+}
+
+/*
+ * In game, as the dock card: the game's art beside "IN-GAME", the game's name and rich presence,
+ * on the card's surface (no tile)
+ */
+.miniprofile_hover :is(.miniprofile_gamesection, .miniprofile_ingamesection):not(#se-none) {
+  position: relative;
+  z-index: var(--se-z-raised);
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--se-space-half) var(--se-space-3);
+  height: auto !important;
+  min-height: 0;
+  margin: var(--se-space-4) var(--se-hc-pad) 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  text-shadow: none;
+}
+
+/* Without art, the text takes the whole row */
+.miniprofile_hover :is(.miniprofile_gamesection, .miniprofile_ingamesection):not(:has(img)):not(#se-none) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Game art: the in-game section's and the playtime section's, one size */
+.miniprofile_hover :is(:is(.miniprofile_gamesection, .miniprofile_ingamesection) img, .miniprofile_playtimesection .gamelogo):not(#se-none) {
+  position: static !important;
+  flex: none;
+  width: 86px !important;
+  height: 40px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm);
+  object-fit: cover;
+  box-shadow: inset 0 0 0 1px var(--se-divider);
+}
+
+.miniprofile_hover :is(.miniprofile_gamesection, .miniprofile_ingamesection) img:not(#se-none) {
+  grid-row: 1 / span 3;
+}
+
+/* The text block joins the grid, so state, name and presence stack beside the art */
+.miniprofile_hover .miniprofile_game_details:not(#se-none) {
+  display: contents;
+  font: 600 13.5px/1.3 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.miniprofile_hover :is(.miniprofile_game_name, .game_name, .rich_presence, .game_state):not(#se-none) {
+  grid-column: -2;
+  position: static !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.miniprofile_hover .game_state:not(#se-none) {
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-running) !important;
+}
+
+.miniprofile_hover :is(.miniprofile_game_name, .game_name):not(#se-none) {
+  color: var(--se-text-strong) !important;
+}
+
+.miniprofile_hover .rich_presence:not(#se-none) {
+  font: var(--se-type-small) !important;
+  color: var(--se-text-muted) !important;
+}
+
+/*
+ * Playtime, as the dock card: the game's art on its own row, then one tile per figure across the
+ * card, the hours large over a small label
+ */
+.miniprofile_hover .miniprofile_playtimesection:not(#se-none) {
+  position: relative;
+  z-index: var(--se-z-raised);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--se-space-3);
+  min-height: 0;
+  margin: var(--se-space-4) var(--se-hc-pad) 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* Inside the in-game section (playtime in the game they're playing): under the game, full width */
+.miniprofile_hover .miniprofile_playtimesection.forcurrentgame:not(#se-none) {
+  grid-column: 1 / -1;
+  margin: var(--se-space-3) 0 0;
+}
+
+.miniprofile_hover .miniprofile_playtimesection .gamelogo:not(#se-none) {
+  align-self: flex-start;
+}
+
+.miniprofile_hover .miniprofile_playtimesection .playtimecontent:not(#se-none) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: var(--se-space-2);
+  min-width: 0;
+}
+
+/* The tile: the hours large on top, the label small under them */
+.miniprofile_hover .miniprofile_playtimesection .playtimecontent > div:not(#se-none) {
+  min-width: 0;
+  margin: 0;
+  padding: var(--se-space-2) var(--se-space-3);
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  font: var(--se-label-font);
+  font-size: var(--se-fs-2xs);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.miniprofile_hover .miniprofile_playtimesection .timeplayed:not(#se-none) {
+  display: block;
+  font: 700 16px/22px var(--se-font);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--se-text-strong);
+}
+
+/* Badge and Steam level, as the dock card: one footer tile, the badge first, the level's ring at
+   the end */
+.miniprofile_hover .miniprofile_detailssection:not(#se-none) {
+  position: relative;
+  z-index: var(--se-z-raised);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--se-space-3);
+  height: auto !important;
+  margin: var(--se-space-3) var(--se-hc-pad) 0 !important;
+  padding: var(--se-space-2) var(--se-space-3) !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.miniprofile_hover .miniprofile_detailssection:not(:has(.miniprofile_featuredcontainer)) {
+  display: none;
+}
+
+.miniprofile_hover .miniprofile_featuredcontainer:not(#se-none) {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  min-width: 0;
+  height: auto !important;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* The level: just the ring, at the end of the row */
+.miniprofile_hover .miniprofile_featuredcontainer:has(.friendPlayerLevel):not(#se-none) {
+  flex: none;
+  order: 2;
+}
+
+.miniprofile_hover .miniprofile_featuredcontainer:has(.friendPlayerLevel) .description:not(#se-none) {
+  display: none;
+}
+
+/* The badge art keeps its own shape: rounding its corners cut the art off */
+.miniprofile_hover .miniprofile_featuredcontainer .badge_icon:not(#se-none) {
+  flex: none;
+  width: var(--se-card-art) !important;
+  height: var(--se-card-art) !important;
+  margin: 0 !important;
+  object-fit: contain;
+}
+
+.miniprofile_hover .miniprofile_featuredcontainer .friendPlayerLevel:not(#se-none) {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--se-card-art);
+  height: var(--se-card-art);
+  margin: 0 !important;
+  line-height: 1;
+}
+
+.miniprofile_hover .miniprofile_featuredcontainer .friendPlayerLevelNum:not(#se-none) {
+  font: 700 11px/1 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.miniprofile_hover .miniprofile_featuredcontainer .description:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.miniprofile_hover .miniprofile_featuredcontainer .name:not(#se-none) {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 600 12.5px/18px var(--se-font) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.miniprofile_hover .miniprofile_featuredcontainer .xp:not(#se-none) {
+  font: 500 11px/16px var(--se-font) !important;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--se-text-muted) !important;
+}

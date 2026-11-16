@@ -1,0 +1,618 @@
+/*
+ * Continues summary.css (in order, see web/store/loader.js): Steam's buttons as a centred row of
+ * pills; In a discovery queue; Buy; Wishlist and Ignore menus.
+ */
+
+/* ---------- Steam's buttons as a centred row of pills ---------- */
+
+/* Steam shows and hides its buttons with inline display, so containers only get layout here. */
+html.se-app-summary-on #queueActionsCtn {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-space-2);
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-app-summary-on #queueActionsCtn > *,
+html.se-app-summary-on #queueActionsCtn .queue_control_button,
+html.se-app-summary-on #queueActionsCtn .right {
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-app-summary-on #queueActionsCtn .expand_to_fill {
+  display: none !important;
+}
+
+/* Ignore and its menu arrow sit as one pair. */
+html.se-app-summary-on #ignoreBtn {
+  position: relative;
+  gap: var(--se-space-half);
+}
+
+html.se-app-summary-on #ignoreBtn:not([style*="none"]) {
+  display: flex;
+}
+
+/* Every button: a pill on the raised surface. */
+html.se-app-summary-on #queueActionsCtn .btnv6_blue_hoverfade,
+html.se-app-summary-on #queueActionsCtn .queue_menu_arrow {
+  height: 40px;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: none !important;
+  color: var(--se-text) !important;
+  transition: background var(--se-dur), color var(--se-dur);
+}
+
+html.se-app-summary-on #queueActionsCtn .btnv6_blue_hoverfade:hover,
+html.se-app-summary-on #queueActionsCtn .queue_menu_arrow:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-app-summary-on #queueActionsCtn .btnv6_blue_hoverfade > span {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: var(--se-ctl);
+  padding: 0 var(--se-space-4) !important;
+  border-radius: inherit !important;
+  background: none !important;
+  color: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 700;
+  line-height: var(--se-ctl) !important;
+}
+
+/* Ignore's menu arrow: a round button with a chevron. */
+html.se-app-summary-on #queueActionsCtn .queue_menu_arrow {
+  display: grid !important;
+  place-items: center;
+  width: 40px;
+}
+
+html.se-app-summary-on #queueActionsCtn .queue_menu_arrow img {
+  display: none !important;
+}
+
+html.se-app-summary-on #queueActionsCtn .queue_menu_arrow > span {
+  display: block;
+  width: 12px;
+  height: 12px;
+  padding: 0 !important;
+  background: currentColor !important;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* On Wishlist: the wishlist pink, with a heart instead of Steam's check. */
+html.se-app-summary-on #add_to_wishlist_area_success .btnv6_blue_hoverfade {
+  background: color-mix(in srgb, var(--se-wish) 14%, transparent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-wish) 32%, transparent) !important;
+  color: color-mix(in srgb, var(--se-wish) 45%, var(--se-white)) !important;
+}
+
+html.se-app-summary-on #add_to_wishlist_area_success .btnv6_blue_hoverfade:hover {
+  background: color-mix(in srgb, var(--se-wish) 22%, transparent) !important;
+}
+
+html.se-app-summary-on #add_to_wishlist_area_success img {
+  display: none !important;
+}
+
+html.se-app-summary-on #add_to_wishlist_area_success .btnv6_blue_hoverfade > span::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* Following (Follow's active state): the accent tint. */
+html.se-app-summary-on #queueBtnFollow .queue_btn_active {
+  background: var(--se-accent-surface) !important;
+  color: var(--se-accent-hover) !important;
+}
+
+/* View Your Queue: a glass button. */
+html.se-app-summary-on #queueActionsCtn a.btnv6_blue_hoverfade.right {
+  background: var(--se-glass-btn) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line) !important;
+  backdrop-filter: var(--se-blur-chip);
+  color: var(--se-text) !important;
+}
+
+html.se-app-summary-on #queueActionsCtn a.btnv6_blue_hoverfade.right:hover {
+  background: var(--se-glass-btn-hover) !important;
+}
+
+html.se-app-summary-on #queueActionsCtn a.btnv6_blue_hoverfade.right .ico16 {
+  display: none !important;
+}
+
+/* ---------- In a discovery queue (.queue_ctn.in_queue) ----------
+ * Steam adds a reason line ("…is in your discovery queue because it is popular" and
+ * "Customize your queue"), a gold arrow "Next in Queue (11 remaining)" and a gold hint bar.
+ * Here: the reason as one quiet centred line above the buttons, Next in Queue as the row's
+ * last pill (gold tint, chevron, the count as a small badge), the hint as a faint line below.
+ */
+html.se-app-summary-on .queue_ctn.in_queue {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-space-3) var(--se-space-2);
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-app-summary-on .queue_ctn.in_queue > * {
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-app-summary-on .queue_ctn .queue_reason_description_row {
+  order: -1;
+  display: flex !important;
+  flex-wrap: wrap;
+  flex-basis: 100%;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--se-space-1) var(--se-space-4);
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-app-summary-on .queue_ctn .queue_reason_description {
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-sm) !important;
+  line-height: 1.4 !important;
+  text-shadow: 0 1px 8px var(--se-black-60);
+}
+
+html.se-app-summary-on .queue_ctn .queue_reason_description a {
+  color: var(--se-text) !important;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+html.se-app-summary-on .queue_ctn .queue_reason_description a:hover {
+  color: var(--se-accent-hover) !important;
+}
+
+/* "Customize your queue": a link with a small gear, after the reason. */
+html.se-app-summary-on .queue_ctn .queue_settings_link_ctn.queue_reason_description a::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: var(--se-space-2);
+  vertical-align: -1px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M4 7h10M18 7h2M4 17h2M10 17h10'/%3E%3Ccircle cx='16' cy='7' r='2'/%3E%3Ccircle cx='8' cy='17' r='2'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M4 7h10M18 7h2M4 17h2M10 17h10'/%3E%3Ccircle cx='16' cy='7' r='2'/%3E%3Ccircle cx='8' cy='17' r='2'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* Next in Queue: the row's last pill. */
+html.se-app-summary-on .next_in_queue_area {
+  order: 1;
+  float: none !important;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-app-summary-on .btn_next_in_queue {
+  display: inline-flex !important;
+  align-items: center;
+  height: var(--se-ctl) !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: color-mix(in srgb, var(--se-gold) 18%, var(--se-glass-btn)) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-gold) 40%, transparent) !important;
+  backdrop-filter: var(--se-blur-chip);
+  color: var(--se-gold) !important;
+  cursor: pointer;
+  transition: background var(--se-dur);
+}
+
+html.se-app-summary-on .btn_next_in_queue:hover {
+  background: color-mix(in srgb, var(--se-gold) 28%, var(--se-glass-btn)) !important;
+}
+
+/* Steam's arrow tip: a chevron after the label instead. */
+html.se-app-summary-on .btn_next_in_queue::after {
+  content: "" !important;
+  position: static !important;
+  display: block !important;
+  width: 14px !important;
+  height: 14px !important;
+  margin: 0 var(--se-space-4) 0 0 !important;
+  border: 0 !important;
+  background: currentColor !important;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+html.se-app-summary-on .btn_next_in_queue .next_in_queue_content {
+  position: static !important;
+  display: flex !important;
+  align-items: center;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 var(--se-space-3) 0 var(--se-space-4) !important;
+  background: none !important;
+  transform: none !important;
+}
+
+html.se-app-summary-on .btn_next_in_queue span {
+  display: inline-flex !important;
+  align-items: center;
+  gap: var(--se-space-3);
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+}
+
+html.se-app-summary-on .btn_next_in_queue span br {
+  display: none;
+}
+
+/* "(11 remaining)": a small count badge. */
+html.se-app-summary-on .btn_next_in_queue span .queue_sub_text {
+  height: 22px;
+  padding: 0 var(--se-space-2) !important;
+  border-radius: var(--se-radius-control);
+  background: color-mix(in srgb, var(--se-gold) 20%, transparent) !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700 !important;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  opacity: .9;
+}
+
+/* The hint ("Select an option above or…"): a faint line under the row, no gold bar. */
+html.se-app-summary-on .queue_controls_description {
+  order: 2;
+  flex-basis: 100%;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-xs) !important;
+  line-height: 1.4 !important;
+  text-align: center !important;
+  text-shadow: 0 1px 8px var(--se-black-60);
+}
+
+/* ---------- Buy (app/summary.js) and the row's emphasis ----------
+ * Buy is the row's one filled accent button and leads it; it scrolls to the purchase boxes.
+ * Without it (nothing to buy yet), Add to Wishlist takes the accent instead. View Your Queue
+ * is a glass button on the art like the hero's others.
+ */
+.se-app-buy {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  height: 40px;
+  padding: 0 var(--se-space-2) 0 var(--se-space-5);
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: var(--se-accent);
+  color: var(--se-on-accent);
+  font: inherit;
+  font-size: var(--se-fs-base);
+  font-weight: 800;
+  cursor: pointer;
+  transition: background var(--se-dur);
+}
+
+.se-app-buy:hover {
+  background: var(--se-accent-hover);
+}
+
+.se-app-buy:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: 2px;
+}
+
+/* Only "Buy" or Steam's free label: even padding. */
+.se-app-buy:not(:has(.se-app-buy__price)) {
+  padding: 0 var(--se-space-5);
+}
+
+.se-app-buy__pct,
+.se-app-buy__price {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 var(--se-space-3);
+  border-radius: var(--se-radius-control);
+  background: rgb(15 17 21 / .16);
+  font-variant-numeric: tabular-nums;
+}
+
+.se-app-buy__pct {
+  margin-right: calc(-1 * var(--se-space-2));
+  background: var(--se-cart);
+  color: var(--se-on-accent);
+}
+
+/* Wishlist: the accent's quieter tint beside Buy, the filled accent without it. */
+html.se-app-summary-on #add_to_wishlist_area .btnv6_blue_hoverfade {
+  background: var(--se-accent-surface) !important;
+  color: var(--se-accent-hover) !important;
+}
+
+html.se-app-summary-on:not(.se-app-has-buy) #add_to_wishlist_area .btnv6_blue_hoverfade {
+  background: var(--se-btn-primary-bg) !important;
+  color: var(--se-btn-primary-color) !important;
+}
+
+html.se-app-summary-on:not(.se-app-has-buy) #add_to_wishlist_area .btnv6_blue_hoverfade:hover {
+  background: var(--se-btn-primary-bg-hover) !important;
+}
+
+/* Steam's purchase boxes, where Buy lands: clear of the store bar above. */
+html.se-app-summary-on #game_area_purchase {
+  scroll-margin-top: 96px;
+}
+
+/* ---------- Wishlist and Ignore menus ----------
+ * Steam drops each .queue_menu_flyout under its arrow (.queue_btn_menu, position: relative,
+ * left: 0). Anchoring to the whole group instead (the pill + its arrow) lines the menu up
+ * with the pill's left edge, a small gap below the row.
+ */
+html.se-app-summary-on #add_to_wishlist_area_success,
+html.se-app-summary-on #ignoreBtn {
+  position: relative;
+}
+
+html.se-app-summary-on #add_to_wishlist_area_success:not([style*="none"]) {
+  display: flex;
+  gap: var(--se-space-half);
+}
+
+html.se-app-summary-on #queueActionsCtn .queue_btn_menu {
+  position: static !important;
+}
+
+html.se-app-summary-on .queue_menu_flyout {
+  top: calc(100% + 8px) !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: 0 !important;
+  z-index: 30;
+  box-sizing: border-box;
+  width: 320px !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-2) !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-panel-bg) !important;
+  box-shadow: var(--se-panel-shadow) !important;
+  backdrop-filter: var(--se-blur-panel);
+  color: var(--se-text);
+  text-align: left;
+}
+
+html.se-app-summary-on .queue_menu_flyout_content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-half);
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* Rows: Manage / Remove (links), Ignore options (buttons). */
+html.se-app-summary-on .queue_menu_option {
+  display: flex !important;
+  align-items: flex-start;
+  gap: var(--se-space-3);
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: var(--se-space-3) var(--se-space-3) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--se-dur);
+}
+
+html.se-app-summary-on .queue_menu_option:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-app-summary-on .queue_menu_option_label {
+  padding: 0 !important;
+}
+
+html.se-app-summary-on .queue_menu_option .option_title {
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none !important;
+}
+
+html.se-app-summary-on .queue_menu_option .option_subtitle {
+  margin-top: var(--se-space-half);
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-sm) !important;
+  line-height: 1.4;
+}
+
+/* Ignore's choice marks: Steam's check images, sized to sit beside the text. */
+html.se-app-summary-on .queue_ignore_menu_option_image {
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  opacity: .85;
+}
+
+/* Wishlist categories (Steam's React block): a divider, a heading row, tag pills. */
+html.se-app-summary-on [data-featuretarget="wishlist-item-categories"] {
+  margin-top: var(--se-space-1);
+  padding: var(--se-space-3) var(--se-space-3) var(--se-space-2);
+  border-top: 1px solid var(--se-hairline);
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-sm);
+}
+
+html.se-app-summary-on [data-featuretarget="wishlist-item-categories"] [role="button"]:has(> button) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--se-space-2);
+  color: var(--se-text);
+  font-size: var(--se-fs-base);
+  font-weight: 700;
+}
+
+html.se-app-summary-on [data-featuretarget="wishlist-item-categories"] button {
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-pill) !important;
+  box-shadow: none !important;
+  color: var(--se-text-dim) !important;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--se-dur), color var(--se-dur);
+}
+
+html.se-app-summary-on [data-featuretarget="wishlist-item-categories"] button:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+/* Category pills. */
+html.se-app-summary-on [data-featuretarget="wishlist-item-categories"] button:not(:has(svg)) {
+  height: var(--se-ctl-sm);
+  margin: 0 var(--se-space-2) var(--se-space-2) 0 !important;
+  padding: 0 var(--se-space-3) !important;
+}
+
+/* New category: a round accent button. */
+html.se-app-summary-on [data-featuretarget="wishlist-item-categories"] button:has(svg) {
+  display: grid !important;
+  place-items: center;
+  width: 28px !important;
+  height: var(--se-ctl-sm) !important;
+  padding: 0 !important;
+  background: var(--se-accent-surface) !important;
+  color: var(--se-accent-hover) !important;
+}
+
+html.se-app-summary-on [data-featuretarget="wishlist-item-categories"] button svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ---------- Narrow windows: the three columns stack ---------- */
+
+@media (max-width: 1100px) {
+  .se-app-summary__strip,
+  .se-app-summary__strip[data-se-cols] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .se-app-summary__cell {
+    padding-inline: 0;
+  }
+
+  .se-app-summary__cell + .se-app-summary__cell {
+    border-left: 0;
+    border-top: 1px solid var(--se-hairline);
+  }
+}
+
+/* ---------- Duotone feature and reason icons ----------
+ * The theme's icon recipe (1.75 stroke over a 32% fill), drawn as masks in the text colour.
+ * app/summary.js picks the key from Steam's icon file name (ico_cloud.png -> cloud...), so
+ * the match works in any store language; unknown features get the spark. Relevance reasons
+ * use check / cross / info by their tone.
+ */
+.se-app-summary {
+  --se-ico-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M8 12.5l2.6 2.6L16 9.6'/%3E%3C/svg%3E");
+  --se-ico-cross: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M9 9l6 6M15 9l-6 6'/%3E%3C/svg%3E");
+  --se-ico-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M12 11v5M12 8h.01'/%3E%3C/svg%3E");
+  --se-ico-single: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='12' cy='8' r='3.5'/%3E%3C/g%3E%3Ccircle cx='12' cy='8' r='3.5'/%3E%3Cpath d='M5 20c.9-3.6 3.6-5.5 7-5.5s6.1 1.9 7 5.5'/%3E%3C/svg%3E");
+  --se-ico-multi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='9' cy='8.5' r='3.5'/%3E%3C/g%3E%3Ccircle cx='9' cy='8.5' r='3.5'/%3E%3Cpath d='M2.5 19.5c.9-3.3 3.4-5 6.5-5s5.6 1.7 6.5 5'/%3E%3Ccircle cx='17' cy='9' r='2.7'/%3E%3Cpath d='M17 14.3c2.3.1 3.9 1.7 4.6 4.7'/%3E%3C/svg%3E");
+  --se-ico-coop: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='7.5' cy='9' r='2.6'/%3E%3Ccircle cx='16.5' cy='9' r='2.6'/%3E%3C/g%3E%3Ccircle cx='7.5' cy='9' r='2.6'/%3E%3Ccircle cx='16.5' cy='9' r='2.6'/%3E%3Cpath d='M3 19c.6-2.8 2.3-4.3 4.5-4.3S11.4 16.2 12 19c.6-2.8 2.3-4.3 4.5-4.3S20.4 16.2 21 19'/%3E%3C/svg%3E");
+  --se-ico-versus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M9 15l-4 4-1-1 4-4z'/%3E%3Cpath d='M15 15l4 4 1-1-4-4z'/%3E%3C/g%3E%3Cpath d='M14.5 4H20v5.5L9 20.5 3.5 15z'/%3E%3Cpath d='M9.5 4H4v5.5L15 20.5l5.5-5.5'/%3E%3C/svg%3E");
+  --se-ico-screen: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='3' y='4.5' width='18' height='12.5' rx='2'/%3E%3C/g%3E%3Crect x='3' y='4.5' width='18' height='12.5' rx='2'/%3E%3Cpath d='M12 4.5V17M8.5 20.5h7'/%3E%3C/svg%3E");
+  --se-ico-trophy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M8 4h8v5a4 4 0 0 1-8 0z'/%3E%3C/g%3E%3Cpath d='M8 4h8v5a4 4 0 0 1-8 0z'/%3E%3Cpath d='M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v3.5M8.5 20h7M10 16.5h4V20h-4z'/%3E%3C/svg%3E");
+  --se-ico-cards: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='9' y='3' width='11' height='14.5' rx='2'/%3E%3C/g%3E%3Crect x='9' y='3' width='11' height='14.5' rx='2'/%3E%3Cpath d='M6.5 6.5H6a2 2 0 0 0-2 2V19a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-1.5'/%3E%3C/svg%3E");
+  --se-ico-cloud: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M7 18.5a4.2 4.2 0 0 1-.6-8.4A5.6 5.6 0 0 1 17.2 9a4.7 4.7 0 0 1 .3 9.5z'/%3E%3C/g%3E%3Cpath d='M7 18.5a4.2 4.2 0 0 1-.6-8.4A5.6 5.6 0 0 1 17.2 9a4.7 4.7 0 0 1 .3 9.5z'/%3E%3C/svg%3E");
+  --se-ico-stats: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='10.25' y='8' width='3.5' height='12' rx='1'/%3E%3C/g%3E%3Crect x='4' y='12' width='3.5' height='8' rx='1'/%3E%3Crect x='10.25' y='8' width='3.5' height='12' rx='1'/%3E%3Crect x='16.5' y='4' width='3.5' height='16' rx='1'/%3E%3C/svg%3E");
+  --se-ico-podium: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='9' y='7.5' width='6' height='12.5' rx='1'/%3E%3C/g%3E%3Crect x='9' y='7.5' width='6' height='12.5' rx='1'/%3E%3Cpath d='M9 12H4a1 1 0 0 0-1 1v7h18v-4a1 1 0 0 0-1-1h-5M12 3.5v1'/%3E%3C/svg%3E");
+  --se-ico-remote: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='2.5' y='10' width='14' height='9' rx='4.5'/%3E%3C/g%3E%3Crect x='2.5' y='10' width='14' height='9' rx='4.5'/%3E%3Cpath d='M6.5 13v3M5 14.5h3M12.5 14h.01M14 15.5h.01M17 3.5a5 5 0 0 1 4.5 4.5M17 6.5a2 2 0 0 1 1.5 1.5'/%3E%3C/svg%3E");
+  --se-ico-family: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='12' cy='12.5' r='2.2'/%3E%3C/g%3E%3Ccircle cx='7.5' cy='7' r='2.5'/%3E%3Ccircle cx='16.5' cy='7' r='2.5'/%3E%3Ccircle cx='12' cy='12.5' r='2.2'/%3E%3Cpath d='M3 17c.5-3 2.2-4.8 4.5-4.8M21 17c-.5-3-2.2-4.8-4.5-4.8M8 20.5c.5-2.3 2-3.5 4-3.5s3.5 1.2 4 3.5'/%3E%3C/svg%3E");
+  --se-ico-gamepad: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M7 7h10a4.5 4.5 0 0 1 4.4 5.5l-1 4.4a2.5 2.5 0 0 1-4.3 1.1L14.5 16h-5l-1.6 2a2.5 2.5 0 0 1-4.3-1.1l-1-4.4A4.5 4.5 0 0 1 7 7z'/%3E%3C/g%3E%3Cpath d='M7 7h10a4.5 4.5 0 0 1 4.4 5.5l-1 4.4a2.5 2.5 0 0 1-4.3 1.1L14.5 16h-5l-1.6 2a2.5 2.5 0 0 1-4.3-1.1l-1-4.4A4.5 4.5 0 0 1 7 7z'/%3E%3Cpath d='M8 10v3M6.5 11.5h3M15.5 10.5h.01M17 12h.01'/%3E%3C/svg%3E");
+  --se-ico-vr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='2.5' y='7' width='19' height='10' rx='4'/%3E%3C/g%3E%3Crect x='2.5' y='7' width='19' height='10' rx='4'/%3E%3Cpath d='M9.5 17l1-2a1.7 1.7 0 0 1 3 0l1 2'/%3E%3C/svg%3E");
+  --se-ico-workshop: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M14.5 4.2a4.3 4.3 0 0 0 5.3 5.3z'/%3E%3C/g%3E%3Cpath d='M14.5 4.2a4.3 4.3 0 0 0 5.3 5.3l-9.6 9.6a2.1 2.1 0 0 1-3-3z'/%3E%3C/svg%3E");
+  --se-ico-hdr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3C/g%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4'/%3E%3C/svg%3E");
+  --se-ico-shield: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z'/%3E%3C/g%3E%3Cpath d='M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z'/%3E%3Cpath d='M9 12l2 2 4-4'/%3E%3C/svg%3E");
+  --se-ico-cart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M6.2 8H21l-2.4 7H7.4z'/%3E%3C/g%3E%3Cpath d='M3 4h2l2.4 11h11L21 8H6.2'/%3E%3Ccircle cx='9' cy='19.5' r='1.4'/%3E%3Ccircle cx='17' cy='19.5' r='1.4'/%3E%3C/svg%3E");
+  --se-ico-captions: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='3' y='5' width='18' height='14' rx='2.5'/%3E%3C/g%3E%3Crect x='3' y='5' width='18' height='14' rx='2.5'/%3E%3Cpath d='M7 11h4M13 11h4M7 15h6M15 15h2'/%3E%3C/svg%3E");
+  --se-ico-lan: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='9' y='3' width='6' height='5' rx='1'/%3E%3C/g%3E%3Crect x='9' y='3' width='6' height='5' rx='1'/%3E%3Crect x='3' y='16' width='6' height='5' rx='1'/%3E%3Crect x='15' y='16' width='6' height='5' rx='1'/%3E%3Cpath d='M12 8v4M6 16v-4h12v4'/%3E%3C/svg%3E");
+  --se-ico-access: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3C/g%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='7.5' r='1.3'/%3E%3Cpath d='M7.5 10.5l4.5 1 4.5-1M12 11.5v3M9.5 18l2.5-3.5 2.5 3.5'/%3E%3C/svg%3E");
+  --se-ico-spark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z'/%3E%3C/g%3E%3Cpath d='M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z'/%3E%3C/svg%3E");
+}
+
+.se-app-summary__feature-icon[data-se-icon="single"] { --se-ico: var(--se-ico-single); }
+.se-app-summary__feature-icon[data-se-icon="multi"] { --se-ico: var(--se-ico-multi); }
+.se-app-summary__feature-icon[data-se-icon="coop"] { --se-ico: var(--se-ico-coop); }
+.se-app-summary__feature-icon[data-se-icon="versus"] { --se-ico: var(--se-ico-versus); }
+.se-app-summary__feature-icon[data-se-icon="screen"] { --se-ico: var(--se-ico-screen); }
+.se-app-summary__feature-icon[data-se-icon="trophy"] { --se-ico: var(--se-ico-trophy); }
+.se-app-summary__feature-icon[data-se-icon="cards"] { --se-ico: var(--se-ico-cards); }
+.se-app-summary__feature-icon[data-se-icon="cloud"] { --se-ico: var(--se-ico-cloud); }
+.se-app-summary__feature-icon[data-se-icon="stats"] { --se-ico: var(--se-ico-stats); }
+.se-app-summary__feature-icon[data-se-icon="podium"] { --se-ico: var(--se-ico-podium); }
+.se-app-summary__feature-icon[data-se-icon="remote"] { --se-ico: var(--se-ico-remote); }
+.se-app-summary__feature-icon[data-se-icon="family"] { --se-ico: var(--se-ico-family); }
+.se-app-summary__feature-icon[data-se-icon="gamepad"] { --se-ico: var(--se-ico-gamepad); }
+.se-app-summary__feature-icon[data-se-icon="vr"] { --se-ico: var(--se-ico-vr); }
+.se-app-summary__feature-icon[data-se-icon="workshop"] { --se-ico: var(--se-ico-workshop); }
+.se-app-summary__feature-icon[data-se-icon="hdr"] { --se-ico: var(--se-ico-hdr); }
+.se-app-summary__feature-icon[data-se-icon="shield"] { --se-ico: var(--se-ico-shield); }
+.se-app-summary__feature-icon[data-se-icon="cart"] { --se-ico: var(--se-ico-cart); }
+.se-app-summary__feature-icon[data-se-icon="captions"] { --se-ico: var(--se-ico-captions); }
+.se-app-summary__feature-icon[data-se-icon="lan"] { --se-ico: var(--se-ico-lan); }
+.se-app-summary__feature-icon[data-se-icon="access"] { --se-ico: var(--se-ico-access); }
+.se-app-summary__feature-icon[data-se-icon="spark"] { --se-ico: var(--se-ico-spark); }

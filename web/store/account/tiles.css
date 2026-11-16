@@ -1,0 +1,195 @@
+/*
+ * Continues page.css (in order, see web/store/loader.js): Action links; Wallet tile; Danger
+ * card.
+ */
+
+/* ---------- Action links: one row button each ---------- */
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-3);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 40px;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-4) !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-pill) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link::after {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  opacity: .5;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: opacity var(--se-dur), transform var(--se-dur) var(--se-ease);
+}
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link:hover::after {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+/* Add funds: the page's one primary action */
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link[href*="addfunds" i] {
+  background: var(--se-accent) !important;
+  box-shadow: none;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link[href*="addfunds" i]:hover {
+  background: var(--se-accent-hover) !important;
+}
+
+/* ---------- Wallet tile ---------- */
+
+.se-account-balance {
+  order: -1; /* heads the tile, above Add funds */
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  padding-bottom: var(--se-space-1);
+}
+
+.se-account-balance-label {
+  font: var(--se-label-font);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--se-text-faint);
+}
+
+html.se-store-account:not(#se-none) .se-account-balance-amount {
+  align-self: flex-start;
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-4xl)/1.1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+  text-decoration: none !important;
+  transition: color var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) a.se-account-balance-amount:hover {
+  color: var(--se-accent-hover) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-wallet] > p {
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-base);
+}
+
+/* Saved payment method: a field with the brand, the card's tail and its actions */
+html.se-store-account:not(#se-none) .se-account-card .payment_method_box {
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-2) var(--se-space-2) var(--se-space-4) !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .payment_method_box table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .payment_method_box td {
+  padding: 0 !important;
+  vertical-align: middle;
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .payment_method_box td + td {
+  width: 1%;
+  padding-left: var(--se-space-2) !important;
+  white-space: nowrap;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .cached_payment_method_description {
+  margin-left: var(--se-space-2);
+  color: var(--se-text-muted);
+  font-weight: 500;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .payment_method_box td a {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 var(--se-space-3);
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2);
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-label);
+  text-decoration: none !important;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .payment_method_box td a:hover {
+  background: var(--se-hover);
+  color: var(--se-text) !important;
+}
+
+/* ---------- Danger card: delete account ---------- */
+
+.se-account-card[data-tone="danger"] {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-4);
+  padding: var(--se-space-4) var(--se-space-5);
+  background: color-mix(in srgb, var(--se-danger) 6%, var(--se-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-danger) 22%, transparent);
+}
+
+.se-account-card[data-tone="danger"] > .se-account-chip {
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent);
+  box-shadow: none;
+  color: var(--se-danger);
+}
+
+html.se-store-account:not(#se-none) .se-account-card[data-tone="danger"] > .account_setting_block_short {
+  flex: 1;
+  min-width: 0;
+  display: block !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card[data-tone="danger"] .account_setting_sub_block_long {
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none;
+  color: var(--se-text-muted) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card[data-tone="danger"] .account_setting_sub_block_long > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-3) var(--se-space-5);
+  color: var(--se-text-muted);
+}
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link.delete_link {
+  order: 2;
+  width: auto;
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent) !important;
+  box-shadow: none;
+  color: var(--se-danger) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link.delete_link:hover {
+  background: var(--se-danger) !important;
+  color: var(--se-on-accent) !important;
+}

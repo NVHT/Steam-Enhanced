@@ -1,0 +1,173 @@
+/*
+ * Continues ui.css (in order, see web/store/loader.js): Game hover card; Steam's game hover
+ * card; Game hover card; Theme-made parts shared across pages.
+ */
+
+/* ==========================================================================
+ * Game hover card
+ * ========================================================================== */
+/*
+ * Steam's game hover card (store.css .game_hover_box: the popup beside a hovered capsule) as a
+ * dark theme card, on every store page.
+ */
+
+/* ---------- Game hover card (store.css .game_hover_box) ---------- */
+
+html.se-store:not(#se-none) .game_hover_box {
+  width: 320px;
+  margin: 0;
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-base);
+  line-height: 1.45;
+}
+
+html.se-store:not(#se-none) .game_hover_box .content {
+  padding: var(--se-space-4);
+}
+
+html.se-store:not(#se-none) .game_hover :is(.hover_arrow_left, .hover_arrow_right) {
+  display: none;
+}
+
+html.se-store:not(#se-none) .game_hover_box h4.hover_title {
+  margin: 0 0 var(--se-space-1);
+  color: var(--se-white);
+  font-size: var(--se-fs-lg);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+html.se-store:not(#se-none) .game_hover_box .hover_release {
+  margin-bottom: var(--se-space-3);
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-sm);
+}
+
+html.se-store:not(#se-none) .game_hover_box .hover_screenshots {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  margin: var(--se-space-3) 0 var(--se-space-3);
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+}
+
+/* Blocks (reviews, friends who recommend): theme wells. */
+html.se-store:not(#se-none) .game_hover_box :is(.hover_review_summary, .hover_details_block_full, .hover_details_block) {
+  height: auto;
+  margin: var(--se-space-3) 0;
+  padding: var(--se-space-2) var(--se-space-3);
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-edge);
+  color: var(--se-text-dim);
+  line-height: 1.4;
+}
+
+/* Category lines ("N friends recommend this game", .hover_category_icon > img: Steam's blue
+   thumbs-up bitmap, floated over the text): the icon box as the theme's duotone glyph in the
+   accent, in line before the text. */
+html.se-store:not(#se-none) .game_hover_box .hover_category_icon {
+  float: none;
+  display: inline-block;
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  margin: 0 var(--se-space-2) 0 0;
+  vertical-align: -3px;
+  background: var(--se-accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10.5v9.5M7 10.5l3.6-6.4a1.8 1.8 0 0 1 3.3 1.2L13.2 9.5h5a2 2 0 0 1 2 2.3l-1.2 6.5a2 2 0 0 1-2 1.7H7m0-9.5H4.5a1 1 0 0 0-1 1V19a1 1 0 0 0 1 1H7' fill='black' fill-opacity='.32' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10.5v9.5M7 10.5l3.6-6.4a1.8 1.8 0 0 1 3.3 1.2L13.2 9.5h5a2 2 0 0 1 2 2.3l-1.2 6.5a2 2 0 0 1-2 1.7H7m0-9.5H4.5a1 1 0 0 0-1 1V19a1 1 0 0 0 1 1H7' fill='black' fill-opacity='.32' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+html.se-store:not(#se-none) .game_hover_box .hover_category_icon img {
+  display: none;
+}
+
+html.se-store:not(#se-none) .game_hover_box .hover_details_block {
+  float: none;
+  display: inline-flex;
+  margin-inline-end: var(--se-space-2);
+}
+
+html.se-store:not(#se-none) .game_hover_box .hover_review_summary .game_review_summary {
+  font-weight: 700;
+}
+
+html.se-store:not(#se-none) .game_hover_box .hover_body .positive {
+  color: var(--se-accent);
+}
+
+/* User tags: pills. */
+html.se-store:not(#se-none) .game_hover_box .hover_tag_row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  height: auto;
+  max-height: 56px;
+  margin-top: var(--se-space-2);
+}
+
+/* !important: the theme's shared rules (web/store/shared/modals.css) set background with !important */
+html.se-store:not(#se-none) .game_hover_box .hover_tag_row .app_tag {
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-edge);
+  line-height: 24px;
+}
+
+/* Friends who own it: rounded avatars. */
+html.se-store:not(#se-none) .game_hover_box .hover_friends_blocks img,
+html.se-store:not(#se-none) .game_hover_box .friend_blocks_row img {
+  border-radius: var(--se-radius-sm);
+}
+
+html.se-store:not(#se-none) .game_hover_box :is(.playerAvatar, .friend_block_holder) {
+  border-radius: var(--se-radius-md);
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.se-store-rows:not(#se-none) [data-se-tile] .broadcast_live_stream_icon::before {
+    animation: none;
+  }
+
+  html.se-store-rows:not(#se-none) :is([data-se-tile], [data-se-tile-art] img, img[data-se-tile-art], [data-se-price-bar],
+    [data-se-arrow], .mzAzU7-I6qg- img, .nHdn-Ea4zSg- .e217oOT2n-w-) {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
+ * Theme-made parts shared across pages
+ * ========================================================================== */
+
+/* Tag chips added to list rows (front/tabs.js, explore/page.js): one line, at most three. */
+html.se-store:not(#se-none) .se-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  height: 22px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* !important: another rule in this file sets font-size, padding with !important */
+html.se-store:not(#se-none) .se-chip-tag {
+  height: 22px;
+  padding: 0 var(--se-space-2) !important;
+  font-size: var(--se-fs-xs) !important;
+}
+
+/* The chevron after a link's label ("View in store", "See more"); nudges on hover. */
+html.se-store .se-arrow-icon {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border: solid currentColor;
+  border-width: 2px 2px 0 0;
+  transform: rotate(45deg);
+  transition: transform var(--se-dur) var(--se-ease);
+}
+
+html.se-store :hover > .se-arrow-icon {
+  transform: translateX(3px) rotate(45deg);
+}

@@ -1,0 +1,259 @@
+/*
+ * Continues ui.css (in order, see web/store/loader.js): Buttons; Icon buttons; Primary buttons;
+ * Accent chips.
+ */
+
+/* ==========================================================================
+ * Buttons (core/tokens.css --se-btn-*): "See more", "Browse all", "Show more", "Follow",
+ * "Share" and the like, the web's one button with a thin ring that lights up on hover (and while its menu is open). Members
+ * beside a taller control set --se-pill-h to match it.
+ * ========================================================================== */
+/* !important: Steam's own rules (apppageroutes.css, game_gamepad.css, game_mob.css) set
+   background, color, display, font-size, line-height, margin, padding at equal or higher weight;
+   the theme's shared rules (web/store/account/funds/page.css, web/store/account/licenses/page.css,
+   web/store/account/page.css) set background, background-image, border, border-radius, box-shadow,
+   color, display, font-family, font-size, font-weight, letter-spacing, line-height, margin,
+   padding, text-decoration, text-transform with !important */
+html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLKwjtCwE- :is(a, button), .title_grid .see_more_link > a),
+html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn,
+html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) a,
+html.se-store-front #module_discounts_and_events a.znS2DqGQQHM-,
+html.se-store-rows:not(#se-none) .community_recommendation_app .view_more a,
+html.se-store-charts:not(#se-none) .NBN-f1mBrso- ._4IVE0bUT9m8-,
+html.se-store-charts:not(#se-none) .Hm1VV1Ltxnc- a,
+html.se-store-charts:not(#se-none) .Tc1RM13bONs- button,
+html.se-store:not(#se-none) .SaleOuterContainer .SocialShareButton,
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionLabelCtn + :last-child > .DialogButton,
+html.se-store-labs:not(#se-none) .labs-content a.experiment-button,
+html.se-store-dlc:not(#se-none) .se-dlc-hero__store,
+html.se-store-wishlist:not(#se-none) [data-se-wl="tool"],
+html.se-store-search:not(#se-none) :is(#sort_by_trigger, .search_results_filtered_warning .settings_tab) {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-btn-gap);
+  height: var(--se-pill-h, var(--se-btn-h));
+  margin: 0 !important;
+  padding: var(--se-btn-pad) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-btn-bg) !important;
+  background-image: none !important;
+  box-shadow: var(--se-btn-edge) !important;
+  color: var(--se-btn-color) !important;
+  font: var(--se-btn-font) !important;
+  letter-spacing: 0 !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+/* !important: Steam's own rules (game_gamepad.css, game_mob.css, salesectionfactory.css) set
+   background, color at equal or higher weight; the theme's shared rules
+   (web/store/account/funds/page.css, web/store/account/licenses/page.css, web/store/account/page.css) set
+   background, color with !important */
+html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLKwjtCwE- :is(a, button), .title_grid .see_more_link > a):hover,
+html.se-store-rows:not(#se-none) [data-se-tile] .creator_follow_btn:hover,
+html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) a:hover,
+html.se-store-front #module_discounts_and_events a.znS2DqGQQHM-:hover,
+html.se-store-rows:not(#se-none) .community_recommendation_app .view_more a:hover,
+html.se-store-charts:not(#se-none) .NBN-f1mBrso- ._4IVE0bUT9m8-:hover,
+html.se-store-charts:not(#se-none) .Hm1VV1Ltxnc- a:hover,
+html.se-store-charts:not(#se-none) .Tc1RM13bONs- button:hover,
+html.se-store:not(#se-none) .SaleOuterContainer .SocialShareButton:hover,
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionLabelCtn + :last-child > .DialogButton:hover,
+html.se-store-labs:not(#se-none) .labs-content a.experiment-button:hover,
+html.se-store-dlc:not(#se-none) .se-dlc-hero__store:hover,
+html.se-store-wishlist:not(#se-none) [data-se-wl="tool"]:is(:hover, [aria-expanded="true"]),
+html.se-store-search:not(#se-none) :is(#sort_by_trigger, .search_results_filtered_warning .settings_tab):hover {
+  background: var(--se-btn-bg-hover) !important;
+  color: var(--se-btn-color-hover) !important;
+}
+
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionLabelCtn + :last-child > .DialogButton:active,
+html.se-store-labs:not(#se-none) .labs-content a.experiment-button:active,
+html.se-store-dlc:not(#se-none) .se-dlc-hero__store:active,
+html.se-store-wishlist:not(#se-none) [data-se-wl="tool"]:active,
+html.se-store-search:not(#se-none) :is(#sort_by_trigger, .search_results_filtered_warning .settings_tab):active {
+  transform: scale(var(--se-press-scale));
+}
+
+/* ==========================================================================
+ * Icon buttons: a square, quiet button holding one glyph (remove, add, view switch). Members
+ * set --se-icon-btn where they sit beside a taller control, and their own hover colour for a
+ * destructive action.
+ * ========================================================================== */
+html.se-store-wishlist:not(#se-none) :is([data-se-wl="remove"], [data-se-wl="cat-add"], [data-se-wl="tool-icon"]) {
+  box-sizing: border-box;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--se-icon-btn, var(--se-btn-h));
+  height: var(--se-icon-btn, var(--se-btn-h));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: transparent;
+  box-shadow: none;
+  color: var(--se-text-muted);
+  cursor: pointer;
+}
+
+html.se-store-wishlist:not(#se-none) :is([data-se-wl="remove"], [data-se-wl="cat-add"], [data-se-wl="tool-icon"]):hover {
+  background: var(--se-btn-bg-hover);
+  color: var(--se-btn-color-hover);
+}
+
+html.se-store-wishlist:not(#se-none) :is([data-se-wl="remove"], [data-se-wl="cat-add"], [data-se-wl="tool-icon"]):active {
+  transform: scale(var(--se-press-scale));
+}
+
+html.se-store-wishlist:not(#se-none) :is([data-se-wl="remove"], [data-se-wl="cat-add"], [data-se-wl="tool-icon"]):disabled {
+  opacity: var(--se-btn-disabled-opacity);
+  cursor: default;
+}
+
+html.se-store-wishlist:not(#se-none) :is([data-se-wl="remove"], [data-se-wl="cat-add"], [data-se-wl="tool-icon"]) svg {
+  width: var(--se-fs-md);
+  height: var(--se-fs-md);
+  fill: currentColor;
+}
+
+/* ==========================================================================
+ * Primary buttons: a view's one main action (Add to Cart on a wishlist row, Search), filled in the
+ * accent at the price chip's height so the two read as one pair; members set --se-accent-pill-h
+ * beside a control of another height.
+ * ========================================================================== */
+html.se-store-wishlist:not(#se-none) [data-se-wl="cart"],
+html.se-store-search:not(#se-none) .searchbar_left > button {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-space-2);
+  width: auto;
+  min-width: var(--se-hit);
+  height: var(--se-accent-pill-h, var(--se-price-h));
+  margin: 0;
+  padding: 0 var(--se-space-5);
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: var(--se-btn-primary-bg);
+  box-shadow: none;
+  color: var(--se-btn-primary-color);
+  font: var(--se-btn-font);
+  text-decoration: none;
+  text-shadow: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform var(--se-dur-fast) var(--se-ease);
+}
+
+/* Steam's label box inside the button: no fill, the button's type. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="cart"] > *,
+html.se-store-search:not(#se-none) .searchbar_left > button > * {
+  width: auto;
+  height: auto;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-shadow: none;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="cart"]:hover,
+html.se-store-search:not(#se-none) .searchbar_left > button:hover {
+  background: var(--se-btn-primary-bg-hover);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="cart"]:active,
+html.se-store-search:not(#se-none) .searchbar_left > button:active {
+  transform: scale(var(--se-press-scale));
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="cart"]:is(:disabled, [aria-disabled="true"]),
+html.se-store-search:not(#se-none) .searchbar_left > button:is(:disabled, [aria-disabled="true"]) {
+  opacity: var(--se-btn-disabled-opacity);
+  cursor: default;
+  transform: none;
+}
+
+/* ==========================================================================
+ * Accent chips: an active filter, or a tag that is an action (Demo Available), a chip in the
+ * accent's tint. Members set --se-accent-chip-h where they sit in a row of other controls; an
+ * active filter ends in an × (clicking it clears the filter).
+ * ========================================================================== */
+html.se-store-wishlist:not(#se-none) :is([data-se-wl="filter"], [data-se-wl="demo"]),
+html.se-store-search:not(#se-none) .termcontainer .searchtag:not(#searchtag_tmpl) {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: var(--se-accent-chip-h, var(--se-chip-h));
+  margin: 0;
+  padding: 0 var(--se-space-3);
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: var(--se-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  color: var(--se-accent);
+  font: var(--se-chip-font);
+  text-decoration: none;
+  text-transform: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+html.se-store-wishlist:not(#se-none) :is([data-se-wl="filter"], [data-se-wl="demo"]):hover,
+html.se-store-search:not(#se-none) .termcontainer .searchtag:hover {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong);
+  color: var(--se-accent-hover);
+}
+
+html.se-store-wishlist:not(#se-none) :is([data-se-wl="filter"], [data-se-wl="demo"]):active,
+html.se-store-search:not(#se-none) .termcontainer .searchtag:active {
+  transform: scale(var(--se-press-scale));
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="filter"]::after {
+  content: "";
+  width: var(--se-fs-sm);
+  height: var(--se-fs-sm);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-close-sm) center / contain no-repeat;
+  mask: var(--se-icon-close-sm) center / contain no-repeat;
+}
+
+/* ==========================================================================
+ * Checkboxes: a small rounded box with a ring, filled in the accent with a check when on
+ * (Steam's checkbox sprite gives way). Members: the search page's filter rows.
+ * ========================================================================== */
+html.se-store-search:not(#se-none) .tab_filter_control_checkbox {
+  box-sizing: border-box;
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: var(--se-fs-lg);
+  height: var(--se-fs-lg);
+  margin: 0;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-border-strong);
+}
+
+html.se-store-search:not(#se-none) .tab_filter_control.checked .tab_filter_control_checkbox {
+  background: var(--se-accent);
+  box-shadow: none;
+}
+
+html.se-store-search:not(#se-none) .tab_filter_control.checked .tab_filter_control_checkbox::after {
+  content: "";
+  width: 75%;
+  height: 75%;
+  background: var(--se-on-accent);
+  -webkit-mask: var(--se-check-mask) center / contain no-repeat;
+  mask: var(--se-check-mask) center / contain no-repeat;
+}

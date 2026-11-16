@@ -1,0 +1,256 @@
+/*
+ * Steam's classic dialogs on Store and Community pages: dialog.newmodal, opened by Steam's
+ * CModal / ShowDialog / ShowBlockingWaitDialog (confirmations, alerts, "Customize Your
+ * Discovery Queue"). Steam positions
+ * each one (inline left/top/width); this restyles it as a theme card. Loaded by
+ * web/store/loader.js and web/community/loader.js; content particular to a site stays with it
+ * (web/store/shared/modals.css).
+ *
+ *   [ Title                                                   ( × ) ]
+ *   [ Text …                                                        ]
+ *   [                                        ( Cancel )( OK )        ]
+ *
+ * The oldest ones (#modalBG + .modal_frame > .modal_box > .modal_box_ctn: the hub's
+ * "Returning to where you were last on this page…") take the same card.
+ *
+ * Steam's classic markup (shared_global.css): .newmodal_background (the scrim), dialog.newmodal >
+ * .modal_top_bar, .newmodal_header_border > .newmodal_header > .newmodal_close + .title_text,
+ * .newmodal_content_border > .newmodal_content > (content) + .newmodal_buttons > .btn_*_steamui.
+ * Rules use :not(#se-none) for ID-level weight.
+ */
+
+/* ---------- Scrim ---------- */
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal_background {
+  background: var(--se-black-60) !important;
+  opacity: 1 !important;
+  backdrop-filter: blur(4px);
+}
+
+/* ---------- Frame ---------- */
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal {
+  overflow: hidden;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card) !important;
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-elevation-3) !important;
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .modal_top_bar {
+  display: none !important;
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal :is(.newmodal_header_border, .newmodal_content_border) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_header {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: var(--se-space-3);
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-5) var(--se-space-5) 0 var(--se-space-5) !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .title_text {
+  flex: 1;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-heading) !important;
+  letter-spacing: -.01em;
+  text-transform: none !important;
+  white-space: normal !important;
+}
+
+/* Close: a round button with the theme's × */
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_close {
+  position: static !important;
+  flex: none;
+  width: 34px !important;
+  height: 34px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur);
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_close::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--se-text-muted);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+  transition: background-color var(--se-dur);
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_close:hover {
+  background: var(--se-hover) !important;
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_close:hover::before {
+  background: var(--se-text);
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_content {
+  margin: 0 !important;
+  padding: var(--se-space-4) var(--se-space-5) var(--se-space-5) !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font: inherit !important;
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_content p {
+  margin: 0 0 var(--se-space-4) !important;
+  color: var(--se-text-dim) !important;
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_content a:not([class*="btn"]):not(.app_tag) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+/* ---------- Buttons: the green one is the dialog's action ---------- */
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_buttons {
+  display: flex;
+  flex-direction: row-reverse; /* Steam lists OK first; the action sits on the right */
+  justify-content: flex-start;
+  gap: var(--se-space-3);
+  margin: var(--se-space-5) 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  text-align: right;
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_buttons > [class*="btn_"] {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  height: var(--se-ctl);
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur);
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_buttons > [class*="btn_"] > span {
+  padding: 0 var(--se-space-5) !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: 700 var(--se-fs-md)/38px var(--se-font) !important;
+  text-shadow: none !important;
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_buttons > [class*="btn_"]:hover {
+  background: var(--se-hover) !important;
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_buttons > :is(.btn_green_steamui, .btn_green_white_innerfade, .btnv6_green_white_innerfade, .btn_blue_steamui) {
+  background: var(--se-accent) !important;
+  box-shadow: none;
+  color: var(--se-on-accent) !important;
+}
+
+html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_buttons > :is(.btn_green_steamui, .btn_green_white_innerfade, .btnv6_green_white_innerfade, .btn_blue_steamui):hover {
+  background: var(--se-accent-hover) !important;
+}
+
+/* ---------- Focus ----------
+ * Steam focuses the dialog itself when it opens, so the theme's keyboard ring (web/shared/base.css)
+ * framed the whole card; the controls inside keep theirs. Same weight as that rule, later file.
+ */
+html:is(.se-store, .se-community):not(#se-none) :is(dialog, div).newmodal:focus-visible {
+  outline: none !important;
+}
+
+/* ---------- Wait dialog (ShowBlockingWaitDialog) ----------
+ * The spinner beside one line of text. Steam sizes the row to its 32px throbber, which cut the
+ * theme's larger spinner off: the row sizes to the spinner instead.
+ */
+/* !important: height, line-height can come inline from Steam's markup or scripts */
+html:is(.se-store, .se-community):not(#se-none) .newmodal :is(.waiting_dialog_container, .waiting_dialog_centered) {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-4);
+  height: auto !important;
+  overflow: visible;
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+/* !important: height, margin, width can come inline from Steam's markup or scripts */
+html:is(.se-store, .se-community):not(#se-none) .newmodal :is(.waiting_dialog_container, .waiting_dialog_centered) :is(.waiting_dialog_throbber, .LoadingThrobber, .throbber, img) {
+  flex: none;
+  width: var(--se-tile-lg) !important;
+  height: var(--se-tile-lg) !important;
+  margin: 0 !important;
+  background-image: none;
+}
+
+/* ---------- Oldest dialogs (#modalBG, .modal_frame) ----------
+ * A black scrim, then a box framed by a blue gradient (.modal_box's background showing around
+ * .modal_box_ctn): the scrim and card the dialogs above use.
+ */
+/* !important: Steam's own rules set background at equal or higher weight; opacity comes inline from
+   Steam's fade */
+html:is(.se-store, .se-community):not(#se-none) #modalBG {
+  background: var(--se-black-60) !important;
+  opacity: 1 !important;
+  backdrop-filter: blur(4px);
+}
+
+/* The frame sizes to its content: Steam fixes heights (inline and in its rules) that cut off
+   anything taller than its own layout */
+/* !important: Steam's own rules set background, border, padding at equal or higher weight; height
+   comes inline from Steam's scripts */
+html:is(.se-store, .se-community):not(#se-none) :is(.modal_frame, .modal_frame .modal_box, .modal_frame .modal_box_ctn) {
+  height: auto !important;
+}
+
+/* !important: Steam's own rules set background, border, padding at equal or higher weight */
+html:is(.se-store, .se-community):not(#se-none) .modal_frame {
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+/* !important: Steam's own rules set background, padding at equal or higher weight */
+html:is(.se-store, .se-community):not(#se-none) .modal_frame .modal_box {
+  overflow: hidden;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
+  background: none !important;
+  box-shadow: var(--se-elevation-3);
+}
+
+/* !important: Steam's own rules set background, padding at equal or higher weight */
+html:is(.se-store, .se-community):not(#se-none) .modal_frame .modal_box_ctn {
+  padding: var(--se-space-5) var(--se-space-6) !important;
+  border-radius: inherit;
+  background: var(--se-surface) !important;
+  color: var(--se-text-dim);
+  font: var(--se-type-body-lg);
+}

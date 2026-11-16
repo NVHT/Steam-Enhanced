@@ -1,0 +1,460 @@
+/*
+ * Continues summary.css (in order, see web/store/loader.js): "Is this game relevant to you?";
+ * Features; Languages; Overview heading, with the tag dialog's "+" beside it.
+ */
+
+/* ---------- "Is this game relevant to you?" ---------- */
+
+/* Steam's own heading and block, rebuilt in the strip. */
+html.se-app-summary-on [data-se-relevance-source] {
+  display: none !important;
+}
+
+.se-app-summary__relevance {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-3);
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-base);
+  line-height: 1.5;
+}
+
+/* Every reason in one quiet tone; the icon's shape (check, cross, info) tells them apart. */
+.se-app-summary__reason {
+  --tone: var(--se-text-dim);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--se-space-3);
+}
+
+.se-app-summary__reason-icon {
+  --se-ico: var(--se-ico-info);
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px; /* centred on the first line */
+  background: var(--tone);
+  -webkit-mask: var(--se-ico) center / contain no-repeat;
+  mask: var(--se-ico) center / contain no-repeat;
+}
+
+.se-app-summary__reason[data-se-tone="for"] .se-app-summary__reason-icon { --se-ico: var(--se-ico-check); }
+.se-app-summary__reason[data-se-tone="against"] .se-app-summary__reason-icon { --se-ico: var(--se-ico-cross); }
+
+.se-app-summary__reason-text {
+  min-width: 0;
+  color: var(--se-text);
+}
+
+.se-app-summary__relevance a,
+.se-app-summary__relevance a:visited {
+  color: var(--se-accent) !important;
+  text-decoration: none;
+}
+
+.se-app-summary__relevance a:hover {
+  color: var(--se-accent-hover) !important;
+}
+
+/* Similar games you've played: their capsules in a row, indented under the reason's text. */
+.se-app-summary__similar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  padding-left: var(--se-space-6);
+}
+
+.se-app-summary__similar .se-app-summary__similar-game {
+  display: block;
+  width: 92px;
+  aspect-ratio: 460 / 215;
+  border-radius: var(--se-radius-sm);
+  overflow: hidden;
+  background: var(--se-surface-2);
+  box-shadow: var(--se-edge);
+}
+
+.se-app-summary__similar-game img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+.se-app-summary__similar-game:hover img {
+  transform: scale(1.06);
+}
+
+.se-app-summary__reason-note,
+.se-app-summary__noinfo {
+  color: var(--se-text-muted);
+}
+
+.se-app-summary__noinfo p {
+  margin: 0 0 var(--se-space-2);
+}
+
+/* ---------- Features ---------- */
+
+/* Steam's own features block, rebuilt in the details row. */
+html.se-app-summary-on #category_block {
+  display: none !important;
+}
+
+/* Steam styles every h2 on the page (size, capitals, rule, gradient): ours opt out. */
+html.se-app-summary-on .se-app-summary .se-app-summary__heading {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-white) !important;
+  font-size: var(--se-fs-xl) !important;
+  font-weight: 800 !important;
+  letter-spacing: -.01em !important;
+  line-height: 1.25 !important;
+  text-transform: none !important;
+}
+
+.se-app-summary__features {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--se-space-half) var(--se-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.se-app-summary__features--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* A feature: its icon and name, no fill, set like the relevance and language rows. */
+.se-app-summary__feature {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  min-height: 28px;
+  padding: 0;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-base);
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none !important;
+  transition: color var(--se-dur);
+}
+
+.se-app-summary__feature:hover {
+  color: var(--se-accent-hover) !important;
+}
+
+.se-app-summary__feature > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Duotone icon in the text's quieter tone (masks at the end of this file). */
+.se-app-summary__feature-icon {
+  --se-ico: var(--se-ico-spark);
+  flex: none;
+  width: 18px;
+  height: 18px;
+  background: var(--se-text-dim);
+  -webkit-mask: var(--se-ico) center / contain no-repeat;
+  mask: var(--se-ico) center / contain no-repeat;
+}
+
+/* A controller you own (Steam marks it green). */
+.se-app-summary__feature[data-se-yours] {
+  color: var(--se-cart) !important;
+}
+
+.se-app-summary__feature[data-se-yours] .se-app-summary__feature-icon {
+  background: var(--se-cart);
+}
+
+.se-app-summary__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+}
+
+.se-app-summary__subhead {
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-sm);
+  font-weight: 600;
+}
+
+/* Accessibility Features (6): a disclosure row, set like a feature, that opens onto tag pills. */
+.se-app-summary__access > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  min-height: 28px;
+  padding: 0;
+  color: var(--se-text);
+  font-size: var(--se-fs-base);
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+  transition: background var(--se-dur);
+}
+
+.se-app-summary__access > summary::-webkit-details-marker {
+  display: none;
+}
+
+.se-app-summary__access > summary:hover {
+  color: var(--se-accent-hover);
+}
+
+.se-app-summary__access > summary::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  margin-left: auto;
+  background: var(--se-text-muted);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform var(--se-dur);
+}
+
+.se-app-summary__access[open] > summary::after {
+  transform: rotate(180deg);
+}
+
+.se-app-summary__access-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  padding: var(--se-space-3) var(--se-space-half) var(--se-space-half);
+}
+
+/* ---------- Languages ---------- */
+
+/* Steam's own table, rebuilt in the details row. */
+html.se-app-summary-on [data-se-languages-source] {
+  display: none !important;
+}
+
+/* Fills its column (app/summary.js gives every column the row's height), so "Show all N
+   languages" sits at the foot, level with the other columns' "Show all". */
+.se-app-summary__languages {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--se-space-2);
+}
+
+.se-app-summary__lang-more {
+  margin-top: auto;
+}
+
+.se-app-summary__lang-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(3, auto);
+  width: 100%;
+  font-size: var(--se-fs-sm);
+}
+
+.se-app-summary__lang-row {
+  display: contents;
+}
+
+.se-app-summary__lang-row > * {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 var(--se-space-2);
+  border-bottom: 1px solid var(--se-hairline);
+}
+
+.se-app-summary__lang-row > :first-child {
+  padding-left: 0;
+}
+
+.se-app-summary__lang-row--head > * {
+  justify-content: center;
+  min-height: 24px;
+  color: var(--se-text-muted);
+  font-size: var(--se-fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.se-app-summary__lang-row[data-se-extra] {
+  display: none;
+}
+
+.se-app-summary__lang-grid[data-se-open] .se-app-summary__lang-row[data-se-extra] {
+  display: contents;
+}
+
+/* Long names ("Portuguese - Brazil") wrap rather than cut off. */
+.se-app-summary__lang-name {
+  min-width: 0;
+  padding-block: var(--se-space-1) !important;
+  color: var(--se-text);
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+/* A check where the language is supported, a faint dot where it isn't. */
+.se-app-summary__lang-mark {
+  justify-content: center;
+}
+
+.se-app-summary__lang-mark::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--se-text-faint);
+}
+
+.se-app-summary__lang-mark[data-se-on]::before {
+  width: 16px;
+  height: 16px;
+  border-radius: 0;
+  background: var(--se-text-dim);
+  -webkit-mask: var(--se-ico-check) center / contain no-repeat;
+  mask: var(--se-ico-check) center / contain no-repeat;
+}
+
+.se-app-summary__lang-more {
+  height: 28px;
+  padding: 0 var(--se-space-3);
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill);
+  color: var(--se-text-dim);
+  font: inherit;
+  font-size: var(--se-fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--se-dur), color var(--se-dur);
+}
+
+.se-app-summary__lang-more:hover {
+  background: var(--se-hover);
+  color: var(--se-text);
+}
+
+/* ---------- Overview heading, with the tag dialog's "+" beside it ---------- */
+
+.se-app-summary__head {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+}
+
+/* A section's item count beside its heading (Screenshots 27). */
+.se-app-summary__count {
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-md);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.se-app-summary__count:empty {
+  display: none;
+}
+
+/* ---------- Trailers (under the screenshots; app/summary.js) ----------
+ * Tiles set like the screenshots, with a play badge and the trailer's name on a shade at the
+ * foot; a tile opens Steam's own fullscreen player on that trailer.
+ */
+.se-app-summary__trailer {
+  cursor: pointer;
+}
+
+.se-app-summary__trailer-play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--se-radius-control);
+  background: var(--se-glass-btn);
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line), var(--se-glass-btn-shadow);
+  backdrop-filter: var(--se-blur-chip);
+  transition: transform var(--se-dur) var(--se-ease), background var(--se-dur);
+}
+
+.se-app-summary__trailer-play::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  margin-left: var(--se-space-1);
+  background: var(--se-white);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 4v16l14-8z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 4v16l14-8z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.se-app-summary__trailer:hover .se-app-summary__trailer-play {
+  transform: scale(1.08);
+  background: var(--se-accent);
+}
+
+.se-app-summary__trailer:hover .se-app-summary__trailer-play::before {
+  background: var(--se-on-accent);
+}
+
+.se-app-summary__trailer-title {
+  position: absolute;
+  inset: auto 0 0;
+  padding: var(--se-space-4) var(--se-space-3) var(--se-space-2);
+  background: linear-gradient(transparent, rgb(10 12 16 / .85));
+  color: var(--se-white);
+  font-size: var(--se-fs-xs);
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Tags, under the description ---------- */
+
+.se-app-summary__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+}
+
+.se-app-summary__tag {
+  display: inline-flex;
+  align-items: center;
+  height: var(--se-ctl-sm);
+  padding: 0 var(--se-space-3);
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill);
+  color: var(--se-text-dim) !important;
+  font: inherit;
+  font-size: var(--se-fs-sm);
+  font-weight: 600;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background var(--se-dur), color var(--se-dur);
+}
+
+.se-app-summary__tag:hover {
+  background: var(--se-hover);
+  color: var(--se-text) !important;
+}
+
+.se-app-summary__tag--more {
+  justify-content: center;
+  width: 28px;
+  padding: 0;
+  font-size: var(--se-fs-md);
+  font-weight: 700;
+}

@@ -1,0 +1,78 @@
+/*
+ * Scroll to top, on every Store and Community page (web/shared/scroll-top.js): the library game
+ * page's button (client/game-page/activity.css), from the same --se-top-* tokens: a round dark
+ * button with an arrow, ringed in the accent colour by how far down the page you are
+ * (--se-scroll, 0..1). It rises in when shown ([data-shown]) and ignores clicks while hidden.
+ */
+html:is(.se-store, .se-community) .se-top {
+  position: fixed;
+  right: var(--se-top-inset);
+  bottom: var(--se-top-inset);
+  z-index: var(--se-z-dropdown);
+  width: var(--se-top-size);
+  height: var(--se-top-size);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: var(--se-top-rest);
+  transition:
+    transform var(--se-dur-slower) var(--se-ease),
+    opacity var(--se-dur-slow) ease-out,
+    visibility 0s linear var(--se-dur-slow);
+}
+
+html:is(.se-store, .se-community) .se-top[data-shown] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  transition-delay: 0s;
+}
+
+html:is(.se-store, .se-community) .se-top-face {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--se-top-face);
+  box-shadow: var(--se-top-shadow);
+  transition: background-color var(--se-dur-slow) ease-out;
+}
+
+/* Progress ring */
+html:is(.se-store, .se-community) .se-top-face::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(var(--se-accent) calc(var(--se-scroll, 0) * 360deg), var(--se-track) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--se-top-ring)), #000 calc(100% - var(--se-top-ring)));
+  mask: radial-gradient(farthest-side, transparent calc(100% - var(--se-top-ring)), #000 calc(100% - var(--se-top-ring)));
+}
+
+/* Arrow */
+html:is(.se-store, .se-community) .se-top-face::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Dual-tone, like the theme's other icons: a block arrow (32% fill under its outline) to a bar */
+  background: var(--se-text);
+  -webkit-mask: var(--se-icon-arrow-top) center / var(--se-tile-icon) no-repeat;
+  mask: var(--se-icon-arrow-top) center / var(--se-tile-icon) no-repeat;
+}
+
+html:is(.se-store, .se-community) .se-top:hover .se-top-face {
+  background-color: var(--se-top-face-hover);
+}
+
+html:is(.se-store, .se-community) .se-top:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: 3px;
+}

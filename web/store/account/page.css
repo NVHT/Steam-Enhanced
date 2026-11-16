@@ -1,0 +1,491 @@
+/*
+ * Account pages (/account/ and the pages its sidebar links to), as rebuilt by account/page.js:
+ *
+ *   [ Home › Account                                               ]
+ *   [ connorn3794's Account                                        ]
+ *   [ ▭ Steam ID 7656119…  ⧉ ↗ ]
+ *   [ sidebar (sticky)  ][ ▣ Store & Purchase History               ]
+ *   [  👤 Account det…  ][ [ $0.00 wallet ][ links ]                ]
+ *   [  ⚙ Store prefs    ][ ✉ Contact Info                           ]
+ *   [  …                ][ ⚠ Delete my Steam account (danger)       ]
+ *
+ * Every other page: the same header and sidebar, its content column as one card ("panel").
+ *
+ * Steam's frame (account.css, steamaccount.css): .page_header_ctn > .page_content >
+ * .breadcrumbs, h2.pageheader (.youraccount_steamid on Account details); then
+ * .page_content_ctn > .page_content (#main_content) > .two_column.left (a.nav_item) +
+ * .two_column.right. Account details fills the right column with .account_header_line bars over
+ * .account_setting_block > .account_setting_sub_block floats. The layout keys on the frame
+ * itself (.page_content:has(> .two_column.left)), so an /account/ page without the sidebar
+ * (purchase history ...) keeps its own layout. Store looks follow shared/ui.css. Rules use
+ * html.se-store-account:not(#se-none) for ID-level weight over Steam's rules. Until the
+ * script is done ([data-se-account-ready]) the content column is held back so it never jumps
+ * from Steam's look to the cards; if the script fails it shows after 1.5s anyway.
+ *
+ * Continued, by section, in settings.css, tiles.css, frame.css, react.css, newer.css (same
+ * folder), listed after this file in web/store/loader.js: together they keep one file's order.
+ */
+
+/* ---------- Page ---------- */
+
+html.se-store-account:not(#se-none) body,
+html.se-store-account:not(#se-none) :is(.responsive_page_frame, .responsive_page_content, .responsive_page_template_content, .page_content_ctn) {
+  background: var(--se-bg) !important;
+}
+
+html.se-store-account:not(#se-none) [data-se-account-hidden] {
+  display: none !important;
+}
+
+:is(.se-account-id, .se-account-nav-icon, .se-account-chip) svg {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+:is(.se-account-id, .se-account-nav-icon, .se-account-chip) svg .d {
+  fill: currentColor;
+  fill-opacity: .3;
+  stroke: none;
+}
+
+/* ---------- Header ---------- */
+
+html.se-store-account:not(#se-none) .page_header_ctn {
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-6) 0 var(--se-space-6) !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs {
+  height: auto !important;
+  margin: 0 0 var(--se-space-3) !important;
+  padding: 0 !important;
+  font: var(--se-type-small) !important;
+  letter-spacing: .02em;
+  text-transform: none !important;
+  color: var(--se-text-faint) !important;
+}
+
+html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs .blockbg {
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs a {
+  color: var(--se-text-muted) !important;
+  text-decoration: none !important;
+  transition: color var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs a:hover {
+  color: var(--se-white) !important;
+}
+
+/* The current page's name: a .pageheader span on some pages, which Steam sets as a title */
+html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs :is(.pageheader, .breadcrumb_current_page) {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font: inherit !important;
+  letter-spacing: inherit !important;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) h2.pageheader {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-display)/1.15 var(--se-font) !important;
+  letter-spacing: -.02em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/* Steam's plain line until the chip replaces it */
+html.se-store-account:not(#se-none) .youraccount_steamid {
+  margin-top: var(--se-space-3) !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+.se-account-id {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  margin-top: var(--se-space-4);
+  padding: var(--se-space-1) var(--se-space-1) var(--se-space-1) var(--se-space-4);
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+  font: var(--se-type-control-lg);
+  color: var(--se-text-muted);
+}
+
+.se-account-id > svg {
+  width: 17px;
+  height: 17px;
+  color: var(--se-text-faint);
+}
+
+.se-account-id-num {
+  color: var(--se-text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+  user-select: all;
+}
+
+.se-account-id-actions {
+  display: flex;
+  gap: var(--se-space-half);
+  margin-left: var(--se-space-1);
+  padding-left: var(--se-space-2);
+  box-shadow: inset 1px 0 0 var(--se-divider);
+}
+
+html.se-store-account:not(#se-none) .se-account-id-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: var(--se-ctl-sm);
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: none;
+  color: var(--se-text-faint);
+  cursor: pointer;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+.se-account-id-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+html.se-store-account:not(#se-none) .se-account-id-btn:hover {
+  background: var(--se-hover);
+  color: var(--se-white);
+}
+
+html.se-store-account:not(#se-none) .se-account-id-btn[data-copied] {
+  background: var(--se-accent-surface);
+  color: var(--se-accent);
+}
+
+/* ---------- Layout: sidebar + cards ---------- */
+
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) {
+  display: grid !important;
+  grid-template-columns: 280px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--se-space-6);
+  padding: 0 0 4rem !important;
+  background: none !important;
+}
+
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > :not(.two_column) {
+  display: none !important;
+}
+
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column {
+  box-sizing: border-box;
+  width: auto !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+@keyframes se-account-reveal {
+  to { visibility: visible; }
+}
+
+html.se-store-account:not([data-se-account-ready]):not(#se-none) .page_content:has(> .two_column.left) > .two_column.right {
+  visibility: hidden;
+  animation: se-account-reveal 0s 1.5s forwards;
+}
+
+/* ---------- Sidebar ---------- */
+
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.left {
+  position: sticky;
+  top: calc(var(--se-nav-h, 46px) + 38px); /* under the floating store bar */
+  display: flex !important;
+  flex-direction: column;
+  gap: var(--se-space-half);
+  height: auto !important;
+  padding: var(--se-space-3) !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-store-account:not(#se-none) a.nav_item {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-3);
+  width: auto !important;
+  height: auto !important;
+  min-height: 40px;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-3) !important;
+  box-sizing: border-box;
+  border: 0 !important;
+  border-image: none !important;
+  border-radius: var(--se-radius-sm);
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body-lg) !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) a.nav_item:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+/* Steam marks the current page with a bar on the left edge (a pseudo-element); the link's fill
+   says it now */
+html.se-store-account:not(#se-none) a.nav_item::before,
+html.se-store-account:not(#se-none) a.nav_item::after {
+  content: none !important;
+  display: none !important;
+}
+
+html.se-store-account:not(#se-none) a.nav_item.active {
+  background: var(--se-accent-surface) !important;
+  color: var(--se-text) !important;
+}
+
+/* Steam's own glyphs give way to the theme's */
+html.se-store-account:not(#se-none) a.nav_item[data-se-account-nav] > img {
+  display: none !important;
+}
+
+.se-account-nav-icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-pill);
+  color: var(--se-text-faint);
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+.se-account-nav-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+a.nav_item:hover > .se-account-nav-icon {
+  color: var(--se-text-dim);
+}
+
+a.nav_item.active > .se-account-nav-icon {
+  background: var(--se-accent);
+  color: var(--se-on-accent);
+}
+
+/* ---------- Cards ---------- */
+
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.right {
+  display: flex !important;
+  flex-direction: column;
+  gap: var(--se-space-4);
+}
+
+.se-account-card {
+  padding: var(--se-space-5) var(--se-space-6) var(--se-space-6);
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+}
+
+/* Header bar → card title */
+html.se-store-account:not(#se-none) .se-account-card .account_header_line {
+  height: auto !important;
+  margin: 0 0 var(--se-space-4) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_header_line > div {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-4);
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-heading) !important;
+  letter-spacing: -.01em;
+  text-transform: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_header_line img {
+  display: none !important;
+}
+
+.se-account-chip {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: var(--se-ctl);
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill);
+  box-shadow: var(--se-edge);
+  color: var(--se-text-dim);
+}
+
+.se-account-chip svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Block → a grid of tiles (Steam floats half-width columns) */
+html.se-store-account:not(#se-none) .se-account-card :is(.account_setting_block, .account_setting_block_short) {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--se-space-3);
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .account_setting_block + .account_setting_block {
+  margin-top: var(--se-space-3) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card :is(.account_setting_sub_block, .account_setting_sub_block_long):not([data-se-account-hidden]) {
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--se-space-3);
+  width: auto !important;
+  min-width: 0;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: var(--se-space-4) var(--se-space-5) !important;
+  float: none !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+/* Steam spaces with <br>s; the tile's gap does that now */
+html.se-store-account:not(#se-none) .se-account-card .account_setting_sub_block > br {
+  display: none;
+}
+
+html.se-store-account:not(#se-none) .se-account-card :is(p, .account_setting_sub_block > div) {
+  margin: 0 !important;
+  padding: 0;
+  color: var(--se-text-dim);
+  font: inherit;
+}
+
+html.se-store-account:not(#se-none) .se-account-card :is(b, strong) {
+  color: var(--se-text);
+}
+
+html.se-store-account:not(#se-none) .se-account-card .inner_rule {
+  height: 1px;
+  margin: var(--se-space-1) 0 !important;
+  border: 0 !important;
+  background: var(--se-divider) !important;
+}
+
+/* Loose links in the text */
+html.se-store-account:not(#se-none) .se-account-card a[href]:not(.account_manage_link, .accountData a, .payment_method_box a) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+  transition: color var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) .se-account-card a[href]:not(.account_manage_link, .accountData a, .payment_method_box a):hover {
+  color: var(--se-accent-hover) !important;
+}
+
+/* Rows: label then value */
+html.se-store-account:not(#se-none) .se-account-card .accountRow {
+  position: static !important;
+  display: flex;
+  flex-direction: row-reverse; /* Steam puts the value first */
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--se-space-3);
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text-muted) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .accountData {
+  position: static !important;
+  color: var(--se-text) !important;
+}
+
+html.se-store-account:not(#se-none) .se-account-card .accountData a {
+  color: var(--se-text) !important;
+  text-decoration: none !important;
+}
+
+/* Steam's small inline icons: on the text's line; the phone one is the theme's glyph (page.js) */
+html.se-store-account:not(#se-none) .se-account-card .account_setting_sub_block img {
+  width: auto;
+  height: 1.1em;
+  margin: 0 var(--se-space-1) 0 var(--se-space-half);
+  vertical-align: -.2em;
+  opacity: .75;
+}
+
+.se-account-inline-icon {
+  width: 1.15em;
+  height: 1.15em;
+  margin: 0 var(--se-space-1) 0 var(--se-space-1);
+  vertical-align: -.22em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: var(--se-text-muted);
+}
+
+.se-account-inline-icon .d {
+  fill: currentColor;
+  fill-opacity: .3;
+  stroke: none;
+}
+
+/* Named anchors between sections (scroll targets): out of the column's flow, so they add no gap */
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.right > a:empty {
+  position: absolute;
+}
