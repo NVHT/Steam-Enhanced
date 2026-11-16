@@ -38,6 +38,9 @@
   let searchInput;
   let filtersBtn;
   let listResizeObserver;
+  let scopeResizeObserver;
+  let scopeWatchedNode = null;
+  let scopeWidth = -1;
   let listWatchedNode;
   let lastPollSignature = '';
 
@@ -305,8 +308,10 @@
     searchBar = document.createElement('div');
     searchBar.className = 'se-title-search';
     searchBar.setAttribute('role', 'search');
+    // The scope slot holds the game-type picker's place: the native picker is fixed over it.
     searchBar.innerHTML =
-      '<svg class="se-title-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>' +
+      '<span class="se-title-scope" aria-hidden="true"></span>' +
+      '<span class="se-search-icon" aria-hidden="true"></span>' +
       '<input type="text" spellcheck="false" placeholder="Search your library" aria-label="Search your library">' +
       '<button type="button" class="se-title-filters" aria-pressed="false">' +
         '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>' +
@@ -498,6 +503,27 @@
 
   let countCache = { at: 0, count: null };
 
+  /*
+   * The game-type picker sits fixed over the start of the title-bar search (CSS); the field
+   * reserves its width so the text never runs under it. Its label and count change width
+   * ("Games 4,382" / "Soundtracks 64"), so the picker is watched, and the width is written
+   * only when it changes.
+   */
+  function syncSearchScope(picker) {
+    if (!searchBar) return;
+    if (picker !== scopeWatchedNode && window.ResizeObserver) {
+      scopeResizeObserver ??= new ResizeObserver(schedule);
+      if (scopeWatchedNode) scopeResizeObserver.unobserve(scopeWatchedNode);
+      if (picker) scopeResizeObserver.observe(picker);
+      scopeWatchedNode = picker;
+    }
+    const width = picker ? Math.ceil(picker.getBoundingClientRect().width) : 0;
+    if (width === scopeWidth) return;
+    scopeWidth = width;
+    searchBar.classList.toggle('se-has-scope', width > 0);
+    SE.cssVar(searchBar, '--se-title-type-w', width > 0 ? `${width}px` : null);
+  }
+
   function totalLibraryGameCount() {
     if (Date.now() - countCache.at < 5000) return countCache.count;
     const apps = SE.global('appStore', (store) => Array.isArray(store.allApps))?.allApps;
@@ -567,6 +593,7 @@
     }
 
     const picker = list?.querySelector(`.${C.MenuHeader}`);
+    syncSearchScope(isVisible && !downloadsList ? picker : null);
     if (picker) {
       const rawDigits =
         picker.querySelector(`.${C.AppCount}`)?.textContent.replace(/[^\d]/g, '') || '';
@@ -881,6 +908,7 @@
       if (frame) cancelAnimationFrame(frame);
       cancelMountWait();
       listResizeObserver?.disconnect();
+      scopeResizeObserver?.disconnect();
       removeEventListener('resize', schedule);
       document.removeEventListener('scroll', onListScroll, { capture: true });
       document.removeEventListener('keydown', onGlobalKeyDown, true);

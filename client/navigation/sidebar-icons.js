@@ -1,6 +1,11 @@
 /*
  * Collapse the Library sidebar header controls into a 7-slot icon bar. Header counts are
  * owned by client/library/game-list.js.
+ *
+ * Recent and Ready to play can be joined by more toggles in their row: Steam's Linux-games
+ * toggle (Tux, Linux only) and plugin buttons (ProtonDB Library Badges' dots). The row's tile
+ * count goes to --se-view-n on <html> so both toolbars (this one and the title-bar list,
+ * client/navigation) lay out a slot for each; Steam's own extra toggle is marked for its icon.
  */
 ((SE) => {
   const { C } = SE;
@@ -8,6 +13,27 @@
 
   const roots = new Map();
   let observer;
+
+  const ROOT = document.documentElement;
+  const VIEW_N = '--se-view-n';
+  const VIEW = 'data-se-view';
+  // Steam shows the OS toggle only on its own platform; it is drawn with the Linux icon only there.
+  const OS_VIEW = /Linux/.test(navigator.userAgent) && !/Android/.test(navigator.userAgent) ? 'linux' : null;
+
+  /*
+   * Recent and Ready to play are the row's first two children. A native toggle after them is
+   * Steam's OS toggle; a plugin's is wrapped (ProtonDB's .pdb-dots-toggle), so not marked.
+   */
+  const syncViewToggles = (root) => {
+    const bar = root.querySelector(`.${C.CheckboxWithImage}`)?.parentElement;
+    if (!bar) return;
+    const toggles = [...bar.children];
+    SE.cssVar(ROOT, VIEW_N, toggles.length > 2 ? String(toggles.length) : null);
+    toggles.forEach((node, i) => {
+      const native = i > 1 && node.classList.contains(C.CheckboxWithImage);
+      SE.attr(node, VIEW, native ? OS_VIEW : null);
+    });
+  };
 
   function restoreRoot(root, entry) {
     entry.button.remove();
@@ -74,6 +100,7 @@
       }
 
       root.classList.add('se-sidebar-icons');
+      syncViewToggles(root);
       if (search.querySelector('input')?.value) setOpen(root, entry, true);
     }
   };
@@ -88,6 +115,8 @@
       observer?.disconnect();
       for (const [root, entry] of roots) restoreRoot(root, entry);
       roots.clear();
+      SE.cssVar(ROOT, VIEW_N, null);
+      for (const node of document.querySelectorAll(`[${VIEW}]`)) SE.unmark(node, VIEW);
       removeEventListener('DOMContentLoaded', start);
       delete window.__seSidebarIcons;
     },

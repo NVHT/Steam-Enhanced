@@ -2,22 +2,17 @@
  * Classic sidebar toolbar: Home, Collections, Games, Search, Recent, Ready to Play and Filters
  * across a single row (client/navigation/sidebar-icons.js). --se-sb-n slots (7), each
  * (width - 6 px inset and gaps) / n; Recent and Ready to Play share --se-sb-v slots (2).
- * A plugin button in that pair's row (ProtonDB Library Badges' dots toggle) makes it 8 and 3:
- * html[data-se-pdb-toggle], set by compat/protondb-library-badges. The game list's rows and
- * headers are styled by client/library/game-list.css.
+ * More toggles in their row (Steam's Linux-games toggle on Linux, ProtonDB Library Badges'
+ * dots toggle) add a slot each: sidebar-icons.js counts the row into --se-view-n on <html>.
+ * The game list's rows and headers are styled by client/library/game-list.css.
  */
 .se-sidebar-icons {
-  --se-sb-n: 7;
-  --se-sb-v: 2;
+  --se-sb-v: var(--se-view-n, 2);
+  --se-sb-n: calc(5 + var(--se-sb-v));
 
   position: relative;
   box-sizing: border-box;
   padding-top: 48px;
-}
-
-html[data-se-pdb-toggle] .se-sidebar-icons {
-  --se-sb-n: 8;
-  --se-sb-v: 3;
 }
 
 .se-sidebar-tip {
@@ -86,7 +81,7 @@ html[data-se-pdb-toggle] .se-sidebar-icons {
   width: calc((100% - 6px * (var(--se-sb-n) + 1)) / var(--se-sb-n));
 }
 
-/* Recent and Ready to play: slots 5-6 (5-7 with a plugin's button) */
+/* Recent and Ready to play: slots 5-6, plus one per extra toggle */
 .se-sidebar-icons ._36r2az6roul_Oej7D4BMI6 {
   position: absolute;
   top: 6px;
@@ -237,11 +232,16 @@ html[data-se-pdb-toggle] .se-sidebar-icons {
   --se-sidebar-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229%22%2F%3E%3Cpath%20d%3D%22m10%208%206%204-6%204V8Z%22%2F%3E%3C%2Fsvg%3E");
 }
 
+/* Steam's Linux-games toggle (Linux only; sidebar-icons.js marks it) */
+.se-sidebar-icons ._1PgAonvorr0o_NMxNKiDFU > ._3mzKdQXht__YHo6PX1LmB6[data-se-view="linux"] {
+  --se-sidebar-icon: var(--se-icon-tux);
+}
+
 .se-sidebar-icons ._1TxHdzOt3OD9ikR3xIseKe {
   --se-sidebar-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%206h5m4%200h9M3%2012h11m4%200h3M3%2018h3m4%200h11M8%203v6m6%200v6M6%2015v6%22%2F%3E%3C%2Fsvg%3E");
 }
 
-/* Steam sets flex: 0 on this container; it must fill the two reserved slots. */
+/* Steam sets flex: 0 on this container; it must fill its reserved slots. */
 .se-sidebar-icons ._36r2az6roul_Oej7D4BMI6 ._1PgAonvorr0o_NMxNKiDFU {
   flex: 1 1 auto !important;
   min-width: 0 !important;

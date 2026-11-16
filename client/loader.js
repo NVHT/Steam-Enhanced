@@ -147,7 +147,7 @@
     ['content', 'compat/extendium/', ['manager.js']],
     ['desktop', 'compat/steam-size-on-disk/', ['size-on-disk.css', 'size-on-disk.js']],
     ['main', 'compat/playercount-badge/', ['playercount-badge.css']],
-    ['main', 'compat/protondb-library-badges/', ['protondb-library-badges.css', 'protondb-library-badges.js']],
+    ['main', 'compat/protondb-library-badges/', ['protondb-library-badges.css']],
     ['tiers', 'client/shared/', ['achievement-tiers.css']],
     ['desktop', 'compat/achievement-manager/', ['achievement-manager.css', 'achievement-manager.js']],
     ['desktop', 'compat/steamgriddb/', ['steamgriddb.css', 'steamgriddb.js']],
