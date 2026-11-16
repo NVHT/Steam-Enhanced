@@ -146,125 +146,126 @@ Every web page fills the window and shares the theme's cards, pills, glass chips
 
 ## ✦ Make it yours
 
-The main switches and the accent colour are in **Millennium → Themes → Steam Enhanced → Edit**. Change one and restart Steam.
-
-Every colour, radius, elevation and feature switch also lives on `:root` in **`core/tokens.css`**, for anything the settings don't cover. Change a value and restart Steam.
+Everything below is in **Millennium → Themes → Steam Enhanced → Edit**, on the tab named in each section, plus the **Accent** colour, used for links, buttons and selections. Most settings apply as soon as you pick them; the **Web** tab needs a Steam restart.
 
 <details>
-<summary><b>Font</b> &nbsp;<sub>(Millennium setting)</sub></summary>
+<summary><b>Appearance</b> &nbsp;<sub>font, motion, glass, corners</sub></summary>
 <br>
 
-The typeface for the whole theme: client windows, Store, Community, Support and Checkout. Both bundled faces are variable fonts under the SIL Open Font License (licences in `core/fonts/`).
-
-| Value | Look |
-| --- | --- |
-| `SN Pro` *(default)* | A clean geometric sans by Supernotes. |
-| `Xmind` | The theme's original face. |
-| `Steam (Motiva Sans)` | Steam's own font. |
-
-</details>
-
-<details>
-<summary><b>Animations, glass and corners</b> &nbsp;<sub>(Millennium settings)</sub></summary>
-<br>
-
-| Setting | Values | What it does |
+| Setting | Options | What it does |
 | --- | --- | --- |
-| Animations | `Full` *(default)*, `Reduced` | Reduced: hovers, presses and panels change at once instead of moving. Spinners and the window entrance still play. |
-| Glass effects | `On` *(default)*, `Off` | Off drops the frosted blur everywhere and makes see-through surfaces solid. Lighter on slower PCs. |
-| Corners | `Default`, `Sharp`, `Round` | How rounded every corner is. |
+| Font | **SN Pro**, Xmind, Steam (Motiva Sans) | The typeface everywhere: client, Store, Community, Support and Checkout. SN Pro and Xmind are bundled variable fonts (SIL OFL, licences in `core/fonts/`). |
+| Animations | **Full**, Reduced | Reduced: hovers, presses and panels change at once instead of moving. Spinners and the window entrance still play. |
+| Glass effects | **On**, Off | Off drops the frosted blur everywhere and makes see-through surfaces solid. Lighter on slower PCs. |
+| Corners | **Default**, Sharp, Round | How rounded every corner is. |
 
 </details>
 
 <details>
-<summary><b>Game list and Friends dock width</b> &nbsp;<sub>(Millennium settings)</sub></summary>
+<summary><b>Startup</b> &nbsp;<sub>entrance, background, spinner</sub></summary>
 <br>
 
-Both columns share one default width.
+Windows stay on the theme background until they've loaded (the main window until the Library has finished building), so Steam's own look never flashes.
 
-| Setting | Values | What it does |
+| Window entrance | How a window appears once loaded |
+| --- | --- |
+| **Splash** | The main window plays the Steam Enhanced splash (the wireframe Library and a card with a Library bar) while the Library builds. The bar reaches *Ready* in gold just as the Library appears. Other windows use Logo. |
+| Logo | The Steam Enhanced mark breathes while the window loads, then grows and dissolves into it. |
+| Fade | The window fades in. |
+| None | The window appears at once. |
+
+| Startup background | Behind the sign-in and startup screens |
+| --- | --- |
+| **Library** | A wireframe outline of the themed Library window. |
+| Hero | Crossfading hero art from your 8 most recently played games. |
+| Mosaic | A breathing 2:3 tile grid over Steam's login capsule wall. |
+| Wall | Steam's login capsule wall, blurred and dimmed. |
+| Plain | The theme background with a soft radial glow. |
+| Dots | A fading dot matrix. |
+| Steam | Steam's own login background. |
+
+| Loading spinner | One spinner for every loader: client, Splash entrance, Store, Community and Support |
+| --- | --- |
+| **Refined** | A wider arc with a rounded, lit head on a thin track, turning with a slight ease. |
+| Comet | A short tail led by a bright dot, around a gently floating Steam Enhanced mark. |
+| Elastic | A solid arc that stretches ahead and catches up. |
+| Breathe | Refined, with the mark breathing and a soft halo. |
+| Classic | A fading tail with a flat head. |
+
+</details>
+
+<details>
+<summary><b>Library</b> &nbsp;<sub>Home stage, game list</sub></summary>
+<br>
+
+| Setting | Options | What it does |
 | --- | --- | --- |
-| Game list width | `Fixed` *(default)*, `Adjustable` | Fixed keeps one width with no divider. Adjustable lets you drag the list's right edge, or focus it and use the arrow keys. Double-click resets. |
-| Friends dock width | `Fixed` *(default)*, `Adjustable` | The same for the dock's left edge. |
+| Library Home stage | **yes**, no | no restores Steam's Library Home (handy for editing shelves). |
+| Home stage cycling | **Default** (9 s), Slow (15 s), Fast (5 s), Off | How often the stage moves to the next recent game. |
+| Home stage tray | **On**, Off | What's New, Favorites and Collections under the stage. Off: the stage alone fills the window. |
+| Home stage height | **Default**, Short, Tall | How much of the window the stage takes; the tray gets the rest. |
+| Home stage strip | **On**, Off | The row of recent-game cards on the stage. Off hides it; the stage still cycles. |
+| Home stage details | **Full**, Compact, Play only, Hidden | The panel beside the logo. Compact drops the description, Play only keeps the button, Hidden leaves the logo over the art. |
+| Game list width | **Fixed**, Adjustable | Fixed keeps one width with no divider. Adjustable: drag the list's right edge, or focus it and use the arrow keys; double-click resets. |
 
 </details>
 
 <details>
-<summary><b>Web pages</b> &nbsp;<sub>(Millennium setting)</sub></summary>
+<summary><b>Friends</b> &nbsp;<sub>dock width</sub></summary>
 <br>
 
-| Value | What it does |
-| --- | --- |
-| `Theme` *(default)* | Store, Community, Support and Checkout in the theme's design. |
-| `Steam's own` | Those pages exactly as Steam draws them, in Steam's font. The client stays themed. Restart Steam after changing it. |
-
-</details>
-
-<details>
-<summary><b>Startup background</b> &nbsp;<code>--se-startup-background</code></summary>
-<br>
-
-| Value | Look |
-| --- | --- |
-| `library` *(default)* | A wireframe outline of the themed Library window. |
-| `hero` | Crossfading hero art from your 8 most recently played games. |
-| `mosaic` | A breathing 2:3 tile grid over Steam's login capsule wall. |
-| `wall` | Steam's login capsule wall, blurred and dimmed. |
-| `plain` | The theme background with a soft radial glow. |
-| `dots` | A fading dot matrix. |
-| `steam` | Steam's own login background. |
-
-</details>
-
-<details>
-<summary><b>Loading spinner</b> &nbsp;<sub>(Millennium setting)</sub></summary>
-<br>
-
-One spinner for every loader: client windows, the Splash entrance, Store, Community and Support. The style applies everywhere at once.
-
-| Value | Look |
-| --- | --- |
-| `Refined` *(default)* | A wider arc with a rounded, lit head on a thin track, turning with a slight ease. |
-| `Comet` | A short tail led by a bright dot, around a gently floating Steam Enhanced mark. |
-| `Elastic` | A solid arc that stretches ahead and catches up. |
-| `Breathe` | Refined, with the mark breathing and a soft halo. |
-| `Classic` | A fading tail with a flat head. |
-
-</details>
-
-<details>
-<summary><b>Window entrance</b> &nbsp;<code>--se-entrance</code></summary>
-<br>
-
-Windows stay on the theme background until they've loaded (the main window until the Library has finished building), so Steam's own look never flashes. How they then appear:
-
-| Value | Look |
-| --- | --- |
-| `splash` *(default)* | The main window plays the Steam Enhanced splash (the wireframe Library and the card with a Library bar) while the Library builds, picking up where the startup window leaves off. The bar reaches *Ready* in gold just as the finished Library appears. Other windows use `logo`. |
-| `logo` | The Steam Enhanced mark breathes while the window loads, then grows and dissolves into it. |
-| `fade` | The window fades in. |
-| `none` | The window appears at once. |
-
-</details>
-
-<details>
-<summary><b>Home stage, overlay and toasts</b></summary>
-<br>
-
-| Token | Default | What it does |
+| Setting | Options | What it does |
 | --- | --- | --- |
-| `--se-home-stage` | `on` | `off` restores Steam's Library Home (handy for editing shelves). |
-| `--se-home-stage-cycle` | `9` | Seconds between hero transitions. `0` stops cycling. Also a setting: Home stage cycling (Slow 15, Fast 5, Off). |
-| `--se-home-stage-tray` | `30` | Minimum window height kept for the glass tray, in percent (0–70). Also a setting: Home stage height (Short 45, Tall 18). |
-| `--se-home-stage-tray-panels` | `on` | `off` drops the tray: the stage alone fills the window, with no Home rows below. Also a setting: Home stage tray. |
-| *(setting)* Home stage strip | `On` | `Off` hides the row of recent-game cards on the stage; the hero still cycles. |
-| *(setting)* Home stage details | `Full` | `Compact` drops the description, `Play only` keeps just the button, `Hidden` leaves the logo over the art. |
-| `--se-overlay` | `on` | `off` restores Steam's in-game overlay. |
-| `--se-overlay-dim` | `1.2` | Backdrop darkness behind the overlay (0.4–1.4): edges are black from 1, the whole game is hidden at 1.4. Also a setting: Overlay darkness (Light 0.8, Dark 1.4). The overlay's Darkness slider overrides it per user. |
-| `--se-toasts` | `on` | `off` restores Steam's toasts, desktop and in game. |
-| `--se-toasts-style` | `stage` | `stage` plays toasts on a mini Home stage; `compact` restyles Steam's toasts as cards. |
-| `--se-toasts-position` | `center` | Compact toasts only: `center` or `corner`. |
-| `--se-toasts-ingame` | `on` | `off` keeps Steam's own in-game toasts. |
+| Friends dock width | **Fixed**, Adjustable | The same as the game list, on the dock's left edge. Both columns start from one shared width. |
+
+</details>
+
+<details>
+<summary><b>Overlay</b> &nbsp;<sub>restyle, darkness</sub></summary>
+<br>
+
+| Setting | Options | What it does |
+| --- | --- | --- |
+| In-game overlay restyle | **yes**, no | no restores Steam's in-game overlay. |
+| Overlay darkness | **Default**, Light, Dark | The backdrop behind the overlay. Dark hides the game. The overlay's own Darkness slider overrides it. |
+
+</details>
+
+<details>
+<summary><b>Toasts</b> &nbsp;<sub>notifications</sub></summary>
+<br>
+
+| Setting | Options | What it does |
+| --- | --- | --- |
+| Notification toasts | **yes**, no | no restores Steam's toasts, desktop and in game. |
+| Toasts in game | **yes**, no | no keeps Steam's own in-game toasts. |
+| Toast style | **Stage**, Compact | Stage plays toasts on a mini Home stage; Compact restyles Steam's toasts as cards. |
+| Compact toast position | **Centre**, Corner | Compact toasts only: the centre of the screen edge, or Steam's corner. |
+
+</details>
+
+<details>
+<summary><b>Web</b> &nbsp;<sub>Store, Community, Support, Checkout</sub></summary>
+<br>
+
+| Setting | Options | What it does |
+| --- | --- | --- |
+| Web pages | **Theme**, Steam's own | Steam's own leaves those pages exactly as Steam draws them, in Steam's font. The client stays themed. Restart Steam after changing it. |
+
+</details>
+
+<details>
+<summary><b>Beyond the settings</b> &nbsp;<sub><code>core/tokens.css</code></sub></summary>
+<br>
+
+Every colour, radius, elevation and feature switch lives on `:root` in **`core/tokens.css`**. Change a value and restart Steam. A few take finer values than their setting offers:
+
+| Token | Default | Range |
+| --- | --- | --- |
+| `--se-home-stage-cycle` | `9` | Any number of seconds; `0` stops cycling. |
+| `--se-home-stage-tray` | `30` | The tray's share of the window, `0`–`70` (%). |
+| `--se-overlay-dim` | `1.2` | `0.4`–`1.4`: edges are black from 1, the whole game is hidden at 1.4. |
+| `--se-col-w` | `350px` | The default width of the game list and the Friends dock. |
 
 </details>
 
