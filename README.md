@@ -151,6 +151,20 @@ The main switches and the accent colour are in **Millennium → Themes → Steam
 Every colour, radius, elevation and feature switch also lives on `:root` in **`core/tokens.css`**, for anything the settings don't cover. Change a value and restart Steam.
 
 <details>
+<summary><b>Font</b> &nbsp;<sub>(Millennium setting)</sub></summary>
+<br>
+
+The typeface for the whole theme: client windows, Store, Community, Support and Checkout. Both bundled faces are variable fonts under the SIL Open Font License (licences in `core/fonts/`).
+
+| Value | Look |
+| --- | --- |
+| `SN Pro` *(default)* | A clean geometric sans by Supernotes. |
+| `Xmind` | The theme's original face. |
+| `Steam (Motiva Sans)` | Steam's own font. |
+
+</details>
+
+<details>
 <summary><b>Startup background</b> &nbsp;<code>--se-startup-background</code></summary>
 <br>
 

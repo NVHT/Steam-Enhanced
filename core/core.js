@@ -128,7 +128,7 @@
       '<style>' +
       'span{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;' +
       'background:rgba(16,18,23,.82);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);color:#98a2ad;' +
-      'font:700 11px/1 "Xmind","Motiva Sans",Arial,sans-serif;font-variant-numeric:tabular-nums;' +
+      'font:700 11px/1 var(--se-font,"SN Pro","Motiva Sans",Arial,sans-serif);font-variant-numeric:tabular-nums;' +
       'transition:color .3s,box-shadow .3s}' +
       'span::before{content:"";width:6px;height:6px;border-radius:50%;background:#90ba3c}' +
       'span.flash{color:#fff;box-shadow:inset 0 0 0 1px #7cc4ff,0 0 0 3px rgba(124,196,255,.3)}' +

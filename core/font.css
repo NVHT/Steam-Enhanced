@@ -1,13 +1,24 @@
 /*
- * Theme font: Xmind, a variable font (wght 100-900) bundled in core/fonts/ (SIL OFL 1.1, see
- * core/fonts/OFL.txt), so every weight is real rather than synthesised and works offline.
- * Fallbacks: Motiva Sans, Arial.
+ * Theme font. Two variable faces are bundled in core/fonts/ (SIL OFL 1.1, licences beside them),
+ * so every weight is real rather than synthesised and works offline:
+ *   SN Pro  (wght 200-900, SNPro-OFL.txt) — the default
+ *   Xmind   (wght 100-900, Xmind-OFL.txt)
+ * The face in use is --se-font (core/tokens.css), picked by the "Font" setting (skin.json
+ * Conditions, options/appearance/). The fallback below is the default, for web views at first
+ * paint, before tokens.css has loaded.
  *
  * Loaded in every client window (client/loader.js) and, through skin.json "Steam-WebKit", in
  * every Store and Community web view, including pages the theme doesn't otherwise restyle.
- * Self-contained (no tokens), so it applies from the web view's first paint. Code-like text
- * opts out with its own !important.
+ * Code-like text opts out with its own !important.
  */
+@font-face {
+  font-family: "SN Pro";
+  src: url("fonts/SNPro-Variable.woff") format("woff");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @font-face {
   font-family: "Xmind";
   src: url("fonts/Xmind-Variable.woff2") format("woff2");
@@ -17,5 +28,5 @@
 }
 
 * {
-  font-family: "Xmind", "Motiva Sans", Arial, sans-serif !important;
+  font-family: var(--se-font, "SN Pro", "Motiva Sans", Arial, sans-serif) !important;
 }
