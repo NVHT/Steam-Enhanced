@@ -130,44 +130,31 @@ html.se-community-hub .se-hub-sort__chip {
   cursor: pointer;
 }
 
-/* The help link ("About Reviews"): Steam's button, drawn as an icon button in the dropdowns' field
-   look, square at the row's height, after them at the same gap. Its label is its name
-   (hub/page.js) and shows on hover, so the text inside goes */
+/* The help link ("About Reviews"): Steam's button, drawn as a text button in the dropdowns' field
+   look, at the row's height, after them at the same gap */
 /* !important: Steam's own rules (buttons.css) and the theme's shared button rules
    (web/community/shared/ui.css, scoped with :not(#se-none)) set background, border, box-shadow,
    color, display, font, height, padding, width with !important; :not(#se-none) twice outweighs
    them */
 html.se-community-hub:not(#se-none) .se-hub-toolbar [data-se-hub-help]:not(#se-none) {
-  position: relative;
-  display: block !important;
+  display: inline-flex !important;
+  align-items: center;
   flex: none;
   box-sizing: border-box;
-  width: var(--se-hub-toolbar-h) !important;
+  width: auto !important;
   min-width: 0 !important;
   height: var(--se-hub-toolbar-h) !important;
   margin: 0 !important;
-  padding: 0 !important;
+  padding: 0 var(--se-space-4) !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
   background: var(--se-field-bg) !important;
   box-shadow: var(--se-field-edge) !important;
   color: var(--se-text-muted) !important;
-  font-size: 0 !important;
+  font: 600 var(--se-fs-sm)/1 var(--se-font) !important;
+  white-space: nowrap;
+  text-decoration: none !important;
   transition: box-shadow var(--se-dur), color var(--se-dur);
-}
-
-/* Centred absolutely: Steam's text sits in the link itself, and even at no size it takes a line
-   that would push the icon up */
-html.se-community-hub:not(#se-none) .se-hub-toolbar [data-se-hub-help]:not(#se-none)::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: var(--se-icon-glyph);
-  height: var(--se-icon-glyph);
-  background: currentColor;
-  -webkit-mask: var(--se-icon-help) center / contain no-repeat;
-  mask: var(--se-icon-help) center / contain no-repeat;
 }
 
 /* !important: the rule above sets box-shadow, color with !important */
@@ -190,9 +177,10 @@ html.se-community-hub .se-hub-toolbar .se-select__button {
   height: var(--se-hub-toolbar-h);
 }
 
+/* Steam's inner span carries its own button box; only its text stays */
 /* !important: display can come inline from Steam's markup or scripts */
 html.se-community-hub [data-se-hub-help] > * {
-  display: none !important;
+  display: contents !important;
 }
 
 html.se-community-hub .se-hub-sort__chip:focus-visible {

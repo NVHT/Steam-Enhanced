@@ -1,4 +1,4 @@
-/* Continues ui.css (in order, see web/community/loader.js): Tooltips. */
+/* Continues ui.css (in order, see web/community/loader.js): Tooltips; Award tips. */
 
 /* ---------- Tooltips ----------
  * Steam's own tooltips (.community_tooltip, opened as a manual popover, so the browser's
@@ -167,4 +167,44 @@ html.se-community-ui .hover_box [class*="iconHolder"] img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* ---------- Award tips (reviews: Steam's .reaction_award_hover) ----------
+ * The award's animated picture over its name and line. Steam colours the text for its own light
+ * box and frames the picture in a grey panel: both take the tooltip's tones instead.
+ */
+
+html.se-community-ui .reaction_award_hover {
+  width: 200px;
+  text-align: center;
+}
+
+/* !important: Steam's own rules (user_reviews.css) set background, margin, padding at equal or
+   higher weight */
+html.se-community-ui .reaction_award_hover .reaction_award_icon {
+  display: grid;
+  place-items: center;
+  margin: 0 0 var(--se-space-3) !important;
+  padding: var(--se-space-3) !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-white-04) !important;
+}
+
+html.se-community-ui .reaction_award_hover .reaction_award_icon img {
+  display: block;
+  width: 96px;
+  height: 96px;
+}
+
+/* !important: Steam's own rules (user_reviews.css) set color, font at equal or higher weight */
+html.se-community-ui .reaction_award_hover .reaction_award_name {
+  margin-bottom: var(--se-space-1);
+  color: var(--se-text) !important;
+  font: var(--se-type-title) !important;
+}
+
+/* !important: Steam's own rules (user_reviews.css) set color, font at equal or higher weight */
+html.se-community-ui .reaction_award_hover .reaction_award_desc {
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-small) !important;
 }

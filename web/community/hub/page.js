@@ -282,7 +282,7 @@
 
     // Once web/shared/select.js is in: the toolbar row is already in place, so this shifts nothing down.
     // One row: each control takes its caption ("Show", "Language") as its name, and the caption
-    // goes; the help link ("About Reviews") becomes a round "?" at the row's end
+    // goes; the help link ("About Reviews") becomes a text button at the row's end
     const dropdowns = () => selectReady.then((select) => {
       if (!select || !$.alive) return;
       for (const block of document.querySelectorAll('.se-hub-toolbar > *, #AppHubContent .apphub_SectionFilter')) {
@@ -304,38 +304,68 @@
           const text = dom.squash(link.textContent);
           if (!text) continue;
           $.mark(link, 'data-se-hub-help');
-          $.mark(link, 'aria-label', text);
-          $.mark(link, 'title', text);
           // Out of Steam's wrapper (its own spacing) into the row, after the dropdowns
           if (link.parentElement !== block) $.move(link, block);
         }
       }
     });
 
+    let bar = null;
+    let empty = null;
+
+    // Above the feed; with no feed at all (a filter with nothing in it, e.g. Friends' Items when
+    // no friend has posted), under the header, so the filters stay in reach
+    const place = (header, grid) => {
+      if (grid?.parentNode) {
+        if (bar.nextElementSibling !== grid) grid.before(bar);
+      } else if (header.nextElementSibling !== bar) {
+        header.after(bar);
+      }
+    };
+
+    // Steam shows nothing at all for an empty filter; the theme says so. Only once the page is
+    // parsed, so a feed that hasn't arrived yet never reads as empty
+    const showEmpty = (grid) => {
+      const isEmpty = !grid && document.readyState !== 'loading';
+      if (isEmpty && !empty?.isConnected) {
+        empty = $.owned(dom.el('div', { class: 'se-hub-empty', role: 'status' }, [
+          dom.el('p', { class: 'se-hub-empty__title', text: 'Nothing here yet' }),
+          dom.el('p', { class: 'se-hub-empty__text', text: 'Try another sort or filter.' }),
+        ]));
+      }
+      if (isEmpty) {
+        if (bar.nextElementSibling !== empty) bar.after(empty);
+      } else if (empty) {
+        empty.remove();
+        empty = null;
+      }
+    };
+
     // Idempotent: moves only blocks still in the header, so it can run on every header change
     const apply = () => {
       const header = findHeader();
+      if (!header) return;
       const grid = document.querySelector(GRID);
-      if (!header || !grid?.parentNode) return;
       const blocks = [...header.children].filter(
         (node) => node.matches(FILTER_BLOCK) && !node.matches(HEADER_KEEP) && !node.hasAttribute(dom.OWN),
       );
-      if (blocks.length) {
-        let bar = grid.parentNode.querySelector(':scope > .se-hub-toolbar');
-        if (!bar) {
-          bar = $.owned(dom.el('div', { class: 'se-hub-toolbar' }));
-          grid.before(bar);
-        }
-        for (const block of blocks) $.move(block, bar);
-      }
+      if (blocks.length && !bar) bar = $.owned(dom.el('div', { class: 'se-hub-toolbar' }));
+      if (!bar) return;
+      place(header, grid);
+      for (const block of blocks) $.move(block, bar);
+      showEmpty(grid);
       dropdowns();
     };
 
     // Runs from the start, not after load: the row is in place as the feed first paints, so the
-    // cards never jump down. The header or the feed arriving wakes it
+    // cards never jump down. The header or the feed arriving wakes it; the end of parsing settles
+    // whether the feed is there at all
     apply();
     $.observe(apply, { filter: (record) => touchesHeader(record) || [...record.addedNodes].some(
       (node) => node.nodeType === 1 && (node.matches(GRID) || node.querySelector(GRID))) });
+    dom.ready().then(() => {
+      if ($.alive) apply();
+    });
   };
 
   /**

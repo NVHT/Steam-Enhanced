@@ -27,6 +27,7 @@
  *   awards/     The Steam Awards: results.* (/steamawards/2016 ...), archive.* (/steamawards/archive)
  *   replay/     Steam Replay (/replay/<steamid>/<year>)
  *   marketing/  Marketing messages (/marketingmessages/)
+ *   reviews/    Introducing Steam Reviews (/reviews/: the hub's "About Reviews")
  *   legal/      legal.*: Legal Info (/legal/), Video Policy (/video_policy);
  *               agreement.*: Subscriber Agreement (/subscriber_agreement/), Privacy Policy
  *   account/    page.*: every account page (/account/..., Add funds, Phone, Family View): the
@@ -61,6 +62,7 @@
       awardsArchive: { test: (path) => /^\/steamawards\/archive\/?$/i.test(path), root: 'se-store-awards-archive' },
       replay: { test: (path) => /^\/replay(?:\/|$)/i.test(path), root: 'se-store-replay' },
       marketing: { test: (path) => /^\/marketingmessages(?:\/|$)/i.test(path), root: 'se-store-marketing' },
+      reviews: { test: (path) => /^\/reviews\/?$/i.test(path), root: 'se-store-reviews' },
       ssa: { test: (path) => /^\/(?:subscriber|privacy)_agreement(?:\/|$)/i.test(path), root: 'se-store-ssa' },
       legal: { test: (path) => /^\/(?:legal|video_policy)\/?$/i.test(path), root: 'se-store-legal' },
       account: { test: (path) => /^\/(?:account(?:\/[\w-]+)*|steamaccount\/addfunds|phone\/manage|parental(?:\/[\w-]+)?)\/?$/i.test(path), root: 'se-store-account' },
@@ -123,6 +125,7 @@
       { css: 'awards/archive.css', js: 'awards/archive.js', on: ['awardsArchive'] },
       { css: 'replay/page.css', on: ['replay'] },
       { css: 'marketing/page.css', on: ['marketing'] },
+      { css: 'reviews/page.css', on: ['reviews'] },
       { css: 'legal/agreement.css', js: 'legal/agreement.js', on: ['ssa'] },
       { css: 'legal/legal.css', js: 'legal/legal.js', on: ['legal'] },
       { css: 'account/page.css', js: 'account/page.js', on: ['account'] },

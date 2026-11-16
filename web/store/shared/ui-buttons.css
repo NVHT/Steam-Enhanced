@@ -123,12 +123,14 @@ html.se-store-wishlist:not(#se-none) :is([data-se-wl="remove"], [data-se-wl="cat
 }
 
 /* ==========================================================================
- * Primary buttons: a view's one main action (Add to Cart on a wishlist row, Search), filled in the
+ * Primary buttons: a view's one main action (Add to Cart on a wishlist row, Search, the Reviews
+ * page's calls to action), filled in the
  * accent at the price chip's height so the two read as one pair; members set --se-accent-pill-h
  * beside a control of another height.
  * ========================================================================== */
 html.se-store-wishlist:not(#se-none) [data-se-wl="cart"],
-html.se-store-search:not(#se-none) .searchbar_left > button {
+html.se-store-search:not(#se-none) .searchbar_left > button,
+html.se-store-reviews:not(#se-none) .bottom_block .btn_green_white_innerfade {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -154,7 +156,8 @@ html.se-store-search:not(#se-none) .searchbar_left > button {
 
 /* Steam's label box inside the button: no fill, the button's type. */
 html.se-store-wishlist:not(#se-none) [data-se-wl="cart"] > *,
-html.se-store-search:not(#se-none) .searchbar_left > button > * {
+html.se-store-search:not(#se-none) .searchbar_left > button > *,
+html.se-store-reviews:not(#se-none) .bottom_block .btn_green_white_innerfade > * {
   width: auto;
   height: auto;
   padding: 0;
@@ -165,13 +168,27 @@ html.se-store-search:not(#se-none) .searchbar_left > button > * {
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="cart"]:hover,
-html.se-store-search:not(#se-none) .searchbar_left > button:hover {
+html.se-store-search:not(#se-none) .searchbar_left > button:hover,
+html.se-store-reviews:not(#se-none) .bottom_block .btn_green_white_innerfade:hover {
   background: var(--se-btn-primary-bg-hover);
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="cart"]:active,
-html.se-store-search:not(#se-none) .searchbar_left > button:active {
+html.se-store-search:not(#se-none) .searchbar_left > button:active,
+html.se-store-reviews:not(#se-none) .bottom_block .btn_green_white_innerfade:active {
   transform: scale(var(--se-press-scale));
+}
+
+/* Steam's green buttons as members: the default control height (no price chip beside them), and
+   the label colour pinned, since Steam sets theirs with !important */
+html.se-store-reviews:not(#se-none) .bottom_block .btn_green_white_innerfade {
+  --se-accent-pill-h: var(--se-ctl);
+}
+
+/* !important: Steam's own rules (buttons.css) set color with !important */
+html.se-store-reviews:not(#se-none) .bottom_block .btn_green_white_innerfade,
+html.se-store-reviews:not(#se-none) .bottom_block .btn_green_white_innerfade > * {
+  color: var(--se-btn-primary-color) !important;
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="cart"]:is(:disabled, [aria-disabled="true"]),

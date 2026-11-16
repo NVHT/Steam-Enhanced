@@ -37,13 +37,16 @@ html.se-community-ui .friendBlock:hover {
    height, margin, width at equal or higher weight; the theme's shared rules
    (web/community/discussions/home.css, web/community/hub/page.css, web/community/profile/page.css) set height,
    margin, padding, width with !important */
+/* The size includes the ring (border-box), so the picture sits centred in an even 2px status
+   ring: counted outside, the box grew around a picture pinned to its top-left corner */
 html.se-community-ui .friendBlock .playerAvatar {
   flex: none;
+  box-sizing: border-box;
   float: none !important;
   width: 32px !important;
   height: 32px !important;
   margin: 0 !important;
-  padding: 1px !important;
+  padding: var(--se-space-half) !important;
 }
 
 /* !important: Steam's own rules (BZPioAp_.css, BrIybpw5.css, apppartnereventspage.css) set height,
@@ -51,8 +54,8 @@ html.se-community-ui .friendBlock .playerAvatar {
    web/community/discussions/home.css, web/community/discussions/page.css) set height, width with
    !important */
 html.se-community-ui .friendBlock .playerAvatar img {
-  width: 30px !important;
-  height: 30px !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 html.se-community-ui .friendBlockContent {

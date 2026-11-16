@@ -44,7 +44,7 @@
       { css: '../../core/levels.css' },
       { css: 'base.css' },
       { css: 'miniprofile.css' },
-      { css: 'modals.css' },
+      { css: 'modals.css', js: 'modals.js' },
       { css: 'select.css' },
       { css: 'scroll-top.css', js: 'scroll-top.js' },
       { css: '../../core/spinner.css' },

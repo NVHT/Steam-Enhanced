@@ -1,0 +1,272 @@
+/*
+ * Introducing Steam Reviews (/reviews/, where the hub's "About Reviews" goes): styles_reviews.css
+ * paints a promo page over a repeating blue backdrop. Restyled in the Legal page's look: the
+ * theme's page colour, a page header, each feature as a card (text beside its picture), the two
+ * calls to action as cards with their button at the end, and the FAQ as two cards side by side.
+ *
+ *   [ Read, Rate, and Discuss                                ]
+ *   [ Now it's easy to see what other Steam users think…     ]
+ *   [ Read helpful reviews  text…              [ picture ]   ]   × 5
+ *   [ Edit and share your Steam Reviews   [See your reviews] ]
+ *   Frequently Asked Questions
+ *   [ For Steam users  Q / A … ][ For Developers  Q / A …    ]
+ *   Let us know what you think
+ *   [ Post feedback, bugs, or suggestions [View Discussions] ]
+ *
+ * Steam's markup: #page_background_holder, then #container > #header_sub (h1 and its text),
+ * .image_block (.text: h2 + span, .img: img), .bottom_block (.text: h2 + text,
+ * .button_container), h3, .col50 (h4, h5 question, p answer). Rules use
+ * html.se-store-reviews:not(#se-none) for ID-level weight over Steam's #container rules.
+ */
+
+/* ---------- Page ---------- */
+
+/* !important: Steam's own rules (styles_reviews.css) set background, color at equal or higher
+   weight */
+html.se-store-reviews:not(#se-none) body {
+  background: var(--se-bg) !important;
+  color: var(--se-text-dim) !important;
+}
+
+/* The promo backdrop */
+/* !important: display can come inline from Steam's markup or scripts */
+html.se-store-reviews:not(#se-none) #page_background_holder {
+  display: none !important;
+}
+
+/* One grid: everything full width, the two FAQ columns side by side */
+/* !important: Steam's own rules (styles_reviews.css) set margin, padding, width at equal or
+   higher weight */
+html.se-store-reviews:not(#se-none) #container {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--se-space-4);
+  box-sizing: border-box;
+  width: var(--se-page-width) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding: var(--se-space-6) 0 4rem !important;
+}
+
+html.se-store-reviews:not(#se-none) #container > * {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+/* Steam centres the page's text and gives it a drop shadow: neither suits the cards */
+/* !important: Steam's own rules (styles_reviews.css) set text-align, text-shadow at equal or
+   higher weight */
+html.se-store-reviews:not(#se-none) #container,
+html.se-store-reviews:not(#se-none) #container * {
+  text-align: start !important;
+  text-shadow: none !important;
+}
+
+/* Steam's spacer divs */
+/* !important: display can come inline from Steam's markup or scripts */
+html.se-store-reviews:not(#se-none) #container > div:not([id], [class]) {
+  display: none !important;
+}
+
+/* ---------- Header ---------- */
+
+/* !important: Steam's own rules (styles_reviews.css) set background, color, font, height, margin,
+   padding, width at equal or higher weight */
+html.se-store-reviews:not(#se-none) #header_sub {
+  width: auto !important;
+  height: auto !important;
+  max-width: 70ch;
+  margin: 0 0 var(--se-space-4) !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+/* !important: Steam's own rules (styles_reviews.css) set color, font, margin, text-transform at
+   equal or higher weight */
+html.se-store-reviews:not(#se-none) #header_sub h1 {
+  margin: 0 0 var(--se-space-3) !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-display)/1.15 var(--se-font) !important;
+  letter-spacing: -.02em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/* ---------- Cards ---------- */
+
+/* !important: Steam's own rules (styles_reviews.css) set background, border, float, height, margin,
+   padding, width at equal or higher weight */
+html.se-store-reviews:not(#se-none) :is(.image_block, .bottom_block, .col50) {
+  box-sizing: border-box;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-6) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+/* A feature: its text beside its picture */
+html.se-store-reviews:not(#se-none) .image_block {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--se-space-6);
+}
+
+/* A call to action: its text, then the button at the end */
+html.se-store-reviews:not(#se-none) .bottom_block {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-6);
+}
+
+/* Steam frames the picture with a grey plate (the .img box's background): the picture alone,
+   rounded */
+/* !important: Steam's own rules (styles_reviews.css) set background, float, height, margin,
+   padding, width at equal or higher weight */
+html.se-store-reviews:not(#se-none) :is(.image_block, .bottom_block) > :is(.text, .img, .button_container) {
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-store-reviews:not(#se-none) .bottom_block > .text {
+  flex: 1;
+  min-width: 0;
+}
+
+html.se-store-reviews:not(#se-none) .bottom_block > .button_container {
+  flex: none;
+}
+
+/* At most its own size: the screenshots are small, and stretched they blur */
+/* !important: Steam's own rules (styles_reviews.css) set border, box-shadow, height, width at equal
+   or higher weight */
+html.se-store-reviews:not(#se-none) .image_block .img img {
+  display: block;
+  width: auto !important;
+  max-width: 100%;
+  height: auto !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg);
+  box-shadow: var(--se-elevation-1) !important;
+}
+
+/* Card text */
+/* !important: Steam's own rules (styles_reviews.css) set color, font at equal or higher weight */
+html.se-store-reviews:not(#se-none) :is(.image_block, .bottom_block) .text {
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+/* !important: Steam's own rules (styles_reviews.css) set color, font, margin, text-transform at
+   equal or higher weight */
+html.se-store-reviews:not(#se-none) :is(.image_block, .bottom_block) h2 {
+  margin: 0 0 var(--se-space-2) !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-heading) !important;
+  letter-spacing: -.01em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/* ---------- FAQ ---------- */
+
+/* Section titles ("Frequently Asked Questions", "Let us know what you think") */
+/* !important: Steam's own rules (styles_reviews.css) set background, border, color, font, margin,
+   padding, text-transform at equal or higher weight */
+html.se-store-reviews:not(#se-none) #container > h3 {
+  margin: var(--se-space-5) 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-heading-lg) !important;
+  letter-spacing: -.01em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
+
+/* The two columns, side by side */
+html.se-store-reviews:not(#se-none) #container > .col50 {
+  grid-column: auto;
+  align-self: start;
+}
+
+/* "For Steam users", "For Developers": a small-caps label */
+/* !important: Steam's own rules (styles_reviews.css) set color, font, margin, text-transform at
+   equal or higher weight */
+html.se-store-reviews:not(#se-none) .col50 h4 {
+  margin: 0 0 var(--se-space-4) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  color: var(--se-label-color) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase !important;
+}
+
+/* Questions as titles, answers under them; a divider between pairs */
+/* !important: Steam's own rules (styles_reviews.css) set color, font, margin at equal or higher
+   weight */
+html.se-store-reviews:not(#se-none) .col50 h5 {
+  margin: 0 0 var(--se-space-1) !important;
+  padding: 0 !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-title) !important;
+  text-transform: none !important;
+}
+
+html.se-store-reviews:not(#se-none) .col50 p + h5 {
+  margin-top: var(--se-space-4) !important;
+  padding-top: var(--se-space-4) !important;
+  border-top: 1px solid var(--se-divider);
+}
+
+/* !important: Steam's own rules (styles_reviews.css) set color, font, margin at equal or higher
+   weight */
+html.se-store-reviews:not(#se-none) .col50 p {
+  margin: 0 !important;
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-body) !important;
+}
+
+/* !important: Steam's own rules (styles_reviews.css) set color, text-decoration at equal or higher
+   weight */
+html.se-store-reviews:not(#se-none) #container a:not([class*="btn_"]) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+  transition: color var(--se-dur);
+}
+
+html.se-store-reviews:not(#se-none) #container a:not([class*="btn_"]):hover {
+  color: var(--se-white) !important;
+}
+
+/* ---------- Narrow windows ---------- */
+
+@media (max-width: 1000px) {
+  html.se-store-reviews:not(#se-none) :is(#container, .image_block) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html.se-store-reviews:not(#se-none) #container > .col50 {
+    grid-column: 1 / -1;
+  }
+
+  html.se-store-reviews:not(#se-none) .bottom_block {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

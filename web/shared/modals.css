@@ -12,6 +12,9 @@
  *
  * The oldest ones (#modalBG + .modal_frame > .modal_box > .modal_box_ctn: the hub's
  * "Returning to where you were last on this page…") take the same card.
+ * Page popups (#modalContent: a page in an iframe under a URL bar, the hub's review popup) are
+ * the same card with a slim address bar; its address opens the page in the client
+ * (web/shared/modals.js).
  *
  * Steam's classic markup (shared_global.css): .newmodal_background (the scrim), dialog.newmodal >
  * .modal_top_bar, .newmodal_header_border > .newmodal_header > .newmodal_close + .title_text,
@@ -253,4 +256,108 @@ html:is(.se-store, .se-community):not(#se-none) .modal_frame .modal_box_ctn {
   background: var(--se-surface) !important;
   color: var(--se-text-dim);
   font: var(--se-type-body-lg);
+}
+
+/* ---------- Page popups (#modalContent: the hub's review and guide popups) ----------
+ * Steam's ShowModalContent: a URL bar (link, external-link icon, ×) over an iframe of the page
+ * (?insideModal=1). The frame becomes the theme's card: a quiet bar with the address and a close
+ * button, the page under it.
+ */
+
+/* !important: Steam's own rules (modalContent.css) set background, border-radius at equal or
+   higher weight; another rule in this file sets background with !important */
+html:is(.se-store, .se-community):not(#se-none) #modalContent {
+  overflow: hidden;
+  border-radius: var(--se-radius-card) !important;
+  background: var(--se-bg) !important;
+  box-shadow: var(--se-elevation-3);
+}
+
+/* !important: Steam's own rules (modalContent.css) set background, height, padding at equal or
+   higher weight; display can come inline from Steam's scripts */
+html:is(.se-store, .se-community):not(#se-none) #modalContentTitleBar {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-2);
+  box-sizing: border-box;
+  height: var(--se-ctl-lg) !important;
+  padding: 0 var(--se-space-2) 0 var(--se-space-4) !important;
+  border-bottom: 1px solid var(--se-divider);
+  background: var(--se-surface) !important;
+}
+
+/* The address: one line, faint, opens the page in the browser */
+/* !important: Steam's own rules (modalContent.css) set color, float, font, margin at equal or
+   higher weight */
+html:is(.se-store, .se-community):not(#se-none) #modalContentTitleBarLink {
+  flex: 1;
+  min-width: 0;
+  float: none !important;
+  margin: 0 !important;
+  overflow: hidden;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+  text-decoration: none !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color var(--se-dur);
+}
+
+/* !important: another rule in this file sets color with !important */
+html:is(.se-store, .se-community):not(#se-none) #modalContentTitleBarLink:hover {
+  color: var(--se-accent) !important;
+}
+
+/* The external-link icon: the address beside it is the same link */
+/* !important: display can come inline from Steam's markup or scripts */
+html:is(.se-store, .se-community):not(#se-none) #modalContentTitleBarImageLink {
+  display: none !important;
+}
+
+/* Close: the dialogs' square × button */
+/* !important: Steam's own rules (modalContent.css) set background, float, height, margin, position,
+   width at equal or higher weight */
+html:is(.se-store, .se-community):not(#se-none) #modalContentDismiss {
+  position: static !important;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--se-hit) !important;
+  height: var(--se-hit) !important;
+  margin: 0 !important;
+  float: none !important;
+  border-radius: var(--se-radius-control);
+  background: none !important;
+  color: var(--se-text-muted);
+  cursor: pointer;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html:is(.se-store, .se-community):not(#se-none) #modalContentDismiss::before {
+  content: "";
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-close-sm) center / contain no-repeat;
+  mask: var(--se-icon-close-sm) center / contain no-repeat;
+}
+
+/* !important: display can come inline from Steam's markup or scripts */
+html:is(.se-store, .se-community):not(#se-none) #modalContentDismiss img {
+  display: none !important;
+}
+
+/* !important: another rule in this file sets background with !important */
+html:is(.se-store, .se-community):not(#se-none) #modalContentDismiss:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white);
+}
+
+html:is(.se-store, .se-community):not(#se-none) #modalContentDismiss:active {
+  transform: scale(var(--se-press-scale));
+}
+
+/* !important: Steam's own rules (modalContent.css) set background at equal or higher weight */
+html:is(.se-store, .se-community):not(#se-none) #modalContentFrameContainer {
+  background: var(--se-bg) !important;
 }

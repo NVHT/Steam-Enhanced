@@ -10,7 +10,8 @@
  *
  * Layout:
  *   shared/        ui.css: what the redesigned classic pages share; small-header.css: the
- *                  profile sub-page header card (inventory, activity settings, edit profile)
+ *                  profile sub-page header card (inventory, activity settings, edit profile);
+ *                  compose.js: the comment box's formatting row
  *   dmca/          Notice of Copyright Infringement (/dmca/create/)
  *   profile/       Profile (/id/<name>, /profiles/<steamid>)
  *   activity/      Friend Activity and My Activity (/id/<name>/home, /id/<name>/myactivity)
@@ -22,6 +23,8 @@
  *   discussions/   Discussions (/discussions/, hub and group forums, topics); home.css/js:
  *                  the Discussions home (/discussions/) on top of page.css
  *   market/        Community Market home (/market/)
+ *   review/        A user's review of a game (/id/<name>/recommended/<appid>), also shown in the
+ *                  hub's review popup (?insideModal=1)
  */
 (() => {
   'use strict';
@@ -46,8 +49,9 @@
     /^\/(?:app\/\d+|groups\/[^/]+)\/(?:discussions|tradingforum|eventcomments)(?:\/|$)/i.test(path);
   const isDiscussionsHome = (path) => /^\/discussions\/?$/i.test(path);
   const isMarket = (path) => /^\/market\/?$/i.test(path);
+  const isReview = (path) => /^\/recommended\/\d+$/i.test(profileRest(path) ?? '');
 
-  const classic = [isProfile, isActivity, isActivitySettings, isInventory, isEditProfile, isHub, isDiscussions, isMarket];
+  const classic = [isProfile, isActivity, isActivitySettings, isInventory, isEditProfile, isHub, isDiscussions, isMarket, isReview];
 
   window.__seWeb.configure({
     siteClass: 'se-community',
@@ -65,6 +69,7 @@
       discussions: { test: isDiscussions, root: 'se-community-discussions' },
       discussionsHome: { test: isDiscussionsHome, root: 'se-community-discussions-home' },
       market: { test: isMarket, root: 'se-community-market' },
+      review: { test: isReview, root: 'se-community-review' },
     },
     files: [
       { css: 'shared/ui.css', on: ['ui'] },
@@ -73,7 +78,8 @@
       { css: 'shared/ui-icons.css', on: ['ui'] },
       { css: 'shared/ui-tooltips.css', on: ['ui'] },
       { css: 'shared/ui-footer.css', on: ['ui'] },
-      { css: 'shared/small-header.css', on: ['inventory', 'activitySettings', 'editProfile'] },
+      { js: 'shared/compose.js', on: ['ui'] },
+      { css: 'shared/small-header.css', on: ['inventory', 'activitySettings', 'editProfile', 'review'] },
       { css: 'dmca/page.css', js: 'dmca/page.js', on: ['dmca'] },
       { js: 'shared/icons.js', on: ['profile', 'activity'] },
       { css: 'profile/page.css', js: 'profile/page.js', on: ['profile'] },
@@ -106,6 +112,7 @@
       { css: 'market/listings.css', on: ['market'] },
       { css: 'market/history.css', on: ['market'] },
       { css: 'market/sidebar.css', on: ['market'] },
+      { css: 'review/page.css', js: 'review/page.js', on: ['review'] },
     ],
   });
 })();
