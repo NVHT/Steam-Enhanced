@@ -24,8 +24,6 @@
   &nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="#-make-it-yours">Make it yours</a>
   &nbsp;&nbsp;·&nbsp;&nbsp;
-  <a href="#-troubleshooting">Troubleshooting</a>
-  &nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="#-licenses">Licenses</a>
 </p>
 
@@ -268,38 +266,6 @@ Every colour, radius, elevation and feature switch lives on `:root` in **`core/t
 | `--se-home-stage-tray` | `30` | The tray's share of the window, `0`–`70` (%). |
 | `--se-overlay-dim` | `1.2` | `0.4`–`1.4`: edges are black from 1, the whole game is hidden at 1.4. |
 | `--se-col-w` | `350px` | The default width of the game list and the Friends dock. |
-
-</details>
-
-<br>
-
-## ✦ Troubleshooting
-
-<details>
-<summary><b>The theme is missing from Millennium</b></summary>
-<br>
-
-Check that `skin.json` sits at `millennium/themes/Steam-Enhanced/skin.json`.
-
-</details>
-
-<details>
-<summary><b>Interactive features are missing</b></summary>
-<br>
-
-Theme JavaScript is off (see the [requirements](#-install)). Turn it on in Millennium's settings, then restart Steam.
-
-</details>
-
-<details>
-<summary><b>Something broke after a Steam update</b></summary>
-<br>
-
-Steam may have rotated its CSS module class names. Rehash them with:
-
-```sh
-python3 dev/classmap.py rehash <path-to-extracted-steamui> .
-```
 
 </details>
 
