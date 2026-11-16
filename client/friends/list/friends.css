@@ -1,0 +1,432 @@
+/*
+ * Friends list panel styles (standalone Friends window and Library dock).
+ *
+ * Styles the self-persona header, toolbar icon tiles, expandable search input,
+ * Favorites grid, collapsible game/status groups, friend request rows, and
+ * group chat rows. Paired with `client/friends/list/friends-list.js`.
+ *
+ * Continued, by section, in friends-search.css, friends-rows.css, friends-requests.css,
+ * friends-chats.css, friends-window.css (same folder), listed after this file in
+ * client/loader.js: together they keep one file's order.
+ */
+/*
+ * Group headers ("AION 2 (3)", "COUNTER-STRIKE 2 (6)"): like the Library's
+ * collection headers; client/navigation/sidebar-icons.js turns the "(3)" into a badge.
+ */
+.friendGroup .groupName {
+  margin-top: 6px !important;
+  padding: 4px 8px !important;
+  border-radius: var(--se-radius-sm);
+  text-transform: uppercase;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  color: var(--se-label-color) !important;
+}
+
+.friendGroup .groupName:hover {
+  background: var(--se-hover);
+  color: var(--se-text) !important;
+}
+
+.friendGroup .groupName [data-se-count] {
+  font-size: 0 !important;
+  opacity: 1 !important;
+  /* Steam fades the count out on expanded groups */
+  transform: none !important;
+}
+
+.friendGroup .groupName [data-se-count]::after {
+  content: attr(data-se-count);
+  display: inline-block;
+  margin-inline-start: 6px;
+  padding: 0 7px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface-2);
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-2xs);
+  font-weight: 700;
+  line-height: 17px;
+  letter-spacing: 0;
+}
+
+.friendGroup .groupName .groupIcon img,
+.friendGroup .groupName img {
+  border-radius: var(--se-radius-xs);
+}
+
+/* Friend rows: rounded avatars, hover as an inset pill */
+.friendGroup .friend {
+  margin: 2px 6px !important;
+  padding-inline-start: 8px !important;
+  border-radius: var(--se-radius-sm);
+}
+
+.friendGroup .friend:hover {
+  background: var(--se-hover) !important;
+}
+
+.friend .avatarHolder,
+.friend .avatarHolder .avatar,
+.friend .avatarHolder img {
+  border-radius: var(--se-radius-sm) !important;
+}
+
+.friend .avatarHolder {
+  overflow: hidden;
+}
+
+/* Favorite friends at the top */
+.quickAccessFriends .friend .avatarHolder,
+.quickAccessFriends .friend .avatarHolder img {
+  border-radius: var(--se-radius-md) !important;
+}
+
+.quickAccessFriends .friend:hover {
+  background: var(--se-hover) !important;
+  border-radius: var(--se-radius-md);
+}
+
+/* Section titles (FAVORITES, ONLINE…) */
+.friendsListSectionTitle {
+  background: transparent !important;
+  font-size: var(--se-fs-xs) !important;
+  font-weight: 700;
+  letter-spacing: .08em !important;
+  color: var(--se-text-muted) !important;
+}
+
+/*
+ * Steam's friends list, styled like the theme's panel
+ * The same in the Friends window and in the Library's dock (client/friends/friends-dock.css only
+ * places it there). native markup: the list (.friendlist) with your status, favorites,
+ * the Friends bar, the groups and friends, and group chats; the name lines use Steam's
+ * persona-label classes (nOdcT… player name, _1cB0q… status/game, _2Ri00… rich presence).
+ * Nothing is moved; client/friends/list/friends-list.js adds data-se-count (a group's count) and
+ * data-se-who (who is in a game). GamepadMode (Big Picture) is left as Steam draws it.
+ */
+.friendlist:not(.GamepadMode),
+.friendlist:not(.GamepadMode) .FriendsListContent,
+.friendlist:not(.GamepadMode) .friendlistListContainer,
+.friendlist:not(.GamepadMode) .listContentContainer,
+.friendlist:not(.GamepadMode) .friendListHeaderContainer,
+.friendlist:not(.GamepadMode) .FriendsListChatSection {
+  background: var(--se-sidebar) !important;
+}
+
+.friendlist:not(.GamepadMode) {
+  font-family: var(--se-font);
+}
+
+/* Scrolls with the wheel, keys or a drag, without a scrollbar */
+.friendlist:not(.GamepadMode),
+.friendlist:not(.GamepadMode) * {
+  scrollbar-width: none !important;
+}
+
+.friendlist:not(.GamepadMode) ::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+/*
+ * Banners over the list, marked [data-se-banner] by client/friends/list/friends-list.js:
+ * - connection ("Disconnected", "Reconnecting…"): Steam's blue gradient strip becomes a slim
+ *   red notice card with a status dot;
+ * - invite ("Invite anyone to play"): Steam's teal strip becomes an accent action row in the
+ *   theme's label type.
+ * Only paint, type and spacing change; Steam keeps the layout inside them and their clicks.
+ */
+[data-se-banner="connection"]:not(#se-none) {
+  box-sizing: border-box;
+  height: auto !important;
+  min-height: 32px;
+  margin: 8px 12px 0 !important;
+  padding: 6px 12px 6px 28px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background:
+    radial-gradient(circle 4px at 14px 50%, var(--se-danger) 92%, transparent),
+    color-mix(in srgb, var(--se-danger) 12%, var(--se-surface)) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-danger) 30%, transparent) !important;
+  font: 600 12px/20px var(--se-font), sans-serif !important;
+  letter-spacing: .01em !important;
+  text-align: start !important;
+  text-shadow: none !important;
+  color: var(--se-danger-text) !important;
+}
+
+[data-se-banner="connection"]::before,
+[data-se-banner="connection"]::after {
+  background-image: none !important;
+}
+
+[data-se-banner="connection"] * {
+  font: inherit !important;
+  text-shadow: none !important;
+  color: inherit !important;
+}
+
+[data-se-banner="invite"]:not(#se-none) {
+  box-sizing: border-box;
+  margin: 8px 12px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-accent-tint) !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent-line) !important;
+  color: var(--se-accent) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+[data-se-banner="invite"]:not(#se-none):hover {
+  background: color-mix(in srgb, var(--se-accent) 22%, transparent) !important;
+  color: var(--se-text-strong) !important;
+}
+
+[data-se-banner="invite"] :not(svg, svg *) {
+  background: none !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-shadow: none !important;
+  color: inherit !important;
+}
+
+[data-se-banner="invite"] svg {
+  color: inherit;
+  opacity: .9;
+}
+
+/* Your status */
+.friendlist:not(.GamepadMode) .friendListHeaderContainer {
+  min-height: 0 !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid var(--se-hairline) !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer {
+  position: relative;
+  background: none !important;
+  border: 0 !important;
+  padding: 12px 24px 12px 14px !important;
+}
+
+.friendlist:not(.GamepadMode) .statusHeaderGlow {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .AvatarAndUser {
+  align-items: center;
+  padding: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserAvatar {
+  width: 36px !important;
+  height: 36px !important;
+  margin-right: 3px;
+}
+
+.friendlist:not(.GamepadMode) .currentUserAvatar:hover {
+  transform: none;
+  filter: brightness(1.1);
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer .labelHolder {
+  margin: 0 0 0 8px !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer .nOdcT-MoOaXGePXLyPe0H {
+  font: 700 14px/1.3 var(--se-font), sans-serif !important;
+  color: var(--se-text) !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer ._3sxE7F1LV2IcSX68YsH9dI {
+  margin: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer ._2Ri005Wg_uXDTa71kdRbcN {
+  margin: 0 !important;
+  font: 600 12px/1.3 var(--se-font), sans-serif !important;
+  color: var(--se-online) !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer.ingame ._2Ri005Wg_uXDTa71kdRbcN {
+  color: var(--se-running) !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer.offline ._2Ri005Wg_uXDTa71kdRbcN {
+  color: var(--se-text-muted) !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer .ContextMenuButton {
+  opacity: .7;
+  margin: 0 !important;
+  padding: 0 0 0 2px !important;
+}
+
+.friendlist:not(.GamepadMode) .currentUserContainer .ContextMenuButton svg {
+  width: 12px !important;
+  height: 12px !important;
+  margin-top: 3px !important;
+  fill: currentColor;
+}
+
+/*
+ * Buttons (settings, search, friend requests, add a friend, collapse): the theme's
+ * 30 px tiles with its duotone icons (a soft fill under the line), drawn as masks so
+ * they follow the tile's color; native glyphs stay in the DOM, hidden
+ */
+.friendlist:not(.GamepadMode) {
+  --se-fd-ico-search: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Ccircle%20cx%3D%2211%22%20cy%3D%2211%22%20r%3D%226.5%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2211%22%20cy%3D%2211%22%20r%3D%226.5%22%2F%3E%3Cpath%20d%3D%22M20%2020l-4.2-4.2%22%2F%3E%3C%2Fsvg%3E");
+  --se-fd-ico-add: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Ccircle%20cx%3D%229.5%22%20cy%3D%228%22%20r%3D%223.5%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%229.5%22%20cy%3D%228%22%20r%3D%223.5%22%2F%3E%3Cpath%20d%3D%22M3%2020c.8-3.4%203.4-5.2%206.5-5.2s5.7%201.8%206.5%205.2M19.5%208.5v6M16.5%2011.5h6%22%2F%3E%3C%2Fsvg%3E");
+  --se-fd-ico-requests: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Ccircle%20cx%3D%229.5%22%20cy%3D%228%22%20r%3D%223.5%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%229.5%22%20cy%3D%228%22%20r%3D%223.5%22%2F%3E%3Cpath%20d%3D%22M3%2020c.8-3.4%203.4-5.2%206.5-5.2s5.7%201.8%206.5%205.2M22%206l-4.5%204.5M17.5%206.5v4h4%22%2F%3E%3C%2Fsvg%3E");
+  --se-fd-ico-collapse: var(--se-icon-collapse);
+  --se-fd-ico-settings: var(--se-icon-settings);
+}
+
+.friendlist:not(.GamepadMode) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton) {
+  position: relative;
+  flex: none;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 30px !important;
+  height: 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background: none;
+  opacity: 1 !important;
+  transform: none !important;
+  color: var(--se-text-muted) !important;
+  cursor: pointer;
+}
+
+.friendlist:not(.GamepadMode) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+/* Keyboard focus on every control the theme restyles, matching the rest of the theme */
+.friendlist:not(.GamepadMode) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton, .friendSearchClear, .friendInviteButton, .confirmInviteButton, .cancelAddFriends, .createChatRoomButton, .openGroupButton, .groupName, .friend, .ChatRoomListGroupItem_header):focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.friendlist:not(.GamepadMode) .friendRequestButton.friendRequestViewActive {
+  background: var(--se-accent-tint) !important;
+  color: var(--se-accent) !important;
+}
+
+.friendlist:not(.GamepadMode) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton) > svg {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton)::before {
+  content: "";
+  width: 20px;
+  height: 20px;
+  background: currentColor;
+  -webkit-mask: var(--se-fd-ico) center / 20px 20px no-repeat;
+  mask: var(--se-fd-ico) center / 20px 20px no-repeat;
+}
+
+.friendlist:not(.GamepadMode) .friendSettingsButton {
+  --se-fd-ico: var(--se-fd-ico-settings);
+}
+
+.friendlist:not(.GamepadMode) .TabSearchButton .searchIconButton {
+  --se-fd-ico: var(--se-fd-ico-search);
+}
+
+.friendlist:not(.GamepadMode) .friendRequestButton {
+  --se-fd-ico: var(--se-fd-ico-requests);
+}
+
+.friendlist:not(.GamepadMode) .addFriendButton {
+  --se-fd-ico: var(--se-fd-ico-add);
+}
+
+/*
+ * The Friends window's collapse button (Steam's friendListButton friendCollapseButton): without
+ * its own icon the mask above would paint a solid square
+ */
+.friendlist:not(.GamepadMode) .friendCollapseButton {
+  --se-fd-ico: var(--se-fd-ico-collapse);
+}
+
+.friendlist:not(.GamepadMode) .friendCollapseButton svg {
+  display: none !important;
+}
+
+/* A friend request count: a small red pill on the tile's corner */
+.friendlist:not(.GamepadMode) .friendRequestButton .requestsNumber {
+  position: absolute !important;
+  top: -3px !important;
+  right: -4px !important;
+  left: auto !important;
+  box-sizing: border-box;
+  min-width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-danger) !important;
+  box-shadow: 0 0 0 2px var(--se-sidebar);
+  font: 800 10px/16px var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  color: var(--se-text-strong) !important;
+  text-align: center;
+  transform: none !important;
+  z-index: var(--se-z-raised);
+}
+
+/* The "Friends" bar: a small label, its buttons at the end */
+.friendlist:not(.GamepadMode) .quickAccessFriends.emptyQuickAccess {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab {
+  display: flex !important;
+  align-items: center;
+  height: 34px !important;
+  margin: 6px 8px 0 !important;
+  padding: 0 0 0 8px !important;
+  border-radius: var(--se-radius-sm);
+  background: none !important;
+  box-shadow: none !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  color: var(--se-label-color) !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .tabLabel {
+  flex: none;
+  color: inherit !important;
+  line-height: 34px;
+}
+
+.friendlist:not(.GamepadMode) .friendsTabButtonsContainer {
+  display: flex !important;
+  align-items: center;
+  gap: 2px;
+  height: 34px !important;
+  padding: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .friendsTabButtonsContainer .TabSearchButton {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+  height: 34px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  opacity: 1 !important;
+}
+
+.friendlist:not(.GamepadMode) .friendsTabButtonsContainer a {
+  display: flex;
+}

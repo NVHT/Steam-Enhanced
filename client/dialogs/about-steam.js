@@ -20,7 +20,7 @@
  * the store's partner events endpoint, fetched by the main window as news-hub.js does.
  * The patch notes open in a panel inside the dialog: the post's BBCode is turned into DOM nodes
  * here (never HTML), images and video are left out, and links open through Steam.
- * Tooltips are Steam's own React tooltip (core/native-tooltips.js, from this window or the main
+ * Tooltips are Steam's own React tooltip (client/shared/native-tooltips.js, from this window or the main
  * one), retried until webpack has it; `title` stands in only if it never turns up.
  */
 ((SE) => {
@@ -36,7 +36,7 @@
   const RESTART_ARM_MS = 3000;
   const MIN_CHECK_MS = 700; // keep "Checking" on screen long enough to read
   const TIP_RETRY_MS = 250;
-  const TIP_RETRIES = 40; // ~10 s for webpack and core/native-tooltips.js to come up
+  const TIP_RETRIES = 40; // ~10 s for webpack and client/shared/native-tooltips.js to come up
   const TICK_MS = 5000;
   const STORAGE = { checked: 'se-about-last-check' };
   const STEAM_NEWS_APP = 593110;
@@ -685,7 +685,7 @@
 
     renderStatus();
 
-    /* Steam's tooltips, once webpack and core/native-tooltips.js are up; `title` if they never are */
+    /* Steam's tooltips, once webpack and client/shared/native-tooltips.js are up; `title` if they never are */
     let tipTries = 0;
     const mountTips = () => {
       const native = nativeTooltips();

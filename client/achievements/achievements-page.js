@@ -4,7 +4,7 @@
  * Steam's icon component takes the global unlock rate as its own prop (globalUnlockPercentage)
  * beside the achievement; it is read from the fiber, so no extra request is made. Each tiered
  * icon gets `data-se-tier` (aura), `data-se-tier-locked` when not unlocked, and the
- * SE.rarity.fx layer (sparkles and the tier's initial). Styles: core/achievement-tiers.css and
+ * SE.rarity.fx layer (sparkles and the tier's initial). Styles: client/shared/achievement-tiers.css and
  * client/achievements/achievements-page.css. Spoiler-covered hidden achievements stay plain.
  */
 ((SE) => {

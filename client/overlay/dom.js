@@ -86,7 +86,7 @@
   const { tierOf, fmtPct } = SE.rarity;
 
   // An achievement icon with its rarity tier: aura and sparkles when unlocked,
-  // the tier's initial either way (core/achievement-tiers.css).
+  // the tier's initial either way (client/shared/achievement-tiers.css).
   const achIcon = (className, item, achieved) => {
     const box = el('span', className);
     box.append(img(null, item.icon));

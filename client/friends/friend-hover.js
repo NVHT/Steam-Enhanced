@@ -91,7 +91,7 @@
 
   /*
    * The popup has a window to itself when nothing else of the client is drawn in it. A popup
-   * layer window (core/popup-layer.js) holds a copy at its own size: the card keeps its look.
+   * layer window (client/shared/popup-layer.js) holds a copy at its own size: the card keeps its look.
    */
   const ownsWindow = (hover) =>
     !document.documentElement.classList.contains('se-layer-document') &&

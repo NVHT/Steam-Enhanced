@@ -1,0 +1,191 @@
+/* Continues downloads.css (in order, see client/loader.js): Page buttons. */
+
+/*
+ * Page buttons (settings, row actions, section actions): one tile set. client/downloads/
+ * page/queue.js tags each (data-se-dl-action) and adds the theme's dual-tone icon; Steam's own
+ * icon is hidden and everything Steam nests inside dissolves, so the tile alone sets the size.
+ *   neutral 36px tile · Download (blue) and Play (green): labelled buttons of one size, like the
+ *   game page's Install and Play · remove turns red
+ */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action] {
+  --dl-btn-bg: var(--se-white-07);
+  --dl-btn-ring: var(--se-white-10);
+  --dl-btn-hover: var(--se-white-14);
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  flex: none !important;
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: none !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  max-height: 36px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--dl-btn-bg) !important;
+  box-shadow: inset 0 0 0 1px var(--dl-btn-ring) !important;
+  font: 700 13px/1 var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  white-space: nowrap !important;
+  color: var(--se-text-strong) !important;
+  opacity: 1 !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out, transform var(--se-dur) ease-out;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action]:hover {
+  background: var(--dl-btn-hover) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action]:active {
+  transform: scale(.96);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action]:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* Labelled ones (Play, Clear all) size to the label */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action][data-se-dl-text] {
+  width: auto !important;
+  padding: 0 16px 0 12px !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="clear"][data-se-dl-text] {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 14px !important;
+  font-weight: 600 !important;
+  font-size: 12.5px !important;
+}
+
+/* Steam's nested markup inside a tile: flattened, its own icon hidden */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action] :not(svg, svg *) {
+  display: contents !important;
+  font: inherit !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: inherit !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action] svg:not(.se-dl-icon) {
+  display: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action] svg.se-dl-icon {
+  display: block !important;
+  flex: none !important;
+  width: 18px !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  max-height: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.8px !important;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: inherit;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action] svg.se-dl-icon .tone {
+  fill: currentColor !important;
+  fill-opacity: .3 !important;
+  stroke: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action] svg.se-dl-icon :not(.tone) {
+  fill: none !important;
+}
+
+/* Download and Play: one size, so they line up row to row */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) :is([data-se-dl-action="download"], [data-se-dl-action="play"])[data-se-dl-text] {
+  min-width: 120px !important;
+  padding: 0 18px 0 14px !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) :is([data-se-dl-action="download"], [data-se-dl-action="play"]) svg.se-dl-icon {
+  width: 16px !important;
+  min-width: 16px !important;
+  height: 16px !important;
+}
+
+/* Download: Steam's Install blue */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="download"] {
+  --dl-btn-bg: linear-gradient(90deg, #06bfff, #2d73ff);
+  --dl-btn-ring: var(--se-white-18);
+  --dl-btn-hover: linear-gradient(90deg, #3ccdff, #4a88ff);
+  box-shadow: inset 0 0 0 1px var(--dl-btn-ring), 0 6px 16px -8px rgba(45, 115, 255, .9) !important;
+  color: var(--se-text-strong) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="download"] svg.se-dl-icon .tone {
+  fill-opacity: .45 !important;
+}
+
+/* Remove: quiet until hovered, then red */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="remove"] {
+  color: rgba(255, 255, 255, .78) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="remove"]:hover,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="clear"]:hover {
+  --dl-btn-hover: color-mix(in srgb, var(--se-danger) 85%, transparent);
+  --dl-btn-ring: transparent;
+  color: var(--se-text-strong) !important;
+}
+
+/* Play: the green call to action */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="play"] {
+  --dl-btn-bg: linear-gradient(180deg, #4fa52e, var(--se-play));
+  --dl-btn-ring: var(--se-white-14);
+  --dl-btn-hover: linear-gradient(180deg, #5cb83a, var(--se-play-hover));
+  box-shadow: inset 0 0 0 1px var(--dl-btn-ring), 0 6px 16px -8px var(--se-play-glow) !important;
+  color: var(--se-text-strong) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-action="play"] svg.se-dl-icon .tone {
+  fill-opacity: .9 !important;
+}
+
+/* Section actions sit at the title's end */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO [data-se-dl-action] {
+  margin-left: auto !important;
+}
+
+/* The jump bar ("Completed (3) · View") at the list's foot */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .mw7VZNUZJWOhSrh3-kiym {
+  left: 8px;
+  right: 8px;
+  bottom: 10px !important;
+  width: auto !important;
+  height: 32px !important;
+  padding: 0 14px !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-shadow-pop);
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  color: var(--se-text-muted) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .mw7VZNUZJWOhSrh3-kiym:not(._2S18z89-a_4mTjE5Lnl0wf) {
+  transform: translateY(calc(100% + 12px)) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .mw7VZNUZJWOhSrh3-kiym .TK9wvF55dyA6RcOclozC8,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .mw7VZNUZJWOhSrh3-kiym ._1CGnw50aAma6AYKF51Qzsm {
+  color: var(--se-text) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .mw7VZNUZJWOhSrh3-kiym ._26xEjt23hBWk4HaJpFeQt6 {
+  color: var(--se-accent) !important;
+}

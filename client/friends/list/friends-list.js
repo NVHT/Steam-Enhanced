@@ -86,7 +86,7 @@
   /*
    * Banners over the list have no class of their own to rely on, so they are recognised by how
    * Steam paints them, among the elements above the favorites, and marked data-se-banner
-   * (client/friends/friends.css draws them):
+   * (client/friends/list/friends.css draws them):
    * - "connection" ("Disconnected", "Reconnecting…"): a gradient strip (on the element or its
    *   ::before) with a short text, or, should Steam repaint it, its English wording;
    * - "invite" ("Invite anyone to play", Remote Play Together while in a game): a solid strip

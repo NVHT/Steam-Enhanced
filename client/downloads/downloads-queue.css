@@ -1,0 +1,506 @@
+/* Continues downloads.css (in order, see client/loader.js): A row's actions; Reordering. */
+
+/* The queue: a panel under the transfer, as tall as its rows; it scrolls inside once it
+   reaches the page's foot */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1l0LmmqDUXH19SjfELddn7 {
+  grid-column: 1;
+  grid-row: 3;
+  align-self: start;
+  position: relative;
+  z-index: var(--se-z-raised);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 0;
+  max-height: calc(100% - 20px - var(--dl-pad));
+  margin: 20px 0 var(--dl-pad);
+  border-radius: var(--se-radius-lg);
+  background: var(--dl-glass);
+  box-shadow: var(--dl-ring);
+  overflow: hidden;
+}
+
+/* ItemLists: the panel's scroller */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa {
+  flex: 1 1 auto;
+  height: auto !important;
+  min-height: 0;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow-y: auto !important;
+  scrollbar-width: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa::-webkit-scrollbar {
+  display: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._3Mbhnlk1Go2j8yCdjthzc7 {
+  margin-top: 22px !important;
+  padding-bottom: 0 !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._3Mbhnlk1Go2j8yCdjthzc7:first-child {
+  margin-top: 0 !important;
+}
+
+/* No rows at all: a quiet note under the section titles */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa:not(:has(._1VNuYHM6BPBOJspC6zPf5r))::after {
+  content: 'Nothing queued';
+  display: block;
+  margin: 6px 4px 0;
+  padding: 18px 12px;
+  border-radius: var(--se-radius-md);
+  box-shadow: inset 0 0 0 1px var(--se-white-07);
+  font: 500 12.5px/1.4 var(--se-font), sans-serif;
+  color: var(--se-text-faint);
+  text-align: center;
+}
+
+/* Section titles: the name, a count pill, and Steam's actions (Clear all, …) as ghost pills */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 32px;
+  margin: 0 0 10px !important;
+  padding: 0 2px !important;
+  font: 700 15px/1.2 var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text-strong) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO .TK9wvF55dyA6RcOclozC8,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO ._1CGnw50aAma6AYKF51Qzsm {
+  font: inherit !important;
+  letter-spacing: inherit !important;
+  color: inherit !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO ._1CGnw50aAma6AYKF51Qzsm[data-se-count] {
+  font-size: 0 !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO ._1CGnw50aAma6AYKF51Qzsm[data-se-count]::after {
+  /* The count: a quiet figure beside the title, same size, lighter */
+  content: attr(data-se-count);
+  margin-left: 2px;
+  font: 600 15px/1.2 var(--se-font), sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, .4);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO ._1CTr1yKRkOXnJ4gSS1-1A3 {
+  visibility: hidden;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .qq2xItSXjpCsNrcxyPJtO .qrwf3iWWPa-yXVD0zOlHM {
+  display: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .OINnOU8K5HzPe2nzczpZi {
+  position: relative;
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .OINnOU8K5HzPe2nzczpZi.d9VKGABvFZQGmdqtaicMo {
+  box-shadow: 0 0 0 2px var(--se-accent-line);
+  background: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .OINnOU8K5HzPe2nzczpZi ._3T0JB8ekn9tlXVJd7Wjw2f:empty {
+  display: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1zv2D9H37p5yuOJNsCemS3 {
+  padding: 4px 4px !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1zv2D9H37p5yuOJNsCemS3 ._1nCT-M7nZcoNzedbVzbXha {
+  height: auto !important;
+  font: 500 12.5px/1.4 var(--se-font), sans-serif;
+  color: var(--se-text-faint);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz):has(._373v1eWNyaPKhgnea9FZSt ._1zv2D9H37p5yuOJNsCemS3) ._1ugNiylO2vKXhirsGocAxa ._1zv2D9H37p5yuOJNsCemS3 {
+  display: none !important;
+}
+
+/* A row: a card with the game's art, its name and sizes, and its state at the end */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1VNuYHM6BPBOJspC6zPf5r {
+  --dl-row-art-w: 132px;
+  --dl-row-pad: 12px;
+  position: relative;
+  height: auto !important;
+  min-height: 86px;
+  margin: 0 !important;
+  padding: var(--dl-row-pad) calc(16px + var(--dl-actions-w, 0px)) var(--dl-row-pad) var(--dl-row-pad) !important;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-white-04) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1VNuYHM6BPBOJspC6zPf5r:is(:hover, ._3-SbBb63lDnu6LzKV-q3Cg),
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .gpfocus > ._1VNuYHM6BPBOJspC6zPf5r {
+  background: var(--se-divider) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._3ebCJiEl-ybizhZ4avcFw5 {
+  gap: 16px !important;
+  align-items: center;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2pjdgFqp04LlhgtFS0rQn_ {
+  flex: none;
+  width: var(--dl-row-art-w) !important;
+  height: 62px !important;
+  border-radius: var(--se-radius-md) !important;
+  overflow: hidden;
+  background: var(--se-surface-2);
+  box-shadow: 0 6px 16px -8px var(--se-black-70);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2pjdgFqp04LlhgtFS0rQn_ > *,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2pjdgFqp04LlhgtFS0rQn_ :is(div:has(> img), img) {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2pjdgFqp04LlhgtFS0rQn_ img {
+  object-fit: cover;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Zh51LA1WZNKTkf1qlZabn ._2pjdgFqp04LlhgtFS0rQn_ img {
+  filter: saturate(.85);
+  opacity: .9;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2xy0gY9dA8OoNNR7_Z2y2x {
+  flex: 1 1 auto;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 5px 16px !important;
+  min-width: 0;
+  overflow: visible !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2xy0gY9dA8OoNNR7_Z2y2x > .kGTS55N3oEbxE7HAgE9ZX:not(._2WEwEIAncE7-wa4Ye07a8x) {
+  display: contents !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1Er4SotWhGIid50maW3Lfv {
+  grid-column: 1;
+  min-width: 0;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1Er4SotWhGIid50maW3Lfv ._35eOQ6EeVHNV5HGBrJ1-Vu {
+  display: block !important;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 700 15px/1.3 var(--se-font), sans-serif !important;
+  color: var(--se-text-strong) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Zh51LA1WZNKTkf1qlZabn ._1Er4SotWhGIid50maW3Lfv ._35eOQ6EeVHNV5HGBrJ1-Vu {
+  font-weight: 600 !important;
+  color: var(--se-text-dim) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1Er4SotWhGIid50maW3Lfv ._1IKbaHLvcciS-EMMYx1WVG {
+  display: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Bku7JSkuQ7NyWi6M4w1sl {
+  grid-column: 1;
+  min-width: 0;
+  height: auto !important;
+  gap: 6px !important;
+  overflow: hidden;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Bku7JSkuQ7NyWi6M4w1sl > * {
+  margin: 0 !important;
+  font: 500 12.5px/1.3 var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: rgba(255, 255, 255, .7) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Bku7JSkuQ7NyWi6M4w1sl ._1dHjjSl-57o1KQsQ1m1HSA {
+  color: rgba(255, 255, 255, .7) !important;
+  font-weight: 500;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Bku7JSkuQ7NyWi6M4w1sl ._22mb5kcx6UUTgRNUjEp1yv {
+  display: none !important;
+}
+
+/* Its state ("Next · 1% complete", "Auto-updates on", …): both lines at the end */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2xy0gY9dA8OoNNR7_Z2y2x > ._1SyggnJY6qbRSmbZpkK3-H {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  justify-self: end;
+  align-self: center;
+  max-width: none !important;
+  overflow: visible !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  font: 600 12.5px/1.45 var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: rgba(255, 255, 255, .75) !important;
+  text-align: right;
+  white-space: nowrap;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._2xy0gY9dA8OoNNR7_Z2y2x > ._1SyggnJY6qbRSmbZpkK3-H * {
+  font: inherit !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._3Mbhnlk1Go2j8yCdjthzc7:not(.Zh51LA1WZNKTkf1qlZabn) ._1SyggnJY6qbRSmbZpkK3-H ._2ns4wnmgr4XBzARpwn2NZ1 > span:only-child {
+  color: var(--se-running) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._3Mbhnlk1Go2j8yCdjthzc7:not(.Zh51LA1WZNKTkf1qlZabn) ._1SyggnJY6qbRSmbZpkK3-H > div:not([class]) {
+  font-weight: 700;
+  color: var(--se-text-strong) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._3Mbhnlk1Go2j8yCdjthzc7:not(.Zh51LA1WZNKTkf1qlZabn) ._1SyggnJY6qbRSmbZpkK3-H > div:not([class]) ~ div:not([class]) {
+  font-weight: 500;
+  color: rgba(255, 255, 255, .65) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1SyggnJY6qbRSmbZpkK3-H ._1ia3Wetvb6Jx1P6qi8vFJh {
+  color: var(--se-danger-text) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Zh51LA1WZNKTkf1qlZabn .Bku7JSkuQ7NyWi6M4w1sl {
+  display: none !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Zh51LA1WZNKTkf1qlZabn ._2xy0gY9dA8OoNNR7_Z2y2x > ._1SyggnJY6qbRSmbZpkK3-H {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: start;
+  max-width: 100% !important;
+  text-align: left;
+  color: var(--se-text-faint) !important;
+  font-weight: 500 !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa .Zh51LA1WZNKTkf1qlZabn ._1SyggnJY6qbRSmbZpkK3-H > div:not([class])::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 4px;
+  margin: 0 6px 3px 0;
+  border-left: 2px solid var(--se-running);
+  border-bottom: 2px solid var(--se-running);
+  transform: rotate(-45deg);
+}
+
+/* A partly downloaded one: a thin bar across the row's foot */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1_uxK_0wz2NWDqpHB-os-Z .FuJLsEk_Umr68UjGanMno {
+  color: var(--se-text-muted) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._1_uxK_0wz2NWDqpHB-os-Z ._1vMU1vG5ZtLihr3mfXUymR {
+  position: absolute;
+  left: calc(var(--dl-row-pad) + var(--dl-row-art-w) + 16px) !important;
+  right: 16px !important;
+  bottom: 12px;
+  width: auto !important;
+  margin: 0 !important;
+  height: 4px !important;
+  background: var(--se-white-10) !important;
+}
+
+/*
+ * A row's actions (start now, remove, Play): the box holding them (data-se-dl-bar, found by
+ * client/downloads/page/queue.js) is pinned to the row's end and always shown; the row keeps
+ * room for it (--dl-actions-w, in the row's padding), so the state text never runs under it.
+ */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-bar] {
+  position: absolute !important;
+  inset: 50% 16px auto auto !important;
+  z-index: var(--se-z-sticky);
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: translateY(-50%) !important;
+}
+
+/* Steam's drag handle: the theme's grip (.se-dl-grip) takes its place */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._14DhZoqwtCm4l0yDeN6QZe {
+  display: none !important;
+}
+
+/*
+ * Reordering (client/downloads/page/drag.js): a grip at each Up Next card's start. The dragged
+ * card lifts and follows the pointer, the others slide aside, a line marks where it lands, and
+ * the transfer at the top lights up when it would start now.
+ */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa [data-se-dl-sortable] {
+  padding-left: calc(var(--dl-row-pad) + 26px) !important;
+  cursor: grab;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa [data-se-dl-sortable] [data-se-dl-bar] {
+  cursor: default;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa [data-se-dl-sortable] ._1vMU1vG5ZtLihr3mfXUymR {
+  left: calc(var(--dl-row-pad) + 26px + var(--dl-row-art-w) + 16px) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dl-grip {
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 44px;
+  margin-top: -22px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: none;
+  color: rgba(255, 255, 255, .32);
+  cursor: grab;
+  touch-action: none;
+  transition: color var(--se-dur) ease-out, background-color var(--se-dur) ease-out;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dl-grip svg {
+  width: 9px;
+  height: 15px;
+  fill: currentColor;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dl-grip:hover,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dl-grip:focus-visible,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-dragging] .se-dl-grip {
+  color: var(--se-accent);
+  background: color-mix(in srgb, var(--se-accent) 14%, transparent);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dl-grip:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-sorting] {
+  user-select: none;
+  cursor: grabbing;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-sorting] ._21P7c4MWmsU2QSZeL-uyZo:not([data-se-dl-ghost]) {
+  transition: transform .2s var(--se-ease);
+}
+
+/* The slot the card will land in: an empty, accent-edged card */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._21P7c4MWmsU2QSZeL-uyZo[data-se-dl-dragging]:not([data-se-dl-ghost]) ._1VNuYHM6BPBOJspC6zPf5r {
+  background: color-mix(in srgb, var(--se-accent) 7%, transparent) !important;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--se-accent) 70%, transparent),
+    0 0 24px -8px color-mix(in srgb, var(--se-accent) 60%, transparent) !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._21P7c4MWmsU2QSZeL-uyZo[data-se-dl-dragging]:not([data-se-dl-ghost]) ._1VNuYHM6BPBOJspC6zPf5r > *,
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._21P7c4MWmsU2QSZeL-uyZo[data-se-dl-dragging]:not([data-se-dl-ghost]) [data-se-dl-bar] {
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* The lifted card, following the pointer */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-ghost] {
+  position: fixed !important;
+  z-index: var(--se-z-drag);
+  margin: 0 !important;
+  pointer-events: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-ghost] ._1VNuYHM6BPBOJspC6zPf5r {
+  background: rgba(36, 42, 51, .97) !important;
+  box-shadow: inset 0 0 0 1px var(--se-white-12), 0 24px 48px -12px var(--se-black-90) !important;
+  scale: 1.02;
+  animation: se-dl-lift var(--se-dur) var(--se-ease);
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-ghost][data-now] ._1VNuYHM6BPBOJspC6zPf5r {
+  box-shadow: inset 0 0 0 2px var(--se-accent), 0 24px 48px -12px var(--se-black-90) !important;
+  scale: .96;
+  transition: scale var(--se-dur) var(--se-ease);
+}
+
+@keyframes se-dl-lift {
+  from { scale: 1; }
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-sorting] .se-dl-grip {
+  cursor: inherit;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh[data-drop]::before {
+  content: '';
+  position: absolute;
+  inset: 0 -14px -10px;
+  border-radius: var(--se-radius-xl);
+  background: color-mix(in srgb, var(--se-accent) 8%, transparent);
+  box-shadow: inset 0 0 0 2px var(--se-accent), 0 0 32px -6px color-mix(in srgb, var(--se-accent) 60%, transparent);
+  pointer-events: none;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) .se-dlh[data-drop]::after {
+  content: 'Drop to download now';
+  position: absolute;
+  top: 6px;
+  right: 0;
+  padding: 6px 12px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent);
+  font: 800 12px/1 var(--se-font), sans-serif;
+  color: var(--se-bg-ink);
+}
+
+/* Steam's wrappers inside the bar dissolve, so its actions line up in one row */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-bar] :has([data-se-dl-action]):not([data-se-dl-action]) {
+  display: contents !important;
+}
+
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) [data-se-dl-bar] > :not([data-se-dl-action], :has([data-se-dl-action])) {
+  display: none !important;
+}

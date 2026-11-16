@@ -1,6 +1,6 @@
 /*
  * "Playing now": the game list shows who is playing a game when its friends icon is hovered.
- * The theme draws that card itself, for real, as a popup-layer panel (core/popup-layer.js): in
+ * The theme draws that card itself, for real, as a popup-layer panel (client/shared/popup-layer.js): in
  * the page on the Library, in a popup window above a Store or Community page's browser view,
  * which Steam's own hover (drawn in the main window) can't reach above. Steam's hover is hidden.
  * The card carries the attributes client/friends/friend-hover.css styles, the same look
@@ -19,9 +19,18 @@
   // On <body> while the theme's card stands in for Steam's hover (friend-hover.css hides it)
   const ATTR = 'data-se-playing-card';
 
-  let card = null;
   // Steam waits a moment before its hover too: a pointer passing over the list opens nothing
-  const intent = SE.hoverIntent((icon, game) => show(icon, game));
+  const card = layer.hover({
+    sheets: ['client/friends/friend-hover.css'],
+    place(icon) {
+      const rect = icon.getBoundingClientRect();
+      const gap = SE.px('--se-space-2');
+      return { left: rect.right + gap, top: rect.top - gap };
+    },
+    draw: (icon, game) => build(game),
+    // No window over a browser page: Steam's hover shows instead.
+    blocked: () => document.body.removeAttribute(ATTR),
+  });
 
   const gameOf = (appid) =>
     window.__seFriendsDockParts?.read?.()?.games.find((game) => game.appid === appid && game.friends.length) || null;
@@ -56,37 +65,18 @@
     wrap.append(host);
   };
 
-  function leave() {
-    intent.cancel();
-    card?.release();
-    card = null;
-  }
-
-  function show(icon, game) {
-    if (!icon.isConnected) return;
-    card = layer.panel({ sheets: ['client/friends/friend-hover.css'] });
-    if (!card) {
-      // No window over a browser page: Steam's hover shows instead.
-      document.body.removeAttribute(ATTR);
-      return;
-    }
-    const rect = icon.getBoundingClientRect();
-    const gap = SE.px('--se-space-2');
-    card.show({ left: rect.right + gap, top: rect.top - gap }, build(game));
-  }
-
   function onOver(event) {
     const target = event.target.closest?.(ICON);
-    if (!target || target === intent.node) return;
-    leave();
+    if (!target || target === card.node) return;
+    card.leave();
     const game = gameOf(SE.appOf(target)?.appid);
     // Set before Steam's own hover shows, which waits for its delay.
     SE.attr(document.body, ATTR, game ? '' : null);
-    if (game) intent.enter(target, game);
+    if (game) card.enter(target, game);
   }
 
   function onOut(event) {
-    if (intent.left(event)) leave();
+    if (card.left(event)) card.leave();
   }
 
   document.addEventListener('mouseover', onOver);
@@ -96,7 +86,7 @@
     destroy() {
       document.removeEventListener('mouseover', onOver);
       document.removeEventListener('mouseout', onOut);
-      leave();
+      card.leave();
       document.body?.removeAttribute(ATTR);
       delete SE.playingCard;
     },

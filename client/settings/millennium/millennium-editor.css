@@ -1,0 +1,257 @@
+/* Continues millennium.css (in order, see client/loader.js): . */
+
+/* Quick CSS: the editor on the page */
+.MillenniumSettings [data-se-mill-page="quickcss"] .DialogBody[data-se-qc] > :not(.se-qc):not(.se-qc-open) {
+  display: none !important;
+}
+
+.se-qc {
+  --se-qc-font: 13px/22px "Cascadia Mono", Consolas, "Courier New", monospace;
+  display: flex;
+  flex-direction: column;
+  height: var(--se-fill-h, 520px);
+  margin-top: 18px;
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-field);
+  outline: 1px solid var(--se-hairline);
+  outline-offset: -1px;
+  transition: box-shadow var(--se-dur) ease-out;
+}
+
+.se-qc:focus-within {
+  outline-color: var(--se-accent-line);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--se-accent) 10%, transparent);
+}
+
+.se-qc-bar,
+.se-qc-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  background: var(--se-sidebar);
+  color: var(--se-text-muted);
+}
+
+.se-qc-bar {
+  height: 40px;
+  gap: 12px;
+  padding: 0 10px 0 14px;
+  box-shadow: inset 0 -1px 0 var(--se-hairline);
+  font: 600 12px var(--se-font);
+}
+
+.se-qc-file {
+  font: 500 12.5px "Cascadia Mono", Consolas, monospace !important;
+  color: var(--se-text);
+}
+
+.se-qc-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.se-qc-state i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--se-text-faint);
+}
+
+.se-qc-state[data-state="saved"] {
+  color: var(--se-running);
+}
+
+.se-qc-state[data-state="saved"] i {
+  background: var(--se-running);
+}
+
+.se-qc-state[data-state="saving"] i {
+  background: var(--se-accent);
+}
+
+.se-qc-state[data-state="error"] {
+  color: var(--se-danger-text);
+}
+
+.se-qc-state[data-state="error"] i {
+  background: var(--se-danger);
+}
+
+.se-qc-tools {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.se-qc-watch {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 6px;
+  font: 600 12.5px var(--se-font);
+  color: var(--se-text-dim);
+}
+
+.se-msw {
+  all: unset;
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 22px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-selected);
+  cursor: pointer;
+}
+
+.se-msw::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--se-text-muted);
+  transition: transform var(--se-dur) ease-out, background-color var(--se-dur) ease-out;
+}
+
+.se-msw[data-on] {
+  background: var(--se-accent);
+}
+
+.se-msw[data-on]::after {
+  transform: translateX(18px);
+  background: var(--se-bg-ink);
+}
+
+.se-msw:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-qc-main {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+}
+
+.se-qc-cur {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 22px;
+  background: var(--se-white-04);
+  pointer-events: none;
+}
+
+.se-qc-cur[hidden] {
+  display: none;
+}
+
+.se-qc-gutter {
+  position: relative;
+  z-index: var(--se-z-raised);
+  flex: none;
+  width: 52px;
+  margin: 0;
+  padding: 12px 14px 12px 0;
+  box-sizing: border-box;
+  text-align: right;
+  font: var(--se-qc-font) !important;
+  color: var(--se-text-faint);
+  user-select: none;
+  background: none;
+  border: 0;
+  overflow: visible;
+}
+
+.se-qc-code {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.se-qc-hl,
+.se-qc-ta {
+  margin: 0;
+  padding: 12px 18px 12px 16px;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 0;
+  font: var(--se-qc-font) !important;
+  letter-spacing: 0;
+  tab-size: 2;
+  white-space: pre;
+  word-wrap: normal;
+  overflow-wrap: normal;
+  text-transform: none;
+}
+
+.se-qc-hl {
+  position: absolute;
+  left: 0;
+  top: 0;
+  min-width: 100%;
+  pointer-events: none;
+  color: var(--se-text);
+  background: none;
+  overflow: visible;
+}
+
+.se-qc-ta {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  resize: none;
+  outline: 0;
+  overflow: auto;
+  background: transparent;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  caret-color: var(--se-accent);
+}
+
+.se-qc-ta::selection {
+  background: color-mix(in srgb, var(--se-accent) 24%, transparent);
+}
+
+.se-qc-hl .c {
+  color: #808a96;
+  font-style: italic;
+}
+
+.se-qc-hl .s {
+  color: var(--se-accent);
+}
+
+.se-qc-hl .p {
+  color: #c7a8ff;
+}
+
+.se-qc-hl .v {
+  color: #f2b679;
+}
+
+.se-qc-hl .u {
+  color: var(--se-text-muted);
+}
+
+.se-qc-foot {
+  height: 30px;
+  gap: 16px;
+  padding: 0 14px;
+  box-shadow: inset 0 1px 0 var(--se-hairline);
+  font: 500 12px var(--se-font);
+}
+
+.se-qc-pos {
+  margin-left: auto;
+}

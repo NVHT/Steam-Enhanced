@@ -1,0 +1,275 @@
+/*
+ * Continues friends.css (in order, see client/loader.js): The Friends window; The Friends & Chat
+ * window's collapse button; Unread chats; Status icons beside a friend's name.
+ */
+
+/*
+ * The Friends window: its window buttons share the header's top-right corner, so your
+ * status keeps clear of them and the settings button sits below them
+ */
+:is(html, body).friendsui-container .friendlist:not(.GamepadMode) .currentUserContainer {
+  padding-block: 18px !important;
+  padding-inline-end: 110px !important;
+}
+
+:is(html, body).friendsui-container .friendlist:not(.GamepadMode) .friendListHeaderContainer {
+  min-height: 72px !important;
+}
+
+:is(html, body).friendsui-container .friendlist:not(.GamepadMode) .friendListButtons {
+  top: auto !important;
+  bottom: 8px;
+  inset-inline-end: 8px !important;
+  align-items: center;
+}
+
+/*
+ * The Friends & Chat window's collapse button: at the start of the chat's tab strip, centered on the
+ * tabs (the 52 px strip of client/friends/chat/tabs.css), the same spot as the open button once the list is
+ * collapsed, so the toggle doesn't move. It sits just past the list's edge, in the strip.
+ */
+:is(html, body).friendsui-container .friendlist:not(.GamepadMode) .friendListHeaderContainer:has(> .friendListCollapse) {
+  position: relative;
+  overflow: visible !important;
+}
+
+:is(html, body).friendsui-container .friendlist:not(.GamepadMode) .friendListCollapse {
+  position: absolute !important;
+  top: 11px !important;
+  right: auto !important;
+  inset-inline-start: calc(100% + 10px) !important;
+  inset-inline-end: auto !important;
+  width: var(--se-tile-sm) !important;
+  height: var(--se-tile-sm) !important;
+  margin: 0 !important;
+  z-index: var(--se-z-sticky);
+}
+
+/* The header, favorites and the Friends bar keep their height; only the list below scrolls */
+.friendlist:not(.GamepadMode) .FriendsListContent > .friendListHeaderContainer,
+.friendlist:not(.GamepadMode) .FriendsListContent > .quickAccessFriends,
+.friendlist:not(.GamepadMode) .FriendsListContent > .socialTabSearchContainer {
+  flex-shrink: 0 !important;
+}
+
+/* Native tooltip hitboxes for Friends & Chat controls. */
+.se-chat-tooltip-host {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.se-chat-tooltip-host > *,
+.se-chat-tooltip-hitbox {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * Unread chats: Steam's gold "1 Unread Message" bar over the list becomes the theme's accent
+ * pill (the chat log's jump bar), and a friend's gold message count in "Unread Messages"
+ * becomes the blue count pill of the chat tabs, centered at the row's end
+ */
+.friendlist:not(.GamepadMode) .unreadMessageViolator {
+  inset-inline: auto !important;
+  left: 50% !important;
+  right: auto !important;
+  width: auto !important;
+  max-width: calc(100% - 24px);
+  box-sizing: border-box;
+  margin: 8px 0 0 !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-accent) !important;
+  box-shadow: var(--se-shadow-card), 0 0 0 3px var(--se-sidebar) !important;
+  font: 700 12px/28px var(--se-font), sans-serif !important;
+  letter-spacing: 0 !important;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--se-bg-ink) !important;
+  transform: translateX(-50%);
+  transition: filter var(--se-dur) ease-out;
+}
+
+.friendlist:not(.GamepadMode) .unreadMessageViolator:hover {
+  filter: brightness(1.08) !important;
+}
+
+.friendlist:not(.GamepadMode) :is(.unread-messages-anim-appear, .unread-messages-anim-enter).unreadMessageViolator {
+  transform: translate(-50%, -12px);
+}
+
+.friendlist:not(.GamepadMode) :is(.unread-messages-anim-appear-active, .unread-messages-anim-enter-active).unreadMessageViolator {
+  transform: translateX(-50%);
+}
+
+.friendlist:not(.GamepadMode) .unread-messages-anim-exit-active.unreadMessageViolator {
+  transform: translate(-50%, -12px);
+}
+
+.friendlist:not(.GamepadMode) .unreadFriend {
+  align-items: center;
+}
+
+.friendlist:not(.GamepadMode) .unreadFriend .friend {
+  padding-inline-end: 40px !important;
+}
+
+.friendlist:not(.GamepadMode) .unreadFriend .FriendMessageCount {
+  position: absolute !important;
+  top: 50% !important;
+  inset-inline-end: 12px !important;
+  box-sizing: border-box;
+  min-width: 18px;
+  height: 18px;
+  margin: -9px 0 0 !important;
+  padding: 0 5px !important;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-accent) !important;
+  box-shadow: none !important;
+  animation: none !important;
+  font: 800 10.5px/18px var(--se-font), sans-serif !important;
+  letter-spacing: 0;
+  color: var(--se-bg-ink) !important;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* A mention: the same pill in the theme's red */
+.friendlist:not(.GamepadMode) .unreadFriend .FriendMessageCount.HasUnreadMention {
+  background: var(--se-danger) !important;
+  color: var(--se-text-strong) !important;
+}
+
+
+/*
+ * Status icons beside a friend's name (friends list, chats, hover card): the device icons and
+ * the snooze "ZZZ" in the theme's dual-tone style (outline over a 32% fill), in the friend's
+ * status color.
+ * PersonaStatusIcon .KxAI_M9gWx3OnKSshHOs6 (+ MobilePhoneIcon ._1iRFj5lJrMqMnRb3GZYPSw,
+ * SteamDeckIcon ._2oLqcfqHHKKAK0WfzjXMg_, VRIcon ._368tz9TSOLGiG2mNMLScMz; Big Picture has no
+ * class of its own), each holding an SVGIcon_* <svg>. Steam's <svg> becomes a box painting the
+ * theme icon through a mask; its own drawing is hidden.
+ */
+.KxAI_M9gWx3OnKSshHOs6:not(.GamepadMode *):not(#se-none) {
+  --se-status-icon-color: var(--se-text-faint);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0 0 0 4px;
+  color: var(--se-status-icon-color);
+}
+
+.KxAI_M9gWx3OnKSshHOs6.online:not(.GamepadMode *):not(#se-none) {
+  --se-status-icon-color: var(--se-online);
+}
+
+.KxAI_M9gWx3OnKSshHOs6.ingame:not(.GamepadMode *):not(#se-none) {
+  --se-status-icon-color: var(--se-running);
+}
+
+.KxAI_M9gWx3OnKSshHOs6.watchingbroadcast:not(.GamepadMode *):not(#se-none) {
+  --se-status-icon-color: var(--se-broadcast);
+}
+
+.KxAI_M9gWx3OnKSshHOs6.awayOrSnooze:not(.GamepadMode *):not(#se-none) {
+  color: color-mix(in srgb, var(--se-status-icon-color) 70%, transparent);
+}
+
+.KxAI_M9gWx3OnKSshHOs6:not(.GamepadMode *) :is(.SVGIcon_MobilePhone, .SVGIcon_BigPicture, .SVGIcon_SteamDeck, .SVGIcon_VRIcon):not(#se-none) {
+  display: block;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: var(--se-status-icon) center / contain no-repeat;
+  mask: var(--se-status-icon) center / contain no-repeat;
+}
+
+.KxAI_M9gWx3OnKSshHOs6:not(.GamepadMode *) :is(.SVGIcon_MobilePhone, .SVGIcon_BigPicture, .SVGIcon_SteamDeck, .SVGIcon_VRIcon) > * {
+  visibility: hidden;
+}
+
+.KxAI_M9gWx3OnKSshHOs6 .SVGIcon_MobilePhone {
+  --se-status-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Crect x='6.5' y='2.5' width='11' height='19' rx='2.5'/%3E%3C/g%3E%3Crect x='6.5' y='2.5' width='11' height='19' rx='2.5'/%3E%3Cpath d='M11 18h2'/%3E%3C/svg%3E");
+}
+
+.KxAI_M9gWx3OnKSshHOs6 .SVGIcon_BigPicture {
+  --se-status-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M17.32 5H6.68a4 4 0 0 0-3.98 3.59l-.02.15C2.6 9.42 2 14.46 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.41-1.41A2 2 0 0 1 9.83 16h4.34a2 2 0 0 1 1.41.59L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.55-.6-6.58-.69-7.26l-.02-.15A4 4 0 0 0 17.32 5z'/%3E%3C/g%3E%3Cpath d='M17.32 5H6.68a4 4 0 0 0-3.98 3.59l-.02.15C2.6 9.42 2 14.46 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.41-1.41A2 2 0 0 1 9.83 16h4.34a2 2 0 0 1 1.41.59L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.55-.6-6.58-.69-7.26l-.02-.15A4 4 0 0 0 17.32 5z'/%3E%3Cpath d='M6 11h4M8 9v4M15 12h.01M18 10h.01'/%3E%3C/svg%3E");
+}
+
+.KxAI_M9gWx3OnKSshHOs6 .SVGIcon_SteamDeck {
+  --se-status-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Crect x='2' y='6.5' width='20' height='11' rx='3'/%3E%3C/g%3E%3Crect x='2' y='6.5' width='20' height='11' rx='3'/%3E%3Crect x='7.5' y='9' width='9' height='6' rx='1'/%3E%3Cpath d='M4.5 10.5h.01M19.5 13.5h.01'/%3E%3C/svg%3E");
+}
+
+.KxAI_M9gWx3OnKSshHOs6 .SVGIcon_VRIcon {
+  --se-status-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M4 7h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4l-2-2.5h-4L8 17H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z'/%3E%3C/g%3E%3Cpath d='M4 7h16a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4l-2-2.5h-4L8 17H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z'/%3E%3C/svg%3E");
+}
+
+/*
+ * Snooze (SnoozeContainer ._1DsumfIa3MlkzUV9EXY5W9, its three Z letters ._2n0EiKMGRP-r_BI5tDtttu;
+ * Medium ._1iYPlsChibPe7Ga9B3c5Wm, Large ._3BESV4eFnr4EnaSaJSdk6T): a dual-tone moon in the
+ * status color that breathes gently while Steam animates it, instead of three glowing Zs.
+ */
+._1DsumfIa3MlkzUV9EXY5W9:not(.GamepadMode *):not(#se-none) {
+  --se-snooze-size: 14px;
+  --se-status-icon-color: var(--se-online);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  width: var(--se-snooze-size);
+  height: var(--se-snooze-size);
+  margin-inline-start: 4px;
+  color: color-mix(in srgb, var(--se-status-icon-color) 80%, transparent);
+}
+
+._1DsumfIa3MlkzUV9EXY5W9._1iYPlsChibPe7Ga9B3c5Wm:not(.GamepadMode *):not(#se-none) {
+  --se-snooze-size: 16px;
+}
+
+._1DsumfIa3MlkzUV9EXY5W9._3BESV4eFnr4EnaSaJSdk6T:not(.GamepadMode *):not(#se-none) {
+  --se-snooze-size: 20px;
+  filter: drop-shadow(0 1px 4px var(--se-black-60));
+}
+
+._1DsumfIa3MlkzUV9EXY5W9.in-game:not(.GamepadMode *):not(#se-none) {
+  --se-status-icon-color: var(--se-running);
+}
+
+._1DsumfIa3MlkzUV9EXY5W9.watchingbroadcast:not(.GamepadMode *):not(#se-none) {
+  --se-status-icon-color: var(--se-broadcast);
+}
+
+._1DsumfIa3MlkzUV9EXY5W9:not(.GamepadMode *) ._2n0EiKMGRP-r_BI5tDtttu:not(#se-none) {
+  display: none;
+}
+
+._1DsumfIa3MlkzUV9EXY5W9:not(.GamepadMode *)::before {
+  content: '';
+  width: 100%;
+  height: 100%;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z'/%3E%3C/g%3E%3Cpath d='M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z'/%3E%3Cpath d='M15 3.5h3l-3 3.5h3'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='white' fill-opacity='.32' stroke='none'%3E%3Cpath d='M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z'/%3E%3C/g%3E%3Cpath d='M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z'/%3E%3Cpath d='M15 3.5h3l-3 3.5h3'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+._1DsumfIa3MlkzUV9EXY5W9._2rXc7hLg6bohWZ-JpRcYEB:not(.GamepadMode *)::before {
+  animation: se-snooze-breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes se-snooze-breathe {
+  50% { opacity: .55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ._1DsumfIa3MlkzUV9EXY5W9._2rXc7hLg6bohWZ-JpRcYEB::before {
+    animation: none;
+  }
+}

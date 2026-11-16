@@ -1,6 +1,6 @@
 /*
  * Tips for the title bar, rail, sidebar and dock buttons: the theme's own tip, drawn for real
- * as a popup-layer panel (core/popup-layer.js): in the page, or in a popup window above a Store
+ * as a popup-layer panel (client/shared/popup-layer.js): in the page, or in a popup window above a Store
  * or Community page (the dock's tips open over it). One listener for the whole window; a button
  * opts in by being a theme button or carrying [data-se-tip] (its text), [data-se-tip-dir] its
  * side. Steam's own tips on the buttons the theme labels are muted. The tip wears the skin
@@ -115,9 +115,6 @@
 
   const CANDIDATES = '.se-menu-icon, .se-header-action, .se-sidebar-tip, [data-se-tip]';
 
-  let tip = null;
-  // Steam's own tooltip delay (nDelayShowMS, --se-tip-delay), as these tips had
-  const intent = SE.hoverIntent((node) => show(node), '--se-tip-delay');
 
   // Where the tip goes beside its button: on `direction`'s side, centred on the button.
   function spotFor(node, direction) {
@@ -133,24 +130,26 @@
     };
   }
 
-  function hide() {
-    intent.cancel();
-    tip?.release();
-    tip = null;
-  }
-
-  function show(source) {
-    const label = source.isConnected && labelFor(source);
-    if (!label || !layer) return;
-    tip = layer.panel({ sheets: ['client/dialogs/dialogs.css'] });
-    tip?.show(spotFor(source, directionFor(source, titleBarHeight)), (container) => {
+  // Steam's own tooltip delay (nDelayShowMS, --se-tip-delay), as these tips had. Without the
+  // popup layer there are no tips; the rest (labels, muting) still runs.
+  const tips = layer?.hover({
+    sheets: ['client/dialogs/dialogs.css'],
+    delay: '--se-tip-delay',
+    place: (source) => spotFor(source, directionFor(source, titleBarHeight)),
+    draw: (source, label) => (container) => {
       const el = container.ownerDocument.createElement('div');
       el.className = 'se-tip';
       el.setAttribute('role', 'tooltip');
       el.textContent = label;
       container.append(el);
-    });
-  }
+    },
+  }) ?? { enter() {}, left: () => false, leave() {}, node: null };
+
+  const hide = () => tips.leave();
+  const show = (node) => {
+    const label = labelFor(node);
+    if (label) tips.enter(node, label);
+  };
 
   // The button a hover or keyboard focus lands on, when it has a tip to show.
   const tipped = (target) => {
@@ -160,29 +159,29 @@
 
   function onOver(event) {
     const node = event.target.closest?.(CANDIDATES);
-    if (node && node === intent.node) return;
+    if (node && node === tips.node) return;
     hide();
-    if (tipped(event.target)) intent.enter(node);
+    if (tipped(event.target)) show(node);
   }
 
   function onOut(event) {
-    if (intent.left(event)) hide();
+    if (tips.left(event)) hide();
   }
 
   // Keyboard focus shows the tip as a hover does (pointer focus doesn't: the hover already did).
   function onFocus(event) {
     const node = tipped(event.target);
-    if (!node || node === intent.node || !node.matches(':focus-visible')) return;
+    if (!node || node === tips.node || !node.matches(':focus-visible')) return;
     hide();
-    intent.enter(node);
+    show(node);
   }
 
   function onBlur(event) {
-    if (intent.node && intent.node.contains(event.target)) hide();
+    if (tips.node && tips.node.contains(event.target)) hide();
   }
 
   function onKey(event) {
-    if (event.key === 'Escape' && (tip || intent.node)) hide();
+    if (event.key === 'Escape' && tips.node) hide();
   }
 
   const MUTE_ATTR = 'data-se-tip-muted';
@@ -223,7 +222,7 @@
     watchTray();
     syncNativeTips();
     // A button that went away, or now opens a menu, takes its tip with it.
-    const source = intent.node;
+    const source = tips.node;
     if (source && (!source.isConnected || ownsDropdown(source))) hide();
   };
 

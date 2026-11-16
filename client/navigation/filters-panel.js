@@ -3,7 +3,7 @@
  * library, under the page's browser view, where it can't be seen; so the Filters button there
  * opens Steam's filter component (the one inside its panel, given the same props: the library's
  * filter and its change handler) rendered by the theme in a popup-layer panel
- * (core/popup-layer.js), under the title-bar search like the library's. Filters set here apply
+ * (client/shared/popup-layer.js), under the title-bar search like the library's. Filters set here apply
  * to the library as if set in Steam's own panel. client/navigation/nav-rail.css styles both.
  */
 ((SE) => {
@@ -88,7 +88,10 @@
   function open(fallback) {
     const search = document.querySelector(SEARCH);
     if (!layer || !search || !steamFilters()) return false;
-    panel = layer.panel({ sheets: ['client/navigation/nav-rail.css'], steam: true });
+    panel = layer.panel({
+      sheets: ['client/navigation/nav-rail.css', 'client/navigation/nav-rail-library.css', 'client/navigation/nav-rail-filters.css'],
+      steam: true,
+    });
     if (!panel) return false;
     const box = search.getBoundingClientRect();
     const top = box.bottom + SE.px('--se-space-2');
@@ -109,7 +112,7 @@
       }
       return unrender;
     });
-    // A panel whose window never came (core/popup-layer.js gives up on it) falls back.
+    // A panel whose window never came (client/shared/popup-layer.js gives up on it) falls back.
     giveUp = setTimeout(() => {
       giveUp = 0;
       if (panel === watched && (watched.released || !pane)) {

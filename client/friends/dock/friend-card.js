@@ -2,7 +2,7 @@
  * The friend card: an avatar hovered in the open panel (Steam's Friends tree) shows who the
  * friend is. The card is Steam's own (its MiniProfile component, given what Steam's hover gives
  * it: the persona and the loader of its community data, the profile background, frame, level
- * and badge), rendered by the theme for real in a popup-layer panel (core/popup-layer.js): in
+ * and badge), rendered by the theme for real in a popup-layer panel (client/shared/popup-layer.js): in
  * the page on the Library, in a popup window above a Store or Community page, which Steam's own
  * hover can't reach above. Steam's hover is hidden; client/dialogs/hover-cards.css styles both.
  *
@@ -21,9 +21,6 @@
   // On <body> while the theme's card stands in for Steam's hover (friends-dock.css hides it)
   const ATTR = 'data-se-friend-card';
 
-  let card = null;
-  // Steam waits a moment before its hover too: a pointer passing over the list opens nothing
-  const intent = SE.hoverIntent((avatar, friend) => show(avatar, friend));
 
   /*
    * Steam's MiniProfile: the module that draws the card (it alone reads community_data_override
@@ -84,46 +81,39 @@
     container.insertAdjacentHTML('beforeend', friendCardHTML(describe(friend)));
   };
 
-  function leave() {
-    intent.cancel();
-    card?.release();
-    card = null;
+  // Steam's card where it can be drawn, the theme's otherwise (or if Steam's throws).
+  function draw(avatar, friend) {
+    const props = steamProps(friend);
+    return (props && layer.react(findMiniProfile(), props)) || themeCard(friend);
   }
 
-  function show(avatar, friend) {
-    if (state.destroyed || !avatar.isConnected) return;
-    card = layer.panel({ sheets: ['client/dialogs/hover-cards.css', 'client/friends/friends-dock.css'], steam: true });
-    if (!card) {
-      // No window over a browser page: Steam's hover shows instead.
-      document.body.removeAttribute(ATTR);
-      return;
-    }
-    const props = steamProps(friend);
-    const steamCard = props && layer.react(findMiniProfile(), props);
-    const rect = { right: dock.getBoundingClientRect().left - SE.px('--se-space-3'), top: avatar.getBoundingClientRect().top };
-    try {
-      card.show(rect, steamCard || themeCard(friend));
-    } catch {
-      card.show(rect, themeCard(friend));
-    }
-  }
+  // Steam waits a moment before its hover too: a pointer passing over the list opens nothing
+  const card = layer?.hover({
+    sheets: ['core/levels.css', 'client/dialogs/hover-cards.css', 'client/friends/friends-dock.css'],
+    steam: true,
+    place: (avatar) => ({ right: dock.getBoundingClientRect().left - SE.px('--se-space-3'), top: avatar.getBoundingClientRect().top }),
+    draw,
+    fallback: (avatar, friend) => themeCard(friend),
+    // No window over a browser page: Steam's hover shows instead.
+    blocked: () => document.body.removeAttribute(ATTR),
+  });
 
   function over(event) {
     const target = event.target.closest?.(AVATAR);
-    if (!target || target === intent.node || !steamHost.contains(target)) return;
-    leave();
-    const friend = layer ? friendOf(target) : null;
+    if (!card || state.destroyed || !target || target === card.node || !steamHost.contains(target)) return;
+    card.leave();
+    const friend = friendOf(target);
     // Set before Steam's own hover shows, which waits for its delay.
     SE.attr(document.body, ATTR, friend ? '' : null);
-    if (friend) intent.enter(target, friend);
+    if (friend) card.enter(target, friend);
   }
 
   function out(event) {
-    if (intent.left(event)) leave();
+    if (card?.left(event)) card.leave();
   }
 
   function dispose() {
-    leave();
+    card?.leave();
     document.body?.removeAttribute(ATTR);
   }
 

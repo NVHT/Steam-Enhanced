@@ -122,7 +122,7 @@
   }
 
   /*
-   * The dock's menus (status, a friend's), as popup-layer panels (core/popup-layer.js): in the
+   * The dock's menus (status, a friend's), as popup-layer panels (client/shared/popup-layer.js): in the
    * page on the Library, in a popup window above a Store or Community page.
    */
   live.menuPanel = null;
@@ -265,7 +265,7 @@
 
   /*
    * Over a browser page the flyout is drawn for real in a popup window (a popup-layer panel,
-   * core/popup-layer.js): the dock's own element, in the main window, would sit under the
+   * client/shared/popup-layer.js): the dock's own element, in the main window, would sit under the
    * page's browser view. Same markup and listeners as the dock's own. Returns false when no
    * window could open, and the dock's element shows instead.
    */

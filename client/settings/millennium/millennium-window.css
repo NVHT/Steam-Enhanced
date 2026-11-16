@@ -1,0 +1,410 @@
+/*
+ * Continues millennium.css (in order, see client/loader.js): Themes; Row menus; Logs › one log;
+ * Page buttons and row buttons.
+ */
+
+/* Millennium window pages */
+:root {
+  --se-ic-mgeneral: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%2215%22 cy=%227%22 r=%222.5%22/%3E%3Ccircle cx=%229%22 cy=%2217%22 r=%222.5%22/%3E%3C/g%3E%3Cpath d=%22M4 7h8.5M17.5 7H20M4 17h2.5M11.5 17H20%22/%3E%3Ccircle cx=%2215%22 cy=%227%22 r=%222.5%22/%3E%3Ccircle cx=%229%22 cy=%2217%22 r=%222.5%22/%3E%3C/svg%3E");
+  --se-ic-mthemes: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223.5%22 y=%223.5%22 width=%2214%22 height=%226%22 rx=%221.5%22/%3E%3C/g%3E%3Crect x=%223.5%22 y=%223.5%22 width=%2214%22 height=%226%22 rx=%221.5%22/%3E%3Cpath d=%22M17.5 6.5h2.5v5.2l-8 1.8v2.5%22/%3E%3Crect x=%2210%22 y=%2216%22 width=%224%22 height=%225%22 rx=%221%22/%3E%3C/svg%3E");
+  --se-ic-mcss: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223%22 y=%224%22 width=%2218%22 height=%2216%22 rx=%222%22/%3E%3C/g%3E%3Crect x=%223%22 y=%224%22 width=%2218%22 height=%2216%22 rx=%222%22/%3E%3Cpath d=%22M9.5 9.5L7 12l2.5 2.5M14.5 9.5L17 12l-2.5 2.5%22/%3E%3C/svg%3E");
+  --se-ic-mplugins: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M6.5 9h11v3a5.5 5.5 0 0 1-11 0z%22/%3E%3C/g%3E%3Cpath d=%22M6.5 9h11v3a5.5 5.5 0 0 1-11 0zM9 3.5V9M15 3.5V9M12 17.5V21%22/%3E%3C/svg%3E");
+  --se-ic-mupdates: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%224%22/%3E%3C/g%3E%3Cpath d=%22M19.5 12a7.5 7.5 0 0 1-13.4 4.6M4.5 12a7.5 7.5 0 0 1 13.4-4.6M18.2 3.5v4.1h-4.1M5.8 20.5v-4.1h4.1%22/%3E%3C/svg%3E");
+  --se-ic-mlogs: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M6 3h8.5L19 7.5V21H6z%22/%3E%3C/g%3E%3Cpath d=%22M6 3h8.5L19 7.5V21H6zM14.5 3v4.5H19M9 12h7M9 16h4.5%22/%3E%3C/svg%3E");
+  --se-ic-mmenu: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222.2%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M6.5 9.25L12 14.75l5.5-5.5%22/%3E%3C/svg%3E");
+  --se-ic-mdonate: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12 19.5s-7.25-4.5-7.25-10a3.9 3.9 0 0 1 7.25-2 3.9 3.9 0 0 1 7.25 2c0 5.5-7.25 10-7.25 10z%22 fill=%22%23000%22 fill-opacity=%22.3%22/%3E%3C/svg%3E");
+}
+
+[data-se-icon="mgeneral"] {
+  --se-ic: var(--se-ic-mgeneral);
+}
+
+[data-se-icon="mthemes"] {
+  --se-ic: var(--se-ic-mthemes);
+}
+
+[data-se-icon="mcss"] {
+  --se-ic: var(--se-ic-mcss);
+}
+
+[data-se-icon="mplugins"] {
+  --se-ic: var(--se-ic-mplugins);
+}
+
+[data-se-icon="mupdates"] {
+  --se-ic: var(--se-ic-mupdates);
+}
+
+[data-se-icon="mlogs"] {
+  --se-ic: var(--se-ic-mlogs);
+}
+
+/*
+ * Themes: the theme in use carries Steam's tick as a field icon, so the settings rows gave it a
+ * row-icon tile; the initial tile (Themes below) is its only tile.
+ */
+.MillenniumSettings .MillenniumThemes_ThemeItem[data-se-c]::before {
+  content: none !important;
+  display: none !important;
+}
+
+/*
+ * Row menus (▾) and Ko-fi: an icon button that drew no icon left a blank gap at each row's end.
+ * Draw the icons ourselves, so every row's buttons and switches line up at the edge.
+ */
+.MillenniumSettings .MillenniumThemes_ThemeItem .MillenniumIconButton > svg,
+.MillenniumSettings .MillenniumPlugins_PluginField .MillenniumIconButton > svg {
+  display: none !important;
+}
+
+.MillenniumSettings .MillenniumThemes_ThemeItem .MillenniumIconButton::after,
+.MillenniumSettings .MillenniumPlugins_PluginField .MillenniumIconButton::after {
+  content: '' !important;
+  display: block !important;
+  position: static !important;
+  inset: auto !important;
+  margin: 0 !important;
+  flex: none;
+  width: 16px !important;
+  height: 16px !important;
+  background: currentColor;
+  -webkit-mask: var(--se-ic-mmenu) center / 16px 16px no-repeat;
+  mask: var(--se-ic-mmenu) center / 16px 16px no-repeat;
+}
+
+.MillenniumSettings .MillenniumThemes_ThemeItem .MillenniumIconButton:not([data-icon-name^="Karat"])::after,
+.MillenniumSettings .MillenniumPlugins_PluginField .MillenniumIconButton:not([data-icon-name^="Karat"])::after {
+  -webkit-mask-image: var(--se-ic-mdonate);
+  mask-image: var(--se-ic-mdonate);
+}
+
+/*
+ * Logs › one log: its controls a row below the page's line (not touching it), the log in a recessed container
+ * that fills the page.
+ */
+.MillenniumSettings .MillenniumLogs_TextContainer:not(#se-none) {
+  height: auto !important;
+  min-height: 0;
+  margin-top: 18px !important;
+  gap: 14px !important;
+}
+
+.MillenniumSettings .MillenniumLogs_ControlSection:not(#se-none) {
+  align-items: center;
+  gap: 12px !important;
+}
+
+.MillenniumSettings .MillenniumLogs_NavContainer:not(#se-none),
+.MillenniumSettings .MillenniumLogs_TextControls:not(#se-none),
+.MillenniumSettings .MillenniumLogs_Icons:not(#se-none) {
+  align-items: center;
+  gap: 8px !important;
+}
+
+.MillenniumSettings .MillenniumLogs_NavContainer .DialogButton:not(#se-none):not(#se-p2) {
+  gap: 6px !important;
+  padding: 0 12px 0 8px !important;
+}
+
+.MillenniumSettings .MillenniumLogs_NavContainer .DialogButton svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.MillenniumSettings .MillenniumLogs_HeaderTextTypeCount:not(#se-none) {
+  font: 600 11.5px/15px var(--se-font) !important;
+}
+
+.MillenniumSettings .MillenniumLogs_HeaderTextTypeCount[data-count="0"]:not(#se-none) {
+  color: var(--se-text-faint) !important;
+}
+
+.MillenniumSettings .MillenniumLogs_Icons .MillenniumIconButton:not(#se-none):not(#se-p2) {
+  width: 34px !important;
+  min-width: 34px !important;
+  padding: 0 !important;
+  color: var(--se-text-muted) !important;
+}
+
+.MillenniumSettings .MillenniumLogs_Icons .MillenniumIconButton svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/*
+ * Page buttons and row buttons
+ * Install a theme / plugin and Browse local files sit in the window's top strip, which Steam
+ * makes a drag area for moving the window: a click there moved the window instead of pressing
+ * the button. They (and the title beside them) are carved out of it and kept above the page.
+ */
+.MillenniumSettings :is(.MillenniumButtonsSection, .MillenniumButtonsSection *, .DialogHeader) {
+  -webkit-app-region: no-drag !important;
+}
+
+/*
+ * Row buttons (Use / Disable, Ko-fi, the ▾ menu, a plugin's switch): one height, one style,
+ * centered on one line. Millennium wraps the ▾ and Ko-fi in a tooltip box that was a block, so
+ * they sat higher than Use / Disable; the box now lines up like the buttons do.
+ */
+.MillenniumSettings .MillenniumThemes_ThemeItem .tool-tip-source:not(#se-none),
+.MillenniumSettings .MillenniumPlugins_PluginField .tool-tip-source:not(#se-none) {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex: none;
+  height: 30px;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 0 !important;
+}
+
+.MillenniumSettings .MillenniumThemes_ThemeItem ._2o2fXzn99OddeqZMjbDuxQ:not(#se-none),
+.MillenniumSettings .MillenniumPlugins_PluginField ._2o2fXzn99OddeqZMjbDuxQ:not(#se-none),
+.MillenniumSettings .MillenniumThemes_ThemeItem ._1aw7cA3mAZfWt8idAlVJWi:not(#se-none),
+.MillenniumSettings .MillenniumPlugins_PluginField ._1aw7cA3mAZfWt8idAlVJWi:not(#se-none) {
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.MillenniumSettings .MillenniumThemes_ThemeItem .DialogButton:not(#se-none):not(#se-p2),
+.MillenniumSettings .MillenniumPlugins_PluginField .DialogButton:not(#se-none):not(#se-p2) {
+  height: 30px !important;
+  min-height: 0 !important;
+  max-height: 30px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  vertical-align: middle;
+  align-self: center !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+.MillenniumSettings .MillenniumThemes_ThemeItem .MillenniumIconButton:not(#se-none):not(#se-p2),
+.MillenniumSettings .MillenniumPlugins_PluginField .MillenniumIconButton:not(#se-none):not(#se-p2) {
+  position: relative;
+  flex: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  color: var(--se-text-dim) !important;
+}
+
+.MillenniumSettings .MillenniumThemes_ThemeItem .DialogButton:hover:not(#se-none):not(#se-p2),
+.MillenniumSettings .MillenniumPlugins_PluginField .DialogButton:hover:not(#se-none):not(#se-p2) {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+/* The theme in use: its Disable reads as the quieter action. */
+.MillenniumSettings .MillenniumThemes_ThemeItem[data-se-active] .DialogButton:not(.MillenniumIconButton):not(#se-none):not(#se-p2) {
+  color: var(--se-text-dim) !important;
+}
+
+/* Quick CSS Editor window (client/settings/millennium/millennium-pages.js tags it html[data-se-qce]) */
+html[data-se-qce],
+html[data-se-qce] body,
+html[data-se-qce] .PopupFullWindow:not(#se-none),
+html[data-se-qce] .ModalPosition_Content:not(#se-none),
+html[data-se-qce] .DialogContent:not(#se-none),
+html[data-se-qce] .GenericConfirmDialog:not(#se-none),
+html[data-se-qce] .DialogContent_InnerWidth:not(#se-none) {
+  background: var(--se-bg) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html[data-se-qce] .DialogHeader:not(#se-none) {
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  font: 700 22px/28px var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text) !important;
+}
+
+html[data-se-qce] .DialogHeader::after {
+  content: 'Applies to every Steam window as you type, and saves on its own';
+  display: block;
+  margin-top: 3px;
+  font: 500 13px/18px var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.MillenniumQuickCss_CodeEditor:not(#se-none) {
+  border-radius: var(--se-radius-ml);
+  overflow: hidden;
+  background: var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  transition: box-shadow var(--se-dur) ease-out;
+}
+
+.MillenniumQuickCss_CodeEditor:focus-within:not(#se-none) {
+  box-shadow: inset 0 0 0 1px var(--se-accent-line), 0 0 0 3px var(--se-accent-tint);
+}
+
+.MillenniumQuickCss_CodeEditor .cm-editor {
+  background: transparent !important;
+  color: var(--se-text) !important;
+  outline: none !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-scroller {
+  font: 13px/1.65 "Cascadia Mono", Consolas, "Courier New", monospace !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-gutters {
+  background: var(--se-white-02) !important;
+  border-right: 1px solid var(--se-hairline) !important;
+  color: var(--se-text-faint) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-lineNumbers .cm-gutterElement {
+  min-width: 26px;
+  padding: 0 8px 0 14px !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-foldGutter .cm-gutterElement {
+  padding: 0 6px 0 0 !important;
+  color: var(--se-text-faint) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-content {
+  padding: 12px 0 !important;
+  caret-color: var(--se-accent) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-line {
+  padding: 0 18px 0 14px !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-activeLine {
+  background: var(--se-white-04) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-activeLineGutter {
+  background: var(--se-white-04) !important;
+  color: var(--se-text) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-cursor,
+.MillenniumQuickCss_CodeEditor .cm-dropCursor {
+  border-left: 2px solid var(--se-accent) !important;
+}
+
+.MillenniumQuickCss_CodeEditor :is(.cm-selectionBackground, .cm-focused .cm-selectionBackground) {
+  background: color-mix(in srgb, var(--se-accent) 22%, transparent) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-content ::selection {
+  background: color-mix(in srgb, var(--se-accent) 22%, transparent) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-matchingBracket {
+  background: color-mix(in srgb, var(--se-accent) 16%, transparent) !important;
+  outline: 1px solid var(--se-accent-line);
+  color: inherit !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-nonmatchingBracket {
+  background: color-mix(in srgb, var(--se-danger) 18%, transparent) !important;
+  color: inherit !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-selectionMatch {
+  background: var(--se-divider) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-searchMatch {
+  background: color-mix(in srgb, var(--se-warning) 20%, transparent) !important;
+  outline: 0 !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-searchMatch-selected {
+  background: color-mix(in srgb, var(--se-warning) 38%, transparent) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-line:only-child:has(> br:only-child)::before {
+  content: '/* Your own CSS goes here, on top of the theme */';
+  position: absolute;
+  pointer-events: none;
+  color: var(--se-text-faint);
+}
+
+.cm-tooltip:has(.cm-tooltip-autocomplete),
+.MillenniumQuickCss_CodeEditor .cm-tooltip {
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface) !important;
+  box-shadow: 0 14px 34px var(--se-black-50), inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+.cm-tooltip-autocomplete > ul {
+  padding: 4px !important;
+  font: 12.5px/1.5 "Cascadia Mono", Consolas, monospace !important;
+}
+
+.cm-tooltip-autocomplete > ul > li {
+  padding: 3px 10px !important;
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-dim) !important;
+}
+
+.cm-tooltip-autocomplete > ul > li[aria-selected] {
+  background: var(--se-accent-tint) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-panels {
+  background: var(--se-surface) !important;
+  color: var(--se-text) !important;
+  border-color: var(--se-hairline) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-panel.cm-search {
+  padding: 8px 12px !important;
+  font: 600 12px/1 var(--se-font) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-panel.cm-search input.cm-textfield,
+.MillenniumQuickCss_CodeEditor .cm-panel.cm-search button.cm-button {
+  height: 26px;
+  margin: 2px 4px 2px 0 !important;
+  padding: 0 9px !important;
+  box-sizing: border-box;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-field) !important;
+  background-image: none !important;
+  color: var(--se-text) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  font: 600 12px/26px var(--se-font) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-panel.cm-search button.cm-button {
+  background: var(--se-surface-2) !important;
+  cursor: pointer;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-panel.cm-search button.cm-button:hover {
+  background: var(--se-hover) !important;
+}
+
+.MillenniumQuickCss_CodeEditor .cm-panel.cm-search input.cm-textfield:focus {
+  outline: 0;
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+}
+
+.MillenniumQuickCss_CodeEditor .cm-panel.cm-search button[name="close"] {
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-lg) !important;
+}

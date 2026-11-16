@@ -1,0 +1,188 @@
+/* Continues downloads.css (in order, see client/loader.js): . */
+
+/* Library games beside the Downloads queue and transfer details (host marked by page/library.js). */
+[data-se-dl-host][data-se-dl-host] { /* doubled: keeps the old :has() rule's weight over Steam's classes */
+  display: flex;
+  flex-direction: row;
+  min-width: 0;
+}
+
+.se-dl-library {
+  min-height: 0;
+  flex: 0 0 var(--se-list-w);
+  box-sizing: border-box;
+  width: var(--se-list-w);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--se-sidebar);
+  color: var(--se-text);
+  border-inline-end: 1px solid var(--se-hairline);
+}
+
+.se-list-hidden .se-dl-library,
+.se-header-actions-ready .se-dl-library > input,
+.se-title-filters[hidden] {
+  display: none !important;
+}
+
+.se-dl-library + ._1bq4x9pa4-9RLY-dXWUZTp {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.se-dl-library h2 {
+  margin: 12px 12px 6px;
+  font: var(--se-label-font);
+  text-transform: uppercase;
+  color: var(--se-text-muted);
+}
+
+.se-dl-library > input {
+  margin: 0 8px 6px;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--se-hairline);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-field);
+  color: inherit;
+  font: inherit;
+}
+
+.se-dl-library-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 6px 8px;
+}
+
+.se-dl-library button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 6px;
+  min-height: 28px;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.se-dl-library button[hidden],
+.se-dl-library-empty:empty {
+  display: none;
+}
+
+.se-dl-library button[data-installed="false"],
+.se-dl-library-empty {
+  color: var(--se-text-muted);
+}
+
+.se-dl-library button:is(:hover, :focus-visible) {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.se-dl-library button:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: calc(var(--se-focus-offset) * -1);
+}
+
+.se-dl-library button img {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--se-radius-xs);
+}
+
+.se-dl-library button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.se-dl-library-empty {
+  padding: 6px;
+}
+
+/* The native Library route supplies its own list, filters, and collection state. */
+.se-dl-native-layout {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.se-dl-native-list {
+  flex: 0 0 var(--se-list-w);
+  box-sizing: border-box;
+  width: var(--se-list-w);
+  min-width: 0;
+  overflow: hidden;
+  background: var(--se-sidebar);
+}
+
+.se-list-hidden .se-dl-native-list {
+  display: none;
+}
+
+.se-dl-native-list ._3xRRJfD2xy95i9NhJxLTp0 {
+  width: 100%;
+  height: 100%;
+}
+
+.se-dl-native-list ._3xRRJfD2xy95i9NhJxLTp0 > :not(._9sPoVBFyE_vE87mnZJ5aB) {
+  display: none !important;
+}
+
+.se-dl-native-list ._3xRRJfD2xy95i9NhJxLTp0 > ._9sPoVBFyE_vE87mnZJ5aB {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 100%;
+}
+
+.se-dl-native-content {
+  flex: 1 1 0;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Support toast (Ctrl+Shift+D on the Downloads page) */
+.se-dl-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  z-index: var(--se-z-toast);
+  padding: 10px 16px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent);
+  box-shadow: 0 12px 32px -10px var(--se-black-80);
+  font: 700 13px/1 var(--se-font), sans-serif;
+  color: var(--se-bg-ink);
+  translate: -50% 0;
+  pointer-events: none;
+  animation: se-dl-toast 2.6s ease both;
+}
+
+@keyframes se-dl-toast {
+  0% { opacity: 0; translate: -50% 8px; }
+  8%, 85% { opacity: 1; translate: -50% 0; }
+  100% { opacity: 0; }
+}
+
+/* Queue entries: Steam's draggable wrapper around each card, spaced like the cards */
+._1bq4x9pa4-9RLY-dXWUZTp:not(.fqntpaymdveMMSFkyHYNz) ._1ugNiylO2vKXhirsGocAxa ._21P7c4MWmsU2QSZeL-uyZo:not([data-se-dl-ghost]) {
+  margin: 0 0 8px !important;
+  border-radius: var(--se-radius-lg);
+  outline-offset: 2px;
+}

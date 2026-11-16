@@ -40,7 +40,7 @@
    *   overlay       the in-game overlay
    *   toasts        notification toasts
    *   notify        windows a friend notification can be clicked in (main, toasts, overlay, menus)
-   *   achievements  the main window and the overlay
+   *   tiers         windows that show achievement rarity tiers: desktop windows and the overlay
    */
   const GROUPS = {
     main: /^Steam$/,
@@ -50,8 +50,8 @@
     overlay: /^SP Overlay:/,
     toasts: /^notificationtoasts_/,
     notify: /^(?:Steam$|notificationtoasts_|SP Overlay:)|Menu$/,
-    achievements: /^(?:Steam$|SP Overlay:)/,
   };
+  GROUPS.tiers = { test: (title) => GROUPS.desktop.test(title) || GROUPS.overlay.test(title) };
 
   /*
    * [group, folder, files]: a feature's files, in list order. The list order is the cascade
@@ -60,12 +60,14 @@
   /** @type {[group: string, folder: string, files: string[]][]} */
   const FEATURES = [
     // Shared runtime pieces
-    ['all', 'core/', ['font.css', 'tokens.css', 'motion.css', 'images.css', 'images.js', 'popup-layer.css']],
-    ['main', 'core/', ['plugin-rpc.js', 'popup-layer.js']],
+    ['all', 'core/', ['font.css', 'tokens.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
+    ['all', 'client/shared/', ['popup-layer.css']],
+    ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js']],
     ['notify', 'client/friends/', ['friend-notification-clicks.js']],
     // In-game overlay
     ['overlay', 'client/overlay/', [
-      'overlay.css', 'context.js', 'data.js', 'sources.js', 'widgets.js', 'dom.js', 'render.js',
+      'overlay.css', 'overlay-views.css', 'overlay-tools.css',
+      'context.js', 'data.js', 'sources.js', 'widgets.js', 'dom.js', 'render.js',
       'friends.js', 'notes.js', 'browser.js', 'achievements.js', 'main.js',
     ]],
     ['all', 'client/overlay/', ['overlay-popups.css']],
@@ -79,7 +81,7 @@
     ['content', 'core/', ['spinner.css']],
     ['content', 'client/startup/', ['startup.css', 'startup.js', 'sign-in.css']],
     ['main', 'client/entrance/', ['entrance.css', 'entrance.js']],
-    ['desktop', 'core/', ['native-tooltips.js']],
+    ['desktop', 'client/shared/', ['native-tooltips.js']],
     // Library, title bar and navigation
     ['main', 'client/library/', ['artwork.css']],
     ['main', 'client/game-page/', ['always-open-game-details.js']],
@@ -93,13 +95,18 @@
       'shared.js', 'api.js', 'menus.js', 'account.js', 'actions.js', 'hover.js', 'popups.js',
       'placement.js', 'patch.js', 'main.js',
     ]],
-    ['main', 'client/navigation/', ['nav-rail.css', 'nav-rail.js', 'filters-panel.js']],
+    ['main', 'client/navigation/', [
+      'nav-rail.css', 'nav-rail-library.css', 'nav-rail-filters.css', 'nav-rail.js',
+      'filters-panel.js',
+    ]],
     ['main', 'client/library/', [
-      'library.css', 'game-list.css', 'game-list.js', 'game-drag.css', 'game-drag.js',
-      'collections.css', 'collections.js',
+      'library.css', 'library-home.css', 'library-covers.css', 'game-list.css', 'game-list.js',
+      'game-drag.css', 'game-drag.js', 'collections.css', 'collections.js',
     ]],
     // Downloads page
-    ['main', 'client/downloads/', ['downloads.css']],
+    ['main', 'client/downloads/', [
+      'downloads.css', 'downloads-queue.css', 'downloads-buttons.css', 'downloads-library.css',
+    ]],
     ['main', 'client/downloads/page/', [
       'shared.js', 'native.js', 'library.js', 'backdrop.js', 'read.js', 'hero.js', 'transfer.js',
       'queue.js', 'drag.js', 'pass.js', 'debug.js', 'main.js',
@@ -113,8 +120,8 @@
     ['main', 'client/friends/', ['playing-card.js']],
     ['main', 'client/library/', ['sort-segments.css', 'sort-segments.js']],
     // Library Home
-    ['main', 'client/home/', ['home-polish.css', 'home-polish.js', 'home-stage.css']],
-    ['main', 'client/home/stage/', ['util.js', 'tray.js', 'picks.js', 'stage.js', 'data.js', 'news.js', 'main.js']],
+    ['main', 'client/home/', ['home-polish.css', 'home-polish.js']],
+    ['main', 'client/home/stage/', ['stage.css', 'util.js', 'tray.js', 'picks.js', 'stage.js', 'data.js', 'news.js', 'main.js']],
     // Menus, hover cards, notifications, dialogs
     ['all', 'client/dialogs/', ['dialogs.css']],
     ['content', 'client/dialogs/', ['install.css', 'eula.css']],
@@ -141,19 +148,23 @@
     ['desktop', 'compat/steam-size-on-disk/', ['size-on-disk.css', 'size-on-disk.js']],
     ['main', 'compat/playercount-badge/', ['playercount-badge.css']],
     ['main', 'compat/protondb-library-badges/', ['protondb-library-badges.css', 'protondb-library-badges.js']],
-    ['desktop', 'core/', ['achievement-tiers.css']],
+    ['tiers', 'client/shared/', ['achievement-tiers.css']],
     ['desktop', 'compat/achievement-manager/', ['achievement-manager.css', 'achievement-manager.js']],
     ['desktop', 'compat/steamgriddb/', ['steamgriddb.css', 'steamgriddb.js']],
     // Game page and achievements
-    ['achievements', 'core/', ['achievement-tiers.css']],
     ['main', 'client/game-page/', [
       'layout.css', 'play-bar.css', 'overview.css', 'achievements.css', 'friends.css', 'cards.css',
-      'activity.css', 'spotlights.css', 'player-count.css', 'util.js', 'achievements.js',
+      'activity.css', 'activity-feed.css', 'activity-comments.css', 'spotlights.css', 'player-count.css',
+      'util.js', 'achievements.js',
       'layout.js', 'friends.js', 'activity.js', 'cards.js', 'page.js', 'play-bar.js', 'main.js',
     ]],
     ['main', 'client/achievements/', ['achievements-page.css', 'achievements-page.js']],
     // Friends list and chat windows
-    ['desktop', 'client/friends/', ['chat/chat-tooltips.js', 'friends.css', 'friends-list.js']],
+    ['desktop', 'client/friends/', ['chat/chat-tooltips.js']],
+    ['desktop', 'client/friends/list/', [
+      'friends.css', 'friends-search.css', 'friends-rows.css', 'friends-requests.css',
+      'friends-chats.css', 'friends-window.css', 'friends-list.js',
+    ]],
     ['desktop', 'client/friends/chat/', [
       'tabs.css', 'header.css', 'messages.css', 'input.css', 'voice.css', 'members.css', 'icons.css',
       'groups.css', 'chat.js',
@@ -169,8 +180,13 @@
       'shared.js', 'options.js', 'search.js', 'window.js', 'sidebar.js', 'layout.js', 'props-pages.js',
       'props.js', 'main.js',
     ]],
-    ['desktop', 'client/settings/', ['millennium.css', 'millennium-pages.js']],
-    ['main', 'client/settings/', ['millennium-window.js', 'library-manager.css', 'library-manager.js']],
+    ['desktop', 'client/settings/millennium/', [
+      'millennium.css', 'millennium-window.css', 'millennium-redesign.css', 'millennium-editor.css',
+      'millennium-logs.css',
+      'millennium-pages.js',
+    ]],
+    ['main', 'client/settings/millennium/', ['millennium-window.js']],
+    ['main', 'client/settings/', ['library-manager.css', 'library-manager.js']],
     ['main', 'client/game-page/', ['player-count.js']],
   ];
   /** [group, file] in list order */

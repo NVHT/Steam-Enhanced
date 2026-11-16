@@ -1,0 +1,707 @@
+/*
+ * Continues overlay.css (in order, see client/loader.js): Views; Friends view; Text field with a
+ * go button; Shared controls for the tool views.
+ */
+
+/* ---------- Views ---------- */
+
+/* Body: the rail beside the drawer, filling the height under the header, and
+   the footer row under them: Exit game under the rail, Back to game across
+   the drawer's width. */
+html[data-se-ov] .se-ov-body {
+  order: 5;
+  flex: 1 0 100%;
+  height: var(--se-ov-body-h, auto);
+  display: grid;
+  grid-template-columns: var(--se-ov-rail-btn) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 14px 18px;
+  padding-top: 16px;
+  box-shadow: inset 0 1px 0 var(--se-divider);
+  font-family: var(--se-font), 'Motiva Sans', sans-serif;
+}
+
+.se-ov-drawer {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* The rail, styled like the theme's nav rail: icon buttons without a tile at
+   rest, an accent tint and a bar on the rail's edge for the open view. */
+html[data-se-ov] .se-ov-rail {
+  position: relative;
+  z-index: 2;
+  min-height: 0;
+  width: var(--se-ov-rail-btn);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  user-select: none;
+}
+
+html[data-se-ov] .se-ov-tab:not(#se-none) {
+  position: relative;
+  flex: none;
+  width: var(--se-ov-rail-btn);
+  height: var(--se-ov-rail-btn);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: transparent;
+  box-shadow: none;
+  color: var(--se-text-muted);
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+html[data-se-ov] .se-ov-tab[hidden] {
+  display: none;
+}
+
+html[data-se-ov] .se-ov-tab:not(#se-none):hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+html[data-se-ov] .se-ov-tab[aria-pressed='true']:not(#se-none) {
+  background: var(--se-accent-tint);
+  color: var(--se-accent);
+}
+
+html[data-se-ov] .se-ov-tab[aria-pressed='true']::after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--se-accent);
+}
+
+/* Footer: Back to game is the primary action, labelled with its shortcut;
+   Exit game stays quiet under the rail until hovered, then turns danger. */
+html[data-se-ov] .se-ov-back:not(#se-none),
+html[data-se-ov] .se-ov-exit:not(#se-none) {
+  position: relative;
+  height: var(--se-ov-rail-btn);
+  display: flex;
+  align-items: center;
+  margin: 0;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  font-family: var(--se-font), 'Motiva Sans', sans-serif;
+  text-shadow: none;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out;
+}
+
+html[data-se-ov] .se-ov-back:not(#se-none) {
+  gap: 10px;
+  padding: 0 14px 0 16px;
+  background: var(--se-accent);
+  box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--se-accent) 80%, transparent);
+  color: var(--se-bg-ink);
+}
+
+html[data-se-ov] .se-ov-back:not(#se-none):hover {
+  background: var(--se-accent-hover);
+}
+
+html[data-se-ov] .se-ov-back:not(#se-none):active {
+  background: var(--se-accent);
+  box-shadow: none;
+}
+
+.se-ov-back svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.se-ov-back-label {
+  flex: 1;
+  font-size: var(--se-fs-md);
+  font-weight: 700;
+  text-align: start;
+}
+
+.se-ov-back-key {
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--se-bg-ink) 14%, transparent);
+  color: color-mix(in srgb, var(--se-bg-ink) 75%, transparent);
+  font: 600 11px/1 var(--se-font), 'Motiva Sans', sans-serif;
+}
+
+html[data-se-ov] .se-ov-exit:not(#se-none) {
+  justify-content: center;
+  width: var(--se-ov-rail-btn);
+  padding: 0;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--se-white-10);
+  color: var(--se-text-muted);
+}
+
+html[data-se-ov] .se-ov-exit:not(#se-none):hover {
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-danger) 45%, transparent);
+  color: var(--se-danger-text);
+}
+
+html[data-se-ov] .se-ov-exit:not(#se-none):active {
+  background: color-mix(in srgb, var(--se-danger) 26%, transparent);
+}
+
+.se-ov-exit svg {
+  width: 16px;
+  height: 16px;
+}
+
+html[data-se-ov] :is(.se-ov-back, .se-ov-exit):focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* Flyout labels: each icon-only button names itself on hover or keyboard
+   focus, beside the rail. */
+html[data-se-ov] :is(.se-ov-rail, .se-ov-body) > [data-tip]::before {
+  content: attr(data-tip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  z-index: 5;
+  padding: 6px 10px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-shadow-pop);
+  color: var(--se-text-strong);
+  font: 600 12px/16px var(--se-font), 'Motiva Sans', sans-serif;
+  white-space: pre;
+  text-shadow: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-4px, -50%);
+  transition: opacity 120ms ease-out, transform 120ms ease-out;
+}
+
+/* Exit sits at the column's foot: its label opens above it. */
+html[data-se-ov] .se-ov-exit[data-tip]::before {
+  left: 0;
+  top: auto;
+  bottom: calc(100% + 10px);
+  transform: translate(0, 4px);
+}
+
+html[data-se-ov] :is(.se-ov-rail, .se-ov-body) > [data-tip]:is(:hover, :focus-visible)::before {
+  opacity: 1;
+  transform: translate(0, -50%);
+  transition-delay: 250ms;
+}
+
+html[data-se-ov] .se-ov-tab:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-ov-tab-icon {
+  display: flex;
+  width: 22px;
+  height: 22px;
+}
+
+.se-ov-tab-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+.se-ov-tabs-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding-bottom: 10px;
+  box-shadow: inset 0 -1px 0 var(--se-white-10);
+}
+
+.se-ov-tabs-title {
+  flex: 1;
+  margin: 0;
+  color: var(--se-text-strong);
+  font: 600 17px/1.2 var(--se-font), 'Motiva Sans', sans-serif;
+}
+
+.se-ov-tabs-note {
+  color: var(--se-text);
+  font: 500 12px/1 var(--se-font), 'Motiva Sans', sans-serif;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* The overview shows the sections; any other view shows its panel. */
+.se-ov-view {
+  display: none;
+}
+
+html[data-se-ov] .se-ov-overview[data-se-ov-view] {
+  height: var(--se-ov-avail, auto);
+  overflow: hidden;
+  mask-image: none;
+}
+
+html[data-se-ov] .se-ov-overview[data-se-ov-view] > .se-ov-sec {
+  display: none;
+}
+
+html[data-se-ov] .se-ov-overview[data-se-ov-view='achievements'] > [data-view='achievements'],
+html[data-se-ov] .se-ov-overview[data-se-ov-view='friends'] > [data-view='friends'],
+html[data-se-ov] .se-ov-overview[data-se-ov-view='remote'] > [data-view='remote'],
+html[data-se-ov] .se-ov-overview[data-se-ov-view='notes'] > [data-view='notes'],
+html[data-se-ov] .se-ov-overview[data-se-ov-view='controller'] > [data-view='controller'],
+html[data-se-ov] .se-ov-overview[data-se-ov-view='browser'] > [data-view='browser'],
+html[data-se-ov] .se-ov-overview[data-se-ov-view='settings'] > [data-view='settings'] {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: se-ov-view-in var(--se-dur) var(--se-ease);
+}
+
+@keyframes se-ov-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.se-ov-view [hidden] {
+  display: none !important;
+}
+
+/* ---------- Friends view ---------- */
+
+.se-ov-friends-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 -10px 0 -8px;
+  padding: 4px 10px 12px 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  mask-image: linear-gradient(to bottom, transparent, #000 8px, #000 calc(100% - 28px), transparent);
+}
+
+.se-ov-friends-group {
+  margin: 10px 0 4px;
+  color: var(--se-text-dim);
+  font: 700 11px/16px var(--se-font), 'Motiva Sans', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.se-ov-friends-group:first-child {
+  margin-top: 4px;
+}
+
+html[data-se-ov] .se-ov-friend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 -8px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+html[data-se-ov] .se-ov-friend:hover {
+  background: var(--se-hover);
+}
+
+html[data-se-ov] .se-ov-friend:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: -2px;
+}
+
+html[data-se-ov] .se-ov-friend .se-ov-avatar {
+  cursor: inherit;
+}
+
+.se-ov-friend-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.se-ov-friend-name {
+  overflow: hidden;
+  color: var(--se-text-strong);
+  font: 600 13px/18px var(--se-font), 'Motiva Sans', sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-ov-friend-status {
+  overflow: hidden;
+  color: var(--se-text-dim);
+  font: 500 11px/15px var(--se-font), 'Motiva Sans', sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-ov-friend-status[data-status='here'],
+.se-ov-friend-status[data-status='ingame'] {
+  color: var(--se-running);
+}
+
+.se-ov-friend-status[data-status='online'] {
+  color: var(--se-online);
+}
+
+/* "Chat" shows on hover and focus. */
+.se-ov-friend-chat {
+  flex: none;
+  padding: 5px 10px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  color: var(--se-text);
+  font: 600 12px/1 var(--se-font), 'Motiva Sans', sans-serif;
+  opacity: 0;
+  transition: opacity var(--se-dur) ease-out;
+}
+
+html[data-se-ov] .se-ov-friend:is(:hover, :focus-visible) .se-ov-friend-chat {
+  opacity: 1;
+}
+
+html[data-se-ov] .se-ov-friends-more {
+  align-self: flex-start;
+  margin: 10px 0 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--se-text-dim);
+  font: 700 11px/16px var(--se-font), 'Motiva Sans', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+html[data-se-ov] .se-ov-friends-more::after {
+  content: ' ›';
+}
+
+html[data-se-ov] .se-ov-friends-more[aria-expanded='true']::after {
+  content: ' ⌄';
+}
+
+html[data-se-ov] .se-ov-friends-more:hover {
+  color: var(--se-text-strong);
+}
+
+/* The friends view: search and the list. */
+.se-ov-friends-pane {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ---------- Text field with a go button (browser address) ---------- */
+
+.se-ov-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 4px 0 12px;
+  border-radius: var(--se-radius-md);
+  background: rgba(var(--se-ov-ink), 0.75);
+  box-shadow: inset 0 0 0 1px var(--se-white-12);
+}
+
+.se-ov-field:focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent);
+}
+
+html[data-se-ov] .se-ov-field-input:not(#se-none) {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  color: var(--se-text-strong) !important;
+  font: 500 13px/1 var(--se-font), 'Motiva Sans', sans-serif !important;
+  text-shadow: none;
+}
+
+html[data-se-ov] .se-ov-field-input:not(#se-none)::placeholder {
+  color: var(--se-text-dim);
+  opacity: 1;
+}
+
+html[data-se-ov] .se-ov-field-go {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-accent);
+  color: var(--se-bg-ink);
+}
+
+html[data-se-ov] .se-ov-field-go:hover {
+  background: var(--se-accent-hover);
+}
+
+.se-ov-field-go svg {
+  width: 14px;
+  height: 14px;
+}
+
+html[data-se-ov] .se-ov-field-go:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* ---------- Shared controls for the tool views ---------- */
+
+.se-ov-card-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-hairline);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.se-ov-pill {
+  flex: none;
+  padding: 3px 9px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-07);
+  color: var(--se-text);
+  font: 700 10px/14px var(--se-font), 'Motiva Sans', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+html[data-se-ov] .se-ov-btn {
+  flex: none;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  color: var(--se-text-strong);
+  font: 600 12px/1 var(--se-font), 'Motiva Sans', sans-serif;
+  text-shadow: none;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+html[data-se-ov] .se-ov-btn:hover {
+  background: var(--se-hover);
+}
+
+html[data-se-ov] .se-ov-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+html[data-se-ov] .se-ov-btn:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-ov-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ---------- Remote Play Together ---------- */
+
+.se-ov-remote .se-ov-btn {
+  align-self: flex-start;
+}
+
+/* ---------- Sliders (Settings) ---------- */
+
+.se-ov-slider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.se-ov-slider .se-ov-tool-label {
+  flex: none;
+  font: 500 13px/18px var(--se-font), 'Motiva Sans', sans-serif;
+}
+
+html[data-se-ov] .se-ov-range {
+  flex: 1;
+  height: 18px;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+html[data-se-ov] .se-ov-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--se-white-18);
+}
+
+html[data-se-ov] .se-ov-range::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  appearance: none;
+  background: var(--se-accent);
+  box-shadow: 0 0 0 3px rgba(var(--se-ov-ink), 0.8);
+}
+
+html[data-se-ov] .se-ov-range:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+html[data-se-ov] .se-ov-range:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: 4px;
+}
+
+/* ---------- Controller ---------- */
+
+html[data-se-ov] .se-ov-switch-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-hairline);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+html[data-se-ov] .se-ov-switch-row:hover {
+  background: var(--se-hover);
+}
+
+html[data-se-ov] .se-ov-switch-row:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-ov-switch-desc {
+  color: var(--se-text-muted);
+  font: 500 12px/16px var(--se-font), 'Motiva Sans', sans-serif;
+  white-space: normal;
+}
+
+.se-ov-switch {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--se-surface-2);
+  transition: background-color var(--se-dur) ease-out;
+}
+
+.se-ov-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--se-text-muted);
+  transition: transform var(--se-dur) var(--se-ease), background-color var(--se-dur) ease-out;
+}
+
+[aria-checked='true'] > .se-ov-switch {
+  background: var(--se-accent);
+}
+
+[aria-checked='true'] > .se-ov-switch::after {
+  background: var(--se-white);
+  transform: translateX(16px);
+}
+
+.se-ov-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.se-ov-chip {
+  padding: 5px 10px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-hairline);
+  color: var(--se-text-muted);
+  font: 600 11px/14px var(--se-font), 'Motiva Sans', sans-serif;
+  text-shadow: none;
+}
+
+.se-ov-chip[data-good='true'] {
+  background: color-mix(in srgb, var(--se-running) 16%, transparent);
+  color: var(--se-running);
+}
+
+.se-ov-pad-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.se-ov-pad .se-ov-btn {
+  align-self: flex-start;
+}
+
+.se-ov-pad .se-ov-friends-group {
+  margin: 6px 0 -4px;
+}

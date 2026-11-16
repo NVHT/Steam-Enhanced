@@ -1,0 +1,272 @@
+/* Continues friends.css (in order, see client/loader.js): Searching; Favorites. */
+
+/*
+ * Searching: the bar becomes the theme's field (the Library's title-bar search): one rounded
+ * box with a blue focus ring, a magnifier at the start, upright placeholder, and the clear
+ * button as a small tile. Steam's gray backing, the input's inset shadow and its own
+ * magnifier image go; the label leaves the row instead of only fading out
+ */
+.friendlist:not(.GamepadMode) .socialListTab.TabSearchActive {
+  padding: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab.TabSearchActive .tabLabel {
+  display: none !important;
+}
+
+/* While searching the field has the whole row, as the bar's other buttons step aside */
+.friendlist:not(.GamepadMode) .socialListTab.TabSearchActive .friendsTabButtonsContainer > :not(.TabSearchButton) {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab.TabSearchActive .friendsTabButtonsContainer {
+  flex: 1;
+  min-width: 0;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab.TabSearchActive .TabSearchButton {
+  flex: 1;
+  min-width: 0;
+  cursor: text;
+}
+
+.friendlist:not(.GamepadMode) .TabSearchActive .TabSearchButton .searchIconButton {
+  width: 0 !important;
+  min-width: 0 !important;
+  opacity: 0 !important;
+  overflow: hidden;
+}
+
+.friendlist:not(.GamepadMode) .tabSearchTransitionGroup,
+.friendlist:not(.GamepadMode) .tabSearchTransition {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+
+.friendlist:not(.GamepadMode) .socialSearchContainer {
+  flex: 1;
+  min-width: 0;
+  background: none !important;
+}
+
+.friendlist:not(.GamepadMode) .socialSearchContainer .socialInputContainer {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .inputContainer {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 0 4px 0 10px;
+  border-radius: var(--se-radius-sm) !important;
+  overflow: hidden;
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .inputContainer:focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong), 0 0 0 3px var(--se-accent-tint);
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .inputContainer::before {
+  content: "";
+  flex: none;
+  width: 15px;
+  height: 15px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-fd-ico-search) center / 15px 15px no-repeat;
+  mask: var(--se-fd-ico-search) center / 15px 15px no-repeat;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab input.friendSearchInput {
+  flex: 1;
+  min-width: 0;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text) !important;
+  font: 500 13px var(--se-font), sans-serif !important;
+  text-transform: none;
+  letter-spacing: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab input.friendSearchInput::placeholder {
+  font-style: normal !important;
+  color: var(--se-text-faint) !important;
+  opacity: 1;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .friendSearchClear {
+  position: static !important;
+  flex: none;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-hairline);
+  color: var(--se-text-muted);
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: none !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .friendSearchClear:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .friendSearchClear > svg {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab .friendSearchClear::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-close-sm) center / 12px 12px no-repeat;
+  mask: var(--se-icon-close-sm) center / 12px 12px no-repeat;
+}
+
+/*
+ * Favorites: avatars with their status ring in a grid, the name under each,
+ * the game being played as a small icon on the avatar's corner
+ */
+.friendlist:not(.GamepadMode) .quickAccessFriends:not(.emptyQuickAccess) {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  gap: 4px 2px;
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 10px 8px 4px !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .favoriteElement {
+  height: auto !important;
+  min-width: 0;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .friend.quickAccessFriend {
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 8px 2px 6px !important;
+  border-radius: var(--se-radius-sm);
+  justify-content: center;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .friend.quickAccessFriend:hover {
+  background: var(--se-hover) !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriend > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  width: 100%;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .friend .avatarHolder {
+  display: block !important;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .friend .avatarHolder img.avatar {
+  opacity: 1 !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .friend.awayOrSnooze .avatarHolder img.avatar {
+  opacity: .75 !important;
+}
+
+.friendlist:not(.GamepadMode) .FavoriteFriend_GameIcon {
+  position: absolute !important;
+  right: -5px !important;
+  bottom: -4px !important;
+  left: auto !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-surface-2) !important;
+  box-shadow: 0 0 0 2px var(--se-sidebar);
+  z-index: calc(var(--se-z-raised) + 1);
+}
+
+.friendlist:not(.GamepadMode) .FavoriteFriend_GameIcon img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: var(--se-radius-xs) !important;
+  box-shadow: none !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .SnoozeContainer {
+  top: -6px !important;
+  left: -6px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: scale(.8);
+  transform-origin: top left;
+}
+
+.friendlist:not(.GamepadMode) .playerNameQuickAccessContainer {
+  justify-content: center;
+  width: 100% !important;
+  min-width: 0;
+  opacity: 1 !important;
+}
+
+.friendlist:not(.GamepadMode) .friend.quickAccessFriend .playerNameQuickAccessContainer .playerName {
+  width: auto !important;
+  max-width: 100%;
+  margin: 0 !important;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  font: 600 11.5px/14px var(--se-font), sans-serif !important;
+  color: var(--se-text-dim) !important;
+  text-align: center;
+}
+
+.friendlist:not(.GamepadMode) .friend.quickAccessFriend.online .playerName {
+  color: var(--se-online) !important;
+}
+
+.friendlist:not(.GamepadMode) .friend.quickAccessFriend.awayOrSnooze .playerName {
+  color: color-mix(in srgb, var(--se-online) 70%, transparent) !important;
+}
+
+.friendlist:not(.GamepadMode) .friend.quickAccessFriend.ingame .playerName {
+  color: var(--se-running) !important;
+}
+
+.friendlist:not(.GamepadMode) .friend.quickAccessFriend.offline .playerName {
+  color: var(--se-text-faint) !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .ChatUnreadMessageIndicator .chatUnreadCircle {
+  right: 4px !important;
+  bottom: auto !important;
+  top: 4px;
+  box-shadow: 0 0 0 2px var(--se-sidebar) !important;
+}
