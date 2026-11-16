@@ -265,10 +265,13 @@ html body.se-header-actions-ready.se-list-hidden ._298_NBin_2wV9a3P1Smj5i {
 }
 
 /*
- * Fixed list width: the game list matches the Friends dock (--se-list-w). Steam writes the
- * dragged width inline; this wins over it, and the drag divider no longer takes the pointer.
+ * List width: always --se-list-w. Fixed (the default) is --se-col-w; the "Game list width"
+ * setting's Adjustable makes it the width dragged on the theme's handle (client/shared/
+ * column-resize.js, attached by nav-rail.js). Steam writes its own dragged width inline; this
+ * wins over it, and Steam's divider is hidden (below): the theme's handle replaces it.
  */
 html body.se-header-actions-ready ._3xRRJfD2xy95i9NhJxLTp0 > ._9sPoVBFyE_vE87mnZJ5aB {
+  position: relative;
   flex: 0 0 var(--se-list-w) !important;
   box-sizing: border-box !important;
   width: var(--se-list-w) !important;
@@ -276,9 +279,9 @@ html body.se-header-actions-ready ._3xRRJfD2xy95i9NhJxLTp0 > ._9sPoVBFyE_vE87mnZ
   max-width: var(--se-list-w) !important;
 }
 
-html body.se-header-actions-ready ._298_NBin_2wV9a3P1Smj5i {
-  pointer-events: none !important;
-  cursor: default !important;
+/* Steam's divider: the 2 px resize strip beside the game list, wherever the list shows */
+html body.se-header-actions-ready ._276E6ijBpjMA2_iTxNhhjc {
+  display: none !important;
 }
 
 /* The toolbar row is gone; the list starts right under the title bar. */

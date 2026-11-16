@@ -177,6 +177,19 @@ The typeface for the whole theme: client windows, Store, Community, Support and 
 </details>
 
 <details>
+<summary><b>Game list and Friends dock width</b> &nbsp;<sub>(Millennium settings)</sub></summary>
+<br>
+
+Both columns share one default width.
+
+| Setting | Values | What it does |
+| --- | --- | --- |
+| Game list width | `Fixed` *(default)*, `Adjustable` | Fixed keeps one width with no divider. Adjustable lets you drag the list's right edge, or focus it and use the arrow keys. Double-click resets. |
+| Friends dock width | `Fixed` *(default)*, `Adjustable` | The same for the dock's left edge. |
+
+</details>
+
+<details>
 <summary><b>Web pages</b> &nbsp;<sub>(Millennium setting)</sub></summary>
 <br>
 

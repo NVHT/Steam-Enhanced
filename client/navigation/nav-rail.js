@@ -454,7 +454,30 @@
     } catch {}
   };
 
-  // The list's width is fixed in CSS (--se-list-w, core/tokens.css); only its edges are tracked.
+  // The list's width is --se-list-w in CSS; only its edges are tracked here. Its resize handle
+  // (client/shared/column-resize.js) rides on whichever list is showing; the "Game list width"
+  // setting's Adjustable file shows it and makes the dragged width count.
+  let listResize = null;
+  const syncListHandle = (list, visible) => {
+    const host = visible ? list.closest(`.${C.LeftListSizableContainer}`) : null;
+    if (!host) {
+      listResize?.handle.remove();
+      return;
+    }
+    listResize ??= SE.columnResize?.({
+      col: 'list',
+      side: 'right',
+      cssVar: '--se-list-w-user',
+      storageKey: 'se-list-w',
+      label: 'Resize game list',
+      min: 260,
+      max: () => Math.min(560, innerWidth * 0.4),
+      // The host it sits on now: Steam remounts the list, and the handle moves with it
+      measure: () => listResize.handle.parentElement?.getBoundingClientRect().width || 0,
+    });
+    if (listResize && listResize.handle.parentElement !== host) host.appendChild(listResize.handle);
+  };
+
   const setTopVisible = (on) => topBtn?.toggleAttribute('data-se-on', !!on);
 
   // Scroll doesn't bubble, so this listens in the capture phase and takes whichever
@@ -538,6 +561,7 @@
 
     SE.cssVar(document.body, '--se-list-left', null);
     SE.cssVar(document.body, '--se-list-right', null);
+    syncListHandle(list, isVisible);
     if (isVisible !== document.body.hasAttribute('data-se-list')) {
       document.body.toggleAttribute('data-se-list', isVisible);
     }
@@ -819,6 +843,7 @@
     searchBar?.remove();
     listToggleBtn?.remove();
     topBtn?.remove();
+    listResize?.handle.remove();
     topScroller = null;
     document.body?.classList.remove('se-list-hidden');
     document.body?.removeAttribute('data-se-list');
@@ -863,6 +888,8 @@
       document.removeEventListener('mouseover', onMouseOver, true);
       tipObserver?.disconnect();
       cleanup(true);
+      listResize?.destroy();
+      listResize = null;
       delete window.__seRailNav;
     },
   };

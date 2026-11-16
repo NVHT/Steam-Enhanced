@@ -1,0 +1,212 @@
+/*
+ * Column resize handle (client/shared/column-resize.js): a full-height grab strip on a column's
+ * edge. Hidden here; a column's "Adjustable" setting file shows its own
+ * (options/library/game-list-adjustable.css, options/friends/dock-adjustable.css). The strip
+ * straddles the edge so it never covers the column's scrollbar.
+ *
+ * Nothing shows at rest. On hover (after the hover delay) the accent seam draws out along the
+ * edge from the middle, the grip bar springs to full height and its dots pop in one by one.
+ * Held or keyboard-focused, the grip goes accent and swells, the seam goes solid and the width
+ * chip slides in beside it, on the content side.
+ *   .se-col-seam   the line along the edge
+ *   .se-col-grip   the bar, with three dots (i)
+ *   .se-col-chip   the width, written by the script
+ * Reduced motion: no movement (core/motion.css, options/appearance/motion-reduced.css and the
+ * media query below); the parts just appear and change colour.
+ */
+.se-col-resize {
+  --se-grip-w: 9px;
+  --se-grip-h: 60px;
+  --se-grip-dot: 3px;
+  --se-grip-bar: var(--se-selected);
+  --se-grip-ink: var(--se-text);
+  --se-grip-pop: .07s; /* the stagger between the dots popping in */
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: calc(var(--se-z-sticky) + 5);
+  width: var(--se-space-2);
+  cursor: var(--se-cursor-col-resize);
+  touch-action: none;
+  -webkit-app-region: no-drag;
+}
+
+.se-col-resize[data-side="right"] {
+  right: calc(var(--se-space-1) * -1);
+}
+
+.se-col-resize[data-side="left"] {
+  left: calc(var(--se-space-1) * -1);
+}
+
+.se-col-resize:focus-visible {
+  outline: none; /* the accent grip and the chip are the focus indicator */
+}
+
+.se-col-resize > * {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* ---------- Seam ---------- */
+
+.se-col-seam {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: var(--se-space-half);
+  margin-left: calc(var(--se-space-half) / -2);
+  background: var(--se-accent);
+  opacity: 0;
+  transform: scaleY(0);
+  transition:
+    transform var(--se-dur-slow) var(--se-ease),
+    opacity var(--se-dur) var(--se-ease);
+}
+
+/* ---------- Grip ---------- */
+
+.se-col-grip {
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-space-1);
+  width: var(--se-grip-w);
+  height: var(--se-grip-h);
+  margin: calc(var(--se-grip-h) / -2) 0 0 calc(var(--se-grip-w) / -2);
+  border-radius: var(--se-radius-xs);
+  background-color: var(--se-grip-bar);
+  box-shadow: var(--se-shadow-sm);
+  opacity: 0;
+  transform: scaleY(.72);
+  transition:
+    transform var(--se-dur-slow) var(--se-ease-spring),
+    opacity var(--se-dur) var(--se-ease),
+    background-color var(--se-dur) var(--se-ease);
+}
+
+.se-col-grip > i {
+  width: var(--se-grip-dot);
+  height: var(--se-grip-dot);
+  border-radius: 50%;
+  background-color: var(--se-grip-ink);
+  transition: background-color var(--se-dur) var(--se-ease);
+}
+
+/* ---------- Width chip ---------- */
+
+.se-col-chip {
+  top: 50%;
+  padding: var(--se-space-1) var(--se-space-2);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-panel-bg);
+  box-shadow: var(--se-panel-shadow);
+  color: var(--se-text);
+  font: var(--se-type-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0;
+  transition:
+    opacity var(--se-dur) var(--se-ease),
+    transform var(--se-dur-slow) var(--se-ease);
+}
+
+/* Beside the grip, on the content side: right of the game list, left of the Friends dock */
+.se-col-resize[data-side="right"] > .se-col-chip {
+  left: calc(50% + var(--se-grip-w) / 2 + var(--se-space-2));
+  transform: translate(calc(var(--se-space-2) * -1), -50%) scale(.9);
+}
+
+.se-col-resize[data-side="left"] > .se-col-chip {
+  right: calc(50% + var(--se-grip-w) / 2 + var(--se-space-2));
+  transform: translate(var(--se-space-2), -50%) scale(.9);
+}
+
+/* ---------- Hover: the seam draws in, the grip springs up, the dots pop ---------- */
+
+.se-col-resize:hover > .se-col-seam {
+  opacity: .45;
+  transform: scaleY(1);
+  transition-delay: var(--se-hover-delay);
+}
+
+.se-col-resize:hover > .se-col-grip {
+  opacity: 1;
+  transform: scaleY(1);
+  transition-delay: var(--se-hover-delay);
+}
+
+.se-col-resize:hover > .se-col-grip > i {
+  animation: se-grip-dot calc(var(--se-dur-slow) * 1.8) var(--se-ease) both;
+  animation-delay: calc(var(--se-hover-delay) + var(--se-grip-pop));
+}
+
+.se-col-resize:hover > .se-col-grip > i:nth-child(2) {
+  animation-delay: calc(var(--se-hover-delay) + var(--se-grip-pop) * 2);
+}
+
+.se-col-resize:hover > .se-col-grip > i:nth-child(3) {
+  animation-delay: calc(var(--se-hover-delay) + var(--se-grip-pop) * 3);
+}
+
+@keyframes se-grip-dot {
+  0% {
+    opacity: 0;
+    transform: scale(.3);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1.6);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ---------- Held or keyboard-focused: accent, a little bigger, width shown ---------- */
+
+.se-col-resize[data-dragging],
+.se-col-resize:focus-visible {
+  --se-grip-bar: var(--se-accent);
+  --se-grip-ink: var(--se-on-accent);
+}
+
+.se-col-resize[data-dragging] > .se-col-seam,
+.se-col-resize:focus-visible > .se-col-seam {
+  opacity: 1;
+  transform: scaleY(1);
+  transition-delay: 0s; /* no hover wait once held */
+}
+
+.se-col-resize[data-dragging] > .se-col-grip,
+.se-col-resize:focus-visible > .se-col-grip {
+  opacity: 1;
+  transform: scale(1.15, 1.08);
+  transition-delay: 0s; /* no hover wait once held */
+}
+
+.se-col-resize[data-dragging] > .se-col-chip,
+.se-col-resize:focus-visible > .se-col-chip {
+  opacity: 1;
+  transform: translate(0, -50%) scale(1);
+  transition-delay: 0s; /* no hover wait once held */
+}
+
+/* While dragging, the pointer keeps the resize cursor and nothing gets text-selected */
+html[data-se-col-resizing],
+html[data-se-col-resizing] * {
+  cursor: var(--se-cursor-col-resize) !important; /* beats every element's own cursor, Steam's included */
+  user-select: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-col-resize > .se-col-grip > i {
+    animation: none !important; /* beats the hover pop's longer selectors */
+  }
+}

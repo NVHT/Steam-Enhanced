@@ -28,6 +28,19 @@
   dock.setAttribute('aria-label', 'Friends');
   own.className = 'se-fd-own';
   dock.appendChild(own);
+  /* The left-edge resize handle, shown by the "Friends dock width" setting's Adjustable file
+     (client/shared/column-resize.js); the rail keeps its own width */
+  const dockResize = SE.columnResize?.({
+    col: 'dock',
+    side: 'left',
+    cssVar: '--se-fd-w-user',
+    storageKey: 'se-fd-w',
+    label: 'Resize Friends',
+    min: 280,
+    max: () => Math.min(520, innerWidth * 0.4),
+    measure: () => dock.getBoundingClientRect().width,
+  });
+  if (dockResize) dock.appendChild(dockResize.handle);
   dock.addEventListener('error', onAvatarError, true);
   fly.className = 'se-fd-fly';
   own.addEventListener('input', onSearch);
@@ -307,6 +320,7 @@
       steamHost.removeEventListener('mouseover', ns.friendCard.over);
       steamHost.removeEventListener('mouseout', ns.friendCard.out);
       ns.friendCard.dispose();
+      dockResize?.destroy();
       dock.remove();
       fly.remove();
       own.textContent = '';

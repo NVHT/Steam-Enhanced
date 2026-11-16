@@ -159,10 +159,14 @@
   --se-price-size: var(--se-fs-md);
   --se-price-was-size: 11.5px;
   --se-price-pct-size: var(--se-fs-base);
-  /* Friends dock width, shared with the game page's left column */
-  --se-fd-w: 350px;
-  /* Library game list width: fixed, the same as the Friends dock */
-  --se-list-w: var(--se-fd-w);
+  /*
+   * Column widths: the game list (also Downloads' list and the game page's left column) and the
+   * Friends dock share one default. Each is a setting, Fixed or Adjustable: Adjustable reads the
+   * width dragged on the column's edge (options/library/, options/friends/).
+   */
+  --se-col-w: 350px;
+  --se-fd-w: var(--se-col-w);
+  --se-list-w: var(--se-col-w);
   --se-fd-rail: 60px;
   --se-fd-fly-lift: 6px; /* a dock card sits this far above its tile, head level with it */
   --se-shadow-card: 0 10px 24px -12px rgba(0, 0, 0, .8);
@@ -216,6 +220,7 @@
 
   /* Motion: fast (hover, press), base (state), slow (panels), slower (page-scale) */
   --se-ease: cubic-bezier(.2, .8, .2, 1);
+  --se-ease-spring: cubic-bezier(.34, 1.56, .64, 1); /* a small overshoot: a control popping into place */
   --se-dur-fast: .12s;
   --se-dur: .15s;
   --se-dur-slow: .25s;
@@ -394,6 +399,9 @@
   /* Back to top: a dual-tone block arrow up to a bar, as a mask */
   --se-icon-arrow-top: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8.5 6.5 14H10v5.5h4V14h3.5z' fill='white' fill-opacity='.32' stroke='none'/%3E%3Cpath d='M12 8.5 6.5 14H10v5.5h4V14h3.5zM6 4.5h12'/%3E%3C/svg%3E");
   /* Check icon (in library) as a mask, drawn in the text colour */
+  /* Column resize cursor (client/shared/column-resize.css): the grip bar between two arrowheads,
+     white on an ink outline so it reads on any surface; hotspot at its centre */
+  --se-cursor-col-resize: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='%23fff' stroke='%230f1115' stroke-width='1.5' stroke-linejoin='round' paint-order='stroke'%3E%3Crect x='10.25' y='4' width='3.5' height='16' rx='1.75'/%3E%3Cpath d='M2 12l5-4.25v8.5z'/%3E%3Cpath d='M22 12l-5-4.25v8.5z'/%3E%3C/g%3E%3C/svg%3E") 12 12, col-resize;
   --se-check-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 12.5l5 5L19.5 7'/%3E%3C/svg%3E");
   /* Star icon (wishlist) as a mask, drawn in the text colour */
   --se-star-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z'/%3E%3C/svg%3E");
