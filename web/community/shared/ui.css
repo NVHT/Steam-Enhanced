@@ -1,0 +1,394 @@
+/*
+ * Community UI: what every redesigned Community page shares (html.se-community-ui, set by
+ * web/community/loader.js on the inventory, profile, activity, discussions and hub pages).
+ *
+ *   - Page frame: the theme's page colour on the root (behind the page scrollbar) and behind
+ *     Steam's frames, and one page width.
+ *   - Buttons: Steam's classic button classes (.btn_*, .btnv6_*, .btn_profile_action) as
+ *     the web's one button (core/tokens.css --se-btn-*); the green "do it" buttons as the accent.
+ *   - Avatars: rounded squares with Steam's status colour as a ring; avatar frames hidden so
+ *     they all match.
+ *   - Comment threads (profiles, activity, discussions, hub items): the entry box as a field
+ *     beside the poster's avatar, each comment as a row with a rounded avatar (Steam's friend
+ *     overlay left out), author and time on one line and the text under the name.
+ *   - Friend rows (.friendBlock): avatar, name and status as one hoverable row.
+ *   - Duotone icons (shared/icons.js): a soft back layer and a strong front layer in the link's
+ *     own colour; the Steam icon they replace is hidden.
+ *   - Popup menus, the "•••" content options on uploads, the emoticon picker, page buttons,
+ *     focus ring and reduced motion.
+ *   - Tooltips: Steam's (.community_tooltip) and the title tooltips (shared/tips.js) in the
+ *     theme's tooltip style.
+ *
+ * Classes are Steam's (SteamTracking: steamcommunity.com/public/css/skin_1/globalv2.css,
+ * buttons.css, profilev2.css, forums.css). Tokens come from core/tokens.css.
+ *
+ * Continued, by section, in ui-comments.css, ui-friends.css, ui-icons.css, ui-tooltips.css,
+ * ui-footer.css (same folder), listed after this file in web/community/loader.js: together
+ * they keep one file's order.
+ */
+
+html.se-community-ui {
+  /* The store's page width (web/store/shared/layout.css, same values): the window minus a gutter, capped */
+  --se-page-gutter: 28px;
+  --se-page-max: 1760px;
+  --se-community-width: min(100vw - 2 * var(--se-page-gutter), var(--se-page-max));
+  --se-status-online: #57cbde;
+  --se-status-ingame: #90ba3c;
+  --se-status-offline: var(--se-text-faint);
+}
+
+/* ---------- Page frame ---------- */
+
+/* The root too: scrollbar tracks are transparent (core/scrollbars.css), and the page's own
+   scrollbar gutter shows the root's background, which is otherwise the window's black */
+html.se-community-ui {
+  background-color: var(--se-bg);
+}
+
+/* !important: the theme's shared rules (web/community/profile/page.css) set background-color with
+   !important */
+html.se-community-ui body,
+html.se-community-ui :is(.responsive_page_frame, .responsive_page_content, .responsive_page_template_content) {
+  background-color: var(--se-bg) !important;
+  color: var(--se-text-dim);
+  font-family: var(--se-font);
+}
+
+html.se-community-ui :is(.pagecontent, #BG_bottom, #mainContents) {
+  background-color: transparent;
+  background-image: none;
+}
+
+html.se-community-ui :is(a.whiteLink, .whiteLink a) {
+  transition: color var(--se-dur);
+}
+
+/* !important: the theme's shared rules (web/community/inventory/page.css, web/community/market/page.css)
+   set color with !important */
+html.se-community-ui :is(a.whiteLink, .whiteLink a):hover {
+  color: var(--se-accent) !important;
+}
+
+/* ---------- Buttons (the web's one button: core/tokens.css --se-btn-*) ---------- */
+
+/* !important: display, padding can come inline from Steam's markup or scripts */
+html.se-community-ui :is(
+  .btn_profile_action,
+  [class*="btnv6_"],
+  .btn_green_white_innerfade,
+  .btn_grey_white_innerfade,
+  .btn_darkblue_white_innerfade,
+  .btn_blue_white_innerfade,
+  .btn_green_steamui,
+  .btn_grey_black,
+  .btn_grey_grey,
+  .btn_black
+) {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-btn-gap);
+  box-sizing: border-box;
+  height: var(--se-btn-h);
+  padding: var(--se-btn-pad) !important;
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: var(--se-btn-bg);
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-btn-color);
+  font: var(--se-btn-font);
+  text-decoration: none;
+  text-shadow: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--se-dur), color var(--se-dur), box-shadow var(--se-dur), filter var(--se-dur);
+}
+
+html.se-community-ui :is(
+  .btn_profile_action,
+  [class*="btnv6_"],
+  .btn_green_white_innerfade,
+  .btn_grey_white_innerfade,
+  .btn_darkblue_white_innerfade,
+  .btn_blue_white_innerfade,
+  .btn_green_steamui,
+  .btn_grey_black,
+  .btn_grey_grey,
+  .btn_black
+):hover {
+  background: var(--se-btn-bg-hover);
+  color: var(--se-btn-color-hover);
+}
+
+/* Steam's blue fade buttons force their text colour, so the pill's colours need the same weight */
+/* !important: Steam's own rules (buttons.css) set color with !important */
+html.se-community-ui:not(#se-none) .btnv6_blue_hoverfade {
+  color: var(--se-text) !important;
+}
+
+/* !important: Steam's own rules (buttons.css) set color with !important */
+html.se-community-ui:not(#se-none) .btnv6_blue_hoverfade:hover {
+  color: var(--se-white) !important;
+}
+
+/* !important: padding can come inline from Steam's markup or scripts */
+html.se-community-ui :is(.btn_small, .btn_small_thin, .btn_small_tall) {
+  height: var(--se-ctl-sm);
+  padding: 0 var(--se-space-3) !important;
+  font: var(--se-type-label);
+}
+
+/* Steam paints the face on an inner span: the button is the face instead */
+/* !important: Steam's own rules (buttons.css, clanimagepicker.css, community_gamepad.css) set
+   background, border, color, display, line-height, padding at equal or higher weight; the theme's
+   shared rules (web/community/activity/page.css, web/community/discussions/home.css,
+   web/community/dmca/page.css) set background, border, color, display, font, line-height, padding with
+   !important */
+html.se-community-ui :is(
+  .btn_profile_action,
+  [class*="btnv6_"],
+  .btn_green_white_innerfade,
+  .btn_grey_white_innerfade,
+  .btn_darkblue_white_innerfade,
+  .btn_blue_white_innerfade,
+  .btn_green_steamui,
+  .btn_grey_black,
+  .btn_grey_grey,
+  .btn_black
+) > span {
+  display: contents !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: inherit !important;
+}
+
+/* Primary: Steam's green buttons (Add Friend, Post Comment, Post, Submit...) */
+/* !important: Steam's own rules (shared_gamepad.css) set background, color at equal or higher
+   weight; another rule in this file sets background, color with !important */
+html.se-community-ui:not(#se-none) :is(.btn_green_white_innerfade, .btnv6_green_white_innerfade, .btn_green_steamui) {
+  background: var(--se-btn-primary-bg) !important;
+  box-shadow: none;
+  color: var(--se-btn-primary-color) !important;
+}
+
+/* !important: Steam's own rules (shared_gamepad.css) set background, color at equal or higher
+   weight; another rule in this file sets background, color with !important */
+html.se-community-ui:not(#se-none) :is(.btn_green_white_innerfade, .btnv6_green_white_innerfade, .btn_green_steamui):hover {
+  background: var(--se-btn-primary-bg-hover) !important;
+  color: var(--se-btn-primary-color) !important;
+}
+
+html.se-community-ui :is(.btn_disabled, .btn_profile_action_disabled, [disabled]):is(.btn_profile_action, [class*="btn_"], [class*="btnv6_"]) {
+  opacity: var(--se-btn-disabled-opacity);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Icon-only buttons (Steam's "..." more, reward, equipped items) are square */
+/* !important: another rule in this file sets padding with !important */
+html.se-community-ui .btn_profile_action:has(> span:empty),
+html.se-community-ui #profile_action_dropdown_link {
+  width: var(--se-btn-h);
+  padding: 0 !important;
+}
+
+/* ---------- Avatars: rounded squares, status as a ring ---------- */
+
+/* !important: the theme's shared rules (web/community/discussions/home.css,
+   web/community/profile/page.css, web/community/shared/small-header.css) set background with !important */
+html.se-community-ui .playerAvatar {
+  --se-status: var(--se-status-offline);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-status) !important;
+}
+
+html.se-community-ui .playerAvatar.online { --se-status: var(--se-status-online); }
+html.se-community-ui .playerAvatar.in-game { --se-status: var(--se-status-ingame); }
+
+/* Steam pads the image 1px and paints its own status gradient behind it; with the theme's sizes
+   that pushed every avatar image 2px right and down, off centre in its ring */
+html.se-community-ui .playerAvatar img:not(.profile_avatar_frame img) {
+  display: block;
+  box-sizing: border-box;
+  padding: 0;
+  border: 0;
+  border-radius: calc(var(--se-radius-sm) - 1px);
+  background: none;
+}
+
+/* Inline images leave a line-height gap under them, which showed as a strip of ring colour */
+html.se-community-ui .playerAvatar {
+  line-height: 0;
+}
+
+html.se-community-ui .playerAvatar > a {
+  display: block;
+}
+
+/* Avatar frames (Steam's animated profile items) are left out, so every avatar has the same
+   rounded shape and status ring */
+/* !important: display can come inline from Steam's markup or scripts */
+html.se-community-ui .profile_avatar_frame {
+  display: none !important;
+}
+
+/* ---------- Popup menus (profile "...", forum actions, the hub's View Stats) ---------- */
+
+/* Steam's classic popups (.popup_block) frame their content (.shadow_content) with nine
+   shadow images: the content is the panel, the frame goes */
+/* !important: Steam's own rules (shared_global.css) set display at equal or higher weight */
+html.se-community-ui .popup_block > :is(.shadow_ul, .shadow_top, .shadow_ur, .shadow_left, .shadow_right, .shadow_bl, .shadow_bottom, .shadow_br) {
+  display: none !important;
+}
+
+/* !important: Steam's own rules (shared_global.css) set background, border, box-shadow at equal or
+   higher weight; another rule in this file sets background, border, border-radius, box-shadow with
+   !important */
+html.se-community-ui .popup_block_new,
+html.se-community-ui .popup_body.popup_menu,
+html.se-community-ui .popup_block > .shadow_content,
+html.se-community-ui .ugc_options_tooltip {
+  border: 0 !important;
+  border-radius: var(--se-menu-radius) !important;
+  background: var(--se-panel-bg) !important;
+  box-shadow: var(--se-panel-shadow) !important;
+  backdrop-filter: var(--se-blur-panel);
+}
+
+/* !important: Steam's own rules (profilev2.css, shared_global.css) set padding at equal or higher
+   weight; another rule in this file sets padding with !important */
+html.se-community-ui .popup_body.popup_menu,
+html.se-community-ui .popup_block > .shadow_content,
+html.se-community-ui .ugc_options_tooltip {
+  margin: 0 !important;
+  padding: var(--se-menu-pad) !important;
+}
+
+/* !important: Steam's own rules (economy_market.css, profilev2.css, profilev2_gamepad.css) set
+   color, display, font, padding at equal or higher weight; the theme's shared rules
+   (web/community/activity/page.css, web/community/discussions/home.css, web/community/hub/page.css) set
+   background, color, display, font, padding, text-decoration with !important */
+html.se-community-ui .popup_menu .popup_menu_item,
+html.se-community-ui :is(.ugc_options_tooltip, .popup_block > .shadow_content) > .option {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-2);
+  padding: var(--se-menu-item-pad) !important;
+  border-radius: var(--se-menu-item-radius);
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font: var(--se-menu-item-font) !important;
+  text-decoration: none !important;
+}
+
+/* !important: Steam's own rules (shared_gamepad.css, shared_global.css) set color at equal or
+   higher weight; the theme's shared rules (web/community/activity/page.css,
+   web/community/discussions/home.css, web/community/hub/page.css) set background, color with !important */
+html.se-community-ui .popup_menu .popup_menu_item:hover,
+html.se-community-ui :is(.ugc_options_tooltip, .popup_block > .shadow_content) > .option:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-community-ui .popup_menu .popup_menu_item:active,
+html.se-community-ui :is(.ugc_options_tooltip, .popup_block > .shadow_content) > .option:active {
+  transform: scale(var(--se-press-scale));
+}
+
+html.se-community-ui .popup_menu .popup_menu_item img {
+  opacity: .8;
+}
+
+/* ---------- Content options (shared_global.css .ugc_options: the menu on user uploads) ----------
+ * The theme's "•••" button (web/shared/base.css) on the item's top-right corner; its menu is the
+ * popup panel and menu rows above.
+ */
+/* !important: padding can come inline from Steam's markup or scripts */
+html.se-community-ui .ugc_options {
+  top: var(--se-space-3);
+  inset-inline-end: var(--se-space-3);
+  padding: 0 !important;
+}
+
+/* ---------- Page buttons (comment, forum and workshop/guide paging) ----------
+ * One size for everything: 32px round arrows and page numbers, the current page filled with
+ * the accent, Steam's "..." centred between them. Workshop paging leaves the "..." as bare text:
+ * the hub's Guides tab wraps it (.se-page-gap).
+ */
+
+/* !important: Steam's own rules (community_gamepad.css, globalv2.css, shared_global.css) set
+   border-radius, color, display, font, text-decoration at equal or higher weight; the theme's
+   shared rules (web/community/inventory/page.css, web/community/market/page.css) set background, border,
+   border-radius, color, display, font, padding, text-decoration with !important */
+html.se-community-ui :is(.commentthread_paging, .forum_paging_controls, .pageLinks, .workshopBrowsePagingControls) .pagebtn {
+  display: inline-flex !important;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--se-pill) !important;
+  box-shadow: none;
+  color: var(--se-text) !important;
+  font: var(--se-type-label) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+/* !important: the theme's shared rules (web/community/inventory/page.css, web/community/market/page.css)
+   set background with !important */
+html.se-community-ui :is(.commentthread_paging, .forum_paging_controls, .pageLinks, .workshopBrowsePagingControls) .pagebtn:not(.disabled):hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-community-ui :is(.commentthread_paging, .forum_paging_controls, .pageLinks, .workshopBrowsePagingControls) .pagebtn.disabled {
+  opacity: .3;
+}
+
+html.se-community-ui :is(.commentthread_pagelinks, .forum_paging_pagelinks, .se-page-gap) {
+  color: var(--se-text-faint);
+  font: 700 var(--se-fs-sm)/32px var(--se-font);
+  letter-spacing: .1em;
+}
+
+/* !important: Steam's own rules (forums.css) set text-decoration at equal or higher weight;
+   another rule in this file sets color with !important */
+html.se-community-ui :is(.commentthread_pagelink, .forum_paging_pagelink, .workshopBrowsePagingControls :is(.pagelink, .page_current)) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-label);
+  letter-spacing: 0;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+/* !important: another rule in this file sets color with !important */
+html.se-community-ui :is(.commentthread_pagelink, .forum_paging_pagelink, .workshopBrowsePagingControls .pagelink):hover {
+  background: var(--se-pill);
+  color: var(--se-text) !important;
+}
+
+/* !important: Steam's own rules (buttons.css, monacoeditor.css, shared_gamepad.css) set color at
+   equal or higher weight; the theme's shared rules (web/community/discussions/home.css,
+   web/community/hub/page.css, web/community/inventory/page.css) set color with !important */
+html.se-community-ui :is(.commentthread_pagelink, .forum_paging_pagelink).active,
+html.se-community-ui .workshopBrowsePagingControls .page_current {
+  background: var(--se-accent);
+  color: var(--se-on-accent) !important;
+}

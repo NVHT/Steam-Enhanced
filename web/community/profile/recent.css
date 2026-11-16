@@ -1,0 +1,448 @@
+/* Continues page.css (in order, see web/community/loader.js): Recent games. */
+
+/* ---------- Recent games ---------- */
+
+html.se-community-profile .profile_recentgame_header {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-3);
+}
+
+html.se-community-profile .profile_recentgame_header > :first-child,
+html.se-community-profile .profile_recentgame_header h2 {
+  margin: 0 !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-title) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+/* Playtime over two weeks: a chip on the right */
+html.se-community-profile .recentgame_quicklinks.recentgame_recentplaytime {
+  float: none !important;
+  margin: 0 !important;
+  padding: var(--se-space-1) var(--se-space-3) !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill);
+}
+
+html.se-community-profile .recentgame_recentplaytime :is(div, h2) {
+  margin: 0 !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-label) !important;
+}
+
+html.se-community-profile .recent_games {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-5);
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* No box per game: art, title and the achievements tile sit straight on the card */
+html.se-community-profile .recent_game {
+  position: relative;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-community-profile .recent_game > :not(.recent_game_content),
+html.se-community-profile .recent_game_content > :empty {
+  display: none !important;
+}
+
+html.se-community-profile .recent_game_content {
+  display: grid !important;
+  grid-template-columns: 300px minmax(0, 1fr);
+  height: auto !important;
+  min-height: 0 !important;
+  grid-template-areas:
+    "cap name"
+    "cap meta"
+    "cap stats";
+  grid-template-rows: auto auto 1fr;
+  gap: var(--se-space-2) var(--se-space-4);
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-profile .recent_game_content > .game_info {
+  display: contents !important;
+}
+
+html.se-community-profile .recent_game_content :is(.game_info > *, .game_info_stats) {
+  float: none !important;
+  margin: 0 !important;
+}
+
+/* Art fills the row's height (the text and achievements tile are taller than its own shape) */
+html.se-community-profile .game_info_cap {
+  grid-area: cap;
+  align-self: stretch;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0;
+}
+
+html.se-community-profile .game_info_cap a {
+  display: block;
+  overflow: hidden;
+  width: 300px !important;
+  height: 100% !important;
+  border-radius: var(--se-radius-md);
+}
+
+html.se-community-profile .game_info_cap img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 140px;
+  object-fit: cover;
+  border-radius: var(--se-radius-md);
+  box-shadow: var(--se-shadow-sm);
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-community-profile .recent_game:hover .game_info_cap img {
+  transform: scale(1.02);
+}
+
+html.se-community-profile .game_name {
+  grid-area: name;
+  align-self: end;
+  overflow: hidden;
+  padding-top: var(--se-space-1);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-profile .game_name a {
+  color: var(--se-white) !important;
+  font: var(--se-type-title-lg) !important;
+}
+
+html.se-community-profile .game_info_details {
+  grid-area: meta;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+}
+
+html.se-community-profile .recent_game[data-se-recent]:has(.se-recent-meta) .game_info_details {
+  display: none !important;
+}
+
+/* Playtime lines as chips (profile/page.js) */
+html.se-community-profile .se-recent-meta {
+  grid-area: meta;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+}
+
+html.se-community-profile .se-recent-meta span {
+  padding: var(--se-space-1) var(--se-space-3);
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill);
+  color: var(--se-text-muted);
+  font: var(--se-type-badge);
+}
+
+html.se-community-profile .se-recent-meta span:first-child {
+  color: var(--se-text);
+}
+
+html.se-community-profile .recent_game_now_playing .game_name::after {
+  content: "Now playing";
+  margin-left: var(--se-space-3);
+  padding: var(--se-space-1) var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  background: color-mix(in srgb, var(--se-status-ingame) 18%, transparent);
+  color: var(--se-status-ingame);
+  font: var(--se-type-caption);
+  vertical-align: 2px;
+}
+
+/* Achievements: completion bar beside the icons */
+html.se-community-profile .game_info_stats {
+  grid-area: stats;
+  align-self: end;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+/* Achievements as one tile, the same as the Favorite Game showcase */
+html.se-community-profile .recent_game .game_info_stats {
+  align-self: end;
+  margin-top: var(--se-space-2) !important;
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-white-04) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-profile .recent_game .game_info_stats :is(.game_info_achievements_only_ctn, .game_info_achievements, .game_info_achievements_badge) {
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-profile .recent_game .se-ach-ring {
+  width: 44px;
+  height: 44px;
+}
+
+html.se-community-profile .recent_game .game_info_achievement img {
+  width: 36px;
+  height: 36px;
+}
+
+html.se-community-profile .recent_game .game_info_achievement.plus_more {
+  min-width: 36px;
+  height: 36px !important;
+}
+
+html.se-community-profile :is(.game_info_stats_rule, .game_info_achievements_only_ctn > br) {
+  display: none !important;
+}
+
+/* Achievements: completion ring, count with chips, icons. Steam's ribbon and bar give way to the
+   ring (profile/page.js) where it could read the counts. */
+html.se-community-profile .game_info_achievements {
+  display: flex !important;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--se-space-3) var(--se-space-4);
+  float: none !important;
+}
+
+html.se-community-profile .game_info_achievements > * {
+  align-self: center;
+}
+
+html.se-community-profile .game_info_achievements_ribbons {
+  display: flex;
+  flex: none;
+  align-items: center;
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-profile .game_info_achievements:has(.se-ach-ring) .game_info_achievements_ribbons,
+html.se-community-profile .game_info_achievements:has(.se-ach-ring) .achievement_progress_bar_ctn {
+  display: none !important;
+}
+
+/* Ring */
+html.se-community-profile .se-ach-ring {
+  --se-ring: var(--se-accent);
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+}
+
+html.se-community-profile .se-ach-ring[data-se-complete] {
+  --se-ring: var(--se-gold);
+}
+
+html.se-community-profile .se-ach-ring svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+html.se-community-profile .se-ach-ring circle {
+  fill: none;
+  stroke-width: 3.5;
+}
+
+html.se-community-profile .se-ach-ring-track {
+  stroke: var(--se-divider);
+}
+
+html.se-community-profile .se-ach-ring-fill {
+  stroke: var(--se-ring);
+  stroke-dasharray: 100;
+  stroke-dashoffset: calc(100 - var(--se-pct, 0));
+  stroke-linecap: round;
+  animation: se-ach-ring .8s var(--se-ease) both;
+}
+
+@keyframes se-ach-ring {
+  from { stroke-dashoffset: 100; }
+}
+
+html.se-community-profile .se-ach-ring span {
+  color: var(--se-text);
+  font: 800 var(--se-fs-xs)/1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-profile .se-ach-ring[data-se-complete] span {
+  color: var(--se-gold);
+}
+
+/* Count on top, chips (rare, perfect) under it */
+html.se-community-profile .game_info_achievements_summary_area {
+  display: flex !important;
+  flex: 1 1 220px;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  float: none !important;
+}
+
+html.se-community-profile .game_info_achievement_summary {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  width: auto !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-small) !important;
+}
+
+html.se-community-profile .game_info_achievement_summary > * {
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-profile .game_info_achievement_summary a {
+  flex-basis: 100%;
+  margin-bottom: var(--se-space-half) !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-title) !important;
+  text-decoration: none !important;
+}
+
+html.se-community-profile .game_info_achievement_summary a:hover {
+  color: var(--se-accent) !important;
+}
+
+html.se-community-profile .game_info_achievement_summary :is(.num_rare, .se-ach-perfect) {
+  padding: var(--se-space-1) var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  font: var(--se-type-badge) !important;
+}
+
+html.se-community-profile .game_info_achievement_summary .num_rare {
+  background: color-mix(in srgb, var(--se-tier-rare) 16%, transparent);
+  color: var(--se-tier-rare) !important;
+}
+
+html.se-community-profile .se-ach-perfect {
+  background: var(--se-gold-surface);
+  color: var(--se-gold);
+}
+
+/* Steam's bar, where the ring couldn't be built */
+html.se-community-profile .achievement_progress_bar_ctn {
+  height: 6px !important;
+  margin: var(--se-space-2) 0 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill) !important;
+  overflow: hidden;
+}
+
+html.se-community-profile .achievement_progress_bar_ctn :is(.progress_bar, .segment) {
+  background: var(--se-accent) !important;
+}
+
+html.se-community-profile .game_info_stats .achievement_icons {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--se-space-2);
+  float: none !important;
+  margin: 0 !important;
+}
+
+/* Steam sizes each slot smaller than the theme's icon, so they overlapped */
+html.se-community-profile .game_info_achievement {
+  flex: none;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-profile .game_info_achievement > a {
+  display: block;
+}
+
+html.se-community-profile .game_info_achievement img {
+  display: block;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--se-radius-sm);
+  box-shadow: 0 0 0 1px var(--se-hairline);
+}
+
+html.se-community-profile .game_info_achievement.plus_more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 42px !important;
+  padding: 0 var(--se-space-2) !important;
+  box-sizing: border-box;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-pill);
+  color: var(--se-text-muted);
+  font: var(--se-type-badge);
+}
+
+html.se-community-profile .game_info_stats_publishedfilecounts {
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+/* "View All Recently Played | Wishlist | Reviews": pills */
+html.se-community-profile .recentgame_quicklinks:not(.recentgame_recentplaytime) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  float: none !important;
+  margin: var(--se-space-4) 0 0 !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-label) !important;
+}
+
+html.se-community-profile .recentgame_quicklinks:not(.recentgame_recentplaytime) .link_separator {
+  display: none;
+}
+
+html.se-community-profile .recentgame_quicklinks:not(.recentgame_recentplaytime) a {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 var(--se-space-3);
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill);
+  color: var(--se-text) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-profile .recentgame_quicklinks:not(.recentgame_recentplaytime) a:hover {
+  background: var(--se-hover);
+  color: var(--se-white) !important;
+}

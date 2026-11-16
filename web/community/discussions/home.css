@@ -1,0 +1,457 @@
+/*
+ * Discussions home (/discussions/): the landing page as the theme's own. Loads after
+ * discussions/page.css, which still styles the shared parts (search field, side boxes).
+ *
+ *   - Width: every band at the store's page width.
+ *   - Hero: centered title, the theme's search pill with a "/" key hint, a "Popular" row of
+ *     forum chips and a stats row; under them a row of four cards: Steam's three intro
+ *     paragraphs (bold lead as the title, an icon each) and Links & Resources in the same style.
+ *   - Tabs: Steam Forums / Game Forums / Tools & Servers as a segmented control with a sliding
+ *     pill (home.js).
+ *   - Recent games: art cards (store header art from home.js under a fade), the game's tall
+ *     library cover in place of its small icon, name and thread count; unread as a "New" pill.
+ *     "More game forums" sits beside the title.
+ *   - Game Forums tab: the controls as pills, Games You've Recently Played as a row of art
+ *     cards, the hubs as a grid of cards.
+ *   - Forum list: a grid of forum cards (a neutral duotone-icon tile from home.js, the
+ *     name, a thread count chip and the last post); unread forums read bright and bold,
+ *     read ones muted. Steam Feature Discussions below it as a second card grid with theme line
+ *     icons.
+ *
+ * Classes and ids are Steam's (SteamTracking: steamcommunity.com/public/css/skin_1/
+ * discussions.css, forums.css, groupv2.css) and the page report. Avatars, buttons and
+ * duotone icons are shared/ui.css.
+ *
+ * Continued, by section, in home-tabs.css, home-forums.css, home-games.css (same folder),
+ * listed after this file in web/community/loader.js: together they keep one file's order.
+ */
+
+/* ---------- Width ---------- */
+
+html.se-community-discussions-home .pagecontent.discussions_page {
+  width: auto !important;
+  padding-bottom: 4.5rem !important;
+}
+
+html.se-community-discussions-home .pagecontent.discussions_page :is(.grouppage_content_area, #discussions_tab_contents) {
+  box-sizing: border-box;
+  width: var(--se-community-width) !important;
+  max-width: none !important;
+  margin-inline: auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-discussions-home #discussions_tab_contents > .grouppage_content_area {
+  width: auto !important;
+}
+
+html.se-community-discussions-home .pagecontent.discussions_page .maincontent {
+  box-sizing: border-box;
+  float: none !important;
+  width: auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* ---------- Hero ----------
+ * Centered: the title, search, popular chips and stats down the middle, then one row of four
+ * cards: Steam's three intro paragraphs (each paragraph's bold lead as its title, with an icon)
+ * and Links & Resources. Steam's wrappers (.leftcol, .group_content, the intro) are
+ * display: contents, so their children sit straight on the hero's grid. Scoped to the page's
+ * first band (.discussions_page > .grouppage_content_area): the Game Forums tab has its own
+ * .leftcol / .rightcol pair.
+ */
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent:has(> .leftcol ~ .rightcol) {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: start;
+  gap: 0 var(--se-space-4);
+  margin: var(--se-space-6) 0 var(--se-space-6) !important;
+  padding: 3.25rem var(--se-space-7) var(--se-space-7) !important;
+  border-radius: var(--se-radius-xl);
+  background:
+    radial-gradient(60% 90% at 50% 0%, color-mix(in srgb, var(--se-accent) 14%, transparent), transparent 70%),
+    var(--se-surface) !important;
+  box-shadow: var(--se-elevation-3);
+  overflow: hidden;
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent:has(> .leftcol ~ .rightcol) > .leftcol,
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .group_content,
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .steam_discussions_intro {
+  display: contents !important;
+}
+
+/* Down the middle: title, search, popular chips and stats */
+html.se-community-discussions-home .group_content > h2.large_title {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  justify-self: center;
+  margin: 0 0 var(--se-space-5) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-4xl)/1.15 var(--se-font) !important;
+  letter-spacing: -.02em;
+  text-align: center;
+  text-transform: none !important;
+}
+
+html.se-community-discussions-home .group_content > :is(.se-dsc-search, .global_discussion_search_ctn) {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-self: center;
+  width: min(760px, 100%);
+  max-width: none;
+}
+
+html.se-community-discussions-home .group_content > .se-dsc-hero-extras {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  justify-items: center;
+}
+
+/* The row of cards: Steam's three paragraphs, then Links & Resources */
+html.se-community-discussions-home .steam_discussions_intro > p,
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent > .rightcol {
+  grid-row: 4;
+  align-self: stretch;
+  margin: var(--se-space-7) 0 0 !important;
+}
+
+html.se-community-discussions-home .steam_discussions_intro > p {
+  position: relative;
+  box-sizing: border-box;
+  max-width: none;
+  padding: 4.5rem var(--se-space-5) var(--se-space-5) !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-white-03);
+  box-shadow: var(--se-edge);
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+html.se-community-discussions-home .steam_discussions_intro > p::before,
+html.se-community-discussions-home .steam_discussions_intro > p::after {
+  content: "";
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  width: 36px;
+  height: 36px;
+}
+
+html.se-community-discussions-home .steam_discussions_intro > p::before {
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill);
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-discussions-home .steam_discussions_intro > p::after {
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-dsc-icon) center / 20px no-repeat;
+  mask: var(--se-dsc-icon) center / 20px no-repeat;
+}
+
+html.se-community-discussions-home .steam_discussions_intro > p:nth-of-type(1) { --se-dsc-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='8' r='3.5' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M2.5 20c.6-3.6 3.2-5.8 6.5-5.8s5.9 2.2 6.5 5.8'/%3E%3Cpath d='M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.6c1.7.8 2.7 2.7 3 5.4'/%3E%3C/svg%3E"); }
+html.se-community-discussions-home .steam_discussions_intro > p:nth-of-type(2) { --se-dsc-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M15.5 15.5 20 20'/%3E%3C/svg%3E"); }
+html.se-community-discussions-home .steam_discussions_intro > p:nth-of-type(3) { --se-dsc-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23000' fill-opacity='.32' d='M12 3 4.5 6v5.5c0 4.6 3.2 8.2 7.5 9.5 4.3-1.3 7.5-4.9 7.5-9.5V6z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E"); }
+
+html.se-community-discussions-home .steam_discussions_intro > p b {
+  display: block;
+  margin-bottom: var(--se-space-2);
+  color: var(--se-white) !important;
+  font: var(--se-type-title);
+}
+
+html.se-community-discussions-home .steam_discussions_intro a {
+  color: var(--se-accent) !important;
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent > .rightcol {
+  position: static !important;
+  grid-column: 4;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Search: the theme's own field (home.js) in place of Steam's, which is hidden only while
+   the theme's is in place */
+html.se-community-discussions-home .global_discussion_search_ctn[data-se-dsc-search] {
+  display: none !important;
+}
+
+html.se-community-discussions-home .se-dsc-search {
+  position: relative;
+  height: var(--se-ctl-lg);
+  margin: 0;
+}
+
+html.se-community-discussions-home .se-dsc-search-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--se-ctl-lg);
+  margin: 0;
+  padding: 0 6rem 0 var(--se-space-5);
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: var(--se-field-bg);
+  box-shadow: var(--se-edge), 0 8px 20px -12px var(--se-black-70);
+  color: var(--se-text);
+  font: var(--se-type-title);
+  outline: 0;
+  transition: box-shadow var(--se-dur);
+}
+
+html.se-community-discussions-home .se-dsc-search-input::placeholder {
+  color: var(--se-text-faint);
+}
+
+html.se-community-discussions-home .se-dsc-search-input:focus {
+  box-shadow: inset 0 0 0 1px var(--se-accent), 0 0 0 4px var(--se-accent-tint);
+}
+
+html.se-community-discussions-home .se-dsc-search-go {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 36px;
+  height: var(--se-ctl);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--se-pill);
+  box-shadow: var(--se-edge);
+  color: var(--se-text-muted);
+  cursor: pointer;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-community-discussions-home .se-dsc-search-go::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M15.5 15.5 20 20'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M15.5 15.5 20 20'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+html.se-community-discussions-home .se-dsc-search-go:hover {
+  background: var(--se-hover);
+  color: var(--se-white);
+}
+
+html.se-community-discussions-home .se-dsc-key {
+  position: absolute;
+  top: 12px;
+  right: 52px;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0 var(--se-space-2);
+  border-radius: var(--se-radius-xs);
+  background: var(--se-pill);
+  box-shadow: inset 0 -1px 0 var(--se-black-40), inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-muted);
+  font: var(--se-type-label);
+  pointer-events: none;
+  transition: opacity var(--se-dur);
+}
+
+html.se-community-discussions-home .se-dsc-search-input:is(:focus, :not(:placeholder-shown)) ~ .se-dsc-key {
+  opacity: 0;
+}
+
+/* Links & Resources: the same card as the paragraphs (icon tile with a book, white title,
+   body links) */
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox {
+  position: relative;
+  flex: 1;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: 4.5rem var(--se-space-5) var(--se-space-5) !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-white-03) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox::before,
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox::after {
+  content: "";
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  width: 36px;
+  height: 36px;
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox::before {
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill);
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox::after {
+  background: var(--se-text-muted);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23000' fill-opacity='.32' d='M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z'/%3E%3Cpath d='M5 19.5A1.5 1.5 0 0 0 6.5 21H19M9 7.5h6'/%3E%3C/svg%3E") center / 20px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23000' fill-opacity='.32' d='M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z'/%3E%3Cpath d='M5 19.5A1.5 1.5 0 0 0 6.5 21H19M9 7.5h6'/%3E%3C/svg%3E") center / 20px no-repeat;
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox .rightbox_content_header {
+  margin: 0 0 var(--se-space-2) !important;
+  color: var(--se-white) !important;
+  font: var(--se-type-title) !important;
+  letter-spacing: 0;
+  text-transform: none !important;
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox .rule {
+  display: none;
+}
+
+html.se-community-discussions-home .discussions_links {
+  display: grid;
+  gap: var(--se-space-half);
+  width: auto !important;
+  height: auto !important;
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .discussions_links .weblink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2) !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-1) 0;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body-lg) !important;
+  transition: color var(--se-dur);
+}
+
+html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .discussions_links .weblink:hover {
+  color: var(--se-accent) !important;
+}
+
+html.se-community-discussions-home .discussions_links .weblink a {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+/* The whole row is the link */
+html.se-community-discussions-home .discussions_links .weblink a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+/* An arrow that slides in on hover */
+html.se-community-discussions-home .discussions_links .weblink::after {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h13M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h13M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity var(--se-dur);
+}
+
+html.se-community-discussions-home .discussions_links .weblink:hover::after {
+  opacity: 1;
+  transform: none;
+}
+
+/* Steam's sprite icons */
+html.se-community-discussions-home .discussions_links :is(.discussions_link_icon, img) {
+  display: none !important;
+}
+
+/* Popular forums and stats under the search */
+html.se-community-discussions-home .se-dsc-hero-extras {
+  display: grid;
+  gap: var(--se-space-5);
+  margin-top: var(--se-space-5);
+}
+
+html.se-community-discussions-home .se-dsc-popular {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-space-2);
+}
+
+html.se-community-discussions-home .se-dsc-popular-label {
+  margin-right: var(--se-space-1);
+  color: var(--se-text-faint);
+  font: var(--se-label-font);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+html.se-community-discussions-home a.se-dsc-chip {
+  display: inline-flex;
+  align-items: center;
+  height: var(--se-ctl-sm);
+  padding: 0 var(--se-space-4);
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill);
+  box-shadow: var(--se-edge);
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-label);
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background-color var(--se-dur), color var(--se-dur), box-shadow var(--se-dur);
+}
+
+html.se-community-discussions-home a.se-dsc-chip:hover {
+  background: var(--se-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  color: var(--se-accent) !important;
+}
+
+html.se-community-discussions-home .se-dsc-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0;
+}
+
+html.se-community-discussions-home .se-dsc-stat {
+  display: grid;
+  justify-items: center;
+  gap: var(--se-space-1);
+  padding: 0 var(--se-space-6);
+}
+
+html.se-community-discussions-home .se-dsc-stat + .se-dsc-stat {
+  border-left: 1px solid var(--se-divider);
+}
+
+html.se-community-discussions-home .se-dsc-stat-n {
+  color: var(--se-white);
+  font: 800 var(--se-fs-2xl)/1.1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.01em;
+}
+
+html.se-community-discussions-home .se-dsc-stat-label {
+  color: var(--se-text-faint);
+  font: var(--se-label-font);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}

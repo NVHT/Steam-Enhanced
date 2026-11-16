@@ -1,0 +1,806 @@
+/*
+ * Discussions (/discussions/, /app/<id>/discussions/, /groups/<name>/discussions/ and their
+ * topics): forums in the theme's look. Layout widths stay Steam's; on hub forums the hub
+ * header above is hub/page.css.
+ *
+ *   - Topic lists: one card of rows, the title over its author, a reply-count chip and the last
+ *     post time on the right; pinned and locked topics get chips. Unread topics read bright and
+ *     bold, read ones muted (no dot: nearly every topic is unread, so a dot says nothing).
+ *   - Topics: the opening post as a card (title as a heading, author row, body), replies as
+ *     the shared comment rows with an "OP" chip on the starter's replies (discussions/page.js).
+ *   - Side column: search as a pill field, boxes as cards, Start a New Discussion as the
+ *     accent pill. Paging as round buttons and page chips.
+ *
+ * Classes are Steam's (SteamTracking: steamcommunity.com/public/css/skin_1/forums.css).
+ * Comments, buttons and paging buttons are shared/ui.css.
+ */
+
+/* ---------- Breadcrumbs ---------- */
+
+html.se-community-discussions :is(.forum_breadcrumbs, .breadcrumbs) {
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+}
+
+html.se-community-discussions :is(.forum_breadcrumbs, .breadcrumbs) a {
+  color: var(--se-text-muted) !important;
+  text-decoration: none !important;
+}
+
+html.se-community-discussions :is(.forum_breadcrumbs, .breadcrumbs) a:hover {
+  color: var(--se-accent) !important;
+}
+
+/* ---------- Layout: wider, list beside a sticky side column ---------- */
+
+html.se-community-discussions {
+  --se-forum-side: 320px;
+}
+
+@media (min-width: 911px) {
+  html.se-community-discussions .maincontent:has(> .leftcol ~ .rightcol) {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) var(--se-forum-side);
+    align-items: start;
+    gap: var(--se-space-5);
+    width: auto !important;
+    margin: var(--se-space-5) 0 4.5rem !important;
+    padding: 0 !important;
+    background: none !important;
+  }
+
+  html.se-community-discussions .maincontent > :is(.leftcol, .rightcol) {
+    float: none !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  html.se-community-discussions .maincontent > .leftcol {
+    grid-column: 1;
+  }
+
+  html.se-community-discussions .maincontent > .rightcol {
+    grid-column: 2;
+    position: sticky;
+    top: 20px;
+  }
+
+  html.se-community-discussions .maincontent > div:not([class]):empty {
+    display: none;
+  }
+}
+
+/* ---------- Topic list ----------
+ * A row: [icon] title (with its label chip) over the author, then Steam's details group
+ * (replies, awards, last post) on the right. Moved topics have no author or details.
+ */
+
+html.se-community-discussions .forum_topics_container {
+  width: auto !important;
+  padding: var(--se-space-2) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-discussions .forum_topics {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-discussions .forum_topic {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "icon name details"
+    "icon op   details";
+  align-items: center;
+  column-gap: var(--se-space-4);
+  row-gap: var(--se-space-half);
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: none !important;
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-discussions .forum_topic + .forum_topic::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  height: 1px;
+  background: var(--se-divider);
+}
+
+html.se-community-discussions .forum_topic:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-community-discussions .forum_topic:hover::before,
+html.se-community-discussions .forum_topic:hover + .forum_topic::before {
+  opacity: 0;
+}
+
+html.se-community-discussions .forum_topic > * {
+  float: none !important;
+  margin: 0 !important;
+  position: static !important;
+  width: auto !important;
+}
+
+html.se-community-discussions .forum_topic > div:not([class]):empty {
+  display: none;
+}
+
+html.se-community-discussions .forum_topic > .forum_topic_overlay {
+  position: absolute !important;
+  inset: 0;
+  z-index: var(--se-z-raised);
+  border-radius: inherit;
+}
+
+/* Icon: the starter's avatar, or Steam's pinned / locked / moved icon */
+html.se-community-discussions .forum_topic_icon {
+  grid-area: icon;
+  position: relative !important;
+  z-index: var(--se-z-raised-2);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-pill);
+  overflow: hidden;
+}
+
+html.se-community-discussions .forum_topic_icon img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+html.se-community-discussions .forum_topic_icon > a,
+html.se-community-discussions .forum_topic_icon > a img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+html.se-community-discussions .forum_topic_name {
+  grid-area: name;
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-width: 0;
+  overflow: hidden;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body-lg) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-discussions .forum_topic_name.op_hidden {
+  grid-row: 1 / -1;
+}
+
+/* Unread: bright and bold; read topics stay muted. Hover brightens either. */
+html.se-community-discussions .forum_topic.unread .forum_topic_name,
+html.se-community-discussions .forum_topic:hover .forum_topic_name {
+  color: var(--se-white) !important;
+}
+
+html.se-community-discussions .forum_topic.unread .forum_topic_name {
+  font-weight: 700 !important;
+}
+
+html.se-community-discussions .forum_topic_op {
+  grid-area: op;
+  overflow: hidden;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Details: reply and award chips, then the last post time */
+html.se-community-discussions .forum_topic_details {
+  grid-area: details;
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: auto !important;
+}
+
+html.se-community-discussions .forum_topic_details > * {
+  float: none !important;
+  margin: 0 !important;
+  position: static !important;
+}
+
+html.se-community-discussions :is(.forum_topic_reply_count, .forum_topic_award_count) {
+  display: inline-flex !important;
+  align-items: center;
+  gap: var(--se-space-2);
+  width: auto !important;
+  height: auto !important;
+  padding: var(--se-space-1) var(--se-space-3) !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill) !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-caption) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Steam's images (a grey bubble, a blue award ribbon): the theme's duotone icons in the chip's
+   own colour */
+html.se-community-discussions :is(.forum_topic_reply_count, .forum_topic_award_count) img {
+  display: none !important;
+}
+
+html.se-community-discussions :is(.forum_topic_reply_count, .forum_topic_award_count)::before {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: var(--se-dsc-chip-icon) center / contain no-repeat;
+  mask: var(--se-dsc-chip-icon) center / contain no-repeat;
+}
+
+html.se-community-discussions .forum_topic_reply_count { --se-dsc-chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23000' fill-opacity='.32' d='M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-9l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z'/%3E%3C/svg%3E"); }
+html.se-community-discussions .forum_topic_award_count { --se-dsc-chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='9' r='6' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M8.5 13.9 7 22l5-3 5 3-1.5-8.1'/%3E%3C/svg%3E"); }
+
+html.se-community-discussions .forum_topic_lastpost {
+  min-width: 132px;
+  width: auto !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Pinned / moved / locked labels as chips (page.js drops Steam's trailing colon) */
+html.se-community-discussions .forum_topic_label {
+  order: -1;
+  flex: none;
+  margin: 0 !important;
+  padding: var(--se-space-half) var(--se-space-2) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill) !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-caption) !important;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+html.se-community-discussions .forum_topic_label.sticky_label {
+  background: color-mix(in srgb, var(--se-gold) 16%, transparent) !important;
+  color: var(--se-gold) !important;
+}
+
+html.se-community-discussions .forum_topic.sticky {
+  background: color-mix(in srgb, var(--se-gold) 4%, transparent) !important;
+}
+
+html.se-community-discussions .forum_topic.moved .forum_topic_name {
+  color: var(--se-text-muted) !important;
+  font-weight: 500 !important;
+}
+
+/* ---------- Paging ---------- */
+
+html.se-community-discussions .forum_paging {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-3);
+  margin: var(--se-space-3) 0 !important;
+  padding: 0 var(--se-space-1) !important;
+  background: none !important;
+}
+
+html.se-community-discussions :is(.forum_paging_summary, .forum_paging_header) {
+  float: none !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+}
+
+html.se-community-discussions .forum_paging_controls {
+  order: 2;
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-1);
+  float: none !important;
+  width: auto !important;
+}
+
+html.se-community-discussions .forum_paging_controls .commentthread_pagelinks {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-half);
+  width: auto !important;
+  color: var(--se-text-faint);
+}
+
+html.se-community-discussions .forum_paging > div:not([class]):empty {
+  display: none;
+}
+
+html.se-community-discussions .forum_pagesize_options {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--se-space-1);
+  margin: var(--se-space-1) var(--se-space-1) 0 !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+}
+
+html.se-community-discussions .forum_pagesize_options .commentthread_pagination_link {
+  padding: var(--se-space-1) var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  color: var(--se-text-muted) !important;
+  text-decoration: none !important;
+}
+
+html.se-community-discussions .forum_pagesize_options span.commentthread_pagination_link {
+  background: var(--se-accent-surface);
+  color: var(--se-white) !important;
+}
+
+html.se-community-discussions .forum_pagesize_options a.commentthread_pagination_link:hover {
+  background: var(--se-pill);
+  color: var(--se-text) !important;
+}
+
+/* ---------- Opening post ---------- */
+
+html.se-community-discussions .forum_op {
+  margin: 0 0 var(--se-space-5) !important;
+  padding: var(--se-space-5) var(--se-space-5) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text-dim) !important;
+}
+
+html.se-community-discussions .forum_op .topic {
+  margin: 0 0 var(--se-space-4) !important;
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-3xl)/1.25 var(--se-font) !important;
+  letter-spacing: -.015em;
+  overflow-wrap: anywhere;
+}
+
+html.se-community-discussions :is(.forum_op_header, .forum_op .authorline) {
+  display: flex !important;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--se-space-2) var(--se-space-3);
+  margin: 0 0 var(--se-space-4) !important;
+}
+
+html.se-community-discussions .forum_op .commentthread_user_avatar {
+  flex: none;
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-discussions .forum_op .commentthread_user_avatar img {
+  width: 36px;
+  height: 36px;
+}
+
+html.se-community-discussions .forum_op_author {
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+  text-decoration: none !important;
+}
+
+html.se-community-discussions .forum_op .date {
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+}
+
+html.se-community-discussions .forum_op .content {
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+  overflow-wrap: anywhere;
+}
+
+html.se-community-discussions .forum_op .content a,
+html.se-community-discussions .forumtopic_comments .commentthread_comment_text a {
+  color: var(--se-accent) !important;
+}
+
+html.se-community-discussions .forum_op .content img {
+  max-width: 100%;
+  border-radius: var(--se-radius-sm);
+}
+
+html.se-community-discussions .forum_op_footer {
+  margin-top: var(--se-space-4) !important;
+  padding-top: var(--se-space-3) !important;
+  border-top: 1px solid var(--se-divider);
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+/* bbcode quotes and code */
+html.se-community-discussions :is(.forum_op, .forumtopic_comments) blockquote,
+html.se-community-discussions :is(.forum_op, .forumtopic_comments) .bb_blockquote {
+  margin: var(--se-space-3) 0 !important;
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border: 0 !important;
+  border-left: 3px solid var(--se-accent-surface) !important;
+  border-radius: 0 var(--se-radius-sm) var(--se-radius-sm) 0;
+  background: var(--se-white-03) !important;
+  color: var(--se-text-muted) !important;
+}
+
+html.se-community-discussions :is(.forum_op, .forumtopic_comments) .bb_code {
+  padding: var(--se-space-3) var(--se-space-3) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-field) !important;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+/* Replies */
+html.se-community-discussions .forumtopic_comments,
+html.se-community-discussions .commentthread_area:has(.forumtopic_comments) {
+  background: none !important;
+}
+
+html.se-community-discussions .commentthread_answer_bar,
+html.se-community-discussions .forumtopic_answer {
+  border-radius: var(--se-radius-md);
+  background: color-mix(in srgb, var(--se-cart) 8%, transparent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-cart) 30%, transparent);
+}
+
+html.se-community-discussions .forumtopic_reply_entry {
+  margin-top: var(--se-space-4) !important;
+  padding: var(--se-space-4) !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+/* Locked / pinned notices */
+html.se-community-discussions :is(.forum_topic_locked_notice, .forum_topic_pinned_notice, .forum_topic_deleted_notice, .topic_cannotreply_reason) {
+  margin: 0 0 var(--se-space-4) !important;
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-small) !important;
+}
+
+/* ---------- Side column ---------- */
+
+html.se-community-discussions .rightcol .rightbox,
+html.se-community-discussions .rightbox {
+  margin: 0 0 var(--se-space-4) !important;
+  padding: var(--se-space-4) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-body) !important;
+}
+
+html.se-community-discussions :is(.rightbox_list_header, .rightbox_content_header) {
+  margin: 0 0 var(--se-space-2) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+html.se-community-discussions .rightbox .rule {
+  height: 1px;
+  margin: var(--se-space-3) 0 !important;
+  border: 0 !important;
+  background: var(--se-divider) !important;
+}
+
+html.se-community-discussions .rightbox a {
+  color: var(--se-text-dim) !important;
+}
+
+html.se-community-discussions .rightbox a:hover {
+  color: var(--se-accent) !important;
+}
+
+/* Search */
+html.se-community-discussions :is(.discussionSearchTextContainer, .DiscussionSearchForm) {
+  position: relative;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-discussions .discussionSearchText {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: var(--se-ctl) !important;
+  padding: 0 var(--se-space-7) 0 var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-field) !important;
+  box-shadow: var(--se-edge) !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-control-lg) !important;
+  outline: 0 !important;
+}
+
+html.se-community-discussions .discussionSearchText:focus {
+  box-shadow: var(--se-field-edge-focus) !important;
+}
+
+html.se-community-discussions .discussionSearchTextSubmitImg {
+  position: absolute !important;
+  right: 12px;
+  top: 50%;
+  margin-top: calc(-1 * var(--se-space-2)) !important;
+  opacity: .6;
+}
+
+/* Start a New Discussion */
+html.se-community-discussions:not(#se-none) :is(.forum_newtopic_area, .forum_responsive_newtopic_action) :is([class*="btn_"], [class*="btnv6_"]) {
+  background: var(--se-btn-primary-bg) !important;
+  box-shadow: none !important;
+  color: var(--se-btn-primary-color) !important;
+}
+
+html.se-community-discussions:not(#se-none) :is(.forum_newtopic_area, .forum_responsive_newtopic_action) :is([class*="btn_"], [class*="btnv6_"]):hover {
+  background: var(--se-btn-primary-bg-hover) !important;
+}
+
+/* New topic form */
+html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) {
+  border: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) :is(input[type="text"], textarea) {
+  box-sizing: border-box;
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-field-bg) !important;
+  box-shadow: var(--se-field-edge) !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+  outline: 0 !important;
+}
+
+/* Search results */
+html.se-community-discussions .post_searchresult {
+  margin: 0 0 var(--se-space-3) !important;
+  padding: var(--se-space-4) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-discussions .searchmatch_highlight {
+  border-radius: 3px;
+  background: var(--se-accent-surface) !important;
+  color: var(--se-white) !important;
+}
+
+/* ---------- Side column (hub forums) ---------- */
+
+/* Search: field and Steam's image button share one grid cell */
+html.se-community-discussions .discussionSearchTextContainer {
+  display: grid !important;
+  align-items: center;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 0 var(--se-space-4) !important;
+  padding: 0 !important;
+}
+
+html.se-community-discussions .discussionSearchTextContainer > * {
+  grid-area: 1 / 1;
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-discussions .discussionSearchTextContainer > .discussionSearchTextSubmitImg {
+  position: static !important;
+  justify-self: end;
+  margin: 0 var(--se-space-4) 0 0 !important;
+  cursor: pointer;
+}
+
+html.se-community-discussions .rightbox > .content {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-discussions .rightbox > .content + .rule + .content,
+html.se-community-discussions .rightbox > .rule {
+  margin-top: var(--se-space-3) !important;
+}
+
+/* Start a New Discussion: the accent, full width */
+html.se-community-discussions:not(#se-none) .rightcol .rightbox a.btn_darkblue_white_innerfade {
+  width: 100%;
+  background: var(--se-btn-primary-bg) !important;
+  box-shadow: none !important;
+  color: var(--se-btn-primary-color) !important;
+}
+
+html.se-community-discussions:not(#se-none) .rightcol .rightbox a.btn_darkblue_white_innerfade:hover {
+  background: var(--se-btn-primary-bg-hover) !important;
+}
+
+html.se-community-discussions .forum_subscribe_button {
+  width: auto !important;
+  margin: 0 0 var(--se-space-2) !important;
+}
+
+html.se-community-discussions .forum_subscribe_button > * {
+  width: 100%;
+}
+
+html.se-community-discussions .rightcol_minor_text {
+  width: auto !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+}
+
+/* Sub-forums: a nav list, the current one highlighted, thread counts on the right */
+html.se-community-discussions .forum_list .rightbox_list_header {
+  display: flex !important;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+  margin: 0 0 var(--se-space-2) !important;
+  padding: 0 var(--se-space-3) !important;
+}
+
+html.se-community-discussions .forum_list .rightbox_list_header > * {
+  float: none !important;
+  width: auto !important;
+}
+
+html.se-community-discussions .forum_list .rightbox_list_option {
+  position: relative;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-md);
+  cursor: pointer;
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-discussions .forum_list .rightbox_list_option:hover {
+  background: var(--se-hover);
+}
+
+html.se-community-discussions .forum_list .rightbox_list_option.selected {
+  background: var(--se-accent-surface);
+}
+
+html.se-community-discussions .forum_list .rightbox_list_selection_background {
+  display: none !important;
+}
+
+html.se-community-discussions .forum_list .rightbox_list_option_content {
+  display: flex !important;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: var(--se-space-3);
+  width: auto !important;
+  height: auto !important;
+  padding: var(--se-space-2) var(--se-space-3) !important;
+}
+
+html.se-community-discussions .forum_list .rightbox_list_option_content > * {
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+html.se-community-discussions .forum_list .rightbox_list_option_content .forum_list_name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-discussions .forum_list .forum_list_name a {
+  color: var(--se-text) !important;
+  font: var(--se-type-body) !important;
+  text-decoration: none !important;
+}
+
+html.se-community-discussions .forum_list .rightbox_list_option_content .forum_list_postcount {
+  flex: none;
+  padding: var(--se-space-half) var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill);
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-caption) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-discussions .forum_list .rightbox_list_option.selected .forum_list_name a {
+  color: var(--se-white) !important;
+}
+
+/* Links (rules, post history) */
+html.se-community-discussions .rightbox .weblink {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  width: auto !important;
+  font: var(--se-type-body) !important;
+}
+
+html.se-community-discussions .rightbox .weblink img {
+  opacity: .7;
+}
+
+/* ---------- Topic preview tooltip ----------
+ * Steam's hover preview on a topic row (data-tooltip-forum; its body is .topic_hover_text, the
+ * "Posted by / Last post" lines follow): the theme's tooltip. Matched by its content, so the
+ * wrapper's class doesn't matter; the ids are Steam's (aria-describedby="tooltip-N").
+ */
+html.se-community-discussions :is(.forum_topic_tooltip, .community_tooltip, [id^="tooltip-"]):has(.topic_hover_text) {
+  max-width: 380px;
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-shadow-tooltip) !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+  text-shadow: none !important;
+}
+
+html.se-community-discussions :is(.forum_topic_tooltip, .community_tooltip, [id^="tooltip-"]):has(.topic_hover_text) :not(a, .topic_hover_text, .topic_hover_text *) {
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-community-discussions .topic_hover_text {
+  margin: 0 0 var(--se-space-3) !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+html.se-community-discussions :is(.forum_topic_tooltip, .community_tooltip, [id^="tooltip-"]):has(.topic_hover_text) :is(a, b, strong, .whiteLink) {
+  color: var(--se-text-dim) !important;
+  font-weight: 600;
+  text-decoration: none !important;
+}

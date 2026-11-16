@@ -1,0 +1,177 @@
+/*
+ * Continues page.css (in order, see web/community/loader.js): Page chrome; More content; Narrow
+ * windows.
+ */
+
+/* ---------- Page chrome ---------- */
+
+/* Steam's "Back to top" (sliced images): the theme's scroll-to-top button (web/shared/scroll-top) is
+   the one on every page */
+/* !important: display, opacity can come inline from Steam's markup or scripts */
+html.se-community-hub #BackToTop {
+  display: none !important;
+}
+
+/* Steam pins the hub's compact footer to the window's corner (position: sticky), where it sat
+   over the feed: it closes the page in flow instead, like every other page's footer */
+/* !important: Steam's own rules set position, width at equal or higher weight */
+html.se-community-hub #footer.compact {
+  position: static !important;
+  width: auto !important;
+}
+
+/* "Returning to where you were last on this page…" (in Steam's oldest dialog, web/shared/modals.css):
+   one row, the spinner beside the line (its 35px line cut the theme's spinner off) and Cancel at
+   the end */
+/* !important: height, width can come inline from Steam's markup or scripts */
+html.se-community-hub:not(#se-none) #appHubLoadingPageModal {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-5);
+  width: auto !important;
+  height: auto !important;
+  line-height: 1.4;
+}
+
+html.se-community-hub:not(#se-none) #appHubLoadingPageModal > div:first-child {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-4);
+  color: var(--se-text);
+  font: var(--se-type-body-lg);
+}
+
+/* !important: height, width can come inline from Steam's markup or scripts */
+html.se-community-hub:not(#se-none) #appHubLoadingPageModal > div:first-child > img {
+  flex: none;
+  width: var(--se-tile-lg) !important;
+  height: var(--se-tile-lg) !important;
+  margin: 0;
+}
+
+html.se-community-hub:not(#se-none) #appHubLoadingPageModal > div:last-child {
+  flex: none;
+}
+
+/* !important: Steam's own rules set color, text-decoration at equal or higher weight */
+html.se-community-hub:not(#se-none) #appHubLoadingPageModal > div:last-child > a {
+  display: inline-flex;
+  align-items: center;
+  height: var(--se-hit);
+  padding: 0 var(--se-space-4);
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2);
+  color: var(--se-text) !important;
+  font: var(--se-type-control);
+  text-decoration: none !important;
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-hub:not(#se-none) #appHubLoadingPageModal > div:last-child > a:hover {
+  background: var(--se-hover);
+}
+
+html.se-community-hub:not(#se-none) #appHubLoadingPageModal > div:last-child > a:active {
+  transform: scale(var(--se-press-scale));
+}
+
+/* ---------- More content ---------- */
+
+/* !important: height, margin, padding can come inline from Steam's markup or scripts */
+html.se-community-hub :is(.apphub_GetMoreContent, .apphub_GetMoreContentWait) {
+  height: auto !important;
+  margin: var(--se-space-2) auto var(--se-space-6) !important;
+  padding: 0 !important;
+  border: 0;
+  color: var(--se-text-faint);
+  font: var(--se-type-body);
+}
+
+/* !important: Steam's own rules (BfjkgwPa.css, C6L1nUf2.css, Ceuw-a-k.css) set color,
+   text-decoration at equal or higher weight; the theme's shared rules
+   (web/community/shared/small-header.css, web/community/shared/ui.css) set color, text-decoration with
+   !important */
+html.se-community-hub .apphub_GetMoreContent > a {
+  display: inline-flex;
+  align-items: center;
+  height: var(--se-tile);
+  padding: 0 var(--se-space-5);
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill);
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line);
+  color: var(--se-text) !important;
+  text-decoration: none !important;
+}
+
+/* !important: Steam's own rules (Ceuw-a-k.css, apphub.css, apphub_broadcast.css) set color at
+   equal or higher weight; the theme's shared rules (web/community/shared/small-header.css,
+   web/community/shared/ui.css) set color with !important */
+html.se-community-hub .apphub_GetMoreContent > a:hover {
+  background: var(--se-hover);
+  color: var(--se-white) !important;
+}
+
+html.se-community-hub .apphub_GetMoreContent > a:active {
+  transform: scale(var(--se-press-scale));
+}
+
+/* !important: Steam's own rules (apphub_gamepad.css, apphub_home.css) set background at equal or
+   higher weight; height, margin-bottom, padding can come inline from Steam's markup or scripts */
+html.se-community-hub .apphub_NoMoreContent {
+  height: auto !important;
+  margin-bottom: var(--se-space-6) !important;
+  padding: var(--se-space-6) 0 !important;
+  background: none !important;
+  color: var(--se-text-faint);
+}
+
+/* !important: padding can come inline from Steam's markup or scripts */
+html.se-community-hub :is(.apphub_NoMoreContentText1, .apphub_NoMoreContentText2) {
+  padding: 0 !important;
+  font: var(--se-type-body-lg);
+}
+
+/* ---------- Narrow windows ---------- */
+
+@media (max-width: 910px) {
+  html.se-community-hub .apphub_HomeHeader {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html.se-community-hub :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social, div:has(> .apphub_AllContentText)) {
+    grid-column: 1;
+  }
+
+  html.se-community-hub .apphub_AllContentText {
+    text-align: start;
+  }
+
+  html.se-community-hub :is(.apphub_AllContentText, :is(.apphub_HomeHeader, .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > div:has(> .apphub_AllContentText)) {
+    justify-content: flex-start;
+  }
+
+  /* !important: Steam's own rules (apphub_gamepad.css) set padding at equal or higher weight */
+  html.se-community-hub .apphub_HomeHeaderContent {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "title"
+      "site"
+      "stats"
+      "friends"
+      "tabs";
+    padding: var(--se-space-5) var(--se-space-5) var(--se-space-5) !important;
+  }
+
+  html.se-community-hub .apphub_HomeHeaderContent:not(:has(.apphub_Stats, .apphub_recentFriendsArea)) {
+    grid-template-areas:
+      "title"
+      "site"
+      "tabs";
+  }
+
+  html.se-community-hub :is(.apphub_OtherSiteInfo, .apphub_recentFriendsArea) {
+    justify-content: flex-start;
+  }
+}

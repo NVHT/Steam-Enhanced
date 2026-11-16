@@ -1,0 +1,611 @@
+/*
+ * Continues page.css (in order, see web/community/loader.js): Favorite Game; Favorite Group;
+ * Completionist; Game Collector.
+ */
+
+/* ---------- Favorite Game ----------
+ * Straight on the showcase card: the game's large capsule (616x353, profile/page.js) on the left,
+ * the title and stat tiles beside it, the achievement bar (profile/page.js) under both.
+ */
+
+/* No inner box: the art, title and stats sit straight on the showcase card */
+html.se-community-profile .favoritegame_showcase {
+  position: relative;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* The art, the title and the stats row sit at two levels in Steam's markup (the stats row
+   beside the game box, not in it): the grid is the box around both, the game box joins it */
+html.se-community-profile .favoritegame_showcase .showcase_content_bg {
+  display: grid !important;
+  grid-template-columns: minmax(240px, 340px) auto minmax(0, 1fr);
+  /* Spacer rows above and below take the art's extra height, so the title and tiles stay their
+     own size, centred beside it */
+  grid-template-rows: 1fr auto auto 1fr;
+  grid-template-areas:
+    "cap . ."
+    "cap title title"
+    "cap stats ach"
+    "cap . .";
+  gap: 0 var(--se-space-2);
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-profile .favoritegame_showcase .favoritegame_showcase_game {
+  display: contents !important;
+}
+
+html.se-community-profile .favoritegame_showcase :is(.showcase_content_bg, .favoritegame_showcase_game) > * {
+  position: static !important;
+  float: none !important;
+  min-width: 0;
+  margin: 0 !important;
+}
+
+/* Clearfix and spacer nodes Steam leaves between them */
+html.se-community-profile .favoritegame_showcase :is(.showcase_content_bg, .favoritegame_showcase_game) > :empty {
+  display: none !important;
+}
+
+html.se-community-profile .favoritegame_showcase .favorite_game_cap {
+  grid-area: cap;
+  align-self: center;
+  margin-right: var(--se-space-4) !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+html.se-community-profile .favoritegame_showcase .favorite_game_cap a {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+  box-shadow: var(--se-shadow-md);
+}
+
+html.se-community-profile .favoritegame_showcase .favorite_game_cap img {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: var(--se-art-ratio, 616 / 353);
+  object-fit: cover;
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-community-profile .favoritegame_showcase .favorite_game_cap a:hover img {
+  transform: scale(1.03);
+}
+
+/* Title: whatever Steam puts beside the art that isn't the stats row */
+html.se-community-profile .favoritegame_showcase .showcase_content_bg > :not(.favoritegame_showcase_game, .favorite_game_cap, .showcase_stats_row, .game_info_stats),
+html.se-community-profile .favoritegame_showcase .favoritegame_showcase_game > :not(.favorite_game_cap, .showcase_stats_row) {
+  grid-area: title;
+  align-self: end;
+  margin-bottom: var(--se-space-3) !important;
+  overflow: hidden;
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-headline)/1.15 var(--se-font) !important;
+  letter-spacing: -.01em;
+  text-align: left !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-profile .favoritegame_showcase .showcase_content_bg a.whiteLink,
+html.se-community-profile .favoritegame_showcase .favoritegame_showcase_game > :not(.favorite_game_cap, .showcase_stats_row) a {
+  color: inherit !important;
+  font: inherit !important;
+  text-decoration: none !important;
+}
+
+html.se-community-profile .favoritegame_showcase .showcase_stats_row {
+  grid-area: stats;
+  align-self: stretch;
+}
+
+/* Achievements (moved in by profile/page.js): one more tile in the stats row */
+html.se-community-profile .favoritegame_showcase .showcase_content_bg > .game_info_stats {
+  grid-area: ach;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: auto !important;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0 !important;
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-white-04) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-profile .favoritegame_showcase .showcase_content_bg > .game_info_stats > * {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Steam's wrappers inside it carry their own height and spacing: the tile sizes to its content */
+html.se-community-profile .favoritegame_showcase .showcase_content_bg > .game_info_stats :is(.game_info_achievements_only_ctn, .game_info_achievements, .game_info_achievements_badge) {
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+/* Stat tiles beside it: content centred when the row is taller than they are */
+html.se-community-profile .favoritegame_showcase .showcase_stat {
+  justify-content: center;
+}
+
+html.se-community-profile .favoritegame_showcase .se-ach-ring {
+  width: 44px;
+  height: 44px;
+}
+
+html.se-community-profile .favoritegame_showcase .game_info_achievement img {
+  width: 34px;
+  height: 34px;
+}
+
+html.se-community-profile .favoritegame_showcase .game_info_achievement.plus_more {
+  min-width: 34px;
+  height: 34px !important;
+}
+
+/* Achievements under the art and title */
+html.se-community-profile .favoritegame_showcase .game_info_stats {
+  margin: var(--se-space-4) 0 0 !important;
+  padding: var(--se-space-4) 0 0 !important;
+  border-top: 1px solid var(--se-divider) !important;
+}
+
+
+/* ---------- Favorite Group ----------
+ * Like Favorite Game: the avatar on the left, the name as a bold title with the group type muted
+ * beside it, the headline under it, then the stat tiles. In-game and online counts keep their
+ * status colours.
+ */
+
+/* Steam lays this box out as a grid (which shrank the group to its avatar) and positions the
+   text absolutely: a plain block here, the group's own grid below does the layout */
+html.se-community-profile .showcase_content_bg:has(.favoritegroup_showcase_group) {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* If the stats row sits beside the group rather than in it, it lines up with the text column */
+html.se-community-profile .showcase_content_bg:has(.favoritegroup_showcase_group) > .favoritegroup_stats {
+  margin: var(--se-space-3) 0 0 11.5rem !important;
+}
+
+html.se-community-profile .favoritegroup_showcase_group {
+  position: relative !important;
+  box-sizing: border-box;
+  display: grid !important;
+  grid-template-columns: 160px minmax(0, 1fr);
+  align-items: center;
+  gap: 0 var(--se-space-5);
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-profile .favoritegroup_showcase_group > *,
+html.se-community-profile .favoritegroup_showcase_group .favoritegroup_content > * {
+  position: static !important;
+  inset: auto !important;
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-profile .favoritegroup_showcase_group .favoritegroup_avatar {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+html.se-community-profile .favoritegroup_showcase_group .favoritegroup_content {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+html.se-community-profile .favoritegroup_showcase_group > :empty {
+  display: none !important;
+}
+
+html.se-community-profile .favoritegroup_showcase_group .favoritegroup_avatar {
+  width: 160px !important;
+  height: 160px !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-pill) !important;
+  box-shadow: var(--se-shadow-md);
+}
+
+html.se-community-profile .favoritegroup_showcase_group .favoritegroup_avatar :is(a, img) {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+}
+
+html.se-community-profile .favoritegroup_showcase_group .favoritegroup_avatar img {
+  object-fit: cover;
+}
+
+html.se-community-profile .favoritegroup_showcase_group .favoritegroup_content {
+  position: static !important;
+  display: flex !important;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  min-width: 0;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+}
+
+html.se-community-profile .favoritegroup_showcase_group .favoritegroup_namerow {
+  display: flex !important;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--se-space-1) var(--se-space-3);
+  margin: 0 !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+html.se-community-profile .favoritegroup_showcase_group .favoritegroup_namerow .favoritegroup_name,
+html.se-community-profile .favoritegroup_showcase_group .favoritegroup_namerow .favoritegroup_name a {
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-headline)/1.15 var(--se-font) !important;
+  letter-spacing: -.01em;
+  text-decoration: none !important;
+}
+
+html.se-community-profile .favoritegroup_showcase_group .favoritegroup_namerow .favoritegroup_name a:hover {
+  color: var(--se-accent) !important;
+}
+
+html.se-community-profile .favoritegroup_showcase_group .favoritegroup_description {
+  margin: 0 !important;
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+html.se-community-profile .favoritegroup_showcase_group .showcase_stats_row.favoritegroup_stats {
+  margin: var(--se-space-3) 0 0 !important;
+}
+
+html.se-community-profile .showcase_stats_row.favoritegroup_stats .showcase_stat.favoritegroup_ingame .value {
+  color: var(--se-status-ingame) !important;
+}
+
+html.se-community-profile .showcase_stats_row.favoritegroup_stats .showcase_stat.favoritegroup_online .value {
+  color: var(--se-status-online) !important;
+}
+
+/* ---------- Completionist ----------
+ * Summary tiles first (moved by profile/page.js), then the games three across, each with its
+ * ribbon and counts over the bottom of the art.
+ */
+
+/* The summary row (moved to the top by profile/page.js) */
+html.se-community-profile .showcase_stats_row[data-se-summary] {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* Every box Steam wraps the games in: no panel behind the grid */
+html.se-community-profile :is(.showcase_content_bg:has(.showcase_achievementscompletionist_slots), .showcase_achievementscompletionist_slots) {
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Three across: Steam's six slots make two even rows */
+html.se-community-profile .showcase_achievementscompletionist_slots {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--se-space-3);
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-profile .showcase_achievementscompletionist_slots::after {
+  content: none !important;
+}
+
+html.se-community-profile .showcase_achievementscompletionist_slots > :empty {
+  display: none !important;
+}
+
+html.se-community-profile .showcase_achievementscompletionist_game {
+  position: relative !important;
+  float: none !important;
+  clear: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+  transition: transform var(--se-dur) var(--se-ease), box-shadow var(--se-dur);
+}
+
+html.se-community-profile .showcase_achievementscompletionist_game:hover {
+  box-shadow: var(--se-shadow-md);
+  transform: translateY(-2px);
+}
+
+html.se-community-profile .showcase_achievementscompletionist_game > a,
+html.se-community-profile .showcase_achievementscompletionist_capsule_frame {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  line-height: 0;
+}
+
+html.se-community-profile .showcase_achievementscompletionist_game img.game_capsule {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 460 / 215;
+  object-fit: cover;
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-community-profile .showcase_achievementscompletionist_game:hover img.game_capsule {
+  transform: scale(1.04);
+}
+
+/* Ribbon left, counts right, over a fade at the foot of the art; clicks pass to the art */
+html.se-community-profile .showcase_achievementscompletionist_game_bar {
+  position: absolute !important;
+  inset: auto 0 0 0 !important;
+  display: flex !important;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--se-space-3);
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-7) var(--se-space-4) var(--se-space-3) !important;
+  background: linear-gradient(180deg, transparent, rgba(10, 12, 16, .88)) !important;
+  pointer-events: none;
+}
+
+html.se-community-profile .showcase_achievementscompletionist_game_bar > * {
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-profile .showcase_achievementscompletionist_game_ribbons {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+}
+
+html.se-community-profile .showcase_achievementscompletionist_game_ribbons img {
+  display: block;
+  max-height: 30px;
+}
+
+html.se-community-profile .showcase_achievementscompletionist_game_counts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--se-space-half);
+  min-width: 0;
+  text-align: right;
+}
+
+html.se-community-profile .showcase_achievementscompletionist_game_counts :is(.num_achievements, .group_name) {
+  color: var(--se-white) !important;
+  font: var(--se-type-control-lg) !important;
+  text-shadow: 0 1px 6px var(--se-black-60);
+}
+
+html.se-community-profile .showcase_achievementscompletionist_game_counts .subtitle {
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-badge) !important;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* ---------- Game Collector ---------- */
+
+/* Whatever box Steam wraps the grid in: no panel, no padding (it left a gap under the games) */
+html.se-community-profile .showcase_content_bg:has(.showcase_gamecollector_games) {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-profile .showcase_gamecollector_games ~ :empty {
+  display: none !important;
+}
+
+/* "Featured Games": the element right before the grid, as a label with room above it */
+html.se-community-profile .profile_customization :not(.showcase_stats_row, .showcase_content_bg):has(+ .showcase_gamecollector_games) {
+  margin: var(--se-space-5) 0 var(--se-space-3) !important;
+  padding: 0 !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+html.se-community-profile .showcase_gamecollector_games {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--se-space-3);
+  margin: 0 !important;
+}
+
+html.se-community-profile .showcase_gamecollector_games::after {
+  content: none !important;
+}
+
+html.se-community-profile .showcase_gamecollector_game {
+  float: none !important;
+  clear: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 0;
+}
+
+html.se-community-profile .showcase_gamecollector_game a {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+  outline: none !important;
+  transition: transform var(--se-dur) var(--se-ease), box-shadow var(--se-dur), filter var(--se-dur);
+}
+
+/* Hover: lift, shadow and a touch of light; no outline */
+html.se-community-profile .showcase_gamecollector_game a:hover {
+  box-shadow: var(--se-shadow-md);
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+}
+
+/* Keyboard focus still shows where it is */
+html.se-community-profile:not(#se-none) .showcase_gamecollector_game a:focus-visible {
+  outline: var(--se-focus-outline) !important;
+  outline-offset: 2px;
+}
+
+html.se-community-profile .showcase_gamecollector_game img.game_capsule {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 184 / 69;
+  object-fit: cover;
+}
+
+html.se-community-profile .showcase_gamecollector_game.openslot {
+  min-height: 60px;
+  border-radius: var(--se-radius-md);
+  box-shadow: inset 0 0 0 1px var(--se-divider);
+}
+
+/* Custom text: straight on the showcase card, like the other showcases */
+html.se-community-profile :is(.customtext_showcase, .showcase_notes) {
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+html.se-community-profile .showcase_notes {
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+html.se-community-profile .profile_customization :is(.screenshot_showcase_screenshot, .favorite_game_cap, .game_capsule, .showcase_slot, .item_showcase_item, .workshop_showcase_item_image) img,
+html.se-community-profile .profile_customization :is(.screenshot_showcase_screenshot, .showcase_slot, .item_showcase_item) {
+  border-radius: var(--se-radius-sm);
+}
+
+/* Stat tiles: the same look as the header's stats strip */
+html.se-community-profile .showcase_stats_row {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  height: auto !important;
+}
+
+html.se-community-profile .showcase_stats_row::after {
+  content: none !important;
+}
+
+/* Steam's clearfix spacer would take a gap of its own in the row */
+html.se-community-profile .showcase_stats_row > :not(.showcase_stat, [class*="showcase_stats"]):empty {
+  display: none !important;
+}
+
+html.se-community-profile .showcase_stats_row {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-profile .showcase_stat {
+  display: flex !important;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  min-width: 112px;
+  float: none !important;
+  margin: 0 !important;
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-white-04);
+  box-shadow: var(--se-edge);
+  text-decoration: none !important;
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-profile a.showcase_stat:hover {
+  background: var(--se-hover);
+}
+
+html.se-community-profile .showcase_stat .value {
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-2xl)/1.1 var(--se-font) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-profile .showcase_stat .label {
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* Empty showcase slot ("+ Add a Showcase") */
+html.se-community-profile .profile_customization.customization_edit {
+  background: transparent !important;
+  box-shadow: inset 0 0 0 1px var(--se-divider);
+  backdrop-filter: none;
+}
+
+html.se-community-profile .customization_edit_instructions {
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-profile .customization_edit_instructions .profile_customization_header {
+  margin-bottom: var(--se-space-1) !important;
+  color: var(--se-accent) !important;
+}
+
+html.se-community-profile .customization_edit_instructions_text {
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+}

@@ -1,0 +1,85 @@
+/* Continues ui.css (in order, see web/community/loader.js): Friend rows. */
+
+/* ---------- Friend rows (profile side column, activity side column) ---------- */
+
+/* !important: Steam's own rules (globalv2.css, profile.css, profilev2.css) set float, height,
+   margin, padding, width at equal or higher weight; the theme's shared rules
+   (web/community/activity/page.css, web/community/profile/page.css) set background, margin, padding with
+   !important; display can come inline from Steam's markup or scripts */
+html.se-community-ui .friendBlock {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-3);
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-3) !important;
+  border-radius: var(--se-radius-md);
+  background: none !important;
+}
+
+/* !important: position can come inline from Steam's markup or scripts */
+html.se-community-ui .friendBlockLinkOverlay {
+  position: absolute !important;
+  inset: 0;
+  z-index: var(--se-z-raised);
+  border-radius: inherit;
+}
+
+/* !important: another rule in this file sets background with !important */
+html.se-community-ui .friendBlock:hover {
+  background: var(--se-hover) !important;
+}
+
+/* !important: Steam's own rules (apphub_gamepad.css, chat.css, community_gamepad.css) set float,
+   height, margin, width at equal or higher weight; the theme's shared rules
+   (web/community/discussions/home.css, web/community/hub/page.css, web/community/profile/page.css) set height,
+   margin, padding, width with !important */
+html.se-community-ui .friendBlock .playerAvatar {
+  flex: none;
+  float: none !important;
+  width: 32px !important;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 1px !important;
+}
+
+/* !important: Steam's own rules (BZPioAp_.css, BrIybpw5.css, apppartnereventspage.css) set height,
+   width at equal or higher weight; the theme's shared rules (web/community/activity/page.css,
+   web/community/discussions/home.css, web/community/discussions/page.css) set height, width with
+   !important */
+html.se-community-ui .friendBlock .playerAvatar img {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+html.se-community-ui .friendBlockContent {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--se-text);
+  font: var(--se-type-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* !important: another rule in this file sets color with !important */
+html.se-community-ui .friendSmallText {
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-caption);
+}
+
+/* !important: another rule in this file sets color with !important */
+html.se-community-ui .friendBlock.in-game .friendSmallText {
+  color: var(--se-status-ingame) !important;
+}
+
+/* !important: another rule in this file sets color with !important */
+html.se-community-ui .friendBlock.online .friendSmallText {
+  color: var(--se-status-online) !important;
+}
+
+html.se-community-ui .friendSmallText [class^="linkFriend_"] {
+  color: inherit;
+}

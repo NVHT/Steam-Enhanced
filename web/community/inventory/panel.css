@@ -1,0 +1,398 @@
+/*
+ * Continues page.css (in order, see web/community/loader.js): Item panel; Below Steam's
+ * breakpoint; Item panel.
+ */
+
+/* ---------- Item panel ---------- */
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) {
+  --se-q: var(--se-accent);
+  position: relative !important;
+  inset: auto !important;
+  box-sizing: border-box;
+  width: auto !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-elevation-2);
+  overflow: hidden;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_desc_content {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 0 var(--se-space-5) !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-body) !important;
+}
+
+/* The art on its rarity glow */
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_desc_icon {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  float: none !important;
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: 16 / 11;
+  margin: 0 0 var(--se-space-4) !important;
+  padding: var(--se-space-5) !important;
+  border: 0 !important;
+  background:
+    radial-gradient(70% 70% at 50% 55%, color-mix(in srgb, var(--se-q) 30%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--se-surface-2), var(--se-surface)) !important;
+  box-shadow: inset 0 -1px 0 var(--se-hairline);
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_desc_icon_center {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_desc_icon img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 78% !important;
+  max-height: 100% !important;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 24px var(--se-black-60));
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_desc_description {
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 var(--se-space-5) !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .hover_item_name {
+  margin: 0 0 var(--se-space-3) !important;
+  padding: 0 !important;
+  color: var(--se-white);
+  font: 800 var(--se-fs-3xl)/1.2 var(--se-font) !important;
+  letter-spacing: -.015em;
+  text-shadow: none !important;
+  overflow-wrap: anywhere;
+}
+
+/* Game row: icon, game name, item type */
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_desc_game_info {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--se-space-3);
+  align-items: center;
+  margin: 0 0 var(--se-space-4) !important;
+  padding: 0 !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_desc_game_icon {
+  grid-row: span 2;
+  float: none !important;
+  width: 32px !important;
+  height: 32px !important;
+  margin: 0 !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_desc_game_icon img {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: var(--se-radius-sm);
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_desc_game_info > div:not(.item_desc_game_icon) {
+  margin: 0 !important;
+  overflow: hidden;
+  font: var(--se-type-small) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) [id$="_game_name"] {
+  color: var(--se-text) !important;
+  font-weight: 700 !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) [id$="_item_type"] {
+  color: var(--se-text-muted) !important;
+}
+
+/* Descriptions, owner notes and tags: one block each, divided by hairlines */
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_desc_descriptors, [id$="_item_tags"]) {
+  margin: 0 !important;
+  padding: var(--se-space-4) 0 0 !important;
+  border-top: 1px solid var(--se-divider);
+  color: var(--se-text-dim) !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_desc_descriptors, [id$="_item_tags"]):empty,
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_desc_descriptors, [id$="_item_tags"])[style*="display: none"] {
+  display: none !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_desc_descriptors, [id$="_item_tags"]) + :is(.item_desc_descriptors, [id$="_item_tags"]) {
+  margin-top: var(--se-space-4) !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .descriptor {
+  margin: 0 0 var(--se-space-1) !important;
+  font: var(--se-type-body) !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) [id$="_item_tags_content"] {
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-small) !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .fraud_warning {
+  margin: 0 0 var(--se-space-4) !important;
+  padding: var(--se-space-3) var(--se-space-3) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: color-mix(in srgb, var(--se-danger) 12%, transparent) !important;
+  color: var(--se-danger) !important;
+  font: var(--se-type-small) !important;
+}
+
+/* Actions */
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_actions, .item_owner_actions, .item_scrap_actions) {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  margin: var(--se-space-4) 0 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_actions, .item_owner_actions, .item_scrap_actions):empty {
+  display: none !important;
+}
+
+/* Market: a tinted block with Sell as the accent */
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_market_actions {
+  margin: var(--se-space-4) 0 0 !important;
+  padding: var(--se-space-4) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2) !important;
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-small) !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_market_actions:empty,
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_market_actions[style*="display: none"] {
+  display: none !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_market_actions a:not(.item_market_action_button) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_market_action_button {
+  display: inline-flex !important;
+  align-items: center;
+  height: var(--se-ctl);
+  margin-top: var(--se-space-3) !important;
+  padding: 0 var(--se-space-4) !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-cart) !important;
+  color: var(--se-on-accent) !important;
+  font: var(--se-type-control) !important;
+  text-decoration: none !important;
+  transition: filter var(--se-dur);
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_market_action_button:hover {
+  filter: brightness(1.1);
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_market_action_button :is(.item_market_action_button_edge, .item_market_action_button_preload) {
+  display: none !important;
+}
+
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_market_action_button_contents {
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+}
+
+/* Empty state, while neither of Steam's panels is showing */
+html.se-community-inventory .se-inv-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-space-2);
+  min-height: 360px;
+  padding: var(--se-space-6);
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+  color: var(--se-text-muted);
+  font: var(--se-type-body);
+  text-align: center;
+}
+
+html.se-community-inventory .inventory_page_right:not(:has(> [id^="iteminfo"]:not([style*="display: none"]))) > .se-inv-empty {
+  display: flex;
+}
+
+html.se-community-inventory .se-inv-empty strong {
+  color: var(--se-text);
+  font: var(--se-type-title);
+}
+
+html.se-community-inventory .se-inv-empty-icon {
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--se-space-3);
+  border-radius: var(--se-radius-lg);
+  background: var(--se-pill);
+  box-shadow: var(--se-edge);
+  position: relative;
+}
+
+html.se-community-inventory .se-inv-empty-icon::before {
+  content: "";
+  position: absolute;
+  inset: 15px;
+  background: var(--se-text-faint);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linejoin='round'%3E%3Cpath d='M12 2.5 21 7v10l-9 4.5L3 17V7z'/%3E%3Cpath d='M3 7l9 4.5L21 7M12 11.5v10'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* ---------- Below Steam's breakpoint: colours only ---------- */
+
+@media (max-width: 910px) {
+  html.se-community-inventory .se-inv-empty {
+    display: none !important;
+  }
+
+  html.se-community-inventory .profile_small_header_bg {
+    margin: var(--se-space-3) !important;
+  }
+}
+
+/* ---------- Item panel: Steam's React version ----------
+ * Steam now renders the item panel with its own components inside #iteminfo0 / #iteminfo1
+ * (hashed classes, no .inventory_iteminfo). The card above holds it; inside, its own panels
+ * go clear so the card shows through, and the name, links and tags take the theme's type.
+ * --se-q is the name's colour (inventory/page.js).
+ */
+
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) {
+  padding: var(--se-space-4) !important;
+}
+
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) div:not([data-se-btn]) {
+  background-color: transparent !important;
+}
+
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) > div,
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) > div > div,
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) > div > div > div {
+  width: auto !important;
+  max-width: none !important;
+  border: 0 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* The art (the panel's first block) on the rarity glow */
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) > div > div > div > div:first-child:has(img) {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  margin: calc(-1 * var(--se-space-4)) calc(-1 * var(--se-space-4)) var(--se-space-4) !important;
+  padding: var(--se-space-5) !important;
+  aspect-ratio: 16 / 11;
+  background:
+    radial-gradient(70% 70% at 50% 55%, color-mix(in srgb, var(--se-q) 30%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--se-surface-2), var(--se-surface)) !important;
+  box-shadow: inset 0 -1px 0 var(--se-hairline) !important;
+}
+
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) > div > div > div > div:first-child:has(img) img {
+  max-width: 78% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 24px var(--se-black-60));
+}
+
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) h1 {
+  margin: 0 0 var(--se-space-3) !important;
+  font: 800 var(--se-fs-3xl)/1.2 var(--se-font) !important;
+  letter-spacing: -.015em;
+  overflow-wrap: anywhere;
+}
+
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) h1 span {
+  font: inherit !important;
+}
+
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) :is(span, div) {
+  font-family: var(--se-font) !important;
+}
+
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) a:not(:has(img)) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) a:not(:has(img)):hover {
+  text-decoration: underline !important;
+}
+
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) img:not(:first-child) {
+  border-radius: var(--se-radius-xs);
+}
+
+/* Its buttons (View in store, Send gift..., Sell...), tagged [data-se-btn] by page.js: pills */
+html.se-community-inventory:not(#se-none) .inventory_page_right > [id^="iteminfo"] [data-se-btn] {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: var(--se-ctl);
+  padding: 0 var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line) !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-control) !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-community-inventory:not(#se-none) .inventory_page_right > [id^="iteminfo"] [data-se-btn]:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-community-inventory:not(#se-none) .inventory_page_right > [id^="iteminfo"] [data-se-btn] * {
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+}
+
+/* The first button in the panel is its main action */
+html.se-community-inventory:not(#se-none) .inventory_page_right > [id^="iteminfo"] [data-se-btn="primary"] {
+  background: var(--se-btn-primary-bg) !important;
+  box-shadow: none !important;
+  color: var(--se-btn-primary-color) !important;
+}
+
+html.se-community-inventory:not(#se-none) .inventory_page_right > [id^="iteminfo"] [data-se-btn="primary"]:hover {
+  background: var(--se-btn-primary-bg-hover) !important;
+  color: var(--se-on-accent) !important;
+}

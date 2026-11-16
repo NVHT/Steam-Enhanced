@@ -1,0 +1,347 @@
+/* Continues home.css (in order, see web/community/loader.js): Forum list; Feature discussions. */
+
+/* ---------- Forum list: Steam Forums, then Steam Feature Discussions, both as card grids ---------- */
+
+html.se-community-discussions-home .forum_list_ctn {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--se-space-6);
+  width: auto !important;
+  margin-top: var(--se-space-4) !important;
+}
+
+html.se-community-discussions-home .forum_list_ctn > * {
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+html.se-community-discussions-home .forum_list_ctn > div:not([class]):empty {
+  display: none;
+}
+
+html.se-community-discussions-home .forum_list_left {
+  display: grid;
+  gap: var(--se-space-4);
+}
+
+/* The column labels: each card labels itself */
+html.se-community-discussions-home .forum_list_left > .discussions_forumlist_header {
+  display: none !important;
+}
+
+/* Cards: a grid that fills the column */
+html.se-community-discussions-home .discussions_forumlist {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--se-space-3);
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* A card: [tile] name over threads and last post */
+html.se-community-discussions-home .discussions_forum_row {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: 44px auto minmax(0, 1fr);
+  grid-template-areas:
+    "icon name name"
+    "icon count last";
+  align-items: center;
+  gap: var(--se-space-1) var(--se-space-4);
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+  transition: background-color var(--se-dur), box-shadow var(--se-dur);
+}
+
+html.se-community-discussions-home .discussions_forum_row:hover {
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-white-14), var(--se-shadow-md);
+}
+
+html.se-community-discussions-home .discussions_forum_row > *,
+html.se-community-discussions-home .discussions_forumlist_content > * {
+  float: none !important;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+/* The card link: Steam's spacer image as an overlay over the whole card */
+html.se-community-discussions-home .discussions_forumlist_linkoverlay {
+  position: absolute !important;
+  inset: 0;
+  z-index: var(--se-z-raised);
+  width: auto !important;
+  height: auto !important;
+  border-radius: inherit;
+}
+
+html.se-community-discussions-home .discussions_forumlist_linkoverlay a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+html.se-community-discussions-home .discussions_forumlist_linkoverlay img {
+  display: none !important;
+}
+
+html.se-community-discussions-home .discussions_forumlist_content {
+  display: contents !important;
+}
+
+/* Tile: a theme duotone icon or the forum's first letter (home.js); Steam's envelope (its unread
+   mark) only without the script */
+html.se-community-discussions-home .discussions_forumlist_icon {
+  grid-area: icon;
+  display: grid !important;
+  place-items: center;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill);
+}
+
+html.se-community-discussions-home .discussions_forumlist_icon img {
+  display: block;
+  max-width: 26px;
+  max-height: 26px;
+  object-fit: contain;
+}
+
+html.se-community-discussions-home .discussions_forumlist_icon:has(> .se-dsc-mono) {
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-discussions-home .discussions_forumlist_icon:has(> .se-dsc-mono) img {
+  display: none !important;
+}
+
+html.se-community-discussions-home .se-dsc-mono {
+  display: grid;
+  place-items: center;
+  color: var(--se-text-muted);
+  transition: color var(--se-dur);
+  font: 800 var(--se-fs-xl)/1 var(--se-font);
+  text-transform: uppercase;
+}
+
+html.se-community-discussions-home .se-dsc-mono svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+html.se-community-discussions-home .discussions_forum_row:hover .se-dsc-mono {
+  color: var(--se-white);
+}
+
+html.se-community-discussions-home .discussions_forumlist_forumname {
+  grid-area: name;
+  min-width: 0;
+  overflow: hidden;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-title) !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+html.se-community-discussions-home .discussions_forum_row.unread .discussions_forumlist_forumname {
+  color: var(--se-white) !important;
+  font-weight: 700 !important;
+}
+
+html.se-community-discussions-home .discussions_forum_row:hover .discussions_forumlist_forumname {
+  color: var(--se-white) !important;
+}
+
+/* A forum with a description: shown under the name */
+html.se-community-discussions-home .discussions_forumlist_forumname > * {
+  overflow: hidden;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+  text-overflow: ellipsis;
+}
+
+html.se-community-discussions-home .discussions_forum_row > .discussions_forumlist_topiccount {
+  grid-area: count;
+  justify-self: start;
+  padding: var(--se-space-half) var(--se-space-2) !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill);
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-caption) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-discussions-home .discussions_forum_row > .discussions_forumlist_lastpost {
+  grid-area: last;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ---------- Feature discussions: a card grid like the forums ----------
+ * The header reads as a section title like "Steam Forums" (home.js lower-cases Steam's
+ * all-caps text so CSS can capitalise it); each group is a card in the forum cards' type with
+ * a theme line icon (home.js) in the same neutral tile.
+ */
+
+html.se-community-discussions-home .forum_list_right {
+  position: static !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--se-space-3);
+  height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-discussions-home .forum_list_right > .discussions_forumlist_header {
+  grid-column: 1 / -1;
+  display: block !important;
+  height: auto !important;
+  margin: 0 0 var(--se-space-half) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-discussions-home .forum_list_right > .discussions_forumlist_header > * {
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-white) !important;
+  font: var(--se-type-title-lg) !important;
+  letter-spacing: -.005em;
+  text-transform: none;
+}
+
+html.se-community-discussions-home .forum_list_right > .discussions_forumlist_header > [data-se-dsc-case] {
+  text-transform: capitalize;
+}
+
+html.se-community-discussions-home a.recent_game_discussion.quasi_official_group {
+  display: grid !important;
+  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-areas:
+    "icon name"
+    "icon count";
+  align-items: center;
+  gap: var(--se-space-1) var(--se-space-4);
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-4) !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+  text-decoration: none !important;
+  transition: background-color var(--se-dur), box-shadow var(--se-dur);
+}
+
+html.se-community-discussions-home a.recent_game_discussion.quasi_official_group:hover {
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-white-14), var(--se-shadow-md);
+}
+
+html.se-community-discussions-home a.quasi_official_group > * {
+  float: none !important;
+  position: static !important;
+  margin: 0 !important;
+}
+
+html.se-community-discussions-home a.quasi_official_group .playerAvatar {
+  grid-area: icon;
+  display: grid !important;
+  place-items: center;
+  width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill) !important;
+  box-shadow: var(--se-edge);
+  overflow: hidden;
+}
+
+html.se-community-discussions-home a.quasi_official_group .playerAvatar img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  object-fit: cover;
+}
+
+/* The theme's icon (home.js) in place of Steam's group picture */
+html.se-community-discussions-home a.quasi_official_group .playerAvatar:has(> .se-dsc-glyph) img {
+  display: none !important;
+}
+
+html.se-community-discussions-home .se-dsc-glyph {
+  display: grid;
+  place-items: center;
+  color: var(--se-text-muted);
+  font: 800 var(--se-fs-xl)/1 var(--se-font);
+  text-transform: uppercase;
+  transition: color var(--se-dur);
+}
+
+html.se-community-discussions-home .se-dsc-glyph svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+html.se-community-discussions-home a.quasi_official_group:hover .se-dsc-glyph {
+  color: var(--se-white);
+}
+
+html.se-community-discussions-home a.quasi_official_group .recent_game_discussion_name {
+  grid-area: name;
+  width: auto !important;
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font: var(--se-type-title) !important;
+  text-shadow: none !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+html.se-community-discussions-home a.quasi_official_group .recent_game_discussion_count {
+  grid-area: count;
+  width: auto !important;
+  overflow: hidden;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-discussions-home a.quasi_official_group:hover .recent_game_discussion_name {
+  color: var(--se-white) !important;
+}

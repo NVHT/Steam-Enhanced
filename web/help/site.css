@@ -1,0 +1,514 @@
+/*
+ * Steam Support (help.steampowered.com), site-wide (web/help/loader.js): Steam's navy wizard over a
+ * blue-lit background (help.css) in the theme's look, matching the store's legal pages.
+ *
+ *   [ Steam Support                                   (display title) ]
+ *   [ Home > …                                                        ]
+ *   [ What do you need help with, name?                               ]
+ *   [ RECENT PRODUCTS                                                 ]
+ *   [ ▭ The Witcher 3            › ][ ▭ Cyberpunk 2077             › ]
+ *   [ ◉ Games, Software, etc.    › ][ ◉ Purchases                  › ]
+ *   [ 🔍 Search Steam Support                                        ]
+ *
+ * Wizard buttons (.help_wizard_button) are rounded cards with a drawn chevron on every page,
+ * and a game's header (.help_app_header) is a card of art, title and facts;
+ * on the home page the buttons lay out two across, and the large topic buttons carry an icon chip
+ * (web/help/site.js). Classes are help.css's own (SteamTracking), stable across Steam's builds.
+ *
+ * Continued, by section, in site-pages.css, site-forms.css (same folder), listed after this
+ * file in web/help/loader.js: together they keep one file's order.
+ */
+
+/* ---------- Page ---------- */
+
+html.se-help body.v6 {
+  background: var(--se-bg) !important;
+  color: var(--se-text-dim) !important;
+}
+
+html.se-help :is(.responsive_page_frame, .responsive_page_content, .responsive_page_template_content, .page_body_ctn) {
+  background: none !important;
+}
+
+html.se-help #page_content {
+  box-sizing: border-box;
+  width: min(100% - 56px, 1100px) !important;
+  max-width: none !important;
+  margin: 0 auto !important;
+  padding-bottom: var(--se-space-7);
+}
+
+/* The loading throbber's row stays out of the way once the page is in */
+html.se-help #loading_throbber.page_loaded {
+  display: none !important;
+}
+
+html.se-help #wizard_contents {
+  padding: var(--se-space-6) 0 var(--se-space-5) !important;
+}
+
+/* Title: "Steam Support" as the store's display heading */
+html.se-help a.help_header {
+  display: inline-block;
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-display)/1.15 var(--se-font) !important;
+  letter-spacing: -.02em;
+  text-decoration: none !important;
+}
+
+html.se-help a.help_header:hover {
+  color: var(--se-white) !important;
+}
+
+/* Breadcrumbs */
+html.se-help .breadcrumbs {
+  margin: var(--se-space-3) 0 0 !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+  text-transform: none !important;
+}
+
+html.se-help .breadcrumbs a {
+  color: var(--se-text-muted) !important;
+  text-decoration: none !important;
+  transition: color var(--se-dur);
+}
+
+html.se-help .breadcrumbs a:hover {
+  color: var(--se-white) !important;
+}
+
+html.se-help .breadcrumbs .breadcrumb_current_page {
+  color: var(--se-text-dim) !important;
+}
+
+/* Greeting and section labels */
+html.se-help .help_intro_text {
+  margin: var(--se-space-5) 0 var(--se-space-4) !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-heading) !important;
+  letter-spacing: -.01em;
+}
+
+html.se-help .help_section_text {
+  margin: var(--se-space-2) 0 var(--se-space-half);
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-caption) !important;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+html.se-help .help_divider {
+  max-width: none !important;
+  margin: var(--se-space-4) 0 !important;
+  background: var(--se-divider) !important;
+}
+
+/* ---------- Wizard buttons: rounded cards with a chevron ---------- */
+
+html.se-help a.help_wizard_button {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-3);
+  width: 100%;
+  max-width: none !important;
+  min-height: 52px;
+  box-sizing: border-box;
+  margin: var(--se-space-2) 0 0 !important;
+  padding: var(--se-space-2) var(--se-space-7) var(--se-space-2) var(--se-space-2) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur), box-shadow var(--se-dur), transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-help a.help_wizard_button:not(.disabled):not(.nohover):hover,
+html.se-help a.help_wizard_button.opened {
+  background: var(--se-hover) !important;
+  box-shadow: inset 0 0 0 1px var(--se-white-10);
+}
+
+html.se-help a.help_wizard_button > span {
+  flex: 1;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 0 0 var(--se-space-2);
+}
+
+html.se-help a.help_wizard_button > img {
+  flex: none;
+  float: none !important;
+  width: auto;
+  height: 40px;
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm);
+  object-fit: cover;
+}
+
+html.se-help a.help_wizard_button > img + span {
+  margin-left: 0 !important;
+}
+
+/* Chevron: drawn, in place of Steam's arrow image */
+html.se-help a.help_wizard_arrow_right {
+  background-image: none !important;
+}
+
+html.se-help a.help_wizard_arrow_right::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  width: 16px;
+  height: 16px;
+  margin-top: calc(-1 * var(--se-space-2));
+  background: var(--se-text-faint);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: background-color var(--se-dur), translate var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-help a.help_wizard_arrow_right:not(.disabled):hover::after {
+  background: var(--se-text);
+  translate: 2px 0;
+}
+
+/* High-priority buttons: the accent */
+html.se-help a.help_wizard_button.help_wizard_button_highpri {
+  background: var(--se-btn-primary-bg) !important;
+  box-shadow: none;
+  color: var(--se-btn-primary-color) !important;
+}
+
+html.se-help a.help_wizard_button.help_wizard_button_highpri:not(.disabled):not(.nohover):hover {
+  background: var(--se-btn-primary-bg-hover) !important;
+}
+
+html.se-help a.help_wizard_button.help_wizard_button_highpri::after {
+  background: var(--se-on-accent);
+}
+
+/* Large topic buttons: taller, with an icon chip (web/help/site.js) */
+html.se-help a.help_wizard_button_large {
+  min-height: 68px;
+  padding-left: var(--se-space-4) !important;
+  font-size: var(--se-fs-lg) !important;
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon]::before {
+  content: "";
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-help-icon) center / 22px 22px no-repeat, var(--se-pill);
+  box-shadow: var(--se-edge);
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="game"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23b8c0c8' fill-opacity='.32' stroke='none' d='M7 7h10a5 5 0 0 1 4.9 6l-.6 3a2.5 2.5 0 0 1-4.3 1.2L15 15H9l-2 2.2A2.5 2.5 0 0 1 2.7 16l-.6-3A5 5 0 0 1 7 7z'/%3E%3Cpath d='M7 7h10a5 5 0 0 1 4.9 6l-.6 3a2.5 2.5 0 0 1-4.3 1.2L15 15H9l-2 2.2A2.5 2.5 0 0 1 2.7 16l-.6-3A5 5 0 0 1 7 7zM7.5 10v4M5.5 12h4M15.5 11h.01M17.5 13h.01'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="cart"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23b8c0c8' fill-opacity='.32' stroke='none' d='M6 6h15l-1.6 8.2a2 2 0 0 1-2 1.6H8.7a2 2 0 0 1-2-1.7z'/%3E%3Cpath d='M3 3h2.5l2.2 11.1a2 2 0 0 0 2 1.7h7.7a2 2 0 0 0 2-1.6L21 6H6M9.5 20h.01M17.5 20h.01'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="account"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23b8c0c8' fill-opacity='.32' stroke='none' cx='12' cy='8' r='4'/%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="gift"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect fill='%23b8c0c8' fill-opacity='.32' stroke='none' x='4' y='10' width='16' height='10' rx='1.5'/%3E%3Cpath d='M4 10h16v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20zM3 7h18v3H3zM12 7v14.5M12 7S10.5 3 8 3.5 7 7 12 7zM12 7s1.5-4 4-3.5S17 7 12 7z'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="hardware"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect fill='%23b8c0c8' fill-opacity='.32' stroke='none' x='2' y='7' width='20' height='10' rx='5'/%3E%3Crect x='2' y='7' width='20' height='10' rx='5'/%3E%3Crect x='8' y='9' width='8' height='6' rx='1'/%3E%3Cpath d='M5 11v2M4 12h2M18.5 11h.01M18.5 13h.01'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="community"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23b8c0c8' fill-opacity='.32' stroke='none' cx='9' cy='8' r='3.5'/%3E%3Ccircle cx='9' cy='8' r='3.5'/%3E%3Cpath d='M3 19.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M15.5 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2 .7 3.5 2.6 3.5 5.2'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="key"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23b8c0c8' fill-opacity='.32' stroke='none' cx='8' cy='15' r='4.5'/%3E%3Ccircle cx='8' cy='15' r='4.5'/%3E%3Cpath d='M11.3 11.7L20 3M16.5 6.5l2.5 2.5M14.5 8.5l2 2'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="client"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect fill='%23b8c0c8' fill-opacity='.32' stroke='none' x='3' y='4' width='18' height='5'/%3E%3Crect x='3' y='4' width='18' height='16' rx='2'/%3E%3Cpath d='M3 9h18M6.5 6.5h.01M9.5 6.5h.01'/%3E%3C/svg%3E");
+}
+
+html.se-help a.help_wizard_button_large[data-se-help-icon="help"] {
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23b8c0c8' fill-opacity='.32' stroke='none' cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M9.5 9.5a2.5 2.5 0 0 1 4.8 1c0 1.7-2.3 2.2-2.3 3.5M12 17h.01'/%3E%3C/svg%3E");
+}
+
+/* ---------- Home: two across ---------- */
+
+html.se-help #help_home_block {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--se-space-3);
+  align-items: start;
+}
+
+html.se-help #help_home_block > :not(a.help_wizard_button) {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+  html.se-help #help_home_block {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Search ---------- */
+
+html.se-help #help_search_support_form {
+  margin-top: var(--se-space-4) !important;
+}
+
+html.se-help #help_search_support_input {
+  width: 100% !important;
+  max-width: none !important;
+  height: 54px !important;
+  box-sizing: border-box;
+  padding: 0 var(--se-space-4) 0 3.125rem !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f7984' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%236f7984' fill-opacity='.32' stroke='none' cx='11' cy='11' r='6.5'/%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M20 20l-4.2-4.2'/%3E%3C/svg%3E") 18px center / 20px 20px no-repeat, var(--se-field) !important;
+  box-shadow: var(--se-edge) !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-title) !important;
+  font-style: normal !important;
+  transition: box-shadow var(--se-dur);
+}
+
+html.se-help #help_search_support_input:focus {
+  outline: 0 !important;
+  box-shadow: var(--se-field-edge-focus) !important;
+}
+
+html.se-help #help_search_support_input::placeholder {
+  color: var(--se-text-faint) !important;
+  font-style: normal !important;
+  text-align: left !important;
+}
+
+/* ---------- Game header (wizard pages for one game) ----------
+ * .help_app_header: capsule and name, account / playtime / purchase facts, then the purchase
+ * line and the store / library links. Steam floats them in a translucent box; laid out as a
+ * card instead: art and title on the left, facts as label/value pairs on the right, the
+ * purchase line under a divider with the links as pill buttons.
+ */
+html.se-help .help_app_header {
+  max-width: none !important;
+  margin: var(--se-space-4) 0 var(--se-space-3) !important;
+  padding: var(--se-space-5) var(--se-space-5) !important;
+  overflow: visible !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-help .help_app_header > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-5);
+}
+
+html.se-help .help_app_header [style*="clear"] {
+  display: none !important;
+}
+
+html.se-help .help_app_header .subbox_left {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-4);
+  min-width: 0;
+  width: auto !important;
+  max-width: none !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+html.se-help .help_app_header .subbox_left > a {
+  flex: none;
+  display: block;
+}
+
+html.se-help .help_app_header img {
+  float: none !important;
+  display: block;
+  width: 184px;
+  max-width: none !important;
+  height: auto;
+  margin: 0 !important;
+  border-radius: var(--se-radius-md);
+  box-shadow: 0 0 0 1px var(--se-hairline);
+}
+
+html.se-help .help_app_header .game_name {
+  min-width: 0;
+  font: var(--se-type-heading) !important;
+  letter-spacing: -.01em;
+}
+
+html.se-help .help_app_header .game_name a {
+  color: var(--se-text) !important;
+  text-decoration: none !important;
+}
+
+html.se-help .help_app_header .game_name a:hover {
+  color: var(--se-white) !important;
+}
+
+/* Account, playtime, purchase date: label over value, side by side */
+html.se-help .help_app_header .account_details {
+  flex: none;
+  display: flex;
+  gap: var(--se-space-6);
+  width: auto !important;
+  margin: 0 !important;
+  float: none !important;
+  overflow: visible !important;
+}
+
+html.se-help .help_app_header .account_details > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  margin: 0 !important;
+}
+
+html.se-help .help_app_header .help_highlight_text {
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-caption) !important;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+html.se-help .help_app_header .help_lowlight_text {
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+/* Purchase line and links, under a divider */
+html.se-help .help_purchase_detail_box {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-4);
+  margin: var(--se-space-4) 0 0 !important;
+  padding: var(--se-space-4) 0 0 !important;
+  border-top: 1px solid var(--se-divider);
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body) !important;
+}
+
+html.se-help .help_purchase_detail_box :is(.help_header_left, .help_header_right) {
+  width: auto !important;
+  float: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+html.se-help .help_purchase_detail_box .help_header_left {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+html.se-help .help_purchase_detail_box .help_header_left a {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+html.se-help .help_purchase_detail_box .help_header_left a:hover {
+  color: var(--se-accent-hover) !important;
+}
+
+html.se-help .help_purchase_detail_box .help_header_right {
+  flex: none;
+  display: flex;
+  gap: var(--se-space-2);
+}
+
+html.se-help .help_header_link a {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 var(--se-space-4);
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-edge);
+  color: var(--se-text) !important;
+  font: var(--se-type-label) !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background-color var(--se-dur);
+}
+
+html.se-help .help_header_link a:hover {
+  background: var(--se-hover);
+  color: var(--se-white) !important;
+}
+
+@media (max-width: 900px) {
+  html.se-help .help_app_header > div:first-child,
+  html.se-help .help_purchase_detail_box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ---------- Site buttons and the error panel ---------- */
+
+html.se-help .help_site_button {
+  display: inline-flex !important;
+  align-items: center;
+  height: var(--se-ctl);
+  padding: 0 var(--se-space-4) !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text) !important;
+  font: var(--se-type-control) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur);
+}
+
+html.se-help .help_site_button:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-help #error_contents {
+  padding: var(--se-space-6) 0 0 !important;
+}
+
+html.se-help .error_bg {
+  max-width: none !important;
+  margin-top: var(--se-space-4) !important;
+  padding: var(--se-space-5) var(--se-space-6) !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-help #error_description {
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-title) !important;
+}
+
+html.se-help .error_reload {
+  display: flex;
+  gap: var(--se-space-2);
+  margin-top: var(--se-space-4);
+}

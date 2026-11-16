@@ -1,0 +1,342 @@
+/*
+ * Continues home.css (in order, see web/community/loader.js): Tabs; Tab panel; Recent game
+ * cards.
+ */
+
+/* ---------- Tabs ---------- */
+
+html.se-community-discussions-home .pagecontent.discussions_page > .discussions_header.maincontent {
+  position: relative;
+  display: flex !important;
+  gap: var(--se-space-half);
+  width: fit-content !important;
+  height: auto !important;
+  margin: 0 0 var(--se-space-5) calc((100% - var(--se-community-width)) / 2) !important;
+  padding: var(--se-space-1) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-discussions-home .discussions_header > a.group_tab {
+  position: relative;
+  z-index: var(--se-z-raised);
+  display: inline-flex !important;
+  align-items: center;
+  float: none !important;
+  height: 36px !important;
+  margin: 0 !important;
+  padding: 0 var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control);
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-control-lg) !important;
+  text-decoration: none !important;
+  text-transform: none !important;
+  transition: color var(--se-dur);
+}
+
+html.se-community-discussions-home .discussions_header > a.group_tab,
+html.se-community-discussions-home .discussions_header > a.group_tab.active {
+  top: auto !important;
+  box-sizing: border-box;
+  line-height: 1 !important;
+  vertical-align: top;
+}
+
+html.se-community-discussions-home .discussions_header > a.group_tab > span {
+  position: static !important;
+  display: block !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: 1 !important;
+}
+
+/* Steam's tab art (the active tab's lip) */
+html.se-community-discussions-home .discussions_header > a.group_tab::before,
+html.se-community-discussions-home .discussions_header > a.group_tab::after,
+html.se-community-discussions-home .discussions_header > a.group_tab > span::before,
+html.se-community-discussions-home .discussions_header > a.group_tab > span::after {
+  display: none !important;
+}
+
+html.se-community-discussions-home .discussions_header > a.group_tab:hover {
+  color: var(--se-text) !important;
+}
+
+html.se-community-discussions-home .discussions_header > a.group_tab.active {
+  color: var(--se-white) !important;
+}
+
+/* Without the script: the open tab carries its own pill */
+html.se-community-discussions-home .discussions_header:not([data-se-dsc-tabs]) > a.group_tab.active {
+  background: var(--se-accent-surface) !important;
+}
+
+html.se-community-discussions-home .se-dsc-tabs-pill {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: var(--w, 0);
+  border-radius: var(--se-radius-control);
+  background: var(--se-accent-surface);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  transform: translateX(var(--x, 0));
+  transition: transform var(--se-dur-slower) var(--se-ease), width var(--se-dur-slower) var(--se-ease), opacity var(--se-dur-slow);
+}
+
+/* ---------- Tab panel: recent games, then the forums ---------- */
+
+html.se-community-discussions-home .discussion_tab_content_area {
+  display: grid !important;
+  grid-template-columns: repeat(var(--se-dsc-recent, 4), minmax(0, 1fr));
+  gap: var(--se-space-4);
+  margin: 0 !important;
+}
+
+html.se-community-discussions-home .discussion_tab_content_area > * {
+  grid-column: 1 / -1;
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-discussions-home .discussion_tab_content_area > a.recent_game_discussion {
+  grid-column: auto;
+}
+
+html.se-community-discussions-home .discussion_tab_content_area > :is(.discussion_tab_content_rule, div:not([class]):empty) {
+  display: none !important;
+}
+
+/* Title and "More game forums" share the first row */
+html.se-community-discussions-home .discussion_tab_content_area > h2:first-of-type,
+html.se-community-discussions-home .discussion_tab_content_area > .discussions_view_more_link {
+  grid-row: 1;
+  align-self: center;
+}
+
+html.se-community-discussions-home .discussion_tab_content_area > h2:first-of-type,
+html.se-community-discussions-home .forum_list_left > h2.discussion_primary_header {
+  justify-self: start;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-white) !important;
+  font: var(--se-type-title-lg) !important;
+  letter-spacing: -.005em;
+  text-transform: none !important;
+}
+
+html.se-community-discussions-home .discussion_tab_content_area > .discussions_view_more_link {
+  justify-self: end;
+  float: none !important;
+}
+
+html.se-community-discussions-home .discussions_view_more_link a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-space-1);
+  padding: var(--se-space-2) var(--se-space-3);
+  border-radius: var(--se-radius-control);
+  color: var(--se-accent) !important;
+  font: var(--se-type-label) !important;
+  letter-spacing: .02em;
+  text-decoration: none !important;
+  text-transform: none !important;
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-discussions-home .discussions_view_more_link a::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
+  transform: rotate(-90deg);
+}
+
+html.se-community-discussions-home .discussions_view_more_link a:hover {
+  background: var(--se-accent-tint);
+}
+
+/* ---------- Recent game cards ---------- */
+
+html.se-community-discussions-home a.recent_game_discussion:not(.quasi_official_group) {
+  position: relative;
+  isolation: isolate;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "icon name"
+    "icon count";
+  align-content: end;
+  column-gap: var(--se-space-3);
+  row-gap: var(--se-space-half);
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  min-height: 156px;
+  margin: 0 !important;
+  padding: var(--se-space-4) !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+  text-decoration: none !important;
+  overflow: hidden;
+  transition: box-shadow var(--se-dur-slow);
+}
+
+/* Art under a fade (home.js sets --se-dsc-art once it has loaded) */
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-art]::before,
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-art]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--se-z-under);
+  pointer-events: none;
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-art]::before {
+  background: var(--se-dsc-art, none) center / cover no-repeat;
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity var(--se-dur-slower), transform var(--se-dur-slower) var(--se-ease);
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-art="ready"]::before {
+  opacity: .7;
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-art]::after {
+  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--se-surface) 70%, transparent) 45%, var(--se-surface) 100%);
+}
+
+html.se-community-discussions-home a.recent_game_discussion:not(.quasi_official_group):hover {
+  box-shadow: inset 0 0 0 1px var(--se-white-14), var(--se-shadow-lg);
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-art="ready"]:hover::before {
+  opacity: .9;
+  transform: scale(1.06);
+}
+
+html.se-community-discussions-home a.recent_game_discussion > * {
+  float: none !important;
+  margin: 0 !important;
+  position: static !important;
+}
+
+html.se-community-discussions-home a.recent_game_discussion .playerAvatar {
+  grid-area: icon;
+  align-self: center;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-pill) !important;
+  box-shadow: 0 6px 14px -6px var(--se-black-80);
+  overflow: hidden;
+}
+
+html.se-community-discussions-home a.recent_game_discussion .playerAvatar img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  object-fit: cover;
+}
+
+/* Cover: the game's tall library art (home.js) in place of Steam's 32px icon */
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-cover] .playerAvatar {
+  align-self: end;
+  width: 56px !important;
+  height: 84px !important;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-pill) var(--se-dsc-cover) center / cover no-repeat !important;
+  box-shadow: inset 0 0 0 1px var(--se-white-14), 0 10px 22px -8px var(--se-black-90);
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-cover] .playerAvatar img {
+  opacity: 0;
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-cover]:hover .playerAvatar {
+  transform: translateY(-3px) rotate(-2deg);
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-cover] :is(.recent_game_discussion_name, .recent_game_discussion_count) {
+  align-self: end;
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-cover] .recent_game_discussion_count {
+  margin-bottom: var(--se-space-1) !important;
+}
+
+html.se-community-discussions-home a.recent_game_discussion .recent_game_discussion_name {
+  grid-area: name;
+  width: auto !important;
+  overflow: hidden;
+  color: var(--se-white) !important;
+  font: var(--se-type-title) !important;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 6px var(--se-black-60);
+  white-space: nowrap;
+}
+
+html.se-community-discussions-home a.recent_game_discussion .recent_game_discussion_count {
+  grid-area: count;
+  width: auto !important;
+  overflow: hidden;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-small) !important;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Unread: Steam renders its indicator on every card; home.js tags the cards whose indicator
+   holds a real icon ([data-se-dsc-unread]) and the theme draws that as a dot */
+html.se-community-discussions-home a.recent_game_discussion > .recent_game_discussions_unread_indicator {
+  display: none !important;
+}
+
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-unread] > .recent_game_discussions_unread_indicator {
+  position: absolute !important;
+  top: 12px;
+  right: 12px;
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  line-height: 0 !important;
+}
+
+/* Unread: a "New" pill in the corner (a dot means little when nearly everything is unread;
+   over art, a labelled pill reads where a colour change wouldn't) */
+html.se-community-discussions-home a.recent_game_discussion[data-se-dsc-unread] > .recent_game_discussions_unread_indicator::before,
+html.se-community-discussions-home .discussions_recentlyplayed.unread a::before {
+  content: "New";
+  display: block;
+  padding: var(--se-space-1) var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  background: color-mix(in srgb, var(--se-bg) 70%, transparent);
+  box-shadow: inset 0 0 0 1px var(--se-white-14);
+  color: var(--se-white);
+  font: var(--se-type-badge);
+  letter-spacing: .06em;
+  text-shadow: none;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+
+html.se-community-discussions-home .recent_game_discussions_unread_indicator img {
+  display: none !important;
+}

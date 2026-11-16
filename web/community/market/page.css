@@ -1,0 +1,480 @@
+/*
+ * Community Market home (/market/): a wide two-column page in the theme's look.
+ *
+ *   - Hero: Steam's banner as a glass card. The title, the subtitle under it, live activity chips (page.js), and the wallet card on the right with the avatar,
+ *     balance, View Inventory and "Sell an item" (moved in by page.js). A fanned wall of the
+ *     popular items' art (page.js) fades in behind it.
+ *   - Beta note: a slim info strip.
+ *   - Main column: My Market Activity as a segmented control, then the sell listings and buy
+ *     orders as two cards with empty states (a card with rows takes the full width). Below,
+ *     Popular / Newly Listed / Recently Sold as a second segmented control over one listing
+ *     card: ranked rows (popular items) with the item art on its rarity glow (--se-q,
+ *     page.js), name and game, quantity and the starting price.
+ *   - Sidebar: a sticky card with search, advanced options, the game filter (page.js) and
+ *     Browse by Game as icon rows; then the FAQ links.
+ *
+ * Layout applies above Steam's responsive breakpoint (910px); below it Steam's mobile layout
+ * stays, in the theme's colours.
+ *
+ * Ids and classes are Steam's (SteamTracking: steamcommunity.com/public/css/skin_1/
+ * economy_market.css, economy.css; the page report). The page frame and pill buttons are
+ * shared/ui.css, tokens core/tokens.css, the footer web/shared/base.css.
+ *
+ * Continued, by section, in tabs.css, listings.css, history.css, sidebar.css (same folder),
+ * listed after this file in web/community/loader.js: together they keep one file's order.
+ */
+
+html.se-community-market {
+  --se-mkt-side: clamp(300px, 20vw, 360px);
+  --se-mkt-gap: 24px;
+  --se-mkt-tile: 48px;
+  --se-mkt-row-gap: 12px;
+  --se-mkt-lead: calc(var(--se-mkt-tile) + var(--se-mkt-row-gap)); /* row content before the name */
+  --se-mkt-qty-w: 120px;
+  --se-mkt-price-w: 130px;
+  --se-mkt-icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M16 16l4.5 4.5'/%3E%3C/svg%3E");
+  --se-mkt-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  --se-mkt-icon-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-opacity='.35' d='M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20z'/%3E%3Cpath d='M11 10.5h2V17h-2zM12 6.5a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6z'/%3E%3C/svg%3E");
+  /* Empty-state icons, drawn in their final colour (--se-text-faint) */
+  --se-mkt-icon-tag: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236f7984'%3E%3Cpath fill-opacity='.4' d='M2.5 4.5a2 2 0 0 1 2-2h7.2a2 2 0 0 1 1.4.6l8.3 8.3a2 2 0 0 1 0 2.8l-7.3 7.3a2 2 0 0 1-2.8 0L3.1 13.2a2 2 0 0 1-.6-1.4z'/%3E%3Cpath d='M8 6a2 2 0 1 1 0 4 2 2 0 0 1 0-4z'/%3E%3C/svg%3E");
+  --se-mkt-icon-cart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236f7984'%3E%3Cpath fill-opacity='.4' d='M5.5 6h16l-2 8.5a2 2 0 0 1-2 1.5H8.3a2 2 0 0 1-2-1.6z'/%3E%3Cpath d='M1.5 3h3.2l3.1 13H19v2H6.2L3.1 5H1.5zM9 19.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM17 19.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z'/%3E%3C/svg%3E");
+}
+
+/* ---------- Page ---------- */
+
+@media (min-width: 911px) {
+  html.se-community-market .pagecontent {
+    padding-bottom: 4.5rem !important;
+  }
+
+  html.se-community-market:not(#se-none) :is(.market_header_bg, #BG_bottom) {
+    box-sizing: border-box;
+    width: var(--se-community-width) !important;
+    max-width: none !important;
+    margin-inline: auto !important;
+    padding: 0 !important;
+  }
+
+  html.se-community-market:not(#se-none) #BG_bottom {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) var(--se-mkt-side);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "note note"
+      "tabs side"
+      "panel side";
+    column-gap: var(--se-mkt-gap);
+    align-items: start;
+  }
+
+  /* Steam's floats: their children are placed in #BG_bottom's grid instead */
+  /* Steam's floats and wrappers: their children are placed in #BG_bottom's grid instead */
+  html.se-community-market:not(#se-none) :is(#mainContents, #sellListings) {
+    display: contents !important;
+  }
+
+  /*
+   * The open panel (listings or your activity) ends level with the sidebar's last card: it
+   * adds no height of its own (contain: size), so the sidebar sets the row and the panel
+   * fills it, scrolling inside.
+   */
+  html.se-community-market:not(#se-none) :is(#myListings, #sellListings > .market_content_block) {
+    grid-area: panel;
+    align-self: stretch;
+    contain: size;
+    min-height: 360px;
+    margin: 0 !important;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  /*
+   * The rows share the panel's height, so the list always ends at its bottom: each row grows
+   * from its own height up to a cap; past the panel, it scrolls. Steam hides the inactive
+   * tables with an inline display: none, which still wins over this flex.
+   */
+  html.se-community-market:not(#se-none) :is(#popularItemsTable, #sellListingsTable, #soldListingTable) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* The rows take what is left after the header and "Find more" (basis 0), whatever height
+     Steam gives the list itself, so "Find more" always sits at the bottom of the card */
+  html.se-community-market:not(#se-none) :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > [id$="Rows"] {
+    display: flex;
+    flex: 1 1 0 !important;
+    flex-direction: column;
+    height: auto !important;
+    min-height: min-content !important;
+  }
+
+  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > [id$="Rows"] > :is(a.market_listing_row_link, .market_listing_row) {
+    display: flex;
+    flex: 1 1 0;
+    min-height: calc(var(--se-mkt-tile) + 12px);
+    max-height: 96px;
+  }
+
+  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > :is(.market_listing_table_showmore, .market_listing_table_header) {
+    flex: none;
+  }
+
+  /* Steam's empty spacers (clear divs, line breaks) would add height under "Find more" */
+  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > :is(div:empty, br) {
+    display: none !important;
+  }
+
+  html.se-community-market .market_home_main_listing_table a.market_listing_row_link > .market_listing_row {
+    flex: 1;
+  }
+
+  /* Your activity: the open part fills the panel too (history's pager sits at its bottom);
+     the listing and buy-order cards stay at their own height at the top */
+  html.se-community-market:not(#se-none) #myListings {
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  html.se-community-market #myListings > :is(#tabContentsMyListings, #tabContentsMyMarketHistory) {
+    flex: 1 0 auto;
+  }
+
+  html.se-community-market #tabContentsMyListings {
+    align-content: start;
+  }
+
+  html.se-community-market:not(#se-none) #tabContentsMyMarketHistory {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* The column header stays in view while the rows scroll */
+  html.se-community-market:not(#se-none) .market_home_main_listing_table .market_listing_table_header {
+    position: sticky;
+    z-index: var(--se-z-raised-2);
+    top: -8px;
+    margin: calc(-1 * var(--se-space-2)) calc(-1 * var(--se-space-2)) var(--se-space-1) !important;
+    padding: var(--se-space-3) var(--se-space-5) var(--se-space-2) !important;
+    background: var(--se-surface) !important;
+  }
+
+  html.se-community-market .se-mkt-tabs { grid-area: tabs; }
+
+  html.se-community-market #marketBetaNoteCtn { grid-area: note; }
+  html.se-community-market #myMarketTabs { grid-area: tabs; }
+  html.se-community-market #sideBar { grid-area: side; }
+
+  html.se-community-market #mainContents > div:not([id]) {
+    grid-column: 1 / -1;
+  }
+
+  html.se-community-market #BG_bottom > br {
+    display: none;
+  }
+}
+
+/* ---------- Hero ---------- */
+
+html.se-community-market:not(#se-none) .market_header_bg {
+  height: auto !important;
+  margin-top: var(--se-space-5) !important;
+  margin-bottom: var(--se-space-5) !important;
+  background: none !important;
+}
+
+html.se-community-market:not(#se-none) #BG_top {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "title wallet"
+    "stats wallet";
+  align-items: center;
+  gap: var(--se-space-4) var(--se-space-6);
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: var(--se-space-6) var(--se-space-6) !important;
+  border-radius: var(--se-radius-xl);
+  background:
+    radial-gradient(90% 160% at 0% 0%, color-mix(in srgb, var(--se-accent) 15%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--se-surface-2), var(--se-surface)) !important;
+  box-shadow: var(--se-elevation-2);
+  overflow: hidden;
+}
+
+html.se-community-market #BG_top > :not(.se-mkt-art) {
+  position: relative;
+  z-index: var(--se-z-raised);
+}
+
+html.se-community-market:not(#se-none) h1.market_header {
+  grid-area: title;
+  min-width: 0;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  font: inherit !important;
+}
+
+html.se-community-market h1.market_header > a {
+  display: block;
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_header_logo {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-4);
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_header_text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  min-width: 0;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-market .market_header_text > br {
+  display: none;
+}
+
+html.se-community-market:not(#se-none) .market_title_text {
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-display)/1.1 var(--se-font) !important;
+  letter-spacing: -.01em;
+  text-shadow: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_subtitle_text {
+  max-width: 620px;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body-lg) !important;
+  text-shadow: none !important;
+}
+
+/* Activity chips (page.js) */
+html.se-community-market .se-mkt-stats {
+  grid-area: stats;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+}
+
+html.se-community-market .se-mkt-stats:empty {
+  display: none;
+}
+
+html.se-community-market .se-mkt-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: 32px;
+  padding: 0 var(--se-space-4) 0 var(--se-space-1);
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: var(--se-glass-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  color: var(--se-text-dim);
+  font: var(--se-type-label);
+  cursor: pointer;
+  backdrop-filter: var(--se-blur-chip);
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-community-market .se-mkt-stat:hover {
+  background: var(--se-hover);
+  color: var(--se-white);
+}
+
+html.se-community-market .se-mkt-stat-n {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  background: var(--se-accent-surface);
+  color: var(--se-accent);
+  font: 800 var(--se-fs-xs)/1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-market .se-mkt-stat[data-se-mkt-empty] .se-mkt-stat-n {
+  background: var(--se-pill);
+  color: var(--se-text-faint);
+}
+
+/* Hero art: popular items fanned behind the wallet (page.js) */
+html.se-community-market .se-mkt-art {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: -40px;
+  display: grid;
+  grid-template-columns: repeat(3, 112px);
+  gap: var(--se-space-4);
+  transform: translateY(-50%) rotate(-10deg);
+  opacity: .5;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 45%);
+  animation: se-mkt-art-in var(--se-dur-slower) var(--se-ease) both;
+}
+
+html.se-community-market .se-mkt-art-tile {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 112px;
+  height: 112px;
+  padding: var(--se-space-4);
+  border-radius: var(--se-radius-lg);
+  background:
+    radial-gradient(circle at 50% 60%, color-mix(in srgb, var(--se-q, var(--se-accent)) 26%, transparent), transparent 70%),
+    var(--se-field);
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-market .se-mkt-art-tile:nth-child(3n + 2) {
+  transform: translateY(28px);
+}
+
+html.se-community-market .se-mkt-art-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@keyframes se-mkt-art-in {
+  from { opacity: 0; translate: 24px 0; }
+}
+
+/* Wallet card */
+html.se-community-market:not(#se-none) #BG_top .user_info {
+  grid-area: wallet;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-4);
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-4) var(--se-space-4) var(--se-space-4) var(--se-space-4) !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-glass) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line), var(--se-shadow-sm);
+  backdrop-filter: var(--se-blur-chip);
+}
+
+/* The theme's avatar: a rounded square (--se-avatar-radius) with the status ring as a 2px gap,
+   then a 2px line */
+html.se-community-market:not(#se-none) .user_info .iconHolder_online {
+  display: block;
+  flex: none;
+  float: none !important;
+  box-sizing: border-box;
+  width: 44px !important;
+  height: 44px !important;
+  margin: var(--se-space-1) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-avatar-radius);
+  background: none !important;
+  outline: 2px solid var(--se-online); /* the theme's online blue (core/tokens.css), not Steam's cyan */
+  outline-offset: 2px;
+}
+
+html.se-community-market .user_info .avatarIcon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  line-height: 0;
+}
+
+html.se-community-market .user_info .avatarIcon img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: var(--se-avatar-radius);
+  object-fit: cover;
+}
+
+html.se-community-market:not(#se-none) .user_info .user_info_text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  float: none !important;
+  width: auto !important;
+  min-width: 140px;
+  margin: 0 !important;
+  padding: 0 var(--se-space-1) 0 0 !important;
+}
+
+html.se-community-market .user_info_text > br {
+  display: none;
+}
+
+html.se-community-market:not(#se-none) #marketWalletBalance {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-half);
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .08em;
+  text-decoration: none !important;
+  text-transform: uppercase;
+}
+
+html.se-community-market:not(#se-none) #marketWalletBalanceAmount {
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-3xl)/1.15 var(--se-font) !important;
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-market:not(#se-none) .user_info_text > a:not(#marketWalletBalance) {
+  width: fit-content;
+  color: var(--se-accent) !important;
+  font: var(--se-type-small) !important;
+  text-decoration: none !important;
+}
+
+html.se-community-market:not(#se-none) .user_info_text > a:not(#marketWalletBalance):hover {
+  color: var(--se-accent-hover) !important;
+}
+
+/* "Sell an item" in the wallet card (page.js); in Steam's tab row until moved */
+html.se-community-market:not(#se-none) .pick_and_sell_button {
+  float: none !important;
+  margin: 0 !important;
+}
+
+/* Steam pins the wrapper absolutely, 8px off the bottom right, with a zero line-height
+   (economy_market.css .pick_and_sell_button): back in the card's row, sized to the button and
+   centred */
+html.se-community-market:not(#se-none) .pick_and_sell_button[data-se-mkt-sell] {
+  position: static !important;
+  inset: auto !important;
+  display: flex !important;
+  align-items: center;
+  align-self: center;
+  width: auto !important;
+  height: auto !important;
+  margin-left: var(--se-space-2) !important;
+  line-height: normal !important;
+}

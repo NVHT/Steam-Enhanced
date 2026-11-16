@@ -1,0 +1,427 @@
+/* Continues page.css (in order, see web/community/loader.js): Sidebar; Narrow windows. */
+
+/* ---------- Sidebar ---------- */
+
+html.se-community-market:not(#se-none) #sideBar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-4);
+  float: none !important;
+  box-sizing: border-box;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+@media (min-width: 911px) {
+  /* Capped at the window, so an expanded game list scrolls here instead of stretching the panel */
+  html.se-community-market:not(#se-none) #sideBar {
+    position: sticky;
+    top: 16px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    border-radius: var(--se-radius-lg);
+  }
+}
+
+html.se-community-market:not(#se-none) :is(#findItems, #moreInfo) {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_search_sidebar_contents {
+  box-sizing: border-box;
+  width: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-market:not(#se-none) #escrow_description {
+  width: auto !important;
+  margin: 0 0 var(--se-space-4) !important;
+  padding: var(--se-space-3) var(--se-space-3) !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-white-04) !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-caption) !important;
+}
+
+html.se-community-market:not(#se-none) .escrow_description_link {
+  display: block;
+  width: auto !important;
+  height: auto !important;
+}
+
+html.se-community-market:not(#se-none) #escrow_description a {
+  color: var(--se-accent) !important;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_search_sidebar_section_tip_small {
+  display: block;
+  margin: 0 0 var(--se-space-2) !important;
+  padding: 0 var(--se-space-half) !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Search */
+html.se-community-market:not(#se-none) .market_search_box_container {
+  width: auto !important;
+  margin: 0 0 var(--se-space-5) !important;
+}
+
+html.se-community-market #market_search {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+}
+
+html.se-community-market:not(#se-none) .market_search_input_container {
+  display: block;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-market .market_search_sidebar_search_box div {
+  border-color: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html.se-community-market .market_search_sidebar_search_box > div {
+  position: relative;
+}
+
+/* Steam's React box sizes its wrappers in px (259px): every wrapper around the input fills the card */
+html.se-community-market:not(#se-none) .market_search_sidebar_search_box :is(div:has(input), input) {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+html.se-community-market:not(#se-none) #market_search_advanced_show {
+  float: none !important;
+  width: auto !important;
+}
+
+html.se-community-market .market_search_sidebar_search_box > div::before {
+  content: "";
+  position: absolute;
+  z-index: var(--se-z-raised);
+  top: 50%;
+  left: 14px;
+  width: 16px;
+  height: 16px;
+  margin-top: calc(-1 * var(--se-space-2));
+  background: var(--se-text-faint);
+  -webkit-mask: var(--se-mkt-icon-search) center / contain no-repeat;
+  pointer-events: none;
+}
+
+html.se-community-market:not(#se-none) #market_search input {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: var(--se-ctl) !important;
+  padding: 0 var(--se-space-4) 0 2.5rem !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-field-bg) !important;
+  box-shadow: var(--se-field-edge) !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-control) !important;
+  outline: 0 !important;
+  transition: box-shadow var(--se-dur);
+}
+
+html.se-community-market:not(#se-none) #market_search input:focus {
+  box-shadow: var(--se-field-edge-focus) !important;
+}
+
+html.se-community-market:not(#se-none) .market_search_advanced_button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-2);
+  box-sizing: border-box;
+  width: auto !important;
+  height: var(--se-ctl) !important;
+  padding: 0 var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line);
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-label) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-community-market:not(#se-none) .market_search_advanced_button:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-community-market:not(#se-none) .market_search_advanced_button .btn_details_arrow {
+  flex: none;
+  width: 12px !important;
+  height: 12px !important;
+  margin: 0 !important;
+  background: currentColor !important;
+  -webkit-mask: var(--se-mkt-icon-chevron) center / contain no-repeat;
+  position: static !important; /* Steam floats it outside the button */
+  float: none !important;
+  opacity: .7;
+}
+
+/* Game filter (page.js) */
+html.se-community-market .se-mkt-filter {
+  position: relative;
+  display: block;
+  margin: 0 0 var(--se-space-2);
+}
+
+html.se-community-market .se-mkt-filter::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 14px;
+  height: 14px;
+  margin-top: calc(-1 * var(--se-space-2));
+  background: var(--se-text-faint);
+  -webkit-mask: var(--se-mkt-icon-search) center / contain no-repeat;
+  pointer-events: none;
+}
+
+html.se-community-market .se-mkt-filter-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--se-ctl);
+  padding: 0 var(--se-space-3) 0 var(--se-space-6);
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: var(--se-field-bg);
+  box-shadow: var(--se-field-edge);
+  color: var(--se-text);
+  font: var(--se-type-label);
+  outline: 0;
+  transition: box-shadow var(--se-dur);
+}
+
+html.se-community-market .se-mkt-filter-input::placeholder {
+  color: var(--se-text-faint);
+}
+
+html.se-community-market .se-mkt-filter-input:focus {
+  box-shadow: var(--se-field-edge-focus);
+}
+
+html.se-community-market .se-mkt-filter-input::-webkit-search-cancel-button {
+  filter: invert(.6);
+  cursor: pointer;
+}
+
+html.se-community-market .se-mkt-filter-none {
+  margin: var(--se-space-2) 0 0;
+  padding: var(--se-space-4) var(--se-space-2);
+  color: var(--se-text-faint);
+  font: var(--se-type-small);
+  text-align: center;
+}
+
+html.se-community-market .se-mkt-filter-none[hidden] {
+  display: none;
+}
+
+/* While filtering: every list open, the matches only, no "Show more" */
+html.se-community-market [data-se-mkt-filtering] :is(.market_more_games, .market_unvetted_games) {
+  display: block !important;
+}
+
+html.se-community-market [data-se-mkt-filtering] .market_show_more_games,
+html.se-community-market [data-se-mkt-filtering] .market_unvetted_games:not(:has(a.game_button:not([data-se-mkt-hide]))) {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) a.game_button[data-se-mkt-hide] {
+  display: none !important;
+}
+
+/* Browse by Game */
+html.se-community-market:not(#se-none) .market_search_game_button_group {
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-market:not(#se-none) #browseItems {
+  width: auto !important;
+  margin: 0 !important;
+}
+
+html.se-community-market:not(#se-none) a.game_button {
+  display: flex !important;
+  align-items: center;
+  float: none !important;
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-2) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-community-market:not(#se-none) a.game_button:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+/* Steam frames the contents span (economy.css .game_button > span: gradient, border-image) */
+html.se-community-market:not(#se-none) .game_button > span {
+  border: 0 !important;
+  border-image: none !important;
+}
+
+html.se-community-market:not(#se-none) .game_button_contents {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-3);
+  min-width: 0;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  line-height: normal !important;
+}
+
+html.se-community-market:not(#se-none) .game_button_game_icon {
+  display: block !important;
+  flex: none;
+  float: none !important;
+  width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  border-radius: 7px;
+  background: var(--se-white-04) !important;
+  overflow: hidden;
+}
+
+/* Steam places the icon absolutely over the button (economy.css .game_button_game_icon > img):
+   back in its tile instead, or it stretches across the name */
+html.se-community-market:not(#se-none) .game_button_game_icon > img {
+  position: static !important;
+  inset: auto !important;
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+html.se-community-market:not(#se-none) .game_button_game_name {
+  display: block !important;
+  flex: 1;
+  min-width: 0;
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  color: inherit !important;
+  max-width: none !important;
+  font: var(--se-type-body) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-market:not(#se-none) .market_show_more_games {
+  margin: var(--se-space-2) 0 0 !important;
+}
+
+html.se-community-market:not(#se-none) .market_show_more_games a {
+  width: 100% !important;
+}
+
+html.se-community-market .market_show_more_games .ico16 {
+  display: none;
+}
+
+html.se-community-market:not(#se-none) .market_unvetted_games {
+  margin-top: var(--se-space-3) !important;
+  padding-top: var(--se-space-3) !important;
+  border-top: 1px solid var(--se-divider);
+}
+
+/* More info: FAQ and group links */
+html.se-community-market:not(#se-none) #moreInfo .market_search_sidebar_contents {
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-small) !important;
+}
+
+html.se-community-market:not(#se-none) #moreInfo a {
+  color: var(--se-accent) !important;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+html.se-community-market:not(#se-none) #moreInfo a:hover {
+  color: var(--se-accent-hover) !important;
+}
+
+/* ---------- Narrow windows ---------- */
+
+@media (max-width: 1280px) {
+  html.se-community-market:not(#se-none) #BG_top {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "title"
+      "stats"
+      "wallet";
+  }
+
+  html.se-community-market:not(#se-none) #BG_top .user_info {
+    justify-self: start;
+  }
+
+  html.se-community-market {
+    --se-mkt-qty-w: 96px;
+    --se-mkt-price-w: 108px;
+  }
+}
+
+@media (max-width: 910px) {
+  html.se-community-market .se-mkt-stats {
+    padding-left: 0;
+  }
+
+  html.se-community-market .se-mkt-art {
+    display: none;
+  }
+
+  html.se-community-market:not(#se-none) #BG_top {
+    padding: var(--se-space-5) !important;
+  }
+}

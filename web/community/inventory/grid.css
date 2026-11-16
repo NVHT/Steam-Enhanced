@@ -1,0 +1,243 @@
+/* Continues page.css (in order, see web/community/loader.js): Grid and item panel; Pager. */
+
+/* ---------- Grid and item panel ---------- */
+
+@media (min-width: 911px) {
+  html.se-community-inventory #active_inventory_page {
+    display: grid !important;
+    grid-template-columns: auto minmax(var(--se-inv-panel), 1fr);
+    grid-template-areas: "grid panel";
+    align-items: start;
+    gap: var(--se-space-5);
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+
+  html.se-community-inventory #active_inventory_page .inventory_page_left {
+    grid-area: grid;
+    float: none !important;
+    width: auto !important;
+    height: auto !important;
+  }
+
+  html.se-community-inventory #active_inventory_page .inventory_page_right {
+    grid-area: panel;
+    position: sticky !important;
+    top: 24px;
+    display: grid !important;
+    float: none !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+
+  /* Steam cross-fades two item panels in one spot: they share one grid cell */
+  html.se-community-inventory .inventory_page_right > * {
+    grid-area: 1 / 1;
+    min-width: 0;
+  }
+
+  html.se-community-inventory #inventories {
+    box-sizing: border-box;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 0 var(--se-space-4) !important;
+    padding: var(--se-space-4) !important;
+    border-radius: var(--se-radius-card);
+    background: var(--se-surface) !important;
+    box-shadow: var(--se-edge);
+    overflow: visible !important;
+  }
+
+  html.se-community-inventory #inventories .inventory_ctn {
+    display: grid; /* pages stack in one cell, so a page change never jumps the layout */
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  html.se-community-inventory #inventories .inventory_ctn[style*="display: none"] {
+    display: none !important;
+  }
+
+  /* Steam shows the current page with an inline display: block: the grid has to outrank it
+     (pages it hides keep their inline display: none, matched below) */
+  html.se-community-inventory #inventories .inventory_page {
+    grid-area: 1 / 1;
+    display: grid !important;
+    grid-template-columns: repeat(5, var(--se-inv-tile));
+    gap: var(--se-inv-gap);
+    position: relative !important;
+    inset: auto !important;
+    float: none !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+
+  html.se-community-inventory #inventories .inventory_page[style*="display: none"] {
+    display: none !important;
+  }
+
+  html.se-community-inventory #inventories .itemHolder {
+    float: none !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    aspect-ratio: 1;
+  }
+}
+
+/* Tiles */
+html.se-community-inventory #inventories .itemHolder {
+  border-radius: var(--se-radius-md);
+  background: none !important;
+}
+
+html.se-community-inventory #inventories .itemHolder.disabled {
+  background: var(--se-white-02) !important;
+  box-shadow: inset 0 0 0 1px var(--se-white-03);
+}
+
+html.se-community-inventory #inventories .item {
+  --se-q: transparent; /* items without a quality colour (Steam's own) get no glow */
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background:
+    radial-gradient(120% 90% at 50% 100%, color-mix(in srgb, var(--se-q) 22%, transparent), transparent 70%),
+    var(--se-surface-2) !important;
+  box-shadow: var(--se-edge), inset 0 -2px 0 color-mix(in srgb, var(--se-q) 75%, transparent);
+  overflow: hidden;
+  transition: transform var(--se-dur-slow) var(--se-ease), box-shadow var(--se-dur), background-color var(--se-dur);
+}
+
+html.se-community-inventory #inventories .item:hover {
+  transform: translateY(-2px);
+  background-color: var(--se-hover) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-q) 45%, transparent), inset 0 -2px 0 var(--se-q), var(--se-shadow-sm);
+}
+
+html.se-community-inventory #inventories .item.activeInfo {
+  box-shadow: 0 0 0 2px var(--se-accent), inset 0 -2px 0 var(--se-q), var(--se-shadow-sm);
+}
+
+html.se-community-inventory #inventories .item > img {
+  position: absolute;
+  inset: 10%;
+  width: 80% !important;
+  height: 80% !important;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px var(--se-black-50));
+}
+
+html.se-community-inventory #inventories .item .inventory_item_link {
+  position: absolute;
+  inset: 0;
+  z-index: var(--se-z-raised);
+}
+
+/* Count / stack badges Steam draws in the corner */
+html.se-community-inventory #inventories .item .item_currency_amount,
+html.se-community-inventory #inventories .item .item_count {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  z-index: var(--se-z-raised-2);
+  padding: var(--se-space-half) var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  background: var(--se-glass-chip);
+  color: var(--se-text);
+  font: var(--se-type-caption);
+  backdrop-filter: var(--se-blur-chip);
+}
+
+/* Loading: tiles pulse until their art arrives */
+html.se-community-inventory #inventories .item.pendingItem {
+  animation: se-inv-pulse 1.4s var(--se-ease) infinite alternate;
+}
+
+@keyframes se-inv-pulse {
+  from { opacity: .55; }
+  to { opacity: 1; }
+}
+
+/* ---------- Pager ---------- */
+
+html.se-community-inventory #inventory_pagecontrols {
+  display: flex !important;
+  flex-direction: row-reverse; /* Steam floats next before previous */
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-space-3);
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+html.se-community-inventory #inventory_pagecontrols > * {
+  float: none !important;
+  margin: 0 !important;
+}
+
+html.se-community-inventory #inventory_pagecontrols .pagebtn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px !important;
+  height: var(--se-ctl) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--se-glass-btn) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line), var(--se-glass-btn-shadow) !important;
+  color: var(--se-text) !important;
+  font-size: 0 !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur), opacity var(--se-dur);
+}
+
+html.se-community-inventory #inventory_pagecontrols .pagebtn::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: rotate(-45deg);
+  margin-right: var(--se-space-1);
+}
+
+html.se-community-inventory #inventory_pagecontrols #pagebtn_previous::before {
+  transform: rotate(135deg);
+  margin: 0 0 0 var(--se-space-1);
+}
+
+html.se-community-inventory #inventory_pagecontrols .pagebtn:not(.disabled):hover {
+  background: var(--se-glass-btn-hover) !important;
+}
+
+html.se-community-inventory #inventory_pagecontrols .pagebtn.disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+html.se-community-inventory #inventory_pagecontrols .pagecounts {
+  min-width: 72px;
+  padding: 0 var(--se-space-1) !important;
+  color: var(--se-text-faint) !important;
+  font: 600 var(--se-fs-base)/36px var(--se-font) !important;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+html.se-community-inventory #inventory_pagecontrols .pagecounts span {
+  color: var(--se-text) !important;
+}

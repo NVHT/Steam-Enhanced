@@ -1,0 +1,324 @@
+/*
+ * Continues page.css (in order, see web/community/loader.js): Action buttons; Beta note;
+ * Segmented tabs; One tab bar.
+ */
+
+/* ---------- Action buttons (Sell an item, Buy, Remove...) ---------- */
+
+html.se-community-market:not(#se-none) a.item_market_action_button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-space-2);
+  box-sizing: border-box;
+  width: auto !important;
+  height: var(--se-ctl) !important;
+  padding: 0 var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-pill) !important;
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line) !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-control) !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+  white-space: nowrap;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-community-market:not(#se-none) a.item_market_action_button:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-white) !important;
+}
+
+html.se-community-market:not(#se-none) a.item_market_action_button_green {
+  background: var(--se-btn-primary-bg) !important;
+  box-shadow: 0 8px 22px -10px color-mix(in srgb, var(--se-accent) 80%, transparent) !important;
+  color: var(--se-btn-primary-color) !important;
+}
+
+html.se-community-market:not(#se-none) a.item_market_action_button_green:hover {
+  background: var(--se-btn-primary-bg-hover) !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-community-market:not(#se-none) .item_market_action_button_contents {
+  display: contents !important;
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: inherit !important;
+}
+
+html.se-community-market :is(.item_market_action_button_preload, .item_market_action_button_edge, .item_market_action_button_left, .item_market_action_button_right) {
+  display: none !important;
+}
+
+/* ---------- Beta note ---------- */
+
+html.se-community-market:not(#se-none) #marketBetaNoteCtn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  height: auto !important;
+  margin: 0 0 var(--se-space-5) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-market:not(#se-none) .marketBetaNoteText {
+  position: relative;
+  margin: 0 !important;
+  padding: var(--se-space-3) var(--se-space-4) var(--se-space-3) var(--se-space-7) !important;
+  border-radius: var(--se-radius-md);
+  background: color-mix(in srgb, var(--se-accent) 8%, transparent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 18%, transparent);
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-small) !important;
+}
+
+html.se-community-market .marketBetaNoteText::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  width: 18px;
+  margin-top: calc(-1 * var(--se-space-2));
+  height: 18px;
+  background: var(--se-accent);
+  -webkit-mask: var(--se-mkt-icon-info) center / contain no-repeat;
+}
+
+html.se-community-market:not(#se-none) .marketBetaNoteText a {
+  color: var(--se-accent) !important;
+  font-weight: 600;
+  text-decoration: none !important;
+}
+
+/* ---------- Segmented tabs (My Market Activity; Popular / Newly Listed / Recently Sold) ---------- */
+
+html.se-community-market:not(#se-none) #myMarketTabs {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  height: auto !important;
+  margin: 0 0 var(--se-space-4) !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_large_tab_well {
+  position: static !important;
+  height: auto !important;
+  margin: 0 0 var(--se-space-4) !important;
+  background: none !important;
+}
+
+html.se-community-market .market_large_tab_well > img {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_tab_well_tabs {
+  position: static !important;
+  display: inline-flex;
+  gap: var(--se-space-1);
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-1) !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-market:not(#se-none) a.market_tab_well_tab {
+  display: inline-flex !important;
+  align-items: center;
+  flex: none !important;
+  float: none !important;
+  box-sizing: border-box;
+  width: auto !important;
+  min-width: 0 !important;
+  height: var(--se-ctl) !important;
+  margin: 0 !important;
+  padding: 0 var(--se-space-4) !important;
+  border-radius: var(--se-radius-control);
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-control) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-community-market:not(#se-none) a.market_tab_well_tab:hover {
+  background: var(--se-white-04) !important;
+  color: var(--se-text) !important;
+}
+
+html.se-community-market:not(#se-none) a.market_tab_well_tab.market_tab_well_tab_active {
+  background: var(--se-accent) !important;
+  color: var(--se-on-accent) !important;
+}
+
+html.se-community-market :is(.market_tab_well_tab_left, .market_tab_well_tab_right, .market_tab_well_tab_preload) {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_tab_well_tab_contents {
+  display: inline-flex !important;
+  align-items: center;
+  gap: var(--se-space-2);
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: inherit !important;
+  text-shadow: none !important;
+}
+
+/* Counts: "( 0 )" as a chip */
+html.se-community-market .my_market_header_count {
+  font-size: 0 !important;
+}
+
+html.se-community-market .my_market_header_count > span {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill);
+  color: var(--se-text-muted);
+  font: var(--se-type-badge);
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-market .market_tab_well_tab_active .my_market_header_count > span {
+  background: rgba(15, 17, 21, .16);
+  color: inherit;
+}
+
+/* ---------- One tab bar (page.js) ----------
+ * Steam's two bars as one theme-built bar: listings, a divider, then your activity. A pill
+ * slides under the open tab (--x / --w from page.js). Steam's bars are hidden while it is in
+ * place; its buttons click Steam's tabs, and [data-se-mkt-view] on #BG_bottom shows only the
+ * open side's panel.
+ */
+
+html.se-community-market #BG_bottom:has(> .se-mkt-tabs) :is(#myMarketTabs, .market_large_tab_well) {
+  display: none !important;
+}
+
+html.se-community-market #BG_bottom[data-se-mkt-view="browse"] #myListings,
+html.se-community-market #BG_bottom[data-se-mkt-view="activity"] #sellListings > .market_content_block {
+  display: none !important;
+}
+
+html.se-community-market .se-mkt-tabs {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-half);
+  justify-self: start;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 var(--se-space-4);
+  padding: var(--se-space-1);
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface);
+  box-shadow: var(--se-elevation-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+html.se-community-market .se-mkt-tabs-pill {
+  position: absolute;
+  z-index: var(--se-z-under);
+  top: 5px;
+  bottom: 5px;
+  left: 0;
+  width: var(--w, 0);
+  border-radius: var(--se-radius-control);
+  background: var(--se-accent);
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--se-accent) 75%, transparent);
+  transform: translateX(var(--x, 0));
+  transition: transform var(--se-dur-slow) var(--se-ease), width var(--se-dur-slow) var(--se-ease), opacity var(--se-dur);
+}
+
+html.se-community-market .se-mkt-tabs-divider {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  margin: 0 var(--se-space-2);
+  background: var(--se-divider);
+}
+
+html.se-community-market .se-mkt-tab {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: var(--se-ctl);
+  padding: 0 var(--se-space-4) 0 var(--se-space-4);
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: none;
+  color: var(--se-text-muted);
+  font: var(--se-type-control);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--se-dur), background-color var(--se-dur);
+}
+
+html.se-community-market .se-mkt-tab:hover {
+  background: var(--se-white-04);
+  color: var(--se-text);
+}
+
+html.se-community-market .se-mkt-tab[aria-selected="true"] {
+  background: none;
+  color: var(--se-on-accent);
+}
+
+html.se-community-market .se-mkt-tab-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--se-mkt-tab-icon) center / contain no-repeat;
+  opacity: .85;
+}
+
+html.se-community-market .se-mkt-tab[data-se-mkt-icon="popular"] { --se-mkt-tab-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12.5 2.5c.6 3.2 2.4 4.9 4.1 6.6A7.7 7.7 0 0 1 19 14.7 7 7 0 0 1 5 14.8c0-2.6 1.2-4.3 2.6-5.6.2 1.7.9 2.9 2.2 3.6-.5-4.2.7-7.8 2.7-10.3z'/%3E%3C/svg%3E"); }
+html.se-community-market .se-mkt-tab[data-se-mkt-icon="new"] { --se-mkt-tab-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M11 2h2l1.6 5.4L20 9v2l-5.4 1.6L13 18h-2l-1.6-5.4L4 11V9l5.4-1.6zM18.5 15l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z'/%3E%3C/svg%3E"); }
+html.se-community-market .se-mkt-tab[data-se-mkt-icon="sold"] { --se-mkt-tab-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm4.3 6.3L10.5 14l-2.8-2.8-1.4 1.4 4.2 4.2 7.2-7.1z'/%3E%3C/svg%3E"); }
+html.se-community-market .se-mkt-tab[data-se-mkt-icon="listings"] { --se-mkt-tab-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2.5 4.5a2 2 0 0 1 2-2h7.2a2 2 0 0 1 1.4.6l8.3 8.3a2 2 0 0 1 0 2.8l-7.3 7.3a2 2 0 0 1-2.8 0L3.1 13.2a2 2 0 0 1-.6-1.4zM8 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z'/%3E%3C/svg%3E"); }
+html.se-community-market .se-mkt-tab[data-se-mkt-icon="history"] { --se-mkt-tab-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 1-9.4 13.4l1.9-.7A8 8 0 1 0 6.3 6.3L8.5 8.5H2.5v-6l2.4 2.4A10 10 0 0 1 12 2zm-1 5h2v4.6l3.3 2-1 1.7L11 12.7z'/%3E%3C/svg%3E"); }
+
+html.se-community-market .se-mkt-tab-count {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 20px;
+  height: 20px;
+  margin-right: calc(-1 * var(--se-space-2));
+  padding: 0 var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill);
+  color: var(--se-text-muted);
+  font: 800 var(--se-fs-xs)/1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-community-market .se-mkt-tab[aria-selected="true"] .se-mkt-tab-count {
+  background: rgba(15, 17, 21, .18);
+  color: var(--se-on-accent);
+}

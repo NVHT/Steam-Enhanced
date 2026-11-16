@@ -1,0 +1,362 @@
+/*
+ * Checkout (checkout.steampowered.com: Payment Info, Review + Purchase, receipt). Steam's
+ * classic checkout is navy boxes on a blue art band, a blue step tab, a green Purchase button.
+ * Restyled to continue the theme's cart:
+ *
+ *  - The page on the theme's background; the step header as plain steps, the current one an
+ *    accent pill.
+ *  - Items, totals, Steam Points, payment details and the side notes as the theme's cards.
+ *  - Purchase as the accent primary pill (the cart's Continue to payment), one per view.
+ *
+ * Classes and ids are Steam's classic ones (store.steampowered.com/public/css/v6/cart.css in
+ * SteamTracking), stable across store builds. Rules use html.se-checkout:not(#se-none) for
+ * ID-level weight over Steam's id rules.
+ */
+
+/* ---------- Page ---------- */
+
+/* !important: another rule in this file sets font-family with !important */
+html.se-checkout:not(#se-none),
+html.se-checkout:not(#se-none) body {
+  background: var(--se-bg) !important; /* overrides Steam's navy body (shared_global.css) */
+  color: var(--se-text-dim);
+  font-family: var(--se-font) !important;
+}
+
+/* Steam's blue art band behind the header and page */
+html.se-checkout:not(#se-none) :is(#main_content, .page_content_ctn, .page_header_ctn, #checkout_header) {
+  background: none !important; /* overrides Steam's background images */
+}
+
+html.se-checkout:not(#se-none) a {
+  color: var(--se-accent);
+}
+
+html.se-checkout:not(#se-none) a:hover {
+  color: var(--se-accent-hover);
+}
+
+/* ---------- Step header ---------- */
+
+html.se-checkout:not(#se-none) :is(.cart_tab, .cart_tab_spacer) {
+  font: var(--se-type-label);
+}
+
+html.se-checkout:not(#se-none) .cart_tab_off {
+  color: var(--se-text-faint);
+}
+
+html.se-checkout:not(#se-none) .cart_tab_inactive:hover {
+  color: var(--se-text);
+}
+
+html.se-checkout:not(#se-none) .cart_tab_inactive:active {
+  transform: scale(var(--se-press-scale));
+}
+
+html.se-checkout:not(#se-none) .cart_tab_on {
+  padding: var(--se-space-2) var(--se-space-4);
+  border-radius: var(--se-radius-control);
+  background: var(--se-accent);
+  color: var(--se-on-accent);
+}
+
+/* Steam's pointer under the current tab */
+html.se-checkout:not(#se-none) :is(.cart_tab_left_on, .cart_tab_right_on) {
+  display: none;
+}
+
+html.se-checkout:not(#se-none) .cart_tab_spacer {
+  opacity: .4;
+}
+
+html.se-checkout:not(#se-none) #checkout_steam_logo {
+  opacity: .5;
+}
+
+/* ---------- Cards: items, totals, payment details, side notes ---------- */
+
+html.se-checkout:not(#se-none) :is(
+  .checkout_review_cart_item,
+  .checkout_content_box .checkout_content:is(.cart, .confirm),
+  .checkout_content_box.method,
+  #payment_info_tab .checkout_content .payment_info_form_area,
+  .checkout_total,
+  .rightcol .block
+) {
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important; /* overrides Steam's black washes */
+  box-shadow: var(--se-edge);
+}
+
+/* The outer box Steam washes too: let the cards inside carry the surface */
+html.se-checkout:not(#se-none) .checkout_content_box.checkout_main.txn {
+  background: none;
+  padding: 0;
+}
+
+/* ---------- Items ---------- */
+
+html.se-checkout:not(#se-none) .checkout_review_cart_item {
+  margin: 0 0 var(--se-space-3);
+  padding: var(--se-space-3) var(--se-space-4);
+}
+
+html.se-checkout:not(#se-none) .checkout_review_item_img {
+  padding-top: 0;
+}
+
+html.se-checkout:not(#se-none) .checkout_review_item_img img {
+  display: block;
+  border-radius: var(--se-radius-md);
+  box-shadow: 0 0 0 1px var(--se-hairline);
+}
+
+html.se-checkout:not(#se-none) .checkout_review_item_desc {
+  padding-top: var(--se-space-2);
+  color: var(--se-white);
+  font: var(--se-type-body-lg);
+}
+
+html.se-checkout:not(#se-none) .checkout_review_item_desc_ext {
+  color: var(--se-text-faint);
+  font-weight: 500;
+}
+
+html.se-checkout:not(#se-none) .checkout_review_item_platform {
+  opacity: .5;
+}
+
+html.se-checkout:not(#se-none) .checkout_review_item_price {
+  padding-top: var(--se-space-2);
+}
+
+html.se-checkout:not(#se-none) .checkout_review_item_price .price {
+  color: var(--se-white);
+  font: 800 var(--se-fs-lg)/1.4 var(--se-font);
+}
+
+html.se-checkout:not(#se-none) .checkout_review_item_price .quantity {
+  color: var(--se-text-faint);
+}
+
+/* ---------- Totals ---------- */
+
+html.se-checkout:not(#se-none) .cart_totals_area {
+  padding: var(--se-space-4) var(--se-space-5);
+}
+
+html.se-checkout:not(#se-none) .cart_total_row {
+  color: var(--se-text-muted);
+  font: var(--se-type-body);
+}
+
+html.se-checkout:not(#se-none) .cart_totals_area .price {
+  color: var(--se-text);
+  font-weight: 600;
+}
+
+/* The total: the line that matters, largest */
+html.se-checkout:not(#se-none) .cart_total_rule {
+  border-top-color: var(--se-divider);
+}
+
+html.se-checkout:not(#se-none) .cart_total_rule ~ .cart_total_row {
+  color: var(--se-white);
+  font-size: var(--se-fs-lg);
+  font-weight: 700;
+}
+
+html.se-checkout:not(#se-none) .cart_total_rule ~ .cart_total_row .price {
+  color: var(--se-white);
+  font-size: var(--se-fs-xl);
+  font-weight: 800;
+}
+
+html.se-checkout:not(#se-none) :is(.cart_total_row.savings, .cart_price_total_sub_text) {
+  color: var(--se-text-faint);
+}
+
+/* ---------- Steam Points ---------- */
+
+html.se-checkout:not(#se-none) .checkout_steam_rewards_banner {
+  margin: var(--se-space-3) 0;
+  border: 0;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important; /* overrides Steam's banner art */
+  box-shadow: var(--se-edge);
+}
+
+html.se-checkout:not(#se-none) .checkout_steam_rewards_banner div {
+  color: var(--se-text-dim);
+}
+
+html.se-checkout:not(#se-none) .checkout_steam_rewards_banner div.left {
+  color: var(--se-text);
+  font-weight: 600;
+}
+
+/* Steam's gradient-clipped points text: the accent, solid */
+html.se-checkout:not(#se-none) .checkout_steam_rewards_banner :is(div.right div.points div, div div.congratulations) {
+  background: none;
+  color: var(--se-accent);
+  -webkit-text-fill-color: currentColor;
+}
+
+/* ---------- Payment details ---------- */
+
+html.se-checkout:not(#se-none) .checkout_content.confirm {
+  padding: var(--se-space-4) var(--se-space-5);
+}
+
+html.se-checkout:not(#se-none) .review_row .review_row_label {
+  color: var(--se-text-faint);
+  font: var(--se-type-caption);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+html.se-checkout:not(#se-none) :is(.review_row .review_row_value, .review_payment_method_label, .review_steam_account_name) {
+  color: var(--se-text);
+}
+
+html.se-checkout:not(#se-none) .payment_method_review_method_label {
+  color: var(--se-text);
+  font-weight: 600;
+}
+
+/* Text fields (security code, card details) */
+html.se-checkout:not(#se-none) .checkout_content_box :is(input[type="text"], input[type="password"], input[type="tel"]),
+html.se-checkout:not(#se-none) :is(#security_code, #security_code_cached) {
+  box-sizing: border-box;
+  height: var(--se-ctl);
+  padding: 0 var(--se-space-3);
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-edge);
+  color: var(--se-text);
+  font: 600 var(--se-fs-md)/var(--se-ctl) var(--se-font);
+}
+
+html.se-checkout:not(#se-none) :is(#security_code, #security_code_cached) {
+  width: 4.5rem;
+}
+
+/* Focused: the one focus ring every field wears (search, wishlist) */
+html.se-checkout:not(#se-none) .checkout_content_box :is(input[type="text"], input[type="password"], input[type="tel"]):focus-visible,
+html.se-checkout:not(#se-none) :is(#security_code, #security_code_cached):focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: 0;
+}
+
+/* Section rule above the agreement */
+html.se-checkout:not(#se-none) .checkout_content_box hr {
+  border: 0;
+  border-top: 1px solid var(--se-divider);
+}
+
+/* ---------- Agreement and Purchase ---------- */
+
+html.se-checkout:not(#se-none) #purchase_bottom {
+  color: var(--se-text-dim);
+  font: var(--se-type-body);
+}
+
+html.se-checkout:not(#se-none) :is(#accept_ssa, .checkout_checkbox) {
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  accent-color: var(--se-accent);
+  cursor: pointer;
+}
+
+/* The box stays small; its label is the hit target (at least --se-hit tall, all clickable) */
+html.se-checkout:not(#se-none) label:has(> :is(#accept_ssa, .checkout_checkbox)),
+html.se-checkout:not(#se-none) label[for="accept_ssa"] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-height: var(--se-hit);
+  cursor: pointer;
+}
+
+/* Purchase: the accent pill, Steam's green image layers cleared */
+/* !important: Steam's own rules (styles_storev5.css) set color at equal or higher weight */
+html.se-checkout:not(#se-none) :is(#purchase_button_bottom, .btn_checkout_green, .btn_checkout_blue) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--se-tile);
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: var(--se-btn-primary-bg) !important; /* overrides Steam's button gradient */
+  box-shadow: none;
+  color: var(--se-btn-primary-color) !important;
+  text-decoration: none;
+}
+
+html.se-checkout:not(#se-none) :is(#purchase_button_bottom, .btn_checkout_green, .btn_checkout_blue) > span {
+  padding: 0 var(--se-space-5);
+  border: 0;
+  background: none !important; /* overrides Steam's button gradient */
+  color: inherit;
+  font: 700 var(--se-fs-md)/var(--se-tile) var(--se-font);
+  text-shadow: none;
+}
+
+html.se-checkout:not(#se-none) :is(#purchase_button_bottom, .btn_checkout_green, .btn_checkout_blue):hover {
+  background: var(--se-btn-primary-bg-hover) !important; /* overrides Steam's button gradient */
+}
+
+html.se-checkout:not(#se-none) :is(#purchase_button_bottom, .btn_checkout_green, .btn_checkout_blue):active {
+  transform: scale(var(--se-press-scale));
+}
+
+/* Disabled (agreement not accepted yet: Steam shows its own disabled copy of the button) */
+html.se-checkout:not(#se-none) :is(#purchase_button_disabled_bottom, .btn_disabled):is(#purchase_button_disabled_bottom, .btn_checkout_green, .btn_checkout_blue, .btn_disabled) {
+  background: var(--se-surface-2) !important; /* overrides Steam's button gradient and the pill above */
+  color: var(--se-text-faint);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Working (after Purchase): the same pill, quiet, so the step doesn't jump */
+html.se-checkout:not(#se-none) .btn_checkout_working {
+  height: var(--se-tile);
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2);
+  color: var(--se-text-faint);
+  font: 700 var(--se-fs-sm)/var(--se-tile) var(--se-font);
+  text-transform: none;
+}
+
+/* ---------- Side notes ---------- */
+
+html.se-checkout:not(#se-none) .rightcol .block {
+  overflow: hidden;
+}
+
+html.se-checkout:not(#se-none) .rightcol h2,
+html.se-checkout:not(#se-none) .block .block_header {
+  background: none;
+  color: var(--se-text-faint);
+  font: var(--se-type-caption);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+html.se-checkout:not(#se-none) .block .block_header {
+  padding: var(--se-space-4) var(--se-space-4) 0;
+}
+
+html.se-checkout:not(#se-none) :is(.block .block_content, #col_right_review .block_content_inner) {
+  padding: var(--se-space-2) var(--se-space-4) var(--se-space-4);
+  color: var(--se-text-dim);
+  font: var(--se-type-small);
+}
+
+html.se-checkout:not(#se-none) :is(.checkout_notes, .checkout_footer_notes) {
+  color: var(--se-text-faint);
+  font: var(--se-type-caption);
+}

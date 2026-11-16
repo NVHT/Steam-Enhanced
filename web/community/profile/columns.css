@@ -1,0 +1,288 @@
+/*
+ * Continues page.css (in order, see web/community/loader.js): Stats strip; Columns; Showcases;
+ * Game Collector.
+ */
+
+/* ---------- Stats strip (profile/page.js) ---------- */
+
+html.se-community-profile .se-profile-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: var(--se-space-2);
+  padding: var(--se-space-4) var(--se-profile-pad) var(--se-space-5);
+  border-top: 1px solid var(--se-divider);
+}
+
+html.se-community-profile .se-profile-stat {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "icon value"
+    "icon label";
+  align-items: center;
+  column-gap: var(--se-space-3);
+  min-height: 56px;
+  padding: var(--se-space-3) var(--se-space-4);
+  border-radius: var(--se-radius-md);
+  background: var(--se-white-04);
+  box-shadow: var(--se-edge);
+  color: var(--se-text-muted);
+  text-decoration: none !important;
+  transition: background-color var(--se-dur), color var(--se-dur), transform var(--se-dur) var(--se-ease);
+}
+
+html.se-community-profile .se-profile-stat:hover {
+  background: var(--se-hover);
+  color: var(--se-text);
+  transform: translateY(-1px);
+}
+
+html.se-community-profile .se-profile-stat .se-duo {
+  grid-area: icon;
+  width: 24px;
+  height: 24px;
+  color: var(--se-text-muted);
+  transition: color var(--se-dur);
+}
+
+html.se-community-profile .se-profile-stat:hover .se-duo {
+  color: var(--se-text);
+}
+
+html.se-community-profile .se-profile-stat-value {
+  grid-area: value;
+  align-self: end;
+  color: var(--se-white);
+  font: 800 var(--se-fs-xl)/1.15 var(--se-font);
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-profile .se-profile-stat-label {
+  grid-area: label;
+  align-self: start;
+  overflow: hidden;
+  font: var(--se-type-caption);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A link with no total: the label takes the value's place */
+html.se-community-profile .se-profile-stat[data-se-empty] {
+  grid-template-areas: "icon label";
+}
+
+html.se-community-profile .se-profile-stat[data-se-empty] .se-profile-stat-label {
+  align-self: center;
+  color: var(--se-text);
+  font: var(--se-type-body-lg);
+}
+
+/* ---------- Columns ---------- */
+
+@media (min-width: 911px) {
+  html.se-community-profile .profile_content {
+    box-sizing: border-box;
+    width: var(--se-profile-width) !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: var(--se-space-5) auto 4.5rem !important;
+    padding: 0 !important;
+  }
+
+  /* Steam clips these boxes (overflow), which makes them the side column's scroll container:
+     its sticky top then offsets it inside the grid and it never sticks */
+  html.se-community-profile :is(.profile_content, .profile_content_inner) {
+    overflow: visible !important;
+  }
+
+  html.se-community-profile .profile_content_inner {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) var(--se-profile-side);
+    grid-template-areas: "main side";
+    align-items: start;
+    gap: var(--se-space-5);
+    padding: 0 !important;
+  }
+
+  /* Steam paints the side column as a dark box (profilev2.css: rgba(0,0,0,.3)); the cards
+     in it are the surfaces here */
+  html.se-community-profile .profile_content_inner > :is(.profile_leftcol, .profile_rightcol) {
+    float: none !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Steam's mobile slot for groups and friends: empty here, and would add a gap */
+  html.se-community-profile #responsive_groupfriends_element_ctn:not(:has(*)) {
+    display: none !important;
+  }
+
+  html.se-community-profile .profile_leftcol {
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+    gap: var(--se-space-5);
+  }
+
+  html.se-community-profile .profile_rightcol {
+    grid-area: side;
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--se-space-3);
+  }
+
+  html.se-community-profile .profile_content_inner > :not(.profile_leftcol, .profile_rightcol) {
+    grid-column: 1 / -1;
+  }
+
+  html.se-community-profile .responsive_count_link_area {
+    display: flex !important;
+    flex-direction: column;
+    gap: var(--se-space-3);
+  }
+
+  /* The stats strip carries these now */
+  html.se-community-profile div.profile_page[data-se-stats] .profile_item_links {
+    display: none !important;
+  }
+
+  /* The status pill carries this, unless it offers Join Game */
+  html.se-community-profile div.profile_page[data-se-status] .responsive_status_info:not(:has(.profile_in_game_joingame)) {
+    display: none !important;
+  }
+}
+
+/* Glass cards */
+html.se-community-profile :is(
+  .profile_customization,
+  .profile_comment_area,
+  .profile_in_game,
+  .profile_item_links,
+  .profile_badges,
+  .profile_awards,
+  .profile_group_links,
+  .profile_friend_links
+),
+html.se-community-profile .se-profile-recent {
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: var(--se-space-5) var(--se-space-5) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-profile-card) !important;
+  box-shadow: var(--se-edge);
+  backdrop-filter: var(--se-profile-blur);
+}
+
+/* ---------- Showcases ---------- */
+
+html.se-community-profile .profile_customization_area {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-5);
+}
+
+html.se-community-profile .profile_customization {
+  overflow: hidden;
+}
+
+html.se-community-profile :is(.profile_customization_header, .profile_recentgame_header) {
+  margin: 0 0 var(--se-space-4) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-title) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html.se-community-profile .profile_customization_block {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text-dim);
+}
+
+html.se-community-profile .profile_customization_block > * + * {
+  margin-top: var(--se-space-4) !important;
+}
+
+/* Steam's clearfix spacers would take a section gap of their own at the end of a showcase */
+html.se-community-profile .profile_customization_block > :empty,
+html.se-community-profile .profile_customization > :empty:not(.profile_customization_header) {
+  display: none !important;
+}
+
+html.se-community-profile :is(.profile_customization_block, .profile_customization)::after {
+  content: none !important;
+}
+
+html.se-community-profile .profile_customization_block > :last-child {
+  margin-bottom: 0 !important;
+}
+
+html.se-community-profile .showcase_content_bg {
+  margin: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-white-03) !important;
+}
+
+/* Stats rows and game grids carry their own tiles: no box behind them */
+html.se-community-profile :is(.showcase_content_bg.showcase_stats_row, .showcase_content_bg:has(> .showcase_gamecollector_games)) {
+  padding: 0 !important;
+  background: none !important;
+}
+
+/* ---------- Game Collector: stats sidebar (.se-collector, profile/page.js) ----------
+ * Stats 2x2 on the left, as tall as the games; "Featured Games" above the games, 4 across.
+ */
+
+html.se-community-profile .se-collector {
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    ". label"
+    "stats games";
+  gap: 0 var(--se-space-5);
+}
+
+/* Wrappers Steam left empty once their contents moved */
+html.se-community-profile .profile_customization_block:has(> .se-collector) > :not(.se-collector):not(:has(*)) {
+  display: none !important;
+}
+
+html.se-community-profile .se-collector > .showcase_stats_row {
+  grid-area: stats;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  gap: var(--se-space-2);
+  margin: 0 !important;
+}
+
+html.se-community-profile .se-collector .showcase_stat {
+  justify-content: center;
+  min-width: 0;
+}
+
+html.se-community-profile .se-collector .showcase_stat .value {
+  font-size: var(--se-fs-3xl) !important;
+}
+
+html.se-community-profile .profile_customization .se-collector > [data-se-collector-label]:not(#se-none) {
+  grid-area: label;
+  margin: 0 0 var(--se-space-3) !important;
+}
+
+html.se-community-profile .se-collector > .showcase_gamecollector_games {
+  grid-area: games;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0 !important;
+}

@@ -1,0 +1,83 @@
+/* Continues ui.css (in order, see web/community/loader.js): Footer. */
+
+/* ---------- Footer (Steam's classic #footer: .footer_content > #footerText, the mobile opt-in) ----------
+ * One quiet row at the foot of the window, in the page's width: the legal links on the left,
+ * the copyright and "View mobile website" on the right, every item centred on one line. On a
+ * short page the footer still sits at the window's bottom edge (the frame fills the window), so
+ * the page never ends in a band of empty background under it.
+ */
+html.se-community-ui .responsive_page_frame:has(> #footer) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+html.se-community-ui .responsive_page_frame:has(> #footer) > .responsive_page_content {
+  flex: 1 0 auto;
+}
+
+/* !important: Steam's own rules (footer.css, shared_responsive.css) set height, margin, padding,
+   width at equal or higher weight */
+html.se-community-ui #footer:has(> .footer_content) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--se-space-1) var(--se-space-5);
+  box-sizing: border-box;
+  width: auto !important;
+  height: auto !important;
+  margin: auto 0 0 !important;
+  padding: var(--se-space-5) max(var(--se-page-gutter), (100% - var(--se-community-width)) / 2) !important;
+  font: var(--se-type-small);
+}
+
+/* Steam's wrappers step aside, so every link, the copyright and the opt-in line up as items of
+   one row (and the copyright can lead the right-hand group) */
+/* !important: Steam's own rules set display at equal or higher weight */
+html.se-community-ui #footer :is(.footer_content, #footerText, .responsive_optin_link) {
+  display: contents !important;
+}
+
+/* !important: Steam's own rules set display, float, margin at equal or higher weight */
+html.se-community-ui #footer #footerText > :is(a, .copyright) {
+  display: inline-flex !important;
+  align-items: center;
+  float: none !important;
+  min-height: var(--se-hit);
+  margin: 0 !important;
+}
+
+/* !important: Steam's own rules (footer.css, shared_global.css) set color, text-decoration at equal
+   or higher weight */
+html.se-community-ui #footer :is(#footerText a, .responsive_optin_link > *) {
+  color: var(--se-text-muted) !important;
+  text-decoration: none !important;
+  transition: color var(--se-dur);
+}
+
+/* !important: Steam's own rules set color at equal or higher weight */
+html.se-community-ui #footer :is(#footerText a, .responsive_optin_link > *):hover {
+  color: var(--se-text) !important;
+}
+
+/* The right-hand group: the copyright, faint, then the opt-in */
+/* !important: Steam's own rules set color at equal or higher weight */
+html.se-community-ui #footer .copyright {
+  margin-inline-start: auto !important;
+  color: var(--se-text-faint) !important;
+}
+
+/* The opt-in is one of Steam's buttons: here a plain link like the others, with the hit target */
+/* !important: the theme's shared rules (above) set display, height, padding with !important; Steam's
+   own rules (buttons.css) set background, color with !important */
+html.se-community-ui:not(#se-none) #footer .responsive_optin_link > [class*="btn"] {
+  display: inline-flex !important;
+  align-items: center;
+  height: var(--se-hit);
+  padding: 0 !important;
+  border: 0;
+  background: none !important;
+  box-shadow: none;
+  font: inherit;
+  cursor: pointer;
+}

@@ -1,0 +1,544 @@
+/*
+ * Continues page.css (in order, see web/community/loader.js): Side column; Comments; Private
+ * profile; Below Steam's breakpoint.
+ */
+
+/* ---------- Side column ---------- */
+
+html.se-community-profile .responsive_status_info {
+  margin: 0 !important;
+}
+
+html.se-community-profile .profile_in_game {
+  --se-status: var(--se-status-offline);
+  position: relative;
+  padding-left: var(--se-space-7) !important;
+}
+
+html.se-community-profile .profile_in_game.online { --se-status: var(--se-status-online); }
+html.se-community-profile .profile_in_game.in-game { --se-status: var(--se-status-ingame); }
+
+html.se-community-profile .profile_in_game::before {
+  content: "";
+  position: absolute;
+  top: 27px;
+  left: 22px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--se-status);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--se-status) 22%, transparent);
+}
+
+html.se-community-profile .profile_in_game_header {
+  color: var(--se-status) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+html.se-community-profile .profile_in_game_name {
+  color: var(--se-text) !important;
+  font: var(--se-type-body) !important;
+}
+
+html.se-community-profile .profile_in_game_joingame {
+  margin-top: var(--se-space-3) !important;
+}
+
+/* Preview cards: the count link as the card's header, with a chevron */
+html.se-community-profile :is(.profile_item_links, .profile_badges, .profile_awards, .profile_group_links, .profile_friend_links) {
+  padding: var(--se-space-2) !important;
+}
+
+html.se-community-profile .profile_count_link {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+html.se-community-profile .profile_count_link a {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-3);
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border-radius: var(--se-radius-md);
+  text-decoration: none !important;
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-profile .profile_count_link a:hover {
+  background: var(--se-hover);
+}
+
+html.se-community-profile .profile_count_link a::after {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: var(--se-text-faint);
+  -webkit-mask: var(--se-chevron-mask) center / contain no-repeat;
+  transition: background-color var(--se-dur), transform var(--se-dur) var(--se-ease);
+}
+
+html.se-community-profile .profile_count_link a:hover::after {
+  background: var(--se-text);
+  transform: translateX(2px);
+}
+
+html.se-community-profile .count_link_label {
+  flex: 1;
+  min-width: 0;
+  color: var(--se-text) !important;
+  font: var(--se-type-title) !important;
+}
+
+html.se-community-profile .profile_count_link_total {
+  flex: none;
+  padding: var(--se-space-1) var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  background: var(--se-pill);
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-small) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-profile .profile_count_link_total[data-se-empty] {
+  display: none;
+}
+
+html.se-community-profile .profile_count_link_preview {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  margin: 0 !important;
+  padding: var(--se-space-half) var(--se-space-3) var(--se-space-3) !important;
+}
+
+html.se-community-profile .profile_count_link_preview > div:empty {
+  display: none;
+}
+
+/* Award and badge previews: one 72px square each, the art centred and contained (Steam's slot
+   size and the icon sizes disagreed, so art sat off-centre or spilled out) */
+html.se-community-profile .profile_count_link_preview:has(.profile_badges_badge) {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, 72px);
+  justify-content: start;
+  gap: var(--se-space-2);
+}
+
+html.se-community-profile .profile_badges_badge {
+  display: grid !important;
+  place-items: center;
+  box-sizing: border-box;
+  width: 72px !important;
+  height: 72px !important;
+  float: none !important;
+  margin: 0 !important;
+  padding: var(--se-space-3) !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-white-03);
+  transition: background-color var(--se-dur), transform var(--se-dur) var(--se-ease);
+}
+
+html.se-community-profile .profile_badges_badge:hover {
+  background: var(--se-hover);
+  transform: translateY(-1px);
+}
+
+html.se-community-profile .profile_badges_badge > a {
+  display: grid !important;
+  place-items: center;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-profile .profile_badges_badge img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  object-fit: contain;
+}
+
+/* Groups */
+html.se-community-profile .profile_group_links .profile_count_link_preview {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: var(--se-space-half);
+  padding: 0 0 var(--se-space-1) !important;
+}
+
+html.se-community-profile .profile_group {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: 42px minmax(0, 1fr);
+  grid-template-areas:
+    "avatar name"
+    "avatar count";
+  align-content: center;
+  align-items: center;
+  gap: var(--se-space-half) var(--se-space-3);
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-3) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: none !important;
+  transition: background-color var(--se-dur);
+}
+
+/* The primary group gets extra height and helper nodes from Steam: same row as the rest */
+html.se-community-profile .profile_group > :not(.profile_group_avatar, a.whiteLink, .profile_group_membercount) {
+  display: none !important;
+}
+
+html.se-community-profile .profile_group .profile_group_avatar {
+  align-self: center;
+}
+
+html.se-community-profile .profile_group > a.whiteLink {
+  align-self: end;
+}
+
+html.se-community-profile .profile_group_membercount {
+  align-self: start;
+}
+
+html.se-community-profile .profile_group:hover {
+  background: var(--se-hover);
+}
+
+/* Steam positions the avatar absolutely and pads the text past it: both back in the grid */
+html.se-community-profile .profile_group > * {
+  position: static !important;
+  float: none !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-profile .profile_group > div:empty {
+  display: none;
+}
+
+/* Steam sizes these per group (the primary group's is larger) and they overflow onto the name:
+   one fixed box, the image filling it */
+html.se-community-profile .profile_group .profile_group_avatar {
+  grid-area: avatar;
+  width: 42px !important;
+  height: 42px !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-pill) !important;
+  box-shadow: none !important;
+}
+
+html.se-community-profile .profile_group .profile_group_avatar :is(a, img) {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html.se-community-profile .profile_group .profile_group_avatar img {
+  object-fit: cover;
+}
+
+html.se-community-profile .profile_group > a.whiteLink {
+  grid-area: name;
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-profile .profile_group_membercount {
+  grid-area: count;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+}
+
+/* Friends (rows: shared/ui.css), a size up in the wider side column */
+html.se-community-profile .profile_topfriends {
+  display: flex !important;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: var(--se-space-half);
+  padding: 0 0 var(--se-space-1) !important;
+}
+
+html.se-community-profile .profile_topfriends .friendBlock {
+  gap: var(--se-space-3);
+  padding: var(--se-space-2) var(--se-space-4) !important;
+}
+
+/* Avatars: the theme's rounded square (--se-avatar-radius) with its status ring, a 2px gap then
+   a 2px line, drawn as an outline so the picture keeps its full size and the ring stays even */
+html.se-community-profile .profile_topfriends .friendBlock .playerAvatar {
+  box-sizing: border-box;
+  width: 38px !important;
+  height: 38px !important;
+  margin: var(--se-space-1) !important;
+  padding: 0 !important;
+  border-radius: var(--se-avatar-radius);
+  background: none !important;
+  outline: 2px solid var(--se-status);
+  outline-offset: 2px;
+}
+
+html.se-community-profile .profile_topfriends .friendBlock .playerAvatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  border-radius: inherit !important;
+}
+
+html.se-community-profile .profile_topfriends .friendBlockContent {
+  flex: 1;
+  font-size: var(--se-fs-md) !important;
+}
+
+html.se-community-profile .profile_topfriends .friendSmallText {
+  display: block;
+  overflow: hidden;
+  font-size: var(--se-fs-sm) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Level ring: Steam pins it to a corner; here it closes the row on the right, at Steam's
+   32px sprite size so the tier art stays aligned */
+html.se-community-profile .profile_topfriends .friendPlayerLevel {
+  position: static !important;
+  order: 3;
+  flex: none;
+  float: none !important;
+  margin: 0 0 0 auto !important;
+}
+
+html.se-community-profile .profile_topfriends .friendPlayerLevelNum {
+  font: 700 var(--se-fs-xs)/32px var(--se-font) !important;
+}
+
+/* ---------- Comments ----------
+ * Profile only (shared/ui.css keeps the plain version elsewhere).
+ *   - Composer: the field and its buttons as one rounded box (Formatting help as a quiet text
+ *     button, emoji, Post); the whole box takes the accent ring while typing.
+ *   - Comments: avatar | name · time / text, no dividers or highlight; actions on hover.
+ */
+
+html.se-community-profile .profile_comment_area {
+  margin-top: 0 !important;
+}
+
+/* Composer */
+html.se-community-profile .profile_comment_area .commentthread_entry {
+  grid-template-columns: 40px minmax(0, 1fr) !important;
+  column-gap: var(--se-space-4) !important;
+  margin: 0 0 var(--se-space-5) !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_entry > .commentthread_user_avatar {
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_entry > .commentthread_user_avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: var(--se-avatar-radius) !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_entry_quotebox {
+  margin: 0 !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_textarea {
+  min-height: 52px;
+  padding: var(--se-space-4) var(--se-space-4) !important;
+  border-radius: var(--se-radius-lg) var(--se-radius-lg) 0 0 !important;
+  box-shadow: inset 1px 1px 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline) !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_textarea:focus {
+  box-shadow: inset 1px 1px 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline) !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_entry_submitlink {
+  gap: var(--se-space-2) !important;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-3) !important;
+  border-radius: 0 0 var(--se-radius-lg) var(--se-radius-lg);
+  background: var(--se-field);
+  box-shadow: inset 1px -1px 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline);
+}
+
+html.se-community-profile .profile_comment_area .commentthread_entry:focus-within :is(.commentthread_textarea, .commentthread_entry_submitlink) {
+  box-shadow: 0 0 0 1px var(--se-accent) !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_entry:focus-within .commentthread_textarea {
+  clip-path: inset(-2px -2px 0 -2px);
+}
+
+html.se-community-profile .profile_comment_area .commentthread_entry:focus-within .commentthread_entry_submitlink {
+  clip-path: inset(0 -2px -2px -2px);
+}
+
+/* Formatting help: a quiet text button */
+html.se-community-profile .profile_comment_area .commentthread_entry_submitlink .btn_grey_black {
+  margin-right: auto !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text-faint) !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_entry_submitlink .btn_grey_black:hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text) !important;
+}
+
+/* Comments: avatar | name · time / text */
+/* No hover highlight and no side padding: avatars and text line up with the composer */
+html.se-community-profile .profile_comment_area .commentthread_comments {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  margin: 0 !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_comment {
+  padding: var(--se-space-3) 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_comment_content {
+  display: grid !important;
+  grid-template-columns: 40px minmax(0, 1fr);
+  column-gap: var(--se-space-4);
+  row-gap: var(--se-space-1);
+}
+
+html.se-community-profile .profile_comment_area .commentthread_comment_author {
+  display: contents !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_comment_friendindicator {
+  display: none !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_comment_avatar {
+  grid-column: 1;
+  grid-row: 1 / span 4;
+  align-self: start;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_comment_avatar img {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Name · time on one line (Steam stacks them as a column) */
+html.se-community-profile .profile_comment_area .author_name_group {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: baseline;
+  flex-wrap: nowrap !important;
+  gap: var(--se-space-2);
+  min-width: 0;
+  padding-right: var(--se-space-6);
+}
+
+html.se-community-profile .profile_comment_area .author_name_group > * {
+  flex: none;
+  width: auto !important;
+  min-width: 0;
+}
+
+html.se-community-profile .profile_comment_area .author_name_group > .flex_row::after {
+  content: "·";
+  margin-left: var(--se-space-2);
+  color: var(--se-text-faint);
+  font-weight: 700;
+}
+
+html.se-community-profile .profile_comment_area .author_name_group > .commentthread_comment_timestamp {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Text in the second column, under the name (beats shared/ui.css's indent) */
+html.se-community-profile:not(#se-none) .profile_comment_area .commentthread_comment_content > :not(.commentthread_comment_author) {
+  grid-column: 2;
+  margin-left: 0 !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_comment_text {
+  color: var(--se-text) !important;
+}
+
+html.se-community-profile .profile_comment_area .commentthread_comment_actions {
+  top: 12px;
+  right: 0;
+}
+
+/* ---------- Private profile ---------- */
+
+html.se-community-profile .profile_private_info {
+  margin: 0 !important;
+  padding: var(--se-space-5) !important;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-profile-card) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body-lg) !important;
+}
+
+/* ---------- Below Steam's breakpoint ---------- */
+
+@media (max-width: 910px) {
+  html.se-community-profile .profile_header {
+    border-radius: 0;
+    background: var(--se-profile-card) !important;
+  }
+
+  html.se-community-profile .se-profile-stats {
+    display: none;
+  }
+
+  html.se-community-profile .se-profile-recent,
+  html.se-community-profile :is(.profile_customization, .profile_comment_area) {
+    margin: var(--se-space-3) !important;
+  }
+
+  html.se-community-profile .recent_game_content {
+    grid-template-columns: 140px minmax(0, 1fr);
+  }
+
+  html.se-community-profile .game_info_cap a {
+    width: 140px !important;
+  }
+
+  html.se-community-profile .game_info_cap img {
+    min-height: 0;
+  }
+}

@@ -1,0 +1,294 @@
+/*
+ * Continues site.css (in order, see web/help/loader.js): Every other Support page; Column; Text;
+ * Panels.
+ */
+
+/* ==========================================================================
+ * Every other Support page: help.css's components by role, so each wizard step, FAQ, form,
+ * refund, account-data, ticket and recovery page takes the theme's look. Groups are help.css's
+ * own selectors (SteamTracking), listed by what they draw.
+ * ========================================================================== */
+
+/* ---------- Column: help.css caps most blocks at the old 712px wizard width ---------- */
+
+html.se-help :is(
+  .help_page_text, .help_page_section_header, .help_page_important_warning, .help_page_trade_ctn,
+  .help_page_purchasetoprove, .help_wizard_button_notes, .loginbox_background, .login_help_links_box,
+  .help_top_details, .help_refund_request_area, .refund_result_message, #refund_tell_why_text,
+  .help_app_header_divider, .help_official_box, .help_itempurchase_detail_box, .help_issue_details,
+  .help_notinlibrary_details, .help_missingrefund_details, .help_cannot_launch_game_details,
+  .help_cannot_install_game_details, .help_before_contacting_steam_support_details,
+  .help_issue_delete_header, .help_search_results_faqs, .help_section_content, .help_section_body_small,
+  .help_step_section, .help_section_alert, .help_home_error_events, .help_event_limiteduser,
+  .help_login_nag, .create_help_request_form, .help_request_page, .issue_help_requests,
+  .help_restrictedaccount_content, .help_report_scam, .help_provide_pop_header,
+  .help_provide_pop_subheader, #report_abuse_container, .dropdown_help_btn_container
+) {
+  max-width: none !important;
+}
+
+/* ---------- Text ----------
+ * Role groups use :where(), so a group adds no weight of its own: !important beats help.css,
+ * and any more specific rule here (the game header, the official box) still wins.
+ */
+
+html.se-help body.v6 {
+  font-weight: 400;
+}
+
+html.se-help #page_content {
+  color: var(--se-text-dim);
+  font: var(--se-type-body-lg);
+}
+
+html.se-help #page_content a {
+  color: var(--se-text);
+  transition: color var(--se-dur);
+}
+
+html.se-help #page_content a:hover {
+  color: var(--se-accent);
+}
+
+/* Links inside running text: accent, so they read as links */
+html.se-help :where(.help_faq_text, .help_page_text, .help_issue_details, .help_section_content, .help_step_section, .help_top_details, .help_request_message, .refund_note, .help_official_box) a:not([class*="btn"]):not(.help_wizard_button) {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+html.se-help :where(.help_faq_text, .help_page_text, .help_issue_details, .help_section_content, .help_step_section, .help_top_details, .help_request_message, .refund_note, .help_official_box) a:not([class*="btn"]):not(.help_wizard_button):hover {
+  color: var(--se-accent-hover) !important;
+}
+
+/* Headings: the theme's text colour and weight, in place of help.css's blues */
+html.se-help body.v6 h2.pageheader {
+  color: var(--se-text) !important;
+  font: 800 var(--se-fs-display)/1.15 var(--se-font) !important;
+  letter-spacing: -.02em;
+  text-transform: none !important;
+}
+
+html.se-help body.v6 h2,
+html.se-help body.v6 .help_refund_request_area h1 {
+  color: var(--se-text) !important;
+  font: var(--se-type-title-lg) !important;
+  letter-spacing: -.01em;
+  text-transform: none !important;
+}
+
+html.se-help body.v6 h3 {
+  color: var(--se-text) !important;
+  font: var(--se-type-heading) !important;
+}
+
+html.se-help body.v6 h4 {
+  color: var(--se-text) !important;
+  font: var(--se-type-title) !important;
+}
+
+html.se-help :where(
+  .help_page_title, .help_page_inside_title, .help_section_medium_header, .help_section_medium_header_no_padding,
+  .help_section_mediumsteps_header, .help_section_mediumwhite_header, .help_section_alert .title, .help_game_header,
+  .help_request_track_shipping_title, .help_request_legal_dmca_instructions .instructions_title,
+  .help_pendingform_title, .help_vacorgameban_accountheader, .vac_title,
+  .help_page_section_header_large, .help_delete_how, .feature_title, .login_help_links_box .title,
+  .help_recoveraccount_header, .help_provide_pop_header, .help_page_section_header
+) {
+  color: var(--se-text) !important;
+  font-family: var(--se-font) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em;
+}
+
+html.se-help :where(.help_page_title, .help_page_inside_title, .help_game_header, .help_section_alert .title) {
+  font-size: var(--se-fs-xl) !important;
+}
+
+/* Small caps headers: the theme's section label */
+html.se-help :where(.help_section_small_header, .help_section_small_header_lowercase, .help_request_headers .col, .help_subsection_header) {
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-caption) !important;
+  letter-spacing: .1em;
+  text-transform: uppercase !important;
+}
+
+html.se-help :where(.help_recoveraccount_header_subheader, .help_provide_pop_subheader, body.v6 .help_refund_request_area h2, body.v6 h2 .header_inline) {
+  color: var(--se-text-muted) !important;
+  font-weight: 500 !important;
+}
+
+/* Values and highlights: accent */
+html.se-help :where(
+  .help_highlight_text, .refund_value, .refund_value_details, .purchase_detail_field, .refund_token_balance_name,
+  .refund_request_warnings, .purchase_rma_details_help_issue, .help_purchase_failure_note,
+  .help_restrictedaccount_step, .help_itembug_currency, .help_damagedwalletcode_details .highlight,
+  .create_help_request_secondary, .help_request_email_validation_hightlight, .orderdetails_orderdate,
+  .search_error_tip_prefix, .help_issue_details .bold, .help_request_title,
+  .create_request_form_row .hint_text.right_hint
+) {
+  color: var(--se-accent) !important;
+}
+
+/* Kept out of the :is() lists: an id in one would give the whole list id weight */
+html.se-help #what_is_this a {
+  color: var(--se-accent) !important;
+}
+
+html.se-help #help_request_email_verification p {
+  color: var(--se-text-muted) !important;
+}
+
+html.se-help #gift_refundable_notes h2 {
+  color: var(--se-text) !important;
+}
+
+html.se-help :where(.help_whitelight_text, .help_issue_details .HighlightedText, .help_missingrefund_details b, .help_request_name, .help_pendingform_notadded, .code_text, .code_explanation) {
+  color: var(--se-text) !important;
+}
+
+/* Secondary text: muted */
+html.se-help :where(
+  .help_lowlight_text, .help_faq_text, .help_text_block, .help_your_issue_start, .refund_note,
+  .help_purchase_detail_text, .purchase_totals, .help_chargeback_note, .help_request_state_msg,
+  .small_timestamp, .help_game_playtime, .help_wizard_button_dark, .help_header_nolink, .help_purchase_qty,
+  .create_request_form_row .hint_text:not(.right_hint), .help_game_cooldown_levelup, .refund_item_header,
+  .refund_game_detail, .refund_token_balance_amount, .help_delete_step_text, .help_request_header_row,
+  .help_request_area, .attached_file_size, .scam_report_date, .help_page_trade_date, .help_page_trade_with,
+  .hardware_support_serial_section, .help_event_limiteduser_spend span
+) {
+  color: var(--se-text-muted) !important;
+}
+
+/* FAQ and article text reads at body size */
+html.se-help :where(.help_faq_text, .help_page_text, .help_issue_details, .help_section_content) {
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-md) !important;
+  line-height: 1.65 !important;
+}
+
+/* Struck-out prices */
+html.se-help :where(.lineitem_price_strikeout, .help_purchase_price.price_strikeout) {
+  color: var(--se-text-faint) !important;
+}
+
+/* Danger, warning, success */
+html.se-help :where(
+  .warning, #error_description, .help_highlight_bans_text, .help_page_important_warning, #change_password_error,
+  .vac_ban_header, .help_refund_request_area h1.failed, #updateShippingError, #shipping_error_display,
+  #validate_email_error_contents, .help_microtxn_info .warning
+) {
+  color: var(--se-danger) !important;
+}
+
+html.se-help :where(.help_delete_important, .help_game_cooldown_expirationtime, .agent_actions .help_section_text, .help_page_section_contrast, .promotion_details) {
+  color: var(--se-gold) !important;
+}
+
+html.se-help :where(.no_vac_bans_header, .help_request_state_msg b) {
+  color: var(--se-cart) !important;
+}
+
+/* ---------- Panels: help.css's dark translucent boxes as the theme's cards ---------- */
+
+html.se-help :is(
+  .help_page_section_ctn, .help_page_purchasetoprove, .help_wizard_button_notes, .loginbox_background,
+  .help_refund_request_area, .purchase_gift_message_box, .purchase_rma_details_box, .refund_info_box, .info_box,
+  .refund_game_block, .remove_games_block, .help_game_guides_box, .help_game_refund_box,
+  .help_itempurchase_detail_box, .help_issue_details, .help_notinlibrary_details, .help_missingrefund_details,
+  .help_cannot_launch_game_details, .help_cannot_install_game_details,
+  .help_before_contacting_steam_support_details, .help_issue_delete, .help_vacorgameban_account,
+  .account_recovery_box, .account_select_row > div:not(.account_reset_column), .accountname_area,
+  .help_section_content, .help_login_nag, .create_help_request_form, .help_request_track_shipping,
+  .help_request_legal_dmca_instructions, .help_restrictedaccount_instructions, .help_chargeback_box,
+  .data_removed_box, .help_game_highlight_details, .help_request_footerbox, .attachment_upload_targetarea,
+  .help_official_box, .help_purchase_failure_box, .login_signin_msg, .system_report_details_inner
+) {
+  border: 0 !important;
+  border-radius: var(--se-radius-card) !important;
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge) !important;
+}
+
+/* A card inside a card steps down a shade */
+html.se-help :is(.help_app_header, .help_issue_details, .help_section_content, .help_refund_request_area, .help_page_section_ctn) :is(.info_box, .refund_info_box, .help_game_highlight_details, .purchase_rma_details_box, .purchase_gift_message_box, .refund_game_block, .remove_games_block) {
+  background: var(--se-surface-2) !important;
+}
+
+/* Official and featured boxes: a soft accent wash */
+html.se-help :is(.help_official_box, .help_purchase_failure_box) {
+  background: linear-gradient(135deg, var(--se-accent-surface), var(--se-surface) 60%) !important;
+}
+
+html.se-help .help_official_box .help_highlight_text.help_highlight_text {
+  color: var(--se-text) !important;
+  font-weight: 700;
+}
+
+/* Notices with a coloured edge: warnings and alerts keep their meaning */
+html.se-help :is(.help_issue_warning, .help_section_alert, .help_important_info_box, .help_event_limiteduser, .help_page_trade_box) {
+  border: 0 !important;
+  border-radius: var(--se-radius-card) !important;
+  background: var(--se-surface) !important;
+}
+
+html.se-help :is(.help_section_alert, .help_important_info_box) {
+  box-shadow: inset 3px 0 0 var(--se-danger), inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+html.se-help :is(.help_issue_warning, .help_event_limiteduser, .help_page_trade_box) {
+  box-shadow: inset 3px 0 0 var(--se-gold), inset 0 0 0 1px var(--se-hairline) !important;
+}
+
+html.se-help .help_page_trade_header {
+  border-radius: var(--se-radius-lg) var(--se-radius-lg) 0 0;
+  background: rgba(240, 192, 96, .14) !important;
+  color: var(--se-gold) !important;
+}
+
+/* Messages: errors red, notes accent, both as tinted rounded strips */
+html.se-help :is(#verify_code_error_msg, #changepw_error_msg, #search_error_msg, #form_submit_error) {
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: rgba(229, 115, 122, .12) !important;
+  box-shadow: inset 0 0 0 1px rgba(229, 115, 122, .35);
+  color: var(--se-text) !important;
+}
+
+html.se-help :is(#form_submit_search_error, #recovery_code_resent, .help_request_recent_submit) {
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-accent-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  color: var(--se-text) !important;
+}
+
+html.se-help .reset_complete_emailprefsdiffer {
+  border-radius: var(--se-radius-md);
+  background: rgba(240, 192, 96, .14) !important;
+  box-shadow: inset 0 0 0 1px rgba(240, 192, 96, .35);
+  color: var(--se-text) !important;
+}
+
+/* Password strength tags: pills */
+html.se-help .password_tag {
+  border-radius: var(--se-radius-control) !important;
+}
+
+html.se-help .password_tag::before {
+  display: none !important;
+}
+
+/* Dividers */
+html.se-help :is(.help_app_header_divider, .hardware_serial_divider) {
+  background: var(--se-divider) !important;
+}
+
+html.se-help :is(.help_page_section_hr, .refund_token_balance_hr, .purchase_totals .line_break, .search_error_hr, .help_page_trade_footer) {
+  border-color: var(--se-divider) !important;
+}
+
+html.se-help :is(.help_section_divider, .help_section_divider_dim) hr,
+html.se-help .help_issue_details .issue_hr {
+  border: 0 !important;
+  border-top: 1px solid var(--se-divider) !important;
+}

@@ -1,0 +1,439 @@
+/*
+ * Continues page.css (in order, see web/community/loader.js): My listings / buy orders; Listing
+ * tables.
+ */
+
+/* ---------- My listings / buy orders ---------- */
+
+html.se-community-market:not(#se-none) #myListings {
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* !important: Steam's tab switch shows this with an inline display: block */
+html.se-community-market #tabContentsMyListings {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--se-space-4);
+}
+
+html.se-community-market #tabContentsMyListings[style*="display: none"] {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) :is(#myListings .my_listing_section, #tabContentsMyMarketHistory) {
+  box-sizing: border-box;
+  min-width: 0;
+  width: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-4) var(--se-space-5) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-market #tabContentsMyListings > .my_listing_section:has(.market_listing_row) {
+  grid-column: 1 / -1;
+}
+
+html.se-community-market:not(#se-none) h3.my_market_header {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  margin: 0 0 var(--se-space-3) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html.se-community-market .my_market_header_active {
+  color: inherit !important;
+}
+
+/* Empty states */
+/* The icon sits in the padding: the message is text with an inline link, which a flex row
+   would split apart */
+html.se-community-market:not(#se-none) #myListings .market_listing_table_message {
+  position: relative;
+  display: block;
+  margin: 0 !important;
+  padding: var(--se-space-5) var(--se-space-4) var(--se-space-5) 4.375rem !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body) !important;
+  text-align: left !important;
+}
+
+html.se-community-market #myListings .market_listing_table_message::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  margin-top: calc(-1 * var(--se-space-5));
+  width: 40px;
+  height: 40px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-mkt-icon-cart) center / 22px 22px no-repeat, var(--se-pill);
+}
+
+html.se-community-market #tabContentsMyActiveMarketListingsTable .market_listing_table_message::before {
+  background-image: var(--se-mkt-icon-tag);
+}
+
+html.se-community-market #myListings .market_listing_table_message a {
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+/* ---------- Listing tables ---------- */
+
+html.se-community-market:not(#se-none) #sellListings {
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-market:not(#se-none) .market_home_main_listing_table {
+  box-sizing: border-box;
+  width: auto !important;
+  margin: 0 !important;
+  padding: var(--se-space-2) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+html.se-community-market #popularItemsTable {
+  --se-mkt-lead: calc(24px + var(--se-mkt-tile) + 2 * var(--se-mkt-row-gap)); /* rank, art */
+}
+
+html.se-community-market:not(#se-none) .market_listing_table_header {
+  display: flex;
+  align-items: center;
+  height: auto !important;
+  margin: 0 0 var(--se-space-1) !important;
+  padding: var(--se-space-2) var(--se-space-4) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--se-divider) !important;
+  background: none !important;
+  color: var(--se-text-faint) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+html.se-community-market .market_listing_table_header > div:not(.market_listing_price_listings_block, .market_listing_right_cell, .market_listing_left_cell) {
+  text-align: left !important;
+  order: 1;
+  flex: 1;
+  min-width: 0;
+  float: none !important;
+  width: auto !important;
+  padding-left: var(--se-mkt-lead) !important;
+}
+
+html.se-community-market .market_listing_header_namespacer {
+  display: none !important;
+}
+
+/* A spacer after the name pushes the columns right. Newly Listed / Recently Sold headers have
+   "NAME" as bare text (no element of its own), so the header itself carries the name's lead. */
+html.se-community-market .market_listing_table_header {
+  gap: var(--se-mkt-row-gap); /* the rows' gap, so the columns line up */
+}
+
+html.se-community-market .market_listing_table_header::before {
+  content: "";
+  order: 2;
+  flex: 1;
+}
+
+html.se-community-market:not(#se-none) .market_listing_table_header:not(:has(> div:not(.market_listing_right_cell, .market_listing_price_listings_block, .market_listing_left_cell))) {
+  padding-left: calc(var(--se-space-5) + var(--se-mkt-lead)) !important;
+}
+
+/* Steam draws column separators and a brighter sorted column: one plain label colour, no lines */
+html.se-community-market:not(#se-none) .market_listing_table_header :is(div, span, a) {
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: var(--se-text-faint) !important;
+  font: inherit !important;
+  letter-spacing: inherit !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+}
+
+html.se-community-market .market_listing_table_header :is(div, span, a)::before,
+html.se-community-market .market_listing_table_header :is(div, span, a)::after {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_table_header a:hover {
+  color: var(--se-text) !important;
+}
+
+/* Rows: [rank] art | name and game | (seller) | quantity | price | (actions) */
+html.se-community-market a.market_listing_row_link {
+  display: block;
+  border-radius: var(--se-radius-md);
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_row {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-mkt-row-gap);
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: none !important;
+  box-shadow: none !important;
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-market:not(#se-none) :is(a.market_listing_row_link:hover .market_listing_row, .market_listing_row:hover) {
+  background: var(--se-hover) !important;
+}
+
+html.se-community-market .market_listing_row > div:not([class]) {
+  display: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_row .market_listing_item_img {
+  order: 0;
+  flex: none;
+  box-sizing: border-box;
+  width: var(--se-mkt-tile) !important;
+  height: var(--se-mkt-tile) !important;
+  float: none !important;
+  margin: 0 !important;
+  padding: var(--se-space-1) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background:
+    radial-gradient(circle at 50% 62%, color-mix(in srgb, var(--se-q, var(--se-white)) 24%, transparent), transparent 72%),
+    var(--se-field) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-q, var(--se-white)) 18%, transparent);
+  object-fit: contain;
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-community-market :is(a.market_listing_row_link:hover, .market_listing_row:hover) .market_listing_item_img {
+  transform: scale(1.06);
+}
+
+html.se-community-market:not(#se-none) .market_listing_item_name_block {
+  order: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  float: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-community-market .market_listing_item_name_block > br {
+  display: none;
+}
+
+/* White, not Steam's quality colour (some are too dark on the theme's surfaces): the quality
+   shows as the art's glow instead */
+html.se-community-market:not(#se-none) .market_listing_item_name {
+  display: block;
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-community-market:not(#se-none) .market_listing_game_name {
+  overflow: hidden;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Right-hand cells: Steam floats them in reverse; the theme orders them left to right */
+html.se-community-market:not(#se-none) :is(.market_listing_right_cell, .market_listing_price_listings_block) {
+  float: none !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: right;
+}
+
+html.se-community-market .market_listing_price_listings_block {
+  order: 3;
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+
+html.se-community-market .market_listing_seller { order: 2; }
+html.se-community-market .market_listing_listed_date { order: 2; }
+html.se-community-market .market_listing_num_listings { order: 0; }
+html.se-community-market .market_listing_their_price,
+html.se-community-market .market_listing_my_price { order: 4; }
+html.se-community-market :is(.market_listing_action_buttons, .market_listing_edit_buttons, .market_listing_cancel_button) { order: 5; flex: none; }
+
+/* Buy Now column: one width in the header and the rows, so PRICE sits over the prices.
+   Steam's column is 74px tall with side padding, and its button wrapper drops 25px with a
+   zero line-height (economy_market.css .market_listing_action_buttons, .market_listing_buy_button):
+   all reset so the button centres on the row. */
+html.se-community-market:not(#se-none) .market_listing_action_buttons {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+  width: 120px !important;
+  height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  line-height: normal !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_buy_button {
+  margin: 0 !important;
+  line-height: normal !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_buy_button .item_market_action_button_contents {
+  width: auto !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_num_listings {
+  flex: none;
+  width: var(--se-mkt-qty-w) !important;
+  color: var(--se-text-muted);
+  font: var(--se-type-body);
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-market:not(#se-none) :is(.market_listing_their_price, .market_listing_my_price) {
+  flex: none;
+  width: var(--se-mkt-price-w) !important;
+}
+
+/* The price cell centres its price on the row: Steam's trailing line breaks (and the hidden
+   fee prices around them) would otherwise sit under it and lift it above the Buy Now button */
+html.se-community-market:not(#se-none) .market_listing_row :is(.market_listing_their_price, .market_listing_my_price) {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  align-self: center;
+}
+
+/* Steam gives each value a 10px top and bottom margin and the cells a 73px line-height
+   (.market_table_value, .market_home_main_listing_table .market_listing_right_cell) */
+html.se-community-market:not(#se-none) .market_listing_row :is(.market_listing_right_cell, .market_table_value) {
+  line-height: normal !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_row .market_listing_right_cell > .market_table_value {
+  margin: 0 !important;
+  vertical-align: middle;
+}
+
+html.se-community-market .market_listing_row :is(.market_listing_their_price, .market_listing_my_price) br {
+  display: none !important;
+}
+
+/* Steam left-aligns the recent listings' prices (.market_listing_price): right, under PRICE */
+html.se-community-market:not(#se-none) :is(.market_listing_their_price, .market_listing_my_price, .market_listing_num_listings),
+html.se-community-market:not(#se-none) :is(.market_listing_their_price, .market_listing_my_price) :is(.market_table_value, .market_listing_price) {
+  text-align: right !important;
+}
+
+html.se-community-market .market_listing_table_header :is(.market_listing_num_listings, .market_listing_their_price) {
+  color: inherit;
+  font: inherit;
+}
+
+/* "Starting at:" as a caption over the price */
+html.se-community-market:not(#se-none) .market_listing_row :is(.market_listing_their_price, .market_listing_my_price) .market_table_value {
+  display: block;
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-caption) !important;
+}
+
+html.se-community-market .market_listing_row .market_table_value > br {
+  display: none;
+}
+
+/* Newly Listed / Recently Sold, history and your listings show .market_listing_price; the
+   fee variants Steam keeps beside it stay hidden as Steam has them (inline display: none) */
+html.se-community-market:not(#se-none) .market_listing_row .market_table_value > :is(.normal_price, .sale_price, span[title], .market_listing_price) {
+  display: block;
+  color: var(--se-white) !important;
+  font: 800 var(--se-fs-lg)/1.3 var(--se-font) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-community-market .market_listing_num_listings_qty {
+  color: var(--se-text-dim);
+}
+
+/* Rank on popular items: the top three in gold */
+html.se-community-market #popularItemsRows {
+  counter-reset: se-mkt-rank;
+}
+
+html.se-community-market #popularItemsRows .market_listing_row::before {
+  content: counter(se-mkt-rank);
+  counter-increment: se-mkt-rank;
+  order: -1;
+  flex: none;
+  width: 24px;
+  color: var(--se-text-faint);
+  font: 800 var(--se-fs-base)/1 var(--se-font);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+html.se-community-market #popularItemsRows > a:nth-of-type(-n + 3) .market_listing_row::before {
+  color: var(--se-gold);
+}
+
+/* "Find more" */
+html.se-community-market:not(#se-none) .market_listing_table_showmore {
+  margin: var(--se-space-2) 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+html.se-community-market:not(#se-none) .market_listing_table_showmore a {
+  width: 100% !important;
+  height: 34px;
+}
+
+/* Empty table message (newly listed / recently sold while loading) */
+html.se-community-market:not(#se-none) #sellListings .market_listing_table_message {
+  padding: var(--se-space-6) !important;
+  color: var(--se-text-muted) !important;
+  font: var(--se-type-body) !important;
+  text-align: center;
+}
