@@ -39,6 +39,37 @@
   box-shadow: inset 0 -1px 0 var(--se-hairline) !important;
 }
 
+/*
+ * The web panel's top corners, rounded where the bar meets the sidebar colour around it (the
+ * game list, the title bar), as the client's other panes are (navigation/nav-rail.css). Painted
+ * as sidebar-coloured corner masks, so nothing in the bar is clipped.
+ */
+[data-se-urlbar="bar"] {
+  position: relative;
+}
+
+[data-se-urlbar="bar"]::before,
+[data-se-urlbar="bar"]::after {
+  --se-urlbar-r: var(--se-radius-lg);
+  content: '';
+  position: absolute;
+  top: 0;
+  z-index: 3; /* over the button groups and Steam's URL div */
+  width: var(--se-urlbar-r);
+  height: var(--se-urlbar-r);
+  pointer-events: none;
+}
+
+[data-se-urlbar="bar"]::before {
+  left: 0;
+  background: radial-gradient(circle at 100% 100%, transparent calc(var(--se-urlbar-r) - .5px), var(--se-rail-bg, var(--se-sidebar)) var(--se-urlbar-r));
+}
+
+[data-se-urlbar="bar"]::after {
+  right: 0;
+  background: radial-gradient(circle at 0 100%, transparent calc(var(--se-urlbar-r) - .5px), var(--se-rail-bg, var(--se-sidebar)) var(--se-urlbar-r));
+}
+
 /* Steam's own reload (ours clicks it) and globe / lock icons (ours replace them). */
 :is([data-se-urlbar="reload"], [data-se-urlbar="lock"], [data-se-urlbar="status"]) {
   display: none !important;
