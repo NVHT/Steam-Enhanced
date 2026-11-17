@@ -1,0 +1,326 @@
+/*
+ * Wishlist grid (wishlist/grid.js, switched by wishlist/page.js): the column's List / Grid
+ * control, and the theme-drawn grid that stands in for Steam's list in Grid
+ * ([data-se-wl-layout="grid"] on the page). Expanded: three cards a row; Compact: four smaller
+ * ones without tags.
+ */
+
+/* ---------- List / Grid: an icon switch leading the View row ---------- */
+
+/* Its own small track; Compact / Expanded keep theirs after it (column.css starts that track
+   past this switch). */
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-layout"] {
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  width: var(--se-wl-layout-w);
+  height: var(--se-wl-view-h);
+  margin-inline-end: var(--se-space-2);
+  padding: var(--se-wl-seg-pad);
+  border-radius: var(--se-radius-control);
+  background: var(--se-field-bg);
+  box-shadow: var(--se-field-edge);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-layout"][hidden] {
+  display: none;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-layout-btn"] {
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-control-inner);
+  background: transparent;
+  color: var(--se-text-muted);
+  cursor: pointer;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-layout-btn"]::before {
+  content: "";
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-view-expanded) center / contain no-repeat;
+  mask: var(--se-icon-view-expanded) center / contain no-repeat;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-layout-btn"][data-se-wl-layout="grid"]::before {
+  -webkit-mask-image: var(--se-icon-grid);
+  mask-image: var(--se-icon-grid);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-layout-btn"]:hover {
+  color: var(--se-white);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-layout-btn"][aria-pressed="true"] {
+  background: var(--se-selected);
+  color: var(--se-text-strong);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-layout-btn"]:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* ---------- Grid in place of the list ---------- */
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-layout="grid"] [data-se-wl="list"],
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-wrap"][hidden] {
+  display: none;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-wrap"] {
+  grid-column: 2;
+  container-type: inline-size;
+  min-width: 0;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid"] {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--se-space-4);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid"][data-se-wl-density="compact"] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--se-space-3);
+}
+
+@container (width < 760px) {
+  html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid"][data-se-wl-density="compact"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-empty"] {
+  margin: 0;
+  padding: var(--se-space-7) var(--se-space-4);
+  color: var(--se-text-muted);
+  font: var(--se-type-body);
+  text-align: center;
+}
+
+/* ---------- A card: art, then title, facts, tags and the buy row ---------- */
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-card"] {
+  /* Cards off-screen skip layout and paint (a long list switches and scrolls light); the
+     browser remembers each card's last size. */
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 20rem;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--se-radius-card);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
+  transition: transform var(--se-dur) var(--se-ease), box-shadow var(--se-dur) var(--se-ease);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-card"]:is(:hover, :focus-within) {
+  transform: translateY(-2px);
+  box-shadow: var(--se-card-edge), var(--se-shadow-md);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-art"] {
+  position: relative;
+  display: block;
+  aspect-ratio: 460 / 215;
+  overflow: hidden;
+  background: var(--se-surface-2);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-art"] img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--se-dur) var(--se-ease);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-card"]:hover [data-se-wl="own-grid-art"] img {
+  transform: scale(1.03);
+}
+
+/* Your rank: a glass chip on the art. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-rank"] {
+  position: absolute;
+  inset: var(--se-wl-10) auto auto var(--se-wl-10);
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--se-ctl-sm);
+  padding: 0 var(--se-wl-10);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-glass-chip);
+  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  backdrop-filter: var(--se-blur-chip);
+  color: var(--se-text-strong);
+  font: var(--se-chip-font);
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-body"] {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--se-wl-10);
+  min-width: 0;
+  padding: var(--se-wl-14) var(--se-space-4) var(--se-space-4);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-title"] {
+  overflow: hidden;
+  color: var(--se-text-strong);
+  font: 700 var(--se-wl-15)/1.3 var(--se-font);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-title"]:hover {
+  color: var(--se-accent);
+}
+
+/* "Very Positive · 2014": the review label in the accent, then the year. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-facts"] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--se-space-1) var(--se-space-2);
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm)/1.3 var(--se-font);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-facts"]:empty {
+  display: none;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-fact"] {
+  white-space: nowrap;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-fact"][data-se-wl-fact="review"] {
+  color: var(--se-accent);
+  font-weight: 600;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-fact"][data-se-wl-review="mixed"] {
+  color: var(--se-warning);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-fact"][data-se-wl-review="negative"] {
+  color: var(--se-danger);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-fact"] + [data-se-wl="own-grid-fact"]::before {
+  content: "· ";
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-tags"] {
+  display: flex;
+  gap: var(--se-wl-6);
+  min-width: 0;
+  max-height: var(--se-chip-h);
+  overflow: hidden;
+}
+
+/* !important: the shared tag chip (shared/ui.css) sets its radius with !important */
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-tag"] {
+  border-radius: var(--se-radius-sm) !important;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-tags"]:empty {
+  display: none;
+}
+
+/* The buy row, at the card's foot: the price chip, then Add to Cart (a gift on a friend's
+   list) as an icon button. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-buy"] {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  margin-block-start: auto;
+  padding-block-start: var(--se-space-1);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-soon"] {
+  color: var(--se-text-muted);
+  font: var(--se-chip-font);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-cart"] {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-ctl);
+  height: var(--se-ctl);
+  margin-inline-start: auto;
+  border-radius: var(--se-radius-control);
+  background: var(--se-btn-primary-bg);
+  box-shadow: none;
+  color: var(--se-btn-primary-color);
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-cart"]::before {
+  content: "";
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-cart) center / contain no-repeat;
+  mask: var(--se-icon-cart) center / contain no-repeat;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-cart"][data-se-wl-gift]::before {
+  -webkit-mask-image: var(--se-icon-gift);
+  mask-image: var(--se-icon-gift);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-cart"]:hover {
+  background: var(--se-btn-primary-bg-hover);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-grid-cart"]:active {
+  transform: scale(var(--se-press-scale));
+}
+
+/* ---------- Compact: smaller cards, the title over the price ---------- */
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-density="compact"] [data-se-wl="own-grid-card"] {
+  border-radius: var(--se-radius-lg);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-density="compact"] [data-se-wl="own-grid-rank"] {
+  inset: var(--se-space-2) auto auto var(--se-space-2);
+  height: var(--se-space-5);
+  padding: 0 var(--se-space-2);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-density="compact"] [data-se-wl="own-grid-body"] {
+  gap: var(--se-space-2);
+  padding: var(--se-wl-10) var(--se-space-3) var(--se-space-3);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-density="compact"] [data-se-wl="own-grid-title"] {
+  font: 700 var(--se-fs-base)/1.3 var(--se-font);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-density="compact"] :is([data-se-wl="own-grid-facts"], [data-se-wl="own-grid-tags"]) {
+  display: none;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-density="compact"] [data-se-wl="own-grid-buy"] {
+  gap: var(--se-wl-6);
+  padding-block-start: 0;
+}

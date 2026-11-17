@@ -2,18 +2,31 @@
  * Wishlist (/wishlist/id|profiles/<who>/): Steam's React wishlist, a 1200px column of navy
  * rows, as a page of the theme:
  *
- *  - Header: the owner's avatar and a display title, the item count as a pill at the end.
- *  - Toolbar: one card holding the search field (with the theme's search glyph), the Options
- *    and Sort pills and the view switch; active filters as accent chips under it.
- *  - Each item as a card: rank and drag grip, the capsule rounded, the title, release and
- *    review facts, tag pills and the demo chip, your categories; the shared price chip and Add
- *    to Cart (the row's one accent action) top-right, the date added and a quiet remove button
- *    under them. The card lifts while it is dragged.
+ *  - Header: the owner's avatar, a "Wishlist" label over their name in its own case; under it,
+ *    on your own wishlist, Share, notification settings and a line on ranking (a friend's
+ *    wishlist keeps Steam's "Send a Gift Card" instead); stat tiles at the end: items, on sale
+ *    and coming soon.
+ *  - Options column (left, sticky): the search field; "Display": View (Compact / Expanded) and
+ *    the Sort dropdown; then "Filters" with its count and Reset over Discount, Price, Type,
+ *    Platform, Deck compatibility, Exclude and Demo. It is Steam's own Options form, laid out in place for
+ *    good (Steam keeps it mounted while closed), and Steam's own Sort button and menu.
+ *  - Main column: "Filtered by" and the active filter chips over the list.
+ *  - Each item as a card: rank over a drag grip, the capsule rounded, the title, the review
+ *    summary and release date after their icons, one line of tag pills, the demo chip, your
+ *    categories and "+ Category"; the shared price chip and Add to Cart (Purchase as a Gift on
+ *    a friend's list; the row's one accent action) top-right, the date added and a quiet bin
+ *    button under them; the text block centred against the capsule. The card lifts while it is dragged.
+ *    Compact view: one line per item, no tags or categories.
  *
- * Parts are tagged by wishlist/page.js ([data-se-wl]). Their looks (cards, the field, pills,
- * tag pills, icon buttons, the accent pill and chips, the price chip) are shared/ui.css; this
- * file is layout, size and the page's own variants. The list is virtualised at Steam's row
- * height, so a card never grows past the capsule's height plus its padding.
+ * Continued in column.css (the options column), listed right after this file in
+ * web/store/loader.js.
+ *
+ * Parts are tagged by wishlist/page.js ([data-se-wl], the Options sections [data-se-wl-opt],
+ * the view [data-se-wl-view]). Their looks (cards, the field, tag pills, icon buttons, the
+ * accent pill and chips, the price chip, the pop-up menu) are shared/ui.css and
+ * shared/ui-buttons.css; this file is layout, size and the page's own controls. The list is
+ * virtualised at Steam's row height, so a card never grows past the capsule's height plus its
+ * padding.
  */
 
 /* ---------- Page ---------- */
@@ -27,13 +40,26 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="wash"] {
   display: none;
 }
 
-/* The page column, as on every store page; header and count share the first row. */
+/*
+ * Two columns: the options column beside the list, the header across both. Row gaps would
+ * stack under the column's spanned rows, so the main column spaces itself.
+ */
 html.se-store-wishlist:not(#se-none) [data-se-wl="page"] {
+  --se-wl-rail: 18.5rem;
+  /* The mockup's in-between steps: chips and icon gaps, the compact row's inset and line gap,
+     the cart button's sides. */
+  --se-wl-6: 6px;
+  --se-wl-3: 3px;
+  --se-wl-14: 14px;
+  --se-wl-7: 7px;
+  --se-wl-10: 10px;
+  --se-wl-20: 20px;
+  --se-wl-15: 15px;
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--se-space-4) var(--se-space-5);
+  grid-template-columns: var(--se-wl-rail) minmax(0, 1fr);
+  align-items: start;
+  gap: 0 var(--se-space-5); /* the mockup's 24px between the column and the list */
   width: var(--se-page-width);
   max-width: none;
   margin-inline: auto;
@@ -43,18 +69,15 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="page"] {
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="page"] > * {
-  grid-column: 1 / -1;
+  grid-column: 2;
   min-width: 0;
   margin: 0;
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="page"] > [data-se-wl="head"] {
-  grid-area: 1 / 1;
-}
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="page"] > [data-se-wl="count"] {
-  grid-area: 1 / 2;
-  justify-self: end;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  margin-block-end: var(--se-space-6);
 }
 
 /* ---------- Header ---------- */
@@ -62,16 +85,25 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="page"] > [data-se-wl="count"] 
 html.se-store-wishlist:not(#se-none) [data-se-wl="head"] {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-5);
   height: auto;
   padding: 0;
   background: none;
 }
 
+/* Avatar beside the title, the theme's row under the title. */
 html.se-store-wishlist:not(#se-none) [data-se-wl="owner"] {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  gap: var(--se-space-4);
+  gap: var(--se-space-2) var(--se-space-4);
   width: auto;
+  min-width: 0;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="owner"] > a {
+  grid-row: 1 / span 2;
 }
 
 /* Without a profile frame, the theme's avatar shape. */
@@ -79,7 +111,74 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="owner"]:not(:has([data-se-wl="
   border-radius: var(--se-avatar-radius);
 }
 
+/* The theme's heading replaces Steam's all-caps one when the page title gave a name. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="owner"]:has([data-se-wl="own-heading"]) h2 {
+  display: none;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-heading"] {
+  grid-column: 2;
+  align-self: end;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  min-width: 0;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-label"] {
+  color: var(--se-label-color);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-name"] {
+  margin: 0;
+  overflow: hidden;
+  color: var(--se-text-strong);
+  font: 800 var(--se-fs-display)/1.1 var(--se-font);
+  letter-spacing: -.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Stat tiles at the header's end: items, on sale, coming soon. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-stats"] {
+  display: flex;
+  flex: none;
+  gap: var(--se-space-3);
+  margin-inline-start: auto;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-stat"] {
+  box-sizing: border-box; /* 8rem across in all, its padding inside */
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  min-width: 8rem;
+  padding: var(--se-space-3) var(--se-space-4);
+  border-radius: var(--se-radius-lg);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-stat"][hidden] {
+  display: none;
+}
+
+html.se-store-wishlist:not(#se-none) :is([data-se-wl="own-stat-value"], [data-se-wl="own-stat-value-sale"]) {
+  color: var(--se-text-strong);
+  font: 800 22px/1.2 var(--se-font); /* the mockup's figure, between --se-fs-2xl and -3xl */
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-stat-value-sale"] {
+  color: var(--se-cart);
+}
+
 html.se-store-wishlist:not(#se-none) [data-se-wl="owner"] h2 {
+  grid-column: 2;
+  align-self: end;
   width: auto;
   margin: 0;
   color: var(--se-text-strong);
@@ -89,113 +188,170 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="owner"] h2 {
   text-shadow: none;
 }
 
-/* "27 items": a quiet pill at the header's end. */
-html.se-store-wishlist:not(#se-none) [data-se-wl="count"] {
+/* Only the title on a friend's wishlist: centred beside the avatar. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="page"]:not(:has([data-se-wl="share"])) [data-se-wl="owner"] :is(h2, [data-se-wl="own-heading"]) {
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-meta"] {
+  grid-column: 2;
+  align-self: start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--se-space-2);
+}
+
+/* Share, notifications and the ranking line are the owner's: Steam's Share button only shows
+   on your own wishlist. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="page"]:not(:has([data-se-wl="share"])) [data-se-wl="own-meta"] {
+  display: none;
+}
+
+html.se-store-wishlist:not(#se-none) :is([data-se-wl="own-share"], [data-se-wl="own-notify"]) {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
-  height: var(--se-hit);
-  padding: 0 var(--se-space-4);
+  justify-content: center;
+  gap: var(--se-space-2);
+  height: var(--se-ctl-sm);
+  min-width: var(--se-ctl-sm);
+  margin: 0;
+  padding: 0 var(--se-space-3);
+  border: 0;
   border-radius: var(--se-radius-control);
-  background: var(--se-surface);
-  box-shadow: var(--se-edge);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--se-white-10);
+  color: var(--se-text-dim);
+  font: var(--se-type-label);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-notify"] {
+  padding: 0;
+}
+
+html.se-store-wishlist:not(#se-none) :is([data-se-wl="own-share"], [data-se-wl="own-notify"]):hover {
+  background: var(--se-btn-bg-hover);
+  color: var(--se-btn-color-hover);
+}
+
+html.se-store-wishlist:not(#se-none) :is([data-se-wl="own-share"], [data-se-wl="own-notify"]):active {
+  transform: scale(var(--se-press-scale));
+}
+
+html.se-store-wishlist:not(#se-none) :is([data-se-wl="own-share"], [data-se-wl="own-notify"]):focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-icon"] {
+  flex: none;
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-link) center / contain no-repeat;
+  mask: var(--se-icon-link) center / contain no-repeat;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-notify"] [data-se-wl="own-icon"] {
+  -webkit-mask-image: var(--se-icon-bell);
+  mask-image: var(--se-icon-bell);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-sep"] {
+  width: 1px;
+  height: var(--se-space-4);
+  margin-inline: var(--se-space-1);
+  background: var(--se-divider);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-hint"] {
+  color: var(--se-text-muted);
+  font: var(--se-type-small);
+}
+
+/* A friend's wishlist: Steam's "Send a Gift Card" as a button at the header's end. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="giftcard"] {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--se-space-2);
+  width: auto;
+  height: var(--se-ctl);
+  margin: 0;
+  padding: var(--se-btn-pad);
+  border-radius: var(--se-radius-control);
+  background: var(--se-btn-bg);
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-btn-color);
+  font: var(--se-btn-font);
+  text-decoration: none;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="giftcard"]:hover {
+  background: var(--se-btn-bg-hover);
+  color: var(--se-btn-color-hover);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="giftcard"] img {
+  width: auto;
+  height: var(--se-space-5);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="giftcard"] * {
+  color: inherit;
+  font: inherit;
+}
+
+/* ---------- Main column: count and active filters ---------- */
+
+/* Steam's "300 items": read by the header's stat tile. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="page"]:has([data-se-wl="own-stat"]:not([hidden])) [data-se-wl="count"] {
+  display: none;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="count"] {
+  display: flex;
+  align-items: center;
+  height: auto;
+  margin-block-end: var(--se-space-3);
+  padding: 0;
+  background: none;
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="count"] * {
   margin: 0;
   padding: 0;
-  color: var(--se-text-muted);
+  color: var(--se-label-color);
   font: var(--se-label-font);
   letter-spacing: var(--se-label-spacing);
   text-transform: uppercase;
 }
 
-/* ---------- Toolbar ---------- */
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="bar"] {
-  --se-pill-h: var(--se-ctl);
-  --se-icon-btn: var(--se-ctl);
-  --se-field-pad-start: calc(var(--se-space-3) + var(--se-fs-lg) + var(--se-space-2));
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--se-space-2);
-  height: auto;
-  padding: var(--se-space-2);
-}
-
-/* The search glyph, drawn on the bar (an <input> can't hold one) over the field's start. */
-html.se-store-wishlist:not(#se-none) [data-se-wl="bar"]::before {
-  content: "";
-  position: absolute;
-  inset-inline-start: calc(var(--se-space-2) + var(--se-space-3));
-  top: 50%;
-  z-index: var(--se-z-raised);
-  width: var(--se-fs-lg);
-  height: var(--se-fs-lg);
-  background: var(--se-text-faint);
-  -webkit-mask: var(--se-ni-search) center / contain no-repeat;
-  mask: var(--se-ni-search) center / contain no-repeat;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="search"] {
-  flex: 1;
-  width: auto;
-  min-width: 0;
-  height: var(--se-ctl);
-  color: var(--se-text);
-  font: var(--se-type-control-lg);
-}
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="search"]::placeholder {
-  color: var(--se-text-faint);
-}
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="search"]:hover {
-  box-shadow: inset 0 0 0 1px var(--se-white-10) !important; /* the shared field's ring is !important */
-}
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="search"]:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: 0;
-}
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="bar"]:focus-within::before {
-  background: var(--se-text);
-}
-
-/* Options, Sort, view: one row of controls at the field's height. */
-html.se-store-wishlist:not(#se-none) [data-se-wl="bar"] > :not([data-se-wl="search"], input) {
-  display: flex;
-  align-items: center;
-  gap: var(--se-space-2);
-  width: auto;
-}
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="tool"] svg {
-  width: var(--se-fs-xs);
-  height: var(--se-fs-xs);
-  fill: currentColor;
-}
-
-/* "Sort by:" stays quiet; the chosen order reads in the text colour. */
-html.se-store-wishlist:not(#se-none) [data-se-wl="sort-value"] {
-  color: var(--se-text);
-}
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="menu"] {
-  padding: var(--se-space-2);
-  color: var(--se-text-dim);
-}
-
-/* Active filters under the bar. */
+/* Active filters over the list, after a "Filtered by" label. */
 html.se-store-wishlist:not(#se-none) [data-se-wl="filters"] {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--se-space-2);
   height: auto;
+  margin-block-end: var(--se-space-3);
   background: none;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="filters"]:has([data-se-wl="filter"])::before {
+  content: "Filtered by";
+  margin-inline-end: var(--se-space-1);
+  color: var(--se-label-color);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
 }
 
 /* ---------- List and cards ---------- */
@@ -206,21 +362,35 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="list"] {
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="card"] {
+  --se-wl-handle-w: 48px;
+  --se-wl-gap: 18px;
+  --se-wl-pad-y: 14px;
+  --se-wl-pad-end: 18px;
   position: relative;
   isolation: isolate;
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  /* The text block (title, facts, tag line) centred against the capsule, between two
+     flexible rows; the date added under the buttons. */
+  grid-template-columns: var(--se-wl-handle-w) auto fit-content(60%) minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto auto auto minmax(0, 1fr);
   grid-template-areas:
-    "handle capsule title   buy"
-    "handle capsule details buy"
-    "handle capsule cats    added";
+    "handle capsule .     .     .    "
+    "handle capsule title title buy  "
+    "handle capsule facts facts buy  "
+    "handle capsule tags  cats  added"
+    "handle capsule .     .     .    ";
   align-items: start;
-  gap: var(--se-space-2) var(--se-space-4);
-  padding: var(--se-space-3) var(--se-space-4) var(--se-space-3) var(--se-space-2);
+  gap: var(--se-space-2) var(--se-wl-gap);
+  padding: var(--se-wl-pad-y) var(--se-wl-pad-end) var(--se-wl-pad-y) var(--se-space-3);
   border: 0;
   color: var(--se-text-dim);
+}
+
+/* A friend's list has no rank column: the capsule starts the card. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="card"]:not(:has([data-se-wl="handle"])) {
+  --se-wl-handle-w: 0px;
+  padding-inline-start: 0;
 }
 
 /* Hover: a light wash over the card's surface, faded in. */
@@ -245,35 +415,62 @@ html.se-store-wishlist:not(#se-none) [data-rbd-draggable-id][style*="position: f
   box-shadow: inset 0 0 0 1px var(--se-accent-line), var(--se-shadow-lg) !important; /* the shared card ring is !important */
 }
 
-/* Rank and drag grip */
+/* Rank and drag grip: the rank field over the grip button, centred down the card. */
 html.se-store-wishlist:not(#se-none) [data-se-wl="handle"] {
   grid-area: handle;
-  align-self: stretch;
+  align-self: center;
+  justify-self: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--se-space-2);
+  gap: var(--se-wl-6);
   width: auto;
-  min-width: calc(var(--se-hit) + var(--se-space-2));
+  min-width: 0;
   height: auto;
   margin: 0;
   padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
   cursor: grab;
 }
 
+/* The grip: a 32px button of six dots (Steam's grip art goes). */
 html.se-store-wishlist:not(#se-none) [data-se-wl="grip"] {
-  opacity: .4;
-  transition: opacity var(--se-dur) var(--se-ease);
+  display: grid;
+  flex: none;
+  order: 1;
+  place-items: center;
+  width: var(--se-hit);
+  height: var(--se-hit);
+  min-height: 0;
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-faint);
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
-html.se-store-wishlist:not(#se-none) [data-se-wl="card"]:hover [data-se-wl="grip"] {
-  opacity: 1;
+html.se-store-wishlist:not(#se-none) [data-se-wl="grip"]::before {
+  content: "";
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-grip) center / contain no-repeat;
+  mask: var(--se-icon-grip) center / contain no-repeat;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="grip"] > * {
+  display: none;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="grip"]:hover {
+  background: var(--se-hover);
+  color: var(--se-text);
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="rank"] {
   box-sizing: border-box;
-  width: calc(var(--se-hit) + var(--se-space-2));
+  width: 44px;
   height: var(--se-hit);
   margin: 0;
   padding: 0;
@@ -281,14 +478,14 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="rank"] {
   border-radius: var(--se-radius-sm);
   background: var(--se-field);
   box-shadow: var(--se-edge);
-  color: var(--se-text-dim);
-  font: var(--se-type-label);
+  color: var(--se-text);
+  font: 700 var(--se-fs-md)/1 var(--se-font);
   font-variant-numeric: tabular-nums;
   text-align: center;
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="rank"]:hover {
-  box-shadow: inset 0 0 0 1px var(--se-white-10);
+  box-shadow: var(--se-field-edge-hover);
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="rank"]:focus-visible {
@@ -301,17 +498,34 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="rank"]:disabled {
   opacity: .5;
 }
 
-/* Capsule: rounded, the art drifts in a little on hover. */
+/* Capsule: as tall as the card's inside, rounded; the art drifts in a little on hover. */
 html.se-store-wishlist:not(#se-none) [data-se-wl="capsule"] {
+  --se-wl-cap-h: 8.25rem;
   grid-area: capsule;
+  align-self: center;
   display: block;
+  width: calc(var(--se-wl-cap-h) * 460 / 215);
+  height: var(--se-wl-cap-h);
   overflow: hidden;
   border-radius: var(--se-radius-md);
   line-height: 0;
 }
 
+/* Steam's art box fills the capsule and the art fills the box, laid over the box's other
+   (empty) child so that can't push it out of view. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="capsule"] > div {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 html.se-store-wishlist:not(#se-none) [data-se-wl="capsule"] img {
+  position: absolute;
+  inset: 0;
   display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   transition: transform var(--se-dur-slow) var(--se-ease);
 }
 
@@ -332,8 +546,7 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="title"] a {
   display: block;
   overflow: hidden;
   color: var(--se-text-strong);
-  font: var(--se-type-title-lg);
-  letter-spacing: -.01em;
+  font: 700 var(--se-fs-lg)/1.25 var(--se-font);
   text-decoration: none;
   text-overflow: ellipsis;
   text-transform: none;
@@ -344,48 +557,102 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="title"] a:hover {
   color: var(--se-accent);
 }
 
-/* Facts (release date, reviews) over the tags and demo chip. */
+/* Facts and the tag line are the card's own rows: their wrapper steps aside. */
 html.se-store-wishlist:not(#se-none) [data-se-wl="details"] {
-  grid-area: details;
-  display: flex;
-  flex-direction: column;
-  gap: var(--se-space-2);
-  width: auto;
-  height: auto;
-  min-width: 0;
-  margin: 0;
+  display: contents;
 }
 
+/* The review summary, then the release date, each after its icon; the labels the icons say
+   are kept for screen readers. */
 html.se-store-wishlist:not(#se-none) [data-se-wl="facts"] {
+  grid-area: facts;
   display: flex;
   flex-wrap: wrap;
   gap: var(--se-space-1) var(--se-space-4);
+  min-width: 0;
+  color: var(--se-text-muted);
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="fact"] {
   display: inline-flex;
-  align-items: baseline;
-  gap: var(--se-space-1);
+  align-items: center;
+  gap: var(--se-wl-6);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact"]::before {
+  content: "";
+  flex: none;
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-calendar) center / contain no-repeat;
+  mask: var(--se-icon-calendar) center / contain no-repeat;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact"]:last-child:not(:first-child) {
+  order: -1;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact"]:last-child:not(:first-child) {
+  color: var(--se-accent);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact"]:last-child:not(:first-child)::before {
+  -webkit-mask-image: var(--se-icon-thumb);
+  mask-image: var(--se-icon-thumb);
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="fact-label"] {
-  color: var(--se-text-faint);
-  font: var(--se-type-small);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* How the reviews lean (page.js reads Steam's words): Mixed in amber with the thumb on its
+   side, negative in red with the thumb down. Positive keeps the accent and the thumb up. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact"][data-se-wl-review][data-se-wl-review="mixed"] {
+  color: var(--se-warning);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact"][data-se-wl-review][data-se-wl-review="negative"] {
+  color: var(--se-danger);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact"][data-se-wl-review="mixed"]::before {
+  rotate: -90deg;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact"][data-se-wl-review="negative"]::before {
+  rotate: 180deg;
+}
+
+/* Steam colours the review summary by score: the mockup's one accent instead. */
+/* !important: Steam colours the summary inline by score */
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact-value"],
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact-value"] * {
+  color: inherit !important;
+  font: 500 var(--se-fs-base)/1.3 var(--se-font);
   text-transform: none;
 }
 
-html.se-store-wishlist:not(#se-none) [data-se-wl="fact-value"] {
-  font: var(--se-type-small);
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact"]:last-child:not(:first-child) [data-se-wl="fact-value"],
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact"]:last-child:not(:first-child) [data-se-wl="fact-value"] * {
+  font-weight: 600;
 }
 
 /* One line of chips: whatever doesn't fit wraps out of sight. */
 html.se-store-wishlist:not(#se-none) [data-se-wl="extras"] {
-  --se-accent-chip-h: var(--se-space-5); /* the tag pills' height */
+  --se-accent-chip-h: var(--se-ctl-sm); /* the tag pills' height */
+  grid-area: tags;
+  align-self: start;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--se-space-2);
-  max-height: var(--se-space-5);
+  gap: var(--se-wl-6);
+  max-height: var(--se-ctl-sm);
   min-width: 0;
   overflow: hidden;
 }
@@ -393,6 +660,32 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="extras"] {
 /* The demo's and the tags' wrappers step aside, so every chip shares that one line. */
 html.se-store-wishlist:not(#se-none) [data-se-wl="extras"] > * {
   display: contents;
+}
+
+/* A badge in the tag line (Early Access): a chip in the accent's tint, the tags' height and
+   corners. */
+/* !important: Steam fills and pads its badge from its own rules */
+html.se-store-wishlist:not(#se-none) [data-se-wl="flag"] {
+  box-sizing: border-box;
+  display: inline-flex !important;
+  align-items: center;
+  height: var(--se-chip-h) !important;
+  margin: 0 !important;
+  padding: var(--se-chip-pad) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-accent-tint) !important;
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  color: var(--se-accent) !important;
+  font: var(--se-chip-font);
+  text-transform: none;
+  white-space: nowrap;
+}
+
+/* Tag chips: the mockup's 8px corners, as "+ Category" has. */
+/* !important: the shared tag chip (shared/ui.css) sets its radius with !important */
+html.se-store-wishlist:not(#se-none) [data-se-wl="tag"] {
+  border-radius: var(--se-radius-sm) !important;
 }
 
 /* Labels the layout already says: kept for screen readers only. */
@@ -406,72 +699,181 @@ html.se-store-wishlist:not(#se-none) :is([data-se-wl="tags-label"], [data-se-wl=
 }
 
 /* Your categories: a small label, its chips and the add button. */
+/* Right after the tags: 6px from the last one, as chips are spaced (the column gap is wider). */
 html.se-store-wishlist:not(#se-none) [data-se-wl="cats"] {
   grid-area: cats;
+  align-self: start;
   display: flex;
   align-items: center;
-  gap: var(--se-space-2);
+  gap: var(--se-wl-6);
   width: auto;
   height: auto;
   min-width: 0;
-  margin: 0;
+  margin: 0 0 0 calc(var(--se-wl-6) - var(--se-wl-gap));
+}
+
+/* Steam's category list and its box, while you have none on this game: out of the line, so
+   they add no gap before "+ Category". */
+html.se-store-wishlist:not(#se-none) [data-se-wl="cats"] div:empty,
+html.se-store-wishlist:not(#se-none) [data-se-wl="cats"] div:not(:has(:not([data-se-wl="cats-label"], :empty))) {
+  display: none;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="cats"] > * > * {
+  display: contents;
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="cats"] > * {
   display: flex;
   align-items: center;
-  gap: var(--se-space-2);
+  gap: var(--se-wl-6);
   width: auto;
   height: auto;
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="cats-label"] {
-  color: var(--se-label-color);
-  font: var(--se-label-font);
-  letter-spacing: var(--se-label-spacing);
-  text-transform: uppercase;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-/* Price and Add to Cart */
+/* Add to a category: a ghost chip after the tags. */
+/* !important: the shared icon button (shared/ui-buttons.css) sizes it square */
+html.se-store-wishlist:not(#se-none) [data-se-wl="cat-add"] {
+  display: inline-flex;
+  gap: var(--se-wl-6);
+  width: auto !important;
+  height: var(--se-chip-h) !important;
+  padding: var(--se-chip-pad);
+  border-radius: var(--se-radius-sm);
+  box-shadow: inset 0 0 0 1px var(--se-white-10);
+  color: var(--se-text-muted);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="cat-add"] svg {
+  width: var(--se-fs-xs);
+  height: var(--se-fs-xs);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="cat-add"]::after {
+  content: "Category";
+  font: var(--se-chip-font);
+}
+
+/* Price and Add to Cart (Purchase as a Gift on a friend's list) */
 html.se-store-wishlist:not(#se-none) [data-se-wl="buy"] {
   grid-area: buy;
   justify-self: end;
+  align-self: end;
   width: auto;
   height: auto;
   margin: 0;
 }
 
+/* !important: Steam boxes the price and button together (background, edge, padding) from its
+   own rules at higher weight */
 html.se-store-wishlist:not(#se-none) :is([data-se-wl="buy"], [data-se-wl="buy"] > div) {
   display: flex;
   align-items: center;
   gap: var(--se-space-2);
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="buy"] > div:empty {
   display: none;
 }
 
+/* The link around the price chip: only the chip shows (Steam gives the link its own box). */
+/* !important: Steam's link background and edge come from its own rules at higher weight */
 html.se-store-wishlist:not(#se-none) [data-se-wl="buy"] a:has([data-se-price]) {
   display: inline-flex;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
   text-decoration: none;
+}
+
+/* Add to Cart with its cart; on a friend's list, Purchase as a Gift with a gift. The mockup's
+   button: 14px each side, the icon 8px from the label. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="cart"] {
+  gap: var(--se-space-2);
+  padding: 0 var(--se-wl-14);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="cart"]::before {
+  content: "";
+  flex: none;
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-cart) center / contain no-repeat;
+  mask: var(--se-icon-cart) center / contain no-repeat;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="page"]:not(:has([data-se-wl="share"])) [data-se-wl="cart"]::before {
+  -webkit-mask-image: var(--se-icon-gift);
+  mask-image: var(--se-icon-gift);
 }
 
 /* Date added and remove */
 html.se-store-wishlist:not(#se-none) [data-se-wl="added"] {
+  --se-icon-btn: var(--se-hit);
   grid-area: added;
   justify-self: end;
-  align-self: end;
+  align-self: center;
   display: flex;
   align-items: center;
-  gap: var(--se-space-1);
+  gap: var(--se-wl-6);
   margin: 0;
-  color: var(--se-text-faint);
-  font: var(--se-type-badge);
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm)/1.3 var(--se-font);
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="added-date"] {
   color: inherit;
   font: inherit;
+  white-space: nowrap;
+}
+
+/* "Added on Dec 10, 2020" as the mockup has it, "Added Dec 10, 2020" (page.js reads the date
+   out into [data-se-wl-date]; another language keeps Steam's own words). */
+/* A flex box, so the drawn text centres on the bin beside it (in a zero-size line it would
+   sit on that line's baseline, high). */
+html.se-store-wishlist:not(#se-none) [data-se-wl="added-date"][data-se-wl-date] {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0;
+  line-height: 0;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="added-date"][data-se-wl-date]::before {
+  content: "Added " attr(data-se-wl-date);
+  font: 500 var(--se-fs-sm)/1.3 var(--se-font);
+}
+
+/* The theme's font draws its letters a little above the middle of their line: down 1px, so the
+   text's middle meets the bin's. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="page"]:not([data-se-wl-view="compact"]) [data-se-wl="added-date"][data-se-wl-date]::before {
+  translate: 0 1px;
+}
+
+/* Remove: a bin (Steam's cross goes). */
+html.se-store-wishlist:not(#se-none) [data-se-wl="remove"] svg {
+  display: none;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="remove"]::before {
+  content: "";
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-trash) center / contain no-repeat;
+  mask: var(--se-icon-trash) center / contain no-repeat;
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="remove"]:hover {
@@ -482,22 +884,192 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="remove"]:active {
   transform: scale(var(--se-press-scale));
 }
 
-/* ---------- Narrow windows: the facts and chips keep the room, categories go ---------- */
+/* ---------- Compact view: one line per item ---------- */
 
+/*
+ * The mockup's compact list: one card holding every row (the list draws it), each row a quiet
+ * line that lights up on hover. Rank and grip side by side, a small capsule, the title over
+ * one line of facts ("Very Positive · Apr 23, 2021 · Added Dec 10, 2020"), then the price,
+ * Add to Cart as an icon and remove. Steam keeps its own row height, so rows are spaced by it.
+ */
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="list"] {
+  padding-block: var(--se-wl-6);
+  border-radius: var(--se-radius-card);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
+}
+
+/* !important: the shared card look (shared/ui.css) is !important */
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="card"] {
+  grid-template-columns: auto 112px auto minmax(0, 1fr) auto auto;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "handle capsule title title buy remove"
+    "handle capsule facts added buy remove";
+  align-content: center;
+  align-items: center;
+  gap: var(--se-wl-3) var(--se-space-3);
+  margin-inline: var(--se-wl-6);
+  padding: var(--se-wl-6) var(--se-space-2) var(--se-wl-6) var(--se-space-1);
+  border-radius: var(--se-radius-ml) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="card"]::before {
+  background: var(--se-hover);
+}
+
+/* Price and cart centred on the row (Expanded sets them on the title block's lower edge). */
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="buy"] {
+  align-self: center;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="handle"] {
+  flex-direction: row;
+  gap: var(--se-space-3);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="rank"] {
+  width: 40px;
+  height: var(--se-ctl-sm);
+  font-size: var(--se-fs-base);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="grip"] {
+  width: 22px;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="grip"]::before {
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="capsule"] {
+  --se-wl-cap-h: 52px;
+  border-radius: var(--se-radius-sm);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="title"] {
+  align-self: end;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="title"] a {
+  font: 700 var(--se-fs-md)/1.3 var(--se-font);
+}
+
+/* The facts on one line, no icons, a dot between. */
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="facts"] {
+  align-self: start;
+  flex-wrap: nowrap;
+  gap: 0;
+  white-space: nowrap;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="fact"] {
+  gap: 0;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="fact"]::before {
+  display: none;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="fact"]:first-child::before {
+  content: "\00a0·\00a0";
+  display: inline;
+  width: auto;
+  height: auto;
+  background: none;
+  -webkit-mask: none;
+  mask: none;
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm)/1.3 var(--se-font);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] :is([data-se-wl="fact-value"], [data-se-wl="fact-value"] *) {
+  font-size: var(--se-fs-sm);
+}
+
+/* Date added: its box steps aside, the date follows the facts and remove ends the row. */
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="added"] {
+  display: contents;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="added-date"] {
+  grid-area: added;
+  align-self: start;
+  justify-self: start;
+  min-width: 0;
+  margin-inline-start: calc(-1 * var(--se-space-3));
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="added-date"][data-se-wl-date]::before {
+  content: "\00a0·\00a0 Added " attr(data-se-wl-date);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="remove"] {
+  --se-icon-btn: var(--se-hit);
+  grid-area: remove;
+  align-self: center;
+  /* The bin sits as far from the cart as the cart from the price (8px): its box starts at the
+     cart's edge, the glyph 8px into it. */
+  margin-inline-start: calc(-1 * var(--se-space-3));
+}
+
+/* Add to Cart: the icon alone (its label kept for screen readers). */
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="cart"] {
+  width: var(--se-ctl);
+  min-width: 0;
+  padding: 0;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="cart"] > * {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] :is([data-se-wl="extras"], [data-se-wl="cats"]) {
+  display: none;
+}
+
+/* ---------- Narrow windows ---------- */
+
+/* One column: the options column goes over the list (column.css). */
+@media (width < 1100px) {
+  html.se-store-wishlist:not(#se-none) [data-se-wl="page"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html.se-store-wishlist:not(#se-none) [data-se-wl="page"] > * {
+    grid-column: 1;
+  }
+
+}
+
+/* The facts and chips keep the room, categories go. */
 @container (width < 960px) {
   html.se-store-wishlist:not(#se-none) [data-se-wl="card"] {
-    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-columns: var(--se-wl-handle-w) auto minmax(0, 1fr) auto;
+    grid-template-rows: minmax(0, 1fr) auto auto auto minmax(0, 1fr);
     grid-template-areas:
-      "handle capsule title   title"
-      "handle capsule details details"
-      "handle capsule buy     added";
+      "handle capsule .     .    "
+      "handle capsule title title"
+      "handle capsule facts facts"
+      "handle capsule buy   added"
+      "handle capsule .     .    ";
   }
 
   html.se-store-wishlist:not(#se-none) [data-se-wl="buy"] {
     justify-self: start;
   }
 
-  html.se-store-wishlist:not(#se-none) [data-se-wl="cats"] {
+  html.se-store-wishlist:not(#se-none) :is([data-se-wl="cats"], [data-se-wl="extras"]) {
     display: none;
   }
 }

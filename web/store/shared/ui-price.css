@@ -43,6 +43,9 @@ html.se-store:not(#se-none) :is([data-se-price], .se-cinema__price, #module_disc
   padding: 0 var(--se-space-3) !important;
   border: 0 !important;
   border-radius: var(--se-price-radius) !important;
+  background: var(--se-price-bg) !important;
+  backdrop-filter: var(--se-blur-chip);
+  box-shadow: var(--se-price-edge) !important;
   white-space: nowrap;
   line-height: 1 !important;
 }
@@ -157,6 +160,23 @@ html.se-store:not(#se-none) :is([data-se-price], .se-cinema__price, #module_disc
   font-weight: 500 !important;
   line-height: 1 !important;
   text-decoration: line-through !important;
+}
+
+/* Steam's React widget lifts the old price out of the flow (its own offset), which pushes it
+   past the chip's top edge; in the stack both prices sit in the flow, where they are drawn. */
+/* !important: Steam's widget positions them from its own rules at equal or higher weight */
+html.se-store:not(#se-none) :is([data-se-price], [data-se-nav="panel"] :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-), :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-) :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-)) :is(:is(.Cnw9IXSgr7I-, ._9Rf9BwU0xAQ-), .Y9w82-bhx7g-, [data-se-price-was], :is(.JBijjejcvmo-, .-HQzBzl6lqI-), .QYFii1vIT5Q-, [data-se-price-now]) {
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+}
+
+/* Steam's own strike line (a rotated rule drawn over the old price): the stack's
+   line-through says it. */
+/* !important: Steam's widget draws it from its own rules at equal or higher weight */
+html.se-store:not(#se-none) :is([data-se-price], [data-se-nav="panel"] :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-), :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-) :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-)) :is(:is(.Cnw9IXSgr7I-, ._9Rf9BwU0xAQ-), .Y9w82-bhx7g-, [data-se-price-was], :is(.cQ79XIQ7w-Y-, .-OkCLv-56oQ-), .YHonIqDIZys-, [data-se-price-amounts])::before,
+html.se-store:not(#se-none) :is([data-se-price], [data-se-nav="panel"] :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-), :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-) :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-)) :is(:is(.Cnw9IXSgr7I-, ._9Rf9BwU0xAQ-), .Y9w82-bhx7g-, [data-se-price-was], :is(.cQ79XIQ7w-Y-, .-OkCLv-56oQ-), .YHonIqDIZys-, [data-se-price-amounts])::after {
+  display: none !important;
 }
 
 /* The price itself; also Steam's text-only states ("Free To Play", "Free"). */
