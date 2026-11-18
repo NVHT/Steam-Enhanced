@@ -11,6 +11,10 @@
  *
  * Hovering your avatar in the title bar shows your own card the same way, beside
  * the rail (the avatar's menu opens on click; client/header/menu/hover.js leaves its hover to this).
+ *
+ * Other parts show a friend's card beside an avatar of theirs the same way: showFor(avatar,
+ * accountid) on the pointer coming in, leaveFor(event) on it going out, dropFor() when the
+ * avatar may have been replaced (the Home's Friend activity, client/home/stage/panels-community.js).
  */
 ((SE) => {
   const ns = window.__seFriendsDockParts;
@@ -148,14 +152,42 @@
   addEventListener('mouseout', outAccount, true);
   addEventListener('pointerdown', pressAccount, true);
 
+  // A friend's card beside an avatar elsewhere in the main window, at its right
+  const besideCard = layer?.hover({
+    sheets: ['core/levels.css', 'client/shared/hover-cards.css', 'client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css'],
+    steam: true,
+    place: (avatar) => {
+      const rect = avatar.getBoundingClientRect();
+      return { left: rect.right + SE.px('--se-space-3'), top: rect.top };
+    },
+    draw,
+    fallback: (avatar, friend) => themeCard(friend),
+  });
+
+  function showFor(avatar, accountid) {
+    if (!besideCard || state.destroyed || avatar === besideCard.node) return;
+    const friend = run(() => app().FriendStore.GetPlayer(accountid));
+    if (friend?.persona) besideCard.enter(avatar, friend);
+  }
+
+  function leaveFor(event) {
+    if (besideCard?.left(event)) besideCard.leave();
+  }
+
+  // Closes the card when its avatar is gone (its list repainted) or, `always`, whatever it is on
+  function dropFor(always = false) {
+    if (besideCard?.node && (always || !besideCard.node.isConnected)) besideCard.leave();
+  }
+
   function dispose() {
     card?.leave();
     selfCard?.leave();
+    besideCard?.leave();
     removeEventListener('mouseover', overAccount, true);
     removeEventListener('mouseout', outAccount, true);
     removeEventListener('pointerdown', pressAccount, true);
     document.body?.removeAttribute(ATTR);
   }
 
-  ns.friendCard = { over, out, dispose };
+  ns.friendCard = { over, out, dispose, showFor, leaveFor, dropFor };
 })(window.__se);

@@ -1,98 +1,140 @@
 /*
- * Continues stage-hero.css (in order, see client/loader.js): the tray's glass, then What's
- * New in it (the card, the headlines, the list).
+ * Continues stage-settings.css (in order, see client/loader.js): the board under the stage
+ * (its glass, its cells, its pages), then a panel's heading and its View all link.
  */
-/* The tray: What's New · Favorites · Collections on one glass */
-.se-hs-tray {
+/* The board: the panels on one glass, a hairline between cells */
+.se-hs-board {
   position: relative;
   z-index: var(--se-z-raised);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   margin: 0 var(--se-space-5) var(--se-space-5);
   border-radius: var(--se-radius-xl);
   background: var(--se-hs-glass);
-  backdrop-filter: blur(12px) saturate(1.15);
+  -webkit-backdrop-filter: var(--se-blur-bar);
+  backdrop-filter: var(--se-blur-bar);
   /* Lighter: the art behind it animates */
   box-shadow: inset 0 0 0 1px var(--se-divider), 0 30px 60px -30px var(--se-black-90);
-  pointer-events: none;
+  overflow: hidden;
 }
 
-.se-hs-tray[hidden] {
+.se-hs-board[hidden] {
   display: none;
 }
 
-[data-se-hs-col="1"]:not(#se-none) {
-  margin-inline-start: var(--se-space-5) !important;
-}
-
-[data-se-hs-last]:not(#se-none) {
-  margin-inline-end: var(--se-space-5) !important;
-}
-
-[data-se-hs-col]:not([data-se-hs-col="1"]):not(#se-none) {
-  border-inline-start: 1px solid var(--se-divider) !important;
-}
-
-/* What's New in the tray: no ground of its own, and clipped to its column */
-[data-se-hs-sec="news"]:not(#se-none),
-[data-se-hs-sec="news"] ._17uEBe5Ri8TMsnfELvs8-N:not(#se-none) {
-  /* UpdatesContainer */
-  background: transparent !important;
-}
-
-[data-se-hs-sec="news"] ._17uEBe5Ri8TMsnfELvs8-N:not(#se-none) {
-  padding-inline: 0 !important;
-}
-
-._17uEBe5Ri8TMsnfELvs8-N[data-se-hs-sec="news"]:not(#se-none),
-[data-se-hs-sec="news"] ._17uEBe5Ri8TMsnfELvs8-N:not(#se-none) {
-  clip-path: inset(-12px 0 -12px 0) !important;
-}
-
-._17uEBe5Ri8TMsnfELvs8-N[data-se-hs-sec="news"]:not(#se-none) {
-  padding: var(--se-space-4) var(--se-space-4) var(--se-space-3) !important;
-}
-
-/* Headings in the tray: a size down from the page's, so three fit side by side */
-[data-se-hs-col] :is(.fyxt0H7Cwfirf9908slPp, ._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv-, ._23SnllqT_AqZ1C_QHcNQ4Z .tfg3_RdonFKIGYRd12bKl):not(#se-none) {
-  /* WhatsNewHeaderText, shelf name */
-  font-size: var(--se-fs-xl) !important;
-}
-
-/* What's New as a list */
-[data-se-hs-sec="news"]:not(#se-none) {
-  display: flex !important;
-  flex-direction: column;
+/* The cells of the page showing: one row, its columns set by stage/board.js */
+.se-hs-cells {
+  flex: 1 1 auto;
   min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--se-hs-cols, 12), minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
 }
 
-/* Steam's cards stay laid out (so their images load) but out of sight, under the list */
-[data-se-hs-carousel]:not(#se-none) {
-  position: absolute !important;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 100% !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  z-index: var(--se-z-under);
-  overflow: hidden !important;
+.se-hs-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: var(--se-space-4) var(--se-space-4) var(--se-space-3);
+  box-sizing: border-box;
+  animation: se-hs-cell-in var(--se-dur-slow) var(--se-ease) both;
 }
 
-/* Paging arrows have nothing to page through: the list scrolls */
-[data-se-hs-sec="news"] .bsNegRKT1Hbv4tqHrOk9-:not(#se-none) {
-  display: none !important;
+.se-hs-cell:not([data-first]) {
+  border-inline-start: 1px solid var(--se-divider);
 }
 
-/* PageClickContainer */
-.se-hs-nhead {
+.se-hs-cell[data-below] {
+  border-top: 1px solid var(--se-divider);
+}
+
+@keyframes se-hs-cell-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* More panels than fit: pages, with arrows and a dot for each */
+.se-hs-pager {
+  flex: none;
   display: flex;
   align-items: center;
-  flex-wrap: wrap; /* a narrow column lets the filter drop under the heading */
-  gap: var(--se-space-1) var(--se-space-2);
-  min-height: 32px;
-  margin-bottom: var(--se-space-2);
-  font-family: var(--se-font);
+  justify-content: center;
+  gap: var(--se-space-1);
+  padding-bottom: var(--se-space-2);
 }
 
+.se-hs-pager[hidden] {
+  display: none;
+}
+
+.se-hs-pager button {
+  display: grid;
+  place-items: center;
+  min-width: var(--se-control-h-sm);
+  height: var(--se-control-h-sm);
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: transparent;
+  color: var(--se-text-muted);
+  cursor: pointer;
+}
+
+.se-hs-pager button:hover {
+  color: var(--se-text-strong);
+  background: var(--se-hairline);
+}
+
+.se-hs-pager button:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-hs-pager button:disabled {
+  color: var(--se-text-faint);
+  background: transparent;
+  cursor: default;
+}
+
+.se-hs-pager svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* A page's dot: a wider pill for the page showing */
+.se-hs-pager [data-page]::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-25);
+  transition: width var(--se-dur-slow) var(--se-ease), background var(--se-dur);
+}
+
+.se-hs-pager [data-page][aria-current="true"]::before {
+  width: 22px;
+  background: var(--se-accent);
+}
+
+.se-hs-pager [data-page] {
+  min-width: 0;
+  padding: 0 var(--se-space-half);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-hs-cell {
+    animation: none;
+  }
+  .se-hs-pager [data-page]::before {
+    transition: none;
+  }
+}
+
+/* A panel's heading: its name and a count */
 .se-hs-nh {
   font-size: var(--se-fs-xl);
   font-weight: 700;
@@ -110,223 +152,8 @@
   text-overflow: ellipsis;
 }
 
-.se-hs-nhead .se-hs-hall {
-  margin: 0 0 0 auto;
-}
-
-.se-hs-news {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 150px;
-  container-type: inline-size;
-}
-
-/* The card and the headlines share the column; both fill its height */
-.se-hs-news > .se-hs-feat,
-.se-hs-news > .se-hs-heads {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-}
-
-.se-hs-feat {
-  left: 0;
-  width: calc(51% - 8px);
-}
-
-.se-hs-heads {
-  right: 0;
-  width: calc(49% - 8px);
-}
-
-/* The artwork and caption share a frame without overlapping. */
-.se-hs-feat {
-  display: block;
-  box-sizing: border-box;
-  overflow: hidden;
-  padding: 0;
-  border: 1px solid var(--se-hairline);
-  border-radius: var(--se-radius-md);
-  background: var(--se-surface);
-  box-shadow: var(--se-shadow-card);
-  color: var(--se-text-strong);
-  font-family: var(--se-font);
-  text-align: start;
-  cursor: pointer;
-}
-
-.se-hs-feat:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: var(--se-focus-offset);
-}
-
-/* Use the extra space around the full image for the badge and excerpt. */
-.se-hs-fpreview {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.se-hs-fheader,
-.se-hs-fcaption {
-  flex: 1 0 auto;
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  padding: var(--se-space-2) var(--se-space-3);
-}
-
-.se-hs-fimg {
-  display: block;
-  flex: 0 1 auto;
-  width: 100%;
-  height: auto;
-  min-height: 0;
-  object-fit: contain;
-}
-
-/* Official posts without artwork get a Steam wordmark panel. */
-.se-hs-fsteam:not([hidden]) {
-  flex: 2 1 72px;
-  display: grid;
-  place-items: center;
-  min-height: 30px;
-  background: radial-gradient(ellipse at 65% 85%, #24517c, #142337 65%, #111822);
-  color: #e5f4ff;
-  font: 800 clamp(19px, 6cqw, 42px)/1 var(--se-font);
-  letter-spacing: .18em;
-}
-
-.se-hs-feat:hover .se-hs-fpreview {
-  background-color: var(--se-hover);
-}
-
-.se-hs-feat[hidden] {
-  display: none;
-}
-
-.se-hs-fkind {
-  padding: var(--se-space-half) var(--se-space-2);
-  border-radius: var(--se-radius-pill);
-  background: var(--se-chip);
-  font-size: var(--se-fs-xs);
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-
-.se-hs-feat[hidden] + .se-hs-heads {
-  width: 100%;
-}
-
-.se-hs-fexcerpt {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  overflow-wrap: anywhere;
-  color: var(--se-text-dim);
-  font-size: var(--se-fs-base);
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-/* The headlines: date · game over a one-line title; the one in the card is lit */
-.se-hs-heads {
-  display: flex;
-  flex-direction: column;
-  gap: var(--se-space-half);
-  min-width: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.se-hs-heads > * {
-  flex: 0 0 auto;
-}
-
-/* A day's headlines under one divider, which stays at the top while they scroll by */
-.se-hs-hday {
-  position: sticky;
-  top: 0;
-  z-index: var(--se-z-raised);
-  padding: var(--se-space-1) var(--se-space-2) var(--se-space-1);
-  background: linear-gradient(180deg, rgba(18, 20, 25, .96) 70%, rgba(18, 20, 25, 0));
-  font: var(--se-label-font);
-  letter-spacing: var(--se-label-spacing);
-  text-transform: uppercase;
-  color: var(--se-text-faint);
-}
-
-.se-hs-hday:not(:first-child) {
-  margin-top: var(--se-space-1);
-}
-
-/* More below: the last line fades out until the list reaches its end */
-.se-hs-heads[data-more="yes"]:not([data-end="yes"]) {
-  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 36px), transparent);
-  mask-image: linear-gradient(180deg, #000 calc(100% - 36px), transparent);
-}
-
-.se-hs-hline {
-  display: flex;
-  flex-direction: column;
-  gap: var(--se-space-1);
-  padding: var(--se-space-2) var(--se-space-2);
-  border: 0;
-  border-radius: var(--se-radius-sm);
-  background: transparent;
-  color: var(--se-text);
-  font-family: var(--se-font);
-  text-align: start;
-  cursor: pointer;
-}
-
 .se-hs-hall[hidden] {
   display: none;
-}
-
-.se-hs-hline[data-on] {
-  background: var(--se-white-07);
-}
-
-.se-hs-hline:focus-visible,
-.se-hs-hall:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: -2px; /* inside the scrolling list, which clips */
-}
-
-.se-hs-hmeta {
-  display: flex;
-  align-items: center;
-  gap: var(--se-space-1);
-  min-width: 0;
-  font: 600 var(--se-fs-sm)/16px var(--se-font);
-  color: var(--se-text-muted);
-}
-
-.se-hs-hmeta img {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 auto;
-  border-radius: var(--se-radius-xs);
-}
-
-.se-hs-hmeta span {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.se-hs-htitle {
-  font-size: var(--se-fs-md);
-  font-weight: 600;
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .se-hs-hall {
@@ -345,20 +172,14 @@
   color: var(--se-text-strong);
 }
 
+.se-hs-hall:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: -2px; /* inside the panel, which clips */
+}
+
 /* Match the Game Page links on hover and keyboard focus. */
-.se-hs-nhead .se-hs-hall:is(:hover, :focus-visible),
-.se-hs-hall:is([data-all], [data-foot]):is(:hover, :focus-visible) {
+.se-hs-hall[data-all]:is(:hover, :focus-visible) {
   color: var(--se-text-strong);
   text-decoration: underline;
   text-underline-offset: 3px;
-}
-
-/* A narrow column keeps the card alone */
-@container (max-width: 400px) {
-  .se-hs-news > .se-hs-feat {
-    width: 100%;
-  }
-  .se-hs-news > .se-hs-heads {
-    display: none;
-  }
 }

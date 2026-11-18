@@ -1,0 +1,443 @@
+/*
+ * The Home stage's settings button (stage-settings.js), in the stage's upper right corner,
+ * shown while the pointer is over the stage, and the Home's settings menus (menu.js: the
+ * stage's, and each board panel's ⋯), drawn as the theme's menus are: a summary, rows with a
+ * mark at their end, headings, dividers and segmented controls (client/shared/segmented.css).
+ */
+.se-hs-gear {
+  position: absolute;
+  top: var(--se-space-4);
+  right: var(--se-space-4);
+  z-index: var(--se-z-raised);
+  display: grid;
+  place-items: center;
+  width: var(--se-hit);
+  height: var(--se-hit);
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-glass-btn);
+  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line);
+  -webkit-backdrop-filter: var(--se-blur-chip);
+  backdrop-filter: var(--se-blur-chip);
+  color: var(--se-text);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--se-dur) var(--se-ease), background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.se-hs-gear::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-home-stage) center / contain no-repeat;
+  mask: var(--se-icon-home-stage) center / contain no-repeat;
+}
+
+.se-hs-stage:hover .se-hs-gear,
+.se-hs-gear:focus-visible,
+.se-hs-gear[aria-expanded="true"] {
+  opacity: 1;
+}
+
+.se-hs-gear:hover,
+.se-hs-gear[aria-expanded="true"] {
+  background: var(--se-glass-btn-hover);
+  color: var(--se-text-strong);
+}
+
+.se-hs-gear:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/*
+ * The menu, in the theme's menu language (the game-type menu, sidebar-icons.css): the
+ * popup surface and shadow, a summary with a divider under it, rows that light up on hover
+ * with a mark at their end, headings and dividers between sections, Reset as the last row.
+ * .se-hs-pick (stage-shelves.css) places it; this restyles it. Scrolls inside when short.
+ */
+.se-hs-menu:not(#se-none) {
+  width: 320px;
+  max-height: calc(100vh - 2 * var(--se-space-3));
+  padding: var(--se-space-1);
+  border-radius: var(--se-radius-menu);
+  background: var(--se-surface);
+  box-shadow: var(--se-shadow-pop);
+  animation: se-menu-in var(--se-dur) var(--se-ease);
+}
+
+/* The header: the title as a group heading (.se-hs-mn-group below), its control at the right */
+.se-hs-mn-sum {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-3);
+  min-height: var(--se-control-h);
+  padding: var(--se-space-1) var(--se-space-2) 0;
+}
+
+.se-hs-mn-title {
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.se-hs-mn-head:empty {
+  display: none;
+}
+
+.se-hs-mn-body:empty {
+  display: none;
+}
+
+.se-hs-mn-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* A section's heading, a divider above every one but the first; a control at its right */
+.se-hs-mn-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-3);
+  min-height: var(--se-control-h);
+  padding: var(--se-space-1) var(--se-space-2) 0;
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.se-hs-mn-group:not(:first-child) {
+  margin-top: var(--se-space-1);
+  border-top: 1px solid var(--se-divider);
+  padding-top: var(--se-space-2);
+}
+
+.se-hs-mn-group .se-seg button {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* A row, the menu's full width: icon, name (a line under it or a count after it), the mark at its end */
+.se-hs-mn-row {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-width: 0;
+  min-height: var(--se-control-h);
+  padding: var(--se-space-1) var(--se-space-2);
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-dim);
+  font: 600 var(--se-fs-base) var(--se-font);
+  cursor: pointer;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.se-hs-mn-row:hover,
+.se-hs-mn-row:focus-visible,
+.se-hs-mn-row:has(> .se-hs-mn-input:focus-visible) {
+  background: var(--se-selected);
+  color: var(--se-text-strong);
+  outline: none;
+}
+
+.se-hs-mn-row:is([data-on], :has(> .se-hs-mn-input:checked)) {
+  color: var(--se-text-strong);
+}
+
+/* Keyboard focus is the row's highlight, as in the theme's menus (popup-layer.css): no ring */
+.se-hs-menu .se-hs-mn-row:is(:focus, :focus-visible):not(#se-none) {
+  outline: none;
+}
+
+/* A radio row's input: kept for the keyboard and onChange, not seen */
+.se-hs-mn-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.se-hs-mn-icon {
+  flex: 0 0 auto;
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-hs-mn-icon) center / contain no-repeat;
+  mask: var(--se-hs-mn-icon) center / contain no-repeat;
+  transition: background-color var(--se-dur) var(--se-ease);
+}
+
+.se-hs-mn-row[data-on] .se-hs-mn-icon {
+  background: var(--se-accent);
+}
+
+.se-hs-mn-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.se-hs-mn-name,
+.se-hs-mn-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.se-hs-mn-row > .se-hs-mn-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.se-hs-mn-sub {
+  font: 500 var(--se-fs-xs) var(--se-font);
+  color: var(--se-text-faint);
+}
+
+.se-hs-mn-count {
+  margin-left: var(--se-space-1);
+  font: 500 var(--se-fs-sm) var(--se-font);
+  color: var(--se-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The mark at a row's end: a hairline square (round for one-of-several), accent with a tick when on */
+.se-hs-mn-mark {
+  flex: 0 0 var(--se-space-4);
+  width: var(--se-space-4);
+  height: var(--se-space-4);
+  box-sizing: border-box;
+  border-radius: var(--se-radius-xs);
+  box-shadow: inset 0 0 0 1.5px var(--se-border-strong);
+  transition: background-color var(--se-dur) var(--se-ease), box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-hs-mn-mark[data-round] {
+  border-radius: var(--se-radius-pill);
+}
+
+.se-hs-mn-row:is([data-on], :has(> .se-hs-mn-input:checked)) .se-hs-mn-mark {
+  box-shadow: none;
+  background: var(--se-accent) var(--se-icon-check) center / var(--se-space-3) no-repeat;
+}
+
+/* On/off rows two to a row (the stage's Details) */
+.se-hs-mn-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px var(--se-space-1);
+}
+
+/* The collections to choose from (the stage's "A collection", the Favorites panel's) */
+.se-hs-mn-colls {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-left: calc(var(--se-icon-glyph) + var(--se-space-2));
+}
+
+/* A row's current value at its end (the collection shown, how many games chosen), then › to its page */
+.se-hs-mn-value {
+  flex: none;
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 500 var(--se-fs-sm) var(--se-font);
+  color: var(--se-text-faint);
+}
+
+.se-hs-mn-row:hover .se-hs-mn-value {
+  color: var(--se-text-muted);
+}
+
+.se-hs-mn-chev {
+  flex: none;
+  width: var(--se-space-4);
+  height: var(--se-space-4);
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
+  rotate: -90deg;
+}
+
+
+
+/* A label with its segmented control */
+.se-hs-mn-field {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-height: var(--se-control-h);
+  padding: 0 var(--se-space-2);
+}
+
+.se-hs-mn-label {
+  flex: 1;
+  min-width: 0;
+  font: 600 var(--se-fs-base) var(--se-font);
+  color: var(--se-text-dim);
+  white-space: nowrap;
+}
+
+/* The menu's segmented controls, a size down so a label and four choices share a row */
+.se-hs-menu .se-seg button {
+  height: var(--se-space-6);
+  padding: 0 var(--se-space-2);
+  font-size: var(--se-fs-sm);
+}
+
+/* A choice that can't be made right now (a panel already first or last) */
+.se-hs-menu .se-seg button:disabled {
+  color: var(--se-text-faint);
+  background: transparent;
+  cursor: default;
+}
+
+/*
+ * A panel's width in its menu's header (board.js): each choice a picture of the board's 12
+ * columns, a hairline bar filled to the panel's share (--se-hs-w), lit when set
+ */
+.se-hs-menu .se-hs-mn-widths button {
+  display: grid;
+  place-items: center;
+  width: var(--se-space-6);
+  padding: 0;
+}
+
+.se-hs-menu .se-hs-mn-widths button::before {
+  content: "";
+  width: 20px;
+  height: 10px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+  background: linear-gradient(90deg, currentColor var(--se-hs-w), transparent 0);
+  opacity: 0.55;
+}
+
+.se-hs-menu .se-hs-mn-widths button:is(:hover, [data-on])::before {
+  opacity: 1;
+}
+
+/* Reset and Remove from Home: the last rows, after the menu's divider */
+.se-hs-mn-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: var(--se-space-1);
+  padding-top: var(--se-space-1);
+  border-top: 1px solid var(--se-divider);
+}
+
+.se-hs-mn-foot .se-hs-mn-row {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-hs-gear {
+    transition: none;
+  }
+}
+
+/*
+ * Back to the theme's Home, over Steam's (home-mode.js): Home: Steam in the Home stage menu
+ * shows Steam's own Home with this button at its top.
+ */
+.se-hs-back {
+  position: sticky;
+  top: var(--se-space-3);
+  z-index: var(--se-z-raised-3);
+  display: flex;
+  justify-content: flex-end;
+  height: 0;
+  padding-right: var(--se-space-4);
+  overflow: visible;
+}
+
+.se-hs-back button {
+  height: var(--se-control-h);
+  padding: 0 var(--se-space-4);
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-bar);
+  box-shadow: var(--se-panel-shadow);
+  -webkit-backdrop-filter: var(--se-blur-bar);
+  backdrop-filter: var(--se-blur-bar);
+  color: var(--se-text-strong);
+  font: 600 var(--se-fs-base) var(--se-font);
+  cursor: pointer;
+}
+
+.se-hs-back button:hover {
+  background: var(--se-glass-btn-hover);
+}
+
+.se-hs-back button:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/*
+ * The Home stage menu's Panels (stage-settings.js): in their order on Home, each row with a
+ * grip; any part of a row drags it, the row lifting and following the pointer.
+ */
+.se-hs-mn-panels {
+  display: flex;
+  flex-direction: column;
+}
+
+.se-hs-mn-prow {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-1);
+}
+
+.se-hs-mn-prow > .se-hs-mn-row {
+  flex: 1 1 auto;
+  width: auto;
+}
+
+.se-hs-mn-grip {
+  flex: none;
+  align-self: stretch;
+  width: 10px;
+  background: radial-gradient(circle, currentColor 1.1px, transparent 1.6px) center / 5px 5px;
+  -webkit-mask: linear-gradient(#000, #000) center / 10px 15px no-repeat;
+  mask: linear-gradient(#000, #000) center / 10px 15px no-repeat;
+  color: var(--se-text-faint);
+  cursor: grab;
+}
+
+.se-hs-mn-row:hover .se-hs-mn-grip {
+  color: var(--se-text-muted);
+}
+
+.se-hs-mn-prow[data-dragging] {
+  position: relative;
+  z-index: 1;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-shadow-sm);
+}
+
+/* The whole list while a row is held: grabbing, over each part's own cursor */
+.se-hs-mn-panels[data-dragging],
+.se-hs-mn-panels[data-dragging] :is(.se-hs-mn-row, .se-hs-mn-grip) {
+  cursor: grabbing;
+  user-select: none;
+}

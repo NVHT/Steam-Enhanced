@@ -1,6 +1,6 @@
 /*
- * Pickers for the tray columns (Favorites, What's New sources, Collections): reading and
- * saving the choice, the popup, its keyboard and placement.
+ * Pickers for the board's panels (Favorites, Collections), opened from a panel's ⋯ menu in its
+ * place: reading and saving the choice, the popup, its keyboard and placement.
  */
 ((SE) => {
   const ns = window.__seHomeStageParts;
@@ -12,26 +12,37 @@
 
   const { coverURLs, run } = SE;
 
+  /*
+   * Steam's own source for a game's library art (its GetHeaderImages: the custom capsule, the
+   * cached copy, then the CDN, by the file names Steam keeps for the game), found once by its
+   * methods.
+   */
+  const libraryArt = () =>
+    SE.findModule('home:library-art', (src, id, req) => {
+      if (!src.includes('GetHeaderImagesForAppId') || !src.includes('BHasRecentlyLaunched')) return null;
+      for (const value of Object.values(run(() => req(id)) || {})) {
+        if (typeof value?.GetHeaderImages === 'function') return value;
+      }
+      return null;
+    });
+
+  /**
+   * A game's wide capsule: Steam's own list first, then the file Steam names for it (newer
+   * games keep theirs under a hashed path, so a bare header.jpg can miss), then its hero art.
+   */
   function wideURLs(app) {
     const s = appStore();
     const list = [];
     const add = (v) => {
-      if (Array.isArray(v)) list.push(...v.filter(Boolean));
+      if (Array.isArray(v)) list.push(...v.filter((u) => typeof u === 'string' && u));
       else if (typeof v === 'string' && v) list.push(v);
     };
-    if (s) {
-      if (app.rt_custom_image_mtime) {
-        add(run(() => s.GetCustomLandcapeImageURLs(app)));
-        add(run(() => s.GetCustomLandscapeImageURLs(app)));
-      }
-      add(run(() => s.GetCachedLandscapeImageURL(app)));
-      add(run(() => s.GetLandscapeImageURLForApp(app)));
-    }
-    list.push(
-      `/assets/${app.appid}/header.jpg`,
-      `${ns.CDN(app.appid)}/header.jpg`,
-      `/assets/${app.appid}/library_hero.jpg`
-    );
+    add(run(() => libraryArt()?.GetHeaderImages(app)));
+    if (s && app.rt_custom_image_mtime) add(run(() => s.GetCustomLandcapeImageURLs(app)));
+    const file = app.header_filename || 'header.jpg';
+    list.push(`/assets/${app.appid}/${file}`, `${ns.CDN(app.appid)}/${file}`);
+    if (file !== 'header.jpg') list.push(`/assets/${app.appid}/header.jpg`, `${ns.CDN(app.appid)}/header.jpg`);
+    add(SE.heroURLs(app.appid, s));
     return [...new Set(list)];
   }
 
@@ -82,16 +93,28 @@
   live.pickEl = null;
   let pickOpts = null;
   let pickAnchor = null;
+  let pickSide = null;
 
   function closePick() {
     if (!live.pickEl) return;
     live.pickEl.remove();
     live.pickEl = null;
     pickOpts = null;
+    pickSide = null;
     document.removeEventListener('pointerdown', onPickOutside, true);
     document.removeEventListener('keydown', onPickKey, true);
     pickAnchor?.setAttribute('aria-expanded', 'false');
     pickAnchor = null;
+  }
+
+  // Back to the menu it came from (its ‹ and Escape), else closed
+  function backPick() {
+    const { back } = pickOpts || {};
+    const a = pickAnchor;
+    const s = pickSide;
+    closePick();
+    if (back) back(s);
+    else a?.focus();
   }
 
   function onPickOutside(e) {
@@ -100,22 +123,21 @@
     }
   }
 
+  // By its button, on the side the menu it came from had (menu.js placePop), so it opens in its place
   function placePick() {
     if (!live.pickEl || !pickAnchor?.isConnected) {
       closePick();
       return;
     }
-    const r = pickAnchor.getBoundingClientRect();
-    const w = live.pickEl.offsetWidth;
-    const h = live.pickEl.offsetHeight;
-    const left = Math.max(12, Math.min(r.right - w, innerWidth - w - 12));
-    const top = r.bottom + 8 + h <= innerHeight - 12 ? r.bottom + 8 : Math.max(12, r.top - 8 - h);
-    live.pickEl.style.left = `${left}px`;
-    live.pickEl.style.top = `${top}px`;
+    pickSide = ns.placePop(live.pickEl, pickAnchor, pickSide);
   }
 
-  const pickedNow = () => readPick(pickOpts.key) || pickOpts.defaults();
+  const pickedNow = () => (pickOpts.single ? [String(pickOpts.current())] : readPick(pickOpts.key) || pickOpts.defaults());
 
+  /*
+   * The rows, as the menu's: art, name, a quiet line at the end (hours, games), the square mark;
+   * the checkbox kept for the keyboard and the change, not seen
+   */
   function paintPick() {
     if (!live.pickEl) return;
     const q = (live.pickEl.querySelector('.se-hs-pk-search')?.value || '').trim().toLowerCase();
@@ -125,43 +147,66 @@
       groups
         .map(
           (g) =>
-            (g.label && g.rows.length ? `<div class="se-hs-pk-group">${SE.esc(g.label)}</div>` : '') +
+            (g.label && g.rows.length ? `<div class="se-hs-mn-group"><span>${SE.esc(g.label)}</span></div>` : '') +
             g.rows
-              .map(
-                (r) =>
-                  '<label class="se-hs-pk-row">' +
-                  `<input type="checkbox" data-id="${SE.esc(r.id)}"${chosen.has(String(r.id)) ? ' checked' : ''}>` +
+              .map((r) => {
+                const on = chosen.has(String(r.id));
+                const inner =
                   (r.img ? `<span class="se-hs-pk-pic">${imgTag(r.img, 'se-hs-pk-img')}</span>` : '') +
-                  `<span class="se-hs-pk-text"><span class="se-hs-pk-name">${SE.esc(r.name)}</span>${r.sub ? `<span class="se-hs-pk-sub">${SE.esc(r.sub)}</span>` : ''}</span>` +
-                  '</label>'
-              )
+                  `<span class="se-hs-mn-name">${SE.esc(r.name)}</span>` +
+                  (r.sub ? `<span class="se-hs-mn-value">${SE.esc(r.sub)}</span>` : '');
+                return pickOpts.single
+                  ? `<button type="button" class="se-hs-mn-row se-hs-pk-row" role="radio" aria-checked="${on}" data-one="${SE.esc(r.id)}"${on ? ' data-on' : ''}>` +
+                      `${inner}<span class="se-hs-mn-mark" data-round></span></button>`
+                  : '<label class="se-hs-mn-row se-hs-pk-row">' +
+                      `<input type="checkbox" class="se-hs-mn-input" data-id="${SE.esc(r.id)}"${on ? ' checked' : ''}>` +
+                      `${inner}<span class="se-hs-mn-mark"></span></label>`;
+              })
               .join('')
         )
         .join('') || '<span class="se-hs-empty">Nothing found</span>';
     paintPickFoot();
   }
 
+  // The header's count and the footer's rows: Show all / Show none, or Clear (a choice that
+  // replaces something when it has any: the Favorites panel's games)
   function paintPickFoot() {
-    if (!live.pickEl) return;
+    if (!live.pickEl || pickOpts.single) return;
     const picks = readPick(pickOpts.key);
-    live.pickEl.querySelector('.se-hs-pk-count').textContent = !picks
-      ? pickOpts.allText
-      : picks.length
-        ? `${picks.length} chosen`
-        : 'None shown';
-    live.pickEl.querySelector('[data-pk-all]').disabled = !picks;
-    live.pickEl.querySelector('[data-pk-none]').disabled = Boolean(picks && !picks.length);
+    const n = picks?.length || 0;
+    live.pickEl.querySelector('.se-hs-pk-count').textContent = pickOpts.clearable
+      ? n ? `${n} chosen` : 'None'
+      : !picks ? 'All' : n ? `${n} chosen` : 'None';
+    const set = (sel, off) => {
+      const b = live.pickEl.querySelector(sel);
+      if (b) b.disabled = off;
+    };
+    set('[data-pk-all]', !picks);
+    set('[data-pk-none]', Boolean(picks && !n));
+    set('[data-pk-clear]', !n);
   }
 
   function onPickKey(e) {
     if (e.key === 'Escape' && live.pickEl) {
       e.stopPropagation();
-      const a = pickAnchor;
-      closePick();
-      a?.focus();
+      backPick();
     }
   }
 
+  const pickRow = (attr, iconName, name) =>
+    `<button type="button" class="se-hs-mn-row" ${attr}>` +
+    `<span class="se-hs-mn-icon" style="--se-hs-mn-icon: var(--se-icon-${iconName})"></span>` +
+    `<span class="se-hs-mn-name">${name}</span></button>`;
+
+  /*
+   * A list to tick, drawn as the Home's menus are (menu.js): a header (‹ back to the menu it
+   * came from, the title, how many are chosen), a search box, the rows, Show all and Show
+   * none in the footer. Every tick applies at once.
+   *   opts { key, title, placeholder, defaults(), items(q), back(side), side }
+   *     clearable      none chosen means none kept (Clear in the footer, not Show all / none)
+   *     single         one to choose, current() the one set: rows with a round mark, choosing
+   *                    one calls onChoose(id) and goes back; no count, no footer
+   */
   function openPick(anchor, opts) {
     if (live.pickEl && pickAnchor === anchor) {
       closePick();
@@ -170,22 +215,28 @@
     closePick();
     pickOpts = opts;
     pickAnchor = anchor;
+    pickSide = opts.side || null;
     anchor.setAttribute('aria-expanded', 'true');
     live.pickEl = document.createElement('div');
-    live.pickEl.className = 'se-hs-pick';
+    live.pickEl.className = 'se-hs-pick se-hs-menu se-hs-pk';
     live.pickEl.setAttribute('role', 'dialog');
     live.pickEl.setAttribute('aria-label', opts.title);
     live.pickEl.innerHTML =
-      `<div class="se-hs-pk-head"><span class="se-hs-pk-title">${SE.esc(opts.title)}</span>` +
-      '<button type="button" class="se-hs-pk-x" data-pk-close aria-label="Close">×</button></div>' +
+      '<div class="se-hs-mn-sum">' +
+      (opts.back ? '<button type="button" class="se-hs-pk-back" data-pk-back aria-label="Back"></button>' : '') +
+      `<span class="se-hs-mn-title">${SE.esc(opts.title)}</span>${opts.single ? '' : '<span class="se-hs-pk-count"></span>'}</div>` +
       (opts.placeholder
-        ? `<input type="search" class="se-hs-pk-search" placeholder="${SE.esc(opts.placeholder)}" aria-label="${SE.esc(opts.placeholder)}">`
+        ? '<label class="se-hs-pk-find"><span class="se-hs-pk-glass"></span>' +
+          `<input type="search" class="se-hs-pk-search" placeholder="${SE.esc(opts.placeholder)}" aria-label="${SE.esc(opts.placeholder)}"></label>`
         : '') +
-      '<div class="se-hs-pk-list"></div>' +
-      '<div class="se-hs-pk-foot"><span class="se-hs-pk-count"></span>' +
-      '<button type="button" class="se-hs-hall" data-pk-all>Show all</button>' +
-      '<button type="button" class="se-hs-hall" data-pk-none>Show none</button>' +
-      '<button type="button" class="se-hs-pk-done" data-pk-close>Done</button></div>';
+      '<div class="se-hs-mn-body se-hs-pk-list"></div>' +
+      (opts.single
+        ? ''
+        : '<div class="se-hs-mn-foot se-hs-pk-foot">' +
+          (opts.clearable
+            ? pickRow('data-pk-clear', 'restore', 'Clear')
+            : pickRow('data-pk-all', 'list', 'Show all') + pickRow('data-pk-none', 'eye-off', 'Show none')) +
+          '</div>');
 
     live.pickEl.addEventListener('error', onImgError, true);
     live.pickEl.addEventListener('load', onImgLoad, true);
@@ -200,22 +251,30 @@
       if (!box) return;
       const ids = pickedNow().filter((id) => id !== box.dataset.id);
       if (box.checked) ids.push(box.dataset.id);
-      writePick(pickOpts.key, ids);
+      writePick(pickOpts.key, pickOpts.clearable && !ids.length ? null : ids);
       paintPickFoot();
       schedule();
     });
     live.pickEl.addEventListener('click', (e) => {
-      if (e.target.closest('[data-pk-close]')) {
-        closePick();
+      if (e.target.closest('[data-pk-back]')) {
+        backPick();
         return;
       }
-      if (e.target.closest('[data-pk-all]')) {
+      const one = e.target.closest('[data-one]');
+      if (one) {
+        pickOpts.onChoose(one.dataset.one);
+        backPick();
+        return;
+      }
+      if (e.target.closest('[data-pk-clear]')) {
         writePick(pickOpts.key, null);
         paintPick();
         schedule();
+        return;
       }
-      if (e.target.closest('[data-pk-none]')) {
-        writePick(pickOpts.key, []);
+      const all = e.target.closest('[data-pk-all]');
+      if (all || e.target.closest('[data-pk-none]')) {
+        writePick(pickOpts.key, all ? null : []);
         paintPick();
         schedule();
       }
@@ -229,16 +288,23 @@
     (live.pickEl.querySelector('.se-hs-pk-search') || live.pickEl.querySelector('input'))?.focus();
   }
 
-  function favPicker(anchor) {
+  /*
+   * The games chosen for the Favorites panel: when there are any they replace the collection it
+   * shows (tray.js paintFav); none chosen, the collection again
+   */
+  const favPickKey = () => 'se-home-fav-pick';
+  // Rows of the library shown at once (the search finds the rest)
+  const LIBRARY_ROWS = 100;
+
+  function favPicker(anchor, from = {}) {
     openPick(anchor, {
-      key: 'se-home-fav-pick',
-      title: 'Games in Favorites',
+      ...from,
+      key: favPickKey(),
+      title: 'Choose games',
       placeholder: 'Search your library',
-      allText: 'Showing all favorites',
-      defaults: () => (collectionApps(live.favCollection) || []).map((a) => String(a.appid)),
+      clearable: true,
+      defaults: () => [],
       items: (q) => {
-        const favs = sorted(collectionApps(live.favCollection) || [], 'az');
-        const ids = new Set(favs.map((a) => String(a.appid)));
         const match = (a) => !q || String(a.display_name || '').toLowerCase().includes(q);
         const row = (a) => ({
           id: String(a.appid),
@@ -246,53 +312,52 @@
           sub: hoursText(a),
           img: coverURLs(a, appStore()),
         });
-        const extra = (readPick('se-home-fav-pick') || [])
-          .filter((id) => !ids.has(id))
-          .map(appById)
-          .filter(Boolean);
-        const more =
-          q.length >= 2
-            ? sorted(
-                libraryGames().filter((a) => !ids.has(String(a.appid)) && match(a)),
-                'az'
-              ).slice(0, 40)
-            : [];
-        const seen = new Set();
-        const once = (list) => list.filter((a) => !seen.has(String(a.appid)) && seen.add(String(a.appid)));
+        const picked = (readPick(favPickKey()) || []).map(appById).filter(Boolean);
+        const ids = new Set(picked.map((a) => String(a.appid)));
+        const rest = sorted(libraryGames().filter((a) => !ids.has(String(a.appid)) && match(a)), 'az');
         return [
-          { label: '', rows: once(favs.filter(match)).map(row) },
-          { label: 'Other games', rows: once([...extra.filter(match), ...more]).map(row) },
+          { label: 'Chosen', rows: sorted(picked.filter(match), 'az').map(row) },
+          { label: picked.length ? 'Library' : '', rows: rest.slice(0, LIBRARY_ROWS).map(row) },
         ];
       },
     });
   }
 
-  function newsPicker(anchor) {
+  /** The collection the Favorites panel shows: one to choose, `from.current()` the one set. */
+  function sourcePicker(anchor, from) {
     openPick(anchor, {
-      key: 'se-home-news-types',
-      title: 'News types',
-      placeholder: '',
-      allText: 'Showing every type',
-      defaults: () => Object.keys(ns.NEWS_TYPES),
-      items: () => [
-        {
-          label: '',
-          rows: Object.entries(ns.NEWS_TYPES).map(([id, name]) => ({
-            id,
-            name,
-            sub: ns.NEWS_SUBS[id] || '',
-          })),
-        },
-      ],
+      ...from,
+      single: true,
+      title: 'Collection',
+      placeholder: 'Search collections',
+      items: (q) => {
+        const list = [
+          { id: 'favorite', name: 'Favorites', apps: collectionApps('favorite') || [] },
+          ...userCollections()
+            .filter((c) => c.id !== 'favorite')
+            .map((c) => ({ id: String(c.id), name: c.displayName || c.strName || String(c.id), apps: run(() => c.visibleApps) || [] })),
+        ];
+        return [
+          {
+            label: '',
+            rows: list
+              .filter((c) => !q || c.name.toLowerCase().includes(q))
+              .map((c) => {
+                const n = run(() => c.apps.length) || 0;
+                return { id: c.id, name: c.name, sub: `${n.toLocaleString()} ${n === 1 ? 'game' : 'games'}` };
+              }),
+          },
+        ];
+      },
     });
   }
 
-  function collPicker(anchor) {
+  function collPicker(anchor, from = {}) {
     openPick(anchor, {
+      ...from,
       key: 'se-home-coll-pick',
       title: 'Collections to show',
       placeholder: 'Search collections',
-      allText: 'Showing all collections',
       defaults: () => userCollections().map((c) => String(c.id)),
       items: (q) => [
         {
@@ -322,7 +387,7 @@
     );
 
   Object.assign(ns, {
-    appById, closePick, collPicker, collectionApps, favPicker, hoursText, newsPicker, placePick,
-    readPick, sorted, wideURLs,
+    appById, closePick, collPicker, collectionApps, favPickKey, favPicker, hoursText, libraryGames,
+    placePick, readPick, sorted, sourcePicker, wideURLs, writePick,
   });
 })(window.__se);

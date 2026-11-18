@@ -122,7 +122,7 @@
     ['main', 'client/library/', ['sort-segments.css', 'sort-segments.js']],
     // Library Home
     ['main', 'client/home/', ['home-shelves.css', 'home-shelves.js']],
-    ['main', 'client/home/stage/', ['stage.css', 'stage-hero.css', 'stage-tray.css', 'stage-shelves.css', 'stage-narrow.css', 'util.js', 'tray.js', 'picks.js', 'stage.js', 'data.js', 'news.js', 'main.js']],
+    ['main', 'client/home/stage/', ['stage.css', 'stage-hero.css', 'stage-settings.css', 'stage-tray.css', 'stage-shelves.css', 'stage-panels.css', 'stage-narrow.css', 'util.js', 'tray.js', 'picks.js', 'menu.js', 'stage-settings.js', 'panels-library.js', 'panels-community.js', 'board.js', 'home-mode.js', 'stage.js', 'stage-art.js', 'data.js', 'main.js']],
     // Menus, hover cards, notifications, dialogs
     ['all', 'client/dialogs/', ['dialogs.css']],
     ['content', 'client/dialogs/', ['install.css', 'eula.css']],

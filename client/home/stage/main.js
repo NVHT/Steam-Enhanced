@@ -1,29 +1,30 @@
 /*
- * Library Home hero stage and bottom shelf tray.
+ * Library Home, drawn by the theme: the hero stage and the board of panels under it.
  *
- * Renders recently played games in a full-bleed hero carousel with game logo,
+ * Renders the featured games in a full-bleed hero carousel with game logo,
  * store review summary, live player count, playtime/achievement counters,
- * Play/Install action button, and an 8-item thumbnail selector strip. Below the
- * stage, What's New, Favorites, and Collections are arranged side by side in a
- * three-column tray.
+ * Play/Install action button, and a strip of thumbnails or dots. Below the
+ * stage, the board's panels (Favorites, Collections, Recently added, Friend activity) on
+ * pages, as tall as nine capsules need. Steam's own Home stays mounted, never drawn.
  *
- * Controlled via CSS custom properties in core/tokens.css:
- *   --se-home-stage (on | off)
- *   --se-home-stage-cycle (seconds)
- *   --se-home-stage-tray (percentage of viewport height)
- *   --se-home-stage-tray-panels (on | off)
+ * Controlled by the stage's own settings (stage-settings.js, kept in localStorage): the Home
+ * stage menu, which also switches to Steam's own Home (home-mode.js) and adds or removes the
+ * board's panels (none: the stage fills the window).
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
  * window.__seHomeStageParts (values parts reassign live on its `live`): util.js
- * (shared helpers), tray.js, picks.js, stage.js (the stage and the layout pass), data.js,
- * news.js, and this one, main.js, which watches Home, runs one layout pass per frame and undoes
+ * (shared helpers), tray.js (panel shell, Favorites, Collections), picks.js, menu.js (the
+ * settings menus), stage-settings.js (the stage's settings and the Steam Enhanced | Steam
+ * switch), panels-library.js and panels-community.js (more panels), board.js (the board, its
+ * pages, adding and removing panels and each panel's ⋯ menu), home-mode.js (which Home shows),
+ * stage.js (the stage and the layout pass), data.js, and this one, main.js, which watches Home, runs one layout pass per frame and undoes
  * everything in destroy().
  */
 ((SE) => {
   const ns = window.__seHomeStageParts;
   if (!ns) return;
   const {
-    cancelNewsOpen, cancelPass, forgetStage, layout, narrow, placePick, reducedMotion,
+    cancelPass, forgetStage, layout, placePick, reducedMotion,
     restartCycle, schedule, select, setOn, setPass, teardown,
   } = ns;
   const { live } = ns;
@@ -36,7 +37,7 @@
 
   function watchSizes() {
     if (!sizes) return;
-    const want = new Set(live.scope ? [live.scroller, ...live.scope.querySelectorAll('[data-se-hs-col]')].filter(Boolean) : []);
+    const want = new Set(live.scope ? [live.scroller, live.scope].filter(Boolean) : []);
     for (const el of watched) {
       if (!want.has(el)) sizes.unobserve(el);
     }
@@ -83,13 +84,9 @@
     if (live.pickEl) placePick();
   }
 
-  const NEW_ROW =
-    ':scope > :not([data-se-hs-sec]):not([data-se-hs-flat]):not(.se-hs-stage):not(.se-hs-tray), ' +
-    '[data-se-hs-flat] > :not([data-se-hs-sec]):not([data-se-hs-flat])';
-
   function onMutate() {
     const home = document.querySelector('.LibraryHome')?.parentElement;
-    if (home && (home !== live.scope || !live.stage?.isConnected || home.querySelector(NEW_ROW))) {
+    if (home && (home !== live.scope || !live.stage?.isConnected)) {
       update();
     } else {
       schedule();
@@ -108,12 +105,11 @@
       sync: true,
       ignore: (node) => {
         const el = node.nodeType === 1 ? node : node.parentElement;
-        return Boolean(el?.closest(`.se-hs-stage, .se-hs-pick, ${SE.SIDE}`));
+        return Boolean(el?.closest(`.se-hs-stage, .se-hs-board, .se-hs-pick, .se-hs-back, ${SE.SIDE}`));
       },
     });
     sizes = typeof ResizeObserver === 'function' ? new ResizeObserver(scheduleSize) : null;
     addEventListener('resize', onResize);
-    narrow.addEventListener?.('change', schedule);
     document.addEventListener('visibilitychange', schedule);
     reducedMotion.addEventListener?.('change', onMotion);
     schedule();
@@ -121,17 +117,16 @@
 
   window.__seHomeStage = {
     destroy() {
-      cancelNewsOpen();
       watcher?.disconnect();
       sizes?.disconnect();
       removeEventListener('resize', onResize);
-      narrow.removeEventListener?.('change', schedule);
       document.removeEventListener('visibilitychange', schedule);
       reducedMotion.removeEventListener?.('change', onMotion);
       cancelPass();
       clearTimeout(sizeTimer);
       teardown();
       setOn(false);
+      ns.paintBackButton(null);
       forgetStage();
       removeEventListener('DOMContentLoaded', start);
       delete window.__seHomeStage;

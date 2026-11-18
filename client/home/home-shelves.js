@@ -73,8 +73,8 @@
   const measureShelfShifts = () => {
     const measurements = [];
     for (const shelf of document.querySelectorAll(SHELF_SELECTOR)) {
-      // A shelf the Home stage drew its own panel for is out of sight: nothing to align.
-      if (shelf.closest('[data-se-hs-own]')) continue;
+      // Under the Home stage Steam's Home isn't drawn: nothing to align.
+      if (shelf.closest('[data-se-hs]')) continue;
       const box = shelf.querySelector(COVER_BOX_SELECTOR);
       const firstCover = (box && box.querySelector('img')) || box || shelf.querySelector('img');
       if (!firstCover) continue;

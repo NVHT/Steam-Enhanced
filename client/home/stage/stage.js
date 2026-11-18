@@ -1,15 +1,17 @@
 /*
  * The hero stage (games, art, logo, counters, Play / Install, the strip and its cycle) and the
- * layout pass that places the stage and the tray on Home, measures them and tears them down.
+ * layout pass that places the stage and the board (stage/board.js) on Home, measures them and
+ * tears them down.
+ * The stage's style is the cinematic corner: the game's block in the lower left over the art,
+ * the strip of games in the lower right. What it shows follows stage-settings.js.
  */
 ((SE) => {
   const ns = window.__seHomeStageParts;
   if (!ns) return;
   const {
-    artImg, boxOf, clearMarks, client, closePick, compact, cycleSeconds, dropAllOwn, dropOwn,
-    enabled, fitColl, fitFav, hours, ICON_INSTALL, ICON_PLAY, isFavorites, kindOf, mark, narrow,
-    NEWS, own, paintColl, paintFav, reducedMotion, schedule, scrollerOf, setHTML, SHELF,
-    SHELF_HEADER, shelfId, trayShare, trayShown, when,
+    applyStageLook, artImg, boxOf, clearMarks, client, closeMenu, closePick, compact,
+    cycleSeconds, dropAllOwn, hours, ICON_INSTALL, ICON_PLAY, mark, NARROW_AT,
+    reducedMotion, schedule, scrollerOf, setHTML, stageSettings, when,
   } = ns;
   const { live } = ns;
 
@@ -18,17 +20,12 @@
   live.scope = null;
   live.scroller = null;
   live.stage = null;
-  let tray = null;
-  // The Favorites column: the theme's own grid cell, so Steam's row (its size, position or
-  // render state) can never leave the column blank. Steam's shelf stays mounted, out of sight.
-  let favHost = null;
   live.apps = [];
   live.selected = 0;
   let appsSig = '';
   let hovering = false;
   let cycleTimer = 0;
   let cycleDue = false;
-  const marked = new Set();
   const logos = new Map();
 
   function buildStage() {
@@ -47,7 +44,8 @@
       '</div>' +
       '</div>' +
       '</div>' +
-      '<div class="se-hs-strip" role="group" aria-label="Recent games"></div>';
+      '<div class="se-hs-strip" role="group" aria-label="Featured games"></div>' +
+      '<button type="button" class="se-hs-gear" data-act="settings" aria-label="Home stage settings" aria-haspopup="dialog" aria-expanded="false"></button>';
     el.addEventListener('click', onClick);
     el.addEventListener('pointerenter', () => {
       hovering = true;
@@ -65,7 +63,12 @@
       restartCycle();
       return;
     }
-    const act = e.target.closest('[data-act]')?.dataset.act;
+    const actEl = e.target.closest('[data-act]');
+    const act = actEl?.dataset.act;
+    if (act === 'settings') {
+      ns.openStageMenu(actEl);
+      return;
+    }
     const app = live.apps[live.selected];
     if (!act || !app) return;
     const sc = client();
@@ -83,6 +86,8 @@
     art.querySelectorAll('.se-hs-layer').forEach((l) => l.remove());
     const strip = live.stage.querySelector('.se-hs-strip');
     strip.textContent = '';
+    // The thumbnails share the strip's width (stage-hero.css): more games, smaller thumbnails
+    SE.cssVar(strip, '--se-hs-n', String(Math.max(1, live.apps.length)));
 
     live.apps.forEach((app, i) => {
       const layer = document.createElement('div');
@@ -97,23 +102,12 @@
 
       const pic = document.createElement('span');
       pic.className = 'se-hs-pic';
-      pic.appendChild(artImg(ns.heroURLs(app), 'se-hs-thumbimg'));
+      pic.appendChild(artImg(ns.wideURLs(app), 'se-hs-thumbimg')); // the wide capsule: art with the game's name
 
-      const label = document.createElement('span');
-      label.className = 'se-hs-thumblabel';
-      const name = document.createElement('span');
-      name.className = 'se-hs-thumbname';
-      name.textContent = app.display_name || '';
-      const date = document.createElement('span');
-      date.className = 'se-hs-thumbdate';
-      date.textContent = when(app.rt_last_time_played);
-
-      label.append(name, date);
-      pic.appendChild(label);
       b.appendChild(pic);
       strip.appendChild(b);
     });
-    strip.hidden = live.apps.length < 2;
+    applyStageLook();
   }
 
   function logoFor(app) {
@@ -132,53 +126,59 @@
   function paintGame() {
     const app = live.apps[live.selected];
     if (!live.stage || !app) return;
+    const show = stageSettings().details;
     const title = live.stage.querySelector('.se-hs-title');
     const logo = logoFor(app);
+    const useLogo = show.logo && logo.ok;
     title.querySelectorAll('.se-hs-logo').forEach((img) => {
-      if (img !== logo.img) img.remove();
+      if (img !== logo.img || !useLogo) img.remove();
     });
-    if (logo.ok && logo.img.parentElement !== title) title.prepend(logo.img);
-    SE.mark(title, 'data-logo', logo.ok ? 'yes' : 'no');
+    if (useLogo && logo.img.parentElement !== title) title.prepend(logo.img);
+    SE.mark(title, 'data-logo', useLogo ? 'yes' : 'no');
     title.querySelector('.se-hs-name').textContent = app.display_name || '';
 
     const ach = ns.achievementsOf(app.appid);
-    const stat = (value, label, extra = '') => `<span class="se-hs-stat"${extra}><b>${value}</b><em>${label}</em></span>`;
+    // A stat: its label over its value (the developer line's small caps), a bar under it if given
+    const stat = (label, value, { bar = '', extra = '' } = {}) =>
+      `<span class="se-hs-stat"${extra}><em>${label}</em><b>${value}</b>${bar}</span>`;
     const info = ns.infoOf(app.appid);
     const now = ns.playersOf(app.appid);
     const recent = app.minutes_playtime_last_two_weeks || 0;
-    const parts = [
-      stat(
-        `${SE.esc(hours(app.minutes_playtime_forever))}<small> h</small>`,
-        recent ? `played · ${SE.esc(hours(recent))} h in 2 weeks` : 'played'
-      ),
-    ];
-    if (ach) {
+    const parts = [];
+    if (show.hours) {
+      parts.push(stat(
+        recent ? `Played · ${SE.esc(hours(recent))} h lately` : 'Played',
+        `${SE.esc(hours(app.minutes_playtime_forever))}<small> h</small>`
+      ));
+    }
+    if (show.last && app.rt_last_time_played) parts.push(stat('Last played', SE.esc(when(app.rt_last_time_played))));
+    if (ach && show.ach) {
       const pct = Math.round((ach.got / ach.total) * 100);
-      parts.push(
-        `<span class="se-hs-stat" data-ach${pct === 100 ? ' data-perfect' : ''}><b>${ach.got}<small> / ${ach.total}</small></b>` +
-          `<em>achievements<span class="se-hs-achbar" aria-hidden="true"><span style="width:${pct}%"></span></span></em></span>`
-      );
+      parts.push(stat('Achievements', `${ach.got}<small> / ${ach.total}</small>`, {
+        bar: `<span class="se-hs-achbar" aria-hidden="true"><span style="width:${pct}%"></span></span>`,
+        extra: pct === 100 ? ' data-perfect' : '',
+      }));
     }
     const meta = live.stage.querySelector('.se-hs-meta');
     setHTML(meta, parts.join(''));
 
     const chips = [];
-    if (info?.pct != null) {
+    if (info?.pct != null && show.reviews) {
       const tone = info.pct >= 70 ? 'good' : info.pct >= 40 ? 'mixed' : 'bad';
-      chips.push(`<span class="se-hs-chip" data-reviews="${tone}">${info.pct}% · ${SE.esc(info.score || 'positive')}</span>`);
+      chips.push(`<span class="se-hs-chip" data-reviews="${tone}"><b>${info.pct}%</b>${SE.esc(info.score || 'positive')}</span>`);
     }
-    if (now != null && now > 0) {
-      chips.push(`<span class="se-hs-chip" data-live><i></i>${SE.esc(compact(now))} playing now</span>`);
+    if (now != null && now > 0 && show.live) {
+      chips.push(`<span class="se-hs-chip" data-live><i></i><b>${SE.esc(compact(now))}</b>playing now</span>`);
     }
     setHTML(live.stage.querySelector('.se-hs-chips'), chips.join(''));
 
     const desc = live.stage.querySelector('.se-hs-desc');
-    const text = info?.text || '';
+    const text = (show.desc && info?.text) || '';
     if (desc.textContent !== text) desc.textContent = text;
     desc.hidden = !text;
 
     const by = live.stage.querySelector('.se-hs-by');
-    const byText = [info?.dev, info?.year || ''].filter(Boolean).join(' · ');
+    const byText = show.by ? [info?.dev, info?.year || ''].filter(Boolean).join(' · ') : '';
     if (by.textContent !== byText) by.textContent = byText;
     by.hidden = !byText;
 
@@ -213,13 +213,16 @@
       t.toggleAttribute('data-on', on);
       t.setAttribute('aria-pressed', on ? 'true' : 'false');
       t.querySelector('.se-hs-prog')?.remove();
-      if (on && cycleSeconds() > 0 && !reducedMotion.matches && live.apps.length > 1) {
+      if (on && cycleSeconds() > 0 && !reducedMotion.matches && live.apps.length > 1 && stageSettings().nav !== 'none') {
         const bar = document.createElement('span');
         bar.className = 'se-hs-prog';
-        t.querySelector('.se-hs-pic').appendChild(bar);
+        // Under the thumbnail as its own track; inside the dot when the strip is dots
+        (stageSettings().nav === 'dots' ? t.querySelector('.se-hs-pic') : t).appendChild(bar);
       }
     });
     paintGame();
+    // Screenshots or the trailer behind the game now on show (stage-art.js)
+    ns.paintArtMedia?.();
   }
 
   // Cards the strip shows (set by stage-hero.css container queries), capped to the games.
@@ -231,7 +234,7 @@
 
   // Keep the shown game on a visible card after the strip narrows.
   function fitStrip() {
-    if (live.apps.length && live.selected >= stripCount()) select(0);
+    if (live.apps.length && stageSettings().nav !== 'none' && live.selected >= stripCount()) select(0);
   }
 
   function restartCycle() {
@@ -246,7 +249,7 @@
       // Out of sight (another page over Home, or the window hidden): the art's push-in pauses too.
       const idle = document.visibilityState !== 'visible' || !SE.visible(live.stage);
       SE.attr(live.stage, 'data-se-hs-idle', idle ? '' : null);
-      const shown = stripCount();
+      const shown = stageSettings().nav === 'none' ? live.apps.length : stripCount();
       if (idle || hovering || shown < 2) return;
       select((live.selected + 1) % shown);
     }, seconds * 1000);
@@ -287,15 +290,14 @@
 
   function teardown(leaving) {
     closePick();
+    closeMenu();
     unlockScroller();
     clearMarks();
     dropAllOwn(leaving);
-    document.querySelectorAll('[data-se-hs-carousel]').forEach((el) => el.removeAttribute('data-se-hs-carousel'));
-    ns.resetNews(leaving);
+    ns.dropBoard(leaving);
+    ns.stopArtMedia?.();
     if (!leaving) appsSig = '';
     live.stage?.remove();
-    tray?.remove();
-    favHost?.remove();
     clearInterval(cycleTimer);
     cycleTimer = 0;
     cycleDue = true;
@@ -319,62 +321,24 @@
     (!live.scroller || live.scroller === document.scrollingElement || live.scroller.clientHeight >= 300);
 
   let isNarrow = false;
+  // The board's bottom margin (--se-space-5), under the glass
+  const BOARD_MARGIN = 24;
 
-  function collectHomeRows(lib) {
-    const shelves = [...lib.querySelectorAll(SHELF)];
-    let list = lib;
-    if (shelves.length) {
-      list = shelves[0].parentElement;
-      while (list && list !== lib && !shelves.every((s) => list.contains(s))) {
-        list = list.parentElement;
-      }
-      if (!list || !lib.contains(list)) list = lib;
-    }
-    const flat = new Set();
-    for (let el = list; el && el !== live.scope; el = el.parentElement) flat.add(el);
-    const news = live.scope.querySelector(NEWS);
-    if (news) {
-      for (let el = news.parentElement; el && el !== live.scope; el = el.parentElement) flat.add(el);
-    }
-
-    const rows = [];
-    for (const parent of [live.scope, ...flat]) {
-      for (const child of parent.children) {
-        if (flat.has(child) || child === live.stage || child === tray) continue;
-        rows.push(child);
-      }
-    }
-    return { flat, rows };
-  }
-
-  // Reads only: the room under the header, and the tallest tray panel's least height.
-  function measureStage(trayRows, kinds) {
+  // Reads only: the room under the header, and the board's width.
+  function measureStage() {
     const view = live.scroller?.clientHeight || innerHeight;
     const top =
       live.scope.getBoundingClientRect().top -
       (live.scroller?.getBoundingClientRect?.().top || 0) +
       (live.scroller?.scrollTop || 0);
-    const ownHeight = (r) => {
-      const cs = getComputedStyle(r);
-      const panel = r.querySelector(':scope > .se-hs-own');
-      const parts = panel ? [...panel.children] : [...r.children];
-      const least = (c) =>
-        c.classList.contains('se-hs-clist-box')
-          ? 150
-          : c.classList.contains('se-hs-grid')
-            ? Math.round(2 * ((c.clientWidth - 20) / 3 / (460 / 215)) + 10)
-            : c.offsetHeight;
-      const inner = parts.reduce((h, c) => h + least(c), 0) + (panel ? 8 : 14);
-      return inner + (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
-    };
     return {
       measured: Math.max(420, Math.round(view - Math.max(0, top)) - HEADROOM),
-      content: trayRows.length ? Math.max(...trayRows.filter((r) => kinds.get(r) !== 'news').map(ownHeight), 0) : 0,
+      boardW: ns.boardWidth(),
     };
   }
 
-  // Writes only, from measureStage()'s numbers.
-  function applyStageDimensions({ measured, content }, trayRows, showTray) {
+  // Writes only, from measureStage()'s numbers: the board's height, the stage gets the rest.
+  function applyStageDimensions({ measured, boardW }, showBoard) {
     const now = performance.now();
 
     if (!appliedVh || measured === appliedVh) {
@@ -391,26 +355,17 @@
     }
 
     const vh = appliedVh;
-    const want = Math.round((vh * trayShare()) / 100);
-    const trayBox = trayRows.length && !isNarrow ? Math.min(Math.max(want, content, 220), vh - 340 - 22) : 0;
-    const px = trayBox ? `${trayBox}px` : '';
-    if (tray.style.height !== px) tray.style.height = px;
-    const trayH = trayBox ? trayBox + 22 : 0;
+    // The board as tall as 9 capsules in a third of its width need (board.js); the stage the rest,
+    // never under 340 px
+    const want = ns.boardIdeal(boardW);
+    const boardBox = showBoard ? Math.max(0, Math.min(Math.max(want, ns.boardLeast()), vh - 340 - BOARD_MARGIN)) : 0;
+    ns.sizeBoard(boardBox);
+    const boardH = boardBox ? boardBox + BOARD_MARGIN : 0;
 
     SE.cssVar(live.stage, '--se-hs-vh', `${vh}px`);
-    const stageH = isNarrow && showTray ? Math.round(vh * 0.7) : vh - trayH;
-    SE.cssVar(live.stage, '--se-hs-h', `${Math.max(340, stageH)}px`);
-
-    // Locked: the stage and the tray are the whole page, Steam's other Home rows hidden. With the
-    // tray off the stage alone is the page, narrow windows included.
-    const lock = (showTray ? !isNarrow && trayRows.length > 0 : true) && vh - trayH >= 340;
-    if (lock) {
-      mark(live.scope, 'data-se-hs-lock');
-      lockScroll();
-    } else {
-      SE.unmark(live.scope, 'data-se-hs-lock');
-      unlockScroller();
-    }
+    SE.cssVar(live.stage, '--se-hs-h', `${Math.max(340, vh - boardH)}px`);
+    if (live.scope.hasAttribute('data-se-hs-event')) unlockScroller();
+    else lockScroll();
   }
 
   function layout() {
@@ -419,19 +374,21 @@
     if (live.stage?.hasAttribute('data-se-hs-idle') && document.visibilityState === 'visible') {
       SE.attr(live.stage, 'data-se-hs-idle', null);
     }
-    ns.resetCardEvents();
     const lib = document.querySelector('.LibraryHome');
     const home = lib?.parentElement;
     if (!home) {
       if (live.scope) teardown(true);
       return;
     }
-    if (!enabled()) {
+    // Home: Steam (the Home stage menu's switch, home-mode.js): Steam's own Home, with the way back at its top
+    if (ns.homeMode() === 'steam') {
       if (live.scope) teardown();
       setOn(false);
+      ns.paintBackButton(home);
       return;
     }
-    live.apps = ns.recentApps();
+    ns.paintBackButton(null);
+    live.apps = ns.stageApps();
     if (!live.apps.length) {
       if (live.scope) teardown();
       setOn(false);
@@ -443,77 +400,24 @@
       live.scroller = scrollerOf(home);
     }
     if (!live.stage) live.stage = buildStage();
-    if (!tray) {
-      tray = document.createElement('div');
-      tray.className = 'se-hs-tray';
-      tray.setAttribute('aria-hidden', 'true');
-    }
     if (live.stage.parentElement !== live.scope) live.scope.prepend(live.stage);
-    if (tray.parentElement !== live.scope) live.scope.appendChild(tray);
 
-    if (!favHost) {
-      favHost = document.createElement('div');
-      favHost.className = 'se-hs-favhost';
-    }
+    // The board; with every panel removed it goes and the stage fills the window, until the Home
+    // stage menu's Panels add one back
+    const showBoard = ns.boardLayout().panels.length > 0;
+    const board = ns.boardEl();
+    if (!showBoard) board.remove();
+    else if (board.previousElementSibling !== live.stage) live.stage.after(board);
 
-    const { flat, rows } = collectHomeRows(lib);
-    clearMarks(new Set([live.scope, favHost, ...flat, ...rows]));
+    clearMarks(new Set([live.scope]));
     mark(live.scope, 'data-se-hs');
-    for (const el of flat) mark(el, 'data-se-hs-flat');
-
-    const kinds = new Map(rows.map((r) => [r, kindOf(r)]));
-    const firstOf = (k) => rows.find((r) => kinds.get(r) === k);
-    if (!firstOf('fav')) {
-      const s = firstOf('shelf');
-      if (s) kinds.set(s, 'fav');
-    }
-
-    // Favorites first: whether it draws decides how many columns the tray has. With the tray
-    // off ("Home stage tray" setting) nothing goes in it, and the stage fills the page alone.
-    const showTray = trayShown();
-    const favSource = (showTray && firstOf('fav')) || null;
-    const favShelf = favSource && (favSource.matches(SHELF) ? favSource : favSource.querySelector(SHELF));
-    const favId = (favShelf && shelfId(favShelf)) || (favShelf && isFavorites(favShelf) ? 'favorite' : null);
-    const favTitle =
-      favId === 'favorite'
-        ? 'Favorites'
-        : (favShelf?.querySelector(SHELF_HEADER)?.textContent || '').replace(/[·•].*$/, '').trim();
-    const favEntry = showTray ? paintFav(favHost, favId, favTitle) : null;
-    if (favEntry) {
-      if (favHost.parentElement !== live.scope) live.scope.appendChild(favHost);
-      kinds.set(favHost, 'fav');
-    } else {
-      favHost.remove();
-    }
-
-    const trayRows = showTray ? [firstOf('news'), favEntry ? favHost : null, firstOf('coll')].filter(Boolean) : [];
-    for (const r of [...rows, ...(favEntry ? [favHost] : [])]) {
-      let k = kinds.get(r);
-      if (r === favSource && favEntry) k = 'favsrc';
-      else if ((k === 'news' || k === 'fav' || k === 'coll') && !trayRows.includes(r)) {
-        k = k === 'news' ? 'other' : 'shelf';
-      }
-      mark(r, 'data-se-hs-sec', k);
-      const col = trayRows.indexOf(r);
-      if (col >= 0) mark(r, 'data-se-hs-col', String(col + 1));
-      else SE.unmark(r, 'data-se-hs-col');
-      if (col >= 0 && col === trayRows.length - 1) mark(r, 'data-se-hs-last');
-      else SE.unmark(r, 'data-se-hs-last');
-    }
-
-    mark(live.scope, 'data-se-hs-n', String(trayRows.length));
-    isNarrow = narrow.matches;
+    // A news post open over Home (Library route state event_to_show): Steam's Home shows it
+    const eventOpen = Boolean(SE.run(() => SE.mainWindow().m_history.location.state.event_to_show));
+    if (eventOpen) mark(live.scope, 'data-se-hs-event');
+    else SE.unmark(live.scope, 'data-se-hs-event');
+    isNarrow = live.scope.clientWidth <= NARROW_AT;
     if (isNarrow) mark(live.scope, 'data-se-hs-narrow');
     else SE.unmark(live.scope, 'data-se-hs-narrow');
-    tray.hidden = !trayRows.length;
-
-    ns.paintNews(trayRows.find((r) => kinds.get(r) === 'news') || null);
-    for (const row of [...own.keys()]) {
-      if (!trayRows.includes(row)) dropOwn(row);
-    }
-
-    const collRow = trayRows.find((r) => kinds.get(r) === 'coll');
-    const collEntry = collRow ? paintColl(collRow) : null;
 
     const sig = live.apps.map((a) => a.appid).join(',');
     if (sig !== appsSig) {
@@ -526,6 +430,7 @@
     } else {
       paintGame();
     }
+    applyStageLook();
 
     if (cycleDue) {
       cycleDue = false;
@@ -533,26 +438,21 @@
     }
     setOn(true);
 
-    // Every measurement of the pass at once (one layout), then the writes that depend on them.
-    const favBox = favEntry && boxOf(favEntry.el.querySelector('.se-hs-grid'));
-    const collBox = collEntry && boxOf(collEntry.el.querySelector('.se-hs-cgrid'));
-    const headsMore = live.newsHeads?.isConnected ? live.newsHeads.scrollHeight > live.newsHeads.clientHeight + 2 : null;
-    const dims = measureStage(trayRows, kinds);
-
-    if (favEntry) fitFav(favEntry, favBox);
-    if (collEntry) fitColl(collEntry, collBox);
-    if (headsMore !== null) SE.mark(live.newsHeads, 'data-more', headsMore ? 'yes' : 'no');
-    applyStageDimensions(dims, trayRows, showTray);
+    // Reads, then the writes they decide: sizes first, then the page of panels and their fit.
+    const dims = measureStage();
+    applyStageDimensions(dims, showBoard);
+    const fits = showBoard ? ns.paintBoard(dims.boardW) : [];
+    const boxes = fits.map((f) => boxOf(f.grid));
+    fits.forEach((f, i) => f.fit(f.entry, boxes[i]));
     fitStrip();
   }
 
-  /** destroy(): let go of the stage and tray elements. */
+  /** destroy(): let go of the stage element. */
   function forgetStage() {
     live.stage = null;
-    tray = null;
   }
 
   Object.assign(ns, {
-    forgetStage, layout, marked, paintGame, restartCycle, select, setOn, teardown,
+    forgetStage, layout, paintGame, restartCycle, select, setOn, teardown,
   });
 })(window.__se);

@@ -1,53 +1,9 @@
 /*
- * Library Home: what every part shares: Steam's selectors, the --se-home-stage* settings,
- * Steam's stores, theme art images, formatters and icons, and the frame pass (index.js).
+ * Library Home: what every part shares: Steam's stores, theme art images, formatters and icons, and the frame pass (main.js).
  */
 ((SE) => {
   const ns = (window.__seHomeStageParts = { live: {} });
 
-  const { C } = SE;
-
-  const NEWS = `.${C.UpdatesContainer}`;
-  const SHELF = `.${C.Showcase}`;
-  const SHELF_HEADER = `.${C.ShowcaseHeader}`;
-  const RECENT = `.${C.RecentGame}, .${C.EmptyDate_AddedDate}, .${C.FeaturedCapsule}`;
-  const PLAY_NEXT = `.${C.PlayNextSubHead}, .${C.PlayNextCarouselSubHeading}, .${C.Message_AddedDate}`;
-  const COLLECTION_TILE = `.${C.Collection}`;
-  const ADD_SHELF = `.${C.AddShowcaseRow}, .${C.AddShowcase}`;
-  const COVER = `.${C.LibraryItemBox}`;
-  const NEWS_CARD = `.${C.PartnerEventRowCapsule}`;
-  const NEWS_IMAGE = `.${C.PartnerEventRowCapsule_MainImageContainer}, .${C.EventImageWrapper}`;
-  const NEWS_DATE = `.${C.NewUpdates_EventTime}, .${C.BasicHomeUpdates_EventTime}`;
-  const NEWS_GAME = `.${C.ArrowWrapper_GameIconAndName}, .${C.BasicHomeUpdates_GameIconAndName}`;
-  const NEWS_HEADING = `.${C.WhatsNewHeaderText}`;
-
-  /*
-   * The --se-home-stage* settings, read at most every 2 s: each getComputedStyle read can force
-   * a style recalc, and layout() runs often.
-   */
-  let settings = null;
-  let settingsAt = -Infinity;
-  function setting(name) {
-    if (!settings || performance.now() - settingsAt > 2000) {
-      const cs = getComputedStyle(document.documentElement);
-      settings = Object.fromEntries(
-        ['--se-home-stage', '--se-home-stage-cycle', '--se-home-stage-tray', '--se-home-stage-tray-panels'].map((k) => [k, cs.getPropertyValue(k).trim()])
-      );
-      settingsAt = performance.now();
-    }
-    return settings[name];
-  }
-  const enabled = () => setting('--se-home-stage') !== 'off';
-  const cycleSeconds = () => {
-    const n = parseFloat(setting('--se-home-stage-cycle'));
-    return Number.isFinite(n) ? Math.max(0, n) : 9;
-  };
-  const trayShare = () => {
-    const n = parseFloat(setting('--se-home-stage-tray'));
-    return Number.isFinite(n) ? Math.min(70, Math.max(0, n)) : 30;
-  };
-  // The tray's panels (What's New, Favorites, Collections): off gives the stage the window
-  const trayShown = () => setting('--se-home-stage-tray-panels') !== 'off';
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
   const appStore = () => SE.global('appStore', (s) => !!s.allApps);
@@ -138,7 +94,15 @@
   const ICON_FILTER = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g fill="currentColor" fill-opacity=".32" stroke="none"><path d="M4 5h16l-6 7.5V19l-4-2v-4.5z"></path></g><path d="M4 5h16l-6 7.5V19l-4-2v-4.5z"></path></svg>';
   const ICON_PICK = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>';
 
-  const narrow = matchMedia('(max-width: 1100px)');
+  const ICON_DOTS = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>';
+
+  /** A panel's ⋯ button: its settings (stage/board.js opens the menu). */
+  const panelMenuButton = (name) =>
+    `<button type="button" class="se-hs-pickbtn" data-panel-menu aria-label="${SE.esc(name)} settings" title="Settings" aria-haspopup="dialog" aria-expanded="false">${ICON_DOTS}</button>`;
+
+  // The stage goes narrow at this width of its own (not the window's: the game list and the
+  // Friends dock take a share of it). stage.js reads the Home's width each pass.
+  const NARROW_AT = 1100;
 
   /*
    * One layout pass per frame. Parts ask for one with schedule(); index.js sets what a pass runs
@@ -161,10 +125,9 @@
   }
 
   Object.assign(ns, {
-    ADD_SHELF, COLLECTION_TILE, COVER, ICON_FILTER, ICON_INSTALL, ICON_PICK, ICON_PLAY, NEWS,
-    NEWS_CARD, NEWS_DATE, NEWS_GAME, NEWS_HEADING, NEWS_IMAGE, PLAY_NEXT, RECENT, SHELF,
-    SHELF_HEADER, appStore, artImg, cancelPass, client, collectionStore, compact, cycleSeconds,
-    dayLabel, enabled, hours, imgTag, narrow, onImgError, onImgLoad, partnerEventStore,
-    reducedMotion, schedule, setHTML, setPass, trayShare, trayShown, when,
+    ICON_FILTER, ICON_INSTALL, ICON_PICK, ICON_PLAY, appStore,
+    panelMenuButton, artImg, cancelPass, client, collectionStore, compact, dayLabel,
+    hours, imgTag, NARROW_AT, onImgError, onImgLoad, partnerEventStore,
+    reducedMotion, schedule, setHTML, setPass, when,
   });
 })(window.__se);

@@ -3,17 +3,7 @@
  * drawn by the theme, the pickers that choose what they (and What's New) show, Favorites'
  * capsules and Collections' fanned covers.
  */
-/* Favorites and Collections View, drawn by the theme */
-/* Steam's shelf stays mounted but out of sight; the theme's panel takes its place */
-[data-se-hs-own] > :not(.se-hs-own):not(#se-none) {
-  display: none !important;
-}
-
-[data-se-hs-own]:not(#se-none) {
-  display: flex !important;
-  flex-direction: column;
-}
-
+/* A panel the theme draws (Favorites, Collections and the board's other panels) in its cell */
 .se-hs-own {
   flex: 1 1 auto;
   display: flex;
@@ -37,41 +27,7 @@
   color: var(--se-text-muted);
 }
 
-/*
- * What's New's filter: the funnel and the types chosen, in its heading (or on its own line when
- * Steam's heading shows); lit while some types are left out
- */
-.se-hs-pickbtn.se-hs-nfilter {
-  width: auto;
-  gap: var(--se-space-1);
-  padding: 0 var(--se-space-2);
-  font: 600 var(--se-fs-sm) var(--se-font);
-}
-
-.se-hs-pickbtn.se-hs-nfilter svg {
-  width: 13px;
-  height: 13px;
-}
-
-.se-hs-pickbtn.se-hs-nfilter[data-on] {
-  color: var(--se-accent);
-  background: var(--se-accent-surface);
-}
-
-.se-hs-nhead .se-hs-nfilter {
-  margin-left: auto;
-}
-
-.se-hs-nhead .se-hs-nfilter + .se-hs-hall {
-  margin-left: var(--se-space-1);
-}
-
-.se-hs-nfilter[data-bar] {
-  align-self: flex-start;
-  margin: 0 0 var(--se-space-2);
-}
-
-/* The sliders button: choose what Favorites and Collections show */
+/* A panel's ⋯ button (its settings, stage/board.js) */
 .se-hs-pickbtn {
   flex: 0 0 auto;
   width: 30px;
@@ -98,209 +54,185 @@
   background: var(--se-selected);
 }
 
-.se-hs-pickbtn:focus-visible,
-.se-hs-pk-x:focus-visible,
-.se-hs-pk-done:focus-visible {
+.se-hs-pickbtn:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
 }
 
+/* The heading's buttons sit at its end: a link (View all) first, then ⋯ */
 .se-hs-own .se-hs-pickbtn {
   margin-left: auto;
 }
 
-/* The list to tick, over the page by its button */
+.se-hs-own .se-hs-hall + .se-hs-pickbtn {
+  margin-left: 0;
+}
+
+/*
+ * A popup over the page by its button: the Home's menus (menu.js) and pickers (picks.js), placed
+ * by placePop; stage-settings.css draws them
+ */
 .se-hs-pick {
   position: fixed;
   z-index: var(--se-z-toast);
-  width: 340px;
   max-width: calc(100vw - 24px);
   display: flex;
   flex-direction: column;
-  padding: var(--se-space-3);
   box-sizing: border-box;
-  border-radius: var(--se-radius-lg);
-  background: rgba(22, 25, 31, .97);
-  box-shadow: inset 0 0 0 1px var(--se-white-10), 0 24px 60px -12px var(--se-black-90);
   color: var(--se-text);
-  font-family: var(--se-font);
 }
 
-.se-hs-pk-head {
-  display: flex;
-  align-items: center;
-  gap: var(--se-space-2);
-  margin-bottom: var(--se-space-2);
-}
-
-.se-hs-pk-title {
-  flex: 1;
-  font-size: var(--se-fs-lg);
-  font-weight: 700;
-}
-
-.se-hs-pk-x {
-  width: 28px;
-  height: 28px;
+/* A picker (picks.js), in the menu's language: ‹ back to its menu, the title, how many chosen */
+.se-hs-pk-back {
+  flex: none;
+  width: var(--se-space-5);
+  height: var(--se-space-5);
+  margin-right: calc(-1 * var(--se-space-1));
   padding: 0;
   border: 0;
   border-radius: var(--se-radius-sm);
   background: transparent;
   color: var(--se-text-muted);
-  font-size: var(--se-fs-2xl);
-  line-height: 1;
   cursor: pointer;
 }
 
-.se-hs-pk-x:hover {
-  background: var(--se-divider);
+.se-hs-pk-back::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-chevron) center / var(--se-space-4) no-repeat;
+  mask: var(--se-icon-chevron) center / var(--se-space-4) no-repeat;
+  rotate: 90deg;
+}
+
+.se-hs-pk-back:hover {
+  background: var(--se-selected);
   color: var(--se-text-strong);
 }
 
-.se-hs-pk-search {
-  height: 34px;
-  padding: 0 var(--se-space-3);
-  border: 0;
-  border-radius: var(--se-radius-sm);
-  background: var(--se-surface-2);
-  color: var(--se-text);
-  font: 500 var(--se-fs-base) var(--se-font);
-  outline: none;
-}
-
-.se-hs-pk-search:focus {
-  box-shadow: none;
+.se-hs-pk-back:focus-visible {
   outline: var(--se-focus-outline);
-  outline-offset: var(--se-focus-offset);
+  outline-offset: 0;
 }
 
-.se-hs-pk-list {
-  max-height: min(360px, 52vh);
-  margin: var(--se-space-2) calc(-1 * var(--se-space-1)) 0;
-  padding: 0 var(--se-space-1);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--se-white-18) transparent;
+.se-hs-pk .se-hs-mn-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.se-hs-pk-group {
-  padding: var(--se-space-2) var(--se-space-1) var(--se-space-1);
-  font: var(--se-label-font);
-  letter-spacing: var(--se-label-spacing);
-  text-transform: uppercase;
+.se-hs-pk-count {
+  flex: none;
+  font: 500 var(--se-fs-sm) var(--se-font);
   color: var(--se-text-faint);
+  font-variant-numeric: tabular-nums;
 }
 
-.se-hs-pk-row {
+/* The search box: a quiet field with the magnifier, a hairline of accent while typing */
+.se-hs-pk-find {
+  flex: none;
   display: flex;
   align-items: center;
   gap: var(--se-space-2);
-  min-height: 40px;
-  padding: var(--se-space-1) var(--se-space-1);
+  height: var(--se-control-h);
+  margin: var(--se-space-1) var(--se-space-1) var(--se-space-1);
+  padding: 0 var(--se-space-2);
   border-radius: var(--se-radius-sm);
-  cursor: pointer;
+  background: var(--se-surface-2);
+  cursor: text;
+  transition: box-shadow var(--se-dur) var(--se-ease);
 }
 
-.se-hs-pk-row:hover {
-  background: var(--se-hairline);
+.se-hs-pk-find:focus-within {
+  box-shadow: inset 0 0 0 1px var(--se-accent);
 }
 
-.se-hs-pk-row input {
-  flex: 0 0 auto;
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  accent-color: var(--se-accent);
-  cursor: pointer;
+.se-hs-pk-glass {
+  flex: none;
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-icon-search) center / contain no-repeat;
+  mask: var(--se-icon-search) center / contain no-repeat;
 }
 
+.se-hs-pk-search {
+  all: unset;
+  flex: 1;
+  min-width: 0;
+  color: var(--se-text);
+  font: 500 var(--se-fs-base) var(--se-font);
+}
+
+.se-hs-pk-search::placeholder {
+  color: var(--se-text-faint);
+}
+
+.se-hs-pk-search::-webkit-search-cancel-button {
+  display: none;
+}
+
+/* A game's (or collection's) row: its art, then the menu row's name, line and mark */
 .se-hs-pk-pic {
-  flex: 0 0 auto;
-  width: 22px;
-  height: 33px;
-  border-radius: 3px;
+  flex: none;
+  width: 20px;
+  height: 30px;
+  border-radius: var(--se-radius-xs);
   overflow: hidden;
   background: var(--se-surface-2);
 }
 
 .se-hs-pk-img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
-.se-hs-pk-text {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+.se-hs-pk-list > .se-hs-empty {
+  padding: var(--se-space-3) var(--se-space-2);
 }
 
-.se-hs-pk-name {
-  font-size: var(--se-fs-md);
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.se-hs-pk-sub {
-  font-size: var(--se-fs-sm);
-  color: var(--se-text-muted);
-}
-
+/* Show all and Show none, side by side; greyed when they'd change nothing */
 .se-hs-pk-foot {
-  display: flex;
-  align-items: center;
-  gap: var(--se-space-1);
-  margin-top: var(--se-space-2);
-  padding-top: var(--se-space-2);
-  border-top: 1px solid var(--se-divider);
+  flex: none;
+  flex-direction: row;
 }
 
-.se-hs-pk-count {
+.se-hs-pk-foot .se-hs-mn-row {
   flex: 1;
-  font-size: var(--se-fs-sm);
-  color: var(--se-text-muted);
+  width: auto;
 }
 
-.se-hs-pk-foot .se-hs-hall {
-  margin: 0;
-  padding-inline: var(--se-space-2);
-}
-
-.se-hs-pk-foot .se-hs-hall:disabled {
+.se-hs-pk-foot .se-hs-mn-row:disabled {
   color: var(--se-text-faint);
+  background: transparent;
   cursor: default;
 }
 
-.se-hs-pk-done {
-  height: 30px;
-  padding: 0 var(--se-space-3);
-  border: 0;
-  border-radius: var(--se-radius-sm);
-  background: var(--se-accent);
-  color: var(--se-bg-ink);
-  font: 700 var(--se-fs-base) var(--se-font);
-  cursor: pointer;
+.se-hs-pk-foot .se-hs-mn-row:disabled .se-hs-mn-icon {
+  background: var(--se-text-faint);
 }
 
-.se-hs-pk-done:hover {
-  filter: brightness(1.08);
-}
-
-/* Favorites: wide capsules, 3 × 2 */
+/*
+ * Favorites and Recently added: wide capsules in 3 rows, 3 across for every 4 of the board's
+ * columns the panel spans (9, 18, 27), each at the size both the width and the height allow
+ * (stage/tray.js sets --se-hs-fcols and the capsule's width, --se-hs-fcolw)
+ */
 .se-hs-grid {
   flex: 1 1 auto;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--se-hs-fcols, 3), var(--se-hs-fcolw, minmax(0, 1fr)));
+  /* A grid narrower than its panel (a short cell) sits in the middle, not against the left */
+  justify-content: center;
   /*
-   * Rows set by stage/tray.js: as many as the games need and the tray holds, each up to a
-   * little taller than a capsule
+   * Rows set by stage/tray.js: as many as the games need and the tray holds, each exactly a
+   * capsule's height at its width (460 × 215)
    */
   grid-template-rows: repeat(var(--se-hs-frows, 2), minmax(0, var(--se-hs-frowh, 1fr)));
   align-content: start;
@@ -308,6 +240,7 @@
 }
 
 .se-hs-tile {
+  container-type: inline-size;
   position: relative;
   min-height: 0;
   padding: 0;
@@ -387,9 +320,17 @@
 
 .se-hs-thrs {
   flex: 0 0 auto;
+  margin-left: auto;
   font-size: var(--se-fs-sm);
   font-weight: 600;
   color: var(--se-hs-on-art);
+}
+
+/* A capsule too small to read its name (under 170 px): the art names it, the hours stay */
+@container (max-width: 169px) {
+  .se-hs-tname {
+    display: none;
+  }
 }
 
 .se-hs-tplay {
@@ -451,7 +392,7 @@
  * whole covers fanned on the right. --se-hs-ch (a card's height) is set by stage/tray.js.
  */
 .se-hs-coll .se-hs-hall {
-  margin: 0;
+  margin: 0 0 0 auto;
 }
 
 .se-hs-clist-box {
@@ -617,33 +558,4 @@
   font-size: var(--se-fs-3xl);
   font-weight: 800;
   color: var(--se-text-strong);
-}
-
-/*
- * Favorites and Collections View: covers from the left, evenly spaced
- * Steam spreads a shelf's covers across its width; in the tray's narrower columns that left
- * wide gaps. The covers now start at the left edge with the theme's 16 px between them.
- */
-[data-se-hs-col] ._1VMQWnw-9FBp-MVXUbWfS_:not(#se-none) {
-  /* ChildrenContainer */
-  justify-content: flex-start !important;
-  justify-items: start !important;
-  gap: var(--se-space-4) !important;
-}
-
-[data-se-hs-col] ._1VMQWnw-9FBp-MVXUbWfS_ > *:not(#se-none) {
-  margin-inline: 0 !important;
-}
-
-/*
- * Collections View: each tile sits in a slot wider than itself, which left the gaps; the
- * slots now fit their tile
- */
-[data-se-hs-sec="coll"] ._1VMQWnw-9FBp-MVXUbWfS_ > *:not(#se-none),
-[data-se-hs-sec="coll"] ._1VMQWnw-9FBp-MVXUbWfS_ *:has(> ._3IWn-2rn7x98o5fDd0rAxb):not(#se-none) {
-  /* Slots holding a Collection tile */
-  width: auto !important;
-  min-width: 0 !important;
-  max-width: none !important;
-  flex: 0 0 auto !important;
 }

@@ -1,6 +1,9 @@
 /*
  * Continues stage.css (in order, see client/loader.js): the stage. The art and its grade,
- * the game's logo, facts, stats and buttons, the strip of recent games, and reduced motion.
+ * the game's logo, facts, stats and buttons, the strip of featured games, and reduced motion.
+ * Its style is the cinematic corner: the game's block stacked in the lower left over the art,
+ * the strip as small thumbnails (or dots) in the lower right. What shows follows the stage's
+ * settings (stage-settings.js): data-nav and data-motion on .se-hs-stage (motion's media: stage-art.js).
  */
 /* The stage */
 /*
@@ -16,12 +19,15 @@
   height: var(--se-hs-h, 520px);
   min-height: 340px;
   container: se-hs-stage / size;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  /* The game's block and the strip share the bottom row; the art fills the rest behind them */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-items: end;
+  column-gap: var(--se-space-6);
   /*
-   * The sides match the tray's (24 px), so the strip's cards line up with it; the game's
-   * text keep their own indent (.se-hs-body)
+   * The sides match the tray's (24 px), so the game's block and the strip's cards line up
+   * with it on both sides
    */
   padding: var(--se-space-5) var(--se-space-5) clamp(14px, 1cqw, 24px);
   color: var(--se-text);
@@ -67,16 +73,24 @@
   transform: scale(1.15); /* pushes the blur's soft edge out of view */
 }
 
+/*
+ * The art, centred and a little wider than the view when the stage is tall, so it reaches down
+ * toward the game's block instead of ending high: as wide as the stage's full height needs
+ * at Steam's hero shape (3840 × 1240, about 3.1 : 1), never under the view's width, never over
+ * 140 % of it (a fifth cropped each side at most)
+ */
 .se-hs-hero {
+  --se-hs-hero-w: clamp(100%, var(--se-hs-h, 0px) * 3.1, 140%);
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
+  left: calc((100% - var(--se-hs-hero-w)) / 2);
+  width: var(--se-hs-hero-w);
   height: auto;
   transform: scale(1.04);
   transform-origin: center top;
-  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+  /* Only its last tenth fades, so nearly all of the art shows */
+  -webkit-mask-image: linear-gradient(to bottom, #000 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 90%, transparent 100%);
 }
 
 /* A slow push-in on the art that is showing; held while the stage is out of sight */
@@ -122,20 +136,34 @@
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 240px 240px;
 }
 
-/* Text content */
+/* The game's block: logo, then facts, description, Play and stats, stacked in the corner */
 .se-hs-body {
+  grid-column: 1;
+  grid-row: 2;
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: clamp(32px, 4cqw, 120px);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(16px, min(1.3cqw, 2.6cqh), 30px);
   min-width: 0;
-  padding-inline: calc(clamp(36px, 3.3cqw, 80px) - 24px);
+  max-width: clamp(520px, 44cqw, 900px); /* the strip's room is figured from this (.se-hs-strip) */
+  /* As wide as what's under the logo (.se-hs-side): the logo never runs past its right edge */
+  justify-self: start;
+  width: fit-content;
+  /* Its left edge on the board's (both 24 px in from the sides) */
+  padding-inline: 0;
 }
 
 .se-hs-title {
+  /*
+   * Adds no width of its own (inline-size containment): it stretches to the block's, set by
+   * what's under it, and the logo fits inside that
+   */
+  align-self: stretch;
+  contain: inline-size;
   display: flex;
   align-items: flex-end;
   flex: 0 1 auto;
+  max-width: 100%;
   min-width: 0;
   min-height: 72px;
   padding: 0;
@@ -169,12 +197,18 @@
   outline-offset: 6px; /* clear of the logo's drop shadow */
 }
 
-/* The right side: description, stats, buttons, over a soft dark pool so bright art stays readable */
+/* Under the logo: facts, description, Play and stats, over a soft dark pool so bright art stays readable */
 .se-hs-side {
   position: relative;
   isolation: isolate;
-  flex: 0 1 clamp(420px, 38cqw, 780px);
-  min-width: 0;
+  /*
+   * As wide as PLAY and its stats: the line above and the description take that width (they
+   * add none of their own), so their edges meet PLAY's and the last stat's. With few stats,
+   * still wide enough to read.
+   */
+  width: fit-content;
+  max-width: 100%;
+  min-width: min(clamp(420px, 30cqw, 640px), 100cqw - 2 * var(--se-space-5));
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -188,6 +222,12 @@
   z-index: var(--se-z-under);
   pointer-events: none;
   background: radial-gradient(closest-side, rgba(8, 10, 14, .8) 0%, rgba(8, 10, 14, .74) 55%, rgba(8, 10, 14, .42) 80%, rgba(8, 10, 14, 0) 100%);
+}
+
+.se-hs-desc,
+.se-hs-top {
+  width: 0;
+  min-width: 100%;
 }
 
 .se-hs-desc {
@@ -212,32 +252,41 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--se-space-2) clamp(8px, .5cqw, 12px);
+  gap: var(--se-space-2) clamp(10px, .7cqw, 16px);
   margin-bottom: calc(-1 * clamp(2px, .2cqw, 6px));
 }
 
 .se-hs-top .se-hs-by {
-  margin: 0 clamp(4px, .3cqw, 8px) 0 0;
+  margin: 0;
 }
 
 .se-hs-chips {
   display: contents;
 }
 
+/*
+ * Reviews and players: no pills, the same small caps as the developer line and the stats'
+ * labels, a hairline before each; the number bold in its status colour (reviews by how
+ * good, players in the running green with a live dot)
+ */
 .se-hs-chip {
+  --chip: var(--se-online);
   display: inline-flex;
   align-items: center;
-  gap: var(--se-space-1);
-  height: clamp(24px, 1.5cqw, 32px);
-  padding: 0 clamp(9px, .6cqw, 13px);
-  border-radius: var(--se-radius-pill);
-  font: 700 clamp(11.5px, .66cqw, 15px)/1 var(--se-font);
+  gap: clamp(5px, .35cqw, 8px);
+  padding-left: clamp(10px, .7cqw, 16px);
+  border-left: 1px solid var(--se-white-14);
+  font: 700 clamp(11px, .62cqw, 14px)/1.3 var(--se-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-hs-on-art);
   white-space: nowrap;
-  /* One recipe, tinted by the chip's status colour */
-  --chip: var(--se-online);
-  background: color-mix(in srgb, var(--chip) 16%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chip) 38%, transparent);
-  color: color-mix(in srgb, var(--chip) 60%, var(--se-text-strong));
+  text-shadow: 0 1px 3px var(--se-black-90), 0 1px 10px var(--se-black-70);
+}
+
+.se-hs-chip b {
+  font-weight: 800;
+  color: color-mix(in srgb, var(--chip) 70%, var(--se-text-strong));
 }
 
 .se-hs-chip[data-reviews="mixed"] { --chip: var(--se-warning); }
@@ -252,12 +301,18 @@
   box-shadow: 0 0 6px color-mix(in srgb, var(--chip) 80%, transparent);
 }
 
-/* Play, then hours and achievements beside it */
+/* No developer line before it: the first one needs no hairline */
+.se-hs-top .se-hs-by[hidden] + .se-hs-chips > .se-hs-chip:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+/* PLAY, then the stats beside it, wrapping under it when the stage is narrow */
 .se-hs-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--se-space-3) clamp(22px, 1.8cqw, 40px);
+  gap: var(--se-space-4) clamp(28px, 2.2cqw, 52px);
   margin-top: clamp(2px, .3cqw, 8px);
 }
 
@@ -276,7 +331,7 @@
   width: auto;
   height: auto;
   min-height: clamp(100px, min(9cqw, 22cqh), 220px);
-  max-width: clamp(420px, 42cqw, 1000px);
+  max-width: min(100%, clamp(420px, 42cqw, 1000px));
   max-height: clamp(150px, min(14cqw, 34cqh), 340px);
   object-fit: contain;
   object-position: left bottom;
@@ -303,40 +358,62 @@
   /* Still read out by screen readers */
 }
 
-/* The stats as big numbers: hours played, achievements with a bar */
+/*
+ * The stats: each a small-caps label (as the developer line over them) over its value, a
+ * hairline between them; achievements with a slim bar under the count, gold when complete
+ */
 .se-hs-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--se-space-3) clamp(28px, 2.2cqw, 52px);
+  align-items: stretch;
+  row-gap: var(--se-space-4);
+  min-width: 0;
+}
+
+.se-hs-meta:empty {
+  display: none;
 }
 
 .se-hs-stat {
   display: flex;
   flex-direction: column;
-  gap: clamp(4px, .35cqw, 8px);
+  justify-content: center;
+  gap: clamp(6px, .4cqw, 9px);
+  padding: 0 clamp(20px, 1.6cqw, 36px);
+  border-left: 1px solid var(--se-white-14);
 }
 
-.se-hs-stat b {
-  font: 800 clamp(20px, min(1.35cqw, 3.8cqh), 32px)/1 var(--se-font);
-  color: var(--se-text-strong);
-  text-shadow: 0 2px 18px var(--se-black-60);
-  white-space: nowrap;
+.se-hs-stat:first-child {
+  padding-left: 0;
+  border-left: 0;
 }
 
-.se-hs-stat small {
-  font-size: .55em;
-  font-weight: 600;
-  color: var(--se-hs-on-art);
+.se-hs-stat:last-child {
+  padding-right: 0;
 }
 
 .se-hs-stat em {
-  display: flex;
-  align-items: center;
-  gap: var(--se-space-2);
+  font: 700 clamp(10.5px, .58cqw, 13px)/1 var(--se-font);
   font-style: normal;
-  font-size: clamp(12px, .75cqw, 18px);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
   color: var(--se-hs-on-art);
+  white-space: nowrap;
   text-shadow: 0 1px 3px var(--se-black-90), 0 1px 10px var(--se-black-60);
+}
+
+.se-hs-stat b {
+  font: 800 clamp(20px, min(1.3cqw, 3.6cqh), 30px)/1 var(--se-font);
+  color: var(--se-text-strong);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 18px var(--se-black-60);
+}
+
+.se-hs-stat small {
+  font-size: .6em;
+  font-weight: 600;
+  color: var(--se-hs-on-art);
 }
 
 .se-hs-stat[data-perfect] b {
@@ -345,23 +422,24 @@
 
 .se-hs-achbar {
   display: block;
-  flex: 0 0 auto;
-  width: clamp(60px, 4cqw, 110px);
-  height: 4px;
-  border-radius: 2px;
-  background: var(--se-white-18);
+  width: 100%;
+  min-width: clamp(70px, 4.5cqw, 120px);
+  height: 3px;
   overflow: hidden;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-18);
 }
 
 .se-hs-achbar > span {
   display: block;
   height: 100%;
-  background: var(--se-accent);
   border-radius: inherit;
+  background: var(--se-accent);
 }
 
 .se-hs-stat[data-perfect] .se-hs-achbar > span {
-  background: var(--se-gold-text);
+  background: var(--se-gold);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--se-gold) 60%, transparent);
 }
 
 /* The buttons: PLAY as on the game page, Game page as glass */
@@ -388,7 +466,10 @@
 }
 
 .se-hs-play {
-  padding: 0 clamp(36px, 2.7cqw, 64px);
+  /* One width for PLAY and INSTALL, so the stats beside it never shift between games */
+  justify-content: center;
+  width: clamp(220px, 14cqw, 340px);
+  padding: 0 var(--se-space-4);
   background: var(--se-play-fill);
   box-shadow: inset 0 1px 0 var(--se-white-25), 0 14px 34px -12px var(--se-play-glow);
   color: var(--se-text-strong);
@@ -402,10 +483,11 @@
   filter: brightness(1.08);
 }
 
+/* INSTALL: PLAY's recipe in the accent, as on the game page (--se-install-fill) */
 .se-hs-play[data-kind="install"] {
-  background: var(--se-accent);
-  box-shadow: 0 14px 34px -12px var(--se-accent-strong);
-  color: var(--se-bg-ink);
+  background: var(--se-install-fill);
+  box-shadow: inset 0 1px 0 var(--se-white-25), 0 14px 34px -12px var(--se-install-glow);
+  color: var(--se-text-strong);
 }
 
 .se-hs-play svg {
@@ -414,44 +496,61 @@
 }
 
 /*
- * The strip: the recent games as cards across the stage, name and date over the art;
- * the one showing ringed and lifted, its timer filling
+ * The strip: the featured games as small thumbnails in the lower right, level with the game's
+ * block; the one showing ringed and lifted, its timer filling.
+ */
+/*
+ * Every featured game gets a thumbnail: they share the strip's room (what the game's block
+ * leaves; all of the width on its own row), each between a least and a most width. Only a
+ * very narrow stage shows fewer. --se-hs-n is the games' count (stage.js).
  */
 .se-hs-strip {
-  /* Cards shown; read by stage/stage.js so the cycle stays on visible cards */
-  --se-hs-cols: 8;
-  display: grid;
-  grid-template-columns: repeat(var(--se-hs-cols), minmax(0, 1fr));
-  gap: clamp(10px, .75cqw, 18px);
-  margin-top: clamp(22px, min(2cqw, 3.6cqh), 48px);
+  /* Thumbnails shown; read by stage/stage.js so the cycle stays on visible ones */
+  --se-hs-cols: 10;
+  --se-hs-n: 6;
+  --se-hs-gap: clamp(8px, .5cqw, 14px);
+  /*
+   * Whatever the game's block leaves: the stage's width less the block's (.se-hs-body max-width),
+   * the sides and the gap between them, so the thumbnails never push into the text
+   */
+  --se-hs-room: calc(100cqw - clamp(520px, 44cqw, 900px) - 2 * var(--se-space-5) - var(--se-space-6));
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--se-hs-gap);
+  /* Thumbnails' foot level with the stats' (both at the row's end); the timer hangs below */
 }
 
 .se-hs-strip[hidden] {
   display: none;
 }
 
-/* Narrow stages show fewer, readable cards (~120px+) rather than eight slivers */
-@container se-hs-stage (width < 1100px) {
-  .se-hs-strip { --se-hs-cols: 6; }
-  .se-hs-thumb:nth-child(n + 7) { display: none; }
-}
-
+/* Under 860px the strip takes its own row; under 600px it shows 6 at most */
 @container se-hs-stage (width < 860px) {
-  .se-hs-strip { --se-hs-cols: 4; }
-  .se-hs-thumb:nth-child(n + 5) { display: none; }
+  .se-hs-body { grid-column: 1 / -1; }
+  .se-hs-strip {
+    --se-hs-room: 100cqw;
+    grid-column: 1 / -1;
+    grid-row: 3;
+    justify-content: flex-start;
+    margin-top: var(--se-space-4);
+  }
 }
 
 @container se-hs-stage (width < 600px) {
-  .se-hs-strip { --se-hs-cols: 3; }
-  .se-hs-thumb:nth-child(n + 4) { display: none; }
+  .se-hs-strip { --se-hs-cols: 6; }
+  .se-hs-stage:not([data-nav="dots"]) .se-hs-thumb:nth-child(n + 7) { display: none; }
 }
 
 .se-hs-thumb {
+  position: relative;
   display: block;
-  min-width: 0;
+  flex: none;
+  width: clamp(48px, min(9.5cqw, (var(--se-hs-room) - (var(--se-hs-n) - 1) * var(--se-hs-gap)) / var(--se-hs-n)), 230px);
   padding: 0;
   border: 0;
-  border-radius: clamp(var(--se-radius-md), .6cqw, var(--se-radius-lg));
+  border-radius: clamp(var(--se-radius-sm), .5cqw, var(--se-radius-md));
   background: none;
   text-align: start;
   font-family: var(--se-font);
@@ -462,7 +561,7 @@
   position: relative;
   display: block;
   width: 100%;
-  height: clamp(70px, min(6.2cqw, 15cqh), 150px);
+  aspect-ratio: 460 / 215; /* Steam's wide capsule */
   border-radius: inherit;
   overflow: hidden;
   background: var(--se-surface);
@@ -484,48 +583,36 @@
 
 .se-hs-thumb[data-on] .se-hs-pic {
   opacity: 1;
-  transform: translateY(-4px);
-  box-shadow: 0 0 0 clamp(2px, .13cqw, 3px) var(--se-text-strong), 0 24px 40px -16px var(--se-black-90);
-}
-
-.se-hs-thumblabel {
-  position: absolute;
-  inset: auto 0 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--se-space-half);
-  padding: 26% clamp(9px, .6cqw, 15px) clamp(7px, .55cqw, 13px);
-  background: linear-gradient(180deg, transparent, var(--se-black-80));
-  pointer-events: none;
-}
-
-.se-hs-thumbname {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: clamp(12px, .72cqw, 17px);
-  font-weight: 700;
-  color: var(--se-text-strong);
-}
-
-.se-hs-thumbdate {
-  font-size: clamp(10.5px, .56cqw, 14px);
-  font-weight: 500;
-  color: var(--se-hs-on-art);
+  transform: translateY(-3px);
+  box-shadow: 0 0 0 clamp(2px, .12cqw, 3px) var(--se-text-strong), 0 18px 32px -14px var(--se-black-90);
 }
 
 .se-hs-prog {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  z-index: var(--se-z-raised);
-  height: clamp(3px, .17cqw, 4px);
-  width: 100%;
-  background: var(--se-text-strong);
-  box-shadow: 0 -1px 0 var(--se-black-30);
   /*
-   * Slides in from the left (the image clips it) instead of growing in width: moved on
-   * the GPU, no layout each frame, and never rescaled, so its edges stay crisp
+   * The timer to the next game: a slim rounded track just under the thumbnail showing, lifted
+   * with it, the accent filling it from the left
+   */
+  position: absolute;
+  left: clamp(4px, .3cqw, 8px);
+  right: clamp(4px, .3cqw, 8px);
+  top: calc(100% + clamp(5px, .35cqw, 8px));
+  height: clamp(3px, .17cqw, 4px);
+  overflow: hidden;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-18);
+  transform: translateY(-3px); /* level with the lifted picture */
+}
+
+.se-hs-prog::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--se-accent);
+  box-shadow: 0 0 8px var(--se-accent-strong);
+  /*
+   * Slides in from the left (the track clips it) instead of growing in width: moved on the
+   * GPU, no layout each frame, and never rescaled, so its edges stay crisp
    */
   transform: translateX(-100%);
   animation: se-hs-fill var(--se-hs-cycle, 9s) linear forwards;
@@ -537,14 +624,144 @@
   }
 }
 
+/* Dots in place of thumbnails: the one showing a wider pill, its timer filling it */
+.se-hs-stage[data-nav="dots"] .se-hs-strip {
+  --se-hs-cols: 99;
+  align-items: center;
+  gap: var(--se-space-1);
+}
+
+.se-hs-stage[data-nav="dots"] .se-hs-thumb {
+  width: auto;
+  padding: var(--se-space-3) var(--se-space-half);
+  border-radius: var(--se-radius-pill);
+}
+
+.se-hs-stage[data-nav="dots"] .se-hs-pic {
+  width: 8px;
+  aspect-ratio: auto;
+  height: 8px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-40);
+  box-shadow: none;
+  opacity: 1;
+  transition: width var(--se-dur-slow) var(--se-ease), background var(--se-dur);
+}
+
+.se-hs-stage[data-nav="dots"] .se-hs-thumb:hover .se-hs-pic {
+  background: var(--se-text-dim);
+}
+
+.se-hs-stage[data-nav="dots"] .se-hs-thumb[data-on] .se-hs-pic {
+  width: 32px;
+  transform: none;
+  box-shadow: none;
+  background: var(--se-white-25);
+}
+
+.se-hs-stage[data-nav="dots"] .se-hs-thumbimg {
+  display: none;
+}
+
+.se-hs-stage[data-nav="dots"] .se-hs-prog {
+  inset: 0;
+  height: auto;
+  background: none;
+  transform: none;
+}
+
+.se-hs-stage[data-nav="dots"] .se-hs-prog::before {
+  background: var(--se-text-strong);
+  box-shadow: none;
+}
+
+/* Background art (stage-settings.js): the push-in is Slow zoom's alone */
+.se-hs-stage:not([data-motion="zoom"]) .se-hs-layer[data-on] .se-hs-hero {
+  animation: none;
+}
+
+/*
+ * Parallax: the art moves against the pointer and the blurred fill behind it the other way
+ * (stage-art.js writes --se-hs-px / --se-hs-py, a percent each way), easing after it
+ */
+.se-hs-stage[data-motion="parallax"] .se-hs-hero {
+  transform: scale(1.08) translate(var(--se-hs-px, 0%), var(--se-hs-py, 0%));
+  transition: transform 700ms cubic-bezier(.2, .7, .3, 1);
+}
+
+.se-hs-stage[data-motion="parallax"] .se-hs-layer::before {
+  transform: scale(1.15) translate(calc(var(--se-hs-px, 0%) * -.5), calc(var(--se-hs-py, 0%) * -.5));
+  transition: transform 700ms cubic-bezier(.2, .7, .3, 1);
+}
+
+/*
+ * Screenshots and Trailer (stage-art.js): over the art, the whole frame shown (never cropped),
+ * from the top, as wide as the view allows, the blurred art (the layer's ::before) around it;
+ * fading at the view's foot. The art fades out once one shows (data-media on the layer), and
+ * stays for a game without them.
+ */
+.se-hs-media {
+  position: absolute;
+  inset: 0;
+}
+
+.se-hs-shot,
+.se-hs-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center top;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
+}
+
+.se-hs-shot[data-on],
+.se-hs-layer[data-media] .se-hs-video {
+  opacity: 1;
+}
+
+/* Each screenshot drifts in a little while it shows, from its top edge, so all of it stays in view */
+.se-hs-shot[data-on] {
+  transform-origin: center top;
+  animation: se-hs-shot 8s ease-out both;
+}
+
+@keyframes se-hs-shot {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.se-hs-hero {
+  transition: opacity 1.2s ease;
+}
+
+.se-hs-layer[data-media] .se-hs-hero {
+  opacity: 0;
+}
+
 /* Reduced motion: the stage holds still */
 @media (prefers-reduced-motion: reduce) {
   .se-hs-layer,
   .se-hs-pic {
     transition: none;
   }
-  .se-hs-layer[data-on] .se-hs-hero {
+  .se-hs-layer[data-on] .se-hs-hero,
+  .se-hs-shot[data-on] {
     animation: none;
+  }
+  .se-hs-hero,
+  .se-hs-layer::before,
+  .se-hs-shot,
+  .se-hs-video {
+    transition: none;
   }
   .se-hs-prog {
     display: none;

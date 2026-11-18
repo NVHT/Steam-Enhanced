@@ -5,7 +5,7 @@
 ((SE) => {
   const ns = window.__seHomeStageParts;
   if (!ns) return;
-  const { appStore, client, collectionStore, paintGame } = ns;
+  const { appStore, client, collectionStore, paintGame, schedule } = ns;
   const { live } = ns;
 
   const { run } = SE;
@@ -13,8 +13,9 @@
 
   let recentCache = { at: 0, list: [] };
 
-  function recentApps() {
-    if (Date.now() - recentCache.at < 5000) return recentCache.list;
+  /** The n most recently played games (the stage's "Recently played"), up to 10. */
+  function recentApps(n = 8) {
+    if (Date.now() - recentCache.at < 5000) return recentCache.list.slice(0, n);
     const store = appStore();
     let list = [];
     if (store) {
@@ -31,11 +32,11 @@
                 !hidden(a.appid)
             )
             .sort((a, b) => b.rt_last_time_played - a.rt_last_time_played)
-            .slice(0, 8)
+            .slice(0, 10)
         ) || [];
     }
     recentCache = { at: Date.now(), list };
-    return list;
+    return list.slice(0, n);
   }
 
   const CDN = (id) => `https://shared.steamstatic.com/store_item_assets/steam/apps/${id}`;
@@ -70,6 +71,7 @@
         if (r?.result !== 1 || !Array.isArray(all) || !all.length) return;
         achievements.set(id, { got: all.filter((a) => a.bAchieved).length, total: all.length });
         if (live.apps[live.selected]?.appid === id) paintGame();
+        schedule(); // the board's Achievements panel
       })
       .catch(() => {});
     return null;

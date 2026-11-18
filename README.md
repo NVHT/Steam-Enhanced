@@ -72,7 +72,7 @@ Steam Enhanced rebuilds the Steam client around your library: a navigation rail,
   <tr>
     <td width="33%" valign="top">
       <h3>Library Home</h3>
-      <sub>A cinematic hero stage over your recent games, with a glass tray of news, favourites and collections.</sub>
+      <sub>Drawn entirely by the theme: a cinematic hero stage over your recent games, favourites, a collection or your newest games, set up from its own settings button, and a board of panels under it (news, favourites, collections, friends playing, achievements, games not played yet) that never scrolls.</sub>
     </td>
     <td width="33%" valign="top">
       <h3>Game pages</h3>
@@ -200,13 +200,11 @@ Windows stay on the theme background until they've loaded (the main window until
 
 | Setting | Options | What it does |
 | --- | --- | --- |
-| Library Home stage | **yes**, no | no restores Steam's Library Home (handy for editing shelves). |
-| Home stage cycling | **Default** (9 s), Slow (15 s), Fast (5 s), Off | How often the stage moves to the next recent game. |
-| Home stage tray | **On**, Off | What's New, Favorites and Collections under the stage. Off: the stage alone fills the window. |
-| Home stage height | **Default**, Short, Tall | How much of the window the stage takes; the tray gets the rest. |
-| Home stage strip | **On**, Off | The row of recent-game cards on the stage. Off hides it; the stage still cycles. |
-| Home stage details | **Full**, Compact, Play only, Hidden | The panel beside the logo. Compact drops the description, Play only keeps the button, Hidden leaves the logo over the art. |
-| Game list width | **Fixed**, Adjustable | Fixed keeps one width with no divider. Adjustable: drag the list's right edge, or focus it and use the arrow keys; double-click resets. |
+| Game list width | **Fixed**, Adjustable | Fixed keeps one width with no divider. Adjustable: drag the list's right edge (double-click resets). |
+
+The Home stage's own settings button (upper right, on hover) sets the rest, at once: Steam Enhanced or Steam's own Home, which panels the board under the stage shows and in what order (drag them; with none, the stage fills the window), which games the stage features (recently played, Favorites A–Z, a collection or recently added) and how many, which details show, thumbnails, dots or nothing to move between them, how often it moves on, and its background art: a slow zoom, parallax that follows your pointer, the game's screenshots, its trailer (muted), or still.
+
+Each panel on the board has a ⋯ menu: its width (a third, two thirds or the whole board) and what it shows (Favorites can show any collection or games you choose; sort orders; hours on or off). Panels that don't fit move to more pages.
 
 </details>
 
@@ -262,8 +260,6 @@ Every colour, radius, elevation and feature switch lives on `:root` in **`core/t
 
 | Token | Default | Range |
 | --- | --- | --- |
-| `--se-home-stage-cycle` | `9` | Any number of seconds; `0` stops cycling. |
-| `--se-home-stage-tray` | `30` | The tray's share of the window, `0`–`70` (%). |
 | `--se-overlay-dim` | `1.2` | `0.4`–`1.4`: edges are black from 1, the whole game is hidden at 1.4. |
 | `--se-col-w` | `350px` | The default width of the game list and the Friends dock. |
 
@@ -279,7 +275,7 @@ Steam Enhanced is released under the [MIT License](LICENSE). It bundles a few th
 | --- | --- | --- |
 | [SN Pro](https://github.com/supernotes/sn-pro) · © 2024 The SN Pro Project Authors | Default typeface | SIL Open Font License 1.1 · [`core/fonts/SNPro-OFL.txt`](core/fonts/SNPro-OFL.txt) |
 | [Xmind](https://github.com/lamzhonghang/xmind) · © 2025 The Xmind Project Authors | Optional typeface | SIL Open Font License 1.1 · [`core/fonts/Xmind-OFL.txt`](core/fonts/Xmind-OFL.txt) |
-| [hls.js](https://github.com/video-dev/hls.js) 1.6.15 · © 2017 Dailymotion | Store trailer playback | Apache License 2.0 · [`web/store/vendor/hls.js-LICENSE`](web/store/vendor/hls.js-LICENSE) |
+| [hls.js](https://github.com/video-dev/hls.js) 1.6.15 · © 2017 Dailymotion | Store trailer playback, the Home stage's trailer background | Apache License 2.0 · [`web/store/vendor/hls.js-LICENSE`](web/store/vendor/hls.js-LICENSE) |
 
 The fonts stay under the OFL and the player under Apache 2.0; the MIT License covers the rest of the theme. Steam and the Steam logo are trademarks of Valve Corporation; Steam Enhanced is an unofficial theme and is not affiliated with Valve.
 

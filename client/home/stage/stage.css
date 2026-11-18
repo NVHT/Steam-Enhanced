@@ -1,49 +1,56 @@
 /*
- * Library Home hero stage and three-column bottom shelf tray.
+ * Library Home, drawn by the theme: the hero stage over the board of panels (What's New,
+ * Favorites, Collections, Friends playing, Achievements, Not played yet).
  *
- * Scoped to `[data-se-hs]` (managed by `client/home/stage/`). Places
- * the selected recent game on a full-bleed hero stage with container-query
- * typography, stats, and an 8-game selector strip, above a glass tray housing
- * What's New, Favorites, and Collections side by side.
+ * Scoped to `[data-se-hs]` (Steam's Home container, managed by `client/home/stage/`). Steam's
+ * own Home stays mounted underneath, out of sight and out of layout (display: none), so it
+ * costs no drawing; the panels read Steam's data, never its rows. The page never scrolls:
+ * the stage and the board share the window.
  *
- * This file: the grid, the native Home kept out of sight, the page's other rows. Continued, in
- * order (client/loader.js), by stage-hero.css (the stage: art, game, stats, buttons, strip),
- * stage-tray.css (the tray's glass and What's New), stage-shelves.css (Favorites, Collections
- * and their pickers) and stage-narrow.css (narrow windows).
+ * This file: the grid and Steam's Home kept out of sight. Continued, in order
+ * (client/loader.js), by stage-hero.css (the stage: art, game, stats, buttons, strip),
+ * stage-settings.css (the stage's settings button and menu), stage-tray.css (the board's
+ * glass, cells and pages, and What's New), stage-shelves.css (Favorites, Collections, the
+ * pickers), stage-panels.css (Friends playing, Achievements, Not played yet) and
+ * stage-narrow.css (narrow windows).
  */
-/* The grid */
+/* The grid: the stage, then the board */
 [data-se-hs]:not(#se-none) {
-  /* Soft text over the art, and the tray's glass (no theme tokens for these yet) */
+  /* Soft text over the art, and the board's glass (no theme tokens for these yet) */
   --se-hs-on-art: var(--se-on-art);
   --se-hs-glass: var(--se-glass);
   display: grid !important;
   grid-template-columns: minmax(0, 1fr);
-  grid-auto-flow: row;
+  grid-template-rows: auto auto;
   align-content: start;
   position: relative;
   isolation: isolate;
-  padding: 0 0 var(--se-space-5) !important;
-  overflow-x: clip;
+  padding: 0 !important;
+  overflow: clip;
 }
 
-[data-se-hs][data-se-hs-n="3"]:not(#se-none) {
-  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1.3fr) minmax(0, .95fr);
+/* Steam's Home, all of it: mounted for its data, never drawn */
+[data-se-hs]:not([data-se-hs-event]) > :not(.se-hs-stage):not(.se-hs-board):not(#se-none) {
+  display: none !important;
 }
 
-[data-se-hs][data-se-hs-n="2"]:not(#se-none) {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+/*
+ * A news post open (What's New, or a link to one): Steam shows it over its own Home, so the
+ * stage and the board step aside until it closes (stage/stage.js sets data-se-hs-event)
+ */
+[data-se-hs][data-se-hs-event] > :is(.se-hs-stage, .se-hs-board) {
+  display: none;
 }
 
-/* Steam's wrappers between the grid and its rows */
-[data-se-hs-flat]:not(#se-none) {
-  display: contents !important;
+[data-se-hs] > .se-hs-stage {
+  grid-row: 1;
 }
 
-/* The stage and the tray are the whole page: no scrolling, no space after the tray */
-[data-se-hs][data-se-hs-lock]:not(#se-none) {
-  padding-bottom: 0 !important;
+[data-se-hs] > .se-hs-board {
+  grid-row: 2;
 }
 
+/* The page doesn't scroll while the stage is up */
 [data-se-hs-scroll-lock]:not(#se-none) {
   overflow-y: hidden !important;
 }
@@ -54,72 +61,12 @@ html[data-se-hs-scroll-lock] > body[data-se-hs-scroll-lock] {
 }
 
 /*
- * Never native home under the stage: a Library Home Steam has just drawn, and a row it
- * adds to one, stay out of sight until stage/stage.js has placed them (normally before the
- * frame is painted, so this only covers a frame the script misses). [data-se-hs-on] is set
- * on the window while the stage is in use. A new Home is caught from .LibraryHome and what
- * follows it, which needs no document-wide :has().
+ * Never Steam's Home under the stage: a Library Home Steam has just drawn stays out of sight
+ * until stage/stage.js has placed the stage (normally before the frame is painted, so this
+ * only covers a frame the script misses). [data-se-hs-on] is set on the window while the
+ * stage is in use; a new Home is caught from .LibraryHome and what follows it, which needs no
+ * document-wide :has().
  */
-html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *),
-[data-se-hs] > :not([data-se-hs-sec]):not([data-se-hs-flat]):not(.se-hs-stage):not(.se-hs-tray),
-[data-se-hs] [data-se-hs-flat] > :not([data-se-hs-sec]):not([data-se-hs-flat]) {
+html[data-se-hs-on] :not([data-se-hs]) > :is(.LibraryHome, .LibraryHome ~ *) {
   visibility: hidden !important;
-}
-
-[data-se-hs] > .se-hs-stage {
-  grid-column: 1 / -1;
-  grid-row: 1;
-}
-
-[data-se-hs] > .se-hs-tray {
-  grid-column: 1 / -1;
-  grid-row: 2;
-}
-
-[data-se-hs-sec]:not(#se-none) {
-  position: relative;
-  z-index: var(--se-z-raised-2);
-  min-width: 0;
-}
-
-[data-se-hs-col]:not(#se-none) {
-  grid-row: 2;
-  align-self: stretch;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  margin: 0 0 var(--se-space-5) !important;
-  padding: var(--se-space-4) var(--se-space-4) var(--se-space-3) !important;
-  box-sizing: border-box;
-  /* Each row stays in its own column (room is left above and below for hover lifts) */
-  clip-path: inset(-16px 0 -16px 0);
-}
-
-[data-se-hs-col="1"]:not(#se-none) {
-  grid-column: 1;
-}
-
-[data-se-hs-col="2"]:not(#se-none) {
-  grid-column: 2;
-}
-
-[data-se-hs-col="3"]:not(#se-none) {
-  grid-column: 3;
-}
-
-/* Everything else: full width, below the tray, on the page's sides */
-[data-se-hs-sec]:not([data-se-hs-col]):not(#se-none) {
-  grid-column: 1 / -1;
-  margin-top: var(--se-space-5);
-  padding-inline: var(--se-space-4) !important;
-}
-
-/* Steam's Favorites shelf: the theme's column (.se-hs-favhost) shows it */
-[data-se-hs-sec="favsrc"]:not(#se-none),
-[data-se-hs-sec="recent"]:not(#se-none),
-[data-se-hs-sec="playnext"]:not(#se-none),
-[data-se-hs-sec="add"]:not(#se-none),
-[data-se-hs-lock] > [data-se-hs-sec]:not([data-se-hs-col]):not(#se-none),
-[data-se-hs-lock] [data-se-hs-flat] > [data-se-hs-sec]:not([data-se-hs-col]):not(#se-none) {
-  display: none !important;
 }

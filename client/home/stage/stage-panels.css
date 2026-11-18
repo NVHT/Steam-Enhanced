@@ -1,0 +1,381 @@
+/*
+ * Continues stage-shelves.css (in order, see client/loader.js): Friend activity
+ * (stage/panels-community.js), one row per item in a list that scrolls, its end fading out;
+ * then its hover cards.
+ */
+.se-hs-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(180deg, #000 calc(100% - 24px), transparent);
+}
+
+.se-hs-list::-webkit-scrollbar {
+  width: 0;
+}
+
+.se-hs-list > * {
+  flex: none;
+}
+
+/*
+ * The panel at any width the board gives it (4, 8 or 12 of its columns, the last panel in a row
+ * stretched to fill): its rows in one column while narrow, then two, then three side by side,
+ * filled left to right, top to bottom, so a wide panel isn't one long sentence and a far-off
+ * time. The panel is the container its width is read from.
+ */
+.se-hs-factivity {
+  container: se-factivity / inline-size;
+}
+
+@container se-factivity (min-width: 640px) {
+  .se-hs-factivity .se-hs-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 40px;
+    align-content: start;
+    column-gap: var(--se-space-5);
+  }
+
+  .se-hs-factivity .se-hs-empty {
+    grid-column: 1 / -1;
+  }
+}
+
+@container se-factivity (min-width: 1100px) {
+  .se-hs-factivity .se-hs-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The heading: name, View all, ⋯ */
+.se-hs-factivity .se-hs-ohead {
+  /* Never squeezed by the list under it */
+  flex: none;
+}
+
+.se-hs-factivity .se-hs-ohead .se-hs-hall {
+  margin: 0 0 0 auto;
+  align-self: center;
+}
+
+/* A row: the avatar (the friend's profile), then the rest (what it's about) */
+.se-hs-item {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: 40px;
+  /* Flush with the heading: only the avatar ring's 3 px inside the left edge, the picture on
+     the right edge, under the ⋯ button */
+  padding-left: 3px;
+  border-radius: var(--se-radius-sm);
+  font-family: var(--se-font);
+}
+
+.se-hs-item[hidden] {
+  display: none;
+}
+
+.se-hs-item:hover {
+  background: var(--se-white-07);
+}
+
+.se-hs-item button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.se-hs-item button:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: -2px; /* inside the cell, which clips */
+}
+
+/* The friend's avatar, ringed in their presence as the rail's own avatar is (nav-rail.css):
+   a slim ring, grey while offline */
+.se-hs-iicon {
+  --se-status: var(--se-offline);
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--se-avatar-radius);
+  overflow: hidden;
+  background: var(--se-surface-2);
+  box-shadow: 0 0 0 1.5px var(--se-surface), 0 0 0 3px var(--se-status);
+  transition: box-shadow var(--se-dur-fast) var(--se-ease);
+}
+
+.se-hs-iicon[data-state="online"] {
+  --se-status: var(--se-online);
+}
+
+.se-hs-iicon[data-state="away"] {
+  --se-status: var(--se-away);
+}
+
+.se-hs-iicon[data-state="ingame"] {
+  --se-status: var(--se-running);
+}
+
+.se-hs-iicon[data-state="ingame-away"] {
+  --se-status: var(--se-away-ingame);
+}
+
+.se-hs-iicon:hover {
+  box-shadow: 0 0 0 1.5px var(--se-surface), 0 0 0 3px var(--se-status), 0 0 0 6px var(--se-white-10);
+}
+
+.se-hs-iicon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.se-hs-item .se-hs-fmain {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  height: 100%;
+  padding-right: 0;
+  border-radius: var(--se-radius-sm);
+}
+
+/* One sentence, two lines at most: the friend and the game in bold */
+.se-hs-fline {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: var(--se-fs-sm);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--se-text-muted);
+}
+
+.se-hs-fline b {
+  font-weight: 600;
+  color: var(--se-text-strong);
+}
+
+.se-hs-ftime {
+  flex: none;
+  font-size: var(--se-fs-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-faint);
+  white-space: nowrap;
+}
+
+/* The picture's slot: one width on every row, so the times line up */
+.se-hs-fpic {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  width: 64px;
+}
+
+/* The game's capsule at its own shape (231 × 87), or the screenshot */
+.se-hs-ithumb {
+  position: relative;
+  flex: none;
+  width: 64px;
+  height: 24px;
+  border-radius: var(--se-radius-xs);
+  overflow: hidden;
+  background: var(--se-surface-2);
+}
+
+/* "N more": a card of the friend's other games on hover */
+.se-hs-fothers {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
+.se-hs-ithumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The achievements' icons, overlapping, then +N */
+.se-hs-fstack {
+  flex: none;
+  display: flex;
+  align-items: center;
+}
+
+.se-hs-fstack img,
+.se-hs-fmore {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--se-radius-xs);
+  box-shadow: 0 0 0 2px var(--se-surface);
+}
+
+/* Rare achievements (epic, legendary): ringed in their tier's colour, with its glow */
+.se-hs-fstack img[data-se-tier] {
+  position: relative;
+  box-shadow: 0 0 0 2px var(--se-surface), 0 0 0 3px var(--se-tier), var(--se-tier-aura) color-mix(in srgb, var(--se-tier) 45%, transparent);
+}
+
+.se-hs-fstack > * + * {
+  margin-left: calc(var(--se-space-2) * -1);
+}
+
+.se-hs-fmore {
+  display: grid;
+  place-items: center;
+  background: var(--se-surface-2);
+  font-size: var(--se-fs-2xs);
+  font-weight: 700;
+  color: var(--se-text-muted);
+}
+
+/* New since your last look: its time in the accent */
+.se-hs-item[data-new] .se-hs-ftime {
+  color: var(--se-accent);
+}
+
+/* Keyboard focus on a row: the row lights as on hover */
+.se-hs-item:has(.se-hs-fmain:focus-visible) {
+  background: var(--se-white-07);
+}
+
+/* The hover cards: a row's achievements, or its screenshot larger */
+.se-hs-fcard {
+  box-sizing: border-box;
+  width: 320px;
+  padding: var(--se-space-2);
+  border-radius: var(--se-radius-menu);
+  background: var(--se-surface);
+  box-shadow: var(--se-shadow-pop);
+  font-family: var(--se-font);
+  color: var(--se-text);
+  animation: se-menu-in var(--se-dur) var(--se-ease);
+}
+
+.se-hs-fcard-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--se-space-2);
+  padding: var(--se-space-1) var(--se-space-1) var(--se-space-2);
+  font: 600 var(--se-fs-base) / 1.3 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.se-hs-fcard-head span {
+  flex: none;
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.se-hs-fcard-row {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  padding: var(--se-space-1);
+}
+
+.se-hs-fcard-row > img {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--se-radius-xs);
+}
+
+.se-hs-fcard-row > img:is([data-se-tier="legendary"], [data-se-tier="epic"]) {
+  box-shadow: 0 0 0 1px var(--se-tier), var(--se-tier-aura) color-mix(in srgb, var(--se-tier) 45%, transparent);
+}
+
+.se-hs-fcard-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.se-hs-fcard-text b {
+  overflow: hidden;
+  font-size: var(--se-fs-sm);
+  font-weight: 600;
+  color: var(--se-text-strong);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.se-hs-fcard-text span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: var(--se-fs-xs);
+  line-height: 1.3;
+  color: var(--se-text-muted);
+}
+
+/* Its rarity: the tier's name in its colour, the unlock rate under it */
+.se-hs-fcard-rare {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: var(--se-fs-2xs);
+  font-weight: 700;
+  color: var(--se-tier);
+}
+
+.se-hs-fcard-rare span {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-faint);
+}
+
+.se-hs-fcard-foot {
+  padding: var(--se-space-1) var(--se-space-1) 0;
+  font-size: var(--se-fs-xs);
+  font-weight: 600;
+  color: var(--se-text-faint);
+}
+
+.se-hs-fcard[data-shot] {
+  width: 420px;
+}
+
+.se-hs-fcard[data-shot] > img {
+  display: block;
+  width: 100%;
+  /* Its room held before it loads, so the card doesn't grow and move under the pointer */
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--se-surface-2);
+  border-radius: var(--se-radius-sm);
+}
+
+.se-hs-fcard-caption {
+  padding: var(--se-space-2) var(--se-space-1) 0;
+  font-size: var(--se-fs-sm);
+  line-height: 1.35;
+  color: var(--se-text);
+}
