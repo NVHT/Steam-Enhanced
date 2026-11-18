@@ -117,7 +117,7 @@ Steam Enhanced rebuilds the Steam client around your library: a navigation rail,
 
 | Area | What changes |
 | --- | --- |
-| **Navigation rail** | One root menu, title-bar library search, and Restart Steam / Reload UI above Exit. |
+| **Navigation** | An icon-only rail: Store, Library, Community and Profile open menus of their pages, the one you're on lit. At its foot, notifications, a Downloads card, Settings and your avatar with your account menu. A title bar with library search and Friends. |
 | **Notifications** | Grouped by day, opened by hovering the bell. |
 | **Address bar** | A toolbar with a pill address field above store and Community pages. |
 | **Settings &amp; dialogs** | Steam Settings, App Properties, Millennium Settings, Library Manager, install, uninstall, backups and product activation. |
@@ -127,7 +127,7 @@ Steam Enhanced rebuilds the Steam client around your library: a navigation rail,
 
 ## ✦ Store, Community &amp; Support
 
-Every web page fills the window and shares the theme's cards, pills, glass chips and type.
+Every web page fills the window and shares the theme's cards, pills, glass chips and type, one search field (the client's) and one breadcrumb trail.
 
 | Area | What changes |
 | --- | --- |
@@ -136,7 +136,7 @@ Every web page fills the window and shares the theme's cards, pills, glass chips
 | **Browse** | New &amp; Upcoming, Charts, Labs, DLC, Next Fest (with a live countdown), Steam Awards and Replay, plus sale and event pages. |
 | **Account** | One settings page with a sticky sidebar: Account details, Purchase History and Licenses with search and filters, Add Funds, Redeem, phone, country and Family View. |
 | **Legal** | The Subscriber Agreement and Privacy Policy as documents with a contents sidebar and progress bar. |
-| **Community** | Profiles as glass cards over their own background, a three-column Activity feed, Hubs, reviews with a verdict hero over the game's art, Discussions, a 5 × 5 inventory grid with rarity glows and a Community Market with a wallet hero, ranked listings and a game filter. |
+| **Community** | Profiles as glass cards over their own background, a three-column Activity feed, Hubs, reviews with a verdict hero over the game's art, Discussions, formatted text (headings, quotes, code, tables, lists, spoilers) in one look across guides, posts, comments, reviews and profiles, a 5 × 5 inventory grid with rarity glows and a Community Market with a wallet hero, ranked listings and a game filter. |
 | **Support** | Every help.steampowered.com page, from the wizard to refunds and account recovery. |
 | **Search** | Results as cards with aligned date, review and price columns, one toolbar card for search and sort, and filters as folding cards with accent checkboxes. |
 | **Wishlist** | Item cards with the rounded capsule, review facts and tag pills, the shared price chip beside Add to Cart, one toolbar card for search, sort and options, and active filters as chips. |
@@ -289,14 +289,14 @@ The fonts stay under the OFL and the player under Apache 2.0; the MIT License co
 
 ```text
 Steam-Enhanced/
-├── skin.json     Millennium manifest: core.js and the client loader, in every window
-├── core/         Shared by client and web: runtime (SE), tokens, font, level badges, scrollbars, spinner
+├── skin.json     Millennium manifest: core.js and the client loader, in every window (the loader adds the runtime)
+├── core/         Shared by client and web: web boot (core.js), runtime and class map, tokens and icons, font, motion, level badges, scrollbars, spinner, emoticon picker
 ├── client/       Client features, one folder per area; shared/ for the client-only parts; loader.js maps windows to files
-├── web/          The web sites: shared/ (site loader, runtime, base styles, dropdown), then store/,
+├── web/          The web sites: shared/ (site loader, runtime, base styles, search field, dropdown), then store/,
 │                 community/, help/ and checkout/, each a config (loader.js) and one folder per page
 ├── compat/       Plugin integrations (HowLongToBeat, Extendium, Size on Disk, Player Count, ProtonDB, Achievement Manager, SteamGridDB)
 ├── options/      Setting overrides that Millennium applies when you pick them, one folder per settings tab
-├── dev/          Element inspector (Ctrl+Shift+E), classmap.py, colors.py, css-check.py, spinner_svg.py
+├── dev/          Element inspector (Ctrl+Shift+E), classmap.py, steamclasses.py, storeclasses.py, colors.py, css-check.py, spinner_svg.py
 └── assets/       Logos, Millennium header and splash
 ```
 
