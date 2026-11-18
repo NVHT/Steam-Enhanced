@@ -187,6 +187,8 @@
       'millennium-icons.js', 'millennium-plugins.js', 'millennium-updates.js', 'millennium-logs.js',
       'millennium-pages.js',
     ]],
+    // Brew Hub's page in Millennium Settings: after the Millennium files, whose icons and fillHeight it reads
+    ['desktop', 'compat/brew-hub/', ['brew-hub.css', 'brew-hub.js']],
     ['main', 'client/settings/millennium/', ['millennium-window.js']],
     ['main', 'client/settings/library-manager/', ['library-manager.css', 'library-manager.js']],
     ['main', 'client/game-page/', ['player-count.js']],

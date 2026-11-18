@@ -85,8 +85,16 @@
     ['Updates', 'mupdates', 'Millennium, theme and plugin updates', 'updates'],
     ['Logs', 'mlogs', 'What Millennium and its plugins report', 'logs'],
   ];
-  const MILL_BY_NAME = new Map(MILL_PAGES.map((p) => [p[0].toLowerCase(), p]));
-  const MILL_BY_KEY = new Map(MILL_PAGES.map((p) => [p[3], p]));
+  /*
+   * Pages plugins add to the Millennium sidebar that the theme designs (compat/), in the same
+   * shape. Kept out of MILL_PAGES: the sidebar's by-position fallback matches that list's length,
+   * which a plugin that isn't installed would break.
+   */
+  const MILL_PLUGIN_PAGES = [
+    ['Brew Hub', 'mbrewhub', 'Themes and plugins from the community, ready to install', 'brewhub'],
+  ];
+  const MILL_BY_NAME = new Map([...MILL_PAGES, ...MILL_PLUGIN_PAGES].map((p) => [p[0].toLowerCase(), p]));
+  const MILL_BY_KEY = new Map([...MILL_PAGES, ...MILL_PLUGIN_PAGES].map((p) => [p[3], p]));
   const MILL_GROUPS = ['Customize', 'Maintain'];
   const GROUPS = ['Account', 'Steam', 'Devices & media'];
 

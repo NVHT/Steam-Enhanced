@@ -1,0 +1,924 @@
+/*
+ * Brew Hub (github.com/madmaxgrey/BrewHub; Millennium Settings › Brew Hub, root .sf-root): the plugin's theme and plugin store,
+ * paired with brew-hub.js. Laid out like the other Millennium pages, Themes above all.
+ *
+ * Browse: the page title and its sub-line (a .DialogHeader of the theme's, so it is every page's
+ * title) with Refresh as the header's icon button; the toolbar (Themes | Plugins as the
+ * segmented control, search, Sort, Tags); the label row ("Themes · 27") with the pager; then the
+ * cards three across, as many rows as the window holds (Themes' card: picture, name, one-line
+ * description, the action and an icon button). Details: Back and the title as a sub-page title,
+ * the item as the "theme in use" card, then the README filling the rest and scrolling on its own.
+ *
+ * The plugin's React owns every node: nothing of its is moved. The root is one grid with the
+ * plugin's two bars as `display: contents`; brew-hub.js marks the view ([data-se-bh]), sizes the
+ * root to the window (--se-bh-h), and adds the title, the segmented track, the Sort menu and the
+ * label row ([data-se-bh-own]). The plugin styles itself from an inline <style> whose buttons
+ * carry !important, and Steam draws its own ::before on DialogButton, so the button rules below
+ * need !important and three ids to win (as millennium.css's page buttons do).
+ */
+
+/* Root */
+.MillenniumSettings .sf-root {
+  gap: var(--se-space-3);
+  padding: 0;
+  color: var(--se-text);
+  font-family: var(--se-font);
+}
+
+.MillenniumSettings .sf-root[data-se-bh] {
+  height: var(--se-bh-h, auto);
+  min-height: 0;
+}
+
+/*
+ * The title row and the toolbar sit in the window's top strip, which Steam makes a drag area for
+ * moving the window: a click there moved the window instead of pressing the control. Carved out
+ * as Millennium's own page buttons are (millennium-window.css), with its !important.
+ */
+.MillenniumSettings .sf-root :is(.sf-bar1, .sf-bar1 *, .sf-bar2, .sf-bar2 *, .sf-dhead, .sf-dhead *),
+.MillenniumSettings .sf-root :is([data-se-bh-own], [data-se-bh-own] *) {
+  -webkit-app-region: no-drag !important;
+}
+
+/* Browse: title, toolbar, label row, cards */
+.MillenniumSettings .sf-root[data-se-bh="grid"] {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  gap: var(--se-space-3) var(--se-space-2);
+  align-items: center;
+}
+
+.MillenniumSettings .sf-root[data-se-bh="grid"] > .sf-bar1,
+.MillenniumSettings .sf-root[data-se-bh="grid"] > .sf-bar2 {
+  display: contents;
+}
+
+/* Anything else the plugin shows (loading, empty, an error) takes the cards' place */
+.MillenniumSettings .sf-root[data-se-bh="grid"] > :not(.sf-bar1):not(.sf-bar2):not(.sf-grid):not([data-se-bh-own]) {
+  grid-column: 1 / -1;
+  grid-row: 4;
+  align-self: start;
+}
+
+.MillenniumSettings .sf-root[data-se-bh="grid"] .sf-grow,
+.MillenniumSettings .sf-root[data-se-bh="grid"] .sf-pills {
+  display: none;
+}
+
+.MillenniumSettings .sf-root[data-se-bh="grid"] > .se-bh-head {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  align-self: start;
+}
+
+/* The plugin's Refresh: the pager row's Refresh (.se-bh-refresh, brew-hub.js) presses it */
+.MillenniumSettings .sf-root[data-se-bh="grid"] .sf-bar1 > div:not(.sf-tab):not(.sf-grow) {
+  display: none;
+}
+
+/* The foot and Back icon buttons draw their glyph on Steam's ::before */
+.MillenniumSettings .sf-root .sf-foot > .sf-btn:not(#se-none):not(#se-p2):not(#se-p3)::before,
+.MillenniumSettings .sf-root .sf-dhead .sf-btn:not(#se-none):not(#se-p2):not(#se-p3)::before {
+  content: '' !important;
+  display: block !important;
+  position: static !important;
+  flex: none !important;
+  width: var(--se-icon-md) !important;
+  height: var(--se-icon-md) !important;
+  margin: 0 !important;
+  opacity: 1 !important;
+  border: 0 !important;
+  background: currentColor !important;
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat !important;
+  mask: var(--se-icon-chevron) center / contain no-repeat !important;
+}
+
+/* Themes | Plugins: the segmented control's look (client/shared/segmented.css). The plugin's two
+   tabs are separate grid items, so brew-hub.js draws the track behind them (.se-bh-track); the
+   tabs are positioned, so they paint over it. */
+.MillenniumSettings .se-bh-track {
+  grid-column: 1 / 3;
+  grid-row: 2;
+  align-self: stretch;
+  height: var(--se-control-h);
+  border-radius: var(--se-radius-md);
+  background: var(--se-field);
+  box-shadow: var(--se-search-edge);
+}
+
+.MillenniumSettings .sf-root[data-se-bh="grid"] .sf-tab {
+  position: relative;
+  grid-row: 2;
+  display: inline-flex;
+  align-items: center;
+  height: calc(var(--se-control-h) - 2 * var(--se-space-half));
+  padding: 0 var(--se-space-3);
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: transparent;
+  color: var(--se-text-muted);
+  font: 600 var(--se-fs-base) / 1 var(--se-font);
+  transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.MillenniumSettings .sf-root[data-se-bh="grid"] .sf-tab:first-child {
+  grid-column: 1;
+  margin-left: var(--se-space-half);
+}
+
+.MillenniumSettings .sf-root[data-se-bh="grid"] .sf-tab:nth-child(2) {
+  grid-column: 2;
+  margin-left: calc(var(--se-space-half) - var(--se-space-2));
+  margin-right: var(--se-space-half);
+}
+
+.MillenniumSettings .sf-root[data-se-bh="grid"] .sf-tab:hover {
+  background: transparent;
+  color: var(--se-text-strong);
+}
+
+.MillenniumSettings .sf-root[data-se-bh="grid"] .sf-tab.sf-on {
+  background: var(--se-selected);
+  color: var(--se-text-strong);
+}
+
+.MillenniumSettings .sf-root[data-se-bh="grid"] .sf-tab:active {
+  transform: scale(var(--se-press-scale));
+}
+
+/* "Themes 27": the name, then the count in the faint tone (brew-hub.js splits the plugin's
+   "Themes (27)" into attributes; its own text stays, hidden, for screen readers) */
+.MillenniumSettings .sf-root .sf-tab[data-se-name] {
+  font-size: 0;
+}
+
+.MillenniumSettings .sf-root .sf-tab[data-se-name]::before {
+  content: attr(data-se-name);
+  font-size: var(--se-fs-base);
+}
+
+.MillenniumSettings .sf-root .sf-tab[data-se-name]::after {
+  content: attr(data-se-count);
+  /* A margin, not a gap: the hidden text is a flex item too, and a gap would double around it */
+  margin-left: var(--se-space-1);
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-base);
+  font-weight: 500;
+}
+
+/* Search: the theme's search field */
+.MillenniumSettings .sf-root[data-se-bh="grid"] .sf-search {
+  grid-column: 3;
+  grid-row: 2;
+  width: auto;
+  height: var(--se-control-h);
+}
+
+.MillenniumSettings .sf-root .sf-search::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: var(--se-search-pad);
+  width: var(--se-search-icon-size);
+  height: var(--se-search-icon-size);
+  transform: translateY(-50%);
+  background: var(--se-search-icon-color);
+  -webkit-mask: var(--se-icon-search) center / contain no-repeat;
+  mask: var(--se-icon-search) center / contain no-repeat;
+  pointer-events: none;
+}
+
+.MillenniumSettings .sf-root .sf-searchicon {
+  display: none;
+}
+
+.MillenniumSettings .sf-root .sf-search .sf-input {
+  height: 100%;
+  padding: 0 var(--se-search-pad) 0 calc(var(--se-search-pad) + var(--se-search-icon-size) + var(--se-search-gap));
+  border: 0;
+  border-radius: var(--se-search-radius);
+  background: var(--se-search-bg);
+  box-shadow: var(--se-search-edge);
+  color: var(--se-search-text);
+  font: var(--se-search-font);
+  line-height: normal;
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.MillenniumSettings .sf-root .sf-search .sf-input::placeholder {
+  color: var(--se-search-placeholder);
+  font-style: normal;
+}
+
+.MillenniumSettings .sf-root .sf-search .sf-input:hover {
+  box-shadow: var(--se-search-edge-hover);
+}
+
+.MillenniumSettings .sf-root .sf-search .sf-input:focus {
+  box-shadow: var(--se-search-edge-focus);
+}
+
+/* Sort (brew-hub.js) and Tags (the plugin's): one dropdown field */
+.MillenniumSettings .sf-root[data-se-bh="grid"] .se-bh-sort {
+  grid-column: 4;
+  grid-row: 2;
+}
+
+.MillenniumSettings .sf-root[data-se-bh="grid"] .sf-filter {
+  grid-column: 5;
+  grid-row: 2;
+  width: 150px;
+  height: var(--se-control-h);
+}
+
+.MillenniumSettings .se-bh-sort {
+  position: relative;
+  width: 170px;
+  height: var(--se-control-h);
+}
+
+.MillenniumSettings .sf-root .sf-input.sf-select,
+.MillenniumSettings .se-bh-sort > button {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-2);
+  width: 100%;
+  height: 100%;
+  padding: 0 var(--se-space-3);
+  border-radius: var(--se-radius-md);
+  background: var(--se-field-bg);
+  box-shadow: var(--se-field-edge);
+  color: var(--se-text);
+  font: 600 var(--se-fs-base) / 1 var(--se-font);
+  cursor: pointer;
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.MillenniumSettings .sf-root .sf-input.sf-select:hover,
+.MillenniumSettings .se-bh-sort > button:hover {
+  background: var(--se-field-bg);
+  box-shadow: var(--se-field-edge-hover);
+}
+
+.MillenniumSettings .se-bh-sort > button:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.MillenniumSettings .se-bh-sort > button[aria-expanded="true"] {
+  box-shadow: var(--se-field-edge-focus);
+}
+
+.MillenniumSettings .se-bh-sort > button > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.MillenniumSettings .sf-root .sf-chev,
+.MillenniumSettings .se-bh-sort > button .se-micon {
+  flex: none;
+  width: var(--se-icon-xs);
+  height: var(--se-icon-xs);
+  opacity: 1;
+  color: var(--se-text-muted);
+  transform: rotate(90deg);
+}
+
+.MillenniumSettings .sf-root .sf-chev {
+  transform: none;
+}
+
+/* The open lists: the pop-up panel recipe */
+.MillenniumSettings .sf-root .sf-menu,
+.MillenniumSettings .se-bh-menu {
+  position: absolute;
+  top: calc(100% + var(--se-space-1));
+  /* The field's own width: the Tags list sits at the page's right edge, so a wider list ran
+     out of the window; long options end in an ellipsis */
+  left: 0;
+  right: 0;
+  z-index: var(--se-z-dropdown);
+  box-sizing: border-box;
+  max-height: var(--se-menu-max-h);
+  overflow-y: auto;
+  padding: var(--se-menu-pad);
+  border: 0;
+  border-radius: var(--se-menu-radius);
+  background: var(--se-panel-bg);
+  box-shadow: var(--se-panel-shadow);
+  -webkit-backdrop-filter: var(--se-blur-panel);
+  backdrop-filter: var(--se-blur-panel);
+}
+
+.MillenniumSettings .sf-root .sf-menu {
+  animation: se-bh-open var(--se-dur) var(--se-ease);
+}
+
+@keyframes se-bh-open {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--se-space-1)));
+  }
+}
+
+/* The sort list stays mounted so it can animate closed too */
+.MillenniumSettings .se-bh-menu {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(calc(-1 * var(--se-space-1)));
+  transition:
+    opacity var(--se-dur) var(--se-ease),
+    transform var(--se-dur) var(--se-ease),
+    visibility 0s linear var(--se-dur);
+}
+
+.MillenniumSettings .se-bh-menu[data-open] {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
+}
+
+.MillenniumSettings .sf-root .sf-opt,
+.MillenniumSettings .se-bh-menu [role="option"] {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  padding: var(--se-menu-item-pad);
+  border: 0;
+  border-radius: var(--se-menu-item-radius);
+  overflow: hidden;
+  color: var(--se-text);
+  font: var(--se-menu-item-font);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  outline: none;
+}
+
+.MillenniumSettings .sf-root .sf-opt:hover,
+.MillenniumSettings .se-bh-menu [role="option"]:hover,
+.MillenniumSettings .se-bh-menu [role="option"]:focus-visible {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.MillenniumSettings .sf-root .sf-opt.sf-on,
+.MillenniumSettings .se-bh-menu [aria-selected="true"] {
+  padding: var(--se-menu-item-pad);
+  border-left: 0;
+  background: var(--se-selected);
+  color: var(--se-text-strong);
+}
+
+.MillenniumSettings .se-bh-menu [role="option"] .se-micon {
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
+  margin-left: auto;
+  color: var(--se-accent);
+  visibility: hidden;
+}
+
+.MillenniumSettings .se-bh-menu [aria-selected="true"] .se-micon {
+  visibility: visible;
+}
+
+/* The pager row: the pager (.se-mpager, millennium.css) and Refresh at the right. No label: the
+   tab already says what is listed and how many */
+.MillenniumSettings .sf-root[data-se-bh="grid"] > .se-bh-bar {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  justify-content: flex-end;
+  gap: var(--se-space-2);
+  margin: 0;
+}
+
+/* Refresh: one of the pager's buttons */
+.MillenniumSettings .se-bh-refresh {
+  all: unset;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: var(--se-control-h-sm);
+  height: var(--se-control-h-sm);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  color: var(--se-text-dim);
+  cursor: pointer;
+  transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.MillenniumSettings .se-bh-refresh:hover:not(:disabled) {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.MillenniumSettings .se-bh-refresh:active:not(:disabled) {
+  transform: scale(var(--se-press-scale));
+}
+
+.MillenniumSettings .se-bh-refresh:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.MillenniumSettings .se-bh-refresh:disabled {
+  cursor: default;
+}
+
+.MillenniumSettings .se-bh-refresh .se-micon {
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
+}
+
+/* While the plugin reloads its list, the arrow turns (core/motion.css) */
+.MillenniumSettings .se-bh-refresh[data-busy] .se-micon {
+  animation: se-turn var(--se-dur-busy) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .MillenniumSettings .se-bh-refresh[data-busy] .se-micon {
+    animation: none;
+  }
+}
+
+/* The cards: Themes' card, three across, as many rows as fit (brew-hub.js pages the rest) */
+.MillenniumSettings .sf-root .sf-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: max-content;
+  gap: var(--se-space-3);
+}
+
+.MillenniumSettings .sf-root[data-se-bh="grid"] .sf-grid {
+  grid-column: 1 / -1;
+  grid-row: 4;
+  align-self: stretch;
+  align-content: start;
+  min-height: 0;
+}
+
+.MillenniumSettings .sf-root .sf-card {
+  gap: var(--se-space-2);
+  min-height: 0;
+  padding: var(--se-space-2);
+  border: 0;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.MillenniumSettings .sf-root .sf-card:hover {
+  box-shadow: var(--se-edge-accent);
+}
+
+/* A card on another page of the pager */
+.MillenniumSettings .sf-root .sf-card[data-se-bh-hide] {
+  display: none;
+}
+
+/* 4 px under Themes' picture (84px): three rows of cards fit the fixed window under the toolbar */
+.MillenniumSettings .sf-root .sf-card .sf-img {
+  flex: none;
+  height: 80px;
+  border-radius: var(--se-radius-md);
+  background-color: var(--se-field);
+  box-shadow: var(--se-edge);
+}
+
+.MillenniumSettings .sf-root .sf-card .sf-body {
+  flex: none;
+  gap: var(--se-space-2);
+  padding: 0;
+}
+
+.MillenniumSettings .sf-root .sf-card .sf-clickable:not(.sf-img) {
+  padding-left: var(--se-space-1);
+}
+
+.MillenniumSettings .sf-root .sf-name {
+  color: var(--se-text);
+  font: 700 var(--se-fs-md) / 1.3 var(--se-font);
+}
+
+.MillenniumSettings .sf-root .sf-meta {
+  opacity: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm) / 1.4 var(--se-font);
+}
+
+/* A card keeps to name and one line of description, as Themes' cards; the rest is on Details */
+.MillenniumSettings .sf-root .sf-card :is(.sf-meta, .sf-tags) {
+  display: none;
+}
+
+.MillenniumSettings .sf-root .sf-card .sf-desc {
+  display: block;
+  min-height: 0;
+  margin-top: var(--se-space-half);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 1;
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm) / 1.4 var(--se-font);
+}
+
+.MillenniumSettings .sf-root .sf-foot {
+  gap: var(--se-space-2);
+  align-items: center;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.MillenniumSettings .sf-root .sf-card .sf-act {
+  flex: none;
+  gap: var(--se-space-1);
+}
+
+/*
+ * The plugin's buttons, as the row buttons on Themes (millennium.css). !important and the three
+ * ids: the plugin's inline <style> sets these with !important, and the settings dialog's
+ * DialogButton rules carry two ids.
+ */
+.MillenniumSettings .sf-root .sf-btn:not(#se-none):not(#se-p2):not(#se-p3) {
+  gap: var(--se-space-2) !important;
+  width: auto !important;
+  min-width: 76px !important;
+  height: 30px !important;
+  padding: 0 var(--se-space-3) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: none !important;
+  color: var(--se-text) !important;
+  font: 700 var(--se-fs-base) / 30px var(--se-font) !important;
+  transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.MillenniumSettings .sf-root .sf-btn:hover:not(:disabled):not(#se-none):not(#se-p2):not(#se-p3) {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.MillenniumSettings .sf-root .sf-btn:active:not(:disabled) {
+  transform: scale(var(--se-press-scale));
+}
+
+.MillenniumSettings .sf-root .sf-btn:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.MillenniumSettings .sf-root .sf-btn:disabled:not(#se-none):not(#se-p2):not(#se-p3) {
+  opacity: var(--se-btn-disabled-opacity);
+  cursor: default;
+}
+
+/* Icon buttons: Refresh (title row), Details (a card), Back (Details' title) */
+/* No gap: the hidden label is still a flex item, and the gap beside it pushed the icon off centre */
+.MillenniumSettings .sf-root :is(.sf-foot, .sf-dhead) > .sf-btn:not(#se-none):not(#se-p2):not(#se-p3) {
+  flex: none !important;
+  gap: 0 !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  font-size: 0 !important;
+}
+
+/* Details: the Themes cards' icon buttons (millennium.css): the info icon in the dim icon tone
+   at 18px, the strong tone on hover */
+.MillenniumSettings .sf-root .sf-foot > .sf-btn:not(#se-none):not(#se-p2):not(#se-p3) {
+  width: 30px !important;
+  color: var(--se-text-dim) !important;
+}
+
+.MillenniumSettings .sf-root .sf-foot > .sf-btn:not(#se-none):not(#se-p2):not(#se-p3)::before {
+  width: 18px !important;
+  height: 18px !important;
+  -webkit-mask-image: var(--se-icon-info) !important;
+  mask-image: var(--se-icon-info) !important;
+}
+
+.MillenniumSettings .sf-root .sf-dhead .sf-btn:not(#se-none):not(#se-p2):not(#se-p3) {
+  width: var(--se-control-h) !important;
+  height: var(--se-control-h) !important;
+}
+
+.MillenniumSettings .sf-root .sf-dhead .sf-btn:not(#se-none):not(#se-p2):not(#se-p3) {
+  color: var(--se-text-muted) !important;
+}
+
+.MillenniumSettings .sf-root .sf-dhead .sf-btn:not(#se-none):not(#se-p2):not(#se-p3)::before {
+  transform: rotate(90deg);
+  -webkit-mask-image: var(--se-icon-chevron) !important;
+  mask-image: var(--se-icon-chevron) !important;
+}
+
+/* The one main action on Details: Use / Install in the accent */
+.MillenniumSettings .sf-root .sf-dactions .sf-act .sf-btn:not(#se-none):not(#se-p2):not(#se-p3) {
+  background: var(--se-accent) !important;
+  color: var(--se-on-accent) !important;
+}
+
+.MillenniumSettings .sf-root .sf-dactions .sf-act .sf-btn:hover:not(:disabled):not(#se-none):not(#se-p2):not(#se-p3) {
+  background: var(--se-accent-hover) !important;
+  color: var(--se-on-accent) !important;
+}
+
+/* Install progress and errors */
+.MillenniumSettings .sf-root .sf-bar {
+  height: 3px;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-track);
+}
+
+.MillenniumSettings .sf-root .sf-fill {
+  border-radius: inherit;
+  background: var(--se-accent);
+}
+
+.MillenniumSettings .sf-root .sf-err {
+  color: var(--se-danger-text);
+  font: 500 var(--se-fs-sm) / 1.4 var(--se-font);
+}
+
+.MillenniumSettings .sf-root .sf-empty {
+  padding: var(--se-space-7) 0;
+  opacity: 1;
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-md) / 1.4 var(--se-font);
+}
+
+/*
+ * Details: Back and the title as a sub-page title (client/settings/layout.css), the item as the
+ * "theme in use" card on Themes (picture | description, chips, actions), then the README.
+ * The card is the grid's ::before, laid behind its rows: the title row stays outside it.
+ */
+.MillenniumSettings .sf-root[data-se-bh="detail"] {
+  display: flex;
+  flex-direction: column;
+}
+
+.MillenniumSettings .sf-root[data-se-bh="detail"] > [data-se-bh-own] {
+  display: none;
+}
+
+.MillenniumSettings .sf-root[data-se-bh="detail"] .sf-detail {
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: var(--se-space-4);
+}
+
+.MillenniumSettings .sf-root .sf-dmain {
+  display: grid;
+  grid-template-columns: var(--se-space-4) 276px var(--se-space-5) minmax(0, 1fr) var(--se-space-4);
+  grid-template-rows: auto var(--se-space-4) auto auto minmax(0, 1fr) var(--se-space-4);
+  gap: var(--se-space-3) 0;
+  align-items: start;
+}
+
+.MillenniumSettings .sf-root .sf-dmain::before {
+  content: "";
+  grid-column: 1 / -1;
+  grid-row: 2 / -1;
+  align-self: stretch;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge-accent);
+}
+
+.MillenniumSettings .sf-root .sf-dinfo {
+  display: contents;
+}
+
+.MillenniumSettings .sf-root .sf-dinfo > * {
+  grid-column: 4;
+}
+
+/* In the window's top strip: kept above it, as Millennium's page buttons are (millennium.css) */
+.MillenniumSettings .sf-root .sf-dhead {
+  position: relative;
+  z-index: var(--se-z-sticky);
+  grid-column: 1 / -1;
+  grid-row: 1;
+  gap: var(--se-space-3);
+}
+
+.MillenniumSettings .sf-root .sf-dtitle {
+  color: var(--se-text);
+  font: 700 var(--se-fs-3xl) / 30px var(--se-font);
+}
+
+.MillenniumSettings .sf-root .sf-dhero {
+  grid-column: 2;
+  grid-row: 3 / 6;
+  flex: none;
+  width: 276px;
+  height: 156px;
+  max-height: none;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field);
+  box-shadow: var(--se-edge);
+}
+
+/* The description: the one child of the info with no class of its own */
+.MillenniumSettings .sf-root .sf-dinfo > div:not([class]) {
+  grid-row: 3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  color: var(--se-text);
+  font: 500 var(--se-fs-md) / 1.45 var(--se-font);
+}
+
+.MillenniumSettings .sf-root .sf-chips {
+  grid-row: 4;
+  gap: var(--se-space-1);
+}
+
+.MillenniumSettings .sf-root .sf-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--se-space-2);
+  border-radius: var(--se-radius-xs);
+  background: var(--se-hairline);
+  color: var(--se-text-dim);
+  font: 700 var(--se-fs-xs) / 1 var(--se-font);
+}
+
+.MillenniumSettings .sf-root .sf-chip b {
+  margin-right: var(--se-space-1);
+  opacity: 1;
+  color: var(--se-text-faint);
+  font-weight: 600;
+}
+
+.MillenniumSettings .sf-root .sf-dactions {
+  grid-row: 5;
+  align-self: end;
+  gap: var(--se-space-2);
+}
+
+.MillenniumSettings .sf-root .sf-dactions .sf-act {
+  flex: none;
+  width: auto;
+}
+
+/* README */
+.MillenniumSettings .sf-root .sf-sec {
+  margin-top: 0;
+  padding-left: var(--se-space-1);
+  opacity: 1;
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.MillenniumSettings .sf-root .sf-readme {
+  padding: var(--se-space-4) var(--se-space-5);
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+  color: var(--se-text-dim);
+  font: 400 var(--se-fs-base) / 1.6 var(--se-font);
+}
+
+.MillenniumSettings .sf-root[data-se-bh="detail"] .sf-readme {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.MillenniumSettings .sf-md :is(h1, h2, h3, h4) {
+  margin: var(--se-space-5) 0 var(--se-space-2);
+  color: var(--se-text-strong);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.MillenniumSettings .sf-md > :first-child,
+.MillenniumSettings .sf-md > :first-child > :first-child {
+  margin-top: 0;
+}
+
+.MillenniumSettings .sf-md h1 {
+  font-size: var(--se-fs-xl);
+}
+
+.MillenniumSettings .sf-md h2 {
+  font-size: var(--se-fs-lg);
+}
+
+.MillenniumSettings .sf-md :is(h3, h4) {
+  font-size: var(--se-fs-md);
+}
+
+.MillenniumSettings .sf-md :is(ul, ol) {
+  margin: 0 0 var(--se-space-3);
+  padding-left: var(--se-space-5);
+}
+
+.MillenniumSettings .sf-md li + li {
+  margin-top: var(--se-space-1);
+}
+
+.MillenniumSettings .sf-md strong {
+  color: var(--se-text-strong);
+}
+
+.MillenniumSettings .sf-md .sf-link {
+  color: var(--se-link);
+  cursor: pointer;
+}
+
+.MillenniumSettings .sf-md .sf-link:hover {
+  text-decoration: underline;
+}
+
+.MillenniumSettings .sf-md hr {
+  margin: var(--se-space-4) 0;
+  border: 0;
+  border-top: 1px solid var(--se-divider);
+}
+
+.MillenniumSettings .sf-md .sf-mdimg {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--se-radius-sm);
+}
+
+.MillenniumSettings .sf-md :is(code, pre) {
+  border-radius: var(--se-radius-xs);
+  background: var(--se-field);
+  font-family: var(--se-font-mono);
+  font-size: var(--se-fs-sm);
+}
+
+.MillenniumSettings .sf-md code {
+  padding: 0 var(--se-space-1);
+}
+
+.MillenniumSettings .sf-md pre {
+  padding: var(--se-space-3);
+  overflow-x: auto;
+}
+
+.MillenniumSettings .sf-md details {
+  margin: 0 0 var(--se-space-3);
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-edge);
+}
+
+.MillenniumSettings .sf-md summary {
+  padding: var(--se-space-2) var(--se-space-3);
+  color: var(--se-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.MillenniumSettings .sf-md details[open] > :not(summary) {
+  margin: 0 var(--se-space-3) var(--se-space-3);
+}
+
+.MillenniumSettings .sf-md table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.MillenniumSettings .sf-md :is(th, td) {
+  padding: var(--se-space-2);
+  border-bottom: 1px solid var(--se-divider);
+  text-align: left;
+  vertical-align: top;
+}
+
+.MillenniumSettings .sf-md th {
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .MillenniumSettings .sf-root .sf-menu {
+    animation: none;
+  }
+
+  .MillenniumSettings .se-bh-menu {
+    transform: none;
+  }
+}

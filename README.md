@@ -65,6 +65,7 @@ The theme styles these when they're installed, so they look built in.
 | **[ProtonDB Library Badges](https://github.com/Yohlo/protondb-library-badges)**<br><sub><code>Yohlo/protondb-library-badges</code></sub> | ProtonDB tiers for Linux and Steam Deck | Game page · Library |
 | **[Achievement Manager](https://github.com/madmaxgrey/AchievementManager)**<br><sub><code>madmaxgrey/AchievementManager</code></sub> | Unlock and lock achievements | Game page · Its own window |
 | **[SteamGridDB](https://github.com/DevsNate/SteamGridDB-Millennium)**<br><sub><code>DevsNate/SteamGridDB-Millennium</code></sub> | Custom grids, heroes, logos and icons | Its own window |
+| **[Brew Hub](https://github.com/madmaxgrey/BrewHub)**<br><sub><code>madmaxgrey/BrewHub</code></sub> | Browse and install community themes and plugins | Millennium Settings |
 
 <br>
 
