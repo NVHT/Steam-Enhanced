@@ -83,7 +83,7 @@
   }
 
   function pasteChip(input) {
-    const wrap = input.closest('.DialogInput_Wrapper');
+    const wrap = input.closest(`.${SE.C.className_className3}`);
     if (!wrap || wrap.querySelector(':scope > .se-sgdb-paste')) return;
     const chip = SE.el('button', 'se-sgdb-paste', 'Paste');
     chip.type = 'button';
@@ -271,7 +271,7 @@
    * the loader's links (still in <head>, only switched off); baseURL keeps their relative urls
    * (the font) resolving next to the files.
    */
-  const SHEETS = ['core/tokens.css', 'core/spinner.css', 'compat/steamgriddb/steamgriddb.css'];
+  const SHEETS = ['core/tokens.css', 'core/icons-nav.css', 'core/icons-ui.css', 'core/spinner.css', 'compat/steamgriddb/steamgriddb.css', 'compat/steamgriddb/steamgriddb-browser.css'];
 
   /*
    * The artwork browser's rules are in a cascade layer, se-sgdb (steamgriddb.css), against the
@@ -343,6 +343,7 @@
   if (isPluginWindow()) {
     start();
   } else {
+    // Own observer on purpose: it watches <head> and <html>'s class for the plugin's window to appear, which the shared observer (<body> only) can't see; disconnects once it has
     waiting = new MutationObserver(() => {
       if (!isPluginWindow()) return;
       waiting.disconnect();

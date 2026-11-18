@@ -17,8 +17,8 @@
   const KEY = '__seSizeOnDisk';
   window[KEY]?.destroy?.();
 
-  const TITLE = '._3zuICQ63IRympzZ6qgs-5O'; // SettingsStyles.Title
-  const ROW = '._1y1wmpgy_HhnryUAHjEOSG'; // SettingsStyles.AsyncBackedInputChildren
+  const TITLE = `.${SE.C.Added_Title}`; // SettingsStyles.Title
+  const ROW = `.${SE.C.AsyncBackedInputChildren}`; // SettingsStyles.AsyncBackedInputChildren
   const PANEL = 'data-se-sod';
   const PART = 'data-se-sod-part';
   const SIZE = /^\s*([\d.,]+\s*[^\s\d.,]+)\s+(.+?)\s*$/; // "12.3 GB" + "across 456 files"
