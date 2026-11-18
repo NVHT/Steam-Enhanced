@@ -52,12 +52,31 @@
   opacity: 1;
 }
 
+/*
+ * The art is shown whole, like the game page's hero: full width at its own proportions, its
+ * foot fading out. Behind it the same picture, blurred and dimmed, fills the rest of the view,
+ * so a tall stage (game list and Friends dock both open) no longer crops it to a middle slice.
+ * stage.js writes the loaded picture's URL into --se-hs-art on the layer.
+ */
+.se-hs-layer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--se-hs-art) center 30% / cover no-repeat;
+  filter: var(--se-blur-ambient) brightness(.55) saturate(1.2);
+  transform: scale(1.15); /* pushes the blur's soft edge out of view */
+}
+
 .se-hs-hero {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 30%;
+  height: auto;
   transform: scale(1.04);
+  transform-origin: center top;
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
 }
 
 /* A slow push-in on the art that is showing; held while the stage is out of sight */

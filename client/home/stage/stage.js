@@ -193,7 +193,11 @@
    * at once cost a lot of memory for layers nobody sees.
    */
   function ensureLayerArt(layer, app) {
-    if (layer && app && !layer.firstChild) layer.appendChild(artImg(ns.heroURLs(app), 'se-hs-hero'));
+    if (!layer || !app || layer.firstChild) return;
+    const img = artImg(ns.heroURLs(app), 'se-hs-hero');
+    // The blurred fill behind the art (stage-hero.css) paints whichever URL actually loaded
+    img.addEventListener('load', () => SE.cssVar(layer, '--se-hs-art', `url(${JSON.stringify(img.currentSrc)})`));
+    layer.appendChild(img);
   }
 
   function select(i) {
