@@ -438,7 +438,9 @@
       tag(form.parentElement, 'search');
       tag(form, 'search-form');
       tag(input, 'search-input');
-      tag(form.querySelector('button[type="submit"]'), 'search-submit');
+      const submit = form.querySelector('button[type="submit"]');
+      tag(submit, 'search-submit');
+      life.search(input, form, submit);
 
       mirrorButton(bar, 'wishlist', 'a[href*="/wishlist"]:not([data-se-own])');
       mirrorButton(bar, 'cart', 'a[href*="/cart"]:not([data-se-own])');

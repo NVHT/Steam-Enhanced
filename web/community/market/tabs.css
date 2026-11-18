@@ -17,7 +17,7 @@ html.se-community-market:not(#se-none) a.item_market_action_button {
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
   background: var(--se-pill) !important;
-  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line) !important;
+  box-shadow: var(--se-btn-edge) !important;
   color: var(--se-text) !important;
   font: var(--se-type-control) !important;
   text-decoration: none !important;
@@ -200,7 +200,7 @@ html.se-community-market .my_market_header_count > span {
 }
 
 html.se-community-market .market_tab_well_tab_active .my_market_header_count > span {
-  background: rgba(15, 17, 21, .16);
+  background: color-mix(in srgb, var(--se-bg-ink) 16%, transparent);
   color: inherit;
 }
 
@@ -248,8 +248,10 @@ html.se-community-market .se-mkt-tabs-pill {
   border-radius: var(--se-radius-control);
   background: var(--se-accent);
   box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--se-accent) 75%, transparent);
-  transform: translateX(var(--x, 0));
-  transition: transform var(--se-dur-slow) var(--se-ease), width var(--se-dur-slow) var(--se-ease), opacity var(--se-dur);
+  /* Moved by web.dom.slidePill: the slide and the width change are one transform */
+  transform: translateX(var(--x, 0)) scaleX(var(--sx, 1));
+  transform-origin: left center;
+  transition: transform var(--se-dur-slow) var(--se-ease), opacity var(--se-dur);
 }
 
 html.se-community-market .se-mkt-tabs-divider {
@@ -319,6 +321,6 @@ html.se-community-market .se-mkt-tab-count {
 }
 
 html.se-community-market .se-mkt-tab[aria-selected="true"] .se-mkt-tab-count {
-  background: rgba(15, 17, 21, .18);
+  background: color-mix(in srgb, var(--se-bg-ink) 18%, transparent);
   color: var(--se-on-accent);
 }

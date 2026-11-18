@@ -133,7 +133,7 @@ html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-
   border-radius: var(--se-radius-control);
   background: var(--se-white-18);
   opacity: 1 !important;
-  transition: width var(--se-dur-slow) var(--se-ease), background-color var(--se-dur-slow);
+  transition: background-color var(--se-dur-slow);
 }
 
 /* !important: display can come inline from Steam's markup or scripts */
@@ -142,7 +142,7 @@ html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-
 }
 
 html.se-store-rows:not(#se-none) :is([data-se-pips], .nHdn-Ea4zSg- .I8j65FBXdOY-) > :hover {
-  background: rgba(255, 255, 255, .4);
+  background: var(--se-white-40);
 }
 
 /* !important: Steam's own rules (buttons.css) set background at equal or higher weight; the
@@ -242,7 +242,34 @@ html.se-store-rows:not(#se-none) img[data-se-tile-art] {
 
 html.se-store-rows:not(#se-none) [data-se-slot]:hover [data-se-tile] {
   transform: translateY(-3px);
-  box-shadow: inset 0 0 0 1px var(--se-white-14), var(--se-shadow-md);
+  box-shadow: var(--se-shadow-lift);
+}
+
+/* Where the tile fills its slot (shared/rows.js), the drop shadow is the slot's own layer that
+   fades in and lifts with the tile (composited); the tile keeps only its ring. */
+html.se-store-rows:not(#se-none) [data-se-slot][data-se-tile-fill] {
+  isolation: isolate;
+}
+
+html.se-store-rows:not(#se-none) [data-se-slot][data-se-tile-fill]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--se-z-under);
+  border-radius: var(--se-radius-card);
+  box-shadow: var(--se-shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--se-dur-slow), transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-store-rows:not(#se-none) [data-se-slot][data-se-tile-fill]:hover::before {
+  opacity: 1;
+  transform: translateY(-3px);
+}
+
+html.se-store-rows:not(#se-none) [data-se-slot][data-se-tile-fill]:hover [data-se-tile] {
+  box-shadow: var(--se-edge-lift);
 }
 
 html.se-store-rows:not(#se-none) [data-se-slot]:hover :is([data-se-tile-art] img, img[data-se-tile-art]) {
@@ -268,7 +295,7 @@ html.se-store-rows:not(#se-none) [data-se-tile]:has(> img[data-se-tile-art])::af
   inset: auto 0 0;
   height: 40%;
   z-index: var(--se-z-raised);
-  background: linear-gradient(180deg, transparent, rgba(8, 10, 14, .55));
+  background: linear-gradient(180deg, transparent, var(--se-art-scrim));
   pointer-events: none;
 }
 
@@ -495,7 +522,7 @@ html.se-store-rows:not(#se-none) [data-se-tile] .prepurchase_tag {
   background-color: var(--se-glass-chip) !important;
   background-position: 8px center !important;
   backdrop-filter: var(--se-blur-chip);
-  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  box-shadow: var(--se-edge-glass);
   transition: translate var(--se-dur-slow) var(--se-ease);
 }
 
@@ -577,7 +604,7 @@ html.se-store-rows:not(#se-none) [data-se-tile] .broadcast_live_stream_icon::bef
   border-radius: 50%;
   background: var(--se-live);
   box-shadow: 0 0 8px var(--se-live);
-  animation: se-sh-live 1.6s var(--se-ease) infinite;
+  animation: se-sh-live var(--se-dur-pulse) var(--se-ease) infinite;
 }
 
 @keyframes se-sh-live {
@@ -681,4 +708,11 @@ html.se-store-rows:not(#se-none) :is(.ds_flag, .UcrgejVf5aA-) {
 /* !important: display can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) :is(#content_more, #content_loading, #content_none, #content_callout, #content_login) {
   display: none !important;
+}
+
+/* Reduced motion: the pulse holds still */
+@media (prefers-reduced-motion: reduce) {
+  html.se-store-rows:not(#se-none) [data-se-tile] .broadcast_live_stream_icon::before {
+    animation: none;
+  }
 }

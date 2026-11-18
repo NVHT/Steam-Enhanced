@@ -97,6 +97,7 @@
       { css: 'front/tabs.css', js: 'front/tabs.js', on: ['front'] },
       { js: 'app/deck.js', on: ['app'] },
       { css: 'app/hero.css', js: 'app/hero.js', on: ['app'] },
+      { js: '../shared/select.js', on: ['app'] },
       { js: 'app/player.js', on: ['app'] },
       { js: 'app/viewer.js', on: ['app'] },
       { js: 'app/trailers.js', on: ['app'] },

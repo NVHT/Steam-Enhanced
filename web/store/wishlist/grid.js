@@ -155,7 +155,9 @@
     }, { once: true });
     const rank = own ? dom.el('span', { [ROLE]: 'own-grid-rank', text: `#${app.rank}`, title: 'Your rank' }) : null;
     const buyLabel = own ? 'Add to Cart' : 'Purchase as a Gift';
-    return dom.el('article', { [ROLE]: 'own-grid-card', 'data-se-wl-app': String(app.appid) }, [
+    // The card holds the hover shadow; its contents sit in a wrapper that skips rendering
+    // off-screen (content-visibility on the card itself would clip the shadow).
+    return dom.el('article', { [ROLE]: 'own-grid-card', 'data-se-wl-app': String(app.appid) }, [dom.el('div', { [ROLE]: 'own-grid-inner' }, [
       dom.el('a', { [ROLE]: 'own-grid-art', href, tabIndex: -1, 'aria-hidden': 'true' }, [img, rank]),
       dom.el('div', { [ROLE]: 'own-grid-body' }, [
         dom.el('a', { [ROLE]: 'own-grid-title', href, text: app.name || `App ${app.appid}`, title: app.name || '' }),
@@ -173,7 +175,7 @@
           }),
         ]),
       ]),
-    ]);
+    ])]);
   };
 
   /**

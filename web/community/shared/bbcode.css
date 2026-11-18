@@ -1,0 +1,137 @@
+/*
+ * Steam's formatted text (BBCode) in one look, wherever people write: guides, a guide's top
+ * description, discussion posts and replies, comments, hub announcements, reviews, profile
+ * summaries and showcase notes. Headings, quotes, code, tables, lists, spoilers and rules.
+ * Pages keep only what's theirs (a hub card's compact headings, a guide's links and pictures).
+ *
+ * Every rule is scoped to the text areas below, so Steam's own markup elsewhere is untouched:
+ *   .guide, .guideTopDescription       guides (guide/)
+ *   .forum_op .content                 a topic's first post (discussions/)
+ *   .commentthread_comment_text        replies and comments (every page)
+ *   .apphub_CardContentNewsDesc        hub announcement cards (hub/)
+ *   [id="ReviewText"]                  a review (review/); the attribute keeps class weight
+ *   .profile_summary, .showcase_notes  a profile's summary and showcase notes (profile/)
+ */
+
+/* ---------- Headings ---------- */
+
+/* !important: Steam's own rules (shared_global.css) set color, font, margin at equal or higher
+   weight */
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) :is(.bb_h1, .bb_h2, .bb_h3) {
+  margin: var(--se-space-2) 0 !important;
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-title) !important;
+}
+
+/* ---------- Quotes: a quiet panel with an accent bar; the author line as a caption ---------- */
+
+/* !important: Steam's own rules (shared_global.css, forums.css) set background, border, margin,
+   padding at equal or higher weight */
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) :is(blockquote, .bb_blockquote) {
+  margin: var(--se-space-3) 0 !important;
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border: 0 !important;
+  border-inline-start: var(--se-space-half) solid var(--se-accent-line) !important;
+  border-radius: var(--se-radius-control);
+  background: var(--se-surface-2) !important;
+  color: var(--se-text-muted);
+}
+
+/* !important: Steam's own rules (shared_global.css) set color, font at equal or higher weight */
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) .bb_quoteauthor {
+  margin-bottom: var(--se-space-1);
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-caption) !important;
+}
+
+/* ---------- Code ---------- */
+
+/* !important: Steam's own rules (shared_global.css, forums.css) set background, border, color,
+   font-size, padding at equal or higher weight */
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) .bb_code {
+  padding: var(--se-space-3) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-field) !important;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+/* ---------- Tables: rounded, hairline rows, a header tone ---------- */
+
+/* !important: Steam's own rules (shared_global.css) set border, margin at equal or higher weight */
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) .bb_table {
+  margin: var(--se-space-3) 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control);
+  box-shadow: var(--se-edge-divider);
+  overflow: hidden;
+}
+
+/* !important: Steam's own rules (shared_global.css) set border, padding at equal or higher weight */
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) :is(.bb_table_th, .bb_table_td) {
+  padding: var(--se-space-2) var(--se-space-3) !important;
+  border: 0 !important;
+  border-top: 1px solid var(--se-divider) !important;
+  vertical-align: middle;
+}
+
+/* !important: the cell rule above sets border-top with !important */
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) .bb_table_tr:first-child > * {
+  border-top: 0 !important;
+}
+
+/* !important: Steam's own rules (shared_global.css) set background, color at equal or higher
+   weight */
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) .bb_table_th {
+  background: var(--se-surface-2) !important;
+  color: var(--se-text-strong) !important;
+  font: var(--se-type-label);
+}
+
+/* !important: the heading rule above sets margin with !important */
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) .bb_table :is(.bb_h1, .bb_h2, .bb_h3) {
+  margin: 0 !important;
+}
+
+/* ---------- Lists: Steam's markers, the text's own spacing ---------- */
+
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) :is(.bb_ul, ol) > li {
+  margin-block: var(--se-space-1);
+}
+
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) :is(.bb_ul, ol) > li::marker {
+  color: var(--se-text-dim);
+}
+
+/* ---------- Links: Steam's "[host]" after a link ---------- */
+
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) .bb_link_host {
+  color: var(--se-text-faint);
+  font: var(--se-type-caption);
+}
+
+/* ---------- Spoilers: hidden until hovered, as Steam's; the field tone instead of black ---------- */
+
+/* Steam hides the inner span (visibility) until hover; the bar's own text stays invisible */
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) .bb_spoiler {
+  padding: 0 var(--se-space-1);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-field);
+  color: transparent;
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) .bb_spoiler:hover {
+  background: var(--se-hover);
+  color: var(--se-text);
+}
+
+/* ---------- Rules ([hr]): one hairline ---------- */
+
+html.se-community-ui :is(.guide, .guideTopDescription, .forum_op .content, .commentthread_comment_text, .apphub_CardContentNewsDesc, [id="ReviewText"], .profile_summary, .showcase_notes) hr {
+  height: 1px;
+  margin: var(--se-space-3) 0;
+  border: 0;
+  background: var(--se-divider);
+}

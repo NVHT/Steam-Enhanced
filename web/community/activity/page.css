@@ -200,40 +200,12 @@ html.se-community-activity .friend_activity_header_search {
   box-shadow: none !important;
 }
 
-html.se-community-activity :is(#searchInputBoxNew, #profileFriendSearchInputBox) {
-  box-sizing: border-box;
-  width: 100% !important;
-  height: var(--se-ctl) !important;
-  margin: 0 !important;
-  padding: 0 var(--se-space-7) 0 var(--se-space-4) !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-control) !important;
-  background: var(--se-field-bg) !important;
-  box-shadow: var(--se-field-edge) !important;
-  color: var(--se-text) !important;
-  font: var(--se-type-control-lg) !important;
-  outline: 0 !important;
-  transition: box-shadow var(--se-dur);
-}
-
-html.se-community-activity #profileFriendSearchInputBox {
-  height: var(--se-ctl) !important;
-  font-size: var(--se-fs-base) !important;
-}
-
-html.se-community-activity :is(#searchInputBoxNew, #profileFriendSearchInputBox):focus {
-  box-shadow: var(--se-field-edge-focus) !important;
-}
-
-html.se-community-activity :is(#searchInputBoxNew, #profileFriendSearchInputBox)::placeholder {
-  color: var(--se-text-faint);
-}
-
-/* Steam floats and offsets the field and its image button. Both share one grid cell instead,
-   the button at the field's end, so nothing depends on Steam's positioning. */
+/* The header's and the friends column's search: the shared search field
+   (web/shared/search-field.css; page.js tags it, Steam's image button is its magnifier). Steam
+   floats and offsets the field and its button; the form holds the field alone instead.
+   !important: Steam's markup or scripts set float, height, margin, padding and position inline */
 html.se-community-activity :is(#headerSearchForm, #profileFriendSearchField) {
-  display: grid !important;
-  align-items: center;
+  display: block !important;
   height: auto !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -241,32 +213,12 @@ html.se-community-activity :is(#headerSearchForm, #profileFriendSearchField) {
   background: none !important;
 }
 
-html.se-community-activity :is(#headerSearchForm, #profileFriendSearchField) > * {
-  grid-area: 1 / 1;
-  position: static !important;
-  inset: auto !important;
-  float: none !important;
-  margin: 0 !important;
-}
-
 html.se-community-activity :is(#searchInputBoxNew, #profileFriendSearchInputBox) {
+  --se-search-h: var(--se-ctl);
   display: block;
-}
-
-html.se-community-activity :is(#searchSubmitImg, #profileFriendSearchSubmitImg) {
-  justify-self: end;
-  width: 22px !important;
-  height: 22px !important;
-  margin-right: var(--se-space-3) !important;
-  padding: 0 !important;
-  border: 0 !important;
-  object-fit: contain;
-  opacity: .55;
-  transition: opacity var(--se-dur);
-}
-
-html.se-community-activity :is(#searchSubmitImg, #profileFriendSearchSubmitImg):hover {
-  opacity: 1;
+  position: static !important;
+  float: none !important;
+  width: 100% !important;
 }
 
 /* ---------- Status box ---------- */
@@ -362,7 +314,7 @@ html.se-community-activity #blotter_appselect_app_options :is(div, ul, li, form)
 html.se-community-activity #blotter_appselect_app_options input:not([type="image"], [type="submit"]) {
   box-sizing: border-box;
   width: 100% !important;
-  height: 36px !important;
+  height: var(--se-ctl) !important;
   margin: 0 0 var(--se-space-2) !important;
   padding: 0 var(--se-space-6) 0 var(--se-space-4) !important;
   border: 0 !important;

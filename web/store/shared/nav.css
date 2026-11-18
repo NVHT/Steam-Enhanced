@@ -173,75 +173,19 @@ html.se-store [data-se-nav="search"]::after {
 html.se-store [data-se-nav="search"]::before { left: 0; }
 html.se-store [data-se-nav="search"]::after { right: 0; }
 
-/* !important: height, max-width, min-width can come inline from Steam's markup or scripts */
+/* The field is the shared search field (web/shared/search-field.css; Steam's submit square is its
+   magnifier); here only its size and place. */
+/* !important: max-width, min-width can come inline from Steam's markup or scripts */
 html.se-store [data-se-nav="search-form"] {
-  position: relative;
+  --se-search-h: var(--se-nav-ctl);
   flex: 1;
   min-width: 0 !important;
   max-width: none !important;
-  height: var(--se-nav-ctl) !important;
-  border-radius: var(--se-radius-md);
-  background: var(--se-field);
-  box-shadow: inset 0 0 0 1px transparent;
-  transition: box-shadow var(--se-dur);
 }
 
-html.se-store [data-se-nav="search-form"]:focus-within {
-  box-shadow: var(--se-field-edge-focus);
-}
-
-/* !important: another rule in this file sets color, font-size with !important; padding can come
-   inline from Steam's markup or scripts */
+/* !important: width can come inline from Steam's markup or scripts */
 html.se-store [data-se-nav="search-input"] {
-  height: 100%;
-  padding: 0 var(--se-space-3) 0 var(--se-space-half) !important;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  color: var(--se-text) !important;
-  font-size: var(--se-fs-base) !important;
-  outline: none;
-}
-
-/* !important: another rule in this file sets color, font-size with !important */
-html.se-store [data-se-nav="search-input"]::placeholder {
-  color: var(--se-text-faint) !important;
-  font-style: normal;
-  font-size: var(--se-fs-base) !important;
-}
-
-/* Steam's blue submit square becomes the field's leading duotone magnifier. */
-/* !important: another rule in this file sets color with !important; width can come inline from
-   Steam's markup or scripts */
-html.se-store [data-se-nav="search-submit"] {
-  order: -1;
-  width: 38px !important;
-  background: transparent;
-  box-shadow: none;
-  color: var(--se-text-faint) !important;
-}
-
-/* !important: Steam's own rules (B2WHDg87.css, CcPUUgaw.css, DIQ1eQa6.css) set display at equal or
-   higher weight; the theme's shared rules (web/store/shared/sale/sale.css, web/store/shared/ui.css) set display
-   with !important */
-html.se-store [data-se-nav="search-submit"] svg {
-  display: none !important;
-}
-
-html.se-store [data-se-nav="search-submit"]::before {
-  content: "";
-  width: 17px;
-  height: 17px;
-  background: currentColor;
-  -webkit-mask: var(--se-ni-search) center / contain no-repeat;
-  mask: var(--se-ni-search) center / contain no-repeat;
-}
-
-/* !important: another rule in this file sets color with !important */
-html.se-store [data-se-nav="search-submit"]:hover,
-html.se-store [data-se-nav="search-form"]:focus-within [data-se-nav="search-submit"] {
-  color: var(--se-text) !important;
+  width: 100% !important;
 }
 
 /* ---------- Wishlist and cart: our own icon buttons (shared/nav.js), mockup N1 ---------- */

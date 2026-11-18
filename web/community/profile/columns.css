@@ -3,78 +3,88 @@
  * Game Collector.
  */
 
-/* ---------- Stats strip (profile/page.js) ---------- */
+/* ---------- Counts and links (profile/page.js) ---------- */
 
-html.se-community-profile .se-profile-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
-  gap: var(--se-space-2);
-  padding: var(--se-space-4) var(--se-profile-pad) var(--se-space-5);
-  border-top: 1px solid var(--se-divider);
+/* Counts: no box, a large number over its label, hairlines between; they wrap when narrow */
+html.se-community-profile .se-profile-bar[data-se-bar="counts"] {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: var(--se-space-3);
 }
 
-html.se-community-profile .se-profile-stat {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  grid-template-areas:
-    "icon value"
-    "icon label";
-  align-items: center;
-  column-gap: var(--se-space-3);
-  min-height: 56px;
-  padding: var(--se-space-3) var(--se-space-4);
-  border-radius: var(--se-radius-md);
-  background: var(--se-white-04);
-  box-shadow: var(--se-edge);
-  color: var(--se-text-muted);
+html.se-community-profile .se-profile-bar[hidden] {
+  display: none;
+}
+
+html.se-community-profile [data-se-bar="counts"] .se-profile-seg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  padding: 0 var(--se-space-4);
+  border-left: 1px solid var(--se-divider);
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-caption);
   text-decoration: none !important;
-  transition: background-color var(--se-dur), color var(--se-dur), transform var(--se-dur) var(--se-ease);
-}
-
-html.se-community-profile .se-profile-stat:hover {
-  background: var(--se-hover);
-  color: var(--se-text);
-  transform: translateY(-1px);
-}
-
-html.se-community-profile .se-profile-stat .se-duo {
-  grid-area: icon;
-  width: 24px;
-  height: 24px;
-  color: var(--se-text-muted);
+  white-space: nowrap;
   transition: color var(--se-dur);
 }
 
-html.se-community-profile .se-profile-stat:hover .se-duo {
-  color: var(--se-text);
+html.se-community-profile [data-se-bar="counts"] .se-profile-seg:first-child {
+  padding-left: 0;
+  border-left: 0;
 }
 
-html.se-community-profile .se-profile-stat-value {
-  grid-area: value;
-  align-self: end;
+html.se-community-profile [data-se-bar="counts"] .se-profile-seg strong {
   color: var(--se-white);
-  font: 800 var(--se-fs-xl)/1.15 var(--se-font);
+  font: 800 var(--se-fs-xl)/1 var(--se-font);
   font-variant-numeric: tabular-nums;
+  transition: color var(--se-dur);
 }
 
-html.se-community-profile .se-profile-stat-label {
-  grid-area: label;
-  align-self: start;
-  overflow: hidden;
-  font: var(--se-type-caption);
-  text-overflow: ellipsis;
+html.se-community-profile [data-se-bar="counts"] .se-profile-seg:hover {
+  color: var(--se-text-muted) !important;
+}
+
+html.se-community-profile [data-se-bar="counts"] .se-profile-seg:hover strong {
+  color: var(--se-accent);
+}
+
+/* Links: quiet buttons, icon and label, a face only on hover; the first icon lines up with the
+   counts' edge */
+html.se-community-profile .se-profile-bar[data-se-bar="links"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-1);
+  margin-left: calc(-1 * var(--se-space-3));
+}
+
+html.se-community-profile [data-se-bar="links"] .se-profile-seg {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: var(--se-ctl-sm);
+  padding: 0 var(--se-space-3);
+  border-radius: var(--se-radius-control);
+  color: var(--se-text-dim) !important;
+  font: var(--se-type-label);
+  text-decoration: none !important;
   white-space: nowrap;
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
-/* A link with no total: the label takes the value's place */
-html.se-community-profile .se-profile-stat[data-se-empty] {
-  grid-template-areas: "icon label";
+html.se-community-profile [data-se-bar="links"] .se-profile-seg:hover {
+  background: var(--se-hover);
+  color: var(--se-text) !important;
 }
 
-html.se-community-profile .se-profile-stat[data-se-empty] .se-profile-stat-label {
-  align-self: center;
-  color: var(--se-text);
-  font: var(--se-type-body-lg);
+html.se-community-profile .se-profile-seg:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+html.se-community-profile .se-profile-seg .se-duo {
+  width: 16px;
+  height: 16px;
 }
 
 /* ---------- Columns ---------- */
@@ -104,7 +114,7 @@ html.se-community-profile .se-profile-stat[data-se-empty] .se-profile-stat-label
     padding: 0 !important;
   }
 
-  /* Steam paints the side column as a dark box (profilev2.css: rgba(0,0,0,.3)); the cards
+  /* Steam paints the side column as a dark box (profilev2.css: var(--se-black-30)); the cards
      in it are the surfaces here */
   html.se-community-profile .profile_content_inner > :is(.profile_leftcol, .profile_rightcol) {
     float: none !important;
@@ -189,7 +199,67 @@ html.se-community-profile .profile_customization_area {
 }
 
 html.se-community-profile .profile_customization {
+  position: relative;
   overflow: hidden;
+}
+
+/* Steam's "Edit or Change Showcase" link: a small pencil button at the header's end, shown on
+   hover (as Steam does) or keyboard focus. The text stays for screen readers; Steam's pencil
+   goes. */
+html.se-community-profile .profile_customization_editlink {
+  position: absolute !important;
+  inset: var(--se-space-4) var(--se-space-4) auto auto !important;
+  z-index: var(--se-z-raised);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: var(--se-ctl-sm);
+  height: var(--se-ctl-sm);
+  padding: 0 !important;
+  border-radius: var(--se-radius-control);
+  color: var(--se-text-muted) !important;
+  opacity: 0;
+  transition: opacity var(--se-dur), background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-community-profile .profile_customization:is(:hover, :focus-within) .profile_customization_editlink {
+  opacity: 1;
+}
+
+html.se-community-profile .profile_customization_editlink:hover {
+  background: var(--se-hover);
+  color: var(--se-text) !important;
+}
+
+html.se-community-profile .profile_customization_editlink:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+html.se-community-profile .profile_customization_editlink::before {
+  content: "";
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-edit) center / contain no-repeat;
+}
+
+/* Steam's own pencil, whatever draws it (an image, an icon element or a background) */
+html.se-community-profile .profile_customization_editlink > :not(.profile_customization_editlink_text) {
+  display: none !important;
+}
+
+html.se-community-profile .profile_customization_editlink {
+  background-image: none !important;
+}
+
+html.se-community-profile .profile_customization_editlink_text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 html.se-community-profile :is(.profile_customization_header, .profile_recentgame_header) {

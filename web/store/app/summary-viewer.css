@@ -24,7 +24,7 @@ html.se-viewer-open {
   border: 0;
   /* The dim lives on the dialog, which fills the viewport: ::backdrop doesn't inherit tokens. */
   background: color-mix(in srgb, var(--se-bg) 94%, transparent);
-  backdrop-filter: blur(16px);
+  backdrop-filter: var(--se-blur-panel);
   color: var(--se-text);
   display: none;
   grid-template-rows: auto minmax(0, 1fr) auto;
@@ -215,7 +215,7 @@ html.se-viewer-open {
   aspect-ratio: 16 / 9;
   border-radius: var(--se-radius-md);
   overflow: hidden;
-  background: #000;
+  background: var(--se-media-bg);
   box-shadow: var(--se-shadow-lg);
   outline: none;
 }
@@ -233,7 +233,7 @@ html.se-viewer-open {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background: #000;
+  background: var(--se-media-bg);
   cursor: pointer;
 }
 
@@ -416,6 +416,7 @@ html.se-viewer-open {
 .se-player__volume {
   width: 0;
   opacity: 0;
+  /* Width on purpose: the volume slider opens room for itself in the control row on hover */
   transition: width var(--se-dur-slow) var(--se-ease), opacity var(--se-dur), margin var(--se-dur-slow) var(--se-ease);
 }
 
@@ -430,9 +431,8 @@ html.se-viewer-open {
   border-radius: var(--se-radius-control);
   background:
     linear-gradient(var(--se-accent), var(--se-accent)) 0 / var(--se-played, 0%) 100% no-repeat,
-    linear-gradient(rgb(255 255 255 / .35), rgb(255 255 255 / .35)) 0 / var(--se-buffered, 0%) 100% no-repeat,
+    linear-gradient(var(--se-white-32), var(--se-white-32)) 0 / var(--se-buffered, 0%) 100% no-repeat,
     var(--se-white-18);
-  transition: height var(--se-dur);
 }
 
 .se-player__seek:hover::-webkit-slider-runnable-track {
@@ -474,31 +474,10 @@ html.se-viewer-open {
   outline: none;
 }
 
-/* Quality: a small glass select. */
-.se-player__quality {
-  height: 28px;
-  padding: 0 var(--se-space-3);
-  border: 0;
-  border-radius: var(--se-radius-control);
-  background: var(--se-white-10);
-  color: var(--se-white);
-  font: inherit;
-  font-size: var(--se-fs-sm);
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.se-player__quality:hover {
-  background: var(--se-white-18);
-}
-
-.se-player__quality[hidden] {
-  display: none;
-}
-
-.se-player__quality option {
-  background: var(--se-surface);
-  color: var(--se-text);
+/* Quality: the web's one dropdown (web/shared/select.js) in the control row */
+.se-player__row .se-select {
+  flex: none;
+  margin-right: var(--se-space-1);
 }
 
 /*
@@ -543,37 +522,6 @@ html.se-viewer-open {
 
 .se-player:not(#se-none) .se-player__sound:is(:hover, :focus-within) .se-player__volume {
   width: 84px !important;
-}
-
-/* Quality: a compact pill sized to its label, with the theme's chevron. */
-.se-player:not(#se-none) .se-player__quality {
-  box-sizing: border-box;
-  width: auto !important;
-  min-width: 0 !important;
-  max-width: none !important;
-  height: 28px !important;
-  margin: 0 var(--se-space-1) 0 0 !important;
-  padding: 0 var(--se-space-5) 0 var(--se-space-3) !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-control) !important;
-  background: var(--se-white-10) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") right 9px center / 11px no-repeat !important;
-  box-shadow: none !important;
-  color: var(--se-white) !important;
-  font: inherit;
-  font-size: var(--se-fs-sm) !important;
-  font-weight: 700 !important;
-  line-height: 28px !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-}
-
-.se-player:not(#se-none) .se-player__quality:hover {
-  background-color: var(--se-white-18) !important;
-}
-
-.se-player:not(#se-none) .se-player__quality:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: 1px;
 }
 
 @media (prefers-reduced-motion: reduce) {

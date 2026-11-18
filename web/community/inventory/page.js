@@ -149,6 +149,8 @@
       const before = filter.getAttribute('placeholder');
       filter.placeholder = 'Search items';
       filter.setAttribute('aria-label', 'Search items');
+      // The shared search field (web/shared/search-field.css), its magnifier on Steam's wrapper
+      $.search(filter, filter.closest('.filter_control_ctn'));
       $.add(() => {
         if (before == null) filter.removeAttribute('placeholder');
         else filter.setAttribute('placeholder', before);

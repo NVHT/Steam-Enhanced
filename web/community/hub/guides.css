@@ -394,7 +394,7 @@ html.se-community-hub-guides #ig_bottom a.workshopItemCollection {
 html.se-community-hub-guides #ig_bottom a.workshopItemCollection:hover {
   translate: 0 calc(-1 * var(--se-space-1));
   background: var(--se-surface-2);
-  box-shadow: inset 0 0 0 1px var(--se-white-12);
+  box-shadow: var(--se-edge-mid);
 }
 
 html.se-community-hub-guides #ig_bottom a.workshopItemCollection:active {
@@ -603,7 +603,7 @@ html.se-community-hub-guides #ig_bottom .searchTextContainer > input.searchText 
 }
 
 html.se-community-hub-guides #ig_bottom .searchTextContainer > input.searchText:hover {
-  box-shadow: inset 0 0 0 1px var(--se-white-12);
+  box-shadow: var(--se-edge-mid);
 }
 
 /* Steam writes its hint into the field as text (.defaultText) */
@@ -929,7 +929,7 @@ html.se-community-hub-guides #ig_bottom .guide_category_tags .filterOption input
   border: 0;
   border-radius: var(--se-radius-xs);
   background: var(--se-field-bg) center / 75% no-repeat;
-  box-shadow: inset 0 0 0 1px var(--se-white-12);
+  box-shadow: var(--se-edge-mid);
   -webkit-appearance: none;
   appearance: none;
   cursor: pointer;
@@ -942,12 +942,21 @@ html.se-community-hub-guides #ig_bottom .guide_category_tags .filterOption:hover
 
 html.se-community-hub-guides #ig_bottom .guide_category_tags .filterOption input[type="checkbox"]:checked {
   background-color: var(--se-accent);
-  background-image: var(--se-icon-check-ink);
   box-shadow: none;
 }
 
+/* Its tick, in the ink on the accent (a mask; the box takes ::before as appearance is none) */
+html.se-community-hub-guides #ig_bottom .guide_category_tags .filterOption input[type="checkbox"]:checked::before {
+  content: "";
+  display: block;
+  height: 100%;
+  background: var(--se-on-accent);
+  -webkit-mask: var(--se-check-mask) center / 75% no-repeat;
+  mask: var(--se-check-mask) center / 75% no-repeat;
+}
+
 html.se-community-hub-guides #ig_bottom .guide_category_tags .filterOption input[type="checkbox"]:disabled {
-  opacity: .45;
+  opacity: var(--se-btn-disabled-opacity);
   cursor: default;
 }
 

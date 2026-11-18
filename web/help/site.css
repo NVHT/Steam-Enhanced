@@ -61,25 +61,9 @@ html.se-help a.help_header:hover {
 }
 
 /* Breadcrumbs */
+/* The trail's look is web/shared/base.css's */
 html.se-help .breadcrumbs {
   margin: var(--se-space-3) 0 0 !important;
-  color: var(--se-text-faint) !important;
-  font: var(--se-type-small) !important;
-  text-transform: none !important;
-}
-
-html.se-help .breadcrumbs a {
-  color: var(--se-text-muted) !important;
-  text-decoration: none !important;
-  transition: color var(--se-dur);
-}
-
-html.se-help .breadcrumbs a:hover {
-  color: var(--se-white) !important;
-}
-
-html.se-help .breadcrumbs .breadcrumb_current_page {
-  color: var(--se-text-dim) !important;
 }
 
 /* Greeting and section labels */
@@ -130,7 +114,7 @@ html.se-help a.help_wizard_button {
 html.se-help a.help_wizard_button:not(.disabled):not(.nohover):hover,
 html.se-help a.help_wizard_button.opened {
   background: var(--se-hover) !important;
-  box-shadow: inset 0 0 0 1px var(--se-white-10);
+  box-shadow: var(--se-edge-soft);
 }
 
 html.se-help a.help_wizard_button > span {
@@ -193,57 +177,70 @@ html.se-help a.help_wizard_button.help_wizard_button_highpri::after {
   background: var(--se-on-accent);
 }
 
-/* Large topic buttons: taller, with an icon chip (web/help/site.js) */
+/* Large topic buttons: taller, with an icon chip (a span web/help/site.js adds first) */
 html.se-help a.help_wizard_button_large {
   min-height: 68px;
   padding-left: var(--se-space-4) !important;
   font-size: var(--se-fs-lg) !important;
 }
 
-html.se-help a.help_wizard_button_large[data-se-help-icon]::before {
-  content: "";
+/* The chip: a span, so it opts out of the text span's flex and padding above */
+html.se-help a.help_wizard_button_large > [data-se-help-chip] {
+  display: grid;
+  place-items: center;
   flex: none;
+  padding: 0;
   width: 40px;
   height: 40px;
   border-radius: var(--se-radius-md);
-  background: var(--se-help-icon) center / 22px 22px no-repeat, var(--se-pill);
+  background: var(--se-pill);
   box-shadow: var(--se-edge);
 }
 
+/* The chip's icon (--se-help-icon, set per topic below): a mask in the dim text tone */
+html.se-help a.help_wizard_button_large > [data-se-help-chip]::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  background: var(--se-text-dim);
+  -webkit-mask: var(--se-help-icon) center / contain no-repeat;
+  mask: var(--se-help-icon) center / contain no-repeat;
+}
+
 html.se-help a.help_wizard_button_large[data-se-help-icon="game"] {
-  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23b8c0c8' fill-opacity='.32' stroke='none' d='M7 7h10a5 5 0 0 1 4.9 6l-.6 3a2.5 2.5 0 0 1-4.3 1.2L15 15H9l-2 2.2A2.5 2.5 0 0 1 2.7 16l-.6-3A5 5 0 0 1 7 7z'/%3E%3Cpath d='M7 7h10a5 5 0 0 1 4.9 6l-.6 3a2.5 2.5 0 0 1-4.3 1.2L15 15H9l-2 2.2A2.5 2.5 0 0 1 2.7 16l-.6-3A5 5 0 0 1 7 7zM7.5 10v4M5.5 12h4M15.5 11h.01M17.5 13h.01'/%3E%3C/svg%3E");
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23000' fill-opacity='.32' stroke='none' d='M7 7h10a5 5 0 0 1 4.9 6l-.6 3a2.5 2.5 0 0 1-4.3 1.2L15 15H9l-2 2.2A2.5 2.5 0 0 1 2.7 16l-.6-3A5 5 0 0 1 7 7z'/%3E%3Cpath d='M7 7h10a5 5 0 0 1 4.9 6l-.6 3a2.5 2.5 0 0 1-4.3 1.2L15 15H9l-2 2.2A2.5 2.5 0 0 1 2.7 16l-.6-3A5 5 0 0 1 7 7zM7.5 10v4M5.5 12h4M15.5 11h.01M17.5 13h.01'/%3E%3C/svg%3E");
 }
 
 html.se-help a.help_wizard_button_large[data-se-help-icon="cart"] {
-  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23b8c0c8' fill-opacity='.32' stroke='none' d='M6 6h15l-1.6 8.2a2 2 0 0 1-2 1.6H8.7a2 2 0 0 1-2-1.7z'/%3E%3Cpath d='M3 3h2.5l2.2 11.1a2 2 0 0 0 2 1.7h7.7a2 2 0 0 0 2-1.6L21 6H6M9.5 20h.01M17.5 20h.01'/%3E%3C/svg%3E");
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23000' fill-opacity='.32' stroke='none' d='M6 6h15l-1.6 8.2a2 2 0 0 1-2 1.6H8.7a2 2 0 0 1-2-1.7z'/%3E%3Cpath d='M3 3h2.5l2.2 11.1a2 2 0 0 0 2 1.7h7.7a2 2 0 0 0 2-1.6L21 6H6M9.5 20h.01M17.5 20h.01'/%3E%3C/svg%3E");
 }
 
 html.se-help a.help_wizard_button_large[data-se-help-icon="account"] {
-  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23b8c0c8' fill-opacity='.32' stroke='none' cx='12' cy='8' r='4'/%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5'/%3E%3C/svg%3E");
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23000' fill-opacity='.32' stroke='none' cx='12' cy='8' r='4'/%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5'/%3E%3C/svg%3E");
 }
 
 html.se-help a.help_wizard_button_large[data-se-help-icon="gift"] {
-  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect fill='%23b8c0c8' fill-opacity='.32' stroke='none' x='4' y='10' width='16' height='10' rx='1.5'/%3E%3Cpath d='M4 10h16v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20zM3 7h18v3H3zM12 7v14.5M12 7S10.5 3 8 3.5 7 7 12 7zM12 7s1.5-4 4-3.5S17 7 12 7z'/%3E%3C/svg%3E");
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect fill='%23000' fill-opacity='.32' stroke='none' x='4' y='10' width='16' height='10' rx='1.5'/%3E%3Cpath d='M4 10h16v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20zM3 7h18v3H3zM12 7v14.5M12 7S10.5 3 8 3.5 7 7 12 7zM12 7s1.5-4 4-3.5S17 7 12 7z'/%3E%3C/svg%3E");
 }
 
 html.se-help a.help_wizard_button_large[data-se-help-icon="hardware"] {
-  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect fill='%23b8c0c8' fill-opacity='.32' stroke='none' x='2' y='7' width='20' height='10' rx='5'/%3E%3Crect x='2' y='7' width='20' height='10' rx='5'/%3E%3Crect x='8' y='9' width='8' height='6' rx='1'/%3E%3Cpath d='M5 11v2M4 12h2M18.5 11h.01M18.5 13h.01'/%3E%3C/svg%3E");
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect fill='%23000' fill-opacity='.32' stroke='none' x='2' y='7' width='20' height='10' rx='5'/%3E%3Crect x='2' y='7' width='20' height='10' rx='5'/%3E%3Crect x='8' y='9' width='8' height='6' rx='1'/%3E%3Cpath d='M5 11v2M4 12h2M18.5 11h.01M18.5 13h.01'/%3E%3C/svg%3E");
 }
 
 html.se-help a.help_wizard_button_large[data-se-help-icon="community"] {
-  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23b8c0c8' fill-opacity='.32' stroke='none' cx='9' cy='8' r='3.5'/%3E%3Ccircle cx='9' cy='8' r='3.5'/%3E%3Cpath d='M3 19.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M15.5 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2 .7 3.5 2.6 3.5 5.2'/%3E%3C/svg%3E");
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23000' fill-opacity='.32' stroke='none' cx='9' cy='8' r='3.5'/%3E%3Ccircle cx='9' cy='8' r='3.5'/%3E%3Cpath d='M3 19.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M15.5 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2 .7 3.5 2.6 3.5 5.2'/%3E%3C/svg%3E");
 }
 
 html.se-help a.help_wizard_button_large[data-se-help-icon="key"] {
-  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23b8c0c8' fill-opacity='.32' stroke='none' cx='8' cy='15' r='4.5'/%3E%3Ccircle cx='8' cy='15' r='4.5'/%3E%3Cpath d='M11.3 11.7L20 3M16.5 6.5l2.5 2.5M14.5 8.5l2 2'/%3E%3C/svg%3E");
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23000' fill-opacity='.32' stroke='none' cx='8' cy='15' r='4.5'/%3E%3Ccircle cx='8' cy='15' r='4.5'/%3E%3Cpath d='M11.3 11.7L20 3M16.5 6.5l2.5 2.5M14.5 8.5l2 2'/%3E%3C/svg%3E");
 }
 
 html.se-help a.help_wizard_button_large[data-se-help-icon="client"] {
-  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect fill='%23b8c0c8' fill-opacity='.32' stroke='none' x='3' y='4' width='18' height='5'/%3E%3Crect x='3' y='4' width='18' height='16' rx='2'/%3E%3Cpath d='M3 9h18M6.5 6.5h.01M9.5 6.5h.01'/%3E%3C/svg%3E");
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect fill='%23000' fill-opacity='.32' stroke='none' x='3' y='4' width='18' height='5'/%3E%3Crect x='3' y='4' width='18' height='16' rx='2'/%3E%3Cpath d='M3 9h18M6.5 6.5h.01M9.5 6.5h.01'/%3E%3C/svg%3E");
 }
 
 html.se-help a.help_wizard_button_large[data-se-help-icon="help"] {
-  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8c0c8' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23b8c0c8' fill-opacity='.32' stroke='none' cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M9.5 9.5a2.5 2.5 0 0 1 4.8 1c0 1.7-2.3 2.2-2.3 3.5M12 17h.01'/%3E%3C/svg%3E");
+  --se-help-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23000' fill-opacity='.32' stroke='none' cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M9.5 9.5a2.5 2.5 0 0 1 4.8 1c0 1.7-2.3 2.2-2.3 3.5M12 17h.01'/%3E%3C/svg%3E");
 }
 
 /* ---------- Home: two across ---------- */
@@ -271,30 +268,17 @@ html.se-help #help_search_support_form {
   margin-top: var(--se-space-4) !important;
 }
 
+/* The shared search field (web/shared/search-field.css, site.js tags it), at the home page's
+   hero size. !important: max-width and width can come inline from Steam's markup or scripts */
 html.se-help #help_search_support_input {
+  --se-search-h: 54px;
+  --se-search-font: var(--se-type-title);
   width: 100% !important;
   max-width: none !important;
-  height: 54px !important;
-  box-sizing: border-box;
-  padding: 0 var(--se-space-4) 0 3.125rem !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-lg) !important;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f7984' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%236f7984' fill-opacity='.32' stroke='none' cx='11' cy='11' r='6.5'/%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M20 20l-4.2-4.2'/%3E%3C/svg%3E") 18px center / 20px 20px no-repeat, var(--se-field) !important;
-  box-shadow: var(--se-edge) !important;
-  color: var(--se-text) !important;
-  font: var(--se-type-title) !important;
-  font-style: normal !important;
-  transition: box-shadow var(--se-dur);
 }
 
-html.se-help #help_search_support_input:focus {
-  outline: 0 !important;
-  box-shadow: var(--se-field-edge-focus) !important;
-}
-
+/* !important: Steam's own rules set text-align at equal or higher weight */
 html.se-help #help_search_support_input::placeholder {
-  color: var(--se-text-faint) !important;
-  font-style: normal !important;
   text-align: left !important;
 }
 

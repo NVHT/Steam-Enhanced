@@ -27,7 +27,7 @@
   const web = window.__seWeb;
 
   web.define((dom) => {
-    const { mark, scope, tagPrice } = dom;
+    const { mark, scope, tagPrice, unmark } = dom;
     const life = scope();
     const isFront = document.documentElement.classList.contains('se-store-front');
 
@@ -132,7 +132,26 @@
       moved.length = 0;
     });
 
+    /*
+     * Whether the tile is the slot's whole content (the slot wraps only it, through single-child
+     * wrappers), so the slot can carry the tile's hover shadow as its own layer: the tile clips
+     * its art, which would clip a layer inside it. Where both are laid out, their boxes must
+     * match too; anything else keeps the tile's own shadow.
+     */
+    const fillsSlot = (slot, tile) => {
+      if (tile === slot) return false;
+      let node = slot;
+      while (node !== tile && node.childElementCount === 1) node = node.firstElementChild;
+      if (node !== tile) return false;
+      const a = slot.getBoundingClientRect();
+      const b = tile.getBoundingClientRect();
+      if (!a.width || !b.width) return true;
+      return Math.abs(a.left - b.left) < 1 && Math.abs(a.top - b.top) < 1 &&
+        Math.abs(a.width - b.width) < 1 && Math.abs(a.height - b.height) < 1;
+    };
+
     const tagTiles = (carousel) => {
+      const pairs = [];
       for (const slot of slotsOf(carousel)) {
         const img = slot.querySelector('img');
         if (!img) continue;
@@ -140,6 +159,7 @@
         const tile = link && slot.contains(link) ? link : slot;
         mark(slot, 'data-se-slot');
         mark(tile, 'data-se-tile');
+        pairs.push([slot, tile]);
         const art = img.parentElement && img.parentElement !== tile && img.parentElement !== slot ? img.parentElement : img;
         mark(art, 'data-se-tile-art');
 
@@ -156,6 +176,9 @@
           mark(bar, 'data-se-price-bar');
         }
       }
+      // Reads for every tile first, then the marks: one layout pass, not one per tile.
+      const fills = pairs.map(([slot, tile]) => fillsSlot(slot, tile));
+      pairs.forEach(([slot], i) => (fills[i] ? mark(slot, 'data-se-tile-fill') : unmark(slot, 'data-se-tile-fill')));
     };
 
     const tagArrowsAndPips = (root) => {
@@ -258,7 +281,7 @@
 
     const ATTRS = [
       'data-se-shelf', 'data-se-shelf-head', 'data-se-shelf-title', 'data-se-shelf-more', 'data-se-shelf-panel',
-      'data-se-slot', 'data-se-tile', 'data-se-tile-art', 'data-se-price-bar', 'data-se-arrow', 'data-se-pips',
+      'data-se-slot', 'data-se-tile-fill', 'data-se-tile', 'data-se-tile-art', 'data-se-price-bar', 'data-se-arrow', 'data-se-pips',
       'data-se-upto', 'data-se-upto-label',
     ];
 

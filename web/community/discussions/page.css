@@ -15,22 +15,6 @@
  * Comments, buttons and paging buttons are shared/ui.css.
  */
 
-/* ---------- Breadcrumbs ---------- */
-
-html.se-community-discussions :is(.forum_breadcrumbs, .breadcrumbs) {
-  color: var(--se-text-faint) !important;
-  font: var(--se-type-small) !important;
-}
-
-html.se-community-discussions :is(.forum_breadcrumbs, .breadcrumbs) a {
-  color: var(--se-text-muted) !important;
-  text-decoration: none !important;
-}
-
-html.se-community-discussions :is(.forum_breadcrumbs, .breadcrumbs) a:hover {
-  color: var(--se-accent) !important;
-}
-
 /* ---------- Layout: wider, list beside a sticky side column ---------- */
 
 html.se-community-discussions {
@@ -440,27 +424,6 @@ html.se-community-discussions .forum_op_footer {
   font-size: var(--se-fs-sm) !important;
 }
 
-/* bbcode quotes and code */
-html.se-community-discussions :is(.forum_op, .forumtopic_comments) blockquote,
-html.se-community-discussions :is(.forum_op, .forumtopic_comments) .bb_blockquote {
-  margin: var(--se-space-3) 0 !important;
-  padding: var(--se-space-3) var(--se-space-4) !important;
-  border: 0 !important;
-  border-left: 3px solid var(--se-accent-surface) !important;
-  border-radius: 0 var(--se-radius-sm) var(--se-radius-sm) 0;
-  background: var(--se-white-03) !important;
-  color: var(--se-text-muted) !important;
-}
-
-html.se-community-discussions :is(.forum_op, .forumtopic_comments) .bb_code {
-  padding: var(--se-space-3) var(--se-space-3) !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-sm);
-  background: var(--se-field) !important;
-  color: var(--se-text) !important;
-  font-size: var(--se-fs-sm) !important;
-}
-
 /* Replies */
 html.se-community-discussions .forumtopic_comments,
 html.se-community-discussions .commentthread_area:has(.forumtopic_comments) {
@@ -533,37 +496,17 @@ html.se-community-discussions .rightbox a:hover {
   color: var(--se-accent) !important;
 }
 
-/* Search */
+/* Search: the shared search field (web/shared/search-field.css; page.js tags it, Steam's image
+   button is its magnifier) */
 html.se-community-discussions :is(.discussionSearchTextContainer, .DiscussionSearchForm) {
-  position: relative;
-  border: 0 !important;
-  background: none !important;
+  border: 0 !important; /* Steam's own rules set it at equal or higher weight */
+  background: none !important; /* Steam's own rules set it at equal or higher weight */
 }
 
+/* !important: width can come inline from Steam's markup or scripts */
 html.se-community-discussions .discussionSearchText {
-  box-sizing: border-box;
+  --se-search-h: var(--se-ctl);
   width: 100% !important;
-  height: var(--se-ctl) !important;
-  padding: 0 var(--se-space-7) 0 var(--se-space-4) !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-control) !important;
-  background: var(--se-field) !important;
-  box-shadow: var(--se-edge) !important;
-  color: var(--se-text) !important;
-  font: var(--se-type-control-lg) !important;
-  outline: 0 !important;
-}
-
-html.se-community-discussions .discussionSearchText:focus {
-  box-shadow: var(--se-field-edge-focus) !important;
-}
-
-html.se-community-discussions .discussionSearchTextSubmitImg {
-  position: absolute !important;
-  right: 12px;
-  top: 50%;
-  margin-top: calc(-1 * var(--se-space-2)) !important;
-  opacity: .6;
 }
 
 /* Start a New Discussion */
@@ -615,27 +558,19 @@ html.se-community-discussions .searchmatch_highlight {
 
 /* ---------- Side column (hub forums) ---------- */
 
-/* Search: field and Steam's image button share one grid cell */
+/* Search: the field alone in its container (Steam floats it and its image button)
+   !important: height, margin, padding and width can come inline from Steam's markup or scripts */
 html.se-community-discussions .discussionSearchTextContainer {
-  display: grid !important;
-  align-items: center;
+  display: block !important;
   width: auto !important;
   height: auto !important;
   margin: 0 0 var(--se-space-4) !important;
   padding: 0 !important;
 }
 
-html.se-community-discussions .discussionSearchTextContainer > * {
-  grid-area: 1 / 1;
+/* !important: Steam's own rules set float at equal or higher weight */
+html.se-community-discussions .discussionSearchText {
   float: none !important;
-  margin: 0 !important;
-}
-
-html.se-community-discussions .discussionSearchTextContainer > .discussionSearchTextSubmitImg {
-  position: static !important;
-  justify-self: end;
-  margin: 0 var(--se-space-4) 0 0 !important;
-  cursor: pointer;
 }
 
 html.se-community-discussions .rightbox > .content {

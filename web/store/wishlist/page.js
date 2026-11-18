@@ -637,6 +637,10 @@
         for (const node of document.querySelectorAll(selector)) writes.push([node, part]);
       }
 
+      // The search field: the shared search field, its magnifier drawn on the column
+      const search = document.querySelector(SEL.search);
+      $.search(search, search?.parentElement);
+
       page = document.querySelector(SEL.page);
       options = document.querySelector(SEL.options) ?? document.querySelector(`${SEL.tools} > [popover]:has(> form)`);
       const menu = document.querySelector(SEL.menu);

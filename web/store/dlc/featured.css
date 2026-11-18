@@ -181,8 +181,8 @@ html.se-store-dlc:not(#se-none) .se-dlc-spot__stage::after {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(15, 17, 21, .95) 0%, rgba(15, 17, 21, .78) 34%, rgba(15, 17, 21, .15) 68%, rgba(15, 17, 21, .55) 100%),
-    linear-gradient(0deg, rgba(15, 17, 21, .85), transparent 55%);
+    linear-gradient(90deg, color-mix(in srgb, var(--se-bg-ink) 95%, transparent) 0%, color-mix(in srgb, var(--se-bg-ink) 78%, transparent) 34%, color-mix(in srgb, var(--se-bg-ink) 15%, transparent) 68%, color-mix(in srgb, var(--se-bg-ink) 55%, transparent) 100%),
+    linear-gradient(0deg, color-mix(in srgb, var(--se-bg-ink) 85%, transparent), transparent 55%);
 }
 
 /* Left column: capsule, name, date, blurb, bottom-aligned. */
@@ -219,7 +219,7 @@ html.se-store-dlc:not(#se-none) .curator_featured .capsule > a::after {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  box-shadow: var(--se-edge-glass);
   pointer-events: none;
 }
 
@@ -267,17 +267,15 @@ html.se-store-dlc:not(#se-none) .curator_featured .price_row .app_platforms {
   border-radius: var(--se-radius-control);
   background: var(--se-glass-chip);
   backdrop-filter: var(--se-blur-chip);
-  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  box-shadow: var(--se-edge-glass);
 }
 
 /* Item flags (look: shared/ui.css). Featured: the art's top-left corner. */
-/* !important: the theme's shared rules (web/store/shared/sale/sale.css, web/store/shared/ui.css) set inset,
-   line-height, padding with !important */
+/* Placement only; the chip itself is shared/ui-flags.css */
+/* !important: the theme's shared rules (web/store/shared/sale/sale.css, web/store/shared/ui.css) set inset
+   with !important */
 html.se-store-dlc:not(#se-none) .curator_featured .ds_flag {
   inset: 10px auto auto 10px !important;
-  height: 24px;
-  padding: 0 var(--se-space-3) !important;
-  line-height: 24px !important;
 }
 
 /* List: the capsule's top-left corner, measured from the row's padding like the options button. */
@@ -373,7 +371,7 @@ html.se-store-dlc:not(#se-none) .curator_featured .curator_review_date {
   border-radius: var(--se-radius-control);
   background: var(--se-glass-chip);
   backdrop-filter: var(--se-blur-chip);
-  box-shadow: inset 0 0 0 1px var(--se-glass-chip-line);
+  box-shadow: var(--se-edge-glass);
   margin: 0 !important;
   color: var(--se-gold) !important;
   font-size: var(--se-fs-sm) !important;
@@ -471,7 +469,7 @@ html.se-store-dlc:not(#se-none) .content_highlights .carousel_thumbs > * {
   border-radius: var(--se-radius-control);
   background: var(--se-white-25);
   cursor: pointer;
-  transition: width var(--se-dur-slow) var(--se-ease), background-color var(--se-dur);
+  transition: background-color var(--se-dur);
 }
 
 /* !important: the theme's shared rules (web/store/shared/ui.css) set background with !important; width

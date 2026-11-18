@@ -69,7 +69,8 @@
     return h ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}` : `${m}:${String(s).padStart(2, '0')}`;
   };
 
-  const createPlayer = ({ el, scope }) => {
+  const createPlayer = (dom) => {
+    const { el, scope } = dom;
     const life = scope();
     let hls = null;
     let ticket = 0;
@@ -99,6 +100,14 @@
       ]),
     ]);
     const element = el('div', { class: 'se-player', tabIndex: 0, 'data-se-paused': '' }, [video, big, status, bar]);
+
+    // Quality: the web's one dropdown (web/shared/select.js) over the <select>, which stays hidden
+    // as its source
+    const qualityMenu = window.__seWeb?.parts?.select?.enhanceSelect(dom, life, quality);
+    const showQuality = (shown) => {
+      quality.hidden = !shown;
+      if (qualityMenu?.root) qualityMenu.root.hidden = !shown;
+    };
 
     /* ---------- State → controls ---------- */
 
@@ -139,8 +148,8 @@
     /** HLS levels as the quality menu: "Auto", then each height, highest first. */
     const renderLevels = () => {
       const levels = hls?.levels ?? [];
-      quality.hidden = levels.length < 2;
-      if (quality.hidden) return;
+      showQuality(levels.length >= 2);
+      if (levels.length < 2) return;
       const options = levels
         .map((level, i) => ({ i, height: level.height || 0 }))
         .filter((level) => level.height)
@@ -150,6 +159,7 @@
         ...options.map((level) => el('option', { value: String(level.i), text: `${level.height}p` })),
       );
       quality.value = String(hls.autoLevelEnabled ? -1 : hls.currentLevel);
+      qualityMenu?.();
     };
 
     /* ---------- Controls → video ---------- */
@@ -227,7 +237,7 @@
       video.removeAttribute('src');
       video.removeAttribute('poster');
       video.load();
-      quality.hidden = true;
+      showQuality(false);
       setStatus('');
       renderPlay();
       renderTime();
@@ -281,7 +291,10 @@
             });
           });
           hls.on(Hls.Events.LEVEL_SWITCHED, () => {
-            if (quality.value !== '-1') quality.value = String(hls.currentLevel);
+            if (quality.value !== '-1') {
+              quality.value = String(hls.currentLevel);
+              qualityMenu?.();
+            }
           });
           hls.loadSource(manifest);
           hls.attachMedia(video);
@@ -313,7 +326,7 @@
     renderPlay();
     renderTime();
     renderSound();
-    quality.hidden = true;
+    showQuality(false);
     setStatus('');
 
     return {

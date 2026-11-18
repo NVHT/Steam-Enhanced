@@ -5,6 +5,8 @@
  * same.
  *
  *   enhanceSelect(dom, $, select)               a <select>: choosing sets its value and fires
+ *                                               (returns render(), call it after changing the
+ *                                               options; render.root is the dropdown)
  *                                               its change event, so Steam's handlers (inline
  *                                               onchange included) run as before.
  *   enhanceDivSelect(dom, $, trigger, list, opt) Steam's script-driven div dropdowns (the hub's
@@ -160,6 +162,7 @@
 
     render();
     $.add(() => document.removeEventListener('pointerdown', outside, true));
+    render.root = root;
     return render;
   };
 
@@ -184,6 +187,7 @@
     hideSource($, select);
     // Steam can change the value from its own scripts (reset filters): keep the button in step
     $.listen(select, 'change', render);
+    return render;
   };
 
   const findList = (trigger, selector) => {

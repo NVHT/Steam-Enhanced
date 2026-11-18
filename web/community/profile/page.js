@@ -6,13 +6,21 @@
  *     so its video plays once; a still background is read from Steam's inline style. The same
  *     art (the video's poster, the still, or else the avatar) is exposed as --se-profile-art for
  *     the blurred page backdrop. Everything moves back below the breakpoint and on destroy.
- *   - Status pill: Steam's status card (.profile_in_game) mirrored as a pill beside the name.
- *     The side card then hides unless it carries a Join Game button.
- *   - Stats strip: every count link in the side column (badges, games, friends, groups...)
- *     as a tile under the header, with a duotone icon (shared/icons.js). The side column's
- *     plain link list hides; badge, award, group and friend previews stay.
- *   - ID chips: under the real name, the Steam ID and the profile link, each with a copy
- *     button. Values come from Steam's own g_rgProfileData; without it the chips are skipped.
+ *   - Status: Steam's status card (.profile_in_game) mirrored as a status line at the end of
+ *     the real name and place. The side card then hides unless it carries a Join Game button.
+ *   - Info row (.se-profile-chips, under the avatar and name), four columns: the favourite
+ *     badge (moved in), the summary (moved in), the Steam ID and the profile link (click to copy;
+ *     the value reads "Copied" for a moment), then two bars built from the side column's count
+ *     links: the counts ("3,891 Games"; a zero
+ *     count is left out) and the links without one (Inventory, Screenshots...) with a duotone
+ *     icon (shared/icons.js). The side column's plain link list hides; badge, award, group and
+ *     friend previews stay. IDs come from Steam's own g_rgProfileData; without it no ID chips.
+ *   - Level card: hovering the level badge (on the avatar's corner) shows the XP to the next
+ *     level, read once from the profile's badges page.
+ *   - Name history: the name itself opens Steam's name history (Steam's arrow lies over it);
+ *     made reachable by keyboard.
+ *   - Summary: always shown in full (CSS); Steam's "View more info" dialog link hides. A blank
+ *     line (a break right after a break) loses its second break, so the summary reads as one.
  *   - Recent games and the Favorite Game showcase: each gets wide header art (the 184x69 capsule's header.jpg sibling,
  *     falling back to the capsule), its playtime lines as chips, and an achievement ring with
  *     a percentage computed from "78 / 78" (a "Perfect" chip at 100%). The art also tints the row (--se-art).
@@ -34,6 +42,7 @@
 
   const WIDE = '(min-width: 911px)';
   const COPIED_MS = 1400;
+  const COPIED_TEXT = 'Copied';
   // Any of Steam's store art files (capsule_184x69.jpg, capsule_231x87.jpg, header.jpg...)
   const STORE_ART = /\/(?:capsule_[\w]+|header(?:_alt_assets_\d+)?)(\.(?:jpg|png|webp))/i;
   // Steam's unhashed store art path, by app ID: newer art lives in per-file hashed folders, where
@@ -144,8 +153,11 @@
 
     const syncStatus = () => {
       const box = document.querySelector('.profile_in_game');
-      const name = document.querySelector('.profile_header_centered_persona .persona_name, .profile_header_centered_col .persona_name');
-      if (!box || !name) return;
+      // The status ends the real-name line; a profile without one keeps it beside the name
+      const line =
+        document.querySelector('.profile_header_centered_persona .header_real_name, .profile_header_centered_col .header_real_name') ??
+        document.querySelector('.profile_header_centered_persona .persona_name, .profile_header_centered_col .persona_name');
+      if (!box || !line) return;
       const state = box.classList.contains('in-game') ? 'ingame' : box.classList.contains('online') ? 'online' : 'offline';
       const head = squash(box.querySelector('.profile_in_game_header')?.textContent);
       const game = squash(box.querySelector('.profile_in_game_name')?.textContent);
@@ -154,90 +166,236 @@
       mark(pill, 'data-se-state', state);
       mark(pill, 'title', text);
       setText(pill, text);
-      if (pill.parentElement !== name) name.append(pill);
+      if (pill.parentElement !== line) line.append(pill);
       const host = page();
       if (host) mark(host, 'data-se-status');
     };
 
-    /* ---------- Stats strip ---------- */
+    /* ---------- Chips: badge, IDs, counts and links ---------- */
 
-    const strip = el('nav', { class: 'se-profile-stats', 'aria-label': 'Profile sections' });
-    let stripSignature = '';
+    const ids = el('div', { class: 'se-profile-ids' });
+    const counts = el('nav', { class: 'se-profile-bar', 'data-se-bar': 'counts', 'aria-label': 'Profile stats', hidden: true });
+    const sections = el('nav', { class: 'se-profile-bar', 'data-se-bar': 'links', 'aria-label': 'Profile sections', hidden: true });
+    const medal = el('div', { class: 'se-profile-medal' });
+    const about = el('div', { class: 'se-profile-about' });
+    const chips = el('div', { class: 'se-profile-chips' }, [
+      medal,
+      about,
+      ids,
+      el('div', { class: 'se-profile-stack' }, [counts, sections]),
+    ]);
+    let barsSignature = '';
     $.add(() => {
-      strip.remove();
+      chips.remove();
       const host = page();
       if (host) unmark(host, 'data-se-stats');
     });
 
-    const statTile = (link) => {
-      const label = squash(link.querySelector('.count_link_label')?.textContent) || squash(link.textContent);
-      const total = squash(link.querySelector('.profile_count_link_total')?.textContent.replace(/ /g, ' '));
-      const tile = el('a', { class: 'se-profile-stat', href: link.href, title: total ? `${label}: ${total}` : label, 'data-se-empty': !total });
-      const icon = duoIcon(iconFor(link.getAttribute('href') ?? '') ?? 'profile');
-      tile.append(
-        ...[
-          icon,
-          total && el('span', { class: 'se-profile-stat-value', text: total }),
-          el('span', { class: 'se-profile-stat-label', text: label }),
-        ].filter(Boolean),
-      );
-      return tile;
+    const countSegment = (link, label, total) =>
+      el('a', { class: 'se-profile-seg', href: link.href, title: `${label}: ${total}` }, [
+        el('strong', { text: total }),
+        el('span', { text: label }),
+      ]);
+
+    const linkSegment = (link, label) =>
+      el('a', { class: 'se-profile-seg', href: link.href, title: label }, [
+        duoIcon(iconFor(link.getAttribute('href') ?? '') ?? 'profile'),
+        el('span', { text: label }),
+      ]);
+
+    // Steam leaves some totals blank (Inventory's is "&nbsp;"): those are links. A count of 0
+    // has nothing behind it and is left out.
+    const placeBars = () => {
+      const links = [...document.querySelectorAll('.profile_rightcol .profile_count_link a[href]')];
+      const signature = links.map((link) => `${link.href}|${squash(link.textContent)}`).join('\n');
+      if (signature === barsSignature) return;
+      barsSignature = signature;
+      const countItems = [];
+      const linkItems = [];
+      for (const link of links) {
+        const label = squash(link.querySelector('.count_link_label')?.textContent) || squash(link.textContent);
+        const total = squash(link.querySelector('.profile_count_link_total')?.textContent.replace(/ /g, ' '));
+        if (!total) linkItems.push(linkSegment(link, label));
+        else if (count(total)) countItems.push(countSegment(link, label, total));
+      }
+      counts.replaceChildren(...countItems);
+      sections.replaceChildren(...linkItems);
+      counts.hidden = !countItems.length;
+      sections.hidden = !linkItems.length;
+      const host = page();
+      if (!host) return;
+      if (links.length) mark(host, 'data-se-stats');
+      else unmark(host, 'data-se-stats');
     };
 
-    const placeStats = () => {
-      const header = page()?.querySelector(':scope > .profile_header_bg');
-      const links = [...document.querySelectorAll('.profile_rightcol .profile_count_link a[href]')];
-      if (!header || !links.length) return;
-      const signature = links.map((link) => `${link.href}|${squash(link.textContent)}`).join('\n');
-      if (signature !== stripSignature) {
-        stripSignature = signature;
-        strip.replaceChildren(...links.map(statTile));
-      }
-      if (strip.parentElement !== header) header.append(strip);
-      mark(page(), 'data-se-stats');
+    const placeChips = () => {
+      const content = page()?.querySelector('.profile_header_content');
+      if (!content) return;
+      if (chips.parentElement !== content) content.append(chips);
+      placeBars();
+    };
+
+    // Wide only (restored with the cover's moves): the favourite badge and the summary join the
+    // info row, badge first, summary second
+    const placeBadge = () => {
+      const badge = document.querySelector('.profile_header_badgeinfo .profile_header_badge');
+      if (badge?.querySelector('.favorite_badge')) move(badge, medal);
+      move(document.querySelector('.profile_header_content .profile_header_summary'), about);
     };
 
     /* ---------- ID chips ---------- */
 
-    const copyButton = (label, value) => {
-      const button = el('button', { class: 'se-profile-copy', type: 'button', 'aria-label': `Copy ${label}`, title: `Copy ${label}` });
+    // The whole chip is the copy button. "Copied" shows over the value for a moment (CSS, from
+    // [data-se-copied]): the value stays in place, so the chip keeps its width
+    const chip = (label, shown, value) => {
+      const text = el('span', { class: 'se-profile-chip-value', text: shown });
+      const node = el('button', { class: 'se-profile-chip', type: 'button', 'aria-label': `Copy ${label}`, title: `Copy ${label}` }, [
+        el('b', { text: label }),
+        text,
+      ]);
       let timer = 0;
-      $.listen(button, 'click', async (event) => {
+      const reset = () => {
+        node.removeAttribute('data-se-copied');
+        text.removeAttribute('data-se-copied');
+      };
+      $.listen(node, 'click', async (event) => {
         event.preventDefault();
         try {
           await navigator.clipboard.writeText(value);
         } catch {
           return;
         }
-        button.setAttribute('data-se-copied', '');
+        node.setAttribute('data-se-copied', '');
+        text.setAttribute('data-se-copied', COPIED_TEXT);
         clearTimeout(timer);
-        timer = setTimeout(() => button.removeAttribute('data-se-copied'), COPIED_MS);
+        timer = setTimeout(reset, COPIED_MS);
       });
       $.add(() => clearTimeout(timer));
-      return button;
+      return node;
     };
-
-    const chip = (label, shown, value) =>
-      el('span', { class: 'se-profile-chip' }, [el('b', { text: label }), el('span', { text: shown }), copyButton(label, value)]);
-
-    const ids = el('div', { class: 'se-profile-ids' });
-    $.add(() => ids.remove());
 
     // Steam sets g_rgProfileData in an inline script that may run after this module
     const placeIds = () => {
       const profile = window.g_rgProfileData;
-      if (!ids.childElementCount && profile) {
-        if (profile.steamid) ids.append(chip('ID', String(profile.steamid), String(profile.steamid)));
+      if (!ids.querySelector('.se-profile-chip') && profile) {
+        if (profile.steamid) ids.append(chip('Steam ID', String(profile.steamid), String(profile.steamid)));
         if (profile.url) {
           const url = String(profile.url);
           const path = url.replace(/^https?:\/\/(?:www\.)?steamcommunity\.com/i, '').replace(/\/$/, '');
-          ids.append(chip('Link', path || url, url));
+          ids.append(chip('Profile link', path || url, url));
         }
       }
-      if (!ids.childElementCount) return;
-      const persona = document.querySelector('.profile_header_centered_persona') ?? document.querySelector('.profile_header_centered_col');
-      if (persona && ids.parentElement !== persona) persona.append(ids);
     };
+
+    /* ---------- Level card ---------- */
+
+    // The level badge sits on the avatar's corner; hovering or focusing it shows the XP to the
+    // next level. Steam's profile doesn't carry it: the badges page does (.profile_xp_block_*),
+    // fetched once, the first time the card opens.
+    const levelCard = el('span', { class: 'se-level-card', role: 'tooltip', id: 'se-level-card' });
+    const levelTitle = el('strong', { class: 'se-level-card-title' });
+    const levelNext = el('span', { class: 'se-level-card-next' });
+    const levelBar = el('span', { class: 'se-level-card-bar', hidden: true }, [el('span')]);
+    const levelXp = el('span', { class: 'se-level-card-xp' });
+    levelCard.append(
+      el('span', { class: 'se-level-card-head' }, [levelTitle, levelNext]),
+      levelBar,
+      el('span', { class: 'se-level-card-foot' }, [levelXp, el('span', { class: 'se-level-card-open', text: 'View badges' })]),
+    );
+    let levelLink = null;
+    let levelLoad = null;
+    const levelAbort = new AbortController();
+
+    $.add(() => {
+      levelAbort.abort();
+      levelCard.remove();
+      if (levelLink) {
+        unmark(levelLink, 'aria-describedby');
+        unmark(levelLink, 'data-se-level');
+      }
+    });
+
+    const loadLevel = () => {
+      const url = window.g_rgProfileData?.url;
+      if (levelLoad || !url) return;
+      levelLoad = fetch(`${String(url).replace(/\/?$/, '/')}badges/`, { credentials: 'same-origin', signal: levelAbort.signal })
+        .then((response) => (response.ok ? response.text() : Promise.reject(new Error(String(response.status)))))
+        .then((html) => {
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const next = squash(doc.querySelector('.profile_xp_block_remaining')?.textContent);
+          const xp = squash(doc.querySelector('.profile_xp_block_xp')?.textContent);
+          const width = doc.querySelector('.profile_xp_block_remaining_bar_progress')?.style.width;
+          setText(levelNext, next);
+          setText(levelXp, xp);
+          if (width) {
+            levelBar.firstChild.style.setProperty('--se-pct', width);
+            levelBar.hidden = false;
+          }
+        })
+        .catch(() => {});
+    };
+
+    const placeLevel = () => {
+      const link = document.querySelector('.profile_header_badgeinfo .persona_level')?.closest('a');
+      const level = squash(link?.querySelector('.friendPlayerLevelNum')?.textContent);
+      if (!link || !level) return;
+      if (levelLink !== link) {
+        levelLink = link;
+        mark(link, 'data-se-level');
+        mark(link, 'aria-describedby', levelCard.id);
+        $.listen(link, 'pointerenter', loadLevel);
+        $.listen(link, 'focus', loadLevel);
+      }
+      setText(levelTitle, `Level ${level}`);
+      if (levelCard.parentElement !== link) link.append(levelCard);
+    };
+
+    /* ---------- Name history ---------- */
+
+    // Steam's arrow (.namehistory_link, onclick ShowAliasPopup) is stretched over the name in
+    // CSS, so clicking the name opens Steam's own popup under it. It's a bare span: it gets a
+    // role, a name and Enter / Space.
+    const HISTORY_ATTRS = { role: 'button', tabindex: '0', 'aria-label': 'Name history', 'data-se-history': '' };
+    let historyLink = null;
+
+    const onHistoryKey = (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      event.currentTarget.click();
+    };
+
+    const placeHistory = () => {
+      const link = document.querySelector('.profile_header_centered_persona .namehistory_link, .profile_header_centered_col .namehistory_link');
+      if (!link || link === historyLink) return;
+      historyLink = link;
+      for (const [name, value] of Object.entries(HISTORY_ATTRS)) mark(link, name, value);
+      $.listen(link, 'keydown', onHistoryKey);
+    };
+
+    $.add(() => {
+      if (historyLink) for (const name of Object.keys(HISTORY_ATTRS)) unmark(historyLink, name);
+    });
+
+    /* ---------- Summary: blank lines ---------- */
+
+    const gaps = new Set();
+
+    const isBlank = (node) => node?.nodeType === Node.TEXT_NODE && !node.textContent.trim();
+
+    const markGaps = () => {
+      for (const br of document.querySelectorAll('.profile_header_summary .profile_summary br:not([data-se-gap])')) {
+        let prev = br.previousSibling;
+        while (isBlank(prev)) prev = prev.previousSibling;
+        if (prev?.nodeName !== 'BR') continue;
+        mark(br, 'data-se-gap');
+        gaps.add(br);
+      }
+    };
+
+    $.add(() => {
+      for (const br of gaps) unmark(br, 'data-se-gap');
+      gaps.clear();
+    });
 
     /* ---------- Recent games ---------- */
 
@@ -553,10 +711,16 @@
     /* ---------- Run ---------- */
 
     const scan = () => {
-      if (wide.matches) placeCover();
+      if (wide.matches) {
+        placeCover();
+        placeBadge();
+      }
       syncStatus();
-      placeStats();
       placeIds();
+      placeChips();
+      placeLevel();
+      placeHistory();
+      markGaps();
       tagTotals();
       joinFriendStatus();
       sharpenCapsules();

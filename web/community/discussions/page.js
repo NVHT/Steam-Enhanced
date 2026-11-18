@@ -6,6 +6,8 @@
  *     author link (.forum_op .forum_op_author); each reply whose author link points to the same
  *     profile gets [data-se-op], which shared/ui.css draws as the chip.
  *
+ *   - Search: the side column's field takes the shared search field look.
+ *
  * Topics and replies page in place, so new ones are handled as they arrive.
  *
  * Classes are Steam's (SteamTracking: steamcommunity.com/public/css/skin_1/forums.css).
@@ -59,9 +61,17 @@
       labels.clear();
     });
 
+    // The side column's search: the shared search field, Steam's image button its magnifier
+    const tagSearch = () => {
+      const input = document.querySelector('.discussionSearchText');
+      const box = input?.closest('.discussionSearchTextContainer');
+      if (box) $.search(input, box, box.querySelector('.discussionSearchTextSubmitImg'));
+    };
+
     const scan = () => {
       tag();
       tidyLabels();
+      tagSearch();
     };
 
     $.observe(scan);

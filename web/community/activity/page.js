@@ -17,6 +17,7 @@
  *   - Duotone icons: the menu's small grey icons (and the friends list / groups buttons') are
  *     replaced by the theme's two-tone ones (shared/icons.js), matched by link path. A link
  *     with no matching icon keeps Steam's.
+ *   - Search fields: the header's and the friends column's take the shared search field look.
  *
  * The feed loads more as you scroll: new blocks are handled as they arrive.
  */
@@ -206,7 +207,22 @@
 
     /* ---------- Run ---------- */
 
+    /* ---------- Search fields ---------- */
+
+    // The header's and the friends column's: the shared search field, Steam's image button
+    // its magnifier
+    const SEARCHES = [
+      ['searchInputBoxNew', 'headerSearchForm', 'searchSubmitImg'],
+      ['profileFriendSearchInputBox', 'profileFriendSearchField', 'profileFriendSearchSubmitImg'],
+    ];
+    const tagSearches = () => {
+      for (const [input, box, go] of SEARCHES) {
+        $.search(document.getElementById(input), document.getElementById(box), document.getElementById(go));
+      }
+    };
+
     const scan = () => {
+      tagSearches();
       if (wide.matches) arrange();
       tagKinds();
       widenArt();

@@ -7,30 +7,14 @@
  * Tier tiles (legacy monthly page): flags and the game hover card.
  * ========================================================================== */
 
-/* Classic flags on the tiles (.ds_flag "On Wishlist" / "In Library" / "Ignored"): the theme's
-   glass chip, top-left, clear of the wishlist button in the other corner. */
-/* !important: the theme's shared rules (web/store/app/summary.css, web/store/dlc/page.css,
-   web/store/explore/page.css) set color, font-size, font-weight, height, inset, line-height, padding,
-   position, width with !important */
+/* Classic flags on the tiles (.ds_flag "On Wishlist" / "In Library" / "Ignored"): placement only,
+   top-left, clear of the wishlist button in the other corner. The chip's look is the one in
+   shared/ui-flags.css, the same on every store page. */
+/* !important: Steam's sale CSS places the flag with !important */
 html.se-store:not(#se-none) .SaleOuterContainer .ds_flag {
   position: absolute !important;
   inset: 10px auto auto 10px !important;
   z-index: 4;
-  width: auto !important;
-  height: auto !important;
-  padding: var(--se-space-1) var(--se-space-3) !important;
-  color: var(--se-owned) !important;
-  font-size: var(--se-fs-xs) !important;
-  font-weight: 700 !important;
-  letter-spacing: .06em;
-  line-height: 14px !important;
-  text-transform: uppercase;
-}
-
-/* !important: the theme's shared rules (web/store/app/summary.css, web/store/front/sections.css,
-   web/store/shared/ui.css) set color with !important */
-html.se-store:not(#se-none) .SaleOuterContainer .ds_flag.ds_wishlist_flag {
-  color: var(--se-wish) !important;
 }
 
 /* Steam's star is a background image the chip replaces; it returns as the shared flag glyph
@@ -103,7 +87,7 @@ html.se-store:not(#se-none) .PFP2RDjCi0w- .mVkwv5PYwMg- {
   padding: var(--se-space-1) var(--se-space-3);
   border-radius: var(--se-radius-control);
   background: rgba(164, 208, 7, .16);
-  color: #c6ef5a;
+  color: var(--se-lime);
   font-size: var(--se-fs-sm);
   font-weight: 700;
   text-shadow: none;
@@ -200,7 +184,7 @@ html.se-store:not(#se-none) [data-se-hcard] :is(.WishlistButton, [data-se-hcard-
   min-width: 32px;
   height: 32px;
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px var(--se-white-12) !important;
+  box-shadow: var(--se-edge-mid) !important;
   color: var(--se-white);
   transition: background-color var(--se-dur), color var(--se-dur);
 }
@@ -317,7 +301,7 @@ html.se-store:not(#se-none) .PFP2RDjCi0w-.djLCJl8FKv8- {
 }
 
 html.se-store:not(#se-none) .PFP2RDjCi0w-.djLCJl8FKv8- .uN9-XHR7odQ- {
-  background: rgba(23, 26, 32, .94);
+  background: color-mix(in srgb, var(--se-bg) 94%, transparent);
 }
 
 /* The popover card (main.css .j-9OlMX1FS8- positioner) keeps Steam's fade; it just scales in

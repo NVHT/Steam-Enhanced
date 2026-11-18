@@ -97,12 +97,14 @@ html.se-store-dlc:not(#se-none) .se-dlc-tabs__pill {
   border-radius: var(--se-radius-control);
   background: var(--se-selected);
   box-shadow: var(--se-shadow-sm);
-  translate: var(--x, 0) var(--y, 0);
+  /* Moved by web.dom.slidePill: the slide and the width change are one transform */
+  transform: translate(var(--x, 0), var(--y, 0)) scaleX(var(--sx, 1));
+  transform-origin: left center;
   pointer-events: none;
 }
 
 html.se-store-dlc:not(#se-none) [data-se-dlc-tabs="ready"] .se-dlc-tabs__pill {
-  transition: translate var(--se-dur-slow) var(--se-ease), width var(--se-dur-slow) var(--se-ease);
+  transition: transform var(--se-dur-slow) var(--se-ease);
 }
 
 html.se-store-dlc:not(#se-none) .se-dlc-tabs__pill[hidden] {
@@ -289,15 +291,34 @@ html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation {
   height: auto !important;
   padding: var(--se-space-3) 9.375rem var(--se-space-3) var(--se-space-3) !important;
   border: 0;
+  isolation: isolate;
   transition: background-color var(--se-dur), box-shadow var(--se-dur), translate var(--se-dur-slow) var(--se-ease);
+}
+
+/* The lift shadow is its own layer that fades in: a long list repaints a blurred box-shadow on
+   every frame of a box-shadow transition, an opacity fade is composited. */
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--se-z-under);
+  border-radius: inherit;
+  box-shadow: var(--se-shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--se-dur);
 }
 
 /* !important: the theme's shared rules (web/store/shared/ui.css) set background, box-shadow with
    !important */
 html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation:hover {
   background: var(--se-surface-2) !important;
-  box-shadow: inset 0 0 0 1px var(--se-white-12), var(--se-shadow-md) !important;
+  box-shadow: var(--se-edge-mid) !important;
   translate: 0 -2px;
+}
+
+html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation:hover::after {
+  opacity: 1;
 }
 
 html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation {

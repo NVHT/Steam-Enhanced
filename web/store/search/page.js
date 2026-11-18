@@ -1,5 +1,6 @@
 /*
  * Search (/search/):
+ *  - The term field takes the shared search field look (web/shared/search-field.css).
  *  - Tags each result's price (.discount_block) for the shared price chip ([data-se-price]).
  *  - Writes each review summary's words ("Very Positive") inside it, from the first line of
  *    the tooltip Steam keeps on it (data-tooltip-html), so the row says it without hovering.
@@ -52,6 +53,10 @@
         else if (text) summary.append(dom.el('span', { class: WORDS, text }));
       }
     };
+
+    // The term field: the shared search field, its magnifier on the field's wrapper
+    const term = document.getElementById('term');
+    $.search(term, term?.closest('.searchbar_left'));
 
     tag();
     $.observe(tag, { filter: (record) => Boolean(record.target.closest?.(RESULTS)) });

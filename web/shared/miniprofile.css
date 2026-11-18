@@ -1,7 +1,7 @@
 /*
  * Web friend card: the mini profile Steam's shared miniprofile script builds on Store and
  * Community pages (.miniprofile_hover), drawn as the friend dock's card (Steam's client card,
- * client/dialogs/hover-cards.css): the profile background as a fading banner, a rounded-square
+ * client/shared/hover-cards.css): the profile background as a fading banner, a rounded-square
  * avatar in a status ring with the name at its foot, the game when playing, the playtime as
  * tiles (hours large over a small label), then badge and level's ring in one footer tile.
  * Loaded by web/store/loader.js and web/community/loader.js.
@@ -54,7 +54,7 @@
   color: var(--se-text);
 }
 
-/* Sections in the friend dock card's order (client/dialogs/hover-cards.css): name, game,
+/* Sections in the friend dock card's order (client/shared/hover-cards.css): name, game,
    playtime, then badge and level; Steam may wrap them in .miniprofile_content */
 /* !important: Steam's own rules (shared_global.css) set width at equal or higher weight */
 .miniprofile_hover .miniprofile_content:not(#se-none) {
@@ -143,7 +143,7 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font: 700 18px/1.25 var(--se-font) !important;
+  font: 700 var(--se-fs-xl)/1.25 var(--se-font) !important;
   letter-spacing: -.01em;
   color: var(--se-text-strong) !important;
   text-shadow: 0 2px 12px var(--se-black-60);
@@ -155,10 +155,10 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font: 600 12.5px/18px var(--se-font) !important;
+  font: 600 var(--se-fs-base)/18px var(--se-font) !important;
   letter-spacing: 0;
   text-transform: none;
-  text-shadow: 0 1px 8px var(--se-black-60);
+  text-shadow: var(--se-text-shadow-art);
   color: var(--se-hc-ring) !important;
 }
 
@@ -199,7 +199,7 @@
   margin: 0 !important;
   border-radius: var(--se-radius-sm);
   object-fit: cover;
-  box-shadow: inset 0 0 0 1px var(--se-divider);
+  box-shadow: var(--se-edge-divider);
 }
 
 .miniprofile_hover :is(.miniprofile_gamesection, .miniprofile_ingamesection) img:not(#se-none) {
@@ -209,7 +209,7 @@
 /* The text block joins the grid, so state, name and presence stack beside the art */
 .miniprofile_hover .miniprofile_game_details:not(#se-none) {
   display: contents;
-  font: 600 13.5px/1.3 var(--se-font);
+  font: 600 var(--se-fs-md)/1.3 var(--se-font);
   color: var(--se-text-strong);
 }
 
@@ -292,7 +292,7 @@
 
 .miniprofile_hover .miniprofile_playtimesection .timeplayed:not(#se-none) {
   display: block;
-  font: 700 16px/22px var(--se-font);
+  font: 700 var(--se-fs-lg)/22px var(--se-font);
   letter-spacing: 0;
   text-transform: none;
   color: var(--se-text-strong);
@@ -365,7 +365,7 @@
 }
 
 .miniprofile_hover .miniprofile_featuredcontainer .friendPlayerLevelNum:not(#se-none) {
-  font: 700 11px/1 var(--se-font);
+  font: var(--se-type-badge);
   color: var(--se-text-strong);
 }
 
@@ -381,12 +381,12 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font: 600 12.5px/18px var(--se-font) !important;
+  font: 600 var(--se-fs-base)/18px var(--se-font) !important;
   color: var(--se-text-strong) !important;
 }
 
 .miniprofile_hover .miniprofile_featuredcontainer .xp:not(#se-none) {
-  font: 500 11px/16px var(--se-font) !important;
+  font: 500 var(--se-fs-xs)/16px var(--se-font) !important;
   letter-spacing: 0;
   text-transform: none;
   color: var(--se-text-muted) !important;

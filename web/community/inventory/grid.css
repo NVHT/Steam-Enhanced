@@ -161,7 +161,7 @@ html.se-community-inventory #inventories .item .item_count {
 
 /* Loading: tiles pulse until their art arrives */
 html.se-community-inventory #inventories .item.pendingItem {
-  animation: se-inv-pulse 1.4s var(--se-ease) infinite alternate;
+  animation: se-inv-pulse var(--se-dur-shimmer) var(--se-ease) infinite alternate;
 }
 
 @keyframes se-inv-pulse {
@@ -240,4 +240,11 @@ html.se-community-inventory #inventory_pagecontrols .pagecounts {
 
 html.se-community-inventory #inventory_pagecontrols .pagecounts span {
   color: var(--se-text) !important;
+}
+
+/* Reduced motion: the pulse holds still */
+@media (prefers-reduced-motion: reduce) {
+  html.se-community-inventory #inventories .item.pendingItem {
+    animation: none;
+  }
 }

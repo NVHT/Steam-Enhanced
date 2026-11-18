@@ -1,0 +1,87 @@
+/*
+ * Search field: one look for every web search box, the client's (the --se-search-* tokens in
+ * core/tokens.css). A page script tags its box with dom.scope().search(input, box, go):
+ *   [data-se-search]      the <input>: the field itself (fill, hairline, focus ring)
+ *   [data-se-search-box]  the positioned ancestor the magnifier is drawn on (an <input> holds no
+ *                         ::before), at --se-search-x / --se-search-y (the input's start and
+ *                         middle when the box hugs the input; a page sets them when it doesn't)
+ *   [data-se-search-go]   Steam's submit button or image, when the box has one: it becomes the
+ *                         magnifier and still submits
+ * Page files keep only the field's size and place: width, and a height its row needs
+ * (--se-search-h), its font in a hero field (--se-search-font).
+ */
+
+html:not(#se-none) [data-se-search-box] {
+  position: relative;
+}
+
+/* !important (the go control): Steam's form styles set its size, border, background, position
+   and opacity at equal or higher weight, some inline */
+html:not(#se-none) [data-se-search-box]:not(:has([data-se-search-go]))::before,
+html:not(#se-none) [data-se-search-box] [data-se-search-go] {
+  content: "";
+  position: absolute !important;
+  top: var(--se-search-y, 50%) !important;
+  inset-inline-start: var(--se-search-x, var(--se-search-pad)) !important;
+  z-index: var(--se-z-raised);
+  box-sizing: content-box !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: calc(var(--se-search-icon-size) / 2) !important;
+  border: 0 !important;
+  overflow: hidden;
+  background: var(--se-search-icon-color) !important;
+  opacity: 1 !important;
+  -webkit-mask: var(--se-icon-search) center / contain no-repeat;
+  mask: var(--se-icon-search) center / contain no-repeat;
+  font-size: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: background-color var(--se-dur);
+}
+
+html:not(#se-none) [data-se-search-box] [data-se-search-go] {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* !important: the rule above sets background with !important */
+html:not(#se-none) [data-se-search-box]:focus-within::before,
+html:not(#se-none) [data-se-search-box]:focus-within [data-se-search-go],
+html:not(#se-none) [data-se-search-box] [data-se-search-go]:hover {
+  background: var(--se-search-text) !important;
+}
+
+/* !important: Steam's form styles set these at equal or higher weight, and height, margin,
+   padding and width can come inline from Steam's markup or scripts */
+html:not(#se-none) input[data-se-search] {
+  box-sizing: border-box;
+  height: var(--se-search-h) !important;
+  margin: 0 !important;
+  padding: 0 var(--se-search-pad) 0 calc(var(--se-search-pad) + var(--se-search-icon-size) + var(--se-search-gap)) !important;
+  border: 0 !important;
+  border-radius: var(--se-search-radius) !important;
+  background: var(--se-search-bg) !important;
+  box-shadow: var(--se-search-edge) !important;
+  color: var(--se-search-text) !important;
+  font: var(--se-search-font) !important;
+  outline: 0 !important;
+  transition: box-shadow var(--se-dur);
+}
+
+/* !important: the rule above sets box-shadow with !important */
+html:not(#se-none) input[data-se-search]:hover:not(:focus) {
+  box-shadow: var(--se-search-edge-hover) !important;
+}
+
+/* !important: the rule above sets box-shadow with !important */
+html:not(#se-none) input[data-se-search]:focus {
+  box-shadow: var(--se-search-edge-focus) !important;
+}
+
+/* !important: Steam's form styles set color and font-style at equal or higher weight */
+html:not(#se-none) input[data-se-search]::placeholder {
+  color: var(--se-search-placeholder) !important;
+  font-style: normal !important;
+}

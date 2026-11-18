@@ -25,7 +25,7 @@ html.se-community-discussions-home .discussions_header > a.group_tab {
   display: inline-flex !important;
   align-items: center;
   float: none !important;
-  height: 36px !important;
+  height: var(--se-ctl) !important;
   margin: 0 !important;
   padding: 0 var(--se-space-4) !important;
   border: 0 !important;
@@ -87,9 +87,11 @@ html.se-community-discussions-home .se-dsc-tabs-pill {
   width: var(--w, 0);
   border-radius: var(--se-radius-control);
   background: var(--se-accent-surface);
-  box-shadow: inset 0 0 0 1px var(--se-accent-line);
-  transform: translateX(var(--x, 0));
-  transition: transform var(--se-dur-slower) var(--se-ease), width var(--se-dur-slower) var(--se-ease), opacity var(--se-dur-slow);
+  box-shadow: var(--se-edge-accent);
+  /* Moved by web.dom.slidePill: the slide and the width change are one transform */
+  transform: translateX(var(--x, 0)) scaleX(var(--sx, 1));
+  transform-origin: left center;
+  transition: transform var(--se-dur-slower) var(--se-ease), opacity var(--se-dur-slow);
 }
 
 /* ---------- Tab panel: recent games, then the forums ---------- */
@@ -328,7 +330,7 @@ html.se-community-discussions-home .discussions_recentlyplayed.unread a::before 
   padding: var(--se-space-1) var(--se-space-2);
   border-radius: var(--se-radius-control);
   background: color-mix(in srgb, var(--se-bg) 70%, transparent);
-  box-shadow: inset 0 0 0 1px var(--se-white-14);
+  box-shadow: var(--se-edge-lift);
   color: var(--se-white);
   font: var(--se-type-badge);
   letter-spacing: .06em;

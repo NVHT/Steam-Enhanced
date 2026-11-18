@@ -34,6 +34,37 @@
     if (node.style.getPropertyValue(name) !== value) node.style.setProperty(name, value);
   };
 
+  /**
+   * Move a sliding tab pill onto a tab. The width snaps to the new tab; the motion is a
+   * transform (translate, plus scaleX from the old width), so the slide never runs through
+   * layout. The CSS reads --x, --y, --w and --sx.
+   */
+  const pillBoxes = new WeakMap();
+  const slidePill = (pill, { x, y = 0, w }) => {
+    const from = pillBoxes.get(pill);
+    pillBoxes.set(pill, { x, y, w });
+    setVar(pill, '--w', `${w}px`);
+    if (!from || !from.w || !w) {
+      setVar(pill, '--x', `${x}px`);
+      setVar(pill, '--y', `${y}px`);
+      setVar(pill, '--sx', '1');
+      return;
+    }
+    if (from.x === x && from.y === y && from.w === w) return;
+    // Start from the old box with no transition, then let the transform ease to the new one
+    pill.style.transition = 'none';
+    setVar(pill, '--x', `${from.x}px`);
+    setVar(pill, '--y', `${from.y}px`);
+    setVar(pill, '--sx', String(from.w / w));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      pill.style.removeProperty('transition');
+      const now = pillBoxes.get(pill);
+      setVar(pill, '--x', `${now.x}px`);
+      setVar(pill, '--y', `${now.y}px`);
+      setVar(pill, '--sx', '1');
+    }));
+  };
+
   const squash = (text) => (text ?? '').replace(/\s+/g, ' ').trim();
 
   /**
@@ -250,8 +281,13 @@
   /* ---------- Feature scope ---------- */
 
   /** A feature's resources, released in reverse order by destroy(). */
+  const SEARCH = 'data-se-search';
+  const SEARCH_BOX = 'data-se-search-box';
+  const SEARCH_GO = 'data-se-search-go';
+
   const scope = () => {
     const undo = [];
+    const searched = new WeakSet();
     let alive = true;
     return {
       get alive() {
@@ -272,6 +308,22 @@
       mark(node, name, value = '') {
         mark(node, name, value);
         undo.push(() => unmark(node, name));
+      },
+      /**
+       * A search box in the shared look (web/shared/search-field.css): tags the input, the
+       * ancestor its magnifier is drawn on (`box`, the input's parent unless given), and Steam's
+       * submit control when there is one (`go`: it becomes the magnifier and still submits).
+       * Safe to call on every pass; destroy() untags.
+       */
+      search(input, box = input?.parentElement, go = null) {
+        if (!input) return;
+        for (const [node, name] of [[input, SEARCH], [box, SEARCH_BOX], [go, SEARCH_GO]]) {
+          if (!node) continue;
+          mark(node, name);
+          if (searched.has(node)) continue;
+          searched.add(node);
+          undo.push(() => unmark(node, name));
+        }
       },
       /** Move a node (before `before`, else to the end of `target`); destroy() puts it back. */
       move(node, target, before = null) {
@@ -303,5 +355,5 @@
     };
   };
 
-  web.dom = { OWN, mark, unmark, setText, setVar, squash, el, isOwn, ready, copy, tagPrice, untagPrice, untagPrices, heroURLs, firstLoaded, observe, perFrame, scope };
+  web.dom = { OWN, mark, unmark, setText, setVar, slidePill, squash, el, isOwn, ready, copy, tagPrice, untagPrice, untagPrices, heroURLs, firstLoaded, observe, perFrame, scope };
 })();

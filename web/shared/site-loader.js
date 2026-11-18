@@ -5,7 +5,7 @@
  * window.__seWeb.start(global). Given the pages and files, this:
  *
  *   - puts the common files first (COMMON): every site gets the runtime (dom.js), the tokens,
- *     the web base and the spinner; `common: 'full'` adds what the redesigned sites share
+ *     the web base, the search field and the spinner; `common: 'full'` adds what the redesigned sites share
  *     (level badges, the friend card, Steam's dialogs, the dropdown, scroll to top)
  *   - puts the site class and one class per matched page on <html> before any stylesheet, so
  *     the CSS applies from the first paint
@@ -37,12 +37,15 @@
 
   /** Files every site starts with, in cascade order, relative to this file. */
   const COMMON = {
-    lite: [{ js: 'dom.js' }, { css: '../../core/tokens.css' }, { css: 'base.css' }, { css: '../../core/spinner.css' }],
+    lite: [{ js: 'dom.js' }, { css: '../../core/tokens.css' }, { css: '../../core/icons-nav.css' }, { css: '../../core/icons-ui.css' }, { css: 'base.css' }, { css: 'search-field.css' }, { css: '../../core/spinner.css' }],
     full: [
       { js: 'dom.js' },
       { css: '../../core/tokens.css' },
+      { css: '../../core/icons-nav.css' },
+      { css: '../../core/icons-ui.css' },
       { css: '../../core/levels.css' },
       { css: 'base.css' },
+      { css: 'search-field.css' },
       { css: 'miniprofile.css' },
       { css: 'modals.css', js: 'modals.js' },
       { css: 'select.css' },

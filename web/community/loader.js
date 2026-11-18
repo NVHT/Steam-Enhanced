@@ -9,7 +9,8 @@
  * avatars and comments.
  *
  * Layout:
- *   shared/        ui.css: what the redesigned classic pages share; small-header.css: the
+ *   shared/        ui.css: what the redesigned classic pages share; bbcode.css: Steam's
+ *                  formatted text (guides, posts, comments, reviews, profiles); small-header.css: the
  *                  profile sub-page header card (inventory, activity settings, edit profile);
  *                  compose.js: the comment box's formatting row
  *   dmca/          Notice of Copyright Infringement (/dmca/create/)
@@ -83,6 +84,7 @@
     files: [
       { css: 'shared/ui.css', on: ['ui'] },
       { css: 'shared/ui-comments.css', on: ['ui'] },
+      { css: 'shared/bbcode.css', on: ['ui'] },
       { css: 'shared/ui-friends.css', on: ['ui'] },
       { css: 'shared/ui-icons.css', on: ['ui'] },
       { css: 'shared/ui-tooltips.css', on: ['ui'] },

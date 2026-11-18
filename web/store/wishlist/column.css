@@ -23,47 +23,18 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="page"] > [data-se-wl="bar"] {
   overscroll-behavior: contain;
 }
 
-/* The search glyph, drawn on the column (an <input> can't hold one) over the field's start. */
-html.se-store-wishlist:not(#se-none) [data-se-wl="bar"]::before {
-  content: "";
-  position: absolute;
-  inset-inline-start: calc(var(--se-space-4) + var(--se-space-3));
-  top: calc(var(--se-space-4) + (var(--se-ctl) - var(--se-fs-lg)) / 2);
-  z-index: var(--se-z-raised);
-  width: var(--se-fs-lg);
-  height: var(--se-fs-lg);
-  background: var(--se-text-faint);
-  -webkit-mask: var(--se-icon-search) center / contain no-repeat;
-  mask: var(--se-icon-search) center / contain no-repeat;
-  pointer-events: none;
-}
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="bar"]:focus-within::before {
-  background: var(--se-text);
+/* The search field is the shared search field (web/shared/search-field.css, page.js tags it);
+   its magnifier is drawn on the column, over the field's start: the field is the column's
+   first item, under the column's padding. */
+html.se-store-wishlist:not(#se-none) [data-se-wl="bar"] {
+  --se-search-x: calc(var(--se-space-4) + var(--se-search-pad));
+  --se-search-y: calc(var(--se-space-4) + var(--se-search-h) / 2);
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="search"] {
-  --se-field-pad-start: calc(var(--se-space-3) + var(--se-fs-lg) + var(--se-space-2));
   flex: none;
   width: 100%;
   min-width: 0;
-  height: var(--se-ctl);
-  color: var(--se-text);
-  font: var(--se-type-control);
-}
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="search"]::placeholder {
-  color: var(--se-text-faint);
-  font-style: normal;
-}
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="search"]:hover {
-  box-shadow: var(--se-field-edge-hover) !important; /* the shared field's ring is !important */
-}
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="search"]:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: 0;
 }
 
 /*
@@ -646,7 +617,7 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="own-tag"] {
   border: 0;
   border-radius: var(--se-radius-control);
   background: transparent;
-  box-shadow: inset 0 0 0 1px var(--se-white-10);
+  box-shadow: var(--se-edge-soft);
   color: var(--se-text-dim);
   font: var(--se-chip-font);
   white-space: nowrap;

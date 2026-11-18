@@ -117,8 +117,7 @@
         pill.style.opacity = '0';
         return;
       }
-      setVar(pill, '--x', `${active.offsetLeft}px`);
-      setVar(pill, '--w', `${active.offsetWidth}px`);
+      dom.slidePill(pill, { x: active.offsetLeft, w: active.offsetWidth });
       pill.style.opacity = '1';
     };
 
@@ -274,8 +273,10 @@
       autocomplete: 'off',
       spellcheck: false,
       'aria-label': 'Filter games',
+      'data-se-search': true,
     });
-    const filter = el('label', { class: 'se-mkt-filter', 'data-se-mkt-filter': true }, [field]);
+    // The shared search field (web/shared/search-field.css), its magnifier drawn on the label
+    const filter = el('label', { class: 'se-mkt-filter', 'data-se-mkt-filter': true, 'data-se-search-box': true }, [field]);
     const none = el('p', { class: 'se-mkt-filter-none', text: 'No games match.', hidden: true });
     const names = new WeakMap(); // game button -> lower-case name
     let group = null;
@@ -334,7 +335,14 @@
 
     /* ---------- Run ---------- */
 
+    // The sidebar's search: the shared search field, its magnifier on Steam's outer wrapper
+    const tagSearch = () => {
+      const input = document.querySelector('.market_search_sidebar_search_box input');
+      $.search(input, input?.closest('.market_search_sidebar_search_box > div'));
+    };
+
     const scan = () => {
+      tagSearch();
       mark(document.getElementById('BG_bottom'), 'data-se-mkt-view', view);
       placeBar();
       placeSell();

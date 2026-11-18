@@ -24,6 +24,41 @@ html:is(.se-store, .se-community, .se-help, .se-checkout):not(#se-none) :is(a, b
   outline-offset: var(--se-focus-offset);
 }
 
+/* ---------- Breadcrumbs ----------
+ * Steam's trail above a page's title (.breadcrumbs; .forum_breadcrumbs on discussions), one look
+ * on every site: small faint text, the links a step brighter and white on hover, the current page
+ * between. Pages keep only their own spacing. Two designs of their own are left out: the glass
+ * pills over the app page's hero (web/store/app/hero.css) and the trail under a guide's header
+ * card (web/community/guide/page.css).
+ * !important: Steam's own rules (store, community and help CSS) set color, font and
+ * text-transform on the trail and its links, inline on some pages.
+ */
+html:is(.se-store, .se-community, .se-help, .se-checkout):not(.se-app-hero-on, #se-none) :is(.breadcrumbs, .forum_breadcrumbs):not(.sharedfiles_item_page_header + .breadcrumbs) {
+  color: var(--se-text-faint) !important;
+  font: var(--se-type-small) !important;
+  letter-spacing: .02em;
+  text-transform: none !important;
+}
+
+html:is(.se-store, .se-community, .se-help, .se-checkout):not(.se-app-hero-on, #se-none) :is(.breadcrumbs, .forum_breadcrumbs):not(.sharedfiles_item_page_header + .breadcrumbs) .blockbg {
+  padding: 0 !important;
+  background: none !important;
+}
+
+html:is(.se-store, .se-community, .se-help, .se-checkout):not(.se-app-hero-on, #se-none) :is(.breadcrumbs, .forum_breadcrumbs):not(.sharedfiles_item_page_header + .breadcrumbs) a {
+  color: var(--se-text-muted) !important;
+  text-decoration: none !important;
+  transition: color var(--se-dur);
+}
+
+html:is(.se-store, .se-community, .se-help, .se-checkout):not(.se-app-hero-on, #se-none) :is(.breadcrumbs, .forum_breadcrumbs):not(.sharedfiles_item_page_header + .breadcrumbs) a:hover {
+  color: var(--se-white) !important;
+}
+
+html:is(.se-store, .se-community, .se-help, .se-checkout):not(.se-app-hero-on, #se-none) :is(.breadcrumbs, .forum_breadcrumbs):not(.sharedfiles_item_page_header + .breadcrumbs) .breadcrumb_current_page {
+  color: var(--se-text-dim) !important;
+}
+
 /* ---------- Footer ----------
  * Steam's footer (#footer; its hashed React classes vary, the id and the --footer-bg-color
  * hook it reads don't): the theme's page colour under a hairline, instead of Steam's
@@ -33,7 +68,7 @@ html:is(.se-store, .se-community, .se-help, .se-checkout):not(#se-none) :is(a, b
 html:is(.se-store, .se-community, .se-help, .se-checkout):not(#se-none) #footer {
   --footer-bg-color: var(--se-bg);
   background-color: var(--se-bg) !important;
-  box-shadow: inset 0 1px 0 var(--se-hairline);
+  box-shadow: var(--se-rule-top);
   color: var(--se-text-faint);
 }
 

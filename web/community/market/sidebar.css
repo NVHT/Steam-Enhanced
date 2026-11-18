@@ -104,10 +104,6 @@ html.se-community-market .market_search_sidebar_search_box div {
   box-shadow: none !important;
 }
 
-html.se-community-market .market_search_sidebar_search_box > div {
-  position: relative;
-}
-
 /* Steam's React box sizes its wrappers in px (259px): every wrapper around the input fills the card */
 html.se-community-market:not(#se-none) .market_search_sidebar_search_box :is(div:has(input), input) {
   box-sizing: border-box;
@@ -120,37 +116,9 @@ html.se-community-market:not(#se-none) #market_search_advanced_show {
   width: auto !important;
 }
 
-html.se-community-market .market_search_sidebar_search_box > div::before {
-  content: "";
-  position: absolute;
-  z-index: var(--se-z-raised);
-  top: 50%;
-  left: 14px;
-  width: 16px;
-  height: 16px;
-  margin-top: calc(-1 * var(--se-space-2));
-  background: var(--se-text-faint);
-  -webkit-mask: var(--se-mkt-icon-search) center / contain no-repeat;
-  pointer-events: none;
-}
-
+/* The field: the shared search field (web/shared/search-field.css; page.js tags it) */
 html.se-community-market:not(#se-none) #market_search input {
-  box-sizing: border-box;
-  width: 100% !important;
-  height: var(--se-ctl) !important;
-  padding: 0 var(--se-space-4) 0 2.5rem !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-control) !important;
-  background: var(--se-field-bg) !important;
-  box-shadow: var(--se-field-edge) !important;
-  color: var(--se-text) !important;
-  font: var(--se-type-control) !important;
-  outline: 0 !important;
-  transition: box-shadow var(--se-dur);
-}
-
-html.se-community-market:not(#se-none) #market_search input:focus {
-  box-shadow: var(--se-field-edge-focus) !important;
+  --se-search-h: var(--se-ctl);
 }
 
 html.se-community-market:not(#se-none) .market_search_advanced_button {
@@ -165,7 +133,7 @@ html.se-community-market:not(#se-none) .market_search_advanced_button {
   border: 0 !important;
   border-radius: var(--se-radius-control);
   background: var(--se-pill) !important;
-  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line);
+  box-shadow: var(--se-btn-edge);
   color: var(--se-text-dim) !important;
   font: var(--se-type-label) !important;
   cursor: pointer;
@@ -196,40 +164,9 @@ html.se-community-market .se-mkt-filter {
   margin: 0 0 var(--se-space-2);
 }
 
-html.se-community-market .se-mkt-filter::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 12px;
-  width: 14px;
-  height: 14px;
-  margin-top: calc(-1 * var(--se-space-2));
-  background: var(--se-text-faint);
-  -webkit-mask: var(--se-mkt-icon-search) center / contain no-repeat;
-  pointer-events: none;
-}
-
+/* The filter field: the shared search field (page.js tags it), as wide as the column */
 html.se-community-market .se-mkt-filter-input {
-  box-sizing: border-box;
   width: 100%;
-  height: var(--se-ctl);
-  padding: 0 var(--se-space-3) 0 var(--se-space-6);
-  border: 0;
-  border-radius: var(--se-radius-control);
-  background: var(--se-field-bg);
-  box-shadow: var(--se-field-edge);
-  color: var(--se-text);
-  font: var(--se-type-label);
-  outline: 0;
-  transition: box-shadow var(--se-dur);
-}
-
-html.se-community-market .se-mkt-filter-input::placeholder {
-  color: var(--se-text-faint);
-}
-
-html.se-community-market .se-mkt-filter-input:focus {
-  box-shadow: var(--se-field-edge-focus);
 }
 
 html.se-community-market .se-mkt-filter-input::-webkit-search-cancel-button {

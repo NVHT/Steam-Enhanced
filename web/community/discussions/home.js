@@ -255,8 +255,7 @@
         pill.style.opacity = '0';
         return;
       }
-      setVar(pill, '--x', `${active.offsetLeft}px`);
-      setVar(pill, '--w', `${active.offsetWidth}px`);
+      dom.slidePill(pill, { x: active.offsetLeft, w: active.offsetWidth });
       pill.style.opacity = '1';
     };
 

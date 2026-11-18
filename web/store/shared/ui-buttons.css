@@ -195,6 +195,13 @@ html.se-store-search:not(#se-none) .searchbar_left > button:is(:disabled, [aria-
   transform: none;
 }
 
+/* Steam's disabled buttons (.btn_disabled on a btnv6_ button), anywhere on the store */
+html.se-store:not(#se-none) [class*="btnv6_"].btn_disabled {
+  opacity: var(--se-btn-disabled-opacity);
+  cursor: default;
+  pointer-events: none;
+}
+
 /* ==========================================================================
  * Accent chips: an active filter, or a tag that is an action (Demo Available), a chip in the
  * accent's tint. Members set --se-accent-chip-h where they sit in a row of other controls; an
@@ -212,7 +219,7 @@ html.se-store-search:not(#se-none) .termcontainer .searchtag:not(#searchtag_tmpl
   border: 0;
   border-radius: var(--se-radius-control);
   background: var(--se-accent-tint);
-  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  box-shadow: var(--se-edge-accent);
   color: var(--se-accent);
   font: var(--se-chip-font);
   text-decoration: none;

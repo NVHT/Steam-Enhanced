@@ -101,9 +101,7 @@
       pill.hidden = !selected;
       if (!selected) return;
       // offset* are relative to the tab row (position: relative); --y follows a wrapped row.
-      dom.setVar(pill, '--x', `${selected.offsetLeft}px`);
-      dom.setVar(pill, '--y', `${selected.offsetTop}px`);
-      dom.setVar(pill, '--w', `${selected.offsetWidth}px`);
+      dom.slidePill(pill, { x: selected.offsetLeft, y: selected.offsetTop, w: selected.offsetWidth });
     });
 
     place();
