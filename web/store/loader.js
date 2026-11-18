@@ -93,7 +93,7 @@
       { css: 'shared/sale/sale-browser.css' },
       { css: 'front/hero.css', js: 'front/hero.js', on: ['front'] },
       { css: 'shared/rows.css', js: 'shared/rows.js', on: ['rows'] },
-      { css: 'front/sections.css', on: ['front'] },
+      { css: 'front/sections.css', js: 'front/sections.js', on: ['front'] },
       { css: 'front/tabs.css', js: 'front/tabs.js', on: ['front'] },
       { js: 'app/deck.js', on: ['app'] },
       { css: 'app/hero.css', js: 'app/hero.js', on: ['app'] },

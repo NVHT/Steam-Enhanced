@@ -682,3 +682,31 @@ html.se-store-rows:not(#se-none) .mzAzU7-I6qg- img {
 html.se-store-rows:not(#se-none) .mzAzU7-I6qg-:hover img {
   transform: scale(1.03);
 }
+
+/* ---------- Take-under banner ----------
+ * The sponsored band under the hero, at the page's full width and the image's own proportions
+ * (front/sections.js reads the ratio). Only once sized: until then Steam's own sizing stays.
+ */
+/* !important: Steam's page CSS sizes the band and its holder in px */
+html.se-store-front #home_takeunder_ctn:has([data-se-takeunder]),
+html.se-store-front #home_takeunder_ctn .home_page_content.takeunder:has(> [data-se-takeunder]) {
+  height: auto !important;
+}
+
+html.se-store-front #home_takeunder_ctn .home_page_content.takeunder:has(> [data-se-takeunder]) {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* !important: Steam's page CSS caps the link's size in px */
+html.se-store-front a.home_page_takeunder[data-se-takeunder] {
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+  max-height: none !important;
+  aspect-ratio: var(--se-takeunder-ratio);
+  border-radius: var(--se-radius-card);
+  background-size: cover !important;
+  background-position: center !important;
+}

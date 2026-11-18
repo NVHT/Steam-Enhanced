@@ -568,7 +568,7 @@
       seen.observe(hero);
       life.add(() => seen.disconnect());
 
-      return { element: hero, start: () => go(0) };
+      return { element: hero, start: () => go(0), refresh };
     };
 
     /* ---------- Mount ---------- */
@@ -663,12 +663,43 @@
     const MEDIA = 'img, picture, video, canvas, iframe';
     const PROBE_DELAYS_MS = [0, 500, 2000];
 
+    /*
+     * The art the takeover paints is also the slide's last resort: a sale or event takeover
+     * (a Fest) has no library hero, page background or header under its appid, so without it
+     * the slide had no art at all. Read before it is hidden or stripped (the marks' rules
+     * remove background images), from the takeover's own holders and the hero's containers.
+     */
+    const TAKEOVER_SOURCES = '.home_page_takeover_link, #page_background_holder, .page_background_holder, .fullscreen-bg, [data-se-takeover-art]';
+    const URL_IN_CSS = /url\(\s*["']?([^"')]+?)["']?\s*\)/g;
+
+    const paintedURLs = (node) => {
+      const urls = [];
+      for (const pseudo of [null, '::before', '::after']) {
+        for (const [, url] of getComputedStyle(node, pseudo).backgroundImage.matchAll(URL_IN_CSS)) urls.push(url);
+      }
+      if (node.matches('img')) urls.push(node.currentSrc || node.src);
+      if (node.matches('video')) urls.push(node.poster);
+      return urls.filter((url) => /^https?:/.test(url));
+    };
+
     const isClear = (color) => /^(transparent|rgba\(.*,\s*0\))$/.test(color);
     const hasImage = (node) =>
       [null, '::before', '::after'].some((pseudo) => getComputedStyle(node, pseudo).backgroundImage !== 'none');
     const paintsArt = (node) => node.matches(MEDIA) || hasImage(node) || !isClear(getComputedStyle(node).backgroundColor);
 
-    const hideTakeoverArt = (hero) => {
+    const hideTakeoverArt = (hero, onArt) => {
+      const found = new Set();
+      const collectArt = () => {
+        const before = found.size;
+        const nodes = [];
+        for (let node = hero.parentElement; node; node = node.parentElement) nodes.push(node);
+        for (const holder of document.querySelectorAll(TAKEOVER_SOURCES)) nodes.push(holder, ...holder.querySelectorAll('*'));
+        for (const node of nodes) {
+          if (!dom.isOwn(node)) paintedURLs(node).forEach((url) => found.add(url));
+        }
+        if (found.size > before) onArt([...found]);
+      };
+
       const pageColor = () => getComputedStyle(document.querySelector('.responsive_page_template_content') ?? document.body).backgroundColor;
 
       const probeContainers = () => {
@@ -732,6 +763,7 @@
 
       const probe = () => {
         if (!life.alive) return;
+        collectArt();
         probeContainers();
         probeLayers();
         unloadVideos();
@@ -763,7 +795,16 @@
         hero.element.remove();
         root.classList.remove('se-cinema-on', 'se-takeover');
       });
-      if (takeover) hideTakeoverArt(hero.element);
+      if (takeover) {
+        // The takeover's own art goes in before header.jpg, the smallest candidate.
+        hideTakeoverArt(hero.element, (urls) => {
+          const fresh = urls.filter((url) => !takeover.art.includes(url));
+          if (!fresh.length) return;
+          const at = takeover.art.findIndex((url) => url.endsWith('/header.jpg'));
+          takeover.art.splice(at < 0 ? takeover.art.length : at, 0, ...fresh);
+          hero.refresh(takeover);
+        });
+      }
       hero.start();
     };
 
