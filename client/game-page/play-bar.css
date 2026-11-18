@@ -87,6 +87,34 @@
 }
 
 /*
+ * The main button's other states, in PLAY's recipe: blue (Install, Update, Resume…: not Green,
+ * not Disabled, not running) as the Home stage's INSTALL; red STOP while the game runs
+ * (play-bar.js marks data-se-action); a flat grey when there's nothing to do. !important as
+ * the green one: dialogs.css gives every DialogButton its own background with !important.
+ */
+:is(._1U7LKpx70kEsz3jJwAFOi-, ._39RheXihcN6H2k2muQTjkI) ._1FnJ6dPuknQFQ2RTpKTI16:not(._3cI5TXsFX3bvpR-7EBOtxq, ._1Pb6PMh_3L5p5NzuUz0Pp9, [data-se-action]) ._3ydigb6zZAjJ0JCDgHwSYA:not(._1WVYDQv_srgKP95rVG1cX-, #se-none) {
+  /* PlayButtonContainer without Green, Disabled or STOP > PlayButton (not the X beside it) */
+  background: var(--se-install-fill) !important;
+  box-shadow: inset 0 1px 0 var(--se-white-25);
+}
+
+:is(._1U7LKpx70kEsz3jJwAFOi-, ._39RheXihcN6H2k2muQTjkI) ._1FnJ6dPuknQFQ2RTpKTI16[data-se-action="stop"] ._3ydigb6zZAjJ0JCDgHwSYA:not(._1WVYDQv_srgKP95rVG1cX-, #se-none) {
+  background: var(--se-stop-fill) !important;
+  box-shadow: inset 0 1px 0 var(--se-white-25);
+}
+
+:is(._1U7LKpx70kEsz3jJwAFOi-, ._39RheXihcN6H2k2muQTjkI) ._1FnJ6dPuknQFQ2RTpKTI16._1Pb6PMh_3L5p5NzuUz0Pp9 ._3ydigb6zZAjJ0JCDgHwSYA:not(#se-none) {
+  /* Disabled: no glow, no highlight, the word dimmed */
+  background: var(--se-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+}
+
+:is(._1U7LKpx70kEsz3jJwAFOi-, ._39RheXihcN6H2k2muQTjkI) ._1FnJ6dPuknQFQ2RTpKTI16._1Pb6PMh_3L5p5NzuUz0Pp9 ._3ydigb6zZAjJ0JCDgHwSYA:not(#se-none) :is(*, svg, svg *) {
+  color: var(--se-text-faint) !important;
+  fill: var(--se-text-faint) !important;
+}
+
+/*
  * Every stat in the bar gets the same small icon, drawn by the theme (Steam's
  * own icons differ in size and color, and some stats have none). Achievements get a
  * gold progress ring (client/game-page/achievements.js sets --se-pct) instead of the bar beside the count.

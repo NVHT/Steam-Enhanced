@@ -1,6 +1,7 @@
 /*
  * Header: play bar icons, stat kinds, the game status, the "and N more" developer names,
- * labels and the game logo sized to its visible pixels (--se-logo-crop).
+ * labels, the main button's STOP state and the game logo sized to its visible pixels
+ * (--se-logo-crop).
  */
 ((SE) => {
   const ns = window.__seGamePageParts;
@@ -156,6 +157,27 @@
     }
   }
 
+  /*
+   * The main button's state Steam gives no class for: STOP (this game is running) is drawn
+   * like Install (not Green). Marked data-se-action="stop" for play-bar.css's red recipe.
+   * PlayButtonContainer and Green are Steam's (SteamTracking sp.css), not in the classmap.
+   */
+  const PLAY_CONTAINER = '._1FnJ6dPuknQFQ2RTpKTI16';
+  const PLAY_GREEN = '._3cI5TXsFX3bvpR-7EBOtxq';
+
+  function placePlayAction() {
+    const id = +(location.href.match(/\/app\/(\d+)/) || [])[1] || 0;
+    const running =
+      id > 0 &&
+      [...SE.owners()].some((owner) =>
+        SE.run(() => owner.SteamUIStore?.RunningApps?.some((game) => Number(game.appid) === id))
+      );
+    for (const el of document.querySelectorAll(PLAY_CONTAINER)) {
+      if (running && !el.matches(PLAY_GREEN)) mark(el, 'data-se-action', 'stop');
+      else unmark(el, 'data-se-action');
+    }
+  }
+
   function placeLabels() {
     for (const labelEl of document.querySelectorAll(`.${C.ConciseContainer_Container} .${C.Label}`)) {
       const word = labelEl.textContent.trim().replace(/\s*[:：]\s*$/, '');
@@ -285,7 +307,7 @@
   }
 
   Object.assign(ns, {
-    LOGO_CROP, onLogoLoad, placeLabels, placeMoreNames, placePlayBarIcons, placeStatKinds,
-    placeStatus, sizeLogos, stopLogos,
+    LOGO_CROP, onLogoLoad, placeLabels, placeMoreNames, placePlayAction, placePlayBarIcons,
+    placeStatKinds, placeStatus, sizeLogos, stopLogos,
   });
 })(window.__se);
