@@ -816,13 +816,19 @@
 
   /*
    * The theme's one popup menu, in a panel (above a browser page too). One open at a time.
-   *   items   rows [{ label, run, state, icon, hint, keys, checked }], with { heading } and
-   *           { separator: true } between them. state goes on the row as data-state with an <i>
-   *           before the label for the caller's mark (the dock's status dots); icon is a mask
-   *           token's name (a duotone icon); hint a line under the label; keys a shortcut at
-   *           the row's end; checked (true / false) makes the row an on/off setting, with a
-   *           switch at its end (role menuitemcheckbox) that run flips; current marks the
-   *           row for the page you're on (aria-current, the accent)
+   *   items   rows [{ label, run, state, icon, art, hint, keys, time, unread, external, checked }],
+   *           with { heading, action }, { separator: true } and { note } between them. state
+   *           goes on the row as data-state with an <i> before the label for the caller's mark
+   *           (the dock's status dots); icon is a mask token's name (a duotone icon); art an
+   *           image URL drawn as a tile at the row's start (the icon in the tile while it's
+   *           missing or fails; '' for the icon's tile alone); hint a line under the label;
+   *           keys a shortcut at the row's end; time a short time at the row's end; unread
+   *           (true / false) an accent dot after it; external a mark that the row opens
+   *           outside; checked (true / false) makes the row an on/off setting, with a switch at
+   *           its end (role menuitemcheckbox) that run flips; current marks the row for the
+   *           page you're on (aria-current, the accent). A heading's action ({ label, run })
+   *           is a small button at its end: run(handle), the menu staying open. A note is a
+   *           line of plain text (an empty state).
    *   at      where: a spot for show() ({ left | right, top }, or a function of the menu's size)
    *   options { sheets: the theme files styling the marks; owner: the button that opened it,
    *           whose press never counts as an outside click (it toggles) and which carries
@@ -830,7 +836,8 @@
    * Keys: in the page the rows take focus; a popup window never does, so the main window hears
    * Up / Down / Enter / Escape and moves a highlight ([data-se-active]) through the rows. A menu
    * opens with no row lit: only the pointer or the keys light one.
-   * Returns { release(), released }, or null when no panel could open.
+   * Returns { release(), update(items), released }, or null when no panel could open. update
+   * draws new rows in place, without the opening animation.
    */
   let openMenu = null;
 
@@ -909,6 +916,7 @@
     const open = panel({ sheets });
     if (!open) return null;
     let rows = [];
+    let shown = null;
     let index = -1;
     let released = false;
     const leaving = closeOnLeave && owner ? leaveCloser(owner, () => handle.release()) : null;
@@ -935,7 +943,7 @@
 
     const onPointer = (event) => {
       const target = event.target;
-      if (rows[0]?.parentElement?.contains(target) || owner?.contains(target)) return;
+      if (shown?.contains(target) || owner?.contains(target)) return;
       handle.release();
     };
 
@@ -949,29 +957,54 @@
         leaving?.dispose();
         SE.attr(owner, 'aria-expanded', 'false');
         // In the page it fades out first; a popup window's goes at once (its spare is reused)
-        const list = rows[0]?.parentElement;
-        if (list?.ownerDocument === document) closeWith(list, () => open.release());
+        if (shown?.ownerDocument === document) closeWith(shown, () => open.release());
         else open.release();
+      },
+      update(next) {
+        if (handle.released) return;
+        index = -1;
+        open.show(at, build(next, true));
       },
       get released() {
         return released || open.released;
       },
     };
 
-    open.show(at, (container) => {
+    const build = (entries, redraw = false) => (container) => {
       const doc = container.ownerDocument;
       const list = doc.createElement('div');
       list.className = 'se-menu';
       list.setAttribute('role', 'menu');
+      if (redraw) list.setAttribute('data-se-redraw', '');
       const part = (tag, className, text) => {
         const node = doc.createElement(tag);
         node.className = className;
         if (text != null) node.textContent = text;
         return node;
       };
-      for (const item of items) {
+      const maskIcon = (token) => {
+        const icon = part('span', 'se-menu-icon');
+        icon.setAttribute('aria-hidden', 'true');
+        icon.style.setProperty('--se-menu-mask', `var(${token})`);
+        return icon;
+      };
+      for (const item of entries) {
         if (item.heading) {
-          list.append(part('div', 'se-menu-heading', item.heading));
+          const heading = part('div', 'se-menu-heading', item.heading);
+          if (item.action) {
+            const action = part('button', 'se-menu-heading-action', item.action.label);
+            action.type = 'button';
+            action.addEventListener('click', (event) => {
+              event.stopPropagation();
+              item.action.run(handle);
+            });
+            heading.append(action);
+          }
+          list.append(heading);
+          continue;
+        }
+        if (item.note) {
+          list.append(part('div', 'se-menu-note', item.note));
           continue;
         }
         if (item.separator) {
@@ -988,11 +1021,22 @@
           row.dataset.state = item.state;
           row.append(doc.createElement('i'));
         }
-        if (item.icon) {
-          const icon = part('span', 'se-menu-icon');
-          icon.setAttribute('aria-hidden', 'true');
-          icon.style.setProperty('--se-menu-mask', `var(${item.icon})`);
-          row.append(icon);
+        if (item.art != null) {
+          const tile = part('span', 'se-menu-art');
+          tile.setAttribute('aria-hidden', 'true');
+          if (item.icon) tile.append(maskIcon(item.icon));
+          if (item.art) {
+            const img = doc.createElement('img');
+            img.alt = '';
+            img.draggable = false;
+            img.decoding = 'async';
+            img.addEventListener('error', () => img.remove(), { once: true });
+            img.src = item.art;
+            tile.append(img);
+          }
+          row.append(tile);
+        } else if (item.icon) {
+          row.append(maskIcon(item.icon));
         }
         const text = part('span', 'se-menu-text');
         text.append(part('span', 'se-menu-label', item.label));
@@ -1002,6 +1046,16 @@
         }
         row.append(text);
         if (item.keys) row.append(part('kbd', 'se-menu-keys', item.keys));
+        if (item.time) row.append(part('span', 'se-menu-time', item.time));
+        if (typeof item.unread === 'boolean') {
+          row.toggleAttribute('data-unread', item.unread);
+          row.append(part('span', 'se-menu-dot'));
+        }
+        if (item.external) {
+          const mark = part('span', 'se-menu-external');
+          mark.setAttribute('aria-hidden', 'true');
+          row.append(mark);
+        }
         if (typeof item.checked === 'boolean') {
           row.setAttribute('role', 'menuitemcheckbox');
           row.setAttribute('aria-checked', String(item.checked));
@@ -1017,9 +1071,12 @@
         list.append(row);
       }
       container.append(list);
+      shown = list;
       leaving?.watch(list);
       rows = [...list.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"]')];
-    });
+    };
+
+    open.show(at, build(items));
 
     openMenu = handle;
     addEventListener('keydown', onKey, true);

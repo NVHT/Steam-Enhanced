@@ -1,7 +1,7 @@
 /*
  * Navigation, part 4 of 4, listed last (window.__seNavParts; client/navigation/title-bar-search.js
- * names the parts): routing, the rail's page icons and their section menus (opened on click),
- * and the update loop that runs every part.
+ * names the parts): routing, the rail's page icons and their section menus (opened on click;
+ * a right click runs the menu's first row), and the update loop that runs every part.
  */
 ((SE) => {
   const { C, railMode, mainWindow, navigate: goLibrary } = SE;
@@ -391,6 +391,25 @@
     if (!toggleNavMenu(key, node) && entry.click) activateTarget(entry.click);
   }
 
+  /*
+   * A right click skips the menu: the section's first row runs at once (Store: Featured,
+   * Library: Home, Community: Home, Profile: your profile), or its fixed page if Steam's items
+   * can't be read.
+   */
+  function onNavContext(event) {
+    if (!railMode()) return;
+    const node = event.currentTarget;
+    const key = node.getAttribute('data-se-icon');
+    const entry = NAV_ITEMS[key];
+    if (!entry) return;
+    event.preventDefault();
+    event.stopPropagation();
+    closeNavMenu();
+    const first = sectionRows(key, node)?.find((row) => typeof row.run === 'function');
+    if (first) first.run();
+    else if (entry.click) activateTarget(entry.click);
+  }
+
   function bindNavItems() {
     for (const key of Object.keys(NAV_ITEMS)) {
       if (NAV_ITEMS[key].items) continue; // Games: a button at the rail's foot (header-actions.js)
@@ -398,8 +417,10 @@
       const prev = navNodes.get(key);
       if (node !== prev) {
         prev?.removeEventListener('click', onNavClick, true);
+        prev?.removeEventListener('contextmenu', onNavContext, true);
         if (node) {
           node.addEventListener('click', onNavClick, true);
+          node.addEventListener('contextmenu', onNavContext, true);
           node.setAttribute('aria-haspopup', 'menu');
           navNodes.set(key, node);
         } else {
@@ -448,6 +469,7 @@
     closeNavMenu();
     for (const node of navNodes.values()) {
       node.removeEventListener('click', onNavClick, true);
+      node.removeEventListener('contextmenu', onNavContext, true);
       node.removeAttribute('aria-haspopup');
     }
     navNodes.clear();

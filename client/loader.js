@@ -63,7 +63,7 @@
     // Shared runtime pieces
     ['all', 'core/', ['font.css', 'tokens.css', 'icons-nav.css', 'icons-ui.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
     ['all', 'client/shared/', ['popup-layer.css', 'search-field.css', 'segmented.css']],
-    ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'column-resize.css', 'column-resize.js']],
+    ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'news-feed.js', 'column-resize.css', 'column-resize.js']],
     ['notify', 'client/friends/', ['friend-notification-clicks.js']],
     // In-game overlay
     ['overlay', 'client/overlay/', [
@@ -90,7 +90,7 @@
     ['main', 'client/header/', ['header-actions.css', 'header-actions.js']],
     ['main', 'client/browser/', ['url-bar.css', 'url-bar.js']],
     ['main', 'client/navigation/', ['icons.css']],
-    ['main', 'client/header/', ['header-tooltips.js', 'downloads-card.css', 'downloads-card.js']],
+    ['main', 'client/header/', ['header-tooltips.js', 'downloads-card.css', 'downloads-card.js', 'announcements.js']],
     ['main', 'client/navigation/', ['sidebar-icons.css', 'sidebar-icons.js']],
     ['main', 'client/header/menu/', [
       'shared.js', 'api.js', 'menus.js', 'account.js', 'actions.js', 'hover.js', 'popups.js',

@@ -266,3 +266,116 @@ html.se-layer-document .se-layer-wrap > *:not(#se-none) {
   background: var(--se-bg-ink);
   transform: translateX(calc(var(--se-switch-w) - var(--se-switch-h)));
 }
+
+/* Redrawn in place (update()): no second opening animation */
+.se-menu[data-se-redraw] {
+  animation: none;
+}
+
+/*
+ * Feed rows (the Announcements menu): the art as a 32px tile at the start, as the notifications
+ * panel draws it (client/header/notifications.css), the time and an unread dot at the end. The
+ * menu keeps one width; long names and hints end in an ellipsis.
+ */
+.se-menu:has(.se-menu-art) {
+  width: 360px;
+}
+
+.se-menu button:has(.se-menu-art) {
+  height: auto;
+  min-height: 44px;
+  gap: var(--se-space-3);
+  /* !important: the row's own padding is, against Steam's button styles */
+  padding: var(--se-space-1) var(--se-space-2) !important;
+}
+
+.se-menu button:has(.se-menu-art) .se-menu-text {
+  flex: 1 1 auto;
+}
+
+.se-menu button:has(.se-menu-art) :is(.se-menu-label, .se-menu-hint) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.se-menu-art {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  color: var(--se-text-muted);
+  overflow: hidden;
+}
+
+.se-menu-art > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.se-menu-time {
+  flex: none;
+  margin-left: auto;
+  padding-left: var(--se-space-2);
+  font: 600 var(--se-fs-xs) / 1 var(--se-font);
+  color: var(--se-text-faint);
+}
+
+/* The dot keeps its place on read rows, so every time lines up */
+.se-menu-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--se-accent);
+  visibility: hidden;
+}
+
+.se-menu button[data-unread] .se-menu-dot {
+  visibility: visible;
+}
+
+.se-menu button[data-unread] .se-menu-label {
+  color: var(--se-text-strong);
+}
+
+.se-menu-external {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin-left: auto;
+  background: var(--se-text-faint);
+  -webkit-mask: var(--se-icon-external) center / contain no-repeat;
+  mask: var(--se-icon-external) center / contain no-repeat;
+}
+
+/* A heading's action at its end (Mark all read) */
+.se-menu-heading:has(.se-menu-heading-action) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: var(--se-space-1);
+}
+
+/* !important: the menu rows' button styles above are, against Steam's */
+.se-menu .se-menu-heading-action {
+  height: 24px;
+  padding: 0 var(--se-space-1) !important;
+  font: 600 var(--se-fs-xs) / 24px var(--se-font) !important;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--se-text-faint) !important;
+}
+
+/* An empty state: plain text, not a row */
+.se-menu-note {
+  padding: var(--se-space-3) var(--se-space-2);
+  font: 500 var(--se-fs-sm) / 1.3 var(--se-font);
+  color: var(--se-text-faint);
+}

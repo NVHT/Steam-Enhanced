@@ -635,7 +635,7 @@
   }
 
   /*
-   * Games: a button at the rail's foot, between the bell and Downloads, opening the Games menu
+   * Games: a button at the rail's foot, between Announcements and Downloads, opening the Games menu
    * (Steam's Games items, laid out in client/navigation/nav-rail.js) beside it.
    */
   function onGames() {
