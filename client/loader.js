@@ -63,7 +63,7 @@
     // Shared runtime pieces
     ['all', 'core/', ['font.css', 'tokens.css', 'icons-nav.css', 'icons-ui.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
     ['all', 'client/shared/', ['popup-layer.css', 'search-field.css', 'segmented.css']],
-    ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'news-feed.js', 'column-resize.css', 'column-resize.js']],
+    ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'news-feed.js', 'column-resize.css', 'column-resize.js', 'window-fold.js']],
     ['notify', 'client/friends/', ['friend-notification-clicks.js']],
     // In-game overlay
     ['overlay', 'client/overlay/', [

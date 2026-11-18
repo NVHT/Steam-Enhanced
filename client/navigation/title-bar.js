@@ -30,7 +30,7 @@
   let listBrand;
   let listBrandWidth = -1;
 
-  /* Read once; updates go to memory and storage together */
+  /* The saved choice. Read once; updates go to memory and storage together */
   let listHidden = (() => {
     try {
       return localStorage.getItem(HIDE_KEY) === '1';
@@ -39,12 +39,24 @@
     }
   })();
 
-  const isListHidden = () => listHidden;
+  /*
+   * Small windows (1000 px and under) hide the list (client/shared/window-fold.js). The
+   * toggle shows it there until the window crosses the breakpoint; the saved choice is only
+   * changed on a big window, and comes back once the window grows again.
+   */
+  const LIST_FOLD_AT = 1000;
+  const listFold = SE.windowFold(LIST_FOLD_AT, () => ns.schedule());
 
-  const setListHidden = (hidden) => {
-    listHidden = hidden;
+  const isListHidden = () => (listFold.small ? !listFold.held : listHidden);
+
+  const toggleListHidden = () => {
+    if (listFold.small) {
+      listFold.toggle();
+      return;
+    }
+    listHidden = !listHidden;
     try {
-      localStorage.setItem(HIDE_KEY, hidden ? '1' : '0');
+      localStorage.setItem(HIDE_KEY, listHidden ? '1' : '0');
     } catch {}
   };
 
@@ -233,7 +245,7 @@
       listToggleBtn.innerHTML =
         '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9 4v16"/></svg>';
       listToggleBtn.addEventListener('click', () => {
-        setListHidden(!isListHidden());
+        toggleListHidden();
         ns.schedule();
       });
     }
@@ -356,6 +368,7 @@
       removeEventListener('resize', ns.schedule);
       document.removeEventListener('scroll', onListScroll, { capture: true });
       cleanup();
+      listFold.destroy();
       listResize?.destroy();
       listResize = null;
     },

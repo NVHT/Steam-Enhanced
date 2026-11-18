@@ -153,6 +153,7 @@
     dockHidden: store.get('se-fdock-hidden', '0') === '1',
     manualWindowOpen: 0,
     allowNativeWindow: false,
+    // Open or rail as drawn; the saved choice is store 'se-fdock' (small windows fold it, ui.js)
     mode: store.get('se-fdock', 'open'),
     view: 'steam',
     steamError: '',

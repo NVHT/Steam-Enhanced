@@ -192,8 +192,10 @@
    * Column widths: the game list (also Downloads' list and the game page's left column) and the
    * Friends dock share one default. Each is a setting, Fixed or Adjustable: Adjustable reads the
    * width dragged on the column's edge (options/library/, options/friends/).
+   * The default scales with the window on one line through 280 px at a 1280 px window and
+   * 350 px at 2560 (4K at 150%), held between 280 and 420: about 315 at 1920, 420 at 3840.
    */
-  --se-col-w: 350px;
+  --se-col-w: clamp(280px, 210px + 5.46875vw, 420px);
   --se-fd-w: var(--se-col-w);
   --se-list-w: var(--se-col-w);
   --se-fd-rail: 60px;

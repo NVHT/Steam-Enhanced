@@ -113,14 +113,35 @@
 
   const steamURL = (url) => run(() => window.SteamClient.URL.ExecuteSteamURL(url));
 
-  function setMode(m) {
+  function applyMode(m) {
     state.mode = m;
-    store.set('se-fdock', m);
     hideFly(true);
     state.sig = '';
     ns.place();
     // The title bar's Friends & Chat button names what its click does next
     window.__seHeaderActions?.syncFriendsButton?.();
+  }
+
+  /*
+   * Small windows (1400 px and under) fold the dock to its rail (client/shared/window-fold.js).
+   * Expanding it there holds it open until the window crosses the breakpoint; the saved
+   * choice is only changed on a big window, and comes back once the window grows again.
+   */
+  const DOCK_FOLD_AT = 1400;
+  const savedMode = () => store.get('se-fdock', 'open');
+  const foldedMode = () => (live.fold.held ? 'open' : 'rail');
+  live.fold = SE.windowFold(DOCK_FOLD_AT, () => {
+    if (!state.destroyed) applyMode(live.fold.small ? foldedMode() : savedMode());
+  });
+  if (live.fold.small) state.mode = foldedMode();
+
+  function setMode(m) {
+    if (live.fold.small) {
+      if ((m === 'open') !== live.fold.held) live.fold.toggle();
+    } else {
+      store.set('se-fdock', m);
+    }
+    applyMode(m);
   }
 
   /*

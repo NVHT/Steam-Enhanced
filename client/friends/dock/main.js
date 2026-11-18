@@ -334,6 +334,7 @@
       steamHost.removeEventListener('mouseout', ns.friendCard.out);
       ns.friendCard.dispose();
       dockResize?.destroy();
+      live.fold?.destroy();
       dock.remove();
       fly.remove();
       own.textContent = '';
