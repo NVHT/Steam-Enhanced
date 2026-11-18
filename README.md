@@ -29,7 +29,7 @@
 
 <br>
 
-Steam Enhanced rebuilds the Steam client around your library: a navigation rail, a cinematic Home stage, two-column game pages, a Friends dock that stays in reach and an overlay that matches. The Store, Community and Support pages follow in the same look.
+Steam Enhanced rebuilds the Steam client around your library. A slim navigation rail, a cinematic Home you set up yourself, two-column game pages, a Friends dock that stays in reach and an in-game overlay to match. The Store, Community and Support pages follow in the same look, so every window feels like one app.
 
 > [!NOTE]
 > Steam still runs underneath. Your library, data and settings behave exactly as Steam intends.
@@ -44,25 +44,27 @@ Steam Enhanced rebuilds the Steam client around your library: a navigation rail,
 1. Download the [latest release](https://github.com/NVHT/Steam-Enhanced/releases/latest).
 2. Exit Steam from **Steam → Exit**.
 3. Extract the `Steam-Enhanced` folder into `<Steam>/millennium/themes/`, so you end up with `themes/Steam-Enhanced/skin.json`.
-4. Start Steam, go to **Millennium → Themes** and select **Steam Enhanced**.
+4. Start Steam, open **Millennium → Themes** and select **Steam Enhanced**.
 
 > [!TIP]
 > **Updating?** With Steam closed, delete the old `Steam-Enhanced` folder before extracting. Merging leaves stale files behind.
 
+> [!NOTE]
+> Works at any window size: the layout scales with it, and on small windows the Friends dock and game list fold away.
+
 ### Optional plugins
+
+The theme styles these when they're installed, so they look built in.
 
 | Plugin | What it adds | Shows up in |
 | --- | --- | --- |
-| **[HLTB for Millennium](https://github.com/jcdoll/hltb-millennium-plugin)**<br><sub><code>jcdoll/hltb-millennium-plugin</code></sub> | HowLongToBeat completion times for each game | Game page |
+| **[HLTB for Millennium](https://github.com/jcdoll/hltb-millennium-plugin)**<br><sub><code>jcdoll/hltb-millennium-plugin</code></sub> | HowLongToBeat completion times | Game page |
 | **[Extendium](https://github.com/BossSloth/Extendium)**<br><sub><code>BossSloth/Extendium</code></sub> | Chrome extensions inside Steam's browser | Steam's browser |
-| **[Size on Disk](https://github.com/k0d13/steam-size-on-disk)**<br><sub><code>k0d13/steam-size-on-disk</code></sub> | How much disk space each installed game takes | Game page · Settings |
+| **[Size on Disk](https://github.com/k0d13/steam-size-on-disk)**<br><sub><code>k0d13/steam-size-on-disk</code></sub> | Disk space taken by each installed game | Game page · Settings |
 | **[Player Count](https://github.com/swindlesmccoop/playercount-badge)**<br><sub><code>swindlesmccoop/playercount-badge</code></sub> | Live player counts, replacing the theme's own | Game page |
-| **[ProtonDB Library Badges](https://github.com/Yohlo/protondb-library-badges)**<br><sub><code>Yohlo/protondb-library-badges</code></sub> | ProtonDB compatibility tiers for Linux and Steam Deck | Game page · Library |
+| **[ProtonDB Library Badges](https://github.com/Yohlo/protondb-library-badges)**<br><sub><code>Yohlo/protondb-library-badges</code></sub> | ProtonDB tiers for Linux and Steam Deck | Game page · Library |
 | **[Achievement Manager](https://github.com/madmaxgrey/AchievementManager)**<br><sub><code>madmaxgrey/AchievementManager</code></sub> | Unlock and lock achievements | Game page · Its own window |
-| **[SteamGridDB](https://github.com/DevsNate/SteamGridDB-Millennium)**<br><sub><code>DevsNate/SteamGridDB-Millennium</code></sub> | Custom grids, heroes, logos and icons from SteamGridDB | Its own window |
-
-> [!NOTE]
-> Built for a Steam window at least **1920 px** wide, or **1600 px** with the Friends dock collapsed. That's your screen width divided by display scaling: 1920×1080 at 100%, 2560×1440 up to 125%, 4K up to 200%. Narrower windows work, but parts of Library Home may hide.
+| **[SteamGridDB](https://github.com/DevsNate/SteamGridDB-Millennium)**<br><sub><code>DevsNate/SteamGridDB-Millennium</code></sub> | Custom grids, heroes, logos and icons | Its own window |
 
 <br>
 
@@ -72,11 +74,11 @@ Steam Enhanced rebuilds the Steam client around your library: a navigation rail,
   <tr>
     <td width="33%" valign="top">
       <h3>Library Home</h3>
-      <sub>Drawn entirely by the theme: a cinematic hero stage over your recent games, favourites, a collection or your newest games, set up from its own settings button, and a board of panels under it (news, favourites, collections, friends playing, achievements, games not played yet) that never scrolls.</sub>
+      <sub>A cinematic stage for your recent games, favourites, a collection or your newest additions, over a board of panels: Favorites, Collections, Recently added and Friend activity. It fits the window and never scrolls, and you set all of it up from its own menu.</sub>
     </td>
     <td width="33%" valign="top">
       <h3>Game pages</h3>
-      <sub>Two independent columns, HowLongToBeat bars and achievement rarity tiers from Legendary to Common. Finish a game and the banner turns gold: <b>Mastered</b>.</sub>
+      <sub>Two independent columns, HowLongToBeat bars and achievement rarity tiers from Legendary to Common. The play button turns red to stop a running game, and finishing a game turns the banner gold: <b>Mastered</b>.</sub>
     </td>
     <td width="33%" valign="top">
       <h3>Collections</h3>
@@ -86,7 +88,7 @@ Steam Enhanced rebuilds the Steam client around your library: a navigation rail,
   <tr>
     <td valign="top">
       <h3>Friends</h3>
-      <sub>A dock grouped by what friends are playing, collapsible to a slim rail. Click a friend and their Steam chat opens beside it.</sub>
+      <sub>A seamless dock grouped by what friends are playing, with favorites up top and offline friends out of the way. Fold it to a slim rail, hover an avatar for their card, click to chat beside it.</sub>
     </td>
     <td valign="top">
       <h3>Downloads</h3>
@@ -108,7 +110,7 @@ Steam Enhanced rebuilds the Steam client around your library: a navigation rail,
     </td>
     <td valign="top">
       <h3>Toasts</h3>
-      <sub>Notifications play on a small Home stage at the bottom centre, on the desktop and in game, with achievements in their rarity tier.</sub>
+      <sub>Notifications play on a small stage at the bottom centre, on the desktop and in game, with achievements in their rarity tier.</sub>
     </td>
   </tr>
 </table>
@@ -117,9 +119,12 @@ Steam Enhanced rebuilds the Steam client around your library: a navigation rail,
 
 | Area | What changes |
 | --- | --- |
-| **Navigation** | An icon-only rail: Store, Library, Community and Profile open menus of their pages, the one you're on lit. At its foot, notifications, a Downloads card, Settings and your avatar with your account menu. A title bar with library search and Friends. |
-| **Notifications** | Grouped by day, opened by hovering the bell. |
-| **Address bar** | A toolbar with a pill address field above store and Community pages. |
+| **Navigation** | An icon-only rail. Store, Library, Community and Profile open menus of their pages on click, or jump straight to the first one on right-click. At its foot: notifications, Announcements, Games, Downloads and Settings. |
+| **Title bar** | Library search with its view toggles inside, the Steam Enhanced lockup over the game list, your avatar with name and status (hover for your card, click for your account menu) and Friends &amp; Chat. |
+| **Announcements** | A news feed of Steam's posts and your games', with unread dots and Mark all read. |
+| **Notifications** | Grouped by day, in a panel that opens on click. |
+| **Menus** | Every menu the theme draws shares one look: grouped rows with an icon, a name and a hint, opening and closing with a little motion. |
+| **Address bar** | A toolbar with a pill address field above Store and Community pages. |
 | **Settings &amp; dialogs** | Steam Settings, App Properties, Millennium Settings, Library Manager, install, uninstall, backups and product activation. |
 | **System Information &amp; Report** | Spec tiles and section cards with jump chips and a filter. IPs, MACs and hardware IDs stay blurred until clicked. |
 
@@ -127,26 +132,43 @@ Steam Enhanced rebuilds the Steam client around your library: a navigation rail,
 
 ## ✦ Store, Community &amp; Support
 
-Every web page fills the window and shares the theme's cards, pills, glass chips and type, one search field (the client's) and one breadcrumb trail.
+Every web page fills the window and shares the theme's cards, glass chips, dropdowns and type, one search field (the client's) and one breadcrumb trail.
 
 | Area | What changes |
 | --- | --- |
-| **Store front** | A cinema hero from Featured &amp; Recommended with game tabs and a glass info bar, ranked lists beside a spotlight card, and a capsule store bar with hover menus of art tiles. |
+| **Store front** | A cinema hero from Featured &amp; Recommended with game tabs and a glass info bar, event takeover art, ranked lists beside a spotlight card, and a capsule store bar with hover menus of art tiles. |
 | **Game pages** | A title card over the hero art, one summary band with screenshots and features, the trailer as a card with a picker, and About This Game in a reader window. |
 | **Browse** | New &amp; Upcoming, Charts, Labs, DLC, Next Fest (with a live countdown), Steam Awards and Replay, plus sale and event pages. |
+| **Search** | Results as cards with aligned date, review and price columns, one toolbar for search and sort, and filters as folding cards. |
+| **Wishlist** | A filter column with search, sort, views and your top tags, item cards with review facts and tag pills, and the shared price chip beside Add to Cart (Purchase as a gift on someone else's). |
+| **Checkout** | The cart and checkout as one flow: item cards, a sticky total, payment details and Steam Points as cards, and Purchase as the one primary button. |
 | **Account** | One settings page with a sticky sidebar: Account details, Purchase History and Licenses with search and filters, Add Funds, Redeem, phone, country and Family View. |
 | **Legal** | The Subscriber Agreement and Privacy Policy as documents with a contents sidebar and progress bar. |
-| **Community** | Profiles as glass cards over their own background, a three-column Activity feed, Hubs, reviews with a verdict hero over the game's art, Discussions, formatted text (headings, quotes, code, tables, lists, spoilers) in one look across guides, posts, comments, reviews and profiles, a 5 × 5 inventory grid with rarity glows and a Community Market with a wallet hero, ranked listings and a game filter. |
+| **Community** | Profiles as glass cards over their own background, a three-column Activity feed, Hubs with a News reader and Guides, reviews with a verdict hero over the game's art, Discussions, a 5 × 5 inventory grid with rarity glows and a Community Market with a wallet hero and ranked listings. Formatted text (headings, quotes, code, tables, lists, spoilers) looks the same in guides, posts, comments, reviews and profiles. |
 | **Support** | Every help.steampowered.com page, from the wizard to refunds and account recovery. |
-| **Search** | Results as cards with aligned date, review and price columns, one toolbar card for search and sort, and filters as folding cards with accent checkboxes. |
-| **Wishlist** | Item cards with the rounded capsule, review facts and tag pills, the shared price chip beside Add to Cart, one toolbar card for search, sort and options, and active filters as chips. |
-| **Checkout** | The cart and checkout as one flow: item cards, a sticky total, payment details and Steam Points as cards, and Purchase as the one primary button. |
 
 <br>
 
 ## ✦ Make it yours
 
-Everything below is in **Millennium → Themes → Steam Enhanced → Edit**, on the tab named in each section, plus the **Accent** colour, used for links, buttons and selections. Most settings apply as soon as you pick them; the **Web** tab needs a Steam restart.
+Most of it is in **Millennium → Themes → Steam Enhanced → Edit**, on the tab named in each section, plus the **Accent** colour used for links, buttons and selections. Settings apply as soon as you pick them; the **Web** tab needs a Steam restart.
+
+<details>
+<summary><b>Library Home</b> &nbsp;<sub>its own menu</sub></summary>
+<br>
+
+Hover the Home stage and open its menu (upper right) to set up the whole Home at once:
+
+- **Home:** Steam Enhanced or Steam's own.
+- **Featured games:** recently played, Favorites A–Z, a collection or recently added, and how many.
+- **On the stage:** which details show, and thumbnails, dots or nothing to move between games.
+- **Cycling:** how often it moves on to the next game.
+- **Background:** a slow zoom, parallax that follows your pointer, the game's screenshots, its trailer (muted), or still.
+- **Panels:** add or remove panels and drag them into order. With none, the stage fills the window.
+
+Each panel has its own ⋯ menu for its width (a third, two thirds or the whole board) and what it shows: Favorites can show any collection or games you pick, with sort orders and hours on or off. Panels that don't fit move to more pages.
+
+</details>
 
 <details>
 <summary><b>Appearance</b> &nbsp;<sub>font, motion, glass, corners</sub></summary>
@@ -154,9 +176,9 @@ Everything below is in **Millennium → Themes → Steam Enhanced → Edit**, on
 
 | Setting | Options | What it does |
 | --- | --- | --- |
-| Font | **SN Pro**, Xmind, Steam (Motiva Sans) | The typeface everywhere: client, Store, Community, Support and Checkout. SN Pro and Xmind are bundled variable fonts (SIL OFL, licences in `core/fonts/`). |
+| Font | **SN Pro**, Xmind, Steam (Motiva Sans) | The typeface everywhere: client, Store, Community, Support and Checkout. SN Pro and Xmind are bundled variable fonts. |
 | Animations | **Full**, Reduced | Reduced: hovers, presses and panels change at once instead of moving. Spinners and the window entrance still play. |
-| Glass effects | **On**, Off | Off drops the frosted blur everywhere and makes see-through surfaces solid. Lighter on slower PCs. |
+| Glass effects | **On**, Off | Off drops the frosted blur and makes see-through surfaces solid. Lighter on slower PCs. |
 | Corners | **Default**, Sharp, Round | How rounded every corner is. |
 
 </details>
@@ -169,7 +191,7 @@ Windows stay on the theme background until they've loaded (the main window until
 
 | Window entrance | How a window appears once loaded |
 | --- | --- |
-| **Splash** | The main window plays the Steam Enhanced splash (the wireframe Library and a card with a Library bar) while the Library builds. The bar reaches *Ready* in gold just as the Library appears. Other windows use Logo. |
+| **Splash** | The main window plays the Steam Enhanced splash while the Library builds, reaching *Ready* in gold just as the Library appears. Other windows use Logo. |
 | Logo | The Steam Enhanced mark breathes while the window loads, then grows and dissolves into it. |
 | Fade | The window fades in. |
 | None | The window appears at once. |
@@ -178,16 +200,16 @@ Windows stay on the theme background until they've loaded (the main window until
 | --- | --- |
 | **Library** | A wireframe outline of the themed Library window. |
 | Hero | Crossfading hero art from your 8 most recently played games. |
-| Mosaic | A breathing 2:3 tile grid over Steam's login capsule wall. |
+| Mosaic | A breathing tile grid over Steam's login capsule wall. |
 | Wall | Steam's login capsule wall, blurred and dimmed. |
 | Plain | The theme background with a soft radial glow. |
 | Dots | A fading dot matrix. |
 | Steam | Steam's own login background. |
 
-| Loading spinner | One spinner for every loader: client, Splash entrance, Store, Community and Support |
+| Loading spinner | One spinner for every loader: client, Splash, Store, Community and Support |
 | --- | --- |
-| **Refined** | A wider arc with a rounded, lit head on a thin track, turning with a slight ease. |
-| Comet | A short tail led by a bright dot, around a gently floating Steam Enhanced mark. |
+| **Refined** | A wider arc with a rounded, lit head on a thin track. |
+| Comet | A short tail led by a bright dot, around a gently floating mark. |
 | Elastic | A solid arc that stretches ahead and catches up. |
 | Breathe | Refined, with the mark breathing and a soft halo. |
 | Classic | A fading tail with a flat head. |
@@ -195,26 +217,13 @@ Windows stay on the theme background until they've loaded (the main window until
 </details>
 
 <details>
-<summary><b>Library</b> &nbsp;<sub>Home stage, game list</sub></summary>
+<summary><b>Library &amp; Friends</b> &nbsp;<sub>column widths</sub></summary>
 <br>
 
 | Setting | Options | What it does |
 | --- | --- | --- |
-| Game list width | **Fixed**, Adjustable | Fixed keeps one width with no divider. Adjustable: drag the list's right edge (double-click resets). |
-
-The Home stage's own settings button (upper right, on hover) sets the rest, at once: Steam Enhanced or Steam's own Home, which panels the board under the stage shows and in what order (drag them; with none, the stage fills the window), which games the stage features (recently played, Favorites A–Z, a collection or recently added) and how many, which details show, thumbnails, dots or nothing to move between them, how often it moves on, and its background art: a slow zoom, parallax that follows your pointer, the game's screenshots, its trailer (muted), or still.
-
-Each panel on the board has a ⋯ menu: its width (a third, two thirds or the whole board) and what it shows (Favorites can show any collection or games you choose; sort orders; hours on or off). Panels that don't fit move to more pages.
-
-</details>
-
-<details>
-<summary><b>Friends</b> &nbsp;<sub>dock width</sub></summary>
-<br>
-
-| Setting | Options | What it does |
-| --- | --- | --- |
-| Friends dock width | **Fixed**, Adjustable | The same as the game list, on the dock's left edge. Both columns start from one shared width. |
+| Game list width | **Fixed**, Adjustable | Fixed scales with the window and has no divider. Adjustable: drag the list's right edge (double-click resets). |
+| Friends dock width | **Fixed**, Adjustable | The same, on the dock's left edge. |
 
 </details>
 
@@ -237,7 +246,7 @@ Each panel on the board has a ⋯ menu: its width (a third, two thirds or the wh
 | --- | --- | --- |
 | Notification toasts | **yes**, no | no restores Steam's toasts, desktop and in game. |
 | Toasts in game | **yes**, no | no keeps Steam's own in-game toasts. |
-| Toast style | **Stage**, Compact | Stage plays toasts on a mini Home stage; Compact restyles Steam's toasts as cards. |
+| Toast style | **Stage**, Compact | Stage plays toasts on a small stage; Compact restyles Steam's toasts as cards. |
 | Compact toast position | **Centre**, Corner | Compact toasts only: the centre of the screen edge, or Steam's corner. |
 
 </details>
@@ -248,7 +257,7 @@ Each panel on the board has a ⋯ menu: its width (a third, two thirds or the wh
 
 | Setting | Options | What it does |
 | --- | --- | --- |
-| Web pages | **Theme**, Steam's own | Steam's own leaves those pages exactly as Steam draws them, in Steam's font. The client stays themed. Restart Steam after changing it. |
+| Web pages | **Theme**, Steam's own | Steam's own leaves those pages exactly as Steam draws them. The client stays themed. Restart Steam after changing it. |
 
 </details>
 
@@ -261,7 +270,7 @@ Every colour, radius, elevation and feature switch lives on `:root` in **`core/t
 | Token | Default | Range |
 | --- | --- | --- |
 | `--se-overlay-dim` | `1.2` | `0.4`–`1.4`: edges are black from 1, the whole game is hidden at 1.4. |
-| `--se-col-w` | `350px` | The default width of the game list and the Friends dock. |
+| `--se-col-w` | `clamp(280px, 210px + 5.46875vw, 420px)` | The game list and Friends dock width. Any CSS length, fixed or scaling. |
 
 </details>
 
@@ -275,9 +284,9 @@ Steam Enhanced is released under the [MIT License](LICENSE). It bundles a few th
 | --- | --- | --- |
 | [SN Pro](https://github.com/supernotes/sn-pro) · © 2024 The SN Pro Project Authors | Default typeface | SIL Open Font License 1.1 · [`core/fonts/SNPro-OFL.txt`](core/fonts/SNPro-OFL.txt) |
 | [Xmind](https://github.com/lamzhonghang/xmind) · © 2025 The Xmind Project Authors | Optional typeface | SIL Open Font License 1.1 · [`core/fonts/Xmind-OFL.txt`](core/fonts/Xmind-OFL.txt) |
-| [hls.js](https://github.com/video-dev/hls.js) 1.6.15 · © 2017 Dailymotion | Store trailer playback, the Home stage's trailer background | Apache License 2.0 · [`web/store/vendor/hls.js-LICENSE`](web/store/vendor/hls.js-LICENSE) |
+| [hls.js](https://github.com/video-dev/hls.js) 1.6.15 · © 2017 Dailymotion | Store trailers and the Home stage's trailer background | Apache License 2.0 · [`web/store/vendor/hls.js-LICENSE`](web/store/vendor/hls.js-LICENSE) |
 
-The fonts stay under the OFL and the player under Apache 2.0; the MIT License covers the rest of the theme. Steam and the Steam logo are trademarks of Valve Corporation; Steam Enhanced is an unofficial theme and is not affiliated with Valve.
+Steam and the Steam logo are trademarks of Valve Corporation. Steam Enhanced is an unofficial theme and is not affiliated with Valve.
 
 <br>
 
@@ -285,14 +294,13 @@ The fonts stay under the OFL and the player under Apache 2.0; the MIT License co
 
 ```text
 Steam-Enhanced/
-├── skin.json     Millennium manifest: core.js and the client loader, in every window (the loader adds the runtime)
-├── core/         Shared by client and web: web boot (core.js), runtime and class map, tokens and icons, font, motion, level badges, scrollbars, spinner, emoticon picker
-├── client/       Client features, one folder per area; shared/ for the client-only parts; loader.js maps windows to files
-├── web/          The web sites: shared/ (site loader, runtime, base styles, search field, dropdown), then store/,
-│                 community/, help/ and checkout/, each a config (loader.js) and one folder per page
-├── compat/       Plugin integrations (HowLongToBeat, Extendium, Size on Disk, Player Count, ProtonDB, Achievement Manager, SteamGridDB)
-├── options/      Setting overrides that Millennium applies when you pick them, one folder per settings tab
-├── dev/          Element inspector (Ctrl+Shift+E), classmap.py, steamclasses.py, storeclasses.py, colors.py, css-check.py, spinner_svg.py
+├── skin.json     Millennium manifest: settings, and core.js plus the client loader in every window
+├── core/         Shared by client and web: runtime and class map, tokens and icons, font, motion, spinner
+├── client/       Client features, one folder per area; shared/ for client-wide parts; loader.js maps windows to files
+├── web/          The web sites: shared/ first, then store/, community/, help/ and checkout/, one folder per page
+├── compat/       Plugin integrations, one folder per plugin
+├── options/      Setting overrides Millennium applies when you pick them, one folder per settings tab
+├── dev/          Element inspector (Ctrl+Shift+E) and the class map and CSS check scripts
 └── assets/       Logos, Millennium header and splash
 ```
 
