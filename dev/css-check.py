@@ -4,10 +4,15 @@
     python dev/css-check.py --report   also lists !important and :not(#se-none) counts per file
 
 Flags a raw value equal to a token, so it doesn't creep back:
-  - font-size equal to a --se-fs-* step, border-radius equal to a --se-radius-* step
+  - a font-size, or a font shorthand's size, in px up to 30: every text size is a --se-fs-*
+    step (larger display sizes are free); border-radius equal to a --se-radius-* step
   - a transition duration equal to a --se-dur-* step, cubic-bezier equal to --se-ease
   - a var(--se-x, fallback) on a token core/tokens.css defines: tokens load everywhere, so the
     fallback is dead
+
+Everywhere else (client, compat, core), margin, padding or gap in px from 2 to 48 that isn't a
+--se-space-* token (bigger values clear an avatar, icon or column and stay px; px inside calc(),
+clamp() and the like is arithmetic and stays too).
 
 On the web pages (everything under web/), which share one component set
 (core/tokens.css "Web components"), it also flags what made them drift apart:
@@ -31,6 +36,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKIP = {'core/tokens.css', 'core/font.css', 'core/images.css', 'web/store/replay/page.css'}
 COMMENT = re.compile(r'/\*.*?\*/', re.S)
 DECL = re.compile(r'(?<![\w-])((?!--)[a-z-]+)\s*:\s*([^;{}]+?)(\s*!important)?(?=\s*[;}])')
+FONT_SIZE = re.compile(r'(?<![\w.-])\d*\.?\d+px(?=\s)')  # a font shorthand's size (before any /)
 TIME = re.compile(r'(?<![\w.-])\d*\.?\d+m?s(?![\w-])')
 
 
@@ -46,6 +52,38 @@ def unique(defs, prefix):
         if name.startswith(prefix) and not value.startswith('var('):
             seen.setdefault(value, []).append(name)
     return {value: names[0] for value, names in seen.items() if len(names) == 1}
+
+
+def text_step(prop, value, sizes):
+    """The --se-fs-* step a raw px text size (30px or less) should be, or None."""
+    size = FONT_SIZE.search(value.split('/')[0] + ' ') if prop == 'font' else re.fullmatch(r'\d*\.?\d+px', value)
+    if not size or float(size.group(0)[:-2]) > 30:
+        return None
+    px = float(size.group(0)[:-2])
+    steps = {float(v[:-2]): name for v, name in sizes.items() if re.fullmatch(r'\d*\.?\d+px', v)}
+    nearest = min(steps, key=lambda s: (abs(s - px), -s))  # ties round up
+    return f'var({steps[nearest]})' + ('' if nearest == px else f' (nearest step, {nearest:g}px)')
+
+
+SPACE_STEPS = {2: 'half', 4: '1', 8: '2', 12: '3', 16: '4', 24: '5', 32: '6', 48: '7'}
+
+
+def space_step(prop, value):
+    """The --se-space-* token a top-level px spacing value (2 to 48) should be, or None."""
+    if not SPACING.match(prop):
+        return None
+    depth = 0
+    for i, ch in enumerate(value):
+        depth += ch == '('
+        depth -= ch == ')'
+        if depth:
+            continue
+        m = re.match(r'(?<![\w.-])-?(\d*\.?\d+)px\b', value[i:]) if (i == 0 or not re.match(r'[\w.-]', value[i - 1])) else None
+        if m and 1 < float(m.group(1)) <= 48:
+            px = float(m.group(1))
+            step = min(SPACE_STEPS, key=lambda s: (abs(s - px), s))  # ties round down
+            return f'var(--se-space-{SPACE_STEPS[step]})' + ('' if step == px else f' (nearest step, {step}px)')
+    return None
 
 
 def css_files():
@@ -108,10 +146,12 @@ def main():
             if web:
                 selector = text[text.rfind('}', 0, match.start()) + 1:text.rfind('{', 0, match.start())]
                 hint = web_hint(prop, value, types, ':focus' in selector)
+            else:
+                hint = space_step(prop, value)
             if hint:
                 pass
-            elif prop == 'font-size' and value in sizes:
-                hint = f'var({sizes[value]})'
+            elif prop in ('font-size', 'font') and (step := text_step(prop, value, sizes)):
+                hint = step
             elif prop == 'border-radius' and value in radii:
                 hint = f'var({radii[value]})'
             elif ease and any(c.replace(' ', '') == ease for c in re.findall(r'cubic-bezier\([^)]*\)', value)):

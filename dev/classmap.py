@@ -2,13 +2,13 @@
 
 Usage:
   python3 classmap.py build   <STEAM_SRC> <THEME_DIR>
-      Rebuild core/core.js class map and dev/classmap.json from active hashes.
+      Rebuild core/classmap.js class map and dev/classmap.json from active hashes.
   python3 classmap.py convert <THEME_DIR>
       Replace raw hash string literals in feature JS files with class map lookups:
       C.<Key> where the file destructures C, SE.C.<Key> otherwise.
   python3 classmap.py rehash  <NEW_STEAM_SRC> <THEME_DIR>
       Match recorded classes against new Steam bundles by module similarity and
-      update hashes in core/core.js, CSS files, and dev/classmap.json.
+      update hashes in core/classmap.js, CSS files, and dev/classmap.json.
 """
 import collections
 import json
@@ -49,7 +49,7 @@ def save(state):
 
 
 def js_files(theme):
-    core_path = Path(theme) / 'core' / 'core.js'
+    core_path = Path(theme) / 'core' / 'classmap.js'
     return sorted(str(p) for p in Path(theme).rglob('*.js') if p != core_path)
 
 
@@ -81,7 +81,7 @@ def module_label(keys, name, taken=()):
 
 
 def write_core_map(theme, keymap):
-    path = Path(theme) / 'core' / 'core.js'
+    path = Path(theme) / 'core' / 'classmap.js'
     src = path.read_text(encoding='utf-8')
     entries = [
         f"    {k}: '{h}',"
@@ -97,7 +97,7 @@ def build(src, theme):
     mods, by = sc.index(src)
     used, css_used = set(), set()
 
-    for f in js_files(theme) + [os.path.join(theme, 'core', 'core.js')]:
+    for f in js_files(theme) + [os.path.join(theme, 'core', 'classmap.js')]:
         if not os.path.exists(f):
             continue
         for h in HASH.findall(Path(f).read_text(encoding='utf-8')):
@@ -109,7 +109,7 @@ def build(src, theme):
             if sc.is_hash(h) and h in by and h not in used:
                 css_used.add(h)
 
-    core_path = os.path.join(theme, 'core', 'core.js')
+    core_path = os.path.join(theme, 'core', 'classmap.js')
     prior = {}
     if os.path.exists(core_path):
         prior = {
@@ -344,7 +344,7 @@ def rehash(new_src, theme):
             continue
         moves[old_hash] = mods[best_idx][info['name']]
 
-    targets = [os.path.join(theme, 'core', 'core.js')] + sorted(css_files(theme)) + js_files(theme)
+    targets = [os.path.join(theme, 'core', 'classmap.js')] + sorted(css_files(theme)) + js_files(theme)
     for f in targets:
         src = Path(f).read_text(encoding='utf-8')
         updated = HASH.sub(lambda m: moves.get(m.group(0), m.group(0)), src)

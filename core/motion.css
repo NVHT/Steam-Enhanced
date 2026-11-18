@@ -11,4 +11,51 @@
     transition-delay: 0s !important;
     scroll-behavior: auto !important;
   }
+
+  /* Menus just appear */
+  html:is(.Steam_Root_Menu, .Account_Menu) ._2EstNjFIIZm_WUSKm5Wt7n,
+  .se-menu {
+    animation: none !important;
+  }
+}
+
+/*
+ * A menu opening and closing: a short fade as it settles 4 px down into place, and back up as it
+ * goes, a little quicker. The Steam menu, the account menu (client/header/steam-menu.css,
+ * account-menu.css) and the theme's own menus (client/shared/popup-layer.css) use them; closing
+ * is [data-se-closing], held until it ends (SE.layer.closeWith, client/shared/popup-layer.js).
+ * Under reduced motion (here and options/appearance/motion-reduced.css) menus just appear and go.
+ */
+@keyframes se-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes se-menu-out {
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/*
+ * An icon turning while its action runs (a refresh glyph while checking). Loading itself is the
+ * one spinner (core/spinner.css); this is only for an icon that stands in for it.
+ */
+@keyframes se-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+ * Keyboard focus on the theme's own controls in the client windows (the web's counterpart is
+ * web/shared/base.css): one ring, from the focus tokens. A control that draws focus another way
+ * (a field's edge) sets its own rule; this is the floor for every other one.
+ */
+:is(button, a, select, summary, [role="button"], [role="tab"], [role="menuitem"], [role="option"], [tabindex]):is([class^="se-"], [class*=" se-"], [data-se-own]):focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
