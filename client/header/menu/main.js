@@ -6,7 +6,7 @@
   if (!ns) return;
   const {
     anchors, avatarLayouts, cancelHoverClose, closeAfterHover, enterMenuPopup, hoverDocuments,
-    leaveMenuPopup, onMainMouseMove, openMillenniumWindow, openOnHover, openSideOnHover, patched,
+    leaveMenuPopup, onMainMouseMove, openMillenniumWindow, openSideOnHover, patched,
     restorePopups, sideButtons, sidebarManagers, start, unpatchInstance,
   } = ns;
   const { live } = ns;
@@ -22,7 +22,6 @@
         node.removeEventListener('mouseleave', closeAfterHover);
       }
       sideButtons.clear();
-      live.hoverButton?.removeEventListener('mouseenter', openOnHover);
       live.hoverButton?.removeEventListener('mouseleave', closeAfterHover);
       for (const doc of hoverDocuments) {
         doc.body?.removeEventListener('mouseenter', enterMenuPopup);

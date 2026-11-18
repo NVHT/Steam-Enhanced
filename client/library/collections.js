@@ -241,7 +241,7 @@
   }
 
   function setText(e, t) {
-    if (e && e.textContent !== t) e.textContent = t;
+    SE.setText(e, t);
   }
 
   function own(parent, cls, make, before) {
@@ -787,6 +787,8 @@
 
   /* Core batches to a frame; throttled, as a collection grid re-renders often */
   watcher = SE.watch(update, { ignore: SE.inSide, throttle: 250 });
+  // Collection contents change in Steam's store without always re-rendering the list; 4 s
+  // backstop, only while the list view is visible.
   const timer = SE.poll(schedule, 4000, { active: () => SE.visible('[data-se-view="list"]') });
   schedule();
 

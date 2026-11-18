@@ -62,13 +62,13 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   position: relative;
   width: 420px; /* BASE_W in config.js */
   box-sizing: border-box;
-  padding: 6px;
+  padding: var(--se-space-1);
   border-radius: var(--se-radius-xl);
   /* No backdrop blur: the toast window is transparent, so there is nothing behind to blur */
   background: rgba(16, 18, 23, .82);
   box-shadow: inset 0 0 0 1px var(--se-divider), 0 6px 18px -6px var(--se-black-80);
   pointer-events: auto;
-  transition: box-shadow .4s ease;
+  transition: box-shadow var(--se-dur-long) ease;
   /* Drawn at 420 px, scaled as a whole (art, text, buttons, strip) to the size config.js sets. */
   zoom: var(--se-tst-zoom, 1);
 }
@@ -78,19 +78,19 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 .se-tst-tray[data-show] {
-  animation: se-tst-open .55s cubic-bezier(.2, .9, .25, 1) both;
+  animation: se-tst-open .55s var(--se-ease) both;
 }
 
 .se-tst-tray[data-show] .se-tst-stage {
-  animation: se-tst-letter .6s .1s cubic-bezier(.65, 0, .35, 1) both;
+  animation: se-tst-letter .6s .1s var(--se-ease-inout) both;
 }
 
 .se-tst-tray[data-out] {
-  animation: se-tst-close .42s .22s cubic-bezier(.5, 0, .75, 0) forwards;
+  animation: se-tst-close .42s .22s var(--se-ease-in) forwards;
 }
 
 .se-tst-tray[data-out] .se-tst-stage {
-  animation: se-tst-letter-out .34s cubic-bezier(.65, 0, .35, 1) forwards;
+  animation: se-tst-letter-out .34s var(--se-ease-inout) forwards;
 }
 
 /* Another toast window took over the stage mid-queue: it appears in place, no rise. */
@@ -246,7 +246,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 .se-tst-wf-glow {
   transform-box: fill-box;
   transform-origin: center;
-  animation: se-tst-wf-breathe 4s ease-in-out infinite alternate;
+  animation: se-tst-wf-breathe var(--se-dur-glow) ease-in-out infinite alternate;
 }
 
 @keyframes se-tst-wf-breathe {
@@ -256,7 +256,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 /* The cards below it light up in turn. */
 .se-tst-wf-card {
-  animation: se-tst-wf-card 4.5s ease-in-out infinite;
+  animation: se-tst-wf-card var(--se-dur-sweep) ease-in-out infinite;
   animation-delay: calc(var(--i) * 1.5s);
 }
 
@@ -348,25 +348,25 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 .se-tst-grade {
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: var(--se-z-under);
   background:
     radial-gradient(ellipse 50% 70% at 92% 0%, rgba(255, 196, 150, .14), transparent 70%),
-    linear-gradient(90deg, rgba(0, 0, 0, .74) 0%, rgba(0, 0, 0, .42) 42%, rgba(0, 0, 0, .04) 78%),
-    radial-gradient(ellipse 90% 95% at 50% 45%, transparent 50%, rgba(0, 0, 0, .45) 100%);
+    linear-gradient(90deg, var(--se-black-74) 0%, var(--se-black-40) 42%, var(--se-black-04) 78%),
+    radial-gradient(ellipse 90% 95% at 50% 45%, transparent 50%, var(--se-black-45) 100%);
 }
 
 /* Rarity: the corner light takes the tier's color, stronger the rarer it is. */
 .se-tst-layer[data-se-tier] .se-tst-grade {
   background:
     radial-gradient(ellipse 60% 95% at 88% 0%, color-mix(in srgb, var(--c) var(--se-tst-gl, 20%), transparent), transparent 70%),
-    linear-gradient(90deg, rgba(0, 0, 0, .74) 0%, rgba(0, 0, 0, .42) 42%, rgba(0, 0, 0, .04) 78%),
-    radial-gradient(ellipse 90% 95% at 50% 45%, transparent 50%, rgba(0, 0, 0, .45) 100%);
+    linear-gradient(90deg, var(--se-black-74) 0%, var(--se-black-40) 42%, var(--se-black-04) 78%),
+    radial-gradient(ellipse 90% 95% at 50% 45%, transparent 50%, var(--se-black-45) 100%);
 }
 
 .se-tst-layer[data-accent="err"] .se-tst-grade {
   background:
-    linear-gradient(90deg, rgba(0, 0, 0, .8), rgba(40, 8, 10, .5) 50%, color-mix(in srgb, var(--se-danger) 12%, transparent)),
-    radial-gradient(ellipse 90% 95% at 50% 45%, transparent 50%, rgba(0, 0, 0, .45) 100%);
+    linear-gradient(90deg, var(--se-black-80), rgba(40, 8, 10, .5) 50%, color-mix(in srgb, var(--se-danger) 12%, transparent)),
+    radial-gradient(ellipse 90% 95% at 50% 45%, transparent 50%, var(--se-black-45) 100%);
 }
 
 /* Legendary (and Mastered): the banner's slow shine. */
@@ -377,7 +377,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   width: 250%;
   pointer-events: none;
   background: linear-gradient(105deg, transparent 40%, rgba(255, 230, 170, .14) 50%, transparent 60%);
-  animation: se-tst-pass 4.5s linear infinite;
+  animation: se-tst-pass var(--se-dur-sweep) linear infinite;
 }
 
 /* ---------- Content ---------- */
@@ -387,14 +387,14 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   inset: 0;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 0 16px;
+  gap: var(--se-space-3);
+  padding: 0 var(--se-space-4);
 }
 
 .se-tst-ct > * {
   opacity: 0;
   transform: translateY(10px);
-  transition: opacity .3s ease, transform .45s var(--se-ease);
+  transition: opacity var(--se-dur-relaxed) ease, transform .45s var(--se-ease);
 }
 
 .se-tst-layer[data-on] .se-tst-ct > * {
@@ -415,7 +415,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   display: grid;
   place-items: center;
   /* Opaque enough to hold on the art without a nested backdrop blur */
-  background: rgba(16, 18, 23, .78);
+  background: color-mix(in srgb, var(--se-bg-ink) 78%, transparent);
   color: var(--c);
   box-shadow: 0 10px 22px -8px var(--se-black-90), inset 0 0 0 1px var(--se-white-14);
 }
@@ -459,9 +459,9 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   position: absolute;
   right: 4px;
   bottom: 3px;
-  font: 800 13px/1 var(--se-font);
+  font: 800 var(--se-fs-base)/1 var(--se-font);
   color: var(--c);
-  text-shadow: 0 0 3px #0b0d10, 0 1px 2px #0b0d10;
+  text-shadow: var(--se-text-halo);
 }
 
 /* Four-point sparkles, one per tier rank, placed as in client/game-page/achievements.css. */
@@ -469,7 +469,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   position: absolute;
   background: var(--c);
   clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
-  animation: se-tst-twinkle 1.6s ease-in-out infinite;
+  animation: se-tst-twinkle var(--se-dur-pulse) ease-in-out infinite;
 }
 
 .se-tst-spark:nth-child(1) { left: -10%; top: -10%; width: 25%; height: 25%; }
@@ -488,11 +488,11 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: var(--se-space-half);
 }
 
 .se-tst-ey {
-  font: 700 10.5px/13px var(--se-font);
+  font: 700 var(--se-fs-2xs)/13px var(--se-font);
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--c);
@@ -500,7 +500,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 .se-tst-tt {
-  font: 800 19px/23px var(--se-font);
+  font: 800 var(--se-fs-2xl)/23px var(--se-font);
   color: var(--se-text-strong);
   text-shadow: 0 2px 14px var(--se-black-60);
   white-space: nowrap;
@@ -509,7 +509,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 .se-tst-ds {
-  font: 400 13px/17px var(--se-font);
+  font: 400 var(--se-fs-base)/17px var(--se-font);
   color: var(--se-on-art);
   text-shadow: 0 1px 3px var(--se-black-90);
   white-space: nowrap;
@@ -523,14 +523,14 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 .se-tst-chips {
   display: flex;
-  gap: 4px;
+  gap: var(--se-space-1);
 }
 
 .se-tst-chips i {
-  padding: 0 6px;
+  padding: 0 var(--se-space-1);
   border-radius: var(--se-radius-sm);
   background: var(--se-chip);
-  font: 700 11px/18px var(--se-font);
+  font: 700 var(--se-fs-xs)/18px var(--se-font);
   font-style: normal;
   color: var(--c);
 }
@@ -538,9 +538,9 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 .se-tst-rt {
   flex: none;
   align-self: flex-end;
-  margin-bottom: 16px;
+  margin-bottom: var(--se-space-4);
   display: flex;
-  gap: 8px;
+  gap: var(--se-space-2);
   align-items: flex-end;
 }
 
@@ -552,10 +552,10 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 .se-tst-btn {
   height: 36px;
   max-width: 150px;
-  padding: 0 16px;
+  padding: 0 var(--se-space-4);
   border: 0;
   border-radius: var(--se-radius-md);
-  font: 700 13px/36px var(--se-font);
+  font: 700 var(--se-fs-base)/36px var(--se-font);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -580,8 +580,8 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 .se-tst-btn-play {
-  padding: 0 20px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--se-play) 72%, #b6f07a 28%), var(--se-play));
+  padding: 0 var(--se-space-4);
+  background: var(--se-play-fill);
   box-shadow: inset 0 1px 0 var(--se-white-25), 0 12px 26px -10px var(--se-play-glow);
   color: var(--se-text-strong);
   letter-spacing: .06em;
@@ -596,7 +596,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 .se-tst-btn-glass {
   background: var(--se-white-10);
-  box-shadow: inset 0 0 0 1px var(--se-white-14);
+  box-shadow: var(--se-edge-lift);
   color: var(--se-text-strong);
 }
 
@@ -605,11 +605,11 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 5px;
+  gap: var(--se-space-1);
 }
 
 .se-tst-stat b {
-  font: 800 26px/1 var(--se-font);
+  font: 800 var(--se-fs-3xl)/1 var(--se-font);
   /* The tier's color, lifted toward white so even Common's grey reads on bright art. */
   color: color-mix(in srgb, var(--c) 62%, var(--se-text-strong));
   /* A tight dark edge first, so the number holds on bright art; then the soft lift. */
@@ -623,12 +623,12 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 .se-tst-pill {
-  padding: 2px 9px;
+  padding: var(--se-space-half) var(--se-space-2);
   border-radius: var(--se-radius-pill);
   background: color-mix(in srgb, var(--c) 18%, rgba(12, 14, 18, .78));
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 30%, transparent);
   color: var(--c);
-  font: 600 11.5px/14px var(--se-font);
+  font: 600 var(--se-fs-sm)/14px var(--se-font);
   font-style: normal;
 }
 
@@ -637,7 +637,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   content: "";
   position: absolute;
   inset: -18px -22px -14px -30px;
-  z-index: -1;
+  z-index: var(--se-z-under);
   background: radial-gradient(closest-side, rgba(8, 10, 14, .82), rgba(8, 10, 14, .5) 60%, transparent);
   pointer-events: none;
 }
@@ -655,7 +655,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgba(16, 18, 23, .78);
+  background: color-mix(in srgb, var(--se-bg-ink) 78%, transparent);
   color: var(--c);
   cursor: pointer;
 }
@@ -696,7 +696,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   top: -1px;
   width: 5px;
   height: 5px;
-  margin-left: -2.5px;
+  margin-left: calc(-1 * var(--se-space-half));
   border-radius: 50%;
   background: #eaf6ff;
   box-shadow: 0 0 6px 1px var(--c);
@@ -762,8 +762,8 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 .se-tst-strip {
   display: none;
   align-items: center;
-  gap: 6px;
-  padding: 8px 4px 2px;
+  gap: var(--se-space-1);
+  padding: var(--se-space-2) var(--se-space-1) var(--se-space-half);
 }
 
 .se-tst-tray[data-queue] .se-tst-strip {
@@ -785,9 +785,9 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   border: 0;
   border-radius: var(--se-radius-sm);
   background: color-mix(in srgb, var(--c) 30%, var(--se-surface));
-  box-shadow: inset 0 0 0 1px var(--se-divider);
+  box-shadow: var(--se-edge-divider);
   cursor: pointer;
-  transition: transform var(--se-dur-slow) cubic-bezier(.3, 1.4, .6, 1), box-shadow .2s;
+  transition: transform var(--se-dur-slow) var(--se-ease-spring), box-shadow var(--se-dur-mid);
 }
 
 /* A long queue shows its next 8; the count beside them says how many are waiting. */
@@ -835,7 +835,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 
 .se-tst-pos {
   margin-left: auto;
-  font: 700 11.5px/1 var(--se-font);
+  font: 700 var(--se-fs-sm)/1 var(--se-font);
   color: var(--se-text-muted);
 }
 
@@ -845,7 +845,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   .se-tst-tray[data-show],
   .se-tst-tray[data-show] .se-tst-stage,
   .se-tst-tray[data-queue] .se-tst-strip {
-    animation-duration: .15s;
+    animation-duration: var(--se-dur);
     animation-delay: 0s;
   }
 
@@ -853,7 +853,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   @keyframes se-tst-letter { from { clip-path: none; } to { clip-path: none; } }
 
   .se-tst-tray[data-out] {
-    animation: se-tst-close .15s linear forwards;
+    animation: se-tst-close var(--se-dur) linear forwards;
   }
 
   .se-tst-tray[data-out] .se-tst-stage {
@@ -902,13 +902,13 @@ html[data-se-tst-compact] .DesktopToastPopup {
   position: relative;
   box-sizing: border-box;
   height: calc(100vh - 6px) !important;
-  margin: 3px 0 !important;
+  margin: var(--se-space-half) 0 !important;
   overflow: hidden;
   border-radius: var(--se-radius-xl) !important;
   background:
     linear-gradient(90deg, color-mix(in srgb, var(--c) 20%, transparent), transparent 58%),
     rgba(16, 18, 23, .94) !important;
-  box-shadow: inset 0 0 0 1px var(--se-divider) !important;
+  box-shadow: var(--se-edge-divider) !important;
   font-family: var(--se-font), 'Motiva Sans', sans-serif !important;
 }
 
@@ -941,10 +941,10 @@ html[data-se-tst-compact] .DesktopToastPopup :is(.StandardTemplateContainer, .De
 html[data-se-tst-compact] .DesktopToastTemplate:not(#se-none) {
   display: flex !important;
   align-items: center !important;
-  gap: 10px !important;
+  gap: var(--se-space-2) !important;
   box-sizing: border-box !important;
   height: 100% !important;
-  padding: 0 12px 0 9px !important;
+  padding: 0 var(--se-space-3) 0 var(--se-space-2) !important;
 }
 
 /*
@@ -1054,10 +1054,10 @@ html[data-se-tst-compact] .Header:empty {
 .se-tst-cmp-ey {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--se-space-1);
   margin-bottom: 1px;
   color: var(--c);
-  font: 700 9.5px/11px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 700 var(--se-fs-2xs)/11px var(--se-font), 'Motiva Sans', sans-serif;
   letter-spacing: .08em;
   text-transform: uppercase;
 }
@@ -1077,13 +1077,13 @@ html[data-se-tst-compact] :is(.Title, .GroupMessageUserName, .StandardNotificati
 
 html[data-se-tst-compact] :is(.Title, .GroupMessageUserName) {
   color: var(--se-text-strong) !important;
-  font: 600 13px/16px var(--se-font), 'Motiva Sans', sans-serif !important;
+  font: 600 var(--se-fs-base)/16px var(--se-font), 'Motiva Sans', sans-serif !important;
 }
 
 html[data-se-tst-compact] :is(.StandardNotificationDescription, .GroupMessageBody) {
   margin: 0 !important;
   color: var(--se-text-dim) !important;
-  font: 400 12px/14px var(--se-font), 'Motiva Sans', sans-serif !important;
+  font: 400 var(--se-fs-sm)/14px var(--se-font), 'Motiva Sans', sans-serif !important;
 }
 
 /* Any further line Steam adds (a request's "is awaiting your response") */
@@ -1091,7 +1091,7 @@ html[data-se-tst-compact] .Content > :not(.se-tst-cmp-ey, .Header, .Body, .Stand
   overflow: hidden;
   margin: 0 !important;
   color: var(--se-text-faint) !important;
-  font: 400 11.5px/14px var(--se-font), 'Motiva Sans', sans-serif !important;
+  font: 400 var(--se-fs-sm)/14px var(--se-font), 'Motiva Sans', sans-serif !important;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -1099,7 +1099,7 @@ html[data-se-tst-compact] .Content > :not(.se-tst-cmp-ey, .Header, .Body, .Stand
 html[data-se-tst-compact] .GroupMessageIcon {
   width: 12px !important;
   height: 12px !important;
-  margin-inline-end: 4px !important;
+  margin-inline-end: var(--se-space-1) !important;
   color: var(--se-text-faint) !important;
   vertical-align: -1px;
 }

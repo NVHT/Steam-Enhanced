@@ -319,10 +319,10 @@
     ].filter(Boolean).join(' · ');
     setText(refs.sub, sub);
 
-    const clamp = (value) => `${round(Math.max(0, Math.min(100, value ?? 0)))}%`;
-    SE.cssVar(refs.fill, 'width', clamp(pct));
+    const scale = (value) => `scaleX(${Math.max(0, Math.min(100, value ?? 0)) / 100})`;
+    SE.cssVar(refs.fill, 'transform', scale(pct));
     setHidden(refs.installBar, data.install?.value == null);
-    if (data.install?.value != null) SE.cssVar(refs.installFill, 'width', clamp(data.install.value));
+    if (data.install?.value != null) SE.cssVar(refs.installFill, 'transform', scale(data.install.value));
     setText(refs.pct, pct == null ? '' : `${Math.round(pct)}%`);
 
     setHidden(refs.pause, !canPause);

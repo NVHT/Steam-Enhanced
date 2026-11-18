@@ -119,77 +119,34 @@
     hideFly(true);
     state.sig = '';
     ns.place();
+    // The title bar's Friends & Chat button names what its click does next
+    window.__seHeaderActions?.syncFriendsButton?.();
   }
 
   /*
-   * The dock's menus (status, a friend's), as popup-layer panels (client/shared/popup-layer.js): in the
-   * page on the Library, in a popup window above a Store or Community page.
+   * The dock's menus (status, a friend's): the popup layer's menu (client/shared/popup-layer.js),
+   * in the page on the Library, in a popup window above a Store or Community page. It handles
+   * keys and outside clicks itself.
    */
-  live.menuPanel = null;
-  // What a dock popup in a window is styled by
-  const DOCK_SHEETS = { sheets: ['client/friends/friends-dock.css'] };
-  const menuOpen = () => Boolean(live.menuPanel && !live.menuPanel.released);
+  live.menu = null;
+  // What the status dots in a menu window are styled by
+  const DOCK_SHEETS = ['client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css'];
+  const menuOpen = () => Boolean(live.menu && !live.menu.released);
 
   function hideMenu() {
-    live.menuPanel?.release();
-    live.menuPanel = null;
-    live.menuItems = [];
-    live.menuIndex = -1;
-  }
-
-  /*
-   * Keyboard: in the page the menu takes focus; a popup window never does, so the main window
-   * hears the keys (onKeyMenu) and moves a highlight ([data-se-active]) through the items.
-   */
-  live.menuItems = [];
-  live.menuIndex = -1;
-
-  function highlight(index) {
-    const items = live.menuItems;
-    if (!items.length) return;
-    live.menuIndex = (index + items.length) % items.length;
-    const item = items[live.menuIndex];
-    if (item.ownerDocument === document) {
-      item.focus({ preventScroll: true });
-      return;
-    }
-    items.forEach((other) => SE.attr(other, 'data-se-active', other === item ? '' : null));
+    live.menu?.release();
+    live.menu = null;
   }
 
   // At (x, y), kept a margin inside the main window as the menu always has been.
-  function showMenu(items, x, y) {
+  function showMenu(items, x, y, owner) {
     hideMenu();
-    const panel = SE.layer?.panel(DOCK_SHEETS);
-    if (!panel) return;
-    live.menuPanel = panel;
     const margin = SE.px('--se-space-2');
     const spot = (w, h) => ({
       left: Math.max(margin, Math.min(x, innerWidth - w - margin)),
       top: Math.max(margin, Math.min(y, innerHeight - h - margin)),
     });
-    panel.show(spot, (container) => {
-      const doc = container.ownerDocument;
-      const menu = doc.createElement('div');
-      menu.className = 'se-fd-menu';
-      menu.setAttribute('role', 'menu');
-      for (const it of items) {
-        const b = doc.createElement('button');
-        b.type = 'button';
-        b.setAttribute('role', 'menuitem');
-        if (it.state) b.dataset.state = it.state;
-        b.innerHTML = `${it.state ? '<i></i>' : ''}<span></span>`;
-        b.lastChild.textContent = it.label;
-        b.addEventListener('click', (e) => {
-          e.stopPropagation();
-          hideMenu();
-          it.run();
-        });
-        menu.appendChild(b);
-      }
-      container.append(menu);
-      live.menuItems = [...menu.children];
-      highlight(0);
-    });
+    live.menu = SE.layer?.menu(items, spot, { sheets: DOCK_SHEETS, owner }) || null;
   }
 
   const PERSONA = { online: 1, away: 3, invisible: 7 };
@@ -222,7 +179,8 @@
         run: () => setStatus(st),
       })),
       r.left,
-      r.bottom + 6
+      r.bottom + 6,
+      btn
     );
   }
 
@@ -345,22 +303,19 @@
     else state.flyTimer = setTimeout(go, 220);
   }
 
-  function closeMenu(e) {
-    if (!e.target.closest?.('.se-fd-menu, [data-act="status"]')) hideMenu();
-
-    const navigation = e.target.closest?.('.se-menu-icon, .se-rail-extra, a[href]');
+  // A click that navigates (a page icon, a store or community link): the open chat stays put.
+  function noteNavigation(e) {
+    const navigation = e.target.closest?.('.se-menu-icon, a[href]');
     const href = navigation?.getAttribute('href') || navigation?.dataset?.url || '';
     if (
       navigation &&
-      (navigation.matches('.se-menu-icon, .se-rail-extra') ||
+      (navigation.matches('.se-menu-icon') ||
         /^(?:https?:\/\/(?:store\.steampowered\.com|steamcommunity\.com)(?:\/|$)|steam:\/\/(?:store|openurl)\/|\/(?:library|store|community)\b)/i.test(
           href
         ))
     ) {
       state.chatNavigationUntil = performance.now() + 1500;
-      return;
     }
-
   }
 
   function onContext(e) {
@@ -369,18 +324,6 @@
     e.preventDefault();
     e.stopPropagation();
     friendMenu(row.dataset.friend, e.clientX, e.clientY);
-  }
-
-  function onKeyMenu(event) {
-    if (!menuOpen()) return;
-    const step = { ArrowDown: 1, ArrowUp: -1 }[event.key];
-    if (event.key === 'Escape') hideMenu();
-    else if (step) highlight(live.menuIndex + step);
-    // In the page the focused button hears Enter itself; in a popup window it's pressed here.
-    else if ((event.key === 'Enter' || event.key === ' ') && live.menuItems[live.menuIndex]?.ownerDocument !== document) {
-      live.menuItems[live.menuIndex]?.click();
-    } else return;
-    event.preventDefault();
   }
 
   live.frame = 0;
@@ -401,7 +344,7 @@
   }
 
   Object.assign(ns, {
-    closeMenu, hideFly, hideMenu, onContext, onKeyMenu, onNativeChannelClick,
+    noteNavigation, hideFly, hideMenu, onContext, onNativeChannelClick,
     onNativeFriendClick, openChat, openGroup, pressRow, schedule, setMode, showFly, statusMenu,
     steamURL, sync,
   });

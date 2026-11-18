@@ -92,6 +92,8 @@
     gate?.disconnect();
     gate = null;
     observer ||= SE.watch(update, { scope: SCOPE, attributes: ['data-se-chat-tip', 'title'] });
+    // Removed chat rows don't always pass through the scoped watcher; a 5 s sweep drops stale
+    // tooltips, only while any are mounted.
     sweep ||= SE.poll(prune, 5000, { active: () => mounts.size > 0 });
     update();
   };

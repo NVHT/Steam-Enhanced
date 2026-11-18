@@ -1,12 +1,11 @@
 /*
- * Vertical 60px navigation rail and 48px unified titlebar layout.
+ * The navigation: a 60px rail down the left edge (Store, Library, Community and Profile; the bell,
+ * Settings and your avatar at its foot) and the 48px title bar (the Steam button, the list
+ * header, the search, then Downloads and Friends). Game-list filter
+ * controls and search live in the title bar, with the dropdown Library Filters panel.
+ * Paired with client/navigation/nav-rail.js and the title-bar*.js parts beside it.
  *
- * Positions primary navigation icons (Store, Library, Community, Profile, and
- * secondary shortcuts) in a left-hand vertical rail, moves game-list filter
- * controls and search into the top bar, and styles the dropdown Library
- * Filters panel. Paired with `client/navigation/nav-rail.js`.
- *
- * Continued, by section, in nav-rail-library.css, nav-rail-filters.css (same folder), listed
+ * Continued, by section, in title-bar.css, title-bar-filters.css (same folder), listed
  * after this file in client/loader.js: together they keep one file's order.
  */
 :root {
@@ -47,37 +46,6 @@ html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy ._2D64jIEK7wpUR_NlObDW
 html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy ._2D64jIEK7wpUR_NlObDW76 > ._7AlhCx3XGzBeIrQaCneUD {
   flex: 0 0 auto;
   align-self: center;
-}
-
-/* Bottom action stack: Add, Downloads, Friends, Big Picture, News, Bell, Settings, Avatar */
-html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u {
-  position: fixed;
-  z-index: calc(var(--se-z-sticky) + 2);
-  top: auto;
-  bottom: 12px;
-  left: 0;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: var(--se-rail-width);
-  height: auto;
-  max-height: calc(100vh - var(--se-rail-top) - var(--se-rail-nav-count, 5) * var(--se-rail-step) - 16px);
-  margin: 0;
-  margin-inline: 0 !important;
-  padding: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: none;
-}
-
-html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm,
-html body.se-header-actions-ready .se-header-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  margin: 0 !important;
 }
 
 html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > * {
@@ -160,14 +128,6 @@ html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u ._3yD46y5pd3zOGR7CzKs
   margin: 0 !important;
 }
 
-html body.se-header-actions-ready .se-header-actions {
-  width: var(--se-steam-home-width, 44px);
-  min-width: var(--se-steam-home-width, 44px);
-  flex: 0 0 auto;
-  padding: 0;
-  margin: 0;
-}
-
 html body.se-header-actions-ready ._3yD46y5pd3zOGR7CzKs0mC > :first-child {
   margin: 0 !important;
   align-self: center;
@@ -240,8 +200,12 @@ html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > :has(.RtSv39ZoBOySn
   order: 3;
 }
 
-html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > .se-header-action:is([data-se-action="millennium"], [data-se-action="library-manager"], [data-se-action="settings"]) {
+html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > .se-header-action[data-se-action="settings"] {
   order: 4;
+}
+
+html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > .se-header-action[data-se-action="games"] {
+  order: 3;
 }
 
 html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > ._3yD46y5pd3zOGR7CzKs0mC,
@@ -262,11 +226,14 @@ html body.se-header-actions-ready {
   --se-rail-bar: 48px;
   /* Tall enough for a 40 px Steam button in the corner */
   --se-rail-width: 60px;
-  /* Title bar + 12 px + Steam button + divider block */
-  --se-rail-top: calc(var(--se-rail-bar) + 12px + var(--se-rail-btn) + 9px);
-  --se-rail-step: calc(var(--se-rail-btn) + 4px);
-  /* The title-bar search field, and the Filters panel under it */
+  /* The one gap between rail buttons, top and foot alike */
+  --se-rail-gap: 9px;
+  /* Where the page icons start: one gap under the hide-list toggle in the corner */
+  --se-rail-top: calc((var(--se-rail-bar) + var(--se-rail-btn)) / 2 + var(--se-rail-gap));
+  /* The title-bar search field, and the Filters panel under it: centred until nav-rail.js
+     measures its place into <body> */
   --se-title-search-w: min(600px, calc(100vw - 520px));
+  --se-title-search-x: calc(50vw - var(--se-title-search-w) / 2);
   /* The tools inside it: the game-type scope chip at its start, Filters at its end */
   --se-title-tool-h: 32px;
 }
@@ -325,12 +292,12 @@ html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy::before {
   flex: 0 0 1px;
   width: 24px;
   height: 1px;
-  margin: 0 0 8px;
+  margin: 0 0 var(--se-space-2);
   background: var(--se-divider);
 }
 
 html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy ._2D64jIEK7wpUR_NlObDW76:not(#se-none) {
-  gap: 4px;
+  gap: var(--se-rail-gap);
   width: 100%;
   padding: 0;
   margin: 0;
@@ -393,8 +360,7 @@ html body.se-header-actions-ready ._7AlhCx3XGzBeIrQaCneUD._1gqEjB5QsKT_NftD1dEsd
   text-shadow: none;
 }
 
-html body.se-header-actions-ready ._7AlhCx3XGzBeIrQaCneUD._1gqEjB5QsKT_NftD1dEsdZ:not(._2cO0HdvLEGAdhosLekWsmo) ._19axKcqYRuaJ8vdYKYmtTQ.se-menu-icon:not(#se-none)::after,
-html body.se-header-actions-ready .se-rail-extra._1gqEjB5QsKT_NftD1dEsdZ > .se-native-header-button.se-menu-icon:not(#se-none)::after {
+html body.se-header-actions-ready ._7AlhCx3XGzBeIrQaCneUD._1gqEjB5QsKT_NftD1dEsdZ:not(._2cO0HdvLEGAdhosLekWsmo) ._19axKcqYRuaJ8vdYKYmtTQ.se-menu-icon:not(#se-none)::after {
   content: '' !important;
   display: block !important;
   position: absolute;
@@ -431,7 +397,7 @@ html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u .RtSv39ZoBOySnb8XQ5hJ
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--se-running);
+  background: var(--se-accent);
   box-shadow: 0 0 0 2px var(--se-rail-bg);
   pointer-events: none;
 }
@@ -475,7 +441,7 @@ html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u .se-download-ring-val
   stroke-linecap: round;
   stroke-dasharray: 0 100;
   filter: drop-shadow(0 0 3px color-mix(in srgb, var(--se-accent) 45%, transparent));
-  transition: stroke-dasharray .6s cubic-bezier(.22, 1, .36, 1);
+  transition: stroke-dasharray .6s var(--se-ease);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -487,7 +453,6 @@ html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u .se-download-ring-val
 /* Avatar: a rounded square (as in the toasts), with a status ring (blue online, green in game, gray otherwise). */
 html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u ._3yD46y5pd3zOGR7CzKs0mC:not(#se-none) {
   background: transparent !important;
-  margin-top: 6px !important;
   --se-status: var(--se-offline);
 }
 
@@ -510,13 +475,133 @@ html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u ._3yD46y5pd3zOGR7CzKs
   box-shadow: 0 0 0 2px var(--se-rail-bg), 0 0 0 4px var(--se-status), 0 0 0 7px var(--se-hairline);
 }
 
-/* A button stays lit while its menu is open (set by client/header/menu/placement.js). */
-html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo :is(.se-header-action, .se-native-header-button, ._2Szzh5sKyGgnLUR870zbDE, .RtSv39ZoBOySnb8XQ5hJf)[data-se-menu-open]:not(#se-none),
+/*
+ * A button stays lit while its menu is open: Steam's menus (data-se-menu-open, set by
+ * client/header/menu/placement.js), the theme's own (aria-expanded, client/shared/popup-layer.js).
+ */
+html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo :is(.se-header-action, .se-native-header-button, ._2Szzh5sKyGgnLUR870zbDE, .RtSv39ZoBOySnb8XQ5hJf):is([data-se-menu-open], [aria-expanded="true"]):not(#se-none),
 html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo [data-se-menu-open] > .se-native-header-button:not(#se-none) {
+  background: var(--se-hover) !important;
+  color: var(--se-text-strong);
+}
+
+/* A page icon's section menu (client/navigation/nav-rail.js) lights it the same way; the
+   current page keeps its accent tint. */
+html body.se-header-actions-ready .se-menu-icon[aria-expanded="true"]:not(#se-none) {
   background: var(--se-hover) !important;
   color: var(--se-text-strong);
 }
 
 html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo ._3yD46y5pd3zOGR7CzKs0mC[data-se-menu-open]:not(#se-none) > :first-child {
   box-shadow: 0 0 0 2px var(--se-rail-bg, var(--se-sidebar)), 0 0 0 4px var(--se-status), 0 0 0 7px var(--se-white-10);
+}
+
+/*
+ * The title bar's right end: Friends. Add a Game, Big Picture and Announcements aren't kept;
+ * the bell, Downloads, Settings (a menu: Steam Settings, Millennium, Library Manager;
+ * client/header/header-actions.js) and your avatar are at the rail's foot.
+ */
+html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm,
+html body.se-header-actions-ready .se-header-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--se-space-1);
+}
+
+/*
+ * The title bar's right end in the rail's rhythm: Friends & Chat and the window controls are
+ * rail tiles (--se-rail-btn) with the rail's one gap (--se-rail-gap) between every pair,
+ * Friends and minimize included. The controls' end inset stays their 10 px
+ * (client/header/header-actions.css), the rail's own (60 - 40) / 2.
+ */
+html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u {
+  padding-inline-end: var(--se-rail-gap);
+}
+
+html body.se-header-actions-ready .qP17eBPXkfezFfexZ4hC3 {
+  --se-wc-size: var(--se-rail-btn);
+}
+
+html body.se-header-actions-ready .qP17eBPXkfezFfexZ4hC3:has(.title-area:not(.OSX)) {
+  width: calc(3 * var(--se-rail-btn) + 2 * var(--se-rail-gap) + 10px);
+}
+
+html body.se-header-actions-ready .qP17eBPXkfezFfexZ4hC3 .title-area:not(.OSX) .title-bar-actions {
+  gap: var(--se-rail-gap);
+}
+
+/* …and the rail tiles' corners */
+html body.se-header-actions-ready .qP17eBPXkfezFfexZ4hC3 .title-area:not(.OSX) .title-bar-actions .title-area-icon:is(.minimizeButton, .maximizeButton, .restoreButton, .closeButton) {
+  border-radius: var(--se-radius-md);
+}
+
+/* Not kept. Hidden, never removed: Steam's own buttons stay mounted. */
+html body.se-header-actions-ready .se-header-actions > [data-se-action="add"],
+html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > :is(._3LKQ3S_yqrebeNLF6aeiog, :has(._3LKQ3S_yqrebeNLF6aeiog)),
+html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > :is(._5wILZhsLODVwGfcJ0hKmJ, :has(._5wILZhsLODVwGfcJ0hKmJ:not(.se-header-action))):not(.se-header-actions, .se-header-action) {
+  display: none;
+}
+
+/*
+ * The rail's foot, centred in the rail, top to bottom: the bell, Games (its menu: Steam's Games
+ * items, client/navigation/nav-rail.js), Downloads (its card on click,
+ * client/header/downloads-card.js), Settings, your avatar and your
+ * name under it (data-se-name, client/navigation/nav-rail.js). Their
+ * menus open beside it (client/header/menu/placement.js, client/header/header-actions.js);
+ * hovering the avatar shows your card (client/friends/dock/friend-card.js).
+ */
+html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > :is(.se-header-action:is([data-se-action="settings"], [data-se-action="games"]), ._3mGEzzp18imtSzGPkduedi, :has(.RtSv39ZoBOySnb8XQ5hJf), ._3yD46y5pd3zOGR7CzKs0mC, :has(._3yD46y5pd3zOGR7CzKs0mC)),
+html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > .se-header-actions > .se-header-action[data-se-action="downloads"] {
+  position: fixed;
+  left: calc((var(--se-rail-width) - var(--se-rail-btn)) / 2);
+  z-index: calc(var(--se-z-sticky) + 2);
+  --se-rail-name-h: calc(var(--se-fs-2xs) * 1.3 + var(--se-space-1));
+}
+
+html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u ._3yD46y5pd3zOGR7CzKs0mC[data-se-name]:not(#se-none) {
+  position: relative;
+  overflow: visible !important;
+}
+
+html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u ._3yD46y5pd3zOGR7CzKs0mC[data-se-name]:not(#se-none)::after {
+  content: attr(data-se-name);
+  position: absolute;
+  top: calc(100% + var(--se-space-1));
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(var(--se-rail-width) - var(--se-space-2));
+  font: 600 var(--se-fs-2xs)/1.3 var(--se-font);
+  color: var(--se-text-muted);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u ._3yD46y5pd3zOGR7CzKs0mC[data-se-name]:not(#se-none):hover::after {
+  color: var(--se-text-strong);
+}
+
+/* Each its own rule: in one :is() the settings selector's weight would win every offset,
+   stacking the three on one spot. */
+html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > :is(._3yD46y5pd3zOGR7CzKs0mC, :has(._3yD46y5pd3zOGR7CzKs0mC)) {
+  bottom: calc(var(--se-space-3) + var(--se-rail-name-h));
+}
+
+html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > .se-header-action[data-se-action="settings"] {
+  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + var(--se-rail-btn) + var(--se-rail-gap));
+}
+
+html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > .se-header-actions > .se-header-action[data-se-action="downloads"] {
+  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + 2 * (var(--se-rail-btn) + var(--se-rail-gap)));
+}
+
+html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > .se-header-action[data-se-action="games"] {
+  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + 3 * (var(--se-rail-btn) + var(--se-rail-gap)));
+}
+
+html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > :is(._3mGEzzp18imtSzGPkduedi, :has(.RtSv39ZoBOySnb8XQ5hJf)) {
+  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + 4 * (var(--se-rail-btn) + var(--se-rail-gap)));
 }

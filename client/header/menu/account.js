@@ -1,5 +1,9 @@
 /*
- * The account menu: online status, Do Not Disturb, profile rename, the avatar section.
+ * The account menu, grouped like the Settings menu (client/header/account-menu.css): Status
+ * (the four states as one segmented row, Do Not Disturb as a switch), Profile (view, rename),
+ * Account (details, store preferences, wallet, change account, sign out). Steam's own rows stay
+ * and are moved and marked (data-se-acct-icon); the headings, the status row and the switch are
+ * the theme's.
  */
 ((SE) => {
   const ns = window.__seSteamMenuParts;
@@ -35,6 +39,19 @@
         hasStatus = true;
       }
     }
+    if (choicesOnly) markCurrentState(root, itemClass);
+  }
+
+  // The status row's current state (account-menu.css): Steam's order is Online, Away, Invisible,
+  // Offline; your persona's state picks one.
+  const STATE_ORDER = { 1: 0, 3: 1, 7: 2, 0: 3 };
+  function markCurrentState(root, itemClass) {
+    const persona = nativeFriendStore()?.self?.persona;
+    const states = [...root.querySelectorAll(`.${itemClass}`)].filter((item) =>
+      isLabel('state', normalizeMenuLabel(item.textContent), /^(?:Online|Away|Invisible|Offline)$/i)
+    );
+    const index = persona ? STATE_ORDER[persona.m_ePersonaState] : undefined;
+    states.forEach((item, i) => SE.attr(item, 'data-se-current', i === index ? '' : null));
   }
 
   function nativeFriendStore() {
@@ -57,6 +74,8 @@
     lineHeight: 'inherit',
   };
 
+  const h = (...args) => live.api.React.createElement(...args);
+
   function DoNotDisturbItem() {
     const read = () => Boolean(nativeFriendStore()?.GetUserDoNotDisturb());
     const [checked, setChecked] = live.api.React.useState(read);
@@ -75,7 +94,8 @@
         'aria-checked': checked,
         disabled: !nativeFriendStore(),
         className: avatarItemClass(),
-        style: { ...avatarItemStyle, display: 'flex', alignItems: 'center', gap: '8px' },
+        'data-se-acct-icon': 'dnd',
+        style: avatarItemStyle,
         onClick: (event) => {
           event.preventDefault();
           event.stopPropagation();
@@ -85,22 +105,15 @@
           setChecked(Boolean(store.GetUserDoNotDisturb()));
         },
       },
-      live.api.React.createElement('input', {
-        type: 'checkbox',
-        checked,
-        readOnly: true,
-        tabIndex: -1,
-        'aria-hidden': true,
-        style: { margin: 0, pointerEvents: 'none', accentColor: 'var(--se-accent, #7cc4ff)' },
-      }),
-      'Do Not Disturb'
+      h('span', { className: 'se-acct-text' }, 'Do Not Disturb', h('span', { className: 'se-acct-hint' }, 'Mute chat and notifications')),
+      h('span', { className: 'se-acct-switch', 'aria-hidden': true })
     );
   }
 
   function resolveRenameDialog() {
     live.renameDialogOpener ||= SE.findModule('steam-menu:rename-dialog', (source, id, req) => {
       const marker = source.indexOf('"ChangePersonaDialog"');
-      if (marker < 0 || !source.includes('Dialog_ChangePersonaName')) return null;
+      if (marker < 0 || !source.includes(C.className_className5)) return null;
       const declaration = source.slice(source.lastIndexOf('function ', marker), marker);
       const local = /^function\s+([\w$]+)\s*\(/.exec(declaration)?.[1];
       const exports = req(id);
@@ -117,7 +130,7 @@
 
   function findNativeRenameMenu() {
     return SE.findModule('steam-menu:rename-menu', (source, id, req) => {
-      if (!source.includes('Dialog_ChangePersonaName') || !source.includes('setPersonaNameEresultCallback')) return null;
+      if (!source.includes(C.className_className5) || !source.includes('setPersonaNameEresultCallback')) return null;
       return Object.values(req(id) || {}).find((value) => {
         if (typeof value !== 'function') return false;
         const body = Function.prototype.toString.call(value);
@@ -212,6 +225,7 @@
       {
         type: 'button',
         'data-se-native-rename-action': '',
+        'data-se-acct-icon': 'edit',
         className: avatarItemClass(),
         style: avatarItemStyle,
         onClick: async (event) => {
@@ -242,60 +256,110 @@
     if (!entry || permission !== live.api.allowed) return null;
     const props = entry.props;
 
-    const list = (mode) =>
-      live.api.React.createElement(
-        'div',
-        { 'data-se-account-status': mode, style: { display: 'contents' }, ref: trimAccountStatus },
-        live.api.React.createElement(live.api.MenuItems, {
-          menuItems: props.menuItems || [],
-          children: props.menuContent,
-          disabledItemClass: props.disabledItemClass,
-        })
-      );
+    const heading = (text, divided) =>
+      h('div', { className: divided ? 'se-acct-heading se-acct-heading-divided' : 'se-acct-heading', role: 'presentation' }, text);
+    const section = (name, ...children) =>
+      h('div', { 'data-se-avatar-section': name, style: { display: 'contents' }, ref: placeAvatarSection }, ...children);
 
-    return live.api.React.createElement(
+    return h(
       live.api.React.Fragment,
       null,
-      live.api.React.createElement(
-        'div',
-        { 'data-se-avatar-section': 'edit', style: { display: 'contents' }, ref: placeAvatarSection },
-        live.api.React.createElement(EditProfileNameItem)
+      section(
+        'status',
+        heading('Status'),
+        h(
+          'div',
+          { 'data-se-account-status': 'choices', className: 'se-acct-seg', role: 'group', ref: trimAccountStatus },
+          h(live.api.MenuItems, {
+            menuItems: props.menuItems || [],
+            children: props.menuContent,
+            disabledItemClass: props.disabledItemClass,
+          })
+        ),
+        h(DoNotDisturbItem)
       ),
-      live.api.React.createElement(
-        'div',
-        { 'data-se-avatar-section': 'status', style: { display: 'contents' }, ref: placeAvatarSection },
-        live.api.React.createElement(DoNotDisturbItem),
-        live.api.React.createElement(live.api.SubMenu, {
-          label: 'Online Status',
-          className: [live.api.menuStyles.MenuItem, live.api.menuStyles.Item, 'se-avatar-status-submenu'].filter(Boolean).join(' '),
-          children: list('choices'),
-        })
-      )
+      section('profile', heading('Profile', true)),
+      section('edit', h(EditProfileNameItem)),
+      section('account', heading('Account', true))
     );
   }
+
+  /*
+   * Where each section goes among Steam's rows: Status first, the Profile heading before View My
+   * Profile and Edit Profile Name after it, the Account heading before Account Details.
+   */
+  const SECTION_PLACES = {
+    profile: { group: 'profile', english: /^View My Profile$/i },
+    edit: { group: 'profile', english: /^View My Profile$/i, after: true },
+    account: { group: 'details', english: /^Account Details/i },
+  };
+
+  // Steam's rows and their icons (account-menu.css), by label
+  const ROW_ICONS = [
+    ['profile', 'profile', /^View My Profile$/i],
+    ['details', 'details', /^Account Details/i],
+    ['store', 'store', /^Store Preferences$/i],
+    ['wallet', 'wallet', /^View My Wallet\b/i],
+    ['account', 'switch', /^Change Account(?:\.\.\.|…)?$/i],
+    ['signOut', 'signout', /^(?:Sign Out|Log Out)\b/i],
+  ];
+
+  const topChild = (node, parent) => {
+    let anchor = node;
+    while (anchor && anchor.parentElement !== parent) anchor = anchor.parentElement;
+    return anchor;
+  };
 
   function placeAvatarSection(section) {
     if (!section) return;
     const parent = section.parentElement;
-    const [group, english] =
-      section.getAttribute('data-se-avatar-section') === 'edit'
-        ? ['profile', /^View My Profile$/i]
-        : ['account', /^Change Account(?:\.\.\.)?$/i];
-    const itemClass = live.api.menuStyles.MenuItem.split(' ')[0];
-    const row = [...parent.querySelectorAll(`.${itemClass}`)].find(
-      (item) => !item.closest('[data-se-avatar-section]') && isLabel(group, normalizeMenuLabel(item.textContent), english)
-    );
-    if (!row) return;
-
-    let anchor = row;
-    while (anchor.parentElement !== parent && anchor.parentElement) {
-      anchor = anchor.parentElement;
-    }
-    if (anchor.parentElement !== parent || anchor.contains(section) || section.nextElementSibling === anchor) {
+    if (!parent) return;
+    const name = section.getAttribute('data-se-avatar-section');
+    if (name === 'status') {
+      if (parent.firstElementChild !== section) parent.insertBefore(section, parent.firstElementChild);
       return;
     }
-    parent.insertBefore(section, anchor);
+    const place = SECTION_PLACES[name];
+    if (!place) return;
+    const itemClass = live.api.menuStyles.MenuItem.split(' ')[0];
+    const row = [...parent.querySelectorAll(`.${itemClass}`)].find(
+      (item) => !item.closest('[data-se-avatar-section]') && isLabel(place.group, normalizeMenuLabel(item.textContent), place.english)
+    );
+    const anchor = row && topChild(row, parent);
+    if (!anchor || anchor.contains(section)) return;
+    if (place.after) {
+      if (anchor.nextElementSibling !== section) parent.insertBefore(section, anchor.nextSibling);
+    } else if (section.nextElementSibling !== anchor) {
+      parent.insertBefore(section, anchor);
+    }
   }
+
+  function markRows(node) {
+    const itemClass = live.api.menuStyles.MenuItem.split(' ')[0];
+    for (const item of node.querySelectorAll(`.${itemClass}`)) {
+      if (item.closest('[data-se-avatar-section]')) continue;
+      const label = normalizeMenuLabel(item.textContent);
+      const icon = ROW_ICONS.find(([group, , english]) => isLabel(group, label, english))?.[1];
+      SE.attr(item, 'data-se-acct-icon', icon || null);
+      if (icon === 'details') splitDetails(item);
+    }
+  }
+
+  // "Account Details: name" (Steam: LogoutButton > text, AccountName): the account name on its
+  // own line under the label, as a hint (account-menu.css), the label without its colon.
+  function splitDetails(item) {
+    const label = item.firstElementChild;
+    const name = label?.lastElementChild;
+    if (!name) return;
+    SE.attr(label, 'data-se-acct-label', '');
+    SE.attr(name, 'data-se-acct-sub', '');
+    for (const node of label.childNodes) {
+      if (node.nodeType === Node.TEXT_NODE && /:\s*$/.test(node.data)) {
+        node.data = node.data.replace(/\s*:\s*$/, '');
+      }
+    }
+  }
+
 
   function initializeAvatarMenu(node) {
     if (!node) return;
@@ -308,9 +372,11 @@
     const arrange = () => {
       for (const root of node.querySelectorAll('[data-se-account-status]')) trimAccountStatus(root);
       for (const section of node.querySelectorAll('[data-se-avatar-section]')) placeAvatarSection(section);
+      markRows(node);
     };
     arrange();
     if (avatarLayouts.has(node)) return;
+    // Own observer on purpose: one menu node's children while it is open
     const obs = new MutationObserver(arrange);
     obs.observe(node, { childList: true, subtree: true });
     avatarLayouts.set(node, obs);

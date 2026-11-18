@@ -26,10 +26,10 @@
 ((SE) => {
   window.__seAboutSteam?.destroy();
 
-  const DIALOG = '.DialogContent.FFIKUQ7BGKw6vO1voazlr';
-  const HEADER = '._3QhXBKJwISpG-AmpbOQgLQ';
-  const BODY = '._32eeZuly3nnz3cMXdSgyj9';
-  const LABEL = '._2yhBdvNsgdBGL_UjfmTDGH';
+  const DIALOG = `.DialogContent.${SE.C.AboutSteamDialog}`;
+  const HEADER = `.${SE.C.DialogHeader}`;
+  const BODY = `.${SE.C.AboutSteamDialog_DialogBodyText}`;
+  const LABEL = `.${SE.C.DialogBodyLabel}`;
   const BUILT = 'data-se-about';
   const AUTHOR = 'NVHT';
   const COPIED_MS = 1400;
@@ -451,10 +451,7 @@
       cleanups.push(() => clearTimeout(id));
       return id;
     };
-    const listen = (target, type, fn, options) => {
-      target.addEventListener(type, fn, options);
-      cleanups.push(() => target.removeEventListener(type, fn, options));
-    };
+    const listen = SE.listenInto(cleanups);
 
     let checking = false;
     latestPatchNotes(); // warm, so the button opens the post at once
@@ -721,7 +718,7 @@
   const viewOf = new WeakMap();
 
   const build = (dialog) => {
-    const inner = dialog.querySelector(':scope > .DialogContent_InnerWidth');
+    const inner = dialog.querySelector(`:scope > .${SE.C.className_className}`);
     const header = inner?.querySelector(HEADER);
     const body = inner?.querySelector(BODY);
     if (!inner || !header || !body) return;
@@ -742,7 +739,7 @@
   const scan = () => {
     for (const view of [...views]) if (!view.dialog.isConnected) view.destroy();
     for (const dialog of document.querySelectorAll(DIALOG)) {
-      const inner = dialog.querySelector(':scope > .DialogContent_InnerWidth');
+      const inner = dialog.querySelector(`:scope > .${SE.C.className_className}`);
       if (dialog.hasAttribute(BUILT) && inner?.querySelector(':scope > .se-about-hero')) continue;
       build(dialog);
     }

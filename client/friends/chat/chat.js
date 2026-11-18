@@ -70,9 +70,7 @@
     return { cls: 'offline', text: 'Offline' };
   };
 
-  const setText = (el, text) => {
-    if (el.textContent !== text) el.textContent = text;
-  };
+  const { setText } = SE;
 
   const openActiveTabContextMenu = (win, triggerBtn) => {
     const dialog = win.closest('.multiChatDialog');
@@ -305,6 +303,8 @@
   let timer = null;
   const start = () => {
     watcher = SE.watch(update, { scope: SCOPE, throttle: 100 });
+    // Friends data reaches the chat through Steam's stores, not a SteamClient event; 2 s backstop
+    // for changes that render without a DOM mutation, only while a chat window is up.
     timer = SE.poll(update, 2000, {
       active: () =>
         SE.visible('.multiChatDialog .chatWindow') ||
@@ -330,6 +330,7 @@
     attachDocument(doc) {
       if (!doc || doc === document || attachedDocuments.has(doc)) return () => {};
       // The popup paints on its own frames: mark new dialogs before it can paint them unstyled.
+      // Own observer on purpose: another window's document (one observer per window, its own)
       const obs = new MutationObserver(() => {
         markDialogs(doc);
         schedule();

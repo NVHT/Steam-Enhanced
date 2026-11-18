@@ -28,17 +28,17 @@
 
   /* AddNonSteamGameDialog CSS module (sp.js 92445) */
   const C = {
-    root: '.zhaKeChn9HPNSMtk0ami_',
-    header: '._3m0MnUo45wjLOfNLpZ-3KH',
-    name: '._1kVk1iZQs3Blqmz6k0qeFV',
-    path: '._1LM_TWL_05e13S1LS9wHao',
-    list: '._1e6tjguQEHdYIehM9aRmO5',
-    row: '._1cXzMrhKqoTeIK_bPpNLIC',
-    icon: '._1lI4JF6IbYhApR8FbMR8Nr',
-    loading: '._2xttHmlEaBDSek3NmEjep0',
-    arrow: '._22hYbsRuIIJj7Fcm97dEOE',
-    footer: '.kOsdHFGVApmVzmcTgOixo',
-    browse: '._3XOLUJOxOIjqw9EpFcBr0z',
+    root: `.${SE.C.AddNonSteamGameDialogContent}`,
+    header: `.${SE.C.AddNonSteamGameDialog_Header}`,
+    name: `.${SE.C.AppName}`,
+    path: `.${SE.C.ExePath}`,
+    list: `.${SE.C.GameList}`,
+    row: `.${SE.C.GameRow}`,
+    icon: `.${SE.C.IconContainer}`,
+    loading: `.${SE.C.LoadingContainer}`,
+    arrow: `.${SE.C.Arrow}`,
+    footer: `.${SE.C.Footer}`,
+    browse: `.${SE.C.BrowseButton}`,
   };
 
   const BUILT = 'data-se-ns';
@@ -407,17 +407,14 @@
     const tips = createTips(root);
     cleanups.push(tips.destroy);
 
-    const listen = (target, type, fn, opts) => {
-      target.addEventListener(type, fn, opts);
-      cleanups.push(() => target.removeEventListener(type, fn, opts));
-    };
+    const listen = SE.listenInto(cleanups);
 
     const rows = () => [...list.querySelectorAll(`:scope > ${C.row}`)];
     const isOwned = (row) => owned.has(rowInfo.get(row)?.exe);
     const isHidden = (row) => hideHelpers && !!rowInfo.get(row)?.helper && !isSelected(row);
     const shown = (row) => (view === 'all' || isSelected(row)) && !isHidden(row);
     const shownRows = () => rows().filter(shown);
-    const searchInput = () => root.querySelector(':scope > .DialogInput_Wrapper input');
+    const searchInput = () => root.querySelector(`:scope > .${SE.C.className_className3} input`);
     const addButton = () =>
       footer?.querySelector(':scope > button.Primary') ?? footer?.querySelector(':scope > button:nth-last-of-type(2)');
 
@@ -430,7 +427,7 @@
     };
 
     const clearSearch = async () => {
-      const clear = root.querySelector(':scope > .DialogInput_Wrapper .DialogInput_ClearAction');
+      const clear = root.querySelector(`:scope > .${SE.C.className_className3} .${SE.C.className_className2}`);
       if (!clear) return false;
       clear.click();
       await nextFrame();

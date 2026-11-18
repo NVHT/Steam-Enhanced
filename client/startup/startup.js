@@ -134,6 +134,7 @@
   let bgLayerKind = '';
   let bgLayerHost = null;
   let poller = null;
+  let loginEvents = null;
   let watcher = null;
   let mosaicResizeObserver = null;
   let artSaveTimer = 0;
@@ -229,7 +230,8 @@
       if (valueEl.textContent !== labelValue) valueEl.textContent = labelValue;
 
       const barFill = cell.querySelector('.se-startup-bar > span');
-      if (barFill.style.width !== barWidth) barFill.style.width = barWidth;
+      const barScale = `scaleX(${parseFloat(barWidth) / 100})`;
+      if (barFill.style.transform !== barScale) barFill.style.transform = barScale;
     }
   };
 
@@ -552,6 +554,8 @@
   const stopPolling = () => {
     poller?.disconnect();
     poller = null;
+    SE.run(() => loginEvents?.unregister?.());
+    loginEvents = null;
   };
 
   const resetStartupState = () => {
@@ -614,7 +618,11 @@
   const startPolling = () => {
     if (poller) return;
     update();
-    poller = SE.poll(update, 250, { active: () => !!document.querySelector(`.${CLS.statusBox}`) });
+    // Steam reports each login step and percentage (loginStore.OnLoginStateChange is fed by the
+    // same event), so the bar moves on the event. The poll stays as a slow backstop for the
+    // card swaps the event doesn't cover.
+    loginEvents = SE.run(() => SE.global('SteamClient')?.User?.RegisterForLoginStateChange?.(() => update()));
+    poller = SE.poll(update, loginEvents ? 1000 : 250, { active: () => !!document.querySelector(`.${CLS.statusBox}`) });
   };
 
   const stopWatching = () => {

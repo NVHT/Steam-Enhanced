@@ -23,10 +23,10 @@
   box-sizing: border-box;
   display: flex !important;
   align-items: center;
-  gap: 8px;
+  gap: var(--se-space-2);
   height: 30px !important;
-  margin: 8px 8px 2px;
-  padding: 0 2px 0 8px !important;
+  margin: var(--se-space-2) var(--se-space-2) var(--se-space-half);
+  padding: 0 var(--se-space-half) 0 var(--se-space-2) !important;
   border: 0 !important;
   border-radius: var(--se-radius-sm);
   background: none !important;
@@ -57,18 +57,20 @@
   display: none !important;
 }
 
+/* The list sections' chevron (friends-rows.css): down while open, right while folded */
 .friendlist:not(.GamepadMode) .chatSectionTitle .ToggleGroupChatList::before {
   content: "";
-  width: 14px;
-  height: 14px;
-  background: currentColor;
-  -webkit-mask: var(--se-fd-ico-chev) center / 14px 14px no-repeat;
-  mask: var(--se-fd-ico-chev) center / 14px 14px no-repeat;
+  width: 5px;
+  height: 5px;
+  border-right: 1.75px solid currentColor;
+  border-bottom: 1.75px solid currentColor;
+  /* Offset by transform, not margin, so the turn animates on the compositor */
+  transform: translateY(-3px) rotate(45deg);
   transition: transform var(--se-dur) ease-out;
 }
 
 .friendlist:not(.GamepadMode) .FriendsListChatSection.Collapsed .chatSectionTitle .ToggleGroupChatList::before {
-  transform: rotate(-90deg);
+  transform: translateX(-3px) rotate(-45deg);
 }
 
 .friendlist:not(.GamepadMode) .chatSectionTitle .voiceRoomDragBar {
@@ -94,8 +96,8 @@
 .friendlist:not(.GamepadMode) .chatSectionTitle .voiceRoomDragBar[data-se-count]::after {
   content: attr(data-se-count);
   margin-inline-start: auto;
-  padding-inline-end: 6px;
-  font: 700 11px/14px var(--se-font), sans-serif;
+  padding-inline-end: var(--se-space-1);
+  font: 700 var(--se-fs-xs)/14px var(--se-font), sans-serif;
   letter-spacing: 0;
   color: var(--se-label-color);
 }
@@ -117,8 +119,8 @@
   cursor: pointer;
 }
 
+/* No tile of its own: the row lights on hover and the icon brightens */
 .friendlist:not(.GamepadMode) .chatSectionTitle .createChatRoomButton:hover {
-  background: var(--se-divider) !important;
   color: var(--se-text-strong) !important;
 }
 
@@ -163,12 +165,28 @@
 }
 
 .friendlist:not(.GamepadMode) .chatRoomListContainer {
-  padding: 0 8px;
+  padding: 0 var(--se-space-2);
   box-sizing: border-box;
 }
 
+/*
+ * Folding and opening move as the list's sections do (friends-rows.css): Steam sizes the chats
+ * to nothing and back (its height and max height, inline) and the theme times it, 0.3s eased in
+ * and out, fading with it, in place of Steam's 0.2s. Dragging the divider stays instant
+ * (Steam's ChatListResizing).
+ */
+.friendlist:not(.GamepadMode) .FriendsListChatSection:not(.ChatListResizing) .chatRoomListContainer {
+  /* Layout transition on purpose: a fold has to move what sits below it, which a transform can't.
+     It runs only while [data-se-folding] / a fold is in progress. */
+  transition: height var(--se-dur-relaxed) ease-in-out, max-height var(--se-dur-relaxed) ease-in-out, opacity var(--se-dur-relaxed) ease-in-out;
+}
+
+.friendlist:not(.GamepadMode) .FriendsListChatSection.Collapsed .chatRoomListContainer {
+  opacity: 0;
+}
+
 .friendlist:not(.GamepadMode) .ChatRoomList {
-  padding: 0 0 10px !important;
+  padding: 0 0 var(--se-space-2) !important;
 }
 
 .friendlist:not(.GamepadMode) .ChatRoomListGroupItem {
@@ -183,9 +201,9 @@
   box-sizing: border-box;
   display: flex !important;
   align-items: center;
-  gap: 11px;
+  gap: var(--se-space-3);
   min-height: 46px;
-  padding: 6px 8px !important;
+  padding: var(--se-space-1) var(--se-space-2) !important;
   border-radius: var(--se-radius-sm);
   background: none !important;
 }
@@ -227,7 +245,7 @@
 }
 
 .friendlist:not(.GamepadMode) .ChatRoomListGroupItem .ChatRoomGroupAvatar_initials {
-  font: 700 12px var(--se-font), sans-serif !important;
+  font: 700 var(--se-fs-sm) var(--se-font), sans-serif !important;
   color: var(--se-text-dim) !important;
 }
 
@@ -244,14 +262,14 @@
 .friendlist:not(.GamepadMode) .ChatRoomListGroupItem .groupNameStatusContainer .displayRow {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--se-space-1);
   min-width: 0;
 }
 
 .friendlist:not(.GamepadMode) .ChatRoomListGroupItem .groupNameStatusContainer .chatRoomName {
   min-width: 0;
   margin: 0 !important;
-  font: 600 13.5px/1.3 var(--se-font), sans-serif !important;
+  font: 600 var(--se-fs-md)/1.3 var(--se-font), sans-serif !important;
   color: var(--se-text) !important;
   white-space: nowrap;
   overflow: hidden;
@@ -266,7 +284,7 @@
 .friendlist:not(.GamepadMode) .ChatRoomListGroupItem .groupNameStatusContainer[data-se-sub]::after {
   content: attr(data-se-sub);
   order: 1;
-  font: 500 12px/1.35 var(--se-font), sans-serif;
+  font: 500 var(--se-fs-sm)/1.35 var(--se-font), sans-serif;
   color: var(--se-text-faint);
   white-space: nowrap;
   overflow: hidden;
@@ -301,7 +319,7 @@
   align-self: center;
   width: auto !important;
   height: auto !important;
-  margin: 0 2px 0 0 !important;
+  margin: 0 var(--se-space-half) 0 0 !important;
   display: flex;
   background: none !important;
   box-shadow: none !important;
@@ -324,10 +342,10 @@
   width: auto !important;
   height: 18px !important;
   min-width: 18px !important;
-  padding: 0 5px !important;
+  padding: 0 var(--se-space-1) !important;
   box-sizing: border-box;
   border-radius: var(--se-radius-pill) !important;
-  font: 800 11px/18px var(--se-font), sans-serif !important;
+  font: 800 var(--se-fs-xs)/18px var(--se-font), sans-serif !important;
   color: var(--se-bg-ink) !important;
   text-align: center;
 }
@@ -338,11 +356,11 @@
   display: flex !important;
   align-items: center;
   flex-wrap: nowrap !important;
-  gap: 8px;
+  gap: var(--se-space-2);
   height: 26px;
   min-height: 0 !important;
-  margin: 5px 0 0 !important;
-  padding: 0 4px 0 8px;
+  margin: var(--se-space-1) 0 0 !important;
+  padding: 0 var(--se-space-1) 0 var(--se-space-2);
   border-radius: var(--se-radius-sm);
   background: color-mix(in srgb, var(--se-running) 10%, transparent);
   color: var(--se-running);
@@ -373,7 +391,7 @@
   order: 1;
   flex: 1;
   min-width: 0;
-  font: 600 12px var(--se-font), sans-serif;
+  font: 600 var(--se-fs-sm) var(--se-font), sans-serif;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -389,7 +407,7 @@
 .friendlist:not(.GamepadMode) .ChatRoomListGroupItem .membersInVoice .voiceFriendAvatar {
   width: 18px !important;
   height: 18px !important;
-  margin: 0 0 0 -6px !important;
+  margin: 0 0 0 calc(-1 * var(--se-space-1)) !important;
   border-radius: var(--se-avatar-radius) !important;
   overflow: hidden;
   box-shadow: 0 0 0 2px var(--se-sidebar), 0 0 0 3px var(--se-running);
@@ -445,8 +463,8 @@
 
 /* The channels, when shown: rows indented under the chat's name */
 .friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel {
-  margin: 0 0 2px 51px !important;
-  padding: 0 8px !important;
+  margin: 0 0 var(--se-space-half) 51px !important;
+  padding: 0 var(--se-space-2) !important;
   border-radius: var(--se-radius-sm);
   background: none !important;
 }

@@ -89,7 +89,7 @@
     const search = document.querySelector(SEARCH);
     if (!layer || !search || !steamFilters()) return false;
     panel = layer.panel({
-      sheets: ['client/navigation/nav-rail.css', 'client/navigation/nav-rail-library.css', 'client/navigation/nav-rail-filters.css'],
+      sheets: ['client/navigation/nav-rail.css', 'client/navigation/title-bar.css', 'client/navigation/title-bar-filters.css'],
       steam: true,
     });
     if (!panel) return false;

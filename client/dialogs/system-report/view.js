@@ -79,10 +79,7 @@
     const win = doc.defaultView;
     const cleanups = [];
     const timers = new Map();
-    const listen = (target, type, fn, options) => {
-      target.addEventListener(type, fn, options);
-      cleanups.push(() => target.removeEventListener(type, fn, options));
-    };
+    const listen = SE.listenInto(cleanups);
 
     /*
      * Tooltips: Steam's own once webpack is up, `title` if it never is. Each tip belongs to a

@@ -58,9 +58,7 @@
     made.add(el);
     return el;
   };
-  const setText = (el, text) => {
-    if (el.textContent !== text) el.textContent = text;
-  };
+  const { setText } = SE;
   const toggleAttr = (el, name, on) => {
     if (el.hasAttribute(name) !== on) el.toggleAttribute(name, on);
   };

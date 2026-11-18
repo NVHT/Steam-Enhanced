@@ -40,6 +40,7 @@
           if (!doc || doc.title !== 'Steam Root Menu') continue;
           bindMenuHoverDocument(doc);
           if (!popupObservers.has(doc)) {
+            // Own observer on purpose: the Steam menu's own popup window (one observer per window)
             const obs = new MutationObserver(() => placeGroup(doc));
             obs.observe(doc.body, { subtree: true, childList: true });
             popupObservers.set(doc, obs);
@@ -93,12 +94,8 @@
   function restorePopups() {
     for (const obs of popupObservers.values()) obs.disconnect();
     popupObservers.clear();
-    for (const [parent, saved] of movedGroups) {
-      const anchor = saved.anchor?.parentNode === parent ? saved.anchor : null;
-      for (const node of saved.group) {
-        if (node.parentNode === parent) parent.insertBefore(node, anchor);
-      }
-      if (saved.separator) saved.separator.style.display = saved.display;
+    for (const saved of movedGroups.values()) {
+      for (const [node, display] of saved.hidden) node.style.display = display;
     }
     movedGroups.clear();
   }

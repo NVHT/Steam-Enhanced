@@ -60,12 +60,12 @@
     logo: `.${C.TopSectionMiddle}.${C.ShowGameLogo} img`,
     backToGame: `.${C.AchievementContent_TopSection} .${C.BackToGameBtn}`,
     // Steam's Exit game button in the time stats column (hidden; the rail's clicks it).
-    exitGame: `.${C.AchievementContent_TopSection} .${C.TimeStats} .BoygotvcKo4DC4dSix8G3`,
+    exitGame: `.${C.AchievementContent_TopSection} .${C.TimeStats} .${C.ExitGameBtn}`,
     // ToolbarContainer > ToolbarButton (module 13, not in the core class map).
-    toolbarButton: '._3OzkVrQFFPv0aV41N4MrHV ._3ZLaTxSHxeGcoKlIy_-Z0L',
+    toolbarButton: `.${C.ToolbarContainer} .${C.ToolbarButton}`,
   });
   // ToolbarButton's "widget open" state.
-  const TOOLBAR_ACTIVE = '_1BXjK5v8XI_SEhGola5ftn';
+  const TOOLBAR_ACTIVE = C.Toggled;
   const ICON = Object.freeze({
     play: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.6v10.8a.6.6 0 0 0 .9.5l8.6-5.4a.6.6 0 0 0 0-1L4.9 2.1a.6.6 0 0 0-.9.5z" fill="currentColor" fill-opacity=".32" stroke="currentColor" stroke-width="1.17" stroke-linejoin="round" stroke-linecap="round"></path></svg>',
     chevron: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',

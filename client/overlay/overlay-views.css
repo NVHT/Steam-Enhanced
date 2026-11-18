@@ -15,8 +15,8 @@ html[data-se-ov] .se-ov-body {
   display: grid;
   grid-template-columns: var(--se-ov-rail-btn) minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) auto;
-  gap: 14px 18px;
-  padding-top: 16px;
+  gap: var(--se-space-3) var(--se-space-4);
+  padding-top: var(--se-space-4);
   box-shadow: inset 0 1px 0 var(--se-divider);
   font-family: var(--se-font), 'Motiva Sans', sans-serif;
 }
@@ -26,19 +26,19 @@ html[data-se-ov] .se-ov-body {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--se-space-3);
 }
 
 /* The rail, styled like the theme's nav rail: icon buttons without a tile at
    rest, an accent tint and a bar on the rail's edge for the open view. */
 html[data-se-ov] .se-ov-rail {
   position: relative;
-  z-index: 2;
+  z-index: var(--se-z-raised-2);
   min-height: 0;
   width: var(--se-ov-rail-btn);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--se-space-1);
   user-select: none;
 }
 
@@ -104,8 +104,8 @@ html[data-se-ov] .se-ov-exit:not(#se-none) {
 }
 
 html[data-se-ov] .se-ov-back:not(#se-none) {
-  gap: 10px;
-  padding: 0 14px 0 16px;
+  gap: var(--se-space-2);
+  padding: 0 var(--se-space-3) 0 var(--se-space-4);
   background: var(--se-accent);
   box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--se-accent) 80%, transparent);
   color: var(--se-bg-ink);
@@ -135,11 +135,11 @@ html[data-se-ov] .se-ov-back:not(#se-none):active {
 }
 
 .se-ov-back-key {
-  padding: 3px 7px;
+  padding: var(--se-space-half) var(--se-space-2);
   border-radius: 6px;
   background: color-mix(in srgb, var(--se-bg-ink) 14%, transparent);
   color: color-mix(in srgb, var(--se-bg-ink) 75%, transparent);
-  font: 600 11px/1 var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-xs)/1 var(--se-font), 'Motiva Sans', sans-serif;
 }
 
 html[data-se-ov] .se-ov-exit:not(#se-none) {
@@ -147,7 +147,7 @@ html[data-se-ov] .se-ov-exit:not(#se-none) {
   width: var(--se-ov-rail-btn);
   padding: 0;
   background: transparent;
-  box-shadow: inset 0 0 0 1px var(--se-white-10);
+  box-shadow: var(--se-edge-soft);
   color: var(--se-text-muted);
 }
 
@@ -179,18 +179,18 @@ html[data-se-ov] :is(.se-ov-rail, .se-ov-body) > [data-tip]::before {
   left: calc(100% + 12px);
   top: 50%;
   z-index: 5;
-  padding: 6px 10px;
+  padding: var(--se-space-1) var(--se-space-2);
   border-radius: var(--se-radius-sm);
   background: var(--se-surface-2);
   box-shadow: var(--se-shadow-pop);
   color: var(--se-text-strong);
-  font: 600 12px/16px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-sm)/16px var(--se-font), 'Motiva Sans', sans-serif;
   white-space: pre;
   text-shadow: none;
   opacity: 0;
   pointer-events: none;
   transform: translate(-4px, -50%);
-  transition: opacity 120ms ease-out, transform 120ms ease-out;
+  transition: opacity var(--se-dur-fast) ease-out, transform var(--se-dur-fast) ease-out;
 }
 
 /* Exit sits at the column's foot: its label opens above it. */
@@ -204,7 +204,7 @@ html[data-se-ov] .se-ov-exit[data-tip]::before {
 html[data-se-ov] :is(.se-ov-rail, .se-ov-body) > [data-tip]:is(:hover, :focus-visible)::before {
   opacity: 1;
   transform: translate(0, -50%);
-  transition-delay: 250ms;
+  transition-delay: var(--se-dur-slow);
 }
 
 html[data-se-ov] .se-ov-tab:focus-visible {
@@ -227,8 +227,8 @@ html[data-se-ov] .se-ov-tab:focus-visible {
 .se-ov-tabs-head {
   display: flex;
   align-items: baseline;
-  gap: 12px;
-  padding-bottom: 10px;
+  gap: var(--se-space-3);
+  padding-bottom: var(--se-space-2);
   box-shadow: inset 0 -1px 0 var(--se-white-10);
 }
 
@@ -236,12 +236,12 @@ html[data-se-ov] .se-ov-tab:focus-visible {
   flex: 1;
   margin: 0;
   color: var(--se-text-strong);
-  font: 600 17px/1.2 var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-xl)/1.2 var(--se-font), 'Motiva Sans', sans-serif;
 }
 
 .se-ov-tabs-note {
   color: var(--se-text);
-  font: 500 12px/1 var(--se-font), 'Motiva Sans', sans-serif;
+  font: 500 var(--se-fs-sm)/1 var(--se-font), 'Motiva Sans', sans-serif;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -272,7 +272,7 @@ html[data-se-ov] .se-ov-overview[data-se-ov-view='settings'] > [data-view='setti
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--se-space-3);
   animation: se-ov-view-in var(--se-dur) var(--se-ease);
 }
 
@@ -294,32 +294,32 @@ html[data-se-ov] .se-ov-overview[data-se-ov-view='settings'] > [data-view='setti
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin: 0 -10px 0 -8px;
-  padding: 4px 10px 12px 8px;
+  gap: var(--se-space-half);
+  margin: 0 calc(-1 * var(--se-space-2)) 0 calc(-1 * var(--se-space-2));
+  padding: var(--se-space-1) var(--se-space-2) var(--se-space-3) var(--se-space-2);
   overflow-y: auto;
   overscroll-behavior: contain;
   mask-image: linear-gradient(to bottom, transparent, #000 8px, #000 calc(100% - 28px), transparent);
 }
 
 .se-ov-friends-group {
-  margin: 10px 0 4px;
+  margin: var(--se-space-2) 0 var(--se-space-1);
   color: var(--se-text-dim);
-  font: 700 11px/16px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 700 var(--se-fs-xs)/16px var(--se-font), 'Motiva Sans', sans-serif;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .se-ov-friends-group:first-child {
-  margin-top: 4px;
+  margin-top: var(--se-space-1);
 }
 
 html[data-se-ov] .se-ov-friend {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 0 -8px;
-  padding: 6px 8px;
+  gap: var(--se-space-3);
+  margin: 0 calc(-1 * var(--se-space-2));
+  padding: var(--se-space-1) var(--se-space-2);
   border: 0;
   border-radius: var(--se-radius-md);
   background: none;
@@ -348,13 +348,13 @@ html[data-se-ov] .se-ov-friend .se-ov-avatar {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--se-space-half);
 }
 
 .se-ov-friend-name {
   overflow: hidden;
   color: var(--se-text-strong);
-  font: 600 13px/18px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-base)/18px var(--se-font), 'Motiva Sans', sans-serif;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -362,7 +362,7 @@ html[data-se-ov] .se-ov-friend .se-ov-avatar {
 .se-ov-friend-status {
   overflow: hidden;
   color: var(--se-text-dim);
-  font: 500 11px/15px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 500 var(--se-fs-xs)/15px var(--se-font), 'Motiva Sans', sans-serif;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -379,11 +379,11 @@ html[data-se-ov] .se-ov-friend .se-ov-avatar {
 /* "Chat" shows on hover and focus. */
 .se-ov-friend-chat {
   flex: none;
-  padding: 5px 10px;
+  padding: var(--se-space-1) var(--se-space-2);
   border-radius: var(--se-radius-sm);
   background: var(--se-surface-2);
   color: var(--se-text);
-  font: 600 12px/1 var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-sm)/1 var(--se-font), 'Motiva Sans', sans-serif;
   opacity: 0;
   transition: opacity var(--se-dur) ease-out;
 }
@@ -394,12 +394,12 @@ html[data-se-ov] .se-ov-friend:is(:hover, :focus-visible) .se-ov-friend-chat {
 
 html[data-se-ov] .se-ov-friends-more {
   align-self: flex-start;
-  margin: 10px 0 4px;
+  margin: var(--se-space-2) 0 var(--se-space-1);
   padding: 0;
   border: 0;
   background: none;
   color: var(--se-text-dim);
-  font: 700 11px/16px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 700 var(--se-fs-xs)/16px var(--se-font), 'Motiva Sans', sans-serif;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
@@ -423,7 +423,7 @@ html[data-se-ov] .se-ov-friends-more:hover {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--se-space-3);
 }
 
 /* ---------- Text field with a go button (browser address) ---------- */
@@ -431,16 +431,18 @@ html[data-se-ov] .se-ov-friends-more:hover {
 .se-ov-field {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--se-space-1);
   height: 40px;
-  padding: 0 4px 0 12px;
+  padding: 0 var(--se-space-1) 0 var(--se-space-3);
   border-radius: var(--se-radius-md);
   background: rgba(var(--se-ov-ink), 0.75);
-  box-shadow: inset 0 0 0 1px var(--se-white-12);
+  box-shadow: var(--se-edge-mid);
 }
 
 .se-ov-field:focus-within {
-  box-shadow: inset 0 0 0 1px var(--se-accent);
+  box-shadow: none;
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 html[data-se-ov] .se-ov-field-input:not(#se-none) {
@@ -454,7 +456,7 @@ html[data-se-ov] .se-ov-field-input:not(#se-none) {
   box-shadow: none !important;
   outline: none !important;
   color: var(--se-text-strong) !important;
-  font: 500 13px/1 var(--se-font), 'Motiva Sans', sans-serif !important;
+  font: 500 var(--se-fs-base)/1 var(--se-font), 'Motiva Sans', sans-serif !important;
   text-shadow: none;
 }
 
@@ -499,20 +501,20 @@ html[data-se-ov] .se-ov-field-go:focus-visible {
 .se-ov-card-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
+  gap: var(--se-space-3);
+  padding: var(--se-space-2) var(--se-space-3);
   border-radius: var(--se-radius-lg);
   background: var(--se-hairline);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  box-shadow: var(--se-edge);
 }
 
 .se-ov-pill {
   flex: none;
-  padding: 3px 9px;
+  padding: var(--se-space-half) var(--se-space-2);
   border-radius: var(--se-radius-pill);
   background: var(--se-white-07);
   color: var(--se-text);
-  font: 700 10px/14px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 700 var(--se-fs-2xs)/14px var(--se-font), 'Motiva Sans', sans-serif;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -523,14 +525,14 @@ html[data-se-ov] .se-ov-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: var(--se-space-1);
   margin: 0;
-  padding: 0 14px;
+  padding: 0 var(--se-space-3);
   border: 0;
   border-radius: var(--se-radius-sm);
   background: var(--se-surface-2);
   color: var(--se-text-strong);
-  font: 600 12px/1 var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-sm)/1 var(--se-font), 'Motiva Sans', sans-serif;
   text-shadow: none;
   cursor: pointer;
   transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
@@ -566,12 +568,12 @@ html[data-se-ov] .se-ov-btn:focus-visible {
 .se-ov-slider {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--se-space-3);
 }
 
 .se-ov-slider .se-ov-tool-label {
   flex: none;
-  font: 500 13px/18px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 500 var(--se-fs-base)/18px var(--se-font), 'Motiva Sans', sans-serif;
 }
 
 html[data-se-ov] .se-ov-range {
@@ -592,7 +594,7 @@ html[data-se-ov] .se-ov-range::-webkit-slider-runnable-track {
 html[data-se-ov] .se-ov-range::-webkit-slider-thumb {
   width: 14px;
   height: 14px;
-  margin-top: -5px;
+  margin-top: calc(-1 * var(--se-space-1));
   border-radius: 50%;
   appearance: none;
   background: var(--se-accent);
@@ -614,13 +616,13 @@ html[data-se-ov] .se-ov-range:focus-visible {
 html[data-se-ov] .se-ov-switch-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--se-space-3);
   margin: 0;
-  padding: 12px 14px;
+  padding: var(--se-space-3) var(--se-space-3);
   border: 0;
   border-radius: var(--se-radius-lg);
   background: var(--se-hairline);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  box-shadow: var(--se-edge);
   color: inherit;
   text-align: start;
   cursor: pointer;
@@ -638,7 +640,7 @@ html[data-se-ov] .se-ov-switch-row:focus-visible {
 
 .se-ov-switch-desc {
   color: var(--se-text-muted);
-  font: 500 12px/16px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 500 var(--se-fs-sm)/16px var(--se-font), 'Motiva Sans', sans-serif;
   white-space: normal;
 }
 
@@ -676,15 +678,15 @@ html[data-se-ov] .se-ov-switch-row:focus-visible {
 .se-ov-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--se-space-1);
 }
 
 .se-ov-chip {
-  padding: 5px 10px;
+  padding: var(--se-space-1) var(--se-space-2);
   border-radius: var(--se-radius-pill);
   background: var(--se-hairline);
   color: var(--se-text-muted);
-  font: 600 11px/14px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-xs)/14px var(--se-font), 'Motiva Sans', sans-serif;
   text-shadow: none;
 }
 
@@ -703,5 +705,5 @@ html[data-se-ov] .se-ov-switch-row:focus-visible {
 }
 
 .se-ov-pad .se-ov-friends-group {
-  margin: 6px 0 -4px;
+  margin: var(--se-space-1) 0 calc(-1 * var(--se-space-1));
 }

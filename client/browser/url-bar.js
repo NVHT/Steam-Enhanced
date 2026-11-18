@@ -334,6 +334,7 @@
       else ui.img.removeAttribute('src');
     }
   };
+  // Own observer on purpose: one element (the address), attributes only; the shared observer would widen to every node in the window
   const urlObserver = new MutationObserver(() => {
     refresh();
     wake();
@@ -462,6 +463,7 @@
   const track = (el) => {
     if (confirmations.has(el)) return;
     const entry = { key: '', timer: 0, observer: null };
+    // Own observer on purpose: one confirmation's subtree, while it is shown; released with it
     entry.observer = new MutationObserver(() => {
       if (!el.isConnected) forget(el);
       else if (keyOf(el) !== entry.key) decide(el, entry);
@@ -484,6 +486,7 @@
   // One observer for both jobs: Steam's confirmations come and go as direct children of <body>,
   // and the bar's parts are re-tagged in a microtask after any redraw (before paint).
   let queued = false;
+  // Own observer on purpose: it must run in the observer's microtask (before paint); the shared observer batches to the next frame
   const observer = new MutationObserver(records => {
     for (const { target, addedNodes, removedNodes } of records) {
       if (target !== document.body) continue;

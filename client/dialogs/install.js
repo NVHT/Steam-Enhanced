@@ -23,12 +23,12 @@
 
   /* InstallRequestModal CSS module (58879) */
   const C = {
-    modal: '._3wtPUBfilFITcl1s4u6A7T',
-    apps: '.Krg05lMwvNmhhVXhqdleu',
-    app: '._3MJEANCb5PkduXTSJ6o3bq',
-    selector: '.vaNI84b_TV6hw20mhGl_d',
-    option: '.Oo5JPcEk_erKEYAzYp2nY',
-    notice: '.WonjNtnAq8aOefGl_x2v4',
+    modal: `.${SE.C.InstallRequestModal}`,
+    apps: `.${SE.C.AppsToInstall}`,
+    app: `.${SE.C.AppToInstall}`,
+    selector: `.${SE.C.FolderSelector}`,
+    option: `.${SE.C.FolderOption}`,
+    notice: `.${SE.C.NoticeInstallFolder}`,
   };
 
   const OURS = 'se-inst';
@@ -205,7 +205,7 @@
       /* Steam always mounts the notice; it only matters when it has text */
       const notice = root.querySelector(C.notice);
       const text = notice?.textContent.trim();
-      SE.attr(root, NOTICE, text ? (notice.querySelector('.bhL5Q352pNmO44_JjKZTX') ? 'warning' : 'info') : null);
+      SE.attr(root, NOTICE, text ? (notice.querySelector(`.${SE.C.Warning}`) ? 'warning' : 'info') : null);
 
       /* Drive cards */
       const options = new Set(root.querySelectorAll(C.option));

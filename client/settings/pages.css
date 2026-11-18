@@ -1,6 +1,6 @@
 /*
  * Settings › page specifics: Family, Notifications, Library, Voice.
- * Settings styles load in order: layout, controls, pages, storage, search, game-properties, finishing.
+ * Settings styles load in order: layout, controls, pages, storage, search, game-properties, spacing.
  */
 
 /*
@@ -19,7 +19,7 @@
   max-height: none !important;
   flex: 0 0 auto !important;
   overflow: visible !important;
-  margin: 22px 0 0 !important;
+  margin: var(--se-space-5) 0 0 !important;
   padding: 0 !important;
   background: none !important;
   box-shadow: none !important;
@@ -35,7 +35,7 @@
   z-index: 0;
   border-radius: var(--se-radius-lg);
   background: linear-gradient(110deg, var(--se-surface-2) 0%, var(--se-surface) 65%);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  box-shadow: var(--se-edge);
 }
 
 .CFTLX2wIKOK3hNV-fS7_V [data-se-family]::before {
@@ -45,9 +45,13 @@
   z-index: var(--se-z-raised);
   width: 52px;
   height: 52px;
-  margin: 22px 0;
+  margin: var(--se-space-5) 0;
   border-radius: var(--se-radius-lg);
-  background: var(--se-surface-2) var(--se-ic-family-tile) center / 26px 26px no-repeat;
+  /* One mask in the muted text tone: the icon over a faint fill of the same tone (::after is
+     the card, so the tile and its icon share this one pseudo-element) */
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-ic-family-tile) center / 26px 26px no-repeat, linear-gradient(rgb(0 0 0 / .06) 0 0);
+  mask: var(--se-ic-family-tile) center / 26px 26px no-repeat, linear-gradient(rgb(0 0 0 / .06) 0 0);
 }
 
 .CFTLX2wIKOK3hNV-fS7_V [data-se-family] > * {
@@ -59,17 +63,17 @@
 .CFTLX2wIKOK3hNV-fS7_V [data-se-family] > :first-child:not(.WIVHxIb79kMHNG7iA_Q9H) {
   grid-column: 4;
   grid-row: 1;
-  padding: 22px 0 !important;
+  padding: var(--se-space-5) 0 !important;
   margin: 0 !important;
-  font: 500 13px/1.45 var(--se-font) !important;
+  font: 500 var(--se-fs-base)/1.45 var(--se-font) !important;
   color: var(--se-text-muted) !important;
 }
 
 .CFTLX2wIKOK3hNV-fS7_V [data-se-family] > :first-child[data-se-head]::before {
   content: attr(data-se-head);
   display: block;
-  margin-bottom: 4px;
-  font: 700 16px var(--se-font);
+  margin-bottom: var(--se-space-1);
+  font: 700 var(--se-fs-lg) var(--se-font);
   color: var(--se-text-strong);
 }
 
@@ -102,8 +106,8 @@
   display: flex !important;
   align-items: flex-end !important;
   justify-content: space-between !important;
-  margin: 22px 0 10px !important;
-  padding: 0 18px 0 4px !important;
+  margin: var(--se-space-5) 0 var(--se-space-2) !important;
+  padding: 0 var(--se-space-4) 0 var(--se-space-1) !important;
 }
 
 .CFTLX2wIKOK3hNV-fS7_V ._2zGUtyw-lRSsEUPY1qaqf7 [data-se-sec]:not(#se-none) {
@@ -140,8 +144,8 @@
 /* Library: the three actions become tiles with an icon. */
 .CFTLX2wIKOK3hNV-fS7_V .RoSh6WoygUX6LLAoB20f3 {
   display: flex !important;
-  gap: 10px !important;
-  margin: 22px 0 0 !important;
+  gap: var(--se-space-2) !important;
+  margin: var(--se-space-5) 0 0 !important;
   padding: 0 !important;
 }
 
@@ -150,24 +154,39 @@
   flex: 1 1 0 !important;
   height: auto !important;
   min-height: 74px !important;
-  padding: 16px 16px 16px 72px !important;
+  padding: var(--se-space-4) var(--se-space-4) var(--se-space-4) 72px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
   justify-content: center !important;
-  gap: 3px;
+  gap: var(--se-space-half);
   border-radius: var(--se-radius-lg) !important;
   background-color: var(--se-surface) !important;
-  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  box-shadow: var(--se-edge) !important;
   text-align: left !important;
   text-shadow: none !important;
-  font: 700 14px/18px var(--se-font) !important;
+  font: 700 var(--se-fs-md)/18px var(--se-font) !important;
   color: var(--se-text) !important;
   white-space: normal !important;
-  background-image: var(--se-tile-ic, none) !important;
-  background-repeat: no-repeat !important;
-  background-position: 16px center !important;
-  background-size: 42px 42px !important;
+}
+
+/* The tile's icon chip (the icon from --se-tile-ic, client/settings/storage.css): one mask in the
+   muted text tone, the icon over a faint fill of the same tone.
+   !important: client/dialogs/dialogs.css hides a button's ::before with !important, and
+   Steam's button styles place it */
+.CFTLX2wIKOK3hNV-fS7_V .RoSh6WoygUX6LLAoB20f3 button.DialogButton[data-se-tile]::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 50% auto auto var(--se-space-4) !important;
+  width: 42px;
+  height: 42px;
+  opacity: 1 !important;
+  transform: translateY(-50%) !important;
+  border-radius: 11px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-tile-ic) center / 42px 42px no-repeat, linear-gradient(rgb(0 0 0 / .09) 0 0);
+  mask: var(--se-tile-ic) center / 42px 42px no-repeat, linear-gradient(rgb(0 0 0 / .09) 0 0);
 }
 
 .CFTLX2wIKOK3hNV-fS7_V .RoSh6WoygUX6LLAoB20f3 button.DialogButton:not(#se-none):not(#se-t1):not(#se-t2):hover {
@@ -177,7 +196,7 @@
 .CFTLX2wIKOK3hNV-fS7_V .RoSh6WoygUX6LLAoB20f3 button.DialogButton[data-se-sub]::after {
   content: attr(data-se-sub);
   display: block;
-  font: 500 12px/16px var(--se-font);
+  font: 500 var(--se-fs-sm)/16px var(--se-font);
   color: var(--se-text-muted);
 }
 
@@ -185,7 +204,7 @@
 .CFTLX2wIKOK3hNV-fS7_V ._3Vl2zkYPoCpw1q_1n28D3z[data-se-c]:not(#se-none) {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: 14px;
+  column-gap: var(--se-space-3);
   align-items: center;
 }
 
@@ -194,15 +213,15 @@
   grid-column: 1;
   margin: 0 !important;
   padding: 0 !important;
-  font: 600 14px/19px var(--se-font) !important;
+  font: 600 var(--se-fs-md)/19px var(--se-font) !important;
   color: var(--se-text) !important;
 }
 
 .CFTLX2wIKOK3hNV-fS7_V ._3Vl2zkYPoCpw1q_1n28D3z > ._3w92Ej5Kq7nbt5WACQ6jwI {
   grid-column: 1;
-  margin: 3px 0 0 !important;
+  margin: var(--se-space-half) 0 0 !important;
   padding: 0 !important;
-  font: 500 12.5px/1.4 var(--se-font) !important;
+  font: 500 var(--se-fs-base)/1.4 var(--se-font) !important;
   color: var(--se-text-muted) !important;
 }
 
@@ -221,7 +240,7 @@
 
 /* Game Recording: the three modes as selectable cards in a row. */
 .CFTLX2wIKOK3hNV-fS7_V ._2KgeKsqRFBSwJXDDLlYFj7 {
-  margin: 22px 0 0 !important;
+  margin: var(--se-space-5) 0 0 !important;
   padding: 0 !important;
 }
 
@@ -233,7 +252,7 @@
 .CFTLX2wIKOK3hNV-fS7_V ._1EntoGyxFp22pF4skClUbC {
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px !important;
+  gap: var(--se-space-2) !important;
   margin: 0 !important;
   padding: 0 !important;
 }
@@ -241,14 +260,14 @@
 .CFTLX2wIKOK3hNV-fS7_V ._7EGqd8bdiXJBd2fj5Hh8r:not(#se-none) {
   display: flex !important;
   align-items: flex-start !important;
-  gap: 14px !important;
+  gap: var(--se-space-3) !important;
   margin: 0 !important;
-  padding: 16px 18px !important;
+  padding: var(--se-space-4) var(--se-space-4) !important;
   min-height: 0 !important;
   border: 0 !important;
   border-radius: var(--se-radius-lg) !important;
   background: var(--se-surface) !important;
-  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  box-shadow: var(--se-edge) !important;
   cursor: pointer;
 }
 
@@ -269,7 +288,7 @@
   border: 0 !important;
   border-radius: 50% !important;
   background: transparent !important;
-  box-shadow: inset 0 0 0 2px #4b5866 !important;
+  box-shadow: inset 0 0 0 2px var(--se-control-off) !important;
 }
 
 .CFTLX2wIKOK3hNV-fS7_V ._2sQtvR60AbFF5UzDwY9hit._1gKI37LOWj1Df3QSnxvKyF:not(#se-none) {
@@ -283,13 +302,13 @@
 
 .CFTLX2wIKOK3hNV-fS7_V ._3HgL0eRQXwU6dIEXXK6qba {
   min-width: 0;
-  font: 500 12.5px/1.45 var(--se-font) !important;
+  font: 500 var(--se-fs-base)/1.45 var(--se-font) !important;
   color: var(--se-text-muted) !important;
 }
 
 .CFTLX2wIKOK3hNV-fS7_V ._3HgL0eRQXwU6dIEXXK6qba > ._1RUoX0kTOBfqpwCaBZGDLJ {
-  margin: 0 0 4px !important;
-  font: 700 14px/19px var(--se-font) !important;
+  margin: 0 0 var(--se-space-1) !important;
+  font: 700 var(--se-fs-md)/19px var(--se-font) !important;
   color: var(--se-text) !important;
 }
 
@@ -301,7 +320,7 @@
 .CFTLX2wIKOK3hNV-fS7_V ._2Dptk9e7W_k4zYB5wfRTcp {
   display: flex !important;
   align-items: center !important;
-  gap: 10px !important;
+  gap: var(--se-space-2) !important;
   margin: 0 !important;
 }
 
@@ -324,8 +343,8 @@
 /* Storage: a drive card (name, size, usage bar, legend), then the installed items. */
 .CFTLX2wIKOK3hNV-fS7_V ._18pPl6a2EhE7NRoba3yw7L {
   /* DriveDropdownControl */
-  margin: 22px 0 0 !important;
-  padding: 16px 18px 6px !important;
+  margin: var(--se-space-5) 0 0 !important;
+  padding: var(--se-space-4) var(--se-space-4) var(--se-space-1) !important;
   border-radius: var(--se-radius-lg) var(--se-radius-lg) 0 0 !important;
   background: var(--se-surface) !important;
   box-shadow: inset 0 1px 0 var(--se-hairline), inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline) !important;
@@ -342,7 +361,7 @@
 
 .CFTLX2wIKOK3hNV-fS7_V ._18pPl6a2EhE7NRoba3yw7L ._1rihlgVMF4Q_fFZDnXeVt5,
 .CFTLX2wIKOK3hNV-fS7_V ._1LvKJs5FKB30xbur_XL2DL ._1rihlgVMF4Q_fFZDnXeVt5 {
-  font: 700 14px var(--se-font) !important;
+  font: 700 var(--se-fs-md) var(--se-font) !important;
   color: var(--se-text) !important;
   text-decoration: none !important;
   text-transform: none !important;
@@ -350,7 +369,7 @@
 }
 
 .CFTLX2wIKOK3hNV-fS7_V ._5bG9Iwr014pu3H1SPRwYh {
-  font: 700 13px var(--se-font) !important;
+  font: 700 var(--se-fs-base) var(--se-font) !important;
   color: var(--se-text) !important;
   text-transform: none !important;
   letter-spacing: 0 !important;
@@ -360,9 +379,9 @@
   /* The row holding DriveUsage and the "…" button */
   display: flex !important;
   align-items: flex-start !important;
-  gap: 14px !important;
+  gap: var(--se-space-3) !important;
   margin: var(--se-join, 0px) 0 0 !important;
-  padding: 4px 18px 18px !important;
+  padding: var(--se-space-1) var(--se-space-4) var(--se-space-4) !important;
   border-radius: 0 0 var(--se-radius-lg) var(--se-radius-lg) !important;
   background: var(--se-surface) !important;
   box-shadow: inset 0 -1px 0 var(--se-hairline), inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline) !important;
@@ -384,8 +403,8 @@
 }
 
 .CFTLX2wIKOK3hNV-fS7_V ._1LvKJs5FKB30xbur_XL2DL > ._1rihlgVMF4Q_fFZDnXeVt5 {
-  margin: 0 0 12px !important;
-  font: 500 12px var(--se-font) !important;
+  margin: 0 0 var(--se-space-3) !important;
+  font: 500 var(--se-fs-sm) var(--se-font) !important;
   color: var(--se-text-muted) !important;
   text-transform: none !important;
 }
@@ -434,17 +453,17 @@
 .CFTLX2wIKOK3hNV-fS7_V ._2g2Ot3OPmLYBoz7PgpMnu6 {
   display: flex !important;
   flex-wrap: wrap;
-  gap: 6px 16px !important;
-  margin: 10px 0 0 !important;
+  gap: var(--se-space-1) var(--se-space-4) !important;
+  margin: var(--se-space-2) 0 0 !important;
 }
 
 /* labels */
 .CFTLX2wIKOK3hNV-fS7_V .GKxgpfNV7qATpOCAVTZhM {
   display: flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  gap: var(--se-space-1) !important;
   margin: 0 !important;
-  font: 600 11.5px var(--se-font) !important;
+  font: 600 var(--se-fs-sm) var(--se-font) !important;
   color: var(--se-text-muted) !important;
   text-transform: none !important;
   letter-spacing: 0 !important;

@@ -119,7 +119,7 @@
   const fieldLabel = (n) => text(n.querySelector?.(LABEL));
   const KEY_RE = /^(?:(?:shift|ctrl|control|alt|cmd|win)\s*\+\s*)*(?:f\d{1,2}|tab|space|insert|delete|home|end|page ?(?:up|down)|key ?pad.*|num.*|[a-z0-9]|none|[^\s]+\s*\+\s*[^\s]+)$/i;
   // Steam draws a connected controller's icon inside its name (no CSS-module key in core's map).
-  const CONTROLLER_ICON = ':is(.JASigq2q1TdofKTOw7MQt, ._3IdIX2_eZXnDrm2wqIpTSQ, ._28B5PnW21FOp5fzffM9K6) > ._30lE6NZfqKKk3ozfL--IYQ';
+  const CONTROLLER_ICON = `:is(.${C.ControllerLabel}, .${C.DongleLabel}, .${C.DisconnectedControllerLabel}) > .${C.AllControllersContainer_Icon}`;
   const TILE_SUBS = {
     'add a non-steam game': 'Shortcuts to other programs',
     'activate a product': 'Enter a product code',

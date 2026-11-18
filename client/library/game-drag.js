@@ -459,6 +459,7 @@
       zones: new Map(),
       stale: new Set(),
       over: null,
+      // Own observers on purpose: they watch the drop zones only while a drag is live, with options the window-wide observer doesn't carry; both disconnect when the drag ends
       observer: new MutationObserver(onMutations),
       bodyObserver: new MutationObserver(onBodyMutations),
       added: [],

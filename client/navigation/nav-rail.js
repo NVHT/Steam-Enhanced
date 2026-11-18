@@ -1,109 +1,143 @@
 /*
- * Navigation rail routing, extra rail shortcuts, title-bar library search, and game-list toggle.
+ * Navigation, part 4 of 4, listed last (window.__seNavParts; client/navigation/title-bar-search.js
+ * names the parts): routing, the rail's page icons and their section menus (opened on click),
+ * and the update loop that runs every part.
  */
 ((SE) => {
   const { C, railMode, mainWindow, navigate: goLibrary } = SE;
   window.__seRailNav?.destroy?.();
-
-  const SEARCH_INPUT = `.${C.GameListHomeAndSearch_Container} .${C.ContainerHide_Container} input`;
-  const FILTERS = `.${C.GameListHomeAndSearch_Container} .${C.AdvancedSearchButton}`;
-  const FILTER_PANEL = `.${C.AdvancedSearchContainer} .${C.AdvancedSearchPane}`;
-  const SELECTED = C.Selected;
-  const GAME_ROW = `.${C.GameListHomeAndSearch_Container} .Container:is(.Installed, .Uninstalled)`;
-  /* Virtualized rows and collection headers: their hover/selection churn never matters here */
-  const LIST_ROWS = SE.inside(`.${C.AppIconDownloading_Container}, .${C.HoverOverlay_Container}`);
-
-  const visibleFilterPanel = () => {
-    const pane = document.querySelector(FILTER_PANEL);
-    const box = pane?.closest(`.${C.AdvancedSearchPaneContainer}`);
-    return box?.classList.contains('Visible') ? pane : null;
-  };
-
-  const dismissFilters = (pane) => {
-    for (let fiber = SE.fiber(pane), depth = 0; fiber && depth < 20; fiber = fiber.return, depth++) {
-      const instance = fiber.stateNode;
-      if (typeof instance?.CloseAdvancedSearch === 'function') {
-        instance.CloseAdvancedSearch();
-        return;
-      }
-    }
-    const box = pane.closest(`.${C.AdvancedSearchPaneContainer}`);
-    box?.querySelector('.AdvancedSearchDismissalOverlay')?.click();
-  };
+  const ns = window.__seNavParts;
+  if (!ns?.search || !ns.titleBar || !ns.tips) return;
 
   let observer;
   let timer;
   let frame = 0;
-  let searchBar;
-  let searchInput;
-  let filtersBtn;
-  let listResizeObserver;
-  let scopeResizeObserver;
-  let scopeWatchedNode = null;
-  let scopeWidth = -1;
-  let listWatchedNode;
   let lastPollSignature = '';
 
   const patchedMenus = new Map();
   const navNodes = new Map();
-  const extraNodes = new Map();
 
   /*
-   * Every rail icon opens a fixed destination. Native SuperNav tabs reopen the last page
-   * visited in that section, so each primary item overrides its click with a set target.
+   * Every page icon opens its section's menu on click, drawn by the popup layer beside the rail
+   * in the Settings menu's language (client/header/header-actions.js): groups under headings,
+   * each row an icon, a name and a hint. A row runs Steam's own item of that name (its SuperNav
+   * items; Games: its Games menu, a button at the rail's foot) and takes Steam's localized name
+   * unless the layout gives one; a row Steam has no item for is left out, and an item the layout
+   * doesn't place (one Steam adds later) still shows, in a group at the end, unless omitted.
+   * Steam's hover dropdown stays off. If Steam's items can't be read, the icon goes to its
+   * section's fixed page (`click`). The row for the page you're on is marked (the accent): a row
+   * names its page by the library route (`route`), the Store or Community view's address (`url`),
+   * or a path under your own profile (`mine`, after /id/<name> or /profiles/<id>; Steam's browser
+   * manager says which addresses are yours).
    */
   const NAV_ITEMS = {
     store: {
       click: { url: 'https://store.steampowered.com/' },
-      extras: [
-        {
-          key: 'wishlist',
-          label: 'Wishlist',
-          url: 'https://store.steampowered.com/wishlist/',
-          match: /store\.steampowered\.com\/wishlist/,
-        },
+      layout: [
+        { heading: 'Shop' },
+        { name: '#Menu_Featured', hint: 'The store front page', icon: '--se-icon-store', url: /^https:\/\/store\.steampowered\.com\/?([?#]|$)/ },
+        { name: '#Menu_DiscoveryQueue', hint: 'Games picked for you', icon: '--se-icon-compass', url: /^https:\/\/store\.steampowered\.com\/explore\b/ },
+        { name: '#Menu_Stats', hint: 'Top sellers and most played', icon: '--se-icon-chart', url: /^https:\/\/store\.steampowered\.com\/(charts|stats)\b/ },
+        // Newer clients name the row Charts
+        { name: '#Menu_Charts', hint: 'Top sellers and most played', icon: '--se-icon-chart', url: /^https:\/\/store\.steampowered\.com\/(charts|stats)\b/ },
+        { name: '#Menu_News', hint: 'Updates and announcements', icon: '--se-icon-news', url: /^https:\/\/store\.steampowered\.com\/news\b/ },
+        { heading: 'Yours' },
+        { name: '#Menu_Wishlist', hint: 'Games you\'re waiting for', icon: '--se-icon-heart', url: /^https:\/\/store\.steampowered\.com\/wishlist\b/ },
+        { name: '#Menu_PersonalCalendar', hint: 'Releases you follow', icon: '--se-icon-calendar' },
+        { name: '#Menu_PointsShop', hint: 'Spend your Steam Points', icon: '--se-icon-points', url: /^https:\/\/store\.steampowered\.com\/points\b/ },
       ],
     },
     library: {
       click: { route: '/library/home' },
-      extras: [
-        {
-          key: 'collections',
-          label: 'Collections',
-          route: '/library/collections',
-          routeMatch: /^\/library\/collection/,
-        },
+      // The rail's Downloads button already opens Downloads
+      omit: ['#Menu_Downloads'],
+      // Steam's View menu isn't kept (client/header/menu/shared.js): its library views live here
+      extra: [
+        { name: '#Menu_HiddenGames', steamURL: 'steam://open/library/collection/hidden' },
+        { name: '#Menu_Soundtracks', steamURL: 'steam://open/library/view/soundtracks' },
+      ],
+      layout: [
+        { heading: 'Browse' },
+        { name: '#Menu_Home', hint: 'Your games and what\'s new', icon: '--se-icon-home', route: /^\/library\/home\b/ },
+        { name: '#Menu_Collections', hint: 'Your shelves of games', icon: '--se-icon-grid', route: /^\/library\/collections\b/ },
+        { name: '#Menu_HiddenGames', hint: 'Games you\'ve hidden', icon: '--se-icon-eye-off', route: /^\/library\/collection\/hidden\b/ },
+        { name: '#Menu_Soundtracks', hint: 'Music you own', icon: '--se-icon-music', route: /^\/library\/(view\/)?soundtracks\b/ },
       ],
     },
     community: {
       click: { url: 'https://steamcommunity.com/discussions/' },
-      extras: [
-        {
-          key: 'market',
-          label: 'Market',
-          url: 'https://steamcommunity.com/market/',
-          match: /steamcommunity\.com\/market/,
-        },
+      layout: [
+        { heading: 'Browse' },
+        { name: '#Menu_Home', hint: 'The community front page', icon: '--se-icon-home', url: /^https:\/\/steamcommunity\.com\/?([?#]|$)/ },
+        { name: '#Menu_Discussions', hint: 'Forums for every game', icon: '--se-icon-bubble', url: /^https:\/\/steamcommunity\.com\/discussions\b/ },
+        { name: '#Menu_Broadcasts', hint: 'Live game streams', icon: '--se-icon-broadcast', url: /^https:\/\/steamcommunity\.com\/(\?subsection=broadcasts|broadcast\b)/ },
+        { heading: 'Make and Trade' },
+        { name: '#Menu_Workshop', hint: 'Mods and creations', icon: '--se-icon-workshop', url: /^https:\/\/steamcommunity\.com\/workshop\b/ },
+        { name: '#Menu_Market', hint: 'Buy and sell items', icon: '--se-icon-tag', url: /^https:\/\/steamcommunity\.com\/market\b/ },
       ],
     },
     profile: {
       click: { url: 'https://steamcommunity.com/my/' },
-      extras: [
+      layout: [
+        { heading: 'You' },
+        { name: '#Menu_Profile', hint: 'Your public page', icon: '--se-icon-user', mine: /^\/?([?#]|$)/ },
+        { name: '#Menu_Activity', hint: 'What friends are up to', icon: '--se-icon-activity', mine: /^\/home\b/ },
+        { name: '#Menu_Badges', hint: 'Level and badges', icon: '--se-icon-badge', mine: /^\/(badges|gamecards)\b/ },
+        { name: '#Menu_YearInReview', hint: 'Your year in games', icon: '--se-icon-calendar', url: /^https:\/\/store\.steampowered\.com\/(replay|yearinreview)\b/ },
+        { heading: 'People' },
+        { name: '#Menu_Friends', hint: 'Your friends list', icon: '--se-icon-friends', mine: /^\/friends\b/ },
+        { name: '#Menu_Groups', hint: 'Groups you\'re in', icon: '--se-icon-group', mine: /^\/groups\b/ },
+        { heading: 'Items' },
+        { name: '#Menu_Content', hint: 'Screenshots, art, guides', icon: '--se-icon-photo', mine: /^\/(screenshots|images|videos|myworkshopfiles|recommended)\b/ },
+        { name: '#Menu_Inventory', hint: 'Items and trading', icon: '--se-icon-inventory', mine: /^\/inventory\b/ },
+      ],
+    },
+    games: {
+      items: () => [
+        ...(gamesMenuItems() || []),
+        // Moved here from the Steam menu (client/header/menu/actions.js)
+        backupRestore() && { name: '#Menu_BackupRestore', onClick: (win) => openBackupRestore(win) },
+      ],
+      // The rail's Library icon already opens the library
+      omit: ['#Menu_ViewLibrary'],
+      // Short names of its own: Steam's are long ("Activate a Product on Steam...")
+      layout: [
+        { heading: 'Redeem' },
         {
-          key: 'activity',
-          label: 'Activity',
-          url: 'https://steamcommunity.com/my/home/',
-          match: /steamcommunity\.com\/(?:id|profiles|my)\/[^/]+\/home|steamcommunity\.com\/my\/home/,
+          name: '#Menu_ActivateRetail',
+          label: 'Activate a Product',
+          hint: 'Enter a product key',
+          icon: '--se-icon-key',
         },
         {
-          key: 'inventory',
-          label: 'Inventory',
-          url: 'https://steamcommunity.com/my/inventory/',
-          match: /steamcommunity\.com\/(?:id|profiles)\/[^/]+\/inventory|steamcommunity\.com\/my\/inventory/,
+          name: '#Menu_RedeemWallet',
+          label: 'Redeem Wallet Code',
+          hint: 'Add funds to your wallet',
+          icon: '--se-icon-wallet',
+        },
+        {
+          name: '#Menu_ManageGifts',
+          label: 'Gifts and Guest Passes',
+          hint: 'Your gift inventory',
+          icon: '--se-icon-gift',
+        },
+        { heading: 'Add Games' },
+        {
+          name: '#Menu_AddNonSteam',
+          label: 'Add a Non-Steam Game',
+          hint: 'A game on this PC',
+          icon: '--se-icon-folder-plus',
+        },
+        {
+          name: '#Menu_BackupRestore',
+          label: 'Restore a Backup',
+          hint: 'Install from backup files',
+          icon: '--se-icon-restore',
         },
       ],
     },
   };
+
 
   function currentRoutePath() {
     try {
@@ -150,50 +184,6 @@
     else if (target.url) openExternalURL(target.url);
   }
 
-  /*
-   * Runs `callback` once the library's list is mounted, navigating there first if needed.
-   * One wait at a time: a later call replaces the pending callback (callbacks read live state
-   * when they run), so fast typing neither re-navigates nor applies a stale value.
-   */
-  let mountWait = null;
-
-  /*
-   * Library search acts on the library, so on a Store or Community page it brings the library
-   * forward first: its list stays mounted under the page, where results can't be seen. (Filters
-   * there opens over the page instead, and comes here only when it can't.)
-   */
-  function whenLibraryMounted(callback) {
-    if (SE.browserShown()) navigateToLibraryRoute('/library/home');
-    if (document.querySelector(SEARCH_INPUT)) {
-      callback();
-      return;
-    }
-    if (mountWait) {
-      mountWait.callback = callback;
-      return;
-    }
-    navigateToLibraryRoute('/library/home');
-    mountWait = { callback, attempts: 0, timer: 0 };
-    const pollMount = () => {
-      const wait = mountWait;
-      if (!wait) return;
-      if (document.querySelector(SEARCH_INPUT)) {
-        mountWait = null;
-        wait.callback();
-      } else if (++wait.attempts < 60) {
-        wait.timer = setTimeout(pollMount, 50);
-      } else {
-        mountWait = null;
-      }
-    };
-    mountWait.timer = setTimeout(pollMount, 50);
-  }
-
-  function cancelMountWait() {
-    if (mountWait) clearTimeout(mountWait.timer);
-    mountWait = null;
-  }
-
   function findRetainedPopupMenu(fiber) {
     for (let hook = fiber?.memoizedState; hook; hook = hook.next) {
       const value = hook.memoizedState?.current;
@@ -220,614 +210,203 @@
     }
   }
 
-  function onNavClick(event) {
-    if (!railMode()) return;
-    const key = event.currentTarget.getAttribute('data-se-icon');
-    const target = NAV_ITEMS[key]?.click;
-    if (!target) return;
-    event.preventDefault();
-    event.stopPropagation();
-    activateTarget(target);
+  /* Steam's word for a menu token in the client's language; "#Menu_PointsShop" -> "Points Shop" else */
+  /*
+   * Steam's own localizer first (the one its menus use, found by client/header/menu/api.js),
+   * then its LocalizationManager; a word made from the token only if neither knows it.
+   */
+  function localizeToken(token) {
+    const sources = [
+      () => window.__seSteamMenuParts?.live?.api?.localize?.(token),
+      () =>
+        SE.global('LocalizationManager', (m) => typeof m.LocalizeString === 'function')
+          ?.LocalizeString(token, true),
+      () => SE.global('LocalizeString', (fn) => typeof fn === 'function')?.(token),
+    ];
+    for (const source of sources) {
+      const text = SE.run(source);
+      if (typeof text === 'string' && text && !text.startsWith('#')) return text.replace(/\u2026/g, '...');
+    }
+    return token.replace(/^#(?:Menu_)?/, '').replace(/([a-z])([A-Z])/g, '$1 $2');
   }
 
-  function buildExtraRailButton(extra) {
-    const wrap = document.createElement('div');
-    wrap.className = 'se-rail-extra';
-    wrap.setAttribute('data-se-extra', extra.key);
+  /*
+   * A Steam URL, opened as Steam's menus open one: through its navigator's SteamWeb (steam://
+   * links such as steam://url/RedeemWalletVoucher, and Store or Community pages, in the client's
+   * browser). Without the navigator: steam:// links through the client, pages in the browser.
+   */
+  function openSteamURL(url) {
+    const navigator = SE.run(() => SE.global('tempNavStore')?.GetNavigator());
+    if (typeof navigator?.SteamWeb === 'function' && SE.run(() => (navigator.SteamWeb(url), true))) return;
+    if (url.startsWith('steam://')) SE.run(() => window.SteamClient.URL.ExecuteSteamURL(url));
+    else openExternalURL(url);
+  }
 
-    const button = document.createElement('div');
-    button.className = `${C.Button} se-native-header-button se-menu-icon`;
-    button.setAttribute('data-se-icon', extra.key);
-    button.setAttribute('role', 'button');
-    button.tabIndex = 0;
-    button.setAttribute('aria-label', extra.label);
-    button.appendChild(document.createElement('span'));
-    button.addEventListener('click', () => activateTarget(extra));
-    button.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        activateTarget(extra);
-      }
+  /* The props Steam renders a page icon's SuperNav menu from (its menuItems among them) */
+  function superNavProps(node) {
+    for (let fiber = SE.fiber(node), depth = 0; fiber && depth < 15; fiber = fiber.return, depth++) {
+      if (fiber.memoizedProps?.bSuperNavBehavior) return fiber.memoizedProps;
+    }
+    return null;
+  }
+
+  /*
+   * Steam's Restore Game Backup dialog (what the Steam menu's row opened): the backup module's
+   * opener taking just the window (its other export, backing up given games, takes two).
+   */
+  const backupRestore = () =>
+    SE.findModule('rail:backup-restore', (src, id, req) => {
+      if (!src.includes('#BackupApps_Title') || !src.includes('GetBackupsInFolder')) return null;
+      const exports = SE.run(() => req(id));
+      return Object.values(exports || {}).find((fn) => typeof fn === 'function' && fn.length === 1) || null;
     });
-    wrap.appendChild(button);
-    return wrap;
+  const openBackupRestore = (win) => backupRestore()?.(win);
+
+  /* Steam's Games menu items, read off its (hidden) menu-bar button */
+  function gamesMenuItems() {
+    const button = document.querySelector(`.${C.RootMenuBar} .${C.RootMenuButton}[data-se-icon="games"]`);
+    for (let fiber = SE.fiber(button), depth = 0; fiber && depth < 15; fiber = fiber.return, depth++) {
+      const props = fiber.memoizedProps;
+      if (props?.title === 'Games Root Menu' && Array.isArray(props.menuItems)) return props.menuItems;
+    }
+    return null;
+  }
+
+  /*
+   * Steam's items as menu rows. An item carries a route (the library's pages), a steamURL (a
+   * Store or Community page, resolved by Steam) or its own onClick; hidden ones (visible:
+   * false) are left out, and "Separator" rows become dividers, never doubled or at an end.
+   */
+  // What a Steam menu item does: a route (the library's pages), a steamURL, or its own onClick
+  function itemAction(item) {
+    if (!item || item.visible === false) return null;
+    if (item.route) return () => navigateToLibraryRoute(item.route);
+    if (typeof item.steamURL === 'string' && item.steamURL) return () => openSteamURL(item.steamURL);
+    // Handed this window: a dialog it opens (Activate a Product) shows here as an overlay
+    if (typeof item.onClick === 'function') return () => SE.run(item.onClick, window);
+    return null;
+  }
+
+  // The page the main window shows: a library route, or the Store / Community view's address
+  // (and, under your own profile, the path after it)
+  function currentPage() {
+    if (!SE.browserShown()) return { route: currentRoutePath() };
+    const url = currentBrowserURL();
+    const mine = SE.run(() => browserManager()?.GetTabForURL(url)) === 'me';
+    const rest = mine ? url.replace(/^https:\/\/steamcommunity\.com\/(id|profiles)\/[^/?#]+/, '') : null;
+    return { url, mine: rest };
+  }
+
+  // Whether a layout row names the page the main window shows
+  function isCurrent(row, here) {
+    if (row.route && here.route != null) return row.route.test(here.route);
+    if (row.url && here.url) return row.url.test(here.url);
+    if (row.mine && here.mine != null) return row.mine.test(here.mine);
+    return false;
+  }
+
+  // A section's menu: the layout's rows Steam has an item for, grouped under their headings,
+  // then any item of Steam's the layout doesn't place
+  function layoutRows(layout, items, omit = []) {
+    const here = currentPage();
+    const named = items.filter((item) => typeof item?.name === 'string');
+    const byName = new Map(named.map((item) => [item.name, item]));
+    const groups = [];
+    const placed = new Set(omit);
+    for (const row of layout) {
+      if (row.heading) {
+        groups.push({ heading: row.heading, rows: [] });
+        continue;
+      }
+      placed.add(row.name);
+      const run = itemAction(byName.get(row.name));
+      // Without a label of its own, the row takes Steam's name for the item
+      const label = row.label || localizeToken(row.name);
+      if (run) groups.at(-1).rows.push({ label, hint: row.hint, icon: row.icon, run, current: isCurrent(row, here) });
+    }
+    const rest = [];
+    for (const [name, item] of byName) {
+      const run = !placed.has(name) && !name.startsWith('Separator') && itemAction(item);
+      if (run) rest.push({ label: localizeToken(name), run });
+    }
+    groups.push({ rows: rest });
+
+    const rows = [];
+    for (const group of groups.filter((g) => g.rows.length)) {
+      if (rows.length) rows.push({ separator: true });
+      if (group.heading) rows.push({ heading: group.heading });
+      rows.push(...group.rows);
+    }
+    return rows.length ? rows : null;
+  }
+
+  function sectionRows(key, node) {
+    const entry = NAV_ITEMS[key];
+    const items = entry.items ? entry.items() : superNavProps(node)?.menuItems;
+    if (!Array.isArray(items)) return null;
+    return layoutRows(entry.layout, [...items, ...(entry.extra || [])], entry.omit);
+  }
+
+  let navMenu = null;
+  let navMenuKey = '';
+  function closeNavMenu() {
+    navMenu?.release();
+    navMenu = null;
+    navMenuKey = '';
+  }
+
+  /*
+   * Opens (or, clicked again, closes) a section's menu beside the rail, side-aligned with its
+   * button (SE.layer.besideRail: a page icon's top, a foot button's bottom). Returns false if the
+   * menu couldn't open.
+   */
+  function toggleNavMenu(key, node, { foot = false } = {}) {
+    const entry = NAV_ITEMS[key];
+    if (!entry || !node) return false;
+    const reopen = !(navMenu && !navMenu.released && navMenuKey === key);
+    closeNavMenu();
+    if (!reopen) return true;
+
+    const rows = sectionRows(key, node);
+    navMenu = rows
+      ? SE.layer?.menu(
+          rows,
+          SE.layer.besideRail(node, { foot }),
+          // Leaving the button or the menu closes it, as the rail's other menus do
+          { owner: node, closeOnLeave: true }
+        )
+      : null;
+    if (navMenu) navMenuKey = key;
+    return Boolean(navMenu);
+  }
+
+  function onNavClick(event) {
+    if (!railMode()) return;
+    const node = event.currentTarget;
+    const key = node.getAttribute('data-se-icon');
+    const entry = NAV_ITEMS[key];
+    if (!entry) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (!toggleNavMenu(key, node) && entry.click) activateTarget(entry.click);
   }
 
   function bindNavItems() {
-    for (const [key, config] of Object.entries(NAV_ITEMS)) {
+    for (const key of Object.keys(NAV_ITEMS)) {
+      if (NAV_ITEMS[key].items) continue; // Games: a button at the rail's foot (header-actions.js)
       const node = document.querySelector(`.${C.SuperNavBar} .se-menu-icon[data-se-icon="${key}"]`);
       const prev = navNodes.get(key);
       if (node !== prev) {
         prev?.removeEventListener('click', onNavClick, true);
         if (node) {
           node.addEventListener('click', onNavClick, true);
+          node.setAttribute('aria-haspopup', 'menu');
           navNodes.set(key, node);
         } else {
           navNodes.delete(key);
         }
       }
-      if (!node) {
-        for (const extra of config.extras) extraNodes.get(extra.key)?.remove();
-        continue;
-      }
-      suppressSuperNavDropdown(node);
-      let anchor = node.closest(`.${C.SuperNavMenu}`);
-      if (!anchor?.parentElement) continue;
-      for (const extra of config.extras) {
-        let wrap = extraNodes.get(extra.key);
-        if (!wrap) {
-          wrap = buildExtraRailButton(extra);
-          extraNodes.set(extra.key, wrap);
-        }
-        if (wrap.previousElementSibling !== anchor) anchor.after(wrap);
-        anchor = wrap;
-      }
-    }
-  }
-
-  // Title-bar library search and filter button
-  const setNativeSearchValue = (value) => {
-    const native = document.querySelector(SEARCH_INPUT);
-    if (!native || native.value === value) return;
-    const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(native), 'value')?.set;
-    if (setter) setter.call(native, value);
-    else native.value = value;
-    native.dispatchEvent(new Event('input', { bubbles: true }));
-  };
-
-  let lastPointerDownAt = 0;
-  let filterWasOpenOnDown = null;
-
-  const onPointerDown = (event) => {
-    lastPointerDownAt = performance.now();
-    filterWasOpenOnDown = filtersBtn?.contains(event.target) ? !!visibleFilterPanel() : null;
-  };
-  addEventListener('pointerdown', onPointerDown, true);
-
-  function buildSearchBar() {
-    searchBar = document.createElement('div');
-    searchBar.className = 'se-title-search';
-    searchBar.setAttribute('role', 'search');
-    // The scope slot holds the game-type picker's place: the native picker is fixed over it.
-    searchBar.innerHTML =
-      '<span class="se-title-scope" aria-hidden="true"></span>' +
-      '<span class="se-search-icon" aria-hidden="true"></span>' +
-      '<input type="text" spellcheck="false" placeholder="Search your library" aria-label="Search your library">' +
-      '<button type="button" class="se-title-filters" aria-pressed="false">' +
-        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>' +
-        'Filters' +
-      '</button>';
-
-    searchInput = searchBar.querySelector('input');
-    filtersBtn = searchBar.querySelector('.se-title-filters');
-    let lastTypedAt = 0;
-
-    const retainSearchFocus = () => {
-      if (document.activeElement === searchInput || !searchInput.isConnected) return;
-      const caretPos = searchInput.value.length;
-      searchInput.focus({ preventScroll: true });
-      try {
-        searchInput.setSelectionRange(caretPos, caretPos);
-      } catch {}
-    };
-
-    searchInput.addEventListener('input', () => {
-      const value = searchInput.value;
-      lastTypedAt = performance.now();
-      searchBar.classList.toggle('se-has-text', !!value);
-      if (window.__seDownloads?.library) {
-        cancelMountWait();
-        window.__seDownloads.searchGames(value);
-        return;
-      }
-      whenLibraryMounted(() => {
-        setNativeSearchValue(searchInput.value);
-        retainSearchFocus();
-        requestAnimationFrame(retainSearchFocus);
-        setTimeout(retainSearchFocus, 120);
-      });
-    });
-
-    searchInput.addEventListener('blur', () => {
-      if (performance.now() - lastTypedAt > 800 || performance.now() - lastPointerDownAt < 400) return;
-      requestAnimationFrame(retainSearchFocus);
-    });
-
-    searchInput.addEventListener('keydown', (event) => {
-      event.stopPropagation();
-      if (event.key === 'Escape') {
-        searchInput.value = '';
-        searchBar.classList.remove('se-has-text');
-        const downloads = window.__seDownloads;
-        if (downloads?.library) downloads.searchGames('');
-        else setNativeSearchValue('');
-        searchInput.blur();
-      } else if (event.key === 'Enter') {
-        const downloads = window.__seDownloads;
-        if (downloads?.library) {
-          if (downloads.openFirstGame()) searchInput.blur();
-          return;
-        }
-        const firstRow = document.querySelector(GAME_ROW);
-        if (firstRow) {
-          firstRow.click();
-          searchInput.blur();
-        }
-      }
-    });
-
-    for (const type of ['keyup', 'keypress']) {
-      searchInput.addEventListener(type, (event) => event.stopPropagation());
-    }
-
-    filtersBtn.addEventListener('click', (event) => {
-      const wasOpen = event.detail === 0 ? null : filterWasOpenOnDown;
-      filterWasOpenOnDown = null;
-      const library = () =>
-        whenLibraryMounted(() => {
-          const nativeBtn = document.querySelector(FILTERS);
-          if (!nativeBtn) return;
-          const pane = visibleFilterPanel();
-          if (wasOpen || pane) {
-            if (pane) dismissFilters(pane);
-            return;
-          }
-          nativeBtn.click();
-        });
-      // Over a Store or Community page, Steam's panel is drawn above it (filters-panel.js).
-      if (SE.browserShown() && SE.filtersPanel?.toggle(library)) return;
-      library();
-    });
-  }
-
-  function ensureSearchBar() {
-    const topBar = document.querySelector(`.${C.TopBar}`);
-    if (!topBar) return;
-    if (!searchBar) buildSearchBar();
-    if (searchBar.parentElement !== topBar) topBar.appendChild(searchBar);
-
-    const downloads = window.__seDownloads;
-    filtersBtn.hidden = Boolean(downloads?.library);
-    const native = downloads?.library?.querySelector('input') || document.querySelector(SEARCH_INPUT);
-    if (native && document.activeElement !== searchInput && native.value !== searchInput.value) {
-      searchInput.value = native.value;
-      searchBar.classList.toggle('se-has-text', !!native.value);
-    }
-    SE.mark(filtersBtn, 'aria-pressed', String(Boolean(visibleFilterPanel() || SE.filtersPanel?.open)));
-  }
-
-  function onGlobalKeyDown(event) {
-    if (!railMode() || !searchBar) return;
-    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 'k') {
-      event.preventDefault();
-      searchInput.focus();
-      searchInput.select();
-    }
-  }
-
-  // Game list header metrics and collapse toggle
-  const LIST_SELECTOR = `.${C.GameListHomeAndSearch_Container}`;
-  const HIDE_KEY = 'se-list-hidden';
-  const VIEW_COUNT_KEY = 'se-view-count';
-  /* The game-type menu's last total, mirrored to storage for the next start */
-  let lastViewCount = null;
-
-  let listToggleBtn;
-  // Scroll-to-top tile beside Recent / Ready to play; shown once the game list is scrolled.
-  const TOP_THRESHOLD = 120;
-  let topBtn;
-  let topScroller = null;
-  /* Until measured: the rail's width, plus the fixed list width (--se-list-w) */
-  let listLeft = 60;
-  let listRight = 410;
-
-  /* Read once; updates go to memory and storage together */
-  let listHidden = (() => {
-    try {
-      return localStorage.getItem(HIDE_KEY) === '1';
-    } catch {
-      return false;
-    }
-  })();
-
-  const isListHidden = () => listHidden;
-
-  const setListHidden = (hidden) => {
-    listHidden = hidden;
-    try {
-      localStorage.setItem(HIDE_KEY, hidden ? '1' : '0');
-    } catch {}
-  };
-
-  // The list's width is --se-list-w in CSS; only its edges are tracked here. Its resize handle
-  // (client/shared/column-resize.js) rides on whichever list is showing; the "Game list width"
-  // setting's Adjustable file shows it and makes the dragged width count.
-  let listResize = null;
-  const syncListHandle = (list, visible) => {
-    const host = visible ? list.closest(`.${C.LeftListSizableContainer}`) : null;
-    if (!host) {
-      listResize?.handle.remove();
-      return;
-    }
-    listResize ??= SE.columnResize?.({
-      col: 'list',
-      side: 'right',
-      cssVar: '--se-list-w-user',
-      storageKey: 'se-list-w',
-      label: 'Resize game list',
-      min: 260,
-      max: () => Math.min(560, innerWidth * 0.4),
-      // The host it sits on now: Steam remounts the list, and the handle moves with it
-      measure: () => listResize.handle.parentElement?.getBoundingClientRect().width || 0,
-    });
-    if (listResize && listResize.handle.parentElement !== host) host.appendChild(listResize.handle);
-  };
-
-  const setTopVisible = (on) => topBtn?.toggleAttribute('data-se-on', !!on);
-
-  // Scroll doesn't bubble, so this listens in the capture phase and takes whichever
-  // tall scroller inside the list fired: no hashed class to chase for the virtual list.
-  const onListScroll = (event) => {
-    const el = event.target;
-    if (!(el instanceof Element) || el.clientHeight < 200 || !el.closest(LIST_SELECTOR)) return;
-    topScroller = el;
-    setTopVisible(el.scrollTop > TOP_THRESHOLD);
-  };
-
-  const applyListEdgeVars = () => {
-    for (const el of [listToggleBtn, topBtn, document.querySelector('.se-sidebar-icons')]) {
-      SE.cssVar(el, '--se-list-left', `${listLeft}px`);
-      SE.cssVar(el, '--se-list-right', `${listRight}px`);
-    }
-  };
-
-  let countCache = { at: 0, count: null };
-
-  /*
-   * The game-type picker sits fixed over the start of the title-bar search (CSS); the field
-   * reserves its width so the text never runs under it. Its label and count change width
-   * ("Games 4,382" / "Soundtracks 64"), so the picker is watched, and the width is written
-   * only when it changes.
-   */
-  function syncSearchScope(picker) {
-    if (!searchBar) return;
-    if (picker !== scopeWatchedNode && window.ResizeObserver) {
-      scopeResizeObserver ??= new ResizeObserver(schedule);
-      if (scopeWatchedNode) scopeResizeObserver.unobserve(scopeWatchedNode);
-      if (picker) scopeResizeObserver.observe(picker);
-      scopeWatchedNode = picker;
-    }
-    const width = picker ? Math.ceil(picker.getBoundingClientRect().width) : 0;
-    if (width === scopeWidth) return;
-    scopeWidth = width;
-    searchBar.classList.toggle('se-has-scope', width > 0);
-    SE.cssVar(searchBar, '--se-title-type-w', width > 0 ? `${width}px` : null);
-  }
-
-  function totalLibraryGameCount() {
-    if (Date.now() - countCache.at < 5000) return countCache.count;
-    const apps = SE.global('appStore', (store) => Array.isArray(store.allApps))?.allApps;
-    const collections = SE.global('collectionStore');
-    const isHidden = (id) => !!SE.run(() => collections.BIsHidden(id));
-    const count = apps
-      ? apps.filter(
-          app =>
-            (app.app_type === 1 || app.app_type === 1073741824) &&
-            app.visible_in_game_list !== false &&
-            !isHidden(app.appid)
-        ).length
-      : null;
-    countCache = { at: Date.now(), count };
-    return count;
-  }
-
-  const resolveSelfPersona = () =>
-    SE.global('g_FriendsUIApp')?.FriendStore?.self?.persona || SE.global('friendStore')?.self?.persona || null;
-
-  function syncAccountStatus() {
-    const account = document.querySelector(`.${C.FocusNavigationRoot_TitleBarControls} .${C.AccountMenu}`);
-    if (!account) return;
-    const persona = resolveSelfPersona();
-    let status = '';
-    if (persona) {
-      status = persona.is_ingame
-        ? 'ingame'
-        : persona.is_online
-          ? persona.is_awayOrSnooze
-            ? 'away'
-            : 'online'
-          : 'offline';
-    } else if (account.classList.contains('ingame')) {
-      status = 'ingame';
-    } else if (account.classList.contains('online')) {
-      status = 'online';
-    }
-    SE.attr(account, 'data-se-status', status || null);
-  }
-
-  function syncGameList() {
-    const hidden = isListHidden();
-    document.body.classList.toggle('se-list-hidden', hidden);
-
-    const downloadsList = window.__seDownloads?.library;
-    const list = downloadsList || document.querySelector(LIST_SELECTOR);
-    if (list !== listWatchedNode && window.ResizeObserver) {
-      listResizeObserver ??= new ResizeObserver(schedule);
-      if (listWatchedNode) listResizeObserver.unobserve(listWatchedNode);
-      if (list) listResizeObserver.observe(list);
-      listWatchedNode = list;
-    }
-
-    const rect = list && !hidden ? list.getBoundingClientRect() : null;
-    const isVisible = !!rect && rect.width > 0 && rect.height > 0;
-    if (isVisible) {
-      listLeft = Math.round(rect.left);
-      listRight = Math.round(rect.right);
-    }
-
-    SE.cssVar(document.body, '--se-list-left', null);
-    SE.cssVar(document.body, '--se-list-right', null);
-    syncListHandle(list, isVisible);
-    if (isVisible !== document.body.hasAttribute('data-se-list')) {
-      document.body.toggleAttribute('data-se-list', isVisible);
-    }
-
-    const picker = list?.querySelector(`.${C.MenuHeader}`);
-    syncSearchScope(isVisible && !downloadsList ? picker : null);
-    if (picker) {
-      const rawDigits =
-        picker.querySelector(`.${C.AppCount}`)?.textContent.replace(/[^\d]/g, '') || '';
-      let count = rawDigits ? Number(rawDigits) : null;
-      const viewLabel = (
-        picker.querySelector(`.${C.ViewName}`)?.textContent ||
-        picker.textContent ||
-        ''
-      )
-        .trim()
-        .toLowerCase();
-
-      if (count === null && lastViewCount === null) {
-        try {
-          const cached = localStorage.getItem(VIEW_COUNT_KEY);
-          if (cached) lastViewCount = Number(cached);
-        } catch {}
-      }
-      if (count === null) count = lastViewCount;
-      if (count === null && /^(all )?games$/.test(viewLabel)) {
-        count = totalLibraryGameCount();
-      }
-      SE.attr(picker, 'data-se-count', count === null ? null : count.toLocaleString('en'));
-    }
-
-    const onLibraryRoute = /^\/library/.test(currentRoutePath()) || !!list;
-    if (!listToggleBtn) {
-      listToggleBtn = document.createElement('button');
-      listToggleBtn.type = 'button';
-      listToggleBtn.className = 'se-list-toggle se-sidebar-tip';
-      listToggleBtn.innerHTML =
-        '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9 4v16"/></svg>';
-      listToggleBtn.addEventListener('click', () => {
-        setListHidden(!isListHidden());
-        schedule();
-      });
-    }
-
-    const topBar = document.querySelector(`.${C.TopBar}`);
-    if (topBar && onLibraryRoute) {
-      if (listToggleBtn.parentElement !== topBar) topBar.appendChild(listToggleBtn);
-    } else {
-      listToggleBtn.remove();
-    }
-
-    if (!topBtn) {
-      topBtn = document.createElement('button');
-      topBtn.type = 'button';
-      topBtn.className = 'se-list-top se-sidebar-tip';
-      topBtn.setAttribute('aria-label', 'Scroll to top');
-      topBtn.addEventListener('click', () => {
-        const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
-        topScroller?.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
-      });
-    }
-
-    if (topBar && onLibraryRoute && isVisible) {
-      if (topBtn.parentElement !== topBar) topBar.appendChild(topBtn);
-      if (!topScroller?.isConnected) topScroller = null;
-      setTopVisible(topScroller && topScroller.scrollTop > TOP_THRESHOLD);
-    } else {
-      topBtn.remove();
-      setTopVisible(false);
-    }
-
-    SE.mark(listToggleBtn, 'aria-label', hidden ? 'Show game list' : 'Hide game list');
-    SE.mark(listToggleBtn, 'aria-pressed', String(hidden));
-    applyListEdgeVars();
-  }
-
-  // Reposition native tooltips beneath title-bar controls
-  const TOOLTIP_SELECTOR = `.${C.ToolTipCustom}, .${C.TextToolTip}`;
-  let hoveredElement = null;
-  let tipObserver;
-
-  const titleBarBottom = () =>
-    document.querySelector(`.${C.TopBar}`)?.getBoundingClientRect().bottom || 48;
-
-  function onMouseOver(event) {
-    hoveredElement = event.target instanceof Element ? event.target : null;
-  }
-
-  const resolveTitleBarControl = (el) => {
-    if (!el?.isConnected) return null;
-    const rect = el.getBoundingClientRect();
-    return rect.top < titleBarBottom() - 2 &&
-      rect.bottom > 0 &&
-      rect.height <= 64 &&
-      rect.width <= 480
-      ? el
-      : null;
-  };
-
-  function positionTitleBarTooltip(tip) {
-    if (!railMode()) return;
-    const hovered = resolveTitleBarControl(hoveredElement);
-    if (!hovered) return;
-
-    const anchor =
-      hovered.closest(
-        `.${C.CheckboxWithImage}, .${C.MenuHeader}, .se-list-toggle, .se-list-top, .se-title-search, [role=button], button`
-      ) || hovered;
-
-    let container = null;
-    for (let node = tip; node && node !== document.body; node = node.parentElement) {
-      if (node.contains(anchor)) break;
-      const pos = getComputedStyle(node).position;
-      if ((pos === 'absolute' || pos === 'fixed') && node.getBoundingClientRect().width > 0) {
-        container = node;
-        break;
-      }
-    }
-    if (!container) {
-      container = tip;
-      container.style.setProperty('position', 'fixed', 'important');
-      container.style.setProperty('z-index', 'var(--se-z-popover, 1000)', 'important');
-    }
-
-    const anchorRect = anchor.getBoundingClientRect();
-    const boxRect = container.getBoundingClientRect();
-    if (!boxRect.width || boxRect.width > 480 || boxRect.height > 320 || anchorRect.height > 64) {
-      return;
-    }
-
-    const desired = {
-      left: Math.round(
-        Math.max(
-          8,
-          Math.min(
-            innerWidth - boxRect.width - 8,
-            anchorRect.left + anchorRect.width / 2 - boxRect.width / 2
-          )
-        )
-      ),
-      top: Math.round(anchorRect.bottom + 6),
-    };
-
-    if (Math.abs(boxRect.top - desired.top) < 1 && Math.abs(boxRect.left - desired.left) < 1) {
-      return;
-    }
-
-    for (const [prop, val] of [
-      ['bottom', 'auto'],
-      ['right', 'auto'],
-      ['transform', 'none'],
-      ['margin', '0'],
-    ]) {
-      container.style.setProperty(prop, val, 'important');
-    }
-
-    let left = desired.left;
-    let top = desired.top;
-    for (let pass = 0; pass < 2; pass++) {
-      container.style.setProperty('left', `${left}px`, 'important');
-      container.style.setProperty('top', `${top}px`, 'important');
-      const currentRect = container.getBoundingClientRect();
-      const dx = desired.left - currentRect.left;
-      const dy = desired.top - currentRect.top;
-      if (Math.abs(dx) < 1 && Math.abs(dy) < 1) break;
-      left += Math.round(dx);
-      top += Math.round(dy);
-    }
-  }
-
-  function inspectGameTypeMenu(menu) {
-    let total = 0;
-    let hasActive = false;
-    for (const row of menu.querySelectorAll(`.${C.Row}`)) {
-      const countEl = row.querySelector(`.${C.AppCount}`);
-      if (!countEl) continue;
-      const digits = countEl.textContent.replace(/[^\d]/g, '');
-      const formatted = digits ? Number(digits).toLocaleString('en') : '';
-      SE.mark(countEl, 'data-se-n', formatted);
-      if (digits && row.querySelector('.DialogCheckbox.Active')) {
-        total += Number(digits);
-        hasActive = true;
-      }
-    }
-    if (hasActive && total !== lastViewCount) {
-      lastViewCount = total;
-      try {
-        localStorage.setItem(VIEW_COUNT_KEY, String(total));
-      } catch {}
-      schedule();
-    }
-  }
-
-  function observeTooltips() {
-    /*
-     * Records from the list rows are dropped by `ignore`; class changes are kept for the
-     * game-type menu's checkboxes, which are inspected only when a record touches the menu.
-     */
-    tipObserver = SE.watch(
-      records => {
-        const menu = document.querySelector(`.${C.DropDown}`);
-        if (menu && records.some(({ target }) => menu.contains(target) || target.contains(menu))) {
-          inspectGameTypeMenu(menu);
-        }
-        for (const record of records) {
-          for (const node of record.addedNodes) {
-            if (!(node instanceof Element)) continue;
-            const tip = node.matches(TOOLTIP_SELECTOR) ? node : node.querySelector(TOOLTIP_SELECTOR);
-            if (tip) {
-              requestAnimationFrame(() => {
-                positionTitleBarTooltip(tip);
-                setTimeout(() => positionTitleBarTooltip(tip), 80);
-              });
-            }
-          }
-        }
-      },
-      { attributes: ['class'], records: true, ignore: LIST_ROWS }
-    );
-    document.addEventListener('mouseover', onMouseOver, true);
-  }
-
-  function syncActiveRoute() {
-    const route = currentRoutePath();
-    const url =
-      /^\/browser/i.test(route) || !/^\/library/.test(route) ? currentBrowserURL() : '';
-    let activeKey = '';
-
-    for (const config of Object.values(NAV_ITEMS)) {
-      for (const extra of config.extras) {
-        const matches = extra.routeMatch
-          ? extra.routeMatch.test(route)
-          : url && extra.match?.test(url);
-        if (matches) activeKey = extra.key;
-      }
-    }
-
-    SE.attr(document.body, 'data-se-extra', activeKey || null);
-    for (const [key, wrap] of extraNodes) {
-      wrap.classList.toggle(SELECTED, key === activeKey);
+      if (node) suppressSuperNavDropdown(node);
     }
   }
 
@@ -839,10 +418,8 @@
       return;
     }
     bindNavItems();
-    ensureSearchBar();
-    syncGameList();
-    syncAccountStatus();
-    syncActiveRoute();
+    ns.search.ensure();
+    ns.titleBar.sync();
   }
 
   function schedule() {
@@ -851,12 +428,12 @@
 
   function pollState() {
     if (!railMode()) return;
-    const persona = resolveSelfPersona();
+    const persona = ns.resolveSelfPersona();
     const signature = [
       currentRoutePath(),
       currentBrowserURL(),
-      persona ? `${persona.is_ingame}${persona.is_online}${persona.is_awayOrSnooze}` : '',
-      document.querySelector(`${LIST_SELECTOR} .${C.AppCount}`)?.textContent || '',
+      persona ? `${persona.is_ingame}${persona.is_online}${persona.is_awayOrSnooze}${persona.m_strPlayerName}` : '',
+      document.querySelector(`${ns.LIST_SELECTOR} .${C.AppCount}`)?.textContent || '',
     ].join('|');
 
     if (signature !== lastPollSignature) {
@@ -866,19 +443,14 @@
   }
 
   function cleanup(full) {
-    for (const wrap of extraNodes.values()) wrap.remove();
-    searchBar?.remove();
-    listToggleBtn?.remove();
-    topBtn?.remove();
-    listResize?.handle.remove();
-    topScroller = null;
-    document.body?.classList.remove('se-list-hidden');
-    document.body?.removeAttribute('data-se-list');
+    ns.search.cleanup();
+    ns.titleBar.cleanup();
+    closeNavMenu();
     for (const node of navNodes.values()) {
       node.removeEventListener('click', onNavClick, true);
+      node.removeAttribute('aria-haspopup');
     }
     navNodes.clear();
-    document.body?.removeAttribute('data-se-extra');
 
     if (full) {
       for (const [menu, saved] of patchedMenus) {
@@ -890,34 +462,31 @@
     }
   }
 
+  Object.assign(ns, { currentRoutePath, navigateToLibraryRoute, schedule });
+
   function start() {
     /* Core already batches to a frame; rows' hover/selection classes are ignored */
-    observer = SE.watch(update, { attributes: ['class'], ignore: LIST_ROWS });
-    document.addEventListener('keydown', onGlobalKeyDown, true);
-    addEventListener('resize', schedule);
-    document.addEventListener('scroll', onListScroll, { capture: true, passive: true });
+    observer = SE.watch(update, { attributes: ['class'], ignore: ns.LIST_ROWS });
+    ns.search.start();
+    ns.titleBar.start();
+    // Route, browser URL and persona have no shared Steam event; pollState() compares a short
+    // signature and only re-renders when it changes. Rail mode only, paused when hidden.
     timer = SE.poll(pollState, 400, { active: railMode });
-    observeTooltips();
+    ns.tips.start();
     schedule();
   }
 
   window.__seRailNav = {
+    // The Games button at the rail's foot (client/header/header-actions.js) opens its menu here
+    toggleGames: (button) => toggleNavMenu('games', button, { foot: true }),
     destroy() {
       observer?.disconnect();
       timer?.disconnect();
       if (frame) cancelAnimationFrame(frame);
-      cancelMountWait();
-      listResizeObserver?.disconnect();
-      scopeResizeObserver?.disconnect();
-      removeEventListener('resize', schedule);
-      document.removeEventListener('scroll', onListScroll, { capture: true });
-      document.removeEventListener('keydown', onGlobalKeyDown, true);
-      removeEventListener('pointerdown', onPointerDown, true);
-      document.removeEventListener('mouseover', onMouseOver, true);
-      tipObserver?.disconnect();
+      ns.search.destroy();
+      ns.titleBar.destroy();
+      ns.tips.destroy();
       cleanup(true);
-      listResize?.destroy();
-      listResize = null;
       delete window.__seRailNav;
     },
   };

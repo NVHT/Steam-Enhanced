@@ -117,6 +117,9 @@
 
   applyBackdrops();
   sync();
+  // No Steam event covers the overlay's game stats, play time or toolbar state: 1 s while it's
+  // shown, paused when hidden. Window centring needs 100 ms (the overlay can move its widgets
+  // without a resize), and the prefetch is a fixed 20 s cache refresh.
   const loop = SE.poll(sync, TICK_MS);
   const windowLoop = SE.poll(() => enabled() && centerWidgets(), WINDOW_TICK_MS);
   const prefetchTimer = setInterval(() => SE.run(prefetch), PREFETCH_MS);
@@ -199,8 +202,8 @@
       controllerSample: live.controllerSample && namesOf(live.controllerSample),
       windows: windowsDebug(),
     };
-    console.log('[Steam Enhanced overlay]', report);
-    return report;
+    return report; // the caller logs or copies it
+
   };
 
   window.__seOverlay = {

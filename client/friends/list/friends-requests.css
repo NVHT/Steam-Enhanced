@@ -22,12 +22,18 @@
   color: var(--se-label-color) !important;
 }
 
+/*
+ * The header sits where the list's section headers do (friends-rows.css): a 30 px row 10 px
+ * down, flush with the list's inset, its chevron and label in their places; the back tile at its
+ * end as Group Chats' button is. Rows and the buttons below share the list's edges.
+ */
 .friendlist:not(.GamepadMode) .friendGroup:is(.friendRequests, .friendOutgoingRequests) .groupHeaderContainer > .groupName {
   display: flex !important;
   align-items: center;
-  min-height: 34px;
-  margin: 6px 8px 2px !important;
-  padding: 0 52px 0 8px !important;
+  height: 30px;
+  min-height: 30px;
+  margin: var(--se-space-2) 0 var(--se-space-half) !important;
+  padding: 0 var(--se-space-6) 0 var(--se-space-2) !important;
   box-sizing: border-box;
 }
 
@@ -54,11 +60,11 @@
   box-sizing: border-box;
   min-width: 18px;
   height: 18px;
-  margin-inline-start: 8px !important;
-  padding: 0 6px !important;
+  margin-inline-start: var(--se-space-2) !important;
+  padding: 0 var(--se-space-1) !important;
   border-radius: var(--se-radius-pill) !important;
   background: var(--se-danger) !important;
-  font: 800 10.5px/18px var(--se-font), sans-serif !important;
+  font: 800 var(--se-fs-2xs)/18px var(--se-font), sans-serif !important;
   letter-spacing: 0 !important;
   text-align: center;
   color: var(--se-text-strong) !important;
@@ -68,9 +74,9 @@
 .friendlist:not(.GamepadMode) .friendInviteContainer {
   display: flex !important;
   align-items: center !important;
-  gap: 4px;
-  margin: 0 8px !important;
-  padding: 0 4px 0 0;
+  gap: var(--se-space-1);
+  margin: 0 !important;
+  padding: 0 var(--se-space-1) 0 0;
   border-radius: var(--se-radius-sm);
 }
 
@@ -81,7 +87,7 @@
 .friendlist:not(.GamepadMode) .friendInviteContainer > div:has(> .friend) {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--se-space-1);
   flex: 1;
   min-width: 0;
 }
@@ -105,7 +111,7 @@
 .friendlist:not(.GamepadMode) .friendInviteContainer :is(.inviteLabel, ._2Ri005Wg_uXDTa71kdRbcN /* richPresenceLabel */) {
   -webkit-mask: none !important;
   mask: none !important;
-  font: 500 12px/1.3 var(--se-font), sans-serif !important;
+  font: 500 var(--se-fs-sm)/1.3 var(--se-font), sans-serif !important;
   color: var(--se-text-faint) !important;
   white-space: nowrap;
   overflow: hidden;
@@ -128,7 +134,7 @@
   flex: none;
   display: flex !important;
   align-items: center;
-  gap: 2px;
+  gap: var(--se-space-half);
   margin: 0 !important;
   padding: 0 !important;
 }
@@ -190,12 +196,12 @@
 
 /* Confirm / Ignore All */
 .friendlist:not(.GamepadMode) .confirmInviteRequestContainer {
-  padding: 10px 12px 12px !important;
+  padding: var(--se-space-2) 0 var(--se-space-3) !important;
 }
 
 .friendlist:not(.GamepadMode) .confirmInviteRequestActions {
   display: flex !important;
-  gap: 8px;
+  gap: var(--se-space-2);
   margin: 0 !important;
 }
 
@@ -206,10 +212,10 @@
   justify-content: center;
   height: var(--se-control-h);
   margin: 0 !important;
-  padding: 0 12px !important;
+  padding: 0 var(--se-space-3) !important;
   border-radius: var(--se-radius-sm);
   background: var(--se-surface-2) !important;
-  font: 600 13px var(--se-font), sans-serif !important;
+  font: 600 var(--se-fs-base) var(--se-font), sans-serif !important;
   color: var(--se-text) !important;
   cursor: pointer;
   transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
@@ -235,17 +241,17 @@
   cursor: default;
 }
 
-/* Back to the friends list: a tile at the header's end */
+/* Back to the friends list: a 26 px tile at the header's end, centred on its 30 px row */
 .friendlist:not(.GamepadMode) .confirmInviteRequestContainer .cancelAddFriends {
   position: absolute !important;
-  top: 8px !important;
-  right: 12px !important;
-  inset-inline-end: 12px !important;
+  top: 12px !important;
+  right: 2px !important;
+  inset-inline-end: 2px !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--se-tile-sm) !important;
-  height: var(--se-tile-sm) !important;
+  width: 26px !important;
+  height: 26px !important;
   border-radius: var(--se-radius-sm);
   color: var(--se-text-muted);
   cursor: pointer;

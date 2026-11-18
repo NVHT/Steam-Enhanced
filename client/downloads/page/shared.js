@@ -15,7 +15,7 @@
  * - queue.js     the queue rows' action buttons
  * - drag.js      reordering the queue
  * - pass.js      the update pass and its scheduling
- * - debug.js     support helpers
+ * - support.js   support helpers
  * - main.js      the drag guards, Steam's overview subscription, the watchers, and the API
  */
 ((SE) => {

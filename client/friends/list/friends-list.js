@@ -1,5 +1,6 @@
 /*
- * Annotate Friends list group counts, active game players, and group chat previews.
+ * Annotate Friends list group counts, active game players, and group chat previews, and fold
+ * the favorites under the Friends bar's label.
  */
 ((SE) => {
   window.__seFriendsList?.destroy();
@@ -174,6 +175,182 @@
     }
   };
 
+  /*
+   * The favorites fold away under the Friends bar's label, as a list section does under its
+   * header (client/friends/list/friends-search.css draws the label and its chevron). Steam's own
+   * click on the label opens the search; a click (or Enter / Space) there folds the favorites
+   * instead, before Steam hears it, and the magnifier still searches. Remembered across windows
+   * and restarts (localStorage); data-se-favorites on Steam's header carries it.
+   */
+  const FAVORITES_KEY = 'se-favorites-folded';
+  const FAVORITES_LABEL = `${LIST_SELECTOR} .socialListTab:not(.TabSearchActive) .tabLabel`;
+  const readFolded = () => run(() => localStorage.getItem(FAVORITES_KEY) === '1') || false;
+
+  const syncFavorites = (list) => {
+    const folded = readFolded();
+    setAttr(list.querySelector('.friendListHeaderContainer'), 'data-se-favorites', folded ? 'folded' : 'open');
+    const label = list.querySelector('.socialListTab .tabLabel');
+    if (!label) return;
+    setAttr(label, 'role', 'button');
+    setAttr(label, 'tabindex', '0');
+    setAttr(label, 'aria-expanded', folded ? 'false' : 'true');
+    // The favorites' count at the bar's end, as Group Chats counts its chats
+    const count = list.querySelectorAll('.quickAccessFriends .favoriteElement').length;
+    setAttr(label, 'data-se-count', count ? String(count) : '');
+  };
+
+  /*
+   * Folding and opening, one motion for the whole list: what folds (the favorites, a section's
+   * friends) shrinks from its height to nothing as it fades, and grows back the same way, 0.3s
+   * eased in and out. data-se-folding holds it shown while it moves
+   * (client/friends/list/friends-rows.css times it, so the theme's reduced Animations and the
+   * system's reduced motion end it at once); then the inline sizes go and done() runs.
+   */
+  const FOLDING = 'data-se-folding';
+  const FOLD_SIZES = ['height', 'opacity', 'padding-top', 'padding-bottom', 'margin-top', 'margin-bottom'];
+  const foldTimers = new WeakMap();
+
+  const settleFold = (el) => {
+    clearTimeout(foldTimers.get(el));
+    foldTimers.delete(el);
+    el.removeAttribute(FOLDING);
+    for (const name of FOLD_SIZES) el.style.removeProperty(name);
+  };
+
+  const shut = (el) => {
+    el.style.setProperty('height', '0px');
+    el.style.setProperty('opacity', '0');
+    for (const name of FOLD_SIZES.slice(2)) el.style.setProperty(name, '0px', 'important');
+  };
+
+  // from / to: the height before and after (0 when folded)
+  const moveBox = (el, from, to, done = () => settleFold(el)) => {
+    clearTimeout(foldTimers.get(el));
+    el.setAttribute(FOLDING, '');
+    if (from) {
+      el.style.setProperty('height', `${from}px`);
+      for (const name of FOLD_SIZES.slice(1)) el.style.removeProperty(name);
+    } else {
+      shut(el);
+    }
+    void el.offsetHeight; // the start, laid out before the end is set
+    if (to) {
+      el.style.setProperty('height', `${to}px`);
+      for (const name of FOLD_SIZES.slice(1)) el.style.removeProperty(name);
+    } else {
+      shut(el);
+    }
+    const seconds = Math.max(...getComputedStyle(el).transitionDuration.split(',').map(parseFloat));
+    if (!(seconds > 0.01)) done();
+    else foldTimers.set(el, setTimeout(done, seconds * 1000 + 30));
+  };
+
+  const toggleFavorites = (event) => {
+    if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
+    if (event.type === 'click' && event.button !== 0) return;
+    if (!event.target.closest?.(FAVORITES_LABEL)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const folding = !readFolded();
+    const lists = [...document.querySelectorAll(LIST_SELECTOR)];
+    const favorites = lists.map((list) => list.querySelector('.quickAccessFriends:not(.emptyQuickAccess)'));
+    // Where each one starts: its height now (one moving is caught where it is)
+    const from = favorites.map((el) => (el ? el.getBoundingClientRect().height : 0));
+    favorites.forEach((el) => el && settleFold(el));
+    run(() => localStorage.setItem(FAVORITES_KEY, folding ? '1' : '0'));
+    lists.forEach(syncFavorites);
+    favorites.forEach((el, i) => {
+      if (!el?.isConnected) return;
+      if (folding) moveBox(el, from[i], 0);
+      else moveBox(el, from[i], el.getBoundingClientRect().height);
+    });
+  };
+
+  for (const type of ['click', 'keydown']) document.addEventListener(type, toggleFavorites, true);
+
+  /*
+   * The list's sections (UNREAD MESSAGES, ONLINE, OFFLINE, a game, your categories) fold the
+   * same way. Steam fades each row out, then drops them all at once, so everything below jumps
+   * up; opening, the rows pop in and fade. Here the section's friends move as one instead:
+   * - closing, the click is held: they shrink to nothing, then Steam gets the click and closes
+   *   the section, which stays at nothing until its rows are gone (Steam keeps them a moment);
+   * - opening, Steam opens it at once, already held at nothing (its rows' own fade is off while
+   *   they are, friends-rows.css), and it grows to its height once drawn.
+   * The chevron turns on the click (data-se-fold). A body taller than the window moves only a
+   * window's height; the rest is out of sight.
+   */
+  const SECTION_HEAD = `${LIST_SELECTOR} .friendGroup .groupName`;
+  const SECTION_ROWS = '.friend, .SteamPlayerGroupFooter, .unreadFriend, .friendCategoryContainer';
+  const HOLD_MS = 1000;
+  let releasing = null;
+
+  // A section's friends: what follows its header (the name, or the box that holds it)
+  const sectionBody = (head) => {
+    const header = head.parentElement?.classList.contains('groupHeaderContainer') ? head.parentElement : head;
+    const body = header.nextElementSibling;
+    return body && !body.matches('.groupName, .groupHeaderContainer, hr') ? body : null;
+  };
+
+  // Closed: held at nothing until Steam has let its rows go, then given back
+  const holdClosed = (body, head) => {
+    const until = performance.now() + HOLD_MS;
+    const check = () => {
+      if (body.isConnected && body.querySelector(SECTION_ROWS) && performance.now() < until) {
+        requestAnimationFrame(check);
+        return;
+      }
+      settleFold(body);
+      head.removeAttribute('data-se-fold');
+    };
+    requestAnimationFrame(check);
+  };
+
+  const growSection = (head, body) => {
+    const target = head.isConnected ? sectionBody(head) || body : body;
+    if (!target?.isConnected) return;
+    if (target !== body) settleFold(body);
+    // Its natural height, measured still marked (its rows' own fade stays off), sizes cleared
+    clearTimeout(foldTimers.get(target));
+    target.setAttribute(FOLDING, '');
+    for (const name of FOLD_SIZES) target.style.removeProperty(name);
+    const natural = target.getBoundingClientRect().height;
+    moveBox(target, 0, Math.min(natural, innerHeight));
+  };
+
+  const onSection = (event) => {
+    if (event.button !== 0) return;
+    const head = event.target.closest?.(SECTION_HEAD);
+    if (!head || head === releasing || event.target.closest('.ContextMenuButton, .SortByRecent, button, a')) return;
+    const body = sectionBody(head);
+    if (!body) return;
+    if (body.hasAttribute(FOLDING)) {
+      // Already moving: this click waits for it
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    if (head.classList.contains('Collapsed')) {
+      moveBox(body, 0, 0, () => {});
+      requestAnimationFrame(() => requestAnimationFrame(() => growSection(head, body)));
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    head.setAttribute('data-se-fold', 'close');
+    const from = Math.min(body.getBoundingClientRect().height, innerHeight);
+    moveBox(body, from, 0, () => {
+      releasing = head;
+      try {
+        head.click();
+      } finally {
+        releasing = null;
+      }
+      holdClosed(body, head);
+    });
+  };
+
+  document.addEventListener('click', onSection, true);
+
   const update = () => {
     const lists = document.querySelectorAll(LIST_SELECTOR);
     if (!lists.length) return;
@@ -184,6 +361,7 @@
 
     for (const list of lists) {
       if (scanBanners) markBanners(list);
+      syncFavorites(list);
 
       for (const countEl of list.querySelectorAll('.friendGroup .groupName .groupCount')) {
         const match = COUNT_RE.exec(countEl.textContent.trim());
@@ -248,6 +426,8 @@
     if (watcher) return;
     gate.disconnect();
     watcher = SE.watch(update, { scope: SCOPE, throttle: 250 });
+    // Persona changes come from FriendStore, not a SteamClient event; 2 s backstop for rows
+    // that update without a DOM mutation, only while the list is visible.
     timer = SE.poll(update, 2000, { active: () => SE.visible(LIST_SELECTOR) });
     update();
   };
@@ -258,12 +438,22 @@
 
   window.__seFriendsList = {
     destroy() {
+      for (const type of ['click', 'keydown']) document.removeEventListener(type, toggleFavorites, true);
+      document.removeEventListener('click', onSection, true);
+      for (const el of document.querySelectorAll(`${LIST_SELECTOR} [data-se-fold]`)) el.removeAttribute('data-se-fold');
       gate.disconnect();
       watcher?.disconnect();
       timer?.disconnect();
       lastSeenPlayers.clear();
       for (const el of document.querySelectorAll(`[${BANNER}]`)) el.removeAttribute(BANNER);
       for (const el of document.querySelectorAll(`[${STRAY}]`)) el.removeAttribute(STRAY);
+      for (const el of document.querySelectorAll(`${LIST_SELECTOR} [data-se-favorites]`)) {
+        el.removeAttribute('data-se-favorites');
+      }
+      for (const el of document.querySelectorAll(`${LIST_SELECTOR} [${FOLDING}]`)) settleFold(el);
+      for (const el of document.querySelectorAll(`${LIST_SELECTOR} .tabLabel[role="button"]`)) {
+        for (const name of ['role', 'tabindex', 'aria-expanded', 'data-se-count']) el.removeAttribute(name);
+      }
       for (const attrName of ['data-se-who', 'data-se-sub', 'data-se-voice']) {
         for (const el of document.querySelectorAll(`${LIST_SELECTOR} [${attrName}]`)) {
           el.removeAttribute(attrName);

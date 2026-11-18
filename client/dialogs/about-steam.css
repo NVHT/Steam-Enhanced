@@ -39,9 +39,9 @@
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) auto auto;
   grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
-  column-gap: 8px;
+  column-gap: var(--se-space-2);
   justify-items: center;
-  padding: 12px 18px 14px;
+  padding: var(--se-space-3) var(--se-space-4) var(--se-space-3);
   background:
     radial-gradient(300px 150px at 50% 30%, var(--se-accent-tint), transparent 72%),
     var(--se-surface);
@@ -64,9 +64,9 @@
   grid-row: 1;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--se-space-2);
   height: 26px;
-  font: 700 12px/15px var(--se-font);
+  font: 700 var(--se-fs-sm)/15px var(--se-font);
   color: var(--se-text);
   white-space: nowrap;
 }
@@ -84,13 +84,13 @@
 }
 
 .se-about-theme-version {
-  margin-left: -4px;
+  margin-left: calc(-1 * var(--se-space-1));
   font-weight: 600;
   color: var(--se-accent);
 }
 
 .se-about-credit-by {
-  margin-left: -4px;
+  margin-left: calc(-1 * var(--se-space-1));
   font-weight: 500;
   color: var(--se-text-faint);
 }
@@ -164,8 +164,8 @@ button.se-about,
 /* Hero: Steam's version */
 .se-about-hero {
   grid-row: 2;
-  margin-top: 6px;
-  padding: 0 8px;
+  margin-top: var(--se-space-1);
+  padding: 0 var(--se-space-2);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -176,7 +176,7 @@ button.se-about,
 }
 
 .se-about-hero-label {
-  font: 600 9px/11px var(--se-font);
+  font: 600 var(--se-fs-2xs)/11px var(--se-font);
   letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--se-text-muted);
@@ -201,15 +201,15 @@ button.se-about,
 /* Update status pill */
 .se-about-status {
   grid-row: 3;
-  margin-top: 4px;
+  margin-top: var(--se-space-1);
   height: 28px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 3px 0 11px;
+  gap: var(--se-space-2);
+  padding: 0 var(--se-space-half) 0 var(--se-space-3);
   border-radius: var(--se-radius-pill);
-  background: rgba(23, 26, 32, .75);
+  background: color-mix(in srgb, var(--se-bg) 75%, transparent);
   box-shadow: inset 0 0 0 1px var(--se-white-07);
   white-space: nowrap;
 }
@@ -237,7 +237,7 @@ button.se-about,
 }
 
 .se-about-status-label {
-  font: 600 11px/14px var(--se-font);
+  font: 600 var(--se-fs-xs)/14px var(--se-font);
   color: var(--se-text);
 }
 
@@ -279,37 +279,31 @@ button.se-about,
 }
 
 .se-about-status[data-state="checking"] .se-about-refresh svg {
-  animation: se-about-spin .9s linear infinite;
-}
-
-@keyframes se-about-spin {
-  to {
-    transform: rotate(360deg);
-  }
+  animation: se-turn .9s linear infinite;
 }
 
 .se-about-restart-chip {
   height: 22px;
-  padding: 0 10px;
+  padding: 0 var(--se-space-2);
   border-radius: var(--se-radius-pill);
   background: var(--se-gold-surface);
   color: var(--se-gold-text);
-  font: 600 10.5px/1 var(--se-font);
+  font: 600 var(--se-fs-2xs)/1 var(--se-font);
 }
 
 .se-about-restart-chip:hover,
 .se-about-restart-chip[data-armed] {
-  background: rgba(240, 192, 96, .26);
+  background: color-mix(in srgb, var(--se-gold) 26%, transparent);
 }
 
 /* Fact tiles */
 .se-about-tiles {
   grid-row: 4;
   justify-self: stretch;
-  margin-top: 12px;
+  margin-top: var(--se-space-3);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px 8px;
+  gap: var(--se-space-1) var(--se-space-2);
 }
 
 .se-about-tile {
@@ -317,18 +311,18 @@ button.se-about,
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 0 10px 0 7px;
+  gap: var(--se-space-2);
+  padding: 0 var(--se-space-2) 0 var(--se-space-2);
   border-radius: var(--se-radius-ml);
   background: var(--se-bg);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  box-shadow: var(--se-edge);
   color: var(--se-text);
   text-align: left;
 }
 
 .se-about-tile:hover {
   background: var(--se-field);
-  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  box-shadow: var(--se-edge-accent);
 }
 
 .se-about-tile-icon {
@@ -354,14 +348,14 @@ button.se-about,
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--se-space-half);
 }
 
 .se-about-tile-label {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font: 600 8.5px/10px var(--se-font);
+  font: 600 var(--se-fs-2xs)/12px var(--se-font);
   letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--se-text-faint);
@@ -371,12 +365,12 @@ button.se-about,
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font: 700 12px/15px var(--se-font);
+  font: 700 var(--se-fs-sm)/15px var(--se-font);
 }
 
 .se-about-tile-sub {
   flex: none;
-  font: 500 9.5px/11px var(--se-font);
+  font: 500 var(--se-fs-2xs)/11px var(--se-font);
   color: var(--se-text-muted);
   white-space: nowrap;
 }
@@ -391,7 +385,7 @@ button.se-about,
   grid-row: 6;
   justify-self: start;
   display: flex;
-  gap: 8px;
+  gap: var(--se-space-2);
 }
 
 .se-about-tool {
@@ -428,7 +422,7 @@ button.se-about,
   --se-notes-column: calc(var(--se-notes-edge) + var(--se-notes-row) + 10px);
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: var(--se-z-raised);
   display: flex;
   flex-direction: column;
   background: var(--se-surface);
@@ -455,9 +449,9 @@ button.se-about,
   box-sizing: border-box;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 0 calc(var(--se-notes-edge) + var(--se-notes-row) + 2px) 10px var(--se-notes-edge);
-  box-shadow: inset 0 -1px 0 var(--se-hairline);
+  gap: var(--se-space-2);
+  padding: 0 calc(var(--se-notes-edge) + var(--se-notes-row) + 2px) var(--se-space-2) var(--se-notes-edge);
+  box-shadow: var(--se-rule-bottom);
 }
 
 .se-about-notes-bar .se-about-tool {
@@ -512,12 +506,12 @@ button.se-about,
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font: 700 13px/var(--se-notes-title-lh) var(--se-font);
+  font: 700 var(--se-fs-base)/var(--se-notes-title-lh) var(--se-font);
   color: var(--se-text-strong);
 }
 
 .se-about-notes-date {
-  font: 500 10.5px/13px var(--se-font);
+  font: 500 var(--se-fs-2xs)/13px var(--se-font);
   color: var(--se-text-faint);
 }
 
@@ -529,8 +523,8 @@ button.se-about,
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 12px 20px 18px var(--se-notes-column);
-  font: 500 12px/18px var(--se-font);
+  padding: var(--se-space-3) var(--se-space-4) var(--se-space-4) var(--se-notes-column);
+  font: 500 var(--se-fs-sm)/18px var(--se-font);
   color: var(--se-text-dim);
   overflow-wrap: anywhere;
   user-select: text;
@@ -542,7 +536,7 @@ button.se-about,
 }
 
 .se-about-notes-body :is(h3, h4, h5) {
-  margin: 14px 0 4px;
+  margin: var(--se-space-3) 0 var(--se-space-1);
   font-family: var(--se-font);
   color: var(--se-text-strong);
 }
@@ -552,7 +546,7 @@ button.se-about,
 }
 
 .se-about-notes-body h3 {
-  font-size: 15px;
+  font-size: var(--se-fs-lg);
   line-height: 20px;
   font-weight: 800;
 }
@@ -564,7 +558,7 @@ button.se-about,
 }
 
 .se-about-notes-body h5 {
-  font-size: 10px;
+  font-size: var(--se-fs-2xs);
   line-height: 14px;
   font-weight: 700;
   letter-spacing: .08em;
@@ -573,19 +567,19 @@ button.se-about,
 }
 
 .se-about-notes-body p {
-  margin: 0 0 8px;
+  margin: 0 0 var(--se-space-2);
 }
 
 .se-about-notes-body :is(ul, ol):not(#se-none) {
-  margin: 4px 0 10px;
-  padding-left: 14px;
+  margin: var(--se-space-1) 0 var(--se-space-2);
+  padding-left: var(--se-space-3);
   /* Steam's own list style puts the marker inside the text; outside keeps wrapped lines aligned */
   list-style-position: outside;
 }
 
 .se-about-notes-body li:not(#se-none) {
   display: list-item;
-  margin: 2px 0;
+  margin: var(--se-space-half) 0;
   padding: 0;
   text-indent: 0;
 }
@@ -609,22 +603,22 @@ button.se-about,
 }
 
 .se-about-notes-body code {
-  padding: 1px 4px;
+  padding: 1px var(--se-space-1);
   border-radius: var(--se-radius-xs);
   background: var(--se-bg);
   font-size: var(--se-fs-xs);
 }
 
 .se-about-notes-body blockquote {
-  margin: 6px 0 10px;
-  padding: 8px 12px;
+  margin: var(--se-space-1) 0 var(--se-space-2);
+  padding: var(--se-space-2) var(--se-space-3);
   border-radius: var(--se-radius-md);
   background: var(--se-bg);
 }
 
 .se-about-notes-body hr {
   height: 1px;
-  margin: 12px 0;
+  margin: var(--se-space-3) 0;
   border: 0;
   background: var(--se-hairline);
 }
@@ -635,13 +629,13 @@ button.se-about,
   grid-row: 6;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--se-space-1);
   height: 32px;
-  padding: 0 12px;
+  padding: 0 var(--se-space-3);
   border-radius: var(--se-radius-md);
   background: var(--se-surface-2);
   color: var(--se-text);
-  font: 600 12px/1 var(--se-font);
+  font: 600 var(--se-fs-sm)/1 var(--se-font);
 }
 
 .se-about-copyall svg {

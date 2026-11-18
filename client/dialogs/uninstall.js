@@ -22,8 +22,8 @@
 
   /* UninstallDialog CSS module (3867) */
   const C = {
-    root: '._7au1m_-ZIF7Hx_rCvrDfI',
-    error: '._2n_P7MWsN2y6PwS2a957_c',
+    root: `.${SE.C.UninstallDialog}`,
+    error: `.${SE.C.UninstallError}`,
   };
 
   const OURS = 'se-uninst';

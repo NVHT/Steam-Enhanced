@@ -24,21 +24,21 @@
 
 [data-se-sec="friends"] [data-se-fr] {
   width: 100% !important;
-  margin: 0 0 10px !important;
+  margin: 0 0 var(--se-space-2) !important;
   padding: 0 !important;
 }
 
 [data-se-sec="friends"] [data-se-fr="ingame"]:not(#se-none) {
-  margin-bottom: 12px !important;
+  margin-bottom: var(--se-space-3) !important;
 }
 
 .se-fr-tabs {
   display: flex;
-  gap: 2px;
+  gap: var(--se-space-half);
   box-sizing: border-box;
   width: 100%;
-  margin: 0 0 14px;
-  padding: 2px;
+  margin: 0 0 var(--se-space-3);
+  padding: var(--se-space-half);
   border-radius: var(--se-radius-md);
   background: var(--se-surface-2);
 }
@@ -47,7 +47,7 @@
   flex: 1 1 auto;
   min-width: 0;
   height: 30px;
-  padding: 0 8px;
+  padding: 0 var(--se-space-2);
   overflow: hidden;
   text-overflow: ellipsis;
   border: 0;
@@ -60,7 +60,7 @@
 }
 
 .se-fr-tab span {
-  margin-left: 4px;
+  margin-left: var(--se-space-1);
   font-weight: 500;
   color: var(--se-text-faint);
 }
@@ -82,13 +82,13 @@
    is ever wider); the rest rows of avatars */
 [data-se-sec="friends"] [data-se-fr-grid] {
   box-sizing: border-box;
-  padding: 5px !important;
+  padding: var(--se-space-1) !important;
 }
 
 [data-se-sec="friends"] :is([data-se-fr="recent"], [data-se-fr="ingame"]) [data-se-fr-grid]:not(#se-none) {
   display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
-  gap: 10px 18px !important;
+  gap: var(--se-space-2) var(--se-space-4) !important;
   width: auto !important;
   height: auto !important;
 }
@@ -96,7 +96,7 @@
 [data-se-sec="friends"] :is([data-se-fr="ever"], [data-se-fr="wishlist"]) [data-se-fr-grid] {
   display: flex !important;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--se-space-2);
   width: auto !important;
 }
 
@@ -119,7 +119,7 @@
 
 [data-se-sec="friends"] :is([data-se-fr="recent"], [data-se-fr="ingame"]) [data-se-fr-grid] > * {
   display: flex !important;
-  gap: 12px !important;
+  gap: var(--se-space-3) !important;
   padding: 0 !important;
 }
 
@@ -173,7 +173,7 @@
 [data-se-sec="friends"] ._34gmVq6C3FNtdHqDLa3-XR,
 [data-se-sec="friends"] .ShowMore {
   color: var(--se-accent) !important;
-  font: 600 12.5px var(--se-font) !important;
+  font: 600 var(--se-fs-base) var(--se-font) !important;
   background: none !important;
 }
 
@@ -254,7 +254,7 @@
 
 /*
  * The status ring is drawn on the image itself, 2 px out from it: green in game, blue
- * online, dashed when away (green or blue), gray offline. Shared with the feed's avatars.
+ * online, faded when away (--se-away, --se-away-ingame), gray offline. Shared with the feed's avatars.
  */
 :is([data-se-sec="friends"], [data-se-sec="activity"]) img[data-se-fr-pic][data-se-fr-state^="ingame"] {
   --se-fr-ring: var(--se-running);
@@ -269,14 +269,18 @@
 }
 
 :is([data-se-sec="friends"], [data-se-sec="activity"]) img[data-se-fr-pic][data-se-fr-state$="-away"] {
-  --se-fr-ring-style: dashed;
+  --se-fr-ring: var(--se-away);
+}
+
+:is([data-se-sec="friends"], [data-se-sec="activity"]) img[data-se-fr-pic][data-se-fr-state^="ingame"][data-se-fr-state$="-away"] {
+  --se-fr-ring: var(--se-away-ingame);
 }
 
 [data-se-sec="friends"] img[data-se-fr-pic] {
   border: 0 !important;
   box-shadow: none !important;
   object-fit: cover !important;
-  outline: 2px var(--se-fr-ring-style, solid) var(--se-fr-ring, var(--se-white-18));
+  outline: 2px var(--se-fr-ring-style) var(--se-fr-ring, var(--se-white-18));
   outline-offset: 2px;
 }
 
@@ -304,24 +308,28 @@
 }
 
 [data-se-sec="friends"] .avatarHolder.awayOrSnooze > img:not(#se-none) {
-  outline-style: dashed;
+  outline-color: var(--se-away);
+}
+
+[data-se-sec="friends"] .avatarHolder.awayOrSnooze:is(.ingame, .inGame, .InGame) > img:not(#se-none) {
+  outline-color: var(--se-away-ingame);
 }
 
 /* footer */
 .se-fr-foot {
   display: flex;
   align-items: center;
-  gap: 10px 22px;
+  gap: var(--se-space-2) var(--se-space-5);
   flex-wrap: wrap;
-  margin-top: 6px;
-  padding-top: 14px;
+  margin-top: var(--se-space-1);
+  padding-top: var(--se-space-3);
   border-top: 1px solid var(--se-hairline);
 }
 
 .se-fr-stack {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--se-space-2);
   padding: 0;
   border: 0;
   background: none;
@@ -348,7 +356,7 @@
 }
 
 .se-fr-faces img + img {
-  margin-left: -8px;
+  margin-left: calc(-1 * var(--se-space-2));
 }
 
 .se-fr-all {

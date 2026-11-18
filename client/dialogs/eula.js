@@ -22,11 +22,11 @@
 
   /* EulaModalDialog CSS module (70446) */
   const C = {
-    modal: '._3jj_KvFzq6XW7NasX_7Tvv',
-    content: '._2YXHRFCzmxgvxVGtA3TWVf',
-    intro: '._3q_Ir9vDx5xeUcjwJEW8_k',
-    scrolling: '._7lXDajp5HNY9Kpnbeykv',
-    text: '._1dbgUdk0xgEX7E4Db_r5mb',
+    modal: `.${SE.C.EulaModalDialog}`,
+    content: `.${SE.C.EulaDialogContent}`,
+    intro: `.${SE.C.EulaIntro}`,
+    scrolling: `.${SE.C.EULAScrolling}`,
+    text: `.${SE.C.EULAContent}`,
   };
 
   const OURS = 'se-eula';

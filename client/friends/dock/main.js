@@ -8,14 +8,14 @@
   const {
     app, browserClickListeners, cancelChatNavigation, chatBack, chatChip, chatError, chatErrorText,
     chatMinimize, chipAvatar, chipChevron, chipCount, chipName, chipText, closeChat,
-    closeChatPopup, closedSections, closeMenu, deadAvatars, dismissChatError, disposeSteam, dock,
+    closeChatPopup, closedSections, noteNavigation, deadAvatars, dismissChatError, disposeSteam, dock,
     fly, flyoutOwnedTabs, gameInForeground, hideFly, hideMenu, installChatRouting,
     interactionEvents, keepLibraryManagers, markDesktopInteraction, markDockInteraction,
-    minimizeChat, onAvatarError, onContext, onDesktopChatFocus, onKeyMenu, onLibrary,
+    minimizeChat, onAvatarError, onContext, onDesktopChatFocus, onLibrary,
     onNativeChannelClick, onNativeFriendClick, onSearch, onStore, openChat, openFriendNotification,
     openGames, openGroup, own, pendingOverlayChats, place, pressRow, releaseFlyoutTabs, render,
     requestChatHandoff, resetMinimized, restoreChat, restoreChatRenderer, restoreChatRouting,
-    resumeOverlayChat, schedule, setMode, showFly, state, statusMenu, steamBar, steamHost,
+    resumeOverlayChat, schedule, setMode, showFly, state, statusMenu, steamHost,
     steamURL, store, svg, sync, syncBrowserClicks, syncChatTabs, unguardLibraryManagers,
   } = ns;
   const { live } = ns;
@@ -56,7 +56,6 @@
     }
   });
   steamHost.className = 'se-fd-steam friendsui-container client_chat_frame fullheight';
-  steamBar.className = 'se-fd-steambar';
   chatBack.type = 'button';
   chatBack.className = 'se-fd-chat-back';
   chatBack.textContent = '×';
@@ -178,8 +177,7 @@
   });
   dock.addEventListener('contextmenu', onContext);
   fly.addEventListener('contextmenu', onContext);
-  addEventListener('keydown', onKeyMenu, true);
-  addEventListener('click', closeMenu, true);
+  addEventListener('click', noteNavigation, true);
 
 
 
@@ -234,6 +232,8 @@
     place();
   }
 
+  // SteamClient has no friends-list or persona event (it lives in FriendStore); refreshFriends()
+  // compares a signature and does a full pass at most every 2 s. Rail mode, dock showing only.
   const timer = SE.poll(refreshFriends, 1000, {
     active: () =>
       SE.railMode() &&
@@ -246,6 +246,18 @@
 
   window.__seFriendsDock = {
     prepareModal: keepLibraryManagers,
+    // The dock's state, for the title bar's Friends & Chat button (client/header/header-actions.js)
+    get mode() {
+      return state.mode;
+    },
+    get hidden() {
+      return Boolean(state.dockHidden);
+    },
+    toggleMode() {
+      if (state.destroyed) return undefined;
+      setMode(state.mode === 'rail' ? 'open' : 'rail');
+      return state.mode;
+    },
     toggle() {
       if (state.destroyed) return undefined;
       state.dockHidden = !state.dockHidden;
@@ -254,6 +266,7 @@
       hideMenu();
       hideFly(true);
       place();
+      window.__seHeaderActions?.syncFriendsButton?.();
       return !state.dockHidden;
     },
     openWindow(openNative) {
@@ -299,8 +312,7 @@
       document.removeEventListener('visibilitychange', requestChatHandoff);
       run(() => focusRegistration?.unregister?.());
       run(() => notificationRegistration?.unregister?.());
-      removeEventListener('click', closeMenu, true);
-      removeEventListener('keydown', onKeyMenu, true);
+      removeEventListener('click', noteNavigation, true);
       hideMenu();
       removeEventListener('beforeunload', releaseFlyoutTabs);
       closeChatPopup();

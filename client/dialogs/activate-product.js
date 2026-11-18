@@ -23,17 +23,17 @@
 
   /* ActivateProductDialog CSS module (sp.js 28694) */
   const C = {
-    root: '._2siQZCB9yAOkiG8N-zRZEe',
-    header: '._2IWpfqj8UL5hUs7n-pxnUy',
-    infoIcon: '._3sqYFYR9Cl3T6Iy-0a3EJ2',
-    info: '._2V8QeCkR06XqFUJO_GDTVP',
-    body: '._1fFighONx9alttArw-qWFo',
-    exampleHeader: '._3kLa_RUiNSrm_Nr6tz7blu',
-    example: '._2sEmBD0BnXW-eo2PlLcaLV',
-    input: '._2JbjuHCSB0QxUPIMEQbqAi',
-    ssa: '._3m3ry1aX6zf5f8KT9_7RU5',
-    result: '._1aSkOCX_EmlK4A7z7HBIj',
-    productName: '._2yUw38WTqPyZaPo3WENI46',
+    root: `.${SE.C.ActivateProductDialog}`,
+    header: `.${SE.C.HeaderContainer}`,
+    infoIcon: `.${SE.C.InfoIconContainer}`,
+    info: `.${SE.C.ProductActivationInfoContainerDesktop}`,
+    body: `.${SE.C.InfoBody}`,
+    exampleHeader: `.${SE.C.InfoExampleHeader}`,
+    example: `.${SE.C.InfoExample}`,
+    input: `.${SE.C.CodeInput}`,
+    ssa: `.${SE.C.SSAContainer}`,
+    result: `.${SE.C.ResultBody}`,
+    productName: `.${SE.C.ProductName}`,
   };
 
   const OURS = 'se-ap';
@@ -174,7 +174,7 @@
     const container = header.parentElement;
     const info = container?.querySelector(`:scope > ${C.info}`);
     const input = container?.querySelector(`${C.input}, ${C.input} input`);
-    const field = input?.closest('.DialogInput_Wrapper');
+    const field = input?.closest(`.${SE.C.className_className3}`);
     if (!container || !input || !field) return null;
     const nodes = [];
 

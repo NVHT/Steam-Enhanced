@@ -22,8 +22,8 @@
 ((SE) => {
   window.__seSystemInfo?.destroy();
 
-  const ROOT = '._3v2Gg_GCpLHpHQDLFQ7cvI.hYVp3sXyS0uYfJnzVoK-m';
-  const SECTION = '.RRhNQ2haTbK9z71YoH2R3';
+  const ROOT = `.${SE.C.HardwareSurveyDialog}.${SE.C.Desktop}`;
+  const SECTION = `.${SE.C.HardwareSurveySection}`;
   const BUILT = 'data-se-sysinfo';
   const KEY_PREFIX = /^#?SteamUI_ValveSurvey_Summary_/;
   const COPIED_MS = 1400;
@@ -287,10 +287,7 @@
     const win = doc.defaultView;
     const cleanups = [];
     const timers = new Map();
-    const listen = (target, type, fn, options) => {
-      target.addEventListener(type, fn, options);
-      cleanups.push(() => target.removeEventListener(type, fn, options));
-    };
+    const listen = SE.listenInto(cleanups);
 
     /*
      * Tooltips: Steam's own once webpack is up, `title` if it never is. Each tip belongs to a

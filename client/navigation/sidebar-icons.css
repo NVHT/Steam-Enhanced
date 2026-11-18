@@ -12,7 +12,7 @@
 
   position: relative;
   box-sizing: border-box;
-  padding-top: 48px;
+  padding-top: var(--se-space-7);
 }
 
 .se-sidebar-tip {
@@ -29,7 +29,7 @@
   padding: 0;
   background: none;
   box-shadow: none;
-  gap: 6px;
+  gap: var(--se-space-1);
 }
 
 .se-sidebar-icons ._2TKEazUUS3TlniZfpc8OOe > ._3AhYljPF4e4E8LaBt-FoY0,
@@ -94,7 +94,7 @@
 .se-sidebar-icons ._1PgAonvorr0o_NMxNKiDFU {
   display: flex !important;
   width: 100% !important;
-  gap: 6px !important;
+  gap: var(--se-space-1) !important;
 }
 
 .se-sidebar-icons ._3mzKdQXht__YHo6PX1LmB6 {
@@ -121,7 +121,7 @@
 
 /* The search row: collapsed until the Search slot opens it */
 .se-sidebar-icons ._20QAC4WMXm8qFE8waUT5oo {
-  margin: 0 6px;
+  margin: 0 var(--se-space-1);
   padding: 0;
   min-height: 0;
   height: 0;
@@ -216,8 +216,10 @@
   --se-sidebar-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%223%22%20y%3D%223%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%221%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%223%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%221%22%2F%3E%3Crect%20x%3D%223%22%20y%3D%2214%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%221%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%227%22%20height%3D%227%22%20rx%3D%221%22%2F%3E%3C%2Fsvg%3E");
 }
 
+/* The game-type picker: layers (types stacked in one list; grouping too), not a gamepad, since
+   it covers Soundtracks, Software, Videos and Tools as well */
 .se-sidebar-icons ._2PF_m-I5yte3WnQhpcz8RC {
-  --se-sidebar-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22white%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Cpath%20d%3D%22M6%208h12a3%203%200%200%201%203%203l1%206a2%202%200%200%201-3%202l-4-3H9l-4%203a2%202%200%200%201-3-2l1-6a3%203%200%200%201%203-3ZM7%2010v4M5%2012h4M16%2011h.01M18%2013h.01%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3Cpath%20d%3D%22M6%208h12a3%203%200%200%201%203%203l1%206a2%202%200%200%201-3%202l-4-3H9l-4%203a2%202%200%200%201-3-2l1-6a3%203%200%200%201%203-3ZM7%2010v4M5%2012h4M16%2011h.01M18%2013h.01%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E");
+  --se-sidebar-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%203.5%203%208l9%204.5L21%208z%22%20fill%3D%22white%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%2F%3E%3Cpath%20d%3D%22M12%203.5%203%208l9%204.5L21%208z%22%2F%3E%3Cpath%20d%3D%22m3%2012.25%209%204.5%209-4.5%22%2F%3E%3Cpath%20d%3D%22m3%2016.5%209%204.5%209-4.5%22%2F%3E%3C%2Fsvg%3E");
 }
 
 .se-sidebar-icons .se-sidebar-search {
@@ -260,6 +262,188 @@
 
 .EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY {
   white-space: nowrap;
+}
+
+/*
+ * The game-type menu (option 4 with a summary header): the panel in the Settings menu's
+ * language (client/shared/popup-layer.css .se-menu), then a summary (.se-type-summary,
+ * sidebar-icons.js: "Showing 4,409", "1 of 5 types · grouped"), then a row per type: the
+ * type's duotone icon (drawn on Steam's checkbox, still the click target), its name with the
+ * count right after it, and a checkbox at the row's end, accent when on. "Group by Collection",
+ * after Steam's rule, is the same row. sidebar-icons.js marks the rows (data-se-type,
+ * data-se-part, data-se-type-count, data-se-on).
+ */
+.EDl_mzaY3WxkgmYVD8W4d:not(#se-none) {
+  padding: var(--se-space-1) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-menu) !important;
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-shadow-pop) !important;
+  font-family: var(--se-font);
+}
+
+/* Summary: what the list shows, then the menu's divider */
+.se-type-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-half);
+  margin: 0 0 var(--se-space-1);
+  padding: var(--se-space-2) var(--se-space-2) var(--se-space-2);
+  border-bottom: 1px solid var(--se-divider);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.se-type-summary-title {
+  font: 600 var(--se-fs-md) / 1.2 var(--se-font);
+  color: var(--se-text-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.se-type-summary-line {
+  font: 500 var(--se-fs-xs) / 1.2 var(--se-font);
+  color: var(--se-text-faint);
+}
+
+.EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY[data-se-type]:not(#se-none) {
+  --se-type-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22white%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Cpath%20d%3D%22M6%208h12a3%203%200%200%201%203%203l1%206a2%202%200%200%201-3%202l-4-3H9l-4%203a2%202%200%200%201-3-2l1-6a3%203%200%200%201%203-3ZM7%2010v4M5%2012h4M16%2011h.01M18%2013h.01%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3Cpath%20d%3D%22M6%208h12a3%203%200%200%201%203%203l1%206a2%202%200%200%201-3%202l-4-3H9l-4%203a2%202%200%200%201-3-2l1-6a3%203%200%200%201%203-3ZM7%2010v4M5%2012h4M16%2011h.01M18%2013h.01%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E");
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-height: 36px;
+  margin: 0 !important;
+  padding: 0 var(--se-space-2) !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: none !important;
+  color: var(--se-text-dim) !important;
+  font: 600 var(--se-fs-base) var(--se-font) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY[data-se-type]:not(#se-none):hover {
+  background: var(--se-selected) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY[data-se-type="soundtracks"]:not(#se-none) {
+  --se-type-icon: var(--se-icon-music);
+}
+
+.EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY[data-se-type="software"]:not(#se-none) {
+  --se-type-icon: var(--se-icon-grid);
+}
+
+.EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY[data-se-type="videos"]:not(#se-none) {
+  --se-type-icon: var(--se-icon-tv);
+}
+
+.EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY[data-se-type="tools"]:not(#se-none) {
+  --se-type-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M14.7%206.3a4%204%200%200%200%205%205L13%2018a2.8%202.8%200%200%201-4-4l6.7-6.7a4%204%200%200%201-1-1z%22%20fill%3D%22white%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%2F%3E%3Cpath%20d%3D%22M14.7%206.3a1%201%200%200%200%200%201.4l1.6%201.6a1%201%200%200%200%201.4%200l3.8-3.8a6%206%200%200%201-7.9%207.9l-6.9%206.9a2.1%202.1%200%200%201-3-3l6.9-6.9a6%206%200%200%201%207.9-7.9l-3.8%203.8z%22%2F%3E%3C%2Fsvg%3E");
+}
+
+.EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY[data-se-type="group"]:not(#se-none) {
+  --se-type-icon: var(--se-icon-folder);
+}
+
+/* Steam's checkbox becomes the type's icon: its own box and mark fade out, its click stays */
+.EDl_mzaY3WxkgmYVD8W4d [data-se-part="box"]:not(#se-none) {
+  flex: 0 0 18px;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: currentColor !important;
+  -webkit-mask: var(--se-type-icon) center / contain no-repeat;
+  mask: var(--se-type-icon) center / contain no-repeat;
+  color: var(--se-text-muted);
+  transition: color var(--se-dur) var(--se-ease);
+}
+
+.EDl_mzaY3WxkgmYVD8W4d [data-se-part="box"] > *,
+.EDl_mzaY3WxkgmYVD8W4d [data-se-part="box"]::before,
+.EDl_mzaY3WxkgmYVD8W4d [data-se-part="box"]::after {
+  opacity: 0 !important;
+}
+
+/* Steam's label box fills the row, so the checkbox sits at the end */
+.EDl_mzaY3WxkgmYVD8W4d .DialogToggle_Label:not(#se-none) {
+  flex: 1;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* The name, then its count right after it (drawn from data-se-type-count; Steam's is hidden) */
+.EDl_mzaY3WxkgmYVD8W4d [data-se-part="name"]:not(#se-none) {
+  display: flex !important;
+  align-items: baseline;
+  gap: var(--se-space-2);
+  margin: 0 !important;
+  padding: 0 !important;
+  color: inherit !important;
+  font: inherit !important;
+  white-space: nowrap;
+}
+
+.EDl_mzaY3WxkgmYVD8W4d :is([data-se-part="count"], ._3A3N3EnrSNMQLL058Qbzsn):not(#se-none) {
+  display: none !important;
+}
+
+.EDl_mzaY3WxkgmYVD8W4d [data-se-part="name"][data-se-type-count]::after {
+  content: attr(data-se-type-count);
+  color: var(--se-text-faint);
+  font: 500 var(--se-fs-sm) var(--se-font);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The checkbox at the row's end: a hairline square, accent with a check when on */
+.EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY[data-se-type]::after {
+  content: '';
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1.5px var(--se-border-strong);
+  background: transparent;
+  transition: background-color var(--se-dur) var(--se-ease), box-shadow var(--se-dur) var(--se-ease);
+}
+
+.EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY[data-se-type][data-se-on]::after {
+  box-shadow: none;
+  /* The tick is the mask icon drawn as a picture: its ink stroke on the accent */
+  background: var(--se-accent) var(--se-icon-check) center / 12px no-repeat;
+}
+
+/* An on row: its name in full white and its icon in the accent */
+.EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY[data-se-type][data-se-on]:not(#se-none) {
+  color: var(--se-text-strong) !important;
+}
+
+.EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY[data-se-on] [data-se-part="box"]:not(#se-none) {
+  color: var(--se-accent) !important;
+}
+
+/* Steam's rule between the types and the grouping: the menu's divider */
+.EDl_mzaY3WxkgmYVD8W4d ._2kvdTEDgtIT7T9wZIzanom:not(#se-none) {
+  height: 1px !important;
+  margin: var(--se-space-1) var(--se-space-1) !important;
+  border: 0 !important;
+  background: var(--se-divider) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY[data-se-type],
+  .EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY[data-se-type]::after,
+  .EDl_mzaY3WxkgmYVD8W4d [data-se-part="box"] {
+    transition: none;
+  }
 }
 
 /* Anchor the existing panel at the Filters slot rather than the old search origin. */

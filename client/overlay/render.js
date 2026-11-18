@@ -48,9 +48,7 @@
     fill(part.body);
   };
 
-  const setText = (node, text) => {
-    if (node.textContent !== text) node.textContent = text;
-  };
+  const { setText } = SE;
 
   const dateFormat = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
   const formatDate = (seconds) => (seconds > 0 ? dateFormat.format(seconds * 1000) : '');

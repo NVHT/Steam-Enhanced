@@ -1,0 +1,533 @@
+/*
+ * Continues stage.css (in order, see client/loader.js): the stage. The art and its grade,
+ * the game's logo, facts, stats and buttons, the strip of recent games, and reduced motion.
+ */
+/* The stage */
+/*
+ * The game's block grows with the stage. Sizes are clamped between their
+ * size on a ~1400 px stage and their size on a 2400 px one, in container units (cqw, cqh),
+ * so a big window gets a big logo, big buttons and big cards rather than a small cluster.
+ * The stage's height is set by stage/stage.js, so it can be a size container.
+ */
+.se-hs-stage {
+  position: relative;
+  z-index: var(--se-z-raised);
+  box-sizing: border-box;
+  height: var(--se-hs-h, 520px);
+  min-height: 340px;
+  container: se-hs-stage / size;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  /*
+   * The sides match the tray's (24 px), so the strip's cards line up with it; the game's
+   * text keep their own indent (.se-hs-body)
+   */
+  padding: var(--se-space-5) var(--se-space-5) clamp(14px, 1cqw, 24px);
+  color: var(--se-text);
+  font-family: var(--se-font);
+}
+
+/* The art: the whole first view, running on behind the tray, fading into the page */
+.se-hs-art {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--se-hs-vh, 100%);
+  overflow: hidden;
+  z-index: var(--se-z-under);
+  pointer-events: none;
+  background: var(--se-bg);
+}
+
+.se-hs-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity var(--se-dur-ambient) ease;
+}
+
+.se-hs-layer[data-on] {
+  opacity: 1;
+}
+
+.se-hs-hero {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  transform: scale(1.04);
+}
+
+/* A slow push-in on the art that is showing; held while the stage is out of sight */
+.se-hs-layer[data-on] .se-hs-hero {
+  animation: se-hs-push 26s ease-in-out infinite alternate;
+}
+
+.se-hs-stage[data-se-hs-idle] .se-hs-hero {
+  animation-play-state: paused;
+}
+
+@keyframes se-hs-push {
+  to {
+    transform: scale(1.13) translate(-2%, -1.2%);
+  }
+}
+
+/*
+ * The grade: a warm light in the corner, the left side darkened for text content, a vignette,
+ * and the foot fading into the page's ground
+ */
+.se-hs-grade {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 45% at 88% 6%, rgba(255, 196, 150, .16), transparent 70%), linear-gradient(90deg, var(--se-black-70) 0%, var(--se-black-30) 38%, transparent 62%), radial-gradient(ellipse 85% 75% at 50% 40%, transparent 45%, var(--se-black-50) 100%), linear-gradient(180deg, rgba(0, 0, 0, .35) 0%, transparent 14%, transparent 46%, rgba(10, 12, 16, .78) 84%, var(--se-bg) 100%);
+}
+
+/* Toward the tray the art settles into the page's ground, so the shelves read cleanly over it */
+.se-hs-grade::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(14, 16, 21, 0) calc(var(--se-hs-h, 60%) - 260px), rgba(14, 16, 21, .62) calc(var(--se-hs-h, 60%) - 40px), rgba(14, 16, 21, .9) calc(var(--se-hs-h, 60%) + 90px), var(--se-bg) 100%);
+}
+
+/* Film grain, still (an animated one costs a repaint of the whole view every frame) */
+.se-hs-grade::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .07;
+  mix-blend-mode: overlay;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 240px 240px;
+}
+
+/* Text content */
+.se-hs-body {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(32px, 4cqw, 120px);
+  min-width: 0;
+  padding-inline: calc(clamp(36px, 3.3cqw, 80px) - 24px);
+}
+
+.se-hs-title {
+  display: flex;
+  align-items: flex-end;
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: 72px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-ml);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+/* The logo opens the game page: it lifts a little under the pointer */
+.se-hs-title .se-hs-logo,
+.se-hs-title .se-hs-name {
+  transition: transform var(--se-dur-slow) var(--se-ease), filter var(--se-dur-slow);
+  transform-origin: left bottom;
+}
+
+.se-hs-title:hover .se-hs-logo {
+  transform: scale(1.025);
+  filter: drop-shadow(0 6px 24px var(--se-black-60)) brightness(1.08);
+}
+
+.se-hs-title:hover .se-hs-name {
+  transform: scale(1.025);
+}
+
+.se-hs-title:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: 6px; /* clear of the logo's drop shadow */
+}
+
+/* The right side: description, stats, buttons, over a soft dark pool so bright art stays readable */
+.se-hs-side {
+  position: relative;
+  isolation: isolate;
+  flex: 0 1 clamp(420px, 38cqw, 780px);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(14px, min(1.1cqw, 2.4cqh), 26px);
+}
+
+.se-hs-side::before {
+  content: "";
+  position: absolute;
+  inset: -130px -140px -70px -110px;
+  z-index: var(--se-z-under);
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(8, 10, 14, .8) 0%, rgba(8, 10, 14, .74) 55%, rgba(8, 10, 14, .42) 80%, rgba(8, 10, 14, 0) 100%);
+}
+
+.se-hs-desc {
+  margin: 0;
+  font-size: clamp(14px, .82cqw, 19px);
+  line-height: 1.5;
+  color: var(--se-text);
+  text-shadow: 0 1px 3px var(--se-black-90), 0 1px 14px var(--se-black-70);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.se-hs-desc[hidden],
+.se-hs-by[hidden] {
+  display: none;
+}
+
+/* Developer · year, then the reviews and players chips, on one line */
+.se-hs-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--se-space-2) clamp(8px, .5cqw, 12px);
+  margin-bottom: calc(-1 * clamp(2px, .2cqw, 6px));
+}
+
+.se-hs-top .se-hs-by {
+  margin: 0 clamp(4px, .3cqw, 8px) 0 0;
+}
+
+.se-hs-chips {
+  display: contents;
+}
+
+.se-hs-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-space-1);
+  height: clamp(24px, 1.5cqw, 32px);
+  padding: 0 clamp(9px, .6cqw, 13px);
+  border-radius: var(--se-radius-pill);
+  font: 700 clamp(11.5px, .66cqw, 15px)/1 var(--se-font);
+  white-space: nowrap;
+  /* One recipe, tinted by the chip's status colour */
+  --chip: var(--se-online);
+  background: color-mix(in srgb, var(--chip) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chip) 38%, transparent);
+  color: color-mix(in srgb, var(--chip) 60%, var(--se-text-strong));
+}
+
+.se-hs-chip[data-reviews="mixed"] { --chip: var(--se-warning); }
+.se-hs-chip[data-reviews="bad"] { --chip: var(--se-danger); }
+.se-hs-chip[data-live] { --chip: var(--se-running); }
+
+.se-hs-chip[data-live] i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--chip);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--chip) 80%, transparent);
+}
+
+/* Play, then hours and achievements beside it */
+.se-hs-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--se-space-3) clamp(22px, 1.8cqw, 40px);
+  margin-top: clamp(2px, .3cqw, 8px);
+}
+
+/* Who made it · the year it came out, over the description */
+.se-hs-by {
+  margin-bottom: calc(-1 * clamp(6px, .5cqw, 14px));
+  font: 700 clamp(11px, .62cqw, 14px)/1.3 var(--se-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-hs-on-art);
+  text-shadow: 0 1px 3px var(--se-black-90), 0 1px 10px var(--se-black-70);
+}
+
+.se-hs-logo {
+  display: block;
+  width: auto;
+  height: auto;
+  min-height: clamp(100px, min(9cqw, 22cqh), 220px);
+  max-width: clamp(420px, 42cqw, 1000px);
+  max-height: clamp(150px, min(14cqw, 34cqh), 340px);
+  object-fit: contain;
+  object-position: left bottom;
+  filter: drop-shadow(0 6px 24px var(--se-black-60));
+}
+
+.se-hs-logo[hidden] {
+  display: none;
+}
+
+.se-hs-name {
+  font: 800 clamp(56px, min(4.6cqw, 11cqh), 110px)/1 var(--se-font);
+  letter-spacing: -.02em;
+  color: var(--se-text-strong);
+  text-shadow: 0 6px 40px var(--se-black-70);
+}
+
+.se-hs-title[data-logo="yes"] .se-hs-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  /* Still read out by screen readers */
+}
+
+/* The stats as big numbers: hours played, achievements with a bar */
+.se-hs-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-3) clamp(28px, 2.2cqw, 52px);
+}
+
+.se-hs-stat {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4px, .35cqw, 8px);
+}
+
+.se-hs-stat b {
+  font: 800 clamp(20px, min(1.35cqw, 3.8cqh), 32px)/1 var(--se-font);
+  color: var(--se-text-strong);
+  text-shadow: 0 2px 18px var(--se-black-60);
+  white-space: nowrap;
+}
+
+.se-hs-stat small {
+  font-size: .55em;
+  font-weight: 600;
+  color: var(--se-hs-on-art);
+}
+
+.se-hs-stat em {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  font-style: normal;
+  font-size: clamp(12px, .75cqw, 18px);
+  color: var(--se-hs-on-art);
+  text-shadow: 0 1px 3px var(--se-black-90), 0 1px 10px var(--se-black-60);
+}
+
+.se-hs-stat[data-perfect] b {
+  color: var(--se-gold-text);
+}
+
+.se-hs-achbar {
+  display: block;
+  flex: 0 0 auto;
+  width: clamp(60px, 4cqw, 110px);
+  height: 4px;
+  border-radius: 2px;
+  background: var(--se-white-18);
+  overflow: hidden;
+}
+
+.se-hs-achbar > span {
+  display: block;
+  height: 100%;
+  background: var(--se-accent);
+  border-radius: inherit;
+}
+
+.se-hs-stat[data-perfect] .se-hs-achbar > span {
+  background: var(--se-gold-text);
+}
+
+/* The buttons: PLAY as on the game page, Game page as glass */
+.se-hs-actions {
+  display: flex;
+  gap: clamp(12px, .75cqw, 18px);
+}
+
+.se-hs-actions button {
+  height: clamp(46px, min(3.1cqw, 7.5cqh), 72px);
+  border: 0;
+  border-radius: clamp(var(--se-radius-md), .67cqw, 16px);
+  font-family: var(--se-font);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(10px, .67cqw, 16px);
+}
+
+.se-hs-actions button:focus-visible,
+.se-hs-thumb:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-hs-play {
+  padding: 0 clamp(36px, 2.7cqw, 64px);
+  background: var(--se-play-fill);
+  box-shadow: inset 0 1px 0 var(--se-white-25), 0 14px 34px -12px var(--se-play-glow);
+  color: var(--se-text-strong);
+  font-size: clamp(16px, 1.08cqw, 26px);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.se-hs-play:hover {
+  filter: brightness(1.08);
+}
+
+.se-hs-play[data-kind="install"] {
+  background: var(--se-accent);
+  box-shadow: 0 14px 34px -12px var(--se-accent-strong);
+  color: var(--se-bg-ink);
+}
+
+.se-hs-play svg {
+  width: clamp(15px, 1cqw, 24px);
+  height: clamp(15px, 1cqw, 24px);
+}
+
+/*
+ * The strip: the recent games as cards across the stage, name and date over the art;
+ * the one showing ringed and lifted, its timer filling
+ */
+.se-hs-strip {
+  /* Cards shown; read by stage/stage.js so the cycle stays on visible cards */
+  --se-hs-cols: 8;
+  display: grid;
+  grid-template-columns: repeat(var(--se-hs-cols), minmax(0, 1fr));
+  gap: clamp(10px, .75cqw, 18px);
+  margin-top: clamp(22px, min(2cqw, 3.6cqh), 48px);
+}
+
+.se-hs-strip[hidden] {
+  display: none;
+}
+
+/* Narrow stages show fewer, readable cards (~120px+) rather than eight slivers */
+@container se-hs-stage (width < 1100px) {
+  .se-hs-strip { --se-hs-cols: 6; }
+  .se-hs-thumb:nth-child(n + 7) { display: none; }
+}
+
+@container se-hs-stage (width < 860px) {
+  .se-hs-strip { --se-hs-cols: 4; }
+  .se-hs-thumb:nth-child(n + 5) { display: none; }
+}
+
+@container se-hs-stage (width < 600px) {
+  .se-hs-strip { --se-hs-cols: 3; }
+  .se-hs-thumb:nth-child(n + 4) { display: none; }
+}
+
+.se-hs-thumb {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: clamp(var(--se-radius-md), .6cqw, var(--se-radius-lg));
+  background: none;
+  text-align: start;
+  font-family: var(--se-font);
+  cursor: pointer;
+}
+
+.se-hs-pic {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: clamp(70px, min(6.2cqw, 15cqh), 150px);
+  border-radius: inherit;
+  overflow: hidden;
+  background: var(--se-surface);
+  box-shadow: 0 0 0 1px var(--se-white-14);
+  opacity: .7;
+  transition: transform var(--se-dur-relaxed) var(--se-ease), box-shadow var(--se-dur-relaxed), opacity var(--se-dur-relaxed);
+}
+
+.se-hs-thumbimg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.se-hs-thumb:hover .se-hs-pic {
+  opacity: .92;
+}
+
+.se-hs-thumb[data-on] .se-hs-pic {
+  opacity: 1;
+  transform: translateY(-4px);
+  box-shadow: 0 0 0 clamp(2px, .13cqw, 3px) var(--se-text-strong), 0 24px 40px -16px var(--se-black-90);
+}
+
+.se-hs-thumblabel {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-half);
+  padding: 26% clamp(9px, .6cqw, 15px) clamp(7px, .55cqw, 13px);
+  background: linear-gradient(180deg, transparent, var(--se-black-80));
+  pointer-events: none;
+}
+
+.se-hs-thumbname {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(12px, .72cqw, 17px);
+  font-weight: 700;
+  color: var(--se-text-strong);
+}
+
+.se-hs-thumbdate {
+  font-size: clamp(10.5px, .56cqw, 14px);
+  font-weight: 500;
+  color: var(--se-hs-on-art);
+}
+
+.se-hs-prog {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: var(--se-z-raised);
+  height: clamp(3px, .17cqw, 4px);
+  width: 100%;
+  background: var(--se-text-strong);
+  box-shadow: 0 -1px 0 var(--se-black-30);
+  /*
+   * Slides in from the left (the image clips it) instead of growing in width: moved on
+   * the GPU, no layout each frame, and never rescaled, so its edges stay crisp
+   */
+  transform: translateX(-100%);
+  animation: se-hs-fill var(--se-hs-cycle, 9s) linear forwards;
+}
+
+@keyframes se-hs-fill {
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Reduced motion: the stage holds still */
+@media (prefers-reduced-motion: reduce) {
+  .se-hs-layer,
+  .se-hs-pic {
+    transition: none;
+  }
+  .se-hs-layer[data-on] .se-hs-hero {
+    animation: none;
+  }
+  .se-hs-prog {
+    display: none;
+  }
+}

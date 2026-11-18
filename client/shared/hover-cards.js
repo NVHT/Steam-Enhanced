@@ -3,15 +3,15 @@
  *
  * Steam writes each playtime line as one string ("Last two weeks: 3.2 hrs", "Total: 8.3 hrs").
  * The tile shows the value large with the label under it, so each line is split at its last
- * colon into data-se-label / data-se-value, which client/dialogs/hover-cards.css draws.
+ * colon into data-se-label / data-se-value, which client/shared/hover-cards.css draws.
  * The text itself is left to React; a line without a colon (some languages) is left unsplit
  * and shows as written.
  */
 ((SE) => {
   window.__seHoverCards?.destroy();
 
-  const PLAYTIME = '._1VGPO4xU5sgRK6DFt4t74O';
-  const LINE = `${PLAYTIME} > div:not(.MIHa_O-B1JXrzkoGc255n)`;
+  const PLAYTIME = `.${SE.C.PlaytimeDetails}`;
+  const LINE = `${PLAYTIME} > div:not(.${SE.C.AppPortraitHover_Header})`;
   const SPLIT = /^(.*\S)\s*[:：]\s*(\S.*)$/s;
   const ATTRS = ['data-se-src', 'data-se-label', 'data-se-value'];
 

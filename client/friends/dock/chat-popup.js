@@ -16,7 +16,6 @@
   const { C, mainWindow, run } = SE;
 
   const steamHost = document.createElement('div');
-  const steamBar = document.createElement('div');
 
   const chatBack = document.createElement('button');
 
@@ -335,6 +334,7 @@
     for (const type of interactionEvents) {
       shell.addEventListener(type, markDockInteraction, true);
     }
+    // Own observer on purpose: the chat popup's own shell (its own window), while it is open
     entry.chatObserver = new MutationObserver(schedule);
     entry.chatObserver.observe(shell, { childList: true, subtree: true });
 
@@ -542,7 +542,7 @@
   Object.assign(ns, {
     beginChatNavigation, cancelChatNavigation, chatBack, chatChip, chatGeometry, chatMinimize,
     chatRoot, chipAvatar, chipChevron, chipCount, chipName, chipText, closeChatPopup, minimizeChat,
-    resetMinimized, resizeChatPopup, restoreChat, restoreChatRenderer, steamBar, steamHost,
+    resetMinimized, resizeChatPopup, restoreChat, restoreChatRenderer, steamHost,
     syncChatOverlay, updateChatChip,
   });
 })(window.__se);

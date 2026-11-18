@@ -4,17 +4,20 @@
  * it: the persona and the loader of its community data, the profile background, frame, level
  * and badge), rendered by the theme for real in a popup-layer panel (client/shared/popup-layer.js): in
  * the page on the Library, in a popup window above a Store or Community page, which Steam's own
- * hover can't reach above. Steam's hover is hidden; client/dialogs/hover-cards.css styles both.
+ * hover can't reach above. Steam's hover is hidden; client/shared/hover-cards.css styles both.
  *
  * Without the component (a Steam update moved it) the theme's own card stands in:
  * friendCardHTML (templates.js), the game flyout's card headed by the friend.
+ *
+ * Hovering your avatar in the title bar shows your own card the same way, beside
+ * the rail (the avatar's menu opens on click; client/header/menu/hover.js leaves its hover to this).
  */
 ((SE) => {
   const ns = window.__seFriendsDockParts;
   if (!ns) return;
   const { app, ago, COPY, dock, friendCardHTML, state, STATE, statusLabel, steamHost } = ns;
 
-  const { run } = SE;
+  const { C, run } = SE;
   const layer = SE.layer;
 
   const AVATAR = '.avatarHolder';
@@ -89,7 +92,7 @@
 
   // Steam waits a moment before its hover too: a pointer passing over the list opens nothing
   const card = layer?.hover({
-    sheets: ['core/levels.css', 'client/dialogs/hover-cards.css', 'client/friends/friends-dock.css'],
+    sheets: ['core/levels.css', 'client/shared/hover-cards.css', 'client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css'],
     steam: true,
     place: (avatar) => ({ right: dock.getBoundingClientRect().left - SE.px('--se-space-3'), top: avatar.getBoundingClientRect().top }),
     draw,
@@ -112,8 +115,45 @@
     if (card?.left(event)) card.leave();
   }
 
+  // Your card, from the title bar's avatar
+  const ACCOUNT = `.${C.FocusNavigationRoot_TitleBarControls} .${C.AccountMenu}`;
+  const selfCard = layer?.hover({
+    sheets: ['core/levels.css', 'client/shared/hover-cards.css', 'client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css'],
+    steam: true,
+    // Beside the rail, its foot on the avatar's
+    place: (avatar) => {
+      const rect = avatar.getBoundingClientRect();
+      const gap = SE.px('--se-space-3');
+      return (width, height) => ({ left: rect.right + gap, top: rect.bottom - height });
+    },
+    draw,
+    fallback: (avatar, friend) => themeCard(friend),
+  });
+
+  function overAccount(event) {
+    const avatar = event.target.closest?.(ACCOUNT);
+    if (!selfCard || state.destroyed || !avatar || avatar === selfCard.node) return;
+    const self = run(() => app().FriendStore.self);
+    if (self) selfCard.enter(avatar, self);
+  }
+
+  function outAccount(event) {
+    if (selfCard?.left(event)) selfCard.leave();
+  }
+
+  // A press opens the avatar's menu: the card makes way
+  const pressAccount = () => selfCard?.leave();
+
+  addEventListener('mouseover', overAccount, true);
+  addEventListener('mouseout', outAccount, true);
+  addEventListener('pointerdown', pressAccount, true);
+
   function dispose() {
     card?.leave();
+    selfCard?.leave();
+    removeEventListener('mouseover', overAccount, true);
+    removeEventListener('mouseout', outAccount, true);
+    removeEventListener('pointerdown', pressAccount, true);
     document.body?.removeAttribute(ATTR);
   }
 

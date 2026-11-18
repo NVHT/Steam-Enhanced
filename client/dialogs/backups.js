@@ -27,13 +27,13 @@
 
   /* BackupAppsDialog CSS module (sp.js 32609) */
   const C = {
-    root: '.YmQ9vcw08n7STkTEQLiYW',
-    content: '.cBVQzUqhygc4rrsrAVaAf',
-    input: '._3h_6VENNNeSv1LxRpIP263',
-    browse: '.v71Rz05Rte4GxZMKzvwAO',
-    indicator: '._24O5i9aa5PKJmbP0tL_Jbf',
-    found: '._3XJVQHmJH6TijvWtED4ula',
-    text: '._2Nmi6ONpGvLOgRE87Ky2MA',
+    root: `.${SE.C.BackupAppsDialog}`,
+    content: `.${SE.C.BackupAppsContent}`,
+    input: `.${SE.C.BackupAppInput}`,
+    browse: `.${SE.C.BackupAppsBrowse}`,
+    indicator: `.${SE.C.BackupAppsIndicator}`,
+    found: `.${SE.C.ExtraPadding}`,
+    text: `.${SE.C.BackupAppInput_DialogBodyText}`,
   };
 
   const OURS = 'se-bk';

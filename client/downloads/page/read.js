@@ -72,9 +72,7 @@
   };
 
   // Writes only on change: the update runs every tick and Steam's DOM is watched
-  const setText = (el, value) => {
-    if (el.textContent !== value) el.textContent = value;
-  };
+  const { setText } = SE;
   const setHidden = (el, hidden) => {
     if (el.hidden !== hidden) el.hidden = hidden;
   };

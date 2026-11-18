@@ -1,7 +1,7 @@
 /*
  * Millennium Settings window styles.
  *
- * Extends the Steam settings styles (`client/settings/layout.css` … `finishing.css`) for `html[data-se-mill]` pages:
+ * Extends the Steam settings styles (`client/settings/layout.css` … `spacing.css`) for `html[data-se-mill]` pages:
  * Themes grid cards, inline Quick CSS code editor (`.se-qc`) and the General page
  * (millennium-general.css); Plugins, Updates and Logs have files of their own
  * (millennium-plugins.css, -updates.css, -logs.css). Paired with
@@ -40,7 +40,7 @@ html[data-se-mill] body,
   z-index: var(--se-z-sticky) !important;
   display: flex !important;
   flex-wrap: nowrap !important;
-  gap: 8px !important;
+  gap: var(--se-space-2) !important;
   margin: 0 !important;
   padding: 0 !important;
 }
@@ -55,12 +55,12 @@ html[data-se-mill] body,
   height: 34px !important;
   min-height: 0 !important;
   margin: 0 !important;
-  padding: 0 12px !important;
-  gap: 7px !important;
+  padding: 0 var(--se-space-3) !important;
+  gap: var(--se-space-2) !important;
   border-radius: var(--se-radius-sm) !important;
   background: var(--se-surface-2) !important;
   color: var(--se-text) !important;
-  font: 700 13px/34px var(--se-font) !important;
+  font: 700 var(--se-fs-base)/34px var(--se-font) !important;
   white-space: nowrap;
   cursor: pointer;
   pointer-events: auto !important;
@@ -122,20 +122,20 @@ html[data-se-mill] body,
 .MillenniumSettings .MillenniumPlugins_PluginLabel:not(#se-none) {
   display: flex !important;
   align-items: center;
-  gap: 7px !important;
+  gap: var(--se-space-2) !important;
   flex-wrap: wrap;
   flex: 1 1 auto;
   width: 100%;
   min-width: 0;
-  row-gap: 4px !important;
-  font: 700 13.5px/20px var(--se-font) !important;
+  row-gap: var(--se-space-1) !important;
+  font: 700 var(--se-fs-md)/20px var(--se-font) !important;
   color: var(--se-text);
 }
 
 .MillenniumSettings .MillenniumItem_Version:not(#se-none),
 .MillenniumSettings .MillenniumPlugins_Metrics:not(#se-none) {
   display: flex !important;
-  gap: 6px !important;
+  gap: var(--se-space-1) !important;
 }
 
 .MillenniumSettings .MillenniumThemes_ThemeLabel > .MillenniumItem_Version:not(#se-none),
@@ -143,14 +143,14 @@ html[data-se-mill] body,
 .MillenniumSettings .MillenniumPlugins_Metrics span:not(#se-none) {
   display: inline-flex !important;
   align-items: center;
-  gap: 5px;
+  gap: var(--se-space-1);
   height: 20px;
-  padding: 0 7px !important;
+  padding: 0 var(--se-space-2) !important;
   box-sizing: border-box;
   border-radius: var(--se-radius-sm) !important;
   background: var(--se-hairline) !important;
   animation: none !important;
-  font: 600 11px/20px var(--se-font) !important;
+  font: 600 var(--se-fs-xs)/20px var(--se-font) !important;
   color: var(--se-text-muted) !important;
 }
 
@@ -167,8 +167,8 @@ html[data-se-mill] body,
 
 .MillenniumSettings .MillenniumThemes_ThemeItem ._1W1to_azoBRG95oNAFpf9Q:not(#se-none),
 .MillenniumSettings .MillenniumPlugins_PluginField ._1W1to_azoBRG95oNAFpf9Q:not(#se-none) {
-  margin-top: 2px !important;
-  font: 500 12px/17px var(--se-font) !important;
+  margin-top: var(--se-space-half) !important;
+  font: 500 var(--se-fs-sm)/17px var(--se-font) !important;
   color: var(--se-text-muted) !important;
 }
 
@@ -179,7 +179,7 @@ html[data-se-mill] body,
 }
 
 .MillenniumSettings .MillenniumThemes_Author:not(#se-none) {
-  gap: 4px !important;
+  gap: var(--se-space-1) !important;
   color: var(--se-text-faint);
 }
 
@@ -195,13 +195,13 @@ html[data-se-mill] body,
   min-width: 76px !important;
   height: 30px !important;
   min-height: 0 !important;
-  padding: 0 14px !important;
+  padding: 0 var(--se-space-3) !important;
   margin: 0 !important;
   justify-content: center !important;
   border-radius: var(--se-radius-sm) !important;
   background: var(--se-surface-2) !important;
   color: var(--se-text) !important;
-  font: 700 12.5px/30px var(--se-font) !important;
+  font: 700 var(--se-fs-base)/30px var(--se-font) !important;
 }
 
 .MillenniumSettings .MillenniumIconButton svg {
@@ -214,13 +214,30 @@ html[data-se-mill] body,
   content: 'In use';
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--se-space-1);
   height: 20px;
-  padding: 0 7px 0 20px;
+  padding: 0 var(--se-space-2) 0 var(--se-space-4);
   border-radius: var(--se-radius-sm);
-  background: color-mix(in srgb, var(--se-running) 14%, transparent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%236cc24a' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") 6px center / 11px no-repeat;
-  font: 700 11px/20px var(--se-font);
+  order: 1;
+  background: color-mix(in srgb, var(--se-running) 14%, transparent);
+  font: 700 var(--se-fs-xs)/20px var(--se-font);
   color: var(--se-running);
+}
+
+/* Its tick: a mask in the state colour, laid over the chip's start. Placed just before the chip
+   (the same order), which is pulled back over it by the negative end margin */
+.MillenniumSettings .MillenniumThemes_ThemeItem[data-se-active] .MillenniumThemes_ThemeLabel::before {
+  content: '';
+  order: 1;
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 11px;
+  height: 11px;
+  margin-inline: var(--se-space-1) calc(-15px - var(--se-space-2));
+  background: var(--se-running);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
 /* Millennium's tick beside the name is the "In use" chip now. */
@@ -247,22 +264,22 @@ html[data-se-mill] body,
   justify-content: center !important;
   height: auto !important;
   min-height: calc(100vh - 190px);
-  margin-top: 18px;
-  padding: 24px;
+  margin-top: var(--se-space-4);
+  padding: var(--se-space-5);
   box-sizing: border-box;
-  gap: 6px !important;
+  gap: var(--se-space-1) !important;
   border-radius: var(--se-radius-lg);
   background: var(--se-surface);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  box-shadow: var(--se-edge);
   text-align: center;
 }
 
 .MillenniumSettings .MillenniumPlaceholder_Icon:not(#se-none) {
   width: var(--se-tile) !important;
   height: var(--se-tile) !important;
-  padding: 10px;
+  padding: var(--se-space-2);
   box-sizing: border-box;
-  margin-bottom: 6px;
+  margin-bottom: var(--se-space-1);
   border-radius: var(--se-radius-ml);
   background: var(--se-surface-2);
   color: var(--se-accent) !important;
@@ -275,19 +292,19 @@ html[data-se-mill] body,
 }
 
 .MillenniumSettings .MillenniumPlaceholder_Header:not(#se-none) {
-  font: 700 15px/20px var(--se-font) !important;
+  font: 700 var(--se-fs-lg)/20px var(--se-font) !important;
   letter-spacing: 0 !important;
   color: var(--se-text) !important;
 }
 
 .MillenniumSettings .MillenniumPlaceholder_Text:not(#se-none) {
-  font: 500 13px/18px var(--se-font) !important;
+  font: 500 var(--se-fs-base)/18px var(--se-font) !important;
   color: var(--se-text-muted) !important;
 }
 
 .MillenniumSettings .MillenniumPlaceholder_Buttons:not(#se-none) {
-  margin-top: 10px;
-  gap: 8px !important;
+  margin-top: var(--se-space-2);
+  gap: var(--se-space-2) !important;
 }
 
 .MillenniumSettings .MillenniumPlaceholder_Button:not(#se-none):not(#se-p2),
@@ -297,13 +314,13 @@ html[data-se-mill] body,
   min-width: 0 !important;
   height: 32px !important;
   min-height: 0 !important;
-  padding: 0 14px !important;
+  padding: 0 var(--se-space-3) !important;
   margin: 0 !important;
-  gap: 7px !important;
+  gap: var(--se-space-2) !important;
   border-radius: var(--se-radius-sm) !important;
   background: var(--se-surface-2) !important;
   color: var(--se-text) !important;
-  font: 700 12.5px/32px var(--se-font) !important;
+  font: 700 var(--se-fs-base)/32px var(--se-font) !important;
 }
 
 .MillenniumSettings .MillenniumPlaceholder_Button:hover:not(#se-none):not(#se-p2),
@@ -316,7 +333,7 @@ html[data-se-mill] body,
 .MillenniumSettings .MillenniumLogsSection:not(#se-none) {
   display: flex !important;
   flex-wrap: wrap !important;
-  gap: 8px !important;
+  gap: var(--se-space-2) !important;
 }
 
 .MillenniumSettings .MillenniumLogsSection .DialogButton:not(#se-none):not(#se-p2) {
@@ -331,14 +348,14 @@ html[data-se-mill] body,
 .MillenniumSettings :is([data-se-mill-page="logs"] .MillenniumButtonsSection, .MillenniumButtonsSection:has(.MillenniumLogs_LogItemButton)):not(#se-none) {
   position: static !important;
   flex-wrap: wrap !important;
-  margin: 8px 0 0 !important;
+  margin: var(--se-space-2) 0 0 !important;
 }
 
 .MillenniumSettings :is([data-se-mill-page="logs"] .MillenniumButtonsSection, .MillenniumButtonsSection:has(.MillenniumLogs_LogItemButton)) .DialogButton:last-child:not(:first-child):not(#se-none):not(#se-p2) {
   width: auto !important;
-  padding: 0 12px !important;
-  font-size: 12.5px !important;
-  gap: 7px !important;
+  padding: 0 var(--se-space-3) !important;
+  font-size: var(--se-fs-base) !important;
+  gap: var(--se-space-2) !important;
 }
 
 /*
@@ -347,16 +364,16 @@ html[data-se-mill] body,
  */
 .MillenniumSettings .MillenniumLogs_Text:not(#se-none) {
   box-sizing: border-box;
-  height: var(--se-logs-h, 100%) !important;
+  height: var(--se-logs-h) !important;
   min-height: 320px;
   flex: none !important;
   margin: 0 !important;
-  padding: 14px 16px 14px 20px !important;
+  padding: var(--se-space-3) var(--se-space-4) var(--se-space-3) var(--se-space-4) !important;
   overflow-y: auto !important;
   border: 0 !important;
   border-radius: var(--se-radius-ml);
   background: var(--se-field) !important;
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
-  font: 12px/1.6 var(--se-font-mono) !important;
+  box-shadow: var(--se-edge);
+  font: var(--se-fs-sm)/1.6 var(--se-font-mono) !important;
   color: var(--se-text-dim) !important;
 }

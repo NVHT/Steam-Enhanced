@@ -169,8 +169,41 @@
     live.localObserver?.disconnect();
     watchedLocal = node;
     if (!node) return;
+    // Own observer on purpose: one node's style/class/hidden; on the shared observer these attributes would be watched on every node in the window
     live.localObserver = new MutationObserver(() => place());
     live.localObserver.observe(node, { attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
+  }
+
+  /*
+   * The dock's Friends bar sits level with the game list's first collection header (Favorites):
+   * its centre, measured as if the list were scrolled to the top, sets --se-fd-bar-y, the bar's
+   * offset from the top of Steam's header in the dock (friendListHeaderContainer, which holds
+   * the bar and the favorites). Collection header: _2sYIghGVXJr6tsQVvcryy8
+   * (client/library/game-list.css); not in the class map, so matched by its hash. A list
+   * scrolled past its first header keeps the last value.
+   */
+  const LIST_HEADER = `.${C.HoverOverlay_Container}`;
+  const BAR_H = 30; // .socialListTab, client/friends/list/friends-search.css
+  let barY = null;
+
+  function scrollerOf(node) {
+    for (let el = node.parentElement; el && el !== document.body; el = el.parentElement) {
+      const { overflowY } = getComputedStyle(el);
+      if ((overflowY === 'auto' || overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return el;
+    }
+    return null;
+  }
+
+  function alignBar() {
+    const header = document.querySelector(LIST_HEADER);
+    const content = dock.querySelector('.se-fd-steam .friendListHeaderContainer');
+    if (!header || !content || !header.getClientRects().length) return;
+    const box = header.getBoundingClientRect();
+    const centre = box.top + box.height / 2 + (scrollerOf(header)?.scrollTop || 0);
+    const y = Math.max(0, Math.round(centre - BAR_H / 2 - content.getBoundingClientRect().top));
+    if (y === barY) return;
+    barY = y;
+    SE.cssVar(dock, '--se-fd-bar-y', `${y}px`);
   }
 
   function place() {
@@ -188,6 +221,7 @@
       if (dock.parentElement !== document.body) document.body.appendChild(dock);
       if (fly.parentElement !== document.body) document.body.appendChild(fly);
       render(true);
+      if (dock.dataset.mode === 'open') alignBar();
     } else {
       dock.remove();
       hideFly(true);

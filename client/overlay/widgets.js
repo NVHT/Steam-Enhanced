@@ -97,7 +97,7 @@
   };
 
   // Widget windows carry Steam's OverlayPopupBody class on <body>.
-  const OVERLAY_POPUP_BODY = '_1UJDmU3N-pkv7oTJ_Zf9nK';
+  const OVERLAY_POPUP_BODY = SE.C.OverlayPopupBody;
   const isWindow = (value) => !!SE.run(() => value && typeof value.moveTo === 'function' && !!value.document);
   const isWidgetWindow = (win) =>
     isWindow(win) && win !== window && !!SE.run(() => win.document.body.classList.contains(OVERLAY_POPUP_BODY));

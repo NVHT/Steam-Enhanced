@@ -1,6 +1,6 @@
 /*
- * Proxy bottom-bar actions into the header / navigation rail while keeping native components
- * mounted.
+ * Proxy bottom-bar actions into the title bar (Settings into the rail) while keeping native
+ * components mounted.
  */
 ((SE) => {
   const { C } = SE;
@@ -16,13 +16,13 @@
 
   const proxies = new Map();
   const decorated = new Map();
-  const millButtons = [];
   const nativeClasses = [C.Button, C.AnnouncementsButton];
   const styled = new Map();
   const savedVariables = new Map();
   const coloredDividers = new Set();
 
   let settingsButton;
+  let gamesButton;
   let observer;
   let menuObserver;
   let frame = 0;
@@ -118,6 +118,9 @@
     return listDownloadPercent() ?? overviewDownloadPercent() ?? footerDownloadPercent(source);
   }
 
+  // The ring's percentage, for the Downloads card (client/header/downloads-card.js)
+  state.downloadPercent = () => (downloadSource ? readDownloadProgress(downloadSource) : listDownloadPercent() ?? overviewDownloadPercent());
+
   /* The bar (header) and the ring (rail) share one element; CSS shows the one that fits */
   function createProgressIndicator() {
     const bar = document.createElement('span');
@@ -138,6 +141,7 @@
     if (downloadSource !== source) {
       downloadObserver?.disconnect();
       downloadSource = source;
+      // Own observer on purpose: Steam's downloads button only (its attributes and text); released when the source changes
       downloadObserver = new MutationObserver(schedule);
       downloadObserver.observe(source, {
         subtree: true,
@@ -284,6 +288,7 @@
     };
 
     measure();
+    // Own observer on purpose: one element's class and style, which the shared observer would have to watch window-wide
     referenceObserver = new MutationObserver(measure);
     referenceObserver.observe(announcement, { attributes: true, attributeFilter: ['class', 'style'] });
   }
@@ -395,10 +400,10 @@
     };
 
     button.addEventListener('click', (event) => {
-      if (action.key === 'friends' && window.__seFriendsDock?.toggle) {
+      if (action.key === 'friends' && window.__seFriendsDock) {
         event.preventDefault();
         event.stopPropagation();
-        window.__seFriendsDock.toggle();
+        onFriends();
       } else {
         forwardNative(event);
       }
@@ -409,7 +414,7 @@
         event.preventDefault();
         event.stopPropagation();
         const dock = window.__seFriendsDock;
-        if (dock?.openWindow) dock.openWindow(() => forwardNative(event));
+        if (dock) toggleFriendsMenu(button, () => dock.openWindow(() => forwardNative(event)));
         else forwardNative(event);
       });
     }
@@ -452,51 +457,202 @@
     if (action.key === 'downloads') updateDownloadProgress(entry, source);
   }
 
+  /*
+   * Friends & Chat runs the friends dock (client/friends/dock/main.js) in one button: a click
+   * collapses the open dock to its rail and expands it back, or shows it when hidden; a
+   * right-click opens a menu (the popup layer's, in the Settings menu's style) to hide or show
+   * the dock, switch Steam's compact list and compact favorites, and open the Friends & Chat
+   * window. The button carries the dock's state
+   * (data-se-dock: open, rail or hidden) for its icon, and names its click in its tooltip; the
+   * dock calls syncFriendsButton when its state changes.
+   */
+  const FRIENDS_CLICK = { open: 'Collapse friends', rail: 'Expand friends', hidden: 'Show friends' };
+  let friendsMenu = null;
+
+  const dockState = (dock) => (dock.hidden ? 'hidden' : dock.mode === 'rail' ? 'rail' : 'open');
+
+  function syncFriendsButton() {
+    const button = proxies.get('friends')?.button;
+    const dock = window.__seFriendsDock;
+    if (!button) return;
+    if (!dock) {
+      SE.attr(button, 'data-se-dock', null);
+      return;
+    }
+    const current = dockState(dock);
+    SE.attr(button, 'data-se-dock', current);
+    SE.attr(button, 'aria-label', FRIENDS_CLICK[current]);
+  }
+
+  state.syncFriendsButton = syncFriendsButton;
+
+  function onFriends() {
+    const dock = window.__seFriendsDock;
+    friendsMenu?.release();
+    if (dock.hidden) dock.toggle();
+    else dock.toggleMode();
+    syncFriendsButton();
+  }
+
+  // Under a title-bar button, right edges aligned, the menus' gap below it; kept in the window
+  function belowButton(button) {
+    const rect = button.getBoundingClientRect();
+    const edge = SE.px('--se-space-2');
+    return (width) => ({
+      left: Math.max(edge, Math.min(rect.right - width, innerWidth - width - edge)),
+      top: rect.bottom + SE.px('--se-space-3'),
+    });
+  }
+
+  function toggleFriendsMenu(button, openWindow) {
+    if (friendsMenu && !friendsMenu.released) {
+      friendsMenu.release();
+      friendsMenu = null;
+      return;
+    }
+    const dock = window.__seFriendsDock;
+    const run = (act) => () => {
+      act();
+      syncFriendsButton();
+    };
+    const current = dockState(dock);
+    const dockRows =
+      current === 'hidden'
+        ? [{ label: 'Show friends', hint: 'Bring the dock back', icon: '--se-icon-friends', run: run(() => dock.toggle()) }]
+        : [
+            current === 'rail'
+              ? { label: 'Expand friends', hint: 'Show the full list', icon: '--se-icon-collapse', run: run(() => dock.toggleMode()) }
+              : { label: 'Collapse friends', hint: 'Keep just a rail of games', icon: '--se-icon-collapse', run: run(() => dock.toggleMode()) },
+            { label: 'Hide friends', hint: 'Take the dock off the side', icon: '--se-icon-eye-off', run: run(() => dock.toggle()) },
+          ];
+    // Steam's own Friends & Chat settings, as its Friends settings page sets them: its settings
+    // store lives in Steam's shared context (the window that opened this one), not here
+    const settings = [...SE.owners()].map((win) => SE.run(() => win.settingsStore)).find((store) => store?.UpdateFriendSetting);
+    const friendSetting = (key) => Boolean(settings?.friendSettings?.[key]);
+    const flip = (key) => () => SE.run(() => settings.UpdateFriendSetting(key, !friendSetting(key)));
+    const viewRows = settings
+      ? [
+          { separator: true },
+          { heading: 'View' },
+          {
+            label: 'Compact list',
+            hint: 'Tighter rows in the list and chats',
+            icon: '--se-icon-view-compact',
+            checked: friendSetting('bCompactFriendsList'),
+            run: flip('bCompactFriendsList'),
+          },
+          {
+            label: 'Compact favorites',
+            hint: 'Favorites as avatars only',
+            icon: '--se-icon-heart',
+            checked: friendSetting('bCompactQuickAccess'),
+            run: flip('bCompactQuickAccess'),
+          },
+        ]
+      : [];
+    friendsMenu = SE.layer?.menu(
+      [
+        { heading: 'Dock' },
+        ...dockRows,
+        ...viewRows,
+        { separator: true },
+        { heading: 'Window' },
+        { label: 'Open chat window', hint: 'Friends & Chat on its own', icon: '--se-icon-bubble', run: openWindow },
+      ],
+      belowButton(button),
+      // Leaving the button or the menu closes it, as the Settings menu closes
+      { owner: button, closeOnLeave: true }
+    );
+    if (!friendsMenu) openWindow();
+  }
+
+  function openSteamSettings() {
+    if (SE.run(() => window.SteamClient?.URL?.ExecuteSteamURL?.('steam://open/settings')) !== undefined) {
+      return;
+    }
+    location.href = 'steam://open/settings';
+  }
+
+  function openMillennium() {
+    if (!window.__seMillenniumWindow?.openDirect?.()) {
+      window.__seMillenniumWindow?.showError?.();
+    }
+  }
+
+  function openLibraryManager() {
+    if (window.__seMillenniumWindow?.openLibraryManager) {
+      window.__seMillenniumWindow.openLibraryManager();
+      return;
+    }
+    SE.run(() =>
+      document.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: '2',
+          code: 'Digit2',
+          ctrlKey: true,
+          bubbles: true,
+          cancelable: true,
+        })
+      )
+    );
+  }
+
+  /*
+   * Settings: one button at the rail's foot, opening Steam Settings, Millennium and the Library
+   * Manager as a menu beside it, its foot on the button's (the popup layer's menu,
+   * client/shared/popup-layer.js): Steam's and Millennium's in two groups, each row with its
+   * icon and a line on what it opens.
+   */
+  let settingsMenu = null;
+
+  function onSettings() {
+    if (settingsMenu && !settingsMenu.released) {
+      settingsMenu.release();
+      settingsMenu = null;
+      return;
+    }
+    settingsMenu = SE.layer?.menu(
+      [
+        { heading: 'Steam' },
+        { label: 'Settings', hint: 'Account, downloads, display', icon: '--se-icon-settings', run: openSteamSettings },
+        { separator: true },
+        { heading: 'Millennium' },
+        { label: 'Millennium', hint: 'Themes, plugins, updates', icon: '--se-icon-millennium', run: openMillennium },
+        {
+          label: 'Library Manager',
+          hint: 'Theme and plugin settings',
+          icon: '--se-icon-library-manager',
+          keys: 'Ctrl+2',
+          run: openLibraryManager,
+        },
+      ],
+      // Beside the rail, its bottom level with the cog's, as every rail menu opens
+      SE.layer.besideRail(settingsButton, { foot: true }),
+      // Leaving the cog or the menu closes it, as Steam's rail menus close
+      { owner: settingsButton, closeOnLeave: true }
+    );
+    if (!settingsMenu) openSteamSettings();
+  }
+
+  /*
+   * Games: a button at the rail's foot, between the bell and Downloads, opening the Games menu
+   * (Steam's Games items, laid out in client/navigation/nav-rail.js) beside it.
+   */
+  function onGames() {
+    window.__seRailNav?.toggleGames(gamesButton);
+  }
+
   function ensureExtraButtons(target) {
     if (!settingsButton) {
-      settingsButton = makeActionButton('settings', 'Settings', () => {
-        if (SE.run(() => window.SteamClient?.URL?.ExecuteSteamURL?.('steam://open/settings')) !== undefined) {
-          return;
-        }
-        location.href = 'steam://open/settings';
-      });
+      settingsButton = makeActionButton('settings', 'Settings', onSettings);
+      settingsButton.setAttribute('aria-haspopup', 'menu');
+    }
+    if (!gamesButton) {
+      gamesButton = makeActionButton('games', 'Games', onGames);
+      gamesButton.setAttribute('aria-haspopup', 'menu');
     }
     if (settingsButton.parentElement !== target) target.appendChild(settingsButton);
-
-    if (!millButtons.length) {
-      millButtons.push(
-        makeActionButton('millennium', 'Millennium', () => {
-          if (!window.__seMillenniumWindow?.openDirect?.()) {
-            window.__seMillenniumWindow?.showError?.();
-          }
-        }),
-        makeActionButton('library-manager', 'Library Manager', () => {
-          if (window.__seMillenniumWindow?.openLibraryManager) {
-            window.__seMillenniumWindow.openLibraryManager();
-            return;
-          }
-          SE.run(() =>
-            document.dispatchEvent(
-              new KeyboardEvent('keydown', {
-                key: '2',
-                code: 'Digit2',
-                ctrlKey: true,
-                bubbles: true,
-                cancelable: true,
-              })
-            )
-          );
-        })
-      );
-    }
-
-    let next = settingsButton;
-    for (const btn of [...millButtons].reverse()) {
-      if (btn.parentElement !== target || btn.nextElementSibling !== next) {
-        target.insertBefore(btn, next);
-      }
-      next = btn;
-    }
+    if (gamesButton.parentElement !== target) target.appendChild(gamesButton);
   }
 
   function update() {
@@ -504,18 +660,12 @@
     matchLibraryStrip();
     matchSteamHome();
 
-    const navIcons = document.querySelectorAll(
-      '.se-menu-icon[data-se-icon="store"], .se-menu-icon[data-se-icon="library"], .se-menu-icon[data-se-icon="community"], .se-menu-icon[data-se-icon="profile"], .se-menu-icon[data-se-icon="console"]'
-    );
-    const navCount = [...navIcons].filter(node => node.getBoundingClientRect().height > 0).length || 5;
-    setBodyProperty('--se-rail-nav-count', String(navCount));
-
     const announcement = document.querySelector(ANNOUNCEMENT_SELECTOR);
     const sources = PROXY_ACTIONS.map(action => document.querySelector(action.selector));
     if (!announcement || sources.some(source => !source)) {
       group?.remove();
       settingsButton?.remove();
-      for (const btn of millButtons) btn.remove();
+      gamesButton?.remove();
       document.body?.classList.remove('se-header-actions-ready');
       return;
     }
@@ -541,6 +691,7 @@
 
     ensureExtraButtons(target);
     PROXY_ACTIONS.forEach((action, index) => syncProxyButton(action, sources[index]));
+    syncFriendsButton();
     decorateMenuIcons();
     if (!document.body.classList.contains('se-header-actions-ready')) {
       document.body.classList.add('se-header-actions-ready');
@@ -581,9 +732,11 @@
     downloadObserver?.disconnect();
     if (frame) cancelAnimationFrame(frame);
     removeEventListener('DOMContentLoaded', start);
+    settingsMenu?.release();
+    friendsMenu?.release();
     group?.remove();
     settingsButton?.remove();
-    for (const btn of millButtons) btn.remove();
+    gamesButton?.remove();
     removeEventListener('resize', schedule);
     document.body?.classList.remove('se-header-actions-ready', 'se-hide-library-strip');
 

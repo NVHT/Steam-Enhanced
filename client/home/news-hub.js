@@ -431,7 +431,9 @@
     delete window.__seNewsHub;
   };
 
-  // Until Home is first opened: a visibility-aware poll that idles at core's slow rate.
-  initPoll = SE.poll(tryInit, 1000, { active: () => !!document.querySelector('.LibraryHome') });
+  // Until Home is first opened: wakes when Home mounts (the shared observer, scoped to Home).
+  initPoll = SE.watch(() => {
+    if (document.querySelector('.LibraryHome')) tryInit();
+  }, { scope: '.LibraryHome' });
   tryInit();
 })(window.__se);

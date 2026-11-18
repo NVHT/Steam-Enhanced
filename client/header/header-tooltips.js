@@ -14,20 +14,30 @@
   const pageIcons = new Set(['store', 'library', 'community', 'profile']);
   let isRail = false;
 
-  // Controls that open hover menus show the menu, not a tip.
+  // The Steam menu is Steam's own context menu (client/header/menu/): open while one of its
+  // instances the menu patches is visible.
+  const steamMenuOpen = () => {
+    const parts = window.__seSteamMenuParts;
+    if (!parts?.patched || typeof parts.isSteam !== 'function') return false;
+    for (const instance of parts.patched.keys()) if (instance.visible && parts.isSteam(instance)) return true;
+    return false;
+  };
+
+  // Controls that open hover menus show the menu, not a tip; a click menu or card (Settings,
+  // Downloads, the Steam menu) shows its tip until it is open.
   const ownsDropdown = (node) => {
     const icon = node.getAttribute('data-se-icon');
+    if (icon === 'steam') return steamMenuOpen();
     if (
-      icon === 'steam' ||
       node.getAttribute('data-se-action') === 'add' ||
-      (node.matches(`.${C.NotificationsButton}`) && hasNotifications() !== false)
+      (node.hasAttribute('aria-haspopup') && node.getAttribute('aria-expanded') === 'true')
     ) {
       return true;
     }
     return pageIcons.has(icon) && !isRail;
   };
 
-  const RAIL_LABELS = { profile: 'Profile', community: 'Discussions' };
+  const RAIL_LABELS = { profile: 'Profile', community: 'Community' };
 
   const labelFor = (node) =>
     node.getAttribute('data-se-tip') ||
@@ -43,48 +53,16 @@
     ],
   ];
 
-  // Exclude client-only tray entries (eSource === 1) that Steam's notification menu skips.
-  const hasNotifications = () => {
-    for (const owner of SE.owners()) {
-      try {
-        const result = owner.NotificationStore?.GetNotificationsInTray?.();
-        if (Array.isArray(result?.[0])) {
-          return result[0].some(group => {
-            const first = group.notifications?.[0];
-            return first && first.eSource !== 1;
-          });
-        }
-      } catch {}
-    }
-    return null;
-  };
-
-  let trayCallbacks = null;
-  let traySubscription = null;
-
-  const watchTray = () => {
-    for (const owner of SE.owners()) {
-      try {
-        const callbacks = owner.NotificationStore?.GetNotificationsInTray?.()?.[1];
-        if (!callbacks?.Register) continue;
-        if (callbacks === trayCallbacks) return;
-        traySubscription?.Unregister();
-        trayCallbacks = callbacks;
-        traySubscription = callbacks.Register(schedule);
-        break;
-      } catch {}
-    }
-  };
-
   /*
    * Buttons whose own Steam tip is muted (the theme tips them): the title bar's Big Picture and
-   * Announcements buttons in the rail, and the bell (and its tooltip source). Muted by hiding
+   * Announcements buttons in the rail, the bell and the avatar (and their tooltip sources; the
+   * avatar shows your mini profile instead, client/friends/dock/friend-card.js). Muted by hiding
    * Steam's tooltips while the pointer is on one ([data-se-tip-muted] on <body>, dialogs.css),
    * decided at each hover: Steam re-renders these buttons, so nothing is tied to an element, and
    * every event goes on to Steam, whose tip opens and closes as it always does. (Stopping the
    * events instead cut React's enter and leave apart and left Steam's tip open for good.)
    */
-  const BELL = `.${C.FocusNavigationRoot_TitleBarControls} :is(.${C.NotificationsButton}, .tool-tip-source:has(.${C.NotificationsButton}))`;
+  const BELL = `.${C.FocusNavigationRoot_TitleBarControls} :is(.${C.NotificationsButton}, .tool-tip-source:has(.${C.NotificationsButton}), .${C.AccountMenu}, .tool-tip-source:has(.${C.AccountMenu}))`;
   const muted = (target) =>
     Boolean(target.closest?.(BELL)) || (railMode() && NATIVE_TIPS.some(([selector]) => target.closest?.(selector)));
 
@@ -110,7 +88,8 @@
       if (node) SE.attr(node, 'data-se-tip', isRail ? label : null);
     }
     const bell = document.querySelector(`.${C.FocusNavigationRoot_TitleBarControls} .${C.NotificationsButton}`);
-    if (bell) SE.attr(bell, 'data-se-tip', hasNotifications() === false ? 'Notifications' : null);
+    // The bell opens on click (client/header/menu/hover.js): hovering it shows its tip
+    if (bell) SE.attr(bell, 'data-se-tip', 'Notifications');
   }
 
   const CANDIDATES = '.se-menu-icon, .se-header-action, .se-sidebar-tip, [data-se-tip]';
@@ -219,7 +198,6 @@
   const update = () => {
     frame = 0;
     isRail = railMode();
-    watchTray();
     syncNativeTips();
     // A button that went away, or now opens a menu, takes its tip with it.
     const source = tips.node;
@@ -248,7 +226,6 @@
   document.addEventListener('pointerdown', hide, true);
 
   window.__seHeaderTooltips = {
-    hasNotifications,
     destroy() {
       observer?.disconnect();
       for (const type of HOVER_EVENTS) document.removeEventListener(type, onHover, true);
@@ -256,9 +233,6 @@
       document.removeEventListener('focusout', onBlur, true);
       document.removeEventListener('keydown', onKey, true);
       document.removeEventListener('pointerdown', hide, true);
-      traySubscription?.Unregister();
-      traySubscription = null;
-      trayCallbacks = null;
       if (frame) cancelAnimationFrame(frame);
       hide();
       SE.unmark(document.body, MUTE_ATTR);

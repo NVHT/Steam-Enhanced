@@ -29,9 +29,9 @@
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--se-space-3);
   height: 68px;
-  padding: 0 16px 0 var(--se-chat-gutter, 20px);
+  padding: 0 var(--se-space-4) 0 var(--se-chat-gutter, 20px);
   font-family: var(--se-font);
   -webkit-app-region: drag;
 }
@@ -58,7 +58,7 @@
 }
 
 .se-chat-head .se-chat-name {
-  font: 700 16px/1.3 var(--se-font), sans-serif;
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font), sans-serif;
   color: var(--se-text);
   white-space: nowrap;
   overflow: hidden;
@@ -66,7 +66,7 @@
 }
 
 .se-chat-head .se-chat-status {
-  font: 600 12.5px/1.3 var(--se-font), sans-serif;
+  font: 600 var(--se-fs-base)/1.3 var(--se-font), sans-serif;
   color: var(--se-chat-head-status, var(--se-text-faint));
   white-space: nowrap;
   overflow: hidden;
@@ -79,7 +79,7 @@
 }
 
 .se-chat-head[data-se-status="awayOrSnooze"] {
-  --se-chat-head-ring: color-mix(in srgb, var(--se-online) 50%, transparent);
+  --se-chat-head-ring: var(--se-away);
   --se-chat-head-status: color-mix(in srgb, var(--se-online) 70%, transparent);
 }
 
@@ -89,13 +89,13 @@
 }
 
 .se-chat-head[data-se-status="ingame-away"] {
-  --se-chat-head-ring: var(--se-running);
+  --se-chat-head-ring: var(--se-away-ingame);
   --se-chat-head-status: var(--se-running);
 }
 
 .se-chat-head:is([data-se-status="awayOrSnooze"], [data-se-status="ingame-away"]) .se-chat-avatar {
   box-shadow: none;
-  outline: 2px dashed var(--se-chat-head-ring, var(--se-online));
+  outline: 2px solid var(--se-chat-head-ring, var(--se-away));
   outline-offset: 2px;
 }
 
@@ -106,7 +106,7 @@
 
 .se-chat-head .se-chat-actions {
   display: flex;
-  gap: 2px;
+  gap: var(--se-space-half);
   -webkit-app-region: no-drag;
 }
 
@@ -176,7 +176,7 @@
 .multiChatDialog[data-se-chat] .chatWindow .chatHeader.titleBarContainer {
   box-sizing: border-box !important;
   min-height: 68px !important;
-  padding: 0 16px 0 var(--se-chat-gutter) !important;
+  padding: 0 var(--se-space-4) 0 var(--se-chat-gutter) !important;
   align-items: center !important;
   background: var(--se-sidebar) !important;
   border: 0 !important;
@@ -192,7 +192,7 @@
 .multiChatDialog[data-se-chat] .chatHeader .chatActionsCtn {
   display: flex !important;
   align-items: center;
-  gap: 2px;
+  gap: var(--se-space-half);
 }
 
 .multiChatDialog[data-se-chat] .chatHeader .friend {
@@ -225,12 +225,12 @@
 }
 
 .multiChatDialog[data-se-chat] .chatHeader .friend .labelHolder {
-  margin: 0 0 0 12px !important;
+  margin: 0 0 0 var(--se-space-3) !important;
   height: auto !important;
 }
 
 .multiChatDialog[data-se-chat] .chatHeader :is(.nOdcT-MoOaXGePXLyPe0H /* playerName */, .chatRoomGroupHeaderName) {
-  font: 700 16px/1.3 var(--se-font), sans-serif !important;
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font), sans-serif !important;
   letter-spacing: 0 !important;
   text-transform: none !important;
   color: var(--se-text) !important;
@@ -238,7 +238,7 @@
 
 .multiChatDialog[data-se-chat] .chatHeader :is(._2Ri005Wg_uXDTa71kdRbcN /* richPresenceLabel */, ._1cB0qtF0paHWWyj1XNcnbG /* gameName */) {
   margin: 0 !important;
-  font: 600 12.5px/1.3 var(--se-font), sans-serif !important;
+  font: 600 var(--se-fs-base)/1.3 var(--se-font), sans-serif !important;
   color: var(--se-text-faint) !important;
 }
 
@@ -258,24 +258,24 @@
 }
 
 .multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupStats {
-  font: 600 12px/1.3 var(--se-font), sans-serif !important;
+  font: 600 var(--se-fs-sm)/1.3 var(--se-font), sans-serif !important;
   color: var(--se-online) !important;
 }
 
 /* The log: one avatar and name per run, later lines tucked under it, no bubbles */
 .multiChatDialog[data-se-chat] .chatHistoryScroll {
-  padding: 14px 0 8px !important;
+  padding: var(--se-space-3) 0 var(--se-space-2) !important;
 }
 
 .multiChatDialog[data-se-chat] .chatHistory {
   margin: 0 !important;
-  padding: 0 0 16px !important;
+  padding: 0 0 var(--se-space-4) !important;
 }
 
 .multiChatDialog[data-se-chat] .ChatMessageBlock {
   position: relative;
   margin: 0 !important;
-  padding: 6px var(--se-chat-gutter) 6px calc(var(--se-chat-gutter) + var(--se-chat-avatar) + 12px) !important;
+  padding: var(--se-space-1) var(--se-chat-gutter) var(--se-space-1) calc(var(--se-chat-gutter) + var(--se-chat-avatar) + 12px) !important;
   border-radius: 0;
   transition: background-color var(--se-dur) ease-out;
 }
@@ -295,7 +295,7 @@
 .multiChatDialog[data-se-chat] .ChatSpeaker .speaker {
   display: flex !important;
   align-items: baseline !important;
-  gap: 8px;
+  gap: var(--se-space-2);
   margin: 0 !important;
   padding: 0 !important;
   background: none !important;
@@ -344,6 +344,6 @@
 .multiChatDialog[data-se-chat] .ChatSpeaker .speakerName {
   max-width: none !important;
   margin: 0 !important;
-  font: 700 14px/1.4 var(--se-font), sans-serif !important;
+  font: 700 var(--se-fs-md)/1.4 var(--se-font), sans-serif !important;
   color: var(--se-text) !important;
 }

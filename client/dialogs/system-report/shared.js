@@ -31,10 +31,10 @@
 
   window.__seSystemReport?.destroy();
 
-  const ROOT = '._2TAQYpbxatDYN3Ex76KX5u'; // SystemReportDialog
-  const CONTAINER = '._7jaC6UFFrvcKq2UlJr1Pb'; // SystemReportContainer
-  const TEXT_BOX = '.Cw--cBWy7v1Ey1JF0VkBN'; // TextContainer
-  const TEXT = '.keUMR-i_7Q6QoQvP-I2jG'; // Text
+  const ROOT = `.${SE.C.SystemReportDialog}`; // SystemReportDialog
+  const CONTAINER = `.${SE.C.SystemReportContainer}`; // SystemReportContainer
+  const TEXT_BOX = `.${SE.C.TextContainer}`; // TextContainer
+  const TEXT = `.${SE.C.Text}`; // Text
   const BUILT = 'data-se-sysreport';
   const CHAIN = 'data-se-sysreport-chain';
   const MODE_KEY = 'se-sysreport-mode';

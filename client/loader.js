@@ -1,7 +1,8 @@
 /*
  * Client loader: which theme files each Steam window gets.
  *
- * skin.json injects core/core.js and this loader into every window (".*"); this file decides
+ * skin.json injects core/core.js (the web pages' boot) and this loader into every window
+ * (".*"); this file adds the runtime first (core/classmap.js, core/runtime.js) and decides
  * the rest. It sorts the window into groups by its title (GROUPS below) and adds every file
  * listed for those groups, in list order. To add a feature or a window group, edit this file
  * only: no skin.json change, no Steam restart.
@@ -17,7 +18,7 @@
  * The list order is the cascade. Each stylesheet's <link> carries its list position and goes in
  * among the theme's other links by that position, so rules that tie on specificity resolve the
  * same in every window. Scripts run in list order (a split feature's parts rely on it), and only
- * once core/core.js has published the runtime (window.__se): every script can take it as given.
+ * once core/runtime.js has published the runtime (window.__se): every script can take it as given.
  *
  * Files load with the loader's own query string, so whatever cache-busting Millennium puts on
  * this file carries over to every file.
@@ -60,7 +61,7 @@
   /** @type {[group: string, folder: string, files: string[]][]} */
   const FEATURES = [
     // Shared runtime pieces
-    ['all', 'core/', ['font.css', 'tokens.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
+    ['all', 'core/', ['font.css', 'tokens.css', 'icons-nav.css', 'icons-ui.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
     ['all', 'client/shared/', ['popup-layer.css', 'search-field.css', 'segmented.css']],
     ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'column-resize.css', 'column-resize.js']],
     ['notify', 'client/friends/', ['friend-notification-clicks.js']],
@@ -89,15 +90,15 @@
     ['main', 'client/header/', ['header-actions.css', 'header-actions.js']],
     ['main', 'client/browser/', ['url-bar.css', 'url-bar.js']],
     ['main', 'client/navigation/', ['icons.css']],
-    ['main', 'client/header/', ['header-tooltips.js']],
+    ['main', 'client/header/', ['header-tooltips.js', 'downloads-card.css', 'downloads-card.js']],
     ['main', 'client/navigation/', ['sidebar-icons.css', 'sidebar-icons.js']],
     ['main', 'client/header/menu/', [
       'shared.js', 'api.js', 'menus.js', 'account.js', 'actions.js', 'hover.js', 'popups.js',
       'placement.js', 'patch.js', 'main.js',
     ]],
     ['main', 'client/navigation/', [
-      'nav-rail.css', 'nav-rail-library.css', 'nav-rail-filters.css', 'nav-rail.js',
-      'filters-panel.js',
+      'nav-rail.css', 'title-bar.css', 'title-bar-filters.css',
+      'title-bar-search.js', 'title-bar.js', 'title-bar-tips.js', 'nav-rail.js', 'filters-panel.js',
     ]],
     ['main', 'client/library/', [
       'library.css', 'library-home.css', 'library-covers.css', 'game-list.css', 'game-list.js',
@@ -109,10 +110,10 @@
     ]],
     ['main', 'client/downloads/page/', [
       'shared.js', 'native.js', 'library.js', 'backdrop.js', 'read.js', 'hero.js', 'transfer.js',
-      'queue.js', 'drag.js', 'pass.js', 'debug.js', 'main.js',
+      'queue.js', 'drag.js', 'pass.js', 'support.js', 'main.js',
     ]],
     // Friends dock
-    ['main', 'client/friends/', ['friends-dock.css']],
+    ['main', 'client/friends/', ['friends-dock.css', 'friends-dock-chat.css']],
     ['main', 'client/friends/dock/', [
       'templates.js', 'data.js', 'ui.js', 'routing.js', 'flyouts.js', 'embed.js', 'dock.js',
       'chat-popup.js', 'friend-card.js', 'main.js',
@@ -120,16 +121,16 @@
     ['main', 'client/friends/', ['playing-card.js']],
     ['main', 'client/library/', ['sort-segments.css', 'sort-segments.js']],
     // Library Home
-    ['main', 'client/home/', ['home-polish.css', 'home-polish.js']],
-    ['main', 'client/home/stage/', ['stage.css', 'util.js', 'tray.js', 'picks.js', 'stage.js', 'data.js', 'news.js', 'main.js']],
+    ['main', 'client/home/', ['home-shelves.css', 'home-shelves.js']],
+    ['main', 'client/home/stage/', ['stage.css', 'stage-hero.css', 'stage-tray.css', 'stage-shelves.css', 'stage-narrow.css', 'util.js', 'tray.js', 'picks.js', 'stage.js', 'data.js', 'news.js', 'main.js']],
     // Menus, hover cards, notifications, dialogs
     ['all', 'client/dialogs/', ['dialogs.css']],
     ['content', 'client/dialogs/', ['install.css', 'eula.css']],
-    ['all', 'client/dialogs/', ['hover-cards.css']],
+    ['all', 'client/shared/', ['hover-cards.css']],
     ['all', 'client/friends/', ['friend-hover.css', 'friend-hover.js']],
-    ['main', 'client/dialogs/', ['hover-cards.js']],
-    ['all', 'client/header/', ['notifications.css', 'notifications.js']],
-    ['all', 'client/dialogs/', ['window-controls.css']],
+    ['main', 'client/shared/', ['hover-cards.js']],
+    ['all', 'client/header/', ['notifications.css', 'notifications.js', 'account-menu.css', 'steam-menu.css']],
+    ['all', 'client/header/', ['window-controls.css']],
     ['content', 'client/dialogs/utility/', [
       'base.css', 'servers.css', 'media.css', 'library-tools.css', 'modals.css', 'friends.css',
       'standalone.css',
@@ -150,7 +151,7 @@
     ['main', 'compat/protondb-library-badges/', ['protondb-library-badges.css']],
     ['tiers', 'client/shared/', ['achievement-tiers.css']],
     ['desktop', 'compat/achievement-manager/', ['achievement-manager.css', 'achievement-manager.js']],
-    ['desktop', 'compat/steamgriddb/', ['steamgriddb.css', 'steamgriddb.js']],
+    ['desktop', 'compat/steamgriddb/', ['steamgriddb.css', 'steamgriddb-browser.css', 'steamgriddb.js']],
     // Game page and achievements
     ['main', 'client/game-page/', [
       'layout.css', 'play-bar.css', 'overview.css', 'achievements.css', 'friends.css', 'cards.css',
@@ -170,11 +171,11 @@
       'groups.css', 'chat.js',
     ]],
     ['all', 'core/', ['scrollbars.css', 'scrollbars.js']],
-    ['all', 'client/friends/', ['emoticon-picker.css', 'emoticon-picker.js']],
+    ['all', 'core/', ['emoticon-picker.css', 'emoticon-picker.js']],
     // Settings, game properties, Millennium, storage
     ['desktop', 'client/settings/', [
       'layout.css', 'controls.css', 'pages.css', 'storage.css', 'search.css', 'game-properties.css',
-      'finishing.css',
+      'spacing.css',
     ]],
     ['desktop', 'client/settings/dialog/', [
       'shared.js', 'options.js', 'search.js', 'window.js', 'sidebar.js', 'layout.js', 'props-pages.js',
@@ -199,8 +200,8 @@
     'core/images.js',
     'core/scrollbars.css',
     'core/scrollbars.js',
-    'client/friends/emoticon-picker.css',
-    'client/friends/emoticon-picker.js',
+    'core/emoticon-picker.css',
+    'core/emoticon-picker.js',
   ]);
   const onWeb = /^https?:$/.test(location.protocol) && location.hostname !== 'steamloopback.host';
 
@@ -304,9 +305,9 @@
     const kind = coverKind(setting);
     const lift = kind === 'none' ? 0 : LIFT_MS;
     let css =
-      `${WAIT},${LIFT}{background:#171a20!important}` + // --se-bg
+      `${WAIT},${LIFT}{background:var(--se-bg,#171a20)!important}` + // the token once loaded; its value before
       `${WAIT}::after,${LIFT}::after{content:"";position:fixed;inset:0;z-index:2147483646;` +
-      'background:#171a20;will-change:opacity}' +
+      'background:var(--se-bg,#171a20);will-change:opacity}' +
       `${WAIT}::after{animation:se-cover-out ${lift}ms ease ${FALLBACK_MS}ms forwards}` +
       `${LIFT}::after{pointer-events:none;animation:se-cover-lift ${lift + 60}ms cubic-bezier(.4,0,.2,1) 40ms both}` +
       '@keyframes se-cover-out{to{opacity:0;visibility:hidden}}' + // hidden lets clicks through
@@ -316,9 +317,9 @@
     // The cover gets a faint blue halo where it sits.
     css +=
       `${WAIT}::after,${LIFT}::after{background:radial-gradient(circle at 50% 50%,` +
-      'rgba(124,196,255,.09),rgba(124,196,255,0) 160px) #171a20}' +
+      'color-mix(in srgb,var(--se-color-accent,#7cc4ff) 9%,transparent),transparent 160px) var(--se-bg,#171a20)}' +
       `${WAIT}::before,${LOGO_LIFT}::before{content:"";position:fixed;top:50%;left:50%;z-index:2147483647;` +
-      'width:72px;height:72px;margin:-36px 0 0 -36px;pointer-events:none;background:#e6edf3;' + // --se-text
+      'width:72px;height:72px;margin:-36px 0 0 -36px;pointer-events:none;background:var(--se-text,#e6e8eb);' + // --se-text
       `-webkit-mask:${BRAND} center/contain no-repeat;mask:${BRAND} center/contain no-repeat;` +
       'will-change:opacity,scale}' +
       `${WAIT}::before{opacity:0;animation:se-logo-in .4s ease-out ${LOGO_MS}ms forwards,` +
@@ -390,6 +391,7 @@
   const whenSettled = (done) => {
     if (!MAIN || !document.body) return done();
     let added = 0;
+    // Its own observer on purpose: the loader runs before the runtime (and its shared observer) exists; it lives only until the first window settles
     const observer = new MutationObserver((records) => {
       for (const record of records) for (const node of record.addedNodes) if (node.nodeType === 1) added++;
     });
@@ -479,9 +481,11 @@
   };
 
   /*
-   * Stylesheets go in at once. Scripts wait for core/core.js's runtime (window.__se), which
-   * Millennium normally injects first; the wait holds the cover like any pending file.
+   * Stylesheets go in at once. Scripts wait for the runtime (window.__se): core/classmap.js and
+   * core/runtime.js, which this loader adds first, in order; the wait holds the cover like any
+   * pending file.
    */
+  const RUNTIME = ['core/classmap.js', 'core/runtime.js'];
   const load = () => {
     const scripts = [];
     FILES.forEach(([group, file], order) => {
@@ -493,6 +497,11 @@
     if (window.__se) {
       scripts.forEach(addScript);
       return;
+    }
+    for (const file of RUNTIME) {
+      if (added.has(file)) continue;
+      added.add(file);
+      addScript(file);
     }
     pending++;
     addEventListener(

@@ -35,7 +35,7 @@
   height: var(--se-tile);
   border-radius: var(--se-radius-md);
   background: var(--se-surface-2);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  box-shadow: var(--se-edge);
   color: var(--se-text-dim);
 }
 
@@ -56,7 +56,7 @@
   padding: 0 var(--se-space-4);
   border-radius: var(--se-radius-md);
   background: var(--se-surface-2);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  box-shadow: var(--se-edge);
   color: var(--se-text);
   font: 700 var(--se-fs-base) / 1 var(--se-font);
   white-space: nowrap;
@@ -127,7 +127,7 @@
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--se-space-1);
   height: 22px;
   padding: 0 var(--se-space-2);
   border-radius: var(--se-radius-xs);
@@ -164,28 +164,18 @@
 
 .MillenniumSettings .se-mver {
   flex: none;
-  padding: 3px 6px;
+  padding: var(--se-space-half) var(--se-space-1);
   border-radius: var(--se-radius-xs);
   background: var(--se-hairline);
   color: var(--se-text-muted);
   font: 600 var(--se-fs-xs) / 1 var(--se-font);
 }
 
+/* The shared spinner (core/spinner.css, .se-spin-arc draws it), at icon size */
 .MillenniumSettings .se-mspin {
   flex: none;
   width: var(--se-icon-sm);
   height: var(--se-icon-sm);
-  box-sizing: border-box;
-  border-radius: 50%;
-  border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
-  border-top-color: currentColor;
-  animation: se-mspin .8s linear infinite;
-}
-
-@keyframes se-mspin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 /*
@@ -206,7 +196,7 @@
   background: var(--se-accent) !important;
   color: var(--se-bg-ink) !important;
   box-shadow: none !important;
-  padding: 0 14px !important;
+  padding: 0 var(--se-space-3) !important;
 }
 
 .MillenniumSettings .MillenniumButtonsSection .DialogButton:not(:last-child):not([data-button-type="save"]):hover:not(#se-none):not(#se-p2) {
@@ -221,14 +211,14 @@
 .MillenniumSettings .se-mtool {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 18px 0 0;
+  gap: var(--se-space-3);
+  margin: var(--se-space-4) 0 0;
   min-height: 32px;
   grid-column: 1 / -1;
 }
 
 .MillenniumSettings .se-mtool-label {
-  padding-left: 4px;
+  padding-left: var(--se-space-1);
 }
 
 /* Themes' pager: previous, "1 of 2", next */
@@ -331,7 +321,7 @@
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-auto-rows: max-content;
-  gap: 14px !important;
+  gap: var(--se-space-3) !important;
   align-items: stretch;
   /* The page body fills the window; rows keep their own height instead of sharing it
      (with one theme installed its card was stretched to the bottom). */
@@ -357,7 +347,7 @@
   border-radius: var(--se-radius-lg) !important;
   background: var(--se-surface) !important;
   background-image: none !important;
-  box-shadow: inset 0 0 0 1px var(--se-hairline) !important;
+  box-shadow: var(--se-edge) !important;
 }
 
 /* The image: the theme's header_image, else its initial */
@@ -374,8 +364,8 @@
   margin: 0 !important;
   border-radius: var(--se-radius-md);
   background: var(--se-thumb, none) center / cover no-repeat, var(--se-field) !important;
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
-  font: 800 30px/1 var(--se-font);
+  box-shadow: var(--se-edge);
+  font: 800 var(--se-fs-4xl)/1 var(--se-font);
   color: var(--se-text-faint) !important;
   -webkit-mask: none !important;
   mask: none !important;
@@ -406,17 +396,17 @@
   grid-template-rows: var(--se-mtheme-art) auto auto;
   gap: var(--se-space-2) !important;
   align-items: center !important;
-  padding: 10px !important;
+  padding: var(--se-space-2) !important;
 }
 
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem:not([data-se-active]):hover:not(#se-none):not(#se-p2) {
-  box-shadow: inset 0 0 0 1px var(--se-accent-line) !important;
+  box-shadow: var(--se-edge-accent) !important;
 }
 
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem:not([data-se-active]) > ._2tALpM7z8naXJ35Pp5fNAG {
   grid-column: 1;
   grid-row: 2;
-  padding-left: 4px !important;
+  padding-left: var(--se-space-1) !important;
 }
 
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem:not([data-se-active]) > .PSZtxj2h3MlyYv-c9dgke {
@@ -457,12 +447,12 @@
   order: -1;
   grid-template-columns: 276px minmax(0, 1fr);
   grid-template-rows: auto 1fr auto;
-  column-gap: 22px !important;
-  row-gap: 12px !important;
+  column-gap: var(--se-space-5) !important;
+  row-gap: var(--se-space-3) !important;
   align-items: start !important;
-  margin: 18px 0 0 !important;
-  padding: 16px !important;
-  box-shadow: inset 0 0 0 1px var(--se-accent-line) !important;
+  margin: var(--se-space-4) 0 0 !important;
+  padding: var(--se-space-4) !important;
+  box-shadow: var(--se-edge-accent) !important;
 }
 
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem[data-se-active][data-se-initial]::before {
@@ -476,7 +466,7 @@
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem[data-se-active] > ._2tALpM7z8naXJ35Pp5fNAG {
   grid-column: 2;
   grid-row: 1 / span 2;
-  padding-top: 4px !important;
+  padding-top: var(--se-space-1) !important;
 }
 
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem[data-se-active] > .PSZtxj2h3MlyYv-c9dgke {
@@ -486,7 +476,7 @@
 }
 
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem[data-se-active] .MillenniumThemes_ThemeLabel:not(#se-none):not(#se-p2) {
-  font: 800 22px/28px var(--se-font) !important;
+  font: 800 var(--se-fs-3xl)/28px var(--se-font) !important;
 }
 
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem[data-se-active] .MillenniumThemes_ThemeLabel > .MillenniumItem_Version {
@@ -496,15 +486,15 @@
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem[data-se-active] ._1W1to_azoBRG95oNAFpf9Q:not(#se-none):not(#se-p2) {
   display: flex !important;
   flex-direction: column-reverse;
-  gap: 8px;
-  margin-top: 6px !important;
+  gap: var(--se-space-2);
+  margin-top: var(--se-space-1) !important;
 }
 
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem[data-se-active] .MillenniumThemes_Description:not(#se-none) {
   white-space: normal !important;
   max-width: 480px;
   color: var(--se-text-dim);
-  font-size: 13.5px;
+  font-size: var(--se-fs-md);
 }
 
 .MillenniumSettings [data-se-mill-page="themes"] .MillenniumThemes_ThemeItem[data-se-active] .MillenniumThemes_Author:not(#se-none) {

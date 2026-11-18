@@ -1,167 +1,163 @@
 /*
- * The added menus: View/Friends/Games/Help as submenus, and restart/reload actions.
+ * The Steam menu, in the Settings menu's language (client/header/steam-menu.css): groups under
+ * headings, each row an icon, a name and a hint.
+ *   Steam:  About Steam, Check for Updates
+ *   Client: Big Picture Mode, Restart Steam, Reload UI
+ *   Help:   Steam Support, System Information, System Report, Legal (Privacy Policy, Legal
+ *           Information, Steam Subscriber Agreement)
+ *   Exit
+ * Every row is one of Steam's own menu items (its MenuItems, given the theme's row as children),
+ * so its dialogs and links open as Steam's do. Steam's own rows (account, settings, backup,
+ * Millennium's) are hidden: the rail covers them (the avatar's, the cog's and the Games menu).
  */
 ((SE) => {
   const ns = window.__seSteamMenuParts;
   if (!ns) return;
-  const { owners } = SE;
-  const { SUBMENU_NAMES, Submenu, configurations, movedGroups, normalizeMenuLabel } = ns;
+  const { configurations, movedGroups } = ns;
   const { live } = ns;
 
-  function AdditionalMenus() {
-    const entries = configurations();
-    return live.api.React.createElement(
-      live.api.React.Fragment,
-      null,
-      ...SUBMENU_NAMES.map((name) => live.api.React.createElement(Submenu, { key: name, name, entry: entries.get(name) }))
+  const h = (...args) => live.api.React.createElement(...args);
+
+  const localized = (token, fallback) => {
+    const text = SE.run(() => live.api.localize(token));
+    return typeof text === 'string' && text && !text.startsWith('#') ? text : fallback;
+  };
+
+  // A Steam item drawn as the theme's row: its icon (a mask token), its name and a hint
+  const row = (item, { label, hint, icon }) => ({
+    ...item,
+    children: h(
+      'span',
+      // se-sm-plain: one line, no hint (Legal's rows), a plain row's height
+      { className: hint ? 'se-sm-row' : 'se-sm-row se-sm-plain', style: { '--se-sm-mask': `var(${icon})` } },
+      h(
+        'span',
+        { className: 'se-sm-text' },
+        h('span', { className: 'se-sm-label' }, label || localized(item.name, item.name)),
+        hint && h('span', { className: 'se-sm-hint' }, hint)
+      )
+    ),
+  });
+
+  const steamCommand = (namespace, method, ...args) => {
+    for (const owner of SE.owners()) {
+      const target = owner?.SteamClient?.[namespace];
+      if (typeof target?.[method] === 'function') return target[method](...args);
+    }
+    return undefined;
+  };
+
+  /*
+   * The rows are React elements, so they're built on first draw, once Steam's menu API is found
+   * (client/header/menu/api.js); built at load, they'd run before it and leave no menu.
+   */
+  let lists = null;
+  const itemLists = () => (lists ??= {
+    steam: [
+      row({ name: '#Menu_About', dialog: 'AboutSteam' }, { hint: 'Version and credits', icon: '--se-icon-info' }),
+      row(
+        { name: '#Menu_CheckForSteamUpdates', dialog: 'CheckForUpdates' },
+        { label: 'Check for Updates', hint: 'Get the latest client', icon: '--se-icon-install' }
+      ),
+    ],
+    client: [
+      row(
+        { name: '#Menu_BigPictureMode', steamURL: 'steam://open/bigpicture' },
+        { label: 'Big Picture Mode', hint: 'TV and controller mode', icon: '--se-icon-tv' }
+      ),
+      row(
+        { name: 'se-restart', onClick: () => steamCommand('User', 'StartRestart', true) },
+        { label: 'Restart Steam', hint: 'Close and reopen Steam', icon: '--se-icon-restart' }
+      ),
+      row(
+        { name: 'se-reload', onClick: () => steamCommand('Browser', 'RestartJSContext') },
+        { label: 'Reload UI', hint: 'Refresh the interface', icon: '--se-icon-refresh' }
+      ),
+    ],
+    exit: [
+      row({ name: '#Menu_Exit', steamURL: 'steam://exit' }, { hint: 'Quit Steam', icon: '--se-icon-power' }),
+    ],
+  });
+
+  // Help's rows, from Steam's own Help items (their names, dialogs and which ones show)
+  const HELP_ROWS = {
+    '#Menu_Support': { hint: 'Get help with an issue', icon: '--se-icon-help' },
+    '#Menu_SystemInfo': { hint: "Your PC's hardware", icon: '--se-icon-cpu' },
+    '#Menu_SystemReport': { hint: 'Logs for troubleshooting', icon: '--se-icon-report' },
+    '#Menu_SRSI_Diagnostics': { hint: 'Runtime diagnostics', icon: '--se-icon-cpu' },
+  };
+  // Legal's rows: one line each (an icon and Steam's name), in the submenu's own window
+  const LEGAL_ROWS = {
+    '#Menu_PrivacyPolicy': { icon: '--se-icon-shield' },
+    '#Menu_LegalInfo': { icon: '--se-icon-scale' },
+    '#Menu_SSA': { icon: '--se-icon-report' },
+    '#Menu_SSA_China': { icon: '--se-icon-report' },
+  };
+
+  const heading = (text, divided) =>
+    h('div', { className: divided ? 'se-acct-heading se-acct-heading-divided' : 'se-acct-heading', role: 'presentation' }, text);
+
+  function SteamMenu() {
+    if (!live.api) return null;
+    const { steam, client, exit } = itemLists();
+    const help = configurations().get('Help')?.props.menuItems || [];
+    const byName = new Map(help.filter((item) => item?.name).map((item) => [item.name, item]));
+    const helpItems = Object.entries(HELP_ROWS)
+      .filter(([name]) => byName.has(name))
+      .map(([name, look]) => row(byName.get(name), look));
+    const legalItems = Object.entries(LEGAL_ROWS)
+      .filter(([name]) => byName.has(name))
+      .map(([name, look]) => row(byName.get(name), look));
+    const itemClass = [live.api.menuStyles.MenuItem, live.api.menuStyles.Item].filter(Boolean).join(' ');
+
+    return h(
+      'div',
+      { 'data-se-steam-menu': '', style: { display: 'contents' } },
+      heading('Steam'),
+      h(live.api.MenuItems, { menuItems: steam }),
+      heading('Client', true),
+      h(live.api.MenuItems, { menuItems: client }),
+      heading('Help', true),
+      h(live.api.MenuItems, { menuItems: helpItems }),
+      legalItems.length > 0 &&
+        live.api.SubMenu &&
+        h(live.api.SubMenu, {
+          className: itemClass,
+          label: h(
+            'span',
+            // se-sm-sub: a submenu row, its arrow drawn at the row's end (Steam's is hidden)
+            { className: 'se-sm-row se-sm-sub', style: { '--se-sm-mask': 'var(--se-icon-scale)' } },
+            h(
+              'span',
+              { className: 'se-sm-text' },
+              h('span', { className: 'se-sm-label' }, 'Legal'),
+              h('span', { className: 'se-sm-hint' }, 'Privacy, terms, agreement')
+            )
+          ),
+          children: h(live.api.MenuItems, { menuItems: legalItems }),
+        }),
+      h('div', { className: 'se-sm-divider', role: 'separator' }),
+      h(live.api.MenuItems, { menuItems: exit })
     );
   }
 
-  function groupSeparator(key) {
-    return live.api.React.createElement('hr', {
-      key,
-      className: [live.api.menuStyles.MenuItem, live.api.menuStyles.Separator, `se-menu-group-${key}`].filter(Boolean).join(' '),
-    });
-  }
-
-  function SteamClientActions({ instance, nativeWindow }) {
-    const marker = live.api.React.useRef(null);
-
-    live.api.React.useLayoutEffect(() => {
-      const root = marker.current.parentElement;
-      const doc = root.ownerDocument;
-      const itemClass = live.api.menuStyles.MenuItem.split(' ')[0];
-      const exitLabel = normalizeMenuLabel(live.api.localize('#Menu_Exit'));
-      const pluginItem = 'data-restart-steam-root-item';
-      function steamCommand(namespace, method, ...args) {
-        for (const owner of new Set([nativeWindow, ...owners()])) {
-          const target = owner?.SteamClient?.[namespace];
-          if (typeof target?.[method] === 'function') return target[method](...args);
-        }
-        throw new Error(`Steam's ${namespace}.${method} command is unavailable`);
-      }
-
-      const actions = [
-        ['restart', 'Restart Steam', () => steamCommand('User', 'StartRestart', true)],
-        ['reload', 'Reload UI', () => steamCommand('Browser', 'RestartJSContext')],
-      ];
-      const rows = new Map();
-      const separator = doc.createElement('hr');
-      separator.className = [live.api.menuStyles.MenuItem, live.api.menuStyles.Separator].join(' ');
-      let template;
-
-      function makeRow(exit, label, run) {
-        const row = doc.createElement('button');
-        row.type = 'button';
-        row.setAttribute('role', 'menuitem');
-        row.className = exit.className;
-        row.style.cssText = 'font-family:inherit;text-align:start;cursor:pointer';
-        row.textContent = label;
-        row.addEventListener('click', async (event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          if (row.disabled) return;
-          row.disabled = true;
-          row.textContent = label;
-          row.removeAttribute('title');
-          try {
-            // Dispatch before closing the popup that received the click.
-            await run();
-          } catch (error) {
-            row.disabled = false;
-            row.textContent = `${label} failed — try again`;
-            row.title = error?.message || String(error);
-            console.warn(`[Steam Enhanced] ${label}:`, error);
-            return;
-          }
-          row.disabled = false;
-          try {
-            instance.Hide();
-          } catch (error) {
-            console.warn('[Steam Enhanced] Could not close the Steam menu:', error);
-          }
-        });
-        return row;
-      }
-
-      function refresh() {
-        const exit = [...root.querySelectorAll(`[role="menuitem"], .${itemClass}`)].find(
-          (item) => !item.hasAttribute(pluginItem) &&
-            normalizeMenuLabel(item.textContent) === exitLabel
-        );
-        if (exit !== template) {
-          for (const row of rows.values()) row.remove();
-          rows.clear();
-          template = exit;
-          if (exit) {
-            for (const [key, label, run] of actions) rows.set(key, makeRow(exit, label, run));
-          }
-        }
-        if (!exit) {
-          separator.remove();
-          return;
-        }
-
-        const parent = exit.parentElement;
-        const pluginRows = [...parent.children].filter((item) => item.hasAttribute(pluginItem));
-        const pluginKeys = new Set(pluginRows.map((item) => item.getAttribute(pluginItem)));
-        const group = [];
-        for (const [key, row] of rows) {
-          if (pluginKeys.has(key)) row.remove();
-          else group.push(row);
-        }
-        if (group.length && !pluginKeys.has('separator')) group.push(separator);
-        else separator.remove();
-
-        // Leave the plugin's group intact so its own layout hook can position it.
-        let anchor = pluginRows[0] || exit;
-        for (const row of group.reverse()) {
-          if (row.nextElementSibling !== anchor) parent.insertBefore(row, anchor);
-          anchor = row;
-        }
-      }
-
-      const observer = new MutationObserver(refresh);
-      observer.observe(root, { childList: true, subtree: true });
-      refresh();
-      return () => {
-        observer.disconnect();
-        for (const row of rows.values()) row.remove();
-        separator.remove();
-      };
-    }, [instance, nativeWindow]);
-
-    return live.api.React.createElement('span', { hidden: true, ref: marker });
-  }
-
+  /*
+   * Once the menu is drawn: every row of Steam's own is hidden, leaving the theme's section
+   * (rows Steam or a plugin adds later are hidden too). Remembered so restorePopups()
+   * (client/header/menu/popups.js) shows them again.
+   */
   function placeGroup(doc) {
-    const start = doc.querySelector('.se-menu-group-start');
-    const end = doc.querySelector('.se-menu-group-end');
-    const parent = start?.parentElement;
-    if (!parent || end?.parentElement !== parent) return;
-
-    const group = [start, ...parent.querySelectorAll(':scope > .se-steam-native-submenu'), end];
-    if (group.length <= 2) return;
-
-    const label = normalizeMenuLabel(live.api.localize('#Menu_CheckForSteamUpdates'));
-    const updateNode = [...parent.children].find((node) => !group.includes(node) && normalizeMenuLabel(node.textContent) === label);
-    if (!updateNode) return;
-
-    const previous = updateNode.previousElementSibling;
-    if (previous === end) return;
-
-    if (!movedGroups.has(parent)) {
-      movedGroups.set(parent, { group, anchor: end.nextSibling, separator: null, display: '' });
-    }
+    const section = doc.querySelector('[data-se-steam-menu]');
+    const parent = section?.parentElement;
+    if (!parent) return;
+    if (!movedGroups.has(parent)) movedGroups.set(parent, { hidden: [] });
     const saved = movedGroups.get(parent);
-    if (previous?.tagName === 'HR' && previous !== start && previous !== end) {
-      saved.separator = previous;
-      saved.display = previous.style.display;
-      previous.style.display = 'none';
-    }
-    for (const node of group) {
-      parent.insertBefore(node, updateNode);
+    for (const node of parent.children) {
+      if (node === section || node.style.display === 'none') continue;
+      saved.hidden.push([node, node.style.display]);
+      node.style.display = 'none';
     }
   }
-  Object.assign(ns, { AdditionalMenus, SteamClientActions, groupSeparator, placeGroup });
+
+  Object.assign(ns, { SteamMenu, placeGroup });
 })(window.__se);

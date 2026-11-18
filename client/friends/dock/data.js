@@ -21,7 +21,6 @@
     inGame: 'In game',
     search: 'Search friends',
     add: 'Add a friend',
-    collapse: 'Collapse',
     expand: 'Show friends',
     lastOnline: (t) => `Last online ${t}`,
     more: (n) => `+${n}`,

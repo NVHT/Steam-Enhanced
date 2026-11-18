@@ -1,5 +1,6 @@
 /*
- * Hover-to-open between root menu buttons, and the rail's side buttons.
+ * Hover-to-open for the side buttons (Add a Game); the Steam menu, the bell and the avatar open
+ * on click. Every one of them closes once the pointer leaves the button and the menu.
  */
 ((SE) => {
   const ns = window.__seSteamMenuParts;
@@ -147,14 +148,6 @@
     }, 200);
   }
 
-  function openOnHover(event) {
-    live.pointerInMain = true;
-    live.mainPointer = { x: event.clientX, y: event.clientY };
-    cancelHoverClose();
-    const instance = [...patched.keys()].find(ns.isSteam);
-    if (!instance?.visible) live.steamButton?.click();
-  }
-
   function sideFor(button) {
     if (!button) return null;
     for (const side of sideButtons.values()) {
@@ -168,9 +161,9 @@
     live.mainPointer = { x: event.clientX, y: event.clientY };
     cancelHoverClose();
     const button = event.currentTarget;
-    if (button === sideButtons.get('bell') && window.__seHeaderTooltips?.hasNotifications() === false) {
-      return;
-    }
+    // The bell's panel opens on click; hovering the avatar shows your card
+    // (client/friends/dock/friend-card.js), its menu opens on click.
+    if (button === sideButtons.get('bell') || button === sideButtons.get('account')) return;
     const open = [...patched].some(([instance, saved]) => instance.visible && sideFor(saved.button) === button);
     if (!open) button.click();
   }
@@ -190,16 +183,15 @@
         sideButtons.delete(key);
       }
     }
+    // The Steam button opens its menu on click (Steam's own); leaving it closes the menu.
     if (live.hoverButton === live.steamButton) return;
-    live.hoverButton?.removeEventListener('mouseenter', openOnHover);
     live.hoverButton?.removeEventListener('mouseleave', closeAfterHover);
     live.hoverButton = live.steamButton;
-    live.hoverButton?.addEventListener('mouseenter', openOnHover);
     live.hoverButton?.addEventListener('mouseleave', closeAfterHover);
   }
   Object.assign(ns, {
     anyMenuOpen, bindHoverButton, pointerOnMenu, bindMenuHoverDocument, cancelHoverClose,
     closeAfterHover, enterMenuPopup, leaveMenuPopup, onMainMouseMove, openMillenniumWindow,
-    openOnHover, openSideOnHover, sideFor,
+    openSideOnHover, sideFor,
   });
 })(window.__se);

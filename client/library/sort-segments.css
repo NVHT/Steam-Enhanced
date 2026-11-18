@@ -13,11 +13,11 @@
 .se-seg,
 [data-se-sortseg] {
   align-items: center !important;
-  gap: 2px !important;
-  padding: 2px !important;
+  gap: var(--se-space-half) !important;
+  padding: var(--se-space-half) !important;
   border-radius: var(--se-radius-md);
   background: var(--se-surface);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  box-shadow: var(--se-edge);
 }
 
 [data-se-sortseg] ._1ljKTq3H58WbDZGNPfM0TY {
@@ -27,7 +27,7 @@
 
 .se-sortseg {
   display: flex;
-  gap: 2px;
+  gap: var(--se-space-half);
 }
 
 .se-seg-btn,
@@ -36,13 +36,13 @@
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center;
-  gap: 6px !important;
+  gap: var(--se-space-1) !important;
   height: 30px !important;
   min-width: 34px !important;
   max-width: none !important;
   width: auto !important;
   margin: 0 !important;
-  padding: 0 12px !important;
+  padding: 0 var(--se-space-3) !important;
   border: 0 !important;
   border-radius: var(--se-radius-sm) !important;
   background: transparent !important;
@@ -94,7 +94,7 @@
 
 [data-se-sortseg="main"] .DialogDropDown_CurrentDisplay::before {
   content: "More";
-  font-size: 13.5px;
+  font-size: var(--se-fs-md);
 }
 
 [data-se-sortseg] .DialogDropDown_Arrow {
@@ -139,7 +139,7 @@
  * A bold name that opens the shelf picker, no line at rest, a light toolbar on the right.
  */
 ._23SnllqT_AqZ1C_QHcNQ4Z {
-  gap: 16px !important;
+  gap: var(--se-space-4) !important;
   min-height: 48px;
 }
 
@@ -150,8 +150,8 @@
  */
 ._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv- {
   height: 36px;
-  margin-inline-start: -10px !important;
-  padding: 0 10px !important;
+  margin-inline-start: calc(-1 * var(--se-space-2)) !important;
+  padding: 0 var(--se-space-2) !important;
   border-radius: var(--se-radius-md) !important;
   align-items: center !important;
   transition: background var(--se-dur) ease-out;
@@ -167,8 +167,8 @@
 ._23SnllqT_AqZ1C_QHcNQ4Z ._1YdRdM9TZ_3Xolwv9aVEv- .DialogInputLabelGroup {
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
-  font: 700 20px/1 var(--se-font), sans-serif !important;
+  gap: var(--se-space-2) !important;
+  font: 700 var(--se-fs-2xl)/1 var(--se-font), sans-serif !important;
   letter-spacing: -.01em !important;
   color: var(--se-text) !important;
   background: none !important;
@@ -182,7 +182,7 @@
   border-radius: 0 !important;
   background: none !important;
   color: var(--se-text-muted) !important;
-  font-size: 15px !important;
+  font-size: var(--se-fs-lg) !important;
   font-weight: 500 !important;
   line-height: 20px !important;
 }
@@ -197,7 +197,7 @@
   align-items: center;
   width: 14px !important;
   height: 14px !important;
-  margin-inline-start: 2px !important;
+  margin-inline-start: var(--se-space-half) !important;
   padding: 0 !important;
   background: none !important;
 }
@@ -224,7 +224,7 @@
 ._23SnllqT_AqZ1C_QHcNQ4Z > [data-se-sortseg] {
   margin-inline-start: 0 !important;
   padding: 0 !important;
-  gap: 2px !important;
+  gap: var(--se-space-half) !important;
   background: none !important;
   box-shadow: none !important;
   border-radius: 0 !important;
@@ -249,11 +249,22 @@
   width: 28px !important;
   padding: 0 !important;
   justify-content: center;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%2398a2ad'%3E%3Ccircle cx='5' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='19' cy='12' r='1.8'/%3E%3C/svg%3E") center / 16px 16px no-repeat !important;
+  position: relative;
 }
 
 ._23SnllqT_AqZ1C_QHcNQ4Z [data-se-sortseg="main"] .DialogDropDown:hover {
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%23e6e8eb'%3E%3Ccircle cx='5' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='19' cy='12' r='1.8'/%3E%3C/svg%3E") center / 16px 16px no-repeat, rgba(255, 255, 255, .05) !important;
+  background: var(--se-white-04) !important;
+}
+
+/* The "⋯" itself: a mask in the button's text colour (muted, lighter on hover) */
+._23SnllqT_AqZ1C_QHcNQ4Z [data-se-sortseg="main"] .DialogDropDown::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%23000'%3E%3Ccircle cx='5' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='19' cy='12' r='1.8'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='%23000'%3E%3Ccircle cx='5' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='19' cy='12' r='1.8'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+  pointer-events: none;
 }
 
 ._23SnllqT_AqZ1C_QHcNQ4Z [data-se-sortseg="main"] .DialogDropDown > * {
@@ -265,15 +276,15 @@
   /* PageButtons */
   display: flex !important;
   align-items: center;
-  gap: 6px;
-  margin-inline-start: -4px !important;
+  gap: var(--se-space-1);
+  margin-inline-start: calc(-1 * var(--se-space-1)) !important;
 }
 
 ._23SnllqT_AqZ1C_QHcNQ4Z > ._29NTOneobxPjUfxHUk9N8Y::before {
   content: "";
   width: 1px;
   height: 18px;
-  margin-inline-end: 6px;
+  margin-inline-end: var(--se-space-1);
   background: var(--se-white-10);
 }
 
@@ -282,15 +293,15 @@
   width: 28px !important;
   height: 28px !important;
   margin: 0 !important;
-  padding: 7px !important;
+  padding: var(--se-space-2) !important;
 }
 
 /* Shelf reordering: keep the rows legible and hide controls that cannot be used here. */
 ._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt {
   box-sizing: border-box;
   min-height: 56px !important;
-  gap: 8px !important;
-  padding: 8px 14px !important;
+  gap: var(--se-space-2) !important;
+  padding: var(--se-space-2) var(--se-space-3) !important;
   border: 1px solid var(--se-hairline) !important;
   border-radius: var(--se-radius-md) !important;
   background: var(--se-surface) !important;
@@ -356,7 +367,7 @@
   grid-template-rows: auto auto;
   align-items: center !important;
   min-height: 64px;
-  margin-bottom: 16px;
+  margin-bottom: var(--se-space-4);
   text-align: start !important;
 }
 
@@ -364,7 +375,7 @@
   content: "Arrange shelves";
   grid-column: 1;
   grid-row: 1;
-  font: 700 20px/1.3 var(--se-font), sans-serif;
+  font: 700 var(--se-fs-2xl)/1.3 var(--se-font), sans-serif;
   color: var(--se-text);
 }
 
@@ -372,7 +383,7 @@
   content: "Drag to reorder your shelves.";
   grid-column: 1;
   grid-row: 2;
-  font: 400 13px/1.4 var(--se-font), sans-serif;
+  font: 400 var(--se-fs-base)/1.4 var(--se-font), sans-serif;
   color: var(--se-text-muted);
 }
 
@@ -386,7 +397,7 @@
   flex: 0 0 18px;
   width: 18px;
   height: 22px;
-  margin-inline-end: 8px;
+  margin-inline-end: var(--se-space-2);
   background: var(--se-text-muted);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 22'%3E%3Cg fill='black'%3E%3Ccircle cx='5' cy='4' r='1.6'/%3E%3Ccircle cx='13' cy='4' r='1.6'/%3E%3Ccircle cx='5' cy='11' r='1.6'/%3E%3Ccircle cx='13' cy='11' r='1.6'/%3E%3Ccircle cx='5' cy='18' r='1.6'/%3E%3Ccircle cx='13' cy='18' r='1.6'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
   pointer-events: none;

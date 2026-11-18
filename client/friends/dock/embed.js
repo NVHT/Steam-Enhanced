@@ -6,7 +6,7 @@
   const ns = window.__seFriendsDockParts;
   if (!ns) return;
   const {
-    app, COLLAPSE_ICON, COPY, disposeGroupFlyouts, flyoutOwnedTabs, importOf, managerTimers, state,
+    app, COPY, disposeGroupFlyouts, flyoutOwnedTabs, importOf, managerTimers, state,
   } = ns;
 
   const { run } = SE;
@@ -218,7 +218,6 @@
       restoreTitleSetter();
       keepLibraryManagers();
       ns.steamHost.remove();
-      ns.steamBar.remove();
     }
   }
 
@@ -231,8 +230,7 @@
         const embed = findEmbed();
         if (!embed) throw new Error('not found in this Steam version');
         if (!protectMainTitle()) throw new Error('main-window title protection unavailable');
-        ns.steamBar.innerHTML = `<button type="button" class="se-fd-icon" data-act="collapse" data-se-tip="${COPY.collapse}" aria-label="${COPY.collapse}">${COLLAPSE_ICON}</button>`;
-        ns.dock.append(ns.steamBar, ns.steamHost);
+        ns.dock.append(ns.steamHost);
         guardLibraryManagers();
 
         const original = embed.dom.createRoot;

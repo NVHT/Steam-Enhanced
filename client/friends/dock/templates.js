@@ -48,9 +48,6 @@
   const svg = (n, s = 16) =>
     `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
 
-  // The collapse glyph is the shared token (tokens.css), drawn as a mask in currentColor.
-  const COLLAPSE_ICON = '<span class="se-fd-mask" style="--se-fd-mask:var(--se-icon-collapse)" aria-hidden="true"></span>';
-
   const avatar = (url, state, size, cls = '') =>
     `<span class="se-fd-av ${cls}" data-state="${state}" style="--s:${size}px">${url ? `<img src="${esc(url)}" alt="" draggable="false">` : ''}</span>`;
 
@@ -132,8 +129,8 @@
     `<div class="se-fd-me">${avatar(me?.avatar, me?.state || 'online', 36)}` +
     `<button type="button" class="se-fd-status" data-act="status"><span class="se-fd-myname">${esc(me?.name || '')}</span><span class="se-fd-mystate" data-state="${me?.state || 'online'}">${esc(statusLabel(me?.state))}${svg('down', 12)}</span></button>` +
     `<button type="button" class="se-fd-icon" data-act="search" data-se-tip="${ns.COPY.search}" aria-label="${ns.COPY.search}">${svg('search', 20)}</button>` +
-    `<button type="button" class="se-fd-icon" data-act="add" data-se-tip="${ns.COPY.add}" aria-label="${ns.COPY.add}">${svg('add', 20)}</button>` +
-    `<button type="button" class="se-fd-icon" data-act="collapse" data-se-tip="${ns.COPY.collapse}" aria-label="${ns.COPY.collapse}">${COLLAPSE_ICON}</button></div>` +
+    // Collapsing is the title bar's button, beside Friends & Chat (client/header/header-actions.js)
+    `<button type="button" class="se-fd-icon" data-act="add" data-se-tip="${ns.COPY.add}" aria-label="${ns.COPY.add}">${svg('add', 20)}</button></div>` +
     (ns.state.steamError ? `<div class="se-fd-error">${esc(ns.state.steamError)}</div>` : '');
 
   function panelHTML(d) {
@@ -228,7 +225,7 @@
     `</div>`;
 
   Object.assign(ns, {
-    COLLAPSE_ICON, DEAD_AVATAR_LIMIT, avatar, deadAvatars, flyHTML, friendCardHTML, groupAvatar, groupAvatarURL,
+    DEAD_AVATAR_LIMIT, avatar, deadAvatars, flyHTML, friendCardHTML, groupAvatar, groupAvatarURL,
     groupInitials, panelHTML, railHTML, statusLabel, svg, usableAvatar,
   });
 })(window.__se);

@@ -1,0 +1,173 @@
+/*
+ * The Downloads card (client/header/downloads-card.js), in the Settings menu's language
+ * (client/shared/popup-layer.css): a heading, the game in progress, the queue with Pause /
+ * Resume, then Open Downloads.
+ */
+.se-dlc {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 280px;
+  padding: var(--se-space-1);
+  border-radius: var(--se-radius-menu);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-pop);
+  font-family: var(--se-font);
+  color: var(--se-text-dim);
+}
+
+.se-dlc-heading {
+  padding: var(--se-space-2) var(--se-space-2) var(--se-space-1);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.se-dlc-sep {
+  height: 1px;
+  margin: var(--se-space-1) var(--se-space-1);
+  background: var(--se-divider);
+}
+
+.se-dlc-empty {
+  padding: var(--se-space-1) var(--se-space-2) var(--se-space-2);
+  font: 500 var(--se-fs-sm) / 1.4 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+/* The game in progress: its art, name, bar and figures */
+.se-dlc-now {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--se-space-2);
+  padding: var(--se-space-1) var(--se-space-2);
+}
+
+.se-dlc-art {
+  flex: none;
+  width: 64px;
+  height: 30px;
+  border-radius: var(--se-radius-xs);
+  object-fit: cover;
+  background: var(--se-white-10);
+}
+
+.se-dlc-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--se-space-half);
+  min-width: 0;
+}
+
+.se-dlc-game {
+  display: block;
+  overflow: hidden;
+  font: 600 var(--se-fs-base) / 1.3 var(--se-font);
+  color: var(--se-text-strong);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-dlc-bar {
+  height: 4px;
+  margin: var(--se-space-1) 0 var(--se-space-half);
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-10);
+  overflow: hidden;
+}
+
+.se-dlc-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--se-accent);
+  /* Scaled, not resized: the fill animates on the compositor */
+  transform-origin: left center;
+  transition: transform var(--se-dur-slow) ease;
+}
+
+.se-dlc[data-paused="true"] .se-dlc-bar > span {
+  background: var(--se-text-muted);
+}
+
+.se-dlc-detail,
+.se-dlc-hint {
+  font: 500 var(--se-fs-xs) / 1.3 var(--se-font);
+  color: var(--se-text-faint);
+}
+
+/* Up next, and Pause / Resume */
+.se-dlc-next {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  padding: var(--se-space-1) var(--se-space-2);
+}
+
+.se-dlc-queue {
+  font: 600 var(--se-fs-base) / 1.3 var(--se-font);
+}
+
+.se-dlc-toggle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-white-10);
+  color: var(--se-text-dim);
+  cursor: pointer;
+}
+
+.se-dlc-toggle:hover {
+  background: var(--se-selected);
+  color: var(--se-text-strong);
+}
+
+.se-dlc-toggle > span {
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-pause) center / contain no-repeat;
+  mask: var(--se-icon-pause) center / contain no-repeat;
+}
+
+.se-dlc-toggle[data-paused="true"] > span {
+  -webkit-mask-image: var(--se-icon-play);
+  mask-image: var(--se-icon-play);
+}
+
+/* Open Downloads: a menu row */
+.se-dlc-row {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: 32px;
+  padding: 0 var(--se-space-2);
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: none;
+  font: 600 var(--se-fs-base) var(--se-font);
+  color: var(--se-text-dim);
+  text-align: left;
+  cursor: pointer;
+}
+
+.se-dlc-row:hover {
+  background: var(--se-selected);
+  color: var(--se-text-strong);
+}
+
+.se-dlc-icon {
+  flex: none;
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-install) center / contain no-repeat;
+  mask: var(--se-icon-install) center / contain no-repeat;
+}

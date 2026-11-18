@@ -1,0 +1,225 @@
+/*
+ * The account menu (your avatar at the rail's foot), in the Settings menu's language
+ * (client/shared/popup-layer.css): group headings, an 18px duotone glyph per row, a hint line.
+ * Its rows and sections come from client/header/menu/account.js; this is loaded in every window
+ * because Steam's menus open in their own popup windows.
+ */
+
+/*
+ * Room for the shadow, as the Settings menu and the notifications panel have it: Steam's menu
+ * (contextMenu, which its window is sized to) goes see-through and the panel is its contents,
+ * inside a margin the shadow falls in. The avatar's anchor takes the margin back
+ * (client/header/menu/placement.js), so the panel still opens beside the rail. The window is
+ * marked Account_Menu by Steam.
+ */
+html.Account_Menu .PP7LM0Ow1K5qkR8WElLpt:not(#se-none) {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+html.Account_Menu ._2EstNjFIIZm_WUSKm5Wt7n:not(#se-none) {
+  margin: var(--se-space-4) var(--se-space-5) var(--se-space-6) !important;
+  border-radius: var(--se-radius-menu) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-pop) !important;
+  /* Opens and closes as every menu does (core/motion.css) */
+  animation: se-menu-in var(--se-dur) var(--se-ease);
+}
+
+html.Account_Menu ._2EstNjFIIZm_WUSKm5Wt7n[data-se-closing]:not(#se-none) {
+  animation: se-menu-out var(--se-dur-fast) ease-in forwards;
+  pointer-events: none;
+}
+
+/* Steam's separators go: the headings divide the groups */
+[data-se-avatar-menu] :is(.WUOrULWKkGLl3ZUQdDXg8, .IjIBR_wDDi2N77Oz4KAT4, hr) {
+  display: none !important;
+}
+
+.se-acct-heading {
+  padding: var(--se-space-2) var(--se-space-2) var(--se-space-1);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+  cursor: default;
+}
+
+.se-acct-heading-divided {
+  margin: var(--se-space-1) var(--se-space-1) 0;
+  padding: var(--se-space-2) var(--se-space-1) var(--se-space-1);
+  border-top: 1px solid var(--se-divider);
+}
+
+/* Rows: an icon, the label, and (Do Not Disturb) a hint and a switch */
+:root [data-se-avatar-menu] [data-se-acct-icon] {
+  /* The height is the whole row: Steam's items size their content box, padding added on top */
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-height: 32px;
+  padding: 0 var(--se-space-2) !important;
+  /* The Settings menu's row type (client/shared/popup-layer.css) */
+  font: 600 var(--se-fs-base) var(--se-font) !important;
+}
+
+/* Keyboard focus (Steam's arrow keys, or a focused row) is the hover highlight, as in the
+   Settings menu: no ring. */
+:root [data-se-avatar-menu] :is([data-se-acct-icon], .se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI):is(:focus, :focus-visible) {
+  outline: none !important;
+}
+
+:root [data-se-avatar-menu] [data-se-acct-icon]:is(:focus-visible, .gpfocus) {
+  background: var(--se-selected) !important;
+  color: var(--se-text-strong) !important;
+  box-shadow: none !important;
+}
+
+[data-se-avatar-menu] [data-se-acct-icon]::before {
+  content: '';
+  flex: none;
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: currentColor;
+  -webkit-mask: var(--se-acct-mask) center / contain no-repeat;
+  mask: var(--se-acct-mask) center / contain no-repeat;
+}
+
+/* Account Details: the account name on a second line, as a hint (client/header/menu/account.js) */
+:root [data-se-avatar-menu] [data-se-acct-icon="details"]:has([data-se-acct-sub]) {
+  min-height: 38px;
+  padding: var(--se-space-1) var(--se-space-2) !important;
+}
+
+[data-se-acct-label] {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+:root [data-se-avatar-menu] [data-se-acct-sub] {
+  font: 500 var(--se-fs-xs) / 1.2 var(--se-font) !important;
+  color: var(--se-text-faint) !important;
+}
+
+[data-se-acct-icon="details"]:hover [data-se-acct-sub] {
+  color: var(--se-text-muted) !important;
+}
+
+[data-se-acct-icon="profile"] { --se-acct-mask: var(--se-icon-user); }
+[data-se-acct-icon="edit"] { --se-acct-mask: var(--se-icon-edit); }
+[data-se-acct-icon="details"] { --se-acct-mask: var(--se-icon-id-card); }
+[data-se-acct-icon="store"] { --se-acct-mask: var(--se-icon-sliders); }
+[data-se-acct-icon="wallet"] { --se-acct-mask: var(--se-icon-wallet); }
+[data-se-acct-icon="switch"] { --se-acct-mask: var(--se-icon-switch-account); }
+[data-se-acct-icon="signout"] { --se-acct-mask: var(--se-icon-sign-out); }
+[data-se-acct-icon="dnd"] { --se-acct-mask: var(--se-icon-moon); }
+
+:root [data-se-avatar-menu] [data-se-acct-icon="dnd"] {
+  min-height: 38px;
+  padding: var(--se-space-1) var(--se-space-2) !important;
+}
+
+.se-acct-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.se-acct-hint {
+  font: 500 var(--se-fs-xs) / 1.2 var(--se-font);
+  color: var(--se-text-faint);
+}
+
+[data-se-acct-icon]:hover .se-acct-hint {
+  color: var(--se-text-muted);
+}
+
+/* Do Not Disturb's switch: accent when on */
+.se-acct-switch {
+  position: relative;
+  flex: none;
+  width: 28px;
+  height: 16px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-10);
+  transition: background var(--se-dur-fast) ease;
+}
+
+.se-acct-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--se-text-dim);
+  transition: transform var(--se-dur-fast) ease, background var(--se-dur-fast) ease;
+}
+
+[aria-checked="true"] > .se-acct-switch {
+  background: var(--se-accent);
+}
+
+[aria-checked="true"] > .se-acct-switch::after {
+  transform: translateX(12px);
+  background: var(--se-surface);
+}
+
+/* Status: Online, Away, Invisible, Offline as one segmented row; your state in accent */
+.se-acct-seg {
+  display: flex;
+  gap: var(--se-space-1);
+  min-width: 248px;
+  padding: var(--se-space-half) var(--se-space-1) var(--se-space-1);
+}
+
+:root .se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  padding: var(--se-space-1) var(--se-space-half) !important;
+  padding-inline: var(--se-space-half) !important;
+  font: 600 var(--se-fs-xs) var(--se-font) !important;
+  text-align: center;
+  text-indent: 0;
+  white-space: nowrap;
+  box-shadow: var(--se-edge);
+}
+
+/* Steam's check column (StatusEntry > Icon, kept empty on the other states) and marks: the
+   segment is centred on its label alone */
+.se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI::before,
+.se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI::after,
+.se-acct-seg ._1GNJUJrGs0xUpASde60jQh > ._32b_aVF7OElQOPG70LjdrJ,
+.se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI :is(svg, img) {
+  display: none !important;
+}
+
+.se-acct-seg ._1GNJUJrGs0xUpASde60jQh {
+  display: flex !important;
+  justify-content: center;
+  width: 100%;
+}
+
+.se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI * {
+  margin: 0 !important;
+  padding: 0 !important;
+  text-indent: 0 !important;
+  text-align: center !important;
+}
+
+:root .se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI:is([data-se-current], .menuChecked) {
+  background: color-mix(in srgb, var(--se-accent) 16%, transparent) !important;
+  color: var(--se-accent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 45%, transparent);
+}

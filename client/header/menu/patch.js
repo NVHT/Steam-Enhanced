@@ -6,8 +6,8 @@
   if (!ns) return;
   const { C } = SE;
   const {
-    AccountStatusMenu, AdditionalMenus, SIDE_HOVER, SUBMENU_NAMES, SteamClientActions, anchors,
-    anyMenuOpen, applyPlacement, bindHoverButton, bindManager, configurations, groupSeparator,
+    AccountStatusMenu, SIDE_HOVER, SUBMENU_NAMES, SteamMenu, anchors,
+    anyMenuOpen, applyPlacement, bindHoverButton, bindManager, configurations,
     initializeAvatarMenu, inspectPopups, instanceManager, isSteam, menuAnchor, onMainMouseMove,
     openMillenniumWindow, patchSidebarMenus, patched, placementFor, refreshPosition,
     resolveMenuApi, sidebarAnchor,
@@ -15,11 +15,6 @@
   const { live } = ns;
 
   function buildPatchedGetter(originalGet, steam, button) {
-    let nativeWindow;
-    try {
-      nativeWindow = originalGet.constructor('return globalThis')();
-    } catch {}
-
     return function () {
       const element = originalGet.call(this);
       if (!live.api.React.isValidElement(element)) return element;
@@ -34,18 +29,47 @@
           ),
         });
       }
+      // Steam's own rows stay mounted (hidden by placeGroup()); the theme's menu is drawn after
+      // them (client/header/menu/actions.js). Without it, Steam's menu stays as it is.
+      if (typeof SteamMenu !== 'function') return element;
       return live.api.React.cloneElement(element, {
         children: live.api.React.createElement(
           live.api.React.Fragment,
           null,
           element.props.children,
-          groupSeparator('start'),
-          live.api.React.createElement(AdditionalMenus),
-          groupSeparator('end'),
-          live.api.React.createElement(SteamClientActions, { instance: this, nativeWindow })
+          live.api.React.createElement(SteamMenu)
         ),
       });
     };
+  }
+
+  /*
+   * A menu's panel in its window: Steam's contextMenuContents (hashed; SteamTracking sp.js),
+   * whether the menu's element is it, inside it, or holds it.
+   */
+  const MENU_PANEL = `.${C.contextMenuContents}`;
+  function menuPanel(instance) {
+    const el = instance.m_element;
+    return el?.closest?.(MENU_PANEL) || el?.querySelector?.(MENU_PANEL) || null;
+  }
+
+  /*
+   * A menu Steam creates already showing (its root menu, made fresh on each click) is placed from
+   * the element it was made on, before the theme's anchor is in: it opened off its button. Once
+   * its window is up, it's placed again from the anchor (a few frames at most).
+   */
+  function settlePosition(instance, frames = 12) {
+    if (!patched.has(instance) || !instance.visible) return;
+    if (instance.m_element) {
+      // Steam can draw a menu again in the window and panel it closed: open, not still closing
+      menuPanel(instance)?.removeAttribute('data-se-closing');
+      refreshPosition(instance);
+      requestAnimationFrame(() => {
+        if (patched.has(instance) && instance.visible) refreshPosition(instance);
+      });
+    } else if (frames > 0) {
+      requestAnimationFrame(() => settlePosition(instance, frames - 1));
+    }
   }
 
   function patchInstance(instance) {
@@ -67,7 +91,7 @@
     const getter = buildPatchedGetter(descriptor.get, steam, button);
     Object.defineProperty(instance, 'ReactElement', { configurable: true, get: getter });
 
-    const placement = placementFor(steam);
+    const placement = placementFor(button);
     const savedPlacement = new Map();
     for (const [key, value] of Object.entries(placement)) {
       savedPlacement.set(key, {
@@ -79,15 +103,44 @@
 
     const position = instance.position;
     const originalAnchor = position?.element;
-    const anchor = position && button ? menuAnchor(button, steam) : null;
+    const anchor = position && button ? menuAnchor(button) : null;
     if (anchor) position.element = anchor;
+
+    /*
+     * Closing: every way Steam hides a menu ends in InternalHide, which drops its window at once.
+     * The panel plays the menus' closing animation first (SE.layer.closeWith, core/motion.css)
+     * and the window goes when it ends; a menu shown again meanwhile stays. Hidden again while
+     * it fades (Steam hides a menu more than one way at once), it goes straight away, so a menu
+     * is never left half closed and unable to open.
+     */
+    let closing = null;
+    const ownInternalHide = Object.getOwnPropertyDescriptor(instance, 'InternalHide');
+    const originalInternalHide = instance.InternalHide;
+    const internalHide = function (...args) {
+      if (closing) {
+        closing();
+        closing = null;
+        return originalInternalHide.apply(this, args);
+      }
+      const panel = this.visible ? menuPanel(this) : null;
+      if (!panel || !SE.layer?.closeWith) return originalInternalHide.apply(this, args);
+      closing = SE.layer.closeWith(panel, () => {
+        closing = null;
+        originalInternalHide.apply(this, args);
+      });
+      return undefined;
+    };
+    instance.InternalHide = internalHide;
 
     const ownShow = Object.getOwnPropertyDescriptor(instance, 'Show');
     const originalShow = instance.Show;
     const show = function (...args) {
+      closing?.();
+      closing = null;
       applyPlacement(this);
       refreshPosition(this);
       const result = originalShow.apply(this, args);
+      settlePosition(this);
       live.popupPoll?.refresh(); // wake the popup housekeeping now rather than on its idle beat
       return result;
     };
@@ -137,9 +190,12 @@
       takeFocus,
       ownCancel,
       cancel,
+      ownInternalHide,
+      internalHide,
     });
 
     refreshPosition(instance);
+    settlePosition(instance);
     document.body.classList.add('se-steam-menu-ready');
     const owner = instanceManager(instance) || live.manager;
     queueMicrotask(() => {
@@ -162,6 +218,10 @@
     if (instance.OnCancel === saved.cancel) {
       if (saved.ownCancel) Object.defineProperty(instance, 'OnCancel', saved.ownCancel);
       else delete instance.OnCancel;
+    }
+    if (instance.InternalHide === saved.internalHide) {
+      if (saved.ownInternalHide) Object.defineProperty(instance, 'InternalHide', saved.ownInternalHide);
+      else delete instance.InternalHide;
     }
     if (saved.position?.element === saved.anchor) {
       saved.position.element = saved.originalAnchor;
@@ -220,6 +280,8 @@
       },
     });
 
+    // Startup retry: the Steam button can mount before its menu props exist. Capped at 40 tries
+    // (10 s), then the watcher alone keeps it patched.
     let retries = 0;
     live.timer = setInterval(() => {
       update();
@@ -230,6 +292,7 @@
     }, 250);
     update();
     // Every 200 ms while a menu is open (and once more after it closes), idle otherwise.
+    // g_PopupManager's created callback only covers new windows; these menus render in-window.
     live.popupPoll = SE.poll(inspectPopups, 200, { active: () => anyMenuOpen() || !live.popupsIdle });
     inspectPopups();
   }

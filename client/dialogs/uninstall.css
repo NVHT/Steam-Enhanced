@@ -27,13 +27,13 @@
 
 /* Title: Steam's "Uninstall" as an eyebrow over the game */
 [data-se-uninst] .DialogHeader:not(#se-none) {
-  margin: 0 0 14px !important;
+  margin: 0 0 var(--se-space-3) !important;
   padding: 0 !important;
-  font: 800 11.5px/14px var(--se-font), sans-serif !important;
+  font: 800 var(--se-fs-sm)/14px var(--se-font), sans-serif !important;
   letter-spacing: .16em !important;
   text-transform: uppercase !important;
   color: var(--se-accent) !important;
-  text-shadow: 0 1px 8px var(--se-black-60);
+  text-shadow: var(--se-text-shadow-art);
 }
 
 /* Body: capsule and name beside Steam's confirmation, the drive card under both */
@@ -41,8 +41,8 @@
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  column-gap: 18px;
-  row-gap: 6px;
+  column-gap: var(--se-space-4);
+  row-gap: var(--se-space-1);
   margin: 0 !important;
 }
 
@@ -70,7 +70,7 @@
 
 /* Several apps: a fanned stack, the first on top */
 .se-uninst-capsule:nth-child(2) {
-  z-index: -1;
+  z-index: var(--se-z-under);
   transform: translate(10px, -8px) scale(.94);
   opacity: .7;
 }
@@ -102,7 +102,7 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  font: 800 20px/1.2 var(--se-font), sans-serif;
+  font: 800 var(--se-fs-2xl)/1.2 var(--se-font), sans-serif;
   color: var(--se-text-strong);
   text-shadow: 0 2px 14px var(--se-black-60);
 }
@@ -111,7 +111,7 @@
   grid-column: 2;
   grid-row: 2;
   align-self: start;
-  font: 500 13.5px/1.45 var(--se-font), sans-serif !important;
+  font: 500 var(--se-fs-md)/1.45 var(--se-font), sans-serif !important;
   color: var(--se-text-muted) !important;
   text-shadow: 0 1px 8px var(--se-black-50);
 }
@@ -123,13 +123,13 @@
   grid-row: 3;
   display: grid;
   grid-template-columns: 38px minmax(0, 1fr);
-  column-gap: 12px;
-  row-gap: 7px;
-  margin-top: 18px;
-  padding: 14px 16px 14px 12px;
+  column-gap: var(--se-space-3);
+  row-gap: var(--se-space-2);
+  margin-top: var(--se-space-4);
+  padding: var(--se-space-3) var(--se-space-4) var(--se-space-3) var(--se-space-3);
   border-radius: var(--se-radius-md);
   background: var(--se-surface-2);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  box-shadow: var(--se-edge);
 }
 
 .se-uninst-disk[hidden] {
@@ -152,7 +152,7 @@
   height: 38px;
   border-radius: var(--se-radius-sm);
   background: var(--se-hairline);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  box-shadow: var(--se-edge);
   color: var(--se-text-muted);
 }
 
@@ -175,20 +175,20 @@
 .se-uninst-disk-head {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: var(--se-space-2);
   overflow: hidden;
   white-space: nowrap;
 }
 
 .se-uninst-frees {
-  font: 700 14.5px/1.3 var(--se-font), sans-serif;
+  font: 700 var(--se-fs-md)/1.3 var(--se-font), sans-serif;
   color: var(--se-text-strong);
 }
 
 .se-uninst-drive {
   overflow: hidden;
   text-overflow: ellipsis;
-  font: 600 13px/1.3 var(--se-font), sans-serif;
+  font: 600 var(--se-fs-base)/1.3 var(--se-font), sans-serif;
   color: var(--se-text-muted);
 }
 
@@ -196,15 +196,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font: 500 11.5px/1.3 var(--se-font), sans-serif;
+  font: 500 var(--se-fs-sm)/1.3 var(--se-font), sans-serif;
   color: var(--se-text-faint);
 }
 
 .se-uninst-bar {
   display: flex;
-  gap: 2px;
+  gap: var(--se-space-half);
   height: 6px;
-  margin-top: 3px;
+  margin-top: var(--se-space-half);
   overflow: hidden;
   border-radius: var(--se-radius-pill);
   background: var(--se-white-07);
@@ -214,7 +214,7 @@
   flex: none;
   width: var(--w, 0%);
   height: 100%;
-  transition: width var(--se-dur-slow) var(--se-ease);
+  /* Segments share one flex row, so their widths snap (no layout animation) */
 }
 
 .se-uninst-bar-other {
@@ -225,14 +225,14 @@
 /* This game's share: the part that goes */
 .se-uninst-bar-game {
   border-radius: 0 var(--se-radius-pill) var(--se-radius-pill) 0;
-  background: repeating-linear-gradient(-45deg, rgba(255, 255, 255, .5) 0 4px, rgba(255, 255, 255, .22) 4px 8px);
+  background: repeating-linear-gradient(-45deg, var(--se-white-50) 0 4px, var(--se-white-25) 4px 8px);
 }
 
 .se-uninst-caption {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  font: 600 11.5px/1.3 var(--se-font), sans-serif;
+  gap: var(--se-space-3);
+  font: 600 var(--se-fs-sm)/1.3 var(--se-font), sans-serif;
   color: var(--se-text-muted);
   white-space: nowrap;
 }
@@ -249,7 +249,7 @@
 /* ---------- Footer ---------- */
 
 [data-se-uninst] .DialogFooter:not(#se-none) {
-  margin-top: 24px !important;
+  margin-top: var(--se-space-5) !important;
 }
 
 /* Buttons stay neutral: Uninstall is the brighter of the two, not a colored one */
@@ -271,7 +271,7 @@
   display: inline-block !important;
   width: 16px !important;
   height: 16px !important;
-  margin: -3px 8px 0 -4px !important;
+  margin: calc(-1 * var(--se-space-half)) var(--se-space-2) 0 calc(-1 * var(--se-space-1)) !important;
   vertical-align: middle;
   opacity: 1 !important;
   background: currentColor !important;

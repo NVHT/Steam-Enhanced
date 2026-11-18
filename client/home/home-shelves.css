@@ -3,7 +3,7 @@
  *
  * Aligns shelf cover edges, deduplicates adjacent What's New date labels, and
  * expands cover action buttons (`Play` / `Install` / `Stream`) across card
- * footers on hover. Paired with `client/home/home-polish.js`.
+ * footers on hover. Paired with `client/home/home-shelves.js`.
  */
 /* What's New: a date repeated from the card before is hidden, its line kept */
 ._2rlKqvybYupc-uk64cdQ8D,
@@ -24,7 +24,7 @@
 }
 
 /*
- * Cover action buttons, placed from the cover's measured edges (client/home/home-polish.js).
+ * Cover action buttons, placed from the cover's measured edges (client/home/home-shelves.js).
  * :not(#se-none) only lifts these rules above the general cover-button rules in library.css.
  */
 ._3AjoLnMNKxYmNTGTJCLfgs[data-se-cover-btn]:not(#se-none) {
@@ -52,7 +52,7 @@
 
 ._3AjoLnMNKxYmNTGTJCLfgs[data-se-cover-btn]:not(#se-none):is([data-se-hot], :hover)::before {
   order: 2;
-  font: 700 14px/1 var(--se-font), sans-serif;
+  font: 700 var(--se-fs-md)/1 var(--se-font), sans-serif;
   white-space: nowrap;
 }
 
@@ -101,12 +101,14 @@
   display: flex !important;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--se-space-2);
   overflow: hidden;
   z-index: 14;
   /* Ignores the pointer, so Steam's native "Install" tooltip stays away; a click on the bar is
-     passed to it by client/home/home-polish.js */
+     passed to it by client/home/home-shelves.js */
   pointer-events: none !important;
+  /* Width on purpose: the button grows across one cover on hover (absolutely placed, so the
+     relayout stays inside it); a scale would stretch its label */
   transition: width var(--se-dur) ease-out, background var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out !important;
 }
 
@@ -138,7 +140,7 @@
 ._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none):is([data-se-hot], :hover)::after,
 .WYgDg9NyCcMIVuMyZ_NBC:hover ._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn]:not(#se-none)::after {
   content: "Install";
-  font: 700 14px/1 var(--se-font), sans-serif;
+  font: 700 var(--se-fs-md)/1 var(--se-font), sans-serif;
   white-space: nowrap;
 }
 

@@ -163,7 +163,7 @@
     }
   }
 
-  const LOGO = '._2gZXhRmKUk68pA28-5ZmGQ ._2Eh7Soh97QONu_grMi2m66 img._3NBxSLAZLbbbnul8KfDFjw';
+  const LOGO = `.${C.AppDetailsOverviewPanel_Header} .${C.BoxSizer} img.${C.TitleLogo}`;
   const LOGO_CROP = '--se-logo-crop';
   const logoCrops = new Map();
   const logoSources = new WeakMap();

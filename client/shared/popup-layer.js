@@ -10,6 +10,8 @@
  *                       popup window over a browser page, in the page elsewhere
  *   hover()             a panel opened by hovering something: hover intent, one panel at a
  *                       time, released on leave (the friend card, Playing now, the title-bar tips)
+ *   menu()              the theme's one popup menu (.se-menu): rows of actions, keyboard and
+ *                       outside clicks handled (the dock's menus, Settings)
  *   take(owner)         a ready popup window for content of the caller's own (the chat
  *                       flyout), given back with finish(entry)
  *   open / place / close  the windows themselves: open one at a rect of the main window, move
@@ -376,7 +378,7 @@
    * steam })): theme files by path, and Steam's own stylesheets when it renders a Steam
    * component.
    */
-  const BASE_SHEETS = new Set(['core/font.css', 'core/tokens.css', 'client/shared/popup-layer.css']);
+  const BASE_SHEETS = new Set(['core/font.css', 'core/tokens.css', 'core/icons-nav.css', 'core/icons-ui.css', 'client/shared/popup-layer.css']);
   const sheetsFor = ({ sheets = [], steam = false } = {}) => (href, link) => {
     const file = link.dataset.seFile;
     if (file) return BASE_SHEETS.has(file) || sheets.includes(file);
@@ -812,7 +814,239 @@
     };
   }
 
+  /*
+   * The theme's one popup menu, in a panel (above a browser page too). One open at a time.
+   *   items   rows [{ label, run, state, icon, hint, keys, checked }], with { heading } and
+   *           { separator: true } between them. state goes on the row as data-state with an <i>
+   *           before the label for the caller's mark (the dock's status dots); icon is a mask
+   *           token's name (a duotone icon); hint a line under the label; keys a shortcut at
+   *           the row's end; checked (true / false) makes the row an on/off setting, with a
+   *           switch at its end (role menuitemcheckbox) that run flips; current marks the
+   *           row for the page you're on (aria-current, the accent)
+   *   at      where: a spot for show() ({ left | right, top }, or a function of the menu's size)
+   *   options { sheets: the theme files styling the marks; owner: the button that opened it,
+   *           whose press never counts as an outside click (it toggles) and which carries
+   *           aria-expanded while the menu is open }
+   * Keys: in the page the rows take focus; a popup window never does, so the main window hears
+   * Up / Down / Enter / Escape and moves a highlight ([data-se-active]) through the rows. A menu
+   * opens with no row lit: only the pointer or the keys light one.
+   * Returns { release(), released }, or null when no panel could open.
+   */
+  let openMenu = null;
+
+  /*
+   * Closing a click popup when the pointer leaves it, as Steam's own rail menus do (the bell's,
+   * the avatar's): leaving its button or the popup closes it after a moment, unless the pointer
+   * has gone into the other one meanwhile. watch(el) adds an element (the popup, in whatever
+   * document it is drawn); dispose() stops it all.
+   */
+  const LEAVE_MS = 300;
+  function leaveCloser(owner, close) {
+    let timer = 0;
+    const watched = [];
+    const stay = () => {
+      clearTimeout(timer);
+      timer = 0;
+    };
+    const leave = () => {
+      stay();
+      timer = setTimeout(close, LEAVE_MS);
+    };
+    const watch = (el) => {
+      if (!el) return;
+      el.addEventListener('mouseenter', stay);
+      el.addEventListener('mouseleave', leave);
+      watched.push(el);
+    };
+    watch(owner);
+    return {
+      watch,
+      dispose() {
+        stay();
+        for (const el of watched.splice(0)) {
+          el.removeEventListener('mouseenter', stay);
+          el.removeEventListener('mouseleave', leave);
+        }
+      },
+    };
+  }
+
+  /*
+   * Closing with the menus' animation (se-menu-out on [data-se-closing], core/motion.css): marks
+   * the element, waits out the animation it then has, and calls done. With none (reduced motion,
+   * or nothing styled for it) done runs at once and this returns null; otherwise it returns a
+   * cancel() that keeps the element open and never calls done. The wait runs on this window's
+   * clock, not the element's: a popup window can be gone or asleep before it ends.
+   */
+  function closeWith(el, done) {
+    const view = el?.ownerDocument?.defaultView;
+    if (!view) {
+      done();
+      return null;
+    }
+    el.setAttribute('data-se-closing', '');
+    const style = view.getComputedStyle(el);
+    const ms = style.animationName === 'none' ? 0 : parseFloat(style.animationDuration) * 1000;
+    if (!(ms > 0)) {
+      el.removeAttribute('data-se-closing');
+      done();
+      return null;
+    }
+    let timer = setTimeout(() => {
+      timer = 0;
+      done();
+    }, ms);
+    return () => {
+      if (!timer) return;
+      clearTimeout(timer);
+      timer = 0;
+      el.removeAttribute('data-se-closing');
+    };
+  }
+
+  function menu(items, at, { sheets = [], owner = null, closeOnLeave = false } = {}) {
+    openMenu?.release();
+    const open = panel({ sheets });
+    if (!open) return null;
+    let rows = [];
+    let index = -1;
+    let released = false;
+    const leaving = closeOnLeave && owner ? leaveCloser(owner, () => handle.release()) : null;
+
+    const highlight = (next) => {
+      if (!rows.length) return;
+      index = (next + rows.length) % rows.length;
+      const row = rows[index];
+      if (row.ownerDocument === document) row.focus({ preventScroll: true });
+      else rows.forEach((other) => SE.attr(other, 'data-se-active', other === row ? '' : null));
+    };
+
+    const onKey = (event) => {
+      const step = { ArrowDown: 1, ArrowUp: -1 }[event.key];
+      if (event.key === 'Escape') handle.release();
+      // Nothing is lit until the keys are used: Down starts at the first row, Up at the last
+      else if (step) highlight(index < 0 && step < 0 ? rows.length - 1 : index + step);
+      // In the page the focused row hears Enter itself; in a popup window it's pressed here.
+      else if ((event.key === 'Enter' || event.key === ' ') && rows[index]?.ownerDocument !== document) {
+        rows[index]?.click();
+      } else return;
+      event.preventDefault();
+    };
+
+    const onPointer = (event) => {
+      const target = event.target;
+      if (rows[0]?.parentElement?.contains(target) || owner?.contains(target)) return;
+      handle.release();
+    };
+
+    const handle = {
+      release() {
+        if (released) return;
+        released = true;
+        if (openMenu === handle) openMenu = null;
+        removeEventListener('keydown', onKey, true);
+        removeEventListener('pointerdown', onPointer, true);
+        leaving?.dispose();
+        SE.attr(owner, 'aria-expanded', 'false');
+        // In the page it fades out first; a popup window's goes at once (its spare is reused)
+        const list = rows[0]?.parentElement;
+        if (list?.ownerDocument === document) closeWith(list, () => open.release());
+        else open.release();
+      },
+      get released() {
+        return released || open.released;
+      },
+    };
+
+    open.show(at, (container) => {
+      const doc = container.ownerDocument;
+      const list = doc.createElement('div');
+      list.className = 'se-menu';
+      list.setAttribute('role', 'menu');
+      const part = (tag, className, text) => {
+        const node = doc.createElement(tag);
+        node.className = className;
+        if (text != null) node.textContent = text;
+        return node;
+      };
+      for (const item of items) {
+        if (item.heading) {
+          list.append(part('div', 'se-menu-heading', item.heading));
+          continue;
+        }
+        if (item.separator) {
+          const line = part('div', 'se-menu-sep');
+          line.setAttribute('role', 'separator');
+          list.append(line);
+          continue;
+        }
+        const row = doc.createElement('button');
+        row.type = 'button';
+        row.setAttribute('role', 'menuitem');
+        if (item.current) row.setAttribute('aria-current', 'page');
+        if (item.state) {
+          row.dataset.state = item.state;
+          row.append(doc.createElement('i'));
+        }
+        if (item.icon) {
+          const icon = part('span', 'se-menu-icon');
+          icon.setAttribute('aria-hidden', 'true');
+          icon.style.setProperty('--se-menu-mask', `var(${item.icon})`);
+          row.append(icon);
+        }
+        const text = part('span', 'se-menu-text');
+        text.append(part('span', 'se-menu-label', item.label));
+        if (item.hint) {
+          row.toggleAttribute('data-hint', true);
+          text.append(part('span', 'se-menu-hint', item.hint));
+        }
+        row.append(text);
+        if (item.keys) row.append(part('kbd', 'se-menu-keys', item.keys));
+        if (typeof item.checked === 'boolean') {
+          row.setAttribute('role', 'menuitemcheckbox');
+          row.setAttribute('aria-checked', String(item.checked));
+          const toggle = part('span', 'se-menu-switch');
+          toggle.setAttribute('aria-hidden', 'true');
+          row.append(toggle);
+        }
+        row.addEventListener('click', (event) => {
+          event.stopPropagation();
+          handle.release();
+          item.run();
+        });
+        list.append(row);
+      }
+      container.append(list);
+      leaving?.watch(list);
+      rows = [...list.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"]')];
+    });
+
+    openMenu = handle;
+    addEventListener('keydown', onKey, true);
+    addEventListener('pointerdown', onPointer, true);
+    SE.attr(owner, 'aria-expanded', 'true');
+    return handle;
+  }
+
+  /*
+   * Where a rail button's popup goes: 12px off the button's side (the gap every menu keeps from
+   * its button, --se-space-3; the Steam menu's under the Steam button too), side-aligned with it. A page
+   * icon's (top) lines its top up with the button's; one at the rail's foot (`foot`) lines its
+   * bottom up with the button's, so it grows up. Kept inside the window. Steam's own rail menus
+   * (the bell's, the avatar's) open the same way (client/header/menu/placement.js).
+   */
+  const menuGap = () => SE.px('--se-space-3');
+  function besideRail(button, { foot = false } = {}) {
+    const rect = button.getBoundingClientRect();
+    const edge = SE.px('--se-space-2');
+    return (width, height) => ({
+      left: rect.right + menuGap(),
+      top: Math.max(edge, Math.min(foot ? rect.bottom - height : rect.top, innerHeight - height - edge)),
+    });
+  }
+
   const layer = {
+    besideRail,
     runtime: findRuntime,
     missing: () => missing,
     place,
@@ -820,12 +1054,16 @@
     menuOpen,
     panel,
     hover,
+    menu,
+    closeWith,
+    leaveCloser,
     react,
     take,
     finish,
     // How long a panel can wait for its window before the layer gives up on it (one retry).
     giveUpMs: MOUNT_TIMEOUT_MS * 2,
     destroy() {
+      openMenu?.release();
       removeEventListener('pointermove', trackOrigin, { capture: true });
       warmWatcher.disconnect();
       cool();

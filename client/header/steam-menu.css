@@ -1,0 +1,146 @@
+/*
+ * The Steam menu (the title bar's Steam button), in the Settings menu's language
+ * (client/shared/popup-layer.css): group headings (the account menu's, client/header/
+ * account-menu.css), an 18px duotone glyph per row and a hint line. Its rows are Steam's own menu
+ * items drawn with the theme's content (client/header/menu/actions.js); loaded in every window
+ * because Steam's menus open in their own popup windows.
+ */
+
+/*
+ * The panel and its shadow, as the account menu's (client/header/account-menu.css): Steam's menu
+ * (contextMenu, which its window is sized to) goes see-through and the panel is its contents,
+ * inside a margin the shadow falls in. The Steam button's anchor takes the margin back
+ * (client/header/menu/placement.js). The window is marked Steam_Root_Menu by Steam.
+ */
+html.Steam_Root_Menu .PP7LM0Ow1K5qkR8WElLpt:not(#se-none) {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+/* Its left margin is narrower: the menu opens near the screen's left edge (placement.js) */
+html.Steam_Root_Menu ._2EstNjFIIZm_WUSKm5Wt7n:not(#se-none) {
+  margin: var(--se-space-4) var(--se-space-5) var(--se-space-6) var(--se-space-2) !important;
+  border-radius: var(--se-radius-menu) !important;
+  background: var(--se-surface) !important;
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-pop) !important;
+  /* Opens and closes as every menu does (core/motion.css) */
+  animation: se-menu-in var(--se-dur) var(--se-ease);
+}
+
+html.Steam_Root_Menu ._2EstNjFIIZm_WUSKm5Wt7n[data-se-closing]:not(#se-none) {
+  animation: se-menu-out var(--se-dur-fast) ease-in forwards;
+  pointer-events: none;
+}
+
+/*
+ * !important and :root…:not(#se-none): Steam's menu item padding, and the theme's right-click
+ * menu row (client/dialogs/dialogs.css, 8px 14px), which these rows must beat. Not scoped to
+ * the menu's section: Legal's rows sit in the submenu's own window, outside it.
+ */
+:root :has(> .se-sm-row):not(#se-none) {
+  /* The height is the whole row: Steam's items size their content box, padding added on top */
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  min-height: 38px;
+  padding: var(--se-space-1) var(--se-space-2) !important;
+}
+
+/* Legal: a submenu row, whose label box holds the row; the item takes the padding, not the box */
+:root [data-se-steam-menu] :has(> * > .se-sm-row):not(#se-none) {
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  min-height: 38px;
+  padding: var(--se-space-1) var(--se-space-2) !important;
+}
+
+:root [data-se-steam-menu] :has(> * > .se-sm-row) > :has(> .se-sm-row):not(#se-none) {
+  flex: 1;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Steam's arrow box goes (its own margins pulled the row out of line); the row draws one */
+[data-se-steam-menu] :has(> * > .se-sm-sub) > :not(:has(> .se-sm-sub)) {
+  display: none !important;
+}
+
+.se-sm-sub::after {
+  content: '';
+  flex: none;
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
+  margin-left: auto;
+  color: var(--se-text-faint);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
+  transform: rotate(-90deg);
+}
+
+.se-sm-row {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-width: 0;
+  text-align: left;
+}
+
+.se-sm-row::before {
+  content: '';
+  flex: none;
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: currentColor;
+  -webkit-mask: var(--se-sm-mask) center / contain no-repeat;
+  mask: var(--se-sm-mask) center / contain no-repeat;
+}
+
+.se-sm-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.se-sm-label {
+  font: 600 var(--se-fs-base) / 1.2 var(--se-font);
+  white-space: nowrap;
+}
+
+.se-sm-hint {
+  font: 500 var(--se-fs-xs) / 1.2 var(--se-font);
+  color: var(--se-text-faint);
+  white-space: nowrap;
+}
+
+/*
+ * A row without a hint (Legal's) is a plain row's height, rows touching as in the menu itself.
+ * !important: Steam's item height, and the spacing its submenu windows put between items.
+ */
+:root :has(> .se-sm-plain):not(#se-none) {
+  height: 32px !important;
+  min-height: 32px;
+  margin-block: 0 !important;
+  padding-block: 0 !important;
+}
+
+:has(> * > .se-sm-plain) {
+  gap: 0 !important;
+}
+
+:is(:hover, :focus-visible, .gpfocus) > .se-sm-row .se-sm-hint {
+  color: var(--se-text-muted);
+}
+
+/* Before Exit, the one group without a heading */
+.se-sm-divider {
+  height: 1px;
+  margin: var(--se-space-1) var(--se-space-1);
+  background: var(--se-divider);
+}

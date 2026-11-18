@@ -50,21 +50,21 @@ body.se-header-actions-ready ._39oUCO1OuizVPwcnnv88no {
 body.se-header-actions-ready ._3s0lkohH8wU2do0K1il28Y {
   order: 1;
   flex: 0 0 auto;
-  padding-inline-end: 10px;
-  margin-inline-end: 6px;
+  padding-inline-end: var(--se-space-2);
+  margin-inline-end: var(--se-space-1);
   border-inline-end: 1px solid rgba(139, 146, 154, 0.18);
   -webkit-app-region: no-drag;
 }
 
 body.se-header-actions-ready ._3s0lkohH8wU2do0K1il28Y._1Ky59qmywxOUtNcI1cgmkX {
-  gap: 8px;
+  gap: var(--se-space-2);
 }
 
 body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy {
   order: 2;
   flex: 0 1 auto;
   min-width: 0;
-  padding: 0 0 0 2px;
+  padding: 0 0 0 var(--se-space-half);
   white-space: nowrap;
   overflow-x: auto;
   scrollbar-width: none;
@@ -76,7 +76,7 @@ body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy::-webkit-scrollbar {
 }
 
 body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy ._2D64jIEK7wpUR_NlObDW76 {
-  gap: 8px;
+  gap: var(--se-space-2);
 }
 
 body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy ._2D64jIEK7wpUR_NlObDW76 > ._7AlhCx3XGzBeIrQaCneUD {
@@ -105,7 +105,7 @@ body.se-header-actions-ready .qP17eBPXkfezFfexZ4hC3 {
 }
 
 /*
- * Window controls: drawn the same in every Steam window by client/dialogs/window-controls.css;
+ * Window controls: drawn the same in every Steam window by client/header/window-controls.css;
  * here only their size and room in the main window's title bar.
  */
 body.se-header-actions-ready .qP17eBPXkfezFfexZ4hC3:has(.title-area:not(.OSX)) {
@@ -118,11 +118,11 @@ body.se-header-actions-ready .qP17eBPXkfezFfexZ4hC3:has(.title-area:not(.OSX)) {
 }
 
 .qP17eBPXkfezFfexZ4hC3 .title-area:not(.OSX) .title-bar-actions {
-  gap: 4px;
+  gap: var(--se-space-1);
   max-height: none;
   height: 100%;
   margin: 0;
-  padding-inline-end: 10px;
+  padding-inline-end: var(--se-space-2);
 }
 
 /*
@@ -303,7 +303,7 @@ body.se-steam-menu-ready ._3s0lkohH8wU2do0K1il28Y .se-menu-icon:is([data-se-icon
 
 /* Steam menu size and left edge track the live Library Home button. */
 body.se-header-actions-ready ._3s0lkohH8wU2do0K1il28Y._1Ky59qmywxOUtNcI1cgmkX {
-  padding-inline-start: var(--se-steam-home-inset, 6px) !important;
+  padding-inline-start: var(--se-steam-home-inset) !important;
 }
 
 /* Give the full-size Steam button equal breathing room above and below. */
@@ -311,7 +311,7 @@ body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo {
   flex: 0 0 calc(var(--se-steam-home-height, 36px) + 16px);
   height: calc(var(--se-steam-home-height, 36px) + 16px);
   min-height: calc(var(--se-steam-home-height, 36px) + 16px);
-  padding-block: 8px;
+  padding-block: var(--se-space-2);
 }
 
 /* All header icon controls share the Steam/Home button geometry. */
@@ -383,4 +383,32 @@ body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo ._3LKQ3S_yqrebeNLF6aeiog >
   transform: none !important;
   margin: 0 !important;
   align-self: center;
+}
+
+/*
+ * Friends & Chat shows the dock's state (header-actions.js syncFriendsButton): a short line
+ * under the icon, like a tab's — full while the dock is open, half while it's a rail, none
+ * while it's hidden. Under the icon, not beside it, so the tile keeps the window controls'
+ * spacing (client/navigation/nav-rail.css).
+ */
+body.se-header-actions-ready .se-header-action[data-se-action="friends"][data-se-dock]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  transform: translateX(-50%) scaleX(var(--se-dock-mark, 1));
+  transition: transform var(--se-dur) var(--se-ease);
+  pointer-events: none;
+}
+
+body.se-header-actions-ready .se-header-action[data-se-action="friends"][data-se-dock="rail"]::after {
+  --se-dock-mark: .5;
+}
+
+body.se-header-actions-ready .se-header-action[data-se-action="friends"][data-se-dock="hidden"]::after {
+  --se-dock-mark: 0;
 }

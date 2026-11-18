@@ -13,9 +13,9 @@
  * not throw and leave a menu half-patched.
  * - shared.js     selectors, bookkeeping, and the menu's moving parts (on `live`)
  * - api.js        finding Steam's menu API
- * - menus.js      native submenus and localized labels
+ * - menus.js      localized labels
  * - account.js    the account menu
- * - actions.js    the added menus and actions
+ * - actions.js    the Steam menu's layout
  * - hover.js      hover-to-open
  * - popups.js     menu popups and the sidebar's managers
  * - placement.js  where a menu opens
@@ -44,6 +44,10 @@
   window.__seSteamMenu?.destroy();
 
   const ROOT_BTN_SELECTOR = `.${C.RootMenuBar} .${C.RootMenuButton}`;
+  // Steam's menu-bar buttons the theme takes over (their bar buttons hidden). Help's rows join
+  // the Steam menu (client/header/menu/actions.js); View's went elsewhere (Hidden Games and
+  // Soundtracks to the rail's Library menu, Big Picture Mode to the Steam menu) or were dropped;
+  // Friends is the dock's; Games is a button at the rail's foot (client/navigation/nav-rail.js).
   const SUBMENU_NAMES = ['View', 'Friends', 'Games', 'Help'];
   const SIDE_HOVER = {
     add: '[data-se-action="add"]',
@@ -59,7 +63,7 @@
   const popupObservers = new Map();
   const movedGroups = new Map();
   Object.assign(ns, {
-    ROOT_BTN_SELECTOR, SIDE_HOVER, SUBMENU_NAMES, avatarLayouts, hoverDocuments, movedGroups,
-    patched, popupObservers, sideButtons, sidebarManagers,
+    ROOT_BTN_SELECTOR, SIDE_HOVER, SUBMENU_NAMES, avatarLayouts, hoverDocuments,
+    movedGroups, patched, popupObservers, sideButtons, sidebarManagers,
   });
 })(window.__se);

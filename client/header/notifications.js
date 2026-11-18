@@ -1,5 +1,6 @@
 /*
- * Annotate notification tray summary rows and notification cards with type and day metadata.
+ * Annotate notification tray summary rows and notification rows with their kind's glyph and
+ * day headings (client/header/notifications.css).
  */
 ((SE) => {
   window.__seNotifications?.destroy();
@@ -28,15 +29,7 @@
     13: 'chat',
   };
 
-  const setKindAttrs = (el, kind) => {
-    if (kind) {
-      SE.mark(el, 'data-se-kind', kind);
-      SE.mark(el, 'data-se-glyph', kind);
-    } else {
-      SE.unmark(el, 'data-se-kind');
-      SE.unmark(el, 'data-se-glyph');
-    }
-  };
+  const setKindAttrs = (el, kind) => SE.attr(el, 'data-se-glyph', kind || null);
 
   const annotateSummaryRow = (row) => {
     const countItem = SE.fromProps(row, 8, (p) => (typeof p.countItem === 'string' ? p.countItem : undefined));
@@ -88,7 +81,7 @@
 
   const annotateNotificationItems = (list) => {
     let prevDayKey = null;
-    const dayStarts = list.map(item => {
+    for (const item of list) {
       const group = SE.fromProps(item, 3, (p) =>
         p.group && Array.isArray(p.group.notifications) ? p.group : undefined
       );
@@ -105,17 +98,29 @@
       const startsDay = !!date && currentKey !== prevDayKey;
       SE.attr(item, 'data-se-day', startsDay ? formatDayLabel(date) : null);
       prevDayKey = currentKey;
-      return startsDay;
-    });
+    }
+  };
 
-    // The last card of each day (the one before a new day's first, and the very last).
-    list.forEach((item, index) => {
-      SE.attr(item, 'data-se-last', index === list.length - 1 || dayStarts[index + 1] ? '' : null);
-    });
+  /*
+   * Room for the panel's shadow: Steam sizes the menu (and, over a page, its popup window) to the
+   * panel, which cut the shadow off. The wrappers Steam puts around the panel (no bigger than it)
+   * go see-through (data-se-ntf-frame), and in a popup window so does the page itself
+   * (data-se-ntf-window); notifications.css gives the panel a margin the shadow falls in.
+   */
+  const markFrames = (panel) => {
+    const { width, height } = panel.getBoundingClientRect();
+    for (let node = panel.parentElement; node && node !== document.body; node = node.parentElement) {
+      const rect = node.getBoundingClientRect();
+      // The menu's own wrappers hug the panel (with its margin); anything bigger is the page.
+      if (rect.width > width + 80 || rect.height > height + 80) break;
+      SE.mark(node, 'data-se-ntf-frame');
+    }
+    if (!document.querySelector(`.${C.TopBar}`)) SE.mark(document.documentElement, 'data-se-ntf-window');
   };
 
   const update = () => {
     for (const menu of document.querySelectorAll(`.${MENU_CLS}`)) {
+      markFrames(menu);
       for (const row of menu.querySelectorAll(`.${PINNED_CLS}`)) annotateSummaryRow(row);
       annotateNotificationItems([...menu.querySelectorAll(`.${ITEM_CLS}`)]);
     }

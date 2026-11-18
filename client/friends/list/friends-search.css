@@ -14,6 +14,154 @@
   display: none !important;
 }
 
+/*
+ * The Friends bar, as the Group Chats header (friends-chats.css): one 30 px row, inset 8 px, the
+ * chevron at the start and the label beside it in the section headers' type, the bar's buttons
+ * at its end, and the hover lighting the whole row. A click on the label folds the favorites
+ * away and back, as a section folds its friends (friends-list.js marks Steam's header
+ * data-se-favorites); searching stays on the magnifier. Steam's wrappers add no space of their
+ * own, and its label's fades are undone so the type matches the headers below.
+ */
+.friendlist:not(.GamepadMode) :is(.socialTabSearchContainer, .socialTabContainer) {
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) {
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: 30px !important;
+  margin: var(--se-space-2) var(--se-space-2) var(--se-space-half) !important;
+  padding: 0 var(--se-space-half) 0 var(--se-space-2) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background: none !important;
+  opacity: 1 !important;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive):hover {
+  background: var(--se-hover) !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .tabLabel {
+  display: flex !important;
+  flex: 1;
+  align-items: center;
+  gap: var(--se-space-2);
+  align-self: stretch;
+  min-width: 0;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  opacity: 1 !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color) !important;
+  cursor: pointer;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .friendsTabButtonsContainer {
+  flex: none;
+  gap: var(--se-space-half);
+  height: 26px !important;
+  margin-inline-start: auto !important;
+}
+
+/*
+ * The bar's buttons in the Group Chats button's size (friends-chats.css): 26 px with 18 px
+ * icons, inside the 30 px row. The requests count is a small pill ringed in the fill.
+ */
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton) {
+  width: 26px !important;
+  height: 26px !important;
+}
+
+/* No tiles: the row lights on hover and a button's icon brightens (as Group Chats' does); the
+   requests button, while its view is open, shows it in the accent alone */
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton):is(:hover, .friendRequestViewActive) {
+  background: none !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton)::before {
+  width: 18px;
+  height: 18px;
+  -webkit-mask-size: 18px 18px;
+  mask-size: 18px 18px;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .friendsTabButtonsContainer .TabSearchButton {
+  height: 26px !important;
+}
+
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .friendRequestButton .requestsNumber {
+  top: -1px !important;
+  right: -1px !important;
+  min-width: 14px !important;
+  height: 14px !important;
+  padding: 0 var(--se-space-half) !important;
+  font: 800 var(--se-fs-2xs)/14px var(--se-font), sans-serif !important;
+}
+
+/*
+ * With requests waiting, the count takes the arrow's place: the icon drops its arrow (a person
+ * alone) and the count sits where the arrow was, at the icon's top right, covering nothing.
+ */
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .friendRequestButton:has(.requestsNumber:not(:empty)) {
+  --se-fd-ico: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Ccircle%20cx%3D%229.5%22%20cy%3D%228%22%20r%3D%223.5%22%2F%3E%3C%2Fg%3E%3Ccircle%20cx%3D%229.5%22%20cy%3D%228%22%20r%3D%223.5%22%2F%3E%3Cpath%20d%3D%22M3%2020c.8-3.4%203.4-5.2%206.5-5.2s5.7%201.8%206.5%205.2%22%2F%3E%3C%2Fsvg%3E");
+}
+
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .tabLabel:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: calc(-1 * var(--se-focus-offset));
+  border-radius: var(--se-radius-xs);
+}
+
+/* How many favorites, just before the bar's buttons, as Group Chats counts its chats */
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .tabLabel[data-se-count]::after {
+  content: attr(data-se-count);
+  margin-inline-start: auto;
+  /* Group Chats' room before its button: 6 px, and the row's 8 px gap after */
+  padding-inline-end: var(--se-space-1);
+  font: 700 var(--se-fs-xs)/14px var(--se-font), sans-serif;
+  letter-spacing: 0;
+  color: var(--se-label-color);
+}
+
+/*
+ * The list sections' chevron (friends-rows.css), down while open and right while folded. They
+ * centre it in a 14 px box; here the margins do: (14 - 6.75) / 2 each side, and the folded one
+ * moved 3 px left as theirs is.
+ */
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .tabLabel::before {
+  content: "";
+  flex: none;
+  box-sizing: content-box;
+  width: 5px;
+  height: 5px;
+  margin: 0 var(--se-space-1);
+  border-right: 1.75px solid currentColor;
+  border-bottom: 1.75px solid currentColor;
+  /* Offset by transform, not margin, so the turn animates on the compositor */
+  transform: translateY(-3px) rotate(45deg);
+  transition: transform var(--se-dur) ease-out;
+}
+
+.friendlist:not(.GamepadMode) .friendListHeaderContainer[data-se-favorites="folded"] .socialListTab:not(.TabSearchActive) .tabLabel::before {
+  transform: translateX(-3px) rotate(-45deg);
+}
+
+/* Folded favorites go; while folding or opening they stay shown and move (friends-rows.css) */
+.friendlist:not(.GamepadMode) .friendListHeaderContainer[data-se-favorites="folded"] .quickAccessFriends:not([data-se-folding]) {
+  display: none !important;
+}
+
 /* While searching the field has the whole row, as the bar's other buttons step aside */
 .friendlist:not(.GamepadMode) .socialListTab.TabSearchActive .friendsTabButtonsContainer > :not(.TabSearchButton) {
   display: none !important;
@@ -154,11 +302,11 @@
 .friendlist:not(.GamepadMode) .quickAccessFriends:not(.emptyQuickAccess) {
   display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
-  gap: 4px 2px;
+  gap: var(--se-space-1) var(--se-space-half);
   width: auto !important;
   min-height: 0 !important;
   margin: 0 !important;
-  padding: 10px 8px 4px !important;
+  padding: var(--se-space-2) var(--se-space-2) var(--se-space-1) !important;
 }
 
 .friendlist:not(.GamepadMode) .quickAccessFriends .favoriteElement {
@@ -170,7 +318,7 @@
   width: auto !important;
   height: auto !important;
   margin: 0 !important;
-  padding: 8px 2px 6px !important;
+  padding: var(--se-space-2) var(--se-space-half) var(--se-space-1) !important;
   border-radius: var(--se-radius-sm);
   justify-content: center;
 }
@@ -183,7 +331,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 7px;
+  gap: var(--se-space-2);
   min-width: 0;
   width: 100%;
 }
@@ -248,7 +396,7 @@
   text-overflow: ellipsis !important;
   -webkit-mask: none !important;
   mask: none !important;
-  font: 600 11.5px/14px var(--se-font), sans-serif !important;
+  font: 600 var(--se-fs-sm)/14px var(--se-font), sans-serif !important;
   color: var(--se-text-dim) !important;
   text-align: center;
 }
@@ -269,9 +417,99 @@
   color: var(--se-text-faint) !important;
 }
 
+/*
+ * Unread messages from a favorite: the list's blue unread dot (friends-chats.css), on the
+ * avatar's top-right corner with a ring of the fill around it. Steam places its indicator by
+ * the tile's foot; here it covers the tile and the dot sits from the centred avatar
+ * (--se-fav-av, its size; its top is the tile's top padding).
+ */
+.friendlist:not(.GamepadMode) .quickAccessFriends :is(.favoriteElement, .friend.quickAccessFriend) {
+  position: relative;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends {
+  --se-fav-av: 40px;
+  --se-fav-pad: 8px;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends .ChatUnreadMessageIndicator {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: calc(var(--se-z-raised) + 2);
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  background: none !important;
+  pointer-events: none;
+}
+
 .friendlist:not(.GamepadMode) .quickAccessFriends .ChatUnreadMessageIndicator .chatUnreadCircle {
-  right: 4px !important;
+  position: absolute !important;
+  top: calc(var(--se-fav-pad) - 4px) !important;
+  right: calc(50% - var(--se-fav-av) / 2 - 4px) !important;
   bottom: auto !important;
-  top: 4px;
+  left: auto !important;
+  width: 10px !important;
+  height: 10px !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--se-accent) !important;
   box-shadow: 0 0 0 2px var(--se-sidebar) !important;
+  font-size: 0 !important;
+  color: transparent !important;
+}
+
+/*
+ * Compact favorites (Steam's "Compact favorite friends area": .compactQuickAccess). No names,
+ * so the tiles shrink to their avatars: 30 px with a slimmer ring, in rows that wrap with an
+ * even 6 px gap, the game icon and unread dot scaled to match.
+ */
+.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess:not(.emptyQuickAccess) {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: var(--se-space-1);
+  padding: var(--se-space-2) var(--se-space-2) var(--se-space-1) !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess .friend.quickAccessFriend {
+  padding: var(--se-space-1) !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess .quickAccessFriend > div {
+  gap: 0;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess .friend .avatarHolder {
+  width: 30px !important;
+  height: 30px !important;
+  transform: none !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess .friend .avatarHolder :is(img.avatar, .avatar) {
+  width: 100% !important;
+  box-shadow: 0 0 0 2px var(--se-sidebar), 0 0 0 3.5px var(--se-fd-ring) !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess .friend.awayOrSnooze .avatarHolder :is(img.avatar, .avatar) {
+  box-shadow: none !important;
+  outline-width: 1.5px !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess .playerNameQuickAccessContainer {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess .FavoriteFriend_GameIcon {
+  right: -4px !important;
+  bottom: -3px !important;
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess {
+  --se-fav-av: 30px;
+  --se-fav-pad: 5px;
 }

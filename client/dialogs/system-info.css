@@ -15,7 +15,7 @@
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-rows: auto auto minmax(0, 1fr) auto;
-  gap: 14px 8px;
+  gap: var(--se-space-3) var(--se-space-2);
   white-space: normal; /* Steam sets pre-line on the survey dialog */
 }
 
@@ -128,7 +128,7 @@ button.se-sysinfo:focus-visible {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--se-space-2);
   container-type: inline-size;
 }
 
@@ -140,20 +140,20 @@ button.se-sysinfo:focus-visible {
   grid-column: 1 / -1;
   grid-row: 2;
   min-width: 0;
-  margin-top: -10px;
+  margin-top: calc(-1 * var(--se-space-2));
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--se-space-3);
   overflow: hidden;
 }
 
 .se-sysinfo-meta-item {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--se-space-1);
   flex: 0 1 auto;
   min-width: 0;
-  font: 500 12px/16px var(--se-font);
+  font: 500 var(--se-fs-sm)/16px var(--se-font);
   color: var(--se-text-muted);
   white-space: nowrap;
 }
@@ -163,7 +163,7 @@ button.se-sysinfo:focus-visible {
   flex: none;
   width: 3px;
   height: 3px;
-  margin: 0 4px 0 -8px;
+  margin: 0 var(--se-space-1) 0 calc(-1 * var(--se-space-2));
   border-radius: 50%;
   background: var(--se-text-faint);
 }
@@ -184,7 +184,7 @@ button.se-sysinfo:focus-visible {
   flex: none;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: var(--se-space-2);
 }
 
 @container (min-width: 820px) {
@@ -199,17 +199,17 @@ button.se-sysinfo:focus-visible {
   height: 52px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 12px 0 10px;
+  gap: var(--se-space-2);
+  padding: 0 var(--se-space-3) 0 var(--se-space-2);
   border-radius: var(--se-radius-ml);
   background: var(--se-bg);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  box-shadow: var(--se-edge);
   color: var(--se-text);
 }
 
 .se-sysinfo-spec:hover {
   background: var(--se-field);
-  box-shadow: inset 0 0 0 1px var(--se-white-10);
+  box-shadow: var(--se-edge-soft);
 }
 
 .se-sysinfo-spec-icon,
@@ -251,19 +251,19 @@ button.se-sysinfo:focus-visible {
 }
 
 .se-sysinfo-spec-label {
-  font: 700 8.5px/10px var(--se-font);
+  font: 700 var(--se-fs-2xs)/12px var(--se-font);
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--se-text-faint);
 }
 
 .se-sysinfo-spec-value {
-  font: 700 13px/16px var(--se-font);
+  font: 700 var(--se-fs-base)/16px var(--se-font);
   color: var(--se-text-strong);
 }
 
 .se-sysinfo-spec-sub {
-  font: 500 10.5px/12px var(--se-font);
+  font: 500 var(--se-fs-2xs)/12px var(--se-font);
   color: var(--se-text-muted);
 }
 
@@ -276,7 +276,7 @@ button.se-sysinfo:focus-visible {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--se-space-2);
 }
 
 .se-sysinfo-chips,
@@ -285,7 +285,7 @@ button.se-sysinfo:focus-visible {
   flex: 1;
   min-width: 0;
   display: flex;
-  gap: 4px;
+  gap: var(--se-space-1);
   overflow-x: auto;
   scrollbar-width: none;
   mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
@@ -301,11 +301,11 @@ button.se-sysinfo:focus-visible {
   height: 26px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 10px 0 8px;
+  gap: var(--se-space-1);
+  padding: 0 var(--se-space-2) 0 var(--se-space-2);
   border-radius: var(--se-radius-pill);
   background: none;
-  font: 600 11px/1 var(--se-font);
+  font: 600 var(--se-fs-xs)/1 var(--se-font);
   color: var(--se-text-muted);
   white-space: nowrap;
 }
@@ -333,11 +333,11 @@ button.se-sysinfo:focus-visible {
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 4px 0 10px;
+  gap: var(--se-space-1);
+  padding: 0 var(--se-space-1) 0 var(--se-space-2);
   border-radius: var(--se-radius-pill);
   background: var(--se-field);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  box-shadow: var(--se-edge);
   color: var(--se-text-faint);
   cursor: text;
   -webkit-app-region: no-drag;
@@ -345,7 +345,7 @@ button.se-sysinfo:focus-visible {
 }
 
 .se-sysinfo-filter:focus-within {
-  box-shadow: inset 0 0 0 1px var(--se-white-14);
+  box-shadow: var(--se-edge-lift);
   color: var(--se-text-muted);
 }
 
@@ -362,7 +362,7 @@ button.se-sysinfo:focus-visible {
   border: 0;
   outline: 0;
   background: none;
-  font: 500 12px/1 var(--se-font);
+  font: 500 var(--se-fs-sm)/1 var(--se-font);
   color: var(--se-text);
 }
 
@@ -416,7 +416,7 @@ button.se-sysinfo:focus-visible {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--se-space-2);
   overflow-y: auto;
   overscroll-behavior: contain;
   outline: 0;
@@ -426,17 +426,17 @@ button.se-sysinfo:focus-visible {
 .se-sysinfo-card,
 .se-sysreport-card {
   flex: none;
-  padding: 10px 8px 6px;
+  padding: var(--se-space-2) var(--se-space-2) var(--se-space-1);
   border-radius: var(--se-radius-ml);
   background: var(--se-bg);
-  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  box-shadow: var(--se-edge);
 }
 
 .se-sysinfo-card-head {
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 0 4px 6px;
+  gap: var(--se-space-2);
+  padding: 0 var(--se-space-1) var(--se-space-1);
 }
 
 .se-sysinfo-card-icon {
@@ -457,7 +457,7 @@ button.se-sysinfo:focus-visible {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font: 700 12.5px/16px var(--se-font);
+  font: 700 var(--se-fs-base)/16px var(--se-font);
   letter-spacing: 0;
   text-transform: none;
   color: var(--se-text-strong);
@@ -468,11 +468,11 @@ button.se-sysinfo:focus-visible {
   flex: none;
   min-width: 18px;
   height: 16px;
-  padding: 0 5px;
+  padding: 0 var(--se-space-1);
   box-sizing: border-box;
   border-radius: var(--se-radius-pill);
   background: var(--se-white-04);
-  font: 700 9.5px/16px var(--se-font);
+  font: 700 var(--se-fs-2xs)/16px var(--se-font);
   text-align: center;
   color: var(--se-text-faint);
 }
@@ -517,8 +517,8 @@ button.se-sysinfo:focus-visible {
 .se-sysinfo-pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 0 4px 6px;
+  gap: var(--se-space-1);
+  padding: 0 var(--se-space-1) var(--se-space-1);
 }
 
 .se-sysinfo-pill {
@@ -526,12 +526,12 @@ button.se-sysinfo:focus-visible {
   min-height: 24px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
+  gap: var(--se-space-1);
+  padding: var(--se-space-half) var(--se-space-2);
   box-sizing: border-box;
   border-radius: var(--se-radius-pill);
   background: var(--se-surface-2);
-  font: 600 11.5px/16px var(--se-font);
+  font: 600 var(--se-fs-sm)/16px var(--se-font);
   color: var(--se-text);
   overflow-wrap: anywhere;
 }
@@ -555,14 +555,14 @@ button.se-sysinfo:focus-visible {
   display: grid;
   grid-template-columns: minmax(96px, 36%) minmax(0, 1fr) 14px;
   align-items: baseline;
-  column-gap: 12px;
+  column-gap: var(--se-space-3);
   width: 100%;
   min-height: 28px;
   box-sizing: border-box;
-  padding: 6px 6px 6px 8px;
+  padding: var(--se-space-1) var(--se-space-1) var(--se-space-1) var(--se-space-2);
   border-radius: var(--se-radius-sm);
   background: none;
-  font: 500 12px/16px var(--se-font);
+  font: 500 var(--se-fs-sm)/16px var(--se-font);
   user-select: text;
 }
 
@@ -604,7 +604,7 @@ button.se-sysinfo:focus-visible {
 
 .se-sysinfo-mono {
   font-family: Consolas, "Cascadia Mono", "SF Mono", monospace;
-  font-size: 11.5px;
+  font-size: var(--se-fs-sm);
   font-weight: 500;
   letter-spacing: .01em;
 }
@@ -634,8 +634,8 @@ button.se-sysinfo:focus-visible {
 .se-sysinfo-empty,
 .se-sysreport-empty {
   margin: 0;
-  padding: 28px 12px;
-  font: 500 12px/16px var(--se-font);
+  padding: var(--se-space-5) var(--se-space-3);
+  font: 500 var(--se-fs-sm)/16px var(--se-font);
   text-align: center;
   color: var(--se-text-faint);
 }
@@ -644,12 +644,12 @@ button.se-sysinfo:focus-visible {
 .se-sysinfo-loading {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--se-space-2);
 }
 
 .se-sysinfo-loading-text {
-  padding: 2px 2px 4px;
-  font: 600 11px/14px var(--se-font);
+  padding: var(--se-space-half) var(--se-space-half) var(--se-space-1);
+  font: 600 var(--se-fs-xs)/14px var(--se-font);
   color: var(--se-text-muted);
 }
 
@@ -659,7 +659,7 @@ button.se-sysinfo:focus-visible {
   background:
     linear-gradient(100deg, transparent 30%, var(--se-white-04) 50%, transparent 70%) 0 0 / 200% 100%,
     var(--se-bg);
-  animation: se-sysinfo-shimmer 1.4s linear infinite;
+  animation: se-sysinfo-shimmer var(--se-dur-shimmer) linear infinite;
 }
 
 @keyframes se-sysinfo-shimmer {
@@ -681,11 +681,11 @@ button.se-sysinfo:focus-visible {
   height: var(--se-control-h);
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 0 14px 0 12px;
+  gap: var(--se-space-2);
+  padding: 0 var(--se-space-3) 0 var(--se-space-3);
   border-radius: var(--se-radius-md);
   background: var(--se-surface-2);
-  font: 600 12.5px/1 var(--se-font);
+  font: 600 var(--se-fs-base)/1 var(--se-font);
   color: var(--se-text);
   white-space: nowrap;
 }

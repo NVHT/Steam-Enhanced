@@ -218,7 +218,7 @@
     paintGame();
   }
 
-  // Cards the strip shows (set by stage.css container queries), capped to the games.
+  // Cards the strip shows (set by stage-hero.css container queries), capped to the games.
   function stripCount() {
     const strip = live.stage?.querySelector('.se-hs-strip');
     const cols = strip ? parseInt(getComputedStyle(strip).getPropertyValue('--se-hs-cols'), 10) : NaN;

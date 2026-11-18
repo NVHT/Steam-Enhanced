@@ -25,6 +25,8 @@
   const besidePage = SE.inside('.se-dl-native-list, .se-dl-library');
   const ignore = (node) => SE.inSide(node) || besidePage(node);
   const watcher = SE.watch(update, { attributes: ['aria-valuenow'], ignore });
+  // RegisterForDownloadOverview above drives the page; this 1.5 s backstop covers per-item
+  // fields the overview doesn't carry, only while the page is visible.
   const timer = SE.poll(schedule, 1500, { active: () => SE.visible(PAGE_SELECTOR) });
   schedule();
   addEventListener('keydown', debugKey, true);

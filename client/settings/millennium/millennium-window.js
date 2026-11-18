@@ -13,7 +13,6 @@
   window.__seMillenniumWindow?.destroy();
 
   let popup;
-  let popupScan = null;
   let failure = '';
   let errorNotice = null;
 
@@ -334,9 +333,61 @@
     }
   }
 
+  /*
+   * Popup windows: Steam's popup manager announces each one it creates, so the theme watches
+   * that window's own document (one observer per window) until the Millennium page mounts in it,
+   * then lets go. No timer: this works while the main window is hidden in the tray.
+   */
+  const popupWatchers = new Map();
+  let popupHooks = [];
+
+  function unwatchPopupWindow(doc) {
+    const watcher = popupWatchers.get(doc);
+    if (!watcher) return;
+    watcher.observer.disconnect();
+    clearTimeout(watcher.giveUp);
+    popupWatchers.delete(doc);
+  }
+
+  function watchPopupWindow(win) {
+    const doc = SE.run(() => win?.document);
+    if (!doc || doc === document || popupWatchers.has(doc) || popupDocuments.has(doc)) return;
+    let queued = false;
+    const observer = new win.MutationObserver(() => {
+      if (queued) return;
+      queued = true;
+      win.setTimeout(() => {
+        queued = false;
+        scanPopupDocuments();
+        if (popupDocuments.has(doc) || win.closed) unwatchPopupWindow(doc);
+      }, 50);
+    });
+    observer.observe(doc.documentElement || doc, { childList: true, subtree: true });
+    // A popup that isn't Millennium's (chat, a dialog) is let go once it has had time to mount
+    const giveUp = setTimeout(() => unwatchPopupWindow(doc), 10000);
+    popupWatchers.set(doc, { observer, giveUp });
+  }
+
+  function startPopupTracking() {
+    stopPopupHooks();
+    for (const owner of SE.owners()) {
+      const manager = SE.run(() => owner.g_PopupManager);
+      if (!manager) continue;
+      const created = SE.run(() => manager.AddPopupCreatedCallback((entry) => watchPopupWindow(entry?.window)));
+      const destroyed = SE.run(() => manager.AddPopupDestroyedCallback(() => scanPopupDocuments()));
+      popupHooks.push(created, destroyed);
+      for (const entry of SE.run(() => [...manager.m_mapPopups.values()]) || []) watchPopupWindow(entry.window);
+    }
+  }
+
+  function stopPopupHooks() {
+    for (const hook of popupHooks) SE.run(() => hook?.Unregister?.());
+    popupHooks = [];
+    for (const doc of [...popupWatchers.keys()]) unwatchPopupWindow(doc);
+  }
+
   function stopPopupTracking() {
-    clearInterval(popupScan);
-    popupScan = null;
+    stopPopupHooks();
     removeDialogHosts();
     popupModalManagers = null;
     for (const doc of new Set([...popupDocuments, ...managerEmbeds.keys()])) {
@@ -613,9 +664,7 @@
         result.ClosedPromise.then(clearPopup, clearPopup);
       }
       scanPopupDocuments();
-      // A plain interval: the main window is often hidden (opened from the tray) while the popup
-      // is up, and a visibility-aware poll would stop wiring the popup's tabs.
-      popupScan = setInterval(scanPopupDocuments, 250);
+      startPopupTracking();
       return true;
     } catch (error) {
       popup = null;
@@ -643,6 +692,8 @@
   }
 
   installRouteGuards();
+  // Steam re-registers routes and Navigate without an event; 500 ms only while a guard is
+  // missing (guardsNeeded), otherwise one check every 5 s.
   const routeGuardPoll = SE.poll(installRouteGuards, 500, { active: guardsNeeded, idle: 5000 });
 
   window.__seMillenniumWindow = {

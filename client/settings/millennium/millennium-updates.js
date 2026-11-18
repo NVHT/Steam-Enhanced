@@ -123,7 +123,7 @@
     } else if (r.update) {
       state = `<span class="se-mchip" data-tone="accent">${icon('download')}${r.to ? `${esc(r.to)} available` : 'Update available'}</span>`;
       action = card?.isUpdating
-        ? `<button type="button" class="se-mbtn" data-size="sm" disabled><span class="se-mspin"></span>${esc(card.statusText || 'Updating…')}</button>`
+        ? `<button type="button" class="se-mbtn" data-size="sm" disabled><span class="se-mspin se-spin-arc" aria-hidden="true"></span>${esc(card.statusText || 'Updating…')}</button>`
         : card
           ? `<button type="button" class="se-mbtn" data-size="sm" data-act="download">${icon('download')}Download</button>`
           : '';
@@ -225,7 +225,7 @@
 
     const btn = hero.querySelector('[data-act="check"]');
     const btnHtml = waiting
-      ? `<span class="se-mspin"></span>Checking`
+      ? `<span class="se-mspin se-spin-arc" aria-hidden="true"></span>Checking`
       : `${icon('refresh')}${state === 'error' ? 'Try again' : state === 'available' ? 'Check again' : 'Check for updates'}`;
     if (btn.dataset.sig !== btnHtml) {
       btn.dataset.sig = btnHtml;

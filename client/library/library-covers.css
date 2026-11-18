@@ -32,13 +32,13 @@
   max-width: none !important;
   height: auto !important;
   margin: 0 !important;
-  padding: 2px 10px !important;
+  padding: var(--se-space-half) var(--se-space-2) !important;
   gap: 0 !important;
   border-radius: var(--se-radius-pill) !important;
   background: var(--se-chip-hover) !important;
   box-shadow: 0 4px 12px -4px var(--se-black-60) !important;
   color: var(--se-text) !important;
-  font: 600 11.5px/16px var(--se-font), sans-serif !important;
+  font: 600 var(--se-fs-sm)/16px var(--se-font), sans-serif !important;
   letter-spacing: .04em !important;
   text-transform: uppercase;
   white-space: nowrap;
@@ -71,9 +71,11 @@
   display: flex !important;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--se-space-2);
   overflow: hidden;
   z-index: 14;
+  /* Width on purpose: the button grows across one cover on hover (absolutely placed, so the
+     relayout stays inside it); a scale would stretch its label */
   transition: width var(--se-dur) ease-out, background var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out;
 }
 
@@ -100,7 +102,7 @@
  * On hover of the cover: the button widens across the card with its label inside
  * (Install / Update in blue, Play in the theme green). "Hover of the cover" is any of the
  * :is() triggers; the button itself is any cover action button not yet marked by
- * client/home/home-polish.js ([data-se-cover-btn]).
+ * client/home/home-shelves.js ([data-se-cover-btn]).
  */
 :is(.WYgDg9NyCcMIVuMyZ_NBC:hover, .WYgDg9NyCcMIVuMyZ_NBC:hover ~ *, :has(> .WYgDg9NyCcMIVuMyZ_NBC):hover, ._1esfEVxhqNfh8fzr_kEGKa:hover, ._31TK9DDDCRTzSsZCPgqtxX:hover, :has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover) ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs),
 ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):not(._2mDBhx6RW__a_uRpmFziSW):not(._1aml4h4CSJbtrNbX4brUYs):hover {
@@ -121,7 +123,7 @@
 :is(.WYgDg9NyCcMIVuMyZ_NBC:hover, .WYgDg9NyCcMIVuMyZ_NBC:hover ~ *, :has(> .WYgDg9NyCcMIVuMyZ_NBC):hover, ._1esfEVxhqNfh8fzr_kEGKa:hover, ._31TK9DDDCRTzSsZCPgqtxX:hover, :has(> ._3AjoLnMNKxYmNTGTJCLfgs):hover) ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn])::before,
 ._3AjoLnMNKxYmNTGTJCLfgs:not(.xp7A-08Y404Of3FBHqX32 ._3AjoLnMNKxYmNTGTJCLfgs, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ._3AjoLnMNKxYmNTGTJCLfgs):not([data-se-cover-btn]):hover::before {
   order: 2;
-  font: 700 14px/1 var(--se-font), sans-serif;
+  font: 700 var(--se-fs-md)/1 var(--se-font), sans-serif;
   white-space: nowrap;
 }
 
