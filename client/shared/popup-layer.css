@@ -64,6 +64,17 @@ html.se-layer-document .se-layer-popup {
 }
 
 /*
+ * The shift is measured against the box's current place (fit() in popup-layer.js), so it must
+ * land at once. Reduced motion (core/motion.css, options/appearance/motion-reduced.css) gives
+ * every element a .01ms transition of `all`: the transform would lag a frame, the next fit()
+ * would read the old place and shift again, and the panel would land twice as far off.
+ */
+.se-layer-wrap,
+.se-layer-page {
+  transition-property: none;
+}
+
+/*
  * Content sizes to itself, as it does in the page (a fixed box shrinks to fit): here it sits
  * in a box as wide as the main window, where it would stretch.
  */
