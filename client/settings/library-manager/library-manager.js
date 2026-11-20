@@ -159,6 +159,15 @@
   // label), so the selection is matched every way and, failing that, by the label on screen.
   const labelOf = (option) => String(option?.label ?? option?.data ?? '');
 
+  // Steam's dropdown component behind a DialogDropDown: the one whose state holds the label shown.
+  function dropdownInstance(el) {
+    for (let f = SE.fiber(el), depth = 0; f && depth < 12; f = f.return, depth++) {
+      const s = f.stateNode;
+      if (typeof s?.OnValueSelected === 'function' && typeof s.setState === 'function') return s;
+    }
+    return null;
+  }
+
   function dropdownOf(el) {
     const dd = el
       ? SE.fromProps(el, 12, (q) => (Array.isArray(q.rgOptions) && typeof q.onChange === 'function' ? q : null))
@@ -178,9 +187,16 @@
       index,
       selected: dd.rgOptions[index] || null,
       // Always sent: the menu's own selection is stale (it keeps its first option), so comparing
-      // against it would block a return to the first tab.
+      // against it would block a return to the first tab. Recorded on Steam's dropdown too, as a
+      // pick from its menu would be: Millennium's onChange alone saves the value but leaves the
+      // label (Millennium's strDefaultLabel, never redrawn), and every read here is of that label.
       choose(option) {
-        if (option) SE.run(() => dd.onChange(option));
+        if (!option) return;
+        SE.run(() => {
+          const instance = dropdownInstance(el);
+          instance?.setState({ value: option });
+          dd.onChange(option, instance || undefined);
+        });
       },
     };
   }
