@@ -106,37 +106,13 @@
     const anchor = position && button ? menuAnchor(button) : null;
     if (anchor) position.element = anchor;
 
-    /*
-     * Closing: every way Steam hides a menu ends in InternalHide, which drops its window at once.
-     * The panel plays the menus' closing animation first (SE.layer.closeWith, core/motion.css)
-     * and the window goes when it ends; a menu shown again meanwhile stays. Hidden again while
-     * it fades (Steam hides a menu more than one way at once), it goes straight away, so a menu
-     * is never left half closed and unable to open.
-     */
-    let closing = null;
-    const ownInternalHide = Object.getOwnPropertyDescriptor(instance, 'InternalHide');
-    const originalInternalHide = instance.InternalHide;
-    const internalHide = function (...args) {
-      if (closing) {
-        closing();
-        closing = null;
-        return originalInternalHide.apply(this, args);
-      }
-      const panel = this.visible ? menuPanel(this) : null;
-      if (!panel || !SE.layer?.closeWith) return originalInternalHide.apply(this, args);
-      closing = SE.layer.closeWith(panel, () => {
-        closing = null;
-        originalInternalHide.apply(this, args);
-      });
-      return undefined;
-    };
-    instance.InternalHide = internalHide;
+    // Closing plays the menus' animation first; a menu shown again meanwhile stays (shared.js)
+    const closer = ns.animateClose(instance, menuPanel);
 
     const ownShow = Object.getOwnPropertyDescriptor(instance, 'Show');
     const originalShow = instance.Show;
     const show = function (...args) {
-      closing?.();
-      closing = null;
+      closer.cancel();
       applyPlacement(this);
       refreshPosition(this);
       const result = originalShow.apply(this, args);
@@ -190,8 +166,7 @@
       takeFocus,
       ownCancel,
       cancel,
-      ownInternalHide,
-      internalHide,
+      closer,
     });
 
     refreshPosition(instance);
@@ -219,10 +194,7 @@
       if (saved.ownCancel) Object.defineProperty(instance, 'OnCancel', saved.ownCancel);
       else delete instance.OnCancel;
     }
-    if (instance.InternalHide === saved.internalHide) {
-      if (saved.ownInternalHide) Object.defineProperty(instance, 'InternalHide', saved.ownInternalHide);
-      else delete instance.InternalHide;
-    }
+    saved.closer.restore();
     if (saved.position?.element === saved.anchor) {
       saved.position.element = saved.originalAnchor;
     }

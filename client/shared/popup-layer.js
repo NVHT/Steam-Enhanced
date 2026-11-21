@@ -816,7 +816,8 @@
 
   /*
    * The theme's one popup menu, in a panel (above a browser page too). One open at a time.
-   *   items   rows [{ label, run, state, icon, art, hint, keys, time, unread, external, checked }],
+   *   items   rows [{ label, run, state, icon, art, hint, keys, time, unread, external, checked,
+   *           danger }],
    *           with { heading, action }, { separator: true } and { note } between them. state
    *           goes on the row as data-state with an <i> before the label for the caller's mark
    *           (the dock's status dots); icon is a mask token's name (a duotone icon); art an
@@ -826,9 +827,10 @@
    *           (true / false) an accent dot after it; external a mark that the row opens
    *           outside; checked (true / false) makes the row an on/off setting, with a switch at
    *           its end (role menuitemcheckbox) that run flips; current marks the row for the
-   *           page you're on (aria-current, the accent). A heading's action ({ label, run })
-   *           is a small button at its end: run(handle), the menu staying open. A note is a
-   *           line of plain text (an empty state).
+   *           page you're on (aria-current, the accent); danger draws a destroying row in
+   *           red. A heading's action ({ label, run }) is a small button at its end:
+   *           run(handle), the menu staying open. A note is a line of plain text (an empty
+   *           state).
    *   at      where: a spot for show() ({ left | right, top }, or a function of the menu's size)
    *   options { sheets: the theme files styling the marks; owner: the button that opened it,
    *           whose press never counts as an outside click (it toggles) and which carries
@@ -1017,6 +1019,8 @@
         row.type = 'button';
         row.setAttribute('role', 'menuitem');
         if (item.current) row.setAttribute('aria-current', 'page');
+        // A row that destroys something (Delete): in red (popup-layer.css)
+        if (item.danger) row.setAttribute('data-danger', '');
         if (item.state) {
           row.dataset.state = item.state;
           row.append(doc.createElement('i'));

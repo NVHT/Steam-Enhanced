@@ -13,6 +13,7 @@
 
   window.__seSteamMenu = {
     destroy() {
+      for (const cleanup of ns.cleanups) SE.run(cleanup);
       clearInterval(live.timer);
       live.popupPoll?.disconnect();
       cancelHoverClose();

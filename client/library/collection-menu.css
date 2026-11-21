@@ -1,0 +1,63 @@
+/*
+ * A collection's right-click menu (client/library/collection-menu.js): the bar, rows, dividers and
+ * red Delete come from the library menus' look (client/library/game-menu.css); here only its
+ * places and glyphs. Loaded in every window, as game-menu.css is (menus open in their own).
+ */
+
+/* Places, by kind: the bar 1–4 (its divider is 10), Edit filters 20, Expand all 24, Collapse all 25, others 30 */
+[data-se-lib-menu='collection'] [data-se-gm-list] > :is([data-se-gm-slot='only'], [data-se-gm-slot='showall']) {
+  order: 1;
+}
+
+[data-se-lib-menu='collection'] [data-se-gm-list] > :is([data-se-gm-slot='collapse'], [data-se-gm-slot='expand']) {
+  order: 2;
+}
+
+[data-se-lib-menu='collection'] [data-se-gm-list] > [data-se-gm-slot='rename'] {
+  order: 3;
+}
+
+[data-se-lib-menu='collection'] [data-se-gm-list] > [data-se-gm-slot='delete'] {
+  order: 4;
+}
+
+[data-se-lib-menu='collection'] [data-se-gm-list] > [data-se-gm-slot='edit'] {
+  order: 20;
+}
+
+[data-se-lib-menu='collection'] [data-se-gm-list] > [data-se-gm-slot='expandall'] {
+  order: 24;
+}
+
+[data-se-lib-menu='collection'] [data-se-gm-list] > [data-se-gm-slot='collapseall'] {
+  order: 25;
+}
+
+/* Glyphs, by kind */
+[data-se-lib-menu='collection'] [data-se-gm='only'] {
+  --se-gm-icon: var(--se-icon-eye);
+}
+
+[data-se-lib-menu='collection'] [data-se-gm='showall'] {
+  --se-gm-icon: var(--se-icon-list);
+}
+
+[data-se-lib-menu='collection'] :is([data-se-gm='collapse'], [data-se-gm='collapseall']) {
+  --se-gm-icon: var(--se-icon-fold);
+}
+
+[data-se-lib-menu='collection'] :is([data-se-gm='expand'], [data-se-gm='expandall']) {
+  --se-gm-icon: var(--se-icon-unfold);
+}
+
+[data-se-lib-menu='collection'] [data-se-gm='rename'] {
+  --se-gm-icon: var(--se-icon-edit);
+}
+
+[data-se-lib-menu='collection'] [data-se-gm='delete'] {
+  --se-gm-icon: var(--se-icon-trash);
+}
+
+[data-se-lib-menu='collection'] [data-se-gm='edit'] {
+  --se-gm-icon: var(--se-icon-sliders);
+}

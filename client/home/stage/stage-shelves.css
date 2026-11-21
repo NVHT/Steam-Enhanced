@@ -70,11 +70,13 @@
 
 /*
  * A popup over the page by its button: the Home's menus (menu.js) and pickers (picks.js), placed
- * by placePop; stage-settings.css draws them
+ * by placePop; stage-settings.css draws them. A dropdown's level: above the sticky bars and the
+ * dock, under the theme's own popups (SE.layer, --se-z-popover), so a row's right-click menu
+ * shows over the picker
  */
 .se-hs-pick {
   position: fixed;
-  z-index: var(--se-z-toast);
+  z-index: var(--se-z-dropdown);
   max-width: calc(100vw - 24px);
   display: flex;
   flex-direction: column;
@@ -558,4 +560,65 @@
   font-size: var(--se-fs-3xl);
   font-weight: 800;
   color: var(--se-text-strong);
+}
+
+/* Rename in place (picks.js startRename): the row's name as a field, the search field's look */
+.se-hs-pk-rename {
+  flex: 1;
+  min-width: 0;
+  height: var(--se-control-h-sm);
+  padding: 0 var(--se-space-2);
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-search-bg);
+  box-shadow: var(--se-search-edge-focus);
+  color: var(--se-search-text);
+  font: 600 var(--se-fs-base) var(--se-font);
+  outline: none;
+}
+
+/* A taken name: the field's edge in red until it changes */
+.se-hs-pk-rename[aria-invalid='true'] {
+  box-shadow: inset 0 0 0 1px var(--se-danger);
+}
+
+/* Delete asks first (picks.js askDelete): the question, then Keep and Delete (red) */
+.se-hs-pk-ask {
+  cursor: default;
+}
+
+.se-hs-pk-ask:hover {
+  background: transparent;
+}
+
+.se-hs-pk-ask > .se-hs-mn-name {
+  flex: 1;
+  min-width: 0;
+  color: var(--se-text-strong);
+}
+
+.se-hs-pk-ask-btn {
+  all: unset;
+  box-sizing: border-box;
+  min-height: var(--se-hit);
+  padding: 0 var(--se-space-3);
+  border-radius: var(--se-radius-sm);
+  font: 600 var(--se-fs-sm) var(--se-font);
+  line-height: var(--se-hit);
+  color: var(--se-text-dim);
+  cursor: pointer;
+}
+
+.se-hs-pk-ask-btn:is(:hover, :focus-visible) {
+  background: var(--se-selected);
+  color: var(--se-text-strong);
+}
+
+.se-hs-pk-ask-btn[data-danger] {
+  color: var(--se-danger);
+}
+
+.se-hs-pk-ask-btn[data-danger]:is(:hover, :focus-visible) {
+  background: var(--se-danger-surface);
+  color: var(--se-danger-text);
 }

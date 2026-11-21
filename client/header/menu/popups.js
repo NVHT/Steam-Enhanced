@@ -85,6 +85,7 @@
     live.wrappedCreate = function (...args) {
       const instance = live.originalCreate.apply(this, args);
       ns.patchInstance(instance);
+      for (const hook of ns.createHooks) SE.run(hook, instance);
       return instance;
     };
     live.manager.CreateContextMenuInstance = live.wrappedCreate;

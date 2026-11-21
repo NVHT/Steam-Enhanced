@@ -104,6 +104,9 @@
       'library.css', 'library-home.css', 'library-covers.css', 'game-list.css', 'game-list.js',
       'game-drag.css', 'game-drag.js', 'collections.css', 'collections.js',
     ]],
+    // The library's right-click menus (games, collections): part of the Steam menu's patching
+    // (client/header/menu/)
+    ['main', 'client/library/', ['game-menu.js', 'collection-menu.js']],
     // Downloads page
     ['main', 'client/downloads/', [
       'downloads.css', 'downloads-queue.css', 'downloads-buttons.css', 'downloads-library.css',
@@ -130,6 +133,7 @@
     ['all', 'client/friends/', ['friend-hover.css', 'friend-hover.js']],
     ['main', 'client/shared/', ['hover-cards.js']],
     ['all', 'client/header/', ['notifications.css', 'notifications.js', 'account-menu.css', 'steam-menu.css']],
+    ['all', 'client/library/', ['game-menu.css', 'collection-menu.css']],
     ['all', 'client/header/', ['window-controls.css']],
     ['content', 'client/dialogs/utility/', [
       'base.css', 'servers.css', 'media.css', 'library-tools.css', 'modals.css', 'friends.css',
