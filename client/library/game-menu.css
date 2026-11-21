@@ -92,7 +92,7 @@
   order: 20;
 }
 
-[data-se-gm-list] > :is([data-se-gm-slot='shortcut'], [data-se-gm-slot='unshortcut']) {
+[data-se-gm-list] > :is([data-se-gm-slot='shortcut'], [data-se-gm-slot='unlist']) {
   order: 21;
 }
 
@@ -150,6 +150,12 @@
  * the row rule above, which would otherwise draw them (its display: grid).
  */
 :root [data-se-lib-menu] :is([data-se-gm='add'], [data-se-gm='remove']):not(#se-none) {
+  display: none !important;
+}
+
+/* A row that can never act (Mark as Private for a non-Steam game) goes too, with its slot */
+:root [data-se-lib-menu] [data-se-gm-off]:not(#se-none),
+:root [data-se-lib-menu] [data-se-gm-list] > [data-se-gm-slot]:has([data-se-gm-off]):not(#se-none) {
   display: none !important;
 }
 
@@ -279,7 +285,8 @@
   --se-gm-icon: var(--se-icon-eye-off);
 }
 
-[data-se-gm='uninstall'] {
+[data-se-gm='uninstall'],
+[data-se-gm='unlist'] {
   --se-gm-icon: var(--se-icon-trash);
 }
 
@@ -287,8 +294,7 @@
   --se-gm-icon: var(--se-icon-tag);
 }
 
-[data-se-gm='shortcut'],
-[data-se-gm='unshortcut'] {
+[data-se-gm='shortcut'] {
   --se-gm-icon: var(--se-icon-link);
 }
 

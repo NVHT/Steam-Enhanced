@@ -43,12 +43,14 @@
   // The rows' hint lines (the bar's buttons have none)
   const HINTS = {
     shortcut: 'Launch it from the desktop',
-    unshortcut: 'Take it off the desktop',
+    unlist: 'Its files stay on your PC',
     backup: 'Save a copy to restore later',
     private: 'Friends won’t see it',
     manage: 'Shortcuts, hide, uninstall',
     properties: 'Updates, launch options, DLC',
   };
+  // A non-Steam game's Properties has no updates or DLC
+  const SHORTCUT_PROPERTIES = 'Target, launch options, controller';
 
   // The bar's buttons, by kind, with their word under the icon (Play's comes from actionOf)
   const BAR = {
@@ -68,7 +70,8 @@
    */
   const KEYS = {
     AddDesktopShortcut: 'shortcut',
-    RemoveShortcut: 'unshortcut',
+    // Steam's RemoveShortcut removes a non-Steam game from the library (not a desktop shortcut)
+    RemoveShortcut: 'unlist',
     BackupFiles: 'backup',
     Uninstall: 'uninstall',
   };
@@ -147,7 +150,19 @@
     if (src.includes('bPrivate')) return 'private';
     if (src.includes('AppProperties')) return 'properties';
     if (src.includes('launchSource') || src.includes('OpenInstallWizard')) return 'primary';
-    return 'other';
+    return null;
+  }
+
+  // Rows found disabled (no onSelected) whose kind their component told: they can never act
+  const disabledRows = new WeakSet();
+
+  // A disabled row has no onSelected: Mark as Private's is told by its component, which names its string
+  function disabledKind(f) {
+    for (let depth = 0; f && depth < 4; f = f.return, depth++) {
+      const type = f.type;
+      if (source(type?.type || type?.render || type).includes('MarkAsPrivate')) return 'private';
+    }
+    return null;
   }
 
   /*
@@ -161,7 +176,12 @@
       if ('onSelected' in props) {
         // Browse local files runs the same shared closure as the main action: told by Steam's own (localized) name
         if (props.children && props.children === run(() => live.api?.localize('#GameAction_BrowseLocalFiles'))) return 'browse';
-        return keyedKind(f, props.onSelected) || kindOfAction(props.onSelected);
+        if (!props.onSelected) {
+          const kind = disabledKind(f);
+          if (kind) disabledRows.add(row);
+          return kind || 'other';
+        }
+        return keyedKind(f, props.onSelected) || kindOfAction(props.onSelected) || 'other';
       }
       if ('label' in props && props.children) return submenuKind(props.children);
     }
@@ -509,7 +529,7 @@
       kindOf,
       bar: Object.keys(BAR),
       hints: HINTS,
-      danger: ['uninstall'],
+      danger: ['uninstall', 'unlist'],
       word: (kind, row) => {
         if (kind !== 'primary') return BAR[kind];
         action = actionOf(apps, row);
@@ -523,6 +543,11 @@
     const { container, rows, found } = laid;
     flattenFromRow(rows[0]);
     if (found.primary) SE.attr(found.primary, 'data-se-gm-action', action);
+    if (found.properties && apps.length && apps.every((app) => run(() => app.BIsShortcut()))) {
+      SE.attr(found.properties, 'data-se-gm-hint', SHORTCUT_PROPERTIES);
+    }
+    // Mark as Private greyed out (non-Steam games can't be private): a row that can never act goes
+    rows.forEach((row) => SE.attr(row, 'data-se-gm-off', disabledRows.has(row) ? '' : null));
 
     const coll = own(panel, 'collections', (doc) => ownRow(doc, 'collections', 'Collections', instance, () => openCollections(panel, instance)));
     SE.attr(coll, 'data-se-gm-hint', collectionsHint(apps));
