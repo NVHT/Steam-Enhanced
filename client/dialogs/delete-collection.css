@@ -1,0 +1,144 @@
+/*
+ * Delete Collection, rebuilt (client/dialogs/delete-collection.js): the theme's tile (four covers,
+ * a red bin badge on its corner) beside the question and what goes, then Cancel and Delete, red
+ * as the menus' destroying rows are (client/library/game-menu.css). Steam's tile, header and
+ * question stay mounted, hidden; Delete is Steam's Remove button, its word swapped by CSS.
+ */
+
+/* The box of Steam's tile and right side: the tile, then the text. !important: Steam's layout */
+[data-se-delcoll]:not(#se-none) {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: var(--se-space-5);
+}
+
+/* Steam's tile and cross (CollectionDelete), its header and question. !important: Steam's display. */
+[data-se-delcoll] > .gx3vaLhXVrwPiXhU4JlSa,
+[data-se-delcoll] .DialogHeader,
+[data-se-delcoll] .DialogBodyText {
+  display: none !important;
+}
+
+/* The right side (CollectionDeleteRightSide): the theme's text first, then Steam's footer */
+[data-se-delcoll] ._3rTCYsnxbJIEJYKH-cf7DE:not(#se-none) {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.se-dc-text {
+  order: -1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+}
+
+.se-dc-title {
+  font: 700 var(--se-fs-2xl) / 1.25 var(--se-font);
+  color: var(--se-text-strong);
+  overflow-wrap: anywhere;
+}
+
+.se-dc-body {
+  margin: 0;
+  font: 500 var(--se-fs-md) / 1.5 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+/* The tile: two by two covers in a rounded square, the bin badge over its corner */
+.se-dc-tile {
+  order: -1;
+  position: relative;
+  flex: none;
+  width: 88px;
+  height: 88px;
+}
+
+.se-dc-covers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+  box-shadow: var(--se-edge);
+}
+
+.se-dc-covers > span {
+  overflow: hidden;
+  background: var(--se-white-04);
+}
+
+.se-dc-covers img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The badge: a red disc ringed in the dialog's surface, the bin on its own pseudo-element */
+.se-dc-badge {
+  position: absolute;
+  right: calc(-1 * var(--se-space-2));
+  bottom: calc(-1 * var(--se-space-2));
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--se-danger-surface);
+  box-shadow: 0 0 0 3px var(--se-surface);
+  color: var(--se-danger);
+}
+
+.se-dc-badge::before {
+  content: '';
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-trash) center / contain no-repeat;
+  mask: var(--se-icon-trash) center / contain no-repeat;
+}
+
+/* The footer: Cancel, then Delete at the end */
+[data-se-delcoll] .DialogFooter:not(#se-none) {
+  margin-top: var(--se-space-5) !important;
+}
+
+[data-se-delcoll] .DialogFooter :has(> .DialogButton):not(#se-none) {
+  display: flex !important;
+  justify-content: flex-end;
+  gap: var(--se-space-2);
+}
+
+[data-se-delcoll] .DialogFooter .DialogButton:not(#se-none) {
+  flex: none !important;
+  width: auto !important;
+  min-width: 96px;
+  margin: 0 !important;
+}
+
+/*
+ * Delete: Steam's Remove, in the destroying red, its word swapped (Steam's text stays for screen
+ * readers, at no size). !important: the theme's Primary button (client/dialogs/dialogs.css).
+ */
+[data-se-delcoll] .DialogFooter .DialogButton.Primary:not(#se-none) {
+  order: 2;
+  background: var(--se-danger-surface) !important;
+  color: var(--se-danger-text) !important;
+  font-size: 0 !important;
+}
+
+[data-se-delcoll] .DialogFooter .DialogButton.Primary:not(#se-none):is(:hover, :focus-visible, .gpfocus):enabled {
+  background: var(--se-stop) !important;
+  color: var(--se-text-strong) !important;
+}
+
+[data-se-delcoll] .DialogFooter .DialogButton.Primary::after {
+  content: 'Delete';
+  font: 600 var(--se-fs-base) var(--se-font);
+}

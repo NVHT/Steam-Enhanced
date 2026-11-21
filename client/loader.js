@@ -144,7 +144,8 @@
     ['content', 'client/dialogs/', ['add-non-steam.css', 'add-non-steam.js']],
     ['desktop', 'client/dialogs/', [
       'activate-product.css', 'activate-product.js', 'backups.css', 'backups.js', 'install.js',
-      'eula.js', 'uninstall.css', 'uninstall.js',
+      'eula.js', 'uninstall.css', 'uninstall.js', 'new-collection.css', 'new-collection.js',
+      'delete-collection.css', 'delete-collection.js',
     ]],
     // Plugin integrations
     ['main', 'compat/hltb-for-steam/', ['hltb-for-steam.css', 'hltb-for-steam.js']],

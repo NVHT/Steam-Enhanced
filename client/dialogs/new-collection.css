@@ -1,0 +1,107 @@
+/*
+ * New Collection, rebuilt (client/dialogs/new-collection.js): Steam's type label and its two
+ * Options go (still mounted: Create clicks them), as does the Required note (Create is greyed
+ * instead). The theme's block: a Type label, two cards to pick one from (the picked one in the
+ * accent), then Cancel and Create (the theme's dialog buttons, client/dialogs/dialogs.css).
+ */
+
+/* !important: Steam's own display on its label and Options container (CSS module 1634) */
+[data-se-newcoll-footer] > :not(.se-nc),
+[data-se-newcoll] .w_ZWyQas4jedC6a1AHA5Z {
+  display: none !important;
+}
+
+.se-nc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  margin-top: var(--se-space-4);
+}
+
+.se-nc-label {
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.se-nc-types {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--se-space-2);
+}
+
+/* A type card: its glyph, the name, a line on what it does */
+.se-nc-type {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--se-space-3);
+  min-height: var(--se-hit);
+  padding: var(--se-space-3);
+  border-radius: var(--se-radius-md);
+  background: var(--se-white-04);
+  box-shadow: inset 0 0 0 1px var(--se-hairline);
+  color: var(--se-text-dim);
+  cursor: pointer;
+  transition: background-color var(--se-dur) var(--se-ease), box-shadow var(--se-dur) var(--se-ease),
+    color var(--se-dur) var(--se-ease);
+}
+
+.se-nc-type:hover {
+  background: var(--se-selected);
+  color: var(--se-text-strong);
+}
+
+.se-nc-type[aria-checked='true'] {
+  background: var(--se-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--se-accent-strong);
+  color: var(--se-text-strong);
+}
+
+.se-nc-type:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-nc-icon {
+  flex: none;
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: currentColor;
+  -webkit-mask: var(--se-nc-icon) center / contain no-repeat;
+  mask: var(--se-nc-icon) center / contain no-repeat;
+}
+
+.se-nc-type[aria-checked='true'] .se-nc-icon {
+  color: var(--se-accent);
+}
+
+.se-nc-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  min-width: 0;
+}
+
+.se-nc-title {
+  font: 600 var(--se-fs-base) / 1.2 var(--se-font);
+}
+
+.se-nc-hint {
+  font: 500 var(--se-fs-sm) / 1.35 var(--se-font);
+  color: var(--se-text-faint);
+}
+
+.se-nc-type:is(:hover, [aria-checked='true']) .se-nc-hint {
+  color: var(--se-text-muted);
+}
+
+/* Cancel, then Create (the one main action) at the end */
+.se-nc-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--se-space-2);
+  margin-top: var(--se-space-3);
+}
