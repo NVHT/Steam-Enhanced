@@ -97,7 +97,7 @@
       'placement.js', 'patch.js', 'main.js',
     ]],
     ['main', 'client/navigation/', [
-      'nav-rail.css', 'title-bar.css', 'title-bar-filters.css',
+      'nav-rail.css', 'title-bar.css', 'title-bar-filters.css', 'filters-panel.css',
       'title-bar-search.js', 'title-bar.js', 'title-bar-tips.js', 'nav-rail.js', 'filters-panel.js',
     ]],
     ['main', 'client/library/', [

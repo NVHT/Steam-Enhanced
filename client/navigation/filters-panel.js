@@ -4,7 +4,8 @@
  * opens Steam's filter component (the one inside its panel, given the same props: the library's
  * filter and its change handler) rendered by the theme in a popup-layer panel
  * (client/shared/popup-layer.js), under the title-bar search like the library's. Filters set here apply
- * to the library as if set in Steam's own panel. client/navigation/nav-rail.css styles both.
+ * to the library as if set in Steam's own panel. Both panels get a Clear button in their header.
+ * client/navigation/filters-panel.css styles both.
  */
 ((SE) => {
   const { C } = SE;
@@ -30,6 +31,74 @@
     return typeof child?.type === 'function' && props?.appFilter ? { Component: child.type, props, node } : null;
   }
 
+  /* ---------- Clear: every filter off, from the header (both panels) ---------- */
+
+  // How many options are on: every group's chosen ones (the search text isn't one).
+  const activeCount = (filter) =>
+    SE.run(() => filter.m_filterSpec.filterGroups.reduce((n, group) => n + (group.rgOptions?.length || 0), 0)) || 0;
+
+  // A Clear button's pane and the props it was last synced with (the handler reads them).
+  const clears = new WeakMap();
+
+  // Steam's own reset (its gamepad panel's Reset): the filter's, then its change handler.
+  function onClear(event) {
+    const entry = clears.get(event.currentTarget);
+    if (!entry) return;
+    SE.run(() => entry.props.appFilter.Reset());
+    entry.props.fnOnChange?.();
+    requestAnimationFrame(() => syncClear(entry.pane, entry.props));
+  }
+
+  /*
+   * Clear at the end of Steam's header (text only: React leaves a child of ours there), with how
+   * many options are on; hidden when none. Writes only what changed: the library's is synced
+   * from a watcher on the pane, which its own writes would wake again.
+   */
+  function syncClear(paneEl, props) {
+    const header = paneEl?.querySelector('.DialogHeader');
+    if (!header || !props?.appFilter) return;
+    let button = header.querySelector('.se-filters-clear');
+    if (!button) {
+      const doc = header.ownerDocument;
+      button = doc.createElement('button');
+      button.type = 'button';
+      button.className = 'se-filters-clear';
+      button.append(doc.createTextNode('Clear'), Object.assign(doc.createElement('span'), { className: 'se-filters-clear-count' }));
+      button.addEventListener('click', onClear);
+      header.append(button);
+    }
+    clears.set(button, { pane: paneEl, props });
+    const count = activeCount(props.appFilter);
+    const text = String(count);
+    const label = `Clear ${count} ${count === 1 ? 'filter' : 'filters'}`;
+    const countEl = button.lastElementChild;
+    if (countEl.textContent !== text) countEl.textContent = text;
+    if (button.hidden !== !count) button.hidden = !count;
+    if (button.getAttribute('aria-label') !== label) button.setAttribute('aria-label', label);
+  }
+
+  /*
+   * The library's own panel: synced when its markup changes (a section opening, a dropdown's
+   * choice) and after a press or key inside it (a tick changes only a class, which the watcher
+   * doesn't follow), once per frame.
+   */
+  let libraryFrame = 0;
+  function syncLibrary() {
+    libraryFrame = 0;
+    const found = steamFilters();
+    if (found) syncClear(found.node, found.props);
+  }
+  const scheduleLibrary = () => {
+    libraryFrame ||= requestAnimationFrame(syncLibrary);
+  };
+  const onLibraryInput = (event) => {
+    if (event.target.closest?.(PANE)) scheduleLibrary();
+  };
+  const libraryWatcher = SE.watch(scheduleLibrary, { scope: PANE, throttle: 100 });
+  document.addEventListener('pointerup', onLibraryInput, true);
+  document.addEventListener('keyup', onLibraryInput, true);
+  scheduleLibrary();
+
   function unrender() {
     unmount?.();
     unmount = null;
@@ -45,7 +114,10 @@
     const found = steamFilters();
     if (!found || !pane) return false;
     const { Component, props, node } = found;
-    if (unmount && props.appFilter === shown) return true;
+    if (unmount && props.appFilter === shown) {
+      syncClear(pane, props);
+      return true;
+    }
     const build = layer.react(Component, {
       ...props,
       fnOnChange() {
@@ -61,6 +133,7 @@
     unrender();
     unmount = build(pane);
     shown = props.appFilter;
+    syncClear(pane, props);
     // React drops a tree that failed to render: an empty pane is a failure.
     return pane.childElementCount > 0;
   }
@@ -89,7 +162,7 @@
     const search = document.querySelector(SEARCH);
     if (!layer || !search || !steamFilters()) return false;
     panel = layer.panel({
-      sheets: ['client/navigation/nav-rail.css', 'client/navigation/title-bar.css', 'client/navigation/title-bar-filters.css'],
+      sheets: ['client/dialogs/dialogs.css', 'client/navigation/filters-panel.css'],
       steam: true,
     });
     if (!panel) return false;
@@ -148,6 +221,11 @@
     },
     destroy() {
       close();
+      libraryWatcher.disconnect();
+      cancelAnimationFrame(libraryFrame);
+      document.removeEventListener('pointerup', onLibraryInput, true);
+      document.removeEventListener('keyup', onLibraryInput, true);
+      document.querySelector(`${PANE} .se-filters-clear`)?.remove();
       delete SE.filtersPanel;
     },
   };

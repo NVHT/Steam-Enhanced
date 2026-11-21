@@ -121,7 +121,7 @@ The theme styles these when they're installed, so they look built in.
 | Area | What changes |
 | --- | --- |
 | **Navigation** | An icon-only rail. Store, Library, Community and Profile open menus of their pages on click, or jump straight to the first one on right-click. At its foot: notifications, Announcements, Games, Downloads and Settings. |
-| **Title bar** | Library search with its view toggles inside, the Steam Enhanced lockup over the game list, your avatar with name and status (hover for your card, click for your account menu) and Friends &amp; Chat. |
+| **Title bar** | Library search with its view toggles inside and a Filters panel under it (one row of chips per section, Clear to reset them, over Store pages too), the Steam Enhanced lockup over the game list, your avatar with name and status (hover for your card, click for your account menu) and Friends &amp; Chat. |
 | **Announcements** | A news feed of Steam's posts and your games', with unread dots and Mark all read. |
 | **Notifications** | Grouped by day, in a panel that opens on click. |
 | **Menus** | Every menu the theme draws shares one look: grouped rows with an icon, a name and a hint, opening and closing with a little motion. A game's right-click menu has no submenus: Play, Favorite, Files, Hide and Uninstall sit in a bar over the rest, and its Collections row opens a searchable list to tick, rename, delete or make collections. A collection's menu works the same way. |
