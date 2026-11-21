@@ -37,7 +37,7 @@
     storageKey: 'se-fd-w',
     label: 'Resize Friends',
     min: 280,
-    max: () => Math.min(520, innerWidth * 0.4),
+    max: { px: 520, share: 0.4 },
     measure: () => dock.getBoundingClientRect().width,
   });
   if (dockResize) dock.appendChild(dockResize.handle);

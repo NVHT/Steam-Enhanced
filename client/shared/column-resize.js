@@ -3,7 +3,10 @@
  * ("Game list width" and "Friends dock width": Fixed | Adjustable, skin.json Conditions).
  *
  * The handle writes the width to a user variable on <html> (--se-list-w-user, --se-fd-w-user)
- * and to localStorage. The column reads that variable only when its setting is Adjustable
+ * and to localStorage, as a share of the window: the variable is a clamp() of that share in vw
+ * between the column's least and most, so the column follows the window as it's resized with no
+ * script running (a width saved in px by older versions is turned into a share when first read).
+ * The column reads that variable only when its setting is Adjustable
  * (options/library/game-list-adjustable.css, options/friends/dock-adjustable.css), which also
  * shows the handle: Fixed ignores a stored width with no script involved.
  *
@@ -18,10 +21,12 @@
   const STEP = 16;
   const STEP_BIG = 64;
 
+  // The saved share of the window's width; an older px width (over 1) becomes one ({ legacy })
   const readStored = (key) => {
     try {
       const value = Number(localStorage.getItem(key));
-      return Number.isFinite(value) && value > 0 ? value : null;
+      if (!Number.isFinite(value) || value <= 0) return null;
+      return value > 1 ? { share: value / innerWidth, legacy: true } : { share: value, legacy: false };
     } catch {
       return null;
     }
@@ -41,8 +46,8 @@
    *   cssVar: string,         the user width variable, set on <html>
    *   storageKey: string,
    *   label: string,
-   *   min: number,
-   *   max: () => number,      read at use, so it follows the window's size
+   *   min: number,            its least width, px
+   *   max: { px, share },     its most: px, or that share of the window if less
    *   measure: () => number,  the column's width as drawn
    * }} spec
    * @returns {{ handle: HTMLElement, destroy(): void }}
@@ -64,24 +69,37 @@
       '<span class="se-col-chip" aria-hidden="true"></span>';
     const chip = handle.lastElementChild;
 
-    let width = null;
+    // The width set, as a share of the window's width (null: the column's default)
+    let share = null;
     let frame = 0;
     let drag = null;
 
-    const clamp = (value) => Math.round(Math.min(Math.max(value, spec.min), Math.max(spec.min, spec.max())));
+    const maxNow = () => Math.min(spec.max.px, innerWidth * spec.max.share);
+    // A width in px held to the column's least and most
+    const hold = (px) => Math.min(Math.max(px, spec.min), Math.max(spec.min, maxNow()));
+    // The width it draws at now (the CSS clamp below, worked out)
+    const widthNow = () => (share == null ? spec.measure() : hold(share * innerWidth));
+    // A width in px, held, as a share of the window
+    const toShare = (px) => hold(px) / innerWidth;
+    const SHARE_DIGITS = 5;
 
-    const showWidth = (value) => {
-      chip.textContent = `${Math.round(value)} px`;
+    const showWidth = (px) => {
+      chip.textContent = `${Math.round(px)} px`;
     };
 
     const apply = (value) => {
-      width = value;
-      if (drag || handle.matches(':focus-visible')) showWidth(value ?? spec.measure());
-      SE.cssVar(root, spec.cssVar, value == null ? null : `${value}px`);
+      share = value;
+      if (drag || handle.matches(':focus-visible')) showWidth(widthNow());
+      const vw = value == null ? null : (value * 100).toFixed(3);
+      SE.cssVar(
+        root,
+        spec.cssVar,
+        vw == null ? null : `clamp(${spec.min}px, ${vw}vw, min(${spec.max.px}px, ${spec.max.share * 100}vw))`
+      );
       handle.setAttribute('aria-valuemin', String(spec.min));
-      handle.setAttribute('aria-valuemax', String(Math.round(spec.max())));
+      handle.setAttribute('aria-valuemax', String(Math.round(maxNow())));
       if (value == null) handle.removeAttribute('aria-valuenow');
-      else handle.setAttribute('aria-valuenow', String(value));
+      else handle.setAttribute('aria-valuenow', String(Math.round(widthNow())));
     };
 
     const applySoon = (value) => {
@@ -92,7 +110,8 @@
       });
     };
 
-    const commit = () => writeStored(spec.storageKey, width);
+    const commit = () =>
+      writeStored(spec.storageKey, share == null ? null : Number(share.toFixed(SHARE_DIGITS)));
 
     const grow = (dx) => (spec.side === 'right' ? dx : -dx);
 
@@ -100,7 +119,7 @@
       if (event.button !== 0 || !event.isPrimary) return;
       event.preventDefault();
       event.stopPropagation();
-      drag = { x: event.clientX, from: width ?? spec.measure() };
+      drag = { x: event.clientX, from: widthNow() };
       showWidth(drag.from);
       handle.setPointerCapture(event.pointerId);
       handle.setAttribute('data-dragging', '');
@@ -108,7 +127,7 @@
     };
 
     const onPointerMove = (event) => {
-      if (drag) applySoon(clamp(drag.from + grow(event.clientX - drag.x)));
+      if (drag) applySoon(toShare(drag.from + grow(event.clientX - drag.x)));
     };
 
     const onPointerEnd = () => {
@@ -128,7 +147,7 @@
       if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
       event.preventDefault();
       const dx = (event.key === 'ArrowRight' ? 1 : -1) * (event.shiftKey ? STEP_BIG : STEP);
-      apply(clamp((width ?? spec.measure()) + grow(dx)));
+      apply(toShare(widthNow() + grow(dx)));
       commit();
     };
 
@@ -139,10 +158,12 @@
     handle.addEventListener('lostpointercapture', onPointerEnd);
     handle.addEventListener('dblclick', onDoubleClick);
     handle.addEventListener('keydown', onKeyDown);
-    handle.addEventListener('focus', () => showWidth(width ?? spec.measure()));
+    handle.addEventListener('focus', () => showWidth(widthNow()));
 
     const stored = readStored(spec.storageKey);
-    apply(stored == null ? null : clamp(stored));
+    apply(stored?.share ?? null);
+    // An older px width is saved back as its share
+    if (stored?.legacy) commit();
 
     return {
       handle,

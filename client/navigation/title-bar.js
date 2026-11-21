@@ -77,7 +77,7 @@
       storageKey: 'se-list-w',
       label: 'Resize game list',
       min: 260,
-      max: () => Math.min(560, innerWidth * 0.4),
+      max: { px: 560, share: 0.4 },
       // The host it sits on now: Steam remounts the list, and the handle moves with it
       measure: () => listResize.handle.parentElement?.getBoundingClientRect().width || 0,
     });
