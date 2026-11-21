@@ -19,12 +19,21 @@ html.Steam_Root_Menu .PP7LM0Ow1K5qkR8WElLpt:not(#se-none) {
   overflow: visible !important;
 }
 
-/* Its left margin is narrower: the menu opens near the screen's left edge (placement.js) */
+/* A left room the screen's edge narrowed (placement.js): the shadow fades out across it */
+html.Steam_Root_Menu[data-se-room-narrow] .PP7LM0Ow1K5qkR8WElLpt:not(#se-none) {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 var(--se-pop-room-left));
+  mask-image: linear-gradient(to right, transparent, #000 var(--se-pop-room-left));
+}
+
+/*
+ * The room for its shadow (--se-pop-room-*); on the left as much as the screen's edge allows
+ * (--se-pop-room-left, set by placement.js; narrowed, the shadow fades across it, above).
+ */
 html.Steam_Root_Menu ._2EstNjFIIZm_WUSKm5Wt7n:not(#se-none) {
-  margin: var(--se-space-4) var(--se-space-5) var(--se-space-6) var(--se-space-2) !important;
+  margin: var(--se-pop-room-top) var(--se-pop-room-side) var(--se-pop-room-bottom) var(--se-pop-room-left, var(--se-pop-room-side)) !important;
   border-radius: var(--se-radius-menu) !important;
   background: var(--se-surface) !important;
-  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-pop) !important;
+  box-shadow: var(--se-shadow-pop) !important;
   /* Opens and closes as every menu does (core/motion.css) */
   animation: se-menu-in var(--se-dur) var(--se-ease);
 }

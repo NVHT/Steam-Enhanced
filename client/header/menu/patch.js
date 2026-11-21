@@ -135,19 +135,24 @@
     /*
      * Steam cancels a menu that loses focus (its OnBlur). Closing one of the submenus the theme
      * nests in the Steam menu can hand focus to the main window instead of back to the menu, which
-     * cancelled the menu under the pointer. While the pointer is on the menu, it stays open and
-     * takes focus back; a click elsewhere (pointer off the menu) still cancels it, and Escape hides
-     * it through Hide(), not this.
+     * cancelled the menu under the pointer. While the pointer is on the menu and the focus went to
+     * the main window, it stays open and takes focus back; focus gone to another window (one a row
+     * opened: About Steam, System Information) cancels it as Steam would, since taking focus back
+     * (Steam's TakeFocus brings the menu's window to the front) pulled Steam over that window.
+     * The blur comes before the new window has the focus, so the choice waits a tick. A click
+     * elsewhere (pointer off the menu) still cancels it, and Escape hides it through Hide().
      */
     const ownCancel = Object.getOwnPropertyDescriptor(instance, 'OnCancel');
     const originalCancel = instance.OnCancel;
     const cancel = function (...args) {
-      if (ns.pointerOnMenu(this)) {
-        this.CancelHideMenuTimer?.();
-        this.TakeFocus?.();
-        return undefined;
-      }
-      return originalCancel.apply(this, args);
+      if (!ns.pointerOnMenu(this)) return originalCancel.apply(this, args);
+      this.CancelHideMenuTimer?.();
+      setTimeout(() => {
+        if (!this.visible) return;
+        if (document.hasFocus()) this.TakeFocus?.();
+        else originalCancel.apply(this, args);
+      }, 0);
+      return undefined;
     };
     instance.OnCancel = cancel;
 
