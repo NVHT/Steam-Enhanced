@@ -50,7 +50,7 @@ Steam Enhanced rebuilds the Steam client around your library. A slim navigation 
 > **Updating?** With Steam closed, delete the old `Steam-Enhanced` folder before extracting. Merging leaves stale files behind.
 
 > [!NOTE]
-> Works at any window size: the layout scales with it, and on small windows the Friends dock and game list fold away.
+> **Any screen size.** The layout follows the window, not the monitor: the game list and Friends dock scale with it, and the Home and game pages rearrange as space runs out. On small windows the dock folds to its rail (1400 px and under) and the game list steps aside (1000 px and under); open either by hand and it stays open.
 
 ### Optional plugins
 
@@ -124,9 +124,9 @@ The theme styles these when they're installed, so they look built in.
 | **Title bar** | Library search with its view toggles inside, the Steam Enhanced lockup over the game list, your avatar with name and status (hover for your card, click for your account menu) and Friends &amp; Chat. |
 | **Announcements** | A news feed of Steam's posts and your games', with unread dots and Mark all read. |
 | **Notifications** | Grouped by day, in a panel that opens on click. |
-| **Menus** | Every menu the theme draws shares one look: grouped rows with an icon, a name and a hint, opening and closing with a little motion. |
+| **Menus** | Every menu the theme draws shares one look: grouped rows with an icon, a name and a hint, opening and closing with a little motion. A game's right-click menu has no submenus: Play, Favorite, Files, Hide and Uninstall sit in a bar over the rest, and its Collections row opens a searchable list to tick, rename, delete or make collections. A collection's menu works the same way. |
 | **Address bar** | A toolbar with a pill address field above Store and Community pages. |
-| **Settings &amp; dialogs** | Steam Settings, App Properties, Millennium Settings, Library Manager, install, uninstall, backups and product activation. |
+| **Settings &amp; dialogs** | Steam Settings, App Properties, Millennium Settings, Library Manager, install, uninstall, backups, product activation, and new and deleted collections. |
 | **System Information &amp; Report** | Spec tiles and section cards with jump chips and a filter. IPs, MACs and hardware IDs stay blurred until clicked. |
 
 <br>
