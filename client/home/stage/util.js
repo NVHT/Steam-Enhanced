@@ -10,19 +10,8 @@
   const collectionStore = () => SE.global('collectionStore');
   const client = () => SE.global('SteamClient', (sc) => !!sc.Apps) || window.SteamClient;
 
-  /*
-   * Steam's own source for a game's library art (GetHeaderImages, GetHeroImages, GetLogoImages:
-   * the custom art, the cached copy, then the CDN, by the file names Steam keeps for the game),
-   * found once by its methods.
-   */
-  const libraryArt = () =>
-    SE.findModule('home:library-art', (src, id, req) => {
-      if (!src.includes('GetHeaderImagesForAppId') || !src.includes('BHasRecentlyLaunched')) return null;
-      for (const value of Object.values(SE.run(() => req(id)) || {})) {
-        if (typeof value?.GetHeaderImages === 'function') return value;
-      }
-      return null;
-    });
+  // Steam's own source for a game's library art (core/runtime.js)
+  const { libraryArt } = SE;
 
   // The settings menu (client/shared/menu.js), under the names the Home's parts use
   const M = SE.settingsMenu;

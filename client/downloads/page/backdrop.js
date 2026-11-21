@@ -7,7 +7,6 @@
   const { setAttr } = ns;
 
   // Art backdrop and logo for the game downloading
-  const STORE_CDN = 'https://shared.steamstatic.com/store_item_assets/steam/apps';
   const mountedNodes = new Set();
 
   // Steam's art URLs carry the app id: /assets/<appid>/… (cache), …/apps/<appid>/… (CDN),
@@ -18,17 +17,8 @@
     return match ? match[1] || match[2] : null;
   };
 
-  function logoURLs(appid) {
-    const store = SE.appStore();
-    const app = store && SE.run(() => store.GetAppOverviewByAppID(Number(appid)));
-    const urls = [];
-    if (app?.rt_custom_image_mtime) {
-      const custom = SE.run(() => store.GetCustomLogoImageURLs(app));
-      if (Array.isArray(custom)) urls.push(...custom.filter(Boolean));
-    }
-    urls.push(`/assets/${appid}/logo.png`, `${STORE_CDN}/${appid}/logo.png`);
-    return [...new Set(urls)];
-  }
+  // The downloading game's logo, Steam's own list first (core/runtime.js)
+  const logoURLs = (appid) => SE.logoURLs(appid);
 
   function syncBackdrop(page, art) {
     let layer = page.querySelector(':scope > .se-dl-backdrop');

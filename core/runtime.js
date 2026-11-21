@@ -374,23 +374,71 @@
     return [...new Set(urls)];
   };
 
-  // Hero art for an app: the user's custom hero, the local copy, then the CDN (header as a last resort).
+  /*
+   * Steam's own source for a game's library art (GetHeaderImages, GetHeroImages, GetLogoImages:
+   * the custom art, the cached copy, then the CDN, by the file names Steam keeps for the game),
+   * found once by its methods. Newer games keep their art under hashed paths, so the bare names
+   * in heroURLs, headerURLs and logoURLs can 404 (CLAUDE.md section 7); they stay as the last copies.
+   * Finding it scans every module (a long task), so `scan: false` only takes a copy this or
+   * another window already found: heroURLs, headerURLs and logoURLs ask that way.
+   */
+  const LIBRARY_ART = 'core:library-art';
+  const libraryArt = ({ scan = true } = {}) => {
+    const known = moduleCache.get(LIBRARY_ART);
+    if (known?.hit) return known.value;
+    for (const win of owners()) {
+      const found = win !== window && run(() => win.__se?.libraryArt({ scan: false }));
+      if (found) return found;
+    }
+    if (!scan) return null;
+    return findModule(LIBRARY_ART, (src, id, req) => {
+      if (!src.includes('GetHeaderImagesForAppId') || !src.includes('BHasRecentlyLaunched')) return null;
+      for (const value of Object.values(run(() => req(id)) || {})) {
+        if (typeof value?.GetHeaderImages === 'function') return value;
+      }
+      return null;
+    });
+  };
+
+  const urlList = (list) => (Array.isArray(list) ? list.filter((url) => typeof url === 'string' && url) : []);
+  const STORE_ART = 'https://shared.steamstatic.com/store_item_assets/steam/apps';
+
+  // Hero art for an app: Steam's list, the user's custom hero, the local copy, then the CDN (header last).
   const heroURLs = (appid, store) => {
     if (!appid) return [];
     const appStore = store || resolveAppStore();
     const app = appStore && run(() => appStore.GetAppOverviewByAppID(Number(appid)));
-    const cdn = `https://shared.steamstatic.com/store_item_assets/steam/apps/${appid}`;
-    const urls = [];
-    if (app?.rt_custom_image_mtime) {
-      const custom = run(() => appStore.GetCustomHeroImageURLs(app));
-      if (Array.isArray(custom)) urls.push(...custom.filter(Boolean));
-    }
+    const urls = app ? urlList(run(() => libraryArt({ scan: false })?.GetHeroImages(app)?.rgHeroImages)) : [];
+    if (app?.rt_custom_image_mtime) urls.push(...urlList(run(() => appStore.GetCustomHeroImageURLs(app))));
     urls.push(
       `/assets/${appid}/library_hero.jpg`,
-      `${cdn}/library_hero.jpg`,
+      `${STORE_ART}/${appid}/library_hero.jpg`,
       `/assets/${appid}/header.jpg`,
-      `${cdn}/header.jpg`
+      `${STORE_ART}/${appid}/header.jpg`
     );
+    return [...new Set(urls)];
+  };
+
+  // Wide cover (header) art for an app, in the same order as heroURLs.
+  const headerURLs = (appid, store) => {
+    if (!appid) return [];
+    const appStore = store || resolveAppStore();
+    const app = appStore && run(() => appStore.GetAppOverviewByAppID(Number(appid)));
+    const urls = app ? urlList(run(() => libraryArt({ scan: false })?.GetHeaderImages(app)?.rgHeaderImages)) : [];
+    // Steam's own spelling (Landcape)
+    if (app?.rt_custom_image_mtime) urls.push(...urlList(run(() => appStore.GetCustomLandcapeImageURLs(app))));
+    urls.push(`/assets/${appid}/header.jpg`, `${STORE_ART}/${appid}/header.jpg`);
+    return [...new Set(urls)];
+  };
+
+  // Logo art for an app, in the same order as heroURLs.
+  const logoURLs = (appid, store) => {
+    if (!appid) return [];
+    const appStore = store || resolveAppStore();
+    const app = appStore && run(() => appStore.GetAppOverviewByAppID(Number(appid)));
+    const urls = app ? urlList(run(() => libraryArt({ scan: false })?.GetLogoImages(app)?.rgLogoImages)) : [];
+    if (app?.rt_custom_image_mtime) urls.push(...urlList(run(() => appStore.GetCustomLogoImageURLs(app))));
+    urls.push(`/assets/${appid}/logo.png`, `${STORE_ART}/${appid}/logo.png`);
     return [...new Set(urls)];
   };
 
@@ -945,7 +993,10 @@
     icons,
     isInstalled,
     coverURLs,
+    headerURLs,
     heroURLs,
+    logoURLs,
+    libraryArt,
     art,
     rarity,
     watch,

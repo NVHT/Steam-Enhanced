@@ -42,33 +42,17 @@
   const CDN = (id) => `https://shared.steamstatic.com/store_item_assets/steam/apps/${id}`;
 
   /*
-   * Hero and logo art: Steam's own lists first (util.js libraryArt: the custom art, the cached
-   * copy, then the CDN by the file names Steam keeps; newer games keep theirs under a hashed
-   * path, so a bare library_hero.jpg or logo.png can miss), then the bare names.
+   * Hero and logo art: Steam's own lists first, then the bare names (core/runtime.js). The Home
+   * finds Steam's art module itself (libraryArt scans); the core lists only reuse it.
    */
-  const steamArt = (list) => (Array.isArray(list) ? list.filter((url) => typeof url === 'string' && url) : []);
-
-  const heroURLs = (app) => [
-    ...new Set([
-      ...steamArt(run(() => libraryArt()?.GetHeroImages(app)?.rgHeroImages)),
-      ...SE.heroURLs(app.appid, appStore()),
-    ]),
-  ];
-
-  function logoURLs(app) {
-    const s = appStore();
-    const custom = s && app.rt_custom_image_mtime ? run(() => s.GetCustomLogoImageURLs(app)) : null;
-    return [
-      ...new Set([
-        ...steamArt(run(() => libraryArt()?.GetLogoImages(app)?.rgLogoImages)),
-        ...steamArt(custom),
-        `/assets/${app.appid}/logo.png`,
-        `${CDN(app.appid)}/logo.png`,
-      ]),
-    ];
-  }
-
-
+  const heroURLs = (app) => {
+    libraryArt();
+    return SE.heroURLs(app.appid, appStore());
+  };
+  const logoURLs = (app) => {
+    libraryArt();
+    return SE.logoURLs(app.appid, appStore());
+  };
 
   const achievements = new Map();
 
