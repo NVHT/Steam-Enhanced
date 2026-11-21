@@ -19,7 +19,8 @@
    *           keys a shortcut at the row's end; time a short time at the row's end; unread
    *           (true / false) an accent dot after it; external a mark that the row opens
    *           outside; checked (true / false) makes the row an on/off setting, with a switch at
-   *           its end (role menuitemcheckbox) that run flips; current marks the row for the
+   *           its end (role menuitemcheckbox) that run flips, the menu staying open (every
+   *           other row closes it); current marks the row for the
    *           page you're on (aria-current, the accent); danger draws a destroying row in
    *           red. A heading's action ({ label, run }) is a small button at its end:
    *           run(handle), the menu staying open. A note is a line of plain text (an empty
@@ -262,6 +263,13 @@
         }
         row.addEventListener('click', (event) => {
           event.stopPropagation();
+          // A setting flips in place, so several can be set in one visit
+          if (typeof item.checked === 'boolean') {
+            item.checked = !item.checked;
+            row.setAttribute('aria-checked', String(item.checked));
+            item.run();
+            return;
+          }
           handle.release();
           item.run();
         });
