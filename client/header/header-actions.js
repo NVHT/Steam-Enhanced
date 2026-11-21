@@ -399,22 +399,24 @@
       }
     };
 
+    // Friends & Chat: a click opens its menu, a right-click shows or folds the dock at once
     button.addEventListener('click', (event) => {
-      if (action.key === 'friends' && window.__seFriendsDock) {
-        event.preventDefault();
-        event.stopPropagation();
-        onFriends();
-      } else {
+      const dock = action.key === 'friends' && window.__seFriendsDock;
+      if (!dock) {
         forwardNative(event);
+        return;
       }
+      event.preventDefault();
+      event.stopPropagation();
+      toggleFriendsMenu(button, () => dock.openWindow(() => forwardNative(event)));
     });
 
     if (action.key === 'friends') {
+      button.setAttribute('aria-haspopup', 'menu');
       button.addEventListener('contextmenu', (event) => {
         event.preventDefault();
         event.stopPropagation();
-        const dock = window.__seFriendsDock;
-        if (dock) toggleFriendsMenu(button, () => dock.openWindow(() => forwardNative(event)));
+        if (window.__seFriendsDock) onFriends();
         else forwardNative(event);
       });
     }
@@ -459,14 +461,12 @@
 
   /*
    * Friends & Chat runs the friends dock (client/friends/dock/main.js) in one button: a click
-   * collapses the open dock to its rail and expands it back, or shows it when hidden; a
-   * right-click opens a menu (the popup layer's, in the Settings menu's style) to hide or show
-   * the dock, switch Steam's compact list and compact favorites, and open the Friends & Chat
-   * window. The button carries the dock's state
-   * (data-se-dock: open, rail or hidden) for its icon, and names its click in its tooltip; the
-   * dock calls syncFriendsButton when its state changes.
+   * opens a menu (the popup layer's, in the Settings menu's style) to hide or show the dock,
+   * switch Steam's compact list and compact favorites, and open the Friends & Chat window; a
+   * right-click collapses the open dock to its rail and expands it back, or shows it when
+   * hidden. The button carries the dock's state (data-se-dock: open, rail or hidden) for its
+   * icon; the dock calls syncFriendsButton when its state changes.
    */
-  const FRIENDS_CLICK = { open: 'Collapse friends', rail: 'Expand friends', hidden: 'Show friends' };
   let friendsMenu = null;
 
   const dockState = (dock) => (dock.hidden ? 'hidden' : dock.mode === 'rail' ? 'rail' : 'open');
@@ -481,7 +481,6 @@
     }
     const current = dockState(dock);
     SE.attr(button, 'data-se-dock', current);
-    SE.attr(button, 'aria-label', FRIENDS_CLICK[current]);
   }
 
   state.syncFriendsButton = syncFriendsButton;

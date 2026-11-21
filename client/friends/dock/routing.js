@@ -51,7 +51,7 @@
   chatError.addEventListener('focusout', releaseChatError);
 
   function reportChatError() {
-    chatErrorText.textContent = 'Unable to open chat here. Right-click Friends & Chat to open its window.';
+    chatErrorText.textContent = 'Unable to open chat here. Open its window from the Friends & Chat menu.';
     chatError.hidden = false;
     revealDock();
     releaseChatError();
