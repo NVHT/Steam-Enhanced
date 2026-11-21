@@ -254,7 +254,7 @@
     let entry = live.flyPanel;
     if (entry && !entry.panel.released && entry.key === key && entry.html === html) return true;
     if (!entry || entry.panel.released) {
-      const panel = SE.layer?.panel(DOCK_SHEETS);
+      const panel = SE.layer?.panel({ sheets: DOCK_SHEETS });
       if (!panel) return false;
       entry = live.flyPanel = { panel, key: '', html: '' };
     }

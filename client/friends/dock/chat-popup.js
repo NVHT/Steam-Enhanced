@@ -307,8 +307,10 @@
     const doc = node.ownerDocument;
 
     // Copied even when a `.*` patch may already reach the popup: a duplicate href is skipped.
+    // The dock's two files (friends-dock-chat.css sizes this host and places its buttons), the
+    // Friends list's and the chat's folders: kept in step with client/loader.js's paths.
     layer.copyStyles(doc, (href) =>
-      /(?:core\/(?:tokens|icons|scrollbars)|client\/friends\/(?:friends|friends-dock|chat\/[a-z-]+))\.css(?:[?#]|$)/.test(href)
+      /(?:core\/(?:tokens|icons|scrollbars)|client\/friends\/(?:friends-dock(?:-chat)?|(?:list|chat)\/[a-z-]+))\.css(?:[?#]|$)/.test(href)
     );
 
     window.__seChat?.attachDocument(doc);
