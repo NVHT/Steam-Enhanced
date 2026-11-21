@@ -17,7 +17,7 @@ Flags (each one is a fix before the release):
 Notes (look, then decide; names can be built at runtime, sizes can be fine):
   - theme classes (.se-*) a stylesheet styles that no script or other stylesheet names
   - files past the ~40 KB split size
-  - skin.json's version against a version-named branch
+  - skin.json's version not past the last release tag (a release needs the bump)
 
 Skips .git, .claude, dev/ and __pycache__; comments are stripped before reading code.
 """
@@ -322,14 +322,17 @@ def big_files(files):
 
 
 def version():
+    """skin.json's version against the last release tag: a release needs it bumped past the tag."""
     skin = json.loads(read(os.path.join(ROOT, 'skin.json'))).get('version', '')
     try:
-        branch = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], cwd=ROOT, capture_output=True,
-                                text=True, check=True).stdout.strip()
+        tags = subprocess.run(['git', 'tag', '--list'], cwd=ROOT, capture_output=True, text=True,
+                              check=True).stdout.split()
     except (OSError, subprocess.CalledProcessError):
         return []
-    if re.fullmatch(r'\d+\.\d+\.\d+', branch) and branch != skin:
-        return [f'version: skin.json says {skin}, the branch is {branch}']
+    key = lambda v: tuple(int(n) for n in v.split('.'))
+    releases = sorted((t for t in tags if re.fullmatch(r'\d+\.\d+\.\d+', t)), key=key)
+    if releases and re.fullmatch(r'\d+\.\d+\.\d+', skin) and key(skin) <= key(releases[-1]):
+        return [f'version: skin.json says {skin}, the last release is {releases[-1]} (bump it before releasing)']
     return []
 
 
