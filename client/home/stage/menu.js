@@ -58,53 +58,13 @@
     a?.focus();
   }
 
-  // Under this much room, a kept side (opts.keep) gives way to the other
-  const KEEP_MIN = 200;
-
-  /**
-   * Places a popup (a menu, a picker) by its button: below when it fits, else on the side with
-   * more room, and keeps `side` once chosen (the edge by the button fixed, so a list opening
-   * inside it grows away from the button instead of moving it) unless it no longer fits there
-   * and the other side has more room. Never taller than its side's room: past that it scrolls
-   * inside, so it never runs out of a short window. Returns the side.
-   *   opts.cap   its tallest, whatever the room (a long list scrolls inside instead)
-   *   opts.keep  stay on `side` even when it doesn't fit whole (a page taking a menu's place),
-   *              unless that side has under KEEP_MIN of room and the other has more
-   */
-  function placePop(el, button, side, { cap = Infinity, keep = false } = {}) {
-    const r = button.getBoundingClientRect();
-    const GAP = 8;
-    const EDGE = 12;
-    const room = {
-      below: Math.max(0, innerHeight - r.bottom - GAP - EDGE),
-      above: Math.max(0, r.top - GAP - EDGE),
-    };
-    const other = (s) => (s === 'below' ? 'above' : 'below');
-    // Its full height: the inline cap off for the read (the stylesheet's 100vh cap stays)
-    el.style.maxHeight = 'none';
-    const need = Math.min(el.offsetHeight, cap);
-    const fits = (x) => need <= room[x] || room[x] >= room[other(x)] || (keep && room[x] >= KEEP_MIN);
-    let s = side && fits(side) ? side : null;
-    s ??= need <= room.below || room.below >= room.above ? 'below' : 'above';
-    const w = el.offsetWidth;
-    el.style.left = `${Math.max(EDGE, Math.min(r.right - w, innerWidth - w - EDGE))}px`;
-    if (s === 'below') {
-      el.style.top = `${r.bottom + GAP}px`;
-      el.style.bottom = '';
-    } else {
-      el.style.top = '';
-      el.style.bottom = `${innerHeight - r.top + GAP}px`;
-    }
-    el.style.maxHeight = `${Math.min(room[s], cap)}px`;
-    return s;
-  }
 
   function placeMenu() {
     if (!menu || !anchor?.isConnected) {
       closeMenu();
       return;
     }
-    side = placePop(menu, anchor, side);
+    side = SE.placePop(menu, anchor, side);
   }
 
   /** Repaint the body, keeping focus on the control that had it (by data-set/val or name/value). */
@@ -225,6 +185,6 @@
   Object.assign(ns, {
     closeMenu, menuGroup: group, menuOption: option, menuRadio: radio, menuSegButtons: segButtons,
     menuHeight: () => menu?.offsetHeight || 0, menuSegment: segment, menuSide: () => side,
-    menuToggle: toggle, openMenu, placeMenu, placePop, repaintMenu,
+    menuToggle: toggle, openMenu, placeMenu, repaintMenu,
   });
 })(window.__se);

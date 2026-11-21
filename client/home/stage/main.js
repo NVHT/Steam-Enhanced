@@ -81,7 +81,7 @@
 
   function onResize() {
     scheduleSize();
-    if (live.pickEl) placePick();
+    placePick();
   }
 
   function onMutate() {

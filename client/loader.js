@@ -63,7 +63,7 @@
     // Shared runtime pieces
     ['all', 'core/', ['font.css', 'tokens.css', 'icons-nav.css', 'icons-ui.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
     ['all', 'client/shared/', ['popup-layer.css', 'search-field.css', 'segmented.css']],
-    ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'news-feed.js', 'column-resize.css', 'column-resize.js', 'window-fold.js']],
+    ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'popup-layer-panel.js', 'popup-layer-menu.js', 'picker.js', 'news-feed.js', 'column-resize.css', 'column-resize.js', 'window-fold.js']],
     ['notify', 'client/friends/', ['friend-notification-clicks.js']],
     // In-game overlay
     ['overlay', 'client/overlay/', [
@@ -126,6 +126,8 @@
     // Library Home
     ['main', 'client/home/', ['home-shelves.css', 'home-shelves.js']],
     ['main', 'client/home/stage/', ['stage.css', 'stage-hero.css', 'stage-settings.css', 'stage-tray.css', 'stage-shelves.css', 'stage-panels.css', 'stage-narrow.css', 'util.js', 'tray.js', 'picks.js', 'menu.js', 'stage-settings.js', 'panels-library.js', 'panels-community.js', 'board.js', 'home-mode.js', 'stage.js', 'stage-art.js', 'data.js', 'main.js']],
+    // After the Home's stylesheets: the picker restyles their menu
+    ['main', 'client/shared/', ['picker.css']],
     // Menus, hover cards, notifications, dialogs
     ['all', 'client/dialogs/', ['dialogs.css']],
     ['content', 'client/dialogs/', ['install.css', 'eula.css']],

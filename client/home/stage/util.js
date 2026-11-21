@@ -12,51 +12,21 @@
   const client = () => SE.global('SteamClient', (sc) => !!sc.Apps) || window.SteamClient;
 
   /*
-   * Art works through its copies (local first, then the CDN): the ones still to try ride in
-   * data-urls. Until one has loaded the image is marked data-se-art-wait and drawn as nothing
-   * (core/images.css), so a failed copy never shows the broken-image icon. One chain for
-   * both kinds of image: built ones listen themselves (they can fail before they're attached),
-   * innerHTML-built ones are caught by their panel's capture listeners.
+   * Steam's own source for a game's library art (GetHeaderImages, GetHeroImages, GetLogoImages:
+   * the custom art, the cached copy, then the CDN, by the file names Steam keeps for the game),
+   * found once by its methods.
    */
-  const ART_WAIT = 'data-se-art-wait';
-  const artFailed = new WeakMap(); // img → called once its last copy has failed
+  const libraryArt = () =>
+    SE.findModule('home:library-art', (src, id, req) => {
+      if (!src.includes('GetHeaderImagesForAppId') || !src.includes('BHasRecentlyLaunched')) return null;
+      for (const value of Object.values(SE.run(() => req(id)) || {})) {
+        if (typeof value?.GetHeaderImages === 'function') return value;
+      }
+      return null;
+    });
 
-  /* load doesn't bubble: caught on the way down, beside onImgError */
-  function onImgLoad(e) {
-    if (e.target instanceof HTMLImageElement) e.target.removeAttribute(ART_WAIT);
-  }
-
-  function onImgError(e) {
-    const img = e.target;
-    if (!(img instanceof HTMLImageElement) || !img.dataset.urls) return;
-    const rest = JSON.parse(img.dataset.urls);
-    if (rest.length) {
-      img.dataset.urls = JSON.stringify(rest.slice(1));
-      img.src = rest[0];
-    } else {
-      delete img.dataset.urls;
-      img.hidden = true;
-      artFailed.get(img)?.();
-    }
-  }
-
-  function artImg(urls, cls, onFail) {
-    const img = document.createElement('img');
-    img.className = cls;
-    img.alt = '';
-    img.draggable = false;
-    img.decoding = 'async';
-    img.setAttribute(ART_WAIT, '');
-    img.dataset.urls = JSON.stringify(urls.slice(1));
-    img.addEventListener('load', onImgLoad);
-    img.addEventListener('error', onImgError);
-    if (onFail) artFailed.set(img, onFail);
-    img.src = urls[0];
-    return img;
-  }
-
-  const imgTag = (urls, cls) =>
-    `<img class="${cls}" alt="" draggable="false" loading="lazy" ${ART_WAIT} src="${SE.esc(urls[0])}" data-urls="${SE.esc(JSON.stringify(urls.slice(1)))}">`;
+  // The art fallback chain (core/runtime.js SE.art)
+  const { img: artImg, tag: imgTag, onLoad: onImgLoad, onError: onImgError } = SE.art;
 
   // innerHTML only when the markup changed (compared with what was last written, not with the
   // browser's serialisation of it, which never matches attribute-only or SVG markup).
@@ -127,7 +97,7 @@
   Object.assign(ns, {
     ICON_FILTER, ICON_INSTALL, ICON_PICK, ICON_PLAY, appStore,
     panelMenuButton, artImg, cancelPass, client, collectionStore, compact, dayLabel,
-    hours, imgTag, NARROW_AT, onImgError, onImgLoad, partnerEventStore,
+    hours, imgTag, libraryArt, NARROW_AT, onImgError, onImgLoad, partnerEventStore,
     reducedMotion, schedule, setHTML, setPass, when,
   });
 })(window.__se);

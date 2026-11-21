@@ -10,7 +10,7 @@
  * drawn in the menu itself: the menu class's BuildManageSubmenu hands back its rows, not the
  * submenu. React owns Steam's rows, so they are never moved: the panel is a grid and each row's
  * place is its CSS `order`. Add to › and Remove from › are hidden: Collections opens the
- * theme's picker (SE.picker, client/home/stage/picks.js) in the menu's place: every collection
+ * theme's picker (SE.picker, client/shared/picker.js) in the menu's place: every collection
  * ticked or not, a search, and a row making a new one; its ‹ shows the menu again. The theme's
  * row and dividers are plain nodes put among Steam's rows (React never owns them).
  *
@@ -33,7 +33,7 @@
   const PICKER_W = 320;
   // Room under the menu's top the picker wants before it opens upward instead
   const PICKER_ROOM = 420;
-  // placePop's gap between a popup and its anchor (client/home/stage/menu.js)
+  // placePop's gap between a popup and its anchor (client/shared/picker.js)
   const POP_GAP = 8;
   const RECENT_KEY = 'se-collections-recent';
   const RECENT_ROWS = 3;

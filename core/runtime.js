@@ -394,6 +394,56 @@
     return [...new Set(urls)];
   };
 
+  /*
+   * Art works through its copies (local first, then the CDN): the ones still to try ride in
+   * data-urls. Until one has loaded the image is marked data-se-art-wait and drawn as nothing
+   * (core/images.css), so a failed copy never shows the broken-image icon. One chain for
+   * both kinds of image: built ones listen themselves (they can fail before they're attached),
+   * innerHTML-built ones (tag()) are caught by capture listeners on their container (onLoad,
+   * onError). The Library Home and the picker (client/shared/picker.js) use it.
+   */
+  const ART_WAIT = 'data-se-art-wait';
+  const artFailed = new WeakMap(); // img → called once its last copy has failed
+
+  /* load doesn't bubble: caught on the way down, beside onImgError */
+  function onImgLoad(e) {
+    if (e.target instanceof HTMLImageElement) e.target.removeAttribute(ART_WAIT);
+  }
+
+  function onImgError(e) {
+    const img = e.target;
+    if (!(img instanceof HTMLImageElement) || !img.dataset.urls) return;
+    const rest = JSON.parse(img.dataset.urls);
+    if (rest.length) {
+      img.dataset.urls = JSON.stringify(rest.slice(1));
+      img.src = rest[0];
+    } else {
+      delete img.dataset.urls;
+      img.hidden = true;
+      artFailed.get(img)?.();
+    }
+  }
+
+  function artImg(urls, cls, onFail) {
+    const img = document.createElement('img');
+    img.className = cls;
+    img.alt = '';
+    img.draggable = false;
+    img.decoding = 'async';
+    img.setAttribute(ART_WAIT, '');
+    img.dataset.urls = JSON.stringify(urls.slice(1));
+    img.addEventListener('load', onImgLoad);
+    img.addEventListener('error', onImgError);
+    if (onFail) artFailed.set(img, onFail);
+    img.src = urls[0];
+    return img;
+  }
+
+  const imgTag = (urls, cls) =>
+    `<img class="${cls}" alt="" draggable="false" loading="lazy" ${ART_WAIT} src="${esc(urls[0])}" data-urls="${esc(JSON.stringify(urls.slice(1)))}">`;
+
+  const art = { img: artImg, tag: imgTag, onLoad: onImgLoad, onError: onImgError };
+
   // Achievement rarity tiers by global unlock rate (% of players). Colors: --se-tier-* in tokens.css.
   const TIERS = Object.freeze([
     Object.freeze({ id: 'legendary', name: 'Legendary', max: 5, rank: 5 }),
@@ -893,6 +943,7 @@
     isInstalled,
     coverURLs,
     heroURLs,
+    art,
     rarity,
     watch,
     visible,
