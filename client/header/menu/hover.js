@@ -148,6 +148,12 @@
     }, 200);
   }
 
+  // The pointer, as the main window last saw it, is on the button that opened `instance`
+  function pointerOnOwnButton(instance) {
+    const saved = patched.get(instance);
+    return pointerOverButton(ns.isSteam(instance) ? live.steamButton : sideFor(saved?.button));
+  }
+
   function sideFor(button) {
     if (!button) return null;
     for (const side of sideButtons.values()) {
@@ -192,6 +198,6 @@
   Object.assign(ns, {
     anyMenuOpen, bindHoverButton, pointerOnMenu, bindMenuHoverDocument, cancelHoverClose,
     closeAfterHover, enterMenuPopup, leaveMenuPopup, onMainMouseMove, openMillenniumWindow,
-    openSideOnHover, sideFor,
+    openSideOnHover, pointerOnOwnButton, sideFor,
   });
 })(window.__se);

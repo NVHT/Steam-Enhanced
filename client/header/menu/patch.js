@@ -6,7 +6,7 @@
   if (!ns) return;
   const { C } = SE;
   const {
-    AccountStatusMenu, SIDE_HOVER, SUBMENU_NAMES, SteamMenu, anchors,
+    AccountStatusMenu, SIDE_HOVER, SUBMENU_NAMES, SteamMenu, anchors, hoverDocuments,
     anyMenuOpen, applyPlacement, bindHoverButton, bindManager, configurations,
     initializeAvatarMenu, inspectPopups, instanceManager, isSteam, menuAnchor, onMainMouseMove,
     openMillenniumWindow, patchSidebarMenus, patched, placementFor, refreshPosition,
@@ -72,6 +72,30 @@
     }
   }
 
+  /*
+   * The focus is still Steam's: in the main window, or in a menu's own window (over a page each
+   * menu is a popup window of its own, and holds the focus while it shows). Anywhere else is a
+   * window a row opened (About Steam, System Information).
+   */
+  function focusInMenus(instance) {
+    if (document.hasFocus()) return true;
+    for (let menu = instance; menu; menu = menu.submenu) {
+      if (SE.run(() => menu.m_element?.ownerDocument?.hasFocus())) return true;
+    }
+    for (const doc of hoverDocuments) {
+      if (SE.run(() => doc.hasFocus())) return true;
+    }
+    return false;
+  }
+
+  /*
+   * Over a Store or Community page, a click on a menu's button hands the focus back to the page's
+   * browser view a moment after the menu opens (~200 ms), which blurs the menu's window: Steam
+   * would cancel the menu under a still pointer. A blur this soon, with the pointer still on the
+   * button, is that hand-back, not the user leaving.
+   */
+  const OPENING_MS = 600;
+
   function patchInstance(instance) {
     if (!instance || patched.has(instance)) return;
     const steam = isSteam(instance);
@@ -112,6 +136,8 @@
     const ownShow = Object.getOwnPropertyDescriptor(instance, 'Show');
     const originalShow = instance.Show;
     const show = function (...args) {
+      const entry = patched.get(this);
+      if (entry) entry.shownAt = performance.now();
       closer.cancel();
       applyPlacement(this);
       refreshPosition(this);
@@ -135,8 +161,8 @@
     /*
      * Steam cancels a menu that loses focus (its OnBlur). Closing one of the submenus the theme
      * nests in the Steam menu can hand focus to the main window instead of back to the menu, which
-     * cancelled the menu under the pointer. While the pointer is on the menu and the focus went to
-     * the main window, it stays open and takes focus back; focus gone to another window (one a row
+     * cancelled the menu under the pointer. While the pointer is on the menu and the focus is still
+     * Steam's (focusInMenus), it stays open and takes focus back; focus gone to another window (one a row
      * opened: About Steam, System Information) cancels it as Steam would, since taking focus back
      * (Steam's TakeFocus brings the menu's window to the front) pulled Steam over that window.
      * The blur comes before the new window has the focus, so the choice waits a tick. A click
@@ -145,11 +171,16 @@
     const ownCancel = Object.getOwnPropertyDescriptor(instance, 'OnCancel');
     const originalCancel = instance.OnCancel;
     const cancel = function (...args) {
+      const entry = patched.get(this);
+      if (performance.now() - (entry?.shownAt ?? -Infinity) < OPENING_MS && ns.pointerOnOwnButton(this)) {
+        this.CancelHideMenuTimer?.();
+        return undefined;
+      }
       if (!ns.pointerOnMenu(this)) return originalCancel.apply(this, args);
       this.CancelHideMenuTimer?.();
       setTimeout(() => {
         if (!this.visible) return;
-        if (document.hasFocus()) this.TakeFocus?.();
+        if (focusInMenus(this)) this.TakeFocus?.();
         else originalCancel.apply(this, args);
       }, 0);
       return undefined;
@@ -172,6 +203,8 @@
       ownCancel,
       cancel,
       closer,
+      // A menu Steam made already showing (the Steam menu) opened now: it never passes Show()
+      shownAt: instance.visible ? performance.now() : -Infinity,
     });
 
     refreshPosition(instance);
