@@ -180,11 +180,11 @@
     // Settings, game properties, Millennium, storage
     ['desktop', 'client/settings/', [
       'layout.css', 'controls.css', 'pages.css', 'storage.css', 'search.css', 'game-properties.css',
-      'spacing.css',
+      'game-properties-install.css', 'game-properties-extras.css', 'spacing.css',
     ]],
     ['desktop', 'client/settings/dialog/', [
       'shared.js', 'options.js', 'search.js', 'window.js', 'sidebar.js', 'layout.js', 'props-pages.js',
-      'props.js', 'main.js',
+      'props-header.js', 'props.js', 'main.js',
     ]],
     ['desktop', 'client/settings/millennium/', [
       'millennium.css', 'millennium-window.css', 'millennium-redesign.css', 'millennium-editor.css',

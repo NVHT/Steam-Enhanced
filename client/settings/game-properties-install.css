@@ -1,0 +1,451 @@
+/*
+ * Game Properties, continued from game-properties.css: General, Updates, Installed Files, Game
+ * Versions & Betas and a non-Steam game's Shortcut page.
+ */
+
+/*
+ * General: the cloud space as help text and a bar inside the cloud toggle's row (Steam's own
+ * two lines under it hidden); launch options in monospace, a plain field until focused
+ */
+.CFTLX2wIKOK3hNV-fS7_V ._2Dfy8vuNMdABIKGO2KHbVF[data-se-cloud] {
+  display: none !important; /* beats Steam's SteamCloudUsage flex (sp.css) */
+}
+
+.se-cloud {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  margin-top: var(--se-space-1);
+}
+
+.se-cloud-text {
+  font: 500 var(--se-fs-base)/1.4 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-cloud .se-pbar {
+  max-width: 360px;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V input[data-se-launch]:not(#se-none):not(#se-p2) {
+  font: 600 var(--se-fs-md) var(--se-font-mono) !important; /* beats controls.css's input font (same reach) */
+  box-shadow: var(--se-edge) !important; /* beats controls.css's input edge (same reach) */
+}
+
+.CFTLX2wIKOK3hNV-fS7_V input[data-se-launch]:not(#se-none):not(#se-p2):focus {
+  box-shadow: var(--se-edge-accent) !important; /* beats the rest edge above */
+}
+
+/* Updates: App ID, Build ID and last update as three tiles; the IDs with a copy button */
+.CFTLX2wIKOK3hNV-fS7_V .t4XYbyKAM5Yz-nmWNHSLB {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--se-space-3);
+  margin-top: var(--se-space-7) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .t4XYbyKAM5Yz-nmWNHSLB[data-se-pre-text]::before {
+  content: attr(data-se-pre-text);
+  position: absolute;
+  left: 4px;
+  top: -24px;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .t4XYbyKAM5Yz-nmWNHSLB > br {
+  display: none;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .t4XYbyKAM5Yz-nmWNHSLB > div {
+  grid-column: 1 / -1;
+  font: 500 var(--se-fs-base)/1.4 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .t4XYbyKAM5Yz-nmWNHSLB > div[data-se-k] {
+  grid-column: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  padding: var(--se-space-3) var(--se-space-4);
+  border-radius: var(--se-radius-lg);
+  font-size: 0 !important;
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .t4XYbyKAM5Yz-nmWNHSLB > div[data-se-k]::before {
+  content: attr(data-se-k);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+  padding-right: var(--se-space-6);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .t4XYbyKAM5Yz-nmWNHSLB > div[data-se-k]::after {
+  content: attr(data-se-v);
+  font: 800 var(--se-fs-xl)/1.3 var(--se-font);
+  color: var(--se-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .t4XYbyKAM5Yz-nmWNHSLB > div[data-se-v2]::before {
+  content: attr(data-se-k) ' · ' attr(data-se-v2);
+}
+
+.se-copy {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--se-text-faint);
+}
+
+/* The hit area grows to --se-hit around the 26px button (10px clear of the tile's edge) */
+.se-copy::after {
+  content: '';
+  position: absolute;
+  inset: calc((26px - var(--se-hit)) / 2);
+}
+
+.se-copy svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.se-copy:hover {
+  background: var(--se-hover);
+  color: var(--se-text);
+}
+
+.se-copy[data-done] {
+  color: var(--se-accent);
+}
+
+/* Installed Files: the size large in a tile with Browse, the drive's free space and a bar */
+.CFTLX2wIKOK3hNV-fS7_V .vgVsCDEci0IK6JY9IrT9w {
+  display: grid !important;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  column-gap: var(--se-space-3);
+  row-gap: var(--se-space-2);
+  align-items: center;
+  padding: var(--se-space-4) var(--se-space-4) !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .vgVsCDEci0IK6JY9IrT9w::before {
+  content: '';
+  grid-row: 1;
+  grid-column: 1;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2); /* the row icon tile, as in every other row */
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .vgVsCDEci0IK6JY9IrT9w::after {
+  content: '';
+  grid-row: 1;
+  grid-column: 1;
+  width: 18px;
+  height: 18px;
+  justify-self: center;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-ic-pfolder) center / 18px 18px no-repeat;
+  mask: var(--se-ic-pfolder) center / 18px 18px no-repeat;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3sCkhDJ57IT9iI8VuF4bSe {
+  display: none !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .b5YdRXAobg5HWhcfAlIeZ[data-se-big] {
+  grid-row: 1;
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  font-size: 0 !important;
+  margin: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .b5YdRXAobg5HWhcfAlIeZ[data-se-big]::before {
+  content: attr(data-se-big);
+  font: 800 var(--se-fs-3xl)/1.2 var(--se-font);
+  color: var(--se-text);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .b5YdRXAobg5HWhcfAlIeZ[data-se-big]::after {
+  content: attr(data-se-rest);
+  font: 500 var(--se-fs-base)/1.4 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .vgVsCDEci0IK6JY9IrT9w > button {
+  grid-row: 1;
+  grid-column: 3;
+  margin: 0 !important;
+}
+
+.se-disk {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--se-space-1);
+}
+
+.se-disk-text {
+  align-self: flex-end;
+  font: 600 var(--se-fs-sm) var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1wSQxXZWWYuvKQyTg1CHKj,
+.CFTLX2wIKOK3hNV-fS7_V ._1wSQxXZWWYuvKQyTg1CHKj a {
+  font: 500 var(--se-fs-base)/1.4 var(--se-font) !important;
+  color: var(--se-accent) !important;
+  text-decoration: none !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1wSQxXZWWYuvKQyTg1CHKj a:hover {
+  text-decoration: underline !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .r3hOLjghfVd2FkvKjlsrO {
+  border: 0 !important;
+  padding: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Game Versions & Betas: Steam's intro as plain text; each version a selectable card */
+.CFTLX2wIKOK3hNV-fS7_V [data-se-ptext]:is([data-se-c], :not([data-se-c])):is([data-se-c], :not([data-se-c])):not(#se-none):not(#se-p2) {
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 0 var(--se-space-4) !important;
+  min-height: 0 !important;
+  border-radius: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-ptext] ._2VcTlXFC64Jtg9gvtT6cmY {
+  display: none !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V [data-se-ptext] ._1W1to_azoBRG95oNAFpf9Q {
+  margin: 0 !important;
+  font: 500 var(--se-fs-md)/1.45 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+}
+
+[data-se-props] .DialogBody .X3pN_ESh0aoxmm2nK65Hu {
+  display: none !important;
+}
+
+[data-se-props] .DialogBody ._3jWpi0kJp_piNEvdMufMmy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  background: none !important;
+}
+
+[data-se-props] .DialogBody ._3jWpi0kJp_piNEvdMufMmy ._1LCoWsUrJmZHr7SVX0luaG {
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  column-gap: var(--se-space-3);
+  align-items: start;
+  padding: var(--se-space-3) var(--se-space-4);
+  border-radius: var(--se-radius-lg);
+  cursor: pointer;
+  transition: box-shadow var(--se-dur) ease-out;
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+}
+
+[data-se-props] .DialogBody ._3jWpi0kJp_piNEvdMufMmy ._1LCoWsUrJmZHr7SVX0luaG:is(._2fy9Xqi70es7wkqy4iOvBE, ._231y-BrqpRH85PNLgfseSR) {
+  background: var(--se-surface) !important;
+}
+
+[data-se-props] .DialogBody ._3jWpi0kJp_piNEvdMufMmy ._1LCoWsUrJmZHr7SVX0luaG:hover {
+  box-shadow: var(--se-edge-accent);
+}
+
+[data-se-props] .DialogBody ._3jWpi0kJp_piNEvdMufMmy ._1LCoWsUrJmZHr7SVX0luaG.dB7T-kfL2b2b0jd9Zg9fa {
+  background: var(--se-accent-tint) !important;
+  box-shadow: var(--se-edge-accent);
+}
+
+[data-se-props] .DialogBody ._1LCoWsUrJmZHr7SVX0luaG > * {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: auto !important;
+  min-width: 0;
+  flex: none !important;
+}
+
+[data-se-props] .DialogBody ._1LCoWsUrJmZHr7SVX0luaG input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: var(--se-space-half) 0 0 !important;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 2px solid var(--se-border-strong);
+  background: none;
+  cursor: pointer;
+}
+
+[data-se-props] .DialogBody ._1LCoWsUrJmZHr7SVX0luaG input[type="radio"]:checked {
+  border-color: var(--se-accent);
+  background: radial-gradient(circle, var(--se-accent) 0 4px, transparent 4.5px);
+}
+
+[data-se-props] .DialogBody ._1LCoWsUrJmZHr7SVX0luaG .a19KifKnB2YZP_hYoFsar {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  font: 700 var(--se-fs-md)/1.35 var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+[data-se-props] .DialogBody ._1LCoWsUrJmZHr7SVX0luaG.dB7T-kfL2b2b0jd9Zg9fa .a19KifKnB2YZP_hYoFsar::after {
+  content: 'Installed';
+  padding: 1px var(--se-space-2);
+  border-radius: var(--se-radius-pill);
+  background: color-mix(in srgb, var(--se-running) 15%, transparent);
+  font: 700 var(--se-fs-xs)/16px var(--se-font);
+  color: var(--se-running);
+}
+
+[data-se-props] .DialogBody ._1LCoWsUrJmZHr7SVX0luaG ._3OwCSCZC5BPFq4X7PLVzKp {
+  margin-top: var(--se-space-half) !important;
+  font: 500 var(--se-fs-base)/1.4 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+  white-space: normal !important;
+}
+
+[data-se-props] .DialogBody ._1LCoWsUrJmZHr7SVX0luaG ._3FgV6oQH8JCN-J9BPCCs14 {
+  font: 500 var(--se-fs-sm)/1.6 var(--se-font) !important;
+  color: var(--se-text-faint) !important;
+  white-space: nowrap;
+  text-align: right;
+}
+
+[data-se-props] .DialogBody ._3H9mJurCFIkAqvWpYfEaDM {
+  margin: var(--se-space-5) var(--se-space-1) var(--se-space-1) !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase;
+  color: var(--se-label-color) !important;
+}
+
+[data-se-props] .DialogBody ._3H9mJurCFIkAqvWpYfEaDM + div {
+  margin: 0 var(--se-space-1) var(--se-space-2);
+  font: 500 var(--se-fs-base)/1.4 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+[data-se-props] .DialogBody ._2WZcpnJsf4iRuWPaYpL_gi {
+  margin: 0 !important;
+  display: flex !important;
+  gap: var(--se-space-2);
+  align-items: center;
+  padding: var(--se-space-3) var(--se-space-4);
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+}
+
+[data-se-props] .DialogBody ._2WZcpnJsf4iRuWPaYpL_gi > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+[data-se-props] .DialogBody ._2WZcpnJsf4iRuWPaYpL_gi button._1IwF6o-Z7lL4drKYAGGOAt:not(#se-none):not(#se-p2) {
+  background: var(--se-accent-tint) !important;
+  color: var(--se-accent) !important;
+  box-shadow: var(--se-edge-accent) !important;
+}
+
+
+/*
+ * Shortcut (a non-Steam game): the icon as a tile beside the name; Target, Start In and Launch
+ * Options each a small label over its field (and Browse), on the spacing scale
+ */
+[data-se-props] .DialogBody ._3_JQeUyTsRI5PeQWRc0yBf {
+  gap: var(--se-space-4);
+}
+
+[data-se-props] .DialogBody ._3_JQeUyTsRI5PeQWRc0yBf ._1UxV1a61v14MBGo4epEsCM {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-edge);
+}
+
+[data-se-props] .DialogBody ._3_JQeUyTsRI5PeQWRc0yBf ._1UxV1a61v14MBGo4epEsCM ._3tFB_OlF3A5El-w84XJz_A {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+[data-se-props] .DialogBody ._3_JQeUyTsRI5PeQWRc0yBf .bP2Ipgau61tQ0ZGNU5LM {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+[data-se-props] .DialogBody ._3_JQeUyTsRI5PeQWRc0yBf ._1y1wmpgy_HhnryUAHjEOSG {
+  margin: 0;
+}
+
+[data-se-props] .DialogBody:has(._3_JQeUyTsRI5PeQWRc0yBf) > :has(> ._1y1wmpgy_HhnryUAHjEOSG) {
+  margin: var(--se-space-5) 0 0 !important; /* beats the SectionTopLine reset above (same file) */
+}
+
+[data-se-props] .DialogBody:has(._3_JQeUyTsRI5PeQWRc0yBf) > :has(> ._1y1wmpgy_HhnryUAHjEOSG) > div:first-child:not(._1y1wmpgy_HhnryUAHjEOSG) {
+  padding: 0 var(--se-space-1);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+[data-se-props] .DialogBody:has(._3_JQeUyTsRI5PeQWRc0yBf) > :has(> ._1y1wmpgy_HhnryUAHjEOSG) > ._1y1wmpgy_HhnryUAHjEOSG {
+  gap: var(--se-space-2);
+  margin-top: var(--se-space-2);
+}
+
+/* The toggles after the fields: their card clear of the last field */
+[data-se-props] .DialogBody:has(._3_JQeUyTsRI5PeQWRc0yBf) > :has(> ._1y1wmpgy_HhnryUAHjEOSG) + * {
+  margin-top: var(--se-space-6);
+}

@@ -100,7 +100,7 @@
     setAttr(root, 'data-se-mill', mill ? '' : null);
     setAttr(root, 'data-se-props', isProps ? '' : null);
     live.observer?.takeRecords();
-    sidebar(list, steam, mill);
+    sidebar(list, steam, mill, isProps);
 
     if (isProps) {
       propsSidebar(list, content);
@@ -189,13 +189,13 @@
   // Everything update() marks lives in the dialog (or on <html>), so destroy() can undo it there
   // without touching other modules' marks of the same name elsewhere.
   const MARKS = [
-    'art', 'big', 'c', 'cloud', 'cloudrow', 'count', 'cover', 'ctl', 'cur', 'danger', 'drive', 'family',
+    'art', 'big', 'c', 'cloud', 'count', 'cover', 'ctl', 'cur', 'danger', 'drive', 'dsize', 'family',
     'filtering', 'good', 'head', 'hit', 'icon', 'k', 'kbd', 'label', 'launch', 'licon', 'licon-el', 'mill-page',
-    'miss', 'name', 'nickname-preview', 'notice', 'noxs', 'paccent', 'pfirst', 'pre', 'pre-text', 'primary',
-    'psub', 'ptext', 'ptitle', 'rest', 'row', 'sec', 'secsub', 'seg', 'seglabel', 'size', 'sortlabel', 'sticky',
+    'miss', 'name', 'nickname-preview', 'nocolon', 'notice', 'noxs', 'paccent', 'pfirst', 'pre', 'pre-text', 'primary',
+    'psub', 'ptext', 'ptitle', 'rest', 'row', 'sec', 'secsub', 'seg', 'seglabel', 'short', 'size', 'sortlabel', 'sticky',
     'sub', 'sval', 'tile', 'title', 'v', 'v2', 'ws-empty',
   ].map((m) => `data-se-${m}`);
-  const VARS = ['--se-seg-w', '--se-join'];
+  const VARS = ['--se-seg-w', '--se-join', '--se-props-cover'];
 
   function unmarkAll() {
     const sel = MARKS.map((m) => `[${m}]`).join(',');

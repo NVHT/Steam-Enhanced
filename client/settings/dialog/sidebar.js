@@ -1,6 +1,6 @@
 /*
  * Steam Settings, Game Properties and Millennium Settings: sidebar headers and icons, and the
- * settings search box (not in Millennium Settings).
+ * settings search box (Steam Settings only).
  *
  * Part of client/settings/dialog/ (see shared.js).
  */
@@ -22,7 +22,7 @@
     );
   }
 
-  function sidebar(list, steam, mill) {
+  function sidebar(list, steam, mill, props) {
     const items = [...list.querySelectorAll(ITEM)];
     if (mill) {
       [...list.querySelectorAll(SEP)]
@@ -44,14 +44,15 @@
     if (title && steam && /^steam settings$/i.test(text(title))) {
       setAttr(title, 'data-se-title', 'Settings');
     }
-    // Millennium Settings has no search box: its pages are few and its General page fits the window.
-    if (mill && live.search) {
+    // Millennium Settings and Game Properties have no search box: their pages are few.
+    const searchable = !mill && !props;
+    if (!searchable && live.search) {
       live.search.remove();
       live.results?.remove();
       live.search = undefined;
       live.results = undefined;
     }
-    if (title && !mill && !live.search) {
+    if (title && searchable && !live.search) {
       live.search = document.createElement('label');
       live.search.className = 'se-settings-search';
       live.search.innerHTML =

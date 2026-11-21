@@ -28,7 +28,7 @@
     artwork: `.${C.AssetWrapper}`,
     noGap: `.${C.NoBottomGap}`,
   };
-  const PROPS_BLOCK = `.${C.Field}, .SettingsDialogSubHeader, .SettingsDialogBodyText, [data-se-ptext], .${C.BrowseDiskRow}, .${C.DlcTopRow}, .${C.BuildInfo}, button.DialogButton, .${C.WorkshopTopRow}, .${C.BetasTable}`;
+  const PROPS_BLOCK = `.${C.Field}, .${C.ShortcutRow}, .SettingsDialogSubHeader, .SettingsDialogBodyText, [data-se-ptext], .${C.BrowseDiskRow}, .${C.DlcTopRow}, .${C.BuildInfo}, button.DialogButton, .${C.WorkshopTopRow}, .${C.BetasTable}`;
   const PROPS_NAMES = {
     'general': ['pgen', 'general'],
     'updates': ['dl', 'updates'],
@@ -43,7 +43,7 @@
     'privacy': ['security', 'privacy'],
     'customization': ['pcustom', 'custom'],
     'compatibility': ['pcompat', 'compat'],
-    'shortcut': ['pgen', 'shortcut'],
+    'shortcut': ['pshortcut', 'shortcut'],
     'performance': ['ingame', 'performance'],
     'feedback': ['notify', 'feedback'],
   };
@@ -100,40 +100,35 @@
   const COPY_SVG =
     '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" fill="currentColor" fill-opacity=".32" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"></rect><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" fill="currentColor" fill-opacity=".32" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"></path></svg>';
 
+  /*
+   * General: the cloud space as help text and a bar inside the cloud toggle's row ("1.8 MB of
+   * 953.7 MB"), in place of Steam's two lines under it. The bar shows a sliver even when
+   * nearly empty, so it never reads as missing.
+   */
   function propsGeneralPage(content, details) {
     const usage = content.querySelector(P.cloudUsage);
-    let box = usage?.parentElement.querySelector(':scope > .se-cloud');
-    if (usage) {
-      const spans = usage.querySelectorAll(':scope > span');
-      const tUsed = text(spans[0] || usage.childNodes[0]);
-      const tAvail = text(spans[1] || spans[0]);
-      const used = bytesOf(details?.strCloudBytesUsed || tUsed);
-      const avail = bytesOf(details?.strCloudBytesAvailable || tAvail);
-      if (used >= 0 && avail >= 0 && spans.length >= 2) {
-        if (!box) {
-          box = own('div', 'se-cloud');
-          box.innerHTML = '<div class="se-pbar"></div><div class="se-cloud-text"><span></span><span></span></div>';
-        }
-        box
-          .querySelector('.se-pbar')
-          .style.setProperty('--p', `${Math.max(0.5, Math.min(100, (used / Math.max(1, used + avail)) * 100)).toFixed(2)}%`);
-        const [a, b] = box.querySelectorAll('.se-cloud-text > span');
-        if (a.textContent !== tUsed) a.textContent = tUsed;
-        if (b.textContent !== tAvail) b.textContent = tAvail;
-        if (box.nextElementSibling !== usage) usage.before(box);
-        setAttr(usage, 'data-se-cloud', '');
-        const toggle = box.previousElementSibling?.matches(FIELD) ? box.previousElementSibling : null;
-        content.querySelectorAll('[data-se-cloudrow]').forEach((f) => {
-          if (f !== toggle) f.removeAttribute('data-se-cloudrow');
-        });
-        if (toggle) {
-          setAttr(toggle, 'data-se-cloudrow', '');
-          ROW_FOR.set(toggle, 'cloud');
-        }
-      } else {
-        box?.remove();
-        usage.removeAttribute('data-se-cloud');
+    const toggle = usage?.previousElementSibling?.matches(FIELD) ? usage.previousElementSibling : null;
+    const column = toggle?.querySelector(`:scope > .${C.FieldLeftColumn}`);
+    let box = content.querySelector('.se-cloud');
+    const spans = usage ? usage.querySelectorAll(':scope > span') : [];
+    const used = usage ? bytesOf(details?.strCloudBytesUsed || text(spans[0] || usage.childNodes[0])) : NaN;
+    const avail = usage ? bytesOf(details?.strCloudBytesAvailable || text(spans[1] || spans[0])) : NaN;
+    if (column && used >= 0 && avail >= 0) {
+      if (!box) {
+        box = own('div', 'se-cloud');
+        box.innerHTML = '<span class="se-cloud-text"></span><div class="se-pbar"></div>';
       }
+      const total = Math.max(1, used + avail);
+      box.querySelector('.se-pbar').style.setProperty('--f', Math.max(0.02, Math.min(1, used / total)).toFixed(4));
+      const label = `${fmtBytes(used)} of ${fmtBytes(total)}`;
+      const t = box.querySelector('.se-cloud-text');
+      if (t.textContent !== label) t.textContent = label;
+      if (box.parentElement !== column) column.append(box);
+      setAttr(usage, 'data-se-cloud', '');
+      ROW_FOR.set(toggle, 'cloud');
+    } else {
+      box?.remove();
+      usage?.removeAttribute('data-se-cloud');
     }
     const launch = content.querySelector('input.DialogTextInputBase, .DialogInput');
     if (launch && /^\s*-|^$/.test(launch.value || '') && launch.closest('.DialogBody')) {
@@ -191,7 +186,7 @@
       const t = `${fmtBytes(f.nFreeSpace)} free of ${fmtBytes(f.nCapacity)}`;
       const st = disk.querySelector('.se-disk-text');
       if (st.textContent !== t) st.textContent = t;
-      disk.querySelector('.se-pbar').style.setProperty('--p', `${(((f.nCapacity - f.nFreeSpace) / f.nCapacity) * 100).toFixed(1)}%`);
+      disk.querySelector('.se-pbar').style.setProperty('--f', ((f.nCapacity - f.nFreeSpace) / f.nCapacity).toFixed(4));
       if (disk.parentElement !== row || disk.nextElementSibling) row.append(disk);
     } else if (disk) {
       disk.remove();
@@ -215,10 +210,7 @@
       if (!empty) {
         empty = own('div', 'se-ws-empty');
         empty.innerHTML =
-          '<div class="se-ws-icon"></div><div class="se-ws-title">No Workshop items yet</div><div class="se-ws-text">Items you subscribe to in the Workshop show up here, in the order the game loads them.</div><button type="button" class="se-ws-btn">Browse the Workshop</button>';
-        empty.querySelector('button').addEventListener('click', () => {
-          content.querySelector('.DialogBody button.DialogButton, button.DialogButton')?.click();
-        });
+          '<div class="se-ws-icon"></div><div class="se-ws-title">No Workshop items yet</div><div class="se-ws-text">Items you subscribe to in the Workshop show up here, in the order the game loads them.</div>';
       }
       if (empty.previousElementSibling !== scroll) scroll.after(empty);
     } else if (empty) {

@@ -95,7 +95,9 @@
         prev && prev.hasAttribute('data-se-seglabel') && prev.nextElementSibling?.hasAttribute('data-se-seg')
           ? prev.nextElementSibling
           : prev;
-      if (prev && !prev.hasAttribute('data-se-sec') && !n.hasAttribute('data-se-pre') && start && adjacent(start, n)) {
+      // A list's edge between two fields (Privacy's per-DLC list opening under its row) keeps one card
+      if (prev && !prev.hasAttribute('data-se-sec') && !n.hasAttribute('data-se-pre') && start &&
+        adjacent(start, n, '[role="list"]:empty')) {
         runNodes.push(n);
       } else {
         flush();

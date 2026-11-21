@@ -8,8 +8,8 @@
  * - Tags contiguous Field rows with card boundary attributes (`data-se-c`),
  *   section headers (`data-se-sec`), segmented radio groups, keyboard shortcut
  *   badges (`data-se-kbd`), and row icons (`data-se-row`).
- * - Enhances Game Properties tabs (Cloud quota bar, Build ID copy actions,
- *   disk usage bar, DLC counts, and Workshop empty states).
+ * - Enhances Game Properties tabs (the game header, Cloud quota bar, Build ID copy
+ *   actions, disk usage bar, short DLC names, and Workshop empty states).
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
  * window.__seSettingsParts (values parts reassign live on its `live`). The parts:
@@ -20,7 +20,8 @@
  * - sidebar.js      sidebar headers and icons
  * - layout.js       sections, pickers, cards and row tagging, and the layout scan
  * - props-pages.js  Game Properties: the General, Updates, Files and Workshop pages
- * - props.js        Game Properties: the page pass, the cover, the sidebar
+ * - props-header.js Game Properties: the game's hero art across the window's top
+ * - props.js        Game Properties: the page pass (row icons, DLC names), the sidebar
  * - main.js         the update pass, watchers, start, and the API (destroy())
  */
 ((SE) => {
