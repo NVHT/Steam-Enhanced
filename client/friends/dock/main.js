@@ -12,11 +12,11 @@
     fly, flyoutOwnedTabs, gameInForeground, hideFly, hideMenu, installChatRouting,
     interactionEvents, keepLibraryManagers, markDesktopInteraction, markDockInteraction,
     minimizeChat, onAvatarError, onContext, onDesktopChatFocus, onLibrary,
-    onNativeChannelClick, onNativeFriendClick, onSearch, onStore, openChat, openFriendNotification,
+    onNativeChannelClick, onNativeFriendClick, onSearch, onStore, openChat, openFlyRow, openFriendNotification,
     openGames, openGroup, own, pendingOverlayChats, place, pressRow, releaseFlyoutTabs, render,
     requestChatHandoff, resetMinimized, restoreChat, restoreChatRenderer, restoreChatRouting,
     resumeOverlayChat, schedule, setMode, showFly, state, statusMenu, steamHost,
-    steamURL, store, svg, sync, syncBrowserClicks, syncChatTabs, unguardLibraryManagers,
+    steamURL, store, svg, sync, syncBrowserClicks, syncChatTabs, unguardLibraryManagers, wireFlySearch,
   } = ns;
   const { live } = ns;
 
@@ -118,14 +118,16 @@
   steamHost.addEventListener('click', onNativeChannelClick);
   steamHost.addEventListener('mouseover', ns.friendCard.over);
   steamHost.addEventListener('mouseout', ns.friendCard.out);
+  dock.addEventListener('mouseover', ns.friendCard.overRail);
+  dock.addEventListener('mouseout', ns.friendCard.outRail);
+  dock.addEventListener('pointerdown', ns.friendCard.pressRail);
   dock.addEventListener('click', (e) => {
     if (steamHost.contains(e.target)) return;
-    const el = e.target.closest('[data-act], [data-game], [data-friend], [data-group], [data-section]');
+    const el = e.target.closest('[data-act], [data-fly], [data-game], [data-friend], [data-group], [data-section]');
     if (!el || !dock.contains(el)) return;
     e.stopPropagation();
     const act = el.dataset.act;
     if (act === 'collapse') return setMode('rail');
-    if (act === 'expand') return setMode('open');
     if (act === 'add') return steamURL('steam://friends/add');
     if (act === 'status') return statusMenu(el);
     if (act === 'search') {
@@ -144,6 +146,8 @@
       state.sig = '';
       return render();
     }
+    // A rail tile with a flyout: a click (or Enter) shows it, as hovering does
+    if (el.dataset.fly && state.mode === 'rail') return showFly(el.dataset.fly);
     if (el.dataset.friend) return openChat(el.dataset.friend);
     if (el.dataset.group) return openGroup(el.dataset.group);
     if (el.dataset.game && state.mode !== 'rail') {
@@ -158,23 +162,20 @@
   own.addEventListener('keydown', pressRow);
   fly.addEventListener('keydown', pressRow);
   dock.addEventListener('mouseover', (e) => {
-    const tile = e.target.closest('.se-fd-railgame');
-    if (tile) showFly(tile.dataset.game);
+    const tile = e.target.closest('[data-fly]');
+    if (tile && state.mode === 'rail') showFly(tile.dataset.fly);
   });
   dock.addEventListener('mouseout', (e) => {
-    if (e.target.closest('.se-fd-railgame') && !e.relatedTarget?.closest?.('.se-fd-railgame, .se-fd-fly')) {
+    if (e.target.closest('[data-fly]') && !e.relatedTarget?.closest?.('[data-fly], .se-fd-fly')) {
       hideFly();
     }
   });
   fly.addEventListener('mouseenter', () => clearTimeout(state.flyTimer));
   fly.addEventListener('mouseleave', () => hideFly());
-  fly.addEventListener('click', (e) => {
-    const row = e.target.closest('[data-friend]');
-    if (row) {
-      e.stopPropagation();
-      openChat(row.dataset.friend);
-    }
-  });
+  fly.addEventListener('click', openFlyRow);
+  fly.addEventListener('mouseover', ns.friendCard.overFly);
+  fly.addEventListener('mouseout', ns.friendCard.outFly);
+  wireFlySearch(fly);
   dock.addEventListener('contextmenu', onContext);
   fly.addEventListener('contextmenu', onContext);
   addEventListener('click', noteNavigation, true);
@@ -332,6 +333,11 @@
       steamHost.removeEventListener('click', onNativeChannelClick);
       steamHost.removeEventListener('mouseover', ns.friendCard.over);
       steamHost.removeEventListener('mouseout', ns.friendCard.out);
+      dock.removeEventListener('mouseover', ns.friendCard.overRail);
+      dock.removeEventListener('mouseout', ns.friendCard.outRail);
+      dock.removeEventListener('pointerdown', ns.friendCard.pressRail);
+      fly.removeEventListener('mouseover', ns.friendCard.overFly);
+      fly.removeEventListener('mouseout', ns.friendCard.outFly);
       ns.friendCard.dispose();
       dockResize?.destroy();
       live.fold?.destroy();

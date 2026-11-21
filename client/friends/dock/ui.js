@@ -4,7 +4,7 @@
 ((SE) => {
   const ns = window.__seFriendsDockParts;
   if (!ns) return;
-  const { app, COPY, ctx, flyHTML, state, statusLabel, store } = ns;
+  const { app, COPY, ctx, filterFly, flyHTML, moreFlyHTML, railModel, state, statusLabel, store } = ns;
   const { live } = ns;
 
   const { mainWindow, run } = SE;
@@ -260,22 +260,22 @@
     }
     entry.key = key;
     entry.html = html;
+    const refocus = flySearchFocused();
+    ns.friendCard?.leaveFly();
     ns.fly.classList.remove('se-fd-show');
     const right = ns.dock.getBoundingClientRect().left - SE.px('--se-space-3');
     const top = tile.getBoundingClientRect().top - SE.px('--se-fd-fly-lift');
     entry.panel.show({ right, top }, (container) => {
       container.insertAdjacentHTML('beforeend', `<div class="se-fd-fly se-fd-show">${html}</div>`);
       const card = container.lastElementChild;
+      entry.card = card;
+      wireFlySearch(card);
+      restoreFlySearch(card, refocus);
       for (const type of ns.interactionEvents) card.addEventListener(type, ns.markDockInteraction, true);
       card.addEventListener('keydown', pressRow);
       card.addEventListener('mouseenter', () => clearTimeout(state.flyTimer));
       card.addEventListener('mouseleave', () => hideFly());
-      card.addEventListener('click', (event) => {
-        const row = event.target.closest('[data-friend]');
-        if (!row) return;
-        event.stopPropagation();
-        openChat(row.dataset.friend);
-      });
+      card.addEventListener('click', openFlyRow);
       card.addEventListener('contextmenu', (event) => {
         const row = event.target.closest('[data-friend]');
         if (!row) return;
@@ -288,20 +288,81 @@
     return true;
   }
 
+  /*
+   * The "+N" flyout's search, in the dock's flyout or a popup card: it filters as you type,
+   * Escape closes, and the flyout stays open while the search has the focus or the pointer is
+   * over it. Rebuilt markup (the list changed) gets the text back and, if it had it, the focus.
+   */
+  const flyRoot = () => live.flyPanel?.card || ns.fly;
+
+  function flySearchFocused() {
+    const root = flyRoot();
+    const active = root.ownerDocument.activeElement;
+    return Boolean(active?.matches?.('.se-fd-flysearch input') && root.contains(active));
+  }
+
+  function restoreFlySearch(root, refocus) {
+    const input = root.querySelector('.se-fd-flysearch input');
+    if (!input) return;
+    input.value = state.flyQuery;
+    filterFly(root, state.flyQuery);
+    if (refocus) input.focus();
+  }
+
+  function wireFlySearch(el) {
+    el.addEventListener('input', (event) => {
+      if (!event.target.matches('.se-fd-flysearch input')) return;
+      state.flyQuery = event.target.value;
+      filterFly(el, state.flyQuery);
+    });
+    el.addEventListener('keydown', (event) => {
+      if (!event.target.matches('.se-fd-flysearch input')) return;
+      event.stopPropagation();
+      if (event.key === 'Escape') hideFly(true);
+    });
+    el.addEventListener('focusout', (event) => {
+      if (!el.contains(event.relatedTarget)) hideFly();
+    });
+  }
+
+  // A flyout's row: a friend's chat or a group's
+  function openFlyRow(event) {
+    const row = event.target.closest('[data-friend], [data-group]');
+    if (!row) return;
+    event.stopPropagation();
+    ns.friendCard?.leaveFly();
+    if (row.dataset.friend) openChat(row.dataset.friend);
+    else openGroup(row.dataset.group);
+  }
+
+  // A rail tile's flyout (data-fly): a game's players, or a "+N" tile's rest ("more:<section>")
+  function flyFor(key) {
+    if (!state.data) return '';
+    if (key.startsWith('more:')) {
+      const sec = railModel(state.data).find((s) => s.key === key.slice(5));
+      return sec?.rest.length ? moreFlyHTML(sec) : '';
+    }
+    const g = state.data.games.find((x) => x.key === key);
+    return g ? flyHTML(g) : '';
+  }
+
   function showFly(key, keep) {
-    const g = state.data?.games.find((x) => x.key === key);
-    const tile = ns.dock.querySelector(`.se-fd-railgame[data-game="${CSS.escape(key)}"]`);
-    if (!g || !tile) return hideFly(true);
+    const html = flyFor(key);
+    const tile = ns.dock.querySelector(`[data-fly="${CSS.escape(key)}"]`);
+    if (!html || !tile) return hideFly(true);
     clearTimeout(state.flyTimer);
-    state.flyGame = key;
-    const html = flyHTML(g);
+    if (key !== state.flyKey) state.flyQuery = '';
+    state.flyKey = key;
     if (SE.browserShown() && showFlyPanel(key, html, tile)) return undefined;
     live.flyPanel?.panel.release();
     live.flyPanel = null;
     if (!keep || ns.fly.dataset.key !== key || ns.fly.dataset.html !== html) {
+      const refocus = flySearchFocused();
+      ns.friendCard?.leaveFly();
       ns.fly.innerHTML = html;
       ns.fly.dataset.key = key;
       ns.fly.dataset.html = html;
+      restoreFlySearch(ns.fly, refocus);
     }
     // Reads first (the tile, the card's height, the tokens), then the one write.
     const r = tile.getBoundingClientRect();
@@ -313,9 +374,11 @@
   }
 
   function hideFly(now) {
+    if (!now && (flySearchFocused() || flyRoot().matches(':hover'))) return;
     clearTimeout(state.flyTimer);
     const go = () => {
-      state.flyGame = null;
+      ns.friendCard?.leaveFly();
+      state.flyKey = null;
       ns.fly.classList.remove('se-fd-show');
       live.flyPanel?.panel.release();
       live.flyPanel = null;
@@ -366,7 +429,7 @@
 
   Object.assign(ns, {
     noteNavigation, hideFly, hideMenu, onContext, onNativeChannelClick,
-    onNativeFriendClick, openChat, openGroup, pressRow, schedule, setMode, showFly, statusMenu,
+    onNativeFriendClick, openChat, openFlyRow, openGroup, wireFlySearch, pressRow, schedule, setMode, showFly, statusMenu,
     steamURL, sync,
   });
 })(window.__se);

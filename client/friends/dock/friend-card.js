@@ -9,6 +9,9 @@
  * Without the component (a Steam update moved it) the theme's own card stands in:
  * friendCardHTML (templates.js), the game flyout's card headed by the friend.
  *
+ * A face in the collapsed rail (overRail / outRail) shows the same card, beside the rail; a
+ * friend's row in a rail flyout (a game's or a "+N" tile's; overFly / outFly), beside the flyout.
+ *
  * Hovering your avatar in the title bar shows your own card the same way, beside
  * the rail (the avatar's menu opens on click; client/header/menu/hover.js leaves its hover to this).
  *
@@ -25,6 +28,7 @@
   const layer = SE.layer;
 
   const AVATAR = '.avatarHolder';
+  const SHEETS = ['core/levels.css', 'client/shared/hover-cards.css', 'client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css'];
   // On <body> while the theme's card stands in for Steam's hover (friends-dock.css hides it)
   const ATTR = 'data-se-friend-card';
 
@@ -96,7 +100,7 @@
 
   // Steam waits a moment before its hover too: a pointer passing over the list opens nothing
   const card = layer?.hover({
-    sheets: ['core/levels.css', 'client/shared/hover-cards.css', 'client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css'],
+    sheets: SHEETS,
     steam: true,
     place: (avatar) => ({ right: dock.getBoundingClientRect().left - SE.px('--se-space-3'), top: avatar.getBoundingClientRect().top }),
     draw,
@@ -119,10 +123,64 @@
     if (card?.left(event)) card.leave();
   }
 
+  // A friend's face in the collapsed rail (templates.js railTile): the card beside the rail
+  const RAIL_FACE = '.se-fd-railfriend';
+
+  function overRail(event) {
+    const tile = event.target.closest?.(RAIL_FACE);
+    if (!card || state.destroyed || !tile || tile === card.node || steamHost.contains(tile)) return;
+    card.leave();
+    const friend = run(() => app().FriendStore.GetPlayer(Number(tile.dataset.friend)));
+    if (friend?.persona) card.enter(tile, friend);
+  }
+
+  function outRail(event) {
+    if (event.target.closest?.(RAIL_FACE) && card?.left(event)) card.leave();
+  }
+
+  // A press opens the friend's chat beside the rail: the card makes way
+  const pressRail = (event) => {
+    if (event.target.closest?.(RAIL_FACE)) card?.leave();
+  };
+
+  /*
+   * A friend's row in a rail flyout: the card to the flyout's left, level with the row. Only
+   * in the main window: over a browser page the flyout is a popup window itself, and Steam
+   * closes a menu window when another opens (client/shared/popup-layer.js), so the card would
+   * close the flyout under the pointer.
+   */
+  const FLY_ROW = '.se-fd-fly .se-fd-row[data-friend]';
+
+  const flyCard = layer?.hover({
+    sheets: SHEETS,
+    steam: true,
+    place: (row) => ({
+      right: row.closest('.se-fd-fly').getBoundingClientRect().left - SE.px('--se-space-3'),
+      top: row.getBoundingClientRect().top,
+    }),
+    draw,
+    fallback: (row, friend) => themeCard(friend),
+  });
+
+  function overFly(event) {
+    const row = event.target.closest?.(FLY_ROW);
+    if (!flyCard || state.destroyed || !row || row === flyCard.node || row.ownerDocument !== document) return;
+    flyCard.leave();
+    const friend = run(() => app().FriendStore.GetPlayer(Number(row.dataset.friend)));
+    if (friend?.persona) flyCard.enter(row, friend);
+  }
+
+  function outFly(event) {
+    if (event.target.closest?.(FLY_ROW) && flyCard?.left(event)) flyCard.leave();
+  }
+
+  // The flyout closed or a row was pressed (its chat opens): its card goes too
+  const leaveFly = () => flyCard?.leave();
+
   // Your card, from the title bar's avatar
   const ACCOUNT = `.${C.FocusNavigationRoot_TitleBarControls} .${C.AccountMenu}`;
   const selfCard = layer?.hover({
-    sheets: ['core/levels.css', 'client/shared/hover-cards.css', 'client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css'],
+    sheets: SHEETS,
     steam: true,
     // Beside the rail, its foot on the avatar's
     place: (avatar) => {
@@ -154,7 +212,7 @@
 
   // A friend's card beside an avatar elsewhere in the main window, at its right
   const besideCard = layer?.hover({
-    sheets: ['core/levels.css', 'client/shared/hover-cards.css', 'client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css'],
+    sheets: SHEETS,
     steam: true,
     place: (avatar) => {
       const rect = avatar.getBoundingClientRect();
@@ -183,11 +241,14 @@
     card?.leave();
     selfCard?.leave();
     besideCard?.leave();
+    flyCard?.leave();
     removeEventListener('mouseover', overAccount, true);
     removeEventListener('mouseout', outAccount, true);
     removeEventListener('pointerdown', pressAccount, true);
     document.body?.removeAttribute(ATTR);
   }
 
-  ns.friendCard = { over, out, dispose, showFor, leaveFor, dropFor };
+  ns.friendCard = {
+    over, out, overRail, outRail, pressRail, overFly, outFly, leaveFly, dispose, showFor, leaveFor, dropFor,
+  };
 })(window.__se);

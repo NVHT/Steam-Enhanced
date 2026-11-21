@@ -43,7 +43,7 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
 .se-fdock[data-mode="rail"] {
   width: var(--se-fd-rail);
   align-items: center;
-  gap: var(--se-space-3);
+  gap: var(--se-space-4);
   padding: var(--se-space-3) 0;
   overflow-y: auto;
   scrollbar-width: none;
@@ -107,7 +107,7 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
 }
 
 .se-fd-thread .se-fd-av[data-state],
-.se-fd-fly .se-fd-av[data-state] {
+.se-fd-ingame .se-fd-av[data-state] {
   --se-fd-ring: var(--se-running);
 }
 
@@ -129,9 +129,9 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
   --se-fd-ring: var(--se-away);
 }
 
-/* In a game's thread or flyout everyone is in game: away there is the faded green */
+/* In a game's thread or flyout (.se-fd-ingame) everyone is in game: away there is the faded green */
 .se-fd-thread .se-fd-av:is([data-state="away"], [data-state="snooze"]),
-.se-fd-fly .se-fd-av:is([data-state="away"], [data-state="snooze"]) {
+.se-fd-ingame .se-fd-av:is([data-state="away"], [data-state="snooze"]) {
   --se-fd-ring: var(--se-away-ingame);
 }
 
@@ -156,7 +156,8 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
   object-fit: cover;
 }
 
-.se-fd-gicon b {
+.se-fd-gicon b,
+.se-fd-unread {
   position: absolute;
   right: -5px;
   bottom: -4px;
@@ -407,8 +408,9 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
 }
 
 .se-fd-thread .se-fd-sub[data-state],
-.se-fd-fly .se-fd-sub[data-state],
+.se-fd-ingame .se-fd-sub[data-state],
 .se-fd-green {
+  /* Beats the rows' own status colours (.se-fd-row .se-fd-sub[data-state], below in this file) */
   color: var(--se-running) !important;
 }
 
@@ -422,6 +424,7 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
   color: color-mix(in srgb, var(--se-online) 70%, transparent);
 }
 
+.se-fd-row .se-fd-sub[data-state="ingame"],
 .se-fd-card .se-fd-sub[data-state="ingame"] {
   color: var(--se-running);
 }
@@ -466,8 +469,8 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
 
 .se-fd-gav {
   flex: none;
-  width: 30px;
-  height: 30px;
+  width: var(--s, 30px);
+  height: var(--s, 30px);
   border-radius: var(--se-avatar-radius);
   overflow: hidden;
   background: var(--se-surface-2);
@@ -479,12 +482,19 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
   object-fit: cover;
 }
 
-/* A group chat without art (or whose art failed to load): its initials on an accent tile */
-.se-fd-gav:has(> .se-fd-ginit) {
+/*
+ * A group chat without art (or whose art failed to load), or a friend without a picture of
+ * their own (none, or Steam's "?"): initials on an accent tile. A friend keeps their status ring.
+ */
+.se-fd-gav:has(> .se-fd-ginit),
+.se-fd-av:has(> .se-fd-ginit) {
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(145deg, var(--se-accent-surface), var(--se-surface-2));
+}
+
+.se-fd-gav:has(> .se-fd-ginit) {
   box-shadow: var(--se-edge-accent);
 }
 
@@ -495,21 +505,45 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
   user-select: none;
 }
 
-/* The rail */
-.se-fd-rule {
+/*
+ * The rail (client/friends/dock/templates.js railHTML): labelled sections, each a column of
+ * 32 px tiles (the hit target, also around a compact section's smaller faces) and a "+N" tile.
+ * A tile's face is sized by its --s (from templates.js), so compact needs no rules of its own.
+ */
+.se-fd-railsec {
   flex: none;
-  width: 28px;
-  height: 1px;
-  background: var(--se-hairline);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--se-space-3);
 }
 
-.se-fd-railme,
-.se-fd-railgame,
-.se-fd-railfriend,
-.se-fd-railgroup {
+.se-fd-railsec[data-compact] {
+  gap: var(--se-space-2);
+}
+
+/*
+ * In capitals as the theme's labels are, at the rail's size and without their spacing:
+ * --se-label-font's would not fit "FAVORITES" in 60 px. The rail's whole width is the label's.
+ */
+.se-fd-raillabel {
+  max-width: var(--se-fd-rail);
+  overflow: hidden;
+  font: 700 var(--se-fs-2xs)/var(--se-label-lh) var(--se-font), sans-serif;
+  text-transform: uppercase;
+  color: var(--se-label-color);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.se-fd-railtile {
   position: relative;
   flex: none;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
   border-radius: var(--se-avatar-radius);
 }
 
@@ -517,8 +551,60 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
   border-radius: var(--se-radius-md);
 }
 
-.se-fd-railgame:hover .se-fd-gicon {
-  box-shadow: 0 0 0 2px var(--se-accent);
+/* Hover: an accent ring around the face, outside a friend's status ring */
+.se-fd-railtile:hover > :is(.se-fd-gicon, .se-fd-gav),
+.se-fd-railmore:hover > span {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-fd-railfriend:hover > .se-fd-av {
+  outline: var(--se-focus-outline);
+  outline-offset: calc(2 * var(--se-focus-offset));
+}
+
+/* The game a friend plays alone, in the face's corner */
+.se-fd-railcorner {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  display: flex;
+  border-radius: var(--se-radius-sm);
+  box-shadow: 0 0 0 2px var(--se-sidebar);
+}
+
+/* Unread messages: the count badge, in accent, at the top corner */
+.se-fd-unread {
+  top: -5px;
+  bottom: auto;
+  background: var(--se-accent);
+  color: var(--se-on-accent);
+}
+
+.se-fd-railgroup .se-fd-gav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.se-fd-railtile .se-fd-ginit {
+  font-size: var(--se-fs-base);
+}
+
+.se-fd-railsec[data-compact] .se-fd-railtile .se-fd-ginit {
+  font-size: var(--se-fs-2xs);
+}
+
+.se-fd-railmore > span {
+  width: var(--s);
+  height: var(--s);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  font: 700 var(--se-fs-xs)/1 var(--se-font), sans-serif;
+  color: var(--se-text-muted);
 }
 
 /* A game's card beside the rail */
@@ -567,6 +653,71 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
 
 .se-fd-flybody {
   padding: var(--se-space-1);
+}
+
+/*
+ * A "+N" flyout (templates.js moreFlyHTML): about ten rows tall (the search finds the rest),
+ * less in a short window, its list scrolling under the head and search. --se-wrap-h is the main window's height in a popup card
+ * (client/shared/popup-layer-panel.js), whose own viewport is only the card.
+ */
+.se-fd-fly:has(> .se-fd-flylist) {
+  display: flex;
+  flex-direction: column;
+  max-height: min(var(--se-fd-fly-max), calc(var(--se-wrap-h, 100vh) - 2 * var(--se-space-2)));
+}
+
+.se-fd-fly > :is(.se-fd-flyhead, .se-fd-flysearch) {
+  flex: none;
+}
+
+.se-fd-flysearch {
+  margin: var(--se-space-2) var(--se-space-2) var(--se-space-1);
+}
+
+.se-fd-flylist {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.se-fd-flylabel {
+  display: flex;
+  gap: var(--se-space-2);
+  padding: var(--se-space-2) var(--se-space-2) var(--se-space-1);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.se-fd-flylabel span {
+  margin-left: auto;
+}
+
+/* One line a friend: their face's ring and the heading above already say their status */
+.se-fd-row.se-fd-line {
+  min-height: 32px;
+  gap: var(--se-space-2);
+}
+
+.se-fd-line .se-fd-name {
+  overflow: hidden;
+  font-size: var(--se-fs-base);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.se-fd-flyempty {
+  padding: var(--se-space-3) var(--se-space-2);
+  font: 500 var(--se-fs-sm)/1.3 var(--se-font), sans-serif;
+  color: var(--se-text-faint);
+}
+
+/* Rows and headings a search left out (their display would otherwise beat [hidden]) */
+.se-fd-line[hidden],
+.se-fd-flygroup[hidden],
+.se-fd-flyempty[hidden] {
+  display: none;
 }
 
 /*

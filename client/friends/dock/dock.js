@@ -153,7 +153,7 @@
     if (input && input !== previousInput && state.searching && document.hasFocus()) {
       input.focus();
     }
-    if (state.flyGame) showFly(state.flyGame, true);
+    if (state.flyKey) showFly(state.flyKey, true);
   }
 
   const onLibrary = SE.libraryShown;

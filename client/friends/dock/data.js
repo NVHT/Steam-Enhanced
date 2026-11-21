@@ -21,9 +21,14 @@
     inGame: 'In game',
     search: 'Search friends',
     add: 'Add a friend',
-    expand: 'Show friends',
     lastOnline: (t) => `Last online ${t}`,
     more: (n) => `+${n}`,
+    moreIn: (n, label) => `${n} more in ${label}`,
+    flySearch: 'Search',
+    noMatch: 'No one matches',
+    unread: (name, n) => `${name}, ${n} unread`,
+    // The rail's sections (its labels must fit 60 px in capitals)
+    rail: { chats: 'Chats', favorites: 'Favorites', playing: 'Playing', online: 'Online', groups: 'Groups' },
     friendsIn: (n) => `${n} friend${n === 1 ? '' : 's'} playing`,
     message: 'Send message',
     profile: 'View profile',
@@ -56,6 +61,13 @@
     return list.filter((g) => g && run(() => g.BIsCurrentUserAMember()) !== false);
   }
 
+  // A chat group's unread count: its rooms', each as Steam's notification level counts it
+  const groupUnread = (g) => {
+    let n = 0;
+    for (const room of run(() => g.m_mapRooms.values()) || []) n += run(() => room.unread_message_count) || 0;
+    return n;
+  };
+
   function ago(t) {
     if (!t) return '';
     const s = Date.now() / 1000 - t;
@@ -78,6 +90,7 @@
     const games = new Map();
     const online = [];
     const offline = [];
+    const byId = new Map();
 
     for (const f of friendsOf(a)) {
       const p = f?.persona;
@@ -89,6 +102,7 @@
         state: STATE[p.m_ePersonaState] || 'offline',
         last: run(() => p.last_seen_online) || 0,
       };
+      byId.set(item.id, item);
       if (run(() => p.is_ingame)) {
         const appid = p.m_unGamePlayedAppID || 0;
         const key = appid ? `a${appid}` : `n${run(() => p.GetCurrentGameName()) || ''}`;
@@ -104,6 +118,7 @@
           };
           games.set(key, g);
         }
+        item.game = { key, appid, name: g.name, icon: g.icon };
         g.friends.push(item);
       } else if (run(() => p.is_online)) {
         online.push(item);
@@ -118,16 +133,49 @@
     online.sort((x, y) => (x.state !== 'online') - (y.state !== 'online') || byName(x, y));
     offline.sort((x, y) => (y.last || 0) - (x.last || 0));
 
+    const groupById = new Map();
     const groups = groupsOf(a)
-      .map((g) => ({
-        id: String(run(() => g.GetGroupID()) ?? run(() => g.m_ulGroupID) ?? ''),
-        name: run(() => g.name) || '',
-        avatar: groupAvatarURL(g),
-      }))
+      .map((g) => {
+        const item = {
+          id: String(run(() => g.GetGroupID()) ?? run(() => g.m_ulGroupID) ?? ''),
+          group: true,
+          name: run(() => g.name) || '',
+          avatar: groupAvatarURL(g),
+          unread: groupUnread(g),
+        };
+        groupById.set(item.id, item);
+        return item;
+      })
       .filter((g) => g.id)
       .sort(byName);
 
-    return { me, games: list, online, offline, groups };
+    // Steam's favorites in its order (a friend or a chat group; a clan has no chat to open here)
+    const favorites = (run(() => a.FriendStore.FavoritesStore.favorites) || [])
+      .map((fav) =>
+        fav?.friend
+          ? byId.get(run(() => fav.friend.accountid))
+          : fav?.chat && groupById.get(String(run(() => fav.chat.GetGroupID()) ?? ''))
+      )
+      .filter(Boolean);
+
+    // Unread conversations, newest first: friends' (blocked ones aside), then group chats'
+    const friendChats = (run(() => a.ChatStore.FriendChatStore.m_rgFriendChats) || [])
+      .map((c) => {
+        const unread = run(() => (c.is_blocked_friend ? 0 : c.unread_message_count)) || 0;
+        const item = unread && byId.get(run(() => c.m_unAccountIDFriend));
+        return item && { ...item, unread, at: run(() => c.time_last_message) || 0 };
+      })
+      .filter(Boolean)
+      .sort((x, y) => y.at - x.at);
+    const chats = [...friendChats, ...groups.filter((g) => g.unread)];
+
+    const settings = run(() => a.SettingsStore.FriendsSettings);
+    const compact = {
+      favorites: Boolean(run(() => settings.bCompactQuickAccess)),
+      list: Boolean(run(() => settings.bCompactFriendsList)),
+    };
+
+    return { me, games: list, online, offline, groups, favorites, chats, compact };
   }
 
   const store = {
@@ -165,7 +213,9 @@
     searching: false,
     data: null,
     sig: '',
-    flyGame: null,
+    flyKey: null,
+    // The open "+N" flyout's search text (ui.js)
+    flyQuery: '',
     flyTimer: 0,
     readAt: 0,
     steamMounted: false,
