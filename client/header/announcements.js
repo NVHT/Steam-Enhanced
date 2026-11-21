@@ -190,8 +190,8 @@
   addEventListener('keydown', onKey, true);
   const offNews = SE.news.onChange(refresh);
   const observer = SE.watch(mark, { throttle: 300 });
-  // Steam's events load on their own: counted again every minute
-  const timer = setInterval(refresh, 60000);
+  // Steam's events load on their own, with no change event: counted again every minute
+  const timer = SE.poll(refresh, 60000);
   refresh();
 
   state.destroy = () => {
@@ -199,7 +199,7 @@
     removeEventListener('keydown', onKey, true);
     offNews();
     observer?.disconnect();
-    clearInterval(timer);
+    timer?.disconnect();
     menu?.release();
     const button = document.querySelector(BUTTON);
     if (button) {

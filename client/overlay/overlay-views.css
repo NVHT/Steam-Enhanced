@@ -18,7 +18,7 @@ html[data-se-ov] .se-ov-body {
   gap: var(--se-space-3) var(--se-space-4);
   padding-top: var(--se-space-4);
   box-shadow: inset 0 1px 0 var(--se-divider);
-  font-family: var(--se-font), 'Motiva Sans', sans-serif;
+  font-family: var(--se-font);
 }
 
 .se-ov-drawer {
@@ -97,7 +97,7 @@ html[data-se-ov] .se-ov-exit:not(#se-none) {
   margin: 0;
   border: 0;
   border-radius: var(--se-radius-md);
-  font-family: var(--se-font), 'Motiva Sans', sans-serif;
+  font-family: var(--se-font);
   text-shadow: none;
   cursor: pointer;
   transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out;
@@ -139,7 +139,7 @@ html[data-se-ov] .se-ov-back:not(#se-none):active {
   border-radius: 6px;
   background: color-mix(in srgb, var(--se-bg-ink) 14%, transparent);
   color: color-mix(in srgb, var(--se-bg-ink) 75%, transparent);
-  font: 600 var(--se-fs-xs)/1 var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-xs)/1 var(--se-font);
 }
 
 html[data-se-ov] .se-ov-exit:not(#se-none) {
@@ -184,7 +184,7 @@ html[data-se-ov] :is(.se-ov-rail, .se-ov-body) > [data-tip]::before {
   background: var(--se-surface-2);
   box-shadow: var(--se-shadow-pop);
   color: var(--se-text-strong);
-  font: 600 var(--se-fs-sm)/16px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-sm)/16px var(--se-font);
   white-space: pre;
   text-shadow: none;
   opacity: 0;
@@ -236,12 +236,12 @@ html[data-se-ov] .se-ov-tab:focus-visible {
   flex: 1;
   margin: 0;
   color: var(--se-text-strong);
-  font: 600 var(--se-fs-xl)/1.2 var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-xl)/1.2 var(--se-font);
 }
 
 .se-ov-tabs-note {
   color: var(--se-text);
-  font: 500 var(--se-fs-sm)/1 var(--se-font), 'Motiva Sans', sans-serif;
+  font: 500 var(--se-fs-sm)/1 var(--se-font);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -283,6 +283,13 @@ html[data-se-ov] .se-ov-overview[data-se-ov-view='settings'] > [data-view='setti
   }
 }
 
+/* Reduced motion: the view appears in place (same specificity as the rule above, so later wins) */
+@media (prefers-reduced-motion: reduce) {
+  html[data-se-ov] .se-ov-overview[data-se-ov-view] > [data-view] {
+    animation: none;
+  }
+}
+
 .se-ov-view [hidden] {
   display: none !important;
 }
@@ -305,7 +312,7 @@ html[data-se-ov] .se-ov-overview[data-se-ov-view='settings'] > [data-view='setti
 .se-ov-friends-group {
   margin: var(--se-space-2) 0 var(--se-space-1);
   color: var(--se-text-dim);
-  font: 700 var(--se-fs-xs)/16px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 700 var(--se-fs-xs)/16px var(--se-font);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -354,7 +361,7 @@ html[data-se-ov] .se-ov-friend .se-ov-avatar {
 .se-ov-friend-name {
   overflow: hidden;
   color: var(--se-text-strong);
-  font: 600 var(--se-fs-base)/18px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-base)/18px var(--se-font);
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -362,7 +369,7 @@ html[data-se-ov] .se-ov-friend .se-ov-avatar {
 .se-ov-friend-status {
   overflow: hidden;
   color: var(--se-text-dim);
-  font: 500 var(--se-fs-xs)/15px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 500 var(--se-fs-xs)/15px var(--se-font);
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -383,7 +390,7 @@ html[data-se-ov] .se-ov-friend .se-ov-avatar {
   border-radius: var(--se-radius-sm);
   background: var(--se-surface-2);
   color: var(--se-text);
-  font: 600 var(--se-fs-sm)/1 var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-sm)/1 var(--se-font);
   opacity: 0;
   transition: opacity var(--se-dur) ease-out;
 }
@@ -399,7 +406,7 @@ html[data-se-ov] .se-ov-friends-more {
   border: 0;
   background: none;
   color: var(--se-text-dim);
-  font: 700 var(--se-fs-xs)/16px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 700 var(--se-fs-xs)/16px var(--se-font);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
@@ -456,7 +463,7 @@ html[data-se-ov] .se-ov-field-input:not(#se-none) {
   box-shadow: none !important;
   outline: none !important;
   color: var(--se-text-strong) !important;
-  font: 500 var(--se-fs-base)/1 var(--se-font), 'Motiva Sans', sans-serif !important;
+  font: 500 var(--se-fs-base)/1 var(--se-font) !important;
   text-shadow: none;
 }
 
@@ -514,7 +521,7 @@ html[data-se-ov] .se-ov-field-go:focus-visible {
   border-radius: var(--se-radius-pill);
   background: var(--se-white-07);
   color: var(--se-text);
-  font: 700 var(--se-fs-2xs)/14px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 700 var(--se-fs-2xs)/14px var(--se-font);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -532,7 +539,7 @@ html[data-se-ov] .se-ov-btn {
   border-radius: var(--se-radius-sm);
   background: var(--se-surface-2);
   color: var(--se-text-strong);
-  font: 600 var(--se-fs-sm)/1 var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-sm)/1 var(--se-font);
   text-shadow: none;
   cursor: pointer;
   transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
@@ -573,7 +580,7 @@ html[data-se-ov] .se-ov-btn:focus-visible {
 
 .se-ov-slider .se-ov-tool-label {
   flex: none;
-  font: 500 var(--se-fs-base)/18px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 500 var(--se-fs-base)/18px var(--se-font);
 }
 
 html[data-se-ov] .se-ov-range {
@@ -640,7 +647,7 @@ html[data-se-ov] .se-ov-switch-row:focus-visible {
 
 .se-ov-switch-desc {
   color: var(--se-text-muted);
-  font: 500 var(--se-fs-sm)/16px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 500 var(--se-fs-sm)/16px var(--se-font);
   white-space: normal;
 }
 
@@ -686,7 +693,7 @@ html[data-se-ov] .se-ov-switch-row:focus-visible {
   border-radius: var(--se-radius-pill);
   background: var(--se-hairline);
   color: var(--se-text-muted);
-  font: 600 var(--se-fs-xs)/14px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 600 var(--se-fs-xs)/14px var(--se-font);
   text-shadow: none;
 }
 

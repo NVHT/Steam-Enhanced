@@ -33,7 +33,6 @@
 
 ._2siQZCB9yAOkiG8N-zRZEe:not(.GamepadMode *):not(#se-none) {
   --ap-good: #67d48a;
-  --ap-mono: "Cascadia Mono", "Cascadia Code", Consolas, "SFMono-Regular", ui-monospace, monospace;
   /*
    * Shrink to the column, never stretch: Steam measures the dialog in an unconstrained host
    * before showing it, and a stretched width there reads as "too wide" and pops it out
@@ -109,7 +108,7 @@
   height: 44px;
   padding-inline: var(--se-space-7) var(--se-space-7) !important;
   border-radius: var(--se-radius-md) !important;
-  font: 600 var(--se-fs-lg)/1 var(--ap-mono) !important;
+  font: 600 var(--se-fs-lg)/1 var(--se-font-mono) !important;
   letter-spacing: .14em !important;
   text-transform: uppercase;
   color: var(--se-text-strong) !important;
@@ -174,6 +173,13 @@ button.se-ap-clear:not(#se-none) {
   opacity: 1;
   visibility: visible;
   transition-delay: 0s;
+}
+
+/* The hit area grows to --se-hit around the 28px disc, still inside the field; the look stays */
+button.se-ap-clear::after {
+  content: '';
+  position: absolute;
+  inset: calc((28px - var(--se-hit)) / 2);
 }
 
 button.se-ap-clear:not(#se-none):hover {
@@ -277,7 +283,7 @@ button.se-ap-clear svg {
   order: 6;
   padding: var(--se-space-1) var(--se-space-3);
   background: var(--se-bg);
-  font: 500 var(--se-fs-base)/1.6 var(--ap-mono) !important;
+  font: 500 var(--se-fs-base)/1.6 var(--se-font-mono) !important;
   letter-spacing: .06em !important;
   text-transform: none;
   color: var(--se-text-muted) !important;
@@ -333,7 +339,7 @@ button.se-ap-clear svg {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font: 500 var(--se-fs-base)/1.3 var(--ap-mono);
+  font: 500 var(--se-fs-base)/1.3 var(--se-font-mono);
   letter-spacing: .04em;
   color: var(--se-text-muted);
 }

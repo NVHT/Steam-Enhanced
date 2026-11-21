@@ -398,12 +398,13 @@ html.se-viewer-open {
   font-variant-numeric: tabular-nums;
 }
 
-/* Sliders: a thin rounded track, the filled part in the accent, a round thumb on hover. */
+/* Sliders: a thin rounded track, the filled part in the accent, a round thumb on hover. The
+   input is a full hit target tall; Chromium centres the track in it. */
 .se-player__seek,
 .se-player__volume {
   -webkit-appearance: none;
   appearance: none;
-  height: 16px;
+  height: var(--se-hit);
   margin: 0;
   background: transparent;
   cursor: pointer;
@@ -411,6 +412,8 @@ html.se-viewer-open {
 
 .se-player__seek {
   width: 100%;
+  /* The taller hit area reaches into the bar's padding and gap, so the bar keeps its height */
+  margin-block: calc(-1 * var(--se-space-2));
 }
 
 .se-player__volume {
@@ -452,7 +455,7 @@ html.se-viewer-open {
   -webkit-appearance: none;
   width: 12px;
   height: 12px;
-  margin-top: calc(-1 * var(--se-space-1));
+  margin-top: calc(-1 * var(--se-space-1)); /* centred on the 4px track */
   border-radius: 50%;
   background: var(--se-white);
   box-shadow: 0 1px 4px var(--se-black-50);
@@ -460,18 +463,20 @@ html.se-viewer-open {
   transition: transform var(--se-dur);
 }
 
-.se-player__seek:hover::-webkit-slider-thumb {
-  margin-top: calc(-1 * var(--se-space-1));
-}
-
 .se-player__seek:is(:hover, :focus-visible)::-webkit-slider-thumb,
 .se-player__volume::-webkit-slider-thumb {
   transform: scale(1);
 }
 
+/* Keyboard focus: the ring on the thumb (the 4 px track is too thin to ring), in the focus colour */
 .se-player__seek:focus-visible,
 .se-player__volume:focus-visible {
   outline: none;
+}
+
+.se-player__seek:focus-visible::-webkit-slider-thumb,
+.se-player__volume:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 1px 4px var(--se-black-50), 0 0 0 2px var(--se-accent);
 }
 
 /* Quality: the web's one dropdown (web/shared/select.js) in the control row */
@@ -501,7 +506,7 @@ html.se-viewer-open {
 .se-player:not(#se-none) :is(.se-player__seek, .se-player__volume) {
   display: block;
   box-sizing: border-box;
-  height: 16px !important;
+  height: var(--se-hit) !important;
   min-height: 0 !important;
   padding: 0 !important;
   border: 0 !important;

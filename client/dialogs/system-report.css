@@ -382,6 +382,7 @@
 }
 
 .se-sysreport-mode {
+  position: relative;
   height: 100%;
   display: inline-flex;
   align-items: center;
@@ -391,6 +392,13 @@
   background: none;
   font: 600 var(--se-fs-xs)/1 var(--se-font);
   color: var(--se-text-muted);
+}
+
+/* The hit area grows to --se-hit over the pill's 2px rim (the 24px mode inside the 28px pill) */
+.se-sysreport-mode::after {
+  content: '';
+  position: absolute;
+  inset: calc((24px - var(--se-hit)) / 2) 0;
 }
 
 .se-sysreport-mode svg {
@@ -508,7 +516,7 @@
 }
 
 .se-sysreport-row-value[data-kind="mono"] {
-  font-family: Consolas, "Cascadia Mono", "SF Mono", monospace;
+  font-family: var(--se-font-mono);
   font-size: var(--se-fs-sm);
   font-weight: 500;
   letter-spacing: .01em;
@@ -596,7 +604,7 @@
   padding: 0 var(--se-space-2) 0 var(--se-space-1);
   border-radius: var(--se-radius-xs);
   background: transparent;
-  font: 600 var(--se-fs-2xs)/1 Consolas, "Cascadia Mono", "SF Mono", monospace;
+  font: 600 var(--se-fs-2xs)/1 var(--se-font-mono);
   letter-spacing: .02em;
   color: var(--se-text-faint);
   white-space: nowrap;
@@ -641,7 +649,7 @@
   display: flex;
   align-items: center;
   gap: var(--se-space-2);
-  min-height: 28px;
+  min-height: var(--se-hit);
   padding: 0 var(--se-space-2) 0 var(--se-space-1);
   border-radius: var(--se-radius-sm);
   font: 600 var(--se-fs-sm)/16px var(--se-font);
@@ -700,7 +708,7 @@
   background: var(--se-bg);
   box-shadow: var(--se-edge);
   outline: 0;
-  font: 400 var(--se-fs-sm)/18px Consolas, "Cascadia Mono", "SF Mono", monospace;
+  font: 400 var(--se-fs-sm)/18px var(--se-font-mono);
   color: var(--se-text-dim);
   user-select: text;
   tab-size: 4;

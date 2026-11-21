@@ -160,10 +160,9 @@
   /*
    * The main button's state Steam gives no class for: STOP (this game is running) is drawn
    * like Install (not Green). Marked data-se-action="stop" for play-bar.css's red recipe.
-   * PlayButtonContainer and Green are Steam's (SteamTracking sp.css), not in the classmap.
    */
-  const PLAY_CONTAINER = '._1FnJ6dPuknQFQ2RTpKTI16';
-  const PLAY_GREEN = '._3cI5TXsFX3bvpR-7EBOtxq';
+  const PLAY_CONTAINER = `.${C.PlayButtonContainer}`;
+  const PLAY_GREEN = `.${C.Green}`;
 
   function placePlayAction() {
     const id = +(location.href.match(/\/app\/(\d+)/) || [])[1] || 0;

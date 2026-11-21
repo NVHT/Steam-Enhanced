@@ -27,7 +27,7 @@
 html:is(.se-store, .se-community):not(#se-none) .newmodal_background {
   background: var(--se-black-60) !important;
   opacity: 1 !important;
-  backdrop-filter: blur(4px);
+  backdrop-filter: var(--se-blur-scrim);
 }
 
 /* ---------- Frame ---------- */
@@ -86,7 +86,8 @@ html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_close {
   height: 34px !important;
   margin: 0 !important;
   border-radius: var(--se-radius-control);
-  background: var(--se-surface-2) !important;
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge);
   cursor: pointer;
   transition: background-color var(--se-dur);
 }
@@ -96,17 +97,17 @@ html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_close::befor
   display: block;
   width: 100%;
   height: 100%;
-  background: var(--se-text-muted);
+  background: var(--se-btn-color);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
   transition: background-color var(--se-dur);
 }
 
 html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_close:hover {
-  background: var(--se-hover) !important;
+  background: var(--se-btn-bg-hover) !important;
 }
 
 html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_close:hover::before {
-  background: var(--se-text);
+  background: var(--se-btn-color-hover);
 }
 
 html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_content {
@@ -150,9 +151,9 @@ html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_buttons > [c
   padding: 0 !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-surface-2) !important;
-  box-shadow: var(--se-edge);
-  color: var(--se-text) !important;
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-btn-color) !important;
   cursor: pointer;
   transition: background-color var(--se-dur);
 }
@@ -162,22 +163,24 @@ html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_buttons > [c
   border: 0 !important;
   background: none !important;
   color: inherit !important;
-  font: 700 var(--se-fs-md)/38px var(--se-font) !important;
+  font: var(--se-btn-font) !important;
   text-shadow: none !important;
 }
 
 html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_buttons > [class*="btn_"]:hover {
-  background: var(--se-hover) !important;
+  background: var(--se-btn-bg-hover) !important;
+  color: var(--se-btn-color-hover) !important;
 }
 
 html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_buttons > :is(.btn_green_steamui, .btn_green_white_innerfade, .btnv6_green_white_innerfade, .btn_blue_steamui) {
-  background: var(--se-accent) !important;
+  background: var(--se-btn-primary-bg) !important;
   box-shadow: none;
-  color: var(--se-on-accent) !important;
+  color: var(--se-btn-primary-color) !important;
 }
 
 html:is(.se-store, .se-community):not(#se-none) .newmodal .newmodal_buttons > :is(.btn_green_steamui, .btn_green_white_innerfade, .btnv6_green_white_innerfade, .btn_blue_steamui):hover {
-  background: var(--se-accent-hover) !important;
+  background: var(--se-btn-primary-bg-hover) !important;
+  color: var(--se-btn-primary-color) !important;
 }
 
 /* ---------- Focus ----------
@@ -221,7 +224,7 @@ html:is(.se-store, .se-community):not(#se-none) .newmodal :is(.waiting_dialog_co
 html:is(.se-store, .se-community):not(#se-none) #modalBG {
   background: var(--se-black-60) !important;
   opacity: 1 !important;
-  backdrop-filter: blur(4px);
+  backdrop-filter: var(--se-blur-scrim);
 }
 
 /* The frame sizes to its content: Steam fixes heights (inline and in its rules) that cut off

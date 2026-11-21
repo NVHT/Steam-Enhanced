@@ -3,8 +3,8 @@
  * paired with brew-hub.js. Laid out like the other Millennium pages, Themes above all.
  *
  * Browse: the page title and its sub-line (a .DialogHeader of the theme's, so it is every page's
- * title) with Refresh as the header's icon button; the toolbar (Themes | Plugins as the
- * segmented control, search, Sort, Tags); the label row ("Themes · 27") with the pager; then the
+ * title); the toolbar (Themes | Plugins as the segmented control, search, Sort, Tags); the pager
+ * row (the pager and Refresh at its right, no label: the tab says what is listed); then the
  * cards three across, as many rows as the window holds (Themes' card: picture, name, one-line
  * description, the action and an icon button). Details: Back and the title as a sub-page title,
  * the item as the "theme in use" card, then the README filling the rest and scrolling on its own.
@@ -12,9 +12,10 @@
  * The plugin's React owns every node: nothing of its is moved. The root is one grid with the
  * plugin's two bars as `display: contents`; brew-hub.js marks the view ([data-se-bh]), sizes the
  * root to the window (--se-bh-h), and adds the title, the segmented track, the Sort menu and the
- * label row ([data-se-bh-own]). The plugin styles itself from an inline <style> whose buttons
- * carry !important, and Steam draws its own ::before on DialogButton, so the button rules below
- * need !important and three ids to win (as millennium.css's page buttons do).
+ * pager row ([data-se-bh-own]). The plugin styles itself from the <style> its frontend injects
+ * (BrewHub's own), whose buttons carry !important, and Steam draws its own ::before on
+ * DialogButton (Steam's sp.js CSS module), so the button rules below need !important and three
+ * ids to win (as millennium.css's page buttons do).
  */
 
 /* Root */
@@ -33,7 +34,8 @@
 /*
  * The title row and the toolbar sit in the window's top strip, which Steam makes a drag area for
  * moving the window: a click there moved the window instead of pressing the control. Carved out
- * as Millennium's own page buttons are (millennium-window.css), with its !important.
+ * as Millennium's own page buttons are (millennium-window.css), with its !important: it beats
+ * Steam's `-webkit-app-region: drag` on that strip (Steam's sp.js CSS module).
  */
 .MillenniumSettings .sf-root :is(.sf-bar1, .sf-bar1 *, .sf-bar2, .sf-bar2 *, .sf-dhead, .sf-dhead *),
 .MillenniumSettings .sf-root :is([data-se-bh-own], [data-se-bh-own] *) {
@@ -77,7 +79,9 @@
   display: none;
 }
 
-/* The foot and Back icon buttons draw their glyph on Steam's ::before */
+/* The foot and Back icon buttons draw their glyph on Steam's ::before. !important: Steam's own
+   DialogButton ::before (Steam's sp.js CSS module) and the plugin's injected <style> (BrewHub's
+   frontend) both set these */
 .MillenniumSettings .sf-root .sf-foot > .sf-btn:not(#se-none):not(#se-p2):not(#se-p3)::before,
 .MillenniumSettings .sf-root .sf-dhead .sf-btn:not(#se-none):not(#se-p2):not(#se-p3)::before {
   content: '' !important;
@@ -141,6 +145,11 @@
 .MillenniumSettings .sf-root[data-se-bh="grid"] .sf-tab.sf-on {
   background: var(--se-selected);
   color: var(--se-text-strong);
+}
+
+.MillenniumSettings .sf-root[data-se-bh="grid"] .sf-tab:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 .MillenniumSettings .sf-root[data-se-bh="grid"] .sf-tab:active {
@@ -264,6 +273,7 @@
   box-shadow: var(--se-field-edge-hover);
 }
 
+.MillenniumSettings .sf-root .sf-input.sf-select:focus-visible,
 .MillenniumSettings .se-bh-sort > button:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
@@ -362,6 +372,7 @@
 }
 
 .MillenniumSettings .sf-root .sf-opt:hover,
+.MillenniumSettings .sf-root .sf-opt:focus-visible,
 .MillenniumSettings .se-bh-menu [role="option"]:hover,
 .MillenniumSettings .se-bh-menu [role="option"]:focus-visible {
   background: var(--se-hover);
@@ -411,6 +422,12 @@
   color: var(--se-text-dim);
   cursor: pointer;
   transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+/* Hidden while the plugin shows no Refresh of its own (brew-hub.js): `display: grid` above
+   outranks the UA's [hidden] rule, as with .se-mpager (millennium-redesign.css) */
+.MillenniumSettings .se-bh-refresh[hidden] {
+  display: none;
 }
 
 .MillenniumSettings .se-bh-refresh:hover:not(:disabled) {
@@ -546,8 +563,9 @@
 
 /*
  * The plugin's buttons, as the row buttons on Themes (millennium.css). !important and the three
- * ids: the plugin's inline <style> sets these with !important, and the settings dialog's
- * DialogButton rules carry two ids.
+ * ids: the plugin's injected <style> (BrewHub's own frontend) sets these with !important, and
+ * the settings dialog's DialogButton rules carry two ids (client/settings/controls.css and
+ * layout.css, the theme's own).
  */
 .MillenniumSettings .sf-root .sf-btn:not(#se-none):not(#se-p2):not(#se-p3) {
   gap: var(--se-space-2) !important;
@@ -583,7 +601,7 @@
   cursor: default;
 }
 
-/* Icon buttons: Refresh (title row), Details (a card), Back (Details' title) */
+/* Icon buttons: Details (a card), Back (Details' title) */
 /* No gap: the hidden label is still a flex item, and the gap beside it pushed the icon off centre */
 .MillenniumSettings .sf-root :is(.sf-foot, .sf-dhead) > .sf-btn:not(#se-none):not(#se-p2):not(#se-p3) {
   flex: none !important;
@@ -611,9 +629,6 @@
 .MillenniumSettings .sf-root .sf-dhead .sf-btn:not(#se-none):not(#se-p2):not(#se-p3) {
   width: var(--se-control-h) !important;
   height: var(--se-control-h) !important;
-}
-
-.MillenniumSettings .sf-root .sf-dhead .sf-btn:not(#se-none):not(#se-p2):not(#se-p3) {
   color: var(--se-text-muted) !important;
 }
 

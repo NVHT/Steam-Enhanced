@@ -26,7 +26,7 @@
  * - main.js    finding the dialog, building the view, the watcher and destroy()
  */
 ((SE) => {
-  const ns = (window.__seSystemReportParts = { live: {} });
+  const ns = (window.__seSystemReportParts = {});
   const { el } = SE;
 
   window.__seSystemReport?.destroy();

@@ -286,6 +286,8 @@ button.se-sysinfo:focus-visible {
   min-width: 0;
   display: flex;
   gap: var(--se-space-1);
+  /* Room for the chips' hit areas above and below: the scroller clips what overflows it */
+  padding-block: calc((var(--se-hit) - 26px) / 2);
   overflow-x: auto;
   scrollbar-width: none;
   mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
@@ -297,6 +299,7 @@ button.se-sysinfo:focus-visible {
 
 .se-sysinfo-chip,
 .se-sysreport-chip {
+  position: relative;
   flex: none;
   height: 26px;
   display: inline-flex;
@@ -308,6 +311,14 @@ button.se-sysinfo:focus-visible {
   font: 600 var(--se-fs-xs)/1 var(--se-font);
   color: var(--se-text-muted);
   white-space: nowrap;
+}
+
+/* The hit area grows to --se-hit around the 26px chip; the look stays */
+.se-sysinfo-chip::after,
+.se-sysreport-chip::after {
+  content: '';
+  position: absolute;
+  inset: calc((26px - var(--se-hit)) / 2) 0;
 }
 
 .se-sysinfo-chip svg {
@@ -380,6 +391,7 @@ button.se-sysinfo:focus-visible {
 
 .se-sysinfo-filter-clear,
 .se-sysreport-filter-clear {
+  position: relative;
   width: 20px;
   height: 20px;
   flex: none;
@@ -395,6 +407,14 @@ button.se-sysinfo:focus-visible {
 
 .se-sysinfo-filter[data-filled] .se-sysinfo-filter-clear {
   visibility: visible;
+}
+
+/* The hit area grows to --se-hit around the 20px disc; the look stays */
+.se-sysinfo-filter-clear::after,
+.se-sysreport-filter-clear::after {
+  content: '';
+  position: absolute;
+  inset: calc((20px - var(--se-hit)) / 2);
 }
 
 .se-sysinfo-filter-clear svg {
@@ -479,6 +499,7 @@ button.se-sysinfo:focus-visible {
 
 .se-sysinfo-card-copy,
 .se-sysreport-card-copy {
+  position: relative;
   width: 24px;
   height: 24px;
   flex: none;
@@ -491,6 +512,14 @@ button.se-sysinfo:focus-visible {
   background: none;
   color: var(--se-text-faint);
   opacity: 0;
+}
+
+/* The hit area grows to --se-hit around the 24px button; the look stays */
+.se-sysinfo-card-copy::after,
+.se-sysreport-card-copy::after {
+  content: '';
+  position: absolute;
+  inset: calc((24px - var(--se-hit)) / 2);
 }
 
 .se-sysinfo-card-copy svg {
@@ -603,7 +632,7 @@ button.se-sysinfo:focus-visible {
 }
 
 .se-sysinfo-mono {
-  font-family: Consolas, "Cascadia Mono", "SF Mono", monospace;
+  font-family: var(--se-font-mono);
   font-size: var(--se-fs-sm);
   font-weight: 500;
   letter-spacing: .01em;

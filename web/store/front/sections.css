@@ -687,18 +687,22 @@ html.se-store-rows:not(#se-none) .mzAzU7-I6qg-:hover img {
  * The sponsored band under the hero, at the page's full width and the image's own proportions
  * (front/sections.js reads the ratio). Only once sized: until then Steam's own sizing stays.
  */
-/* !important: Steam's page CSS sizes the band and its holder in px */
+/* !important: Steam's v6/home.css (store.steampowered.com/public/css) sets the band's holder,
+   .home_page_content.takeunder, 150px tall */
 html.se-store-front #home_takeunder_ctn:has([data-se-takeunder]),
 html.se-store-front #home_takeunder_ctn .home_page_content.takeunder:has(> [data-se-takeunder]) {
   height: auto !important;
 }
 
+/* !important: Steam's v6/home.css gives .home_page_content 940px, and home.css caps .takeunder
+   at 1200px (both store.steampowered.com/public/css) */
 html.se-store-front #home_takeunder_ctn .home_page_content.takeunder:has(> [data-se-takeunder]) {
   width: 100% !important;
   max-width: none !important;
 }
 
-/* !important: Steam's page CSS caps the link's size in px */
+/* !important: Steam caps the link's size; its home_gamepad.css (store.steampowered.com/public/css)
+   lifts the cap only in Gamepad mode, and no SteamTracking stylesheet sets it: the markup does */
 html.se-store-front a.home_page_takeunder[data-se-takeunder] {
   display: block;
   width: 100% !important;

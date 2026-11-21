@@ -5,15 +5,18 @@
  * question stay mounted, hidden; Delete is Steam's Remove button, its word swapped by CSS.
  */
 
-/* The box of Steam's tile and right side: the tile, then the text. !important: Steam's layout */
+/* The box of Steam's tile and right side: the tile, then the text */
 [data-se-delcoll]:not(#se-none) {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: flex-start !important;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
   gap: var(--se-space-5);
 }
 
-/* Steam's tile and cross (CollectionDelete), its header and question. !important: Steam's display. */
+/*
+ * Steam's tile and cross (CollectionDelete), its header and question. !important: the tile's
+ * display: flex in Steam's CollectionDeleteContainer module (steamui/css/sp.css), same specificity.
+ */
 [data-se-delcoll] > .gx3vaLhXVrwPiXhU4JlSa,
 [data-se-delcoll] .DialogHeader,
 [data-se-delcoll] .DialogBodyText {
@@ -22,7 +25,7 @@
 
 /* The right side (CollectionDeleteRightSide): the theme's text first, then Steam's footer */
 [data-se-delcoll] ._3rTCYsnxbJIEJYKH-cf7DE:not(#se-none) {
-  display: flex !important;
+  display: flex;
   flex-direction: column;
   flex: 1;
   min-width: 0;
@@ -106,20 +109,20 @@
 
 /* The footer: Cancel, then Delete at the end */
 [data-se-delcoll] .DialogFooter:not(#se-none) {
-  margin-top: var(--se-space-5) !important;
+  margin-top: var(--se-space-5);
 }
 
 [data-se-delcoll] .DialogFooter :has(> .DialogButton):not(#se-none) {
-  display: flex !important;
+  display: flex;
   justify-content: flex-end;
   gap: var(--se-space-2);
 }
 
 [data-se-delcoll] .DialogFooter .DialogButton:not(#se-none) {
-  flex: none !important;
-  width: auto !important;
+  flex: none;
+  width: auto;
   min-width: 96px;
-  margin: 0 !important;
+  margin: 0;
 }
 
 /*

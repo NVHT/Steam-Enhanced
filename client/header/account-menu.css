@@ -10,7 +10,8 @@
  * (contextMenu, which its window is sized to) goes see-through and the panel is its contents,
  * inside a margin the shadow falls in. The avatar's anchor takes the margin back
  * (client/header/menu/placement.js), so the panel still opens beside the rail. The window is
- * marked Account_Menu by Steam.
+ * marked Account_Menu by Steam. !important: Steam's menu CSS module (contextMenu, in
+ * steamui/sp.js) sets the surface, corners, shadow and margin on these.
  */
 html.Account_Menu .PP7LM0Ow1K5qkR8WElLpt:not(#se-none) {
   background: transparent !important;
@@ -72,7 +73,7 @@ html.Account_Menu ._2EstNjFIIZm_WUSKm5Wt7n[data-se-closing]:not(#se-none) {
   outline: none !important;
 }
 
-:root [data-se-avatar-menu] [data-se-acct-icon]:is(:focus-visible, .gpfocus) {
+:root [data-se-avatar-menu] :is([data-se-acct-icon], .se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI):is(:focus-visible, .gpfocus) {
   background: var(--se-selected) !important;
   color: var(--se-text-strong) !important;
   box-shadow: none !important;
@@ -185,7 +186,10 @@ html.Account_Menu ._2EstNjFIIZm_WUSKm5Wt7n[data-se-closing]:not(#se-none) {
 :root .se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI {
   flex: 1 1 0;
   min-width: 0;
+  /* The minimum hit target; the label stays centred in it */
+  min-height: var(--se-hit);
   display: flex;
+  align-items: center;
   justify-content: center;
   padding: var(--se-space-1) var(--se-space-half) !important;
   padding-inline: var(--se-space-half) !important;

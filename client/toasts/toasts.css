@@ -307,8 +307,9 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   animation-play-state: paused;
 }
 
-/* Thumbs with no art: the same ground, still. */
-.se-tst-thumb:not(:has(img)) {
+/* Thumbs with no art: the same ground, still. SE.art.img leaves a hidden <img> when every copy
+   fails, so a hidden one counts as none. */
+.se-tst-thumb:not(:has(img:not([hidden]))) {
   background:
     radial-gradient(ellipse 80% 120% at 85% 20%, color-mix(in srgb, var(--c) 45%, transparent), transparent 70%),
     var(--se-sidebar);
@@ -909,7 +910,7 @@ html[data-se-tst-compact] .DesktopToastPopup {
     linear-gradient(90deg, color-mix(in srgb, var(--c) 20%, transparent), transparent 58%),
     rgba(16, 18, 23, .94) !important;
   box-shadow: var(--se-edge-divider) !important;
-  font-family: var(--se-font), 'Motiva Sans', sans-serif !important;
+  font-family: var(--se-font) !important;
 }
 
 /* Steam's Steam-logo watermark: the wash replaces it. */
@@ -1057,7 +1058,7 @@ html[data-se-tst-compact] .Header:empty {
   gap: var(--se-space-1);
   margin-bottom: 1px;
   color: var(--c);
-  font: 700 var(--se-fs-2xs)/11px var(--se-font), 'Motiva Sans', sans-serif;
+  font: 700 var(--se-fs-2xs)/11px var(--se-font);
   letter-spacing: .08em;
   text-transform: uppercase;
 }
@@ -1077,13 +1078,13 @@ html[data-se-tst-compact] :is(.Title, .GroupMessageUserName, .StandardNotificati
 
 html[data-se-tst-compact] :is(.Title, .GroupMessageUserName) {
   color: var(--se-text-strong) !important;
-  font: 600 var(--se-fs-base)/16px var(--se-font), 'Motiva Sans', sans-serif !important;
+  font: 600 var(--se-fs-base)/16px var(--se-font) !important;
 }
 
 html[data-se-tst-compact] :is(.StandardNotificationDescription, .GroupMessageBody) {
   margin: 0 !important;
   color: var(--se-text-dim) !important;
-  font: 400 var(--se-fs-sm)/14px var(--se-font), 'Motiva Sans', sans-serif !important;
+  font: 400 var(--se-fs-sm)/14px var(--se-font) !important;
 }
 
 /* Any further line Steam adds (a request's "is awaiting your response") */
@@ -1091,7 +1092,7 @@ html[data-se-tst-compact] .Content > :not(.se-tst-cmp-ey, .Header, .Body, .Stand
   overflow: hidden;
   margin: 0 !important;
   color: var(--se-text-faint) !important;
-  font: 400 var(--se-fs-sm)/14px var(--se-font), 'Motiva Sans', sans-serif !important;
+  font: 400 var(--se-fs-sm)/14px var(--se-font) !important;
   white-space: nowrap;
   text-overflow: ellipsis;
 }

@@ -135,7 +135,8 @@
       types.parentElement.append(block);
       SE.attr(types.parentElement, FOOTER, '');
       SE.attr(root, ROOT, '');
-      refresh();
+      // A rebuilt block shows the type still picked (build() checks the first), then refreshes
+      pick(picked);
     };
 
     // The footer can mount after the frame; the name's changes re-render Steam's Options

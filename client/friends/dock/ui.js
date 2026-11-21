@@ -118,7 +118,7 @@
     hideFly(true);
     state.sig = '';
     ns.place();
-    // The title bar's Friends & Chat button names what its click does next
+    // The title bar's Friends & Chat button mirrors the dock's state (data-se-dock: open, rail, hidden)
     window.__seHeaderActions?.syncFriendsButton?.();
   }
 

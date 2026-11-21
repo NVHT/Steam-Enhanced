@@ -858,6 +858,8 @@
 
   window.__seLibraryManager = {
     destroy() {
+      // Destroyed before the body existed: never start
+      removeEventListener('DOMContentLoaded', start);
       observer?.disconnect();
       for (const el of made) el.remove();
       made.clear();

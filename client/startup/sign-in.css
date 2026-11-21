@@ -66,11 +66,11 @@ html[data-se-login="chooser"] .se-startup-bg::after {
 /* Back to the account chooser: a small button in the window's corner. */
 [data-se-si="back"]:not(#se-none) {
   position: fixed;
-  top: 14px;
-  left: 14px;
+  top: 13px;
+  left: 13px;
   z-index: 5;
-  width: 30px;
-  height: 30px;
+  width: var(--se-hit);
+  height: var(--se-hit);
   margin: 0;
   display: flex;
   align-items: center;
@@ -117,7 +117,7 @@ html[data-se-login="chooser"] .se-startup-bg::after {
 
 .se-signin-tab {
   flex: 1;
-  height: 30px;
+  height: var(--se-hit);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -550,8 +550,8 @@ html[data-se-startup-bg="hero"][data-se-login="chooser"] ._2E_ejdBSC79L4iDC4FAMH
 
 html[data-se-startup-bg="hero"] ._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.-M9HbGeKVWXVykt0Zmw4n:not(#se-none) {
   background: color-mix(in srgb, var(--se-bg) 70%, transparent);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: var(--se-blur-panel);
+  backdrop-filter: var(--se-blur-panel);
 }
 
 /* The list, wherever it appears */
@@ -700,32 +700,43 @@ html[data-se-startup-bg="hero"] ._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.
 }
 
 /*
- * The ⋯ menu (Remove account): a small solid button sitting on the ring at the lower right,
- * shown only while the account is pointed at or the button has the keyboard.
+ * The ⋯ menu (Remove account): a small solid disc sitting on the ring at the lower right,
+ * shown only while the account is pointed at or the button has the keyboard. The button is a
+ * full hit target; the 26px disc is its ::before.
  */
 ._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none) {
-  inset: 88px auto auto 88px;
+  inset: 85px auto auto 85px;
   z-index: var(--se-z-raised);
   flex: none !important;
   box-sizing: border-box !important;
-  width: 26px !important;
+  width: var(--se-hit) !important;
   min-width: 0 !important;
-  max-width: 26px !important;
-  height: 26px !important;
+  max-width: var(--se-hit) !important;
+  height: var(--se-hit) !important;
   min-height: 0 !important;
-  max-height: 26px !important;
+  max-height: var(--se-hit) !important;
   aspect-ratio: 1;
   margin: 0 !important;
   padding: 0 !important;
   line-height: 0 !important;
-  overflow: hidden;
   border: 0 !important;
   border-radius: 50% !important;
-  background: var(--se-surface-2) !important;
-  box-shadow: 0 0 0 3px var(--se-bg), 0 4px 10px -2px var(--se-black-60) !important;
+  background: transparent !important;
+  box-shadow: none !important;
   color: var(--se-text) !important;
   opacity: 0 !important;
-  transition: opacity var(--se-dur), background-color var(--se-dur) !important;
+  transition: opacity var(--se-dur) !important;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none)::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  z-index: -1;
+  border-radius: 50%;
+  background: var(--se-surface-2);
+  box-shadow: 0 0 0 3px var(--se-bg), 0 4px 10px -2px var(--se-black-60);
+  transition: background-color var(--se-dur);
 }
 
 ._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV:is(:hover, ._1Bj4ekFS3Y3McdYpme6WhO) ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none),
@@ -734,8 +745,11 @@ html[data-se-startup-bg="hero"] ._1cpxSyGwDz13Qlo95Kbo5H .-M9HbGeKVWXVykt0Zmw4n.
 }
 
 ._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none):is(:hover, :focus-visible) {
-  background: var(--se-accent) !important;
   color: var(--se-bg-ink) !important;
+}
+
+._1rFuHnL8fa-9b2nm_ZMF4L .szwarX82VO26tR6sfO_XV ._1q5iGs9FEBhJcXc2mY3HPG ._3bvVUTxEPL3cm065bRRLEg:not(#se-none):is(:hover, :focus-visible)::before {
+  background: var(--se-accent);
 }
 
 ._1rFuHnL8fa-9b2nm_ZMF4L ._3bvVUTxEPL3cm065bRRLEg ._1ytPahj2hONDeZYLCN7eEu:not(#se-none) {
