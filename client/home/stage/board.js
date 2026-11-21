@@ -465,7 +465,7 @@
       // A page in the menu's place (its side of the ⋯), its ‹ coming back to the menu
       const anchor = menuAnchor;
       const type = menuType;
-      const from = { side: ns.menuSide(), back: (s) => openPanelMenu(anchor, type, s) };
+      const from = { side: ns.menuSide(), height: ns.menuHeight(), back: (s) => openPanelMenu(anchor, type, s) };
       ns.closeMenu();
       if (act === 'pick') {
         PICKERS[type]?.[2](anchor, from);

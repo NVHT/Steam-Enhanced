@@ -323,6 +323,8 @@
   let isNarrow = false;
   // The board's bottom margin (--se-space-5), under the glass
   const BOARD_MARGIN = 24;
+  // The most of the room under the header the board takes (the stage keeps at least the rest)
+  const BOARD_SHARE = 0.32;
 
   // Reads only: the room under the header, and the board's width.
   function measureStage() {
@@ -355,9 +357,14 @@
     }
 
     const vh = appliedVh;
-    // The board as tall as 9 capsules in a third of its width need (board.js); the stage the rest,
-    // never under 340 px
-    const want = ns.boardIdeal(boardW);
+    /*
+     * The board as tall as its capsules need (board.js's boardIdeal, from its width), but never
+     * more than BOARD_SHARE of the room, so it shrinks with a shorter window instead of leaving
+     * the stage to take all of it; never under its least row, and the stage the rest, never
+     * under 340 px. A taller window doesn't grow it past what its capsules need: the stage
+     * takes that.
+     */
+    const want = Math.min(ns.boardIdeal(boardW), Math.round(vh * BOARD_SHARE));
     const boardBox = showBoard ? Math.max(0, Math.min(Math.max(want, ns.boardLeast()), vh - 340 - BOARD_MARGIN)) : 0;
     ns.sizeBoard(boardBox);
     const boardH = boardBox ? boardBox + BOARD_MARGIN : 0;
