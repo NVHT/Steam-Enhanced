@@ -258,6 +258,8 @@
 
     function show(node, data) {
       if (!node.isConnected) return;
+      // A panel still showing (hover moved straight to another node) goes before its successor
+      open?.release();
       open = panel({ sheets, steam });
       if (!open) {
         blocked?.();

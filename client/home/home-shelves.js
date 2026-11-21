@@ -253,7 +253,7 @@
   };
 
   const start = () => {
-    observer = SE.watch(update, { throttle: 100, ignore: SE.inSide });
+    observer = SE.watch(schedule, { throttle: 100, ignore: SE.inSide });
     addEventListener('resize', schedule);
     // A cover image that loads late can change the cover's size without any DOM change.
     document.addEventListener('load', onImageLoad, true);

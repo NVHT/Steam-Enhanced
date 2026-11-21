@@ -5,7 +5,7 @@
 ((SE) => {
   const ns = window.__seHomeStageParts;
   if (!ns) return;
-  const { appStore, client, collectionStore, libraryArt, paintGame, schedule } = ns;
+  const { appStore, client, collectionStore, libraryArt, paintGame } = ns;
   const { live } = ns;
 
   const { run } = SE;
@@ -84,7 +84,6 @@
         if (r?.result !== 1 || !Array.isArray(all) || !all.length) return;
         achievements.set(id, { got: all.filter((a) => a.bAchieved).length, total: all.length });
         if (live.apps[live.selected]?.appid === id) paintGame();
-        schedule(); // the board's Achievements panel
       })
       .catch(() => {});
     return null;
@@ -188,6 +187,6 @@
   }
 
   Object.assign(ns, {
-    CDN, achievementsOf, decode, heroURLs, infoOf, logoURLs, playersOf, recentApps,
+    CDN, achievementsOf, heroURLs, infoOf, logoURLs, playersOf, recentApps,
   });
 })(window.__se);

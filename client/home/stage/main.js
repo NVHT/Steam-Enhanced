@@ -13,9 +13,8 @@
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
  * window.__seHomeStageParts (values parts reassign live on its `live`): util.js
- * (shared helpers), tray.js (panel shell, Favorites, Collections), picks.js, menu.js (the
- * settings menus), stage-settings.js (the stage's settings and the Steam Enhanced | Steam
- * switch), panels-library.js and panels-community.js (more panels), board.js (the board, its
+ * (shared helpers), tray.js (panel shell, Favorites, Collections), picks.js, stage-settings.js
+ * (the stage's settings and the Steam Enhanced | Steam switch), panels-library.js and panels-community.js (more panels), board.js (the board, its
  * pages, adding and removing panels and each panel's ⋯ menu), home-mode.js (which Home shows),
  * stage.js (the stage and the layout pass), data.js, and this one, main.js, which watches Home, runs one layout pass per frame and undoes
  * everything in destroy().
@@ -105,13 +104,14 @@
       sync: true,
       ignore: (node) => {
         const el = node.nodeType === 1 ? node : node.parentElement;
-        return Boolean(el?.closest(`.se-hs-stage, .se-hs-board, .se-hs-pick, .se-hs-back, ${SE.SIDE}`));
+        return Boolean(el?.closest(`.se-hs-stage, .se-hs-board, .se-placed, .se-hs-back, ${SE.SIDE}`));
       },
     });
     sizes = typeof ResizeObserver === 'function' ? new ResizeObserver(scheduleSize) : null;
     addEventListener('resize', onResize);
     document.addEventListener('visibilitychange', schedule);
     reducedMotion.addEventListener?.('change', onMotion);
+    ns.startParallax();
     schedule();
   }
 
@@ -125,6 +125,7 @@
       cancelPass();
       clearTimeout(sizeTimer);
       teardown();
+      ns.stopParallax(); // after teardown(): its stopArtMedia() queues a centring frame
       setOn(false);
       ns.paintBackButton(null);
       forgetStage();

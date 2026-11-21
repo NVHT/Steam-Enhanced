@@ -28,7 +28,7 @@
   const { C, run } = SE;
   const { live } = ns;
 
-  // The picker's width (.se-hs-menu, client/home/stage/stage-settings.css): its anchor's, so it
+  // The picker's width (.se-mn, client/shared/menu.css): its anchor's, so it
   // lines up with the menu's left edge
   const PICKER_W = 320;
   // Room under the menu's top the picker wants before it opens upward instead
@@ -333,6 +333,9 @@
    * The picker in the menu's place: its top where the menu's was (its bottom, when the menu
    * opened near the window's foot), left edges lined up
    */
+  // Whether the open picker is this file's: teardown closes only its own, never Home's
+  let ownsPicker = false;
+
   function openCollections(panel, instance) {
     const apps = targetApps(panel, instance);
     if (!apps.length || !SE.picker) return;
@@ -387,8 +390,13 @@
         patchLibraryMenu(instance);
         run(() => instance.Show());
       },
-      onClose: () => anchor.remove(),
+      onClose: () => {
+        ownsPicker = false;
+        anchor.remove();
+      },
     });
+    // After open(): opening closes the picker before, whose onClose clears the flag
+    ownsPicker = true;
   }
 
   /* ---------- Layout ---------- */
@@ -758,6 +766,6 @@
     manageHook = null;
     for (const [instance, saved] of patched) unpatch(instance, saved);
     for (const panel of [...observers.keys()]) stopObserving(panel);
-    SE.picker?.close();
+    if (ownsPicker) SE.picker?.close();
   });
 })(window.__se);

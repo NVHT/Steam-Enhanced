@@ -1,15 +1,14 @@
 /*
  * The theme's picker (client/shared/picker.js) and the spot every popup placed by SE.placePop
- * takes. Listed after the Home's stylesheets (client/loader.js): it restyles their menu.
+ * takes. Listed after client/shared/menu.css: it restyles the menu's rows.
  */
 
 /*
- * A popup over the page by its button: the Home's menus (client/home/stage/menu.js) and the
- * picker (client/shared/picker.js), placed by SE.placePop; client/home/stage/stage-settings.css
- * draws them. A dropdown's level: above the sticky bars and the dock, under the theme's own
+ * A popup over the page by its button: the settings menu (client/shared/menu.js) and the
+ * picker (client/shared/picker.js), placed by SE.placePop; client/shared/menu.css draws them. A dropdown's level: above the sticky bars and the dock, under the theme's own
  * popups (SE.layer, --se-z-popover), so a row's right-click menu shows over the picker
  */
-.se-hs-pick {
+.se-placed {
   position: fixed;
   z-index: var(--se-z-dropdown);
   max-width: calc(100vw - 24px);
@@ -20,10 +19,10 @@
 }
 
 /* The picker, in the menu's language: ‹ back to its menu, the title, how many chosen */
-.se-hs-pk-back {
+.se-pick-back {
   flex: none;
-  width: var(--se-space-5);
-  height: var(--se-space-5);
+  width: var(--se-hit); /* fits the heading row's --se-control-h, so the row keeps its height */
+  height: var(--se-hit);
   margin-right: calc(-1 * var(--se-space-1));
   padding: 0;
   border: 0;
@@ -33,7 +32,7 @@
   cursor: pointer;
 }
 
-.se-hs-pk-back::before {
+.se-pick-back::before {
   content: "";
   display: block;
   width: 100%;
@@ -44,17 +43,17 @@
   rotate: 90deg;
 }
 
-.se-hs-pk-back:hover {
+.se-pick-back:hover {
   background: var(--se-selected);
   color: var(--se-text-strong);
 }
 
-.se-hs-pk-back:focus-visible {
+.se-pick-back:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: 0;
 }
 
-.se-hs-pk .se-hs-mn-title {
+.se-pick .se-mn-title {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -62,7 +61,7 @@
   white-space: nowrap;
 }
 
-.se-hs-pk-count {
+.se-pick-count {
   flex: none;
   font: 500 var(--se-fs-sm) var(--se-font);
   color: var(--se-text-faint);
@@ -70,7 +69,7 @@
 }
 
 /* The search box: a quiet field with the magnifier, a hairline of accent while typing */
-.se-hs-pk-find {
+.se-pick-find {
   flex: none;
   display: flex;
   align-items: center;
@@ -84,11 +83,11 @@
   transition: box-shadow var(--se-dur) var(--se-ease);
 }
 
-.se-hs-pk-find:focus-within {
+.se-pick-find:focus-within {
   box-shadow: inset 0 0 0 1px var(--se-accent);
 }
 
-.se-hs-pk-glass {
+.se-pick-glass {
   flex: none;
   width: var(--se-icon-glyph);
   height: var(--se-icon-glyph);
@@ -97,7 +96,7 @@
   mask: var(--se-icon-search) center / contain no-repeat;
 }
 
-.se-hs-pk-search {
+.se-pick-search {
   all: unset;
   flex: 1;
   min-width: 0;
@@ -105,16 +104,16 @@
   font: 500 var(--se-fs-base) var(--se-font);
 }
 
-.se-hs-pk-search::placeholder {
+.se-pick-search::placeholder {
   color: var(--se-text-faint);
 }
 
-.se-hs-pk-search::-webkit-search-cancel-button {
+.se-pick-search::-webkit-search-cancel-button {
   display: none;
 }
 
 /* A game's (or collection's) row: its art, then the menu row's name, line and mark */
-.se-hs-pk-pic {
+.se-pick-pic {
   flex: none;
   width: 20px;
   height: 30px;
@@ -123,40 +122,43 @@
   background: var(--se-surface-2);
 }
 
-.se-hs-pk-img {
+.se-pick-img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.se-hs-pk-list > .se-hs-empty {
+/* Nothing to list (nothing found, nothing made yet) */
+.se-pick-empty {
   padding: var(--se-space-3) var(--se-space-2);
+  font-size: var(--se-fs-base);
+  color: var(--se-text-muted);
 }
 
 /* Show all and Show none, side by side; greyed when they'd change nothing */
-.se-hs-pk-foot {
+.se-pick-foot {
   flex: none;
   flex-direction: row;
 }
 
-.se-hs-pk-foot .se-hs-mn-row {
+.se-pick-foot .se-mn-row {
   flex: 1;
   width: auto;
 }
 
-.se-hs-pk-foot .se-hs-mn-row:disabled {
+.se-pick-foot .se-mn-row:disabled {
   color: var(--se-text-faint);
   background: transparent;
   cursor: default;
 }
 
-.se-hs-pk-foot .se-hs-mn-row:disabled .se-hs-mn-icon {
+.se-pick-foot .se-mn-row:disabled .se-mn-icon {
   background: var(--se-text-faint);
 }
 
 /* Rename in place (startRename): the row's name as a field, the search field's look */
-.se-hs-pk-rename {
+.se-pick-rename {
   flex: 1;
   min-width: 0;
   height: var(--se-control-h-sm);
@@ -171,26 +173,26 @@
 }
 
 /* A taken name: the field's edge in red until it changes */
-.se-hs-pk-rename[aria-invalid='true'] {
+.se-pick-rename[aria-invalid='true'] {
   box-shadow: inset 0 0 0 1px var(--se-danger);
 }
 
 /* Delete asks first (askDelete): the question, then Keep and Delete (red) */
-.se-hs-pk-ask {
+.se-pick-ask {
   cursor: default;
 }
 
-.se-hs-pk-ask:hover {
+.se-pick-ask:hover {
   background: transparent;
 }
 
-.se-hs-pk-ask > .se-hs-mn-name {
+.se-pick-ask > .se-mn-name {
   flex: 1;
   min-width: 0;
   color: var(--se-text-strong);
 }
 
-.se-hs-pk-ask-btn {
+.se-pick-ask-btn {
   all: unset;
   box-sizing: border-box;
   min-height: var(--se-hit);
@@ -202,16 +204,16 @@
   cursor: pointer;
 }
 
-.se-hs-pk-ask-btn:is(:hover, :focus-visible) {
+.se-pick-ask-btn:is(:hover, :focus-visible) {
   background: var(--se-selected);
   color: var(--se-text-strong);
 }
 
-.se-hs-pk-ask-btn[data-danger] {
+.se-pick-ask-btn[data-danger] {
   color: var(--se-danger);
 }
 
-.se-hs-pk-ask-btn[data-danger]:is(:hover, :focus-visible) {
+.se-pick-ask-btn[data-danger]:is(:hover, :focus-visible) {
   background: var(--se-danger-surface);
   color: var(--se-danger-text);
 }

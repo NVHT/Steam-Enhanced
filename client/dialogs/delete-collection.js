@@ -42,20 +42,11 @@
     return { name: props.strDisplayName || collection?.displayName || '', apps };
   }
 
-  // A cover, trying the game's cover sources in turn
-  function cover(doc, app) {
-    const img = doc.createElement('img');
-    img.alt = '';
-    img.decoding = 'async';
-    img.draggable = false;
+  // A cover working through its copies, local first (core/runtime.js SE.art); none left: no img
+  function cover(app) {
     const urls = SE.run(() => SE.coverURLs(app)) || [];
-    let next = 0;
-    const tryNext = () => {
-      if (next < urls.length) img.src = urls[next++];
-      else img.remove();
-    };
-    img.addEventListener('error', tryNext);
-    tryNext();
+    if (!urls.length) return null;
+    const img = SE.art.img(urls, '', () => img.remove());
     return img;
   }
 
@@ -67,7 +58,8 @@
     covers.className = `${OURS}-covers`;
     for (let i = 0; i < COVERS; i++) {
       const cell = doc.createElement('span');
-      if (apps[i]) cell.append(cover(doc, apps[i]));
+      const img = apps[i] && cover(apps[i]);
+      if (img) cell.append(img);
       covers.append(cell);
     }
     const badge = doc.createElement('span');

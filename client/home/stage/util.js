@@ -8,7 +8,6 @@
 
   const appStore = () => SE.global('appStore', (s) => !!s.allApps);
   const collectionStore = () => SE.global('collectionStore');
-  const partnerEventStore = () => SE.global('partnerEventStore');
   const client = () => SE.global('SteamClient', (sc) => !!sc.Apps) || window.SteamClient;
 
   /*
@@ -24,6 +23,14 @@
       }
       return null;
     });
+
+  // The settings menu (client/shared/menu.js), under the names the Home's parts use
+  const M = SE.settingsMenu;
+  Object.assign(ns, {
+    closeMenu: M.close, menuGroup: M.group, menuHeight: M.height, menuOption: M.option, menuRadio: M.radio,
+    menuSegButtons: M.segButtons, menuSegment: M.segment, menuSide: M.side, menuToggle: M.toggle,
+    openMenu: M.open, placeMenu: M.place, repaintMenu: M.repaint,
+  });
 
   // The art fallback chain (core/runtime.js SE.art)
   const { img: artImg, tag: imgTag, onLoad: onImgLoad, onError: onImgError } = SE.art;
@@ -44,7 +51,8 @@
     return h < 100 ? String(Math.round(h * 10) / 10) : Math.round(h).toLocaleString();
   }
 
-  function relativeDate(t, weekdayForWeek) {
+  // A day relative to today: Today, Yesterday, n days ago, then the date
+  function when(t) {
     if (!t) return '';
     const d = new Date(t * 1000);
     const now = new Date();
@@ -52,17 +60,12 @@
     const days = Math.round((day(now) - day(d)) / 86400000);
     if (days <= 0) return 'Today';
     if (days === 1) return 'Yesterday';
-    if (days < 7) return weekdayForWeek ? d.toLocaleDateString(undefined, { weekday: 'long' }) : `${days} days ago`;
+    if (days < 7) return `${days} days ago`;
     return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   }
 
-  const when = (t) => relativeDate(t, false);
-  const dayLabel = (t) => relativeDate(t, true);
-
   const ICON_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor" fill-opacity=".32" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"></path></svg>';
   const ICON_INSTALL = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>';
-  const ICON_FILTER = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g fill="currentColor" fill-opacity=".32" stroke="none"><path d="M4 5h16l-6 7.5V19l-4-2v-4.5z"></path></g><path d="M4 5h16l-6 7.5V19l-4-2v-4.5z"></path></svg>';
-  const ICON_PICK = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>';
 
   const ICON_DOTS = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>';
 
@@ -75,7 +78,7 @@
   const NARROW_AT = 1100;
 
   /*
-   * One layout pass per frame. Parts ask for one with schedule(); index.js sets what a pass runs
+   * One layout pass per frame. Parts ask for one with schedule(); main.js sets what a pass runs
    * (setPass) and cancels a pending one when it runs a pass itself (cancelPass).
    */
   let frame = 0;
@@ -95,9 +98,9 @@
   }
 
   Object.assign(ns, {
-    ICON_FILTER, ICON_INSTALL, ICON_PICK, ICON_PLAY, appStore,
-    panelMenuButton, artImg, cancelPass, client, collectionStore, compact, dayLabel,
-    hours, imgTag, libraryArt, NARROW_AT, onImgError, onImgLoad, partnerEventStore,
+    ICON_INSTALL, ICON_PLAY, appStore,
+    panelMenuButton, artImg, cancelPass, client, collectionStore, compact,
+    hours, imgTag, libraryArt, NARROW_AT, onImgError, onImgLoad,
     reducedMotion, schedule, setHTML, setPass, when,
   });
 })(window.__se);

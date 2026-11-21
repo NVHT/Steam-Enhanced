@@ -1,0 +1,258 @@
+/*
+ * The theme's settings menu (client/shared/menu.js, SE.settingsMenu), drawn as the theme's
+ * menus are: a summary, rows with a mark at their end, headings, dividers and segmented controls
+ * (client/shared/segmented.css). The picker (client/shared/picker.js, picker.css) draws in the
+ * same classes. Listed before the Home's stylesheets (client/loader.js), which add their own
+ * rows on top (client/home/stage/stage-settings.css).
+ */
+
+/*
+ * The menu, in the theme's menu language (the game-type menu, sidebar-icons.css): the
+ * popup surface and shadow, a summary with a divider under it, rows that light up on hover
+ * with a mark at their end, headings and dividers between sections, Reset as the last row.
+ * .se-placed (client/shared/picker.css) places it; this draws it. Scrolls inside when short.
+ */
+.se-mn:not(#se-none) {
+  width: 320px;
+  max-height: calc(100vh - 2 * var(--se-space-3));
+  padding: var(--se-space-1);
+  border-radius: var(--se-radius-menu);
+  background: var(--se-surface);
+  box-shadow: var(--se-shadow-pop);
+  animation: se-menu-in var(--se-dur) var(--se-ease);
+}
+
+/* The header: the title as a group heading (.se-mn-group below), its control at the right */
+.se-mn-sum {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-3);
+  min-height: var(--se-control-h);
+  padding: var(--se-space-1) var(--se-space-2) 0;
+}
+
+.se-mn-title {
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.se-mn-head:empty {
+  display: none;
+}
+
+.se-mn-body:empty {
+  display: none;
+}
+
+.se-mn-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* A section's heading, a divider above every one but the first; a control at its right */
+.se-mn-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-3);
+  min-height: var(--se-control-h);
+  padding: var(--se-space-1) var(--se-space-2) 0;
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.se-mn-group:not(:first-child) {
+  margin-top: var(--se-space-1);
+  border-top: 1px solid var(--se-divider);
+  padding-top: var(--se-space-2);
+}
+
+.se-mn-group .se-seg button {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* A row, the menu's full width: icon, name (a line under it or a count after it), the mark at its end */
+.se-mn-row {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-width: 0;
+  min-height: var(--se-control-h);
+  padding: var(--se-space-1) var(--se-space-2);
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-dim);
+  font: 600 var(--se-fs-base) var(--se-font);
+  cursor: pointer;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.se-mn-row:hover,
+.se-mn-row:focus-visible,
+.se-mn-row:has(> .se-mn-input:focus-visible) {
+  background: var(--se-selected);
+  color: var(--se-text-strong);
+  outline: none;
+}
+
+.se-mn-row:is([data-on], :has(> .se-mn-input:checked)) {
+  color: var(--se-text-strong);
+}
+
+/* Keyboard focus is the row's highlight, as in the theme's menus (popup-layer.css): no ring */
+.se-mn .se-mn-row:is(:focus, :focus-visible):not(#se-none) {
+  outline: none;
+}
+
+/* A radio row's input: kept for the keyboard and onChange, not seen */
+.se-mn-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.se-mn-icon {
+  flex: 0 0 auto;
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-mn-icon) center / contain no-repeat;
+  mask: var(--se-mn-icon) center / contain no-repeat;
+  transition: background-color var(--se-dur) var(--se-ease);
+}
+
+.se-mn-row[data-on] .se-mn-icon {
+  background: var(--se-accent);
+}
+
+.se-mn-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.se-mn-name,
+.se-mn-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.se-mn-row > .se-mn-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.se-mn-sub {
+  font: 500 var(--se-fs-xs) var(--se-font);
+  color: var(--se-text-faint);
+}
+
+.se-mn-count {
+  margin-left: var(--se-space-1);
+  font: 500 var(--se-fs-sm) var(--se-font);
+  color: var(--se-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The mark at a row's end: a hairline square (round for one-of-several), accent with a tick when on */
+.se-mn-mark {
+  flex: 0 0 var(--se-space-4);
+  width: var(--se-space-4);
+  height: var(--se-space-4);
+  box-sizing: border-box;
+  border-radius: var(--se-radius-xs);
+  box-shadow: inset 0 0 0 1.5px var(--se-border-strong);
+  transition: background-color var(--se-dur) var(--se-ease), box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-mn-mark[data-round] {
+  border-radius: var(--se-radius-pill);
+}
+
+.se-mn-row:is([data-on], :has(> .se-mn-input:checked)) .se-mn-mark {
+  box-shadow: none;
+  background: var(--se-accent) var(--se-icon-check) center / var(--se-space-3) no-repeat;
+}
+
+/* A row's current value at its end (the collection shown, how many games chosen), then › to its page */
+.se-mn-value {
+  flex: none;
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 500 var(--se-fs-sm) var(--se-font);
+  color: var(--se-text-faint);
+}
+
+.se-mn-row:hover .se-mn-value {
+  color: var(--se-text-muted);
+}
+
+.se-mn-chev {
+  flex: none;
+  width: var(--se-space-4);
+  height: var(--se-space-4);
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
+  rotate: -90deg;
+}
+
+
+
+/* A label with its segmented control */
+.se-mn-field {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-height: var(--se-control-h);
+  padding: 0 var(--se-space-2);
+}
+
+.se-mn-label {
+  flex: 1;
+  min-width: 0;
+  font: 600 var(--se-fs-base) var(--se-font);
+  color: var(--se-text-dim);
+  white-space: nowrap;
+}
+
+/* The menu's segmented controls, a size down so a label and four choices share a row */
+.se-mn .se-seg button {
+  height: var(--se-space-6);
+  padding: 0 var(--se-space-2);
+  font-size: var(--se-fs-sm);
+}
+
+/* Reset and Remove from Home: the last rows, after the menu's divider */
+.se-mn-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: var(--se-space-1);
+  padding-top: var(--se-space-1);
+  border-top: 1px solid var(--se-divider);
+}
+
+.se-mn-foot .se-mn-row {
+  width: 100%;
+}
+

@@ -367,7 +367,7 @@
   }
 
   Object.assign(ns, {
-    boxOf, clearMarks, dropAllOwn, dropOwn, fitColl, fitTiles, mark, own, ownPanel,
+    boxOf, clearMarks, dropAllOwn, dropOwn, fitColl, fitTiles, mark, ownPanel,
     paintColl, paintFav, scrollerOf, tileHTML, userCollections,
   });
 })(window.__se);

@@ -3,7 +3,7 @@
  * scrolls, one row of panels. Its layout (every panel's order, which are on, their settings and
  * width: 4, 8 or 12 of the board's columns, from their ⋯ menu) is kept in localStorage (se-home-board): panels are turned on and
  * off and put in order from the Home stage menu's Panels (setPanelOn, setPanelOrder), set from their own ⋯ menu (a
- * menu.js menu), which can also remove them. As the board narrows it takes fewer columns (8, then 4), each
+ * settings menu, client/shared/menu.js), which can also remove them. As the board narrows it takes fewer columns (8, then 4), each
  * panel's width scaled to match and the last in a row stretched to fill it; panels that don't
  * fit on a page move to the next, with arrows and a dot for each page.
  * Panels: Favorites and Collections (tray.js); the library and Community panels
@@ -167,9 +167,7 @@
   const cells = new Map(); // panel type → its cell, kept while the board lives
   let page = 0;
   let pageCount = 1;
-  // The last pass's columns and pages (each a list of panel types)
-  let packed = { cols: 12, pages: [] };
-  let refreshTimer = 0;
+  let refresh = null; // SE.poll handle
   // A panel moved from its menu: the board turns to the page it lands on
   let follow = null;
 
@@ -203,9 +201,8 @@
       else if (b.dataset.page) goTo(Number(b.dataset.page));
     });
     // Friends and achievements change with nothing on Home changing: a pass every half minute
-    refreshTimer = setInterval(() => {
-      if (board?.isConnected && document.visibilityState === 'visible') schedule();
-    }, 30000);
+    // (polled: Steam has no change event Home could hear for them)
+    refresh = SE.poll(schedule, 30000, { active: () => board?.isConnected });
     return board;
   }
 
@@ -307,7 +304,6 @@
   function paintBoard(width) {
     boardEl();
     const { cols, pages } = pack(boardLayout(), width);
-    packed = { cols, pages: pages.map((rows) => rows.flatMap((row) => row.cells.map((c) => c.type))) };
     pageCount = Math.max(1, pages.length);
     if (follow) {
       const at = pages.findIndex((rows) => rows.some((row) => row.cells.some((c) => c.type === follow)));
@@ -354,8 +350,8 @@
     for (const cell of cells.values()) dropOwn(cell);
     board?.remove();
     if (!leaving) {
-      clearInterval(refreshTimer);
-      refreshTimer = 0;
+      refresh?.disconnect();
+      refresh = null;
       cells.clear();
       board = null;
       page = 0;
@@ -389,18 +385,18 @@
     coll: ['Choose collections', () => 'se-home-coll-pick', (b, from) => ns.collPicker(b, from)],
   };
   // Each setting's icon in the menu (sliders for any other)
-  const OPT_ICONS = { sort: 'list-ordered', hours: 'chart', show: 'view-expanded', games: 'grid', range: 'calendar' };
+  const OPT_ICONS = { sort: 'list-ordered', hours: 'chart', show: 'view-expanded', games: 'grid' };
 
   let menuAnchor = null;
   let menuType = null;
 
   // A row opening a page of its own (a picker in the menu's place), its current value at its end
   const valueRow = (act, iconName, name, value) =>
-    `<button type="button" class="se-hs-mn-row" data-act="${act}">` +
-    `<span class="se-hs-mn-icon" style="--se-hs-mn-icon: var(--se-icon-${iconName})"></span>` +
-    `<span class="se-hs-mn-name">${SE.esc(name)}</span>` +
-    `<span class="se-hs-mn-value">${SE.esc(value)}</span>` +
-    '<span class="se-hs-mn-chev"></span></button>';
+    `<button type="button" class="se-mn-row" data-act="${act}">` +
+    `<span class="se-mn-icon" style="--se-mn-icon: var(--se-icon-${iconName})"></span>` +
+    `<span class="se-mn-name">${SE.esc(name)}</span>` +
+    `<span class="se-mn-value">${SE.esc(value)}</span>` +
+    '<span class="se-mn-chev"></span></button>';
 
   /*
    * The body: one row per setting, each with its icon (the collection shown and the games
@@ -446,9 +442,9 @@
 
   // The footer's last row: taking the panel off Home (the Home stage menu's Panels add it back)
   const REMOVE_ROW =
-    '<button type="button" class="se-hs-mn-row" data-act="remove">' +
-    '<span class="se-hs-mn-icon" style="--se-hs-mn-icon: var(--se-icon-eye-off)"></span>' +
-    '<span class="se-hs-mn-name">Remove from Home</span></button>';
+    '<button type="button" class="se-mn-row" data-act="remove">' +
+    '<span class="se-mn-icon" style="--se-mn-icon: var(--se-icon-eye-off)"></span>' +
+    '<span class="se-mn-name">Remove from Home</span></button>';
 
   // A copy of the layout to change, and the open menu's panel in it
   function editable() {
@@ -566,13 +562,9 @@
     boardLayout,
     boardIdeal,
     boardLeast,
-    boardPacked: () => packed,
     boardWidth,
     dropBoard,
-    goToPage: goTo,
     paintBoard,
-    panelOpts,
-    saveLayout,
     setPanelOn,
     setPanelOrder,
     sizeBoard,

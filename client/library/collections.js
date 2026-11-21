@@ -163,33 +163,8 @@
     return list.filter((c) => c && c.id !== 'uncategorized' && (c.bIsEditable || (c.visibleApps || []).length));
   }
 
-  /*
-   * Covers try a local copy first, then the CDN. Until one has loaded the image is marked
-   * data-se-art-wait and drawn as nothing (core/images.css), so neither a failed copy nor
-   * the wait for the next one shows the browser's broken-image icon.
-   */
-  function coverImg(app, cls) {
-    const img = document.createElement('img');
-    img.className = cls;
-    img.alt = '';
-    img.loading = 'lazy';
-    img.decoding = 'async';
-    img.draggable = false;
-    img.setAttribute('data-se-art-wait', '');
-    img.addEventListener('load', () => img.removeAttribute('data-se-art-wait'));
-    const urls = coverURLs(app);
-    let i = 0;
-    img.onerror = () => {
-      if (i < urls.length) {
-        img.src = urls[i++];
-      } else {
-        img.onerror = null;
-        img.style.visibility = 'hidden';
-      }
-    };
-    img.src = urls[i++];
-    return img;
-  }
+  // A cover working through its copies, local first (core/runtime.js SE.art)
+  const coverImg = (app, cls) => SE.art.img(coverURLs(app), cls, null, { lazy: true });
 
   const { appOf } = SE;
 
@@ -739,6 +714,9 @@
     );
   }
 
+  // The New tile's retry frame, cancelled on teardown
+  let newFrame = 0;
+
   function newCollection() {
     const scroll = document.querySelector(`.${ALL}`);
     if (!scroll) return;
@@ -755,15 +733,17 @@
     forcedView.set('collections', 'grid');
     SE.mark(scroll, 'data-se-view', 'grid');
     let tries = 0;
+    cancelAnimationFrame(newFrame);
     const again = () => {
+      newFrame = 0;
       if (click() || ++tries > 20) {
         forcedView.delete('collections');
         SE.mark(scroll, 'data-se-view', getView('collections'));
         return;
       }
-      requestAnimationFrame(again);
+      newFrame = requestAnimationFrame(again);
     };
-    requestAnimationFrame(again);
+    newFrame = requestAnimationFrame(again);
   }
 
   let frame = 0;
@@ -797,6 +777,7 @@
       watcher?.disconnect();
       timer?.disconnect();
       if (frame) cancelAnimationFrame(frame);
+      cancelAnimationFrame(newFrame);
       ctrlWidths.disconnect();
       observedCtrls.clear();
       forcedView.clear();

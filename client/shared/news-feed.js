@@ -1,6 +1,6 @@
 /*
- * Steam news, read once for every part that shows it (the Home's What's New panel,
- * client/home/stage/news.js, and the rail's Announcements menu, client/header/announcements.js):
+ * Steam news, read once for every part that shows it (the rail's Announcements menu,
+ * client/header/announcements.js):
  * Steam's What's New events (its events store, the list Steam's own Home shows) and Steam's
  * official news, as items; opening one; Steam's news hub. Steam's Home row is never read.
  *

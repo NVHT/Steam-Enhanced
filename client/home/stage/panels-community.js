@@ -355,13 +355,17 @@
   const SEEN_KEY = 'se-home-factivity-seen';
   let lookSeen = null;
   let lastPaint = 0;
+  let savedSeen = 0; // the last time written: a paint writes only when it changes
   function seenAt(rows) {
     if (lookSeen === null || performance.now() - lastPaint > 60000) {
       lookSeen = Number(SE.run(() => localStorage.getItem(SEEN_KEY))) || todayStart();
     }
     lastPaint = performance.now();
     const newest = rows.reduce((t, r) => Math.max(t, r.t), 0);
-    if (newest > lookSeen) SE.run(() => localStorage.setItem(SEEN_KEY, String(newest)));
+    if (newest > lookSeen && newest !== savedSeen) {
+      savedSeen = newest;
+      SE.run(() => localStorage.setItem(SEEN_KEY, String(newest)));
+    }
     return lookSeen;
   }
 

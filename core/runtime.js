@@ -400,7 +400,8 @@
    * (core/images.css), so a failed copy never shows the broken-image icon. One chain for
    * both kinds of image: built ones listen themselves (they can fail before they're attached),
    * innerHTML-built ones (tag()) are caught by capture listeners on their container (onLoad,
-   * onError). The Library Home and the picker (client/shared/picker.js) use it.
+   * onError). Used by the Library Home, the picker (client/shared/picker.js), collection
+   * banners (client/library/collections.js) and toasts (client/toasts/stage.js).
    */
   const ART_WAIT = 'data-se-art-wait';
   const artFailed = new WeakMap(); // img → called once its last copy has failed
@@ -424,12 +425,14 @@
     }
   }
 
-  function artImg(urls, cls, onFail) {
+  // opts.lazy: load only once near the viewport (set before src, or it has no effect)
+  function artImg(urls, cls, onFail, opts) {
     const img = document.createElement('img');
     img.className = cls;
     img.alt = '';
     img.draggable = false;
     img.decoding = 'async';
+    if (opts?.lazy) img.loading = 'lazy';
     img.setAttribute(ART_WAIT, '');
     img.dataset.urls = JSON.stringify(urls.slice(1));
     img.addEventListener('load', onImgLoad);

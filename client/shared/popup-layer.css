@@ -386,12 +386,20 @@ html.se-layer-document .se-layer-wrap > *:not(#se-none) {
 
 /* !important: the menu rows' button styles above are, against Steam's */
 .se-menu .se-menu-heading-action {
+  position: relative;
   height: 24px;
   padding: 0 var(--se-space-1) !important;
   font: 600 var(--se-fs-xs) / 24px var(--se-font) !important;
   letter-spacing: normal;
   text-transform: none;
   color: var(--se-text-faint) !important;
+}
+
+/* The hit area up to --se-hit tall: a taller box would grow the heading */
+.se-menu .se-menu-heading-action::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--se-space-1)) 0;
 }
 
 /* An empty state: plain text, not a row */

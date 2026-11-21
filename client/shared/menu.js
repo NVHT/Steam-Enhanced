@@ -1,9 +1,12 @@
 /*
- * The Home's settings menus: one at a time, over the page by the button that opened it (the
- * stage's sliders button, a panel's ⋯), in the theme's menu language (the game-type menu,
- * client/navigation/sidebar-icons.css): a header (the title, a control at its right if given), rows that
- * light up on hover with a mark at their end, headings and dividers, Reset as the last row.
+ * The theme's settings menu (SE.settingsMenu): one at a time, over the page by the button that
+ * opened it (the Home stage's sliders button, a Home panel's ⋯), in the theme's menu language
+ * (the game-type menu, client/navigation/sidebar-icons.css): a header (the title, a control at
+ * its right if given), rows that light up on hover with a mark at their end, headings and
+ * dividers, Reset as the last row. Styled by client/shared/menu.css; the picker
+ * (client/shared/picker.js) draws in the same classes and SE.placePop places both.
  * It closes on Escape, a click outside or its button again; every change applies at once.
+ *   SE.settingsMenu  { open, close, place, repaint, height(), side() } and the row builders.
  * Rows the caller can use:
  *   segment()     a label and a segmented control (data-set / data-val); segButtons() alone
  *   option()      a row choosing one of several: icon, name, a line under it, a round mark
@@ -11,9 +14,9 @@
  *   toggle()      an on/off row with a square mark (data-toggle)
  *   radio()       a row with a radio input (onChange), for long lists such as collections
  *   group()       a heading, a control at its right if given
- *   openMenu(anchor, { label, title, head, paint, foot, side, onClick, onChange, onReset })
+ *   open(anchor, { label, title, head, paint, foot, side, onClick, onChange, onReset })
  *     head()         markup at the title's right (a segmented control), repainted with the body
- *     paint()        the body's markup, called on open and on repaintMenu()
+ *     paint()        the body's markup, called on open and on repaint()
  *     onClick(e)     a click inside, after the menu's own buttons
  *     onChange(e)    a radio changed
  *     onKeyDown(e), onMouseDown(e)  a key or a press inside (a list the caller lets you reorder)
@@ -22,8 +25,7 @@
  *     onReset()      the Reset row (none without it)
  */
 ((SE) => {
-  const ns = window.__seHomeStageParts;
-  if (!ns) return;
+  if (SE.settingsMenu) return;
 
   const esc = SE.esc;
 
@@ -85,8 +87,8 @@
 
               : null
       : null;
-    menu.querySelector('.se-hs-mn-body').innerHTML = opts.paint();
-    menu.querySelector('.se-hs-mn-head').innerHTML = opts.head?.() || '';
+    menu.querySelector('.se-mn-body').innerHTML = opts.paint();
+    menu.querySelector('.se-mn-head').innerHTML = opts.head?.() || '';
     placeMenu();
     if (key) menu.querySelector(key)?.focus();
   }
@@ -97,33 +99,29 @@
       return;
     }
     closeMenu();
-    ns.closePick();
+    SE.picker?.close();
     anchor = button;
     opts = options;
     side = options.side || null;
     anchor.setAttribute('aria-expanded', 'true');
     menu = document.createElement('div');
-    menu.className = 'se-hs-pick se-hs-menu';
+    menu.className = 'se-placed se-mn';
     menu.setAttribute('role', 'dialog');
     menu.setAttribute('aria-label', options.label);
     menu.innerHTML =
-      `<div class="se-hs-mn-sum"><span class="se-hs-mn-title">${esc(options.title)}</span><span class="se-hs-mn-head"></span></div>` +
-      '<div class="se-hs-mn-body"></div>' +
+      `<div class="se-mn-sum"><span class="se-mn-title">${esc(options.title)}</span><span class="se-mn-head"></span></div>` +
+      '<div class="se-mn-body"></div>' +
       (options.onReset || options.foot
-        ? '<div class="se-hs-mn-foot">' +
+        ? '<div class="se-mn-foot">' +
           (options.onReset
-            ? '<button type="button" class="se-hs-mn-row" data-mn-reset>' +
-              '<span class="se-hs-mn-icon" style="--se-hs-mn-icon: var(--se-icon-restore)"></span>' +
-              '<span class="se-hs-mn-name">Reset to defaults</span></button>'
+            ? '<button type="button" class="se-mn-row" data-mn-reset>' +
+              '<span class="se-mn-icon" style="--se-mn-icon: var(--se-icon-restore)"></span>' +
+              '<span class="se-mn-name">Reset to defaults</span></button>'
             : '') +
           (options.foot || '') +
           '</div>'
         : '');
     menu.addEventListener('click', (e) => {
-      if (e.target.closest('[data-mn-close]')) {
-        closeMenu();
-        return;
-      }
       if (e.target.closest('[data-mn-reset]')) {
         opts.onReset();
         repaintMenu();
@@ -154,37 +152,37 @@
       .join('')}</div>`;
 
   // A row's icon: a --se-icon-* name, drawn in the row's colour
-  const icon = (name) => (name ? `<span class="se-hs-mn-icon" style="--se-hs-mn-icon: var(--se-icon-${name})"></span>` : '');
+  const icon = (name) => (name ? `<span class="se-mn-icon" style="--se-mn-icon: var(--se-icon-${name})"></span>` : '');
 
   /** A label (an icon before it if given) and a segmented control. */
   const segment = (key, label, options, value, iconName) =>
-    `<div class="se-hs-mn-field">${icon(iconName)}<span class="se-hs-mn-label">${esc(label)}</span>${segButtons(key, label, options, value)}</div>`;
+    `<div class="se-mn-field">${icon(iconName)}<span class="se-mn-label">${esc(label)}</span>${segButtons(key, label, options, value)}</div>`;
 
   /** A row choosing one of several (data-set / data-val), its round mark lit when `on`. */
   const option = (key, value, name, sub, iconName, on) =>
-    `<button type="button" class="se-hs-mn-row" role="radio" aria-checked="${on}" data-set="${key}" data-val="${esc(value)}"${on ? ' data-on' : ''}>` +
+    `<button type="button" class="se-mn-row" role="radio" aria-checked="${on}" data-set="${key}" data-val="${esc(value)}"${on ? ' data-on' : ''}>` +
     icon(iconName) +
-    `<span class="se-hs-mn-text"><span class="se-hs-mn-name">${esc(name)}</span>${sub ? `<span class="se-hs-mn-sub">${esc(sub)}</span>` : ''}</span>` +
-    '<span class="se-hs-mn-mark" data-round></span></button>';
+    `<span class="se-mn-text"><span class="se-mn-name">${esc(name)}</span>${sub ? `<span class="se-mn-sub">${esc(sub)}</span>` : ''}</span>` +
+    '<span class="se-mn-mark" data-round></span></button>';
 
   /** An on/off row (data-toggle="key"), its square mark lit when `on`. */
   const toggle = (key, name, on) =>
-    `<button type="button" class="se-hs-mn-row" aria-pressed="${Boolean(on)}" data-toggle="${key}"${on ? ' data-on' : ''}>` +
-    `<span class="se-hs-mn-name">${esc(name)}</span><span class="se-hs-mn-mark"></span></button>`;
+    `<button type="button" class="se-mn-row" aria-pressed="${Boolean(on)}" data-toggle="${key}"${on ? ' data-on' : ''}>` +
+    `<span class="se-mn-name">${esc(name)}</span><span class="se-mn-mark"></span></button>`;
 
   /** A row with a radio input (onChange), for long lists: name, a quiet count after it, round mark. */
   const radio = (name, value, label, on, count = '') =>
-    '<label class="se-hs-mn-row">' +
-    `<input type="radio" class="se-hs-mn-input" name="${name}" value="${esc(value)}"${on ? ' checked' : ''}>` +
-    `<span class="se-hs-mn-name">${esc(label)}${count ? ` <span class="se-hs-mn-count">${esc(count)}</span>` : ''}</span>` +
-    '<span class="se-hs-mn-mark" data-round></span></label>';
+    '<label class="se-mn-row">' +
+    `<input type="radio" class="se-mn-input" name="${name}" value="${esc(value)}"${on ? ' checked' : ''}>` +
+    `<span class="se-mn-name">${esc(label)}${count ? ` <span class="se-mn-count">${esc(count)}</span>` : ''}</span>` +
+    '<span class="se-mn-mark" data-round></span></label>';
 
   /** A section's heading, with an optional control at its right (a segmented control). */
-  const group = (text, extra = '') => `<div class="se-hs-mn-group"><span>${esc(text)}</span>${extra}</div>`;
+  const group = (text, extra = '') => `<div class="se-mn-group"><span>${esc(text)}</span>${extra}</div>`;
 
-  Object.assign(ns, {
-    closeMenu, menuGroup: group, menuOption: option, menuRadio: radio, menuSegButtons: segButtons,
-    menuHeight: () => menu?.offsetHeight || 0, menuSegment: segment, menuSide: () => side,
-    menuToggle: toggle, openMenu, placeMenu, repaintMenu,
-  });
+  SE.settingsMenu = {
+    open: openMenu, close: closeMenu, place: placeMenu, repaint: repaintMenu,
+    height: () => menu?.offsetHeight || 0, side: () => side,
+    group, option, radio, segButtons, segment, toggle,
+  };
 })(window.__se);

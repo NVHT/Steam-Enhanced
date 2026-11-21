@@ -1,7 +1,7 @@
 /*
  * The Home stage's own settings: what it features, which details it shows and how it moves
  * between games, and the menu that edits them (the sliders button in the stage's corner,
- * a menu.js menu).
+ * a settings menu, client/shared/menu.js).
  * Kept in localStorage (se-home-stage-settings); a change applies at once, no reload.
  *   source      recent | favorites (A–Z) | collection (+ collection id) | added (newest first)
  *   count       games featured: 4, 6, 8 or 10
@@ -9,7 +9,7 @@
  *   nav         thumbs | dots | none          cycle   off | slow | normal | fast
  *   motion      zoom | parallax | shots | trailer | still (the background art: stage-art.js)
  * The stage reads them through stageSettings(), stageApps(), cycleSeconds() and
- * applyStageLook(); stage-settings.css holds the button and the menu.
+ * applyStageLook(); stage-settings.css holds the button and the menu's Home rows.
  */
 ((SE) => {
   const ns = window.__seHomeStageParts;
@@ -145,7 +145,7 @@
     return list;
   }
 
-  /* ---------- The menu (menu.js) ---------- */
+  /* ---------- The menu (client/shared/menu.js) ---------- */
 
   const { menuGroup, menuOption, menuRadio, menuSegButtons, menuSegment, menuToggle } = ns;
 
@@ -226,10 +226,10 @@
           const name = SE.esc(p.name);
           return (
             `<div class="se-hs-mn-prow" data-order="${type}">` +
-            `<button type="button" class="se-hs-mn-row" aria-pressed="${lit}" data-panel="${type}"${lit ? ' data-on' : ''} aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown">` +
+            `<button type="button" class="se-mn-row" aria-pressed="${lit}" data-panel="${type}"${lit ? ' data-on' : ''} aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown">` +
             '<span class="se-hs-mn-grip" aria-hidden="true"></span>' +
-            `<span class="se-hs-mn-text"><span class="se-hs-mn-name">${name}</span>` +
-            `<span class="se-hs-mn-sub">${SE.esc(p.desc)}</span></span><span class="se-hs-mn-mark"></span></button>` +
+            `<span class="se-mn-text"><span class="se-mn-name">${name}</span>` +
+            `<span class="se-mn-sub">${SE.esc(p.desc)}</span></span><span class="se-mn-mark"></span></button>` +
             '</div>'
           );
         })
@@ -285,6 +285,11 @@
       removeEventListener('mouseup', up, true);
       if (!dragging) return;
       dragged = true;
+      // Only the click this mouseup makes is swallowed: a drop outside the menu makes none, and
+      // the flag would eat the next real click
+      setTimeout(() => {
+        dragged = false;
+      });
       row.style.translate = '';
       SE.unmark(row, 'data-dragging');
       SE.unmark(list, 'data-dragging');
@@ -362,8 +367,8 @@
     if (e.target.name !== 'se-hs-coll') return;
     change({ collection: e.target.value });
     // The row's line names the collection (no repaint: the list keeps its scroll)
-    const menu = e.target.closest('.se-hs-menu');
-    const sub = menu?.querySelector('[data-val="collection"] .se-hs-mn-sub');
+    const menu = e.target.closest('.se-mn');
+    const sub = menu?.querySelector('[data-val="collection"] .se-mn-sub');
     if (sub) sub.textContent = collectionName(e.target.value);
   }
 

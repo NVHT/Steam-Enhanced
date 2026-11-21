@@ -19,10 +19,6 @@
   overflow: hidden;
 }
 
-.se-hs-board[hidden] {
-  display: none;
-}
-
 /* The cells of the page showing: one row, its columns set by stage/board.js */
 .se-hs-cells {
   flex: 1 1 auto;
@@ -72,9 +68,10 @@
 }
 
 .se-hs-pager button {
+  position: relative;
   display: grid;
   place-items: center;
-  min-width: var(--se-control-h-sm);
+  min-width: var(--se-hit);
   height: var(--se-control-h-sm);
   padding: 0;
   border: 0;
@@ -82,6 +79,13 @@
   background: transparent;
   color: var(--se-text-muted);
   cursor: pointer;
+}
+
+/* The hit area up to --se-hit tall: the box keeps its height, which board.js's PAGER_H counts */
+.se-hs-pager button::after {
+  content: "";
+  position: absolute;
+  inset: calc((var(--se-control-h-sm) - var(--se-hit)) / 2) 0;
 }
 
 .se-hs-pager button:hover {
@@ -112,17 +116,14 @@
   height: 8px;
   border-radius: var(--se-radius-pill);
   background: var(--se-white-25);
+  /* width, not scaleX(): a scaled pill squashes its round ends; the dot sits alone in its
+     button's box, so its widening lays out nothing else */
   transition: width var(--se-dur-slow) var(--se-ease), background var(--se-dur);
 }
 
 .se-hs-pager [data-page][aria-current="true"]::before {
   width: 22px;
   background: var(--se-accent);
-}
-
-.se-hs-pager [data-page] {
-  min-width: 0;
-  padding: 0 var(--se-space-half);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -152,11 +153,8 @@
   text-overflow: ellipsis;
 }
 
-.se-hs-hall[hidden] {
-  display: none;
-}
-
 .se-hs-hall {
+  position: relative;
   margin-top: auto;
   align-self: flex-start;
   padding: var(--se-space-1) var(--se-space-2);
@@ -166,6 +164,13 @@
   color: var(--se-accent);
   font: 600 var(--se-fs-base) var(--se-font);
   cursor: pointer;
+}
+
+/* The hit area up to --se-hit tall: a taller box would grow the heading board.js's HEAD_H counts */
+.se-hs-hall::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--se-space-1)) 0;
 }
 
 .se-hs-hall:hover {

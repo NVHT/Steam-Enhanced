@@ -94,8 +94,10 @@
 
   /* ---------- The layer on show ---------- */
 
-  // The screenshots' turn, or the trailer's check on whether the stage is in sight
+  // The screenshots' turn
   let timer = 0;
+  // The trailer's check on whether the stage is in sight (SE.poll)
+  let sight = null;
   // The trailer's stream (hls.js), torn down with it
   let hlsPlayer = null;
   let mediaLayer = null;
@@ -114,9 +116,21 @@
     if (layer) delete layer.dataset.want;
   }
 
+  // The window hidden: SE.poll rests then, so the trailer is paused here and played again by
+  // the poll's first tick on return
+  let pauseHidden = null;
+
+  function stopSight() {
+    sight?.disconnect();
+    sight = null;
+    if (pauseHidden) document.removeEventListener('visibilitychange', pauseHidden);
+    pauseHidden = null;
+  }
+
   function stopArtMedia() {
     clearInterval(timer);
     timer = 0;
+    stopSight();
     clearMedia(mediaLayer);
     mediaLayer = null;
     setPointer(0, 0);
@@ -195,6 +209,7 @@
     const toShots = () => {
       clearInterval(timer);
       timer = 0;
+      stopSight();
       hlsPlayer?.destroy();
       hlsPlayer = null;
       box.remove();
@@ -246,11 +261,17 @@
       if (current() && (!streaming || !hlsPlayer)) toShots();
     });
     if (!idle()) run(() => v.play()?.catch(() => {}));
-    // Out of sight (another page over Home, the window hidden): paused, playing again on return
-    timer = setInterval(() => {
+    // Out of sight (another page over Home): paused, playing again on return. Polled: Steam has
+    // no event for a page covering Home.
+    stopSight();
+    sight = SE.poll(() => {
       if (idle()) v.pause();
       else if (v.paused) run(() => v.play()?.catch(() => {}));
-    }, 1500);
+    }, 1500, { active: current });
+    pauseHidden = () => {
+      if (document.visibilityState === 'hidden') v.pause();
+    };
+    document.addEventListener('visibilitychange', pauseHidden);
   }
 
   /** The background for the game on show, by the setting: called whenever select() runs. */
@@ -303,7 +324,18 @@
     setPointer(-((e.clientX - r.left) / r.width - 0.5) * 2, -((e.clientY - r.top) / r.height - 0.5) * 2);
   }
 
-  document.addEventListener('pointermove', onPointerMove, { passive: true });
+  // main.js starts the pointer watch with Home and stops it, pending frame too, in destroy()
+  function startParallax() {
+    document.addEventListener('pointermove', onPointerMove, { passive: true });
+  }
 
-  Object.assign(ns, { paintArtMedia, stopArtMedia });
+  function stopParallax() {
+    document.removeEventListener('pointermove', onPointerMove);
+    cancelAnimationFrame(frame);
+    frame = 0;
+    px = 0;
+    py = 0;
+  }
+
+  Object.assign(ns, { paintArtMedia, stopArtMedia, startParallax, stopParallax });
 })(window.__se);

@@ -1,6 +1,6 @@
 /*
- * Library Home, drawn by the theme: the hero stage over the board of panels (What's New,
- * Favorites, Collections, Friends playing, Achievements, Not played yet).
+ * Library Home, drawn by the theme: the hero stage over the board of panels (Favorites,
+ * Collections, Recently added, Friend activity).
  *
  * Scoped to `[data-se-hs]` (Steam's Home container, managed by `client/home/stage/`). Steam's
  * own Home stays mounted underneath, out of sight and out of layout (display: none), so it
@@ -10,15 +10,17 @@
  * This file: the grid and Steam's Home kept out of sight. Continued, in order
  * (client/loader.js), by stage-hero.css (the stage: art, game, stats, buttons, strip),
  * stage-settings.css (the stage's settings button and menu), stage-tray.css (the board's
- * glass, cells and pages, and What's New), stage-shelves.css (Favorites, Collections, the
- * pickers), stage-panels.css (Friends playing, Achievements, Not played yet) and
- * stage-narrow.css (narrow windows).
+ * glass, cells and pages, a panel's heading), stage-shelves.css (Favorites, Collections,
+ * Recently added, the pickers), stage-panels.css (Friend activity) and stage-narrow.css
+ * (narrow windows).
  */
 /* The grid: the stage, then the board */
 [data-se-hs]:not(#se-none) {
   /* Soft text over the art, and the board's glass (no theme tokens for these yet) */
   --se-hs-on-art: var(--se-on-art);
   --se-hs-glass: var(--se-glass);
+  /* !important: beats the display and padding Steam's own CSS gives its Home container (the
+     .LibraryHome parent, a CSS module in steamui/sp.js) */
   display: grid !important;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto;
@@ -29,7 +31,8 @@
   overflow: clip;
 }
 
-/* Steam's Home, all of it: mounted for its data, never drawn */
+/* Steam's Home, all of it: mounted for its data, never drawn. !important: beats the display
+   Steam's own CSS modules (steamui/sp.js) give .LibraryHome and its siblings */
 [data-se-hs]:not([data-se-hs-event]) > :not(.se-hs-stage):not(.se-hs-board):not(#se-none) {
   display: none !important;
 }

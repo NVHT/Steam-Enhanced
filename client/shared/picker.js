@@ -2,10 +2,10 @@
  * The theme's picker: a list to tick (or one row to choose) with a search, in the place of the
  * menu it was opened from, and the placement every such popup shares. Home's panels
  * (client/home/stage/picks.js) and the game menu's Collections (client/library/game-menu.js)
- * open it. Drawn in the Home menu's language (client/home/stage/stage-settings.css), placed and
- * styled by client/shared/picker.css.
+ * open it. Drawn in the settings menu's classes (client/shared/menu.css), placed and styled by
+ * client/shared/picker.css.
  *   SE.picker  { open(anchor, opts), close(), place(), read(key), write(key, ids) }
- *   SE.placePop(el, button, side, opts)  places a popup by its button (Home's menus too)
+ *   SE.placePop(el, button, side, opts)  places a popup by its button (the settings menu too)
  */
 ((SE) => {
   if (SE.picker) return;
@@ -90,6 +90,7 @@
     pickSide = null;
     document.removeEventListener('pointerdown', onPickOutside, true);
     document.removeEventListener('keydown', onPickKey, true);
+    removeEventListener('resize', placePick);
     pickAnchor?.setAttribute('aria-expanded', 'false');
     pickAnchor = null;
     onClose?.();
@@ -140,39 +141,39 @@
     if (!pickEl) return;
     pickEdit = null;
     // The search as typed (a name to create keeps its case), and lowercased to match
-    const typed = (pickEl.querySelector('.se-hs-pk-search')?.value || '').trim();
+    const typed = (pickEl.querySelector('.se-pick-search')?.value || '').trim();
     const q = typed.toLowerCase();
     const chosen = pickOpts.checked ? null : new Set(pickedNow());
     const groups = pickOpts.items(q);
     const make = typed && pickOpts.create?.allowed(typed) ? typed : '';
-    pickEl.querySelector('.se-hs-pk-list').innerHTML =
+    pickEl.querySelector('.se-pick-list').innerHTML =
       groups
         .map(
           (g) =>
-            (g.label && g.rows.length ? `<div class="se-hs-mn-group"><span>${SE.esc(g.label)}</span></div>` : '') +
+            (g.label && g.rows.length ? `<div class="se-mn-group"><span>${SE.esc(g.label)}</span></div>` : '') +
             g.rows
               .map((r) => {
                 const on = isOn(r.id, chosen);
                 const inner =
-                  (r.img ? `<span class="se-hs-pk-pic">${SE.art.tag(r.img, 'se-hs-pk-img')}</span>` : '') +
-                  `<span class="se-hs-mn-name">${SE.esc(r.name)}</span>` +
-                  (r.sub ? `<span class="se-hs-mn-value">${SE.esc(r.sub)}</span>` : '');
+                  (r.img ? `<span class="se-pick-pic">${SE.art.tag(r.img, 'se-pick-img')}</span>` : '') +
+                  `<span class="se-mn-name">${SE.esc(r.name)}</span>` +
+                  (r.sub ? `<span class="se-mn-value">${SE.esc(r.sub)}</span>` : '');
                 return pickOpts.single
-                  ? `<button type="button" class="se-hs-mn-row se-hs-pk-row" role="radio" aria-checked="${on}" data-one="${SE.esc(r.id)}" data-pk-row="${SE.esc(r.id)}"${on ? ' data-on' : ''}>` +
-                      `${inner}<span class="se-hs-mn-mark" data-round></span></button>`
-                  : `<label class="se-hs-mn-row se-hs-pk-row" data-pk-row="${SE.esc(r.id)}">` +
-                      `<input type="checkbox" class="se-hs-mn-input" data-id="${SE.esc(r.id)}"${on ? ' checked' : ''}>` +
-                      `${inner}<span class="se-hs-mn-mark"></span></label>`;
+                  ? `<button type="button" class="se-mn-row se-pick-row" role="radio" aria-checked="${on}" data-one="${SE.esc(r.id)}" data-pk-row="${SE.esc(r.id)}"${on ? ' data-on' : ''}>` +
+                      `${inner}<span class="se-mn-mark" data-round></span></button>`
+                  : `<label class="se-mn-row se-pick-row" data-pk-row="${SE.esc(r.id)}">` +
+                      `<input type="checkbox" class="se-mn-input" data-id="${SE.esc(r.id)}"${on ? ' checked' : ''}>` +
+                      `${inner}<span class="se-mn-mark"></span></label>`;
               })
               .join('')
         )
         .join('') +
       (make
-        ? `<button type="button" class="se-hs-mn-row se-hs-pk-row" data-pk-create="${SE.esc(make)}">` +
-          '<span class="se-hs-mn-icon" style="--se-hs-mn-icon: var(--se-icon-folder-plus)"></span>' +
-          `<span class="se-hs-mn-name">${SE.esc(pickOpts.create.label(make))}</span></button>`
+        ? `<button type="button" class="se-mn-row se-pick-row" data-pk-create="${SE.esc(make)}">` +
+          '<span class="se-mn-icon" style="--se-mn-icon: var(--se-icon-folder-plus)"></span>' +
+          `<span class="se-mn-name">${SE.esc(pickOpts.create.label(make))}</span></button>`
         : '') ||
-      `<span class="se-hs-empty">${SE.esc(!q && pickOpts.empty ? pickOpts.empty : 'Nothing found')}</span>`;
+      `<span class="se-pick-empty">${SE.esc(!q && pickOpts.empty ? pickOpts.empty : 'Nothing found')}</span>`;
     paintPickFoot();
   }
 
@@ -181,12 +182,12 @@
   function paintPickFoot() {
     if (!pickEl || pickOpts.single) return;
     if (pickOpts.count) {
-      pickEl.querySelector('.se-hs-pk-count').textContent = pickOpts.count();
+      pickEl.querySelector('.se-pick-count').textContent = pickOpts.count();
       return;
     }
     const picks = readPick(pickOpts.key);
     const n = picks?.length || 0;
-    pickEl.querySelector('.se-hs-pk-count').textContent = pickOpts.clearable
+    pickEl.querySelector('.se-pick-count').textContent = pickOpts.clearable
       ? n ? `${n} chosen` : 'None'
       : !picks ? 'All' : n ? `${n} chosen` : 'None';
     const set = (sel, off) => {
@@ -239,13 +240,13 @@
    */
   function startRename(id) {
     const row = rowFor(id);
-    const name = row?.querySelector('.se-hs-mn-name');
+    const name = row?.querySelector('.se-mn-name');
     if (!name) return;
     const opts = pickOpts;
     const old = name.textContent;
     const field = document.createElement('input');
     field.type = 'text';
-    field.className = 'se-hs-pk-rename';
+    field.className = 'se-pick-rename';
     field.value = old;
     field.maxLength = opts.manage.maxLength || 64;
     field.setAttribute('aria-label', 'Name');
@@ -295,15 +296,15 @@
   // Delete asks first, in the row's place: Keep, or Delete in red (it can't be undone)
   function askDelete(id) {
     const row = rowFor(id);
-    const name = row?.querySelector('.se-hs-mn-name')?.textContent;
+    const name = row?.querySelector('.se-mn-name')?.textContent;
     if (!row || name == null) return;
     const ask = document.createElement('div');
-    ask.className = 'se-hs-mn-row se-hs-pk-row se-hs-pk-ask';
+    ask.className = 'se-mn-row se-pick-row se-pick-ask';
     ask.setAttribute('role', 'group');
     ask.innerHTML =
-      `<span class="se-hs-mn-name">Delete “${SE.esc(name)}”?</span>` +
-      '<button type="button" class="se-hs-pk-ask-btn" data-pk-keep>Keep</button>' +
-      `<button type="button" class="se-hs-pk-ask-btn" data-pk-delete="${SE.esc(id)}" data-danger>Delete</button>`;
+      `<span class="se-mn-name">Delete “${SE.esc(name)}”?</span>` +
+      '<button type="button" class="se-pick-ask-btn" data-pk-keep>Keep</button>' +
+      `<button type="button" class="se-pick-ask-btn" data-pk-delete="${SE.esc(id)}" data-danger>Delete</button>`;
     row.replaceWith(ask);
     pickEdit = { id };
     ask.querySelector('[data-pk-keep]').focus();
@@ -324,7 +325,7 @@
       await opts.create.run(name);
     } catch {}
     if (pickOpts !== opts || !pickEl) return;
-    const search = pickEl.querySelector('.se-hs-pk-search');
+    const search = pickEl.querySelector('.se-pick-search');
     if (search) search.value = '';
     paintPick();
     placePick();
@@ -340,7 +341,7 @@
 
   // Enter in the search: makes what it names when the create row shows
   function onPickEnter(e) {
-    if (e.key !== 'Enter' || !e.target.matches('.se-hs-pk-search')) return;
+    if (e.key !== 'Enter' || !e.target.matches('.se-pick-search')) return;
     const make = pickEl?.querySelector('[data-pk-create]');
     if (!make) return;
     e.preventDefault();
@@ -348,12 +349,12 @@
   }
 
   const pickRow = (attr, iconName, name) =>
-    `<button type="button" class="se-hs-mn-row" ${attr}>` +
-    `<span class="se-hs-mn-icon" style="--se-hs-mn-icon: var(--se-icon-${iconName})"></span>` +
-    `<span class="se-hs-mn-name">${name}</span></button>`;
+    `<button type="button" class="se-mn-row" ${attr}>` +
+    `<span class="se-mn-icon" style="--se-mn-icon: var(--se-icon-${iconName})"></span>` +
+    `<span class="se-mn-name">${name}</span></button>`;
 
   /*
-   * A list to tick, drawn as the Home's menus are (client/home/stage/menu.js): a header (‹ back to the menu it
+   * A list to tick, drawn as the settings menu is (client/shared/menu.js): a header (‹ back to the menu it
    * came from, the title, how many are chosen), a search box, the rows, Show all and Show
    * none in the footer. Every tick applies at once.
    *   opts { key, title, placeholder, defaults(), items(q), back(side), side, height }
@@ -384,23 +385,23 @@
     pickSide = opts.side || null;
     anchor.setAttribute('aria-expanded', 'true');
     pickEl = document.createElement('div');
-    pickEl.className = 'se-hs-pick se-hs-menu se-hs-pk';
+    pickEl.className = 'se-placed se-mn se-pick';
     pickEl.setAttribute('role', 'dialog');
     pickEl.setAttribute('aria-label', opts.title);
     pickEl.innerHTML =
-      '<div class="se-hs-mn-sum">' +
-      (opts.back ? '<button type="button" class="se-hs-pk-back" data-pk-back aria-label="Back"></button>' : '') +
-      `<span class="se-hs-mn-title">${SE.esc(opts.title)}</span>${opts.single ? '' : '<span class="se-hs-pk-count"></span>'}</div>` +
+      '<div class="se-mn-sum">' +
+      (opts.back ? '<button type="button" class="se-pick-back" data-pk-back aria-label="Back"></button>' : '') +
+      `<span class="se-mn-title">${SE.esc(opts.title)}</span>${opts.single ? '' : '<span class="se-pick-count"></span>'}</div>` +
       (opts.placeholder
-        ? '<label class="se-hs-pk-find"><span class="se-hs-pk-glass"></span>' +
-          `<input type="search" class="se-hs-pk-search" placeholder="${SE.esc(opts.placeholder)}" aria-label="${SE.esc(opts.placeholder)}"></label>`
+        ? '<label class="se-pick-find"><span class="se-pick-glass"></span>' +
+          `<input type="search" class="se-pick-search" placeholder="${SE.esc(opts.placeholder)}" aria-label="${SE.esc(opts.placeholder)}"></label>`
         : '') +
-      '<div class="se-hs-mn-body se-hs-pk-list"></div>' +
+      '<div class="se-mn-body se-pick-list"></div>' +
       (opts.create?.newLabel
-        ? '<div class="se-hs-mn-foot se-hs-pk-foot">' + pickRow('data-pk-new', 'folder-plus', SE.esc(opts.create.newLabel)) + '</div>'
+        ? '<div class="se-mn-foot se-pick-foot">' + pickRow('data-pk-new', 'folder-plus', SE.esc(opts.create.newLabel)) + '</div>'
         : opts.single || opts.onToggle
         ? ''
-        : '<div class="se-hs-mn-foot se-hs-pk-foot">' +
+        : '<div class="se-mn-foot se-pick-foot">' +
           (opts.clearable
             ? pickRow('data-pk-clear', 'restore', 'Clear')
             : pickRow('data-pk-all', 'list', 'Show all') + pickRow('data-pk-none', 'eye-off', 'Show none')) +
@@ -409,7 +410,7 @@
     pickEl.addEventListener('error', SE.art.onError, true);
     pickEl.addEventListener('load', SE.art.onLoad, true);
     pickEl.addEventListener('input', (e) => {
-      if (e.target.matches('.se-hs-pk-search')) {
+      if (e.target.matches('.se-pick-search')) {
         paintPick();
         placePick();
       }
@@ -476,9 +477,11 @@
     document.body.appendChild(pickEl);
     document.addEventListener('pointerdown', onPickOutside, true);
     document.addEventListener('keydown', onPickKey, true);
+    // Follows the window's size wherever it opened (Home's layout pass also calls SE.picker.place)
+    addEventListener('resize', placePick);
     paintPick();
     placePick();
-    (pickEl.querySelector('.se-hs-pk-search') || pickEl.querySelector('input'))?.focus();
+    (pickEl.querySelector('.se-pick-search') || pickEl.querySelector('input'))?.focus();
   }
 
   SE.placePop = placePop;

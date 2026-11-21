@@ -37,35 +37,20 @@
     document.body.appendChild(live.dock);
   }
 
-  // An <img> working through its copies; drawn as nothing until one loads (core/images.css).
-  function artImg(urls, cls, onFail) {
-    const img = document.createElement('img');
-    img.className = cls;
-    img.alt = '';
-    img.draggable = false;
-    img.decoding = 'async';
-    if (!urls.length) return img;
-    img.setAttribute('data-se-art-wait', '');
-    let i = 0;
-    img.onload = () => img.removeAttribute('data-se-art-wait');
-    img.onerror = () => {
-      if (++i < urls.length) img.src = urls[i];
-      else {
-        img.onerror = null;
-        onFail?.(img);
-      }
-    };
-    img.src = urls[0];
-    return img;
-  }
+  // An <img> working through its copies (core/runtime.js SE.art)
+  const artImg = SE.art.img;
 
   /*
    * A friend's mini-profile background (the one Steam shows on their hover card), from the
-   * community's mini-profile JSON. Fetched once per friend and shared across toast windows.
+   * community's mini-profile JSON. Fetched once per friend and shared across toast windows: the
+   * cache sits on the opener's runtime (window.__se), which every toast window reaches.
    */
+  let localProfiles = null;
   function miniProfile(accountId) {
     const host = run(() => window.opener) || window;
-    const cache = run(() => (host.__seMiniProfiles ||= new Map())) || new Map();
+    const rt = run(() => host.__se);
+    // The opener's own Map, so a closed toast window is not kept alive through it
+    const cache = (rt && run(() => (rt.miniProfiles ||= new host.Map()))) || (localProfiles ||= new Map());
     if (!cache.has(accountId)) {
       // Shared by every toast window for the session: keep the 50 most recent friends.
       if (cache.size >= 50) cache.delete(cache.keys().next().value);
@@ -96,12 +81,26 @@
     }
     el.className = 'se-tst-hero';
     const show = () => {
+      // The toast left before the video loaded: stop it rather than keep it playing off-screen
+      if (!art.isConnected) return video && stopVideos(el);
       art.replaceChildren(el);
       delete art.dataset.ambient;
     };
     if (video) el.addEventListener('loadeddata', show, { once: true });
     else el.addEventListener('load', show, { once: true });
     if (video) run(() => el.play());
+  }
+
+  // A looping profile video keeps decoding until it is paused and its source dropped
+  function stopVideos(root) {
+    const list = root instanceof HTMLVideoElement ? [root] : root.querySelectorAll('video');
+    for (const el of list) {
+      run(() => {
+        el.pause();
+        el.removeAttribute('src');
+        el.load();
+      });
+    }
   }
 
   /*
@@ -323,6 +322,7 @@
     unmark(v.layer, 'data-on');
     setTimeout(() => {
       v.layer.remove();
+      stopVideos(v.layer);
       if (views.get(id) === v) views.delete(id);
     }, PRUNE_MS);
   }
@@ -409,6 +409,7 @@
     live.placeGuard = null;
     if (!live.dock) return;
     live.dock.remove();
+    for (const v of views.values()) stopVideos(v.layer);
     live.dock = live.tray = stage = strip = pos = null;
     views.clear();
   }

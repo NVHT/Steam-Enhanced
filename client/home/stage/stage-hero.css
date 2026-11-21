@@ -346,10 +346,6 @@
   filter: drop-shadow(0 6px 24px var(--se-black-60));
 }
 
-.se-hs-logo[hidden] {
-  display: none;
-}
-
 .se-hs-name {
   font: 800 clamp(56px, calc(4.6 * var(--se-hs-u)), 110px)/1 var(--se-font);
   letter-spacing: -.02em;
@@ -641,18 +637,22 @@
 
 .se-hs-stage[data-nav="dots"] .se-hs-thumb {
   width: auto;
+  min-width: var(--se-hit); /* the hit target; the dot sits in its middle */
   padding: var(--se-space-3) var(--se-space-half);
   border-radius: var(--se-radius-pill);
 }
 
 .se-hs-stage[data-nav="dots"] .se-hs-pic {
   width: 8px;
+  margin-inline: auto;
   aspect-ratio: auto;
   height: 8px;
   border-radius: var(--se-radius-pill);
   background: var(--se-white-40);
   box-shadow: none;
   opacity: 1;
+  /* Width on purpose: the active dot widening pushes its neighbours aside, which scaleX can't;
+     a handful of small dots, so the reflow is cheap */
   transition: width var(--se-dur-slow) var(--se-ease), background var(--se-dur);
 }
 

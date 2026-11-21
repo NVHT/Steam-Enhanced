@@ -72,15 +72,11 @@
   align-items: center;
   gap: var(--se-space-2);
   height: 40px;
-  /* Flush with the heading: only the avatar ring's 3 px inside the left edge, the picture on
+  /* Flush with the heading: only the avatar ring's width inside the left edge, the picture on
      the right edge, under the ⋯ button */
-  padding-left: 3px;
+  padding-left: var(--se-avatar-ring-w);
   border-radius: var(--se-radius-sm);
   font-family: var(--se-font);
-}
-
-.se-hs-item[hidden] {
-  display: none;
 }
 
 .se-hs-item:hover {
@@ -107,12 +103,12 @@
 .se-hs-iicon {
   --se-status: var(--se-offline);
   flex: none;
-  width: 30px;
-  height: 30px;
+  width: var(--se-hit);
+  height: var(--se-hit);
   border-radius: var(--se-avatar-radius);
   overflow: hidden;
   background: var(--se-surface-2);
-  box-shadow: 0 0 0 1.5px var(--se-surface), 0 0 0 3px var(--se-status);
+  box-shadow: 0 0 0 1.5px var(--se-surface), 0 0 0 var(--se-avatar-ring-w) var(--se-status);
   transition: box-shadow var(--se-dur-fast) var(--se-ease);
 }
 
@@ -133,7 +129,7 @@
 }
 
 .se-hs-iicon:hover {
-  box-shadow: 0 0 0 1.5px var(--se-surface), 0 0 0 3px var(--se-status), 0 0 0 6px var(--se-white-10);
+  box-shadow: 0 0 0 1.5px var(--se-surface), 0 0 0 var(--se-avatar-ring-w) var(--se-status), 0 0 0 6px var(--se-white-10);
 }
 
 .se-hs-iicon img {
