@@ -9,7 +9,8 @@
  *     (level badges, the friend card, Steam's dialogs, the dropdown, scroll to top)
  *   - puts the site class and one class per matched page on <html> before any stylesheet, so
  *     the CSS applies from the first paint
- *   - adds each matched stylesheet in list order (the cascade)
+ *   - adds each matched stylesheet in list order (the cascade), a pass's new ones @imported by
+ *     one <style> (addStylesheets)
  *   - runs each matched script, a classic script, in list order. A page script hands its
  *     `init(dom)` to web.define(); init gets the shared runtime (web.dom, web/shared/dom.js) and
  *     returns its destroy function (or a promise of one). A part publishes what pages use on
@@ -155,18 +156,27 @@
       });
     };
 
-    const addStylesheet = (file) => {
-      sheets.add(file);
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = asset(file);
-      link.setAttribute('blocking', 'render'); // holds the first paint where the link is in time for it
-      link.dataset.seFeature = file;
+    /*
+     * A pass's new stylesheets go in through one <style> of @imports, in list order: Chromium
+     * matches an element against each sheet on its own and imports fold into the importing sheet,
+     * so one sheet per file cost every style pass (as in client/loader.js). A later navigation's
+     * page sheets get their own, after the last. [data-se-sheets] marks them for live reload
+     * (core/core.js); [data-se-loaded] once every import is in.
+     */
+    const addStylesheets = (list) => {
+      const style = document.createElement('style');
+      style.setAttribute('blocking', 'render'); // holds the first paint where it is in time for it
+      style.dataset.seFeature = 'sheets';
+      style.dataset.seSheets = '';
+      style.textContent = list.map((file) => `@import url("${asset(file)}");`).join('\n');
+      const loaded = settled(style).then(() => {
+        style.dataset.seLoaded = '';
+      });
       // Keep list order even when a later navigation adds a page's sheet.
-      if (lastStylesheet?.isConnected) lastStylesheet.after(link);
-      else head.append(link);
-      lastStylesheet = link;
-      if (!revealed) firstPass.push(settled(link));
+      if (lastStylesheet?.isConnected) lastStylesheet.after(style);
+      else head.append(style);
+      lastStylesheet = style;
+      if (!revealed) firstPass.push(loaded);
     };
 
     const apply = () => {
@@ -178,9 +188,13 @@
         if (className) root.classList.toggle(className, matched.has(page));
       }
 
+      const newSheets = [];
       for (const file of files) {
         const active = !file.on || file.on.some((page) => matched.has(page));
-        if (active && file.css && !sheets.has(file.css)) addStylesheet(file.css);
+        if (active && file.css && !sheets.has(file.css)) {
+          sheets.add(file.css);
+          newSheets.push(file.css);
+        }
         if (!file.js || permanent.has(file.js)) continue;
         if (active && !running.has(file.js)) {
           const run = startScript(file.js);
@@ -189,6 +203,7 @@
           stopScript(file.js);
         }
       }
+      if (newSheets.length) addStylesheets(newSheets);
     };
 
     apply();

@@ -291,8 +291,8 @@
 
   function adoptTheme() {
     if (adopting) return adopting;
-    const links = [...document.querySelectorAll('link[rel="stylesheet"]')];
-    const hrefs = SHEETS.map((file) => links.find((l) => new URL(l.href).pathname.endsWith(`/${file}`))?.href);
+    // The loader's file → URL list (client/loader.js imports them all through one <style>)
+    const hrefs = SHEETS.map((file) => window.__seClient?.sheets?.get(file));
     if (hrefs.some((h) => !h)) return null;
     adopting = Promise.all(
       hrefs.map(async (href) => {

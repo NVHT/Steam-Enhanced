@@ -315,11 +315,8 @@
     const doc = node.ownerDocument;
 
     // Copied even when a `.*` patch may already reach the popup: a duplicate href is skipped.
-    // Picked by the loader's data-se-file, so a file added to those folders comes along.
-    layer.copyStyles(doc, (href, link) => {
-      const file = link.dataset.seFile;
-      return Boolean(file) && (CHAT_SHEETS.has(file) || CHAT_FOLDERS.test(file));
-    });
+    // Picked by file from the loader's list, so a file added to those folders comes along.
+    layer.copyStyles(doc, (file) => Boolean(file) && (CHAT_SHEETS.has(file) || CHAT_FOLDERS.test(file)));
 
     window.__seChat?.attachDocument(doc);
     entry.detachChatEnhancements = () => window.__seChat?.detachDocument(doc);

@@ -110,11 +110,13 @@
   const STALE_MAX_MS = 3000;
   let current = null;
 
-  // The old build's copies stay until every new stylesheet has loaded (or STALE_MAX_MS passes)
+  // The old build's copies stay until every new stylesheet has loaded (or STALE_MAX_MS passes).
+  // The site loader's sheets are <style>s of @imports, marked [data-se-loaded] once all are in
+  // (web/shared/site-loader.js).
   const dropWhenReady = (stale, started = performance.now()) => {
-    const fresh = [...document.querySelectorAll('link[data-se-feature]')];
-    if ((fresh.length && fresh.every((link) => link.sheet)) || performance.now() - started > STALE_MAX_MS) {
-      stale.forEach((link) => link.remove());
+    const fresh = [...document.querySelectorAll('[data-se-sheets]')];
+    if ((fresh.length && fresh.every((sheet) => sheet.hasAttribute('data-se-loaded'))) || performance.now() - started > STALE_MAX_MS) {
+      stale.forEach((sheet) => sheet.remove());
     } else {
       setTimeout(() => dropWhenReady(stale, started), 100);
     }
@@ -151,12 +153,11 @@
   const swap = (version) => {
     current = version;
     flashBadge(version);
-    const stale = [...document.querySelectorAll('link[data-se-feature]')].map((link) => {
-      const copy = link.cloneNode();
-      copy.removeAttribute('data-se-feature');
-      copy.removeAttribute('blocking');
+    const stale = [...document.querySelectorAll('[data-se-sheets]')].map((sheet) => {
+      const copy = sheet.cloneNode(true); // its imports come from the cache
+      for (const name of ['data-se-feature', 'data-se-sheets', 'data-se-loaded', 'blocking']) copy.removeAttribute(name);
       copy.dataset.seStale = '';
-      link.before(copy);
+      sheet.before(copy);
       return copy;
     });
     // destroy() drops the page classes the copies are scoped to; they come back until the new

@@ -15,9 +15,9 @@
  * mode throws on writes to Steam's objects that a classic script skips, which the theme's
  * patching relies on (the Steam menu). Every script here is a classic one.
  *
- * The list order is the cascade. Each stylesheet's <link> carries its list position and goes in
- * among the theme's other links by that position, so rules that tie on specificity resolve the
- * same in every window. Scripts run in list order (a split feature's parts rely on it), and only
+ * The list order is the cascade: a window's stylesheets are @imported in list order by one
+ * <style id="se-sheets"> (addStylesheets), so rules that tie on specificity resolve the same in
+ * every window. Scripts run in list order (a split feature's parts rely on it), and only
  * once core/runtime.js has published the runtime (window.__se): every script can take it as given.
  *
  * Files load with the loader's own query string, so whatever cache-busting Millennium puts on
@@ -469,22 +469,28 @@
     document.fonts?.ready.then(remeasureMenu);
   }
 
-  /** Puts a stylesheet among the theme's own by list position, so the cascade matches the list. */
-  const addStylesheet = (file, order) => {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = asset(file);
-    link.setAttribute('blocking', 'render'); // no flash of Steam's own look on a window's first paint
-    link.dataset.seFile = file;
-    link.dataset.seOrder = String(order);
-    if (MENU) link.addEventListener('load', remeasureMenu, { once: true });
-    if (file === 'core/tokens.css') link.addEventListener('load', readEntrance, { once: true });
-    const theme = [...head.querySelectorAll(':scope > link[data-se-order]')];
-    const next = theme.find((el) => Number(el.dataset.seOrder) > order);
-    if (next) next.before(link);
-    else if (theme.length) theme[theme.length - 1].after(link);
-    else head.append(link);
-    track(link);
+  /*
+   * The window's stylesheets, file → URL in list order (the cascade). Parts that hand theme files
+   * to other windows read it (client/shared/popup-layer.js, compat/steamgriddb/steamgriddb.js).
+   */
+  const sheets = new Map();
+
+  /*
+   * Every stylesheet goes in through one <style> of @imports, in list order. Chromium matches an
+   * element against each sheet on its own, and imports fold into the sheet importing them: the
+   * main window's 135 links cost a full style pass ~51 ms, the same files imported ~43 ms
+   * (dev/perf.js probe). Each file keeps its own URL, so its url()s and the cache work as before.
+   * Its load event comes once every import is in.
+   */
+  const addStylesheets = () => {
+    const style = document.createElement('style');
+    style.id = 'se-sheets';
+    style.setAttribute('blocking', 'render'); // no flash of Steam's own look on a window's first paint
+    style.textContent = [...sheets.values()].map((href) => `@import url("${href}");`).join('\n');
+    if (MENU) style.addEventListener('load', remeasureMenu, { once: true });
+    if (sheets.has('core/tokens.css')) style.addEventListener('load', readEntrance, { once: true });
+    track(style);
+    head.append(style);
   };
 
   const addScript = (file) => {
@@ -504,12 +510,13 @@
   const RUNTIME = ['core/classmap.js', 'core/runtime.js'];
   const load = () => {
     const scripts = [];
-    FILES.forEach(([group, file], order) => {
-      if (!groups.has(group) || added.has(file) || (onWeb && !WEB_FILES.has(file))) return;
+    for (const [group, file] of FILES) {
+      if (!groups.has(group) || added.has(file) || (onWeb && !WEB_FILES.has(file))) continue;
       added.add(file);
-      if (file.endsWith('.css')) addStylesheet(file, order);
+      if (file.endsWith('.css')) sheets.set(file, asset(file));
       else scripts.push(file);
-    });
+    }
+    if (sheets.size) addStylesheets();
     if (window.__se) {
       scripts.forEach(addScript);
       return;
@@ -530,7 +537,7 @@
     );
   };
 
-  window.__seClient = { groups, files: added };
+  window.__seClient = { groups, files: added, sheets };
   load();
   if (!pending) settle(); // nothing to wait for
 })();

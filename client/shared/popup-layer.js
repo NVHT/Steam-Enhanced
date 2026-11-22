@@ -376,35 +376,43 @@
   /* ---------- Window content: styles and page state ---------- */
 
   // The layer's own sheet always goes in: the window can be up before its loader has run.
-  const LAYER_SHEET = /client\/shared\/popup-layer\.css(?:[?#]|$)/;
+  const LAYER_SHEET = 'client/shared/popup-layer.css';
 
   /*
-   * What a window gets before any popup takes it: the theme's base (client/loader.js tags its
-   * links with data-se-file). Each panel adds its own sheets when it draws (panel({ sheets,
-   * steam })): theme files by path, and Steam's own stylesheets when it renders a Steam
-   * component.
+   * What a window gets before any popup takes it: the theme's base. Each panel adds its own
+   * sheets when it draws (panel({ sheets, steam })): theme files by path, and Steam's own
+   * stylesheets when it renders a Steam component.
    */
-  const BASE_SHEETS = new Set(['core/font.css', 'core/tokens.css', 'core/icons-nav.css', 'core/icons-ui.css', 'client/shared/popup-layer.css']);
-  const sheetsFor = ({ sheets = [], steam = false } = {}) => (href, link) => {
-    const file = link.dataset.seFile;
-    if (file) return BASE_SHEETS.has(file) || sheets.includes(file);
-    return steam;
-  };
+  const BASE_SHEETS = new Set(['core/font.css', 'core/tokens.css', 'core/icons-nav.css', 'core/icons-ui.css', LAYER_SHEET]);
+  const sheetsFor = ({ sheets = [], steam = false } = {}) => (file) => (file ? BASE_SHEETS.has(file) || sheets.includes(file) : steam);
   const restyleOn = (links, entry) => {
     for (const link of links) link.addEventListener('load', () => entry.owner?.restyled(), { once: true });
   };
 
-  // The main window's stylesheets (those `test(href, link)` accepts) the popup doesn't have yet.
+  /*
+   * The main window's stylesheets (those `test(file)` accepts; file is null for Steam's own) the
+   * popup doesn't have yet, each as a <link> of its own: Steam's links, then theme files from the
+   * loader's list (client/loader.js imports them through one <style>, after Steam's), so the
+   * theme wins ties there as it does here.
+   */
   function copyStyles(doc, test = () => true) {
-    const have = new Set([...doc.querySelectorAll('link[rel="stylesheet"]')].map((link) => link.href));
+    const have = new Set([
+      ...[...doc.querySelectorAll('link[rel="stylesheet"]')].map((link) => link.href),
+      ...(doc.defaultView?.__seClient?.sheets?.values() || []), // its own loader's
+    ]);
+    const wanted = [
+      ...[...document.querySelectorAll('link[rel="stylesheet"]')].map((link) => ({ file: null, href: link.href })),
+      ...[...(window.__seClient?.sheets || [])].map(([file, href]) => ({ file, href })),
+    ];
     const added = [];
-    for (const sheet of document.querySelectorAll('link[rel="stylesheet"]')) {
-      if (have.has(sheet.href) || !(LAYER_SHEET.test(sheet.href) || test(sheet.href, sheet))) continue;
-      const copy = sheet.cloneNode(true);
-      copy.href = sheet.href;
-      doc.head.appendChild(copy);
-      have.add(sheet.href);
-      added.push(copy);
+    for (const { file, href } of wanted) {
+      if (have.has(href) || !(file === LAYER_SHEET || test(file))) continue;
+      const link = doc.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      doc.head.appendChild(link);
+      have.add(href);
+      added.push(link);
     }
     return added;
   }
