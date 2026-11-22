@@ -1,0 +1,107 @@
+/*
+ * A friend's right-click menu (client/friends/friend-menu.js), over the game menu's bar and rows
+ * (client/library/game-menu.css): the bar of the friend's quick actions (Remove in red), then
+ * Manage's and Trading's rows, Block last. Loaded in every window because Steam's menus open in
+ * their own popup windows.
+ *
+ * Steam wraps each game section's rows in a box (contextMenuSectionContent); the box steps
+ * aside (display: contents) so its hidden rows take no place. Places, by kind: the bar
+ * (Message, Voice, Profile, Favorite, Remove) 2, its divider 10, a chat tab's and a stranger's
+ * rows 12–13, Manage's and Trading's rows 30–36, anything else 38, the divider 39, Block 41.
+ */
+
+/*
+ * One width, room for the bar's five buttons and the longest row: the menu's size never waits on
+ * its font (friend-menu.js places it by that size before Steam measures it). Rows are fixed
+ * heights already (game-menu.css).
+ */
+[data-se-lib-menu='friend'] > .contextMenuContents {
+  box-sizing: border-box;
+  width: 300px;
+}
+
+/*
+ * The menu in its own window, its shadow and opening kept whole. The game menu's code marks Steam's
+ * menu box (contextMenu: its marker sits beside the rows' box, not in it) as the panel; here
+ * that box goes see-through and holds the popup menus' room for --se-shadow-pop as its padding
+ * (the window's edge would cut the shadow in a hard line), and the rows' box (contextMenuContents)
+ * wears the panel's face and opening instead. Padding, not a margin: Steam sizes the window by the
+ * box (its width, its scrollHeight), and a margin would collapse out of it. The box takes its
+ * content's width (CLAUDE.md, section 7); friend-menu.js moves the menu's place back by the room,
+ * toward the side it opens to, so the panel opens at the pointer. Closing still fades the box ([data-se-closing], game-menu.css).
+ * !important: the right-click panel's surface, corners, edge and clipping (client/dialogs/
+ * dialogs.css) and the game menu's panel face, which this box no longer wears.
+ */
+.contextMenu[data-se-lib-menu='friend']:not(#se-none) {
+  box-sizing: content-box;
+  width: max-content;
+  max-height: none;
+  padding: var(--se-pop-room-top) var(--se-pop-room-side) var(--se-pop-room-bottom);
+  overflow: visible !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.contextMenu[data-se-lib-menu='friend']:not([data-se-closing]):not(#se-none) {
+  animation: none;
+}
+
+/* !important: dialogs.css's see-through rows' box (contextMenuContents) */
+[data-se-lib-menu='friend'] > .contextMenuContents:not(#se-none) {
+  border-radius: var(--se-radius-menu);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-shadow-pop);
+}
+
+/* Opens once shown: friend-menu.js holds it hidden until its window is sized and placed */
+[data-se-lib-menu='friend'][data-se-fm-shown] > .contextMenuContents {
+  animation: se-menu-in var(--se-dur) var(--se-ease);
+}
+
+/*
+ * Steam's rows the menu doesn't show (friend-menu.js): the game they play (its label and rows),
+ * Find Games to Play Together, your game's invites, Recent Names. !important: the game menu's
+ * row rule draws every row (display: grid !important, game-menu.css).
+ */
+:root [data-se-lib-menu='friend'] [data-se-fm-hide]:not(#se-none) {
+  display: none !important;
+}
+
+[data-se-lib-menu='friend'] .contextMenuSectionContent {
+  display: contents;
+}
+
+/* ---------- Places ---------- */
+
+[data-se-lib-menu='friend'] [data-se-gm-place='bar'] { order: 2; }
+[data-se-lib-menu='friend'] [data-se-gm='closetab'] { order: 12; }
+[data-se-lib-menu='friend'] :is([data-se-gm='accept'], [data-se-gm='ignore'], [data-se-gm='add'], [data-se-gm='cancel']) { order: 13; }
+[data-se-lib-menu='friend'] [data-se-gm='nickname'] { order: 30; }
+[data-se-lib-menu='friend'] [data-se-gm='categorize'] { order: 32; }
+[data-se-lib-menu='friend'] [data-se-gm='notifications'] { order: 33; }
+[data-se-lib-menu='friend'] [data-se-gm='inventory'] { order: 34; }
+[data-se-lib-menu='friend'] [data-se-gm='tradeoffer'] { order: 35; }
+[data-se-lib-menu='friend'] [data-se-gm='report'] { order: 36; }
+[data-se-lib-menu='friend'] [data-se-gm='other'] { order: 38; }
+[data-se-gm-list] > [data-se-gm-slot='danger-start'] { order: 39; }
+[data-se-lib-menu='friend'] [data-se-gm='block'] { order: 41; }
+
+/* ---------- Glyphs, by kind ---------- */
+
+[data-se-gm='chat'] { --se-gm-icon: var(--se-icon-bubble); }
+[data-se-gm='voice'] { --se-gm-icon: var(--se-icon-mic); }
+[data-se-gm='closetab'] { --se-gm-icon: var(--se-icon-window-close); }
+[data-se-gm='accept'] { --se-gm-icon: var(--se-icon-check); }
+:is([data-se-gm='ignore'], [data-se-gm='cancel']) { --se-gm-icon: var(--se-icon-close-sm); }
+[data-se-gm='add'] { --se-gm-icon: var(--se-icon-friends); }
+[data-se-gm='profile'] { --se-gm-icon: var(--se-icon-user); }
+[data-se-gm='nickname'] { --se-gm-icon: var(--se-icon-edit); }
+[data-se-gm='quickaccess'] { --se-gm-icon: var(--se-icon-heart); }
+[data-se-gm='categorize'] { --se-gm-icon: var(--se-icon-tag); }
+[data-se-gm='notifications'] { --se-gm-icon: var(--se-icon-bell); }
+[data-se-gm='inventory'] { --se-gm-icon: var(--se-icon-inventory); }
+[data-se-gm='tradeoffer'] { --se-gm-icon: var(--se-icon-send); }
+[data-se-gm='report'] { --se-gm-icon: var(--se-icon-flag); }
+[data-se-gm='removefriend'] { --se-gm-icon: var(--se-icon-trash); }
+[data-se-gm='block'] { --se-gm-icon: var(--se-icon-exclude); }

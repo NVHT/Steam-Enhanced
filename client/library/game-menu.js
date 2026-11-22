@@ -476,7 +476,7 @@
       }
     }
     if (!kind) return;
-    run(() => kind.patched?.(menu));
+    run(() => kind.patched?.(menu, instance));
     // The game it was opened on, for dialogs its rows open with several games (Mark as Private)
     if (isGameMenu(menu.props)) SE.noteMenuApp(menu.props.overview.appid);
 
@@ -576,12 +576,13 @@
   tryHook();
 
   /*
-   * The library's menus, each { name, test(props), layout(panel, instance), patched(element) }:
-   * the game menu here; others (client/library/collection-menu.js, listed after this file)
-   * through ns.libraryMenus.add, with this file's layoutRows and source
+   * The library's menus, each { name, test(props), layout(panel, instance), patched(element, instance) }:
+   * the game menu here; others (client/library/collection-menu.js, client/friends/friend-menu.js,
+   * listed after this file) through ns.libraryMenus.add, with this file's layoutRows, source and
+   * its own / divider / keep for the theme's nodes among Steam's rows
    */
   kinds.push({ name: 'game', test: isGameMenu, layout, patched: () => flattenManage(menuClass()?.prototype) });
-  ns.libraryMenus = { add: (kind) => kinds.push(kind), layoutRows, source, targetApps, patchLibraryMenu };
+  ns.libraryMenus = { add: (kind) => kinds.push(kind), layoutRows, source, targetApps, patchLibraryMenu, own, divider, keep };
 
   ns.createHooks.push(patchLibraryMenu);
   ns.cleanups.push(() => {

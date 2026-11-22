@@ -110,6 +110,8 @@
     // The library's right-click menus (games, collections): part of the Steam menu's patching
     // (client/header/menu/)
     ['main', 'client/library/', ['game-menu.js', 'game-menu-collections.js', 'collection-menu.js']],
+    // A friend's right-click menu, laid out by the game menu's code (ns.libraryMenus)
+    ['main', 'client/friends/', ['friend-menu.js']],
     // Downloads page
     ['main', 'client/downloads/', [
       'downloads.css', 'downloads-queue.css', 'downloads-buttons.css', 'downloads-library.css',
@@ -137,6 +139,7 @@
     ['main', 'client/shared/', ['hover-cards.js']],
     ['all', 'client/header/', ['notifications.css', 'notifications.js', 'account-menu.css', 'steam-menu.css']],
     ['all', 'client/library/', ['game-menu.css', 'collection-menu.css']],
+    ['all', 'client/friends/', ['friend-menu.css']],
     ['all', 'client/header/', ['window-controls.css']],
     // The tray menu (Steam's icon in the Windows tray)
     ['tray', 'client/tray/', ['tray.css', 'tray.js']],
