@@ -23,8 +23,9 @@
 /*
  * A menu opening and closing: a short fade as it settles 4 px down into place, and back up as it
  * goes, a little quicker. The Steam menu, the account menu (client/header/steam-menu.css,
- * account-menu.css) and the theme's own menus (client/shared/popup-layer.css) use them; closing
- * is [data-se-closing], held until it ends (SE.layer.closeWith, client/shared/popup-layer.js).
+ * account-menu.css), the theme's own menus (client/shared/popup-layer.css) and Brew Hub's use
+ * them; closing is [data-se-closing], held until it ends (SE.layer.closeWith,
+ * client/shared/popup-layer.js). The web's counterpart is se-drop-in (web/shared/base.css).
  * Under reduced motion (here and options/appearance/motion-reduced.css) menus just appear and go.
  */
 @keyframes se-menu-in {
@@ -42,12 +43,46 @@
 }
 
 /*
- * An icon turning while its action runs (a refresh glyph while checking). Loading itself is the
- * one spinner (core/spinner.css); this is only for an icon that stands in for it.
+ * An icon turning while its action runs (a refresh glyph while checking), or a toast's countdown
+ * lead going round once. Loading itself is the one spinner (core/spinner.css).
  */
 @keyframes se-turn {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Something arriving: a plain fade in (a Home stage cell, the drag tray) */
+@keyframes se-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/*
+ * A loading skeleton's sheen sweeping across (System Information, System Report): the first
+ * background layer is the sheen, the second the base
+ */
+@keyframes se-shimmer {
+  from {
+    background-position: 150% 0, 0 0;
+  }
+
+  to {
+    background-position: -50% 0, 0 0;
+  }
+}
+
+/* A spark that twinkles: growing, turning and brightening, then back (achievement tiers, toasts) */
+@keyframes se-twinkle {
+  0%, 100% {
+    opacity: .25;
+    transform: scale(.6) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
   }
 }
 

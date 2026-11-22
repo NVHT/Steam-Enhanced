@@ -18,6 +18,18 @@
   }
 }
 
+/*
+ * A dropdown or suggestion list opening: a short fade as it settles 4 px down into place (the
+ * theme's dropdown, web/shared/select.css; the Store's search suggestions). The client's
+ * counterpart is se-menu-in (core/motion.css).
+ */
+@keyframes se-drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--se-space-1)));
+  }
+}
+
 /* One keyboard focus ring for every control, Steam's and the theme's (text fields keep their own). */
 html:is(.se-store, .se-community, .se-help, .se-checkout):not(#se-none) :is(a, button, select, [role="button"], [tabindex]):not(input, textarea):focus-visible {
   outline: var(--se-focus-outline) !important;

@@ -470,7 +470,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   position: absolute;
   background: var(--c);
   clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
-  animation: se-tst-twinkle var(--se-dur-pulse) ease-in-out infinite;
+  animation: se-twinkle var(--se-dur-pulse) ease-in-out infinite;
 }
 
 .se-tst-spark:nth-child(1) { left: -10%; top: -10%; width: 25%; height: 25%; }
@@ -478,12 +478,6 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 .se-tst-spark:nth-child(3) { left: -10%; top: 77%; width: 17%; height: 17%; animation-duration: 2.3s; animation-delay: .6s; }
 .se-tst-spark:nth-child(4) { left: 42%; top: -17%; width: 15%; height: 15%; animation-duration: 2.65s; animation-delay: .9s; }
 .se-tst-spark:nth-child(5) { left: 90%; top: 29%; width: 15%; height: 15%; animation-duration: 3s; animation-delay: 1.2s; }
-
-@keyframes se-tst-twinkle {
-  0%, 100% { opacity: .25; transform: scale(.6) rotate(0deg); }
-  50% { opacity: 1; transform: scale(1) rotate(45deg); }
-}
-
 .se-tst-tx {
   flex: 1;
   min-width: 0;
@@ -715,7 +709,7 @@ html[data-se-tst-wait] body > :not(#se-tst) {
 }
 
 .se-tst-layer[data-on] .se-tst-lead {
-  animation: se-tst-spin var(--se-tst-d, 6000ms) linear var(--se-tst-delay, 0ms) forwards;
+  animation: se-turn var(--se-tst-d, 6000ms) linear var(--se-tst-delay, 0ms) forwards;
 }
 
 /* Until handled: a full, quieter ring and no lead. */
@@ -753,12 +747,6 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   from { stroke-dashoffset: 84.8; }
   to { stroke-dashoffset: 0; }
 }
-
-@keyframes se-tst-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 /* Hovering the tray pauses everything that counts down. */
 .se-tst-tray:hover .se-tst-layer[data-on] :is(.se-tst-arc, .se-tst-lead, .se-tst-hero),
 .se-tst-tray:hover .se-tst-thumb[data-on]::after {
