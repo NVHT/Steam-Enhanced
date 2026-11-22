@@ -107,11 +107,14 @@
       'library.css', 'library-home.css', 'library-covers.css', 'game-list.css', 'game-list.js',
       'game-drag.css', 'game-drag.js', 'collections.css', 'collections.js',
     ]],
-    // The library's right-click menus (games, collections): part of the Steam menu's patching
+    // The library's right-click menus (games, collections, Home's updates and shelves): part of the Steam menu's patching
     // (client/header/menu/)
-    ['main', 'client/library/', ['game-menu.js', 'game-menu-collections.js', 'collection-menu.js']],
-    // A friend's right-click menu, laid out by the game menu's code (ns.libraryMenus)
-    ['main', 'client/friends/', ['friend-menu.js']],
+    ['main', 'client/library/', ['game-menu.js', 'game-menu-collections.js', 'collection-menu.js', 'home-menus.js']],
+    // Text and text fields' right-click menu, laid out by the same code
+    ['main', 'client/shared/', ['text-menu.js']],
+    // A friend's right-click menu, then the friends list's game, category and group chat menus,
+    // laid out by the game menu's code (ns.libraryMenus)
+    ['main', 'client/friends/', ['friend-menu.js', 'group-menus.js']],
     // Downloads page
     ['main', 'client/downloads/', [
       'downloads.css', 'downloads-queue.css', 'downloads-buttons.css', 'downloads-library.css',
@@ -138,8 +141,9 @@
     ['all', 'client/friends/', ['friend-hover.css', 'friend-hover.js']],
     ['main', 'client/shared/', ['hover-cards.js']],
     ['all', 'client/header/', ['notifications.css', 'notifications.js', 'account-menu.css', 'steam-menu.css']],
-    ['all', 'client/library/', ['game-menu.css', 'collection-menu.css']],
-    ['all', 'client/friends/', ['friend-menu.css']],
+    ['all', 'client/library/', ['game-menu.css', 'collection-menu.css', 'home-menus.css']],
+    ['all', 'client/shared/', ['text-menu.css']],
+    ['all', 'client/friends/', ['friend-menu.css', 'group-menus.css']],
     ['all', 'client/header/', ['window-controls.css']],
     // The tray menu (Steam's icon in the Windows tray)
     ['tray', 'client/tray/', ['tray.css', 'tray.js']],

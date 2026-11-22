@@ -8,6 +8,11 @@
  * aside (display: contents) so its hidden rows take no place. Places, by kind: the bar
  * (Message, Voice, Profile, Favorite, Remove) 2, its divider 10, a chat tab's and a stranger's
  * rows 12–13, Manage's and Trading's rows 30–36, anything else 38, the divider 39, Block 41.
+ *
+ * The panel's rules (its width, its room, its hidden rows) also serve the friends list's other
+ * menus ([data-se-lib-menu^='friend']: friend-game, friend-category, friend-chat;
+ * client/friends/group-menus.css). Those can draw in the opener's page instead
+ * ([data-se-fm-inpage]): there they keep the library menus' panel (game-menu.css), no room.
  */
 
 /*
@@ -15,7 +20,7 @@
  * its font (friend-menu.js places it by that size before Steam measures it). Rows are fixed
  * heights already (game-menu.css).
  */
-[data-se-lib-menu='friend'] > .contextMenuContents {
+[data-se-lib-menu^='friend'] > .contextMenuContents {
   box-sizing: border-box;
   width: 300px;
 }
@@ -32,7 +37,7 @@
  * !important: the right-click panel's surface, corners, edge and clipping (client/dialogs/
  * dialogs.css) and the game menu's panel face, which this box no longer wears.
  */
-.contextMenu[data-se-lib-menu='friend']:not(#se-none) {
+.contextMenu[data-se-lib-menu^='friend']:not([data-se-fm-inpage]):not(#se-none) {
   box-sizing: content-box;
   width: max-content;
   max-height: none;
@@ -43,19 +48,19 @@
   box-shadow: none !important;
 }
 
-.contextMenu[data-se-lib-menu='friend']:not([data-se-closing]):not(#se-none) {
+.contextMenu[data-se-lib-menu^='friend']:not([data-se-closing], [data-se-fm-inpage]):not(#se-none) {
   animation: none;
 }
 
 /* !important: dialogs.css's see-through rows' box (contextMenuContents) */
-[data-se-lib-menu='friend'] > .contextMenuContents:not(#se-none) {
+[data-se-lib-menu^='friend']:not([data-se-fm-inpage]) > .contextMenuContents:not(#se-none) {
   border-radius: var(--se-radius-menu);
   background: var(--se-surface) !important;
   box-shadow: var(--se-shadow-pop);
 }
 
 /* Opens once shown: friend-menu.js holds it hidden until its window is sized and placed */
-[data-se-lib-menu='friend'][data-se-fm-shown] > .contextMenuContents {
+[data-se-lib-menu^='friend'][data-se-fm-shown] > .contextMenuContents {
   animation: se-menu-in var(--se-dur) var(--se-ease);
 }
 
@@ -64,11 +69,11 @@
  * Find Games to Play Together, your game's invites, Recent Names. !important: the game menu's
  * row rule draws every row (display: grid !important, game-menu.css).
  */
-:root [data-se-lib-menu='friend'] [data-se-fm-hide]:not(#se-none) {
+:root [data-se-lib-menu^='friend'] [data-se-fm-hide]:not(#se-none) {
   display: none !important;
 }
 
-[data-se-lib-menu='friend'] .contextMenuSectionContent {
+[data-se-lib-menu^='friend'] .contextMenuSectionContent {
   display: contents;
 }
 

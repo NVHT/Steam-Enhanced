@@ -199,7 +199,7 @@
    * when it draws the menu, before its size is known). settle corrects it once the menu is drawn,
    * before Steam measures it.
    */
-  function makeRoom(instance) {
+  function makeRoom(instance, guess = { w: GUESS_W, h: GUESS_H }) {
     const at = instance?.m_position;
     if (!at || pointers.has(instance) || typeof at.clientX !== 'number' || typeof at.clientY !== 'number') return;
     const win = at.element?.ownerDocument?.defaultView || window;
@@ -207,7 +207,7 @@
     const x = at.clientX + (screenXY ? 0 : win.screenLeft);
     const y = at.clientY + (screenXY ? 0 : win.screenTop);
     pointers.set(instance, { clientX: at.clientX, clientY: at.clientY, x, y });
-    place(instance, sides(x, y, GUESS_W, GUESS_H, win.screen));
+    place(instance, sides(x, y, guess.w, guess.h, win.screen));
   }
 
   /*
@@ -330,6 +330,9 @@
     for (const row of rows) attr(row, 'data-se-fm-hide', HIDDEN.has(row.getAttribute('data-se-gm')) ? '' : null);
     run(settle, panel, instance);
   }
+
+  // The room and settling, for the friends list's other menus (client/friends/group-menus.js)
+  ns.popMenuRoom = { make: makeRoom, settle };
 
   add({
     name: 'friend',

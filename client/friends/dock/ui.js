@@ -210,9 +210,12 @@
     if (!f) return;
     const appid = run(() => f.persona.m_unGamePlayedAppID) || 0;
     const items = [
-      { label: COPY.message, run: () => openChat(id) },
+      // Glyphs and hints as the friend menu's rows (client/friends/friend-menu.css, friend-menu.js)
+      { label: COPY.message, icon: '--se-icon-bubble', hint: COPY.messageHint, run: () => openChat(id) },
       {
         label: COPY.profile,
+        icon: '--se-icon-user',
+        hint: COPY.profileHint,
         run: () => {
           const u =
             run(() => f.persona.GetCommunityProfileURL?.()) ||
@@ -225,6 +228,8 @@
     if (appid) {
       items.push({
         label: COPY.viewGame(run(() => f.persona.GetCurrentGameName()) || ''),
+        icon: '--se-icon-library',
+        hint: COPY.viewGameHint,
         run: () => {
           const m = mainWindow();
           run(() => m.Navigate(`/library/app/${appid}`));
@@ -232,6 +237,51 @@
       });
     }
     showMenu(items, x, y);
+  }
+
+  // Steam's leave-a-group function (asks first: "Leave … ?"), found once in its bundle by the confirm it shows
+  const leaveGroupFn = () =>
+    SE.findModule('friends-dock:leave-group', (src, id, req) => {
+      if (!src.includes('#Chat_Actions_LeaveChatRoomGroup_Confirm')) return null;
+      return Object.values(run(() => req(id)) || {}).find(
+        (v) => typeof v === 'function' && Function.prototype.toString.call(v).includes('LeaveChatRoomGroup_Confirm')
+      ) || null;
+    });
+
+  /*
+   * A group chat's menu: Open, Favorite or Unfavorite (Steam's favorites, { chat }), Leave in red
+   * through Steam's own confirm (no row when that can't be found: a group is never left unasked)
+   */
+  function groupMenu(id, x, y) {
+    const a = app();
+    const g = ns.findGroup(id);
+    if (!a || !g) return;
+    const favorites = run(() => a.FriendStore.FavoritesStore);
+    const favorite = Boolean(run(() => favorites.BIsFavorited({ chat: g })));
+    const items = [
+      { label: COPY.openGroup, icon: '--se-icon-bubble', hint: COPY.openGroupHint, run: () => openGroup(id) },
+      {
+        label: favorite ? COPY.unfavorite : COPY.favorite,
+        icon: '--se-icon-heart',
+        hint: favorite ? COPY.unfavoriteHint : COPY.favoriteHint,
+        run: () => run(() => (favorite ? favorites.RemoveFromFavorites({ chat: g }) : favorites.AddToFavorites({ chat: g }))),
+      },
+    ];
+    const leave = leaveGroupFn();
+    if (leave) {
+      items.push(
+        { separator: true },
+        // Steam's function takes the DOM window its confirm opens over (the dock's: the main window)
+        { label: COPY.leaveGroup, icon: '--se-icon-sign-out', hint: COPY.leaveGroupHint, danger: true, run: () => run(leave, window, g) }
+      );
+    }
+    showMenu(items, x, y);
+  }
+
+  // A right-click on a friend or a group: its menu at (x, y), main-window pixels
+  function rowMenu(row, x, y) {
+    if (row.dataset.friend) friendMenu(row.dataset.friend, x, y);
+    else groupMenu(row.dataset.group, x, y);
   }
 
   // Rows are divs with role=button: Enter and Space press them, as on a button.
@@ -277,12 +327,12 @@
       card.addEventListener('mouseleave', () => hideFly());
       card.addEventListener('click', openFlyRow);
       card.addEventListener('contextmenu', (event) => {
-        const row = event.target.closest('[data-friend]');
+        const row = event.target.closest('[data-friend], [data-group]');
         if (!row) return;
         event.preventDefault();
         // Menus are placed in main-window pixels: the card's corner there, plus the point in it.
         const box = card.getBoundingClientRect();
-        friendMenu(row.dataset.friend, right - box.width + event.clientX - box.left, top + event.clientY - box.top);
+        rowMenu(row, right - box.width + event.clientX - box.left, top + event.clientY - box.top);
       });
     });
     return true;
@@ -403,11 +453,11 @@
   }
 
   function onContext(e) {
-    const row = e.target.closest?.('[data-friend]');
+    const row = e.target.closest?.('[data-friend], [data-group]');
     if (!row || ns.steamHost.contains(row) || !(ns.dock.contains(row) || ns.fly.contains(row))) return;
     e.preventDefault();
     e.stopPropagation();
-    friendMenu(row.dataset.friend, e.clientX, e.clientY);
+    rowMenu(row, e.clientX, e.clientY);
   }
 
   live.frame = 0;

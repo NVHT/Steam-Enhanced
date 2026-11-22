@@ -1,0 +1,179 @@
+/*
+ * The friends list's other right-click menus (client/friends/group-menus.js), over the friend
+ * menu's panel (client/friends/friend-menu.css) and the game menu's bar and rows
+ * (client/library/game-menu.css): a game's header, a category's header, a group chat.
+ * Loaded in every window because Steam's menus open in their own popup windows.
+ *
+ * Steam wraps a game section's rows in a box (contextMenuSectionContent, display: contents in
+ * friend-menu.css), so its rows are the list's own grid items: their column and place are set
+ * on the rows. Places, by kind: the header 0–1, the bar 2–8, its divider 10, rows 12–24,
+ * anything else 30, the red divider 39, Remove 41.
+ */
+
+/* Rows only: narrower than the bar menus' one width (friend-menu.css) */
+[data-se-lib-menu='friend-category'] > .contextMenuContents {
+  width: 260px;
+}
+
+[data-se-lib-menu^='friend-'] [data-se-gm-list] [data-se-gm] {
+  grid-column: 1 / -1;
+}
+
+[data-se-lib-menu^='friend-'] [data-se-gm-list] [data-se-gm-place='bar'] {
+  grid-column: auto;
+}
+
+/* ---------- The header ---------- */
+
+[data-se-gm-list] > [data-se-gm-own='head'] {
+  order: 1;
+}
+
+[data-se-lib-menu='friend-chat'] [data-se-gm-list] > [data-se-gm-own='head'] {
+  order: 0;
+}
+
+/*
+ * The game's banner (the game header's menu only: the friend and group chat menus hide the
+ * title row of their game section): Steam's title row, holding its header art. !important: the game menu's
+ * row rule (display: grid, its padding) and the theme's right-click row's hover
+ * (client/library/game-menu.css, client/dialogs/dialogs.css).
+ */
+:root [data-se-lib-menu='friend-game'] [data-se-gm-list] [data-se-gm='gametitle']:not(#se-none) {
+  display: block !important;
+  order: 0;
+  min-height: 0;
+  padding: 0 !important;
+  background: transparent !important;
+  cursor: default;
+}
+
+[data-se-lib-menu='friend-game'] [data-se-gm='gametitle']::before,
+[data-se-lib-menu='friend-game'] [data-se-gm='gametitle']::after {
+  content: none;
+}
+
+/* No art (Steam has no header for the game): no banner */
+:root [data-se-lib-menu='friend-game'] [data-se-gm-list] [data-se-gm='gametitle']:not(:has(img)):not(#se-none) {
+  display: none !important;
+}
+
+/* Steam's art box is a fixed 184 × 69 and fades out to the right (its friends CSS): the banner fills the row instead */
+[data-se-lib-menu='friend-game'] [data-se-gm='gametitle'] :is(.contextMenuGameTitleBlurCropContainer, .contextMenuGameHeader) {
+  width: 100%;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  -webkit-mask: none;
+  mask: none;
+}
+
+[data-se-lib-menu='friend-game'] [data-se-gm='gametitle'] .GameHeader {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 460 / 215;
+  object-fit: cover;
+  border-radius: var(--se-radius-sm);
+}
+
+[data-se-grm-head] {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-width: 0;
+  padding: var(--se-space-2);
+}
+
+[data-se-grm-head='game'] {
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+[data-se-grm-lines] {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+[data-se-grm-name] {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 var(--se-fs-md) / 1.3 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+[data-se-grm-meta] {
+  flex: none;
+  white-space: nowrap;
+  font: 500 var(--se-fs-xs) / 1.3 var(--se-font);
+  color: var(--se-text-faint);
+}
+
+/* The group's picture, else its initials */
+[data-se-grm-avatar] {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-selected);
+  font: 600 var(--se-fs-sm) / 1 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+[data-se-grm-avatar] > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Places ---------- */
+
+[data-se-lib-menu^='friend-'] :is([data-se-gm='launch'], [data-se-gm='join'], [data-se-gm='get'], [data-se-gm='openchat']) { order: 2; }
+[data-se-lib-menu^='friend-'] :is([data-se-gm='watch'], [data-se-gm='favorite'], [data-se-gm='unfavorite']) { order: 3; }
+[data-se-lib-menu^='friend-'] :is([data-se-gm='info'], [data-se-gm='leavechat']) { order: 4; }
+[data-se-lib-menu^='friend-'] [data-se-gm='store'] { order: 5; }
+[data-se-lib-menu^='friend-'] [data-se-gm='hub'] { order: 6; }
+[data-se-lib-menu^='friend-'] [data-se-gm='closetab'] { order: 12; }
+[data-se-lib-menu^='friend-'] [data-se-gm='groupprofile'] { order: 13; }
+[data-se-gm-list] > [data-se-gm-slot='playtogether'] { order: 14; }
+[data-se-lib-menu='friend-chat'] :is([data-se-gm='launch'], [data-se-gm='join'], [data-se-gm='get']) { order: 20; }
+[data-se-lib-menu='friend-chat'] [data-se-gm='watch'] { order: 21; }
+[data-se-lib-menu='friend-chat'] [data-se-gm='info'] { order: 22; }
+[data-se-lib-menu='friend-chat'] [data-se-gm='store'] { order: 23; }
+[data-se-lib-menu='friend-chat'] [data-se-gm='hub'] { order: 24; }
+[data-se-lib-menu^='friend-'] [data-se-gm='newcategory'] { order: 20; }
+[data-se-lib-menu^='friend-'] [data-se-gm='editcategory'] { order: 21; }
+[data-se-lib-menu^='friend-'] [data-se-gm='removecategory'] { order: 41; }
+
+/* ---------- Glyphs, by kind ---------- */
+
+:is([data-se-gm='launch'], [data-se-gm='join']) { --se-gm-icon: var(--se-icon-play); }
+[data-se-gm='get'] { --se-gm-icon: var(--se-icon-library); }
+[data-se-gm='watch'] { --se-gm-icon: var(--se-icon-tv); }
+[data-se-gm='info'] { --se-gm-icon: var(--se-icon-info); }
+[data-se-gm='store'] { --se-gm-icon: var(--se-icon-store); }
+[data-se-gm='hub'] { --se-gm-icon: var(--se-icon-community); }
+[data-se-gm='newcategory'] { --se-gm-icon: var(--se-icon-folder-plus); }
+[data-se-gm='editcategory'] { --se-gm-icon: var(--se-icon-edit); }
+[data-se-gm='removecategory'] { --se-gm-icon: var(--se-icon-trash); }
+[data-se-gm='groupprofile'] { --se-gm-icon: var(--se-icon-group); }
+[data-se-gm='playtogether'] { --se-gm-icon: var(--se-icon-library); }
+[data-se-gm='leavechat'] { --se-gm-icon: var(--se-icon-sign-out); }
+
+/* Open, the group chat's main button: tinted as Install's (game-menu.css [data-se-gm-action]) */
+[data-se-gm-action='open'] {
+  --se-gm-icon: var(--se-icon-bubble);
+  --se-gm-tint: var(--se-install-tint);
+  --se-gm-tint-hover: var(--se-install-tint-hover);
+}
+
+/* Leave as a row (no bar: game-menu.js MIN_BAR): last, under the red divider */
+[data-se-lib-menu='friend-chat'] [data-se-gm='leavechat']:not([data-se-gm-place='bar']) {
+  order: 41;
+}
