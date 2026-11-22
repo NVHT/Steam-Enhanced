@@ -661,6 +661,13 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   cursor: pointer;
 }
 
+/* The hit area out to 32 px (a 30 px button); the look stays as drawn */
+.se-tst-sweep::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+}
+
 .se-tst-ring {
   position: absolute;
   inset: 0;
@@ -789,6 +796,14 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   box-shadow: var(--se-edge-divider);
   cursor: pointer;
   transition: transform var(--se-dur-slow) var(--se-ease-spring), box-shadow var(--se-dur-mid);
+}
+
+/* The hit area out to 32 px (a 24 px thumb; only up and down, beside the next one); the look
+   stays as drawn */
+.se-tst-thumb::before {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
 }
 
 /* A long queue shows its next 8; the count beside them says how many are waiting. */

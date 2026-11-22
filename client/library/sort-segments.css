@@ -56,6 +56,17 @@
   transition: background var(--se-dur) ease-out, color var(--se-dur) ease-out;
 }
 
+/* The hit area out to --se-hit above and below (beside, it meets the next segment), as segmented.css */
+.se-seg-btn {
+  position: relative;
+}
+
+.se-seg-btn::before {
+  content: '';
+  position: absolute;
+  inset: calc((100% - var(--se-hit)) / 2) 0;
+}
+
 .se-seg-btn:hover,
 [data-se-sortseg] .DialogDropDown:hover {
   background: var(--se-hairline) !important;

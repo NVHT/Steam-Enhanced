@@ -254,6 +254,13 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
   color: var(--se-text-muted) !important;
 }
 
+/* The hit area out to 32 px (a 30 px button); the look stays as drawn */
+.se-fd-icon::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+}
+
 .se-fd-icon:hover {
   background: var(--se-hover) !important;
   color: var(--se-text-strong) !important;
@@ -335,6 +342,7 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
 }
 
 .se-fd-head {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--se-space-2);
@@ -344,6 +352,14 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
   border-radius: var(--se-radius-sm);
   color: var(--se-label-color);
   cursor: pointer;
+}
+
+/* The hit area out to 32 px (a 30 px row; only up and down, it spans the column); the look
+   stays as drawn */
+.se-fd-head::before {
+  content: '';
+  position: absolute;
+  inset: -1px 0;
 }
 
 .se-fd-head:hover {
@@ -431,6 +447,15 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
 
 .se-fd-row:has(.se-fd-av[data-state="offline"]) .se-fd-name {
   color: var(--se-text-faint);
+}
+
+/* Lit (hovered or selected): faint text steps up to muted, AA on --se-hover and --se-selected
+   (--se-text-faint is only 4.1 / 3.4 on them) */
+.se-fd-row:hover:has(.se-fd-av[data-state="offline"]) .se-fd-name,
+.se-fd-head:hover,
+.se-fd-head:hover .se-fd-label,
+.se-fd-head:hover .se-fd-count {
+  color: var(--se-text-muted);
 }
 
 /* A game's row, and the friends in it on a thread line */

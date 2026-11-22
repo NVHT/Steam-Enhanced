@@ -18,8 +18,8 @@ Flags (each one breaks a rule):
 
 Notes (look, then decide):
   - contrast: text tokens under AA on a surface token (fine if that pair never meets)
-  - hit target: a theme button or link sized under 32 px (fine if a pseudo-element or its
-    padding grows the hit area)
+  - hit target: a theme button or link sized under 32 px (one whose ::before or ::after reaches
+    past it with a negative inset counts as grown and is not listed)
   - duplicates: the same @keyframes in more than one place, a spinning keyframes outside
     core/spinner.css and core/motion.css
   - blur: a raw blur() in filter (art blur; glass goes through --se-blur-*)
@@ -338,11 +338,14 @@ def interactive_classes(scripts):
 def hit_notes(sheets, scripts, tokens):
     classes = interactive_classes(scripts)
     sizes = {}  # class -> [(height, file, line)]
+    grown = set()  # classes whose ::before / ::after reaches past them (a negative inset)
     for f, raw in sheets.items():
         for selector, decls, start, end, line in rules(raw):
             for one in selectors(selector):
                 last = re.split(r'\s+|>|\+|~', one.strip())[-1]
                 if '::' in last:
+                    if any(p == 'inset' and '-' in v for p, v in decls):
+                        grown.update(re.findall(r'\.([\w-]+)', last.split('::')[0]))
                     continue
                 for cls in re.findall(r'\.([\w-]+)', last):
                     if cls not in classes:
@@ -354,7 +357,7 @@ def hit_notes(sheets, scripts, tokens):
                                 sizes.setdefault(cls, []).append((size, f, line))
     notes = []
     for cls, found in sorted(sizes.items()):
-        if max(s for s, _, _ in found) < 32:
+        if cls not in grown and max(s for s, _, _ in found) < 32:
             size, f, line = min(found)
             notes.append(f'hit target: .{cls} ({f}:{line}) is {size:g} px tall (32 px minimum)')
     return notes
