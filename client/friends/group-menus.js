@@ -170,16 +170,6 @@
 
   /* ---------- A group chat ---------- */
 
-  // A name's initials, as Steam draws a group without a picture
-  const initials = (name) =>
-    name
-      .trim()
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((word) => [...word][0] || '')
-      .join('')
-      .toUpperCase();
-
   // On top: the group's picture (else its initials), its name and its members
   function chatHead(doc, props) {
     const { group, clan } = props;
@@ -196,7 +186,7 @@
       img.src = src;
       avatar.append(img);
     } else {
-      avatar.textContent = initials(name);
+      avatar.textContent = SE.initials(name);
     }
     const lines = doc.createElement('span');
     lines.setAttribute('data-se-grm-lines', '');

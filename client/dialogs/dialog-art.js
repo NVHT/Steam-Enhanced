@@ -1,7 +1,7 @@
 /*
- * A rebuilt dialog's game art (Install, Uninstall, EULA, Mark as Private): the hero art behind
- * its top (.se-dialog-art) and the game capsules (.se-dialog-capsules), styled in
- * client/dialogs/dialogs.css. Both work through a game's copies with Steam's own list first
+ * A rebuilt dialog's game art (Install, Uninstall, EULA, Mark as Private, New Collection, Exit
+ * Game): the hero art behind its top (.se-dialog-art) and the game capsules
+ * (.se-dialog-capsules), styled in client/dialogs/dialogs.css. Both work through a game's copies with Steam's own list first
  * (SE.heroURLs / SE.headerURLs, SE.art in core/runtime.js), so newer games' hashed art loads,
  * and both are marked [data-ready] once their image has loaded.
  *

@@ -482,7 +482,7 @@
   /*
    * Every stylesheet goes in through one <style> of @imports, in list order. Chromium matches an
    * element against each sheet on its own, and imports fold into the sheet importing them: the
-   * main window's 135 links cost a full style pass ~51 ms, the same files imported ~43 ms
+   * main window's 135 links cost a full style pass ~58 ms, the same files imported ~43 ms
    * (dev/perf.js probe). Each file keeps its own URL, so its url()s and the cache work as before.
    * Its load event comes once every import is in.
    */

@@ -414,6 +414,18 @@
     return `${Math.round(s / 86400)} days ago`;
   };
 
+  // A name's initials, as Steam draws a group or friend without a picture: each word's first
+  // letter or digit, so a symbol ("● Squad") never stands for a name
+  const initials = (name) =>
+    String(name || '')
+      .trim()
+      .split(/\s+/)
+      .map((word) => [...word].find((ch) => /[\p{L}\p{N}]/u.test(ch)))
+      .filter(Boolean)
+      .slice(0, 2)
+      .join('')
+      .toUpperCase() || '#';
+
   const esc = (value) => String(value == null ? '' : value).replace(/[&<>"']/g, (ch) => HTML_ENTITIES[ch]);
 
   const isInstalled = (app) => {
@@ -1066,6 +1078,7 @@
     attr,
     esc,
     ago,
+    initials,
     el,
     setText,
     icons,

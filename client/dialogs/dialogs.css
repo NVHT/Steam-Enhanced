@@ -737,6 +737,20 @@ button.DialogButton.Primary:not(#se-none):is(:disabled, .Disabled) {
 }
 
 /*
+ * A dialog whose one action destroys (Exit Game, Delete Collection): its Primary in the
+ * destroying red. !important: the Primary button above.
+ */
+:is([data-se-exitgame], [data-se-delcoll]) .DialogFooter .DialogButton.Primary:not(#se-none) {
+  background: var(--se-danger-btn-bg) !important;
+  color: var(--se-danger-btn-fg) !important;
+}
+
+:is([data-se-exitgame], [data-se-delcoll]) .DialogFooter .DialogButton.Primary:not(#se-none):is(:hover, :focus-visible, .gpfocus):enabled {
+  background: var(--se-danger-btn-bg-hover) !important;
+  color: var(--se-danger-btn-fg-hover) !important;
+}
+
+/*
  * Gamepad-style confirmations ("Exit game?" and other two-button prompts, in the overlay and the
  * desktop client) draw their buttons as <div class="DialogButton"> on Steam's slate card, which
  * the button.DialogButton skin above misses. Same skin and card here; Big Picture (.GamepadMode)
@@ -953,8 +967,8 @@ div.ModalPosition_TopBar:not(#se-none) {
 }
 
 /*
- * Hero art behind the top of a rebuilt dialog (Install, Uninstall, EULA, Mark as Private),
- * under everything else. client/dialogs/dialog-art.js appends it; [data-ready] once loaded.
+ * Hero art behind the top of a rebuilt dialog (Install, Uninstall, EULA, Mark as Private,
+ * New Collection, Exit Game), under everything else. client/dialogs/dialog-art.js appends it; [data-ready] once loaded.
  */
 .DialogContent:has(> .se-dialog-art):not(#se-none) {
   position: relative;
@@ -969,7 +983,6 @@ div.ModalPosition_TopBar:not(#se-none) {
 .se-dialog-art {
   position: absolute;
   inset: 0 0 auto;
-  z-index: 0;
   height: var(--se-dialog-art-h);
   overflow: hidden;
   pointer-events: none;
@@ -1019,7 +1032,7 @@ div.ModalPosition_TopBar:not(#se-none) {
 }
 
 /*
- * A rebuilt dialog's game capsules (Uninstall, EULA, Mark as Private; built by
+ * A rebuilt dialog's game capsules (Uninstall, EULA, Mark as Private, New Collection; built by
  * client/dialogs/dialog-art.js): the first game's wide cover, the next two stepping out to its
  * right, smaller and dimmer, so several games read as several. The stack keeps room on its
  * right for them. A capsule is marked [data-ready] once loaded.
@@ -1047,7 +1060,7 @@ div.ModalPosition_TopBar:not(#se-none) {
   overflow: hidden;
   border-radius: var(--se-radius-md);
   background: var(--se-surface-2);
-  box-shadow: 0 14px 30px -12px var(--se-black-90), 0 0 0 1px var(--se-white-10);
+  box-shadow: var(--se-shadow-card), 0 0 0 1px var(--se-white-10);
 }
 
 .se-dialog-capsule:nth-child(2) {
@@ -1057,7 +1070,7 @@ div.ModalPosition_TopBar:not(#se-none) {
 }
 
 .se-dialog-capsule:nth-child(3) {
-  z-index: -2;
+  z-index: var(--se-z-under-2);
   transform: translateX(48px) scale(.8);
   filter: brightness(.4);
 }

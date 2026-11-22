@@ -349,7 +349,6 @@
 
   function layout(panel, instance) {
     const apps = targetApps(panel, instance);
-    let action = actionOf(apps);
     const laid = layoutRows(panel, {
       kindOf,
       bar: Object.keys(BAR),
@@ -357,9 +356,8 @@
       danger: ['uninstall', 'unlist'],
       word: (kind, row) => {
         if (kind !== 'primary') return BAR[kind];
-        action = actionOf(apps, row);
         const name = row.textContent.trim();
-        return name && name.length <= PRIMARY_WORD_MAX ? name : ACTION_WORD[action];
+        return name && name.length <= PRIMARY_WORD_MAX ? name : ACTION_WORD[actionOf(apps, row)];
       },
       // Play's tooltip carries your hours
       title: (kind, name) => (kind === 'primary' ? [name, hoursText(apps)].filter(Boolean).join(' · ') : null),
@@ -367,7 +365,8 @@
     if (!laid) return;
     const { container, rows, found } = laid;
     flattenFromRow(rows[0]);
-    if (found.primary) SE.attr(found.primary, 'data-se-gm-action', action);
+    // Judged here, not in word(): a menu without a bar never asks Play for its word
+    if (found.primary) SE.attr(found.primary, 'data-se-gm-action', actionOf(apps, found.primary));
     if (found.artwork) SE.attr(found.artwork, 'data-se-gm-hint', patched.get(instance)?.props?.hasCustomArtwork ? ARTWORK.clear : ARTWORK.set);
     if (found.properties && apps.length && apps.every((app) => run(() => app.BIsShortcut()))) {
       SE.attr(found.properties, 'data-se-gm-hint', SHORTCUT_PROPERTIES);

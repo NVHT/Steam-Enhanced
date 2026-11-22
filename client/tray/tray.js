@@ -196,6 +196,7 @@
       markRows(root);
     };
 
+    let reread = 0;
     const onStatus = (event) => {
       const button = event.target.closest('.se-tray-status button');
       if (!button) return;
@@ -206,7 +207,8 @@
       else if (choice) run(() => client().URL.ExecuteSteamURL(`steam://friends/status/${choice[0]}`));
       // The persona updates a moment later; the button shows the choice now
       for (const other of head.querySelectorAll('.se-tray-status button')) attr(other, 'aria-checked', String(other === button));
-      setTimeout(() => renderHead(head), 300);
+      clearTimeout(reread);
+      reread = setTimeout(() => renderHead(head), 300);
     };
     head.addEventListener('click', onStatus);
     // Steam shows the kept window again on each open (and focuses it): read you and the rows anew
@@ -219,6 +221,7 @@
     return {
       destroy() {
         rows.disconnect();
+        clearTimeout(reread);
         head.removeEventListener('click', onStatus);
         document.removeEventListener('visibilitychange', refresh);
         window.removeEventListener('focus', refresh);

@@ -84,16 +84,7 @@
     return '';
   }
 
-  // A word's first letter or digit: a symbol ("● Squad") never stands for a name
-  const initials = (name) =>
-    String(name || '')
-      .trim()
-      .split(/\s+/)
-      .map((word) => [...word].find((ch) => /[\p{L}\p{N}]/u.test(ch)))
-      .filter(Boolean)
-      .slice(0, 2)
-      .join('')
-      .toUpperCase() || '#';
+  const initials = SE.initials;
 
   const groupInitials = (text) => `<b class="se-fd-ginit" aria-hidden="true">${esc(text)}</b>`;
 
