@@ -43,8 +43,8 @@
  * The list: one line of bar buttons (a column each, --se-gm-bar of them, set by game-menu.js),
  * then everything else across every column. A grid, not a wrapping flex list: that sizes the
  * menu as if every row sat on one line. Places, by kind: the bar
- * 1–5, its divider 10, Collections 20, shortcut 21, back up 22, private 23, the rest (Steam's
- * other rows, plugins') 30, the last divider 40, Properties 50.
+ * 1–5, its divider 10, Collections 20, shortcut 21, back up 22, private 23, Dismiss from Play
+ * Next 24, custom artwork 25, the rest (Steam's other rows, plugins') 30, the last divider 40, Properties 50.
  * !important: Steam's contents are a flex column (its contextMenuContents rule).
  */
 [data-se-lib-menu] [data-se-gm-list] {
@@ -102,6 +102,14 @@
 
 [data-se-gm-list] > [data-se-gm-slot='private'] {
   order: 23;
+}
+
+[data-se-gm-list] > [data-se-gm-slot='dismiss'] {
+  order: 24;
+}
+
+[data-se-gm-list] > [data-se-gm-slot='artwork'] {
+  order: 25;
 }
 
 [data-se-gm-list] > [data-se-gm-slot='last'] {
@@ -312,6 +320,14 @@
 
 [data-se-gm='properties'] {
   --se-gm-icon: var(--se-icon-sliders);
+}
+
+[data-se-gm='dismiss'] {
+  --se-gm-icon: var(--se-icon-snooze);
+}
+
+[data-se-gm='artwork'] {
+  --se-gm-icon: var(--se-icon-photo);
 }
 
 /*

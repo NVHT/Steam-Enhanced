@@ -1,0 +1,24 @@
+/*
+ * The right-click menu of text and text fields (client/shared/text-menu.js): bar, rows and panel
+ * come from the library menus' look (client/library/game-menu.css); here only places and glyphs.
+ * Places, by kind: Cut 1, Copy 2, Paste 3, the bar's divider 10, spelling suggestions 20, Add to
+ * dictionary 21, anything else 30, the developer rows 32.
+ */
+
+[data-se-lib-menu='text'] [data-se-gm-list] > [data-se-gm-slot='cut'] { order: 1; }
+[data-se-lib-menu='text'] [data-se-gm-list] > [data-se-gm-slot='copy'] { order: 2; }
+[data-se-lib-menu='text'] [data-se-gm-list] > [data-se-gm-slot='paste'] { order: 3; }
+[data-se-lib-menu='text'] [data-se-gm-list] > [data-se-gm-slot='spelling'] { order: 20; }
+[data-se-lib-menu='text'] [data-se-gm-list] > [data-se-gm-slot='dictionary'] { order: 21; }
+[data-se-lib-menu='text'] [data-se-gm-list] > [data-se-gm-slot='devtools'] { order: 32; }
+
+/* Glyphs, by kind (spelling suggestions keep the glyph's room, empty) */
+[data-se-lib-menu='text'] [data-se-gm='cut'] { --se-gm-icon: var(--se-icon-cut); }
+[data-se-lib-menu='text'] [data-se-gm='copy'] { --se-gm-icon: var(--se-icon-copy); }
+[data-se-lib-menu='text'] [data-se-gm='paste'] { --se-gm-icon: var(--se-icon-paste); }
+[data-se-lib-menu='text'] [data-se-gm='dictionary'] { --se-gm-icon: var(--se-icon-check); }
+[data-se-lib-menu='text'] [data-se-gm='devtools'] { --se-gm-icon: var(--se-icon-code); }
+
+[data-se-lib-menu='text'] [data-se-gm='spelling']::before {
+  background: none;
+}

@@ -1,0 +1,45 @@
+/*
+ * The library's small right-click menus (client/library/home-menus.js): rows, dividers and the
+ * panel come from the library menus' look (client/library/game-menu.css); here only places and
+ * glyphs. Places, by kind: the actions 20–22, View game details 28, anything else 30 (the art
+ * menus' rows: Steam's order), the divider 40 (home-menus.js), Home's settings 50.
+ */
+
+[data-se-lib-menu='home'] [data-se-gm-list] > :is([data-se-gm-slot='gotocollection'], [data-se-gm-slot='allcollections'], [data-se-gm-slot='removeupdate']) {
+  order: 20;
+}
+
+[data-se-lib-menu='home'] [data-se-gm-list] > :is([data-se-gm-slot='fewer'], [data-se-gm-slot='removefromcollection'], [data-se-gm-slot='unhideall']) {
+  order: 21;
+}
+
+[data-se-lib-menu='home'] [data-se-gm-list] > :is([data-se-gm-slot='more'], [data-se-gm-slot='unhideone']) {
+  order: 22;
+}
+
+[data-se-lib-menu='home'] [data-se-gm-list] > [data-se-gm-slot='details'] {
+  order: 28;
+}
+
+[data-se-lib-menu='home'] [data-se-gm-list] > [data-se-gm-slot='homesettings'] {
+  order: 50;
+}
+
+/* Glyphs, by kind */
+[data-se-lib-menu='home'] [data-se-gm='details'] { --se-gm-icon: var(--se-icon-info); }
+[data-se-lib-menu='home'] [data-se-gm='removeupdate'] { --se-gm-icon: var(--se-icon-eye-off); }
+[data-se-lib-menu='home'] :is([data-se-gm='fewer'], [data-se-gm='more']) { --se-gm-icon: var(--se-icon-thumb); }
+[data-se-lib-menu='home'] [data-se-gm='homesettings'] { --se-gm-icon: var(--se-icon-settings); }
+[data-se-lib-menu='home'] :is([data-se-gm='gotocollection'], [data-se-gm='allcollections']) { --se-gm-icon: var(--se-icon-tag); }
+[data-se-lib-menu='home'] :is([data-se-gm='unhideall'], [data-se-gm='unhideone']) { --se-gm-icon: var(--se-icon-eye); }
+[data-se-lib-menu='home'] [data-se-gm='removefromcollection'] { --se-gm-icon: var(--se-icon-close-sm); }
+
+[data-se-lib-menu='home'] :is([data-se-gm='heroset'], [data-se-gm='heroclear'], [data-se-gm='artworkset'], [data-se-gm='artworkclear']) { --se-gm-icon: var(--se-icon-photo); }
+[data-se-lib-menu='home'] :is([data-se-gm='logoset'], [data-se-gm='logoclear']) { --se-gm-icon: var(--se-icon-logo); }
+[data-se-lib-menu='home'] [data-se-gm='logoedit'] { --se-gm-icon: var(--se-icon-move); }
+[data-se-lib-menu='home'] [data-se-gm='logoreset'] { --se-gm-icon: var(--se-icon-restore); }
+
+/* Show less: the thumb turned down */
+[data-se-lib-menu='home'] [data-se-gm='fewer']::before {
+  transform: rotate(180deg);
+}

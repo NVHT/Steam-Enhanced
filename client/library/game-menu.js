@@ -38,10 +38,13 @@
     backup: 'Save a copy to restore later',
     private: 'Friends won’t see it',
     manage: 'Shortcuts, hide, uninstall',
+    dismiss: 'Stop suggesting it',
     properties: 'Updates, launch options, DLC',
   };
   // A non-Steam game's Properties has no updates or DLC
   const SHORTCUT_PROPERTIES = 'Target, launch options, controller';
+  // Set or Clear custom artwork, by whether the game has its own art now
+  const ARTWORK = { set: 'Your own cover, hero and logo', clear: 'Back to Steam’s art' };
 
   // The bar's buttons, by kind, with their word under the icon (Play's comes from actionOf)
   const BAR = {
@@ -144,6 +147,18 @@
     return null;
   }
 
+  /*
+   * Set or Clear custom artwork runs the menu's own onChangeArtwork (a bound store method: no
+   * source to read), handed down from the menu's props above the row
+   */
+  function isArtwork(f, fn) {
+    for (let depth = 0; f && depth < 30; f = f.return, depth++) {
+      const props = f.memoizedProps;
+      if (props && typeof props === 'object' && 'onChangeArtwork' in props) return Boolean(fn) && props.onChangeArtwork === fn;
+    }
+    return false;
+  }
+
   // Rows found disabled (no onSelected) whose kind their component told: they can never act
   const disabledRows = new WeakSet();
 
@@ -167,12 +182,14 @@
       if ('onSelected' in props) {
         // Browse local files runs the same shared closure as the main action: told by Steam's own (localized) name
         if (props.children && props.children === run(() => live.api?.localize('#GameAction_BrowseLocalFiles'))) return 'browse';
+        // Dismiss from Play Next runs a bound method (no source): told by its localized name
+        if (props.children && props.children === run(() => live.api?.localize('#GameAction_DismissPlayNext'))) return 'dismiss';
         if (!props.onSelected) {
           const kind = disabledKind(f);
           if (kind) disabledRows.add(row);
           return kind || 'other';
         }
-        return keyedKind(f, props.onSelected) || kindOfAction(props.onSelected) || 'other';
+        return keyedKind(f, props.onSelected) || kindOfAction(props.onSelected) || (isArtwork(f, props.onSelected) ? 'artwork' : 'other');
       }
       if ('label' in props && props.children) return submenuKind(props.children);
     }
@@ -215,6 +232,9 @@
   }
 
   /* ---------- Layout ---------- */
+
+  // The fewest buttons a bar is drawn with (two side by side read as a stray pair: a list instead)
+  const MIN_BAR = 3;
 
   /*
    * A row of the theme's, in Steam's row classes (hover, press) so it looks like its neighbours.
@@ -276,7 +296,9 @@
    * row marked by its kind (spec.kindOf); kinds in spec.bar become bar buttons with a word under
    * their icon (spec.word) and Steam's whole name as their tooltip (spec.title, else the name);
    * the rest are rows with a hint (spec.hints); kinds in spec.danger are red. Sets the bar's
-   * columns and its divider. Returns { container, rows, found, barCount }, or null.
+   * columns and its divider, there only when rows follow the bar. A bar needs MIN_BAR buttons:
+   * with fewer, every row is a row. Kinds in spec.skip (rows a menu hides or draws above its
+   * bar) count for neither. Returns { container, rows, found, barCount }, or null.
    */
   function layoutRows(panel, spec) {
     const rows = [...panel.querySelectorAll(`.${C.contextMenuItem}`)].filter((row) => !row.hasAttribute('data-se-gm-own'));
@@ -290,9 +312,13 @@
 
     const found = {};
     let barCount = 0;
+    // Two buttons or fewer make no bar: those rows stay rows (with their hints, if any)
+    const kinds = new Map(rows.map((row) => [row, spec.kindOf(row)]));
+    const barKinds = [...kinds.values()].filter((kind) => spec.bar.includes(kind) && !spec.skip?.includes(kind));
+    const useBar = barKinds.length >= MIN_BAR;
     for (const row of rows) {
-      const kind = spec.kindOf(row);
-      const inBar = spec.bar.includes(kind);
+      const kind = kinds.get(row);
+      const inBar = useBar && spec.bar.includes(kind);
       const name = row.textContent.trim();
       const slot = slotOf(row, container);
       SE.attr(row, 'data-se-gm', kind);
@@ -313,7 +339,11 @@
     if (container.style.getPropertyValue('--se-gm-bar') !== String(barCount || 1)) {
       container.style.setProperty('--se-gm-bar', String(barCount || 1));
     }
-    keep(own(panel, 'bar-end', (doc) => divider(doc, 'bar-end')), container, barCount > 0);
+    const follows = rows.some((row) => {
+      const kind = row.getAttribute('data-se-gm');
+      return row.getAttribute('data-se-gm-place') !== 'bar' && !spec.skip?.includes(kind) && !row.hasAttribute('data-se-gm-off');
+    });
+    keep(own(panel, 'bar-end', (doc) => divider(doc, 'bar-end')), container, barCount > 0 && follows);
     return { container, rows, found, barCount };
   }
 
@@ -338,6 +368,7 @@
     const { container, rows, found } = laid;
     flattenFromRow(rows[0]);
     if (found.primary) SE.attr(found.primary, 'data-se-gm-action', action);
+    if (found.artwork) SE.attr(found.artwork, 'data-se-gm-hint', patched.get(instance)?.props?.hasCustomArtwork ? ARTWORK.clear : ARTWORK.set);
     if (found.properties && apps.length && apps.every((app) => run(() => app.BIsShortcut()))) {
       SE.attr(found.properties, 'data-se-gm-hint', SHORTCUT_PROPERTIES);
     }

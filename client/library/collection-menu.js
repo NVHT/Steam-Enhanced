@@ -30,6 +30,13 @@
     edit: 'Change its filters',
     expandall: 'Open every collection',
     collapseall: 'Fold every collection',
+    // The bar's, as rows when the bar is too short to draw (game-menu.js MIN_BAR)
+    only: 'Hide the other collections',
+    showall: 'Show every collection again',
+    collapse: 'Fold its games away',
+    expand: 'Show its games',
+    rename: 'Give it a new name',
+    delete: 'Its games stay in your library',
   };
 
   const localize = (token) => run(() => live.api?.localize(token)) || null;
