@@ -108,6 +108,18 @@
     return wins;
   };
 
+  /*
+   * A SteamClient call from the first window that has it: a window's own SteamClient can lack
+   * namespaces (User, whose StartRestart then fails silently) that Steam's shared context carries
+   */
+  const steamCall = (namespace, method, ...args) => {
+    for (const owner of owners()) {
+      const target = run(() => owner.SteamClient[namespace]);
+      if (typeof target?.[method] === 'function') return run(() => target[method](...args));
+    }
+    return undefined;
+  };
+
   // The game is running: in Steam's RunningApps, read from whichever window holds Steam's store
   const isRunning = (appid) =>
     Number(appid) > 0 &&
@@ -1031,6 +1043,7 @@
     appOf,
     findDown,
     owners,
+    steamCall,
     isRunning,
     mainWindow,
     navigate,

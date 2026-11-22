@@ -598,6 +598,34 @@
     }
   }
 
+  const reloadUI = () => SE.steamCall('Browser', 'RestartJSContext');
+  // false: a plain restart, as Steam's own Restart buttons make it (true is another kind of restart)
+  const restartSteam = () => SE.steamCall('User', 'StartRestart', false);
+
+  /*
+   * Keyboard shortcuts, in the main window: Ctrl+` Steam Settings, Ctrl+1 Millennium (beside
+   * Millennium's own Ctrl+2, the Library Manager), Ctrl+R Reload UI, Ctrl+Shift+R Restart Steam
+   * (shown on the Settings menu's and the Steam menu's rows). By the key's place (event.code),
+   * so they work on any keyboard layout.
+   */
+  const SHORTCUTS = {
+    Backquote: openSteamSettings,
+    Digit1: openMillennium,
+    KeyR: reloadUI,
+    'Shift+KeyR': restartSteam,
+  };
+
+  function onShortcut(event) {
+    if (!event.ctrlKey || event.altKey || event.metaKey || event.repeat) return;
+    const action = SHORTCUTS[(event.shiftKey ? 'Shift+' : '') + event.code];
+    if (!action) return;
+    event.preventDefault();
+    event.stopPropagation();
+    action();
+  }
+
+  addEventListener('keydown', onShortcut, true);
+
   function openLibraryManager() {
     if (window.__seMillenniumWindow?.openLibraryManager) {
       window.__seMillenniumWindow.openLibraryManager();
@@ -633,10 +661,10 @@
     settingsMenu = SE.layer?.menu(
       [
         { heading: 'Steam' },
-        { label: 'Settings', hint: 'Account, downloads, display', icon: '--se-icon-settings', run: openSteamSettings },
+        { label: 'Settings', hint: 'Account, downloads, display', icon: '--se-icon-settings', keys: 'Ctrl+`', run: openSteamSettings },
         { separator: true },
         { heading: 'Millennium' },
-        { label: 'Millennium', hint: 'Themes, plugins, updates', icon: '--se-icon-millennium', run: openMillennium },
+        { label: 'Millennium', hint: 'Themes, plugins, updates', icon: '--se-icon-millennium', keys: 'Ctrl+1', run: openMillennium },
         {
           label: 'Library Manager',
           hint: 'Theme and plugin settings',
@@ -752,6 +780,7 @@
     downloadObserver?.disconnect();
     if (frame) cancelAnimationFrame(frame);
     removeEventListener('DOMContentLoaded', start);
+    removeEventListener('keydown', onShortcut, true);
     settingsMenu?.release();
     friendsMenu?.release();
     group?.remove();

@@ -23,8 +23,8 @@
     return typeof text === 'string' && text && !text.startsWith('#') ? text : fallback;
   };
 
-  // A Steam item drawn as the theme's row: its icon (a mask token), its name and a hint
-  const row = (item, { label, hint, icon }) => ({
+  // A Steam item drawn as the theme's row: its icon (a mask token), its name, a hint and its shortcut
+  const row = (item, { label, hint, icon, keys }) => ({
     ...item,
     children: h(
       'span',
@@ -35,17 +35,10 @@
         { className: 'se-sm-text' },
         h('span', { className: 'se-sm-label' }, label || localized(item.name, item.name)),
         hint && h('span', { className: 'se-sm-hint' }, hint)
-      )
+      ),
+      keys && h('kbd', { className: 'se-sm-keys' }, keys)
     ),
   });
-
-  const steamCommand = (namespace, method, ...args) => {
-    for (const owner of SE.owners()) {
-      const target = owner?.SteamClient?.[namespace];
-      if (typeof target?.[method] === 'function') return target[method](...args);
-    }
-    return undefined;
-  };
 
   /*
    * The rows are React elements, so they're built on first draw, once Steam's menu API is found
@@ -66,12 +59,14 @@
         { label: 'Big Picture Mode', hint: 'TV and controller mode', icon: '--se-icon-tv' }
       ),
       row(
-        { name: 'se-restart', onClick: () => steamCommand('User', 'StartRestart', true) },
-        { label: 'Restart Steam', hint: 'Close and reopen Steam', icon: '--se-icon-restart' }
+        // false: a plain restart, as Steam's own Restart buttons make it
+        { name: 'se-restart', onClick: () => SE.steamCall('User', 'StartRestart', false) },
+        // Its shortcut and Reload UI's: client/header/header-actions.js
+        { label: 'Restart Steam', hint: 'Close and reopen Steam', icon: '--se-icon-restart', keys: 'Ctrl+Shift+R' }
       ),
       row(
-        { name: 'se-reload', onClick: () => steamCommand('Browser', 'RestartJSContext') },
-        { label: 'Reload UI', hint: 'Refresh the interface', icon: '--se-icon-refresh' }
+        { name: 'se-reload', onClick: () => SE.steamCall('Browser', 'RestartJSContext') },
+        { label: 'Reload UI', hint: 'Refresh the interface', icon: '--se-icon-refresh', keys: 'Ctrl+R' }
       ),
     ],
     exit: [
