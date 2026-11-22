@@ -344,7 +344,8 @@ def hit_notes(sheets, scripts, tokens):
             for one in selectors(selector):
                 last = re.split(r'\s+|>|\+|~', one.strip())[-1]
                 if '::' in last:
-                    if any(p == 'inset' and '-' in v for p, v in decls):
+                    # A minus left once custom property names are gone: -5px, calc(-1 * ...), 100% - ...
+                    if any(p == 'inset' and '-' in re.sub(r'--[\w-]+', '', v) for p, v in decls):
                         grown.update(re.findall(r'\.([\w-]+)', last.split('::')[0]))
                     continue
                 for cls in re.findall(r'\.([\w-]+)', last):

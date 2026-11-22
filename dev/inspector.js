@@ -211,12 +211,34 @@
         .then((text) => {
           if (text == null) return null;
           const detached = new CSSStyleSheet();
-          detached.replaceSync(text); // @import is ignored: imported sheets are listed on their own
+          detached.replaceSync(text); // @import is ignored here: allSheets() lists a readable sheet's imports
           return detached.cssRules;
         })
         .catch(() => null));
     }
     return fetched.get(sheet.href);
+  };
+
+  /*
+   * Every stylesheet in cascade order, imported ones included: the theme's files are @imported
+   * by one <style> per window (#se-sheets, [data-se-sheets]), and an import's rules come before
+   * the importing sheet's own. A sheet the page can't read keeps its imports hidden.
+   */
+  const importsOf = (sheet) => {
+    try {
+      return [...sheet.cssRules].filter((rule) => rule instanceof CSSImportRule && rule.styleSheet).map((rule) => rule.styleSheet);
+    } catch {
+      return [];
+    }
+  };
+  const allSheets = () => {
+    const out = [];
+    const add = (sheet) => {
+      for (const imported of importsOf(sheet)) add(imported);
+      out.push(sheet);
+    };
+    for (const sheet of document.styleSheets) add(sheet);
+    return out;
   };
 
   /** Rules that match the element, in cascade order, from every stylesheet (Steam's included). */
@@ -239,7 +261,7 @@
         } catch {} // selectors this engine rejects
       }
     };
-    const sheets = [...document.styleSheets];
+    const sheets = allSheets();
     const lists = await Promise.all(sheets.map(rulesOf));
     sheets.forEach((sheet, i) => {
       const source = sheet.href ? sheet.href.split('/').pop().split('?')[0] : sheet.ownerNode?.dataset?.seFeature || 'inline <style>';
@@ -254,7 +276,8 @@
    * file count: <script src> and stylesheet <link>s. Other <link>s to theme scripts (preload
    * hints beside the <script>s Millennium injects) fetch nothing new and used to list every
    * injected script twice, so they're counted on a line of their own. A file really injected
-   * twice (two <script>s, two sheets) is flagged instead of silently repeated.
+   * twice (two <script>s, two sheets) is flagged instead of silently repeated. Stylesheets come
+   * as the @imports of the theme's one sheet per window (#se-sheets, [data-se-sheets]).
    */
   const LOADS = 'script[src], link[rel~="stylesheet"][href]';
   const themeFiles = () => {
@@ -269,6 +292,11 @@
         continue;
       }
       counts.set(url, (counts.get(url) ?? 0) + 1);
+    }
+    for (const style of document.querySelectorAll('style#se-sheets, style[data-se-sheets]')) {
+      for (const sheet of style.sheet ? importsOf(style.sheet) : []) {
+        if (sheet.href) counts.set(sheet.href, (counts.get(sheet.href) ?? 0) + 1);
+      }
     }
     const lines = [...counts].map(([url, count]) => {
       const u = new URL(url, location.href);
