@@ -303,7 +303,7 @@
       const s = el('div', 'se-seg se-cb-view');
       s.setAttribute('role', 'radiogroup');
       for (const v of ['grid', 'list']) {
-        const b = el('button', 'se-seg-btn');
+        const b = el('button');
         b.type = 'button';
         b.dataset.view = v;
         b.innerHTML = icon(v);
@@ -581,7 +581,7 @@
       const s = el('div', 'se-seg se-cb-sort');
       s.setAttribute('role', 'radiogroup');
       for (const k of ['az', 'size', 'recent']) {
-        const b = el('button', 'se-seg-btn');
+        const b = el('button');
         b.type = 'button';
         b.dataset.sort = k;
         b.setAttribute('role', 'radio');

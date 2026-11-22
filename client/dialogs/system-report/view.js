@@ -163,7 +163,7 @@
     const toggleAll = button('se-sysreport-tool', [toggleIcon], () => setAllOpen(!allOpen()), 'Expand all');
     tip(fixedTips, toggleAll, 'Expand or collapse all groups');
 
-    const modes = el('div', 'se-sysreport-modes');
+    const modes = el('div', 'se-seg se-sysreport-modes');
     modes.setAttribute('role', 'tablist');
     const modeButton = (mode, name, label) => {
       const node = button('se-sysreport-mode', [icon(name), el('span', null, label)], () => setMode(mode));
@@ -425,7 +425,6 @@
       SE.attr?.(root, 'data-se-sysreport-mode', mode);
       for (const node of modes.children) {
         const selected = node.dataset.mode === mode;
-        node.toggleAttribute('data-active', selected);
         node.setAttribute('aria-selected', String(selected));
         node.disabled = !parsed && node.dataset.mode === 'details';
       }

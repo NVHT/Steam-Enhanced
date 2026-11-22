@@ -235,9 +235,12 @@
   display: none;
 }
 
-.MillenniumSettings .se-mpager button {
+/* The pager's buttons, and Brew Hub's Refresh beside them (compat/brew-hub/brew-hub.css): one
+   small square icon button */
+.MillenniumSettings :is(.se-mpager button, .se-bh-refresh) {
   all: unset;
   box-sizing: border-box;
+  position: relative;
   display: grid;
   place-items: center;
   width: var(--se-control-h-sm);
@@ -249,17 +252,28 @@
   transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
-.MillenniumSettings .se-mpager button:hover:not(:disabled) {
+/* The hit area out to --se-hit; the look stays */
+.MillenniumSettings :is(.se-mpager button, .se-bh-refresh)::before {
+  content: '';
+  position: absolute;
+  inset: calc((var(--se-control-h-sm) - var(--se-hit)) / 2);
+}
+
+.MillenniumSettings :is(.se-mpager button, .se-bh-refresh):hover:not(:disabled) {
   background: var(--se-hover);
   color: var(--se-text-strong);
 }
 
-.MillenniumSettings .se-mpager button:focus-visible {
+.MillenniumSettings :is(.se-mpager button, .se-bh-refresh):active:not(:disabled) {
+  transform: scale(var(--se-press-scale));
+}
+
+.MillenniumSettings :is(.se-mpager button, .se-bh-refresh):focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
 }
 
-.MillenniumSettings .se-mpager button:disabled {
+.MillenniumSettings :is(.se-mpager button, .se-bh-refresh):disabled {
   opacity: .4;
   cursor: default;
 }

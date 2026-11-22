@@ -90,7 +90,7 @@
       `<div class="${OURS}-types" role="radiogroup" aria-labelledby="${OURS}-type">` +
       TYPES.map(
         (type, i) =>
-          `<button type="button" class="${OURS}-type" role="radio" aria-checked="${i === 0}" data-type="${i}">` +
+          `<button type="button" class="${OURS}-type" role="radio" aria-checked="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-type="${i}">` +
           `<span class="${OURS}-icon" style="--se-nc-icon: var(${type.icon})" aria-hidden="true"></span>` +
           `<span class="${OURS}-text"><span class="${OURS}-title">${type.title}</span>` +
           `<span class="${OURS}-hint">${i === 0 && count ? `Starts with ${count === 1 ? 'this game' : `these ${count.toLocaleString()} games`}` : type.hint}</span></span></button>`
@@ -122,10 +122,13 @@
       if (!frame) frame = requestAnimationFrame(refresh);
     };
 
+    // The picked card is the group's one Tab stop (a roving tabindex); arrows move between them
     const pick = (index) => {
       picked = index;
       for (const card of block.querySelectorAll(`.${OURS}-type`)) {
-        card.setAttribute('aria-checked', String(Number(card.dataset.type) === index));
+        const on = Number(card.dataset.type) === index;
+        card.setAttribute('aria-checked', String(on));
+        card.tabIndex = on ? 0 : -1;
       }
       refresh();
     };
@@ -148,12 +151,13 @@
       else if (event.target.closest('[data-nc-cancel]')) cancel();
     };
 
-    // Arrow keys move between the cards, as in any radio group
+    // Arrow keys move between the cards, as in any radio group: Left / Up back, Right / Down on
+    const STEP = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 };
     const onKeyDown = (event) => {
       const card = event.target.closest?.(`.${OURS}-type`);
-      if (card && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+      if (card && STEP[event.key]) {
         event.preventDefault();
-        const next = (picked + 1) % TYPES.length;
+        const next = (picked + STEP[event.key] + TYPES.length) % TYPES.length;
         pick(next);
         block.querySelector(`[data-type="${next}"]`)?.focus();
       }

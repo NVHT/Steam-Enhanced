@@ -401,43 +401,14 @@
   margin: 0;
 }
 
-/* Refresh: one of the pager's buttons */
-.MillenniumSettings .se-bh-refresh {
-  all: unset;
-  box-sizing: border-box;
-  display: grid;
-  place-items: center;
-  width: var(--se-control-h-sm);
-  height: var(--se-control-h-sm);
-  border-radius: var(--se-radius-sm);
-  background: var(--se-surface-2);
-  color: var(--se-text-dim);
-  cursor: pointer;
-  transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
-}
-
-/* Hidden while the plugin shows no Refresh of its own (brew-hub.js): `display: grid` above
-   outranks the UA's [hidden] rule, as with .se-mpager (millennium-redesign.css) */
+/* Refresh: drawn as the pager's buttons (client/settings/millennium/millennium-redesign.css) */
 .MillenniumSettings .se-bh-refresh[hidden] {
   display: none;
 }
 
-.MillenniumSettings .se-bh-refresh:hover:not(:disabled) {
-  background: var(--se-hover);
-  color: var(--se-text-strong);
-}
-
-.MillenniumSettings .se-bh-refresh:active:not(:disabled) {
-  transform: scale(var(--se-press-scale));
-}
-
-.MillenniumSettings .se-bh-refresh:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: var(--se-focus-offset);
-}
-
-.MillenniumSettings .se-bh-refresh:disabled {
-  cursor: default;
+/* Busy: the turning arrow says it, so it isn't dimmed as a disabled button is */
+.MillenniumSettings .se-bh-refresh[data-busy]:disabled {
+  opacity: 1;
 }
 
 .MillenniumSettings .se-bh-refresh .se-micon {

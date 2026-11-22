@@ -368,56 +368,17 @@
   height: 14px;
 }
 
-/* Details | Raw */
+/* Details | Raw: the theme's segmented control (client/shared/segmented.css), as tall as the bar's tools */
 .se-sysreport-modes {
   flex: none;
-  height: 28px;
   box-sizing: border-box;
-  display: flex;
-  gap: var(--se-space-half);
-  padding: var(--se-space-half);
-  border-radius: var(--se-radius-pill);
-  background: var(--se-field);
-  box-shadow: var(--se-edge);
+  height: 28px;
 }
 
-.se-sysreport-mode {
-  position: relative;
+.se-sysreport-modes button {
   height: 100%;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--se-space-1);
-  padding: 0 var(--se-space-2) 0 var(--se-space-2);
-  border-radius: var(--se-radius-pill);
-  background: none;
-  font: 600 var(--se-fs-xs)/1 var(--se-font);
-  color: var(--se-text-muted);
-}
-
-/* The hit area grows to --se-hit over the pill's 2px rim (the 24px mode inside the 28px pill) */
-.se-sysreport-mode::after {
-  content: '';
-  position: absolute;
-  inset: calc((24px - var(--se-hit)) / 2) 0;
-}
-
-.se-sysreport-mode svg {
-  width: 13px;
-  height: 13px;
-}
-
-.se-sysreport-mode:hover:not(:disabled) {
-  color: var(--se-text);
-}
-
-.se-sysreport-mode[data-active] {
-  background: var(--se-surface-2);
-  color: var(--se-text-strong);
-}
-
-.se-sysreport-mode:disabled {
-  opacity: .4;
-  cursor: default;
+  padding: 0 var(--se-space-2);
+  font-size: var(--se-fs-xs);
 }
 
 /* Section cards */
@@ -903,9 +864,6 @@
     display: none;
   }
 
-  .se-sysreport-mode {
-    padding: 0 var(--se-space-2);
-  }
 }
 
 /* Short windows: slimmer tiles, so the report keeps most of the height */

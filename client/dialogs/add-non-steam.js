@@ -437,7 +437,7 @@
     /* Toolbar: sort by Program / Location, All / Selected, then the helper filter */
     const tools = el('div', `${OURS} ${OURS}-tools`);
 
-    const sortGroup = el('div', `${OURS}-seg`);
+    const sortGroup = el('div', `se-seg ${OURS}-seg`);
     sortGroup.setAttribute('role', 'group');
     sortGroup.setAttribute('aria-label', 'Sort');
     const sortButtons = [['name', C.name], ['path', C.path]].map(([key, selector]) => {
@@ -454,7 +454,7 @@
       return node;
     });
 
-    const viewGroup = el('div', `${OURS}-seg`);
+    const viewGroup = el('div', `se-seg ${OURS}-seg`);
     viewGroup.setAttribute('role', 'group');
     viewGroup.setAttribute('aria-label', 'Show');
     const viewButtons = [['all', 'All'], ['selected', 'Selected']].map(([key, label]) => {

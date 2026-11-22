@@ -1,23 +1,17 @@
 /*
- * Segmented controls, one style for the whole theme:
- * - the `A-Z / Recent / Hours / More` sort control (client/library/sort-segments.js), whose
- *   host is Steam's sort bar ([data-se-sortseg]) and whose fourth segment is Steam's own
- *   dropdown;
- * - the view switch and All Collections' sort (.se-seg, client/library/collections.js).
- * Also formats shelf header title pickers and item counts, and shelf arrangement mode.
+ * The `A-Z / Recent / Hours / More` sort control (client/library/sort-segments.js), whose host
+ * is Steam's sort bar ([data-se-sortseg]) and whose fourth segment is Steam's own dropdown:
+ * Steam's bar drawn as the theme's segmented control (client/shared/segmented.css: the same
+ * track, buttons and states). Also formats shelf header title pickers and item counts, and shelf
+ * arrangement mode. !important: Steam's sort bar and DialogDropDown rules (steamui sp.css).
  */
-.se-seg {
-  display: inline-flex;
-}
-
-.se-seg,
 [data-se-sortseg] {
   align-items: center !important;
   gap: var(--se-space-half) !important;
   padding: var(--se-space-half) !important;
   border-radius: var(--se-radius-md);
-  background: var(--se-surface);
-  box-shadow: var(--se-edge);
+  background: var(--se-field);
+  box-shadow: var(--se-search-edge);
 }
 
 [data-se-sortseg] ._1ljKTq3H58WbDZGNPfM0TY {
@@ -37,7 +31,7 @@
   align-items: center !important;
   justify-content: center;
   gap: var(--se-space-1) !important;
-  height: 30px !important;
+  height: var(--se-control-h-sm) !important;
   min-width: 34px !important;
   max-width: none !important;
   width: auto !important;
@@ -48,7 +42,7 @@
   background: transparent !important;
   box-shadow: none !important;
   color: var(--se-text-muted) !important;
-  font: 600 var(--se-fs-base)/30px var(--se-font), sans-serif !important;
+  font: 600 var(--se-fs-base)/var(--se-control-h-sm) var(--se-font), sans-serif !important;
   letter-spacing: 0 !important;
   text-transform: none !important;
   white-space: nowrap;
@@ -70,14 +64,13 @@
 .se-seg-btn:hover,
 [data-se-sortseg] .DialogDropDown:hover {
   background: var(--se-hairline) !important;
-  color: var(--se-text) !important;
+  color: var(--se-text-strong) !important;
 }
 
 .se-seg-btn[aria-checked="true"],
 [data-se-sortseg="other"] .DialogDropDown {
   background: var(--se-selected) !important;
   color: var(--se-text-strong) !important;
-  box-shadow: 0 2px 6px -2px var(--se-black-50) !important;
 }
 
 .se-seg-btn:focus-visible {
@@ -93,10 +86,10 @@
   display: flex !important;
   align-items: center;
   flex: 0 0 auto !important;
-  height: 32px;
+  height: var(--se-control-h-sm);
   margin: 0 !important;
   padding: 0 !important;
-  line-height: 30px !important;
+  line-height: var(--se-control-h-sm) !important;
 }
 
 [data-se-sortseg="main"] .DialogDropDown_CurrentDisplay {

@@ -1,10 +1,15 @@
 /*
- * The segmented control: one row of mutually exclusive buttons on a field-coloured track, the
- * chosen one raised ([data-on]). Used by the Library Manager (client/settings/library-manager.*)
- * and the Millennium settings window (Plugins filter, Logs level). Markup:
+ * The segmented control, the theme's only one: a row of mutually exclusive buttons on a
+ * field-coloured track, the chosen one raised. Used by the Library Manager, the Millennium
+ * settings window (Plugins filter, Logs level), the settings menus (client/shared/menu.js), the
+ * Home board's widths, the collections pages' view switch and sort, Add Non-Steam Game's sort
+ * and view, and System Report's Details | Raw. Markup:
  *   <div class="se-seg" role="group" aria-label="…"><button type="button" data-on>All <b>12</b></button>…</div>
- * A <b> inside a button is its count, in the faint tone. Layout (grid, stretch) belongs to the
- * caller; this file is the look and the states.
+ * The chosen button carries whichever its role says: data-on (plain buttons), aria-checked
+ * (radios), aria-pressed (toggles) or aria-selected (tabs). A <b> inside a button is its count,
+ * in the faint tone; an <svg> is its icon, in the button's tone. Layout (grid, stretch, a taller
+ * track) belongs to the caller; this file is the look and the states. The library's sort bar
+ * (client/library/sort-segments.css) draws Steam's own bar in the same look.
  */
 .se-seg {
   display: inline-flex;
@@ -18,6 +23,7 @@
 .se-seg button {
   all: unset;
   box-sizing: border-box;
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -33,11 +39,19 @@
   transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
+/* The hit area out to --se-hit above and below (beside, it meets the next button); the look stays */
+.se-seg button::after {
+  content: '';
+  position: absolute;
+  inset: calc((100% - var(--se-hit)) / 2) 0;
+}
+
 .se-seg button:hover {
+  background: var(--se-hairline);
   color: var(--se-text-strong);
 }
 
-.se-seg button[data-on] {
+.se-seg button:is([data-on], [aria-checked="true"], [aria-pressed="true"], [aria-selected="true"]) {
   background: var(--se-selected);
   color: var(--se-text-strong);
 }
@@ -51,9 +65,23 @@
   outline-offset: var(--se-focus-offset);
 }
 
+.se-seg button:disabled {
+  background: none;
+  color: var(--se-text-faint);
+  cursor: default;
+  opacity: .5;
+  transform: none;
+}
+
 .se-seg b {
   font-weight: 500;
   color: var(--se-text-faint);
+}
+
+.se-seg svg {
+  flex: none;
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
 }
 
 @media (prefers-reduced-motion: reduce) {
