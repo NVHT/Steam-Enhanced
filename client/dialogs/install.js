@@ -84,33 +84,6 @@
 
   const readOption = (node) => propsUp(node, (p) => p.folder && typeof p.folder === 'object' && 'nSpaceRequired' in p);
 
-  /* ---------- Hero art ---------- */
-
-  const buildArt = (host, appid) => {
-    const art = el('div', `${OURS} ${OURS}-art se-dialog-art`);
-    art.setAttribute('aria-hidden', 'true');
-    const img = el('img');
-    img.alt = '';
-    img.decoding = 'async';
-    art.append(img);
-
-    const urls = attempt(() => SE.heroURLs(appid), []) ?? [];
-    let index = 0;
-    const next = () => {
-      if (index >= urls.length) {
-        art.remove();
-        return;
-      }
-      img.src = urls[index++];
-    };
-    img.addEventListener('load', () => SE.mark(art, 'data-ready'));
-    img.addEventListener('error', next);
-    next();
-
-    host.append(art);
-    return art;
-  };
-
   /* ---------- Drive cards ---------- */
 
   const buildDrive = (option) => {
@@ -182,15 +155,16 @@
       const request = anchor && attempt(() => readRequest(anchor), null);
       SE.attr(root, ROOT, anchor ? '' : null);
 
-      /* Hero art behind the top, from the first app */
-      const appid = num(request?.rgApps?.[0]?.nAppID) ?? 0;
+      /* Hero art behind the top, from the game the menu was opened on, else the first app */
+      const apps = Array.isArray(request?.rgApps) ? SE.leadApp(request.rgApps, (app) => app?.nAppID) : [];
+      const appid = num(apps[0]?.nAppID) ?? 0;
       const host = anchor?.closest('.DialogContent') ?? null;
       if (art && (!appid || appid !== artApp || !art.isConnected || art.parentElement !== host)) {
         art.remove();
         art = null;
       }
       if (!art && appid && host) {
-        art = attempt(() => buildArt(host, appid), null);
+        art = attempt(() => SE.dialogArt.hero(host, appid, OURS), null);
         artApp = appid;
       }
       SE.attr(root, 'data-se-inst-art', art ? '' : null);

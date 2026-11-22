@@ -1,7 +1,9 @@
 /*
- * New Collection, rebuilt: the name, then the type as two cards to pick from (Collection, the
- * one picked at first, or Dynamic), then Cancel and Create, the dialog's one main action, greyed
- * until there is a name. Enter creates the picked type.
+ * New Collection, rebuilt: opened with games (the library menu's New Collection), the games
+ * lead: the first one's hero art behind the top, their capsules, the count and names, Steam's
+ * title as an eyebrow over them. Then the name, the type as two cards to pick from (Collection,
+ * the one picked at first, or Dynamic), then Cancel and Create, the dialog's one main action,
+ * greyed until there is a name. Enter creates the picked type.
  *
  * Steam renders the dialog from sp.js (CSS module 1634, SaveCollectionContainer on the dialog's
  * content): a name field, then in the footer a label and TwoOptionsContainer with two Options,
@@ -9,9 +11,13 @@
  * and a Description. The Save-search variant (a filter to save) has no Options and keeps
  * Steam's own OK.
  *
+ * The dialog's props carry the games (rgManuallyAddedApps: app ids or overviews; empty from
+ * the Collections page's New).
+ *
  * Every native node stays mounted and React keeps owning it. The theme marks the dialog
  * ([data-se-newcoll]), hides the footer's label and Options, and appends its own block at the
- * footer's end, a child list React doesn't change while the dialog is open. Create clicks the
+ * footer's end and its games at the body text's end (placed first by CSS order), child lists
+ * React doesn't change while the dialog is open. Create clicks the
  * picked type's own ActionLabel; Cancel runs the dialog's own onCancel.
  *
  * Big Picture (.GamepadMode) keeps Steam's dialog.
@@ -31,6 +37,7 @@
   const OURS = 'se-nc';
   const ROOT = 'data-se-newcoll';
   const FOOTER = 'data-se-newcoll-footer';
+  const GAMES = 'data-se-newcoll-games';
 
   // In Steam's Options' order: Create, then Create Dynamic
   const TYPES = [
@@ -40,10 +47,44 @@
 
   const attempt = SE.attempt('New collection');
   const isOurs = (node) => node.nodeType === 1 && node.closest?.(`.${OURS}`);
+  const { el } = SE;
 
-  function build(doc) {
+  const plural = (n, one, many) => `${n.toLocaleString()} ${n === 1 ? one : many}`;
+
+  // The games it opens with, the one the menu was opened on first: [{ appid, name }]
+  function readGames(root) {
+    const list = SE.fromProps(root, 12, (p) => (Array.isArray(p.rgManuallyAddedApps) ? p.rgManuallyAddedApps : undefined)) || [];
+    const games = [];
+    for (const item of list) {
+      const appid = Number(typeof item === 'object' ? item?.appid : item);
+      if (!(appid > 0)) continue;
+      const name = (typeof item === 'object' && item.display_name) ||
+        attempt(() => SE.appStore()?.GetAppOverviewByAppID(appid)?.display_name, '') || '';
+      games.push({ appid, name });
+    }
+    return SE.leadApp(games, (game) => game.appid);
+  }
+
+  // The games' block: capsules beside the count (or the one name) and the names
+  function buildGames(games) {
+    const block = el('div', `${OURS} ${OURS}-games`);
+    const single = games.length === 1;
+    const text = el('div', `${OURS}-games-text`);
+    text.append(el('div', `${OURS}-games-title`, single ? games[0].name : plural(games.length, 'game', 'games')));
+    if (!single) {
+      const shown = games.slice(0, 2).map((g) => g.name).filter(Boolean);
+      const more = games.length - shown.length;
+      const names = el('div', `${OURS}-games-names`, more ? `${shown.join(', ')} and ${more.toLocaleString()} more` : shown.join(' and '));
+      names.title = games.map((g) => g.name).join('\n');
+      text.append(names);
+    }
+    block.append(SE.dialogArt.capsules(games.map((g) => g.appid)), text);
+    return block;
+  }
+
+  function build(doc, count) {
     const block = doc.createElement('div');
-    block.className = OURS;
+    block.className = `${OURS} ${OURS}-block`;
     block.innerHTML =
       `<div class="${OURS}-label" id="${OURS}-type">Type</div>` +
       `<div class="${OURS}-types" role="radiogroup" aria-labelledby="${OURS}-type">` +
@@ -52,7 +93,7 @@
           `<button type="button" class="${OURS}-type" role="radio" aria-checked="${i === 0}" data-type="${i}">` +
           `<span class="${OURS}-icon" style="--se-nc-icon: var(${type.icon})" aria-hidden="true"></span>` +
           `<span class="${OURS}-text"><span class="${OURS}-title">${type.title}</span>` +
-          `<span class="${OURS}-hint">${type.hint}</span></span></button>`
+          `<span class="${OURS}-hint">${i === 0 && count ? `Starts with ${count === 1 ? 'this game' : `these ${count.toLocaleString()} games`}` : type.hint}</span></span></button>`
       ).join('') +
       '</div>' +
       `<div class="${OURS}-actions">` +
@@ -65,6 +106,8 @@
   const createView = (root) => {
     let block = null;
     let types = null;
+    let games = null;
+    let art = null;
     let picked = 0;
     let frame = 0;
 
@@ -129,12 +172,22 @@
       if (block?.isConnected) return refreshSoon();
       types = root.querySelector(C.types);
       if (!types?.parentElement) return;
-      block = build(root.ownerDocument);
+      const list = attempt(() => readGames(root), []);
+      block = build(root.ownerDocument, list.length);
       block.addEventListener('click', onClick);
       block.addEventListener('keydown', onKeyDown);
       types.parentElement.append(block);
       SE.attr(types.parentElement, FOOTER, '');
       SE.attr(root, ROOT, '');
+      // The games lead, at the top of the body text
+      const body = root.querySelector('.DialogBodyText');
+      if (list.length && body && !games?.isConnected) {
+        games = buildGames(list);
+        body.append(games);
+        art?.remove();
+        art = attempt(() => SE.dialogArt.hero(root.closest('.DialogContent') ?? root, list[0].appid, OURS), null);
+        SE.attr(root, GAMES, '');
+      }
       // A rebuilt block shows the type still picked (build() checks the first), then refreshes
       pick(picked);
     };
@@ -154,7 +207,10 @@
         root.removeEventListener('keydown', onEnter, true);
         if (types?.parentElement) SE.unmark(types.parentElement, FOOTER);
         block?.remove();
+        games?.remove();
+        art?.remove();
         SE.unmark(root, ROOT);
+        SE.unmark(root, GAMES);
       },
     };
   };

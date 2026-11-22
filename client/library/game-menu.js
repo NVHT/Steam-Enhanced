@@ -678,6 +678,8 @@
     }
     if (!kind) return;
     run(() => kind.patched?.(menu));
+    // The game it was opened on, for dialogs its rows open with several games (Mark as Private)
+    if (isGameMenu(menu.props)) SE.noteMenuApp(menu.props.overview.appid);
 
     const { React } = live.api;
     // Runs inside Steam's render: nothing it throws may reach React (a throw there takes the page down)

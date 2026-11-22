@@ -1,0 +1,122 @@
+/*
+ * Mark as Private dialog (styles for client/dialogs/mark-private.js).
+ *
+ * Without the script the dialog keeps the baseline in client/dialogs/dialogs.css. Once the
+ * script has marked it ([data-se-private] on its DialogContent, desktop windows only):
+ *
+ *   [ hero art, fading into the card                              ]
+ *   [ MARK AS PRIVATE                                             ]
+ *   [ [ capsule ]  Hollow Knight                                  ]
+ *   [              Hidden everywhere outside your library         ]
+ *   [ ┌ HIDDEN FROM OTHERS ──────┐  ┌ STILL YOURS ─────────────┐ ]
+ *   [ │ (eye-off) Ownership      │  │ (grid) In your library   │ ]
+ *   [ │ (play) In-game status    │  │ (badge) Saves and ...    │ ]
+ *   [ └ (activity) Playtime ... ─┘  └ (restore) Undo ... ──────┘ ]
+ *   [                             [ Mark as Private ] [ Cancel ] ]
+ *
+ * The capsules and art are the shared ones (.se-dialog-capsules, .se-dialog-art in dialogs.css).
+ */
+
+/*
+ * Steam's FeatureHidden icon before the title, and its description. !important: the icon box's
+ * inline display: inline-block (sp.js module 75799).
+ */
+[data-se-private] .DialogHeader > div,
+[data-se-private] .DialogBody div[style*="pre-line"] {
+  display: none !important;
+}
+
+[data-se-private] .DialogBodyText:not(#se-none) {
+  margin: 0 !important;
+}
+
+/* ---------- Game: capsules, name, what happens ---------- */
+
+.se-private-game {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--se-space-4);
+  row-gap: var(--se-space-1);
+}
+
+.se-private-game > .se-dialog-capsules {
+  grid-row: 1 / span 2;
+}
+
+.se-private-name {
+  align-self: end;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font: 800 var(--se-fs-2xl)/1.2 var(--se-font);
+  color: var(--se-text-strong);
+  text-shadow: 0 2px 14px var(--se-black-60);
+}
+
+.se-private-sub {
+  grid-column: 2;
+  align-self: start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 500 var(--se-fs-md)/1.45 var(--se-font);
+  color: var(--se-text-muted);
+  text-shadow: 0 1px 8px var(--se-black-50);
+}
+
+/* ---------- Cards: what others stop seeing, what stays ---------- */
+
+.se-private-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--se-space-3);
+  margin-top: var(--se-space-5);
+}
+
+.se-private-card {
+  padding: var(--se-space-3) var(--se-space-4);
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-edge);
+}
+
+.se-private-label {
+  margin-bottom: var(--se-space-1);
+  text-transform: uppercase;
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  color: var(--se-label-color);
+}
+
+.se-private-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.se-private-row {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  padding: var(--se-space-1) 0;
+  font: 500 var(--se-fs-md)/1.4 var(--se-font);
+  color: var(--se-text);
+}
+
+.se-private-row::before {
+  content: "";
+  flex: none;
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
+  background: var(--se-text-muted);
+  -webkit-mask: var(--row-icon) center / contain no-repeat;
+  mask: var(--row-icon) center / contain no-repeat;
+}
+
+/* ---------- Footer ---------- */
+
+[data-se-private] .DialogFooter:not(#se-none) {
+  margin-top: var(--se-space-5) !important; /* !important: Steam's DialogFooter margin (steamui/css/sp.css) */
+}

@@ -33,7 +33,8 @@
  * NoticeInstallFolder WonjNtnAq8aOefGl_x2v4.
  *
  * Icons are the theme's duotone: a 1.8px outline over a 30% fill, drawn as CSS masks so they
- * take the text color. Icons and buttons stay neutral; text carries any tone.
+ * take the text color. Icons stay neutral; text carries any tone. Install is the theme's blue
+ * Primary button (dialogs.css).
  *
  * Big Picture (.GamepadMode) keeps Steam's dialog.
  */
@@ -196,17 +197,6 @@
   --inst-i-desktop: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect fill='%23000' fill-opacity='.3' stroke='none' x='3' y='4.5' width='18' height='12' rx='2.2'/><rect x='3' y='4.5' width='18' height='12' rx='2.2'/><path d='M9 20h6M12 16.5V20'/></svg>");
   --inst-i-menu: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect fill='%23000' fill-opacity='.3' stroke='none' x='4' y='4' width='6.5' height='6.5' rx='1.6'/><rect fill='%23000' fill-opacity='.3' stroke='none' x='13.5' y='13.5' width='6.5' height='6.5' rx='1.6'/><rect x='4' y='4' width='6.5' height='6.5' rx='1.6'/><rect x='13.5' y='4' width='6.5' height='6.5' rx='1.6'/><rect x='4' y='13.5' width='6.5' height='6.5' rx='1.6'/><rect x='13.5' y='13.5' width='6.5' height='6.5' rx='1.6'/></svg>");
   --inst-i-info: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle fill='%23000' fill-opacity='.3' stroke='none' cx='12' cy='12' r='8.5'/><circle cx='12' cy='12' r='8.5'/><path d='M12 11v5M12 8v.2'/></svg>");
-}
-
-/* Title: Steam's "Install" as an eyebrow over the game */
-[data-se-inst] .DialogHeader:not(#se-none) {
-  margin: 0 0 var(--se-space-3) !important;
-  padding: 0 !important;
-  font: 800 var(--se-fs-sm)/14px var(--se-font), sans-serif !important;
-  letter-spacing: .16em !important;
-  text-transform: uppercase !important;
-  color: var(--se-accent) !important;
-  text-shadow: var(--se-text-shadow-art);
 }
 
 /* Body: the game, then where it goes, then shortcuts, then Steam's notice */
@@ -376,6 +366,12 @@
 
 [data-se-inst] .Oo5JPcEk_erKEYAzYp2nY ._1p727K-lt5u7dR3PbUTcNZ.bhL5Q352pNmO44_JjKZTX:not(#se-none) {
   color: var(--se-text-faint);
+}
+
+/* Lit (hovered or selected): faint text steps up to muted, AA on --se-hover and --se-selected
+   (--se-text-faint is only 4.1 / 3.4 on them) */
+[data-se-inst] .Oo5JPcEk_erKEYAzYp2nY:is(:hover, ._2-svusNL8L22pzjYeV4GMS) ._1p727K-lt5u7dR3PbUTcNZ.bhL5Q352pNmO44_JjKZTX:not(#se-none) {
+  color: var(--se-text-muted);
 }
 
 [data-se-inst] .Oo5JPcEk_erKEYAzYp2nY ._1p727K-lt5u7dR3PbUTcNZ svg {
@@ -673,18 +669,6 @@
 
 [data-se-inst] .DialogFooter:not(#se-none) {
   margin-top: var(--se-space-5) !important;
-}
-
-/* Buttons stay neutral: Install is the brighter of the two, not a colored one */
-[data-se-inst] .DialogFooter .DialogButton.Primary:not(.Disabled):not(#se-none) {
-  background: var(--se-white-14) !important;
-  box-shadow: none !important;
-  color: var(--se-text-strong) !important;
-}
-
-[data-se-inst] .DialogFooter .DialogButton.Primary:is(:hover, :focus, .gpfocus):not(.Disabled):not(#se-none) {
-  background: var(--se-white-25) !important;
-  color: var(--se-text-strong) !important;
 }
 
 /* Install gets a download glyph. Steam's own ::before (hidden theme-wide) is reused for it. */

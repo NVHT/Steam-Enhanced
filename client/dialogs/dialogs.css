@@ -953,8 +953,8 @@ div.ModalPosition_TopBar:not(#se-none) {
 }
 
 /*
- * Hero art behind the top of a rebuilt dialog (Install, EULA), under everything else.
- * The dialog's script appends .se-dialog-art to its DialogContent; [data-ready] once loaded.
+ * Hero art behind the top of a rebuilt dialog (Install, Uninstall, EULA, Mark as Private),
+ * under everything else. client/dialogs/dialog-art.js appends it; [data-ready] once loaded.
  */
 .DialogContent:has(> .se-dialog-art):not(#se-none) {
   position: relative;
@@ -1001,4 +1001,76 @@ div.ModalPosition_TopBar:not(#se-none) {
   background:
     linear-gradient(90deg, color-mix(in srgb, var(--se-bg) 70%, transparent) 0%, color-mix(in srgb, var(--se-bg) 15%, transparent) 70%),
     linear-gradient(180deg, transparent 40%, var(--se-surface) 100%);
+}
+
+/*
+ * A rebuilt dialog's title as an eyebrow over its game (Install, Uninstall, EULA, Mark as
+ * Private, New Collection with games): small, spaced capitals in the accent. !important: the
+ * theme's DialogHeader above, itself !important against Steam's.
+ */
+:is([data-se-inst], [data-se-uninst], [data-se-eula], [data-se-private], [data-se-newcoll-games]) .DialogHeader:not(#se-none) {
+  margin: 0 0 var(--se-space-3) !important;
+  padding: 0 !important;
+  font: 800 var(--se-fs-sm)/14px var(--se-font) !important;
+  letter-spacing: .16em !important;
+  text-transform: uppercase !important;
+  color: var(--se-accent) !important;
+  text-shadow: var(--se-text-shadow-art);
+}
+
+/*
+ * A rebuilt dialog's game capsules (Uninstall, EULA, Mark as Private; built by
+ * client/dialogs/dialog-art.js): the first game's wide cover, the next two stepping out to its
+ * right, smaller and dimmer, so several games read as several. The stack keeps room on its
+ * right for them. A capsule is marked [data-ready] once loaded.
+ */
+.se-dialog-capsules {
+  display: grid;
+  isolation: isolate;
+  width: 172px;
+  height: 80px;
+}
+
+/* Room for the covers behind: each reaches ~19 / ~31 px past the first */
+.se-dialog-capsules:has(> :nth-child(2)) {
+  margin-inline-end: var(--se-space-5);
+}
+
+.se-dialog-capsules:has(> :nth-child(3)) {
+  margin-inline-end: var(--se-space-6);
+}
+
+.se-dialog-capsule {
+  grid-area: 1 / 1;
+  width: 172px;
+  height: 80px;
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: 0 14px 30px -12px var(--se-black-90), 0 0 0 1px var(--se-white-10);
+}
+
+.se-dialog-capsule:nth-child(2) {
+  z-index: var(--se-z-under);
+  transform: translateX(28px) scale(.9);
+  filter: brightness(.6);
+}
+
+.se-dialog-capsule:nth-child(3) {
+  z-index: -2;
+  transform: translateX(48px) scale(.8);
+  filter: brightness(.4);
+}
+
+.se-dialog-capsule img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--se-dur) var(--se-ease);
+}
+
+.se-dialog-capsule[data-ready] img {
+  opacity: 1;
 }

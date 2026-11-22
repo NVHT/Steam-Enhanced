@@ -90,17 +90,6 @@
   --eula-fade: 56px;
 }
 
-/* Title: Steam's "EULA" as an eyebrow over the game */
-[data-se-eula] .DialogHeader:not(#se-none) {
-  margin: 0 0 var(--se-space-3) !important;
-  padding: 0 !important;
-  font: 800 var(--se-fs-sm)/14px var(--se-font), sans-serif !important;
-  letter-spacing: .16em !important;
-  text-transform: uppercase !important;
-  color: var(--se-accent) !important;
-  text-shadow: var(--se-text-shadow-art);
-}
-
 /* One grid: intro, then language + toolbar on a row, then the agreement, then the footer */
 [data-se-eula] ._2YXHRFCzmxgvxVGtA3TWVf:not(#se-none) {
   display: grid !important;
@@ -142,28 +131,10 @@
   display: contents;
 }
 
-.se-eula-capsule {
+/* The capsule (.se-dialog-capsules, client/dialogs/dialogs.css) beside the name and intro */
+.se-eula-game > .se-dialog-capsules {
   grid-column: 1;
   grid-row: 1 / span 2;
-  width: 172px;
-  height: 80px;
-  overflow: hidden;
-  border-radius: var(--se-radius-md);
-  background: var(--se-surface-2);
-  box-shadow: 0 14px 30px -12px var(--se-black-90), 0 0 0 1px var(--se-white-10);
-}
-
-.se-eula-capsule img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity var(--se-dur) var(--se-ease);
-}
-
-.se-eula-capsule[data-ready] img {
-  opacity: 1;
 }
 
 .se-eula-name {
@@ -484,7 +455,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .se-eula-capsule img,
   .se-eula-meter-track > i,
   .se-eula-fade::before,
   .se-eula-fade::after {

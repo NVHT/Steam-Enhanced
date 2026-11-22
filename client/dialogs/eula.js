@@ -59,18 +59,6 @@
 
   const isOurs = SE.inside(`.${OURS}`);
 
-  /* Tries each URL in turn; drops the image (and calls onFail) when none loads */
-  const loadFirst = (img, urls, onLoad, onFail) => {
-    let index = 0;
-    const next = () => {
-      if (index < urls.length) img.src = urls[index++];
-      else onFail();
-    };
-    img.addEventListener('load', onLoad);
-    img.addEventListener('error', next);
-    next();
-  };
-
   /* ---------- Reading Steam's state ---------- */
 
   const readAppId = (node) => {
@@ -118,31 +106,12 @@
     return bottom;
   };
 
-  /* ---------- Header: hero art, capsule, name ---------- */
-
-  const buildArt = (host, appid) => {
-    const art = el('div', `${OURS} ${OURS}-art se-dialog-art`);
-    art.setAttribute('aria-hidden', 'true');
-    const img = el('img');
-    img.alt = '';
-    img.decoding = 'async';
-    art.append(img);
-    loadFirst(img, attempt(() => SE.heroURLs(appid), []) ?? [], () => SE.mark(art, 'data-ready'), () => art.remove());
-    host.append(art);
-    return art;
-  };
+  /* ---------- Header: capsule, name (the art: SE.dialogArt, client/dialogs/dialog-art.js) ---------- */
 
   const buildGame = (body, appid) => {
     const game = el('div', `${OURS} ${OURS}-game`);
-    const capsule = el('div', `${OURS}-capsule`);
-    const img = el('img');
-    img.alt = '';
-    img.decoding = 'async';
-    capsule.append(img);
     const name = el('div', `${OURS}-name`, appName(appid));
-    game.append(capsule, name);
-    const cdn = `https://shared.steamstatic.com/store_item_assets/steam/apps/${appid}`;
-    loadFirst(img, [`/assets/${appid}/header.jpg`, `${cdn}/header.jpg`], () => SE.mark(capsule, 'data-ready'), () => capsule.remove());
+    game.append(SE.dialogArt.capsules([appid]), name);
     body.prepend(game);
     return { game, name };
   };
@@ -322,7 +291,7 @@
       /* Hero art behind the top, capsule and name over Steam's intro */
       const host = box.closest('.DialogContent');
       if (art && (!art.isConnected || art.parentElement !== host)) art = null;
-      if (!art && appid && host) art = attempt(() => buildArt(host, appid), null);
+      if (!art && appid && host) art = attempt(() => SE.dialogArt.hero(host, appid, OURS), null);
       const body = box.querySelector(C.intro)?.parentElement;
       if (game && (!game.game.isConnected || game.game.parentElement !== body)) game = null;
       if (!game && appid && body) game = attempt(() => buildGame(body, appid), null);

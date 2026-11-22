@@ -118,6 +118,28 @@
     return null;
   };
 
+  /*
+   * The game a library right-click menu was last opened on (client/library/game-menu.js notes
+   * it). A dialog its rows open with several games (Install, Uninstall, Mark as Private) leads
+   * with that one: Steam lists them in selection order. Asked across windows, since the menu
+   * lives in the main window and the dialog can pop out.
+   */
+  let menuApp = 0;
+  const noteMenuApp = (appid) => {
+    menuApp = Number(appid) || 0;
+  };
+  const lastMenuApp = () => menuApp;
+  // `list` reordered so the noted game (found by `idOf`) comes first; unchanged if it isn't there
+  const leadApp = (list, idOf = (item) => item) => {
+    let clicked = 0;
+    for (const win of owners()) {
+      clicked = run(() => win.__se?.lastMenuApp?.()) || 0;
+      if (clicked) break;
+    }
+    const index = clicked ? list.findIndex((item) => Number(idOf(item)) === clicked) : -1;
+    return index > 0 ? [list[index], ...list.slice(0, index), ...list.slice(index + 1)] : list;
+  };
+
   const navigate = (route) => {
     const main = mainWindow();
     if (main && typeof main.Navigate === 'function') {
@@ -994,6 +1016,9 @@
     isInstalled,
     coverURLs,
     headerURLs,
+    leadApp,
+    lastMenuApp,
+    noteMenuApp,
     heroURLs,
     logoURLs,
     libraryArt,

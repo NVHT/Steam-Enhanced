@@ -29,7 +29,6 @@
   const OURS = 'se-uninst';
   const ROOT = 'data-se-uninst';
   const MAX_DEPTH = 12;
-  const MAX_CAPSULES = 3;
 
   /* Duotone: `d` is the soft fill layer under the stroke (styles: .se-uninst svg .d) */
   const ICONS = {
@@ -65,18 +64,6 @@
   };
 
   const pct = (part, whole) => `${Math.min(100, Math.max(0, (part / whole) * 100)).toFixed(3)}%`;
-
-  /* Tries each URL in turn; drops the image (and calls onFail) when none loads */
-  const loadFirst = (img, urls, onLoad, onFail) => {
-    let index = 0;
-    const next = () => {
-      if (index < urls.length) img.src = urls[index++];
-      else onFail();
-    };
-    img.addEventListener('load', onLoad);
-    img.addEventListener('error', next);
-    next();
-  };
 
   /* ---------- Reading Steam's state ---------- */
 
@@ -185,33 +172,11 @@
     return { folder: home, size };
   };
 
-  /* ---------- Header: hero art, capsules, name ---------- */
-
-  const buildArt = (host, appid) => {
-    const art = el('div', `${OURS} ${OURS}-art se-dialog-art`);
-    art.setAttribute('aria-hidden', 'true');
-    const img = el('img');
-    img.alt = '';
-    img.decoding = 'async';
-    art.append(img);
-    loadFirst(img, attempt(() => SE.heroURLs(appid), []) ?? [], () => SE.mark(art, 'data-ready'), () => art.remove());
-    host.append(art);
-    return art;
-  };
+  /* ---------- Header: capsules, name (the art: SE.dialogArt, client/dialogs/dialog-art.js) ---------- */
 
   const buildGame = (body, appids) => {
     const game = el('div', `${OURS} ${OURS}-game`);
-    const stack = el('div', `${OURS}-capsules`);
-    for (const appid of appids.slice(0, MAX_CAPSULES)) {
-      const capsule = el('div', `${OURS}-capsule`);
-      const img = el('img');
-      img.alt = '';
-      img.decoding = 'async';
-      capsule.append(img);
-      stack.append(capsule);
-      const cdn = `https://shared.steamstatic.com/store_item_assets/steam/apps/${appid}`;
-      loadFirst(img, [`/assets/${appid}/header.jpg`, `${cdn}/header.jpg`], () => SE.mark(capsule, 'data-ready'), () => capsule.remove());
-    }
+    const stack = SE.dialogArt.capsules(appids);
     const single = appids.length === 1;
     const name = el('div', `${OURS}-name`, single ? overview(appids[0])?.display_name ?? '' : `${appids.length} games`);
     game.append(stack, name);
@@ -285,13 +250,14 @@
       if (!root.isConnected || built) return;
       const body = root.querySelector('.DialogBodyText');
       if (!body || root.querySelector(C.error)) return;
-      const appids = attempt(() => readApps(body), []);
+      // The game the menu was opened on leads (its art, its capsule in front)
+      const appids = SE.leadApp(attempt(() => readApps(body), []));
       if (!appids.length) return;
       built = true;
       change.disconnect();
 
       const host = root.closest('.DialogContent');
-      if (host) nodes.push(attempt(() => buildArt(host, appids[0]), null));
+      if (host) nodes.push(attempt(() => SE.dialogArt.hero(host, appids[0], OURS), null));
       nodes.push(attempt(() => buildGame(body, appids), null), attempt(() => buildDisk(body, appids), null));
       SE.attr(root, ROOT, '');
     };
