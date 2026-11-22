@@ -111,6 +111,44 @@ html.Account_Menu ._2EstNjFIIZm_WUSKm5Wt7n[data-se-closing]:not(#se-none) {
   color: var(--se-text-muted) !important;
 }
 
+/*
+ * Steam's rows with a hint (account.js ROW_HINTS): the icon over both lines, Steam's label, the
+ * hint under it (a pseudo-element: React owns the row's children). !important: the row rule's
+ * flex and padding above, which beat Steam's own.
+ */
+:root [data-se-avatar-menu] [data-se-acct-hint] {
+  display: grid !important;
+  grid-template-columns: var(--se-icon-glyph) minmax(0, 1fr);
+  grid-template-areas:
+    'icon label'
+    'icon hint';
+  align-content: center;
+  column-gap: var(--se-space-2);
+  row-gap: 1px;
+  min-height: 38px;
+  padding: var(--se-space-1) var(--se-space-2) !important;
+}
+
+[data-se-avatar-menu] [data-se-acct-hint]::before {
+  grid-area: icon;
+  align-self: center;
+}
+
+[data-se-avatar-menu] [data-se-acct-hint]::after {
+  content: attr(data-se-acct-hint);
+  grid-area: hint;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 500 var(--se-fs-xs) / 1.2 var(--se-font);
+  color: var(--se-text-faint);
+}
+
+[data-se-avatar-menu] [data-se-acct-hint]:hover::after {
+  color: var(--se-text-muted);
+}
+
 [data-se-acct-icon="profile"] { --se-acct-mask: var(--se-icon-user); }
 [data-se-acct-icon="edit"] { --se-acct-mask: var(--se-icon-edit); }
 [data-se-acct-icon="details"] { --se-acct-mask: var(--se-icon-id-card); }
@@ -120,7 +158,7 @@ html.Account_Menu ._2EstNjFIIZm_WUSKm5Wt7n[data-se-closing]:not(#se-none) {
 [data-se-acct-icon="signout"] { --se-acct-mask: var(--se-icon-sign-out); }
 [data-se-acct-icon="dnd"] { --se-acct-mask: var(--se-icon-moon); }
 
-:root [data-se-avatar-menu] [data-se-acct-icon="dnd"] {
+:root [data-se-avatar-menu] :is([data-se-acct-icon="dnd"], [data-se-acct-icon="edit"]) {
   min-height: 38px;
   padding: var(--se-space-1) var(--se-space-2) !important;
 }

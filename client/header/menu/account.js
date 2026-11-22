@@ -246,7 +246,12 @@
           }
         },
       },
-      error ? 'Rename dialog unavailable' : 'Edit Profile Name'
+      live.api.React.createElement(
+        'span',
+        { className: 'se-acct-text' },
+        error ? 'Rename dialog unavailable' : 'Edit Profile Name',
+        live.api.React.createElement('span', { className: 'se-acct-hint' }, 'Your name and picture')
+      )
     );
   }
 
@@ -292,6 +297,16 @@
     profile: { group: 'profile', english: /^View My Profile$/i },
     edit: { group: 'profile', english: /^View My Profile$/i, after: true },
     account: { group: 'details', english: /^Account Details/i },
+  };
+
+  // Steam's rows' hint lines, by icon (drawn under the label from data-se-acct-hint, account-menu.css;
+  // Account Details has its account name there instead)
+  const ROW_HINTS = {
+    profile: 'Your page on Steam Community',
+    store: 'What the Store shows you',
+    wallet: 'Your balance and its history',
+    switch: 'Sign in with another account',
+    signout: 'Steam asks for your sign-in next time',
   };
 
   // Steam's rows and their icons (account-menu.css), by label
@@ -341,6 +356,7 @@
       const label = normalizeMenuLabel(item.textContent);
       const icon = ROW_ICONS.find(([group, , english]) => isLabel(group, label, english))?.[1];
       SE.attr(item, 'data-se-acct-icon', icon || null);
+      SE.attr(item, 'data-se-acct-hint', ROW_HINTS[icon] || null);
       if (icon === 'details') splitDetails(item);
     }
   }
