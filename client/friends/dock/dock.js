@@ -176,11 +176,10 @@
 
   /*
    * The dock's Friends bar sits level with the game list's first collection header (Favorites):
-   * its centre, measured as if the list were scrolled to the top, sets --se-fd-bar-y, the bar's
-   * offset from the top of Steam's header in the dock (friendListHeaderContainer, which holds
-   * the bar and the favorites). Collection header: _2sYIghGVXJr6tsQVvcryy8
-   * (client/library/game-list.css); not in the class map, so matched by its hash. A list
-   * scrolled past its first header keeps the last value.
+   * its centre, measured while the list is at its top, sets --se-fd-bar-y, the bar's offset from
+   * the top of Steam's header in the dock (friendListHeaderContainer, which holds the bar and the
+   * favorites). Collection header: SE.C.HoverOverlay_Container (client/library/game-list.css).
+   * A scrolled list keeps the last value.
    */
   const LIST_HEADER = `.${C.HoverOverlay_Container}`;
   const BAR_H = 30; // .socialListTab, client/friends/list/friends-search.css
@@ -198,8 +197,12 @@
     const header = document.querySelector(LIST_HEADER);
     const content = dock.querySelector('.se-fd-steam .friendListHeaderContainer');
     if (!header || !content || !header.getClientRects().length) return;
+    // Measured only at the top: the list keeps only its rows in view, so once scrolled the first
+    // header on the page is a later collection's, far down, and would push Steam's list out of the dock
+    const scroller = scrollerOf(header);
+    if (scroller?.scrollTop) return;
     const box = header.getBoundingClientRect();
-    const centre = box.top + box.height / 2 + (scrollerOf(header)?.scrollTop || 0);
+    const centre = box.top + box.height / 2;
     const y = Math.max(0, Math.round(centre - BAR_H / 2 - content.getBoundingClientRect().top));
     if (y === barY) return;
     barY = y;
