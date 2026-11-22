@@ -58,6 +58,7 @@ Steam has grown one feature at a time, and it shows. Steam Enhanced brings it to
 <br>
 
 <a name="the-client"></a>
+
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="assets/readme/h-client-light.svg">
   <img alt="The client" src="assets/readme/h-client.svg" width="100%">
@@ -137,6 +138,7 @@ Every screen has been rethought, from the moment Steam starts to the moment you 
 <br>
 
 <a name="store-community-support"></a>
+
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="assets/readme/h-web-light.svg">
   <img alt="Store, Community &amp; Support" src="assets/readme/h-web.svg" width="100%">
@@ -161,6 +163,7 @@ The redesign does not stop at the client. Every Store, Community and Support pag
 <br>
 
 <a name="install"></a>
+
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="assets/readme/h-install-light.svg">
   <img alt="Install" src="assets/readme/h-install.svg" width="100%">
@@ -183,6 +186,7 @@ The redesign does not stop at the client. Every Store, Community and Support pag
 <br>
 
 <a name="works-with"></a>
+
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="assets/readme/h-works-with-light.svg">
   <img alt="Works with" src="assets/readme/h-works-with.svg" width="100%">
@@ -204,6 +208,7 @@ Steam Enhanced works with the most popular Millennium plugins and styles them to
 <br>
 
 <a name="make-it-yours"></a>
+
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="assets/readme/h-make-it-yours-light.svg">
   <img alt="Make it yours" src="assets/readme/h-make-it-yours.svg" width="100%">
@@ -289,6 +294,7 @@ Every colour, radius, elevation and feature switch is defined on `:root` in **`c
 <br>
 
 <a name="licenses"></a>
+
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="assets/readme/h-licenses-light.svg">
   <img alt="Licenses" src="assets/readme/h-licenses.svg" width="100%">
