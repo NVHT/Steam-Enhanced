@@ -521,6 +521,11 @@
       scripts.forEach(addScript);
       return;
     }
+    // The profiler, once armed (Ctrl+Shift+P, core/core.js): before the runtime, so it times
+    // everything the theme starts
+    try {
+      if (!onWeb && localStorage.getItem('se-perf') === '1') addScript('dev/perf.js');
+    } catch {}
     for (const file of RUNTIME) {
       if (added.has(file)) continue;
       added.add(file);

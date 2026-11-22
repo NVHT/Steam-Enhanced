@@ -279,3 +279,35 @@
     if (sessionStorage.getItem('se-inspector-catch') === '1') load();
   } catch {} // storage blocked: no armed catch to resume
 })();
+
+/*
+ * Profiler (dev/perf.js), a performance aid: Ctrl+Shift+P arms it in every client window
+ * (localStorage "se-perf"; client/loader.js then loads it before the runtime) and opens its
+ * panel here. Costs nothing until pressed.
+ */
+(() => {
+  if (window.__sePerfHotkey) return;
+  window.__sePerfHotkey = true;
+  const coreSrc = document.currentScript?.src ||
+    [...document.scripts].find((script) => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;
+  addEventListener(
+    'keydown',
+    (event) => {
+      if (!event.ctrlKey || !event.shiftKey || event.altKey || event.metaKey || event.code !== 'KeyP') return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (window.__sePerf) {
+        window.__sePerf.toggle();
+        return;
+      }
+      if (!coreSrc) return;
+      try {
+        localStorage.setItem('se-perf', '1');
+      } catch {}
+      const script = document.createElement('script');
+      script.src = new URL('../dev/perf.js', coreSrc).href;
+      (document.head ?? document.documentElement).append(script);
+    },
+    true
+  );
+})();
