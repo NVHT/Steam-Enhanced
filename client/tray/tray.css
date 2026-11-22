@@ -1,0 +1,308 @@
+/*
+ * The tray menu (client/tray/tray.js marks html[data-se-tray] and Steam's rows): you and your
+ * status, the download in progress, recent games on two lines, Steam's pages as icon tiles, its
+ * modes side by side, Exit Steam. The panel and the rows' base look are every context menu's
+ * (client/dialogs/dialogs.css).
+ *
+ * The rows go on a ten-column grid: a game, the header, a separator and Exit span it, a page
+ * tile takes two columns (five a line), a mode five (two a line).
+ *
+ * Width: Steam sizes the window to the menu's box on every change inside it (PositionMenu, on
+ * its own MutationObserver), and a box that fits the window can never ask for more than the
+ * window already is. So the menu takes its content's own width (max-content, within bounds),
+ * which the window then follows. Only the game names and the modes' labels set it: the header,
+ * the download and the "Played…" lines set `contain: inline-size` and fit what those give.
+ */
+html[data-se-tray] .contextMenu {
+  width: max-content;
+  min-width: 260px;
+  max-width: 360px;
+}
+
+html[data-se-tray] .contextMenuContents {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 1px var(--se-space-half);
+}
+
+html[data-se-tray] .contextMenuContents > * {
+  grid-column: 1 / -1;
+}
+
+html[data-se-tray] :is([data-se-tray="status"], [data-se-tray-hide]) {
+  display: none;
+}
+
+/* ---------- You ---------- */
+
+.se-tray-head {
+  contain: inline-size; /* sets no width (header comment) */
+  display: grid;
+  gap: var(--se-space-2);
+  padding: var(--se-space-2);
+}
+
+.se-tray-me {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  min-width: 0;
+}
+
+.se-tray-avatar {
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--se-avatar-radius);
+  background: var(--se-surface-2);
+  box-shadow: 0 0 0 2px var(--se-surface), 0 0 0 4px var(--se-tray-ring, var(--se-text-faint));
+}
+
+.se-tray-avatar[data-state="online"] { --se-tray-ring: var(--se-online); }
+.se-tray-avatar[data-state="away"] { --se-tray-ring: var(--se-away); }
+
+.se-tray-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.se-tray-avatar[data-initial] img {
+  display: none;
+}
+
+/* No picture of your own (Steam's "?"): your initial */
+.se-tray-avatar[data-initial]::after {
+  content: attr(data-initial);
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--se-text-dim);
+  font: 600 var(--se-fs-md) / 1 var(--se-font);
+}
+
+.se-tray-who {
+  display: grid;
+  gap: var(--se-space-half);
+  min-width: 0;
+}
+
+.se-tray-name {
+  overflow: hidden;
+  color: var(--se-text-strong);
+  font: 600 var(--se-fs-md) / 1.2 var(--se-font);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-tray-state {
+  color: var(--se-text-faint);
+  font: 500 var(--se-fs-xs) / 1.2 var(--se-font);
+}
+
+.se-tray-state[data-state="online"] {
+  color: var(--se-online);
+}
+
+.se-tray-status {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+}
+
+.se-tray-status button {
+  min-width: 0;
+  padding: 0 var(--se-space-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- The download ---------- */
+
+.se-tray-dl {
+  contain: inline-size; /* sets no width (header comment) */
+  display: grid;
+  gap: var(--se-space-1);
+  margin: 0 var(--se-space-2) var(--se-space-2);
+  padding: var(--se-space-2) var(--se-space-3);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+}
+
+.se-tray-dl[hidden] {
+  display: none;
+}
+
+.se-tray-dl-top {
+  display: flex;
+  gap: var(--se-space-2);
+  min-width: 0;
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-xs) / 1.3 var(--se-font);
+}
+
+.se-tray-dl-game {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-tray-dl-pct {
+  color: var(--se-text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.se-tray-dl-bar {
+  height: 3px;
+  overflow: hidden;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-field);
+}
+
+.se-tray-dl-bar span {
+  display: block;
+  height: 100%;
+  background: var(--se-accent);
+  transform-origin: left;
+  transition: transform var(--se-dur) var(--se-ease);
+}
+
+.se-tray-dl[data-paused] .se-tray-dl-bar span {
+  background: var(--se-text-faint);
+}
+
+/* ---------- Recent games: icon, name, when you last played ---------- */
+
+/* !important: dialogs.css gives every context-menu row its padding and type with !important */
+html[data-se-tray] [data-se-tray="game"] {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: var(--se-space-3);
+  padding: var(--se-space-1) var(--se-space-3) !important;
+}
+
+html[data-se-tray] [data-se-tray="game"] > .GameIcon {
+  grid-row: 1 / 3;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+}
+
+html[data-se-tray] [data-se-tray="game"] .GameIcon img {
+  border-radius: var(--se-radius-xs);
+}
+
+html[data-se-tray] [data-se-tray="game"] .JumpListGameName {
+  grid-column: 2;
+  overflow: hidden;
+  color: var(--se-text);
+  font: 500 var(--se-fs-base) / 16px var(--se-font);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-tray-when {
+  contain: inline-size; /* sets no width (header comment) */
+  grid-column: 2;
+  overflow: hidden;
+  color: var(--se-text-faint);
+  font: 500 var(--se-fs-xs) / 14px var(--se-font);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-tray-when[data-running] {
+  color: var(--se-online);
+}
+
+[data-se-tray="game"]:hover .se-tray-when:not([data-running]) {
+  color: var(--se-text-muted);
+}
+
+/* ---------- Pages, modes and Exit: a duotone glyph each ---------- */
+
+html[data-se-tray] :is([data-se-tray="nav"], [data-se-tray="mode"], [data-se-tray="exit"], [data-se-tray="other"])::before {
+  content: '';
+  flex: none;
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: currentColor;
+  -webkit-mask: var(--se-tray-icon, var(--se-icon-external)) center / contain no-repeat;
+  mask: var(--se-tray-icon, var(--se-icon-external)) center / contain no-repeat;
+}
+
+[data-se-tray-option="Store"] { --se-tray-icon: var(--se-icon-store); }
+[data-se-tray-option="MyGames"] { --se-tray-icon: var(--se-icon-library); }
+[data-se-tray-option="Community"] { --se-tray-icon: var(--se-icon-community); }
+[data-se-tray-option="FriendActivity"] { --se-tray-icon: var(--se-icon-activity); }
+[data-se-tray-option="Friends"] { --se-tray-icon: var(--se-icon-friends); }
+[data-se-tray-option="Screenshots"] { --se-tray-icon: var(--se-icon-photo); }
+[data-se-tray-option="Servers"] { --se-tray-icon: var(--se-icon-globe); }
+[data-se-tray-option="Settings"] { --se-tray-icon: var(--se-icon-settings); }
+[data-se-tray-option$="BigPicture"] { --se-tray-icon: var(--se-icon-tv); }
+[data-se-tray-option="VR"] { --se-tray-icon: var(--se-icon-vr); }
+[data-se-tray-option="StopStreaming"] { --se-tray-icon: var(--se-icon-broadcast); }
+[data-se-tray-option="Console"] { --se-tray-icon: var(--se-icon-console); }
+[data-se-tray="exit"] { --se-tray-icon: var(--se-icon-power); }
+
+/* !important: dialogs.css gives every context-menu row its padding with !important */
+html[data-se-tray] :is([data-se-tray="mode"], [data-se-tray="exit"], [data-se-tray="other"]) {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-width: 0;
+  padding: var(--se-space-2) var(--se-space-3) !important;
+}
+
+html[data-se-tray] :is([data-se-tray="mode"], [data-se-tray="exit"], [data-se-tray="other"]) .JumpListItemText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* A page: an icon tile, its name read out and shown on hover (title) */
+html[data-se-tray] [data-se-tray="nav"] {
+  position: relative;
+  grid-column: span 2;
+  display: grid;
+  place-items: center;
+  min-height: 40px;
+  padding: 0 !important;
+}
+
+html[data-se-tray] [data-se-tray="nav"] .JumpListItemText {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+html[data-se-tray] [data-se-tray="mode"] {
+  grid-column: span 5;
+}
+
+html[data-se-tray] [data-se-tray="mode"][data-se-tray-wide] {
+  grid-column: 1 / -1;
+}
+
+/* Exit Steam: the danger tone */
+html[data-se-tray] [data-se-tray="exit"] {
+  color: var(--se-danger) !important; /* beats dialogs.css's !important row colour */
+}
+
+html[data-se-tray] [data-se-tray="exit"]:hover {
+  background: var(--se-danger-surface) !important; /* beats dialogs.css's !important row hover */
+  color: var(--se-danger-text) !important;
+}

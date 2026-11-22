@@ -42,6 +42,8 @@
    *   toasts        notification toasts
    *   notify        windows a friend notification can be clicked in (main, toasts, overlay, menus)
    *   tiers         windows that show achievement rarity tiers: desktop windows and the overlay
+   *   tray          plain "Menu" popups: the tray menu's window (client/tray/tray.js checks it
+   *                 holds the tray's rows, since other context menus share the title)
    */
   const GROUPS = {
     main: /^Steam$/,
@@ -51,6 +53,7 @@
     overlay: /^SP Overlay:/,
     toasts: /^notificationtoasts_/,
     notify: /^(?:Steam$|notificationtoasts_|SP Overlay:)|Menu$/,
+    tray: /^Menu$/,
   };
   GROUPS.tiers = { test: (title) => GROUPS.desktop.test(title) || GROUPS.overlay.test(title) };
 
@@ -135,6 +138,8 @@
     ['all', 'client/header/', ['notifications.css', 'notifications.js', 'account-menu.css', 'steam-menu.css']],
     ['all', 'client/library/', ['game-menu.css', 'collection-menu.css']],
     ['all', 'client/header/', ['window-controls.css']],
+    // The tray menu (Steam's icon in the Windows tray)
+    ['tray', 'client/tray/', ['tray.css', 'tray.js']],
     ['content', 'client/dialogs/utility/', [
       'base.css', 'servers.css', 'media.css', 'library-tools.css', 'modals.css', 'friends.css',
       'standalone.css',
