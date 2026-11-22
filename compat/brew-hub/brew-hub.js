@@ -1,5 +1,5 @@
 /*
- * Brew Hub (github.com/madmaxgrey/BrewHub; Millennium Settings › Brew Hub, root .sf-root): the plugin's theme and plugin store,
+ * Brew Hub (github.com/madmaxgrey/BrewHub; Millennium Settings › Brew Hub, root .bh-root): the plugin's theme and plugin store,
  * paired with brew-hub.css, laid out like the other Millennium pages.
  *
  * The plugin's React owns every node, so nothing of its is moved or rebuilt. This marks the view
@@ -30,7 +30,7 @@
   const parts = window.__seMillParts || {};
   const icon = (name) => parts.icon?.(name) || '';
 
-  const ROOT = '.MillenniumSettings .sf-root';
+  const ROOT = '.MillenniumSettings .bh-root';
   const CONTENT = `.${SE.C.PagedSettingsDialog_PageContent}`;
   const OWN = 'data-se-bh-own';
   const HIDE = 'data-se-bh-hide';
@@ -99,13 +99,13 @@
     const pager = bar.querySelector('.se-mpager');
     const refresh = bar.querySelector('.se-bh-refresh');
     // The plugin's own Refresh (hidden): this one presses it and mirrors its busy state
-    const pluginRefresh = () => root.querySelector('.sf-bar1 .sf-btn');
+    const pluginRefresh = () => root.querySelector('.bh-bar1 .bh-btn');
     const where = pager.querySelector('span');
     const [prev, next] = pager.querySelectorAll('button');
 
-    const pills = () => [...root.querySelectorAll('.sf-pills > .sf-pill')];
-    const grid = () => root.querySelector(':scope > .sf-grid');
-    const cards = () => [...(grid()?.children || [])].filter((c) => c.classList.contains('sf-card'));
+    const pills = () => [...root.querySelectorAll('.bh-pills > .bh-pill')];
+    const grid = () => root.querySelector(':scope > .bh-grid');
+    const cards = () => [...(grid()?.children || [])].filter((c) => c.classList.contains('bh-card'));
     const options = () => [...menu.querySelectorAll('[role="option"]')];
 
     // Sort: the plugin's pills, as one dropdown
@@ -124,7 +124,7 @@
           .map((w, i) => `<div role="option" tabindex="-1" data-i="${i}" aria-selected="false">${SE.esc(w)}${icon('done')}</div>`)
           .join('');
       }
-      const on = Math.max(0, list.findIndex((p) => p.classList.contains('sf-on')));
+      const on = Math.max(0, list.findIndex((p) => p.classList.contains('bh-on')));
       SE.setText(sortBtn.firstElementChild, words[on]);
       options().forEach((o, i) => o.setAttribute('aria-selected', i === on ? 'true' : 'false'));
     }
@@ -150,7 +150,7 @@
     function choose(i) {
       const pill = pills()[i];
       setOpen(false, true);
-      if (pill && !pill.classList.contains('sf-on')) pill.click();
+      if (pill && !pill.classList.contains('bh-on')) pill.click();
     }
 
     const onSortClick = () => setOpen(!open);
@@ -203,7 +203,7 @@
     // The pager: one page of the cards the plugin shows, in its order
     function syncPage() {
       const list = cards();
-      const sig = list.map((c) => text(c.querySelector('.sf-name'))).join('\n');
+      const sig = list.map((c) => text(c.querySelector('.bh-name'))).join('\n');
       if (sig !== listSig) {
         listSig = sig;
         page = 0;
@@ -223,7 +223,7 @@
     // by brew-hub.css from these attributes in place of the plugin's "Themes (27)"; its own text
     // stays for screen readers
     function syncTabs() {
-      for (const tab of root.querySelectorAll('.sf-bar1 > .sf-tab')) {
+      for (const tab of root.querySelectorAll('.bh-bar1 > .bh-tab')) {
         const m = text(tab).match(/^(.*?)\s*\((\d[\d,.]*)\)$/);
         SE.attr(tab, 'data-se-name', m ? m[1] : null);
         SE.attr(tab, 'data-se-count', m ? m[2] : null);
@@ -278,7 +278,7 @@
     };
 
     function sync() {
-      const detail = Boolean(root.querySelector(':scope > .sf-detail'));
+      const detail = Boolean(root.querySelector(':scope > .bh-detail'));
       SE.attr(root, 'data-se-bh', detail ? 'detail' : 'grid');
       const mine = [head, track, sort, bar];
       if (mine.some((el, i) => el !== root.children[root.children.length - mine.length + i])) root.append(...mine);
@@ -299,7 +299,7 @@
     menu.addEventListener('keydown', onMenuKey);
     bar.addEventListener('click', onBarClick);
     win.addEventListener('resize', relayout);
-    // The pills' and tabs' sf-on is a class change, Refresh's busy state its disabled, a tab's
+    // The pills' and tabs' bh-on is a class change, Refresh's busy state its disabled, a tab's
     // count a text change; the theme's own nodes don't count
     const changes = SE.onChange(root, sync, { attributes: ['class', 'disabled'], characterData: true, ignore: isOwn });
     sync();
@@ -316,8 +316,8 @@
         menu.removeEventListener('keydown', onMenuKey);
         bar.removeEventListener('click', onBarClick);
         for (const el of [head, track, sort, bar]) el.remove();
-        for (const c of root.querySelectorAll(`.sf-card[${HIDE}]`)) c.removeAttribute(HIDE);
-        for (const t of root.querySelectorAll('.sf-tab[data-se-name]')) {
+        for (const c of root.querySelectorAll(`.bh-card[${HIDE}]`)) c.removeAttribute(HIDE);
+        for (const t of root.querySelectorAll('.bh-tab[data-se-name]')) {
           t.removeAttribute('data-se-name');
           t.removeAttribute('data-se-count');
         }
