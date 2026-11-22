@@ -43,12 +43,17 @@ html body.se-header-actions-ready .se-sidebar-icons ._20QAC4WMXm8qFE8waUT5oo .vC
   color: var(--se-text-dim);
 }
 
-/* The title, and Clear (filters-panel.js) at its end */
+/*
+ * The title, menu-sized as the other menus' (not the dialogs' 3xl header), and Clear
+ * (filters-panel.js) at its end. !important: the theme's DialogHeader font
+ * (client/dialogs/dialogs.css), itself !important against Steam's.
+ */
 .Woh0kBQCmatzC1daBX9i6 ._170Npw5h84elypMSQ8zNDI ._2DTdZVPQmiXaVGuTTpV7Ai {
   display: flex;
   align-items: center;
   gap: var(--se-space-2);
   margin: 0 0 var(--se-space-2);
+  font: var(--se-type-title) !important;
 }
 
 .se-filters-clear {
@@ -107,10 +112,21 @@ html body.se-header-actions-ready .se-sidebar-icons ._20QAC4WMXm8qFE8waUT5oo .vC
   order: 7;
 }
 
-/* The accessibility sections (shown by the footer's button): rows of the same list */
+/*
+ * The accessibility sections (shown by the footer's button): rows of the same list, under a
+ * quiet "Accessibility" heading so Gameplay, Visual, Audio and Input read as one group
+ */
 .Woh0kBQCmatzC1daBX9i6 ._170Npw5h84elypMSQ8zNDI > ._1ennWu_xj2YF8FRYgJ2M2H {
   display: flex;
   flex-direction: column;
+}
+
+.Woh0kBQCmatzC1daBX9i6 ._170Npw5h84elypMSQ8zNDI > ._1ennWu_xj2YF8FRYgJ2M2H:not(:empty)::before {
+  content: 'Accessibility';
+  padding: var(--se-space-4) 0 var(--se-space-2);
+  box-shadow: var(--se-rule-top);
+  font: 600 var(--se-fs-base)/1.3 var(--se-font);
+  color: var(--se-text-muted);
 }
 
 .Woh0kBQCmatzC1daBX9i6 ._170Npw5h84elypMSQ8zNDI .SHc3wTNfO8Te6rT8PtwYW {
@@ -285,7 +301,8 @@ html body.se-header-actions-ready .se-sidebar-icons ._20QAC4WMXm8qFE8waUT5oo .vC
 /*
  * Suggestions while typing: a popup under the field (sp.css places it 47px down from the
  * row's corner), in the panel recipe, rows lit on hover. Absolute in a grid, its column is its
- * containing block: the field's.
+ * containing block: the field's. Over a Store page (.se-filters-panel, below) they open in the
+ * flow instead.
  */
 .Woh0kBQCmatzC1daBX9i6 ._170Npw5h84elypMSQ8zNDI ._2DZ22hi3bSpiIOoroFSaO_ ._1axoiZsC1RBp22JQmxiBIc.MIMuVt_bcI4rYVo1e14kR ._32e6rHniKd5ztOQ1lYIulu {
   grid-column: 2;
@@ -360,4 +377,16 @@ html body.se-header-actions-ready .se-sidebar-icons ._20QAC4WMXm8qFE8waUT5oo .vC
 .Woh0kBQCmatzC1daBX9i6 ._1RU1UKPmsgtD0aUDNU1Dom :is(.DialogButton, button):disabled {
   background: var(--se-accent-tint) !important;
   color: color-mix(in srgb, var(--se-accent) 55%, transparent) !important;
+}
+
+/*
+ * Over a Store or Community page the panel is its own window, sized to the pane: a popup past
+ * the pane's edge is cut by the window's. The suggestions open in the flow there, under the
+ * field (Steam shows them while the row has focus: height unset, sp.css), so the pane grows
+ * and the window with it (client/shared/popup-layer-panel.js refits on resize).
+ */
+.se-filters-panel ._2DZ22hi3bSpiIOoroFSaO_ ._1axoiZsC1RBp22JQmxiBIc.MIMuVt_bcI4rYVo1e14kR ._32e6rHniKd5ztOQ1lYIulu {
+  position: static;
+  margin-top: var(--se-space-1);
+  box-shadow: var(--se-edge);
 }

@@ -25,11 +25,6 @@
  * Uses `:not(#se-none)` to outrank Steam's nested module selectors without `!important`.
  */
 
-:root {
-  /* Corner chip on DLC art: download arrow + "DLC", in the theme's chip colours */
-  --se-dlc-badge: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 56 22'%3E%3Crect x='.5' y='.5' width='55' height='21' rx='10.5' fill='%230c0e12' fill-opacity='.78' stroke='%23fff' stroke-opacity='.12'/%3E%3Ccircle cx='11' cy='11' r='6.5' fill='%237cc4ff'/%3E%3Cpath d='M11 7.6v6.2M8.4 11.4 11 14l2.6-2.6' fill='none' stroke='%230f1115' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='22' y='15.2' fill='%23e6e8eb' font-family='Segoe UI,Arial,sans-serif' font-size='10.5' font-weight='700' letter-spacing='.9'%3EDLC%3C/text%3E%3C/svg%3E");
-}
-
 /* ── Shared: the X on Steam's pageable headers, as the theme's round button ── */
 
 .bsNegRKT1Hbv4tqHrOk9- ._2dB1oJFsqNThak1cFya2-q:not(#se-none) {
@@ -297,15 +292,48 @@
   outline: none;
 }
 
-/* ── DLC art: the pink corner ribbon becomes a small chip ── */
-
+/*
+ * ── DLC art: the pink corner ribbon becomes a small chip ──
+ * The art box (DLCArt, positioned by Steam) draws it on its own pseudo-elements, in the glass
+ * chip on art, the theme's font and its accent: "DLC" on ::after, the download disc on ::before
+ * over the chip's start (one mask: the disc with the arrow cut out, so the chip shows through).
+ * Steam's ribbon (Banner) goes, and marks which art gets one.
+ */
 ._2bF7XkQZA1M7jTj6txLFp- .ZvLzhhMhwBLr1gcbVh52G:not(#se-none) {
-  content: var(--se-dlc-badge);
-  top: 8px;
-  inset-inline: 8px auto;
-  width: 56px;
+  display: none;
+}
+
+._2bF7XkQZA1M7jTj6txLFp-:has(.ZvLzhhMhwBLr1gcbVh52G)::after {
+  content: 'DLC';
+  position: absolute;
+  top: var(--se-space-2);
+  inset-inline-start: var(--se-space-2);
+  display: flex;
+  align-items: center;
   height: 22px;
-  filter: drop-shadow(0 2px 6px var(--se-black-60));
+  /* the start clears the disc: its 4 px inset, its 14 px, then a step */
+  padding: 0 var(--se-space-2) 0 calc(4px + 14px + var(--se-space-2));
+  border-radius: var(--se-radius-pill);
+  background: var(--se-glass-chip);
+  box-shadow: var(--se-edge-glass), 0 2px 6px var(--se-black-60);
+  font: var(--se-type-badge);
+  letter-spacing: .08em;
+  color: var(--se-on-art);
+  pointer-events: none;
+}
+
+._2bF7XkQZA1M7jTj6txLFp-:has(.ZvLzhhMhwBLr1gcbVh52G)::before {
+  content: '';
+  position: absolute;
+  z-index: var(--se-z-raised);
+  /* px: centred in the 22 px chip, 4 px in from its start */
+  top: calc(var(--se-space-2) + 4px);
+  inset-inline-start: calc(var(--se-space-2) + 4px);
+  width: 14px;
+  height: 14px;
+  background: var(--se-accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cmask id='m'%3E%3Ccircle cx='7' cy='7' r='7' fill='%23fff'/%3E%3Cpath d='M7 3.6v6.2M4.4 7.4 7 10l2.6-2.6' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/mask%3E%3Ccircle cx='7' cy='7' r='7' fill='%23000' mask='url(%23m)'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cmask id='m'%3E%3Ccircle cx='7' cy='7' r='7' fill='%23fff'/%3E%3Cpath d='M7 3.6v6.2M4.4 7.4 7 10l2.6-2.6' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/mask%3E%3Ccircle cx='7' cy='7' r='7' fill='%23000' mask='url(%23m)'/%3E%3C/svg%3E") center / contain no-repeat;
   pointer-events: none;
 }
 

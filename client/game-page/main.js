@@ -133,6 +133,7 @@
     'data-se-icon',
     'data-se-stat',
     'data-se-status',
+    'data-se-bare',
     'data-se-label',
     'data-se-hidden',
     'data-se-cgrid',

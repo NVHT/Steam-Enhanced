@@ -113,6 +113,10 @@
     for (const section of document.querySelectorAll(STATUS)) {
       const kind = statusKind(section);
       mark(section, 'data-se-status', kind);
+      // Only a bar under the status (Starting / Stopping download): no detail text to show
+      const value = section.querySelector(`.${C.PlayBarDetailLabel}`);
+      if (value && !value.textContent.trim()) mark(section, 'data-se-bare');
+      else unmark(section, 'data-se-bare');
       let spin = section.querySelector(`:scope > .${SPIN}`);
       if (kind !== 'busy') {
         drop(spin);
