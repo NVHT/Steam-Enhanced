@@ -68,7 +68,7 @@
     createView,
     // Inside the observer's own callback: rebuilt before the dialog's first paint, so Steam's
     // look never shows
-    { sync: true, ignore: isOurs }
+    { sync: true, scope: DIALOG, ignore: isOurs }
   );
 
   window.__seExitGame = {

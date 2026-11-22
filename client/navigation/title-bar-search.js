@@ -238,10 +238,13 @@
    * reserves the group's measured width in its views slot; the group then takes the slot's
    * place (--se-title-views-x on <body>). Each value is written only when it changes.
    */
-  function syncSearchViews(group) {
+  // `measure`: the title bar's geometry may have moved (client/navigation/title-bar.js); else
+  // the last reads stand unless the group itself changed
+  function syncSearchViews(group, measure = true) {
     if (!searchBar) return;
+    if (!measure && group === viewsWatchedNode) return;
     if (group !== viewsWatchedNode && window.ResizeObserver) {
-      viewsResizeObserver ??= new ResizeObserver(() => ns.schedule());
+      viewsResizeObserver ??= new ResizeObserver(() => ns.titleBar.markGeometry());
       if (viewsWatchedNode) viewsResizeObserver.unobserve(viewsWatchedNode);
       if (group) viewsResizeObserver.observe(group);
       viewsWatchedNode = group;

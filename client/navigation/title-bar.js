@@ -9,8 +9,33 @@
   if (!ns) return;
   const { C } = SE;
 
-  let listResizeObserver;
-  let listWatchedNode;
+  /*
+   * Geometry (the list's edges, the title bar's lockup and status buttons, the view toggles) is
+   * read only after something that can move it: a watched box resizing, the window resizing, or
+   * a different list, title bar or list state. The rail's pass runs on every class change in
+   * the window; the other passes reuse the last reads, so they force no layout.
+   */
+  let geometryDirty = true;
+  let geometryKey = [];
+  const markGeometry = () => {
+    geometryDirty = true;
+    ns.schedule();
+  };
+  let sizeObserver;
+  const watchedSizes = new Set();
+  const watchSize = (el) => {
+    if (!el || watchedSizes.has(el) || !window.ResizeObserver) return;
+    sizeObserver ??= new ResizeObserver(markGeometry);
+    for (const old of watchedSizes) {
+      if (old.isConnected) continue;
+      sizeObserver.unobserve(old);
+      watchedSizes.delete(old);
+    }
+    watchedSizes.add(el);
+    sizeObserver.observe(el);
+  };
+  let listRect = null;
+  let titleMetrics = null;
 
   // Game list header metrics and collapse toggle
   const LIST_SELECTOR = `.${C.GameListHomeAndSearch_Container}`;
@@ -45,7 +70,7 @@
    * changed on a big window, and comes back once the window grows again.
    */
   const LIST_FOLD_AT = 1000;
-  const listFold = SE.windowFold(LIST_FOLD_AT, () => ns.schedule());
+  const listFold = SE.windowFold(LIST_FOLD_AT, markGeometry);
 
   const isListHidden = () => (listFold.small ? !listFold.held : listHidden);
 
@@ -87,10 +112,18 @@
   // Scroll doesn't bubble, so this listens in the capture phase and takes whichever
   // tall scroller inside the list fired (the one scroll-to-top scrolls): no hashed class to
   // chase for the virtual list. Before any scroll the list is at its top, so none is needed.
+  // Each scroller's height is read once: a read per scroll event forced a layout per event
+  // while the virtual list rebuilt its rows.
+  const tallScroller = new WeakMap();
   const onListScroll = (event) => {
     const el = event.target;
-    if (!(el instanceof Element) || el.clientHeight < 200 || !el.closest(LIST_SELECTOR)) return;
-    topScroller = el;
+    if (!(el instanceof Element) || el === topScroller) return;
+    let tall = tallScroller.get(el);
+    if (tall === undefined) {
+      tall = !!el.closest(LIST_SELECTOR) && el.clientHeight >= 200;
+      tallScroller.set(el, tall);
+    }
+    if (tall) topScroller = el;
   };
 
   const applyListEdgeVars = () => {
@@ -126,9 +159,18 @@
         '</span>';
     }
     // The game list's total under the wordmark ("4,409"), while the list shows
+    // Returns whether the lockup changed: its width needs a new read
+    let changed = false;
     const statNode = listBrand.querySelector('.se-list-brand-stat');
-    if (statNode.textContent !== stat) statNode.textContent = stat;
-    if (listBrand.parentElement !== topBar) topBar.appendChild(listBrand);
+    if (statNode.textContent !== stat) {
+      statNode.textContent = stat;
+      changed = true;
+    }
+    if (listBrand.parentElement !== topBar) {
+      topBar.appendChild(listBrand);
+      changed = true;
+    }
+    return changed;
   }
 
   function writeListBrandWidth(width) {
@@ -191,14 +233,18 @@
 
     const downloadsList = window.__seDownloads?.library;
     const list = downloadsList || document.querySelector(LIST_SELECTOR);
-    if (list !== listWatchedNode && window.ResizeObserver) {
-      listResizeObserver ??= new ResizeObserver(() => ns.schedule());
-      if (listWatchedNode) listResizeObserver.unobserve(listWatchedNode);
-      if (list) listResizeObserver.observe(list);
-      listWatchedNode = list;
-    }
+    const topBar = document.querySelector(`.${C.TopBar}`);
+    watchSize(list);
+    watchSize(topBar?.querySelector(`.${C.FocusNavigationRoot_TitleBarControls}`));
 
-    const rect = list && !hidden ? list.getBoundingClientRect() : null;
+    const key = [hidden, !!downloadsList, list, topBar];
+    if (key.some((part, i) => part !== geometryKey[i])) {
+      geometryKey = key;
+      geometryDirty = true;
+    }
+    const measure = geometryDirty;
+    if (measure) listRect = list && !hidden ? list.getBoundingClientRect() : null;
+    const rect = listRect;
     const isVisible = !!rect && rect.width > 0 && rect.height > 0;
     if (isVisible) {
       listLeft = Math.round(rect.left);
@@ -252,7 +298,6 @@
 
     // The rail's corner on every page (client/navigation/title-bar.css), so the page
     // icons under it never move
-    const topBar = document.querySelector(`.${C.TopBar}`);
     if (topBar) {
       if (listToggleBtn.parentElement !== topBar) topBar.appendChild(listToggleBtn);
     } else {
@@ -281,14 +326,18 @@
     SE.mark(listToggleBtn, 'aria-label', hidden ? 'Show game list' : 'Hide game list');
     SE.mark(listToggleBtn, 'aria-pressed', String(hidden));
     applyListEdgeVars();
-    placeListBrand(topBar, statText);
+    // A new total changes the lockup's width
+    const restated = placeListBrand(topBar, statText);
+    watchSize(listBrand?.isConnected ? listBrand : null);
     // One read for the title bar, after every write above; what it decides is written after
-    const metrics = topBar ? measureTitleBar(topBar) : null;
+    if (measure || restated) titleMetrics = topBar ? measureTitleBar(topBar) : null;
+    const metrics = titleMetrics;
     writeListBrandWidth(metrics?.brandWidth);
     syncTitleBar(metrics, isVisible);
     // After the search's place is set: the toggles line up with its views slot
     const views = list?.querySelector(`.${C.CheckboxWithImage}`)?.parentElement?.parentElement;
-    ns.search.syncViews(isVisible && !downloadsList ? views : null);
+    ns.search.syncViews(isVisible && !downloadsList ? views : null, measure || restated);
+    geometryDirty = false;
   }
 
   /*
@@ -353,6 +402,7 @@
   }
 
   function cleanup() {
+    geometryDirty = true;
     syncTitleBar(null, false);
     placeListBrand(null);
     listBrandWidth = -1;
@@ -373,13 +423,15 @@
     },
     setViewCount,
     cleanup,
+    markGeometry,
     start() {
-      addEventListener('resize', ns.schedule);
+      addEventListener('resize', markGeometry);
       document.addEventListener('scroll', onListScroll, { capture: true, passive: true });
     },
     destroy() {
-      listResizeObserver?.disconnect();
-      removeEventListener('resize', ns.schedule);
+      sizeObserver?.disconnect();
+      watchedSizes.clear();
+      removeEventListener('resize', markGeometry);
       document.removeEventListener('scroll', onListScroll, { capture: true });
       cleanup();
       listFold.destroy();

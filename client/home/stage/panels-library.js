@@ -56,11 +56,22 @@
       ...(now() - rt > 300 * DAY ? { year: 'numeric' } : {}),
     });
 
-  function paintAdded(cell, { show, games }) {
+  // The newest games, kept for 5 s like the stage's other lists: the board repaints on every
+  // Home change, and each pick walks the whole library
+  const addedCache = { at: 0, sig: '', list: [] };
+  const newestGames = (show, games) => {
+    const sig = `${show}|${games}`;
+    if (sig === addedCache.sig && Date.now() - addedCache.at < 5000) return addedCache.list;
     const list = pool(games)
       .filter((a) => a.rt_purchased_time > 0 && (show !== 'unplayed' || !a.minutes_playtime_forever))
       .sort((a, b) => b.rt_purchased_time - a.rt_purchased_time)
       .slice(0, LIST);
+    Object.assign(addedCache, { at: Date.now(), sig, list });
+    return list;
+  };
+
+  function paintAdded(cell, { show, games }) {
+    const list = newestGames(show, games);
     return paintTiles(cell, 'se-hs-added', 'Recently added', {
       rows: list.map((app) => ({ app, text: dateText(app.rt_purchased_time) })),
       sig: `${show}|${games}`,

@@ -402,7 +402,9 @@
   };
 
   // core batches watchers into one frame; the poll refreshes the count once a minute.
-  const watcher = SE.watch(update, { attributes: ['class', 'hidden'], ignore: SE.inSide });
+  // Scoped to the game page: class changes elsewhere (hovers, the list) made it re-check
+  // visibility, a style pass each time
+  const watcher = SE.watch(update, { attributes: ['class', 'hidden'], scope: `.${C.InPage}`, throttle: 150 });
   const timer = SE.poll(update, CACHE_TTL_MS, { active: () => !!badge && SE.visible(badge) });
   // The poll only wakes on return; hiding the window must still cancel an in-flight request.
   const onVisibility = () => {

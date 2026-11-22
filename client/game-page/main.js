@@ -180,6 +180,8 @@
       observer?.disconnect();
       live.sizer?.disconnect();
       live.achSizer?.disconnect();
+      live.topSizer?.disconnect();
+      live.cmSizer?.disconnect();
       if (live.muteAll) document.removeEventListener('pointerout', live.muteAll, true);
       unbindTips();
       cancelPass();

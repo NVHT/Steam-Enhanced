@@ -49,19 +49,40 @@
     return p && p !== stop ? p : null;
   }
 
+  /*
+   * Both boxes come from an IntersectionObserver, which reports them after the next layout:
+   * reading them here forced a layout of the whole page on every hover (~70 ms at 4K). The
+   * popup shows at once, out of view, and moves into place when the boxes arrive; a hide in
+   * between (data-on removed) leaves it hidden.
+   */
   function placePopup(pop, anchor) {
     const doc = anchor.ownerDocument;
+    const win = doc.defaultView || window;
     // Re-appending an existing child is still a body mutation (and a full update pass).
     if (pop.parentNode !== doc.body) doc.body.appendChild(pop);
-    const t = pop.getBoundingClientRect();
-    // Above its anchor, below when there's no room (core/runtime.js SE.tipSpot)
-    const { left, top } = SE.tipSpot(anchor.getBoundingClientRect(), t.width, t.height, 'top', {
-      flip: true,
-      win: doc.defaultView || window,
+    // Already showing (the pointer moved to the next anchor): it stays put until placed
+    if (!pop.hasAttribute('data-on')) {
+      pop.style.left = '-9999px';
+      pop.style.top = '0px';
+      pop.dataset.on = '';
+    }
+    pop.__seIO?.disconnect();
+    const boxes = new Map();
+    const io = new win.IntersectionObserver((entries) => {
+      for (const entry of entries) boxes.set(entry.target, entry.boundingClientRect);
+      if (!boxes.has(pop) || !boxes.has(anchor)) return;
+      io.disconnect();
+      if (pop.__seIO !== io) return;
+      pop.__seIO = null;
+      const t = boxes.get(pop);
+      // Above its anchor, below when there's no room (core/runtime.js SE.tipSpot)
+      const { left, top } = SE.tipSpot(boxes.get(anchor), t.width, t.height, 'top', { flip: true, win });
+      pop.style.left = `${left}px`;
+      pop.style.top = `${top}px`;
     });
-    pop.style.left = `${left}px`;
-    pop.style.top = `${top}px`;
-    pop.dataset.on = '';
+    pop.__seIO = io;
+    io.observe(pop);
+    io.observe(anchor);
   }
 
   const steamClient = () =>
@@ -87,7 +108,12 @@
     });
   }
 
+  // Whether an image is at least `min` px wide, by its own pixels (naturalWidth needs no layout;
+  // its drawn width forced one per new image on every page pass). One not loaded yet: `unknown`.
+  const isWide = (img, min, unknown = false) => (img.complete && img.naturalWidth ? img.naturalWidth >= min : unknown);
+
   Object.assign(ns, {
+    isWide,
     cancelPass, day, drop, formatTime, own, ownClasses, parseCount, placePopup, schedule, setPass,
     sharedParent, srcOf, steamClient, when,
   });

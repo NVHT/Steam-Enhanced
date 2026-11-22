@@ -21,10 +21,17 @@
     ['info', (el) => holds(el, `.${C.GameInfoButton}, .${C.DotDotDot}`)],
   ];
 
+  // Read once per element: measuring every control on each page pass forced a layout each time
+  const buttonLike = new WeakMap();
   function isButton(el) {
     if (el.matches(UNIT)) return true;
-    const r = el.getBoundingClientRect();
-    return r.width >= 20 && r.width <= 64 && r.height >= 20 && r.height <= 64 && Boolean(el.querySelector('svg, img'));
+    let known = buttonLike.get(el);
+    if (known === undefined) {
+      const r = el.getBoundingClientRect();
+      known = r.width >= 20 && r.width <= 64 && r.height >= 20 && r.height <= 64 && Boolean(el.querySelector('svg, img'));
+      if (r.width) buttonLike.set(el, known);
+    }
+    return known;
   }
 
   function markIcon(el) {

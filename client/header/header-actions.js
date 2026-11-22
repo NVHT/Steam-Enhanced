@@ -35,6 +35,16 @@
   let homeResizeObserver;
   let stripObserver;
   let stripKey = '';
+  /*
+   * The strip and Home-button reads run only after a watched box resized (the game lists, the
+   * title bar, the Home button), the window resized, or one of those nodes changed. The pass
+   * runs on any structure change in the window; the rest reuse the last reads (no forced layout).
+   */
+  let geometryDirty = true;
+  const remeasure = () => {
+    geometryDirty = true;
+    schedule();
+  };
   const stripLists = new Set();
 
   function setBodyProperty(property, value) {
@@ -174,24 +184,33 @@
   }
 
   // The game list showing or collapsing resizes its header: watched instead of every class change.
+  // Also the title bar, whose foot the strip lines up with. Returns whether a new node is watched.
   function observeLibraryLists(lists) {
-    stripObserver ||= window.ResizeObserver ? new window.ResizeObserver(schedule) : null;
+    stripObserver ||= window.ResizeObserver ? new window.ResizeObserver(remeasure) : null;
     for (const node of stripLists) {
       if (!node.isConnected) {
         stripObserver?.unobserve(node);
         stripLists.delete(node);
       }
     }
+    let added = false;
     for (const node of lists) {
-      if (stripLists.has(node)) continue;
+      if (!node || stripLists.has(node)) continue;
       stripObserver?.observe(node);
       stripLists.add(node);
+      added = true;
     }
+    return added;
   }
 
   function matchLibraryStrip() {
     const lists = [...document.querySelectorAll(`.${C.GameListHomeAndSearch_Container}`)];
-    observeLibraryLists(lists);
+    if (observeLibraryLists([...lists, document.querySelector(`.${C.TopBar}`)])) geometryDirty = true;
+    if (!geometryDirty) {
+      // React can rewrite a divider's className without the set changing: keep the mark on.
+      for (const divider of coloredDividers) if (divider.isConnected) divider.classList.add('se-library-strip');
+      return;
+    }
     const visible = lists.some(node => node.getBoundingClientRect().height > 0);
     if (document.body.classList.contains('se-hide-library-strip') !== visible) {
       document.body.classList.toggle('se-hide-library-strip', visible);
@@ -343,12 +362,13 @@
     if (home !== homeReference) {
       homeResizeObserver?.disconnect();
       homeReference = home;
+      geometryDirty = true;
       if (home && window.ResizeObserver) {
-        homeResizeObserver = new window.ResizeObserver(schedule);
+        homeResizeObserver = new window.ResizeObserver(remeasure);
         homeResizeObserver.observe(home);
       }
     }
-    if (!home || !menu) return;
+    if (!home || !menu || !geometryDirty) return;
     const rect = home.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return;
     for (const [key, number] of Object.entries({ width: rect.width, height: rect.height, inset: 6 })) {
@@ -658,6 +678,7 @@
     frame = 0;
     matchLibraryStrip();
     matchSteamHome();
+    geometryDirty = false;
 
     const announcement = document.querySelector(ANNOUNCEMENT_SELECTOR);
     const sources = PROXY_ACTIONS.map(action => document.querySelector(action.selector));
@@ -707,7 +728,7 @@
    * the Announcements button by referenceObserver, layout changes by the ResizeObservers.
    */
   function start() {
-    addEventListener('resize', schedule);
+    addEventListener('resize', remeasure);
     observer = SE.watch(update, { throttle: 200 });
     // Steam's menu buttons get our icon classes; React rewriting their className would drop
     // them, so class changes inside the menu bars repaint the icons before the next paint.
@@ -736,7 +757,7 @@
     group?.remove();
     settingsButton?.remove();
     gamesButton?.remove();
-    removeEventListener('resize', schedule);
+    removeEventListener('resize', remeasure);
     document.body?.classList.remove('se-header-actions-ready', 'se-hide-library-strip');
 
     for (const [element, saved] of decorated) {

@@ -556,7 +556,8 @@
               ? 'Loading friend activity…'
               : 'Nothing from your friends today'
         }</span>`;
-      list.scrollTop = top;
+      // A scroll write forces layout: only when there's a place to go back to
+      if (top) list.scrollTop = top;
       dropCards();
       if (focused) list.querySelector(`.se-hs-fmain[data-go="${CSS.escape(focused)}"]`)?.focus({ preventScroll: true });
     }

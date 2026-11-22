@@ -40,6 +40,9 @@
     if (!native) return;
     const { React, DOM, Tooltip } = native;
 
+    // Reads first, for every node (a read after the last node's host went in forced a style
+    // pass per node: half a second over a long friends list), then the writes.
+    const work = [];
     for (const node of nodes) {
       if (
         node.closest('.GamepadMode') ||
@@ -47,18 +50,21 @@
       ) {
         continue;
       }
-
       const rawTitle = node.getAttribute('title');
-      if (rawTitle) savedTitles.set(node, rawTitle);
-      const label = node.getAttribute('data-se-chat-tip') || savedTitles.get(node);
+      const label = node.getAttribute('data-se-chat-tip') || rawTitle || savedTitles.get(node);
       if (!label) continue;
+      const fresh = !mounts.has(node);
+      work.push({ node, rawTitle, label, isStatic: fresh && getComputedStyle(node).position === 'static' });
+    }
 
+    for (const { node, rawTitle, label, isStatic } of work) {
+      if (rawTitle) savedTitles.set(node, rawTitle);
       let entry = mounts.get(node);
       if (!entry) {
         const host = document.createElement('span');
         host.className = 'se-chat-tooltip-host';
         const oldPosition = node.style.position;
-        if (getComputedStyle(node).position === 'static') node.style.position = 'relative';
+        if (isStatic) node.style.position = 'relative';
         node.appendChild(host);
         entry = { host, root: DOM.createRoot(host), label: null, oldPosition };
         node.setAttribute('data-se-native-tip', '');

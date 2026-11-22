@@ -179,9 +179,12 @@
     const strip = box.querySelector('.se-shot-strip');
     strip.querySelectorAll('.se-shot').forEach((t, k) => t.toggleAttribute('data-on', k === i));
     if (box.__seShown !== i) {
+      // A new strip starts at its first shot: nothing to measure (the read forced the freshly
+      // opened page's first layout, ~70 ms)
+      const fresh = box.__seShown === undefined && i === 0;
       box.__seShown = i;
       const t = strip.children[i];
-      if (t && (t.offsetLeft < strip.scrollLeft || t.offsetLeft + t.offsetWidth > strip.scrollLeft + strip.clientWidth)) {
+      if (t && !fresh && (t.offsetLeft < strip.scrollLeft || t.offsetLeft + t.offsetWidth > strip.scrollLeft + strip.clientWidth)) {
         strip.scrollTo({
           left: t.offsetLeft - (strip.clientWidth - t.offsetWidth) / 2,
           behavior: 'smooth',
@@ -332,16 +335,18 @@
     return true;
   }
 
-  // Splits the comments into pages that fit the box; returns the pages and each comment's height.
+  /*
+   * Splits the comments into pages that fit the box. The box's room and each comment's height
+   * come from cmSizer (read after layout, never in a pass: reading them here forced the page's
+   * layout). A comment off its page is display:none and reports 0, so it keeps the height it
+   * had while shown.
+   */
   function commentPages(box, list) {
-    list.forEach((c) => mark(c, 'data-se-pg', 'on'));
-    const room = box.clientHeight;
+    const room = box.__seRoom;
     const pages = [];
-    const heights = new Map();
     let used = room + 1;
     for (const c of list) {
-      const h = c.offsetHeight;
-      heights.set(c, h);
+      const h = c.__seH || 0;
       if (used + h > room && (pages.length === 0 || pages[pages.length - 1].length)) {
         pages.push([]);
         used = 0;
@@ -349,12 +354,8 @@
       pages[pages.length - 1].push(c);
       used += h;
     }
-    return { pages: pages.length ? pages : [[]], heights };
+    return pages.length ? pages : [[]];
   }
-
-  // Off-page comments are display:none, so they measure 0 on the next pass.
-  const commentKey = (box, list, heightOf, page) =>
-    `${list.length}|${box.clientHeight}|${box.clientWidth}|${list.map(heightOf).join(',')}|${page}`;
 
   function placeShotComments(wrap) {
     const more = wrap.querySelector(MORE_COMMENTS);
@@ -394,14 +395,45 @@
     const tEl = head.querySelector('.se-cm-title');
     if (tEl.textContent !== title) tEl.textContent = title;
 
-    if (wrap.__seCmKey === commentKey(box, list, (c) => c.offsetHeight || 0, wrap.__sePage || 0)) return;
+    /*
+     * Measured again only when the box or a comment resized (cmSizer), the comments changed, or
+     * a tab was picked (__seCmKey cleared): each page pass re-reading every comment's height
+     * forced a layout each time.
+     */
+    const known = wrap.__seCmList;
+    const sameList = known?.length === list.length && list.every((c, i) => c === known[i]);
+    if (sameList && wrap.__seCmKey) return;
+    if (!sameList) {
+      wrap.__seCmList = list;
+      live.cmSizer ??= new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const node = entry.target;
+          const h = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height;
+          // Layout is clean inside the callback: this read costs nothing
+          if (node.__seCmBox) node.__seRoom = node.clientHeight;
+          else if (h > 0) node.__seH = h;
+          if (node.__seCmWrap) node.__seCmWrap.__seCmKey = '';
+        }
+        schedule();
+      });
+      box.__seCmBox = true;
+      for (const node of [box, ...list]) {
+        node.__seCmWrap = wrap;
+        live.cmSizer.observe(node);
+      }
+    }
+    // Not measured yet: every comment shows, so cmSizer can measure it, and paging waits
+    if (!box.__seRoom || list.some((c) => !c.__seH)) {
+      for (const c of list) mark(c, 'data-se-pg', 'on');
+      return;
+    }
 
-    const { pages, heights } = commentPages(box, list);
+    const pages = commentPages(box, list);
     const page = Math.min(pages.length - 1, Math.max(0, wrap.__sePage || 0));
     wrap.__sePage = page;
     const onPage = new Set(pages[page]);
     for (const c of list) mark(c, 'data-se-pg', onPage.has(c) ? 'on' : 'off');
-    wrap.__seCmKey = commentKey(box, list, (c) => (onPage.has(c) ? heights.get(c) || 0 : 0), page);
+    wrap.__seCmKey = 'paged';
 
     const tabs = head.querySelector('.se-cm-tabs');
     const html =

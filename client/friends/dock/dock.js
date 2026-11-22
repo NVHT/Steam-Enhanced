@@ -193,13 +193,52 @@
     return null;
   }
 
+  /*
+   * The place is measured only after the header or Steam's list resized (barSizer), the game
+   * list stopped scrolling (it may be back at its top), or either node changed: every dock pass
+   * measuring it forced a layout of the whole window.
+   */
+  let barNodes = [];
+  let barDirty = true;
+  let barScrollTimer = 0;
+  live.barSizer = undefined;
+  live.barScroller = null;
+  const remeasureBar = () => {
+    barDirty = true;
+    ns.schedule();
+  };
+  const onBarScroll = () => {
+    clearTimeout(barScrollTimer);
+    barScrollTimer = setTimeout(remeasureBar, 150);
+  };
+  live.releaseBar = () => {
+    clearTimeout(barScrollTimer);
+    live.barSizer?.disconnect();
+    live.barScroller?.removeEventListener('scroll', onBarScroll);
+    live.barScroller = null;
+  };
+
   function alignBar() {
     const header = document.querySelector(LIST_HEADER);
     const content = dock.querySelector('.se-fd-steam .friendListHeaderContainer');
+    if (header !== barNodes[0] || content !== barNodes[1]) {
+      barNodes = [header, content];
+      barDirty = true;
+      live.barSizer ??= new ResizeObserver(remeasureBar);
+      live.barSizer.disconnect();
+      for (const node of barNodes) if (node) live.barSizer.observe(node);
+    }
+    if (!barDirty) return;
+    barDirty = false;
     if (!header || !content || !header.getClientRects().length) return;
     // Measured only at the top: the list keeps only its rows in view, so once scrolled the first
     // header on the page is a later collection's, far down, and would push Steam's list out of the dock
     const scroller = scrollerOf(header);
+    if (scroller !== live.barScroller) {
+      live.barScroller?.removeEventListener('scroll', onBarScroll);
+      live.barScroller = scroller;
+      scroller?.addEventListener('scroll', onBarScroll, { passive: true });
+    }
     if (scroller?.scrollTop) return;
     const box = header.getBoundingClientRect();
     const centre = box.top + box.height / 2;

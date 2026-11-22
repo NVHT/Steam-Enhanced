@@ -307,6 +307,7 @@
       watcher.disconnect();
       chatWatcher.disconnect();
       live.localObserver?.disconnect();
+      live.releaseBar?.();
       timer?.disconnect();
       if (live.frame) cancelAnimationFrame(live.frame);
       window.removeEventListener('focus', onDesktopChatFocus);

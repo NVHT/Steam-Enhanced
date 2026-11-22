@@ -12,6 +12,11 @@
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* Its size comes from the panel (the board's height is set, board.js sizeBoard), never its
+     rows: contained, a repaint of the rows (their times change every minute) lays out only the
+     list. Measured: uncontained, each repaint laid out the whole window, ~70 ms at 4K
+     (dev/perf.js, paintBoard). */
+  contain: strict;
   -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 24px), transparent);
   mask-image: linear-gradient(180deg, #000 calc(100% - 24px), transparent);
 }

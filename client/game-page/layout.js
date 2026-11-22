@@ -72,6 +72,8 @@
   live.sizer = undefined;
   live.fitQueued = 0;
   const sized = new Set();
+  // Each piece's height as its ResizeObserver last reported it (fit() reads no layout)
+  const heights = new WeakMap();
 
   function pieces(c) {
     const out = [];
@@ -94,8 +96,7 @@
     live.fitQueued = 0;
     const c = document.querySelector(CONTAINER);
     if (!c) return;
-    // Batch DOM geometry reads before writing custom properties to avoid layout thrashing.
-    const spans = pieces(c).map((el) => [el, el.getBoundingClientRect().height]);
+    const spans = pieces(c).map((el) => [el, heights.get(el) || 0]);
     for (const [el, h] of spans) {
       setVar(el, '--se-span', String(h > 0 ? Math.ceil((h + GAP) / ROW) : 1));
     }
@@ -104,7 +105,10 @@
   // Sizes change only through the ResizeObserver (it also reports each piece once on observe).
   function placeSpans(c) {
     if (!live.sizer) {
-      live.sizer = new ResizeObserver(() => {
+      live.sizer = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          heights.set(entry.target, entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height);
+        }
         if (!live.fitQueued) live.fitQueued = requestAnimationFrame(fit);
       });
     }

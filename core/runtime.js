@@ -818,11 +818,12 @@
   // High-frequency chrome regions excluded by content-area observers.
   const SIDE = `.${C.TopBar}, .${C.GameListHomeAndSearch_Container}, .se-fdock, .se-fd-fly, .se-fd-menu`;
 
+  // checkVisibility() answers "has a box" from style alone; getClientRects() forced a layout,
+  // and polls ask this every tick
+  const hasBox = (el) => (el.checkVisibility ? el.checkVisibility() : el.getClientRects().length > 0);
   const visible = (target) => {
     const nodes = typeof target === 'string' ? document.querySelectorAll(target) : [target];
-    return [...nodes].some(
-      el => el?.isConnected && !el.closest('[hidden]') && el.getClientRects().length > 0
-    );
+    return [...nodes].some(el => el?.isConnected && !el.closest('[hidden]') && hasBox(el));
   };
 
   const poll = (fn, delay, opts = {}) => {

@@ -11,9 +11,29 @@
 
   const TOP_BTN = `:is(.${C.ScrollToTopButton}, .ScrollToTopButton)`;
 
+  /*
+   * A button's place follows its scroller's box, so it is measured when that moves: a scroll,
+   * a window resize, or the scroller resizing (topSizer). The page's pass, which runs on any
+   * class change in the window, only places a button not yet placed for its scroller: measuring
+   * every button on every pass forced a layout each time, on every page.
+   */
+  live.topSizer = undefined;
+  const placedFor = new WeakMap();
+
+  function watchScroller(sc) {
+    live.topSizer ??= new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const btn = topFor.get(entry.target);
+        if (btn?.__seSc === entry.target) placeTop(btn);
+      }
+    });
+    live.topSizer.observe(sc);
+  }
+
   function placeTop(btn) {
     const sc = btn.__seSc;
     if (!sc?.isConnected) return;
+    placedFor.set(btn, sc);
     if (!servesScroller(btn, sc)) {
       btn.__seSc = null;
       return;
@@ -81,6 +101,7 @@
     if (!best) return;
     best.__seSc = t;
     topFor.set(t, best);
+    watchScroller(t);
     placeTop(best);
   }
 
@@ -101,7 +122,7 @@
           mark(w, 'data-se-top-host');
         }
       }
-      placeTop(btn);
+      if (btn.__seSc && placedFor.get(btn) !== btn.__seSc) placeTop(btn);
     }
   }
 

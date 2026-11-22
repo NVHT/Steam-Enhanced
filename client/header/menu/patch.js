@@ -281,9 +281,11 @@
     document.addEventListener('click', openMillenniumWindow, true);
 
     // Restrict synchronous MutationObserver passes to the titlebar and navigation rail
-    // so deep Library or game-page mutations do not trigger React fiber walks.
+    // so deep Library or game-page mutations do not trigger React fiber walks. Throttled: each
+    // pass walks the menu buttons' fibers (~5 ms), and the startup poll covers the first mount.
     const MENU_AREA = `.${C.TopBar}, .${C.FocusNavigationRoot_TitleBarControls}, .${C.RootMenuBar}, .${C.SuperNavBar}, .se-sidebar-icons, .se-header-actions, .se-menu-icon`;
     live.observer = SE.watch(update, {
+      throttle: 200,
       ignore: (node) => {
         const el = node.nodeType === 1 ? node : node.parentElement;
         if (!el || !live.steamButton?.isConnected) return false;

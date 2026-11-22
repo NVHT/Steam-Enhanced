@@ -5,7 +5,7 @@
 ((SE) => {
   const ns = window.__seGamePageParts;
   if (!ns) return;
-  const { BODY, day, drop, HEADING, own, placePopup, SEEK, sharedParent, srcOf, steamClient } = ns;
+  const { BODY, day, drop, HEADING, isWide, own, placePopup, SEEK, sharedParent, srcOf, steamClient } = ns;
 
   const { C, esc, fromProps, mark, unmark } = SE;
 
@@ -131,7 +131,7 @@
     for (const k of LEFT_CARDS) {
       for (const sec of document.querySelectorAll(`[data-se-sec="${k}"]`)) {
         const imgs = [...sec.querySelectorAll('img')].filter(
-          (i) => !i.closest('.se-dlc-grid') && (i.getBoundingClientRect().width || i.width) >= 40
+          (i) => !i.closest('.se-dlc-grid') && isWide(i, 40)
         );
         if (k !== 'workshop' && k !== 'additionalcontent' && imgs.length > 1) {
           const p1 = imgs[imgs.length - 2];

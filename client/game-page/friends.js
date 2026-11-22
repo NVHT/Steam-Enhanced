@@ -4,7 +4,7 @@
 ((SE) => {
   const ns = window.__seGamePageParts;
   if (!ns) return;
-  const { BODY, drop, own, schedule, sharedParent, srcOf } = ns;
+  const { BODY, drop, isWide, own, schedule, sharedParent, srcOf } = ns;
 
   const { C, esc, fromProps, mark } = SE;
 
@@ -63,7 +63,7 @@
     let imgs = [...sub.querySelectorAll('[data-status-position] img')].filter((i) => !/frame/i.test(i.className));
     if (!imgs.length) {
       imgs = [...sub.querySelectorAll('img')].filter(
-        (i) => !/frame/i.test(i.className) && (i.width || i.getBoundingClientRect().width || 32) >= 24
+        (i) => !/frame/i.test(i.className) && isWide(i, 24, true)
       );
     }
     for (const img of imgs) {

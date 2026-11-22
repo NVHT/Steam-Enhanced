@@ -59,6 +59,19 @@
       elsewhere.add(img);
       return null;
     }
+    // Structure first, with no layout: an image with no field within ROOT_CLIMB levels is never
+    // in a picker (measuring the activity feed's emoticons forced a game page's first layout)
+    let near = false;
+    for (let node = img.parentElement, i = 0; node && node !== document.body && i < ROOT_CLIMB; node = node.parentElement, i++) {
+      if (node.querySelector('input')) {
+        near = true;
+        break;
+      }
+    }
+    if (!near) {
+      elsewhere.add(img);
+      return null;
+    }
     for (let node = img.parentElement, i = 0; node && node !== document.body && i < ROOT_CLIMB; node = node.parentElement, i++) {
       const r = node.getBoundingClientRect();
       if (!r.width) return null;

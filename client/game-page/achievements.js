@@ -291,9 +291,11 @@
   const ICON = 52;
   const ICON_GAP = 12;
 
+  // The row's width comes from its ResizeObserver (read there, after layout): the page's pass
+  // reading it forced a layout on every pass
   function fillAchRow(mine) {
     const list = mine.__seList || [];
-    const w = mine.clientWidth;
+    const w = mine.__seW;
     if (!w) return;
     const fits = Math.max(1, Math.floor((w + ICON_GAP) / (ICON + ICON_GAP)));
     const n = list.length > fits ? fits - 1 : list.length;
@@ -356,6 +358,7 @@
         achRows.set(row, mine);
         if (!live.achSizer) {
           live.achSizer = new ResizeObserver((es) => {
+            for (const e of es) e.target.__seW = e.target.clientWidth;
             for (const e of es) fillAchRow(e.target);
           });
         }

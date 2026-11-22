@@ -6,8 +6,12 @@
 
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
-  const appStore = () => SE.global('appStore', (s) => !!s.allApps);
-  const collectionStore = () => SE.global('collectionStore');
+  // Steam's stores live as long as the window: found once (each lookup walks every Steam window,
+  // and the board's filters ask per game, ~170,000 times a minute)
+  let appStoreFound = null;
+  let collectionStoreFound = null;
+  const appStore = () => appStoreFound || (appStoreFound = SE.global('appStore', (s) => !!s.allApps));
+  const collectionStore = () => collectionStoreFound || (collectionStoreFound = SE.global('collectionStore'));
   const client = () => SE.global('SteamClient', (sc) => !!sc.Apps) || window.SteamClient;
 
   // Steam's own source for a game's library art (core/runtime.js)
