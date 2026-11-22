@@ -1,6 +1,8 @@
 /*
- * The theme's settings menu (client/shared/menu.js, SE.settingsMenu), drawn as the theme's
- * menus are: a summary, rows with a mark at their end, headings, dividers and segmented controls
+ * The theme's settings menu (client/shared/menu.js, SE.settingsMenu): controls that stay open
+ * and apply at once. One of the theme's two menus: rows that run and close go in the action menu
+ * (client/shared/popup-layer.css, SE.layer.menu), which also shows over a Store page. Both share
+ * the panel and row recipe (--se-menu-row-h). Drawn as the theme's menus are: a summary, rows with a mark at their end, headings, dividers and segmented controls
  * (client/shared/segmented.css). The picker (client/shared/picker.js, picker.css) draws in the
  * same classes. Listed before the Home's stylesheets (client/loader.js), which add their own
  * rows on top (client/home/stage/stage-settings.css).
@@ -13,7 +15,7 @@
  * .se-placed (client/shared/picker.css) places it; this draws it. Scrolls inside when short.
  */
 .se-mn:not(#se-none) {
-  width: 320px;
+  width: var(--se-menu-width);
   max-height: calc(100vh - 2 * var(--se-space-3));
   padding: var(--se-space-1);
   border-radius: var(--se-radius-menu);
@@ -92,7 +94,7 @@
   align-items: center;
   gap: var(--se-space-2);
   min-width: 0;
-  min-height: var(--se-control-h);
+  min-height: var(--se-menu-row-h);
   padding: var(--se-space-1) var(--se-space-2);
   border-radius: var(--se-radius-sm);
   color: var(--se-text-dim);

@@ -1,5 +1,5 @@
 /*
- * Continues popup-layer-panel.js (see popup-layer.js's header): the theme's one popup menu,
+ * Continues popup-layer-panel.js (see popup-layer.js's header): the theme's action menu,
  * closing on leave and with the menus' animation, rail placement; publishes SE.layer.
  */
 ((SE) => {
@@ -8,7 +8,9 @@
   const { panel } = ns;
 
   /*
-   * The theme's one popup menu, in a panel (above a browser page too). One open at a time.
+   * The theme's action menu, in a panel (above a browser page too). One open at a time. Controls
+   * that stay open and need focus (segments, a list to reorder) go in the settings menu
+   * (client/shared/menu.js) instead.
    *   items   rows [{ label, run, state, icon, art, hint, keys, time, unread, external, checked,
    *           danger }],
    *           with { heading, action }, { separator: true } and { note } between them. state

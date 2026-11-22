@@ -202,9 +202,6 @@
     return overview ? [overview] : [];
   }
 
-  const isRunning = (appid) =>
-    [...SE.owners()].some((owner) => run(() => owner.SteamUIStore?.RunningApps?.some((game) => Number(game.appid) === appid)));
-
   /*
    * The main row's face, as the game page's button: Stop while it runs, Play when Steam's row is
    * Play (a one-game row carries its action's name as a class: Play, Update, Install, Resume…),
@@ -212,7 +209,7 @@
    */
   function actionOf(apps, row) {
     if (apps.length !== 1) return 'install';
-    if (isRunning(apps[0].appid)) return 'stop';
+    if (SE.isRunning(apps[0].appid)) return 'stop';
     return row?.classList.contains('Play') ? 'play' : 'install';
   }
 

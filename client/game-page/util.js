@@ -53,12 +53,13 @@
     const doc = anchor.ownerDocument;
     // Re-appending an existing child is still a body mutation (and a full update pass).
     if (pop.parentNode !== doc.body) doc.body.appendChild(pop);
-    const r = anchor.getBoundingClientRect();
     const t = pop.getBoundingClientRect();
-    const vw = doc.documentElement.clientWidth;
-    let top = r.top - t.height - 8;
-    if (top < 8) top = r.bottom + 8;
-    pop.style.left = `${Math.max(8, Math.min(vw - t.width - 8, r.left + r.width / 2 - t.width / 2))}px`;
+    // Above its anchor, below when there's no room (core/runtime.js SE.tipSpot)
+    const { left, top } = SE.tipSpot(anchor.getBoundingClientRect(), t.width, t.height, 'top', {
+      flip: true,
+      win: doc.defaultView || window,
+    });
+    pop.style.left = `${left}px`;
     pop.style.top = `${top}px`;
     pop.dataset.on = '';
   }

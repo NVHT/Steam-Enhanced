@@ -221,11 +221,10 @@
       (pid > 0 && Number(browser.m_unPID) === pid) ||
       (appid > 0 && Number(browser.m_unAppID) === appid)
     )) return true;
-    return appid > 0 && [...SE.owners()].some((owner) => {
-      const ui = run(() => owner.SteamUIStore);
-      return Number(run(() => ui?.MainRunningAppID)) === appid ||
-        run(() => ui?.RunningApps?.some((game) => Number(game.appid) === appid));
-    });
+    return appid > 0 && (
+      [...SE.owners()].some((owner) => Number(run(() => owner.SteamUIStore?.MainRunningAppID)) === appid) ||
+      SE.isRunning(appid)
+    );
   }
 
   function desktopChatFocused() {

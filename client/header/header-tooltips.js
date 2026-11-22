@@ -95,18 +95,10 @@
   const CANDIDATES = '.se-menu-icon, .se-header-action, .se-sidebar-tip, [data-se-tip]';
 
 
-  // Where the tip goes beside its button: on `direction`'s side, centred on the button.
+  // Where the tip goes beside its button: on `direction`'s side, centred on it (SE.tipSpot)
   function spotFor(node, direction) {
     const r = node.getBoundingClientRect();
-    const gap = SE.px('--se-space-2');
-    return (w, h) => {
-      const midX = r.left + r.width / 2 - w / 2;
-      const midY = r.top + r.height / 2 - h / 2;
-      if (direction === 'left') return { left: r.left - gap - w, top: midY };
-      if (direction === 'right') return { left: r.right + gap, top: midY };
-      if (direction === 'top') return { left: midX, top: r.top - gap - h };
-      return { left: midX, top: r.bottom + gap };
-    };
+    return (w, h) => SE.tipSpot(r, w, h, direction);
   }
 
   // Steam's own tooltip delay (nDelayShowMS, --se-tip-delay), as these tips had. Without the

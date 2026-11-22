@@ -1,9 +1,10 @@
 /*
- * The theme's settings menu (SE.settingsMenu): one at a time, over the page by the button that
- * opened it (the Home stage's sliders button, a Home panel's ⋯), in the theme's menu language
- * (the game-type menu, client/navigation/sidebar-icons.css): a header (the title, a control at
- * its right if given), rows that light up on hover with a mark at their end, headings and
- * dividers, Reset as the last row. Styled by client/shared/menu.css; the picker
+ * The theme's settings menu (SE.settingsMenu), for controls that stay open and need focus (rows
+ * that run and close go in the action menu, SE.layer.menu): one at a time, over the page by
+ * the button that opened it (the Home stage's sliders button, a Home panel's ⋯), in the theme's
+ * menu language (the game-type menu, client/navigation/sidebar-icons.css): a header (the
+ * title, a control at its right if given), rows that light up on hover with a mark at their
+ * end, headings and dividers, Reset as the last row. Styled by client/shared/menu.css; the picker
  * (client/shared/picker.js) draws in the same classes and SE.placePop places both.
  * It closes on Escape, a click outside or its button again; every change applies at once.
  *   SE.settingsMenu  { open, close, place, repaint, height(), side() } and the row builders.

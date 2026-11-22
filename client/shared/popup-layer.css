@@ -108,8 +108,12 @@ html.se-layer-document .se-layer-wrap > *:not(#se-none) {
 }
 
 /*
- * The theme's one popup menu (menu() in client/shared/popup-layer.js): the dock's menus,
- * Settings. Here, not with a feature, so a popup window always has it (a base sheet).
+ * The theme's action menu (menu() in client/shared/popup-layer.js): rows that run and close it,
+ * over a Store page too (the dock's menus, the rail's, Settings). One of the theme's two menus:
+ * controls that stay open (segments, toggles, a list to reorder) go in the settings menu
+ * (client/shared/menu.css), which needs focus a popup window can't take. Both share the panel
+ * and row recipe (--se-menu-row-h). Here, not with a feature, so a popup window always has it
+ * (a base sheet).
  */
 .se-menu {
   position: fixed;
@@ -142,7 +146,7 @@ html.se-layer-document .se-layer-wrap > *:not(#se-none) {
   display: flex;
   align-items: center;
   gap: var(--se-space-2);
-  height: 32px;
+  height: var(--se-menu-row-h);
   padding: 0 var(--se-space-2) !important;
   border-radius: var(--se-radius-sm);
   font: 600 var(--se-fs-base) var(--se-font), sans-serif !important;
@@ -199,7 +203,7 @@ html.se-layer-document .se-layer-wrap > *:not(#se-none) {
 
 .se-menu button[data-hint] {
   height: auto;
-  min-height: 38px;
+  min-height: var(--se-menu-row-h);
   /* !important: the row's own padding is, against Steam's button styles */
   padding: var(--se-space-1) var(--se-space-2) !important;
 }

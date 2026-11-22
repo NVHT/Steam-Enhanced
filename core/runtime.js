@@ -108,6 +108,11 @@
     return wins;
   };
 
+  // The game is running: in Steam's RunningApps, read from whichever window holds Steam's store
+  const isRunning = (appid) =>
+    Number(appid) > 0 &&
+    [...owners()].some((owner) => run(() => owner.SteamUIStore?.RunningApps?.some((game) => Number(game.appid) === Number(appid))));
+
   const mainWindow = () => {
     for (const win of owners()) {
       try {
@@ -242,6 +247,30 @@
   // A token's value from core/tokens.css, read off the root: px as a number, a duration in ms.
   const token = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   const px = (name) => parseFloat(token(name)) || 0;
+
+  /*
+   * Where a tip (a w × h box) goes beside its anchor's rect: on `side` ('top', 'bottom', 'left',
+   * 'right'), centred on the anchor, kept TIP_EDGE inside the window (`win`, this one by default).
+   * opts.flip: a top or bottom tip without room on its side takes the other. Returns
+   * { left, top, side }; the caller writes it (its own box, a popup-layer spot, Steam's tip).
+   */
+  const TIP_EDGE = 8;
+  const tipSpot = (rect, w, h, side = 'bottom', { gap = px('--se-space-2'), flip = false, win = window } = {}) => {
+    const vw = win.document.documentElement.clientWidth || win.innerWidth;
+    const vh = win.innerHeight;
+    if (flip && side === 'top' && rect.top - gap - h < TIP_EDGE) side = 'bottom';
+    else if (flip && side === 'bottom' && rect.bottom + gap + h > vh - TIP_EDGE) side = 'top';
+    const midX = rect.left + rect.width / 2 - w / 2;
+    const midY = rect.top + rect.height / 2 - h / 2;
+    const at = {
+      top: [midX, rect.top - gap - h],
+      bottom: [midX, rect.bottom + gap],
+      left: [rect.left - gap - w, midY],
+      right: [rect.right + gap, midY],
+    }[side];
+    const clamp = (v, size, room) => Math.round(Math.max(TIP_EDGE, Math.min(room - size - TIP_EDGE, v)));
+    return { left: clamp(at[0], w, vw), top: clamp(at[1], h, vh), side };
+  };
   const ms = (name) => {
     const value = token(name);
     const n = parseFloat(value) || 0;
@@ -991,6 +1020,7 @@
     appOf,
     findDown,
     owners,
+    isRunning,
     mainWindow,
     navigate,
     requires,
@@ -1001,6 +1031,7 @@
     cssVar,
     token,
     px,
+    tipSpot,
     ms,
     hoverIntent,
     railMode,

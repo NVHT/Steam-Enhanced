@@ -10,8 +10,9 @@
  *                       popup window over a browser page, in the page elsewhere
  *   hover()             a panel opened by hovering something: hover intent, one panel at a
  *                       time, released on leave (the friend card, Playing now, the title-bar tips)
- *   menu()              the theme's one popup menu (.se-menu): rows of actions, keyboard and
- *                       outside clicks handled (the dock's menus, Settings)
+ *   menu()              the theme's action menu (.se-menu): rows of actions, keyboard and
+ *                       outside clicks handled (the dock's menus, Settings); controls that
+ *                       stay open use the settings menu (client/shared/menu.js)
  *   take(owner)         a ready popup window for content of the caller's own (the chat
  *                       flyout), given back with finish(entry)
  *   open / place / close  the windows themselves: open one at a rect of the main window, move

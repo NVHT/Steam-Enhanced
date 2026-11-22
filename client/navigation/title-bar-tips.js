@@ -65,18 +65,8 @@
       return;
     }
 
-    const desired = {
-      left: Math.round(
-        Math.max(
-          8,
-          Math.min(
-            innerWidth - boxRect.width - 8,
-            anchorRect.left + anchorRect.width / 2 - boxRect.width / 2
-          )
-        )
-      ),
-      top: Math.round(anchorRect.bottom + 6),
-    };
+    // Under its control, centred on it (core/runtime.js SE.tipSpot)
+    const desired = SE.tipSpot(anchorRect, boxRect.width, boxRect.height, 'bottom');
 
     if (Math.abs(boxRect.top - desired.top) < 1 && Math.abs(boxRect.left - desired.left) < 1) {
       return;
