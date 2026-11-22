@@ -1,0 +1,80 @@
+/*
+ * Exit Game dialog (styles for client/dialogs/exit-game.js). Once marked ([data-se-exitgame] on
+ * its DialogContent, desktop windows only):
+ *
+ *   [ hero art, fading into the card                  ]
+ *   [ EXIT GAME?                                      ]
+ *   [ Counter-Strike: Source                          ]
+ *   [ Unsaved game data may be lost.                  ]
+ *   [                   [ Keep playing ] [ Exit game ] ]
+ *
+ * The art and the eyebrow are the shared ones (.se-dialog-art, the eyebrow in dialogs.css). The
+ * buttons are Steam's Cancel and Confirm, their words swapped at no size (their aria-labels read
+ * the new words), Exit game in the destroying red as Delete Collection's Delete is.
+ */
+
+/* Room for the art behind the eyebrow and the name */
+[data-se-exitgame]:not(#se-none) {
+  min-width: 420px;
+  padding-top: var(--se-space-7);
+}
+
+/* The game's name, between the eyebrow (Steam's header) and the warning */
+.se-exitgame-name {
+  margin: 0 0 var(--se-space-1);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font: 800 var(--se-fs-2xl) / 1.2 var(--se-font);
+  color: var(--se-text-strong);
+  text-shadow: var(--se-text-shadow-art);
+}
+
+[data-se-exitgame] .DialogBodyText:not(#se-none) {
+  color: var(--se-text-muted) !important; /* !important: the theme's DialogBodyText colour (dialogs.css) */
+}
+
+/* The footer: Keep playing, then Exit game at the end */
+[data-se-exitgame] .DialogFooter:not(#se-none) {
+  margin-top: var(--se-space-6) !important; /* !important: Steam's DialogFooter margin (steamui/css/sp.css) */
+}
+
+[data-se-exitgame] .DialogFooter :has(> .DialogButton):not(#se-none) {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--se-space-2);
+}
+
+[data-se-exitgame] .DialogFooter .DialogButton:not(#se-none) {
+  flex: none;
+  width: auto;
+  min-width: 112px;
+  margin: 0;
+  font-size: 0 !important; /* !important: the theme's DialogButton type (dialogs.css); the word is drawn below */
+}
+
+[data-se-exitgame] .DialogFooter .DialogButton::after {
+  font: 600 var(--se-fs-base) var(--se-font);
+}
+
+/* Empty alt text: each button's aria-label carries its name (exit-game.js) */
+[data-se-exitgame] .DialogFooter .DialogButton:not(.Primary)::after {
+  content: 'Keep playing' / '';
+}
+
+[data-se-exitgame] .DialogFooter .DialogButton.Primary::after {
+  content: 'Exit game' / '';
+}
+
+/* !important: the theme's Primary button (client/dialogs/dialogs.css) */
+[data-se-exitgame] .DialogFooter .DialogButton.Primary:not(#se-none) {
+  order: 2;
+  background: var(--se-danger-btn-bg) !important;
+  color: var(--se-danger-btn-fg) !important;
+}
+
+[data-se-exitgame] .DialogFooter .DialogButton.Primary:not(#se-none):is(:hover, :focus-visible, .gpfocus):enabled {
+  background: var(--se-danger-btn-bg-hover) !important;
+  color: var(--se-danger-btn-fg-hover) !important;
+}

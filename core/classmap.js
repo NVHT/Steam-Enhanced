@@ -172,6 +172,7 @@
     EventRowCarousel: '_11cYvnWDwOeGdlUpfGNlYt',
     ExePath: '_1LM_TWL_05e13S1LS9wHao',
     ExitGameBtn: 'BoygotvcKo4DC4dSix8G3',
+    ExitGameDialog: '_1hk7gsJH47tbudHbj5FVT3',
     ExtraPadding: '_3XJVQHmJH6TijvWtED4ula',
     FakeContainer: '_3Vl2zkYPoCpw1q_1n28D3z',
     FavoriteButton: '_21hXW2oDD7zvNsoOaW7Yob',
