@@ -1,6 +1,7 @@
 /*
  * Annotate notification tray summary rows and notification rows with their kind's glyph and
- * day headings (client/header/notifications.css).
+ * day headings (client/header/notifications.css). Under a day's heading a row shows its time
+ * (data-se-ntf-time on Steam's time, which shows a date for older days).
  */
 ((SE) => {
   window.__seNotifications?.destroy();
@@ -9,6 +10,9 @@
   const MENU_CLS = C.NotificationsMenu;
   const PINNED_CLS = C.PinnedTemplateDesktop;
   const ITEM_CLS = C.NotificationMenuItem;
+  const HEADER_CLS = C.AllNotificationsTemplate_Header;
+  const ICON_CLS = C.AllNotificationsTemplate_Icon;
+  const TITLE_CLS = C.AllNotificationsTemplate_Title;
 
   const SUMMARY_KINDS = {
     pending_invites: 'friend',
@@ -79,6 +83,14 @@
     return target.toLocaleDateString(undefined, opts);
   };
 
+  const formatTime = (date) => date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+
+  // Steam's time in the row's head line: whatever there isn't the kind's icon or label
+  const timeOf = (item) =>
+    [...(item.querySelector(`.${HEADER_CLS}`)?.children || [])].find(
+      (el) => !el.classList.contains(ICON_CLS) && !el.classList.contains(TITLE_CLS)
+    ) || null;
+
   const annotateNotificationItems = (list) => {
     let prevDayKey = null;
     for (const item of list) {
@@ -98,6 +110,8 @@
       const startsDay = !!date && currentKey !== prevDayKey;
       SE.attr(item, 'data-se-day', startsDay ? formatDayLabel(date) : null);
       prevDayKey = currentKey;
+      const time = timeOf(item);
+      if (time) SE.attr(time, 'data-se-ntf-time', date ? formatTime(date) : null);
     }
   };
 
@@ -134,6 +148,7 @@
   window.__seNotifications = {
     destroy() {
       watcher.disconnect();
+      delete window.__seNotifications;
     },
   };
 })(window.__se);

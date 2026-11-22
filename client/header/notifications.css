@@ -304,10 +304,24 @@ html[data-se-ntf-window] body,
   object-fit: cover;
 }
 
+/*
+ * A wishlist sale's art: Steam lays a blurred copy (WishlistBlurImage) under the game's icon
+ * placed 7px in, for its bigger tile; in the 32px tile that reads as washed out with a bright
+ * edge. The blur goes and the icon fills the tile. !important: Steam's inline place and size.
+ */
+._1UgM1Pm8SbTWX7_2f-crGt ._3B8wRA4H7e_oSksYNqpSPv ._1GTWEgiW95vRIhUWfk6omo:not(#se-none) {
+  display: none !important;
+}
+
+._1UgM1Pm8SbTWX7_2f-crGt ._3B8wRA4H7e_oSksYNqpSPv ._1VRx9qVxigUC4qeM0NWNMR img[style]:not(#se-none) {
+  position: static !important;
+}
+
 /* The status ring, inside the art's footprint. */
 ._1UgM1Pm8SbTWX7_2f-crGt ._3B8wRA4H7e_oSksYNqpSPv > ._1iutOH026zK2dbpsMFDmMm:not(#se-none) {
   position: absolute;
-  left: 10px;
+  /* The art's own place: the row's left padding (a ring off by even 2px frames the picture) */
+  left: var(--se-space-2);
   top: 50%;
   width: var(--se-ntf-icon-size) !important;
   height: var(--se-ntf-icon-size) !important;
@@ -363,14 +377,14 @@ html[data-se-ntf-window] body,
 
 ._1UgM1Pm8SbTWX7_2f-crGt ._3B8wRA4H7e_oSksYNqpSPv ._3u0Sb5gUTscs0TQlKpA7WZ ._2auM-VHPU-KKomAWyuWrSV:not(#se-none) {
   position: absolute;
-  left: calc(10px + var(--se-ntf-icon-size) - 12px);
+  left: calc(var(--se-space-2) + var(--se-ntf-icon-size) - 12px);
   top: calc(50% + var(--se-ntf-icon-size) / 2 - 12px);
   z-index: var(--se-z-raised);
   box-sizing: border-box;
-  width: 16px !important;
-  height: 16px !important;
+  width: 14px !important;
+  height: 14px !important;
   margin: 0 !important;
-  padding: var(--se-space-half);
+  padding: 1px;
   border-radius: var(--se-radius-xs);
   background: var(--se-surface);
   color: var(--se-text-dim) !important;
@@ -381,6 +395,7 @@ html[data-se-ntf-window] body,
   background: var(--se-selected);
 }
 
+/* The badge's glyph: small enough to leave the art (a game's icon, an avatar) readable */
 ._1UgM1Pm8SbTWX7_2f-crGt ._3B8wRA4H7e_oSksYNqpSPv ._3u0Sb5gUTscs0TQlKpA7WZ ._2auM-VHPU-KKomAWyuWrSV > svg:not(#se-none) {
   width: 12px !important;
   height: 12px !important;
@@ -435,6 +450,20 @@ html[data-se-ntf-window] body,
   background: none !important;
   color: var(--se-accent) !important;
   font-weight: 700;
+}
+
+/*
+ * Under a day's heading the row's time, not Steam's date (notifications.js data-se-ntf-time):
+ * Steam's words go to no size, the time is drawn in their place. Same selector as the time's
+ * rule above, later. !important: that rule's font.
+ */
+._1UgM1Pm8SbTWX7_2f-crGt ._3B8wRA4H7e_oSksYNqpSPv ._3u0Sb5gUTscs0TQlKpA7WZ > [data-se-ntf-time]:not(#se-none) {
+  font-size: 0 !important;
+}
+
+._1UgM1Pm8SbTWX7_2f-crGt [data-se-ntf-time]::after {
+  content: attr(data-se-ntf-time);
+  font: 600 var(--se-fs-xs) / 16px var(--se-font);
 }
 
 /* Unread: an accent dot at the row's end, under the time. */
