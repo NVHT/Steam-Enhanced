@@ -91,6 +91,7 @@
       { css: 'shared/sale/sale-library.css' },
       { css: 'shared/sale/sale-controls.css' },
       { css: 'shared/sale/sale-browser.css' },
+      { js: 'front/hero-takeover.js', on: ['front'] },
       { css: 'front/hero.css', js: 'front/hero.js', on: ['front'] },
       { css: 'shared/rows.css', js: 'shared/rows.js', on: ['rows'] },
       { css: 'front/sections.css', js: 'front/sections.js', on: ['front'] },

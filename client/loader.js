@@ -106,7 +106,7 @@
     ]],
     // The library's right-click menus (games, collections): part of the Steam menu's patching
     // (client/header/menu/)
-    ['main', 'client/library/', ['game-menu.js', 'collection-menu.js']],
+    ['main', 'client/library/', ['game-menu.js', 'game-menu-collections.js', 'collection-menu.js']],
     // Downloads page
     ['main', 'client/downloads/', [
       'downloads.css', 'downloads-queue.css', 'downloads-buttons.css', 'downloads-library.css',
