@@ -68,15 +68,6 @@
     return n;
   };
 
-  function ago(t) {
-    if (!t) return '';
-    const s = Date.now() / 1000 - t;
-    if (s < 3600) return `${Math.max(1, Math.round(s / 60))} min ago`;
-    if (s < 86400) return `${Math.round(s / 3600)} h ago`;
-    if (s < 172800) return 'yesterday';
-    return `${Math.round(s / 86400)} days ago`;
-  }
-
   function read() {
     const a = app();
     if (!a) return null;
@@ -237,7 +228,7 @@
   const closedSections = new Set(['offline']);
 
   Object.assign(ns, {
-    COPY, STATE, ago, app, closedSections, ctx, flyoutOwnedTabs, friendsOf, groupsOf, importOf,
+    COPY, STATE, ago: SE.ago, app, closedSections, ctx, flyoutOwnedTabs, friendsOf, groupsOf, importOf,
     managerTimers, openGames, read, state, store,
   });
 })(window.__se);
