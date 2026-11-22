@@ -89,6 +89,7 @@
     let built = false;
     // Steam's tile and right side sit together in this box (marked [data-se-delcoll])
     let box = null;
+    let button = null;
 
     const sync = () => {
       if (built || !root.isConnected) return;
@@ -105,6 +106,9 @@
       side.append(text);
       nodes.push(tile, text);
       SE.attr(box, ROOT, '');
+      // CSS draws "Delete" over Steam's "Remove": one name for screen readers
+      button = box.querySelector('.DialogFooter .DialogButton.Primary');
+      SE.attr(button, 'aria-label', 'Delete');
     };
 
     // The right side can mount after the frame
@@ -117,6 +121,7 @@
         change.disconnect();
         for (const node of nodes) node.remove();
         if (box) SE.unmark(box, ROOT);
+        SE.unmark(button, 'aria-label');
       },
     };
   };

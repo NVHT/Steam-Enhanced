@@ -14,7 +14,7 @@
   window.__seSteamMenu = {
     destroy() {
       for (const cleanup of ns.cleanups) SE.run(cleanup);
-      clearInterval(live.timer);
+      live.startPoll?.disconnect();
       live.popupPoll?.disconnect();
       cancelHoverClose();
       document.removeEventListener('mousemove', onMainMouseMove);

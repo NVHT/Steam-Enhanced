@@ -263,9 +263,7 @@
     return `app:${row.apps[0]}`;
   }
 
-  function rowHTML(row, seenAt) {
-    const friend = friendOf(row.steamID);
-    const game = gameOf(row.apps[0]);
+  function rowHTML(row, seenAt, friend, game) {
     const text = sentence(row, game);
     const plain = `${friend.name} ${text.replace(/<[^>]+>/g, '')}`;
     const kinds = [...new Set([...row.types].map((t) => HIDE[t]?.[0]).filter(Boolean))].join(',');
@@ -281,6 +279,31 @@
       picture(row, game) +
       '</button></div>'
     );
+  }
+
+  /*
+   * Each row's markup, kept while what it shows is the same: a pass still reads the friend and
+   * the game, but builds markup only for rows whose inputs moved. Rows that left the list drop.
+   */
+  let rowCache = new Map(); // row.key → { inputs, html }
+  function rowsHTML(rows, seenAt) {
+    const next = new Map();
+    const html = rows.map((row) => {
+      const friend = friendOf(row.steamID);
+      const game = gameOf(row.apps[0]);
+      const inputs = [
+        row.t, row.oldest, row.apps.length, [...row.types].join(), row.ach.length, row.shots.length,
+        friend.id, friend.name, friend.state, friend.avatar, game.name, game.art[0] || '',
+        timeText(row.t), row.t > seenAt,
+      ].join('|');
+      const key = String(row.key);
+      const hit = rowCache.get(key);
+      const entry = hit?.inputs === inputs ? hit : { inputs, html: rowHTML(row, seenAt, friend, game) };
+      next.set(key, entry);
+      return entry.html;
+    });
+    rowCache = next;
+    return html.join('');
   }
 
   /* ---------- The panel ---------- */
@@ -514,7 +537,7 @@
     shown.clear();
     for (const row of rows) shown.set(String(row.key), row);
     const list = entry.el.querySelector('.se-hs-list');
-    const html = rows.map((row) => rowHTML(row, seen)).join('');
+    const html = rowsHTML(rows, seen);
     // The markup is the signature: names, art and times arriving all change it
     const sig = `${data ? (data.loading ? 'loading' : '') : 'none'}|${html}`;
     if (entry.sig !== sig) {

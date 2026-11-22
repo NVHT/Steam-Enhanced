@@ -106,10 +106,10 @@
    * The title bar's lockup (mark, "Steam Enhanced", and under it the list's total while the
    * list shows), drawn over
    * Steam's own button, which title-bar.css stretches to the lockup's width so clicks,
-   * hover and the Steam menu stay Steam's. The width (it follows the font) is written only
-   * when it changes.
+   * hover and the Steam menu stay Steam's. Its width (it follows the font) is measured with the
+   * title bar (measureTitleBar) and written only when it changes.
    */
-  function syncListBrand(topBar, stat = '') {
+  function placeListBrand(topBar, stat = '') {
     if (!topBar) {
       listBrand?.remove();
       return;
@@ -129,12 +129,13 @@
     const statNode = listBrand.querySelector('.se-list-brand-stat');
     if (statNode.textContent !== stat) statNode.textContent = stat;
     if (listBrand.parentElement !== topBar) topBar.appendChild(listBrand);
-    const width = Math.ceil(listBrand.getBoundingClientRect().width);
+  }
+
+  function writeListBrandWidth(width) {
     if (!width || width === listBrandWidth) return;
     listBrandWidth = width;
     SE.cssVar(document.body, '--se-list-brand-w', `${width}px`);
   }
-
 
   function totalLibraryGameCount() {
     if (Date.now() - countCache.at < 5000) return countCache.count;
@@ -152,6 +153,10 @@
     countCache = { at: Date.now(), count };
     return count;
   }
+
+  // The Games collection's name in the client's language: the list's view name while only games show
+  const gamesViewName = () =>
+    SE.run(() => SE.global('collectionStore').appTypeCollectionMap.get('type-games').displayName) || null;
 
   const resolveSelfPersona = () =>
     SE.global('g_FriendsUIApp')?.FriendStore?.self?.persona || SE.global('friendStore')?.self?.persona || null;
@@ -213,13 +218,8 @@
       const rawDigits =
         picker.querySelector(`.${C.AppCount}`)?.textContent.replace(/[^\d]/g, '') || '';
       let count = rawDigits ? Number(rawDigits) : null;
-      const viewLabel = (
-        picker.querySelector(`.${C.ViewName}`)?.textContent ||
-        picker.textContent ||
-        ''
-      )
-        .trim()
-        .toLowerCase();
+      // Steam's view name is its Games collection's localized name when only games are shown
+      const viewLabel = (picker.querySelector(`.${C.ViewName}`)?.firstChild?.textContent || '').trim();
 
       if (count === null && lastViewCount === null) {
         try {
@@ -228,7 +228,7 @@
         } catch {}
       }
       if (count === null) count = lastViewCount;
-      if (count === null && /^(all )?games$/.test(viewLabel)) {
+      if (count === null && viewLabel && viewLabel === gamesViewName()) {
         count = totalLibraryGameCount();
       }
       SE.attr(picker, 'data-se-count', count === null ? null : count.toLocaleString('en'));
@@ -281,8 +281,11 @@
     SE.mark(listToggleBtn, 'aria-label', hidden ? 'Show game list' : 'Hide game list');
     SE.mark(listToggleBtn, 'aria-pressed', String(hidden));
     applyListEdgeVars();
-    syncListBrand(topBar, statText);
-    syncTitleBar(topBar, isVisible);
+    placeListBrand(topBar, statText);
+    // One read for the title bar, after every write above; what it decides is written after
+    const metrics = topBar ? measureTitleBar(topBar) : null;
+    writeListBrandWidth(metrics?.brandWidth);
+    syncTitleBar(metrics, isVisible);
     // After the search's place is set: the toggles line up with its views slot
     const views = list?.querySelector(`.${C.CheckboxWithImage}`)?.parentElement?.parentElement;
     ns.search.syncViews(isVisible && !downloadsList ? views : null);
@@ -299,8 +302,24 @@
   const SEARCH_MAX = 600;
   let titleKey = '';
 
-  function syncTitleBar(topBar, listVisible) {
-    if (!topBar) {
+  /*
+   * The title bar's reads, together: the lockup, and the status buttons. Steam's button sits
+   * under the lockup at its width (title-bar.css), so it's measured only when the lockup isn't
+   * (its width would be the one about to change).
+   */
+  function measureTitleBar(topBar) {
+    const brand = listBrand?.isConnected ? listBrand.getBoundingClientRect() : null;
+    const steam = brand?.width ? null : topBar.querySelector(`.${C.RootMenuBar}`)?.getBoundingClientRect();
+    const controls = topBar.querySelector(`.${C.FocusNavigationRoot_TitleBarControls}`)?.getBoundingClientRect();
+    return {
+      brandWidth: brand?.width ? Math.ceil(brand.width) : 0,
+      left: brand?.width ? brand.right : steam?.width ? steam.right : 0,
+      right: controls?.width ? controls.left : innerWidth,
+    };
+  }
+
+  function syncTitleBar(metrics, listVisible) {
+    if (!metrics) {
       if (titleKey) {
         titleKey = '';
         SE.cssVar(document.body, '--se-title-search-x', null);
@@ -308,13 +327,8 @@
       }
       return;
     }
-    const steam = topBar.querySelector(`.${C.RootMenuBar}`)?.getBoundingClientRect();
-    const controls = topBar.querySelector(`.${C.FocusNavigationRoot_TitleBarControls}`)?.getBoundingClientRect();
-    const brand = listBrand?.isConnected ? listBrand.getBoundingClientRect() : null;
-    const start = listVisible
-      ? listRight
-      : Math.max(steam?.width ? steam.right : 0, brand?.width ? brand.right : 0);
-    const end = controls?.width ? controls.left : innerWidth;
+    const start = listVisible ? listRight : metrics.left;
+    const end = metrics.right;
     const room = end - start - 2 * TITLE_GAP;
     const width = Math.round(Math.max(SEARCH_MIN, Math.min(SEARCH_MAX, room)));
     const x = Math.round(
@@ -340,7 +354,7 @@
 
   function cleanup() {
     syncTitleBar(null, false);
-    syncListBrand(null);
+    placeListBrand(null);
     listBrandWidth = -1;
     SE.cssVar(document.body, '--se-list-brand-w', null);
     listToggleBtn?.remove();

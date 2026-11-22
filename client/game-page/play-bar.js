@@ -163,20 +163,15 @@
 
   /*
    * The main button's state Steam gives no class for: STOP (this game is running) is drawn
-   * like Install (not Green). Marked data-se-action="stop" for play-bar.css's red recipe.
+   * like Install (not Green). Marked data-se-action="stop" for play-bar.css's red recipe. The
+   * game is the button's own (its props' overview): the client's URL carries no app id.
    */
   const PLAY_CONTAINER = `.${C.PlayButtonContainer}`;
   const PLAY_GREEN = `.${C.Green}`;
 
   function placePlayAction() {
-    const id = +(location.href.match(/\/app\/(\d+)/) || [])[1] || 0;
-    const running =
-      id > 0 &&
-      [...SE.owners()].some((owner) =>
-        SE.run(() => owner.SteamUIStore?.RunningApps?.some((game) => Number(game.appid) === id))
-      );
     for (const el of document.querySelectorAll(PLAY_CONTAINER)) {
-      if (running && !el.matches(PLAY_GREEN)) mark(el, 'data-se-action', 'stop');
+      if (!el.matches(PLAY_GREEN) && SE.isRunning(SE.appOf(el)?.appid)) mark(el, 'data-se-action', 'stop');
       else unmark(el, 'data-se-action');
     }
   }

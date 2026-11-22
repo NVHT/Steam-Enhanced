@@ -126,8 +126,8 @@
 }
 
 /*
- * Delete: Steam's Remove, in the destroying red, its word swapped (Steam's text stays for screen
- * readers, at no size). !important: the theme's Primary button (client/dialogs/dialogs.css).
+ * Delete: Steam's Remove, in the destroying red, its word swapped at no size (its aria-label
+ * reads Delete). !important: the theme's Primary button (client/dialogs/dialogs.css).
  */
 [data-se-delcoll] .DialogFooter .DialogButton.Primary:not(#se-none) {
   order: 2;
@@ -142,6 +142,7 @@
 }
 
 [data-se-delcoll] .DialogFooter .DialogButton.Primary::after {
-  content: 'Delete';
+  /* Empty alt text: the button's aria-label carries the name (delete-collection.js) */
+  content: 'Delete' / '';
   font: 600 var(--se-fs-base) var(--se-font);
 }

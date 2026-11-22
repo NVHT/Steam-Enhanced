@@ -671,13 +671,17 @@
      */
     const TAKEOVER_SOURCES = '.home_page_takeover_link, #page_background_holder, .page_background_holder, .fullscreen-bg, [data-se-takeover-art]';
     const URL_IN_CSS = /url\(\s*["']?([^"')]+?)["']?\s*\)/g;
+    // An image inside the takeover counts as art only when it's a wide picture, not its logo or a
+    // badge: loaded, at least this wide, and landscape (a later probe takes one still loading)
+    const ART_MIN_W = 960;
+    const isArtImage = (img) => img.naturalWidth >= ART_MIN_W && img.naturalWidth >= 1.5 * img.naturalHeight;
 
     const paintedURLs = (node) => {
       const urls = [];
       for (const pseudo of [null, '::before', '::after']) {
         for (const [, url] of getComputedStyle(node, pseudo).backgroundImage.matchAll(URL_IN_CSS)) urls.push(url);
       }
-      if (node.matches('img')) urls.push(node.currentSrc || node.src);
+      if (node.matches('img') && isArtImage(node)) urls.push(node.currentSrc || node.src);
       if (node.matches('video')) urls.push(node.poster);
       return urls.filter((url) => /^https?:/.test(url));
     };
@@ -702,13 +706,14 @@
 
       const pageColor = () => getComputedStyle(document.querySelector('.responsive_page_template_content') ?? document.body).backgroundColor;
 
-      const probeContainers = () => {
+      // Reads only: the marks it finds are pushed to `marks` and written after every probe's reads
+      const probeContainers = (marks) => {
         const page = pageColor();
         for (let node = hero.parentElement; node; node = node.parentElement) {
-          if (hasImage(node)) dom.mark(node, TAKEOVER_BG);
+          if (hasImage(node)) marks.push([node, TAKEOVER_BG]);
           if (node === document.body || node === document.documentElement) continue; // theme-painted
           const color = getComputedStyle(node).backgroundColor;
-          if (!isClear(color) && color !== page) dom.mark(node, TAKEOVER_FILL);
+          if (!isClear(color) && color !== page) marks.push([node, TAKEOVER_FILL]);
         }
       };
 
@@ -716,7 +721,7 @@
        * Hit-testing (elementsFromPoint) skips pointer-events: none layers, which is how Steam
        * ships some takeover art, so every element's box is checked against the probe points.
        */
-      const probeLayers = () => {
+      const probeLayers = (marks) => {
         const rect = hero.getBoundingClientRect();
         if (!rect.height) return;
         // A grid just outside each side of the hero (the takeover art is barely wider than it),
@@ -731,7 +736,7 @@
           const covers = xs.some((x) => x >= box.left && x <= box.right) && ys.some((y) => y >= box.top && y <= box.bottom);
           if (!covers) continue;
           if (getComputedStyle(node).visibility === 'hidden') continue;
-          if (paintsArt(node)) dom.mark(node, TAKEOVER_ART);
+          if (paintsArt(node)) marks.push([node, TAKEOVER_ART]);
         }
       };
 
@@ -761,13 +766,19 @@
         unloaded.clear();
       });
 
+      // Every read first (a mark hides or strips a box, so marking mid-loop forced a layout per
+      // mark), then the marks
       const probe = () => {
         if (!life.alive) return;
         collectArt();
-        probeContainers();
-        probeLayers();
+        const marks = [];
+        probeContainers(marks);
+        probeLayers(marks);
+        for (const [node, name] of marks) dom.mark(node, name);
         unloadVideos();
       };
+      // Now, before mount() sets html.se-takeover: its rules strip the takeover body's background
+      collectArt();
       for (const delay of PROBE_DELAYS_MS) life.timeout(probe, delay);
       life.listen(window, 'load', probe, { once: true });
       life.add(() => {
@@ -789,12 +800,11 @@
       const hero = buildHero(slides);
       source.before(hero.element);
       const root = document.documentElement;
-      root.classList.add('se-cinema-on');
-      root.classList.toggle('se-takeover', Boolean(takeover));
       life.add(() => {
         hero.element.remove();
         root.classList.remove('se-cinema-on', 'se-takeover');
       });
+      // Before html.se-takeover: hideTakeoverArt reads the takeover's art while it still paints
       if (takeover) {
         // The takeover's own art goes in before header.jpg, the smallest candidate.
         hideTakeoverArt(hero.element, (urls) => {
@@ -805,6 +815,8 @@
           hero.refresh(takeover);
         });
       }
+      root.classList.add('se-cinema-on');
+      root.classList.toggle('se-takeover', Boolean(takeover));
       hero.start();
     };
 

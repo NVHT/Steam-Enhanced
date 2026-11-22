@@ -111,7 +111,8 @@
       .then((lang) => {
         const input = {
           ids: [{ appid: id }],
-          context: { language: lang, country_code: 'US' },
+          // GetItems answers nothing without a country and the Steam realm
+          context: { language: lang, country_code: 'US', steam_realm: 1 },
           data_request: { include_basic_info: true, include_release: true, include_reviews: true },
         };
         return fetch(

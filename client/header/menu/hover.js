@@ -94,6 +94,7 @@
     const target = event.target;
     if (!target || typeof target.closest !== 'function') return;
     const item = target.closest('[role="menuitem"], [class*="MenuItem"], .Focusable');
+    // Millennium's own row, by its name: a product name Millennium never localizes
     if (item?.textContent.trim() !== 'Millennium') return;
 
     const doc = item.ownerDocument;
@@ -148,10 +149,13 @@
     }, 200);
   }
 
-  // The pointer, as the main window last saw it, is on the button that opened `instance`
+  // The pointer, as the main window last saw it, is on the button that opened `instance`: the
+  // Steam button, a side button, or a rail menu's (Store, Library, Community, Profile), which
+  // isn't a side button and is read from the menu's own record
   function pointerOnOwnButton(instance) {
-    const saved = patched.get(instance);
-    return pointerOverButton(ns.isSteam(instance) ? live.steamButton : sideFor(saved?.button));
+    if (ns.isSteam(instance)) return pointerOverButton(live.steamButton);
+    const button = patched.get(instance)?.button;
+    return pointerOverButton(sideFor(button) || button);
   }
 
   function sideFor(button) {

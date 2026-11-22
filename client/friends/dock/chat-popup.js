@@ -32,6 +32,14 @@
   live.chatPopup = null;
   const layer = SE.layer;
   let popupFailure = false;
+  // What the chat popup's window copies from the main window: the base tokens and icons, the
+  // dock's two files (friends-dock-chat.css sizes the host and places its buttons), and every
+  // stylesheet the loader adds from the Friends list's and the chat's folders.
+  const CHAT_SHEETS = new Set([
+    'core/tokens.css', 'core/icons-nav.css', 'core/icons-ui.css', 'core/scrollbars.css',
+    'client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css',
+  ]);
+  const CHAT_FOLDERS = /^client\/friends\/(?:list|chat)\/[^/]+\.css$/;
 
   let portalTarget = null;
   let chatRenderer = null;
@@ -307,11 +315,11 @@
     const doc = node.ownerDocument;
 
     // Copied even when a `.*` patch may already reach the popup: a duplicate href is skipped.
-    // The dock's two files (friends-dock-chat.css sizes this host and places its buttons), the
-    // Friends list's and the chat's folders: kept in step with client/loader.js's paths.
-    layer.copyStyles(doc, (href) =>
-      /(?:core\/(?:tokens|icons|scrollbars)|client\/friends\/(?:friends-dock(?:-chat)?|(?:list|chat)\/[a-z-]+))\.css(?:[?#]|$)/.test(href)
-    );
+    // Picked by the loader's data-se-file, so a file added to those folders comes along.
+    layer.copyStyles(doc, (href, link) => {
+      const file = link.dataset.seFile;
+      return Boolean(file) && (CHAT_SHEETS.has(file) || CHAT_FOLDERS.test(file));
+    });
 
     window.__seChat?.attachDocument(doc);
     entry.detachChatEnhancements = () => window.__seChat?.detachDocument(doc);

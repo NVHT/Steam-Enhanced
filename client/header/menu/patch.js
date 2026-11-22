@@ -180,7 +180,8 @@
       this.CancelHideMenuTimer?.();
       setTimeout(() => {
         if (!this.visible) return;
-        if (focusInMenus(this)) this.TakeFocus?.();
+        // Unpatched meanwhile (destroy, its button gone): Steam's own cancel, as without the theme
+        if (patched.has(this) && focusInMenus(this)) this.TakeFocus?.();
         else originalCancel.apply(this, args);
       }, 0);
       return undefined;
@@ -290,14 +291,15 @@
       },
     });
 
-    // Startup retry: the Steam button can mount before its menu props exist. Capped at 40 tries
-    // (10 s), then the watcher alone keeps it patched.
+    // Startup retry, polled: the Steam button can mount before its menu props exist, and their
+    // arrival changes nothing the watcher sees. Up to 40 tries (10 s, paused while hidden), then
+    // the watcher alone keeps it patched.
     let retries = 0;
-    live.timer = setInterval(() => {
+    live.startPoll = SE.poll(() => {
       update();
       if (patched.size || ++retries >= 40) {
-        clearInterval(live.timer);
-        live.timer = null;
+        live.startPoll?.disconnect();
+        live.startPoll = null;
       }
     }, 250);
     update();

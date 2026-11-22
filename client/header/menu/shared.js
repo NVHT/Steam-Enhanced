@@ -40,7 +40,7 @@
   live.steamButton = undefined;
   live.api = undefined;
   live.observer = undefined;
-  live.timer = undefined;
+  live.startPoll = undefined;
   live.popupPoll = undefined;
 
   window.__seSteamMenu?.destroy();

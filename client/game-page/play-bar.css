@@ -90,7 +90,8 @@
  * The main button's other states, in PLAY's recipe: blue (Install, Update, Resume…: not Green,
  * not Disabled, not running) as the Home stage's INSTALL; red STOP while the game runs
  * (play-bar.js marks data-se-action); a flat grey when there's nothing to do. !important as
- * the green one: dialogs.css gives every DialogButton its own background with !important.
+ * the green one: layout.css paints Green's with !important, and Steam's PlayButton face
+ * (ButtonChild, sp.css) shifts its own gradient on hover.
  */
 :is(._1U7LKpx70kEsz3jJwAFOi-, ._39RheXihcN6H2k2muQTjkI) ._1FnJ6dPuknQFQ2RTpKTI16:not(._3cI5TXsFX3bvpR-7EBOtxq, ._1Pb6PMh_3L5p5NzuUz0Pp9, [data-se-action]) ._3ydigb6zZAjJ0JCDgHwSYA:not(._1WVYDQv_srgKP95rVG1cX-, #se-none) {
   /* PlayButtonContainer without Green, Disabled or STOP > PlayButton (not the X beside it) */
@@ -112,6 +113,21 @@
 :is(._1U7LKpx70kEsz3jJwAFOi-, ._39RheXihcN6H2k2muQTjkI) ._1FnJ6dPuknQFQ2RTpKTI16._1Pb6PMh_3L5p5NzuUz0Pp9 ._3ydigb6zZAjJ0JCDgHwSYA:not(#se-none) :is(*, svg, svg *) {
   color: var(--se-text-faint) !important;
   fill: var(--se-text-faint) !important;
+}
+
+/*
+ * Hover and focus for every face. The faces above hold over Steam's own hover gradient, so
+ * hover lifts the face as the Home stage's PLAY does; Disabled has nothing to do and keeps
+ * still.
+ */
+:is(._1U7LKpx70kEsz3jJwAFOi-, ._39RheXihcN6H2k2muQTjkI) ._1FnJ6dPuknQFQ2RTpKTI16:not(._1Pb6PMh_3L5p5NzuUz0Pp9) ._3ydigb6zZAjJ0JCDgHwSYA:not(._1WVYDQv_srgKP95rVG1cX-):is(:hover, .gpfocus) {
+  /* PlayButtonContainer not Disabled > PlayButton (not the X beside it) */
+  filter: brightness(1.08);
+}
+
+:is(._1U7LKpx70kEsz3jJwAFOi-, ._39RheXihcN6H2k2muQTjkI) ._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA:not(._1WVYDQv_srgKP95rVG1cX-):focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 /*

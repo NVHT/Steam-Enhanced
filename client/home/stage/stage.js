@@ -262,30 +262,41 @@
   const SETTLE_MS = 180;
   const HEADROOM = 8;
   let locked = [];
+  // The stage's ancestors at the last lock: the same chain, still marked, needs no new pass
+  let lockedChain = [];
 
   function lockScroll() {
-    const want = [];
+    const chain = [];
     for (let p = live.scope.parentElement; p && p !== document.body && p !== document.documentElement; p = p.parentElement) {
-      if (p.hasAttribute('data-se-hs-scroll-lock') || /(auto|scroll|overlay)/.test(getComputedStyle(p).overflowY)) {
-        want.push(p);
-      }
+      chain.push(p);
     }
+    if (
+      chain.length === lockedChain.length &&
+      chain.every((el, i) => el === lockedChain[i]) &&
+      locked.every((el) => el.hasAttribute('data-se-hs-scroll-lock'))
+    ) {
+      return;
+    }
+    // Reads (computed overflow, scroll offsets), then writes
+    const want = chain.filter(
+      (p) => p.hasAttribute('data-se-hs-scroll-lock') || /(auto|scroll|overlay)/.test(getComputedStyle(p).overflowY)
+    );
     want.push(document.body, document.documentElement);
+    const fresh = want.filter((el) => !el.hasAttribute('data-se-hs-scroll-lock'));
+    const scrolled = fresh.filter((el) => el.scrollTop);
     for (const el of locked) {
       if (!want.includes(el)) SE.unmark(el, 'data-se-hs-scroll-lock');
     }
-    for (const el of want) {
-      if (!el.hasAttribute('data-se-hs-scroll-lock')) {
-        if (el.scrollTop) el.scrollTop = 0;
-        SE.mark(el, 'data-se-hs-scroll-lock');
-      }
-    }
+    for (const el of scrolled) el.scrollTop = 0;
+    for (const el of fresh) SE.mark(el, 'data-se-hs-scroll-lock');
     locked = want;
+    lockedChain = chain;
   }
 
   function unlockScroller() {
     for (const el of locked) SE.unmark(el, 'data-se-hs-scroll-lock');
     locked = [];
+    lockedChain = [];
   }
 
   function teardown(leaving) {
