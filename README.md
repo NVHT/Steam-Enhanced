@@ -10,14 +10,14 @@
 </p>
 
 <p align="center">
-  <img alt="Millennium theme" src="https://img.shields.io/badge/Millennium-theme-7cc4ff?style=for-the-badge&labelColor=171a20">
-  <a href="https://github.com/NVHT/Steam-Enhanced/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/NVHT/Steam-Enhanced?style=for-the-badge&label=release&labelColor=171a20&color=f0c060"></a>
-  <a href="https://github.com/NVHT/Steam-Enhanced/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/NVHT/Steam-Enhanced/total?style=for-the-badge&label=downloads&labelColor=171a20&color=6fcf97"></a>
+  <a href="https://steambrew.app/theme/YS6sUrY4QsH0IS5Hexgj"><img alt="Millennium theme" src="https://img.shields.io/badge/Millennium-theme-7cc4ff?style=for-the-badge&labelColor=171a20"></a>
+  <a href="https://steambrew.app/theme/YS6sUrY4QsH0IS5Hexgj"><img alt="Version" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FNVHT%2FSteam-Enhanced%2Fmain%2Fskin.json&query=%24.version&label=version&style=for-the-badge&labelColor=171a20&color=f0c060"></a>
+  <a href="https://steambrew.app/theme/YS6sUrY4QsH0IS5Hexgj"><img alt="Downloads" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fsteambrew.app%2Fapi%2Fv2%2Fdetails%2FYS6sUrY4QsH0IS5Hexgj&query=%24.data.download&label=downloads&style=for-the-badge&labelColor=171a20&color=6fcf97"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-98a2ad?style=for-the-badge&labelColor=171a20"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/NVHT/Steam-Enhanced/releases/latest"><img alt="Download the latest release" src="https://img.shields.io/badge/Download-latest%20release-f0c060?style=for-the-badge&labelColor=171a20&logo=github&logoColor=white"></a>
+  <a href="https://steambrew.app/theme/YS6sUrY4QsH0IS5Hexgj"><img alt="Get it on Steam Homebrew" src="https://img.shields.io/badge/Get%20it%20on-Steam%20Homebrew-f0c060?style=for-the-badge&labelColor=171a20"></a>
 </p>
 
 <p align="center">
@@ -176,13 +176,9 @@ The redesign does not stop at the client. Every Store, Community and Support pag
 > [!IMPORTANT]
 > **Requirements:** the [Steam](https://store.steampowered.com/about/) desktop client and [Millennium](https://steambrew.app), with theme JavaScript enabled.
 
-1. Download the [latest release](https://github.com/NVHT/Steam-Enhanced/releases/latest).
-2. Close Steam from **Steam → Exit**.
-3. Extract the `Steam-Enhanced` folder into `<Steam>/millennium/themes/`. The result should be `themes/Steam-Enhanced/skin.json`.
-4. Start Steam, open **Millennium → Themes** and select **Steam Enhanced**.
-
-> [!TIP]
-> **Updating:** with Steam closed, delete the existing `Steam-Enhanced` folder before extracting the new release. Extracting over an older copy leaves obsolete files in place.
+1. In Steam, open **Steam → Millennium → Themes**.
+2. Click **Install a theme** and enter the theme ID: `YS6sUrY4QsH0IS5Hexgj` (also on its [Steam Homebrew page](https://steambrew.app/theme/YS6sUrY4QsH0IS5Hexgj)).
+3. Select **Steam Enhanced** in the list of themes.
 
 > [!NOTE]
 > **Responsive layout.** The layout responds to the window size rather than the display. The game list and Friends dock scale with the window; below 1400 px the dock collapses to its rail, and below 1000 px the game list is hidden. Either can still be opened manually and stays open.
