@@ -1,11 +1,12 @@
 // Brand art: records the theme's animated images from their pages in dev/brand-art/ and writes
 //   assets/header-loop.gif  Millennium's theme list (skin.json header_image) and the README's top
 //   assets/splash.gif       skin.json splash_image and the README's Startup card
+//   assets/web-loop.gif     the README's Store, Community & Support section
 //
 // The pages read the theme's own files (fonts, tokens, the mark from --se-brand-icon and
 // --se-brand-logo, the splash's entrance CSS and wireframe), so rerun this after dev/brand.py or
 // a change to the splash:
-//   node dev/brand-art.js            both
+//   node dev/brand-art.js            all
 //   node dev/brand-art.js header     one
 //
 // Each page is drawn by headless Microsoft Edge one frame at a time: every animation paused and
@@ -23,10 +24,12 @@ const THEME = path.dirname(__dirname);
 const EDGE = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 const GIFSKI = process.env.GIFSKI || 'gifski';
 const OUT = { width: 1280, height: 720, fps: 25, quality: 95 };
-// page: its file in dev/brand-art/; secs: one loop; w, h: the page's size (drawn down to OUT)
+// page: its file in dev/brand-art/; secs: one loop; w, h: the page's size (drawn down to OUT);
+// quality: gifski's, when not OUT's (a loop of many detailed pages runs large at 95)
 const ART = {
   header: { page: 'header.html', gif: 'header-loop.gif', secs: 8, w: 1280, h: 720 },
   splash: { page: 'splash.html', gif: 'splash.gif', secs: 8, w: 1920, h: 1080 },
+  web: { page: 'web.html', gif: 'web-loop.gif', secs: 8, w: 1280, h: 720, quality: 80 },
 };
 // A frame changing more than this share of the picture from the last is a bad capture (Edge now
 // and then hands one back drawn shifted); the loops' own motion stays well under it
@@ -71,7 +74,7 @@ async function record(name, art) {
     await cdp.browser('Browser.close').catch(() => {});
     const gif = path.join(THEME, 'assets', art.gif);
     const files = fs.readdirSync(frames).sort().map((f) => path.join(frames, f));
-    const run = spawnSync(GIFSKI, ['--fps', String(OUT.fps), '--width', String(OUT.width), '--quality', String(OUT.quality), '--quiet', '-o', gif, ...files], { stdio: 'inherit' });
+    const run = spawnSync(GIFSKI, ['--fps', String(OUT.fps), '--width', String(OUT.width), '--quality', String(art.quality || OUT.quality), '--quiet', '-o', gif, ...files], { stdio: 'inherit' });
     if (run.status !== 0) throw new Error('gifski failed');
     console.log(`${name}: wrote assets/${art.gif}, ${(fs.statSync(gif).size / 1e6).toFixed(2)} MB, ${files.length} frames`);
   } finally {

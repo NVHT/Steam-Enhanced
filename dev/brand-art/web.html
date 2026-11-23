@@ -1,0 +1,235 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Web</title>
+<style>
+@font-face{font-family:SNPro;src:url("../../core/fonts/SNPro-Variable.woff") format("woff");font-weight:200 900;font-style:normal;font-display:block}
+html,body{margin:0;background:#000}
+.stage{position:relative;width:1280px;height:720px;overflow:hidden;background:radial-gradient(720px 360px at 50% 100%,rgba(124,196,255,.12),transparent 70%),#171a20;font-family:SNPro,sans-serif;color:#e6e8eb}
+.eb{position:absolute;left:36px;top:30px;font:700 11px/14px SNPro,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#8994a2}
+.title{position:absolute;left:0;right:0;top:40px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.title strong{font:400 36px/1 SNPro,sans-serif;letter-spacing:-.02em;color:#fff}
+.title span{font:500 16px/1.4 SNPro,sans-serif;color:#b8c0c8}
+.fade{position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(180deg,transparent,rgba(23,26,32,.94));pointer-events:none;z-index:20}
+/* A page window: drawn at 1000 x 720, placed and scaled per frame (window.__frame) */
+.pw{position:absolute;left:0;top:0;width:1000px;height:720px;overflow:hidden;border-radius:22px;background:#15181d;transform-origin:0 0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 50px 90px -24px rgba(0,0,0,.95),0 0 0 8px #171a20}
+.pw .dim{position:absolute;inset:0;background:#171a20;pointer-events:none;z-index:9}
+/* Browser chrome and the store's nav bar */
+.addr{height:46px;display:flex;align-items:center;gap:12px;padding:0 14px;background:#1b1f25}
+.ar{width:16px;height:16px;color:#a2acb7;flex:none}
+.lock{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;background:rgba(108,194,74,.18);color:#6cc24a;flex:none}
+.url{display:flex;flex-direction:column;gap:2px;font:600 13px/1.2 SNPro,sans-serif;color:#fff}
+.url small{font-weight:500;font-size:11px;color:#8994a2}
+.tool{margin-left:auto;display:flex;gap:10px}.tool b{width:16px;height:16px;border-radius:4px;box-shadow:inset 0 0 0 1.5px #a2acb7}
+.nav{margin:6px 12px 0;height:42px;display:flex;align-items:center;gap:18px;padding:0 14px;border-radius:11px;background:#1d2128;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);font:500 12px/1 SNPro,sans-serif;color:#b8c0c8;white-space:nowrap}
+.nav>span{display:flex;align-items:center;gap:7px}
+.nav>span::before{content:"";width:12px;height:12px;border-radius:3px;box-shadow:inset 0 0 0 1.5px #a2acb7;background:rgba(162,172,183,.2)}
+.srch{flex:1;display:flex;align-items:center;gap:8px;height:30px;padding:0 10px;border-radius:8px;background:#15181d;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);font:500 12px/1 SNPro,sans-serif;color:#8994a2;white-space:nowrap}
+.srch.focus{box-shadow:inset 0 0 0 1px #7cc4ff,0 0 0 3px rgba(124,196,255,.22);color:#fff}
+.ico{position:relative;width:18px;height:18px;border-radius:5px;box-shadow:inset 0 0 0 1.5px #a2acb7;flex:none}
+.ico i{position:absolute;right:-10px;top:-9px;padding:2px 4px;border-radius:7px;background:#4cb4ff;font:700 9px/1 SNPro,sans-serif;font-style:normal;color:#0b1a28}
+/* Shared parts: card, chip, badge, button, dropdown, field */
+.card{position:relative;border-radius:14px;background:#1d2128;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.row{display:flex;align-items:center;gap:6px}
+.col{display:flex;flex-direction:column;gap:6px}
+.chip{display:flex;align-items:center;height:26px;padding:0 10px;border-radius:7px;background:#262c35;font:600 11px/1 SNPro,sans-serif;color:#e6e8eb;white-space:nowrap}
+.chip.on{background:#33404f;box-shadow:inset 0 0 0 1px rgba(124,196,255,.6);color:#fff}
+.chip.ghost{background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.chip.blue{background:rgba(76,180,255,.14);color:#7cc4ff;box-shadow:inset 0 0 0 1px rgba(76,180,255,.4)}
+.bdg{display:flex;align-items:center;height:24px;padding:0 10px;border-radius:7px;background:rgba(21,24,29,.75);font:600 11px/1 SNPro,sans-serif;white-space:nowrap}
+.b-blue{color:#7cc4ff;box-shadow:inset 0 0 0 1px rgba(124,196,255,.5)}.b-green{color:#b6e04a;box-shadow:inset 0 0 0 1px rgba(164,208,7,.5)}
+.b-gold{color:#f0c060;box-shadow:inset 0 0 0 1px rgba(240,192,96,.5)}.b-orange{color:#f0a070;box-shadow:inset 0 0 0 1px rgba(240,140,90,.5)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:34px;padding:0 16px;border-radius:9px;background:rgba(38,44,53,.92);font:700 13px/1 SNPro,sans-serif;color:#fff;white-space:nowrap}
+.btn.pri{background:#7cc4ff;color:#0b1a28}
+.btn.out{background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}
+.drop{display:flex;align-items:center;gap:10px;height:34px;padding:0 12px;border-radius:9px;background:#15181d;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);font:600 13px/1 SNPro,sans-serif;color:#fff}
+.drop::after,.btn.sq::after{content:"";width:6px;height:6px;margin:-3px 0 0 auto;border:solid #a2acb7;border-width:0 2px 2px 0;rotate:45deg}
+.btn.sq{width:34px;padding:0}.btn.sq::after{margin:-3px 0 0}
+.menu{position:absolute;z-index:5;padding:6px;border-radius:12px;background:rgba(31,36,43,.98);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 20px 40px -14px rgba(0,0,0,.95);font:500 12px/1 SNPro,sans-serif;color:#c8ced6;transform-origin:50% 0}
+.menu span{display:flex;align-items:center;height:30px;padding:0 10px;border-radius:7px}.menu span.on{background:#33404f;color:#fff}
+.k{font:700 10px/1 SNPro,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#8994a2}
+.h{font:800 16px/1.1 SNPro,sans-serif;color:#fff}
+.t{font:700 13px/1.2 SNPro,sans-serif;color:#fff}
+.m{font:500 11px/1.3 SNPro,sans-serif;color:#8994a2}
+.p{margin:0;font:500 12px/1.6 SNPro,sans-serif;color:#c8ced6}
+.sale{display:flex;align-items:center;height:22px;padding:0 6px;border-radius:6px;background:#a4d007;font:800 12px/1 SNPro,sans-serif;color:#0f1a00}
+.was{font:500 10px/1 SNPro,sans-serif;color:#8994a2;text-decoration:line-through}
+.price{font:800 14px/1 SNPro,sans-serif;color:#fff}
+.face{flex:none;border-radius:23%;background:linear-gradient(160deg,#50565f,#2a2e35)}
+/* Placeholder art */
+.a1{background:linear-gradient(160deg,#5a7a92,#22303e)}.a2{background:linear-gradient(160deg,#8a4a32,#2a1a1c)}.a3{background:linear-gradient(160deg,#7a6a9a,#2a3346)}
+.a4{background:linear-gradient(160deg,#5a7a4a,#1e2620)}.a5{background:linear-gradient(160deg,#a08a50,#2a2418)}.a6{background:linear-gradient(160deg,#4a5a8a,#1a1e30)}
+.a7{background:linear-gradient(160deg,#8a4a7a,#26162a)}
+.vista{background:radial-gradient(320px 220px at 74% 30%,rgba(238,240,242,.26),transparent 70%),linear-gradient(170deg,#4d6a80 0%,#2c4258 40%,#1c2633 70%,#15181d 100%)}
+.hill{position:absolute;left:0;right:0;bottom:0;height:60%;background:#15181d;opacity:.55;clip-path:polygon(0 46%,10% 30%,22% 42%,34% 18%,46% 36%,58% 24%,70% 44%,82% 22%,92% 36%,100% 28%,100% 100%,0 100%)}
+.sink{position:absolute;left:0;right:0;bottom:0;height:45%;background:linear-gradient(180deg,transparent,#15181d 85%)}
+.thumb{width:13px;height:13px;flex:none}
+</style></head><body><div class="stage">
+<div class="eb">Store, Community &amp; Support</div>
+<div class="title"><strong>One product, every page</strong><span>The client's cards, dropdowns, type and search, on the web too.</span></div>
+
+<!-- Store: a game page -->
+<div class="pw">
+ <div class="addr"><svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg><svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg><span class="lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span class="url">store.steampowered.com<small>/app/0000/Ashen_Vale/</small></span><span class="tool"><b></b><b></b><b></b></span></div>
+ <div class="nav"><span>Browse</span><span>Recommendations</span><span>Categories</span><span>Hardware</span><span>Ways to Play</span><span>Special Sections</span><span class="srch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a2acb7" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>Search the store</span><b class="ico"><i>300</i></b><b class="ico" style="margin-left:8px"><i>2</i></b></div>
+ <div class="vista" style="position:relative;height:440px;margin-top:8px"><div class="hill"></div><div class="sink"></div>
+  <div class="row" style="position:absolute;left:16px;top:52px;gap:8px"><span class="chip" style="background:rgba(29,33,40,.9)">All Games</span><span class="chip" style="background:rgba(29,33,40,.9)">RPG Games</span><span class="chip" style="background:rgba(29,33,40,.9)">Ashen Vale: The Long Winter</span></div>
+  <span class="chip" style="position:absolute;right:16px;top:14px;background:rgba(29,33,40,.9)">Community Hub</span>
+  <div class="col" style="position:absolute;left:0;right:0;bottom:22px;align-items:center;gap:10px">
+   <span class="k" style="color:#f0c060;letter-spacing:.28em">Ember Hollow · May 18, 2025</span>
+   <span style="font:900 72px/.9 SNPro,sans-serif;color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.5)">ASHEN VALE</span>
+   <span style="font:900 26px/1 SNPro,sans-serif;letter-spacing:.3em;color:#f0c060;margin-bottom:6px">THE LONG WINTER</span>
+   <span class="row"><span class="chip" style="background:rgba(21,24,29,.85)">Open World</span><span class="chip" style="background:rgba(21,24,29,.85)">RPG</span><span class="chip" style="background:rgba(21,24,29,.85)">Story Rich</span></span>
+   <span class="row"><span class="bdg b-blue">Very Positive · 182,406</span><span class="bdg b-green">Metacritic 91</span><span class="bdg b-green">Deck Verified</span><span class="bdg b-gold">Achievements · 64</span><span class="bdg b-gold">Points Shop</span><span class="bdg b-orange">PEGI 16</span></span>
+   <span class="row" style="gap:8px;margin-top:6px"><span class="btn pri" id="play">Play Now</span><span class="btn">Follow</span><span class="btn">Ignore</span><span class="btn sq"></span><span class="btn out">View Your Queue</span></span>
+  </div></div>
+ <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:24px;padding:18px 22px">
+  <div class="col" style="gap:12px"><span class="h">Overview</span><p class="p">A frozen valley, a missing sister and a winter that will not end. Hunt through an open world that remembers every choice you make.</p></div>
+  <div class="col" style="gap:12px"><span class="h">Screenshots <span class="m">20</span></span><span style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"><b class="a1" style="height:70px;border-radius:8px"></b><b class="a2" style="height:70px;border-radius:8px"></b><b class="a3" style="height:70px;border-radius:8px"></b></span></div>
+ </div><span class="dim"></span></div>
+
+<!-- Wishlist -->
+<div class="pw">
+ <div class="addr"><svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg><svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg><span class="lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span class="url">store.steampowered.com<small>/wishlist/?sort=discount</small></span><span class="tool"><b></b><b></b><b></b></span></div>
+ <div class="nav"><span>Browse</span><span>Recommendations</span><span>Categories</span><span>Hardware</span><span>Ways to Play</span><span>Special Sections</span><span class="srch"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a2acb7" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>Search the store</span><b class="ico"><i>300</i></b><b class="ico" style="margin-left:8px"><i>2</i></b></div>
+ <div class="row" style="padding:20px 20px 16px;gap:16px;align-items:flex-start">
+  <b class="vista" style="width:62px;height:62px;border-radius:10px;flex:none"></b>
+  <span class="col" style="gap:8px"><span class="k">Wishlist</span><span style="font:900 32px/1 SNPro,sans-serif;color:#fff">NVHT's wishlist</span><span class="row" style="gap:8px"><span class="chip ghost">Share</span><span class="m">Ranked by you. Drag a game, or type a number, to move it.</span></span></span>
+  <span class="row" style="margin-left:auto;gap:10px"><span class="card col" style="width:100px;padding:12px;gap:8px"><span class="k">Items</span><span style="font:800 22px/1 SNPro,sans-serif">300</span></span><span class="card col" style="width:100px;padding:12px;gap:8px"><span class="k">On sale</span><span style="font:800 22px/1 SNPro,sans-serif;color:#a4d007">86</span></span><span class="card col" style="width:110px;padding:12px;gap:8px"><span class="k">Coming soon</span><span style="font:800 22px/1 SNPro,sans-serif">56</span></span></span>
+ </div>
+ <div class="row" style="padding:0 20px;gap:16px;align-items:flex-start">
+  <div class="card col" style="flex:none;width:220px;padding:14px;gap:12px">
+   <span class="srch" style="flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a2acb7" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>Search by name, tag…</span>
+   <span class="h" style="font-size:14px">Display</span>
+   <span class="row" style="padding:3px;border-radius:9px;background:#15181d;gap:2px"><span class="chip" style="flex:1;justify-content:center;background:none;color:#a2acb7">Compact</span><span class="chip on" style="flex:1;justify-content:center;box-shadow:none">Expanded</span></span>
+   <span class="k">Sort by</span>
+   <span style="position:relative;display:block"><span class="drop">Discount</span><span class="menu" id="sortMenu" style="left:0;right:0;top:40px;display:block"><span>Your rank</span><span class="on">Discount</span><span>Price</span><span>Release date</span><span>Date added</span></span></span>
+   <span class="h" style="font-size:14px;margin-top:4px">Filters</span>
+   <span class="k">Discount</span>
+   <span class="row"><span class="chip on">All</span><span class="chip">On sale</span><span class="chip">50%+</span><span class="chip">75%+</span></span>
+   <span class="k">Tags</span>
+   <span class="row" style="flex-wrap:wrap"><span class="chip ghost">RPG 131</span><span class="chip ghost">Action 120</span><span class="chip ghost">Adventure 81</span></span>
+  </div>
+  <div class="col" style="flex:1;gap:10px">
+   <div class="card row" style="padding:12px;gap:14px"><span class="chip" style="width:40px;justify-content:center;font-size:13px">52</span><b class="a2" style="width:150px;height:70px;border-radius:9px;flex:none"></b><span class="col" style="gap:7px"><span class="t">Starfall Outlaws</span><span class="row" style="gap:10px"><span class="m" style="color:#4cb4ff;font-weight:700">Mostly Positive</span><span class="m">Nov 21, 2024</span></span><span class="row"><span class="chip blue">Demo Available</span><span class="chip">Open World</span><span class="chip">Action</span></span></span><span class="row" style="margin-left:auto;gap:8px"><span class="sale">−80%</span><span class="col" style="gap:3px;align-items:flex-end"><span class="was">$69.99</span><span class="price">$13.99</span></span><span class="btn pri">Add to Cart</span></span></div>
+   <div class="card row" style="padding:12px;gap:14px"><span class="chip" style="width:40px;justify-content:center;font-size:13px">288</span><b class="a3" style="width:150px;height:70px;border-radius:9px;flex:none"></b><span class="col" style="gap:7px"><span class="t">Neon Requiem 2</span><span class="row" style="gap:10px"><span class="m" style="color:#4cb4ff;font-weight:700">Mostly Positive</span><span class="m">Aug 25, 2022</span></span><span class="row"><span class="chip">RPG</span><span class="chip">Cyberpunk</span><span class="chip">Turn-Based</span></span></span><span class="row" style="margin-left:auto;gap:8px"><span class="sale">−80%</span><span class="col" style="gap:3px;align-items:flex-end"><span class="was">$59.99</span><span class="price">$11.99</span></span><span class="btn pri">Add to Cart</span></span></div>
+   <div class="card row" style="padding:12px;gap:14px"><span class="chip" style="width:40px;justify-content:center;font-size:13px">27</span><b class="a5" style="width:150px;height:70px;border-radius:9px;flex:none"></b><span class="col" style="gap:7px"><span class="t">Harvest Moonfall</span><span class="row" style="gap:10px"><span class="m" style="color:#4cb4ff;font-weight:700">Very Positive</span><span class="m">Sep 5, 2023</span></span><span class="row"><span class="chip">Farming Sim</span><span class="chip">Romance</span><span class="chip">Fantasy</span></span></span><span class="row" style="margin-left:auto;gap:8px"><span class="sale">−78%</span><span class="col" style="gap:3px;align-items:flex-end"><span class="was">$39.99</span><span class="price">$8.79</span></span><span class="btn pri">Add to Cart</span></span></div>
+   <div class="card row" style="padding:12px;gap:14px"><span class="chip" style="width:40px;justify-content:center;font-size:13px">13</span><b class="a7" style="width:150px;height:70px;border-radius:9px;flex:none"></b><span class="col" style="gap:7px"><span class="t">Blade Circuit</span><span class="row" style="gap:10px"><span class="m" style="color:#f0c060;font-weight:700">Mixed</span><span class="m">Jul 9, 2020</span></span><span class="row"><span class="chip">Action</span><span class="chip">Anime</span></span></span><span class="row" style="margin-left:auto;gap:8px"><span class="sale">−75%</span><span class="col" style="gap:3px;align-items:flex-end"><span class="was">$59.99</span><span class="price">$14.99</span></span><span class="btn pri">Add to Cart</span></span></div>
+  </div>
+ </div><span class="dim"></span></div>
+
+<!-- Community: a game's hub -->
+<div class="pw">
+ <div class="addr"><svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg><svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg><span class="lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span class="url">steamcommunity.com<small>/app/0000</small></span><span class="tool"><b></b><b></b><b></b></span></div>
+ <div class="card vista" style="margin:14px 16px 0;height:230px;overflow:hidden"><div class="hill" style="opacity:.4"></div>
+  <span class="btn pri" style="position:absolute;right:16px;top:16px">Store Page</span>
+  <div class="col" style="position:absolute;left:22px;top:46px;gap:14px">
+   <span style="font:900 40px/1 SNPro,sans-serif;color:#fff;text-shadow:0 4px 20px rgba(0,0,0,.5)">Ashen Vale: The Long Winter</span>
+   <span class="row" style="gap:8px"><span class="chip" style="gap:6px;background:rgba(21,24,29,.85)"><b style="width:8px;height:8px;border-radius:50%;background:#6cc24a"></b>15,644 In-Game</span><span class="chip" style="background:rgba(21,24,29,.85)">5,713 in Group Chat</span><span class="chip" style="background:rgba(21,24,29,.85)">Follow</span><span class="chip" style="background:rgba(21,24,29,.85)">View Stats</span></span>
+   <span class="row" style="padding:4px;border-radius:11px;background:rgba(21,24,29,.85);gap:2px"><span class="chip on" style="box-shadow:none">All</span><span class="chip" style="background:none">Discussions</span><span class="chip" style="background:none">Screenshots</span><span class="chip" style="background:none">Artwork</span><span class="chip" style="background:none">Broadcasts</span><span class="chip" style="background:none">Workshop</span><span class="chip" style="background:none">News</span><span class="chip" style="background:none">Guides</span><span class="chip" style="background:none">Reviews</span></span>
+  </div></div>
+ <div style="display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:12px;padding:14px 16px">
+  <div class="col" style="gap:12px">
+   <div class="card col" style="padding:16px;gap:10px"><span class="k" style="color:#7cc4ff">Oct 8</span><span class="h">Patch 1.2 is live!</span><p class="p">Every step on the road north is a chance to improve. Patch 1.2 is out now, with smoother frame pacing and a fix for saves made during the blizzard.</p></div>
+   <div class="row" style="gap:12px"><div class="card col" style="flex:1;padding:8px;gap:8px"><b class="a4" style="height:110px;border-radius:9px"></b><span class="row" style="padding:0 4px 4px"><span class="chip">Award</span><span class="m" style="margin-left:auto">63</span></span></div><div class="card col" style="flex:1;padding:8px;gap:8px"><b class="a2" style="height:110px;border-radius:9px"></b><span class="row" style="padding:0 4px 4px"><span class="chip">Award</span><span class="m" style="margin-left:auto">90</span></span></div></div>
+  </div>
+  <div class="col" style="gap:12px">
+   <div class="card col" style="padding:14px;gap:10px"><span class="t">Will the first two games get a remaster too?</span><span class="row" style="gap:8px"><b class="face" style="width:26px;height:26px"></b><span class="m">1 hour ago</span></span></div>
+   <div class="card col" style="padding:14px;gap:10px"><span class="row" style="gap:10px;padding:10px;border-radius:10px;background:#262c35"><svg class="thumb" viewBox="0 0 24 24" fill="none" stroke="#7cc4ff" stroke-width="2" stroke-linejoin="round"><path d="M7 11v9H4v-9zM7 11l4-7a2 2 0 0 1 3 2l-1 4h6a2 2 0 0 1 2 2l-2 7a2 2 0 0 1-2 1H7"/></svg><span class="col" style="gap:3px"><span class="t" style="color:#7cc4ff">Recommended</span><span class="m">147.6 hrs on record</span></span></span><p class="p">Came for the hunts, stayed for the snowed-in villages. 10/10.</p></div>
+  </div>
+  <div class="col" style="gap:12px">
+   <div class="card col" style="padding:8px;gap:8px"><span class="chip" style="position:absolute;left:16px;top:16px;background:rgba(21,24,29,.85)">ARTWORK</span><b class="a6" style="height:190px;border-radius:9px"></b><span class="t" style="padding:2px 6px">Northern lights</span><span class="row" style="padding:0 6px 6px"><span class="chip">Award</span><span class="m" style="margin-left:auto">202</span></span></div>
+  </div>
+ </div><span class="dim"></span></div>
+
+<!-- Profile -->
+<div class="pw">
+ <div class="addr"><svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg><svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg><span class="lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span class="url">steamcommunity.com<small>/id/nvht/</small></span><span class="tool"><b></b><b></b><b></b></span></div>
+ <div class="card" style="margin:14px 16px 0;overflow:hidden">
+  <div style="position:relative;height:170px;background:radial-gradient(300px 140px at 70% 30%,rgba(238,240,242,.3),transparent 70%),linear-gradient(180deg,#6a7a88,#3a4652 60%,#1d2128)"><div class="hill" style="background:#2a333d;opacity:.6"></div><div class="sink" style="background:linear-gradient(180deg,transparent,#1d2128)"></div></div>
+  <div class="row" style="padding:0 22px 18px;gap:18px;align-items:flex-end;margin-top:-56px;position:relative">
+   <span style="position:relative;flex:none"><b class="a1" style="display:block;width:104px;height:104px;border-radius:16px;box-shadow:0 0 0 3px #1d2128,0 0 0 6px #4cb4ff"></b><span style="position:absolute;right:-8px;bottom:-6px;padding:4px 6px;border-radius:7px;background:#15181d;box-shadow:inset 0 0 0 1.5px #4cb4ff;font:800 11px/1 SNPro,sans-serif">157</span></span>
+   <span class="col" style="gap:8px;padding-bottom:6px"><span style="font:900 40px/1 SNPro,sans-serif;color:#fff">NVHT</span><span class="row" style="gap:6px"><b style="width:7px;height:7px;border-radius:50%;background:#4cb4ff"></b><span class="m" style="color:#4cb4ff;font-weight:700">Currently Online</span></span></span>
+   <span class="btn out" style="margin-left:auto;margin-bottom:8px">Edit Profile</span>
+  </div>
+  <div class="row" style="padding:14px 22px 18px;gap:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)">
+   <span class="row" style="gap:12px"><b style="width:42px;height:42px;border-radius:10px;background:#33404f;box-shadow:inset 0 0 0 2px #7cc4ff"></b><span class="col" style="gap:4px"><span class="t" style="font-size:15px">Years of Service</span><span class="m">Featured badge · 650 XP</span></span></span>
+   <span class="row" style="margin-left:auto;gap:22px"><span class="col" style="gap:4px"><span class="price">23</span><span class="m">Awards</span></span><span class="col" style="gap:4px"><span class="price">538</span><span class="m">Badges</span></span><span class="col" style="gap:4px"><span class="price">3,891</span><span class="m">Games</span></span><span class="col" style="gap:4px"><span class="price">129</span><span class="m">Groups</span></span><span class="col" style="gap:4px"><span class="price">901</span><span class="m">Friends</span></span></span>
+  </div>
+ </div>
+ <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:12px;padding:12px 16px">
+  <div class="card col" style="padding:18px;gap:12px"><span class="h">Welcome</span><p class="p">Gaming · Architecture · Technology · Photography<br>Built for good graphics, good stories, and unnecessarily powerful hardware.</p></div>
+  <div class="card col" style="padding:16px;gap:12px"><span class="row"><span class="h">Badges</span><span class="chip" style="margin-left:auto;height:22px">538</span></span><span class="row" style="gap:8px"><b class="a4" style="width:44px;height:44px;border-radius:10px"></b><b class="a7" style="width:44px;height:44px;border-radius:10px"></b><b class="a6" style="width:44px;height:44px;border-radius:10px"></b><b class="a3" style="width:44px;height:44px;border-radius:10px"></b></span></div>
+  <div class="card row" style="padding:16px;gap:16px"><b class="a7" style="width:72px;height:72px;border-radius:14px"></b><span class="col" style="gap:10px"><span class="k">Favorite group</span><span class="h" style="font-size:22px">Northern Lights Club</span><span class="row" style="gap:8px"><span class="card col" style="padding:8px 12px;gap:4px"><span class="price">18,312</span><span class="k">Members</span></span><span class="card col" style="padding:8px 12px;gap:4px"><span class="price" style="color:#a4d007">2,855</span><span class="k">In-game</span></span><span class="card col" style="padding:8px 12px;gap:4px"><span class="price" style="color:#7cc4ff">7,022</span><span class="k">Online</span></span></span></span></div>
+  <div class="card col" style="padding:16px;gap:12px"><span class="row"><span class="h">Friends</span><span class="chip" style="margin-left:auto;height:22px">901</span></span><span class="row" style="gap:10px"><b class="face" style="width:32px;height:32px;box-shadow:0 0 0 2px #1d2128,0 0 0 3.5px #6cc24a"></b><span class="col" style="gap:3px"><span class="t">Zara</span><span class="m" style="color:#6cc24a">In-game</span></span></span><span class="row" style="gap:10px"><b class="face" style="width:32px;height:32px;box-shadow:0 0 0 2px #1d2128,0 0 0 3.5px #4cb4ff"></b><span class="col" style="gap:3px"><span class="t">Kestrel</span><span class="m" style="color:#4cb4ff">Online</span></span></span></div>
+ </div><span class="dim"></span></div>
+
+<!-- Support -->
+<div class="pw">
+ <div class="addr"><svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg><svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg><span class="lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><span class="url">help.steampowered.com<small>/en/</small></span><span class="tool"><b></b><b></b><b></b></span></div>
+ <div class="col" style="padding:36px 110px 0;gap:14px">
+  <span style="font:900 40px/1 SNPro,sans-serif;color:#fff">Steam Support</span>
+  <span class="h" style="font-size:17px">What do you need help with?</span>
+  <span class="srch" id="helpSearch" style="flex:none;height:40px;font-size:14px;gap:10px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#a2acb7" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg><span id="helpQuery">Search issues, features, and games</span></span>
+  <span class="k" style="margin-top:6px">Recent products</span>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+   <div class="card row" style="padding:9px;gap:12px"><b class="a2" style="width:34px;height:34px;border-radius:8px"></b><span class="t">Ashen Vale: The Long Winter</span></div>
+   <div class="card row" style="padding:9px;gap:12px"><b class="a6" style="width:34px;height:34px;border-radius:8px"></b><span class="t">Starfall Outlaws</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
+   <div class="card row" style="padding:12px;gap:14px"><b style="width:36px;height:36px;border-radius:10px;background:#262c35;box-shadow:inset 0 0 0 1.5px #a2acb7"></b><span class="t" style="font-size:15px">Games, Software, etc.</span></div>
+   <div class="card row" style="padding:12px;gap:14px"><b style="width:36px;height:36px;border-radius:10px;background:#262c35;box-shadow:inset 0 0 0 1.5px #a2acb7"></b><span class="t" style="font-size:15px">Purchases</span></div>
+   <div class="card row" style="padding:12px;gap:14px"><b style="width:36px;height:36px;border-radius:10px;background:#262c35;box-shadow:inset 0 0 0 1.5px #a2acb7"></b><span class="t" style="font-size:15px">My Account</span></div>
+   <div class="card row" style="padding:12px;gap:14px"><b style="width:36px;height:36px;border-radius:10px;background:#262c35;box-shadow:inset 0 0 0 1.5px #a2acb7"></b><span class="t" style="font-size:15px">Trading, Gifting, Market and Points</span></div>
+   <div class="card row" style="padding:12px;gap:14px"><b style="width:36px;height:36px;border-radius:10px;background:#262c35;box-shadow:inset 0 0 0 1.5px #a2acb7"></b><span class="t" style="font-size:15px">Steam Client</span></div>
+   <div class="card row" style="padding:12px;gap:14px"><b style="width:36px;height:36px;border-radius:10px;background:#262c35;box-shadow:inset 0 0 0 1.5px #a2acb7"></b><span class="t" style="font-size:15px">Steam Community</span></div>
+  </div>
+ </div><span class="dim"></span></div>
+
+<div class="fade"></div>
+</div><script>
+// The web's 8 s loop, driven per frame by dev/brand-art.js (window.__frame): Store, Wishlist,
+// Community, Profile and Support pass as a carousel, the page in the middle large and lit, its
+// neighbours smaller and dimmed. Each page holds 1.6 s, then the row slides one place in 0.5 s;
+// after five steps it is back where it started, so the loop is seamless. On the way the wishlist's
+// sort dropdown opens and Support's search field takes a query.
+addEventListener('DOMContentLoaded', () => {
+  const pages = [...document.querySelectorAll('.pw')];
+  const n = pages.length, HOLD = 8 / n, MOVE = 0.5;
+  const dims = pages.map((p) => p.querySelector('.dim'));
+  const sortMenu = document.getElementById('sortMenu');
+  const helpSearch = document.getElementById('helpSearch');
+  const helpQuery = document.getElementById('helpQuery');
+  const QUERY = 'refund a game';
+  const ease = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
+  const span = (t, a, b) => ease((t - a) / (b - a));
+  // Where a page sits for its distance d from the middle (any real number)
+  const place = (d) => {
+    const a = Math.abs(d), near = Math.min(a, 1), far = Math.max(0, Math.min(a - 1, 1));
+    const s = 0.64 - 0.24 * near - 0.08 * far;
+    const cx = 640 + Math.sign(d) * (440 * near + 260 * far);
+    const top = 150 + 70 * near + 30 * far;
+    return { s, x: cx - 500 * s, y: top, op: 1 - far, dim: 0.5 * near };
+  };
+  window.__frame = (t) => {
+    // The row's position: whole steps while holding, sliding in each slot's last MOVE seconds
+    const k = Math.floor(t / HOLD), pos = k + span(t - k * HOLD, HOLD - MOVE, HOLD);
+    // A slow float, one rise and settle per loop
+    const lift = -5 * (1 - Math.cos((t / 8) * 2 * Math.PI)) / 2;
+    pages.forEach((p, i) => {
+      let d = ((i - pos) % n + n) % n;
+      if (d > n / 2) d -= n;
+      const q = place(d);
+      p.style.transform = `translate(${q.x.toFixed(2)}px, ${(q.y + lift).toFixed(2)}px) scale(${q.s.toFixed(4)})`;
+      p.style.opacity = q.op.toFixed(3);
+      p.style.zIndex = String(10 - Math.round(Math.abs(d) * 2));
+      dims[i].style.opacity = q.dim.toFixed(3);
+    });
+    // Wishlist (slot 1): the sort dropdown opens, then closes before the row moves on
+    const m = span(t, HOLD + 0.2, HOLD + 0.45) * (1 - span(t, 2 * HOLD - 0.75, 2 * HOLD - 0.55));
+    sortMenu.style.opacity = m.toFixed(3);
+    sortMenu.style.transform = `scale(${(0.96 + 0.04 * m).toFixed(3)})`;
+    // Support (slot 4): the search field takes focus and a query types in, cleared as the row moves on
+    const s4 = 4 * HOLD, on = t > s4 + 0.15 && t < 8 - MOVE;
+    helpSearch.classList.toggle('focus', on);
+    helpQuery.textContent = on ? QUERY.slice(0, Math.round(QUERY.length * span(t, s4 + 0.2, s4 + 1.0))) + '|' : 'Search issues, features, and games';
+  };
+});
+</script></body></html>
