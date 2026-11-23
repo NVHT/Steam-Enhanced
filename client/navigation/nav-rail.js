@@ -158,19 +158,6 @@
     }
   }
 
-  function openExternalURL(url) {
-    const manager = browserManager();
-    try {
-      if (manager && typeof manager.ShowURL === 'function') {
-        manager.ShowURL(url);
-        return;
-      }
-    } catch {}
-    try {
-      window.SteamClient.URL.ExecuteSteamURL(`steam://openurl/${url}`);
-    } catch {}
-  }
-
   function navigateToLibraryRoute(route) {
     if (goLibrary(route)) return true;
     try {
@@ -181,7 +168,7 @@
 
   function activateTarget(target) {
     if (target.route) navigateToLibraryRoute(target.route);
-    else if (target.url) openExternalURL(target.url);
+    else if (target.url) SE.openPage(target.url); // client/shared/open-page.js
   }
 
   function findRetainedPopupMenu(fiber) {
@@ -230,18 +217,6 @@
     return token.replace(/^#(?:Menu_)?/, '').replace(/([a-z])([A-Z])/g, '$1 $2');
   }
 
-  /*
-   * A Steam URL, opened as Steam's menus open one: through its navigator's SteamWeb (steam://
-   * links such as steam://url/RedeemWalletVoucher, and Store or Community pages, in the client's
-   * browser). Without the navigator: steam:// links through the client, pages in the browser.
-   */
-  function openSteamURL(url) {
-    const navigator = SE.run(() => SE.global('tempNavStore')?.GetNavigator());
-    if (typeof navigator?.SteamWeb === 'function' && SE.run(() => (navigator.SteamWeb(url), true))) return;
-    if (url.startsWith('steam://')) SE.run(() => window.SteamClient.URL.ExecuteSteamURL(url));
-    else openExternalURL(url);
-  }
-
   /* The props Steam renders a page icon's SuperNav menu from (its menuItems among them) */
   function superNavProps(node) {
     for (let fiber = SE.fiber(node), depth = 0; fiber && depth < 15; fiber = fiber.return, depth++) {
@@ -281,7 +256,7 @@
   function itemAction(item) {
     if (!item || item.visible === false) return null;
     if (item.route) return () => navigateToLibraryRoute(item.route);
-    if (typeof item.steamURL === 'string' && item.steamURL) return () => openSteamURL(item.steamURL);
+    if (typeof item.steamURL === 'string' && item.steamURL) return () => SE.openPage(item.steamURL);
     // Handed this window: a dialog it opens (Activate a Product) shows here as an overlay
     if (typeof item.onClick === 'function') return () => SE.run(item.onClick, window);
     return null;

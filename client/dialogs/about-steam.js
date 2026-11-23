@@ -78,10 +78,14 @@
 
   const attempt = SE.attempt('About Steam');
 
-  /** A bound SteamClient method, or null when this client doesn't have it. */
+  /**
+   * A bound SteamClient method from the first window that has it, or null. This dialog's own
+   * window can carry a SteamClient without the namespace (URL among them), so the first
+   * SteamClient found isn't enough: steam:// links were dropped.
+   */
   const steamFn = (namespace, method) => {
-    const api = SE.global('SteamClient')?.[namespace];
-    return typeof api?.[method] === 'function' ? api[method].bind(api) : null;
+    const api = SE.global('SteamClient', (client) => typeof client?.[namespace]?.[method] === 'function')?.[namespace];
+    return api ? api[method].bind(api) : null;
   };
 
   /** The main window's navigator: Steam's own routes, as its menus use them. */
@@ -89,25 +93,31 @@
 
   const bringMainToFront = () => attempt(() => SE.mainWindow?.()?.BrowserWindow?.SteamClient?.Window?.BringToFront?.());
 
-  const openSettings = (page) => {
-    const nav = steamNavigator();
-    if (typeof nav?.Settings === 'function' && attempt(() => (nav.Settings(page), true), false)) return true;
-    return openLink(`steam://open/settings/${page.toLowerCase()}`);
-  };
+  /*
+   * Steam's navigator does nothing after a game has run, until a restart (client/shared/
+   * open-page.js), so Settings opens by its steam:// link, which the client always handles.
+   */
+  const openSettings = (page) => openLink(`steam://open/settings/${page.toLowerCase()}`);
 
-  /** A Steam news post in the client's event overlay, else the client's store view, else a link. */
+  // A news post open over the Library's Home (the route state Steam's event overlay reads)
+  const eventShown = () => attempt(() => Boolean(SE.mainWindow().m_history.location.state?.event_to_show), false);
+
+  /**
+   * A Steam news post in the client's event overlay, else its page in the client's store view
+   * (SE.openPage); the overlay is checked a moment later, as the navigator may have done nothing.
+   */
   const openNewsPost = (post) => {
     const nav = steamNavigator();
+    const url = post?.url ?? LINKS.steamNews;
     if (post?.gid && typeof nav?.Home === 'function' &&
         attempt(() => (nav.Home({ partnerEvent: { appid: STEAM_NEWS_APP, gid: post.gid } }), true), false)) {
       bringMainToFront();
+      setTimeout(() => eventShown() || SE.openPage(url), SE.openPage.CHECK_MS);
       return true;
     }
-    if (typeof nav?.SteamWeb === 'function' && attempt(() => (nav.SteamWeb(post?.url ?? LINKS.steamNews), true), false)) {
-      bringMainToFront();
-      return true;
-    }
-    return openLink(post?.url ?? LINKS.steamNews);
+    SE.openPage(url);
+    bringMainToFront();
+    return true;
   };
 
   const openLink = (url) => {

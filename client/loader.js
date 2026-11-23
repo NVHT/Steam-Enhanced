@@ -66,6 +66,8 @@
     // Shared runtime pieces
     ['all', 'core/', ['font.css', 'tokens.css', 'icons-nav.css', 'icons-ui.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
     ['all', 'client/shared/', ['popup-layer.css', 'search-field.css', 'segmented.css']],
+    // A page or steam:// link opened in the main window (the rail's menus, About Steam)
+    ['content', 'client/shared/', ['open-page.js']],
     ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'popup-layer-panel.js', 'popup-layer-menu.js', 'picker.js', 'menu.js', 'menu.css', 'picker.css', 'news-feed.js', 'column-resize.css', 'column-resize.js', 'window-fold.js']],
     ['notify', 'client/friends/', ['friend-notification-clicks.js']],
     // In-game overlay
