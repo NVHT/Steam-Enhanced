@@ -82,7 +82,7 @@
   min-height: 62px;
   box-sizing: border-box;
   padding: var(--se-space-2) var(--se-space-2) !important;
-  padding-inline-end: 86px !important;
+  padding-inline-end: 80px !important;
   background: var(--se-sidebar) !important;
   border-bottom: 1px solid var(--se-hairline) !important;
 }
@@ -105,15 +105,16 @@
 /*
  * No strip: one chat (Steam marks the strip OneTab), or two and more, which the face rail below
  * shows instead (chat.js data-se-rail). Minimize and close come down level with the chat's header
- * (a friend's, client/friends/chat/chat.js .se-chat-head, 68 px: its middle less half a 30 px
- * button; a group's about as tall), whose end clears them as the strip's did.
+ * (a friend's, client/friends/chat/chat.js .se-chat-head, or a group's, both 68 px: the card's
+ * 1 px border, then the header's middle less half a 30 px button), whose end clears them as the
+ * strip's did.
  */
 .se-fdock[data-chat="1"]:is(:has(.multiChatDialog .ChatTabs.OneTab), :has(.multiChatDialog[data-se-rail])) .multiChatDialog .ChatTabs {
   display: none !important;
 }
 
 .se-fdock[data-chat="1"]:is(:has(.multiChatDialog .ChatTabs.OneTab), :has(.multiChatDialog[data-se-rail])) .se-fd-chat-back {
-  bottom: calc(var(--se-chat-bottom) + var(--se-chat-height) - 49px);
+  bottom: calc(var(--se-chat-bottom) + var(--se-chat-height) - 50px);
 }
 
 .se-fdock[data-chat="1"]:is(:has(.multiChatDialog .ChatTabs.OneTab), :has(.multiChatDialog[data-se-rail])) .multiChatDialog .chatHeader {
@@ -121,12 +122,18 @@
 }
 
 .se-fdock[data-chat="1"]:is(:has(.multiChatDialog .ChatTabs.OneTab), :has(.multiChatDialog[data-se-rail])) .se-chat-head {
-  padding-inline-end: 86px;
+  padding-inline-end: 80px;
 }
 
 /* A group's header: the same room, over the flyout's group padding below */
 .se-fdock[data-chat="1"]:is(:has(.multiChatDialog .ChatTabs.OneTab), :has(.multiChatDialog[data-se-rail])) .chatWindow.MultiUserChat[data-se-flyout-group] > .chatHeader.titleBarContainer {
-  padding-inline-end: 86px !important;
+  padding-inline-end: 80px !important;
+}
+
+/* The header's row across its width, now that the header lays it out as a flex item */
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] > .chatHeader.titleBarContainer > .chatRoomHeader {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 /* The header first, then the call (flyouts.js .se-fd-group-call), whatever Steam renders between */
@@ -502,7 +509,13 @@
   position: relative !important;
   inset: auto !important;
   height: auto !important;
-  min-height: 66px !important;
+  /*
+   * A friend's header's 68 px (chat.js .se-chat-head), its row in the middle (Steam's is a block,
+   * the row at its top): minimize and close are placed for it
+   */
+  display: flex !important;
+  align-items: center;
+  min-height: 68px !important;
   flex: 0 0 auto;
   padding: var(--se-space-2) var(--se-space-3) !important;
   box-sizing: border-box;
@@ -988,9 +1001,13 @@
   display: none !important;
 }
 
-/* Minimize and close stay separate in both Library and native chat popups. */
+/*
+ * Minimize beside close on the header tiles' rhythm (30 px tiles, 2 px apart): close's 10 px from
+ * the edge, its width and the gap. The header's end clears both by 80 px (the hairline after its
+ * tiles then sits 8 px from minimize, as from the tiles), in both Library and native chat popups.
+ */
 .se-fdock .se-fd-chat-minimize {
-  right: calc(var(--se-chat-right) + 48px);
+  right: calc(var(--se-chat-right) + 10px + var(--se-tile-sm) + var(--se-space-half));
 }
 
 /*
