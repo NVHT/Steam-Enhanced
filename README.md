@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/header.gif" alt="Steam Enhanced" width="100%">
+  <img src="assets/header-loop.gif" alt="Steam Enhanced" width="100%">
 </p>
 
 <h1 align="center">Steam Enhanced</h1>
@@ -66,6 +66,10 @@ Steam has grown one feature at a time, and it shows. Steam Enhanced brings it to
 
 Every screen has been rethought, from the moment Steam starts to the moment you quit a game.
 
+<p align="center">
+  <img src="assets/splash.gif" alt="The splash: welcome back, then the Library" width="100%">
+</p>
+
 <table>
   <tr>
     <td width="33%" valign="top">
@@ -105,7 +109,7 @@ Every screen has been rethought, from the moment Steam starts to the moment you 
     <td valign="top">
       <picture><source media="(prefers-color-scheme: light)" srcset="assets/readme/icon-startup-light.svg"><img src="assets/readme/icon-startup.svg" width="32" height="32" alt=""></picture><br>
       <h3>Startup</h3>
-      <sub>A polished first impression: a clear Network, Steam, Library progress strip, seven backgrounds and five spinner styles.</sub>
+      <sub>A polished first impression: the theme's lockup over a Network and sign-in bar, then a splash that welcomes you back with your last game while the Library loads. Seven backgrounds and five spinner styles.</sub>
     </td>
     <td valign="top">
       <picture><source media="(prefers-color-scheme: light)" srcset="assets/readme/icon-about-light.svg"><img src="assets/readme/icon-about.svg" width="32" height="32" alt=""></picture><br>
@@ -254,8 +258,8 @@ Windows keep the theme's background until they have finished loading, so Steam's
 
 | Setting | Options | Description |
 | --- | --- | --- |
-| Window entrance | **Splash**, Logo, Fade, None | Splash runs in the main window while the Library loads and completes as it appears; other windows use Logo. |
-| Startup background | **Library**, Hero, Mosaic, Wall, Plain, Dots, Steam | The background of the sign-in and startup screens: a wireframe of the Library, recent games' hero artwork, Steam's capsule wall, a plain gradient, a dot matrix or Steam's default. |
+| Window entrance | **Splash**, Logo, Fade, None | Splash runs in the main window while the Library loads: your last played game's art, its logo and a Library bar, then the art moves into Home as the Library appears. Other windows use Logo. |
+| Startup background | **Aurora**, Library, Mosaic, Wall, Plain, Dots, Steam | The background of the sign-in and startup screens: soft glows under a faint, moving wireframe of the Library, the wireframe alone, Steam's capsule wall cut into glowing tiles or shown still, a plain gradient, a dot matrix or Steam's default. |
 | Loading spinner | **Refined**, Comet, Elastic, Breathe, Classic | A single spinner style for every loading state in the client, Splash, Store, Community and Support. |
 
 </details>
