@@ -1,5 +1,10 @@
 /*
- * Populate direct-chat headers, group-chat layout attributes, and composer placeholders.
+ * Populate direct-chat headers, group-chat layout attributes, and composer placeholders; and read
+ * the log (syncLog): a sender's blocks within ten minutes form one run (data-se-run: the later
+ * blocks lose their speaker line), each line knows its place in its run (data-se-pos: first,
+ * mid, last or only, so a one-to-one chat's bubbles join), the speaker line shows the time only
+ * (data-se-time: the day lines give the date), and a day line with nothing under it hides
+ * (data-se-trailing). Styles: messages.css, bubbles.css.
  */
 ((SE) => {
   const previousDocuments = window.__seChat?.documents?.() || [];
@@ -57,6 +62,49 @@
 
   const resolveChatModel = (win) => SE.fromProps(win, 40, (p) => p.chatView?.chat || null);
 
+  // A sender's next block this soon after their last (seconds) continues the run
+  const RUN_GAP = 600;
+  const TIME = run(() => new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }));
+  const LOG_ITEMS = '.ChatMessageBlock, .msg.timeDivision';
+
+  // A block's messages (unAccountID, rtTimestamp), from its props
+  const messagesOf = (block) =>
+    SE.fromProps(block, 6, (p) => (Array.isArray(p.messages) && p.messages.length ? p.messages : undefined));
+
+  const syncLog = (win) => {
+    const items = win.querySelectorAll(LOG_ITEMS);
+    let prev = null;
+    // The current run's lines, marked with their place once the run ends
+    let lines = [];
+    const endRun = () => {
+      lines.forEach((line, n) =>
+        SE.mark(line, 'data-se-pos', lines.length === 1 ? 'only' : n === 0 ? 'first' : n === lines.length - 1 ? 'last' : 'mid')
+      );
+      lines = [];
+    };
+    items.forEach((item, i) => {
+      if (!item.classList.contains('ChatMessageBlock')) {
+        // A day or time-gap line ends a run; the last item in the log, it heads nothing
+        prev = null;
+        endRun();
+        SE.attr(item, 'data-se-trailing', i === items.length - 1);
+        return;
+      }
+      const msgs = messagesOf(item);
+      const first = msgs?.[0];
+      const last = msgs?.[msgs.length - 1];
+      const gap = first && prev ? first.rtTimestamp - prev.last : -1;
+      const continues = !!(prev && first.unAccountID === prev.sender && gap >= 0 && gap <= RUN_GAP);
+      SE.attr(item, 'data-se-run', continues);
+      if (!continues) endRun();
+      lines.push(...item.querySelectorAll('.msg:not(.timeDivision)'));
+      const stamp = item.querySelector('.ChatSpeaker .speakerTimeStamp');
+      if (stamp && first && TIME) SE.mark(stamp, 'data-se-time', TIME.format(new Date(first.rtTimestamp * 1000)));
+      prev = first ? { sender: first.unAccountID, last: last.rtTimestamp } : null;
+    });
+    endRun();
+  };
+
   const readPersonaStatus = (persona) => {
     if (!persona) return { cls: 'offline', text: '' };
     if (run(() => persona.is_ingame)) {
@@ -67,7 +115,8 @@
     }
     if (run(() => persona.is_awayOrSnooze)) return { cls: 'awayOrSnooze', text: 'Away' };
     if (run(() => persona.is_online)) return { cls: 'online', text: 'Online' };
-    return { cls: 'offline', text: 'Offline' };
+    const when = SE.ago(run(() => persona.last_seen_online) || 0);
+    return { cls: 'offline', text: when ? `Last online ${when}` : 'Offline' };
   };
 
   const { setText } = SE;
@@ -247,6 +296,140 @@
     }
   };
 
+  /*
+   * A one-to-one call's bar (voice.css): Steam's strip over the log, with the mic and headphone
+   * buttons beside its own gear and hang-up. Those two live in the message box (React's, so they
+   * can't move): the bar's are stand-ins that run the originals' own click handlers and show their
+   * state (muted: Steam's "disabled") and labels.
+   */
+  const CALL_TOOLS = 'se-call-tools';
+  const STEAM_TOOL = { mic: '.ToggleMicrophoneButton', out: '.ToggleVoiceOutputButton' };
+  const steamTool = (win, kind) => win.querySelector(`.ChatMessageEntryVoice ${STEAM_TOOL[kind]}`);
+
+  const syncCallTools = (win) => {
+    const bar = win.querySelector('.OneOnOneVoiceRoomControls');
+    if (!bar) return;
+    let tools = bar.querySelector(`:scope > .${CALL_TOOLS}`);
+    if (!tools) {
+      tools = win.ownerDocument.createElement('span');
+      tools.className = CALL_TOOLS;
+      tools.innerHTML = Object.keys(STEAM_TOOL).map((kind) => `<button type="button" class="se-call-tool" data-tool="${kind}"></button>`).join('');
+      tools.addEventListener('click', onCallTool);
+      bar.append(tools);
+    }
+    for (const button of tools.children) {
+      const original = steamTool(win, button.dataset.tool);
+      SE.attr(button, 'hidden', original ? null : '');
+      if (!original) continue;
+      SE.attr(button, 'data-off', original.classList.contains('disabled') || original.classList.contains('NoMicrophone') ? '' : null);
+      const label = original.getAttribute('title') || '';
+      if (label && button.getAttribute('aria-label') !== label) {
+        button.title = label;
+        button.setAttribute('aria-label', label);
+      }
+    }
+  };
+
+  function onCallTool(event) {
+    const button = event.target.closest?.('.se-call-tool');
+    const win = button?.closest('.chatWindow');
+    const original = win && steamTool(win, button.dataset.tool);
+    const onClick = original && SE.fromProps(original, 3, (p) => (typeof p.onClick === 'function' ? p.onClick : undefined));
+    if (!onClick) return;
+    event.stopPropagation();
+    run(() => onClick({ stopPropagation() {}, preventDefault() {}, currentTarget: original, target: original }));
+    // Steam redraws the original's state; the stand-in follows next frame
+    requestAnimationFrame(() => win.isConnected && syncCallTools(win));
+  }
+
+  /*
+   * The Friends dock's chat flyout with two or more chats: the open chats as faces down a rail on
+   * the left (friends-dock-chat.css .se-chat-rail), in place of Steam's tab strip. The strip stays
+   * mounted, hidden, and does the work: a face's click goes to its tab, its × to the tab's close,
+   * and each face reads its tab (picture, name, status, unread count, open).
+   */
+  const RAIL = 'se-chat-rail';
+  const tabOf = new WeakMap();
+  const faceOf = new WeakMap();
+  const STATES = ['ingame', 'online', 'awayOrSnooze', 'offline'];
+
+  const onRailClick = (event) => {
+    const face = event.target.closest?.(`.${RAIL}-face`);
+    const tab = face && tabOf.get(face);
+    if (!tab?.isConnected) return;
+    if (event.target.closest(`.${RAIL}-close`)) {
+      tab.querySelector('.CloseButton, ._1JXI4j2_xSpVK1YjyEuebr')?.click();
+      return;
+    }
+    // A tab is a focusable panel that switches through its own activation, not a click: call the
+    // strip's selectTab with the tab, as its click would (else the click, for an older build)
+    const own = SE.fromProps(tab, 6, (p) => (typeof p.selectTab === 'function' && p.tab ? p : undefined));
+    if (own) run(() => own.selectTab(own.tab));
+    else tab.click();
+  };
+
+  const buildFace = (doc) => {
+    const face = doc.createElement('button');
+    face.type = 'button';
+    face.className = `${RAIL}-face`;
+    face.innerHTML =
+      `<span class="${RAIL}-pic"><img alt="" draggable="false"></span>` +
+      `<b class="${RAIL}-count" hidden></b><span class="${RAIL}-close" aria-hidden="true"></span>`;
+    return face;
+  };
+
+  const syncFace = (face, tab) => {
+    const friend = tab.querySelector('.friend');
+    const name =
+      tab.querySelector('.playerName, .chatTabName, ._1HNpQBKKKQ1tG2OZH3CSsh')?.textContent.trim() ||
+      tab.textContent.trim();
+    const src = tab.querySelector('img')?.getAttribute('src') || '';
+    const img = face.querySelector('img');
+    if (src && img.getAttribute('src') !== src) img.setAttribute('src', src);
+    SE.attr(img, 'hidden', src ? null : '');
+    if (face.title !== name && face.getAttribute('aria-label') !== name) {
+      face.title = name;
+      face.setAttribute('aria-label', name);
+    }
+    SE.mark(face, 'data-state', (friend && STATES.find((s) => friend.classList.contains(s))) || 'none');
+    const open = tab.classList.contains(TAB_ACTIVE_CLS) || tab.classList.contains('Active');
+    SE.attr(face, 'aria-current', open ? 'true' : null);
+    const badge = tab.querySelector('.chatTabUnreadBadge, .ChatUnreadMessageIndicator');
+    const count = face.querySelector(`.${RAIL}-count`);
+    const text = badge ? badge.textContent.trim() || '•' : '';
+    SE.setText(count, text);
+    SE.attr(count, 'hidden', text ? null : '');
+  };
+
+  const syncRail = (dialog) => {
+    const tabs = [...dialog.querySelectorAll(`.${TAB_CLS}`)];
+    let rail = dialog.querySelector(`:scope > .${RAIL}`);
+    if (tabs.length < 2) {
+      rail?.remove();
+      SE.unmark(dialog, 'data-se-rail');
+      return;
+    }
+    if (!rail) {
+      rail = dialog.ownerDocument.createElement('nav');
+      rail.className = RAIL;
+      rail.setAttribute('aria-label', 'Open chats');
+      rail.addEventListener('click', onRailClick);
+      dialog.append(rail);
+    }
+    const faces = tabs.map((tab) => {
+      let face = faceOf.get(tab);
+      if (!face) {
+        face = buildFace(dialog.ownerDocument);
+        faceOf.set(tab, face);
+        tabOf.set(face, tab);
+      }
+      syncFace(face, tab);
+      return face;
+    });
+    if (faces.some((face, i) => rail.children[i] !== face) || rail.children.length !== faces.length) rail.replaceChildren(...faces);
+    SE.mark(dialog, 'data-se-rail');
+  };
+
   const attachedDocuments = new Map();
   let frame = 0;
 
@@ -273,8 +456,10 @@
           !!win.querySelector(':scope > .chatHeader:not(.titleBarContainer)') &&
           !win.querySelector(':scope > .chatHeader.titleBarContainer');
 
+        syncLog(win);
         if (isDirectChat) {
           SE.mark(win, 'data-se-friendchat');
+          syncCallTools(win);
           const partnerName = syncDirectChatHeader(win);
           syncComposerPlaceholder(win, partnerName ? `Message ${partnerName}` : '');
         } else {
@@ -287,6 +472,7 @@
           syncComposerPlaceholder(win, channelName ? `Message #${channelName}` : 'Message');
         }
       }
+      for (const dialog of doc.querySelectorAll(`.se-fdock .multiChatDialog[${DIALOG}]`)) syncRail(dialog);
     }
   };
 
@@ -354,8 +540,12 @@
       if (frame) cancelAnimationFrame(frame);
 
       for (const doc of docs) {
-        for (const el of doc.querySelectorAll('.se-chat-head, .se-group-channel')) el.remove();
+        for (const el of doc.querySelectorAll('.se-chat-head, .se-group-channel, .se-chat-rail, .se-call-tools')) el.remove();
+        for (const el of doc.querySelectorAll('[data-se-rail]')) el.removeAttribute('data-se-rail');
         for (const el of doc.querySelectorAll('[data-se-stats]')) el.removeAttribute('data-se-stats');
+        for (const el of doc.querySelectorAll('[data-se-run], [data-se-time], [data-se-trailing], [data-se-pos]')) {
+          for (const name of ['data-se-run', 'data-se-time', 'data-se-trailing', 'data-se-pos']) el.removeAttribute(name);
+        }
         for (const el of doc.querySelectorAll('[data-se-grouplayout], [data-se-friendchat]')) {
           el.removeAttribute('data-se-grouplayout');
           el.removeAttribute('data-se-members');

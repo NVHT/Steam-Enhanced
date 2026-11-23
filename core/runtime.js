@@ -1026,6 +1026,9 @@
   const mount = (label, find, create, options = {}) => {
     const tryIt = attempt(label);
     const views = new Map();
+    // A view that subscribes while it's made can widen the shared observer, which hands over its
+    // pending records at once and runs this scan again: a root being made is skipped
+    const making = new Set();
     const scan = () => {
       for (const [root, view] of views) {
         if (root.isConnected) continue;
@@ -1033,8 +1036,10 @@
         tryIt(() => view.destroy());
       }
       for (const root of tryIt(find, [])) {
-        if (!root || views.has(root)) continue;
+        if (!root || views.has(root) || making.has(root)) continue;
+        making.add(root);
         const view = tryIt(() => create(root), null);
+        making.delete(root);
         if (view) views.set(root, view);
       }
     };

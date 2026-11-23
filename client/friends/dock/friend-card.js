@@ -109,11 +109,22 @@
     blocked: () => document.body.removeAttribute(ATTR),
   });
 
+  // A one-to-one chat's header face (client/friends/chat/chat.js): its friend is the chat's partner
+  const CHAT_HEAD = '.se-chat-head .se-chat-avatar';
+  const partnerOf = (head) =>
+    SE.fromProps(head.closest('.chatWindow'), 40, (p) => (p.chatView?.chat?.chat_partner?.persona ? p.chatView.chat.chat_partner : undefined));
+
   function over(event) {
-    const target = event.target.closest?.(AVATAR);
+    const target = event.target.closest?.(`${AVATAR}, ${CHAT_HEAD}`);
     if (!card || state.destroyed || !target || target === card.node || !steamHost.contains(target)) return;
     card.leave();
-    const friend = friendOf(target);
+    // In a chat the card is the header's alone: faces in the log and the tabs show none, Steam's
+    // own hover hidden too
+    if (!target.matches(CHAT_HEAD) && target.closest('.multiChatDialog')) {
+      SE.attr(document.body, ATTR, '');
+      return;
+    }
+    const friend = target.matches(CHAT_HEAD) ? partnerOf(target) : friendOf(target);
     // Set before Steam's own hover shows, which waits for its delay.
     SE.attr(document.body, ATTR, friend ? '' : null);
     if (friend) card.enter(target, friend);

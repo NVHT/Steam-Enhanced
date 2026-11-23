@@ -8,7 +8,11 @@
  *   - a category's header: rows with a glyph and a hint (New, Manage), Remove in red last;
  *   - a group chat (the list, a chat's tab): its avatar, name and members, a bar (Open tinted,
  *     Favorite, Leave in red), then rows (Close tab, Group profile, Play together, a game group's
- *     game rows; the game's own label goes).
+ *     game rows; the game's own label goes);
+ *   - a chat's + (the message box): Upload an image, Upload last screenshot, Share your trade
+ *     offer URL, as rows with a glyph and a hint;
+ *   - a chat message (right-click): Copy, Select message, React (its submenu), Report, and
+ *     Delete in red last where you may.
  *
  * Steam's rows stay Steam's, told apart by their React key, never their words. Patched and laid
  * out by the game menu's code (client/library/game-menu.js: ns.libraryMenus); in its own popup
@@ -31,6 +35,8 @@
     creategroup: 'newcategory', managegroup: 'editcategory', removegroup: 'removecategory',
     opentab: 'openchat', closetab: 'closetab', viewprofile: 'groupprofile',
     findgamestoplay: 'playtogether', leavechatroom: 'leavechat', quickaccess: 'favorite',
+    upload: 'uploadimage', lastscreenshot: 'lastshot', tradeoffer: 'tradeurl',
+    copy: 'copymsg', select: 'selectmsg', react: 'react', report: 'reportmsg', delete: 'deletemsg',
   };
 
   // The hint lines of rows (a bar button shows none)
@@ -53,6 +59,14 @@
     favorite: 'Pin it to the top of your list',
     unfavorite: 'Unpin it from the top',
     leavechat: 'You can rejoin by invite',
+    uploadimage: 'From your computer',
+    lastshot: 'The last one you took',
+    tradeurl: 'Adds it to your message',
+    copymsg: 'The message, or what you selected',
+    selectmsg: 'To copy part of it',
+    react: 'Answer with an emoji',
+    reportmsg: "To Steam's moderators",
+    deletemsg: 'For everyone in the chat',
   };
 
   // The bar's words, by kind
@@ -195,6 +209,24 @@
     head.append(avatar, lines);
     return head;
   }
+
+  /* ---------- A chat message ---------- */
+
+  add({
+    name: 'friend-message',
+    // Steam's message menu: { elMessage, msg, chatView, fnCloseContextMenu }
+    test: (props) => 'elMessage' in props && 'msg' in props && 'chatView' in props,
+    layout: (panel, instance) => lay(panel, instance, { bar: [], danger: ['deletemsg'], hidden: [], guess: GUESS.category }),
+  });
+
+  /* ---------- A chat's + ---------- */
+
+  add({
+    name: 'friend-embed',
+    // Steam's message box menu: { refFileInput, chatView, fnInsertText }
+    test: (props) => typeof props.fnInsertText === 'function' && 'chatView' in props,
+    layout: (panel, instance) => lay(panel, instance, { bar: [], danger: [], hidden: [], guess: GUESS.category }),
+  });
 
   add({
     name: 'friend-chat',

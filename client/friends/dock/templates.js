@@ -50,12 +50,11 @@
     `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
 
   // Steam's "?" picture, what an account without an avatar reports
-  const DEFAULT_AVATAR = /fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb/i;
 
   // A friend's face; without a picture of their own (none, Steam's "?", or one that failed to
   // load: onAvatarError in dock.js), their initials
   const avatar = (url, state, size, cls = '', name = '') => {
-    const own = url && !DEFAULT_AVATAR.test(url) && !deadAvatars.has(url);
+    const own = url && !SE.isDefaultAvatar(url) && !deadAvatars.has(url);
     const text = name ? initials(name) : '';
     const face = own
       ? `<img src="${esc(url)}" alt="" draggable="false">`

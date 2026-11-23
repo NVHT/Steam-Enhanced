@@ -1,6 +1,6 @@
 /*
  * Chat › every other icon, in the theme's duotone set.
- * Chat styles load in order: tabs, header, messages, input, voice, members, icons, groups.
+ * Chat styles load in order: tabs, header, messages, bubbles, input, voice, members, icons, groups.
  */
 
 /*
@@ -29,11 +29,11 @@
   --se-chat-ico-react: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23000' fill-opacity='.32' stroke='none' cx='11' cy='13' r='8'/%3E%3Ccircle cx='11' cy='13' r='8'/%3E%3Cpath d='M7.8 15.2a4.2 4.2 0 0 0 6.4 0'/%3E%3Cpath d='M8.8 11h.01M13.2 11h.01' stroke-width='2.4'/%3E%3Cpath d='M19 2.5v5M16.5 5h5'/%3E%3C/svg%3E");
 }
 
-.multiChatDialog[data-se-chat] :is( .chatHeader .chatRoomButton, .MemberListOption.ToggleMemberListView, .chatTabOpenFriendsList, .chatTabSelector, .chatRoomGroupNavCollapseExpand, .chatRoomTextChannelIcon, .chatRoomVoiceChannelIcon, .ChatRoomAddRoomBtn, .VoiceToggle, .VoiceToggleIconCtn, .VoiceControlPanelButton, .OneOnOneVoiceClose, ._2FJUPOjT7afeB0125mqdQt /* OpenPickerButton */, .inviteAnotherFriendButton ) :is(svg, .invitePlus) {
+.multiChatDialog[data-se-chat] :is( .chatHeader .chatRoomButton, .MemberListOption.ToggleMemberListView, .chatTabOpenFriendsList, .chatTabSelector, .chatRoomGroupNavCollapseExpand, .chatRoomTextChannelIcon, .chatRoomVoiceChannelIcon, .ChatRoomAddRoomBtn, .VoiceToggle, .VoiceToggleIconCtn, .VoiceControlPanelButton, .OneOnOneVoiceClose, .inviteAnotherFriendButton ) :is(svg, .invitePlus) {
   display: none !important;
 }
 
-.multiChatDialog[data-se-chat] :is( .chatHeader .chatRoomButton, .MemberListOption.ToggleMemberListView, .chatTabOpenFriendsList, .chatTabSelector, .chatRoomGroupNavCollapseExpand, .chatRoomTextChannelIcon, .chatRoomVoiceChannelIcon, .ChatRoomAddRoomBtn, .VoiceToggle, .VoiceToggleIconCtn, .VoiceControlPanelButton, .OneOnOneVoiceClose, ._2FJUPOjT7afeB0125mqdQt, .inviteAnotherFriendButton )::before {
+.multiChatDialog[data-se-chat] :is( .chatHeader .chatRoomButton, .MemberListOption.ToggleMemberListView, .chatTabOpenFriendsList, .chatTabSelector, .chatRoomGroupNavCollapseExpand, .chatRoomTextChannelIcon, .chatRoomVoiceChannelIcon, .ChatRoomAddRoomBtn, .VoiceToggle, .VoiceToggleIconCtn, .VoiceControlPanelButton, .OneOnOneVoiceClose, .inviteAnotherFriendButton )::before {
   content: "";
   flex: none;
   display: block;
@@ -135,20 +135,28 @@
   --se-chat-ico: var(--se-chat-ico-invite);
 }
 
-.multiChatDialog[data-se-chat] ._2FJUPOjT7afeB0125mqdQt {
-  --se-chat-ico: var(--se-chat-ico-react);
-  --se-chat-ico-size: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+/*
+ * Add a reaction (OpenPickerButton): Steam draws it as a bare <svg> (AddReactionIcon), which no
+ * ::before icon can reach, so the <svg> itself is the pill, as tall as a reaction's, its glyph
+ * (filled in currentColor) in the muted tone. Over Steam's 19 px, faded, stroked look (sp.css).
+ */
+.multiChatDialog[data-se-chat] svg._2FJUPOjT7afeB0125mqdQt {
+  box-sizing: border-box;
+  flex: none;
   width: 24px;
   height: 24px;
+  margin: 0;
+  padding: var(--se-space-1);
   border-radius: var(--se-radius-pill);
   background: var(--se-hairline);
   color: var(--se-text-muted);
+  stroke: none;
+  opacity: 1;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
 }
 
-.multiChatDialog[data-se-chat] ._2FJUPOjT7afeB0125mqdQt:hover {
+.multiChatDialog[data-se-chat] svg._2FJUPOjT7afeB0125mqdQt:hover {
   background: var(--se-hover);
   color: var(--se-text-strong);
 }

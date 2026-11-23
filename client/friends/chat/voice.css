@@ -1,7 +1,7 @@
 /*
  * Chat › voice: voice rooms, one-to-one voice, voice buttons and notices; group chat
  * channel lists.
- * Chat styles load in order: tabs, header, messages, input, voice, members, icons, groups.
+ * Chat styles load in order: tabs, header, messages, bubbles, input, voice, members, icons, groups.
  */
 
 /*
@@ -365,10 +365,15 @@ a.connectionStatus:not(.GamepadMode *) {
   overflow: hidden;
 }
 
+/*
+ * In the row, not lifted out of it (Steam places the gear absolutely). Positioned, so its
+ * tooltip's hit box (chat-tooltips.js, inset 0) stays on it: static, the box spread over the
+ * whole chat, and a click anywhere opened voice settings.
+ */
 .multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls > .VoiceToggleIconCtn {
-  position: static !important;
+  position: relative !important;
+  inset: auto !important;
   margin: 0 !important;
-  top: auto !important;
 }
 
 .multiChatDialog[data-se-chat] .OneOnOneVoiceMembers {
@@ -500,9 +505,11 @@ a.connectionStatus:not(.GamepadMode *) {
   font-weight: 600 !important;
 }
 
+/* Positioned for the same reason as the gear (a click anywhere hung up) */
 .multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls > .OneOnOneVoiceClose {
   flex: none;
-  position: static !important;
+  position: relative !important;
+  inset: auto !important;
   box-sizing: border-box;
   display: flex !important;
   align-items: center;
@@ -514,6 +521,167 @@ a.connectionStatus:not(.GamepadMode *) {
   border-radius: var(--se-radius-sm) !important;
   cursor: pointer;
   transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+/*
+ * One-to-one call, as a bar: Steam's strip spans the chat under the header, one row in its order:
+ * the two faces, what's happening, then mic and headphones (chat.js's stand-ins, .se-call-tools),
+ * Steam's gear, and one red hang-up. End Voice Chat (Steam's second way to hang up) goes; Start
+ * Talking and Decline stay while you're the one invited. The message box loses its call buttons
+ * meanwhile (they're on the bar), and the header its call button.
+ */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceRoomControls:not(#se-none) {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: var(--se-space-2);
+  min-height: 0;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-3) var(--se-space-2) var(--se-chat-gutter) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: color-mix(in srgb, var(--se-running) 10%, var(--se-sidebar)) !important;
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--se-running) 25%, transparent) !important;
+}
+
+/*
+ * Steam's members box holds the call's button (Start Talking / End), Decline, the faces' box and
+ * the status line, stacked: one row here, faces first, the line taking the room, buttons after
+ */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceMembers:not(#se-none) {
+  order: 1;
+  flex: 1 1 auto !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: var(--se-space-2);
+  min-width: 0;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceMembers > :not(.inviteButton, .OneOnOneVoiceStatusLabel) {
+  order: 1;
+  flex: none;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  gap: var(--se-space-2);
+}
+
+/* Each face a fixed tile in that row (its hidden name and spinner take no room) */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceMembers .friend:not(#se-none) {
+  position: relative !important;
+  flex: none !important;
+  display: block !important;
+  overflow: visible;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceMembers .friend :is(.labelHolder, .connectionSpinner) {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceMembers .friend,
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceMembers .friend :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g) {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceStatusLabel {
+  order: 2;
+  font: 600 var(--se-fs-sm) / 1.3 var(--se-font) !important;
+  color: var(--se-running) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceRoomControls .inviteButton {
+  order: 3;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceRoomControls:not(.WaitingForYou) .inviteButton.inviteButtonJoinVoice {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .se-call-tools {
+  order: 4;
+  display: flex;
+  gap: var(--se-space-half);
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceRoomControls > .VoiceToggleIconCtn {
+  order: 5;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceRoomControls > .OneOnOneVoiceClose {
+  order: 6;
+  background: color-mix(in srgb, var(--se-danger) 85%, transparent) !important;
+  color: var(--se-text-strong) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceRoomControls > .OneOnOneVoiceClose:hover {
+  background: var(--se-danger) !important;
+}
+
+/* The stand-ins: the voice tiles' look, Steam's glyphs (icons.css), red while muted */
+.se-call-tool {
+  display: grid;
+  place-items: center;
+  width: var(--se-tile-sm);
+  height: var(--se-tile-sm);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: transparent;
+  color: var(--se-text-muted);
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+.se-call-tool[hidden] {
+  display: none;
+}
+
+.se-call-tool:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.se-call-tool:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-call-tool::before {
+  content: '';
+  width: var(--se-tile-icon);
+  height: var(--se-tile-icon);
+  background: currentColor;
+  -webkit-mask: var(--se-call-ico) center / contain no-repeat;
+  mask: var(--se-call-ico) center / contain no-repeat;
+}
+
+.se-call-tool[data-tool="mic"] {
+  --se-call-ico: var(--se-chat-ico-mic);
+}
+
+.se-call-tool[data-tool="mic"][data-off] {
+  --se-call-ico: var(--se-chat-ico-mic-off);
+}
+
+.se-call-tool[data-tool="out"] {
+  --se-call-ico: var(--se-chat-ico-headphones);
+}
+
+.se-call-tool[data-off] {
+  color: var(--se-danger);
+}
+
+/* While a call is on: no call buttons in the message box (one line again), none in the header */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat]:has(.OneOnOneVoiceRoomControls) .ChatMessageEntryVoice {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .se-chat-head[data-se-voice] .se-chat-voice {
+  display: none;
 }
 
 /*
@@ -603,7 +771,7 @@ a.connectionStatus:not(.GamepadMode *) {
 
 /*
  * "X has opened voice chat…": Steam floats it right in blue italics; the log's quiet centered
- * notice line, with a small green phone
+ * notice line, with a small green phone (the notices' small type; balanced when it wraps)
  */
 .multiChatDialog[data-se-chat] .msg.voiceChannelInvite {
   float: none !important;
@@ -614,9 +782,10 @@ a.connectionStatus:not(.GamepadMode *) {
   width: 100%;
   margin: var(--se-space-1) 0 !important;
   padding: 0 !important;
-  font: 500 var(--se-fs-base)/1.5 var(--se-font), sans-serif !important;
+  font: var(--se-type-small) !important;
   font-style: normal !important;
   text-align: center;
+  text-wrap: balance;
   color: var(--se-text-faint) !important;
 }
 
@@ -630,11 +799,12 @@ a.connectionStatus:not(.GamepadMode *) {
   mask: var(--se-chat-ico-phone) center / contain no-repeat;
 }
 
-.multiChatDialog[data-se-chat] .ChatMessageBlock:has(> .msg.voiceChannelInvite) {
+/* The notice sits in a wrapper .msg, beside an empty .voiceChannelInviteClear */
+.multiChatDialog[data-se-chat] .ChatMessageBlock:has(.msg.voiceChannelInvite) {
   padding-inline-start: var(--se-chat-gutter) !important;
 }
 
-.multiChatDialog[data-se-chat] .ChatMessageBlock:has(> .msg.voiceChannelInvite:only-of-type):hover {
+.multiChatDialog[data-se-chat] .ChatMessageBlock:has(.msg.voiceChannelInvite):hover {
   background: none !important;
 }
 

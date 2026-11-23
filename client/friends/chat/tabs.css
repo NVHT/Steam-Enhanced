@@ -225,9 +225,13 @@
   display: none !important;
 }
 
-/* Close: a small 20 px tile, shown on the open tab and on hover */
+/*
+ * Close: a small 20 px tile, shown on the open tab and on hover. Positioned, so its tooltip's
+ * hit box (client/friends/chat/chat-tooltips.js, inset 0) stays on the button: static, it
+ * stretched over the whole tab, and a click anywhere on the tab closed it.
+ */
 .multiChatDialog[data-se-chat] :is(.chatTabClose, ._1JXI4j2_xSpVK1YjyEuebr /* CloseButton */) {
-  position: static !important;
+  position: relative !important;
   flex: none;
   display: flex !important;
   align-items: center;

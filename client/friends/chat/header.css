@@ -1,6 +1,6 @@
 /*
  * Chat › the header: the group and its actions.
- * Chat styles load in order: tabs, header, messages, input, voice, members, icons, groups.
+ * Chat styles load in order: tabs, header, messages, bubbles, input, voice, members, icons, groups.
  */
 
 /*
@@ -329,12 +329,28 @@
   height: 100% !important;
 }
 
+/*
+ * The face ringed in its status, as the header's (Steam marks the speaker line online, ingame or
+ * offline): a gap in the log's colour, then the ring
+ */
+.multiChatDialog[data-se-chat] .ChatSpeaker .speaker {
+  --se-chat-speaker-ring: var(--se-border-strong);
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker .speaker.online {
+  --se-chat-speaker-ring: var(--se-online);
+}
+
+.multiChatDialog[data-se-chat] .ChatSpeaker .speaker.ingame {
+  --se-chat-speaker-ring: var(--se-running);
+}
+
 .multiChatDialog[data-se-chat] .ChatSpeaker :is(img.avatar, ._3h-QRJGxnVOIExtHD1R0f2 /* avatar */) {
   width: 100% !important;
   height: 100% !important;
   border: 0 !important;
   border-radius: var(--se-avatar-radius) !important;
-  box-shadow: none !important;
+  box-shadow: 0 0 0 2px var(--se-sidebar), 0 0 0 4px var(--se-chat-speaker-ring) !important;
 }
 
 .multiChatDialog[data-se-chat] .ChatSpeaker :is(.avatarFrame, .X_mJE4BYV5StDPwZhSiAu /* avatarFrame */) {

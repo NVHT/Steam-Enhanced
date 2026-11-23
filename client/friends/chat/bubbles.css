@@ -1,0 +1,291 @@
+/*
+ * Chat › bubbles: a one-to-one chat's log (chat.js data-se-friendchat). Theirs on the left, no
+ * face (the header shows who); yours on the right in the accent (Steam's .msg.isCurrentUser).
+ * A run's bubbles join (chat.js data-se-pos: first, mid, last, only); its time sits above it, no
+ * name (the header says who). Day lines as small centred pills; Scroll to bottom as a round arrow.
+ * Emoji-only lines stay bare. Group chats keep the named log (messages.css).
+ * Continues messages.css. Chat styles load in order: tabs, header, messages, bubbles, input,
+ * voice, members, icons, groups.
+ */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] {
+  --se-chat-bubble: var(--se-surface-2);
+  --se-chat-bubble-r: var(--se-radius-lg);
+  --se-chat-bubble-join: var(--se-radius-xs);
+  /* A one-line bubble's height: messages.css's line (--se-fs-md at 1.5) and the bubble's padding */
+  --se-chat-bubble-h: calc(var(--se-fs-md) * 1.5 + 2 * var(--se-space-2));
+}
+
+/* ---------- The blocks ---------- */
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ChatMessageBlock {
+  padding-inline-start: var(--se-chat-gutter) !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--se-space-half);
+  padding-top: var(--se-space-3) !important;
+  padding-bottom: 0 !important;
+  padding-inline-end: var(--se-chat-gutter) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ChatMessageBlock[data-se-run] {
+  padding-top: var(--se-space-half) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ChatMessageBlock:hover {
+  background: none !important;
+}
+
+/* Yours: to the right */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ChatMessageBlock:has(.msg.isCurrentUser) {
+  align-items: flex-end;
+}
+
+/* ---------- The speaker line: the run's time only ---------- */
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ChatSpeaker {
+  align-self: stretch;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ChatSpeaker :is(.speakerName, .rankIcon) {
+  display: none !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ChatMessageBlock:has(.msg.isCurrentUser) .ChatSpeaker .speaker {
+  justify-content: flex-end;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .speakerTimeStamp[data-se-time]::after {
+  font-size: var(--se-fs-xs);
+}
+
+/* No faces: one friend, named in the header */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ChatSpeaker :is(.speakerAvatar, .nibodjvvrm86uCfnnAn4g /* avatarHolder */) {
+  display: none !important;
+}
+
+/* ---------- The bubbles ---------- */
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ChatMessageBlock .msg:not(.timeDivision) {
+  position: relative;
+  width: fit-content !important;
+  max-width: 78% !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg:not(.timeDivision) .msgText {
+  width: fit-content;
+  padding: var(--se-space-2) var(--se-space-3) !important;
+  border-radius: var(--se-chat-bubble-r);
+  background: var(--se-chat-bubble);
+  overflow-wrap: anywhere;
+}
+
+/* A run's bubbles join on the side they sit (theirs left, yours right) */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg:is([data-se-pos="first"], [data-se-pos="mid"]):not(.isCurrentUser) .msgText {
+  border-end-start-radius: var(--se-chat-bubble-join);
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg:is([data-se-pos="mid"], [data-se-pos="last"]):not(.isCurrentUser) .msgText {
+  border-start-start-radius: var(--se-chat-bubble-join);
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg.isCurrentUser:is([data-se-pos="first"], [data-se-pos="mid"]) .msgText {
+  border-end-end-radius: var(--se-chat-bubble-join);
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg.isCurrentUser:is([data-se-pos="mid"], [data-se-pos="last"]) .msgText {
+  border-start-end-radius: var(--se-chat-bubble-join);
+}
+
+/* Yours in the accent. !important: messages.css's line colour, itself over Steam's */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg.isCurrentUser .msgText {
+  background: var(--se-accent);
+  color: var(--se-on-accent) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg.isCurrentUser .msgText > a {
+  color: var(--se-on-accent) !important;
+  text-decoration: underline;
+}
+
+/*
+ * Reactions under a bubble don't widen its line (the hover bar sits beside the line's box): the
+ * row keeps no width and its pills run on from the bubble's edge, rightward under theirs and
+ * leftward under yours
+ */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg ._1Ab0f8lGXvkC0tPjkFoYj8 /* MessageReactions */ {
+  width: 0;
+  flex-wrap: nowrap;
+  overflow: visible;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg.isCurrentUser ._1Ab0f8lGXvkC0tPjkFoYj8 {
+  margin-inline-start: auto;
+  justify-content: flex-end;
+}
+
+/* Each pill and the add button keep their own width (a row of no width would squeeze them) */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg ._1Ab0f8lGXvkC0tPjkFoYj8 > * {
+  flex-shrink: 0;
+}
+
+/*
+ * Steam's notices in the log (a voice chat opened, someone joined): one short centred line, not
+ * a bubble. !important: the bubbles' line width and Steam's own notice look (sp.css .serverMsg).
+ */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg.serverMsg {
+  align-self: center;
+  width: auto !important;
+  max-width: 100% !important;
+  margin: var(--se-space-2) auto !important;
+}
+
+/* A voice notice and the .msg Steam wraps it in: centred, the line's full width (not a bubble's) */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ChatMessageBlock .msg:has(> .voiceChannelInvite) {
+  align-self: center;
+  max-width: 100% !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ChatMessageBlock .msg.voiceChannelInvite {
+  max-width: 100% !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg.serverMsg .msgText {
+  padding: 0 !important;
+  background: none !important;
+  font: var(--se-type-small) !important;
+  color: var(--se-text-muted) !important;
+  text-align: center !important;
+}
+
+/* Emoji alone: big and bare, as Steam draws them */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg.EmojiOnly .msgText {
+  padding: 0 !important;
+  background: none;
+}
+
+/*
+ * React and more (the hover bar): beside the bubble, level with its top (not above it over the
+ * run's time), on the open side: right of theirs, left of yours. !important: messages.css's
+ * place for it, itself over Steam's (sp.css).
+ */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] ._3qYm9oxf8MdyvQDJgbfCrF /* MsgWithAddons */ ._10OzYaCdn7cgVMec9ozEJG /* Addons */ {
+  top: 0 !important;
+  inset-inline: calc(100% + var(--se-space-1)) auto !important;
+  margin: 0 !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] ._3qYm9oxf8MdyvQDJgbfCrF.isCurrentUser ._10OzYaCdn7cgVMec9ozEJG {
+  inset-inline: auto calc(100% + var(--se-space-1)) !important;
+}
+
+/* The bar as tall and round as a one-line bubble, its tiles filling it */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] ._3qYm9oxf8MdyvQDJgbfCrF ._10OzYaCdn7cgVMec9ozEJG {
+  box-sizing: border-box;
+  height: var(--se-chat-bubble-h);
+  align-items: center;
+  padding: var(--se-space-1) !important;
+  border-radius: var(--se-chat-bubble-r) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] ._10OzYaCdn7cgVMec9ozEJG > * {
+  width: calc(var(--se-chat-bubble-h) - 2 * var(--se-space-1)) !important;
+  height: calc(var(--se-chat-bubble-h) - 2 * var(--se-space-1)) !important;
+  border-radius: calc(var(--se-chat-bubble-r) - var(--se-space-1));
+}
+
+/* A tile that is Steam's Emoticon glyph itself (messages.css masks it): the icon keeps its size */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] ._10OzYaCdn7cgVMec9ozEJG ._2ovvDFSsxzUoYuqzJsxecQ /* Emoticon */ {
+  -webkit-mask-size: var(--se-tile-icon);
+  mask-size: var(--se-tile-icon);
+}
+
+/*
+ * The gap between bubble and bar is the bar's own (an unseen strip), so the pointer crossing it
+ * stays on the line and the bar stays (Steam shows it only while the line is hovered)
+ */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] ._3qYm9oxf8MdyvQDJgbfCrF ._10OzYaCdn7cgVMec9ozEJG::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 100%;
+  width: calc(var(--se-space-1) + 1px);
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] ._3qYm9oxf8MdyvQDJgbfCrF.isCurrentUser ._10OzYaCdn7cgVMec9ozEJG::before {
+  inset-inline: 100% auto;
+}
+
+/*
+ * A line's own time on hover (no face gutter to sit in): beside the bubble past the hover bar
+ * (two tiles wide), right of theirs, left of yours
+ */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg .FriendChatTimeStamp {
+  inset-inline: calc(100% + 2 * var(--se-chat-bubble-h)) auto !important;
+  width: auto !important;
+  white-space: nowrap;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg.isCurrentUser .FriendChatTimeStamp {
+  inset-inline: auto calc(100% + 2 * var(--se-chat-bubble-h)) !important;
+  width: auto !important;
+  white-space: nowrap;
+}
+
+/* ---------- Day lines: small centred pills ---------- */
+
+/* A trailing day line (chat.js data-se-trailing) stays hidden (messages.css) */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg.timeDivision:not(.time_passes, [data-se-trailing]) {
+  display: block !important;
+  width: fit-content !important;
+  margin: var(--se-space-4) auto var(--se-space-1) !important;
+  padding: var(--se-space-half) var(--se-space-3) !important;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-surface-2);
+  font: 600 var(--se-fs-xs) / 1.4 var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text-muted) !important;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .msg.timeDivision :is(.preHorizDivider, .horizDivider) {
+  display: none !important;
+}
+
+/*
+ * ---------- Scroll to bottom: a round arrow over the corner ----------
+ * Steam's button lets clicks through (pointer-events: none) and takes them on its words' span
+ * (sp.css), which also wore its pill: the span is the round button, its words at no size, and the
+ * box only places it. Hidden keeps Steam's fade.
+ */
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ScrollToBottomButton:not(#se-none) {
+  inset: auto var(--se-space-4) var(--se-space-3) auto !important;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  overflow: visible;
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ScrollToBottomButton > span:not(#se-none) {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--se-surface-2);
+  box-shadow: var(--se-edge-mid), var(--se-shadow-pop);
+  font-size: 0;
+  transition: background-color var(--se-dur) var(--se-ease);
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ScrollToBottomButton > span:not(#se-none):hover {
+  background: var(--se-hover);
+}
+
+.multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .ScrollToBottomButton > span::before {
+  content: '';
+  position: absolute;
+  inset: calc((100% - var(--se-icon-md)) / 2);
+  background: var(--se-text);
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
+}

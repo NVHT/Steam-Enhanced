@@ -7,14 +7,18 @@
  * picker is open. Marks:
  * - data-se-epicker: the picker; data-se-epicker-frame: wrappers hugging it (Steam's slate
  *   popup frame), so only one card shows;
- * - data-se-epicker-part="tabs" | "search" | "body": its children holding those, so the panel
- *   can be laid out anew (tabs, search, emoticons);
+ * - data-se-epicker-part="tabs" | "search" | "body" | "preview": its children holding those, so
+ *   the panel can be laid out anew (tabs, search, the emoticons: the child holding the most;
+ *   Steam's hover preview: another child holding one, hidden as the footer stands in);
  * - data-se-epicker-strip and data-se-epicker-tab: the tab strip and its tabs (the strip's
  *   children drawn with an icon); data-se-active: the open tab, the one carrying a class more
  *   than its siblings, else the one under Steam's underline;
  * - data-se-epicker-item: an emoticon or sticker tile (the outermost wrapper holding only it);
  * - data-se-epicker-search: the search field;
- * - data-se-label: a section title (short uppercase text).
+ * - data-se-label: a section title (short uppercase text);
+ * - data-se-epicker-host: the outermost box (a frame, else the picker), shifted over the chat's
+ *   emoji button (--se-epicker-shift, read once when it opens).
+ * And adds a footer (.se-epicker-foot): the emoticon under the pointer, large, with its :code:.
  */
 ((SE) => {
   window.__seEmoticonPicker?.destroy();
@@ -32,7 +36,10 @@
   const ACTIVE = 'data-se-active';
   const LABEL = 'data-se-label';
   const SEARCH = 'data-se-epicker-search';
-  const ATTRS = [ROOT, FRAME, PART, STRIP, TAB, ITEM, ACTIVE, LABEL, SEARCH];
+  const HOST = 'data-se-epicker-host';
+  const ATTRS = [ROOT, FRAME, PART, STRIP, TAB, ITEM, ACTIVE, LABEL, SEARCH, HOST];
+  const FOOT = 'se-epicker-foot';
+  const EDGE = 8;
   /* Emoticons in chat lines and reactions, never in a picker */
   const MESSAGES = '.ChatMessageBlock, .msg, .chatHistory';
   const ROOT_CLIMB = 10;
@@ -158,9 +165,77 @@
     return marked.length === 1 ? marked[0] : underlinedTab(strip, tabs);
   };
 
+  /* An emoticon's code (":steamsad:") or a sticker's name, from its image */
+  const nameOf = (img) => {
+    const src = img.getAttribute('src') || '';
+    const file = src.split(/[?#]/)[0].split('/').filter(Boolean).pop() || '';
+    const name = (img.getAttribute('alt') || img.title || SE.run(() => decodeURIComponent(file)) || file).replace(/^:|:$/g, '');
+    return /sticker/i.test(src) ? name : `:${name}:`;
+  };
+
+  // The footer follows the pointer over the emoticons
+  const onOver = (event) => {
+    const item = event.target.closest?.(`[${ITEM}]`);
+    const foot = event.currentTarget.querySelector(`:scope > .${FOOT}`);
+    const img = item && (item.matches('img') ? item : item.querySelector('img'));
+    if (!img || !foot) return;
+    const [preview, label] = foot.children;
+    if (preview.getAttribute('src') !== img.currentSrc) preview.src = img.currentSrc || img.src;
+    preview.hidden = false;
+    SE.setText(label, nameOf(img));
+  };
+
+  // Off the emoticons (to a gap, a label, out of the picker): the footer goes back to its hint
+  const HINT = 'Point at one to see its code';
+  const onOut = (event) => {
+    if (!event.target.closest?.(`[${ITEM}]`) || event.relatedTarget?.closest?.(`[${ITEM}]`)) return;
+    const foot = event.currentTarget.querySelector(`:scope > .${FOOT}`);
+    if (!foot) return;
+    const [preview, label] = foot.children;
+    preview.hidden = true;
+    preview.removeAttribute('src');
+    SE.setText(label, HINT);
+  };
+
+  const addFoot = (root) => {
+    if (root.querySelector(`:scope > .${FOOT}`)) return;
+    const foot = document.createElement('div');
+    foot.className = FOOT;
+    foot.innerHTML = `<img alt="" hidden><span>${HINT}</span>`;
+    root.append(foot);
+    root.addEventListener('pointerover', onOver);
+    root.addEventListener('pointerout', onOut);
+  };
+
+  /*
+   * Over the chat's emoji button: the outermost box moves sideways so its right edge meets the
+   * nearest emoji button's, kept inside the window. Read once, when the picker opens.
+   */
+  const place = (root) => {
+    let host = root;
+    for (let node = root.parentElement; node?.hasAttribute(FRAME); node = node.parentElement) host = node;
+    SE.mark(host, HOST);
+    const r = host.getBoundingClientRect();
+    let best = null;
+    for (const button of document.querySelectorAll('.EmoticonPickerButton')) {
+      const b = button.getBoundingClientRect();
+      if (!b.width) continue;
+      const far = Math.abs(b.right - r.right) + Math.abs(b.top - r.bottom);
+      if (!best || far < best.far) best = { far, right: b.right };
+    }
+    if (!best) return;
+    const shift = Math.min(Math.max(best.right - r.right, EDGE - r.left), innerWidth - EDGE - r.right);
+    SE.cssVar(host, '--se-epicker-shift', `${Math.round(shift)}px`);
+  };
+
   const sync = (root) => {
+    // Its frames found at its own size, before the compact card (emoticon-picker.css) resizes it
+    const opening = !root.hasAttribute(ROOT);
+    if (opening) markFrames(root);
     SE.mark(root, ROOT);
     markFrames(root);
+    addFoot(root);
+    if (opening) requestAnimationFrame(() => root.isConnected && place(root));
 
     const arts = [...root.querySelectorAll(ART)].slice(0, ART_LIMIT);
     for (const img of arts) SE.mark(tileOf(img), ITEM);
@@ -174,14 +249,19 @@
 
     const search = root.querySelector('input');
     if (search) SE.mark(search, SEARCH);
-    for (const child of root.children) {
+    // The emoticons: the child with the most; another child with any is Steam's hover preview
+    const children = [...root.children].filter((child) => !child.classList.contains(FOOT));
+    const held = children.map((child) => arts.filter((img) => child.contains(img)).length);
+    const most = Math.max(0, ...held);
+    children.forEach((child, i) => {
       const role =
         (strip && child.contains(strip) && 'tabs') ||
         (search && child.contains(search) && 'search') ||
-        (arts[0] && child.contains(arts[0]) && 'body') ||
+        (held[i] && held[i] === most && 'body') ||
+        (held[i] && 'preview') ||
         null;
       SE.attr(child, PART, role);
-    }
+    });
 
     const nodes = root.getElementsByTagName('*');
     for (let i = 0; i < nodes.length && i < LABEL_LIMIT; i++) {
@@ -212,6 +292,12 @@
   window.__seEmoticonPicker = {
     destroy() {
       watcher.disconnect();
+      for (const root of document.querySelectorAll(`[${ROOT}]`)) {
+        root.removeEventListener('pointerover', onOver);
+        root.removeEventListener('pointerout', onOut);
+      }
+      for (const foot of document.querySelectorAll(`.${FOOT}`)) foot.remove();
+      for (const host of document.querySelectorAll(`[${HOST}]`)) host.style.removeProperty('--se-epicker-shift');
       const selector = ATTRS.map(name => `[${name}]`).join(', ');
       for (const el of document.querySelectorAll(selector)) {
         for (const name of ATTRS) el.removeAttribute(name);
