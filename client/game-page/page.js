@@ -20,13 +20,23 @@
   live.topSizer = undefined;
   const placedFor = new WeakMap();
 
-  function watchScroller(sc) {
+  // A button serves one scroller: the one it served before is let go, and so is a scroller Steam
+  // removed (a removed box reports one last resize), so replaced pages aren't kept alive
+  function watchScroller(btn, sc) {
     live.topSizer ??= new ResizeObserver((entries) => {
       for (const entry of entries) {
+        if (!entry.target.isConnected) {
+          live.topSizer.unobserve(entry.target);
+          continue;
+        }
         const btn = topFor.get(entry.target);
         if (btn?.__seSc === entry.target) placeTop(btn);
       }
     });
+    const old = btn.__seSc;
+    if (old && old !== sc) live.topSizer.unobserve(old);
+    btn.__seSc = sc;
+    topFor.set(sc, btn);
     live.topSizer.observe(sc);
   }
 
@@ -35,6 +45,7 @@
     if (!sc?.isConnected) return;
     placedFor.set(btn, sc);
     if (!servesScroller(btn, sc)) {
+      live.topSizer?.unobserve(sc);
       btn.__seSc = null;
       return;
     }
@@ -99,9 +110,7 @@
       }
     }
     if (!best) return;
-    best.__seSc = t;
-    topFor.set(t, best);
-    watchScroller(t);
+    watchScroller(best, t);
     placeTop(best);
   }
 

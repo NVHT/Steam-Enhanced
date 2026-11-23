@@ -112,18 +112,20 @@
   // Scroll doesn't bubble, so this listens in the capture phase and takes whichever
   // tall scroller inside the list fired (the one scroll-to-top scrolls): no hashed class to
   // chase for the virtual list. Before any scroll the list is at its top, so none is needed.
-  // Each scroller's height is read once: a read per scroll event forced a layout per event
-  // while the virtual list rebuilt its rows.
+  // A scroller's height is read once when tall, at most once a second while not (a list still
+  // filling grows tall later): a read per scroll event forced a layout per event while the
+  // virtual list rebuilt its rows. Values: true, or when it was last read short.
+  const TALL_RECHECK_MS = 1000;
   const tallScroller = new WeakMap();
   const onListScroll = (event) => {
     const el = event.target;
     if (!(el instanceof Element) || el === topScroller) return;
     let tall = tallScroller.get(el);
-    if (tall === undefined) {
+    if (tall !== true && !(performance.now() - tall < TALL_RECHECK_MS)) {
       tall = !!el.closest(LIST_SELECTOR) && el.clientHeight >= 200;
-      tallScroller.set(el, tall);
+      tallScroller.set(el, tall || performance.now());
     }
-    if (tall) topScroller = el;
+    if (tall === true) topScroller = el;
   };
 
   const applyListEdgeVars = () => {

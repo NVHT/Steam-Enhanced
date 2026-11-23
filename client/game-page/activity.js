@@ -408,6 +408,11 @@
       live.cmSizer ??= new ResizeObserver((entries) => {
         for (const entry of entries) {
           const node = entry.target;
+          // Removed (a removed box reports one last resize): let go, so old comments aren't kept
+          if (!node.isConnected) {
+            live.cmSizer.unobserve(node);
+            continue;
+          }
           const h = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height;
           // Layout is clean inside the callback: this read costs nothing
           if (node.__seCmBox) node.__seRoom = node.clientHeight;
@@ -416,6 +421,11 @@
         }
         schedule();
       });
+      // Comments that left the list (still in the page, now hidden or moved) are let go too
+      if (known) {
+        const now = new Set(list);
+        for (const c of known) if (!now.has(c)) live.cmSizer.unobserve(c);
+      }
       box.__seCmBox = true;
       for (const node of [box, ...list]) {
         node.__seCmWrap = wrap;
