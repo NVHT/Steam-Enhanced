@@ -968,7 +968,7 @@ div.ModalPosition_TopBar:not(#se-none) {
 
 /*
  * Hero art behind the top of a rebuilt dialog (Install, Uninstall, EULA, Mark as Private,
- * New Collection, Exit Game), under everything else. client/dialogs/dialog-art.js appends it; [data-ready] once loaded.
+ * New Collection, Exit Game, CD Keys), under everything else. client/dialogs/dialog-art.js appends it; [data-ready] once loaded.
  */
 .DialogContent:has(> .se-dialog-art):not(#se-none) {
   position: relative;
@@ -1021,13 +1021,28 @@ div.ModalPosition_TopBar:not(#se-none) {
  * Private, New Collection with games, Exit Game): small, spaced capitals in the accent. !important: the
  * theme's DialogHeader above, itself !important against Steam's.
  */
-:is([data-se-inst], [data-se-uninst], [data-se-eula], [data-se-private], [data-se-newcoll-games], [data-se-exitgame]) .DialogHeader:not(#se-none) {
+:is([data-se-inst], [data-se-uninst], [data-se-eula], [data-se-private], [data-se-newcoll-games], [data-se-exitgame], [data-se-cdkeys], [data-se-survey]) .DialogHeader:not(#se-none) {
   margin: 0 0 var(--se-space-3) !important;
   padding: 0 !important;
   font: 800 var(--se-fs-sm)/14px var(--se-font) !important;
   letter-spacing: .16em !important;
   text-transform: uppercase !important;
   color: var(--se-accent) !important;
+  text-shadow: var(--se-text-shadow-art);
+}
+
+/*
+ * A rebuilt dialog's game name (or "N games") under its eyebrow: Uninstall, EULA, Mark as
+ * Private, New Collection with games, Exit Game, CD Keys; the Hardware Survey's step titles. Each
+ * dialog places it; this is its look.
+ */
+.se-dialog-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font: 800 var(--se-fs-2xl) / 1.2 var(--se-font);
+  color: var(--se-text-strong);
   text-shadow: var(--se-text-shadow-art);
 }
 

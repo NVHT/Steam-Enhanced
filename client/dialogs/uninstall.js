@@ -178,7 +178,7 @@
     const game = el('div', `${OURS} ${OURS}-game`);
     const stack = SE.dialogArt.capsules(appids);
     const single = appids.length === 1;
-    const name = el('div', `${OURS}-name`, single ? overview(appids[0])?.display_name ?? '' : `${appids.length} games`);
+    const name = el('div', `${OURS}-name se-dialog-name`, single ? overview(appids[0])?.display_name ?? '' : `${appids.length} games`);
     game.append(stack, name);
     body.prepend(game);
     return game;

@@ -1,12 +1,14 @@
 /*
  * A rebuilt dialog's game art (Install, Uninstall, EULA, Mark as Private, New Collection, Exit
- * Game): the hero art behind its top (.se-dialog-art) and the game capsules
+ * Game, CD Keys): the hero art behind its top (.se-dialog-art) and the game capsules
  * (.se-dialog-capsules), styled in client/dialogs/dialogs.css. Both work through a game's copies with Steam's own list first
  * (SE.heroURLs / SE.headerURLs, SE.art in core/runtime.js), so newer games' hashed art loads,
  * and both are marked [data-ready] once their image has loaded.
  *
  *   SE.dialogArt.hero(host, appid, className?)  appends the art to host; null when there is none
  *   SE.dialogArt.capsules(appids)               the first three games' capsules, fanned
+ *   SE.dialogArt.fitWindow(root)                grows a popped-out dialog's window to the
+ *                                               rebuilt dialog; returns the cancel
  */
 ((SE) => {
   const MAX_CAPSULES = 3;
@@ -42,5 +44,20 @@
     return stack;
   };
 
-  SE.dialogArt = { hero, capsules };
+  /*
+   * Popped out, a dialog is its window, sized by Steam to its own, shorter dialog: the window
+   * grows to fit the rebuilt one, next frame once it is laid out (SteamClient's ResizeTo takes CSS
+   * pixels with `true`, as Settings sizes its window in client/settings/dialog/window.js).
+   */
+  const fitWindow = (root) => {
+    const frame = requestAnimationFrame(() => {
+      const win = window.SteamClient?.Window;
+      if (document.title === 'Steam' || !win?.ResizeTo) return;
+      const need = Math.ceil(root.getBoundingClientRect().top + root.scrollHeight);
+      if (need > innerHeight + 1) SE.run(() => win.ResizeTo(innerWidth, Math.min(need, screen.availHeight || need), true));
+    });
+    return () => cancelAnimationFrame(frame);
+  };
+
+  SE.dialogArt = { hero, capsules, fitWindow };
 })(window.__se);

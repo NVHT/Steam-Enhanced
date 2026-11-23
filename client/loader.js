@@ -154,14 +154,14 @@
       'base.css', 'servers.css', 'media.css', 'library-tools.css', 'modals.css', 'friends.css',
       'standalone.css',
     ]],
-    ['content', 'client/dialogs/', ['about-steam.css', 'about-steam.js', 'system-info.css', 'system-info.js', 'system-report.css']],
+    ['content', 'client/dialogs/', ['about-steam.css', 'about-steam.js', 'system-info.css', 'system-info.js', 'survey.css', 'survey.js', 'system-report.css']],
     ['content', 'client/dialogs/system-report/', ['shared.js', 'parse.js', 'view.js', 'main.js']],
     ['content', 'client/dialogs/', ['add-non-steam.css', 'add-non-steam.js']],
     ['desktop', 'client/dialogs/', [
       'dialog-art.js', 'activate-product.css', 'activate-product.js', 'backups.css', 'backups.js', 'install.js',
       'eula.js', 'uninstall.css', 'uninstall.js', 'new-collection.css', 'new-collection.js',
       'delete-collection.css', 'delete-collection.js', 'mark-private.css', 'mark-private.js',
-      'exit-game.css', 'exit-game.js',
+      'exit-game.css', 'exit-game.js', 'cd-keys.css', 'cd-keys.js',
     ]],
     // Plugin integrations
     ['main', 'compat/hltb-for-steam/', ['hltb-for-steam.css', 'hltb-for-steam.js']],

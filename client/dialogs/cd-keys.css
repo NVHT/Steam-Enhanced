@@ -1,0 +1,182 @@
+/*
+ * CD Keys dialog (styles for client/dialogs/cd-keys.js). Once marked ([data-se-cdkeys] on its
+ * DialogContent, desktop windows only):
+ *
+ *   [ hero art, fading into the card                 ]
+ *   [ CD KEYS                                         ]
+ *   [ The game's name                                 ]
+ *   [ These are your activation keys for ...          ]
+ *   [ ( Key name                                [⧉] ) ]
+ *   [ ( XXXX-XXXX-XXXX-XXXX                         ) ]
+ *   [ ( ... one card per key                        ) ]
+ *   [                                       [ Close ] ]
+ *
+ * The art, the eyebrow and the game's name are the shared ones (.se-dialog-art, the eyebrow,
+ * .se-dialog-name in dialogs.css).
+ * The copy button shows only when the game's keys copy ([data-se-cdkeys-copy]); a copied key's
+ * card takes the accent and a tick while Steam shows "Copied key to clipboard".
+ * Steam's classes (sp.js, the CD keys dialog's module): KeyList ._2rBq1ElGawWUhkk4Hs79K1,
+ * CDKeyOption ._9yHu4QuH-15EhH0Mg7ypG, KeyName ._2KAgx7PA4-yLV9Nu-qBS9R, KeyValue
+ * ._36FPQfDc2mHWDVMY24LXck, CopyAnimation ._206XjPHGiVP4ell73RF6Jz.
+ */
+
+/* Room for the art behind the eyebrow and the name */
+[data-se-cdkeys]:not(#se-none) {
+  min-width: 480px;
+  max-width: 560px;
+  padding-top: var(--se-space-7);
+}
+
+.se-cdkeys.se-dialog-name {
+  margin: 0 0 var(--se-space-2);
+}
+
+/* Steam centres the body's column (steamui/css/sp.css): the cards and the text run full width */
+[data-se-cdkeys] .DialogBody:not(#se-none) {
+  align-items: stretch;
+}
+
+/* Steam's description: the box holding the key list; its first child */
+[data-se-cdkeys] :has(> ._2rBq1ElGawWUhkk4Hs79K1):not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-4);
+}
+
+[data-se-cdkeys] :has(> ._2rBq1ElGawWUhkk4Hs79K1) > div:first-child:not(#se-none) {
+  color: var(--se-text-muted);
+  font: 400 var(--se-fs-md) / 1.5 var(--se-font);
+}
+
+/*
+ * The keys: one card each, all shown (Steam caps the list at 160 px behind a scrollbar that cut
+ * the copy buttons; steamui/css/sp.css). A popped-out dialog's window grows to fit (cd-keys.js).
+ */
+[data-se-cdkeys] ._2rBq1ElGawWUhkk4Hs79K1:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--se-space-2);
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: none;
+}
+
+/* Name over key, the copy button at the end (its disc ::before, its icon ::after); Steam's
+   gamepad focus paints the row white (steamui/css/sp.css): the theme's surfaces win */
+[data-se-cdkeys] ._9yHu4QuH-15EhH0Mg7ypG:not(#se-none) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  width: auto;
+  box-sizing: border-box;
+  column-gap: var(--se-space-3);
+  row-gap: var(--se-space-half);
+  margin: 0;
+  padding: var(--se-space-3) var(--se-space-3) var(--se-space-3) var(--se-space-4);
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-edge);
+  transition: background-color var(--se-dur), box-shadow var(--se-dur);
+}
+
+/* Steam makes name and key centred flex columns (steamui/css/sp.css): plain left-aligned text */
+[data-se-cdkeys] ._9yHu4QuH-15EhH0Mg7ypG:not(#se-none) > * {
+  grid-column: 1;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+}
+
+[data-se-cdkeys] ._2KAgx7PA4-yLV9Nu-qBS9R:not(#se-none) {
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm) / 1.4 var(--se-font);
+}
+
+/* Mono, so 0 and O, 1 and I read apart */
+[data-se-cdkeys] ._36FPQfDc2mHWDVMY24LXck:not(#se-none) {
+  overflow-wrap: anywhere;
+  color: var(--se-text-strong);
+  font: 500 var(--se-fs-lg) / 1.4 var(--se-font-mono) !important; /* !important: the theme's face on every element (core/font.css) */
+  letter-spacing: .04em;
+}
+
+[data-se-cdkeys][data-se-cdkeys-copy] ._9yHu4QuH-15EhH0Mg7ypG::before,
+[data-se-cdkeys][data-se-cdkeys-copy] ._9yHu4QuH-15EhH0Mg7ypG::after {
+  content: "";
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  justify-self: center;
+}
+
+[data-se-cdkeys][data-se-cdkeys-copy] ._9yHu4QuH-15EhH0Mg7ypG::before {
+  width: var(--se-hit);
+  height: var(--se-hit);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-btn-bg);
+  box-shadow: var(--se-btn-edge);
+  transition: background-color var(--se-dur);
+}
+
+[data-se-cdkeys][data-se-cdkeys-copy] ._9yHu4QuH-15EhH0Mg7ypG::after {
+  width: 16px;
+  height: 16px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-icon-copy) center / contain no-repeat;
+  mask: var(--se-icon-copy) center / contain no-repeat;
+  transition: background-color var(--se-dur);
+}
+
+[data-se-cdkeys][data-se-cdkeys-copy] ._9yHu4QuH-15EhH0Mg7ypG {
+  cursor: pointer;
+}
+
+[data-se-cdkeys][data-se-cdkeys-copy] ._9yHu4QuH-15EhH0Mg7ypG:hover:not(#se-none) {
+  background: var(--se-hover);
+}
+
+[data-se-cdkeys][data-se-cdkeys-copy] ._9yHu4QuH-15EhH0Mg7ypG:hover::before {
+  background: var(--se-btn-bg-hover);
+}
+
+[data-se-cdkeys][data-se-cdkeys-copy] ._9yHu4QuH-15EhH0Mg7ypG:hover::after {
+  background: var(--se-text-strong);
+}
+
+[data-se-cdkeys] ._9yHu4QuH-15EhH0Mg7ypG:is(:focus-visible, .gpfocus) {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* Copied: Steam swaps the key for its "Copied key to clipboard" for 2 s */
+[data-se-cdkeys] ._9yHu4QuH-15EhH0Mg7ypG:has(._206XjPHGiVP4ell73RF6Jz):not(#se-none) {
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+}
+
+[data-se-cdkeys] ._206XjPHGiVP4ell73RF6Jz:not(#se-none) {
+  color: var(--se-accent);
+  font: 600 var(--se-fs-md) / 1.4 var(--se-font) !important; /* !important: the key's mono above */
+  letter-spacing: 0;
+  animation: none;
+}
+
+[data-se-cdkeys][data-se-cdkeys-copy] ._9yHu4QuH-15EhH0Mg7ypG:has(._206XjPHGiVP4ell73RF6Jz)::after {
+  background: var(--se-accent);
+  -webkit-mask-image: var(--se-icon-check);
+  mask-image: var(--se-icon-check);
+}
+
+/* Close: at the end, the dialogs' secondary button */
+[data-se-cdkeys] .DialogBody > button.DialogButton:not(#se-none) {
+  display: block;
+  width: auto;
+  min-width: 112px;
+  margin: var(--se-space-5) 0 0 auto;
+}

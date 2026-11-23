@@ -240,6 +240,16 @@
     return { tiles, meta };
   };
 
+  /* System Information is the one survey layout with a node between the body text and the footer */
+  const isSystemInfo = (root) => {
+    const footer = root.querySelector(':scope > .DialogFooter');
+    const before = footer?.previousElementSibling;
+    return !!before && !before.matches('.DialogBodyText, .DialogHeader');
+  };
+
+  // Shared with the Hardware Survey's review step (client/dialogs/survey.js)
+  SE.survey = { readSections, summarise, isSystemInfo };
+
   /* ---------- Copy specs ---------- */
 
   const specsText = (sections) =>
@@ -668,13 +678,6 @@
 
   const viewOf = new WeakMap();
 
-  /* System Information is the one survey layout with a node between the body text and the footer */
-  const isSystemInfo = (root) => {
-    const footer = root.querySelector(':scope > .DialogFooter');
-    const before = footer?.previousElementSibling;
-    return !!before && !before.matches('.DialogBodyText, .DialogHeader');
-  };
-
   const build = (root) => {
     viewOf.get(root)?.destroy();
     root.querySelectorAll(':scope > .se-sysinfo').forEach(node => node.remove());
@@ -706,6 +709,7 @@
       for (const view of [...views]) view.destroy();
       document.querySelectorAll('.se-sysinfo').forEach(node => node.remove());
       document.querySelectorAll(`[${BUILT}]`).forEach(node => SE.unmark(node, BUILT));
+      delete SE.survey;
       delete window.__seSystemInfo;
     },
   };

@@ -78,7 +78,7 @@
     const game = el('div', `${OURS}-game`);
     const stack = SE.dialogArt.capsules(games.map((g) => g.appid));
     const single = games.length === 1;
-    const name = el('div', `${OURS}-name`, single ? games[0].name : plural(games.length, 'game', 'games'));
+    const name = el('div', `${OURS}-name se-dialog-name`, single ? games[0].name : plural(games.length, 'game', 'games'));
     // Several: the first two names, then how many more (all of them in the tooltip)
     const shown = games.slice(0, 2).map((g) => g.name);
     const more = games.length - shown.length;
@@ -111,19 +111,6 @@
     return body;
   };
 
-  /*
-   * Popped out, the dialog is its window: Steam opens it at 680×320, shorter than the rebuilt
-   * dialog, so the window grows to fit (SteamClient's ResizeTo takes CSS pixels with `true`, as
-   * Settings sizes its window in client/settings/dialog/window.js).
-   */
-  const fitWindow = (root) => {
-    if (document.title === 'Steam') return;
-    const win = window.SteamClient?.Window;
-    if (!win?.ResizeTo) return;
-    const need = Math.ceil(root.getBoundingClientRect().top + root.scrollHeight);
-    if (need > innerHeight + 1) attempt(() => win.ResizeTo(innerWidth, Math.min(need, screen.availHeight || need), true));
-  };
-
   /* ---------- View ---------- */
 
   const createView = (root) => {
@@ -137,12 +124,13 @@
     text.parentElement.append(body);
     nodes.push(body, attempt(() => SE.dialogArt.hero(root, apps.games[0].appid, OURS), null));
     SE.attr(root, ROOT, '');
-    const frame = requestAnimationFrame(() => fitWindow(root));
+    // Popped out, Steam opens it at 680×320, shorter than the rebuilt dialog
+    const unfit = SE.dialogArt.fitWindow(root);
 
     return {
       root,
       destroy() {
-        cancelAnimationFrame(frame);
+        unfit();
         for (const node of nodes) node?.remove();
         SE.unmark(root, ROOT);
       },

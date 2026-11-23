@@ -110,7 +110,7 @@
 
   const buildGame = (body, appid) => {
     const game = el('div', `${OURS} ${OURS}-game`);
-    const name = el('div', `${OURS}-name`, appName(appid));
+    const name = el('div', `${OURS}-name se-dialog-name`, appName(appid));
     game.append(SE.dialogArt.capsules([appid]), name);
     body.prepend(game);
     return { game, name };

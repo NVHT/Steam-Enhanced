@@ -70,7 +70,7 @@
     const block = el('div', `${OURS} ${OURS}-games`);
     const single = games.length === 1;
     const text = el('div', `${OURS}-games-text`);
-    text.append(el('div', `${OURS}-games-title`, single ? games[0].name : plural(games.length, 'game', 'games')));
+    text.append(el('div', `${OURS}-games-title se-dialog-name`, single ? games[0].name : plural(games.length, 'game', 'games')));
     if (!single) {
       const shown = games.slice(0, 2).map((g) => g.name).filter(Boolean);
       const more = games.length - shown.length;

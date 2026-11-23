@@ -37,7 +37,7 @@
 
     const nodes = [];
     const header = root.querySelector('.DialogHeader');
-    const name = SE.el('div', `${OURS} ${OURS}-name`, nameOf(appid));
+    const name = SE.el('div', `${OURS} ${OURS}-name se-dialog-name`, nameOf(appid));
     if (header && name.textContent) {
       header.after(name);
       nodes.push(name);
