@@ -3,7 +3,7 @@
  * (client/library/game-menu.css): a bar of the quick actions on top, an icon over a short word
  * each (Play, Install or Stop tinted as the game page's button; Favorite; Files; Hide;
  * Uninstall in red), then rows with an icon, Steam's name and a hint (Collections, shortcut,
- * back up, private, other rows and plugins' rows), Properties last.
+ * back up, private, CD keys, other rows and plugins' rows), Properties last.
  *
  * Steam's rows stay Steam's (its library context menu: their clicks, plugins' rows) and are told
  * apart by their key or what they run (their onSelected), never by their words. Manage's rows are
@@ -37,6 +37,7 @@
     unlist: 'Its files stay on your PC',
     backup: 'Save a copy to restore later',
     private: 'Friends won’t see it',
+    cdkeys: 'Activation keys to copy',
     manage: 'Shortcuts, hide, uninstall',
     dismiss: 'Stop suggesting it',
     properties: 'Updates, launch options, DLC',
@@ -182,8 +183,9 @@
       if ('onSelected' in props) {
         // Browse local files runs the same shared closure as the main action: told by Steam's own (localized) name
         if (props.children && props.children === run(() => live.api?.localize('#GameAction_BrowseLocalFiles'))) return 'browse';
-        // Dismiss from Play Next runs a bound method (no source): told by its localized name
+        // Dismiss from Play Next and CD keys run bound methods (no source): told by their localized names
         if (props.children && props.children === run(() => live.api?.localize('#GameAction_DismissPlayNext'))) return 'dismiss';
+        if (props.children && props.children === run(() => live.api?.localize('#GameAction_ViewCDKeys'))) return 'cdkeys';
         if (!props.onSelected) {
           const kind = disabledKind(f);
           if (kind) disabledRows.add(row);
