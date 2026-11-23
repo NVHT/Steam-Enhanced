@@ -225,8 +225,9 @@
     entry.top = geometry.top;
 
     // The host sizes itself from these (friends-dock.css .se-fd-popup-host); the window from
-    // layer.place below.
+    // layer.place below. A window still mounting has no node yet: mountChatPopupDocument sizes it
     const node = entry.node;
+    if (!node) return;
     node.style.setProperty('--se-chat-host-width', `${entry.width}px`);
     node.style.setProperty('--se-chat-host-height', `${entry.height}px`);
     node.style.setProperty('--se-chat-height', `${entry.height}px`);

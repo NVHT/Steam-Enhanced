@@ -126,32 +126,122 @@
     }
   }
 
+  /*
+   * A group's call, as a bar under its header (friends-dock-chat.css .se-fd-group-call, the look of
+   * a one-to-one call's): the channel, the faces in it, then mic, headphones and leave. Those are
+   * stand-ins: each runs Steam's own button (in the channel list, else the message box) through its
+   * click handler and shows its state (muted: Steam's "disabled").
+   */
+  const CALL_TOOLS = { mic: 'ToggleMicrophoneButton', out: 'ToggleVoiceOutputButton', end: 'chatEndVoiceChat' };
+  const CALL_FACES = 4;
+  const steamCallTool = (win, kind) =>
+    win.querySelector(`.chatRoomGroupNavColumn .VoiceControlPanelButton.${CALL_TOOLS[kind]}`) ||
+    win.querySelector(`.ChatMessageEntryVoice .${CALL_TOOLS[kind]}`);
+
+  function onCallTool(event) {
+    const button = event.target.closest?.('.se-call-tool');
+    const win = button?.closest('.chatWindow');
+    const original = win && steamCallTool(win, button.dataset.tool);
+    const onClick = original && SE.fromProps(original, 3, (p) => (typeof p.onClick === 'function' ? p.onClick : undefined));
+    if (!onClick) return;
+    event.stopPropagation();
+    run(() => onClick({ stopPropagation() {}, preventDefault() {}, currentTarget: original, target: original }));
+    schedule();
+  }
+
+  function buildCallBar(doc) {
+    const bar = doc.createElement('div');
+    bar.className = 'se-fd-group-call';
+    bar.hidden = true;
+    bar.innerHTML =
+      '<span class="se-fd-call-name"></span><span class="se-fd-call-faces"></span>' +
+      Object.keys(CALL_TOOLS).map((kind) => `<button type="button" class="se-call-tool" data-tool="${kind}"></button>`).join('');
+    bar.addEventListener('click', onCallTool);
+    return bar;
+  }
+
+  function syncCallBar(win, bar) {
+    const active = win.querySelector('.ActiveVoiceChannel');
+    SE.attr(win, 'data-se-in-call', !!active);
+    if (bar.hidden !== !active) bar.hidden = !active;
+    if (!active) return;
+    SE.setText(bar.querySelector('.se-fd-call-name'), active.querySelector('.chatRoomVoiceChannelName')?.textContent.trim() || 'Voice');
+    // The faces in the call: their pictures, or their initials for Steam's "?"
+    const faces = bar.querySelector('.se-fd-call-faces');
+    const people = [...active.querySelectorAll('.VoiceChannelParticipants .friend')].slice(0, CALL_FACES).map((friend) => ({
+      src: friend.querySelector(`img.avatar, img.${SE.C.avatar}`)?.getAttribute('src') || '',
+      name: friend.querySelector('.playerName')?.textContent.trim() || '',
+    }));
+    const key = people.map((p) => `${p.src}|${p.name}`).join(',');
+    if (faces.dataset.key !== key) {
+      faces.dataset.key = key;
+      faces.replaceChildren(...people.map(({ src, name }) => {
+        const face = win.ownerDocument.createElement('span');
+        face.className = 'se-fd-call-face';
+        face.title = name;
+        if (src && !SE.isDefaultAvatar?.(src)) {
+          const img = win.ownerDocument.createElement('img');
+          img.alt = '';
+          img.draggable = false;
+          img.src = src;
+          face.append(img);
+        } else {
+          face.textContent = SE.initials(name);
+        }
+        return face;
+      }));
+    }
+    for (const button of bar.querySelectorAll('.se-call-tool')) {
+      const original = steamCallTool(win, button.dataset.tool);
+      SE.attr(button, 'hidden', original ? null : '');
+      if (!original) continue;
+      SE.attr(button, 'data-off', button.dataset.tool !== 'end' && original.classList.contains('disabled') ? '' : null);
+      const label = original.getAttribute('title') || '';
+      if (label && button.getAttribute('aria-label') !== label) {
+        button.title = label;
+        button.setAttribute('aria-label', label);
+      }
+    }
+  }
+
+  /*
+   * A group in the flyout: its channels and members as two tiles in the header, before Steam's
+   * bell, invite and settings (each opens Steam's own list as a small menu), and its call as a bar
+   * under the header.
+   */
+  const keepFocus = (event) => event.preventDefault();
+
+  function buildGroupTools(doc) {
+    const tools = doc.createElement('span');
+    tools.className = 'se-fd-group-tools';
+    tools.innerHTML =
+      '<button type="button" class="se-call-tool" data-tool="channels" aria-expanded="false" aria-label="Channels" title="Channels"></button>' +
+      '<button type="button" class="se-call-tool" data-tool="members" aria-expanded="false" aria-label="Members" title="Members"></button>';
+    // A press doesn't focus them: Steam's focus handling then marked them focus-visible, a ring on
+    // every click. Tab still reaches them, with the ring.
+    tools.addEventListener('mousedown', keepFocus);
+    return tools;
+  }
+
   function syncGroupFlyouts() {
     for (const [win, entry] of groupFlyouts) {
       if (!ns.chatRoot().contains(win)) entry.dispose();
     }
     for (const win of ns.chatRoot().querySelectorAll('.chatWindow.MultiUserChat')) {
       const headerEl = win.querySelector(':scope > .chatHeader.titleBarContainer');
-      if (!headerEl) continue;
-      win.dataset.seFlyoutGroup = '1';
+      const controls = headerEl?.querySelector('.chatRoomGroupControls');
+      if (!controls) continue;
       let entry = groupFlyouts.get(win);
 
-      if (!entry || !win.contains(entry.tools)) {
+      if (!entry || !controls.contains(entry.tools) || !win.contains(entry.callBar)) {
         entry?.dispose();
-        const tools = document.createElement('div');
-        const channels = document.createElement('button');
-        const members = document.createElement('button');
-        tools.className = 'se-fd-group-tools';
-        channels.type = 'button';
-        members.type = 'button';
-        channels.className = 'se-fd-group-channels';
-        members.className = 'se-fd-group-members';
-        channels.setAttribute('aria-expanded', 'false');
-        members.setAttribute('aria-expanded', 'false');
-        channels.setAttribute('aria-label', 'Show text and voice channels');
-        members.setAttribute('aria-label', 'Show group members');
-        tools.append(channels, members);
-        win.insertBefore(tools, headerEl.nextSibling);
+        win.dataset.seFlyoutGroup = '1';
+        const doc = win.ownerDocument;
+        const tools = buildGroupTools(doc);
+        const [channels, members] = tools.children;
+        controls.prepend(tools);
+        const callBar = buildCallBar(doc);
+        win.insertBefore(callBar, headerEl.nextSibling);
 
         const toggle = (panel) => {
           const open = win.dataset.seGroupPanel !== panel;
@@ -174,64 +264,45 @@
           tools,
           channels,
           members,
-          toggle,
-          voiceBar: null,
+          callBar,
           dispose() {
             channels.removeEventListener('click', showChannels);
             members.removeEventListener('click', showMembers);
             win.removeEventListener('click', onChoose);
+            callBar.removeEventListener('click', onCallTool);
+            tools.removeEventListener('mousedown', keepFocus);
             tools.remove();
-            entry.voiceBar?.remove();
+            callBar.remove();
             delete win.dataset.seFlyoutGroup;
             delete win.dataset.seGroupPanel;
+            win.removeAttribute('data-se-in-call');
+            win.style.removeProperty('--se-members-rows');
             groupFlyouts.delete(win);
           },
         };
         groupFlyouts.set(win, entry);
       }
 
-      const channel =
-        win
-          .querySelector('.ActiveTextChannel .chatRoomTextChannelName')
-          ?.textContent.trim()
-          .replace(/^#\s*/, '') || 'Channels';
-      const label = channel === 'Channels' ? 'Channels ▾' : `# ${channel} ▾`;
-      if (entry.channels.textContent !== label) entry.channels.textContent = label;
-
-      const total = headerEl.querySelector('.statMembersTotal')?.textContent.trim();
-      const membersLabel = total || 'Members';
-      if (entry.members.textContent !== membersLabel) entry.members.textContent = membersLabel;
-
-      const column = win.querySelector('.chatHistoryAndMembers > .displayColumn.fullWidth');
-      let composer = column?.querySelector('.chatEntry');
-      if (column && composer) {
-        while (composer.parentElement !== column) composer = composer.parentElement;
-        if (!entry.voiceBar || !win.contains(entry.voiceBar)) {
-          const bar = document.createElement('div');
-          const status = document.createElement('span');
-          const action = document.createElement('button');
-          bar.className = 'se-fd-group-voice';
-          action.type = 'button';
-          action.addEventListener('click', () => entry.toggle('channels'));
-          bar.append(status, action);
-          column.insertBefore(bar, composer);
-          entry.voiceBar = bar;
-        }
-        const currentVoice = win.querySelector('.ActiveVoiceChannel .chatRoomVoiceChannelName')?.textContent.trim();
-        const voiceLabel = currentVoice ? `Voice · ${currentVoice}` : 'Voice channels';
-        const actionLabel = currentVoice ? 'Manage voice' : 'Join voice ▾';
-        if (entry.voiceBar.firstChild.textContent !== voiceLabel) {
-          entry.voiceBar.firstChild.textContent = voiceLabel;
-        }
-        if (entry.voiceBar.lastChild.textContent !== actionLabel) {
-          entry.voiceBar.lastChild.textContent = actionLabel;
-        }
-        const noVoice = !win.querySelector('.chatRoomVoiceChannel');
-        if (entry.voiceBar.hidden !== noVoice) entry.voiceBar.hidden = noVoice;
+      const membersLabel = headerEl.querySelector('.statMembersTotal')?.textContent.trim() || 'Members';
+      if (entry.members.title !== membersLabel) {
+        entry.members.title = membersLabel;
+        entry.members.setAttribute('aria-label', membersLabel);
       }
+      syncCallBar(win, entry.callBar);
+      // Its members menu lists the online ones (member-list.js)
+      ns.hideOfflineMembers?.(win);
+      // ...as tall as its rows: Steam's list is virtualized (no height of its own), and its inner
+      // box's inline height is the rows' total, read with no layout
+      const rows = win.querySelector('.MemberListColumn > .Panel [style*="will-change"] > div')?.style.height || '';
+      if (win.style.getPropertyValue('--se-members-rows') !== rows) win.style.setProperty('--se-members-rows', rows || null);
 
-      const noChannels = !win.querySelector('.chatRoomGroupNavColumn');
-      if (entry.channels.disabled !== noChannels) entry.channels.disabled = noChannels;
+      // A group with only its default chat has an empty list (no channels, no "Add voice channel"):
+      // no # then, rather than an empty menu; a call still starts from the message box
+      const noChannels = !win.querySelector(
+        '.chatRoomGroupNavColumn :is(.chatRoomTextChannel, .chatRoomVoiceChannel, .ChannelTypeTitle)'
+      );
+      SE.attr(entry.channels, 'hidden', noChannels ? '' : null);
+      if (noChannels && win.dataset.seGroupPanel === 'channels') closeGroupPanels();
       const noMembers = !win.querySelector('.MemberListColumn');
       if (entry.members.disabled !== noMembers) entry.members.disabled = noMembers;
     }

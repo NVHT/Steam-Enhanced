@@ -403,6 +403,8 @@
           const group = resolveChatGroup(item);
           const statusBox = item.querySelector('.groupNameStatusContainer');
           if (statusBox) setAttr(statusBox, 'data-se-sub', group ? formatLastMessage(group) : '');
+          // No picture of its own (its members'): no "?" faces
+          SE.markGroupFaces?.(item.querySelector('.ChatRoomMultiFriendAvatar'));
           const voiceIndicator = item.querySelector('.membersInVoice');
           if (voiceIndicator) {
             setAttr(voiceIndicator, 'data-se-voice', (group && activeVoiceChannelName(group)) || 'Voice');
@@ -454,7 +456,7 @@
       for (const el of document.querySelectorAll(`${LIST_SELECTOR} .tabLabel[role="button"]`)) {
         for (const name of ['role', 'tabindex', 'aria-expanded', 'data-se-count']) el.removeAttribute(name);
       }
-      for (const attrName of ['data-se-who', 'data-se-sub', 'data-se-voice']) {
+      for (const attrName of ['data-se-who', 'data-se-sub', 'data-se-voice', 'data-se-faces', 'data-se-bare']) {
         for (const el of document.querySelectorAll(`${LIST_SELECTOR} [${attrName}]`)) {
           el.removeAttribute(attrName);
         }

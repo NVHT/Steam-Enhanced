@@ -402,3 +402,36 @@
 .friendlist:not(.GamepadMode) .friendListHeaderContainer .VoiceControlPanelButton.chatInvite {
   display: none !important;
 }
+
+/*
+ * A group without its own picture (Steam's mosaic of its members'), in a chat header and the
+ * Friends list (SE.markGroupFaces): its "?" faces left out, the others sharing the tile
+ * (data-se-faces, how many: one fills it, two side by side, three with the first down the left,
+ * four in quarters; every face kept when all are "?"). !important: Steam's
+ * absolute quarters (sp.css .MultiAvatar) and utility/friends.css's heights for two and three.
+ */
+.ChatRoomMultiFriendAvatar > [data-se-bare] {
+  display: none !important;
+}
+
+.ChatRoomMultiFriendAvatar[data-se-faces] {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+}
+
+.ChatRoomMultiFriendAvatar[data-se-faces="1"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ChatRoomMultiFriendAvatar[data-se-faces] > .MultiAvatar {
+  position: static !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+/* Three: the first shown face down the left */
+.ChatRoomMultiFriendAvatar[data-se-faces="3"] > :not([data-se-bare]):not(:not([data-se-bare]) ~ *) {
+  grid-row: span 2;
+}

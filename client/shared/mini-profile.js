@@ -7,6 +7,7 @@
  *   SE.profileBackground(accountId)  a promise of { video, still } (either may be missing), or
  *                                    null when the friend has none or the fetch failed
  *   SE.isDefaultAvatar(url)          the URL is Steam's "?" picture
+ *   SE.markGroupFaces(picture)       a group's members' picture without their "?" faces
  *
  * Fetched once per friend and shared across windows: the cache sits on the opener's runtime
  * (window.__se), which popup windows reach; it keeps the 50 most recent friends.
@@ -35,6 +36,19 @@
 
   const DEFAULT_AVATAR = /fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb/i;
   SE.isDefaultAvatar = (url) => typeof url === 'string' && DEFAULT_AVATAR.test(url);
+
+  // A group picture made of its members' (Steam's ChatRoomMultiFriendAvatar: a group without its
+  // own): their "?" faces left out, the others sharing the tile (groups.css data-se-faces); all
+  // of them kept when every face is a "?"
+  SE.markGroupFaces = (picture) => {
+    if (!picture) return;
+    const faces = [...picture.children];
+    const bare = faces.map((face) => face.tagName === 'IMG' && SE.isDefaultAvatar(face.getAttribute('src')));
+    const real = bare.filter((b) => !b).length;
+    const trim = real > 0 && real < faces.length;
+    faces.forEach((face, i) => SE.attr(face, 'data-se-bare', trim && bare[i]));
+    SE.attr(picture, 'data-se-faces', trim ? Math.min(real, 4) : null);
+  };
 
   SE.profileBackground = async (accountId) => {
     const bg = (await miniProfile(accountId))?.profile_background;

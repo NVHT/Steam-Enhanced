@@ -328,6 +328,7 @@
       document.removeEventListener('contextmenu', markDesktopInteraction, true);
       disposeSteam();
       unguardLibraryManagers();
+      ns.showOfflineMembers?.();
       restoreChatRouting();
       steamHost.removeEventListener('click', onNativeFriendClick, true);
       steamHost.removeEventListener('dblclick', onNativeFriendClick, true);

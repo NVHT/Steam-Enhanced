@@ -530,6 +530,12 @@ a.connectionStatus:not(.GamepadMode *) {
  * Talking and Decline stay while you're the one invited. The message box loses its call buttons
  * meanwhile (they're on the bar), and the header its call button.
  */
+/* A call's bar, one-to-one or a group's (friends-dock-chat.css .se-fd-group-call) */
+.multiChatDialog[data-se-chat] {
+  --se-call-bar-bg: color-mix(in srgb, var(--se-running) 10%, var(--se-sidebar));
+  --se-call-bar-edge: inset 0 -1px 0 color-mix(in srgb, var(--se-running) 25%, transparent);
+}
+
 .multiChatDialog[data-se-chat] .chatWindow[data-se-friendchat] .OneOnOneVoiceRoomControls:not(#se-none) {
   display: flex !important;
   flex-direction: row !important;
@@ -540,8 +546,8 @@ a.connectionStatus:not(.GamepadMode *) {
   padding: var(--se-space-2) var(--se-space-3) var(--se-space-2) var(--se-chat-gutter) !important;
   border: 0 !important;
   border-radius: 0 !important;
-  background: color-mix(in srgb, var(--se-running) 10%, var(--se-sidebar)) !important;
-  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--se-running) 25%, transparent) !important;
+  background: var(--se-call-bar-bg) !important;
+  box-shadow: var(--se-call-bar-edge) !important;
 }
 
 /*
@@ -673,6 +679,36 @@ a.connectionStatus:not(.GamepadMode *) {
 
 .se-call-tool[data-off] {
   color: var(--se-danger);
+}
+
+/* Leave, as the one-to-one bar's hang-up: one red tile (client/friends/dock/flyouts.js) */
+.se-call-tool[data-tool="end"] {
+  --se-call-ico: var(--se-chat-ico-hangup);
+  background: color-mix(in srgb, var(--se-danger) 85%, transparent);
+  color: var(--se-text-strong);
+}
+
+.se-call-tool[data-tool="end"]:hover {
+  background: var(--se-danger);
+}
+
+/* A group's channels and members in the dock's header (flyouts.js), open while their menu is */
+.se-call-tool[data-tool="channels"] {
+  --se-call-ico: var(--se-chat-ico-hash);
+}
+
+.se-call-tool[data-tool="members"] {
+  --se-call-ico: var(--se-icon-friends);
+}
+
+.se-call-tool[aria-expanded="true"] {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.se-call-tool:disabled {
+  opacity: .4;
+  cursor: default;
 }
 
 /* While a call is on: no call buttons in the message box (one line again), none in the header */
@@ -872,11 +908,20 @@ a.connectionStatus:not(.GamepadMode *) {
   border: 0 !important;
 }
 
-.multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupHeader .ChatRoomGroupAvatar {
+.multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupHeader :is(.ChatRoomGroupAvatar, .ChatRoomMultiFriendAvatar) {
   flex: none;
   width: 36px !important;
   height: 36px !important;
   margin: 0 !important;
+}
+
+/* A group without its own picture (its members'): a rounded square as the dock's, no frame */
+.multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupHeader .ChatRoomMultiFriendAvatar {
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  box-shadow: none;
+  transform: none;
 }
 
 .multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupHeader .ChatRoomGroupAvatar img {

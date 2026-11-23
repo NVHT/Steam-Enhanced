@@ -1,9 +1,10 @@
 /*
  * Populate direct-chat headers, group-chat layout attributes, and composer placeholders; and read
  * the log (syncLog): a sender's blocks within ten minutes form one run (data-se-run: the later
- * blocks lose their speaker line), each line knows its place in its run (data-se-pos: first,
- * mid, last or only, so a one-to-one chat's bubbles join), the speaker line shows the time only
- * (data-se-time: the day lines give the date), and a day line with nothing under it hides
+ * blocks lose their speaker line), a later run by the same sender continues their streak
+ * (data-se-streak: its time only, no face or name again), each line knows its place in its run
+ * (data-se-pos: first, mid, last or only, so a run's bubbles join), the speaker line's time
+ * shows the hour only (data-se-time: the day lines give the date), and a day line with nothing under it hides
  * (data-se-trailing). Styles: messages.css, bubbles.css.
  */
 ((SE) => {
@@ -71,6 +72,9 @@
   const messagesOf = (block) =>
     SE.fromProps(block, 6, (p) => (Array.isArray(p.messages) && p.messages.length ? p.messages : undefined));
 
+  // A group header's picture made of its members' (a group without its own): no "?" faces
+  const markGroupPicture = (win) => SE.markGroupFaces?.(win.querySelector(':scope > .chatHeader .ChatRoomMultiFriendAvatar'));
+
   const syncLog = (win) => {
     const items = win.querySelectorAll(LOG_ITEMS);
     let prev = null;
@@ -94,8 +98,11 @@
       const first = msgs?.[0];
       const last = msgs?.[msgs.length - 1];
       const gap = first && prev ? first.rtTimestamp - prev.last : -1;
-      const continues = !!(prev && first.unAccountID === prev.sender && gap >= 0 && gap <= RUN_GAP);
+      const sameSender = !!(prev && first && first.unAccountID === prev.sender);
+      const continues = sameSender && gap >= 0 && gap <= RUN_GAP;
       SE.attr(item, 'data-se-run', continues);
+      // A new run by the same sender (after a pause): a group shows its time, not the face again
+      SE.attr(item, 'data-se-streak', sameSender && !continues);
       if (!continues) endRun();
       lines.push(...item.querySelectorAll('.msg:not(.timeDivision)'));
       const stamp = item.querySelector('.ChatSpeaker .speakerTimeStamp');
@@ -358,7 +365,7 @@
     const tab = face && tabOf.get(face);
     if (!tab?.isConnected) return;
     if (event.target.closest(`.${RAIL}-close`)) {
-      tab.querySelector('.CloseButton, ._1JXI4j2_xSpVK1YjyEuebr')?.click();
+      tab.querySelector(`.CloseButton, .${C.CloseButton}`)?.click();
       return;
     }
     // A tab is a focusable panel that switches through its own activation, not a click: call the
@@ -381,7 +388,7 @@
   const syncFace = (face, tab) => {
     const friend = tab.querySelector('.friend');
     const name =
-      tab.querySelector('.playerName, .chatTabName, ._1HNpQBKKKQ1tG2OZH3CSsh')?.textContent.trim() ||
+      tab.querySelector(`.playerName, .chatTabName, .${C.ChatTabContent_ChatRoomName}`)?.textContent.trim() ||
       tab.textContent.trim();
     const src = tab.querySelector('img')?.getAttribute('src') || '';
     const img = face.querySelector('img');
@@ -464,6 +471,7 @@
           syncComposerPlaceholder(win, partnerName ? `Message ${partnerName}` : '');
         } else {
           SE.unmark(win, 'data-se-friendchat');
+          markGroupPicture(win);
           const channelName = win
             .querySelector('.ActiveTextChannel .chatRoomTextChannelName')
             ?.textContent.trim()
@@ -543,8 +551,8 @@
         for (const el of doc.querySelectorAll('.se-chat-head, .se-group-channel, .se-chat-rail, .se-call-tools')) el.remove();
         for (const el of doc.querySelectorAll('[data-se-rail]')) el.removeAttribute('data-se-rail');
         for (const el of doc.querySelectorAll('[data-se-stats]')) el.removeAttribute('data-se-stats');
-        for (const el of doc.querySelectorAll('[data-se-run], [data-se-time], [data-se-trailing], [data-se-pos]')) {
-          for (const name of ['data-se-run', 'data-se-time', 'data-se-trailing', 'data-se-pos']) el.removeAttribute(name);
+        for (const el of doc.querySelectorAll('[data-se-run], [data-se-streak], [data-se-time], [data-se-trailing], [data-se-pos], [data-se-faces], [data-se-bare]')) {
+          for (const name of ['data-se-run', 'data-se-streak', 'data-se-time', 'data-se-trailing', 'data-se-pos', 'data-se-faces', 'data-se-bare']) el.removeAttribute(name);
         }
         for (const el of doc.querySelectorAll('[data-se-grouplayout], [data-se-friendchat]')) {
           el.removeAttribute('data-se-grouplayout');

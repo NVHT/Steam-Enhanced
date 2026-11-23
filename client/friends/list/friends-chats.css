@@ -471,12 +471,34 @@
   transform: none;
 }
 
-/* The channels, when shown: rows indented under the chat's name */
+/*
+ * The channels, when shown: a short list under the chat's name (lined up with it, past the
+ * picture), not Steam's dark well indented twice (sp.css .detailsView and its 46 px margin).
+ * A voice channel is its icon and name on one line, the people in it as small rows under that,
+ * green while you're in it; Steam's italic for a channel not yet saved goes.
+ */
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .detailsView {
+  padding: 0 0 var(--se-space-1) !important;
+  background: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms {
+  margin: 0 !important;
+  padding: 0 var(--se-space-2) 0 52px !important;
+}
+
 .friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel {
-  margin: 0 0 var(--se-space-half) 51px !important;
-  padding: 0 var(--se-space-2) !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch;
+  width: auto !important;
+  margin: 0 0 var(--se-space-half) !important;
+  padding: var(--se-space-1) var(--se-space-2) !important;
   border-radius: var(--se-radius-sm);
   background: none !important;
+  box-shadow: none !important;
 }
 
 .friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel:hover {
@@ -486,4 +508,127 @@
 .friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel.ActiveVoiceChannel {
   background: color-mix(in srgb, var(--se-running) 10%, transparent) !important;
   color: var(--se-running);
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannelNameContainer {
+  justify-content: flex-start !important;
+  gap: var(--se-space-2);
+  min-height: 0 !important;
+  margin: 0 !important;
+}
+
+/* The theme's speaker (icons.css), as in the chat and on its call bar, not Steam's mic picture */
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannelIcon {
+  display: flex !important;
+  flex: none;
+  width: var(--se-icon-md) !important;
+  height: var(--se-icon-md) !important;
+  margin: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannelIcon svg {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannelIcon::before {
+  content: '';
+  width: 100%;
+  height: 100%;
+  background: currentColor;
+  -webkit-mask: var(--se-chat-ico-speaker) center / contain no-repeat;
+  mask: var(--se-chat-ico-speaker) center / contain no-repeat;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannelName {
+  font: 500 var(--se-fs-sm) / 1.3 var(--se-font) !important;
+  font-style: normal !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms :is(.chatRoomVoiceChannelIconGlow, .chatRoomVoiceChannel .chatRoomTextChannel) {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .VoiceChannelParticipants {
+  margin: var(--se-space-1) 0 0 !important;
+  padding: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .emptyChannelNotice {
+  margin: var(--se-space-half) 0 0 !important;
+  padding: 0 !important;
+  font: var(--se-type-small) !important;
+  text-align: start !important;
+  color: var(--se-text-faint) !important;
+}
+
+/* The people in a voice channel: their faces in a row (who they are shows on hover) */
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel .VoiceChannelParticipants > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-1);
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel .VoiceChannelParticipants .friend {
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel .VoiceChannelParticipants .friend .labelHolder {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel .VoiceChannelParticipants .friend .avatarHolder {
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+}
+
+/*
+ * The channel you're in, as the chat's call bar: its name (and Steam's menu) on the first line;
+ * the faces, then mic, headphones and leave on the second. The controls lose their own green
+ * box (voice.css, the bar over the friends list) inside the card, which carries the green.
+ * "No one else in this voice channel" goes: a single face says it.
+ */
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel.ActiveVoiceChannel {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--se-space-1) var(--se-space-2);
+  padding: var(--se-space-2) var(--se-space-2) var(--se-space-2) var(--se-space-3) !important;
+  border-radius: var(--se-radius-md);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-running) 25%, transparent) !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel.ActiveVoiceChannel .chatRoomVoiceChannelNameContainer {
+  grid-column: 1 / -1;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel.ActiveVoiceChannel .chatPinRoom {
+  margin-inline-start: auto !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel.ActiveVoiceChannel .VoiceChannelParticipants {
+  grid-column: 1;
+  margin: 0 !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel.ActiveVoiceChannel .emptyChannelNotice {
+  display: none !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel.ActiveVoiceChannel .activeVoiceControls {
+  grid-column: 2;
+  grid-row: 2;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItemChatRooms .chatRoomVoiceChannel.ActiveVoiceChannel .activeVoiceLabels {
+  display: none !important;
 }
