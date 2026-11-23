@@ -144,7 +144,7 @@
     ['main', 'client/home/', ['home-shelves.css', 'home-shelves.js']],
     ['main', 'client/home/stage/', ['stage.css', 'stage-hero.css', 'stage-settings.css', 'stage-tray.css', 'stage-shelves.css', 'stage-panels.css', 'stage-narrow.css', 'util.js', 'tray.js', 'picks.js', 'stage-settings.js', 'panels-library.js', 'panels-community.js', 'board.js', 'home-mode.js', 'stage.js', 'stage-art.js', 'data.js', 'main.js']],
     // Menus, hover cards, notifications, dialogs
-    ['all', 'client/dialogs/', ['dialogs.css']],
+    ['all', 'client/dialogs/', ['dialogs.css', 'confirm.css']],
     ['content', 'client/dialogs/', ['install.css', 'eula.css']],
     ['all', 'client/shared/', ['hover-cards.css']],
     ['all', 'client/friends/', ['friend-hover.css', 'friend-hover.js']],
@@ -168,7 +168,8 @@
       'eula.js', 'uninstall.css', 'uninstall.js', 'new-collection.css', 'new-collection.js',
       'delete-collection.css', 'delete-collection.js', 'mark-private.css', 'mark-private.js',
       'exit-game.css', 'exit-game.js', 'cd-keys.css', 'cd-keys.js', 'friend-picker.css',
-      'friend-picker.js', 'friend-dialogs.css', 'friend-dialogs.js', 'report-content.css',
+      'friend-picker.js', 'friend-dialogs.css', 'friend-dialogs.js', 'group-settings.css', 'group-settings.js',
+      'report-content.css',
     ]],
     // Plugin integrations
     ['main', 'compat/hltb-for-steam/', ['hltb-for-steam.css', 'hltb-for-steam.js']],

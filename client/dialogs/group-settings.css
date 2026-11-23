@@ -1,0 +1,973 @@
+/*
+ * A group chat's Group Settings, led by the chat (client/dialogs/group-settings.js):
+ * Steam's sidebar as the dialog's head, its title an eyebrow over the chat (.se-friend-head,
+ * friend-dialogs.css) with its picture blurred behind (.se-dialog-art), its pages as tabs drawn
+ * as the segmented control (client/shared/segmented.css), the page under them.
+ *
+ *   [ GROUP SETTINGS                          the chat's picture, blurred ]
+ *   [ faces  Mira, Theo and NVHT                                         ]
+ *   [        Group chat · 3 members                                      ]
+ *   [ ( Save group chat | Invite links )                           Leave ]  unsaved
+ *   [ ( General | Channels | Permissions | Invite links | … )      Leave ]  saved
+ *   the page
+ *
+ * Steam's classes (module 72945): Container _2VY6HOZ…, Nav xSTLmzyl…, NavTitle uyoPtKbi…,
+ * NavItems MWzjHR-u…, NavItem _2YV0m3IR…, Active _1DfstUr4…, Content _3mf9BBKx…; module 86360:
+ * DialogTitle e600t61O…; module 36308: LeaveButton _1NqKTWvx…. !important: the sidebar's own
+ * rules in client/dialogs/utility/friends.css (themselves !important against Steam's).
+ */
+
+/*
+ * The dialog is its window: the head stays, the page scrolls under it, and the window keeps
+ * Steam's size (grown to each page, it ran past the screen)
+ */
+[data-se-groupset]._2VY6HOZXxO2AsBaLssl0Uy {
+  position: relative;
+  isolation: isolate;
+  flex-direction: column !important;
+  box-sizing: border-box;
+  background: var(--se-surface);
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ---------- The head: the chat, then the tabs ---------- */
+
+/*
+ * The chat's picture behind the whole dialog's top, fading into the page as in the friend
+ * dialogs (.se-dialog-art, dialogs.css): head and page lie on it with no surface of their own
+ */
+/* The head here is taller than a friend dialog's (the tabs under the chat): the art reaches past it */
+[data-se-groupset]._2VY6HOZXxO2AsBaLssl0Uy > .se-dialog-art {
+  height: calc(var(--se-dialog-art-h) + 120px);
+}
+
+[data-se-groupset]._2VY6HOZXxO2AsBaLssl0Uy > :not(.se-dialog-art) {
+  position: relative;
+  z-index: var(--se-z-raised);
+}
+
+[data-se-groupset] .xSTLmzylFJdIfak7ZdhuA {
+  position: relative;
+  flex: none;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  padding: var(--se-space-6) var(--se-space-6) var(--se-space-4) !important;
+  background: none !important;
+  box-shadow: none;
+}
+
+/* The title, "Group Settings", as the dialogs' eyebrow (dialogs.css) */
+[data-se-groupset] .xSTLmzylFJdIfak7ZdhuA .uyoPtKbi4K01XGuYF5-C_ {
+  margin: 0 0 var(--se-space-3) !important;
+  padding: 0;
+  font: var(--se-eyebrow-font) !important;
+  letter-spacing: var(--se-eyebrow-spacing) !important;
+  text-transform: uppercase !important;
+  color: var(--se-eyebrow-color) !important;
+  text-shadow: var(--se-text-shadow-art);
+}
+
+[data-se-groupset] .se-friend-head {
+  margin: 0 0 var(--se-space-4);
+}
+
+/*
+ * The pages as tabs: Steam's nav items drawn as the segmented control's track and buttons
+ * (client/shared/segmented.css; React owns their classes, so they can't carry .se-seg-btn)
+ */
+[data-se-groupset] .xSTLmzylFJdIfak7ZdhuA .MWzjHR-uqa-svGrdXYfUl {
+  display: inline-flex;
+  flex-direction: row;
+  align-self: flex-start;
+  /* The row's end is Leave's (about 170 px with its gap) */
+  max-width: calc(100% - 180px);
+  box-sizing: border-box;
+  /* Six pages in a long language: the row scrolls sideways rather than overrun the dialog */
+  overflow-x: auto;
+  gap: var(--se-space-half);
+  padding: var(--se-space-half);
+  border-radius: var(--se-radius-md);
+  background: var(--se-field);
+  box-shadow: var(--se-search-edge);
+}
+
+[data-se-groupset] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV {
+  position: relative;
+  flex: none;
+  gap: var(--se-space-2);
+  height: var(--se-control-h-sm);
+  padding: 0 var(--se-space-3);
+  background: none !important;
+  font: 600 var(--se-fs-base) / 1 var(--se-font) !important;
+  color: var(--se-text-muted) !important;
+  cursor: pointer;
+}
+
+/* The hit area out to --se-hit above and below, as the segmented control's */
+[data-se-groupset] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV::after {
+  content: '';
+  position: absolute;
+  inset: calc((100% - var(--se-hit)) / 2) 0;
+}
+
+[data-se-groupset] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV:is(:hover, .gpfocus):not(._1DfstUr4tIt3Jdt7Mrxfxo) {
+  background: var(--se-hairline) !important;
+  color: var(--se-text-strong) !important;
+}
+
+[data-se-groupset] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV._1DfstUr4tIt3Jdt7Mrxfxo {
+  background: var(--se-selected) !important;
+  color: var(--se-text-strong) !important;
+  font-weight: 600 !important;
+}
+
+[data-se-groupset] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/*
+ * Each page's duotone icon (16 px, so its fill shows), in Steam's order: an unsaved chat's Save,
+ * Invite Links; a saved group's General, Channels, Permissions, Invite Links, Invited Users, Bans
+ */
+[data-se-groupset] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV::before {
+  content: '';
+  flex: none;
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  background: currentColor;
+  -webkit-mask: var(--se-gs-icon, var(--se-icon-group)) center / contain no-repeat;
+  mask: var(--se-gs-icon, var(--se-icon-group)) center / contain no-repeat;
+}
+
+/* A saved group's five or six tabs: a narrower step each, and the row up to Leave's square */
+[data-se-groupset="saved"] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV {
+  padding: 0 var(--se-space-2);
+}
+
+[data-se-groupset="saved"] .xSTLmzylFJdIfak7ZdhuA .MWzjHR-uqa-svGrdXYfUl {
+  max-width: calc(100% - var(--se-control-h-sm) - var(--se-space-4));
+}
+
+[data-se-groupset="unsaved"] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV:nth-child(2) {
+  --se-gs-icon: var(--se-icon-link);
+}
+
+/* An unsaved chat's Leave Group Chat page: the head's Leave button does it */
+[data-se-groupset="unsaved"] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV:nth-child(3) {
+  display: none !important;
+}
+
+[data-se-groupset="saved"] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV:nth-child(1) {
+  --se-gs-icon: var(--se-icon-settings);
+}
+
+[data-se-groupset="saved"] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV:nth-child(2) {
+  --se-gs-icon: var(--se-icon-bubble);
+}
+
+[data-se-groupset="saved"] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV:nth-child(3) {
+  --se-gs-icon: var(--se-icon-shield);
+}
+
+[data-se-groupset="saved"] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV:nth-child(4) {
+  --se-gs-icon: var(--se-icon-link);
+}
+
+[data-se-groupset="saved"] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV:nth-child(5) {
+  --se-gs-icon: var(--se-icon-friends);
+}
+
+[data-se-groupset="saved"] .MWzjHR-uqa-svGrdXYfUl ._2YV0m3IRCNOoUV9YhJNFnV:nth-child(6) {
+  --se-gs-icon: var(--se-icon-exclude);
+}
+
+/*
+ * Leave (Steam's sidebar foot button, its confirm): a small red button on the tabs' row, its end
+ * on the page's right edge (the head's padding), centred on the tabs' track
+ */
+[data-se-groupset] ._1NqKTWvxtFgflRlqLTtv7e {
+  position: absolute !important;
+  bottom: calc(var(--se-space-4) + var(--se-space-half));
+  inset-inline-end: var(--se-space-6);
+  gap: var(--se-space-2);
+  height: var(--se-control-h-sm) !important;
+  padding: 0 var(--se-space-3) !important;
+  background: var(--se-danger-btn-bg) !important;
+  font: 600 var(--se-fs-base) var(--se-font) !important;
+  color: var(--se-danger-btn-fg) !important;
+}
+
+[data-se-groupset] ._1NqKTWvxtFgflRlqLTtv7e:is(:hover, .gpfocus) {
+  background: var(--se-danger-btn-bg-hover) !important;
+  color: var(--se-danger-btn-fg-hover) !important;
+}
+
+/*
+ * A saved group's Leave: the icon alone on a square, beside six tabs (its name in its tooltip,
+ * group-settings.js; the label stays for screen readers)
+ */
+[data-se-groupset="saved"] ._1NqKTWvxtFgflRlqLTtv7e {
+  justify-content: center;
+  /* No gap: the hidden label would still take one beside the icon, pushing it off centre */
+  gap: 0;
+  width: var(--se-control-h-sm);
+  padding: 0 !important;
+  font-size: 0 !important;
+}
+
+/* Steam's exit glyph gives way to the theme's duotone one, in the label's tone */
+[data-se-groupset] ._1NqKTWvxtFgflRlqLTtv7e svg {
+  display: none !important;
+}
+
+[data-se-groupset] ._1NqKTWvxtFgflRlqLTtv7e::before {
+  content: '';
+  flex: none;
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-sign-out) center / contain no-repeat;
+  mask: var(--se-icon-sign-out) center / contain no-repeat;
+}
+
+/* ---------- The page ---------- */
+
+[data-se-groupset] ._3mf9BBKxhIVdrt6nIWBt4x {
+  flex: 1;
+  background: none !important;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/*
+ * The page lies on the art too: Steam's page wrapper (DialogContent _3t8HxXdv…) also carries
+ * .DialogContent, which dialogs.css paints in the dialog colour
+ */
+[data-se-groupset] ._3mf9BBKxhIVdrt6nIWBt4x > .DialogContent:not(#se-none) {
+  background: none;
+}
+
+/* The page's title ("Invite Links", "General"…): the tab names it */
+[data-se-groupset] .e600t61ObcLA11pIZAVb9 {
+  display: none !important;
+}
+
+/* The link's Copy: the page's main action (friends.css draws it secondary elsewhere) */
+[data-se-groupset] .inviteLinkContainer .DialogButton.DialogInput_CopyAction:not(#se-none) {
+  background: var(--se-btn-primary-bg) !important;
+  box-shadow: none !important;
+  color: var(--se-btn-primary-color) !important;
+}
+
+[data-se-groupset] .inviteLinkContainer .DialogButton.DialogInput_CopyAction:not(#se-none):hover {
+  background: var(--se-btn-primary-bg-hover) !important;
+  color: var(--se-btn-primary-color) !important;
+}
+
+/* The link starts level with the other pages' first line (friends.css sets it 16 px down) */
+[data-se-groupset] .inviteLinkContainer .DialogInputLabelGroup:not(#se-none) {
+  margin-top: 0;
+}
+
+/* Copy a step from the field, as the Save page's button. !important: friends.css's margin: 0 !important */
+[data-se-groupset] .inviteLinkContainer .DialogButton.DialogInput_CopyAction:not(#se-none) {
+  margin-inline-start: var(--se-space-2) !important;
+}
+
+/* A link's expiry as time left (group-settings.js); Steam's date in its tooltip */
+[data-se-groupset] .InviteLinksTable .dateCell[data-se-left]:not(#se-none) {
+  font-size: 0;
+}
+
+[data-se-groupset] .InviteLinksTable .dateCell[data-se-left]::after {
+  content: attr(data-se-left);
+  font: 500 var(--se-fs-base) var(--se-font);
+  color: var(--se-text-muted);
+}
+
+[data-se-groupset] .InviteLinksTable .buttonCell {
+  white-space: nowrap;
+}
+
+/* Copy and Delete side by side (dialogs.css draws a DialogButton as a block) */
+[data-se-groupset] .InviteLinksTable .buttonCell button.DialogButton:not(#se-none) {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+/* A row's Copy: a quiet icon button before Delete, ticked once copied */
+.se-gs-copy {
+  all: unset;
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  width: var(--se-control-h-sm);
+  height: var(--se-control-h-sm);
+  margin: 0 var(--se-space-2) 0 0;
+  vertical-align: middle;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-btn-bg);
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-text-muted);
+  cursor: pointer;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.se-gs-copy:hover {
+  background: var(--se-btn-bg-hover);
+  color: var(--se-text-strong);
+}
+
+.se-gs-copy:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-gs-copy::before {
+  content: '';
+  position: absolute;
+  inset: calc((100% - var(--se-icon-md)) / 2);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-copy) center / contain no-repeat;
+  mask: var(--se-icon-copy) center / contain no-repeat;
+}
+
+.se-gs-copy[data-copied] {
+  color: var(--se-accent);
+}
+
+.se-gs-copy[data-copied]::before {
+  -webkit-mask-image: var(--se-icon-check);
+  mask-image: var(--se-icon-check);
+}
+
+/*
+ * A saved group's General page: the group's picture on a tile with "Change Icon" under it, beside
+ * the Name and Tagline fields. Steam's classes (module 36308): General _38sRYifM…, AvatarAndUser
+ * _3-e9k12t…, Avatar _2TJPfQdx…, NoIconLabel _2c3OKW25…; its own rules (sp.css: a 148 px circle
+ * that grows on hover, the "No icon" label placed 94 px down) give way to these.
+ */
+[data-se-groupset] ._38sRYifM5bHCBBAIeuABUx > * {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--se-space-6);
+}
+
+[data-se-groupset] ._38sRYifM5bHCBBAIeuABUx ._3-e9k12ttwoC0nGNdXyJeV {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--se-space-2);
+  width: 112px;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* Steam's "Icon" label over the picture: the tile says it */
+[data-se-groupset] ._3-e9k12ttwoC0nGNdXyJeV > .DialogLabel {
+  display: none;
+}
+
+[data-se-groupset] ._38sRYifM5bHCBBAIeuABUx ._2TJPfQdxYFN81vJw-YW9ok {
+  width: 96px;
+  height: 96px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-initials-bg);
+  box-shadow: none;
+  /* An outline, not an inset shadow: the picture draws over a replaced element's inset */
+  outline: 1px solid var(--se-hairline);
+  outline-offset: -1px;
+  object-fit: cover;
+  cursor: default;
+  transition: none;
+}
+
+[data-se-groupset] ._38sRYifM5bHCBBAIeuABUx ._2TJPfQdxYFN81vJw-YW9ok:hover {
+  transform: none;
+  filter: none;
+}
+
+/* "No icon", centred on the empty tile */
+[data-se-groupset] ._38sRYifM5bHCBBAIeuABUx ._2c3OKW255HvX-X5cpenCgx {
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  color: var(--se-text-faint);
+  pointer-events: none;
+}
+
+/*
+ * "Change Icon" / "Add Icon" as a link under the tile. !important: the theme's DialogButton
+ * skin (client/dialogs/dialogs.css), itself !important against Steam's
+ */
+[data-se-groupset] ._3-e9k12ttwoC0nGNdXyJeV button.DialogButton:not(#se-none) {
+  width: auto;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: var(--se-space-1) var(--se-space-2) !important;
+  background: none !important;
+  font: 600 var(--se-fs-base) var(--se-font) !important;
+  line-height: 1.4 !important;
+  color: var(--se-accent) !important;
+}
+
+[data-se-groupset] ._3-e9k12ttwoC0nGNdXyJeV button.DialogButton:not(#se-none):is(:hover, .gpfocus):enabled {
+  background: var(--se-accent-tint) !important;
+  color: var(--se-accent) !important;
+}
+
+[data-se-groupset] ._3-e9k12ttwoC0nGNdXyJeV button.DialogButton:not(#se-none):disabled {
+  display: none;
+}
+
+/* Name, Tagline, then the owner as a card row */
+[data-se-groupset] .GeneralChatSettings {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+[data-se-groupset] .GeneralChatSettings .groupOwnerFriend {
+  margin-top: var(--se-space-2);
+  padding: var(--se-space-2);
+  border-radius: var(--se-radius-md);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
+}
+
+/*
+ * Channels: the two create buttons side by side, then each list (Text, Voice) as a card of rows:
+ * the channel's icon and name, Steam's "home channel" note or Delete as a quiet red link, and the
+ * move arrows beside the row. Steam's rows sit apart on #373d46 (sp.css .ChatGroupSettingsChannels_Row);
+ * Steam's list wraps nothing, so the card is drawn by the rows themselves: the first and last
+ * round its corners.
+ */
+[data-se-groupset] .Rv511F1U683LQWJLvan2r {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  margin: 0 0 var(--se-space-5);
+}
+
+/* The create buttons: icon and label centred. !important: the DialogButton skin's padding (dialogs.css) */
+[data-se-groupset] .Rv511F1U683LQWJLvan2r button.DialogButton:not(#se-none) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--se-space-4) !important;
+  gap: var(--se-space-2);
+  width: auto;
+  margin: 0 !important;
+}
+
+
+/* Text Channels, Voice Channels: the label alone, no rule under it */
+[data-se-groupset] .displayColumn > .DialogHBar {
+  display: none;
+}
+
+[data-se-groupset] .ChatGroupSettingsChannels_Row {
+  align-items: center;
+  gap: var(--se-space-2);
+}
+
+[data-se-groupset] .ChatGroupSettingsChannels_Row ._DialogRow {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  min-height: 44px;
+  height: auto;
+  margin: 0;
+  padding: 0 var(--se-space-3);
+  border-radius: 0;
+  background: var(--se-card-bg);
+  box-shadow: inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline), inset 0 1px 0 var(--se-hairline);
+  color: var(--se-text);
+}
+
+[data-se-groupset] .ChatGroupSettingsChannels_Row:nth-child(3) ._DialogRow {
+  border-start-start-radius: var(--se-radius-md);
+  border-start-end-radius: var(--se-radius-md);
+}
+
+[data-se-groupset] .ChatGroupSettingsChannels_Row:last-child ._DialogRow {
+  border-end-start-radius: var(--se-radius-md);
+  border-end-end-radius: var(--se-radius-md);
+  box-shadow: var(--se-edge);
+}
+
+[data-se-groupset] .ChatGroupSettingsChannels_Row:nth-child(3):last-child ._DialogRow {
+  border-radius: var(--se-radius-md);
+}
+
+[data-se-groupset] .ChatGroupSettingsChannels_Row ._DialogRowLabel {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--se-space-3);
+  min-width: 0;
+  font: 600 var(--se-fs-md) var(--se-font);
+}
+
+/*
+ * Steam's dark room glyphs give way to the theme's duotone ones in the muted tone: a text
+ * channel's bubble, a voice channel's mic (in the create buttons too)
+ */
+[data-se-groupset] :is(.ChatGroupSettingsChannels_Row ._DialogRowLabel, .Rv511F1U683LQWJLvan2r button.DialogButton) svg {
+  display: none;
+}
+
+[data-se-groupset] .ChatGroupSettingsChannels_Row ._DialogRowLabel::before,
+[data-se-groupset] .Rv511F1U683LQWJLvan2r button.DialogButton::after {
+  content: '';
+  flex: none;
+  order: -1;
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-gs-room, var(--se-icon-bubble)) center / contain no-repeat;
+  mask: var(--se-gs-room, var(--se-icon-bubble)) center / contain no-repeat;
+}
+
+[data-se-groupset] :is(.ChatGroupSettingsChannels_Row ._DialogRowLabel, .Rv511F1U683LQWJLvan2r button.DialogButton):has(svg:not(.SVGIcon_TextRoom)) {
+  --se-gs-room: var(--se-icon-mic);
+}
+
+/*
+ * The list as wide as the create buttons above it: in a popup Steam scrolls it on its own
+ * (library.css .ModalDialogPopup .DialogInnerBody: overflow-y scroll, a bar's gutter always
+ * kept); here the page scrolls instead
+ */
+[data-se-groupset] form.DialogBody > .DialogInnerBody {
+  overflow: visible;
+  padding-inline-end: 0;
+}
+
+[data-se-groupset] .displayColumn:has(> .ChatGroupSettingsChannels_Row) {
+  width: 100%;
+}
+
+[data-se-groupset] ._DialogRowLabel .HomeChannel {
+  font-style: normal;
+  font-weight: 700;
+}
+
+[data-se-groupset] .ChatGroupSettingsChannels_Row ._DialogRowSecondaryLabel {
+  flex: none;
+  margin: 0;
+  line-height: 1.4;
+  text-align: end;
+  font: var(--se-type-small);
+  color: var(--se-text-faint);
+}
+
+[data-se-groupset] .ChatGroupSettingsChannels_Row .ChannelDeleteButton {
+  margin: 0;
+  padding: var(--se-space-1) var(--se-space-2);
+  border-radius: var(--se-radius-sm);
+  font: 600 var(--se-fs-base) / 1.4 var(--se-font);
+  text-transform: none;
+  color: var(--se-danger-text);
+}
+
+[data-se-groupset] .ChatGroupSettingsChannels_Row .ChannelDeleteButton:hover {
+  background: var(--se-danger-btn-bg);
+  color: var(--se-danger-btn-fg-hover);
+}
+
+/* The move arrows (channels and roles): two small stacked buttons */
+[data-se-groupset] .rolePriorityContainer {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--se-space-half);
+  width: 28px;
+  height: auto;
+}
+
+[data-se-groupset] .rolePriorityContainer .rolePriorityButton {
+  position: static;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 18px;
+  margin: 0;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-btn-bg);
+  color: var(--se-text-muted);
+}
+
+[data-se-groupset] .rolePriorityContainer .rolePriorityButton:not(.Disabled):hover {
+  background: var(--se-btn-bg-hover);
+  color: var(--se-text-strong);
+}
+
+[data-se-groupset] .rolePriorityContainer .rolePriorityButton.Disabled {
+  background: var(--se-btn-bg);
+  opacity: var(--se-btn-disabled-opacity);
+}
+
+[data-se-groupset] .rolePriorityButton svg {
+  width: 10px;
+  height: 10px;
+}
+
+/*
+ * Permissions: the roles as one list of row buttons (the role's mark, its name, "Edit" or "View"
+ * at the end), "Create new role" under it; a role's page: Back as a link, its toggles in cards
+ * (SettingsGroup, drawn by the dialogs' skin). Steam's classes (module 36308): PermissionsEdit
+ * _1PFRw63S…, Back _2jkBm4Wv…, RoleNameHeader _29XR1SNM…, FixedRoleName _1aH13bil…,
+ * PermissionsDescription smf_g4nX…
+ */
+[data-se-groupset] .smf_g4nX5ambmZVuWX6AG {
+  font: var(--se-type-small);
+  color: var(--se-text-muted);
+}
+
+[data-se-groupset] .smf_g4nX5ambmZVuWX6AG a {
+  border: 0;
+  color: var(--se-accent);
+}
+
+[data-se-groupset] .roleList button.DialogButton.roleButton:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  margin: 0 0 var(--se-space-1);
+  padding: 0 var(--se-space-3) !important;
+  background: var(--se-card-bg) !important;
+  box-shadow: var(--se-card-edge) !important;
+  text-align: start;
+}
+
+[data-se-groupset] .roleList button.DialogButton.roleButton:not(#se-none):is(:hover, .gpfocus):enabled {
+  background: var(--se-hover) !important;
+}
+
+[data-se-groupset] .roleList button.DialogButton.roleButton .roleSubtitle {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-inline-start: auto;
+  font: 600 var(--se-fs-sm) var(--se-font);
+  text-transform: none;
+  color: var(--se-text-faint);
+}
+
+[data-se-groupset] .roleList button.DialogButton.roleButton:hover .roleSubtitle {
+  color: var(--se-accent);
+}
+
+[data-se-groupset] .meKey:not(#se-none) {
+  display: flex;
+  align-items: center;
+  font: var(--se-type-small) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  color: var(--se-text-faint) !important;
+}
+
+[data-se-groupset] button.DialogButton.createNewRoleButton:not(#se-none) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-width: 0;
+  margin: var(--se-space-3) 0 0;
+  padding: 0 var(--se-space-4) !important;
+}
+
+[data-se-groupset] ._1PFRw63SmEC5gmtojKrml1 ._2jkBm4Wv_CFFjeaDrhEKax {
+  gap: var(--se-space-1);
+  margin: 0 0 var(--se-space-3);
+  font: 600 var(--se-fs-base) var(--se-font);
+  text-transform: none;
+  color: var(--se-accent);
+}
+
+[data-se-groupset] ._1PFRw63SmEC5gmtojKrml1 ._2jkBm4Wv_CFFjeaDrhEKax svg polyline {
+  stroke: currentColor;
+}
+
+[data-se-groupset] ._29XR1SNMJVrwOTq4Ssc0HJ._1aH13bilXD26v3MbunavIS {
+  font: 800 var(--se-fs-2xl) / 1.2 var(--se-font);
+  text-transform: none;
+  color: var(--se-text-strong);
+}
+
+/*
+ * An unsaved chat's Save page: what saving gives as a grid of cards, each with its icon (Steam's
+ * four lines, in its order: name, picture and tagline, permissions, channels), then the name field
+ * and Save on one row. friends.css draws the lines as a ticked list (._3t8HxXdv… .DialogBodyText li)
+ */
+[data-se-groupset] form.DialogBody:has(> .DialogBodyText ul) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: start;
+  align-items: end;
+  column-gap: var(--se-space-2);
+}
+
+[data-se-groupset] form.DialogBody:has(> .DialogBodyText ul) > :not(.DialogInputLabelGroup, button) {
+  grid-column: 1 / -1;
+}
+
+[data-se-groupset] form.DialogBody:has(> .DialogBodyText ul) > .DialogInputLabelGroup {
+  margin: 0;
+}
+
+[data-se-groupset] form.DialogBody:has(> .DialogBodyText ul) > button.DialogButton:not(#se-none) {
+  width: auto;
+  height: var(--se-control-h) !important;
+  margin: 0 !important;
+  padding: 0 var(--se-space-5) !important;
+}
+
+[data-se-groupset] form.DialogBody:has(> .DialogBodyText ul) .ErrorWhileSaving {
+  margin: var(--se-space-2) 0 0;
+}
+
+/* The cards' own margin sets them off the field: Steam's text block adds none of its own */
+[data-se-groupset] form.DialogBody > .DialogBodyText:has(ul):not(#se-none) {
+  margin: 0;
+}
+
+[data-se-groupset] form.DialogBody > .DialogBodyText ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--se-space-2);
+  margin: var(--se-space-3) 0 var(--se-space-5);
+  padding: 0;
+}
+
+[data-se-groupset] form.DialogBody > .DialogBodyText li {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  min-height: 52px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--se-space-2) var(--se-space-3);
+  border-radius: var(--se-radius-md);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
+  font: 600 var(--se-fs-base) / 1.35 var(--se-font);
+  color: var(--se-text);
+}
+
+/* The line's icon on a tile, in place of friends.css's tick */
+[data-se-groupset] form.DialogBody > .DialogBodyText li::before {
+  content: '';
+  position: static;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  transform: none;
+}
+
+[data-se-groupset] form.DialogBody > .DialogBodyText li::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: calc(var(--se-space-3) + (32px - var(--se-icon-md)) / 2);
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-gs-icon, var(--se-icon-edit)) center / contain no-repeat;
+  mask: var(--se-gs-icon, var(--se-icon-edit)) center / contain no-repeat;
+}
+
+[data-se-groupset] form.DialogBody > .DialogBodyText li:nth-child(2) {
+  --se-gs-icon: var(--se-icon-photo);
+}
+
+[data-se-groupset] form.DialogBody > .DialogBodyText li:nth-child(3) {
+  --se-gs-icon: var(--se-icon-shield);
+}
+
+[data-se-groupset] form.DialogBody > .DialogBodyText li:nth-child(4) {
+  --se-gs-icon: var(--se-icon-bubble);
+}
+
+/* Invite Links: the rule between the link and the table goes; the table's card sets it apart */
+[data-se-groupset] .OrSeparator:not(#se-none) {
+  margin: var(--se-space-5) 0 0;
+}
+
+[data-se-groupset] .OrSeparator .HBar:not(#se-none),
+[data-se-groupset] .OrSeparator .DialogHBar {
+  display: none;
+}
+
+/* Delete's label centred in its button, level with Copy */
+[data-se-groupset] .InviteLinksTable .buttonCell button.DialogButton:not(#se-none) {
+  align-items: center;
+  justify-content: center;
+  height: var(--se-control-h-sm);
+  line-height: 1 !important;
+}
+
+/* The roles' heading: under the description, no taller than its line */
+[data-se-groupset] .roleList ._29XR1SNMJVrwOTq4Ssc0HJ {
+  min-height: 0;
+  margin: var(--se-space-5) 0 var(--se-space-2);
+  align-items: center;
+}
+
+[data-se-groupset] .roleList button.DialogButton.roleButton:not(#se-none) {
+  overflow: hidden;
+}
+
+/*
+ * "You do not have permission…" (Steam's Notification, module 36308 _1cjXkI2J…: blue capitals): a
+ * quiet line in the muted tone, the theme's duotone lock before it
+ */
+[data-se-groupset] ._1cjXkI2JrN71BK7A2YXaYa {
+  align-items: center;
+  gap: var(--se-space-2);
+  height: auto;
+  margin: 0 0 var(--se-space-3);
+  font: var(--se-type-small);
+  text-transform: none;
+  color: var(--se-text-muted);
+}
+
+[data-se-groupset] ._1cjXkI2JrN71BK7A2YXaYa svg {
+  display: none;
+}
+
+[data-se-groupset] ._1cjXkI2JrN71BK7A2YXaYa::before {
+  content: '';
+  flex: none;
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-lock) center / contain no-repeat;
+  mask: var(--se-icon-lock) center / contain no-repeat;
+}
+
+/*
+ * A role's page: each section (General Settings, Members & Roles, Room Management) as one card
+ * of toggle rows, as Channels' lists, instead of a card per row. Steam's classes: PermissionsGroup
+ * _2xRhyKnM…, PermissionToggle _1gPDLO3h… (module 36308), its ToggleRow _1MBq0fYr… (sp.css: its
+ * own rgba(59, 63, 72, .5) box, 12 px apart)
+ */
+[data-se-groupset] ._1PFRw63SmEC5gmtojKrml1 ._2xRhyKnM3bD57wEJR8YrPS {
+  margin: 0 0 var(--se-space-5);
+}
+
+[data-se-groupset] ._1PFRw63SmEC5gmtojKrml1 ._1gPDLO3hXAj6KoEe8uTClT {
+  min-height: 48px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--se-space-2) var(--se-space-4);
+  border-radius: 0;
+  background: var(--se-card-bg);
+  box-shadow: inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline), inset 0 1px 0 var(--se-hairline);
+}
+
+[data-se-groupset] ._1PFRw63SmEC5gmtojKrml1 .PermissionsSectionHeader + ._1gPDLO3hXAj6KoEe8uTClT {
+  border-start-start-radius: var(--se-radius-md);
+  border-start-end-radius: var(--se-radius-md);
+}
+
+[data-se-groupset] ._1PFRw63SmEC5gmtojKrml1 ._1gPDLO3hXAj6KoEe8uTClT:last-child {
+  border-end-start-radius: var(--se-radius-md);
+  border-end-end-radius: var(--se-radius-md);
+  box-shadow: var(--se-edge);
+}
+
+[data-se-groupset] ._1PFRw63SmEC5gmtojKrml1 .PermissionsSectionHeader + ._1gPDLO3hXAj6KoEe8uTClT:last-child {
+  border-radius: var(--se-radius-md);
+}
+
+/* A toggle's label in the theme's type; a locked one muted rather than at Steam's 30 % */
+[data-se-groupset] ._1PFRw63SmEC5gmtojKrml1 ._1gPDLO3hXAj6KoEe8uTClT ._1Dhs8IG9_tJWb3XP9ccN9M {
+  font: 500 var(--se-fs-md) / 1.4 var(--se-font);
+  color: var(--se-text);
+}
+
+[data-se-groupset] ._1PFRw63SmEC5gmtojKrml1 ._1gPDLO3hXAj6KoEe8uTClT ._1Dhs8IG9_tJWb3XP9ccN9M.M8qsAk8m30GwcGz7HCVnv {
+  opacity: 1;
+  color: var(--se-text-faint);
+}
+
+/*
+ * A role's switches: Steam's older toggle (sp.css: a 36 px rail with a blue gradient knob) drawn
+ * as the theme's switch, as the direct-messages toggle above them: a pill track, accent when on,
+ * the knob sliding to its end. Steam's classes: Toggle _3Sl0QHQ6…, ToggleRail _2Fw7gGOS… (the
+ * second, Highlight _2OUxguuT…, its on fill), ToggleSwitch _3IWp5Bnn…, On _317lekDG…, Off
+ * _3blKBzfH…, Disabled M8qsAk8m…
+ */
+[data-se-groupset] ._3Sl0QHQ69uK7ZMQo5vBfrA {
+  flex: none;
+  width: var(--se-switch-w);
+  height: var(--se-switch-h);
+}
+
+[data-se-groupset] ._3Sl0QHQ69uK7ZMQo5vBfrA.M8qsAk8m30GwcGz7HCVnv {
+  opacity: var(--se-btn-disabled-opacity);
+}
+
+[data-se-groupset] ._3Sl0QHQ69uK7ZMQo5vBfrA ._2Fw7gGOSCr7y9elv8iszxw {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-selected);
+  box-shadow: none;
+}
+
+[data-se-groupset] ._3Sl0QHQ69uK7ZMQo5vBfrA ._2Fw7gGOSCr7y9elv8iszxw._2OUxguuTe-NeOXZXxSNQsw {
+  width: 100%;
+  background: var(--se-accent);
+  opacity: 0;
+  transition: opacity var(--se-dur) var(--se-ease);
+}
+
+[data-se-groupset] ._3Sl0QHQ69uK7ZMQo5vBfrA ._2Fw7gGOSCr7y9elv8iszxw._2OUxguuTe-NeOXZXxSNQsw._317lekDG36odwSaDLtFQgd {
+  opacity: 1;
+}
+
+[data-se-groupset] ._3Sl0QHQ69uK7ZMQo5vBfrA ._3IWp5BnnsY_aMKCxhCjShP {
+  top: calc((var(--se-switch-h) - var(--se-switch-knob)) / 2);
+  left: calc((var(--se-switch-h) - var(--se-switch-knob)) / 2);
+  width: var(--se-switch-knob);
+  height: var(--se-switch-knob);
+  border-radius: 50%;
+  background: var(--se-text-muted);
+  box-shadow: none;
+  transition: transform var(--se-dur) var(--se-ease), background-color var(--se-dur) var(--se-ease);
+}
+
+[data-se-groupset] ._3Sl0QHQ69uK7ZMQo5vBfrA ._3IWp5BnnsY_aMKCxhCjShP._317lekDG36odwSaDLtFQgd {
+  background: var(--se-bg-ink);
+  transform: translateX(calc(var(--se-switch-w) - var(--se-switch-h)));
+}
+
+/* A page still loading (Invited Accounts, Bans): Steam's throbber centred in the page, not at its corner */
+[data-se-groupset] ._3t8HxXdv4QoWO7f3awdiCQ form:has(> * > .SteamLogoThrobber, > .SteamLogoThrobber, > * > .LoadingThrobber, > .LoadingThrobber) {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+}

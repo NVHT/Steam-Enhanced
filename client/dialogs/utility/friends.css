@@ -969,8 +969,11 @@ input.InviteFriendToChatDialog_LinkInput:not(#se-none) {
   color: var(--se-danger-btn-fg-hover) !important;
 }
 
-/* Invite links: the table as rows in a card, the date in uppercase label, Delete as a quiet red button */
-.InviteLinksTable:not(#se-none) {
+/*
+ * Group settings' tables (Invite Links, Invited Users, Bans): rows in a card, the date in the muted
+ * tone, the row's action (Delete, Revoke, Unban) as a quiet red button
+ */
+:is(.InviteLinksTable, .InvitedUsersTable, .BannedUsersTable):not(#se-none) {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
@@ -979,7 +982,7 @@ input.InviteFriendToChatDialog_LinkInput:not(#se-none) {
   background: var(--se-surface-2);
 }
 
-.InviteLinksTable th:not(#se-none) {
+:is(.InviteLinksTable, .InvitedUsersTable, .BannedUsersTable) th:not(#se-none) {
   height: 36px;
   padding: 0 var(--se-space-3);
   text-align: start;
@@ -990,22 +993,22 @@ input.InviteFriendToChatDialog_LinkInput:not(#se-none) {
   color: var(--se-label-color) !important;
 }
 
-.InviteLinksTable td:not(#se-none) {
+:is(.InviteLinksTable, .InvitedUsersTable, .BannedUsersTable) td:not(#se-none) {
   padding: var(--se-space-2) var(--se-space-3);
   border: 0;
   font: 500 var(--se-fs-base) var(--se-font);
   color: var(--se-text-dim);
 }
 
-.InviteLinksTable tbody tr + tr td {
+:is(.InviteLinksTable, .InvitedUsersTable, .BannedUsersTable) tbody tr + tr td {
   box-shadow: var(--se-rule-top);
 }
 
-.InviteLinksTable tbody tr:not(#se-none) {
+:is(.InviteLinksTable, .InvitedUsersTable, .BannedUsersTable) tbody tr:not(#se-none) {
   background: none !important;
 }
 
-.InviteLinksTable .inviteURLLink:not(#se-none) {
+:is(.InviteLinksTable, .InvitedUsersTable, .BannedUsersTable) .inviteURLLink:not(#se-none) {
   box-sizing: border-box;
   width: 100%;
   min-height: var(--se-control-h-sm);
@@ -1014,18 +1017,18 @@ input.InviteFriendToChatDialog_LinkInput:not(#se-none) {
   color: var(--se-text) !important;
 }
 
-.InviteLinksTable .dateCell:not(#se-none) {
+:is(.InviteLinksTable, .InvitedUsersTable, .BannedUsersTable) .dateCell:not(#se-none) {
   font-variant-numeric: tabular-nums;
   text-transform: none;
   color: var(--se-text-muted);
   white-space: nowrap;
 }
 
-.InviteLinksTable .buttonCell:not(#se-none) {
+:is(.InviteLinksTable, .InvitedUsersTable, .BannedUsersTable) .buttonCell:not(#se-none) {
   text-align: end;
 }
 
-.InviteLinksTable .buttonCell button.DialogButton:not(#se-none) {
+:is(.InviteLinksTable, .InvitedUsersTable, .BannedUsersTable) .buttonCell button.DialogButton:not(#se-none) {
   min-height: var(--se-control-h-sm);
   width: auto;
   padding: 0 var(--se-space-3);
@@ -1033,7 +1036,7 @@ input.InviteFriendToChatDialog_LinkInput:not(#se-none) {
   color: var(--se-danger-btn-fg) !important;
 }
 
-.InviteLinksTable .buttonCell button.DialogButton:not(#se-none):is(:hover, .gpfocus) {
+:is(.InviteLinksTable, .InvitedUsersTable, .BannedUsersTable) .buttonCell button.DialogButton:not(#se-none):is(:hover, .gpfocus) {
   background: var(--se-danger-btn-bg-hover) !important;
   color: var(--se-danger-btn-fg-hover) !important;
 }

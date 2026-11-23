@@ -737,15 +737,16 @@ button.DialogButton.Primary:not(#se-none):is(:disabled, .Disabled) {
 }
 
 /*
- * A dialog whose one action destroys (Exit Game, Delete Collection): its Primary in the
- * destroying red. !important: the Primary button above.
+ * A dialog whose one action destroys (Exit Game, Delete Collection, Steam's confirms it flags
+ * .Destructive: delete an invite or channel, revoke, unban…): its Primary in the destroying red.
+ * !important: the Primary button above.
  */
-:is([data-se-exitgame], [data-se-delcoll]) .DialogFooter .DialogButton.Primary:not(#se-none) {
+:is([data-se-exitgame], [data-se-delcoll], .ModalPosition.Destructive) .DialogFooter .DialogButton.Primary:not(#se-none) {
   background: var(--se-danger-btn-bg) !important;
   color: var(--se-danger-btn-fg) !important;
 }
 
-:is([data-se-exitgame], [data-se-delcoll]) .DialogFooter .DialogButton.Primary:not(#se-none):is(:hover, :focus-visible, .gpfocus):enabled {
+:is([data-se-exitgame], [data-se-delcoll], .ModalPosition.Destructive) .DialogFooter .DialogButton.Primary:not(#se-none):is(:hover, :focus-visible, .gpfocus):enabled {
   background: var(--se-danger-btn-bg-hover) !important;
   color: var(--se-danger-btn-fg-hover) !important;
 }

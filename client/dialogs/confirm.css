@@ -1,0 +1,108 @@
+/*
+ * Steam's confirms that destroy (.ModalPosition.Destructive: delete an invite link or a channel,
+ * revoke an invite, unban, delete a role…): a compact card instead of a full-width sheet. A
+ * trash tile beside the title, the question under it, what goes (Steam's extra line, such as the
+ * link) on a field-coloured chip, then Cancel and the red action at the foot's end. The red
+ * button itself is dialogs.css's destroying Primary.
+ *
+ *   [ trash  Delete Invite                    ]
+ *   [        Are you sure you want to delete… ]
+ *   [        [ https://s.team/chat/… ]        ]
+ *   [                      Cancel  [Delete]   ]
+ *
+ * Steam's markup (sp.js): ModalPosition.Destructive > ModalPosition_Content >
+ * form.DialogContent.GenericConfirmDialog > [DialogHeader, the body, DialogFooter].
+ */
+.ModalPosition.Destructive .ModalPosition_Content:not(.GamepadMode *) {
+  width: min(480px, calc(100vw - 2 * var(--se-space-6)));
+  max-width: 480px;
+  min-height: 0;
+  height: auto;
+}
+
+.ModalPosition.Destructive .GenericConfirmDialog:not(.GamepadMode *) {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  column-gap: var(--se-space-4);
+  align-content: start;
+  height: auto;
+  min-height: 0;
+  padding: var(--se-space-6);
+}
+
+/* The trash tile beside the title: the tile, then its icon over it */
+.ModalPosition.Destructive .GenericConfirmDialog::before {
+  content: '';
+  grid-row: 1 / span 2;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+}
+
+.ModalPosition.Destructive .GenericConfirmDialog::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--se-space-6) + (40px - var(--se-icon-md)) / 2);
+  inset-inline-start: calc(var(--se-space-6) + (40px - var(--se-icon-md)) / 2);
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-icon-trash) center / contain no-repeat;
+  mask: var(--se-icon-trash) center / contain no-repeat;
+}
+
+.ModalPosition.Destructive .GenericConfirmDialog > * {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.ModalPosition.Destructive .GenericConfirmDialog .DialogHeader:not(#se-none) {
+  margin: 0 0 var(--se-space-1) !important;
+  font: 700 var(--se-fs-xl) / 1.3 var(--se-font) !important;
+}
+
+.ModalPosition.Destructive .GenericConfirmDialog .DialogBodyText:not(#se-none) {
+  margin: 0;
+  font: var(--se-type-body) !important;
+  color: var(--se-text-muted) !important;
+}
+
+/* What goes (Steam's extra line, inline-styled 5 px down in #dee2e5): a chip of its own */
+.ModalPosition.Destructive .GenericConfirmDialog .DialogBodyText > div[style] {
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-top: var(--se-space-3) !important;
+  padding: var(--se-space-1) var(--se-space-3);
+  overflow: hidden;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-field);
+  box-shadow: var(--se-search-edge);
+  font: 500 var(--se-fs-base) / 1.6 var(--se-font-mono);
+  color: var(--se-text) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The foot: Cancel, then the red action, at the end, each as wide as its label */
+.ModalPosition.Destructive .GenericConfirmDialog .DialogFooter:not(#se-none) {
+  grid-column: 1 / -1;
+  margin: var(--se-space-5) 0 0;
+  padding: 0;
+}
+
+.ModalPosition.Destructive .GenericConfirmDialog .DialogFooter > * {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  gap: var(--se-space-2);
+}
+
+.ModalPosition.Destructive .GenericConfirmDialog .DialogFooter button.DialogButton:not(#se-none) {
+  flex: none;
+  width: auto;
+  min-width: 96px;
+  margin: 0 !important;
+}
