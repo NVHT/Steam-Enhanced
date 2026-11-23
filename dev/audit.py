@@ -17,14 +17,13 @@ Flags (each one is a fix before the release):
 Notes (look, then decide; names can be built at runtime, sizes can be fine):
   - theme classes (.se-*) a stylesheet styles that no script or other stylesheet names
   - files past the ~40 KB split size
-  - skin.json's version not past the last release tag (a release needs the bump)
+  - skin.json's version not past CHANGELOG.md's newest entry (a release needs the bump)
 
 Skips hidden folders, dev/ and __pycache__; comments are stripped before reading code.
 """
 import json
 import os
 import re
-import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -322,17 +321,16 @@ def big_files(files):
 
 
 def version():
-    """skin.json's version against the last release tag: a release needs it bumped past the tag."""
+    """skin.json's version against CHANGELOG.md's newest entry (## X.Y.Z): a release needs it bumped past it."""
     skin = json.loads(read(os.path.join(ROOT, 'skin.json'))).get('version', '')
     try:
-        tags = subprocess.run(['git', 'tag', '--list'], cwd=ROOT, capture_output=True, text=True,
-                              check=True).stdout.split()
-    except (OSError, subprocess.CalledProcessError):
+        changelog = read(os.path.join(ROOT, 'CHANGELOG.md'))
+    except OSError:
         return []
     key = lambda v: tuple(int(n) for n in v.split('.'))
-    releases = sorted((t for t in tags if re.fullmatch(r'\d+\.\d+\.\d+', t)), key=key)
-    if releases and re.fullmatch(r'\d+\.\d+\.\d+', skin) and key(skin) <= key(releases[-1]):
-        return [f'version: skin.json says {skin}, the last release is {releases[-1]} (bump it before releasing)']
+    released = re.findall(r'^## (\d+\.\d+\.\d+)\b', changelog, re.M)
+    if released and re.fullmatch(r'\d+\.\d+\.\d+', skin) and key(skin) <= key(max(released, key=key)):
+        return [f'version: skin.json says {skin}, CHANGELOG.md is at {max(released, key=key)} (bump it before releasing)']
     return []
 
 
