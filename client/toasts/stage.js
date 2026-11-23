@@ -104,9 +104,8 @@
   }
 
   /*
-   * The ground for toasts with no art: the splash's background (assets/splash.png, drawn by
-   * dev/showcase/scenes/splash.html), the wireframe of the themed Library — rail, game list,
-   * Home, Friends dock — redrawn to the stage's shape. It comes alive in the toast's color: the
+   * The ground for toasts with no art: a wireframe of the themed Library (rail, game list,
+   * Home, Friends dock) drawn to the stage's shape. It comes alive in the toast's color: the
    * selection moves down the list, the bottom cards light in turn, friends' status rings
    * breathe, the hero panel glows, and a light passes over it all.
    */
