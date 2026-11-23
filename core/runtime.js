@@ -404,14 +404,20 @@
     "'": '&#39;',
   };
 
-  // How long ago a Unix time (seconds) was: "5 min ago", "3 h ago", "yesterday", "12 days ago"
+  // How long ago a Unix time (seconds) was: "just now", "5 min ago", "3 h ago", "yesterday",
+  // "12 days ago", then weeks, months and years
   const ago = (t) => {
     if (!t) return '';
     const s = Date.now() / 1000 - t;
+    if (s < 45) return 'just now';
     if (s < 3600) return `${Math.max(1, Math.round(s / 60))} min ago`;
     if (s < 86400) return `${Math.round(s / 3600)} h ago`;
     if (s < 172800) return 'yesterday';
-    return `${Math.round(s / 86400)} days ago`;
+    const day = Math.round(s / 86400);
+    if (day < 14) return `${day} days ago`;
+    if (day < 60) return `${Math.round(day / 7)} wk ago`;
+    if (day < 365) return `${Math.round(day / 30)} mo ago`;
+    return `${Math.round(day / 365)} yr ago`;
   };
 
   // A name's initials, as Steam draws a group or friend without a picture: each word's first

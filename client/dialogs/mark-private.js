@@ -70,21 +70,15 @@
     return { games: SE.leadApp(games, (game) => game.appid), dlc: appids.length - games.length };
   };
 
-  const plural = (n, one, many) => `${n.toLocaleString()} ${n === 1 ? one : many}`;
-
   /* ---------- Parts ---------- */
 
   const buildGame = ({ games, dlc }) => {
     const game = el('div', `${OURS}-game`);
     const stack = SE.dialogArt.capsules(games.map((g) => g.appid));
     const single = games.length === 1;
-    const name = el('div', `${OURS}-name se-dialog-name`, single ? games[0].name : plural(games.length, 'game', 'games'));
+    const name = el('div', `${OURS}-name se-dialog-name`, single ? games[0].name : SE.dialogArt.count(games.length, 'game', 'games'));
     // Several: the first two names, then how many more (all of them in the tooltip)
-    const shown = games.slice(0, 2).map((g) => g.name);
-    const more = games.length - shown.length;
-    const what = single
-      ? 'Hidden everywhere outside your library'
-      : more ? `${shown.join(', ')} and ${more.toLocaleString()} more` : shown.join(' and ');
+    const what = single ? 'Hidden everywhere outside your library' : SE.dialogArt.names(games.map((g) => g.name));
     const sub = el('div', `${OURS}-sub`, dlc ? `${what} · ${single ? 'with its' : 'with their'} ${dlc.toLocaleString()} DLC` : what);
     sub.title = single ? sub.textContent : games.map((g) => g.name).join('\n');
     game.append(stack, name, sub);

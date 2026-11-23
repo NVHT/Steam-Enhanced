@@ -8,8 +8,9 @@
  * The chosen button carries whichever its role says: data-on (plain buttons), aria-checked
  * (radios), aria-pressed (toggles) or aria-selected (tabs). A <b> inside a button is its count,
  * in the faint tone; an <svg> is its icon, in the button's tone. Layout (grid, stretch, a taller
- * track) belongs to the caller; this file is the look and the states. The library's sort bar
- * (client/library/sort-segments.css) draws Steam's own bar in the same look.
+ * track) belongs to the caller; this file is the look and the states. A .se-seg-btn is a button
+ * whose track its host draws: the library's sort bar (client/library/sort-segments.css), Steam's
+ * own bar in the same look.
  */
 .se-seg {
   display: inline-flex;
@@ -20,7 +21,8 @@
   box-shadow: var(--se-search-edge);
 }
 
-.se-seg button {
+.se-seg button,
+.se-seg-btn {
   all: unset;
   box-sizing: border-box;
   position: relative;
@@ -40,32 +42,37 @@
 }
 
 /* The hit area out to --se-hit above and below (beside, it meets the next button); the look stays */
-.se-seg button::after {
+.se-seg button::after,
+.se-seg-btn::after {
   content: '';
   position: absolute;
   inset: calc((100% - var(--se-hit)) / 2) 0;
 }
 
-.se-seg button:hover {
+.se-seg button:hover,
+.se-seg-btn:hover {
   background: var(--se-hairline);
   color: var(--se-text-strong);
 }
 
-.se-seg button:is([data-on], [aria-checked="true"], [aria-pressed="true"], [aria-selected="true"]) {
+:is(.se-seg button, .se-seg-btn):is([data-on], [aria-checked="true"], [aria-pressed="true"], [aria-selected="true"]) {
   background: var(--se-selected);
   color: var(--se-text-strong);
 }
 
-.se-seg button:active {
+.se-seg button:active,
+.se-seg-btn:active {
   transform: scale(var(--se-press-scale));
 }
 
-.se-seg button:focus-visible {
+.se-seg button:focus-visible,
+.se-seg-btn:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
 }
 
-.se-seg button:disabled {
+.se-seg button:disabled,
+.se-seg-btn:disabled {
   background: none;
   color: var(--se-text-faint);
   cursor: default;
@@ -85,7 +92,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .se-seg button {
+  .se-seg button,
+  .se-seg-btn {
     transition: none;
   }
 }

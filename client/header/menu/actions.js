@@ -36,7 +36,7 @@
         h('span', { className: 'se-sm-label' }, label || localized(item.name, item.name)),
         hint && h('span', { className: 'se-sm-hint' }, hint)
       ),
-      keys && h('kbd', { className: 'se-sm-keys' }, keys)
+      keys && h('kbd', { className: 'se-menu-keys' }, keys)
     ),
   });
 
@@ -59,13 +59,12 @@
         { label: 'Big Picture Mode', hint: 'TV and controller mode', icon: '--se-icon-tv' }
       ),
       row(
-        // false: a plain restart, as Steam's own Restart buttons make it
-        { name: 'se-restart', onClick: () => SE.steamCall('User', 'StartRestart', false) },
-        // Its shortcut and Reload UI's: client/header/header-actions.js
+        // The action and its shortcut, and Reload UI's: client/header/header-actions.js
+        { name: 'se-restart', onClick: () => SE.restartSteam() },
         { label: 'Restart Steam', hint: 'Close and reopen Steam', icon: '--se-icon-restart', keys: 'Ctrl+Shift+R' }
       ),
       row(
-        { name: 'se-reload', onClick: () => SE.steamCall('Browser', 'RestartJSContext') },
+        { name: 'se-reload', onClick: () => SE.reloadUI() },
         { label: 'Reload UI', hint: 'Refresh the interface', icon: '--se-icon-refresh', keys: 'Ctrl+R' }
       ),
     ],

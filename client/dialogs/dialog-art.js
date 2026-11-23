@@ -9,6 +9,8 @@
  *   SE.dialogArt.capsules(appids)               the first three games' capsules, fanned
  *   SE.dialogArt.fitWindow(root)                grows a popped-out dialog's window to the
  *                                               rebuilt dialog; returns the cancel
+ *   SE.dialogArt.count(n, one, many)            "1 game", "1,204 games"
+ *   SE.dialogArt.names(names)                   several games' names: "A and B", "A, B and 3 more"
  */
 ((SE) => {
   const MAX_CAPSULES = 3;
@@ -59,5 +61,14 @@
     return () => cancelAnimationFrame(frame);
   };
 
-  SE.dialogArt = { hero, capsules, fitWindow };
+  const count = (n, one, many) => `${n.toLocaleString()} ${n === 1 ? one : many}`;
+
+  // The first two names, then how many more
+  const names = (list) => {
+    const shown = list.slice(0, 2).filter(Boolean);
+    const more = list.length - shown.length;
+    return more ? `${shown.join(', ')} and ${more.toLocaleString()} more` : shown.join(' and ');
+  };
+
+  SE.dialogArt = { hero, capsules, fitWindow, count, names };
 })(window.__se);

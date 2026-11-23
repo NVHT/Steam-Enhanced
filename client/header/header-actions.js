@@ -598,9 +598,10 @@
     }
   }
 
-  const reloadUI = () => SE.steamCall('Browser', 'RestartJSContext');
+  // Shared with the Steam menu's rows (client/header/menu/actions.js)
+  const reloadUI = (SE.reloadUI = () => SE.steamCall('Browser', 'RestartJSContext'));
   // false: a plain restart, as Steam's own Restart buttons make it (true is another kind of restart)
-  const restartSteam = () => SE.steamCall('User', 'StartRestart', false);
+  const restartSteam = (SE.restartSteam = () => SE.steamCall('User', 'StartRestart', false));
 
   /*
    * Keyboard shortcuts, in the main window: Ctrl+` Steam Settings, Ctrl+1 Millennium (beside

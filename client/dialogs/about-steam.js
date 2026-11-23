@@ -352,24 +352,12 @@
     return TILE_LABELS[short.toLowerCase()] ?? short;
   };
 
-  const ago = (seconds) => {
-    if (seconds < 45) return 'just now';
-    const min = Math.round(seconds / 60);
-    if (min < 60) return `${min} min ago`;
-    const hr = Math.round(min / 60);
-    if (hr < 24) return `${hr} hr ago`;
-    const day = Math.round(hr / 24);
-    if (day < 2) return 'Yesterday';
-    if (day < 14) return `${day} days ago`;
-    if (day < 60) return `${Math.round(day / 7)} wk ago`;
-    if (day < 365) return `${Math.round(day / 30)} mo ago`;
-    return `${Math.round(day / 365)} yr ago`;
-  };
-
+  // A build's age as a tile's sub line (time in ms): "Today", "Yesterday", "3 days ago"
   const buildAge = (time) => {
     if (time == null) return '';
-    const seconds = Math.max(0, (Date.now() - time) / 1000);
-    return seconds < 86400 ? 'Today' : ago(seconds);
+    if (Date.now() - time < 86400000) return 'Today';
+    const when = SE.ago(time / 1000);
+    return when.charAt(0).toUpperCase() + when.slice(1);
   };
 
   /* ---------- Theme version ---------- */
@@ -541,11 +529,11 @@
       } else if (update?.checkedAt) {
         kind = 'current';
         text = 'Up to date';
-        when = ago(Math.max(0, Date.now() / 1000 - update.checkedAt));
+        when = SE.ago(update.checkedAt);
       } else {
         kind = 'unknown';
         text = 'Steam updates';
-        when = localCheck ? `checked ${ago(Math.max(0, (Date.now() - localCheck) / 1000))}` : 'not checked yet';
+        when = localCheck ? `checked ${SE.ago(localCheck / 1000)}` : 'not checked yet';
       }
       SE.mark(status, 'data-state', kind);
       statusText.textContent = text;

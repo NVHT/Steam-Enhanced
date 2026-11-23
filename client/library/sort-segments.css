@@ -1,8 +1,8 @@
 /*
  * The `A-Z / Recent / Hours / More` sort control (client/library/sort-segments.js), whose host
  * is Steam's sort bar ([data-se-sortseg]) and whose fourth segment is Steam's own dropdown:
- * Steam's bar drawn as the theme's segmented control (client/shared/segmented.css: the same
- * track, buttons and states). Also formats shelf header title pickers and item counts, and shelf
+ * Steam's bar drawn as the theme's segmented control: the track here, the theme's buttons are
+ * .se-seg-btn (client/shared/segmented.css), and Steam's dropdown is drawn to match. Also formats shelf header title pickers and item counts, and shelf
  * arrangement mode. !important: Steam's sort bar and DialogDropDown rules (steamui sp.css).
  */
 [data-se-sortseg] {
@@ -24,7 +24,7 @@
   gap: var(--se-space-half);
 }
 
-.se-seg-btn,
+/* Steam's dropdown as a .se-seg-btn (client/shared/segmented.css) */
 [data-se-sortseg] .DialogDropDown {
   box-sizing: border-box;
   display: inline-flex !important;
@@ -50,32 +50,18 @@
   transition: background var(--se-dur) ease-out, color var(--se-dur) ease-out;
 }
 
-/* The hit area out to --se-hit above and below (beside, it meets the next segment), as segmented.css */
 .se-seg-btn {
-  position: relative;
+  min-width: 34px;
 }
 
-.se-seg-btn::before {
-  content: '';
-  position: absolute;
-  inset: calc((100% - var(--se-hit)) / 2) 0;
-}
-
-.se-seg-btn:hover,
 [data-se-sortseg] .DialogDropDown:hover {
   background: var(--se-hairline) !important;
   color: var(--se-text-strong) !important;
 }
 
-.se-seg-btn[aria-checked="true"],
 [data-se-sortseg="other"] .DialogDropDown {
   background: var(--se-selected) !important;
   color: var(--se-text-strong) !important;
-}
-
-.se-seg-btn:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: var(--se-focus-offset);
 }
 
 /*

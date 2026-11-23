@@ -49,8 +49,6 @@
   const isOurs = (node) => node.nodeType === 1 && node.closest?.(`.${OURS}`);
   const { el } = SE;
 
-  const plural = (n, one, many) => `${n.toLocaleString()} ${n === 1 ? one : many}`;
-
   // The games it opens with, the one the menu was opened on first: [{ appid, name }]
   function readGames(root) {
     const list = SE.fromProps(root, 12, (p) => (Array.isArray(p.rgManuallyAddedApps) ? p.rgManuallyAddedApps : undefined)) || [];
@@ -70,11 +68,9 @@
     const block = el('div', `${OURS} ${OURS}-games`);
     const single = games.length === 1;
     const text = el('div', `${OURS}-games-text`);
-    text.append(el('div', `${OURS}-games-title se-dialog-name`, single ? games[0].name : plural(games.length, 'game', 'games')));
+    text.append(el('div', `${OURS}-games-title se-dialog-name`, single ? games[0].name : SE.dialogArt.count(games.length, 'game', 'games')));
     if (!single) {
-      const shown = games.slice(0, 2).map((g) => g.name).filter(Boolean);
-      const more = games.length - shown.length;
-      const names = el('div', `${OURS}-games-names`, more ? `${shown.join(', ')} and ${more.toLocaleString()} more` : shown.join(' and '));
+      const names = el('div', `${OURS}-games-names`, SE.dialogArt.names(games.map((g) => g.name)));
       names.title = games.map((g) => g.name).join('\n');
       text.append(names);
     }
