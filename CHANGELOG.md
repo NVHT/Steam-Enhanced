@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.3.6**](#v1-3-6) | Nov 23, 2026 | Friend chats as bubbles, group chat and dialog redesigns, a new startup |
 | [**1.3.5**](#v1-3-5) | Nov 22, 2026 | Friends and tray menus, Game Properties, shortcuts, a faster client |
 | [**1.3.0**](#v1-3-0) | Nov 21, 2026 | Library Home drawn by the theme, library menus, a contrast and focus pass |
 | [**1.2.1**](#v1-2-1) | Nov 20, 2026 | Two fixes |
@@ -18,11 +19,47 @@
 
 <br>
 
+<a name="v1-3-6"></a>
+
+## 1.3.6 · Nov 23, 2026
+
+> Friend chats as bubbles with a call bar, group chats in the dock, Group Settings and a dozen dialogs rebuilt, and a new startup.
+
+**Friends**
+- **Chats**: one-to-one chats as bubbles, with a rail of your open chats and a call bar for voice.
+- **Friends dock**: group chats with a call bar and menus for their channels and members. The chat header's buttons share one line.
+- **Menus**: the voice channel, message and member menus match the rest.
+- **Group Settings**: led by the chat, its pages as tabs, every page in the theme's cards, rows and switches. Invite links show their time left and copy in one click.
+- **Notifications** for a group chat: the levels as clear choices, each saying what it does.
+
+**Dialogs**
+- Rebuilt: a friend's Nickname and Notifications, Report content, Steam's friend picker (now a checklist), CD Keys and the Hardware Survey.
+- Delete and revoke confirms are a compact card with a red action.
+
+**Client**
+- **Startup**: a new mark, a two-step bar, the Library drawn in as a wireframe, and a welcome back into the Library. Failed sign-ins and Steam Guard restyled.
+- Store and Community pages and Steam links open after a game has run.
+- Reload UI asks first during a voice call.
+
+**Fixes and polish**
+- Menus over a Store page stay on top of it.
+- Startup no longer stalls after a reload during a voice call.
+- The game page's Status stat lines up, and Play shows when it's busy.
+- One look for initials tiles and eyebrows; missing focus and fallback states added.
+- The link icon is duotone like the rest.
+
+**Under the hood**
+- Header, splash and web images recorded by one script (`dev/brand-art.js`).
+- A startup preview and a dialog launcher for development (`dev/`).
+- Duplicated helpers and styles folded into their shared versions.
+
+<br>
+
 <a name="v1-3-5"></a>
 
-## 1.3.5 · Nov 22, 2026
-
-> Friends menus and the tray menu in the theme's style, Game Properties redesigned, new keyboard shortcuts, and a faster client.
+<details>
+<summary><b>1.3.5</b> · Nov 22, 2026 · Friends menus and the tray menu in the theme's style, Game Properties redesigned, new keyboard shortcuts, and a faster client.</summary>
+<br>
 
 **Library**
 - **Game Properties**: a redesign. Every setting row has the same layout and an icon of its own, and the game's hero art runs across the top of the window.
@@ -56,7 +93,7 @@
 - A performance profiler for client windows (`dev/perf.js`, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>).
 - One segmented control, danger button, card and chip everywhere. Shared helpers for library art, relative times and initials.
 
-<br>
+</details>
 
 <a name="v1-3-0"></a>
 
