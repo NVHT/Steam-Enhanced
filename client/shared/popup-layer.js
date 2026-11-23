@@ -101,6 +101,8 @@
 
   // A window waiting for a popup: 1 px, transparent, at the main window's corner.
   const PARKED = { left: 0, top: 0, width: 1, height: 1 };
+  // Steam's EWindowBringToFront: raise a window without taking focus (sp.js)
+  const BRING_TO_FRONT_NO_FOCUS = 2;
 
   /*
    * Where the main window's page starts on screen. A pointer event carries it exactly
@@ -241,9 +243,28 @@
     entry.sizeSignal.replaceChildren(entry.doc.createTextNode(''));
     entry.movedAt = performance.now();
     position(entry);
+    placed.add(entry);
+    raise(entry);
   }
 
+  /*
+   * Over a browser page the page can stack over a layer window, always-on-top or not: one opened
+   * ahead (warm()) keeps the stacking it had then, and the browser view takes focus back ~200 ms
+   * after a click in the main window opens a popup. So a window is raised as it's placed and
+   * again whenever the main window loses focus, without taking focus itself (Steam's own
+   * no-focus menus: k_EWindowBringToFrontWithoutForcingOS, 2).
+   */
+  const placed = new Set();
+  function raise(entry) {
+    run(() => entry.doc.defaultView.SteamClient.Window.BringToFront(BRING_TO_FRONT_NO_FOCUS));
+  }
+  const raisePlaced = () => {
+    for (const entry of placed) if (!entry.closed && entry.rect !== PARKED) raise(entry);
+  };
+  addEventListener('blur', raisePlaced);
+
   function release(entry) {
+    placed.delete(entry);
     run(() => entry.restorePositioner?.());
     entry.restorePositioner = null;
     run(() => entry.doc?.defaultView?.removeEventListener('beforeunload', entry.onHide));
@@ -560,6 +581,7 @@
     // The base's own teardown; the menu part's destroy() adds the rest.
     destroy() {
       removeEventListener('pointermove', trackOrigin, { capture: true });
+      removeEventListener('blur', raisePlaced);
       warmWatcher.disconnect();
       cool();
     },
