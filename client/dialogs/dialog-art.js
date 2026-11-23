@@ -107,7 +107,10 @@
     const frame = requestAnimationFrame(() => {
       const win = window.SteamClient?.Window;
       if (document.title === 'Steam' || !win?.ResizeTo) return;
-      const need = Math.ceil(root.getBoundingClientRect().top + root.scrollHeight);
+      // A body that scrolls hides its overflow from the dialog's own height: add what it hides
+      const body = root.querySelector('.DialogBody');
+      const hidden = body ? body.scrollHeight - body.clientHeight : 0;
+      const need = Math.ceil(Math.max(root.getBoundingClientRect().top + root.scrollHeight, innerHeight + hidden));
       if (need > innerHeight + 1) {
         SE.run(() => win.ResizeTo(innerWidth, Math.min(need, screen.availHeight || need), true));
         return;

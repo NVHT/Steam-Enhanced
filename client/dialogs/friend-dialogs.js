@@ -22,17 +22,26 @@
  * the group's picture and name (client/dialogs/utility/friends.css): a group without a picture of
  * its own (initials, or an ad-hoc chat's members' faces, "?" for one without) gets the initials
  * tile, and one with a picture gets it blurred behind the top ([data-se-friend="invite"]).
+ *
+ * A group chat's Notifications (ChatRoomNotificationSettingsDialog, its props { group }) leads
+ * with the chat the same way: its picture blurred behind the top, then its picture (an unnamed
+ * chat's members' faces, else its initials), name and members. The level dropdown becomes a list
+ * of radio rows, each saying what it does; a choice calls Steam's own handler (the level
+ * component's set_notification_level), and Steam's dropdown stays in, hidden, as the source of
+ * truth ([data-se-friend="chat"]). The unread switch and the channels are Steam's, restyled.
  */
 ((SE) => {
   window.__seFriendDialogs?.destroy();
 
   const { run, esc } = SE;
-  const DIALOGS = '.NicknameDialog, .FriendNotificationsDialog, .ChatRoomGroupInviteDialog';
+  const DIALOGS = '.NicknameDialog, .FriendNotificationsDialog, .ChatRoomGroupInviteDialog, .ChatRoomNotificationSettingsDialog';
+  // Steam's level component draws its own .ChatRoomNotificationSettingsDialog inside the dialog's
+  const INNER_CHAT = '.ChatRoomNotificationSettingsDialog .ChatRoomNotificationSettingsDialog';
   const ROOT = 'data-se-friend';
   const OURS = 'se-friend';
 
   const attempt = SE.attempt('Friend dialogs');
-  const isOurs = (node) => node.nodeType === 1 && !!node.closest?.(`.${OURS}-head, .${OURS}-defaults, .${OURS}-av, .se-dialog-art`);
+  const isOurs = (node) => node.nodeType === 1 && !!node.closest?.(`.${OURS}-head, .${OURS}-defaults, .${OURS}-av, .${OURS}-levels, .se-dialog-art`);
   const playerOf = (root) => SE.fromProps(root, 14, (p) => (p.player?.persona ? p.player : undefined));
 
   // The events, in Steam's rows' order: [what, its show setting, its sound setting]
@@ -97,8 +106,150 @@
     };
   };
 
+  /* ---------- A group chat's Notifications ---------- */
+
+  // Steam's levels, in its options' order (all, any mention, direct mention, none): an icon and
+  // what each does; Steam's labels name them
+  const LEVELS = [
+    ['bell', 'A notification for each new message'],
+    ['at', 'When someone mentions everyone, or you'],
+    ['user', 'Only when someone mentions you by name'],
+    ['bell-off', 'No notifications; the chat stays quiet'],
+  ];
+
+  const clanOf = (group) =>
+    run(() => (group.BIsClanChatRoom() ? SE.global('g_FriendsUIApp', (a) => a.FriendStore).FriendStore.ClanStore.GetClan(group.GetClanID()) : null));
+
+  // The chat's face: its picture or its clan's, an unnamed chat's first two members, else initials
+  function chatFace(doc, group, name) {
+    const av = doc.createElement('span');
+    av.className = `${OURS}-av`;
+    av.dataset.initials = SE.initials(name) || '#';
+    const own = run(() => (group.hasIcon ? group.avatar_url_full : clanOf(group)?.avatar_url_full)) || '';
+    const faces = own || run(() => group.IsNamedGroupChat())
+      ? []
+      : (run(() => group.members_to_highlight.members) || [])
+        .map((m) => run(() => m.persona.avatar_url_medium))
+        .filter((url) => url && !SE.isDefaultAvatar?.(url))
+        .slice(0, 2);
+    if (own) av.innerHTML = `<img src="${esc(own)}" alt="" draggable="false">`;
+    else if (faces.length === 2) {
+      av.dataset.faces = '';
+      av.innerHTML = faces.map((url) => `<img src="${esc(url)}" alt="" draggable="false">`).join('');
+    } else if (faces.length) av.innerHTML = `<img src="${esc(faces[0])}" alt="" draggable="false">`;
+    else av.innerHTML = `<b aria-hidden="true">${esc(av.dataset.initials)}</b>`;
+    return { av, picture: own || faces[0] || '' };
+  }
+
+  // "Group chat · 2 members", "Steam group · 42 members · 3 text channels"
+  function chatLine(group) {
+    const parts = [run(() => group.BIsClanChatRoom()) ? 'Steam group' : 'Group chat'];
+    // Steam's own count (its multi-face picture's): the summary until the full list has loaded
+    const members = run(() => (group.m_bFullStateLoaded ? group.m_groupMembers.unfiltered_count : group.m_cMemberSummaryCount)) || 0;
+    if (members) parts.push(SE.dialogArt.count(members, 'member', 'members'));
+    const channels = run(() => group.chatRoomList.filter((room) => room.BShouldTrackUnreadMessages()).length) || 0;
+    if (channels > 1) parts.push(SE.dialogArt.count(channels, 'text channel', 'text channels'));
+    return parts.join(' · ');
+  }
+
+  // A group chat under a dialog's eyebrow: its face, name and line. destroy() removes it
+  function chatHead(doc, group, name) {
+    const head = doc.createElement('div');
+    head.className = `${OURS}-head`;
+    const { av, picture } = chatFace(doc, group, name);
+    const text = doc.createElement('span');
+    text.className = `${OURS}-text`;
+    text.innerHTML = `<span class="se-dialog-name">${esc(name)}</span><span class="${OURS}-line">${esc(chatLine(group))}</span>`;
+    head.append(av, text);
+    // A picture that fails to load: the initials
+    const onError = (event) => {
+      if (event.target?.tagName !== 'IMG') return;
+      const b = doc.createElement('b');
+      b.setAttribute('aria-hidden', 'true');
+      b.textContent = av.dataset.initials;
+      delete av.dataset.faces;
+      av.replaceChildren(b);
+    };
+    head.addEventListener('error', onError, true);
+    return {
+      head,
+      picture,
+      destroy() {
+        head.removeEventListener('error', onError, true);
+        head.remove();
+      },
+    };
+  }
+  SE.chatHead = chatHead;
+
+  // The levels as radio rows, inside Steam's .notificationRow (a child list React leaves alone)
+  function buildLevels(doc, level) {
+    const list = doc.createElement('div');
+    list.className = `${OURS}-levels`;
+    list.setAttribute('role', 'radiogroup');
+    const current = run(() => level.get_notification_level(true));
+    level.drop_down_options.forEach((option, i) => {
+      const [icon, what] = LEVELS[i] || LEVELS[0];
+      const row = doc.createElement('label');
+      row.className = `${OURS}-level`;
+      row.style.setProperty('--se-friend-icon', `var(--se-icon-${icon})`);
+      row.innerHTML =
+        `<input type="radio" name="se-chat-level" value="${i}"${option.data === current ? ' checked' : ''}>` +
+        `<span class="${OURS}-level-icon" aria-hidden="true"></span>` +
+        `<span class="${OURS}-text"><span class="${OURS}-level-name">${esc(String(option.label))}</span>` +
+        `<span class="${OURS}-line">${esc(what)}</span></span>`;
+      list.append(row);
+    });
+    return list;
+  }
+
+  const createChat = (root) => {
+    const group = SE.fromProps(root, 14, (p) => (p.group?.chatRoomList ? p.group : undefined));
+    const title = root.querySelector('.DialogHeader');
+    const row = root.querySelector('.notificationRow');
+    const level = row && SE.findDown(root, (p) => typeof p.set_notification_level === 'function' && Array.isArray(p.drop_down_options));
+    if (!group || !title || !level) return null;
+    const doc = root.ownerDocument;
+    // The name Steam shows ("A and B" for an unnamed chat), in its "For chatroom …" line
+    const name = root.querySelector('.whiteText')?.textContent.trim() || run(() => group.name) || '';
+
+    const { head, picture, destroy: unhead } = chatHead(doc, group, name);
+    title.after(head);
+    const art = picture ? attempt(() => SE.dialogArt.picture(root.closest('.DialogContent') ?? root, picture), null) : null;
+
+    const list = buildLevels(doc, level);
+    row.append(list);
+    const onPick = (event) => {
+      const option = level.drop_down_options[Number(event.target.value)];
+      if (option) attempt(() => level.set_notification_level(option.data));
+    };
+    list.addEventListener('change', onPick);
+
+    SE.attr(root, ROOT, 'chat');
+
+    // The window fits the rebuilt dialog, and again as the unread switch shows or hides
+    let unfit = SE.dialogArt.fitWindow(root, { shrink: true });
+    const refit = SE.onChange(root.querySelector('.DialogBody') ?? root, () => {
+      unfit();
+      unfit = SE.dialogArt.fitWindow(root, { shrink: true });
+    }, { ignore: isOurs });
+
+    return {
+      root,
+      destroy() {
+        refit.disconnect();
+        unfit();
+        list.removeEventListener('change', onPick);
+        unhead();
+        for (const node of [list, art]) node?.remove();
+        SE.unmark(root, ROOT);
+      },
+    };
+  };
+
   const createView = (root) => {
     if (root.matches('.ChatRoomGroupInviteDialog')) return createInvite(root);
+    if (root.matches('.ChatRoomNotificationSettingsDialog')) return createChat(root);
     const player = playerOf(root);
     const title = root.querySelector('.DialogHeader');
     if (!player || !title) return null;
@@ -178,7 +329,7 @@
 
   const mounted = SE.mount(
     'Friend dialogs',
-    () => [...document.querySelectorAll(DIALOGS)].filter((root) => !root.closest('.GamepadMode')),
+    () => [...document.querySelectorAll(DIALOGS)].filter((root) => !root.closest('.GamepadMode') && !root.matches(INNER_CHAT)),
     createView,
     // Inside the observer's own callback: the header is in before the dialog's first paint
     { sync: true, scope: DIALOGS, ignore: isOurs }
@@ -187,6 +338,7 @@
   window.__seFriendDialogs = {
     destroy() {
       mounted.destroy();
+      delete SE.chatHead;
       delete window.__seFriendDialogs;
     },
   };
