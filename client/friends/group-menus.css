@@ -1,7 +1,8 @@
 /*
  * The friends list's other right-click menus (client/friends/group-menus.js), over the friend
  * menu's panel (client/friends/friend-menu.css) and the game menu's bar and rows
- * (client/library/game-menu.css): a game's header, a category's header, a group chat.
+ * (client/library/game-menu.css): a game's header, a category's header, a group chat, a chat's
+ * +, a chat message, a voice channel.
  * Loaded in every window because Steam's menus open in their own popup windows.
  *
  * Steam wraps a game section's rows in a box (contextMenuSectionContent, display: contents in
@@ -16,11 +17,11 @@
  * library menus' 300 px floor (game-menu.css), else drawn in the page it stood wider than its
  * rows, an empty strip at their end.
  */
-:is([data-se-lib-menu='friend-category'], [data-se-lib-menu='friend-embed'], [data-se-lib-menu='friend-message']) {
+:is([data-se-lib-menu='friend-category'], [data-se-lib-menu='friend-embed'], [data-se-lib-menu='friend-message'], [data-se-lib-menu='friend-voice']) {
   min-width: 0;
 }
 
-:is([data-se-lib-menu='friend-category'], [data-se-lib-menu='friend-embed'], [data-se-lib-menu='friend-message']) > .contextMenuContents {
+:is([data-se-lib-menu='friend-category'], [data-se-lib-menu='friend-embed'], [data-se-lib-menu='friend-message'], [data-se-lib-menu='friend-voice']) > .contextMenuContents {
   width: 260px;
 }
 
@@ -188,6 +189,15 @@
 [data-se-gm='groupprofile'] { --se-gm-icon: var(--se-icon-group); }
 [data-se-gm='playtogether'] { --se-gm-icon: var(--se-icon-library); }
 [data-se-gm='leavechat'] { --se-gm-icon: var(--se-icon-sign-out); }
+[data-se-gm='invitevoice'] { --se-gm-icon: var(--se-icon-friends); }
+[data-se-gm='savechannel'] { --se-gm-icon: var(--se-icon-folder-plus); }
+[data-se-gm='renamechannel'] { --se-gm-icon: var(--se-icon-edit); }
+[data-se-gm='removechannel'] { --se-gm-icon: var(--se-icon-trash); }
+
+/* Save where you may not (Steam adds its lock picture): the theme's lock as the row's icon */
+[data-se-gm='savechannel'].ChatRoomContextNoPermission { --se-gm-icon: var(--se-icon-lock); }
+
+[data-se-gm='savechannel'] > svg { display: none !important; }
 
 /* Open, the group chat's main button: tinted as Install's (game-menu.css [data-se-gm-action]) */
 [data-se-gm-action='open'] {
@@ -199,4 +209,29 @@
 /* Leave as a row (no bar: game-menu.js MIN_BAR): last, under the red divider */
 [data-se-lib-menu='friend-chat'] [data-se-gm='leavechat']:not([data-se-gm-place='bar']) {
   order: 41;
+}
+
+/*
+ * A row Steam disables with a reason (Find Games to Play Together: sp.js
+ * ChatroomContextMenuDisableableItem _2BbdeQcdqy7ATc2431QNtL, its DisabledDescriptor
+ * _3TXSuIQPqQndes4gH_DrSc): in a theme menu the reason is the row's hint (group-menus.js), so
+ * Steam's copy goes; in Steam's own chat menus (a voice channel's) it sits on its own line
+ * under the name instead of running on from it
+ */
+[data-se-gm] ._3TXSuIQPqQndes4gH_DrSc {
+  display: none !important;
+}
+
+.contextMenuItem._2BbdeQcdqy7ATc2431QNtL {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+}
+
+.contextMenuItem._2BbdeQcdqy7ATc2431QNtL ._3TXSuIQPqQndes4gH_DrSc {
+  display: block;
+  margin-top: var(--se-space-half);
+  font: var(--se-type-small);
+  white-space: normal;
+  color: var(--se-text-faint);
 }

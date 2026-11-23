@@ -80,6 +80,9 @@
     }
     for (let f = SE.fiber(row), depth = 0; f && depth < 6; f = f.return, depth++) {
       if (f.key && KEYS[f.key]) return KEYS[f.key];
+      // A group member's View (or Edit) Roles: an unkeyed submenu, its component the one that
+      // toggles a member's roles
+      if (typeof f.stateNode?.OnToggle === 'function' && typeof f.memoizedProps?.group?.GetRoles === 'function') return 'roles';
     }
     return 'other';
   }

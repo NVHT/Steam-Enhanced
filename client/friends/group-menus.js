@@ -12,7 +12,9 @@
  *   - a chat's + (the message box): Upload an image, Upload last screenshot, Share your trade
  *     offer URL, as rows with a glyph and a hint;
  *   - a chat message (right-click): Copy, Select message, React (its submenu), Report, and
- *     Delete in red last where you may.
+ *     Delete in red last where you may;
+ *   - a voice channel (its chevron): Invite, Play together, Save, Rename, and Remove in red,
+ *     the last three where you may.
  *
  * Steam's rows stay Steam's, told apart by their React key, never their words. Patched and laid
  * out by the game menu's code (client/library/game-menu.js: ns.libraryMenus); in its own popup
@@ -37,6 +39,8 @@
     findgamestoplay: 'playtogether', leavechatroom: 'leavechat', quickaccess: 'favorite',
     upload: 'uploadimage', lastscreenshot: 'lastshot', tradeoffer: 'tradeurl',
     copy: 'copymsg', select: 'selectmsg', react: 'react', report: 'reportmsg', delete: 'deletemsg',
+    invitefriend: 'invitevoice', findgamestoplayinchannel: 'playtogether', savechannel: 'savechannel',
+    renameroom: 'renamechannel', removeroom: 'removechannel',
   };
 
   // The hint lines of rows (a bar button shows none)
@@ -67,6 +71,10 @@
     react: 'Answer with an emoji',
     reportmsg: "To Steam's moderators",
     deletemsg: 'For everyone in the chat',
+    invitevoice: 'Ask a friend into this channel',
+    savechannel: 'Keep it after everyone leaves',
+    renamechannel: 'Give it a new name',
+    removechannel: 'For everyone in the group',
   };
 
   // The bar's words, by kind
@@ -101,11 +109,29 @@
    * button's tint, the bar's divider only when rows follow it, the theme's header (head, built
    * once), and, in its own window, the room for its shadow and the window settled
    */
+  /*
+   * The hints, with a disabled row's own reason in place of its usual line (Find Games to Play
+   * Together: "You need 2-8 people…"; Steam's copy hidden, group-menus.css). Given to the layout
+   * so each pass writes one hint: set after it, the two flipped on every pass and the menu's
+   * observer laid it out again for good, hanging the client.
+   */
+  function hintsFor(panel) {
+    let hints = HINTS;
+    for (const reason of panel.querySelectorAll(`.${SE.C.DisabledDescriptor}`)) {
+      const row = reason.closest('.contextMenuItem');
+      const text = reason.textContent.trim();
+      if (!row || !text) continue;
+      if (hints === HINTS) hints = { ...HINTS };
+      hints[kindOf(row)] = text;
+    }
+    return hints;
+  }
+
   function lay(panel, instance, spec) {
     const laid = layoutRows(panel, {
       kindOf,
       bar: spec.bar,
-      hints: HINTS,
+      hints: hintsFor(panel),
       danger: spec.danger,
       skip: [...spec.hidden, 'gametitle'],
       word: (kind) => WORDS[kind],
@@ -217,6 +243,15 @@
     // Steam's message menu: { elMessage, msg, chatView, fnCloseContextMenu }
     test: (props) => 'elMessage' in props && 'msg' in props && 'chatView' in props,
     layout: (panel, instance) => lay(panel, instance, { bar: [], danger: ['deletemsg'], hidden: [], guess: GUESS.category }),
+  });
+
+  /* ---------- A voice channel ---------- */
+
+  add({
+    name: 'friend-voice',
+    // Steam's voice channel menu (its chevron, in a group's channels): { group, roomID, ... }
+    test: (props) => 'roomID' in props && typeof props.group?.GetChatRoom === 'function',
+    layout: (panel, instance) => lay(panel, instance, { bar: [], danger: ['removechannel'], hidden: [], guess: GUESS.category }),
   });
 
   /* ---------- A chat's + ---------- */

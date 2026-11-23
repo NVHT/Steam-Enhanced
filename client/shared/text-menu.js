@@ -34,8 +34,13 @@
   }
 
   // The menu's element: its rows keyed as above (Steam's own keys, not React's prefixed ones)
+  // A chat message's menu starts with Copy too, but is the friends menus' (group-menus.js), its
+  // own rows told apart by their keys
+  const MESSAGE_ROWS = new Set(['select', 'react', 'report', 'delete']);
   const isTextMenu = (props) =>
-    Array.isArray(props.children) && props.children.some((row) => row?.key === 'copy' || row?.key === 'paste' || row?.key === 'cut');
+    Array.isArray(props.children) &&
+    props.children.some((row) => row?.key === 'copy' || row?.key === 'paste' || row?.key === 'cut') &&
+    !props.children.some((row) => MESSAGE_ROWS.has(row?.key));
 
   function kindOf(row) {
     for (let f = SE.fiber(row), depth = 0; f && depth < 6; f = f.return, depth++) {
