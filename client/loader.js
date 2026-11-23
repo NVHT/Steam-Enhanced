@@ -72,6 +72,8 @@
     ['tray', 'client/shared/', ['mini-profile.js']],
     // A page or steam:// link opened in the main window (the rail's menus, About Steam)
     ['content', 'client/shared/', ['open-page.js']],
+    // Steam's own confirm dialog for a theme prompt (Reload UI during a call)
+    ['main', 'client/shared/', ['steam-confirm.js']],
     ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'popup-layer-panel.js', 'popup-layer-menu.js', 'picker.js', 'menu.js', 'menu.css', 'picker.css', 'news-feed.js', 'column-resize.css', 'column-resize.js', 'window-fold.js']],
     ['notify', 'client/friends/', ['friend-notification-clicks.js']],
     // In-game overlay
@@ -133,8 +135,8 @@
     // Friends dock
     ['main', 'client/friends/', ['friends-dock.css', 'friends-dock-chat.css']],
     ['main', 'client/friends/dock/', [
-      'templates.js', 'data.js', 'ui.js', 'routing.js', 'flyouts.js', 'embed.js', 'dock.js',
-      'chat-popup.js', 'friend-card.js', 'main.js',
+      'templates.js', 'data.js', 'ui.js', 'routing.js', 'flyouts.js', 'member-list.js', 'embed.js',
+      'dock.js', 'chat-popup.js', 'friend-card.js', 'main.js',
     ]],
     ['main', 'client/friends/', ['playing-card.js']],
     ['main', 'client/library/', ['sort-segments.css', 'sort-segments.js']],

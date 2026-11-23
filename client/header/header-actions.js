@@ -598,10 +598,60 @@
     }
   }
 
-  // Shared with the Steam menu's rows (client/header/menu/actions.js)
-  const reloadUI = (SE.reloadUI = () => SE.steamCall('Browser', 'RestartJSContext'));
   // false: a plain restart, as Steam's own Restart buttons make it (true is another kind of restart)
   const restartSteam = (SE.restartSteam = () => SE.steamCall('User', 'StartRestart', false));
+  const reloadNow = () => SE.steamCall('Browser', 'RestartJSContext');
+
+  /*
+   * Reload UI during a voice call leaves the main window dropping timers and Steam's own menus
+   * taking no input until a full restart (CLAUDE.md, Windows and Millennium). So while a call is
+   * on it asks first, in Steam's own confirm dialog (SE.steamConfirm, the look of Mark as
+   * Private), else the action menu: leave the call and then reload (once Steam says the call is
+   * over, giving up after a few seconds rather than reload in it), restart Steam, or cancel.
+   * Shared with the Steam menu's rows (client/header/menu/actions.js).
+   */
+  const ASK = {
+    title: "You're in a voice call",
+    description: 'Reloading now can leave Steam not responding until it restarts. Leave the call first, or restart Steam (the call ends).',
+  };
+  const LEAVE_WAIT_MS = 5000;
+  const voice = () => SE.global('g_FriendsUIApp', (app) => app.VoiceStore)?.VoiceStore;
+  const inCall = () => SE.run(() => voice().IsAnyVoiceActive()) === true;
+
+  function leaveThenReload() {
+    SE.run(() => voice().OnUserEndVoiceChat());
+    const started = performance.now();
+    const check = () => {
+      if (!inCall()) reloadNow();
+      else if (performance.now() - started < LEAVE_WAIT_MS) setTimeout(check, 150);
+    };
+    setTimeout(check, 150);
+  }
+
+  const reloadUI = (SE.reloadUI = () => {
+    if (!inCall()) return reloadNow();
+    const asked = SE.steamConfirm?.({
+      ...ASK,
+      // Short: Steam's buttons share one width, and a longer label wrapped
+      ok: 'Leave and reload',
+      middle: 'Restart Steam',
+      cancel: 'Cancel',
+      onOK: leaveThenReload,
+      onMiddle: restartSteam,
+    });
+    if (asked || !SE.layer?.menu) return;
+    SE.layer.menu(
+      [
+        { heading: ASK.title },
+        { note: ASK.description },
+        { label: 'Leave the call and reload', icon: '--se-icon-refresh', run: leaveThenReload },
+        { label: 'Restart Steam', hint: 'The call ends', icon: '--se-icon-restart', run: restartSteam },
+        { label: 'Cancel', icon: '--se-icon-close-sm', run: () => {} },
+      ],
+      // In the middle of the window, a third of the way down: no button opened it
+      (width, height) => ({ left: Math.max(0, (innerWidth - width) / 2), top: Math.max(0, (innerHeight - height) / 3) })
+    );
+  });
 
   /*
    * Keyboard shortcuts, in the main window: Ctrl+` Steam Settings, Ctrl+1 Millennium (beside

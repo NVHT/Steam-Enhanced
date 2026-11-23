@@ -292,6 +292,25 @@
   const probeState = () =>
     Object.entries(probe).map(([kind, ran]) => `${kind} ${ran ? 'runs' : 'never ran'}`).join(', ');
 
+  // The popup layer (client/shared/popup-layer*.js), which draws flyouts and menus over a browser page
+  const layerState = () => {
+    const SE = window.__se;
+    const layer = SE?.layer;
+    if (!layer) return 'Popup layer: (none in this window)';
+    let found = 'not checked';
+    try {
+      found = layer.runtime() ? 'Steam runtime found' : `Steam runtime missing (${layer.missing() || '?'})`;
+    } catch (err) {
+      found = `runtime check failed (${err?.message || err})`;
+    }
+    let menu = '?';
+    try {
+      menu = layer.menuOpen() ? 'a Steam menu counts as open' : 'no Steam menu open';
+    } catch {}
+    const browser = SE.browserShown ? (SE.browserShown() ? 'browser page shown' : 'no browser page') : '';
+    return `Popup layer: ${found}; ${menu}; ${browser}`;
+  };
+
   // The loader's wait (client/loader.js): a window that never got [data-se-styled] names what held it
   const loaderState = () => {
     const client = window.__seClient;
@@ -461,6 +480,7 @@
       `Page: ${document.title || '(untitled)'} — ${location.href}`,
       `Root classes: html.${[...document.documentElement.classList].join('.') || '(none)'}`,
       loaderState(),
+      layerState(),
       'Theme files loaded:',
       themeFiles(),
       '',
@@ -523,6 +543,7 @@
       `Page: ${document.title || '(untitled)'} — ${location.href}`,
       `Root classes: html.${[...document.documentElement.classList].join('.') || '(none)'}`,
       loaderState(),
+      layerState(),
       `Body: ${label(body)}  (background ${short(bodyStyle.backgroundColor, 40)}, ${short(bodyStyle.backgroundImage, 100)})`,
       `Window: ${innerWidth}×${innerHeight}, page ${document.documentElement.scrollWidth}×${document.documentElement.scrollHeight}, scale ${devicePixelRatio}`,
       'Theme files loaded:',
