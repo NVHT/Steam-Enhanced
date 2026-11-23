@@ -1,4 +1,4 @@
-"""Design check: the design system's rules (CLAUDE.md section 6) across the whole theme.
+"""Design check: the design system's rules across the whole theme.
 
     python dev/design-check.py     flags and notes; exit code 1 if anything is flagged
 
@@ -24,7 +24,7 @@ Notes (look, then decide):
     core/spinner.css and core/motion.css
   - blur: a raw blur() in filter (art blur; glass goes through --se-blur-*)
 
-Reads core/tokens.css for token values. Skips .git, .claude, dev/, vendor files and
+Reads core/tokens.css for token values. Skips hidden folders, dev/, vendor files and
 core/tokens.css itself.
 """
 import os
@@ -32,7 +32,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SKIP_DIRS = {'.git', '.claude', 'dev', '__pycache__', 'vendor'}
+SKIP_DIRS = {'dev', '__pycache__', 'vendor'}
 FACE_FILES = {'core/font.css', 'core/tokens.css'}
 
 LAYOUT = re.compile(
@@ -60,7 +60,7 @@ def read(path):
 
 def walk(ext):
     for base, dirs, names in os.walk(ROOT):
-        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+        dirs[:] = [d for d in dirs if d not in SKIP_DIRS and not d.startswith('.')]
         for name in names:
             if name.endswith(ext):
                 yield rel(os.path.join(base, name))

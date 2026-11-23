@@ -463,7 +463,7 @@
    * Steam's own source for a game's library art (GetHeaderImages, GetHeroImages, GetLogoImages:
    * the custom art, the cached copy, then the CDN, by the file names Steam keeps for the game),
    * found once by its methods. Newer games keep their art under hashed paths, so the bare names
-   * in heroURLs, headerURLs and logoURLs can 404 (CLAUDE.md section 7); they stay as the last copies.
+   * in heroURLs, headerURLs and logoURLs can 404; they stay as the last copies.
    * Finding it scans every module (a long task), so `scan: false` only takes a copy this or
    * another window already found: heroURLs, headerURLs and logoURLs ask that way.
    */

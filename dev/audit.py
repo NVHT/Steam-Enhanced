@@ -19,7 +19,7 @@ Notes (look, then decide; names can be built at runtime, sizes can be fine):
   - files past the ~40 KB split size
   - skin.json's version not past the last release tag (a release needs the bump)
 
-Skips .git, .claude, dev/ and __pycache__; comments are stripped before reading code.
+Skips hidden folders, dev/ and __pycache__; comments are stripped before reading code.
 """
 import json
 import os
@@ -29,7 +29,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 THEME_DIRS = ('client', 'core', 'web', 'compat', 'options')
-SKIP_DIRS = {'.git', '.claude', 'dev', '__pycache__'}
+SKIP_DIRS = {'dev', '__pycache__'}
 SPLIT_SIZE = 40 * 1024
 
 CSS_COMMENT = re.compile(r'/\*.*?\*/', re.S)
@@ -50,7 +50,7 @@ def read(path):
 def walk():
     """Every file of the theme, as root-relative paths."""
     for base, dirs, names in os.walk(ROOT):
-        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+        dirs[:] = [d for d in dirs if d not in SKIP_DIRS and not d.startswith('.')]
         for name in names:
             yield rel(os.path.join(base, name))
 
