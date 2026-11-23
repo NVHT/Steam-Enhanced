@@ -1,0 +1,233 @@
+/*
+ * Steam's friend picker as a checklist (client/dialogs/friend-picker.js): Create / Manage
+ * Category, Create a new chat, Invite to a group chat, Remote Play's invite.
+ *
+ *   STEAM'S LABEL                    3 chosen
+ *   [ (search) Search friends              ]
+ *   [ face  Name                        [x] ]
+ *   [       Online                          ]
+ *
+ * Steam's picker stays mounted, hidden, as the source of truth; Big Picture keeps it.
+ */
+.FriendPicker[data-se-fpick] {
+  display: none;
+}
+
+.se-fpick {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+}
+
+.se-fpick-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--se-space-3);
+}
+
+.se-fpick-label {
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+.se-fpick-count {
+  font: var(--se-type-caption);
+  color: var(--se-text-muted);
+}
+
+/* The search field: the --se-search-* box and its magnifier (client/shared/search-field.css) */
+.se-fpick-search {
+  display: flex;
+  align-items: center;
+  gap: var(--se-search-gap);
+  height: var(--se-search-h);
+  padding: 0 var(--se-search-pad);
+  border-radius: var(--se-search-radius);
+  background: var(--se-search-bg);
+  box-shadow: var(--se-search-edge);
+  color: var(--se-search-icon-color);
+  cursor: text;
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-fpick-search:hover {
+  box-shadow: var(--se-search-edge-hover);
+}
+
+.se-fpick-search:focus-within {
+  box-shadow: var(--se-search-edge-focus);
+}
+
+.se-fpick-search input {
+  all: unset;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  font: var(--se-search-font);
+  font-style: normal;
+  color: var(--se-search-text);
+}
+
+.se-fpick-search input::placeholder {
+  font-style: normal;
+  color: var(--se-search-placeholder);
+}
+
+/* The list: sunken, as the theme's other pickers; down to the dialog's footer (--se-fpick-h, friend-picker.js) */
+.se-fpick-list {
+  height: var(--se-fpick-h, 320px);
+  overflow-y: auto;
+  padding: var(--se-space-1);
+  border-radius: var(--se-radius-md);
+  background: var(--se-bg);
+  box-shadow: var(--se-edge);
+}
+
+.se-fpick-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--se-space-3);
+  min-height: 44px;
+  padding: var(--se-space-1) var(--se-space-2);
+  border-radius: var(--se-radius-sm);
+  cursor: pointer;
+  transition: background-color var(--se-dur) var(--se-ease);
+}
+
+.se-fpick-row:hover {
+  background: var(--se-hover);
+}
+
+.se-fpick-row[aria-selected="true"] {
+  background: var(--se-accent-tint);
+}
+
+.se-fpick-row:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: calc(-1 * var(--se-focus-offset));
+}
+
+/* The face, ringed in its status colour; without a picture, the initials tile */
+.se-fpick-av {
+  --se-fpick-ring: transparent;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--se-avatar-radius);
+  background: var(--se-initials-bg);
+  box-shadow: 0 0 0 2px var(--se-bg), 0 0 0 4px var(--se-fpick-ring);
+}
+
+.se-fpick-row[data-state="online"] .se-fpick-av {
+  --se-fpick-ring: var(--se-online);
+}
+
+.se-fpick-row[data-state="away"] .se-fpick-av {
+  --se-fpick-ring: color-mix(in srgb, var(--se-online) 50%, transparent);
+}
+
+.se-fpick-row[data-state="ingame"] .se-fpick-av {
+  --se-fpick-ring: var(--se-running);
+}
+
+.se-fpick-av img {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.se-fpick-row[data-state="offline"] .se-fpick-av img {
+  filter: grayscale(.6);
+  opacity: .6;
+}
+
+.se-fpick-av b {
+  font: var(--se-initials-weight) var(--se-fs-sm) / 1 var(--se-font);
+  letter-spacing: var(--se-initials-spacing);
+  color: var(--se-initials-ink);
+}
+
+.se-fpick-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-half);
+  min-width: 0;
+}
+
+.se-fpick-name,
+.se-fpick-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.se-fpick-name {
+  font: 600 var(--se-fs-md) / 1.3 var(--se-font);
+  color: var(--se-text);
+}
+
+.se-fpick-line {
+  font: 500 var(--se-fs-sm) / 1.3 var(--se-font);
+  color: var(--se-text-faint);
+}
+
+.se-fpick-row[data-state="online"] .se-fpick-line {
+  color: var(--se-online);
+}
+
+.se-fpick-row[data-state="away"] .se-fpick-line {
+  color: color-mix(in srgb, var(--se-online) 70%, transparent);
+}
+
+.se-fpick-row[data-state="ingame"] .se-fpick-line {
+  color: var(--se-running);
+}
+
+/* The check: the client's checkbox (client/settings/controls.css), its tick a mask */
+.se-fpick-check {
+  position: relative;
+  width: var(--se-check-size);
+  height: var(--se-check-size);
+  border-radius: var(--se-radius-xs);
+  background: var(--se-check);
+  box-shadow: var(--se-edge-mid);
+  transition: background-color var(--se-dur) var(--se-ease);
+}
+
+.se-fpick-row[aria-selected="true"] .se-fpick-check {
+  background: var(--se-accent);
+  box-shadow: none;
+}
+
+.se-fpick-row[aria-selected="true"] .se-fpick-check::after {
+  content: '';
+  position: absolute;
+  inset: var(--se-space-half);
+  background: var(--se-bg-ink);
+  -webkit-mask: var(--se-icon-check) center / contain no-repeat;
+  mask: var(--se-icon-check) center / contain no-repeat;
+}
+
+/* No friends, or none matching: inside the list, where the rows would be */
+.se-fpick-note {
+  padding: var(--se-space-5) var(--se-space-4);
+  font: var(--se-type-small);
+  color: var(--se-text-faint);
+  text-align: center;
+}
+
+.se-fpick-note[hidden] {
+  display: none;
+}
+
+/* The pager's marker: the next page loads as it nears view */
+.se-fpick-end {
+  display: block;
+  height: 1px;
+}

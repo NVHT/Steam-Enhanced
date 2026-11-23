@@ -161,7 +161,8 @@
       'dialog-art.js', 'activate-product.css', 'activate-product.js', 'backups.css', 'backups.js', 'install.js',
       'eula.js', 'uninstall.css', 'uninstall.js', 'new-collection.css', 'new-collection.js',
       'delete-collection.css', 'delete-collection.js', 'mark-private.css', 'mark-private.js',
-      'exit-game.css', 'exit-game.js', 'cd-keys.css', 'cd-keys.js',
+      'exit-game.css', 'exit-game.js', 'cd-keys.css', 'cd-keys.js', 'friend-picker.css',
+      'friend-picker.js',
     ]],
     // Plugin integrations
     ['main', 'compat/hltb-for-steam/', ['hltb-for-steam.css', 'hltb-for-steam.js']],
