@@ -281,6 +281,62 @@
 })();
 
 /*
+ * Startup preview (dev/startup-preview.js), a theming aid: Ctrl+Shift+L in a client window
+ * draws the startup window's screens. Loaded only on the first press.
+ */
+(() => {
+  if (window.__seStartupPreviewHotkey) return;
+  window.__seStartupPreviewHotkey = true;
+  const coreSrc = document.currentScript?.src ||
+    [...document.scripts].find((script) => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;
+  addEventListener(
+    'keydown',
+    (event) => {
+      if (!event.ctrlKey || !event.shiftKey || event.altKey || event.metaKey || event.code !== 'KeyL') return;
+      if (!window.__seClient || !coreSrc) return; // client windows only: it runs client/startup/
+      event.preventDefault();
+      event.stopPropagation();
+      const script = document.createElement('script');
+      const url = new URL('../dev/startup-preview.js', coreSrc);
+      url.searchParams.set('v', String(Date.now()));
+      script.src = url.href;
+      (document.head ?? document.documentElement).append(script);
+    },
+    true
+  );
+})();
+
+/*
+ * Dialog launcher (dev/dialog-launcher.js), a theming aid: Ctrl+Shift+D in a client window
+ * opens Steam's dialogs on demand. Loaded only on the first press; later presses hide or show it.
+ */
+(() => {
+  if (window.__seDialogLauncherHotkey) return;
+  window.__seDialogLauncherHotkey = true;
+  const coreSrc = document.currentScript?.src ||
+    [...document.scripts].find((script) => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;
+  addEventListener(
+    'keydown',
+    (event) => {
+      if (!event.ctrlKey || !event.shiftKey || event.altKey || event.metaKey || event.code !== 'KeyD') return;
+      if (!window.__seClient || !coreSrc) return; // client windows only: it opens Steam's own dialogs
+      event.preventDefault();
+      event.stopPropagation();
+      if (window.__seDialogLauncher) {
+        window.__seDialogLauncher.toggle();
+        return;
+      }
+      const script = document.createElement('script');
+      const url = new URL('../dev/dialog-launcher.js', coreSrc);
+      url.searchParams.set('v', String(Date.now()));
+      script.src = url.href;
+      (document.head ?? document.documentElement).append(script);
+    },
+    true
+  );
+})();
+
+/*
  * Profiler (dev/perf.js), a performance aid: Ctrl+Shift+P arms it in every client window
  * (localStorage "se-perf"; client/loader.js then loads it before the runtime) and opens its
  * panel here. Costs nothing until pressed.
