@@ -1,0 +1,66 @@
+<!doctype html><html data-se-entrance="splash"><head><meta charset="utf-8"><title>Splash</title>
+<link rel="stylesheet" href="../../core/font.css">
+<link rel="stylesheet" href="../../core/tokens.css">
+<link rel="stylesheet" href="../../core/icons-nav.css">
+<link rel="stylesheet" href="../../core/spinner.css">
+<link rel="stylesheet" href="../../client/dialogs/about-steam.css">
+<link rel="stylesheet" href="../../client/shared/wireframe.css">
+<link rel="stylesheet" href="../../client/home/stage/stage-hero.css">
+<link rel="stylesheet" href="../../client/entrance/entrance.css">
+<style>
+html,body{margin:0;width:1920px;height:1080px;background:#0f1115;overflow:hidden}
+/* Placeholder art standing in for a game's hero */
+.art{position:absolute;inset:0;background:radial-gradient(520px 360px at 72% 28%,rgba(238,240,242,.24),transparent 70%),linear-gradient(160deg,#3a5a80 0%,#22344c 42%,#141b26 80%)}
+.hill{position:absolute;left:0;right:0;bottom:0;height:46%;background:#0f1115;opacity:.55;clip-path:polygon(0 50%,8% 34%,18% 46%,30% 22%,42% 40%,54% 28%,66% 46%,78% 24%,90% 40%,100% 30%,100% 100%,0 100%)}
+.amb{position:absolute;inset:-80px;background:radial-gradient(520px 360px at 72% 28%,rgba(238,240,242,.24),transparent 70%),linear-gradient(160deg,#3a5a80 0%,#22344c 42%,#141b26 80%);filter:blur(48px);opacity:.21}
+.lockup{display:flex;align-items:center;gap:calc(22 * var(--u))}
+.lockup i{width:calc(104 * var(--u));height:calc(104 * var(--u));background:var(--se-brand-logo) center/contain no-repeat;flex:none}
+.lockup span{display:flex;flex-direction:column;gap:calc(10 * var(--u))}
+.lockup small{color:var(--se-text-muted);font:400 calc(18 * var(--u))/1 var(--se-font);letter-spacing:.42em;text-transform:uppercase}
+.lockup b{color:var(--se-text-strong);font:400 calc(64 * var(--u))/.92 var(--se-font);letter-spacing:-.02em}
+</style>
+<script>window.__se={};</script>
+<script src="../../client/shared/wireframe.js"></script>
+</head><body>
+<div id="se-entrance" data-phase="loading" data-logo="">
+ <div class="se-ent-ground"><div class="amb"></div><div id="wf"></div><div class="se-ent-shadow"></div></div>
+ <div class="se-ent-art"><div class="se-hs-art"><div class="se-hs-layer" data-on><div class="art"></div><div class="hill"></div></div><div class="se-hs-grade"></div></div></div>
+ <div class="se-ent-block"><div class="se-ent-game"><span class="se-ent-eyebrow">Welcome back</span>
+  <span class="se-ent-logo"><span class="lockup"><i></i><span><small>Steam</small><b>Enhanced</b></span></span></span><span class="se-ent-name"></span></div>
+  <div class="se-ent-progress"><div class="se-ent-bar"><span id="fill"></span></div>
+  <div class="se-ent-meta"><span class="se-ent-status"><i class="se-ent-spin se-spin-arc"></i><b class="se-ent-tick"></b><span class="se-ent-step" id="step">Loading your library</span></span><span class="se-ent-count">The Steam you always wanted.</span></div></div></div>
+</div>
+<script>
+document.getElementById('wf').outerHTML = window.__se.wireframe({ alive: true, busy: true });
+const el = document.getElementById('se-entrance');
+const place = () => {
+  const r = el.querySelector('.se-wf-stage').getBoundingClientRect();
+  for (const [n, v] of [['x', r.left], ['y', r.top], ['w', r.width], ['h', r.height], ['foot', innerHeight - r.bottom]]) el.style.setProperty('--ent-' + n, v + 'px');
+};
+place();
+addEventListener('resize', place);
+addEventListener('load', place);
+// The entrance's timeline, in seconds (dev/brand-art.js calls it for each frame): in, art, the bar's
+// creep, Ready, out
+const ease = (x) => 1 - Math.pow(1 - x, 3);
+// The splash's own fade in and out set per frame: as CSS animations they run on the compositor,
+// which sends the screencast no frames for them, so the fade skipped
+el.style.animation = 'none';
+// Its own layer, so fading it doesn't repaint the blurred art every frame (which dropped frames)
+el.style.willChange = 'opacity';
+window.__frame = (t) => {
+  const fade = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
+  el.style.opacity = String(Math.min(fade(t / 0.35), 1 - fade((t - 7.5) / 0.4)));
+  const on = (name, yes) => (yes ? el.setAttribute(name, '') : el.removeAttribute(name));
+  on('data-art', t >= 0.4);
+  on('data-game', t >= 0.4);
+  const ready = t >= 4.6;
+  el.dataset.phase = ready ? 'ready' : 'loading';
+  document.getElementById('step').textContent = ready ? 'Ready' : 'Loading your library';
+  let f = 0.04;
+  if (t >= 0.4) f = 0.04 + 0.86 * ease(Math.min(1, (t - 0.4) / 3.8));
+  if (t >= 4.2) f = 0.9 + 0.1 * Math.min(1, (t - 4.2) / 0.32);
+  document.getElementById('fill').style.transform = `scaleX(${f})`;
+};
+</script>
+</body></html>
