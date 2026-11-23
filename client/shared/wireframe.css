@@ -1,0 +1,602 @@
+/*
+ * The Library as a wireframe, drawn from the theme's real Library: rail, game list, Home (search
+ * bar, stage, board) and friends. One drawing for the splash (client/entrance/) and the startup
+ * window's background (client/startup/), built by SE.wireframe() (wireframe.js). Every size is a
+ * multiple of --u, 1 px of a 1920 x 1080 design scaled to the window (a caller may set its own);
+ * the frame stands for the window at 0.88 of its size: the columns keep their widths, Home takes
+ * the rest. The caller places the frame; --se-wf-bg is the ground its cut-outs show.
+ */
+.se-wf *,
+.se-wf *::before,
+.se-wf *::after {
+  box-sizing: border-box;
+}
+
+.se-wf s,
+.se-wf i,
+.se-wf b {
+  display: block;
+  flex: none;
+  font-style: normal;
+  text-decoration: none;
+}
+
+.se-wf {
+  --u: min(calc(100vw / 1920), calc(100vh / 1080));
+  --se-wf-line: var(--se-accent-line);
+  --se-wf-line-soft: color-mix(in srgb, var(--se-accent) 18%, transparent);
+  --se-wf-line-strong: var(--se-accent-strong);
+  --se-wf-green: color-mix(in srgb, var(--se-running) 60%, transparent);
+  display: flex;
+  overflow: hidden;
+  border-radius: calc(26 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) color-mix(in srgb, var(--se-accent) 28%, transparent);
+}
+
+/* A slow light sweeping across the frame */
+.se-wf-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 40%, color-mix(in srgb, var(--se-accent) 9%, transparent) 50%, transparent 60%);
+  animation: se-wf-sweep 5s linear infinite;
+}
+
+@keyframes se-wf-sweep {
+  from { transform: translateX(-30%); }
+  to { transform: translateX(130%); }
+}
+
+/* ---------- Shared pieces: an icon, a line of text, a section header ---------- */
+
+.se-wf-ico {
+  width: calc(14 * var(--u));
+  height: calc(14 * var(--u));
+  border-radius: calc(4 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+.se-wf-txt {
+  height: calc(3 * var(--u));
+  background: var(--se-wf-line);
+}
+
+.se-wf-txt[data-tone="strong"] {
+  background: var(--se-wf-line-strong);
+}
+
+.se-wf-txt[data-tone="accent"] {
+  background: var(--se-accent);
+}
+
+.se-wf-txt[data-tone="green"] {
+  background: var(--se-wf-green);
+}
+
+.se-wf-head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: calc(10 * var(--u));
+  height: calc(28 * var(--u));
+}
+
+.se-wf-head::before {
+  content: "";
+  flex: none;
+  width: calc(6 * var(--u));
+  height: calc(6 * var(--u));
+  border: solid var(--se-wf-line);
+  border-width: 0 calc(2 * var(--u)) calc(2 * var(--u)) 0;
+  rotate: 45deg;
+}
+
+.se-wf-count {
+  width: calc(10 * var(--u));
+  height: calc(3 * var(--u));
+  margin-left: auto;
+  background: var(--se-wf-line-soft);
+}
+
+/* ---------- Rail ---------- */
+
+.se-wf-rail {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(20 * var(--u));
+  width: calc(40 * var(--u));
+  padding: calc(10 * var(--u)) 0 calc(14 * var(--u));
+  box-shadow: inset calc(-2 * var(--u)) 0 0 var(--se-wf-line-soft);
+}
+
+.se-wf-rail-nav,
+.se-wf-rail-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(20 * var(--u));
+}
+
+.se-wf-rail-foot {
+  margin-top: auto;
+}
+
+.se-wf-rail-on {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(28 * var(--u));
+  height: calc(26 * var(--u));
+  margin: calc(-6 * var(--u)) 0;
+  border-radius: calc(7 * var(--u));
+  background: color-mix(in srgb, var(--se-accent) 14%, transparent);
+}
+
+.se-wf-rail-on::before {
+  content: "";
+  position: absolute;
+  top: calc(6 * var(--u));
+  bottom: calc(6 * var(--u));
+  left: calc(-6 * var(--u));
+  width: calc(3 * var(--u));
+  border-radius: 0 calc(2 * var(--u)) calc(2 * var(--u)) 0;
+  background: var(--se-accent);
+}
+
+.se-wf-rail-on .se-wf-ico {
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-accent);
+}
+
+.se-wf-rail-me {
+  width: calc(24 * var(--u));
+  height: calc(24 * var(--u));
+  margin-top: calc(4 * var(--u));
+  border-radius: 23%;
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-accent);
+}
+
+/* ---------- Game list: its header, then sections of rows ---------- */
+
+.se-wf-list {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: calc(240 * var(--u));
+  padding: 0 calc(12 * var(--u));
+  overflow: hidden;
+  box-shadow: inset calc(-2 * var(--u)) 0 0 var(--se-wf-line-soft);
+}
+
+.se-wf-libhead {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: calc(10 * var(--u));
+  height: calc(34 * var(--u));
+  margin-bottom: calc(4 * var(--u));
+}
+
+.se-wf-libhead > b {
+  width: calc(20 * var(--u));
+  height: calc(20 * var(--u));
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-strong);
+}
+
+.se-wf-row {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: calc(10 * var(--u));
+  height: calc(24 * var(--u));
+  padding-left: calc(4 * var(--u));
+}
+
+.se-wf-row > .se-wf-txt {
+  background: var(--se-wf-line-soft);
+}
+
+/* Installed: bright */
+.se-wf-row[data-lit] > .se-wf-txt {
+  background: var(--se-wf-line-strong);
+}
+
+/* Updating */
+.se-wf-dot {
+  width: calc(8 * var(--u));
+  height: calc(8 * var(--u));
+  margin-left: auto;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-accent);
+}
+
+/* ---------- Home: the search bar, the stage, the board ---------- */
+
+.se-wf-home {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.se-wf-top {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: calc(34 * var(--u));
+}
+
+.se-wf-search {
+  width: calc(408 * var(--u));
+  height: calc(24 * var(--u));
+  border-radius: calc(7 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-soft);
+}
+
+/* The stage, flush to the column: the game's block lower left, the strip lower right */
+.se-wf-stage {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: calc(24 * var(--u));
+  min-height: 0;
+  padding: 0 calc(15 * var(--u)) calc(9 * var(--u)) calc(18 * var(--u));
+  border-radius: calc(10 * var(--u)) 0 0 0;
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+.se-wf-game {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(14 * var(--u));
+  min-width: 0;
+}
+
+/* The game's logo: the title over its subtitle */
+.se-wf-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(14 * var(--u));
+  width: calc(246 * var(--u));
+  margin-bottom: calc(6 * var(--u));
+}
+
+.se-wf-logo > i {
+  width: 100%;
+  height: calc(40 * var(--u));
+  border-radius: calc(4 * var(--u));
+  background: var(--se-wf-line-strong);
+}
+
+.se-wf-logo > i + i {
+  width: 70%;
+  height: calc(16 * var(--u));
+  background: var(--se-wf-line);
+}
+
+.se-wf-play {
+  width: calc(158 * var(--u));
+  height: calc(35 * var(--u));
+  border-radius: calc(7 * var(--u));
+  background: color-mix(in srgb, var(--se-running) 45%, transparent);
+}
+
+.se-wf-strip {
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(6, calc(99 * var(--u)));
+  gap: calc(5 * var(--u));
+}
+
+.se-wf-strip > b {
+  height: calc(46 * var(--u));
+  border-radius: calc(5 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-soft);
+}
+
+.se-wf-strip > b[data-on] {
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-accent);
+}
+
+/* The board: three panels in one box */
+.se-wf-board {
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  height: calc(230 * var(--u));
+  margin: calc(9 * var(--u)) calc(15 * var(--u)) calc(22 * var(--u));
+  overflow: hidden;
+  border-radius: calc(10 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-soft);
+}
+
+.se-wf-panel {
+  display: flex;
+  flex-direction: column;
+  gap: calc(16 * var(--u));
+  min-width: 0;
+  padding: calc(16 * var(--u));
+  overflow: hidden;
+}
+
+.se-wf-panel + .se-wf-panel {
+  box-shadow: inset calc(2 * var(--u)) 0 0 var(--se-wf-line-soft);
+}
+
+/* Friend activity: an avatar and what they did */
+.se-wf-act {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: calc(10 * var(--u));
+  height: calc(23 * var(--u));
+  margin-bottom: calc(16 * var(--u));
+}
+
+.se-wf-act > b {
+  width: calc(23 * var(--u));
+  height: calc(23 * var(--u));
+  border-radius: 23%;
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+/* Favorites, Recently added: a row of wide capsules */
+.se-wf-grid {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: calc(6 * var(--u));
+}
+
+.se-wf-grid > b {
+  border-radius: calc(6 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+/* ---------- Friends: header, favorites, games with their players, other games ---------- */
+
+.se-wf-friends {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: calc(14 * var(--u));
+  width: calc(240 * var(--u));
+  padding: calc(12 * var(--u)) calc(12 * var(--u)) 0;
+  overflow: hidden;
+  box-shadow: inset calc(2 * var(--u)) 0 0 var(--se-wf-line-soft);
+}
+
+.se-wf-favs {
+  display: flex;
+  flex: none;
+  gap: calc(16 * var(--u));
+  padding: calc(4 * var(--u)) 0 calc(10 * var(--u));
+  box-shadow: 0 calc(2 * var(--u)) 0 var(--se-wf-line-soft);
+}
+
+.se-wf-favs > b {
+  width: calc(32 * var(--u));
+  height: calc(32 * var(--u));
+  border-radius: calc(8 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-strong);
+}
+
+/* A game: its icon and name */
+.se-wf-group {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: calc(10 * var(--u));
+  margin-top: calc(4 * var(--u));
+}
+
+.se-wf-group > b {
+  width: calc(25 * var(--u));
+  height: calc(25 * var(--u));
+  border-radius: calc(6 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-strong);
+}
+
+/* A friend: indented under the game they're in */
+.se-wf-friend {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: calc(10 * var(--u));
+}
+
+.se-wf-friend[data-in] {
+  padding-left: calc(20 * var(--u));
+}
+
+.se-wf-friend > b {
+  position: relative;
+  width: calc(25 * var(--u));
+  height: calc(25 * var(--u));
+  border-radius: 23%;
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-green);
+}
+
+/*
+ * Alive (SE.wireframe({ alive: true })): the columns draw in one after another (rail, list,
+ * Home, friends), each fading up into place; then the selection steps down the Favorites rows
+ * (2 s a row) and the friends in games come online one by one (2.5 s each), each item's turn set
+ * by wireframe.js. Opacity on pseudo-elements only, so nothing repaints.
+ */
+.se-wf[data-alive] > :is(.se-wf-rail, .se-wf-list, .se-wf-home, .se-wf-friends) {
+  animation: se-wf-in var(--se-dur-slower) var(--se-ease) both;
+}
+
+.se-wf[data-alive] > .se-wf-list {
+  animation-delay: .15s;
+}
+
+.se-wf[data-alive] > .se-wf-home {
+  animation-delay: .3s;
+}
+
+.se-wf[data-alive] > .se-wf-friends {
+  animation-delay: .45s;
+}
+
+@keyframes se-wf-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.se-wf[data-alive] .se-wf-row[data-turn]::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--u)) calc(-6 * var(--u));
+  border-radius: calc(5 * var(--u));
+  background: color-mix(in srgb, var(--se-accent) 12%, transparent);
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) color-mix(in srgb, var(--se-accent) 55%, transparent);
+  opacity: 0;
+  animation: se-wf-row calc(var(--se-wf-turns) * 2s) linear calc(var(--se-wf-turn) * 2s) infinite;
+}
+
+.se-wf[data-alive] .se-wf-friend[data-turn] > b::before {
+  content: "";
+  position: absolute;
+  inset: calc(-4 * var(--u));
+  border-radius: 28%;
+  box-shadow: 0 0 0 calc(2 * var(--u)) color-mix(in srgb, var(--se-running) 80%, transparent), 0 0 calc(12 * var(--u)) color-mix(in srgb, var(--se-running) 50%, transparent);
+  opacity: 0;
+  animation: se-wf-friend calc(var(--se-wf-turns) * 2.5s) linear calc(var(--se-wf-turn) * 2.5s) infinite;
+}
+
+/*
+ * One turn, in, held, out, then a wait while the others take theirs: a turn is 1/8 of the
+ * Favorites' round (8 rows) and 1/4 of the friends' and the activity's (4 each).
+ */
+@keyframes se-wf-row {
+  0%,
+  12.5%,
+  100% {
+    opacity: 0;
+  }
+  1%,
+  11% {
+    opacity: 1;
+  }
+}
+
+@keyframes se-wf-friend {
+  0%,
+  25%,
+  100% {
+    opacity: 0;
+  }
+  3%,
+  21% {
+    opacity: 1;
+  }
+}
+
+/*
+ * Busy ({ alive: true, busy: true }, the splash and the startup window): more of it moves, as if the Library were
+ * loading. The board's capsules shimmer one after another, its activity lights up row by row
+ * (2.5 s each), the search field's caret blinks, the updating game's dot and the Library tab
+ * pulse. Transform and opacity on pseudo-elements only.
+ */
+.se-wf[data-busy] .se-wf-grid > b {
+  position: relative;
+  overflow: hidden;
+}
+
+.se-wf[data-busy] .se-wf-grid > b::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--se-accent) 24%, transparent) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: se-wf-shimmer var(--se-dur-shimmer) ease-in-out calc(var(--se-wf-i) * .12s) infinite;
+}
+
+@keyframes se-wf-shimmer {
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.se-wf[data-busy] .se-wf-act > b {
+  position: relative;
+}
+
+.se-wf[data-busy] .se-wf-act[data-turn] > b::before {
+  content: "";
+  position: absolute;
+  inset: calc(-3 * var(--u));
+  border-radius: 28%;
+  box-shadow: 0 0 0 calc(2 * var(--u)) color-mix(in srgb, var(--se-accent) 75%, transparent), 0 0 calc(12 * var(--u)) color-mix(in srgb, var(--se-accent) 45%, transparent);
+  opacity: 0;
+  animation: se-wf-friend calc(var(--se-wf-turns) * 2.5s) linear calc(var(--se-wf-turn) * 2.5s) infinite;
+}
+
+.se-wf[data-busy] .se-wf-search {
+  position: relative;
+}
+
+.se-wf[data-busy] .se-wf-search::after {
+  content: "";
+  position: absolute;
+  top: calc(6 * var(--u));
+  bottom: calc(6 * var(--u));
+  left: calc(14 * var(--u));
+  width: calc(2 * var(--u));
+  background: var(--se-accent);
+  animation: se-wf-caret 1s step-end infinite;
+}
+
+@keyframes se-wf-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.se-wf[data-busy] .se-wf-dot {
+  opacity: .4;
+  animation: se-wf-pulse var(--se-dur-pulse) ease-in-out infinite;
+}
+
+.se-wf[data-busy] .se-wf-rail-on::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 calc(14 * var(--u)) color-mix(in srgb, var(--se-accent) 55%, transparent);
+  opacity: 0;
+  animation: se-wf-pulse var(--se-dur-breathe) ease-in-out infinite;
+}
+
+@keyframes se-wf-pulse {
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-wf-sweep,
+  .se-wf[data-alive] > *,
+  .se-wf[data-alive] .se-wf-row::after,
+  .se-wf[data-alive] .se-wf-friend > b::before,
+  .se-wf[data-busy] .se-wf-grid > b::after,
+  .se-wf[data-busy] .se-wf-act > b::before,
+  .se-wf[data-busy] .se-wf-search::after,
+  .se-wf[data-busy] .se-wf-dot,
+  .se-wf[data-busy] .se-wf-rail-on::after {
+    animation: none;
+  }
+}

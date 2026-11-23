@@ -81,8 +81,9 @@
       'toasts.css', 'context.js', 'config.js', 'steam.js', 'stage.js', 'hub.js', 'placement.js',
       'scan.js', 'compact.js', 'main.js',
     ]],
-    // Loading spinner (also holds the mark), then startup, sign-in, entrance
+    // Loading spinner (also holds the mark), the Library wireframe, then startup, sign-in, entrance
     ['content', 'core/', ['spinner.css']],
+    ['content', 'client/shared/', ['wireframe.css', 'wireframe.js']],
     ['content', 'client/startup/', ['startup.css', 'startup.js', 'sign-in.css']],
     ['main', 'client/entrance/', ['entrance.css', 'entrance.js']],
     ['desktop', 'client/shared/', ['native-tooltips.js']],

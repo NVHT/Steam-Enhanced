@@ -1,10 +1,7 @@
 /*
- * Startup loading screen, background themes, and step progress strip.
- *
- * Scoped to `html[data-se-startup]`. Implements the selectable startup
- * backgrounds (`library`, `hero`, `mosaic`, `wall`, `plain`, `dots`, `steam`),
- * central spinner housing, user pill, and 4-step startup progress bar. Paired
- * with `client/startup/startup.js`.
+ * The startup window, scoped to `html[data-se-startup]` (client/startup/startup.js): the
+ * background (`aurora`, the default, `library`, `mosaic`, `wall`, `plain`, `dots`, `steam`), the
+ * lockup, the status screen and the two-step bar.
  */
 /* Also client/startup/sign-in.css */
 /* The background */
@@ -36,12 +33,15 @@ html[data-se-startup] .se-startup-bg {
   pointer-events: none;
 }
 
-/* The shade that keeps the window's middle and foot calm over any background. */
+/*
+ * The shade: dark on the left where the lockup, title and form sit, and along the foot under
+ * the bar, opening up to the art on the right.
+ */
 html[data-se-startup] .se-startup-bg::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 34% 30% at 50% 26%, color-mix(in srgb, var(--se-bg) 85%, transparent), color-mix(in srgb, var(--se-bg) 35%, transparent) 85%), linear-gradient(180deg, color-mix(in srgb, var(--se-bg) 20%, transparent), var(--se-bg) 80%);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--se-bg) 90%, transparent), color-mix(in srgb, var(--se-bg) 60%, transparent) 55%, color-mix(in srgb, var(--se-bg) 25%, transparent)), linear-gradient(0deg, color-mix(in srgb, var(--se-bg) 85%, transparent), transparent 60%);
 }
 
 /*
@@ -93,54 +93,51 @@ html[data-se-startup] .se-startup-mosaic > span {
 }
 
 /*
- * Hero: your recent games' hero art, three slides on a 27 s cycle. Each fades in, holds
- * 9 s while it slowly zooms and pans, then crossfades into the next. startup.js paints each
- * slide with the art's addresses in turn and a crop of Steam's wall beneath them.
+ * Aurora (default): three soft glows (the accent, a teal and a violet mixed from theme colours)
+ * drifting slowly on the right and top, the Library's wireframe faint over them, behind the shade. Gradients moved by transform only, so
+ * the drift stays on the compositor.
  */
-html[data-se-startup] .se-startup-slide {
+html[data-se-startup] .se-startup-glow {
   position: absolute;
-  inset: -20px;
-  background-color: transparent;
-  background-repeat: no-repeat;
-  opacity: 0;
-  animation: se-startup-hero 27s linear infinite;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--se-glow), transparent);
+  animation: se-startup-glow 26s ease-in-out infinite alternate;
 }
 
-html[data-se-startup] .se-startup-slide:nth-child(2) {
-  animation-delay: -18s;
+html[data-se-startup] .se-startup-glow:nth-child(1) {
+  --se-glow: color-mix(in srgb, var(--se-accent) 55%, transparent);
+  right: -18vmax;
+  top: -24vmax;
 }
 
-html[data-se-startup] .se-startup-slide:nth-child(3) {
-  animation-delay: -9s;
+html[data-se-startup] .se-startup-glow:nth-child(2) {
+  --se-glow: color-mix(in srgb, color-mix(in srgb, var(--se-accent) 55%, var(--se-running)) 45%, transparent);
+  right: 2vmax;
+  bottom: -32vmax;
+  animation-duration: 32s;
+  animation-delay: -12s;
 }
 
-@keyframes se-startup-hero {
-  0% {
-    opacity: 0;
-    transform: scale(1.04) translateX(0);
-  }
-  6% {
-    opacity: 1;
-  }
-  33% {
-    opacity: 1;
-  }
-  39% {
-    opacity: 0;
-    transform: scale(1.14) translateX(-24px);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.14) translateX(-24px);
-  }
+html[data-se-startup] .se-startup-glow:nth-child(3) {
+  --se-glow: color-mix(in srgb, color-mix(in srgb, var(--se-accent) 55%, var(--se-danger)) 40%, transparent);
+  left: 14vmax;
+  top: -36vmax;
+  animation-duration: 38s;
+  animation-delay: -24s;
 }
 
-/*
- * Lighter than the other backgrounds' shade, so the art shows: dark only behind the middle
- * and at the foot.
- */
-html[data-se-startup] .se-startup-bg[data-kind="hero"]::after {
-  background: radial-gradient(ellipse 38% 42% at 50% 44%, color-mix(in srgb, var(--se-bg) 60%, transparent), color-mix(in srgb, var(--se-bg) 12%, transparent) 90%), linear-gradient(180deg, color-mix(in srgb, var(--se-bg) 35%, transparent), transparent 25%, transparent 55%, color-mix(in srgb, var(--se-bg) 92%, transparent));
+@keyframes se-startup-glow {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-6vmax, 4vmax) scale(1.12);
+  }
+  to {
+    transform: translate(4vmax, -3vmax) scale(.94);
+  }
 }
 
 /* Wall: Steam's picture, still, blurred and dimmed */
@@ -172,721 +169,95 @@ html[data-se-startup] .se-startup-bg[data-kind="dots"]::before {
 }
 
 /*
- * Library wireframe background (default): renders a low-contrast structural
- * silhouette of the navigation rail, game list, hero stage, shelf tray, and
- * friends dock.
+ * Library: the Library's wireframe (client/shared/wireframe.css, the splash's drawing), framed as
+ * in the splash, drawn alive and busy (wireframe.css).
  */
-.se-sl {
+html[data-se-startup] .se-startup-bg .se-wf {
+  --se-wf-bg: var(--se-bg);
   position: absolute;
-  inset: 0;
-  display: flex;
-  background: #12161c;
-  opacity: .55;
-  /* No blur: it re-filtered the whole window on every frame of the animations inside */
-  filter: saturate(.75);
-}
-
-.se-sl s,
-.se-sl u,
-.se-sl b,
-.se-sl i {
-  display: block;
-  text-decoration: none;
-  font-style: normal;
-}
-
-.se-sl-lines {
-  display: flex;
-  flex-direction: column;
-  gap: var(--se-space-half);
-  min-width: 0;
-}
-
-.se-sl-lines s {
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(190, 225, 255, .38);
-}
-
-/* The rail */
-.se-sl-rail {
-  flex: none;
-  width: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--se-space-2);
-  padding-top: var(--se-space-3);
-  background: #0f1217;
-}
-
-.se-sl-rail i {
-  width: 24px;
-  height: 22px;
-  border-radius: 7px;
-  background: color-mix(in srgb, var(--se-accent) 12%, transparent);
-}
-
-.se-sl-rail i:first-child {
-  width: 28px;
-  height: 28px;
-  border-radius: 9px;
-  margin-bottom: var(--se-space-1);
-  background: color-mix(in srgb, var(--se-accent) 20%, transparent);
-}
-
-.se-sl-rail i:nth-child(2) {
-  background: var(--se-accent-line);
-  box-shadow: inset 2px 0 0 var(--se-accent);
-}
-
-/* The page frame and its header */
-.se-sl-frame {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  border-radius: var(--se-radius-ml) 0 0 0;
-  background: var(--se-bg);
-  overflow: hidden;
-  box-shadow: inset 1px 1px 0 color-mix(in srgb, var(--se-accent) 8%, transparent);
-}
-
-.se-sl-head {
-  flex: none;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--se-space-2);
-  padding: 0 var(--se-space-2);
-}
-
-.se-sl-head i {
-  position: relative;
-  width: 20px;
-  height: 20px;
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--se-accent) 12%, transparent);
-}
-
-.se-sl-head .se-sl-me {
-  border-radius: 50%;
-}
-
-.se-sl-bell::after {
-  content: "";
-  position: absolute;
-  right: -2px;
-  top: -2px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--se-accent);
-  box-shadow: 0 0 6px var(--se-accent);
-  animation: se-sl-blink var(--se-dur-breathe) ease-in-out infinite;
-}
-
-@keyframes se-sl-blink {
-  50% {
-    opacity: .3;
-  }
-}
-
-.se-sl-search {
-  margin-right: auto;
-  width: 150px;
-  max-width: 30%;
-  height: 20px;
-  border-radius: var(--se-radius-pill);
-  background: color-mix(in srgb, var(--se-accent) 8%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 12%, transparent);
-}
-
-.se-sl-body {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-}
-
-/* The game list */
-.se-sl-list {
-  flex: none;
-  width: 110px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--se-space-2);
-  padding: var(--se-space-2) var(--se-space-2) 0;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.se-sl-seg {
-  display: flex;
-  gap: var(--se-space-half);
-  padding: var(--se-space-half);
-  margin-bottom: var(--se-space-1);
-  border-radius: 7px;
-  background: color-mix(in srgb, var(--se-accent) 7%, transparent);
-}
-
-.se-sl-seg i {
-  flex: 1;
-  height: 12px;
-  border-radius: var(--se-radius-xs);
-}
-
-.se-sl-seg i:first-child {
-  background: var(--se-accent-line);
-}
-
-.se-sl-row {
-  display: flex;
-  align-items: center;
-  gap: var(--se-space-1);
-  padding: var(--se-space-half) var(--se-space-1);
-  border-radius: 5px;
-}
-
-.se-sl-row b {
-  flex: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  background: color-mix(in srgb, var(--se-accent) 22%, transparent);
-}
-
-.se-sl-row s {
-  height: 5px;
-  max-width: 100%;
-  border-radius: 3px;
-  background: color-mix(in srgb, var(--se-accent) 20%, transparent);
-}
-
-.se-sl-row[data-sel] {
-  background: color-mix(in srgb, var(--se-accent) 16%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 25%, transparent);
-}
-
-/* Library Home: the stage */
-.se-sl-home {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  border-radius: var(--se-radius-md) 0 0 0;
-  overflow: hidden;
-  background: var(--se-art-floor);
-}
-
-.se-sl-stage {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-}
-
-/* Eight games, 4.5 s each (36 s round), the strip's tile lit for the game showing */
-.se-sl-hero {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  animation: se-sl-hero 36s linear infinite;
-}
-
-@keyframes se-sl-hero {
-  0% {
-    opacity: 0;
-    transform: scale(1.06);
-  }
-  3%,
-  12.5% {
-    opacity: 1;
-  }
-  15.5%,
-  100% {
-    opacity: 0;
-    transform: scale(1);
-  }
-}
-
-.se-sl-hero:nth-child(1) {
-  background: radial-gradient(ellipse 60% 70% at 30% 40%, var(--se-art-cover-1), transparent 70%), repeating-linear-gradient(30deg, color-mix(in srgb, var(--se-accent) 5%, transparent) 0 2px, transparent 2px 10px), linear-gradient(160deg, #14243a, #0d131d);
-}
-
-.se-sl-hero:nth-child(2) {
-  background: radial-gradient(ellipse 60% 70% at 70% 30%, var(--se-art-cover-2), transparent 70%), repeating-linear-gradient(50deg, color-mix(in srgb, var(--se-accent) 5%, transparent) 0 2px, transparent 2px 11px), linear-gradient(160deg, #0f1b2c, #0d131d);
-}
-
-.se-sl-hero:nth-child(3) {
-  background: radial-gradient(ellipse 60% 70% at 50% 20%, var(--se-art-cover-3), transparent 70%), repeating-linear-gradient(70deg, color-mix(in srgb, var(--se-accent) 5%, transparent) 0 2px, transparent 2px 12px), linear-gradient(160deg, #16263c, #0d131d);
-}
-
-.se-sl-hero:nth-child(4) {
-  background: radial-gradient(ellipse 60% 70% at 20% 60%, var(--se-art-cover-4), transparent 70%), repeating-linear-gradient(90deg, color-mix(in srgb, var(--se-accent) 5%, transparent) 0 2px, transparent 2px 13px), linear-gradient(160deg, #101a28, #0d131d);
-}
-
-.se-sl-hero:nth-child(5) {
-  background: radial-gradient(ellipse 60% 70% at 80% 50%, var(--se-art-cover-5), transparent 70%), repeating-linear-gradient(110deg, color-mix(in srgb, var(--se-accent) 5%, transparent) 0 2px, transparent 2px 14px), linear-gradient(160deg, #132238, #0d131d);
-}
-
-.se-sl-hero:nth-child(6) {
-  background: radial-gradient(ellipse 60% 70% at 40% 30%, var(--se-art-cover-6), transparent 70%), repeating-linear-gradient(130deg, color-mix(in srgb, var(--se-accent) 5%, transparent) 0 2px, transparent 2px 15px), linear-gradient(160deg, #0e1828, #0d131d);
-}
-
-.se-sl-hero:nth-child(7) {
-  background: radial-gradient(ellipse 60% 70% at 65% 45%, var(--se-art-cover-7), transparent 70%), repeating-linear-gradient(150deg, color-mix(in srgb, var(--se-accent) 5%, transparent) 0 2px, transparent 2px 16px), linear-gradient(160deg, #182a40, #0d131d);
-}
-
-.se-sl-hero:nth-child(8) {
-  background: radial-gradient(ellipse 60% 70% at 35% 25%, var(--se-art-cover-8), transparent 70%), repeating-linear-gradient(170deg, color-mix(in srgb, var(--se-accent) 5%, transparent) 0 2px, transparent 2px 17px), linear-gradient(160deg, #0f1a29, #0d131d);
-}
-
-.se-sl-shade {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(20,25,34,.2), transparent 40%, rgba(20,25,34,.75) 70%), linear-gradient(180deg, transparent 50%, var(--se-art-floor));
-}
-
-.se-sl-logo {
-  position: absolute;
-  left: 16px;
-  top: 40px;
-  width: 110px;
-  height: 38px;
-  background: linear-gradient(90deg, rgba(214,236,255,.85) 0 60%, transparent 60%) 0 4px / 100% 12px no-repeat, linear-gradient(90deg, rgba(214,236,255,.6) 0 85%, transparent 85%) 0 22px / 100% 9px no-repeat;
-  animation: se-sl-fade var(--se-dur-sweep) ease-in-out infinite;
-}
-
-@keyframes se-sl-fade {
-  0% {
-    opacity: 0;
-  }
-  12%,
-  88% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-.se-sl-info {
-  position: absolute;
-  right: 10px;
-  top: 14px;
-  width: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--se-space-1);
-  animation: se-sl-fade var(--se-dur-sweep) ease-in-out infinite;
-}
-
-.se-sl-info > s {
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(214, 236, 255, .35);
-}
-
-.se-sl-chips {
-  display: flex;
-  gap: var(--se-space-1);
-}
-
-.se-sl-chips i {
-  width: 40px;
-  height: 12px;
-  border-radius: var(--se-radius-pill);
-  background: color-mix(in srgb, var(--se-accent) 20%, transparent);
-  box-shadow: var(--se-edge-accent);
-}
-
-.se-sl-chips i + i {
-  width: 30px;
-}
-
-.se-sl-stats {
-  display: flex;
-  align-items: center;
-  gap: var(--se-space-2);
-  margin-top: var(--se-space-half);
-}
-
-.se-sl-stats s {
-  width: 24px;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(214, 236, 255, .6);
-}
-
-.se-sl-stats u {
-  width: 36px;
-  height: 5px;
-  border-radius: 3px;
-  background: linear-gradient(90deg, var(--se-accent) 65%, color-mix(in srgb, var(--se-accent) 20%, transparent) 65%);
-}
-
-.se-sl-play {
-  display: flex;
-  gap: var(--se-space-1);
-  margin-top: var(--se-space-half);
-}
-
-.se-sl-play b {
-  position: relative;
-  width: 58px;
-  height: 20px;
-  border-radius: 6px;
-  background: #4f8cc8;
-}
-
-/* The ring grows and fades by transform and opacity, so it never repaints */
-.se-sl-play b::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--se-accent) 60%, transparent);
-  animation: se-sl-pulse var(--se-dur-glow) ease-out infinite;
-}
-
-.se-sl-play i {
-  width: 46px;
-  height: 20px;
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--se-accent) 15%, transparent);
-  box-shadow: var(--se-edge-accent);
-}
-
-@keyframes se-sl-pulse {
-  0% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  70%,
-  100% {
-    opacity: 0;
-    transform: scale(1.25, 1.7);
-  }
-}
-
-.se-sl-strip {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 6px;
-  display: flex;
-  gap: var(--se-space-1);
-}
-
-.se-sl-strip span {
-  flex: 1;
-  aspect-ratio: 16 / 9;
-  border-radius: var(--se-radius-xs);
-  background: var(--se-art-card);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 20%, transparent);
+  inset: calc(70 * var(--u)) calc(80 * var(--u));
   opacity: .6;
-  animation: se-sl-pick 36s step-end infinite;
 }
 
-@keyframes se-sl-pick {
-  0% {
-    opacity: 1;
-    box-shadow: inset 0 0 0 1.5px #9fd2ff, 0 0 10px color-mix(in srgb, var(--se-accent) 50%, transparent);
-  }
-  12.5%,
-  100% {
-    opacity: .6;
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 20%, transparent);
-  }
+/* Over Aurora: fainter, so the glows show through it */
+html[data-se-startup] .se-startup-bg[data-kind="aurora"] .se-wf {
+  opacity: .4;
 }
 
-/* Library Home: the glass tray (What's New · Favorites · Collections) */
-.se-sl-tray {
-  flex: none;
-  height: 108px;
-  margin: var(--se-space-1) var(--se-space-3) var(--se-space-2);
-  display: grid;
-  grid-template-columns: 1.1fr 1fr 1fr;
-  gap: 1px;
-  border-radius: var(--se-radius-md);
-  overflow: hidden;
-  background: color-mix(in srgb, var(--se-accent) 10%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 16%, transparent);
+/* A brighter sweep than the splash's */
+html[data-se-startup] .se-startup-bg .se-wf-sweep {
+  background: linear-gradient(100deg, transparent 38%, color-mix(in srgb, var(--se-accent) 22%, transparent) 50%, transparent 62%);
 }
 
-.se-sl-col {
-  position: relative;
-  min-width: 0;
-  padding: var(--se-space-2);
-  overflow: hidden;
-  background: rgba(23, 30, 42, .92);
+/*
+ * The lockup: the logo tile and the wordmark, top left on every startup screen.
+ * --se-brand-logo comes from client/dialogs/about-steam.css, loaded in this window too.
+ */
+html[data-se-startup] .se-startup-lockup {
+  position: absolute;
+  left: 64px;
+  top: 40px;
+  z-index: var(--se-z-raised-3);
+  font-family: var(--se-font);
+  pointer-events: none;
 }
 
-.se-sl-news {
+html[data-se-startup] .se-startup-brand {
   display: flex;
-  gap: var(--se-space-1);
+  align-items: center;
+  gap: var(--se-space-5);
 }
 
-.se-sl-card {
+/* The status screen's title, 170 px from the top as in the design; empty on login screens */
+html[data-se-startup] .se-startup-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-3);
+  margin-top: 66px;
+}
+
+html[data-se-startup] .se-startup-heading:has(> b:empty) {
+  display: none;
+}
+
+html[data-se-startup] .se-startup-heading b {
+  color: var(--se-text-strong);
+  font: 400 40px/1.1 var(--se-font);
+  letter-spacing: -.01em;
+}
+
+html[data-se-startup] .se-startup-heading span {
+  color: var(--se-text-dim);
+  font: 500 var(--se-fs-md)/1.45 var(--se-font);
+}
+
+html[data-se-startup] .se-startup-tile {
   flex: none;
-  width: 54px;
-  border-radius: 5px;
-  background: var(--se-art-card);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 22%, transparent);
+  width: 64px;
+  height: 64px;
+  background: var(--se-brand-logo) center / contain no-repeat;
 }
 
-.se-sl-heads {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent);
-  mask-image: linear-gradient(transparent, #000 15%, #000 85%, transparent);
-}
-
-.se-sl-heads > div {
+html[data-se-startup] .se-startup-word {
   display: flex;
   flex-direction: column;
   gap: var(--se-space-2);
-  animation: se-sl-up 16s linear infinite;
 }
 
-@keyframes se-sl-up {
-  to {
-    transform: translateY(-50%);
-  }
+html[data-se-startup] .se-startup-word small {
+  color: var(--se-text-muted);
+  font: 400 var(--se-fs-base)/1 var(--se-font);
+  letter-spacing: .42em;
+  text-transform: uppercase;
 }
 
-.se-sl-favs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-content: start;
-  gap: var(--se-space-1);
+html[data-se-startup] .se-startup-word b {
+  color: var(--se-text-strong);
+  font: 400 36px/.92 var(--se-font);
+  letter-spacing: -.02em;
 }
 
-.se-sl-favs > span {
-  position: relative;
-  height: 22px;
-  border-radius: var(--se-radius-xs);
-  overflow: hidden;
-  background: linear-gradient(color-mix(in srgb, var(--se-accent) 8%, transparent), color-mix(in srgb, var(--se-accent) 8%, transparent)), rgba(36,66,106,.6);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 16%, transparent);
-}
-
-/* The shimmer: a band three tiles wide slid across by transform, under the tile's mark */
-.se-sl-favs > span::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 300%;
-  background: linear-gradient(110deg, transparent 30%, rgba(160,215,255,.15) 50%, transparent 70%);
-  animation: se-sl-shim 3s linear infinite;
-  animation-delay: inherit; /* each tile's stagger is set inline on the tile */
-}
-
-@keyframes se-sl-shim {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(100%);
-  }
-}
-
-.se-sl-favs s {
-  position: absolute;
-  right: 5px;
-  bottom: 5px;
-  width: 16px;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(214,236,255,.4);
-}
-
-.se-sl-cols {
-  display: flex;
-  flex-direction: column;
-  gap: var(--se-space-1);
-}
-
-.se-sl-cols > span {
-  display: flex;
-  align-items: center;
-  gap: var(--se-space-2);
-  padding: var(--se-space-half);
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--se-accent) 6%, transparent);
-}
-
-.se-sl-fan {
-  position: relative;
-  flex: none;
-  width: 34px;
-  height: 20px;
-}
-
-.se-sl-fan i {
-  position: absolute;
-  left: 10px;
-  top: 0;
-  width: 13px;
-  height: 19px;
-  border-radius: 2px;
-  background: var(--se-art-card-on);
-  box-shadow: 0 0 0 1px #171e2a;
-  transform-origin: 50% 100%;
-}
-
-.se-sl-fan i:nth-child(1) {
-  transform: rotate(-16deg);
-}
-
-.se-sl-fan i:nth-child(3) {
-  transform: rotate(16deg);
-}
-
-/* The friends list */
-.se-sl-friends {
-  flex: none;
-  width: 112px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--se-space-2);
-  padding: var(--se-space-2) var(--se-space-2) 0;
-  box-sizing: border-box;
-  overflow: hidden;
-  border-left: 1px solid color-mix(in srgb, var(--se-accent) 8%, transparent);
-}
-
-.se-sl-self {
-  display: flex;
-  align-items: center;
-  gap: var(--se-space-1);
-  padding: var(--se-space-1);
-  margin-bottom: var(--se-space-half);
-  border-radius: 7px;
-  background: color-mix(in srgb, var(--se-accent) 8%, transparent);
-}
-
-.se-sl-self b {
-  width: 20px;
-  height: 20px;
-  border-radius: var(--se-avatar-radius);
-  background: var(--se-art-card-on);
-  box-shadow: 0 0 0 1.5px var(--se-accent);
-}
-
-.se-sl-self s {
-  width: 44px;
-  height: 5px;
-  border-radius: 3px;
-  background: rgba(214,236,255,.45);
-}
-
-.se-sl-grp {
-  flex: none;
-  width: 26px;
-  height: 3px;
-  margin: var(--se-space-half) 0 0 var(--se-space-half);
-  border-radius: 2px;
-  background: color-mix(in srgb, var(--se-accent) 35%, transparent);
-}
-
-.se-sl-fd {
-  --c: var(--se-accent);
-  display: flex;
-  align-items: center;
-  gap: var(--se-space-1);
-}
-
-.se-sl-fd[data-st="game"] {
-  --c: #cfeaff;
-}
-
-.se-sl-fd[data-st="away"] {
-  --c: #4f7fae;
-}
-
-.se-sl-fd[data-st="off"] {
-  --c: #3a4656;
-  opacity: .55;
-}
-
-.se-sl-fd b {
-  position: relative;
-  flex: none;
-  width: 16px;
-  height: 16px;
-  border-radius: var(--se-avatar-radius);
-  background: linear-gradient(160deg, #2e507a, #172a42);
-  box-shadow: 0 0 0 1.5px var(--c);
-}
-
-.se-sl-fd[data-st="game"] b::after {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border-radius: calc(16px * .23 + var(--se-radius-xs)); /* concentric with the avatar, 4 px out */
-  border: 1.5px solid rgba(207,234,255,.55);
-  animation: se-sl-ping 2.6s ease-out infinite;
-  animation-delay: inherit;
-}
-
-@keyframes se-sl-ping {
-  from {
-    opacity: 1;
-    transform: scale(.8);
-  }
-  to {
-    opacity: 0;
-    transform: scale(1.5);
-  }
-}
-
-/* Over it: scanlines and a slow sheen, and the shade that keeps the middle calm */
-.se-sl-scan {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(180deg, var(--se-white-03) 0 1px, transparent 1px 3px);
-}
-
-/* The sheen's track spans the window and slides by transform; the band itself sits on it */
-.se-sl-sheen {
-  position: absolute;
-  inset: 0;
-  animation: se-sl-sheen 11s ease-in-out infinite;
-}
-
-.se-sl-sheen::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  bottom: -50%;
-  left: -260px;
-  width: 180px;
-  background: linear-gradient(90deg, transparent, rgba(190,225,255,.1), transparent);
-  transform: rotate(18deg);
-}
-
-@keyframes se-sl-sheen {
-  0%,
-  30% {
-    transform: translateX(0);
-  }
-  80%,
-  100% {
-    transform: translateX(calc(100% + 380px));
-  }
-}
-
-html[data-se-startup] .se-startup-bg[data-kind="library"]::after {
-  background: radial-gradient(ellipse 45% 55% at 50% 45%, rgba(18,22,28,.7), rgba(18,22,28,.25) 80%), radial-gradient(ellipse 34% 40% at 50% 44%, rgba(13,19,29,.5), transparent 90%), radial-gradient(ellipse 80% 90% at 50% 50%, transparent 60%, rgba(8,12,18,.55));
-}
-
-/* The status screen */
+/* The status screen: Steam's column on the left under the lockup (anything it adds, e.g. a button). */
 html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 {
   font-family: var(--se-font);
 }
@@ -896,321 +267,187 @@ html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._2ngG3CCc-g0zyXymxnDnM0 {
   background: transparent !important;
 }
 
-/* A top-aligned column, leaving the foot to the strip. */
 html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._3sa1NXudhvcc1U7HrlLdNQ:not(#se-none),
 html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2._3sa1NXudhvcc1U7HrlLdNQ:not(#se-none) {
+  align-items: flex-start;
   justify-content: flex-start;
-  padding: 56px var(--se-space-5) 132px;
+  padding: 280px 64px 120px; /* under the heading */
   box-sizing: border-box;
+  text-align: left;
 }
 
-/*
- * The spinner: core/spinner.css draws it on this box. Steam's image (an animation that would
- * be a second spinner) stays as the spacer that sizes the box, and the drawing sits on it.
- */
-html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v {
-  --se-startup-spinner: 64px;
-  padding-top: 0;
+/* The lockup stands in for the spinner; the bar shows the progress and the account. */
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._3CN5DkgNMvdtT9fJhNOj_v,
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 [data-se-startup-account] {
+  display: none;
 }
 
-html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v > img {
-  width: var(--se-startup-spinner) !important;
-  height: var(--se-startup-spinner) !important;
-  margin: 0 0 var(--se-space-4);
-  padding: 0;
-  visibility: hidden;
-}
-
-html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v:not(#se-none)::before {
-  top: 0;
-  height: var(--se-startup-spinner);
-  translate: -50% 0;
-}
-
-html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v:not(#se-none)::after {
-  top: calc(var(--se-startup-spinner) * .15);
-  height: calc(var(--se-startup-spinner) * .7);
-  translate: -50% 0;
-}
-
-/* Shutting down: it slows and dims. */
-html[data-se-startup][data-se-startup-phase="off"] ._3CN5DkgNMvdtT9fJhNOj_v:not(#se-none)::before {
-  animation-duration: 3.6s !important;
-}
-
-html[data-se-startup][data-se-startup-phase="off"] ._3CN5DkgNMvdtT9fJhNOj_v:not(#se-none) {
-  opacity: .6;
-}
-
-/* The status line */
-html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._3rAIymq-pEYFB9bIdm-Aoz {
-  gap: 0;
-}
-
-html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._234vZnlQxRbmkpJ5Qq82Mc {
-  color: var(--se-text);
-  font: 700 var(--se-fs-2xl)/24px var(--se-font);
-  letter-spacing: -.01em;
-  text-shadow: none;
-}
-
-/* Native progress bar: the strip carries the percentage. */
+/* Native progress bar: Steam's inline width, the bar carries the progress. */
 html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._191qxA6UisOKSvaq9gM4W6 {
   display: none !important;
 }
 
-/*
- * The account: a chip whose corners follow the avatar's. The 22 px avatar's rounded-square
- * corner (23%) plus its 4 px ring fills the chip's height, so the chip takes the ring's outer
- * radius on all four corners; a round pill end beside a square-ish avatar didn't match.
- */
-html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._6Z2AOU-R-8aK7KZevey0W:not(#se-none) {
-  height: 30px;
-  box-sizing: border-box;
-  margin-top: var(--se-space-3);
-  padding: 0 var(--se-space-3) 0 var(--se-space-1);
-  gap: var(--se-space-2);
-  border-radius: calc(22px * .23 + var(--se-radius-xs)); /* concentric with the avatar's ring */
-  background: rgba(31, 36, 43, .7);
-  box-shadow: var(--se-edge);
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._3rAIymq-pEYFB9bIdm-Aoz {
+  gap: 0;
 }
 
-html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._3YzgVE15q0lUY1uAwRQm1U > img {
-  width: 22px !important;
-  height: 22px !important;
-  display: block;
-  border-radius: var(--se-avatar-radius);
-  box-shadow: 0 0 0 2px var(--se-bg), 0 0 0 4px var(--se-offline);
+/* Steam's status line: the heading above says it (and Steam often leaves it empty). */
+html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._234vZnlQxRbmkpJ5Qq82Mc {
+  display: none;
 }
 
-html[data-se-startup][data-se-startup-phase="lib"] ._1TR3CCCdSmI-0MXucYBuP2 ._3YzgVE15q0lUY1uAwRQm1U > img {
-  box-shadow: 0 0 0 2px var(--se-bg), 0 0 0 4px var(--se-online);
-}
-
-html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._2tyxJwWA7FRwarLgRU2dWa {
-  color: var(--se-text-dim);
-  font: 600 var(--se-fs-base)/16px var(--se-font);
-}
-
-html[data-se-startup][data-se-startup-phase="off"] ._1TR3CCCdSmI-0MXucYBuP2 ._6Z2AOU-R-8aK7KZevey0W {
-  opacity: .5;
-}
-
-/* The strip */
-html[data-se-startup] .se-startup-strip {
+/* The bar: Network, then signing in, one segment each, the live one breathing. */
+html[data-se-startup] .se-startup-steps {
   position: absolute;
-  left: 24px;
-  right: 24px;
-  bottom: 24px;
+  left: 64px;
+  right: 64px;
+  bottom: 34px;
   z-index: var(--se-z-raised-3);
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--se-space-1);
-  padding: var(--se-space-1);
-  border-radius: 16px;
-  background: var(--se-surface);
-  box-shadow: var(--se-shadow-pop);
-  font-family: var(--se-font);
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-3);
+  font: 500 var(--se-fs-md)/1 var(--se-font);
   pointer-events: none;
   transition: opacity var(--se-dur-relaxed);
 }
 
-html[data-se-startup][data-se-startup-phase="off"] .se-startup-strip {
+html[data-se-startup][data-se-startup-phase="off"] .se-startup-steps {
   opacity: .4;
 }
 
-html[data-se-startup] .se-startup-cell {
-  min-width: 0;
-  padding: var(--se-space-3) var(--se-space-3);
-  border-radius: var(--se-radius-ml);
-  transition: background-color var(--se-dur-slow), box-shadow var(--se-dur-slow);
-}
-
-html[data-se-startup] .se-startup-cell[data-state="current"] {
-  background: color-mix(in srgb, var(--se-accent) 8%, transparent);
-  box-shadow: var(--se-edge-accent);
-}
-
-html[data-se-startup] .se-startup-cell-head {
+html[data-se-startup] .se-startup-track,
+html[data-se-startup] .se-startup-labels {
   display: flex;
-  align-items: center;
   gap: var(--se-space-2);
-  height: 22px;
 }
 
-html[data-se-startup] .se-startup-icon {
-  flex: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: var(--se-hairline);
+html[data-se-startup] .se-startup-track > span {
   position: relative;
-}
-
-html[data-se-startup] .se-startup-icon::before {
-  content: "";
-  position: absolute;
-  inset: 4px;
-  background: var(--se-text-muted);
-  -webkit-mask: var(--se-startup-glyph) center / contain no-repeat;
-  mask: var(--se-startup-glyph) center / contain no-repeat;
-}
-
-html[data-se-startup] .se-startup-cell[data-step="net"] {
-  --se-startup-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-opacity='.32' d='M12 4C7.6 4 3.6 5.7.6 8.5l2.1 2.1A13 13 0 0 1 12 7c3.6 0 6.9 1.4 9.3 3.6l2.1-2.1A16 16 0 0 0 12 4z'/%3E%3Cpath d='M12 10c-2.6 0-4.9 1-6.7 2.6l2.1 2.1A6.6 6.6 0 0 1 12 13c1.8 0 3.4.7 4.6 1.7l2.1-2.1A9.6 9.6 0 0 0 12 10zm0 6a3 3 0 0 0-2.4 1.2L12 20l2.4-2.8A3 3 0 0 0 12 16z'/%3E%3C/svg%3E");
-}
-
-html[data-se-startup] .se-startup-cell[data-step="server"] {
-  --se-startup-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect fill-opacity='.32' x='3' y='3' width='18' height='8' rx='2'/%3E%3Crect x='3' y='13' width='18' height='8' rx='2'/%3E%3Ccircle fill-opacity='.9' cx='7' cy='7' r='1.3'/%3E%3C/svg%3E");
-}
-
-html[data-se-startup] .se-startup-cell[data-step="lib"] {
-  --se-startup-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='3' width='5' height='18' rx='1.5'/%3E%3Crect fill-opacity='.32' x='10' y='3' width='5' height='18' rx='1.5'/%3E%3Crect x='16.2' y='4' width='5' height='17' rx='1.5' transform='rotate(-12 18.7 12.5)'/%3E%3C/svg%3E");
-}
-
-html[data-se-startup] .se-startup-cell[data-state="current"] .se-startup-icon {
-  background: var(--se-accent-tint);
-}
-
-html[data-se-startup] .se-startup-cell[data-state="current"] .se-startup-icon::before {
-  background: var(--se-accent);
-}
-
-html[data-se-startup] .se-startup-cell[data-state="done"] .se-startup-icon {
-  background: rgba(108, 194, 74, .14);
-}
-
-html[data-se-startup] .se-startup-cell[data-state="done"] .se-startup-icon::before {
-  background: var(--se-running);
-}
-
-html[data-se-startup] .se-startup-label {
   flex: 1;
-  min-width: 0;
+  height: 6px;
+  border-radius: 3px;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  color: var(--se-text-muted);
-  font: 700 var(--se-fs-2xs)/14px var(--se-font);
-  letter-spacing: .08em;
-  text-transform: uppercase;
+  background: color-mix(in srgb, var(--se-accent) 14%, transparent);
 }
 
-html[data-se-startup] .se-startup-tick {
-  flex: none;
-  width: 14px;
-  height: 14px;
-  visibility: hidden;
-  background: var(--se-running);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6.4 11.6 2.8 8l1.1-1.1 2.5 2.5 5.7-5.7 1.1 1.1z'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6.4 11.6 2.8 8l1.1-1.1 2.5 2.5 5.7-5.7 1.1 1.1z'/%3E%3C/svg%3E") center / contain no-repeat;
-}
-
-html[data-se-startup] .se-startup-cell[data-state="done"] .se-startup-tick {
-  visibility: visible;
-}
-
-html[data-se-startup] .se-startup-value {
-  margin: var(--se-space-2) 0 var(--se-space-2);
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  color: var(--se-text);
-  font: 800 var(--se-fs-xl)/22px var(--se-font);
-  font-variant-numeric: tabular-nums;
-}
-
-html[data-se-startup] .se-startup-cell[data-state="current"] .se-startup-value {
-  color: var(--se-accent);
-}
-
-html[data-se-startup] .se-startup-cell[data-state="waiting"] .se-startup-value {
-  color: var(--se-text-faint);
-}
-
-html[data-se-startup] .se-startup-bar {
-  position: relative;
-  height: 4px;
-  border-radius: 2px;
-  overflow: hidden;
-  background: var(--se-track);
-}
-
-html[data-se-startup] .se-startup-bar > span {
+/* Scaled, not resized: the fill animates on the compositor */
+html[data-se-startup] .se-startup-track i {
   position: absolute;
   inset: 0;
   border-radius: inherit;
   background: var(--se-accent);
-  /* Scaled, not resized: the fill animates on the compositor */
-  transform: scaleX(0);
+  transform: scaleX(var(--se-fill, 0));
   transform-origin: left center;
-  transition: transform var(--se-dur-long) ease;
+  transition: transform var(--se-dur-long) var(--se-ease);
 }
 
-html[data-se-startup] .se-startup-cell[data-state="done"] .se-startup-bar > span {
-  background: var(--se-running);
+/*
+ * The live step fills: Steam gives no figure for either step, so the bar eases toward 90% and
+ * slows as it goes; when the step ends its track fills.
+ */
+html[data-se-startup] .se-startup-track [data-state="current"] i {
+  animation: se-startup-fill 12s cubic-bezier(.1, .7, .3, 1) forwards;
 }
 
-/* Steps with no number to show: a segment slides along the track. */
-html[data-se-startup] .se-startup-cell[data-sliding="true"] .se-startup-bar > span {
-  width: 38% !important;
-  transition: none;
-  animation: se-startup-indet 1.3s ease-in-out infinite;
-}
-
-@keyframes se-startup-indet {
+@keyframes se-startup-fill {
   from {
-    transform: translateX(-100%);
+    transform: scaleX(0);
   }
   to {
-    transform: translateX(264%);
+    transform: scaleX(.9);
   }
+}
+
+html[data-se-startup] .se-startup-labels > span {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  color: var(--se-text-faint);
+}
+
+html[data-se-startup] .se-startup-labels > span > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+html[data-se-startup] .se-startup-labels [data-state="done"] {
+  color: var(--se-text-muted);
+}
+
+html[data-se-startup] .se-startup-labels [data-step="server"][data-state="done"] {
+  color: var(--se-text);
+}
+
+html[data-se-startup] .se-startup-labels [data-state="current"] {
+  color: var(--se-accent);
+}
+
+html[data-se-startup] .se-startup-tick {
+  display: none;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6.4 11.6 2.8 8l1.1-1.1 2.5 2.5 5.7-5.7 1.1 1.1z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6.4 11.6 2.8 8l1.1-1.1 2.5 2.5 5.7-5.7 1.1 1.1z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+html[data-se-startup] .se-startup-labels [data-state="done"] .se-startup-tick {
+  display: block;
+}
+
+/* The running step's spinner: the theme's ring (core/spinner.css), at the label's size */
+html[data-se-startup] .se-startup-spin {
+  display: none;
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+html[data-se-startup] .se-startup-labels [data-state="current"] .se-startup-spin {
+  display: block;
+}
+
+/* The account's avatar, ringed like a friend online; startup.js sets its src only once known */
+html[data-se-startup] .se-startup-avatar {
+  display: none;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--se-avatar-radius);
+  box-shadow: 0 0 0 1.5px var(--se-bg), 0 0 0 3px var(--se-online);
+}
+
+html[data-se-startup] .se-startup-avatar[src] {
+  display: block;
 }
 
 /* Narrow windows, reduced motion */
 @media (max-width: 460px) {
-  html[data-se-startup] .se-startup-cell {
-    padding: var(--se-space-2);
+  html[data-se-startup] .se-startup-lockup,
+  html[data-se-startup] .se-startup-steps {
+    left: 24px;
+    right: 24px;
   }
-  html[data-se-startup] .se-startup-value {
-    font-size: var(--se-fs-md);
-  }
-  html[data-se-startup] .se-startup-icon {
-    display: none;
+  html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2 ._3sa1NXudhvcc1U7HrlLdNQ:not(#se-none),
+  html[data-se-startup] ._1TR3CCCdSmI-0MXucYBuP2._3sa1NXudhvcc1U7HrlLdNQ:not(#se-none) {
+    padding-inline: var(--se-space-5);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html[data-se-startup] .se-startup-slide {
+  html[data-se-startup] .se-startup-glow {
     animation: none;
-  }
-  html[data-se-startup] .se-startup-slide:first-child {
-    opacity: 1;
   }
   html[data-se-startup] .se-startup-mosaic > span {
     animation: none;
     opacity: .3;
   }
-  .se-sl *,
-  .se-sl *::before,
-  .se-sl *::after,
-  .se-sl-sheen {
-    animation: none !important;
-  }
-  .se-sl-hero:first-child,
-  .se-sl-logo,
-  .se-sl-info {
-    opacity: 1;
-  }
-  .se-sl-sheen {
-    display: none;
-  }
-  html[data-se-startup] .se-startup-cell[data-sliding="true"] .se-startup-bar > span {
+  html[data-se-startup] .se-startup-track [data-state="current"] i {
     animation: none;
-    transform: none;
-    opacity: .5;
-  }
-  html[data-se-startup] ._3CN5DkgNMvdtT9fJhNOj_v::before {
-    animation-duration: var(--se-dur-reduced);
+    transform: scaleX(.5);
   }
 }

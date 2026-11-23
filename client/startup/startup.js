@@ -1,5 +1,7 @@
 /*
- * Startup status progress strip, configurable background layers, and sign-in form tagging.
+ * The startup window (client/startup/startup.css, sign-in.css): the lockup and the two-step bar
+ * (Network, then signing in; the Library's own bar is the splash's), the background layer, and
+ * the sign-in form's tags.
  */
 ((SE) => {
   window.__seStartup?.destroy();
@@ -16,120 +18,16 @@
   };
 
   const SIGNIN_ATTR = 'data-se-si';
-  const SIGNIN_TABS = [
-    {
-      id: 'password',
-      label: 'Password',
-      icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2.5" fill="currentColor" fill-opacity=".32" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="currentColor" fill-opacity=".32" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"></path></svg>',
-    },
-    {
-      id: 'qr',
-      label: 'QR code',
-      icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="currentColor" fill-opacity=".32" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"></rect><rect x="14" y="3" width="7" height="7" rx="1.5" fill="currentColor" fill-opacity=".32" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"></rect><rect x="3" y="14" width="7" height="7" rx="1.5" fill="currentColor" fill-opacity=".32" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"></rect><path d="M14 14h3v3M21 21h-4M21 14v3" fill="currentColor" fill-opacity=".32" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"></path></svg>',
-    },
-  ];
-
   // LoginStore loginState enum: 2 = network, 3 = steam server, 4 = library, 6 = shutdown
   const LOGIN_PHASES = { 2: 'net', 3: 'server', 4: 'lib', 6: 'off' };
-  const PHASE_ORDER = { net: 0, server: 1, lib: 2, off: 3 };
-  const VALID_BACKGROUNDS = ['library', 'hero', 'mosaic', 'wall', 'plain', 'dots', 'steam'];
-  const ART_STORAGE_KEY = 'se-startup-art';
-  const WALL_CROPS = ['18% 22%', '78% 64%', '46% 88%', '8% 70%', '62% 12%', '92% 34%'];
-
-  const PROGRESS_STEPS = [
-    { id: 'net', label: 'Network', doing: 'Connecting', done: 'Connected' },
-    { id: 'server', label: 'Steam', doing: 'Signing in', done: 'Signed in' },
-    { id: 'lib', label: 'Library', doing: 'Loading', done: 'Ready' },
-  ];
+  const VALID_BACKGROUNDS = ['aurora', 'library', 'mosaic', 'wall', 'plain', 'dots', 'steam'];
 
   const docRoot = document.documentElement;
   const MOSAIC_COLS = 12;
   const MOSAIC_GAP = 6;
 
-  // Wireframe library skeleton parameters for the default 'library' startup background.
-  const SKELETON_GAMES = 8;
-  const SKELETON_GAME_WIDTHS = [58, 44, 66, 38, 52, 61, 35, 49, 56, 42, 63, 47, 40, 55, 50];
-  const SKELETON_FRIENDS = [
-    ['game', 44], ['game', 38], ['on', 50], ['on', 36], ['on', 46],
-    ['away', 40], ['off', 42], ['off', 34], ['off', 48], ['off', 38], ['off', 44],
-  ];
-
-  const repeat = (count, fn) => Array.from({ length: count }, (_, i) => fn(i)).join('');
-
-  const buildLibraryWireframeHTML = () => {
-    const bar = (w, extra = '') => `<s style="width:${w}${typeof w === 'number' ? 'px' : ''}${extra}"></s>`;
-    const friendRow = ([st, w], i) =>
-      `<span class="se-sl-fd" data-st="${st}">` +
-        `<b style="animation-delay:${-i * 0.6}s"></b>` +
-        `<span class="se-sl-lines">${bar(w)}${bar(w - 14, ';opacity:.5')}</span>` +
-      `</span>` +
-      (i === 1 || i === 4 ? '<span class="se-sl-grp"></span>' : '');
-
-    const listRows = SKELETON_GAME_WIDTHS.map(
-      (w, i) => `<span class="se-sl-row"${i === 2 ? ' data-sel' : ''}><b></b>${bar(w)}</span>`
-    ).join('');
-
-    const heroLayers = repeat(
-      SKELETON_GAMES,
-      (i) => `<div class="se-sl-hero" style="animation-delay:${i * 4.5 - SKELETON_GAMES * 4.5}s"></div>`
-    );
-
-    const stripItems = repeat(
-      SKELETON_GAMES,
-      (i) => `<span style="animation-delay:${i * 4.5 - SKELETON_GAMES * 4.5}s"></span>`
-    );
-
-    const newsHeadlines = repeat(2, () =>
-      [90, 76, 84, 70, 88, 74]
-        .map(w => `<span class="se-sl-lines">${bar(w + '%')}${bar(w - 30 + '%', ';opacity:.5')}</span>`)
-        .join('')
-    );
-
-    const favCapsules = repeat(6, (i) => `<span style="animation-delay:${i * 0.35}s"><s></s></span>`);
-    const collCards = [40, 32, 46]
-      .map(
-        w =>
-          `<span>` +
-            `<span class="se-sl-fan"><i></i><i></i><i></i></span>` +
-            `<span class="se-sl-lines">${bar(w)}${bar(22, ';opacity:.5')}</span>` +
-          `</span>`
-      )
-      .join('');
-
-    return (
-      '<div class="se-sl">' +
-        `<div class="se-sl-rail">${repeat(6, () => '<i></i>')}</div>` +
-        '<div class="se-sl-frame">' +
-          '<div class="se-sl-head"><span class="se-sl-search"></span><i></i><i class="se-sl-bell"></i><i></i><i class="se-sl-me"></i></div>' +
-          '<div class="se-sl-body">' +
-            `<div class="se-sl-list"><span class="se-sl-seg"><i></i><i></i><i></i></span>${listRows}</div>` +
-            '<div class="se-sl-home">' +
-              '<div class="se-sl-stage">' +
-                heroLayers +
-                '<div class="se-sl-shade"></div><span class="se-sl-logo"></span>' +
-                '<div class="se-sl-info">' +
-                  '<span class="se-sl-chips"><i></i><i></i></span>' +
-                  `${bar('100%')}${bar('92%')}${bar('70%')}` +
-                  '<span class="se-sl-stats"><s></s><u></u></span>' +
-                  '<span class="se-sl-play"><b></b><i></i></span>' +
-                '</div>' +
-                `<div class="se-sl-strip">${stripItems}</div>` +
-              '</div>' +
-              '<div class="se-sl-tray">' +
-                `<div class="se-sl-col se-sl-news"><span class="se-sl-card"></span><div class="se-sl-heads"><div>${newsHeadlines}</div></div></div>` +
-                `<div class="se-sl-col se-sl-favs">${favCapsules}</div>` +
-                `<div class="se-sl-col se-sl-cols">${collCards}</div>` +
-              '</div>' +
-            '</div>' +
-            `<div class="se-sl-friends"><span class="se-sl-self"><b></b><s></s></span><span class="se-sl-grp"></span>${SKELETON_FRIENDS.map(friendRow).join('')}</div>` +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="se-sl-scan"></div><div class="se-sl-sheen"></div>'
-    );
-  };
-
-  let strip = null;
+  let lockup = null;
+  let steps = null;
   let bgLayer = null;
   let bgLayerKind = '';
   let bgLayerHost = null;
@@ -137,17 +35,14 @@
   let loginEvents = null;
   let watcher = null;
   let mosaicResizeObserver = null;
-  let artSaveTimer = 0;
-  let signinTabs = null;
-  let activeSigninTab = 'password';
-  let bgSetting = { at: -Infinity, kind: 'library' };
+  let bgSetting = { at: -Infinity, kind: 'aurora' };
 
   // Read at most every 2 s: getComputedStyle on the root forces a style recalc, and update() polls.
   const resolveBackgroundSetting = () => {
     const now = performance.now();
     if (now - bgSetting.at > 2000) {
       const val = getComputedStyle(docRoot).getPropertyValue('--se-startup-background').trim().toLowerCase();
-      bgSetting = { at: now, kind: VALID_BACKGROUNDS.includes(val) ? val : 'library' };
+      bgSetting = { at: now, kind: VALID_BACKGROUNDS.includes(val) ? val : 'aurora' };
     }
     return bgSetting.kind;
   };
@@ -163,145 +58,120 @@
     return null;
   };
 
-  const readLoginStatus = (statusBox) => {
+  const readPhase = (statusBox) => {
     const store = resolveLoginStore();
     const state = store
       ? store.loginState
       : SE.fromProps(statusBox, 12, (p) => (typeof p.loginState === 'number' ? p.loginState : undefined));
-    const pct = store && typeof store.loginPercentage === 'number' ? store.loginPercentage : 0;
-    return {
-      phase: LOGIN_PHASES[state] || '',
-      pct: Math.max(0, Math.min(1, pct)),
-    };
+    return LOGIN_PHASES[state] || '';
   };
 
-  const buildProgressStrip = () => {
-    const container = document.createElement('div');
-    container.className = 'se-startup-strip';
-    container.setAttribute('aria-hidden', 'true');
-    for (const step of PROGRESS_STEPS) {
-      const cell = document.createElement('div');
-      cell.className = 'se-startup-cell';
-      cell.dataset.step = step.id;
-      cell.innerHTML =
-        '<div class="se-startup-cell-head">' +
-          '<span class="se-startup-icon"></span>' +
-          `<span class="se-startup-label">${SE.esc(step.label)}</span>` +
-          '<span class="se-startup-tick"></span>' +
-        '</div>' +
-        '<div class="se-startup-value"></div>' +
-        '<div class="se-startup-bar"><span></span></div>';
-      container.append(cell);
-    }
-    return container;
+  const buildLockup = () => {
+    const el = document.createElement('div');
+    el.className = 'se-startup-lockup';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML =
+      '<div class="se-startup-brand"><span class="se-startup-tile"></span><span class="se-startup-word"><small>Steam</small><b>Enhanced</b></span></div>' +
+      '<div class="se-startup-heading"><b></b><span></span></div>';
+    return el;
   };
 
-  const updateProgressStrip = (phase, pct) => {
-    const activeIndex = PHASE_ORDER[phase];
-    for (const [idx, step] of PROGRESS_STEPS.entries()) {
-      const cell = strip.children[idx];
-      let state;
-      let labelValue;
-      let barWidth = '0%';
-      let isSliding = false;
-
-      if (phase === 'off' || idx < activeIndex) {
-        state = 'done';
-        labelValue = step.done;
-        barWidth = '100%';
-      } else if (idx === activeIndex) {
-        state = 'current';
-        if (step.id === 'lib' && pct > 0) {
-          labelValue = `${Math.round(pct * 100)}%`;
-          barWidth = labelValue;
-        } else {
-          labelValue = step.doing;
-          isSliding = true;
-        }
-      } else {
-        state = 'waiting';
-        labelValue = 'Waiting';
-      }
-
-      SE.mark(cell, 'data-state', state);
-      SE.mark(cell, 'data-sliding', isSliding ? 'true' : 'false');
-
-      const valueEl = cell.querySelector('.se-startup-value');
-      if (valueEl.textContent !== labelValue) valueEl.textContent = labelValue;
-
-      const barFill = cell.querySelector('.se-startup-bar > span');
-      const barScale = `scaleX(${parseFloat(barWidth) / 100})`;
-      if (barFill.style.transform !== barScale) barFill.style.transform = barScale;
-    }
+  // Steam's own status line says the same in the window's language; the bar is decoration.
+  const buildSteps = () => {
+    const el = document.createElement('div');
+    el.className = 'se-startup-steps';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML =
+      '<div class="se-startup-track"><span data-step="net"><i></i></span><span data-step="server"><i></i></span></div>' +
+      '<div class="se-startup-labels">' +
+        '<span data-step="net"><i class="se-startup-spin se-spin-arc"></i><b class="se-startup-tick"></b><span></span></span>' +
+        '<span data-step="server"><i class="se-startup-spin se-spin-arc"></i><b class="se-startup-tick"></b><img class="se-startup-avatar" alt=""><span></span></span>' +
+      '</div>';
+    return el;
   };
 
   /*
-   * Recent games' hero art. Read live from the library when this window can reach
-   * it; the main window also caches it in localStorage so it is there on the next cold start.
+   * Each step's state, fill and words: a login screen waits on the second step; the Library
+   * phase is the signed-in beat (its own progress is the splash's bar); shutting down ends both.
    */
-  const ownAppStore = () => {
-    try {
-      return window.appStore?.allApps ? window.appStore : null;
-    } catch {
-      return null;
+  // The status screen's title (Steam's own status line is often empty); none on a login screen.
+  const HEADINGS = {
+    net: ['Connecting…', ''],
+    server: ['Signing in…', 'The Library opens next, in the main window.'],
+    lib: ['Signed in', 'Opening the Library…'],
+    off: ['Shutting down…', ''],
+  };
+
+  const stepStates = (phase, account) => {
+    const who = account?.name;
+    const signingIn = who ? `Signing in as ${who}…` : 'Signing in…';
+    // Each label names its step, a spinner while it runs and a tick once done; the heading
+    // says what is happening.
+    const net = phase === 'net'
+      ? { state: 'current', fill: 0, text: 'Network' }
+      : { state: 'done', fill: 1, text: 'Network' };
+    let server;
+    if (phase === 'net') server = { state: 'waiting', fill: 0, text: signingIn };
+    else if (phase === 'server') server = { state: 'current', fill: 0, text: signingIn };
+    else if (phase === 'lib') server = { state: 'done', fill: 1, text: who ? `Signed in as ${who}` : 'Signed in' };
+    else if (phase === 'off') server = { state: 'done', fill: 1, text: 'Shutting down' };
+    else server = { state: 'waiting', fill: 0, text: 'Waiting for sign-in' };
+    return { net, server };
+  };
+
+  const updateSteps = (phase, account) => {
+    for (const [id, step] of Object.entries(stepStates(phase, account))) {
+      for (const el of steps.querySelectorAll(`[data-step="${id}"]`)) SE.mark(el, 'data-state', step.state);
+      const track = steps.querySelector(`.se-startup-track [data-step="${id}"]`);
+      if (track.style.getPropertyValue('--se-fill') !== String(step.fill)) track.style.setProperty('--se-fill', step.fill);
+      const text = steps.querySelector(`.se-startup-labels [data-step="${id}"] > span`);
+      if (text.textContent !== step.text) text.textContent = step.text;
+    }
+    const [title, sub] = HEADINGS[phase] || ['', ''];
+    const heading = lockup.querySelector('.se-startup-heading');
+    if (heading.firstChild.textContent !== title) heading.firstChild.textContent = title;
+    if (heading.lastChild.textContent !== sub) heading.lastChild.textContent = sub;
+    const avatar = steps.querySelector('.se-startup-avatar');
+    const src = phase === 'net' || phase === 'server' || phase === 'lib' ? account?.avatar || '' : '';
+    if (src && avatar.getAttribute('src') !== src) avatar.src = src;
+    else if (!src && avatar.hasAttribute('src')) avatar.removeAttribute('src');
+  };
+
+  // The lockup and the bar, kept in the login host of whichever screen is up.
+  const mountChrome = (host, withSteps) => {
+    if (!lockup || lockup.parentNode !== host) {
+      lockup?.remove();
+      lockup = buildLockup();
+      host.append(lockup);
+    }
+    if (!withSteps) {
+      steps?.remove();
+      steps = null;
+    } else if (!steps || steps.parentNode !== host) {
+      steps?.remove();
+      steps = buildSteps();
+      host.append(steps);
     }
   };
 
-  const liveRecentGames = () => {
-    const store = SE.appStore();
-    if (!store?.allApps) return [];
-    const collections = SE.global('collectionStore');
-    const isHidden = (appid) => SE.run(() => collections.BIsHidden(appid)) || false;
-    const recentApps =
-      SE.run(() =>
-        store.allApps
-          .filter(
-            app =>
-              app &&
-              app.rt_last_time_played > 0 &&
-              (app.app_type === 1 || app.app_type === 1073741824) &&
-              app.visible_in_game_list !== false &&
-              !isHidden(app.appid)
-          )
-          .sort((a, b) => b.rt_last_time_played - a.rt_last_time_played)
-          .slice(0, 8)
-      ) || [];
-    return recentApps.map(app => ({
-      id: app.appid,
-      hero: SE.heroURLs(app.appid, store).filter(url => !url.endsWith('/header.jpg')),
-    }));
+  const removeChrome = () => {
+    lockup?.remove();
+    steps?.remove();
+    lockup = steps = null;
   };
 
-  // Only the window that owns the library writes the cache; every other window would repeat it.
-  const persistRecentArt = () => {
-    artSaveTimer = 0;
-    if (!ownAppStore()) return;
-    const games = liveRecentGames();
-    if (!games.length) {
-      artSaveTimer = setTimeout(persistRecentArt, 30000);
-      return;
-    }
-    try {
-      localStorage.setItem(ART_STORAGE_KEY, JSON.stringify({ at: Date.now(), games }));
-    } catch {}
-    artSaveTimer = setTimeout(persistRecentArt, 10 * 60000);
-  };
-
-  const readCachedArt = () => {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(ART_STORAGE_KEY) || 'null');
-      return Array.isArray(parsed?.games) ? parsed.games : [];
-    } catch {
-      return [];
-    }
-  };
-
-  const toCssUrl = (url) => `url("${String(url).replace(/["\\\n]/g, (ch) => encodeURIComponent(ch))}")`;
-
-  const applySlideBackground = (el, urlList, fallbackCrop, wallSize) => {
-    el.style.backgroundImage = [...urlList.map(toCssUrl), 'var(--se-startup-wall)'].join(', ');
-    el.style.backgroundSize = [...urlList.map(() => 'cover'), wallSize].join(', ');
-    el.style.backgroundPosition = [...urlList.map(() => 'center'), fallbackCrop].join(', ');
+  /*
+   * The account Steam shows under its status line: the box holding the status screen's only
+   * image outside the spinner. Read by structure (no class of its own in the class map), then
+   * hidden: its name and avatar move into the bar.
+   */
+  const readAccount = (statusBox) => {
+    const img = [...statusBox.querySelectorAll('img')].find(el => !el.closest(`.${CLS.spinner}`));
+    let chip = img;
+    while (chip && chip !== statusBox && !chip.textContent.trim()) chip = chip.parentElement;
+    if (!img || !chip || chip === statusBox) return null;
+    SE.mark(chip, 'data-se-startup-account');
+    return { name: chip.textContent.trim(), avatar: img.currentSrc || img.src };
   };
 
   const resolveWallImage = (host) => {
@@ -360,22 +230,11 @@
     bgLayer.style.setProperty('--se-startup-wall', wallImg);
 
     if (kind === 'mosaic') bgLayer.innerHTML = '<div class="se-startup-mosaic"></div>';
-    if (kind === 'library') bgLayer.innerHTML = buildLibraryWireframeHTML();
-    if (kind === 'hero') {
-      const games = readCachedArt().filter(g => g.hero?.length);
-      for (let i = 0; i < 3; i++) {
-        const slide = document.createElement('div');
-        slide.className = 'se-startup-slide';
-        applySlideBackground(
-          slide,
-          games.length ? games[i % games.length].hero : [],
-          WALL_CROPS[i],
-          '170% auto'
-        );
-        bgLayer.append(slide);
-      }
-    }
-
+    // The Library's wireframe, alive and busy (client/shared/wireframe.js); Aurora draws it
+    // faintly over three glows (startup.css)
+    const wireframe = SE.wireframe?.({ alive: true, busy: true }) || '';
+    if (kind === 'library') bgLayer.innerHTML = wireframe;
+    if (kind === 'aurora') bgLayer.innerHTML = '<i class="se-startup-glow"></i>'.repeat(3) + wireframe;
     host.append(bgLayer);
     bgLayerHost = host;
     bgLayerKind = kind;
@@ -386,68 +245,6 @@
       mosaicResizeObserver = new ResizeObserver(syncMosaicGrid);
       mosaicResizeObserver.observe(bgLayer);
     }
-  };
-
-  const buildSigninTabBar = () => {
-    const tablist = document.createElement('div');
-    tablist.className = 'se-signin-tabs';
-    tablist.setAttribute('role', 'tablist');
-
-    for (const tab of SIGNIN_TABS) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'se-signin-tab';
-      btn.dataset.tab = tab.id;
-      btn.setAttribute('role', 'tab');
-      btn.innerHTML = `${tab.icon}<span>${SE.esc(tab.label)}</span>`;
-      btn.addEventListener('click', () => selectSigninTab(tab.id));
-      tablist.append(btn);
-    }
-
-    tablist.addEventListener('keydown', (event) => {
-      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-      event.preventDefault();
-      const next = activeSigninTab === 'password' ? 'qr' : 'password';
-      selectSigninTab(next);
-      tablist.querySelector(`[data-tab="${next}"]`)?.focus();
-    });
-
-    return tablist;
-  };
-
-  const syncSigninTabBar = (cardNode) => {
-    SE.mark(cardNode, 'data-se-signin-tab', activeSigninTab);
-    for (const btn of signinTabs.children) {
-      const isSelected = btn.dataset.tab === activeSigninTab;
-      SE.mark(btn, 'aria-selected', isSelected ? 'true' : 'false');
-      SE.mark(btn, 'tabindex', isSelected ? '0' : '-1');
-    }
-  };
-
-  const selectSigninTab = (tabId) => {
-    activeSigninTab = tabId;
-    if (signinTabs?.parentNode) syncSigninTabBar(signinTabs.parentNode);
-  };
-
-  const removeSigninTabBar = () => {
-    if (!signinTabs) return;
-    const cardNode = signinTabs.parentNode;
-    signinTabs.remove();
-    signinTabs = null;
-    if (cardNode) SE.unmark(cardNode, 'data-se-signin-tab');
-  };
-
-  const ensureSigninTabBar = (cardNode, hasQrCode) => {
-    if (!hasQrCode) {
-      removeSigninTabBar();
-      return;
-    }
-    if (!signinTabs || signinTabs.parentNode !== cardNode) {
-      removeSigninTabBar();
-      signinTabs = buildSigninTabBar();
-      cardNode.prepend(signinTabs);
-    }
-    syncSigninTabBar(cardNode);
   };
 
   // Tag sign-in form elements structurally so sign-in.css remains resilient to hash changes.
@@ -515,7 +312,7 @@
       }
     }
 
-    const qrColumn = [...cardNode.children].find(el => el !== form && el !== signinTabs);
+    const qrColumn = [...cardNode.children].find(el => el !== form);
     if (qrColumn) {
       tagNode(qrColumn, 'qr');
       const innerBox = qrColumn.firstElementChild;
@@ -538,16 +335,16 @@
       }
     }
 
-    ensureSigninTabBar(cardNode, !!qrColumn);
   };
 
   const detectLoginScreen = () => {
     const loginHost = document.querySelector(`.${CLS.login}`);
     if (!loginHost) return null;
+    // The form first, window-wide: from the chooser (Add Account) it wasn't found in the host.
+    const passwordInput = document.querySelector('form input[type="password"]');
+    if (passwordInput) return { kind: 'signin', el: passwordInput.closest('form') };
     const chooser = loginHost.querySelector(`.${CLS.chooser}`);
     if (chooser) return { kind: 'chooser', el: chooser };
-    const passwordInput = loginHost.querySelector('form input[type="password"]');
-    if (passwordInput) return { kind: 'signin', el: passwordInput.closest('form') };
     return { kind: 'other', el: loginHost };
   };
 
@@ -560,10 +357,9 @@
 
   const resetStartupState = () => {
     stopPolling();
-    strip?.remove();
-    strip = null;
-    removeSigninTabBar();
+    removeChrome();
     clearSigninTags();
+    for (const el of document.querySelectorAll('[data-se-startup-account]')) SE.unmark(el, 'data-se-startup-account');
     removeBackgroundLayer();
     for (const attrName of ['data-se-startup', 'data-se-startup-phase', 'data-se-startup-bg', 'data-se-login']) {
       SE.unmark(docRoot, attrName);
@@ -573,22 +369,17 @@
   const update = () => {
     const statusBox = document.querySelector(`.${CLS.statusBox}`);
     const loginHost = statusBox?.closest(`.${CLS.login}`);
-    const { phase, pct } = statusBox ? readLoginStatus(statusBox) : { phase: '' };
+    const phase = statusBox ? readPhase(statusBox) : '';
     const bgKind = resolveBackgroundSetting();
 
     if (statusBox && loginHost && phase) {
-      removeSigninTabBar();
       clearSigninTags();
       SE.unmark(docRoot, 'data-se-login');
       SE.mark(docRoot, 'data-se-startup');
       SE.mark(docRoot, 'data-se-startup-phase', phase);
       SE.mark(docRoot, 'data-se-startup-bg', bgKind);
-      if (!strip || !strip.isConnected) {
-        strip?.remove();
-        strip = buildProgressStrip();
-        loginHost.append(strip);
-      }
-      updateProgressStrip(phase, pct);
+      mountChrome(loginHost, true);
+      updateSteps(phase, readAccount(statusBox));
       mountBackgroundLayer(bgKind);
       return;
     }
@@ -599,19 +390,17 @@
       return;
     }
 
-    strip?.remove();
-    strip = null;
     SE.unmark(docRoot, 'data-se-startup-phase');
     SE.mark(docRoot, 'data-se-startup');
     SE.mark(docRoot, 'data-se-login', screen.kind);
     SE.mark(docRoot, 'data-se-startup-bg', bgKind);
 
-    if (screen.kind === 'signin') {
-      annotateSigninForm(screen.el);
-    } else {
-      removeSigninTabBar();
-      clearSigninTags();
-    }
+    if (screen.kind === 'signin') annotateSigninForm(screen.el);
+    else clearSigninTags();
+    // The chooser and the form have no step to show (the form needs the window's foot).
+    const withSteps = screen.kind === 'other';
+    mountChrome(document.querySelector(`.${CLS.login}`), withSteps);
+    if (withSteps) updateSteps('', null);
     mountBackgroundLayer(bgKind);
   };
 
@@ -630,25 +419,30 @@
     watcher = null;
   };
 
-
   const check = () => {
     if (document.querySelector(`.${CLS.statusBox}`)) startPolling();
     else if (detectLoginScreen()) update();
-    else if (poller || strip || bgLayer || signinTabs || docRoot.hasAttribute('data-se-startup')) {
+    else if (poller || lockup || bgLayer || docRoot.hasAttribute('data-se-startup')) {
       resetStartupState();
     }
   };
 
-  // Kept for the window's life (sign-out or an account switch can show sign-in again later);
-  // throttled, and check() is two querySelector calls when nothing startup-related is up.
-  watcher = SE.watch(check, { throttle: 250 });
+  // Kept for the window's life (sign-out or an account switch can show sign-in again later).
+  // Sync, so a new screen is tagged before its first paint (throttled, Steam's bare form showed
+  // for a few frames); check() is two querySelector calls when nothing startup-related is up.
+  watcher = SE.watch(check, { sync: true });
   check();
 
-  artSaveTimer = setTimeout(persistRecentArt, 15000);
+  // The Hero background (gone) saved art here; drop what it left.
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && /^se-startup-(art|diag|hero:)/.test(key)) localStorage.removeItem(key);
+    }
+  } catch {}
 
   window.__seStartup = {
     destroy() {
-      clearTimeout(artSaveTimer);
       stopWatching();
       resetStartupState();
       delete window.__seStartup;
