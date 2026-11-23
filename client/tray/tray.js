@@ -99,6 +99,15 @@
 
   /* ---------- You ---------- */
 
+  // The chosen status is the group's one Tab stop (a roving tabindex), as in any radio group
+  const checkStatus = (head, state) => {
+    for (const button of head.querySelectorAll('.se-tray-status button')) {
+      const on = button.dataset.state === state;
+      attr(button, 'aria-checked', String(on));
+      button.tabIndex = on ? 0 : -1;
+    }
+  };
+
   function buildHead() {
     const head = el('div', 'se-tray-head');
     const me = el('div', 'se-tray-me');
@@ -137,9 +146,7 @@
     const line = head.querySelector('.se-tray-state');
     setText(line, LABEL[state]);
     attr(line, 'data-state', state);
-    for (const button of head.querySelectorAll('.se-tray-status button')) {
-      attr(button, 'aria-checked', String(button.dataset.state === state));
-    }
+    checkStatus(head, state);
   }
 
   /* ---------- The download ---------- */
@@ -206,11 +213,25 @@
       if (choice && store) run(() => store.SetUserPersonaState(choice[1]));
       else if (choice) run(() => client().URL.ExecuteSteamURL(`steam://friends/status/${choice[0]}`));
       // The persona updates a moment later; the button shows the choice now
-      for (const other of head.querySelectorAll('.se-tray-status button')) attr(other, 'aria-checked', String(other === button));
+      checkStatus(head, button.dataset.state);
       clearTimeout(reread);
       reread = setTimeout(() => renderHead(head), 300);
     };
+    // Arrow keys move the choice, as in any radio group: Left / Up back, Right / Down on. Kept
+    // from Steam's menu, whose own keys would move its row focus instead
+    const STEP = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 };
+    const onStatusKey = (event) => {
+      const button = event.target.closest?.('.se-tray-status button');
+      if (!button || !STEP[event.key]) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const buttons = [...head.querySelectorAll('.se-tray-status button')];
+      const next = buttons[(buttons.indexOf(button) + STEP[event.key] + buttons.length) % buttons.length];
+      next.click();
+      next.focus();
+    };
     head.addEventListener('click', onStatus);
+    head.addEventListener('keydown', onStatusKey);
     // Steam shows the kept window again on each open (and focuses it): read you and the rows anew
     document.addEventListener('visibilitychange', refresh);
     window.addEventListener('focus', refresh);
@@ -223,6 +244,7 @@
         rows.disconnect();
         clearTimeout(reread);
         head.removeEventListener('click', onStatus);
+        head.removeEventListener('keydown', onStatusKey);
         document.removeEventListener('visibilitychange', refresh);
         window.removeEventListener('focus', refresh);
         run(() => feed.unregister());

@@ -52,15 +52,17 @@
   // Steam's "?" picture, what an account without an avatar reports
   const DEFAULT_AVATAR = /fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb/i;
 
-  // A friend's face; without a picture of their own (none, or Steam's "?"), their initials
+  // A friend's face; without a picture of their own (none, Steam's "?", or one that failed to
+  // load: onAvatarError in dock.js), their initials
   const avatar = (url, state, size, cls = '', name = '') => {
-    const own = url && !DEFAULT_AVATAR.test(url);
+    const own = url && !DEFAULT_AVATAR.test(url) && !deadAvatars.has(url);
+    const text = name ? initials(name) : '';
     const face = own
       ? `<img src="${esc(url)}" alt="" draggable="false">`
-      : name
-        ? groupInitials(initials(name))
+      : text
+        ? groupInitials(text)
         : '';
-    return `<span class="se-fd-av ${cls}" data-state="${state}" style="--s:${size}px">${face}</span>`;
+    return `<span class="se-fd-av ${cls}" data-state="${state}"${text ? ` data-initials="${esc(text)}"` : ''} style="--s:${size}px">${face}</span>`;
   };
 
   /*

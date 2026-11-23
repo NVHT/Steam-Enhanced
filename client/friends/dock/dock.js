@@ -20,7 +20,8 @@
   /* error doesn't bubble: caught on the way down, for the panel, the rail and the chat chip */
   function onAvatarError(event) {
     const img = event.target;
-    const tile = img?.tagName === 'IMG' ? img.closest('.se-fd-gav') : null;
+    // A group chat's tile, or a friend's face (which keeps its status ring)
+    const tile = img?.tagName === 'IMG' ? img.closest('.se-fd-gav, .se-fd-av') : null;
     if (!tile) return;
     const src = img.getAttribute('src');
     if (src) {
@@ -28,7 +29,8 @@
       if (deadAvatars.size >= DEAD_AVATAR_LIMIT) deadAvatars.delete(deadAvatars.values().next().value);
       deadAvatars.add(src);
     }
-    img.outerHTML = groupInitials(tile.dataset.initials || '#');
+    if (tile.dataset.initials || tile.classList.contains('se-fd-gav')) img.outerHTML = groupInitials(tile.dataset.initials || '#');
+    else img.remove();
   }
 
   const fly = document.createElement('div');
