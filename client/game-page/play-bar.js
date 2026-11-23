@@ -1,6 +1,6 @@
 /*
  * Header: play bar icons, stat kinds, the game status, the "and N more" developer names,
- * labels, the main button's STOP state and the game logo sized to its visible pixels
+ * labels, the main button's STOP and busy states and the game logo sized to its visible pixels
  * (--se-logo-crop).
  */
 ((SE) => {
@@ -176,10 +176,41 @@
   const PLAY_CONTAINER = `.${C.PlayButtonContainer}`;
   const PLAY_GREEN = `.${C.Green}`;
 
+  /*
+   * No action while Steam works on the game (Validating…): Steam draws an empty button with
+   * only its throbber. The button is marked data-se-busy and gets the theme's ring and the
+   * game's status word (the Status stat's, Steam's own and localized) in place of the throbber.
+   */
+  const PLAY_BUTTON = `.${C.ButtonChild_PlayButton}`;
+  const PLAY_THROBBER = `.${C.ThrobberContainer}`;
+  const PLAY_ROW = `.${C.AchievementCountLabel_Row}`;
+  const BUSY = 'se-play-busy';
+
+  function placeBusy(container) {
+    const button = container.querySelector(`:scope > ${PLAY_BUTTON}`);
+    let busy = button?.querySelector(`:scope > .${BUSY}`);
+    if (!button?.querySelector(PLAY_THROBBER)) {
+      drop(busy);
+      unmark(container, 'data-se-busy');
+      return;
+    }
+    const word = container.closest(PLAY_ROW)?.querySelector(`${STATUS} > div`)?.textContent.trim() || '';
+    if (!busy) {
+      busy = own('span', BUSY);
+      busy.append(own('i', `${BUSY}-ring se-spin-arc`), own('span', `${BUSY}-word`));
+      busy.firstChild.setAttribute('aria-hidden', 'true');
+    }
+    if (busy.lastChild.textContent !== word) busy.lastChild.textContent = word;
+    // Appended last: React inserts its own children before ours
+    if (button.lastElementChild !== busy) button.appendChild(busy);
+    mark(container, 'data-se-busy');
+  }
+
   function placePlayAction() {
     for (const el of document.querySelectorAll(PLAY_CONTAINER)) {
       if (!el.matches(PLAY_GREEN) && SE.isRunning(SE.appOf(el)?.appid)) mark(el, 'data-se-action', 'stop');
       else unmark(el, 'data-se-action');
+      placeBusy(el);
     }
   }
 

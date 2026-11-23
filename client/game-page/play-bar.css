@@ -116,6 +116,47 @@
 }
 
 /*
+ * Busy (Validating…: no action, play-bar.js marks data-se-busy): the theme's ring and Steam's
+ * status word, as the Status stat shows them, in place of Steam's throbber (its spinner
+ * picture, drawn as the full spinner with the mark).
+ */
+:is(._1U7LKpx70kEsz3jJwAFOi-, ._39RheXihcN6H2k2muQTjkI) ._1FnJ6dPuknQFQ2RTpKTI16[data-se-busy] ._3ydigb6zZAjJ0JCDgHwSYA:not(#se-none) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+._1FnJ6dPuknQFQ2RTpKTI16[data-se-busy] .yYVX6xZhkIqeF3gI42_q4 {
+  /* ThrobberContainer */
+  display: none;
+}
+
+.se-play-busy {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  white-space: nowrap;
+}
+
+.se-play-busy-ring {
+  flex: none;
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  border-radius: 50%;
+}
+
+/* !important and as specific: the Disabled face's dimmed words above (every child, with !important) */
+._1FnJ6dPuknQFQ2RTpKTI16[data-se-busy] ._3ydigb6zZAjJ0JCDgHwSYA .se-play-busy-word:not(#se-none) {
+  color: var(--se-text-muted) !important;
+  font: 700 var(--se-fs-md) var(--se-font);
+  letter-spacing: 0;
+}
+
+.se-play-busy-word:empty {
+  display: none;
+}
+
+/*
  * Hover and focus for every face. The faces above hold over Steam's own hover gradient, so
  * hover lifts the face as the Home stage's PLAY does; Disabled has nothing to do and keeps
  * still.
@@ -289,6 +330,27 @@
 ._1U7LKpx70kEsz3jJwAFOi- ._1dg8hJMsAYISbeQUxcCJcv ._1sKdg4-6_xRyPxMt0eRvaf:only-of-type::before,
 ._1U7LKpx70kEsz3jJwAFOi- ._1dg8hJMsAYISbeQUxcCJcv[data-se-bare] ._1sKdg4-6_xRyPxMt0eRvaf::before {
   content: 'Status';
+}
+
+/*
+ * Bare (Starting / Stopping download): Steam still renders the empty detail line for its bar.
+ * As a row of its own it lifted the label and value above the other stats; it sits on the
+ * value's row with no height instead, so the bar hangs under the value.
+ */
+._1U7LKpx70kEsz3jJwAFOi- ._1dg8hJMsAYISbeQUxcCJcv[data-se-bare] ._2pGX3XXztz624QfCJElgkR:not(#se-none) {
+  grid-area: 1 / 2;
+  align-self: end;
+  height: 0;
+}
+
+/*
+ * Alone (Validating…) or bare, the label and value are one row: the icon and the ring keep to
+ * it. Spanning an empty second row they added ~8 px under the value, and as the bar's tallest
+ * item the status then sat higher than the other stats.
+ */
+._1U7LKpx70kEsz3jJwAFOi- ._1dg8hJMsAYISbeQUxcCJcv:is([data-se-bare], :has(> ._1sKdg4-6_xRyPxMt0eRvaf:only-of-type))::before,
+._1U7LKpx70kEsz3jJwAFOi- ._1dg8hJMsAYISbeQUxcCJcv:is([data-se-bare], :has(> ._1sKdg4-6_xRyPxMt0eRvaf:only-of-type)) > .se-status-spin:not(#se-none) {
+  grid-row: 1;
 }
 
 /*
