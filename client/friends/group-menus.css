@@ -10,7 +10,15 @@
  * anything else 30, the red divider 39, Remove 41.
  */
 
-/* Rows only: narrower than the bar menus' one width (friend-menu.css) */
+/*
+ * Rows only: narrower than the bar menus' one width (friend-menu.css). The panel drops the
+ * library menus' 300 px floor (game-menu.css), else drawn in the page it stood wider than its
+ * rows, an empty strip at their end.
+ */
+[data-se-lib-menu='friend-category'] {
+  min-width: 0;
+}
+
 [data-se-lib-menu='friend-category'] > .contextMenuContents {
   width: 260px;
 }
@@ -115,7 +123,7 @@
   color: var(--se-text-faint);
 }
 
-/* The group's picture, else its initials */
+/* The group's picture, else its initials on the initials tile (core/tokens.css) */
 [data-se-grm-avatar] {
   display: grid;
   flex: none;
@@ -124,9 +132,11 @@
   height: 32px;
   overflow: hidden;
   border-radius: var(--se-radius-sm);
-  background: var(--se-selected);
-  font: 600 var(--se-fs-sm) / 1 var(--se-font);
-  color: var(--se-text-strong);
+  background: var(--se-initials-bg);
+  box-shadow: var(--se-initials-edge);
+  font: var(--se-initials-weight) var(--se-fs-sm) / 1 var(--se-font);
+  letter-spacing: var(--se-initials-spacing);
+  color: var(--se-initials-ink);
 }
 
 [data-se-grm-avatar] > img {
