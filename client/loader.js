@@ -66,6 +66,10 @@
     // Shared runtime pieces
     ['all', 'core/', ['font.css', 'tokens.css', 'icons-nav.css', 'icons-ui.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
     ['all', 'client/shared/', ['popup-layer.css', 'search-field.css', 'segmented.css']],
+    // A friend's profile background and Steam's "?" picture (toasts, tray, chat, friend dialogs)
+    ['content', 'client/shared/', ['mini-profile.js']],
+    ['toasts', 'client/shared/', ['mini-profile.js']],
+    ['tray', 'client/shared/', ['mini-profile.js']],
     // A page or steam:// link opened in the main window (the rail's menus, About Steam)
     ['content', 'client/shared/', ['open-page.js']],
     ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'popup-layer-panel.js', 'popup-layer-menu.js', 'picker.js', 'menu.js', 'menu.css', 'picker.css', 'news-feed.js', 'column-resize.css', 'column-resize.js', 'window-fold.js']],
@@ -162,7 +166,7 @@
       'eula.js', 'uninstall.css', 'uninstall.js', 'new-collection.css', 'new-collection.js',
       'delete-collection.css', 'delete-collection.js', 'mark-private.css', 'mark-private.js',
       'exit-game.css', 'exit-game.js', 'cd-keys.css', 'cd-keys.js', 'friend-picker.css',
-      'friend-picker.js',
+      'friend-picker.js', 'friend-dialogs.css', 'friend-dialogs.js', 'report-content.css',
     ]],
     // Plugin integrations
     ['main', 'compat/hltb-for-steam/', ['hltb-for-steam.css', 'hltb-for-steam.js']],
@@ -189,8 +193,8 @@
       'friends-chats.css', 'friends-window.css', 'friends-list.js',
     ]],
     ['desktop', 'client/friends/chat/', [
-      'tabs.css', 'header.css', 'messages.css', 'input.css', 'voice.css', 'members.css', 'icons.css',
-      'groups.css', 'chat.js',
+      'tabs.css', 'header.css', 'messages.css', 'bubbles.css', 'input.css', 'voice.css', 'members.css',
+      'icons.css', 'groups.css', 'chat.js',
     ]],
     ['all', 'core/', ['scrollbars.css', 'scrollbars.js']],
     ['all', 'core/', ['emoticon-picker.css', 'emoticon-picker.js']],

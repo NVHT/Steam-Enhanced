@@ -990,7 +990,7 @@ div.ModalPosition_TopBar:not(#se-none) {
   mask-image: linear-gradient(to bottom, #000 0%, var(--se-black-55) 55%, transparent 100%);
 }
 
-.se-dialog-art img {
+.se-dialog-art :is(img, video) {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1001,9 +1001,27 @@ div.ModalPosition_TopBar:not(#se-none) {
   transition: opacity var(--se-dur-slow) var(--se-ease), transform var(--se-dur-ambient) var(--se-ease);
 }
 
-.se-dialog-art[data-ready] img {
+.se-dialog-art[data-ready] :is(img, video) {
   opacity: .5;
   transform: scale(1.01);
+}
+
+/*
+ * A friend's picture (SE.dialogArt.avatar): small, so blurred into a wash of its colours, at full
+ * strength and under a lighter shade than a game's art (the darkening above would erase it)
+ */
+.se-dialog-art[data-kind="avatar"] img {
+  filter: var(--se-blur-panel) saturate(1.5);
+  transform: scale(1.4);
+}
+
+.se-dialog-art[data-kind="avatar"][data-ready] img {
+  opacity: .9;
+  transform: scale(1.25);
+}
+
+.se-dialog-art[data-kind="avatar"]::after {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--se-bg) 25%, transparent) 0%, color-mix(in srgb, var(--se-surface) 60%, transparent) 55%, var(--se-surface) 100%);
 }
 
 /* Keeps the title readable on bright art */
@@ -1018,10 +1036,11 @@ div.ModalPosition_TopBar:not(#se-none) {
 
 /*
  * A rebuilt dialog's title as an eyebrow over its game (Install, Uninstall, EULA, Mark as
- * Private, New Collection with games, Exit Game): small, spaced capitals in the accent. !important: the
+ * Private, New Collection with games, Exit Game, CD Keys, Hardware Survey; a friend's Nickname
+ * and Notifications; Invite to Group Chat): small, spaced capitals in the accent. !important: the
  * theme's DialogHeader above, itself !important against Steam's.
  */
-:is([data-se-inst], [data-se-uninst], [data-se-eula], [data-se-private], [data-se-newcoll-games], [data-se-exitgame], [data-se-cdkeys], [data-se-survey]) .DialogHeader:not(#se-none) {
+:is([data-se-inst], [data-se-uninst], [data-se-eula], [data-se-private], [data-se-newcoll-games], [data-se-exitgame], [data-se-cdkeys], [data-se-survey], [data-se-friend]) .DialogHeader:not(#se-none) {
   margin: 0 0 var(--se-space-3) !important;
   padding: 0 !important;
   font: var(--se-eyebrow-font) !important;

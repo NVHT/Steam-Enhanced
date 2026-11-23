@@ -8,8 +8,8 @@
  * Friends & Chat: the small dialogs
  * (Friends settings and group settings are paged settings dialogs, styled by the client/settings/ styles.)
  * Create group chat / invite friends: Steam's friend picker (FriendPicker, FriendPicker_Suggestions,
- * FriendPicker_SuggestedFriend, FriendPicker_ChosenFriend, DialogListBuilderInput); add nickname
- * (Dialog_EditNickName); new / manage friend category (nicknameInput, nicknameError); the invite link
+ * FriendPicker_SuggestedFriend, FriendPicker_ChosenFriend, DialogListBuilderInput; its rebuild:
+ * client/dialogs/friend-picker.css); the name and nickname dialogs' error (nicknameError); the invite link
  * (InviteFriendToChatDialog_LinkInput). Global class names, not hashed.
  */
 /*
@@ -268,17 +268,33 @@
 }
 
 /*
- * Invite to Group Chat: the group under the title (its avatar and name on one line), the
- * link field with Copy, the expiry picker on the right, and an "OR" rule before the picker
+ * Invite to Group Chat: Steam's title as an eyebrow (dialogs.css) over the group, its face and
+ * name as a rebuilt dialog's (friend-dialogs.js gives a group without a picture the initials
+ * tile); the link field with Copy, a secondary button (Invite is the main action), the expiry
+ * as a quiet line under it, and an OR rule before the picker. !important: the eyebrow's type
+ * (dialogs.css), which the header's row inherits.
  */
+.ChatRoomGroupInviteDialog[data-se-friend] .DialogHeader:not(#se-none) {
+  margin-bottom: var(--se-space-5) !important;
+}
+
 .ChatRoomGroupInviteDialog .DialogHeader .displayRow:not(#se-none) {
   display: flex;
   align-items: center;
-  gap: var(--se-space-2);
-  margin-top: var(--se-space-2);
+  gap: var(--se-space-4);
+  margin-top: var(--se-space-3);
+  padding: var(--se-space-1);
 }
 
-.ChatRoomGroupInviteDialog .DialogHeaderSubtitle:not(#se-none),
+.ChatRoomGroupInviteDialog .displayRow .DialogHeaderSubtitle:not(#se-none) {
+  min-width: 0;
+  margin: 0;
+  font: 800 var(--se-fs-2xl)/1.2 var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text-strong) !important;
+}
+
 .InviteToVoiceHeader .DialogHeaderSubtitle:not(#se-none) {
   margin: 0;
   font: 600 var(--se-fs-lg)/1.3 var(--se-font) !important;
@@ -287,15 +303,23 @@
   color: var(--se-accent) !important;
 }
 
+/* The group's face, as the friend dialogs' (friend-dialogs.css .se-friend-av) */
 .ChatRoomGroupInviteDialog .DialogHeader .ChatRoomGroupAvatar:not(#se-none),
 .ChatRoomGroupInviteDialog .DialogHeader .ChatRoomMultiFriendAvatar:not(#se-none) {
-  width: 30px;
-  height: 30px;
+  flex: none;
+  width: 64px;
+  height: 64px;
   margin: 0;
   border: 0;
-  border-radius: var(--se-radius-sm);
-  background: var(--se-surface-2);
-  box-shadow: none;
+  border-radius: var(--se-avatar-radius);
+  overflow: hidden;
+  background: var(--se-initials-bg);
+  box-shadow: 0 0 0 2px var(--se-surface), 0 0 0 4px var(--se-hairline);
+}
+
+/* No picture of its own: friend-dialogs.js's initials tile stands in */
+[data-se-friend="invite"] .DialogHeader .displayRow > :is(.ChatRoomGroupAvatar:not(.HasAvatar), .ChatRoomMultiFriendAvatar) {
+  display: none;
 }
 
 /*
@@ -341,23 +365,26 @@
   line-height: normal;
 }
 
+/* Copy: a secondary button (the button set's default face); Invite stays the one main action */
 .inviteLinkContainer .DialogButton.DialogInput_CopyAction:not(#se-none) {
   flex: 0 0 auto;
   min-width: 96px;
   margin: 0 !important;
-  background: var(--se-accent) !important;
-  color: var(--se-bg-ink) !important;
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge) !important;
+  color: var(--se-btn-color) !important;
 }
 
 .inviteLinkContainer .DialogButton.DialogInput_CopyAction:not(#se-none):hover {
-  background: var(--se-accent-hover) !important;
-  color: var(--se-bg-ink) !important;
+  background: var(--se-btn-bg-hover) !important;
+  color: var(--se-btn-color-hover) !important;
 }
 
+/* Expire this link in [One Day]: a quiet line under the field, in sentence case */
 .expireLinkInContainer:not(#se-none) {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: var(--se-space-2);
   margin: var(--se-space-2) 0 0;
 }
@@ -365,6 +392,10 @@
 .expireLinkInContainer .DialogLabel:not(#se-none) {
   margin: 0 !important;
   white-space: nowrap;
+  font: var(--se-type-small) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--se-text-muted) !important;
 }
 
 .expireLinkInContainer > :not(.DialogLabel) {
@@ -536,85 +567,9 @@
 }
 
 /*
- * Friend Notifications: the friend as a rounded-square avatar with its status ring; the options as a
- * card of rows (a header row of uppercase label, then each option with its two ticks)
+ * Notification rows: Steam's table of events and their two ticks (Friends settings; a friend's
+ * Notifications rebuilds its own, client/dialogs/friend-dialogs.css)
  */
-.FriendNotificationsDialog .friend {
-  --se-pk-ring: var(--se-border-strong);
-}
-
-.FriendNotificationsDialog .friend:not(#se-none) {
-  display: flex;
-  align-items: center;
-  gap: var(--se-space-3);
-  margin: var(--se-space-1) 0 var(--se-space-4);
-  padding: 0;
-  background: none !important;
-}
-
-.FriendNotificationsDialog .friend.online {
-  --se-pk-ring: var(--se-online);
-}
-
-.FriendNotificationsDialog .friend.awayOrSnooze {
-  --se-pk-ring: color-mix(in srgb, var(--se-online) 50%, transparent);
-}
-
-.FriendNotificationsDialog .friend.ingame {
-  --se-pk-ring: var(--se-running);
-}
-
-.FriendNotificationsDialog .friend :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g /* avatarHolder */):not(#se-none) {
-  flex: none;
-  width: 56px !important;
-  height: 56px !important;
-  padding: 0 !important;
-  border-radius: var(--se-avatar-radius);
-  overflow: visible !important;
-}
-
-.FriendNotificationsDialog .friend .avatarHolder :is(img, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none),
-.FriendNotificationsDialog .friend .nibodjvvrm86uCfnnAn4g :is(img, .avatar, ._3h-QRJGxnVOIExtHD1R0f2):not(#se-none) {
-  width: 100% !important;
-  height: 100% !important;
-  border: 0 !important;
-  border-radius: var(--se-avatar-radius) !important;
-  object-fit: cover;
-  box-shadow: 0 0 0 2px var(--se-surface), 0 0 0 4px var(--se-pk-ring) !important;
-}
-
-.FriendNotificationsDialog .friend :is(.avatarHolder, .nibodjvvrm86uCfnnAn4g) :is(.avatarStatus, .avatarFrame, ._3xUpb5DWXPFNcHHIcv-9pe /* avatarStatus */, .X_mJE4BYV5StDPwZhSiAu /* avatarFrame */) {
-  display: none !important;
-}
-
-.FriendNotificationsDialog .friend .labelHolder:not(#se-none) {
-  margin: 0 !important;
-  font: 700 var(--se-fs-xl)/1.3 var(--se-font) !important;
-  color: var(--se-text) !important;
-}
-
-.FriendNotificationsDialog .friend .labelHolder .playerNickname,
-.FriendNotificationsDialog .friend .labelHolder .playerNicknameBracket {
-  font-weight: 500;
-  color: var(--se-text-faint) !important;
-}
-
-.FriendNotificationsDialog .DialogBodyText:not(#se-none) {
-  margin: 0 0 var(--se-space-4) !important;
-}
-
-.FriendNotificationsDialog .useDefaultsCheckBox:not(#se-none) {
-  margin: 0 0 var(--se-space-4);
-  font: 500 var(--se-fs-md) var(--se-font) !important;
-  color: var(--se-text) !important;
-}
-
-.FriendNotificationsDialog .SettingsGroup:not(#se-none) {
-  overflow: hidden;
-  border-radius: var(--se-radius-md);
-  background: var(--se-surface-2);
-}
-
 .FriendsSettingsNotificationRow:not(#se-none) {
   display: flex;
   align-items: center;
@@ -658,40 +613,6 @@
 
 .FriendsSettingsNotificationRow_Checkbox .DialogCheckbox_Container:not(#se-none) {
   margin: 0 !important;
-}
-
-.DialogBody.useDefaults .FriendsSettingsNotificationRow:not(.FriendsSettingsNotificationRow_Header) {
-  opacity: .5;
-}
-
-.DialogBody.useDefaults .FriendsSettingsNotificationRow:not(.FriendsSettingsNotificationRow_Header) .FriendsSettingsNotificationRow_Label {
-  color: var(--se-text-dim) !important;
-}
-
-.Dialog_EditNickName .friend .avatarMedium:not(#se-none) {
-  border: 0;
-  border-radius: var(--se-avatar-radius);
-  overflow: hidden;
-  box-shadow: 0 0 0 2px var(--se-surface), 0 0 0 4px var(--se-hairline);
-}
-
-.Dialog_EditNickName .friend .avatarMedium img {
-  border-radius: var(--se-avatar-radius);
-}
-
-.Dialog_EditNickName .friend .labelHolder .nickNamedAs:not(#se-none) {
-  font: 500 var(--se-fs-base) var(--se-font);
-  color: var(--se-text-faint);
-}
-
-.Dialog_EditNickName .friend .DialogTextInputBase:not(#se-none) {
-  min-height: 40px;
-  padding-inline: var(--se-space-3) !important;
-  font: 600 var(--se-fs-xl) var(--se-font) !important;
-}
-
-.Dialog_EditNickName .friend:is(.online, .ingame) .DialogTextInputBase:not(#se-none) {
-  color: var(--se-text) !important;
 }
 
 .nicknameError:not(#se-none) {

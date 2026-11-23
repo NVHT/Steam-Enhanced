@@ -30,8 +30,6 @@
   const PAGE = 100;
   // The list's floor
   const MIN_LIST = 160;
-  // Steam's "?" picture, what an account without an avatar reports
-  const DEFAULT_AVATAR = /fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb/i;
   // Away and Snooze (EPersonaState 3, 4)
   const AWAY = { 3: 'Away', 4: 'Snooze' };
   const RANK = { ingame: 0, online: 0, away: 1, offline: 2 };
@@ -45,8 +43,13 @@
   const pickerProps = (picker) =>
     SE.fromProps(picker, 8, (p) => (typeof p.onChange === 'function' && Array.isArray(p.rgPickedFriends) ? p : undefined));
 
-  // A friend as a row shows them
-  function describe(player) {
+  /*
+   * A friend as the theme shows them (Steam's player object): name, state (ingame, online, away,
+   * offline), its line ("Online", the game, "Last online 3 days ago"), their picture (none for
+   * Steam's "?"; size 'medium' or 'full') and initials. Shared with the friend dialogs
+   * (client/dialogs/friend-dialogs.js).
+   */
+  function friendStatus(player, size = 'medium') {
     const p = player.persona;
     const name = run(() => player.display_name) || run(() => p.m_strPlayerName) || '';
     let state = 'offline';
@@ -62,17 +65,13 @@
       const when = SE.ago(run(() => p.last_seen_online) || 0);
       line = when ? `Last online ${when}` : 'Offline';
     }
-    const url = run(() => p.avatar_url_medium) || '';
-    return {
-      id: player.accountid,
-      player,
-      name,
-      state,
-      line,
-      avatar: url && !DEFAULT_AVATAR.test(url) ? url : '',
-      initials: SE.initials(name) || '?',
-    };
+    const url = run(() => p[`avatar_url_${size}`]) || '';
+    return { name, state, line, avatar: url && !SE.isDefaultAvatar(url) ? url : '', initials: SE.initials(name) || '?' };
   }
+  SE.friendStatus = friendStatus;
+
+  // A friend as a row shows them
+  const describe = (player) => ({ id: player.accountid, player, ...friendStatus(player) });
 
   const face = (f) =>
     f.avatar

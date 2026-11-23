@@ -1,0 +1,289 @@
+/*
+ * Report content (a chat message's, sp.js ContentReportDialog): Steam's steps restyled, no
+ * markup changed. The account-safety note as a gold-tinted callout with the shield; each reason
+ * a card row (name, its line, a chevron when it leads to more); the details step's text area and
+ * name field as the theme's fields; Steam's newer buttons as the button set (data-accent-color
+ * "dull": the secondary face, Back and Cancel; else the primary, Submit Report).
+ *
+ * Classes (CSS modules, sp.js): ContentReportDialog _1nRygtq_ihqZUjZS4TYN8n, its panes
+ * _1VfOHTrrfDbKLMWxAdyOb6, LandingDescriptionCtn _1NNGqASyGXyOaWppwwmRen, BlockList
+ * _38Q054QP3AXcwjoWPKVsqW, BlockListItem _1Qts5QbggIuwJ-L858i8RI, BlockListReason
+ * _3IpL4G2xc7D8CA2ZUmLI2f, BlockListDesc _2OATg5K6QBf_KDfTrdD7qz, BottomButtons
+ * _2hDV1S3w2OR2LlaJBbzlmP, DetailedReasonTextArea _33PqKzJ8bnTZIEbBvMmN-3, NamePanel
+ * LJEV8y2UvdIGEJCa1vrD-, OptionalNameInput _3Kyhzo40BpXdX74J5spi54; AccountSafetyCtn
+ * _3BVlfXvJszBFnVGme4yTnV (Icon _29JC6Kep6vPIPTUmC8xg-W, ExplanationHeader
+ * _1mtADWws8sX_GRUMKT9h6b, ExplanationBody _3eWesiClfi8If1bY0SVd1P, ExplanationMoreInfo
+ * _1IR8K2Mmix7NIM5w8hdbDB); Button _0BH1ydyFmSnUvoVK2hIc.
+ * !important: Steam's own rules for these modules (steamui css/sp.css).
+ */
+
+/* ---------- The steps ---------- */
+
+._1nRygtq_ihqZUjZS4TYN8n ._1VfOHTrrfDbKLMWxAdyOb6:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-3);
+}
+
+/* "What type of issue are you reporting?", the details step's attestation */
+._1nRygtq_ihqZUjZS4TYN8n ._1VfOHTrrfDbKLMWxAdyOb6 > p:not(#se-none) {
+  margin: 0;
+  font: var(--se-type-body-lg);
+  color: var(--se-text-muted);
+}
+
+/* ---------- Keep your account safe ---------- */
+
+._1nRygtq_ihqZUjZS4TYN8n ._1NNGqASyGXyOaWppwwmRen:not(#se-none) {
+  margin: 0 0 var(--se-space-1);
+}
+
+._3BVlfXvJszBFnVGme4yTnV:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  margin: 0;
+  padding: var(--se-space-3) var(--se-space-4);
+  border-radius: var(--se-radius-md);
+  background: color-mix(in srgb, var(--se-gold) 8%, transparent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-gold) 22%, transparent);
+}
+
+/* The text beside the shield, without Steam's own margins (its heading lines up with the shield) */
+._3BVlfXvJszBFnVGme4yTnV ._1kX3tAola58cb6bG5wU46d:not(#se-none) {
+  flex: 1;
+  min-width: 0;
+  gap: var(--se-space-half);
+  margin: 0;
+}
+
+/* The shield on a gold tile, beside the whole note (Steam's own round "i" hidden) */
+._3BVlfXvJszBFnVGme4yTnV ._29JC6Kep6vPIPTUmC8xg-W:not(#se-none) {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-gold-surface);
+  color: var(--se-gold);
+}
+
+._3BVlfXvJszBFnVGme4yTnV ._29JC6Kep6vPIPTUmC8xg-W::before {
+  content: '';
+  width: var(--se-icon-xl);
+  height: var(--se-icon-xl);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-shield) center / contain no-repeat;
+  mask: var(--se-icon-shield) center / contain no-repeat;
+}
+
+._3BVlfXvJszBFnVGme4yTnV ._29JC6Kep6vPIPTUmC8xg-W > * {
+  display: none;
+}
+
+._3BVlfXvJszBFnVGme4yTnV ._1mtADWws8sX_GRUMKT9h6b:not(#se-none) {
+  font: var(--se-type-title) !important;
+  color: var(--se-gold-text) !important;
+}
+
+._3BVlfXvJszBFnVGme4yTnV ._3eWesiClfi8If1bY0SVd1P:not(#se-none) {
+  margin: 0;
+  font: var(--se-type-small) !important;
+  color: var(--se-text-dim) !important;
+}
+
+._3BVlfXvJszBFnVGme4yTnV ._1IR8K2Mmix7NIM5w8hdbDB:not(#se-none) {
+  align-self: flex-start;
+  margin: var(--se-space-1) 0 0;
+  border: 0 !important;
+  font: 600 var(--se-fs-sm) / 1.3 var(--se-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  text-decoration: none !important;
+  color: var(--se-gold-text) !important;
+}
+
+._3BVlfXvJszBFnVGme4yTnV ._1IR8K2Mmix7NIM5w8hdbDB:not(#se-none):hover {
+  text-decoration: underline !important;
+}
+
+/* ---------- The reasons: card rows ---------- */
+
+._1nRygtq_ihqZUjZS4TYN8n ._38Q054QP3AXcwjoWPKVsqW:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  margin: 0;
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._1Qts5QbggIuwJ-L858i8RI:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  min-height: 52px;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-card-radius) !important;
+  background: var(--se-card-bg) !important;
+  box-shadow: var(--se-card-edge) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur) var(--se-ease);
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._1Qts5QbggIuwJ-L858i8RI:not(#se-none):is(:hover, .gpfocus) {
+  background: var(--se-hover) !important;
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._1Qts5QbggIuwJ-L858i8RI:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* The name and its line take the row; the arrow's box keeps its end */
+._1nRygtq_ihqZUjZS4TYN8n ._1Qts5QbggIuwJ-L858i8RI > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._3IpL4G2xc7D8CA2ZUmLI2f:not(#se-none) {
+  font: 600 var(--se-fs-md) / 1.3 var(--se-font) !important;
+  color: var(--se-text) !important;
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._2OATg5K6QBf_KDfTrdD7qz:not(#se-none) {
+  margin: var(--se-space-half) 0 0;
+  font: var(--se-type-small) !important;
+  color: var(--se-text-muted) !important;
+}
+
+/* The arrow (a reason that leads to more): the theme's chevron, turned to point on */
+._1nRygtq_ihqZUjZS4TYN8n ._1Qts5QbggIuwJ-L858i8RI > :has(> svg) {
+  flex: none;
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
+  background: var(--se-text-faint);
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
+  transform: rotate(-90deg);
+  transition: background-color var(--se-dur) var(--se-ease);
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._1Qts5QbggIuwJ-L858i8RI:is(:hover, .gpfocus) > :has(> svg) {
+  background: var(--se-text);
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._1Qts5QbggIuwJ-L858i8RI svg {
+  display: none;
+}
+
+/* ---------- The details step ---------- */
+
+._1nRygtq_ihqZUjZS4TYN8n ._33PqKzJ8bnTZIEbBvMmN-3:not(#se-none),
+._1nRygtq_ihqZUjZS4TYN8n ._3Kyhzo40BpXdX74J5spi54:not(#se-none) {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--se-space-2) var(--se-space-3) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-field-bg) !important;
+  box-shadow: var(--se-field-edge) !important;
+  font: var(--se-type-body) !important;
+  color: var(--se-text) !important;
+  outline: none;
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._33PqKzJ8bnTZIEbBvMmN-3:not(#se-none) {
+  min-height: 120px;
+  resize: vertical;
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._3Kyhzo40BpXdX74J5spi54:not(#se-none) {
+  height: var(--se-field-h);
+}
+
+._1nRygtq_ihqZUjZS4TYN8n :is(._33PqKzJ8bnTZIEbBvMmN-3, ._3Kyhzo40BpXdX74J5spi54):not(#se-none):hover {
+  box-shadow: var(--se-field-edge-hover) !important;
+}
+
+._1nRygtq_ihqZUjZS4TYN8n :is(._33PqKzJ8bnTZIEbBvMmN-3, ._3Kyhzo40BpXdX74J5spi54):not(#se-none):focus {
+  box-shadow: var(--se-search-edge-focus) !important;
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._33PqKzJ8bnTZIEbBvMmN-3::placeholder {
+  font-style: normal;
+  color: var(--se-text-faint);
+}
+
+/* "Your name (optional)": a field label, as every dialog's */
+._1nRygtq_ihqZUjZS4TYN8n .LJEV8y2UvdIGEJCa1vrD-:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  margin: var(--se-space-1) 0 0;
+}
+
+._1nRygtq_ihqZUjZS4TYN8n .LJEV8y2UvdIGEJCa1vrD- > :first-child {
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+/* ---------- Buttons ---------- */
+
+._1nRygtq_ihqZUjZS4TYN8n ._2hDV1S3w2OR2LlaJBbzlmP:not(#se-none) {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--se-space-3);
+  margin: var(--se-space-2) 0 0;
+}
+
+/* Only Cancel or Back: at the end, as every dialog's dismiss */
+._1nRygtq_ihqZUjZS4TYN8n ._2hDV1S3w2OR2LlaJBbzlmP:not(#se-none):has(> :only-child) {
+  justify-content: flex-end;
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._0BH1ydyFmSnUvoVK2hIc:not(#se-none) {
+  height: var(--se-btn-h) !important;
+  min-width: 112px;
+  padding: var(--se-btn-pad) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-btn-primary-bg) !important;
+  box-shadow: none !important;
+  font: var(--se-btn-font) !important;
+  color: var(--se-btn-primary-color) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._0BH1ydyFmSnUvoVK2hIc:not(#se-none):is(:hover, .gpfocus) {
+  background: var(--se-btn-primary-bg-hover) !important;
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._0BH1ydyFmSnUvoVK2hIc[data-accent-color="dull"]:not(#se-none) {
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge) !important;
+  color: var(--se-btn-color) !important;
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._0BH1ydyFmSnUvoVK2hIc[data-accent-color="dull"]:not(#se-none):is(:hover, .gpfocus) {
+  background: var(--se-btn-bg-hover) !important;
+  color: var(--se-btn-color-hover) !important;
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._0BH1ydyFmSnUvoVK2hIc:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+._1nRygtq_ihqZUjZS4TYN8n ._0BH1ydyFmSnUvoVK2hIc:not(#se-none):disabled {
+  opacity: var(--se-btn-disabled-opacity);
+  cursor: default;
+}

@@ -40,41 +40,17 @@
   // An <img> working through its copies (core/runtime.js SE.art)
   const artImg = SE.art.img;
 
-  /*
-   * A friend's mini-profile background (the one Steam shows on their hover card), from the
-   * community's mini-profile JSON. Fetched once per friend and shared across toast windows: the
-   * cache sits on the opener's runtime (window.__se), which every toast window reaches.
-   */
-  let localProfiles = null;
-  function miniProfile(accountId) {
-    const host = run(() => window.opener) || window;
-    const rt = run(() => host.__se);
-    // The opener's own Map, so a closed toast window is not kept alive through it
-    const cache = (rt && run(() => (rt.miniProfiles ||= new host.Map()))) || (localProfiles ||= new Map());
-    if (!cache.has(accountId)) {
-      // Shared by every toast window for the session: keep the 50 most recent friends.
-      if (cache.size >= 50) cache.delete(cache.keys().next().value);
-      cache.set(
-        accountId,
-        fetch(`https://steamcommunity.com/miniprofile/${accountId}/json`, { credentials: 'include' })
-          .then(r => (r.ok ? r.json() : null))
-          .catch(() => null)
-      );
-    }
-    return cache.get(accountId);
-  }
-
+  // A friend's profile background as the toast's art (SE.profileBackground, client/shared/mini-profile.js)
   async function profileArt(accountId, art) {
-    const bg = (await miniProfile(accountId))?.profile_background;
+    const bg = await SE.profileBackground(accountId);
     if (!bg || !art.isConnected) return;
-    const video = bg['video/webm'] || bg['video/mp4'];
-    const still = bg.image || bg['image/jpeg'] || bg['image/png'];
+    const { video, still } = bg;
     let el;
     if (video) {
       el = document.createElement('video');
       Object.assign(el, { src: video, muted: true, loop: true, autoplay: true, playsInline: true });
       el.setAttribute('aria-hidden', 'true');
-    } else if (typeof still === 'string') {
+    } else if (still) {
       el = artImg([still], 'se-tst-hero');
     } else {
       return;

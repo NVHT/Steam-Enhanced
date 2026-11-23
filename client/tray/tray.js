@@ -26,7 +26,6 @@
   const STATE = { 0: 'offline', 1: 'online', 2: 'online', 3: 'away', 4: 'away', 5: 'online', 6: 'online', 7: 'invisible' };
   const CHOICES = [['online', 1, 'Online'], ['away', 3, 'Away'], ['invisible', 7, 'Invisible']];
   const LABEL = { online: 'Online', away: 'Away', invisible: 'Invisible', offline: 'Offline' };
-  const DEFAULT_AVATAR = /fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb/i;
 
   const friends = () => SE.global('g_FriendsUIApp', (app) => app.FriendStore)?.FriendStore || null;
   const client = () => SE.global('SteamClient', (value) => value.Downloads);
@@ -137,7 +136,7 @@
     const url = run(() => persona.avatar_url_medium) || '';
     const avatar = head.querySelector('.se-tray-avatar');
     const img = avatar.firstChild;
-    const picture = url && !DEFAULT_AVATAR.test(url) ? url : '';
+    const picture = url && !SE.isDefaultAvatar(url) ? url : '';
     if (picture && img.getAttribute('src') !== picture) img.src = picture;
     if (!picture) img.removeAttribute('src');
     attr(avatar, 'data-initial', picture ? null : (name.trim()[0] || '?').toUpperCase());

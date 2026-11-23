@@ -1,0 +1,316 @@
+/*
+ * A friend's small dialogs, rebuilt (client/dialogs/friend-dialogs.js): Add / Change Nickname and
+ * Friend Notifications. The art, the eyebrow and the friend's name are the shared ones
+ * (.se-dialog-art, the eyebrow and .se-dialog-name in dialogs.css).
+ *
+ *   [ ADD NICKNAME                      the art, the friend's picture blurred ]
+ *   [ face  vinni3c                                                         ]
+ *   [       Online                                                          ]
+ *   NICKNAME
+ *   [ field                                                                 ]
+ *   Steam's line about nicknames
+ *
+ * [data-se-friend] is the header's mark: what it replaces (Steam's .friend row, its text) hides
+ * only once it's in.
+ */
+
+/* ---------- The friend ---------- */
+
+/* Inset by the ring's width: Steam's form clips what draws outside it */
+.se-friend-head {
+  --se-friend-ring: var(--se-hairline);
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-4);
+  min-width: 0;
+  margin: 0 0 var(--se-space-5);
+  padding: var(--se-space-1);
+}
+
+.se-friend-head[data-state="online"] {
+  --se-friend-ring: var(--se-online);
+}
+
+.se-friend-head[data-state="away"] {
+  --se-friend-ring: color-mix(in srgb, var(--se-online) 50%, transparent);
+}
+
+.se-friend-head[data-state="ingame"] {
+  --se-friend-ring: var(--se-running);
+}
+
+/* The face, ringed in its status colour; without a picture, the initials tile */
+.se-friend-av {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: var(--se-avatar-radius);
+  background: var(--se-initials-bg);
+  box-shadow: 0 0 0 2px var(--se-surface), 0 0 0 4px var(--se-friend-ring, var(--se-hairline));
+}
+
+.se-friend-av img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.se-friend-av b {
+  font: var(--se-initials-weight) var(--se-fs-xl) / 1 var(--se-font);
+  letter-spacing: var(--se-initials-spacing);
+  color: var(--se-initials-ink);
+}
+
+.se-friend-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  min-width: 0;
+}
+
+.se-friend-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: var(--se-type-body);
+  color: var(--se-text-faint);
+  text-shadow: var(--se-text-shadow-art);
+}
+
+.se-friend-head[data-state="online"] .se-friend-line {
+  color: var(--se-online);
+}
+
+.se-friend-head[data-state="away"] .se-friend-line {
+  color: color-mix(in srgb, var(--se-online) 70%, transparent);
+}
+
+.se-friend-head[data-state="ingame"] .se-friend-line {
+  color: var(--se-running);
+}
+
+/* ---------- Nickname: the field, labelled, Steam's line under it ---------- */
+
+[data-se-friend="nickname"] .DialogBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+}
+
+/* "Add a persistent nickname…": the field's hint, under it */
+[data-se-friend="nickname"] .DialogBody > .DialogBodyText:not(:has(.friend)) {
+  order: 2;
+  margin: 0;
+  font-size: var(--se-fs-base);
+}
+
+/* Steam's row (picture, name, "current nickname set as", the field): only the field shows */
+[data-se-friend="nickname"] .friend.editNickname:not(#se-none) {
+  display: block;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  background: none;
+}
+
+[data-se-friend="nickname"] .friend.editNickname :is(.avatarMedium, .labelHolder > .mediumName:not(.asNickName), .nickNamedAs) {
+  display: none;
+}
+
+[data-se-friend="nickname"] .friend.editNickname .labelHolder:not(#se-none) {
+  display: block;
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+
+[data-se-friend="nickname"] .friend.editNickname .asNickName:not(#se-none) {
+  margin: 0;
+  font-size: inherit;
+}
+
+/* The field's label, as every dialog's (dialogs.css .DialogLabel) */
+[data-se-friend="nickname"] .friend.editNickname .asNickName::before {
+  content: "Nickname";
+  display: block;
+  margin: 0 0 var(--se-space-2);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+/* ---------- Notifications: the defaults as a switch, the events as toggles ---------- */
+
+/* Steam's text ("Notification options for…") and friend row: the header says both */
+[data-se-friend="notifications"] .DialogBody > .DialogBodyText {
+  display: none;
+}
+
+/*
+ * "Use my default notifications settings": a card row, its label first, the box drawn as the
+ * client's switch (client/settings/controls.css). !important: the global .DialogCheckbox skin
+ * (client/dialogs/dialogs.css), itself !important against Steam's.
+ */
+[data-se-friend="notifications"] .useDefaultsCheckBox:not(#se-none) {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-4);
+  width: auto;
+  min-height: 52px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--se-space-2) var(--se-space-4);
+  border-radius: var(--se-card-radius);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
+  cursor: pointer;
+}
+
+/* Steam's float-clearing div would take a gap of its own */
+[data-se-friend="notifications"] .useDefaultsCheckBox > div:not([class]) {
+  display: none;
+}
+
+[data-se-friend="notifications"] .useDefaultsCheckBox .DialogToggle_Label:not(#se-none) {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  font: 500 var(--se-fs-md) / 1.4 var(--se-font);
+  color: var(--se-text);
+}
+
+[data-se-friend="notifications"] .useDefaultsCheckBox .DialogCheckbox:not(#se-none) {
+  position: relative;
+  flex: none;
+  width: var(--se-switch-w);
+  height: var(--se-switch-h);
+  margin: 0;
+  border-radius: var(--se-radius-pill) !important;
+  background: var(--se-selected) !important;
+  box-shadow: none !important;
+  transition: background-color var(--se-dur) var(--se-ease);
+}
+
+[data-se-friend="notifications"] .useDefaultsCheckBox .DialogCheckbox:not(#se-none).Active {
+  background: var(--se-accent) !important;
+}
+
+[data-se-friend="notifications"] .useDefaultsCheckBox:hover .DialogCheckbox:not(#se-none) {
+  box-shadow: 0 0 0 3px var(--se-hairline) !important;
+}
+
+[data-se-friend="notifications"] .useDefaultsCheckBox .DialogCheckbox svg {
+  display: none;
+}
+
+[data-se-friend="notifications"] .useDefaultsCheckBox .DialogCheckbox::after {
+  content: '';
+  position: absolute;
+  top: calc((var(--se-switch-h) - var(--se-switch-knob)) / 2);
+  left: calc((var(--se-switch-h) - var(--se-switch-knob)) / 2);
+  width: var(--se-switch-knob);
+  height: var(--se-switch-knob);
+  border-radius: 50%;
+  background: var(--se-text-muted);
+  transition: transform var(--se-dur) var(--se-ease), background-color var(--se-dur) var(--se-ease);
+}
+
+[data-se-friend="notifications"] .useDefaultsCheckBox .DialogCheckbox.Active::after {
+  background: var(--se-bg-ink);
+  transform: translateX(calc(var(--se-switch-w) - var(--se-switch-h)));
+}
+
+[data-se-friend="notifications"] .useDefaultsCheckBox:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* While the defaults rule: what they do, instead of the table (friend-dialogs.js) */
+.se-friend-defaults {
+  margin: var(--se-space-3) var(--se-space-1) 0;
+  font: var(--se-type-body);
+  color: var(--se-text-muted);
+}
+
+.DialogBody:not(.useDefaults) .se-friend-defaults,
+[data-se-friend="notifications"] .DialogBody.useDefaults .SettingsGroup {
+  display: none;
+}
+
+/* The events: a card of rows, each with a bell and a sound toggle (their names in tooltips) */
+[data-se-friend="notifications"] .SettingsGroup:not(#se-none) {
+  margin: var(--se-space-3) 0 0;
+  overflow: hidden;
+  border-radius: var(--se-card-radius);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
+}
+
+/* Over the shared row rule's display (client/dialogs/utility/friends.css) */
+[data-se-friend="notifications"] .FriendsSettingsNotificationRow_Header:not(#se-none) {
+  display: none;
+}
+
+[data-se-friend="notifications"] .FriendsSettingsNotificationRow:not(#se-none) {
+  gap: var(--se-space-2);
+  min-height: 52px;
+}
+
+/* The toggles side by side at the row's end, out of Steam's quarter-width columns (sp.css) */
+[data-se-friend="notifications"] .FriendsSettingsNotificationRow .FriendsSettingsNotificationRow_Checkbox:not(#se-none) {
+  flex: none;
+  width: auto;
+}
+
+/* A toggle: its column's icon (bell, then sound) on a quiet button, lit in the accent when on */
+[data-se-friend="notifications"] .FriendsSettingsNotificationRow_Checkbox .DialogCheckbox:not(#se-none) {
+  position: relative;
+  width: 40px;
+  height: 34px;
+  margin: 0;
+  border-radius: var(--se-radius-sm) !important;
+  background: transparent !important;
+  box-shadow: var(--se-edge-mid) !important;
+  color: var(--se-text-muted);
+  cursor: pointer;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+[data-se-friend="notifications"] .FriendsSettingsNotificationRow_Checkbox .DialogCheckbox:not(#se-none):not(.Active):hover {
+  background: var(--se-hover) !important;
+  color: var(--se-text);
+}
+
+[data-se-friend="notifications"] .FriendsSettingsNotificationRow_Checkbox .DialogCheckbox:not(#se-none).Active {
+  background: var(--se-accent-tint) !important;
+  box-shadow: var(--se-edge-accent) !important;
+  color: var(--se-accent);
+}
+
+[data-se-friend="notifications"] .FriendsSettingsNotificationRow_Checkbox .DialogCheckbox:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+[data-se-friend="notifications"] .FriendsSettingsNotificationRow_Checkbox .DialogCheckbox svg {
+  display: none;
+}
+
+[data-se-friend="notifications"] .FriendsSettingsNotificationRow_Checkbox .DialogCheckbox::before {
+  content: '';
+  position: absolute;
+  inset: calc((100% - var(--se-icon-md)) / 2) calc((100% - var(--se-icon-md)) / 2);
+  background: currentColor;
+  -webkit-mask: var(--se-friend-icon, var(--se-icon-bell)) center / contain no-repeat;
+  mask: var(--se-friend-icon, var(--se-icon-bell)) center / contain no-repeat;
+}
+
+[data-se-friend="notifications"] .FriendsSettingsNotificationRow_Checkbox:last-child {
+  --se-friend-icon: var(--se-icon-sound);
+}
