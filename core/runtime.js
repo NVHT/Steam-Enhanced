@@ -617,6 +617,8 @@
   let observer = null;
   let observerConfigKey = '';
   let scheduledFrame = 0;
+  // How far past its time a throttle's timer counts as lost (enqueueSubscriber)
+  const TIMER_LOST_MS = 1000;
 
   const hasRecordChanged = (record) => {
     if (record.type === 'attributes') {
@@ -687,9 +689,15 @@
 
   const enqueueSubscriber = (sub) => {
     if (sub.throttle) {
-      if (sub.timer) return;
-      const remaining = sub.last + sub.throttle - performance.now();
+      const now = performance.now();
+      // After Reload UI during a voice call, the main window drops timers set in its first
+      // moments: one long overdue is taken as lost, or the subscriber would wait on it for good
+      if (sub.timer && now < sub.due + TIMER_LOST_MS) return;
+      clearTimeout(sub.timer);
+      sub.timer = 0;
+      const remaining = sub.last + sub.throttle - now;
       if (remaining > 0) {
+        sub.due = now + remaining;
         sub.timer = setTimeout(() => {
           sub.timer = 0;
           enqueueSubscriber(sub);
@@ -866,6 +874,11 @@
     let timer = null;
     let stopped = false;
     let isActive = false;
+    let dueAt = 0;
+    const arm = (ms) => {
+      dueAt = performance.now() + ms;
+      timer = setTimeout(tick, ms);
+    };
 
     const isDocumentVisible = () => !win?.closed && doc.visibilityState !== 'hidden';
 
@@ -886,14 +899,14 @@
           console.warn('[Steam Enhanced]', err);
         }
       }
-      if (!stopped && timer === null) {
-        timer = setTimeout(tick, isActive ? delay : idleInterval);
-      }
+      if (!stopped && timer === null) arm(isActive ? delay : idleInterval);
     };
 
     const wake = () => {
-      if (stopped || !isDocumentVisible() || (timer !== null && isActive)) return;
       const now = performance.now();
+      // A timer long past its time was lost (TIMER_LOST_MS): waking runs the poll again
+      const lost = timer !== null && now > dueAt + TIMER_LOST_MS;
+      if (stopped || !isDocumentVisible() || (timer !== null && isActive && !lost)) return;
       if (timer !== null && now - lastWake < 100) return; // resize fires per frame
       lastWake = now;
       tick();
@@ -905,7 +918,7 @@
 
     if (isDocumentVisible()) {
       isActive = !opts.active || !!run(opts.active);
-      timer = setTimeout(tick, isActive ? delay : idleInterval);
+      arm(isActive ? delay : idleInterval);
     }
 
     return {

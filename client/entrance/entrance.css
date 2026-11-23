@@ -32,7 +32,10 @@
   color: var(--se-text);
   font-family: var(--se-font);
   opacity: 0;
-  animation: se-ent-in .35s ease-out forwards;
+  /* se-ent-strand: gone without JS. After Reload UI during a voice call, the window kept the
+     splash while its script's timers never ran. 9.5s outlasts entrance.js's longest run (SAFETY_MS,
+     then Ready, the move and the fade) */
+  animation: se-ent-in .35s ease-out forwards, se-ent-strand var(--se-dur-long) var(--ent-ease) 9.5s forwards;
   user-select: none;
 }
 
@@ -58,6 +61,12 @@
 @keyframes se-ent-out {
   from { opacity: 1; }
   to { opacity: 0; }
+}
+
+/* Hidden lets clicks through and stops its art and wireframe painting */
+@keyframes se-ent-strand {
+  from { opacity: 1; }
+  to { opacity: 0; visibility: hidden; }
 }
 
 /* ---------- The ground: ambient art and the wireframe ---------- */

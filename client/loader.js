@@ -391,6 +391,7 @@
   const reveal = () => {
     if (revealed || pending) return;
     revealed = true;
+    step(settledBy ? `revealed (settled ${settledBy})` : 'revealed');
     const waited = performance.now() - started;
     const splash = MAIN && entrance === 'splash' ? window.__seEntrance : null;
     if (!splash) window.__seEntrance?.destroy(); // mounted from a stale saved setting
@@ -416,40 +417,86 @@
       return box.width > 0 && box.bottom > 0 && box.top < innerHeight && box.right > 0 && box.left < innerWidth;
     });
   // The main window's Library build (see above); other windows are done once their files are.
-  const whenSettled = (done) => {
-    if (!MAIN || !document.body) return done();
+  const whenSettled = (reveal) => {
+    if (!MAIN || !document.body) return reveal();
+    let over = false;
+    let observer = null;
+    const done = (how) => {
+      if (over) return;
+      over = true;
+      observer?.disconnect();
+      settledBy = how || '';
+      reveal();
+    };
+    /*
+     * After Reload UI during a voice call the first check's timer never fired and the window was
+     * never revealed, while later timers ran. A second way out, past the longest wait, that
+     * needs no timer: a frame loop watching the clock (a hidden window has no frames, but there
+     * the first check ends the wait)
+     */
+    const deadline = started + SETTLE_MAX_MS + SETTLE_STEP_MS * 2;
+    const watchDeadline = () => {
+      if (over) return;
+      if (performance.now() >= deadline) done('by the frame deadline');
+      else requestAnimationFrame(watchDeadline);
+    };
+    requestAnimationFrame(watchDeadline);
     let added = 0;
-    // Its own observer on purpose: the loader runs before the runtime (and its shared observer) exists; it lives only until the first window settles
-    const observer = new MutationObserver((records) => {
-      for (const record of records) for (const node of record.addedNodes) if (node.nodeType === 1) added++;
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+    try {
+      // Its own observer on purpose: the loader runs before the runtime (and its shared observer) exists; it lives only until the first window settles
+      observer = new MutationObserver((records) => {
+        for (const record of records) for (const node of record.addedNodes) if (node.nodeType === 1) added++;
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    } catch (err) {
+      return done(`at once, the observer failed (${err?.message || err})`);
+    }
     let busyAt = performance.now();
     const check = () => {
+      if (over) return;
       const now = performance.now();
-      if (added > SETTLE_BURST || loadingScreen() || imagesLoading()) busyAt = now;
+      // A check that threw would end this loop without a reveal (the loop stalled once after
+      // Reload UI during a voice call): an error counts as quiet, kept for the element picker's
+      // report, and each check stamps the step's time
+      try {
+        if (added > SETTLE_BURST || loadingScreen() || imagesLoading()) busyAt = now;
+        step('settling');
+      } catch (err) {
+        step(`settling, a check failed (${err?.message || err})`);
+      }
       added = 0;
       if (now - busyAt < SETTLE_QUIET_MS && document.visibilityState === 'visible' && now - started < SETTLE_MAX_MS) {
         setTimeout(check, SETTLE_STEP_MS);
         return;
       }
-      observer.disconnect();
       done();
     };
     setTimeout(check, SETTLE_STEP_MS);
   };
   // Idle callbacks and frames don't run in a hidden window, so one that loads in the background
   // reveals at once.
-  const settle = () =>
+  const settle = () => {
+    step('settling');
     whenSettled(() => {
+      step('waiting for idle');
       if (document.visibilityState !== 'visible') reveal();
       else if (window.requestIdleCallback) requestIdleCallback(reveal, { timeout: IDLE_MAX_MS });
       else requestAnimationFrame(() => requestAnimationFrame(reveal));
     });
-  const track = (el) => {
+  };
+  // Files still loading, by name, and the last step reached: the element picker's report shows
+  // them while the cover waits
+  const waiting = new Set();
+  let settledBy = ''; // set when the settle wait ended other than by its checks
+  const step = (name) => {
+    if (window.__seClient) window.__seClient.step = `${name} at ${Math.round(performance.now() - started)} ms`;
+  };
+  const track = (el, name) => {
     if (revealed) return;
     pending++;
+    waiting.add(name);
     const done = () => {
+      waiting.delete(name);
       if (--pending === 0) settle();
     };
     el.addEventListener('load', done, { once: true });
@@ -501,7 +548,7 @@
     style.textContent = [...sheets.values()].map((href) => `@import url("${href}");`).join('\n');
     if (MENU) style.addEventListener('load', remeasureMenu, { once: true });
     if (sheets.has('core/tokens.css')) style.addEventListener('load', readEntrance, { once: true });
-    track(style);
+    track(style, 'stylesheets');
     head.append(style);
   };
 
@@ -510,7 +557,7 @@
     script.src = asset(file);
     script.async = false; // run in list order: a split feature's parts rely on it
     script.dataset.seFile = file;
-    track(script);
+    track(script, file);
     head.append(script);
   };
 
@@ -544,9 +591,11 @@
       addScript(file);
     }
     pending++;
+    waiting.add('se-core event');
     addEventListener(
       'se-core',
       () => {
+        waiting.delete('se-core event');
         scripts.forEach(addScript);
         if (--pending === 0) settle();
       },
@@ -554,7 +603,7 @@
     );
   };
 
-  window.__seClient = { groups, files: added, sheets };
+  window.__seClient = { groups, files: added, sheets, waiting };
   load();
   if (!pending) settle(); // nothing to wait for
 })();

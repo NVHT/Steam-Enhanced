@@ -72,13 +72,25 @@
     fill: 'forwards',
   });
 
+  /*
+   * The splash's steps run on frames watching the clock, not timers: after Reload UI during a
+   * voice call the main window drops its timers for its first seconds, which stranded it at
+   * "Loading". A hidden window has no frames; shown, every step that came due runs.
+   */
   const timers = new Set();
   const later = (fn, ms) => {
-    const id = setTimeout(() => {
-      timers.delete(id);
+    const due = performance.now() + ms;
+    const job = { frame: 0 };
+    const tick = () => {
+      if (performance.now() < due) {
+        job.frame = requestAnimationFrame(tick);
+        return;
+      }
+      timers.delete(job);
       fn();
-    }, ms);
-    timers.add(id);
+    };
+    job.frame = requestAnimationFrame(tick);
+    timers.add(job);
   };
 
   /* ---------- The art box: the wireframe's stage ---------- */
@@ -246,7 +258,7 @@
   }
 
   const destroy = () => {
-    for (const id of timers) clearTimeout(id);
+    for (const job of timers) cancelAnimationFrame(job.frame);
     timers.clear();
     waiting?.disconnect();
     waiting = null;
@@ -263,7 +275,9 @@
     waiting = null;
     removeEventListener('resize', onResize);
     saveHint();
-    const moved = moveArt();
+    // A failed hand-off (Home's stage not as expected) fades the art with the rest, never strands
+    // the splash
+    const moved = SE.run(moveArt) === true;
     // Moved, the art waits in the stage's place, then fades over the real one; else it all fades
     el.dataset.phase = 'leave';
     if (moved) {
@@ -293,6 +307,9 @@
   };
 
   later(finish, SAFETY_MS);
+  // Last resort: gone after the longest run it could have (Ready, the move, the fade), whatever
+  // stopped it. If even these never run, entrance.css's se-ent-strand hides it
+  later(destroy, SAFETY_MS + FILL_MS + READY_HOLD_MS + MOVE_MS + FADE_MS + 1000);
   const api = { finish, destroy };
   window.__seEntrance = api;
 })();

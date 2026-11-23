@@ -280,6 +280,27 @@
    * as the @imports of the theme's one sheet per window (#se-sheets, [data-se-sheets]).
    */
   const LOADS = 'script[src], link[rel~="stylesheet"][href]';
+  /*
+   * Whether this window's timers, frames and idle callbacks run at all: each is asked once when
+   * the picker loads, and the report says which have come back since (a window that stopped
+   * revealing, client/loader.js, waits on all three).
+   */
+  const probe = { timeout: false, frame: false, idle: false };
+  setTimeout(() => (probe.timeout = true), 0);
+  requestAnimationFrame(() => (probe.frame = true));
+  window.requestIdleCallback?.(() => (probe.idle = true), { timeout: 500 });
+  const probeState = () =>
+    Object.entries(probe).map(([kind, ran]) => `${kind} ${ran ? 'runs' : 'never ran'}`).join(', ');
+
+  // The loader's wait (client/loader.js): a window that never got [data-se-styled] names what held it
+  const loaderState = () => {
+    const client = window.__seClient;
+    if (!client) return `Loader: (none in this window); ${probeState()}`;
+    const styled = document.documentElement.hasAttribute('data-se-styled') ? 'revealed' : 'not revealed';
+    const waiting = client.waiting?.size ? [...client.waiting].join(', ') : 'nothing';
+    return `Loader: ${styled}; waiting on ${waiting}; last step ${client.step || 'loading files'}; ${probeState()}`;
+  };
+
   const themeFiles = () => {
     const nodes = [...document.querySelectorAll('[data-se-feature], link[href*="Steam-Enhanced"], script[src*="Steam-Enhanced"]')];
     const counts = new Map();
@@ -439,6 +460,7 @@
       'Steam Enhanced element report',
       `Page: ${document.title || '(untitled)'} — ${location.href}`,
       `Root classes: html.${[...document.documentElement.classList].join('.') || '(none)'}`,
+      loaderState(),
       'Theme files loaded:',
       themeFiles(),
       '',
@@ -500,6 +522,7 @@
       'Steam Enhanced page report',
       `Page: ${document.title || '(untitled)'} — ${location.href}`,
       `Root classes: html.${[...document.documentElement.classList].join('.') || '(none)'}`,
+      loaderState(),
       `Body: ${label(body)}  (background ${short(bodyStyle.backgroundColor, 40)}, ${short(bodyStyle.backgroundImage, 100)})`,
       `Window: ${innerWidth}×${innerHeight}, page ${document.documentElement.scrollWidth}×${document.documentElement.scrollHeight}, scale ${devicePixelRatio}`,
       'Theme files loaded:',
