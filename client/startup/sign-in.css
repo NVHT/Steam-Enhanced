@@ -1,7 +1,8 @@
 /*
  * The startup window's sign-in screens (`html[data-se-login]`, tagged by
- * client/startup/startup.js): the sign-in form beside the QR code (`[data-se-si]`) under the
- * lockup, and the account chooser, also wherever Steam shows its account list.
+ * client/startup/startup.js): the sign-in form beside the QR code (`[data-se-si]`), a failed
+ * sign-in and Steam Guard, under the lockup; and the account chooser, also wherever Steam shows
+ * its account list.
  */
 /* startup.css draws the background; the chooser is centred, so its shade is too. */
 html[data-se-login="chooser"] .se-startup-bg::after {
@@ -403,37 +404,281 @@ html[data-se-login="chooser"] .se-startup-bg::after {
 }
 
 /*
- * Sign-in failures (Too Many Retries, Can't connect...): Steam's column of FailureTitle,
- * FailureDescription and FailureButtons, under the lockup on the left like the status screen.
+ * Steam's login panel (sp.js, the login module: StandardLayout > FormContainer), which it
+ * centres, for a failed sign-in and for Steam Guard: under the lockup on the left, like the
+ * sign-in form.
  */
-html[data-se-login="other"] :has(> .ckyl8s69ac87iY9v9cBL):not(#se-none) {
-  position: fixed; /* to the window, as the links are: its own box is centred by Steam */
+html:is([data-se-login="failure"], [data-se-login="guard"]) .yJskfS6UJMuhCvWheUjae:not(#se-none) {
+  position: fixed; /* to the window: Steam centres its own box */
   inset: 124px 64px auto;
   align-items: flex-start;
-  gap: var(--se-space-3);
+  width: auto;
+  max-width: 460px;
   margin: 0;
   padding: 0;
-  text-align: left;
+  background: none;
+  box-shadow: none;
   font-family: var(--se-font);
+  text-align: left;
 }
 
-html[data-se-login="other"] .ckyl8s69ac87iY9v9cBL:not(#se-none) {
+/* Steam's logo row: the lockup stands in for it. */
+html:is([data-se-login="failure"], [data-se-login="guard"]) .yJskfS6UJMuhCvWheUjae .oAWNw68bqhTRPJd84QL1Z:not(#se-none) {
+  display: none;
+}
+
+html:is([data-se-login="failure"], [data-se-login="guard"]) .yJskfS6UJMuhCvWheUjae ._3dtTo2VZCmIdsqb6yzVcS6:not(#se-none) {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: none;
+}
+
+/*
+ * A failed sign-in (`html[data-se-login="failure"]`: Can't connect, Too many retries...): its
+ * title, what happened, Retry (and Go offline when there's no connection), the error reference.
+ * The bar at the foot turns red at the step that failed (startup.js, startup.css).
+ */
+html[data-se-login="failure"] ._3dtTo2VZCmIdsqb6yzVcS6 > ._1xA3zY8qsXnoz5X0yTpzVp:not(#se-none) {
+  align-items: flex-start;
+  padding: 0;
+  gap: var(--se-space-3) !important; /* !important: Steam sets the gap inline (sp.js, the login module's column) */
+}
+
+html[data-se-login="failure"] .ckyl8s69ac87iY9v9cBL:not(#se-none) {
+  margin: 0;
+  padding: 0;
   color: var(--se-text-strong);
   font: 400 40px/1.1 var(--se-font);
   letter-spacing: -.01em;
   text-align: left;
 }
 
-html[data-se-login="other"] ._3x7ANq5knLAC5UtPzq1u5k:not(#se-none) {
-  max-width: 520px;
+html[data-se-login="failure"] ._3x7ANq5knLAC5UtPzq1u5k:not(#se-none) {
+  margin: 0;
+  padding: 0;
   color: var(--se-text-dim);
   font: 500 var(--se-fs-md)/1.45 var(--se-font);
   text-align: left;
 }
 
-html[data-se-login="other"] ._3Hv75NSt0fVMwiHkA0ygfL:not(#se-none) {
-  justify-content: flex-start;
-  margin-top: var(--se-space-3);
+html[data-se-login="failure"] ._3Hv75NSt0fVMwiHkA0ygfL:not(#se-none) {
+  justify-content: flex-start !important; /* !important: Steam sets the row's layout inline (sp.js, the login module's row) */
+  gap: var(--se-btn-gap);
+  margin-top: var(--se-space-2);
+}
+
+/* Retry: the primary, sized like the sign-in button. */
+html[data-se-login="failure"] ._3_ywpZx7p0NUA6i6aDRhG0:not(#se-none) {
+  width: auto;
+  min-width: 120px;
+  height: 36px !important; /* !important: dialogs.css sizes Steam's login submit button with !important */
+  margin: 0;
+  padding: var(--se-btn-pad);
+  font: 700 var(--se-fs-md) var(--se-font) !important; /* !important: the same rule in dialogs.css */
+}
+
+html[data-se-login="failure"] ._3_ywpZx7p0NUA6i6aDRhG0:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* Go offline: the secondary. */
+html[data-se-login="failure"] ._3I_9j9dHmJkUk6hkskNGbA:not(#se-none) {
+  margin: 0;
+  padding: 0;
+}
+
+html[data-se-login="failure"] .LlCy5xHhJOBsK0dwvwFiZ:not(#se-none) {
+  width: auto;
+  height: 36px;
+  margin: 0;
+  padding: var(--se-btn-pad);
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-btn-bg);
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-btn-color);
+  font: 600 var(--se-fs-md) var(--se-font);
+  cursor: pointer;
+}
+
+html[data-se-login="failure"] .LlCy5xHhJOBsK0dwvwFiZ:hover {
+  background: var(--se-btn-bg-hover);
+  color: var(--se-btn-color-hover);
+}
+
+html[data-se-login="failure"] .LlCy5xHhJOBsK0dwvwFiZ:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+html[data-se-login="failure"] ._36ocUpHPapyxxRIWSdS1NO:not(#se-none) {
+  margin: var(--se-space-4) 0 0;
+  padding: 0;
+  color: var(--se-text-faint);
+  font: 400 var(--se-fs-sm)/1.4 var(--se-font-mono);
+  text-align: left;
+}
+
+/*
+ * Steam Guard (`html[data-se-login="guard"]`): the code screen (mobile, email or backup code)
+ * and the mobile confirmation screen. Its instruction leads as the title, then the account,
+ * the code and the links.
+ */
+/* The screen's column: Steam's wrappers dissolve so their parts can be put in order. */
+html[data-se-login="guard"] form > ._1xA3zY8qsXnoz5X0yTpzVp:not(#se-none),
+html[data-se-login="guard"] ._3dtTo2VZCmIdsqb6yzVcS6 > ._1xA3zY8qsXnoz5X0yTpzVp:not(#se-none) {
+  align-items: flex-start;
+  padding: 0;
+  gap: var(--se-space-3) !important; /* !important: Steam sets the gap inline (sp.js, the login module's column) */
+}
+
+html[data-se-login="guard"] ._150fBMw5kqH2Cz_p4RTp5Z,
+html[data-se-login="guard"] :is(._1xA3zY8qsXnoz5X0yTpzVp:has(> ._1wyzmoizDxt1_jtJkEWuXa), ._1wyzmoizDxt1_jtJkEWuXa) {
+  display: contents;
+}
+
+/*
+ * The instruction, as the title ("Enter the code from your Steam Mobile App"...). Steam gives
+ * its boxes padding and room for the drawing; the startup window is short, so none of it stays.
+ */
+html[data-se-login="guard"] :is(._33U5MpTzkUI1G-YrMwHjOa, ._2FF7DFRbKtCkOJb2cLhqbk, .oiJ1RKOjn4pU_HwQ7K_9J, .D2wDvK5PPSMMovLI504J1):not(#se-none) {
+  order: 1;
+  display: block !important; /* !important: Steam lays the code's line out inline (sp.js, the login module's row) */
+  width: auto;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  color: var(--se-text-strong);
+  font: 400 var(--se-fs-3xl)/1.25 var(--se-font);
+  letter-spacing: -.01em;
+  text-align: left;
+}
+
+html[data-se-login="guard"] :is(._33U5MpTzkUI1G-YrMwHjOa, ._2FF7DFRbKtCkOJb2cLhqbk, .oiJ1RKOjn4pU_HwQ7K_9J) *:not(#se-none) {
+  align-items: flex-start;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+html[data-se-login="guard"] :is(._16xa6JKOM6UxBn0KiTQ6qc, ._1rTwS3qPZ8aLPyP90OZSgY):not(#se-none) {
+  color: inherit;
+  font: inherit;
+}
+
+html[data-se-login="guard"] ._1x7e7uBi8V0DRQr18bLhgL:not(#se-none) {
+  color: var(--se-accent);
+}
+
+/* The backup code's own line under its title. */
+html[data-se-login="guard"] .oiJ1RKOjn4pU_HwQ7K_9J ._1maTE41FBhseFUGoRndEZN:not(#se-none) {
+  margin-top: var(--se-space-1);
+  color: var(--se-text-dim);
+  font: 500 var(--se-fs-md)/1.45 var(--se-font);
+  letter-spacing: 0;
+}
+
+/* Steam's phone and envelope drawings: the title says it. */
+html[data-se-login="guard"] :is(._1LQLTpv1Wc9Og_CjEDhwUz, ._1tKOM6kFMJ5bX02eJaVJuS) {
+  display: none;
+}
+
+/* "Account name: …" and what protects it. */
+html[data-se-login="guard"] ._3YghC3pSEVXvRvcefF9imL:not(#se-none) {
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+html[data-se-login="guard"] ._3YghC3pSEVXvRvcefF9imL ._1maTE41FBhseFUGoRndEZN:not(#se-none) {
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-md)/1.45 var(--se-font);
+}
+
+html[data-se-login="guard"] ._2vGa9R21vKtCftqXaF-zlx:not(#se-none) {
+  color: var(--se-text-strong);
+  font-weight: 700;
+}
+
+html[data-se-login="guard"] ._2B5YFPWgcdxOGNlMyi6lGQ:not(#se-none) {
+  color: var(--se-text-dim);
+  font: 500 var(--se-fs-md)/1.45 var(--se-font);
+}
+
+/* The code (its boxes: client/dialogs/utility/standalone.css) with the wrong-code line over it. */
+html[data-se-login="guard"] ._150fBMw5kqH2Cz_p4RTp5Z > ._1xA3zY8qsXnoz5X0yTpzVp:not(#se-none) {
+  order: 3;
+  align-items: flex-start;
+  margin-top: var(--se-space-1);
+}
+
+html[data-se-login="guard"] ._3QfTGN2Nik8ZpRND4qHypV:not(#se-none) {
+  color: var(--se-danger-text);
+  font: 500 var(--se-fs-base)/1.4 var(--se-font);
+  text-align: left;
+}
+
+/* Waiting for the phone: the theme's spinner in place of Steam's phone picture. */
+html[data-se-login="guard"] ._1wyzmoizDxt1_jtJkEWuXa > img:not(#se-none) {
+  order: 3;
+  content: var(--se-spinner-image);
+  width: 40px;
+  height: 40px;
+  margin: 0;
+}
+
+/* The links: backup code / code instead under the code; help at the window's foot, as on the form. */
+html[data-se-login="guard"] ._1VGvKq8aejCLYIXuvsQUN4:not(#se-none) {
+  order: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--se-space-2);
+  margin: 0;
+}
+
+html[data-se-login="guard"] ._1Km5Oqhbeuf4xo2BPIkQ2v:not(#se-none) {
+  margin: 0;
+}
+
+html[data-se-login="guard"] ._2GmYiBCtWUCWZ0JLymkz-n:not(#se-none) {
+  order: 4;
+  margin: 0;
+  padding: 0;
+  color: var(--se-accent);
+  font: 600 var(--se-fs-base)/1.4 var(--se-font);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+html[data-se-login="guard"] ._2GmYiBCtWUCWZ0JLymkz-n:hover {
+  color: var(--se-accent-hover);
+}
+
+html[data-se-login="guard"] ._2GmYiBCtWUCWZ0JLymkz-n:focus-visible {
+  border-radius: var(--se-radius-xs);
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+html[data-se-login="guard"] a._2GmYiBCtWUCWZ0JLymkz-n:not(#se-none) {
+  position: fixed;
+  left: 64px;
+  bottom: var(--se-space-5);
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-sm);
+}
+
+html[data-se-login="guard"] a._2GmYiBCtWUCWZ0JLymkz-n:hover {
+  color: var(--se-text-strong);
 }
 
 /* Accounts: "Who's playing?" and Change account */

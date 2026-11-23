@@ -14,12 +14,18 @@
     login: C.Login,
     statusBox: C.LoginStatusContainer,
     chooser: C.UserChooser,
+    // Steam Guard's "Account name: …" line, on its code and its mobile confirmation screens
+    guard: C.ProtectingAccount,
+    // A failed sign-in's title (Can't connect, Too many retries...)
+    failure: C.FailureTitle,
     spinner: C.SpinnerLoaderContainer,
   };
 
   const SIGNIN_ATTR = 'data-se-si';
   // LoginStore loginState enum: 2 = network, 3 = steam server, 4 = library, 6 = shutdown
   const LOGIN_PHASES = { 2: 'net', 3: 'server', 4: 'lib', 6: 'off' };
+  // The failure screen's `failure` prop (sp.js, the login module's failure enum): 3 = Network
+  const FAILURE_NETWORK = 3;
   const VALID_BACKGROUNDS = ['aurora', 'library', 'mosaic', 'wall', 'plain', 'dots', 'steam'];
 
   const docRoot = document.documentElement;
@@ -116,6 +122,9 @@
     else if (phase === 'lib') server = { state: 'done', fill: 1, text: who ? `Signed in as ${who}` : 'Signed in' };
     else if (phase === 'off') server = { state: 'done', fill: 1, text: 'Shutting down' };
     else server = { state: 'waiting', fill: 0, text: 'Waiting for sign-in' };
+    // A failed sign-in: no connection stops at the first step, anything else at the second.
+    if (phase === 'net-failed') return { net: { state: 'failed', fill: 1, text: 'No connection' }, server };
+    if (phase === 'failed') return { net, server: { state: 'failed', fill: 1, text: 'Sign-in failed' } };
     return { net, server };
   };
 
@@ -343,6 +352,10 @@
     // The form first, window-wide: from the chooser (Add Account) it wasn't found in the host.
     const passwordInput = document.querySelector('form input[type="password"]');
     if (passwordInput) return { kind: 'signin', el: passwordInput.closest('form') };
+    const guard = document.querySelector(`.${CLS.guard}`);
+    if (guard) return { kind: 'guard', el: guard };
+    const failure = document.querySelector(`.${CLS.failure}`);
+    if (failure) return { kind: 'failure', el: failure };
     const chooser = loginHost.querySelector(`.${CLS.chooser}`);
     if (chooser) return { kind: 'chooser', el: chooser };
     return { kind: 'other', el: loginHost };
@@ -397,10 +410,13 @@
 
     if (screen.kind === 'signin') annotateSigninForm(screen.el);
     else clearSigninTags();
-    // The chooser and the form have no step to show (the form needs the window's foot).
-    const withSteps = screen.kind === 'other';
+    // The chooser, the form and Steam Guard have no step to show (the last two need the window's foot).
+    const withSteps = screen.kind === 'other' || screen.kind === 'failure';
     mountChrome(document.querySelector(`.${CLS.login}`), withSteps);
-    if (withSteps) updateSteps('', null);
+    if (screen.kind === 'failure') {
+      const failure = SE.fromProps(screen.el, 12, (p) => (typeof p.failure === 'number' ? p.failure : undefined));
+      updateSteps(failure === FAILURE_NETWORK ? 'net-failed' : 'failed', null);
+    } else if (withSteps) updateSteps('', null);
     mountBackgroundLayer(bgKind);
   };
 

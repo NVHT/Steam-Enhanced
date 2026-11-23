@@ -399,6 +399,25 @@ html[data-se-startup] .se-startup-labels [data-state="done"] .se-startup-tick {
   display: block;
 }
 
+/* A failed sign-in: the step that failed fills red, its tick turns to a cross. */
+html[data-se-startup] .se-startup-track [data-state="failed"] {
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent);
+}
+
+html[data-se-startup] .se-startup-track [data-state="failed"] i {
+  background: var(--se-danger);
+}
+
+html[data-se-startup] .se-startup-labels [data-state="failed"] {
+  color: var(--se-danger-text);
+}
+
+html[data-se-startup] .se-startup-labels [data-state="failed"] .se-startup-tick {
+  display: block;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4.1 3 3.9 3.9L11.9 3 13 4.1 9.1 8l3.9 3.9-1.1 1.1L8 9.1 4.1 13 3 11.9 6.9 8 3 4.1z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4.1 3 3.9 3.9L11.9 3 13 4.1 9.1 8l3.9 3.9-1.1 1.1L8 9.1 4.1 13 3 11.9 6.9 8 3 4.1z'/%3E%3C/svg%3E");
+}
+
 /* The running step's spinner: the theme's ring (core/spinner.css), at the label's size */
 html[data-se-startup] .se-startup-spin {
   display: none;
