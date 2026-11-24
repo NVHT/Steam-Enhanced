@@ -92,7 +92,7 @@ Every screen has been rethought, from the moment Steam starts to the moment you 
     <td valign="top">
       <picture><source media="(prefers-color-scheme: light)" srcset="assets/readme/icon-friends-light.svg"><img src="assets/readme/icon-friends.svg" width="32" height="32" alt=""></picture><br>
       <h3>Friends</h3>
-      <sub>See who is playing what without opening a window. Friends are grouped by game, favourites first, and the dock folds into a compact rail of Chats, Favorites, Playing, Online and Groups.</sub>
+      <sub>See who is playing what without opening a window. Friends are grouped by game, favourites first, and the dock folds into a compact rail of Chats, Favorites, Playing, Online and Groups. Chats read as bubbles, group chats open in the dock, and calls get a bar of their own.</sub>
     </td>
     <td valign="top">
       <picture><source media="(prefers-color-scheme: light)" srcset="assets/readme/icon-downloads-light.svg"><img src="assets/readme/icon-downloads.svg" width="32" height="32" alt=""></picture><br>
@@ -133,8 +133,9 @@ Every screen has been rethought, from the moment Steam starts to the moment you 
 - **Announcements and notifications:** Steam news and game news in a single feed with unread indicators; notifications grouped by day.
 - **Menus:** a consistent design for every menu, including those of the friends list. The game context menu has no submenus: Play, Favorite, Files, Hide and Uninstall appear in a toolbar, and Collections opens a searchable list for adding, renaming, deleting and creating collections.
 - **Tray menu:** account status, the active download, recent games and shortcuts to Steam's pages.
+- **Theme settings:** a window of its own, with thirteen colour presets or your own colours, a search and a tab per area.
 - **Settings and dialogs:** Steam Settings, Millennium Settings, Library Manager, and Game Properties with the game's artwork as a header. Install, uninstall, backup, product activation, Mark as Private, Exit Game and collection dialogs all display the game's artwork.
-- **Keyboard shortcuts:** <kbd>Ctrl</kbd>+<kbd>`</kbd> Steam Settings, <kbd>Ctrl</kbd>+<kbd>1</kbd> Millennium, <kbd>Ctrl</kbd>+<kbd>R</kbd> reload the interface, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> restart Steam.
+- **Keyboard shortcuts:** <kbd>Ctrl</kbd>+<kbd>`</kbd> Steam Settings, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd> Theme settings, <kbd>Ctrl</kbd>+<kbd>1</kbd> Millennium, <kbd>Ctrl</kbd>+<kbd>R</kbd> reload the interface, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> restart Steam.
 - **System Information and Report:** specification tiles and section cards with quick navigation and a filter. IP addresses, MAC addresses and hardware IDs remain blurred until selected.
 
 </details>
@@ -214,7 +215,7 @@ Steam Enhanced works with the most popular Millennium plugins and styles them to
   <img alt="Make it yours" src="assets/readme/h-make-it-yours.svg" width="100%">
 </picture>
 
-Most options are under **Millennium → Themes → Steam Enhanced → Edit**, on the tab named in each section below, together with the **Accent** colour used for links, buttons and selections. Changes take effect immediately, except those on the **Web** tab, which require a Steam restart.
+Every option is in the theme's own settings window: **Theme settings** in the rail's Settings menu, or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd>. It has a tab per area and a search, and changes apply at once, everywhere. Settings chosen in Millennium before 1.4 carry over on the first start.
 
 <details>
 <summary><b>Library Home</b> &nbsp;<sub>its own menu</sub></summary>
@@ -234,47 +235,60 @@ Each panel's ⋯ menu sets its width (one third, two thirds or the full board) a
 </details>
 
 <details>
-<summary><b>Appearance</b> &nbsp;<sub>font, motion, glass, corners</sub></summary>
+<summary><b>Appearance and navigation</b> &nbsp;<sub>colours, font, corners, the rail</sub></summary>
 <br>
 
 | Setting | Options | Description |
 | --- | --- | --- |
-| Font | **SN Pro**, Xmind, Steam (Motiva Sans) | The typeface across the client, Store, Community, Support and Checkout. |
-| Animations | **Full**, Reduced | Reduced makes hover, press and panel changes immediate. Spinners and the window entrance still animate. |
-| Glass effects | **On**, Off | Off removes background blur and makes translucent surfaces opaque, which reduces load on slower hardware. |
+| Colours | **Enhanced**, Graphite, Nebula, Mono, Tonal, Ember, Forest, Abyss, Rosewood, Slate, Midnight, Sand, Void, Custom | A colour preset for the client and web pages. Custom edits every colour, with a contrast mark on each. |
+| Font | **SN Pro**, Xmind, Motiva Sans | The typeface across the client, Store, Community, Support and Checkout. |
 | Corners | **Default**, Sharp, Round | The corner radius used throughout. |
+| Glass effects | **On**, Off | Off removes background blur, which reduces load on slower hardware. |
+| Contrast | **Standard**, High | High brightens secondary text and strengthens lines. |
+| Game art | **On**, Off | The game's art behind dialogs and Game Properties. |
+| Animations | **Full**, Reduced | Reduced makes hover, press and panel changes immediate. Spinners still animate. |
+| Click opens | **Menu**, Page | What a click on a rail button opens; a right-click opens the other. |
+| Menus open on hover | **Off**, On | Rail menus open when the pointer rests on their button, after a short, default or long delay. |
+| Rail buttons | all | Which buttons the rail shows. |
+| Rail labels, Name under avatar, Game count | | Names under the rail's icons, your name under the avatar, the Library's game count in the title bar. |
 
 </details>
 
 <details>
-<summary><b>Startup</b> &nbsp;<sub>entrance, background, spinner</sub></summary>
+<summary><b>Startup</b> &nbsp;<sub>entrance, splash, background, spinner</sub></summary>
 <br>
 
 Windows keep the theme's background until they have finished loading, so Steam's default appearance is never briefly visible.
 
 | Setting | Options | Description |
 | --- | --- | --- |
-| Window entrance | **Splash**, Logo, Fade, None | Splash runs in the main window while the Library loads: your last played game's art, its logo and a Library bar, then the art moves into Home as the Library appears. Other windows use Logo. |
-| Startup background | **Aurora**, Library, Mosaic, Wall, Plain, Dots, Steam | The background of the sign-in and startup screens: soft glows under a faint, moving wireframe of the Library, the wireframe alone, Steam's capsule wall cut into glowing tiles or shown still, a plain gradient, a dot matrix or Steam's default. |
-| Loading spinner | **Refined**, Comet, Elastic, Breathe, Classic | A single spinner style for every loading state in the client, Splash, Store, Community and Support. |
+| Window entrance | **Splash**, Logo, Fade, None | Splash runs in the main window while the Library loads: a game's art, its logo and a Library bar, then the art moves into Home. Other windows use Logo. |
+| Show splash, Splash art | | Every start, once a day or the first start only; the last played game, a random recent one or none. |
+| Wait for Library | **Until ready**, At once | Hold the window until the Library settles (up to 3 s). |
+| Startup background | **Aurora**, Library, Mosaic, Wall, Plain, Dots, Steam | The background of the sign-in and startup screens, animated or still. |
+| Loading spinner | **Refined**, Comet, Elastic, Breathe, Classic | One spinner style for every loading state in the client, the splash and web pages. |
 
 </details>
 
 <details>
-<summary><b>Library, Friends, Overlay, Toasts, Web</b></summary>
+<summary><b>Library, Friends, Toasts, Overlay, Web pages</b></summary>
 <br>
 
 | Setting | Options | Description |
 | --- | --- | --- |
-| Game list width | **Fixed**, Adjustable | Fixed scales with the window. Adjustable allows the list's edge to be dragged; a double-click resets it. |
-| Friends dock width | **Fixed**, Adjustable | The same behaviour for the dock's edge. |
-| In-game overlay restyle | **yes**, no | no restores Steam's overlay. |
-| Overlay darkness | **Default**, Light, Dark | The backdrop behind the overlay; Dark fully obscures the game. The overlay's own slider takes precedence. |
-| Notification toasts | **yes**, no | no restores Steam's toasts on the desktop and in game. |
-| Toasts in game | **yes**, no | no keeps Steam's own toasts during play. |
-| Toast style | **Stage**, Compact | Compact restyles Steam's toasts as cards. |
-| Compact toast position | **Centre**, Corner | The position of Compact toasts. |
-| Web pages | **Theme**, Steam's own | Steam's own leaves the Store, Community, Support and Checkout unstyled. Requires a Steam restart. |
+| Game page sections | all | Which sections a game's page shows. |
+| Rarity tiers | **On**, Off | Achievements grouped from Legendary to Common, or the plain % of players. |
+| Game icons, Game list width | | Each game's icon in the list; a fixed list or one whose edge can be dragged (a double-click resets it). |
+| Dock at startup | **As left**, Open, Folded | How the Friends dock starts. Its width can be fixed or adjustable, like the game list's. |
+| Chats open in | **Dock**, Window | Beside the dock, or in Steam's own chat window. |
+| Friend cards | **On**, Off | A friend's card on hover, after a short, default or long delay. |
+| Profile backgrounds | **Video**, Still, Off | Friends' profile backgrounds in cards, dialogs and toasts. |
+| Restyle toasts | **On**, Off | Steam's notification toasts in the theme's design, in game too if wanted. |
+| Toast style | **Stage**, Compact | One card at the bottom or top centre, or Steam's toasts restyled at the centre or in the corner. Achievement art, pause on hover, time on screen and the queue are set beside it. |
+| Restyle the overlay | **On**, Off | The in-game overlay in the theme's design. |
+| Overlay | | Darkness, the view it opens on, the overview's panels, its views, the clock and play time. |
+| Themed sites | all | Store, Community, Support and Checkout; the rest as Steam draws them. |
+| Page width | **Default**, Comfortable, Edge to edge | How wide Store and Community pages run on a wide screen. |
 
 </details>
 
@@ -316,12 +330,12 @@ Steam and the Steam logo are trademarks of Valve Corporation. Steam Enhanced is 
 
 ```text
 Steam-Enhanced/
-├── skin.json     Millennium manifest: settings, and core.js plus the client loader in every window
+├── skin.json     Millennium manifest: core.js and the client loader in every window
 ├── core/         Shared by client and web: runtime and class map, tokens and icons, fonts, motion, spinner
 ├── client/       Client features, one folder per area; shared/ for client-wide parts; loader.js maps windows to files
 ├── web/          Web pages: shared/ first, then store/, community/, help/ and checkout/, one folder per page
 ├── compat/       Plugin integrations, one folder per plugin
-├── options/      Setting overrides applied by Millennium, one folder per settings tab
+├── options/      A setting's stylesheets, switched on by the settings window, one folder per tab
 ├── dev/          Element inspector (Ctrl+Shift+E), profiler (Ctrl+Shift+P), class map tools, README art and quality checks
 └── assets/       Logos, Millennium header, splash and the README art (readme/)
 ```

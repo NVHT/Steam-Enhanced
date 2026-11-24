@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.4.0**](#v1-4-0) | Nov 24, 2026 | Theme settings in a window of their own, colour presets, a quality pass |
 | [**1.3.6**](#v1-3-6) | Nov 23, 2026 | Friend chats as bubbles, group chat and dialog redesigns, a new startup |
 | [**1.3.5**](#v1-3-5) | Nov 22, 2026 | Friends and tray menus, Game Properties, shortcuts, a faster client |
 | [**1.3.0**](#v1-3-0) | Nov 21, 2026 | Library Home drawn by the theme, library menus, a contrast and focus pass |
@@ -19,11 +20,39 @@
 
 <br>
 
+<a name="v1-4-0"></a>
+
+## 1.4.0 · Nov 24, 2026
+
+> The theme's settings move out of Millennium into a window of their own, with colour presets, new options for every area, and a pass over the whole theme for leaks, speed and consistency.
+
+**Settings**
+- **Theme settings**: a window of its own, from the rail's Settings menu or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd>, with a search and a tab per area. Changes apply at once, everywhere.
+- **Moved from Millennium**: the options under Millennium → Themes → Steam Enhanced are gone; your choices there carry over on the first start.
+- **Colours**: thirteen presets, or Custom to set each colour yourself, with a contrast mark on each.
+- **New options**: high contrast, game art in dialogs, the rail's buttons, labels and hover menus, when the splash shows and its art, a still startup background, game page sections, rarity tiers, game icons, how the Friends dock starts and where chats open, friend cards and profile backgrounds, the toasts' place, time, queue and achievement art, the overlay's first view, panels, views, clock and play time, which sites are themed and page width.
+
+**Fixes and polish**
+- The overlay no longer opens blank when its last view was switched off.
+- Achievements on a game page no longer leave observers behind.
+- Friends' header art and avatars load for newer games, and Steam's "?" picture no longer shows as an avatar on Home.
+- Rebuilt dialogs (About Steam, Add a Non-Steam Game, EULA, install, uninstall, System Information) show from their first frame.
+- Search fields on Community guides and discussions are the theme's own, with a focus ring; the new-topic form shows focus too.
+- Store account, wallet, phone, purchase history and licenses pages, sale trailers and Community buttons use the shared buttons, cards and menus.
+- 32 px hit targets on the library's page arrows, Home's buttons, call tools and Store account pages.
+
+**Under the hood**
+- Theme updates no longer read layout while Steam changes the page: Home's stage, notifications, the friends list, the emoticon picker, Steam Settings, dialogs and SteamGridDB measure only when something resizes.
+- Teardown cleans up everything it adds, for live reloads.
+- Colours, corners, timing and stacking follow the theme's tokens throughout; dead rules and stale notes removed.
+
+<br>
+
 <a name="v1-3-6"></a>
 
-## 1.3.6 · Nov 23, 2026
-
-> Friend chats as bubbles with a call bar, group chats in the dock, Group Settings and a dozen dialogs rebuilt, and a new startup.
+<details>
+<summary><b>1.3.6</b> · Nov 23, 2026 · Friend chats as bubbles with a call bar, group chats in the dock, Group Settings and a dozen dialogs rebuilt, and a new startup.</summary>
+<br>
 
 **Friends**
 - **Chats**: one-to-one chats as bubbles, with a rail of your open chats and a call bar for voice.
@@ -53,7 +82,7 @@
 - A startup preview and a dialog launcher for development (`dev/`).
 - Duplicated helpers and styles folded into their shared versions.
 
-<br>
+</details>
 
 <a name="v1-3-5"></a>
 
