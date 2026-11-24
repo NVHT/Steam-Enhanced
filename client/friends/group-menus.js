@@ -105,11 +105,6 @@
   const propsOf = new WeakMap();
 
   /*
-   * One menu's layout: the bar and rows (spec: bar kinds, danger kinds, hidden kinds), the main
-   * button's tint, the bar's divider only when rows follow it, the theme's header (head, built
-   * once), and, in its own window, the room for its shadow and the window settled
-   */
-  /*
    * The hints, with a disabled row's own reason in place of its usual line (Find Games to Play
    * Together: "You need 2-8 people…"; Steam's copy hidden, group-menus.css). Given to the layout
    * so each pass writes one hint: set after it, the two flipped on every pass and the menu's
@@ -127,6 +122,11 @@
     return hints;
   }
 
+  /*
+   * One menu's layout: the bar and rows (spec: bar kinds, danger kinds, hidden kinds), the main
+   * button's tint, the bar's divider only when rows follow it, the theme's header (head, built
+   * once), and, in its own window, the room for its shadow and the window settled
+   */
   function lay(panel, instance, spec) {
     const laid = layoutRows(panel, {
       kindOf,

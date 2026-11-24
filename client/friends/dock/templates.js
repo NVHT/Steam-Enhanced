@@ -18,7 +18,8 @@
  * - ui.js          native list clicks, menus, the hover flyout and the frame pass
  * - routing.js     which surface opens a chat (dock, overlay, native window)
  * - flyouts.js     browser clicks, game group flyouts and chat tabs
- * - embed.js       mounting Steam's own Friends & Chat tree
+ * - member-list.js a group's members menu without the offline ones
+ * - embed.js      mounting Steam's own Friends & Chat tree
  * - dock.js        the dock element, rendering and placement
  * - chat-popup.js  the chat flyout: popup window, portal, geometry, minimize chip
  * - friend-card.js the friend card on an avatar hovered in the open panel
@@ -38,9 +39,9 @@
 
   const ICON = {
     search:
-      '<g fill="currentColor" fill-opacity=".32" stroke="none"><circle cx="11" cy="11" r="6.5"/></g><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
+      '<g fill="currentColor" stroke="none" style="fill-opacity:var(--se-icon-duo)"><circle cx="11" cy="11" r="6.5"/></g><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
     add:
-      '<g fill="currentColor" fill-opacity=".32" stroke="none"><circle cx="9.5" cy="8" r="3.5"/></g><circle cx="9.5" cy="8" r="3.5"/><path d="M3 20c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2M19.5 8.5v6M16.5 11.5h6"/>',
+      '<g fill="currentColor" stroke="none" style="fill-opacity:var(--se-icon-duo)"><circle cx="9.5" cy="8" r="3.5"/></g><circle cx="9.5" cy="8" r="3.5"/><path d="M3 20c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2M19.5 8.5v6M16.5 11.5h6"/>',
     chev: '<path d="M9 6l6 6-6 6"/>',
     down: '<path d="M6 9l6 6 6-6"/>',
     game: '<rect x="3" y="7" width="18" height="11" rx="4"/><path d="M8 11v3M6.5 12.5h3M15.5 12h.01M18 13.5h.01"/>',
@@ -48,8 +49,6 @@
 
   const svg = (n, s = 16) =>
     `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
-
-  // Steam's "?" picture, what an account without an avatar reports
 
   // A friend's face; without a picture of their own (none, Steam's "?", or one that failed to
   // load: onAvatarError in dock.js), their initials
@@ -316,10 +315,17 @@
     root.querySelector('.se-fd-flyempty')?.toggleAttribute('hidden', any);
   }
 
-  // A card head's banner: the game's store header. Non-Steam games (appid 0) have none, and
-  // the head keeps its plain surface.
-  const headArt = (appid) =>
-    appid ? ` style="--art:url('https://shared.steamstatic.com/store_item_assets/steam/apps/${Number(appid)}/header.jpg')"` : '';
+  /*
+   * A card head's banner: the game's header through its copies (SE.headerURLs: newer games keep
+   * it under a hashed path, the bare header.jpg 404s), stacked as background layers so a failed
+   * copy shows the next (friends-dock.css .se-fd-flyhead). Non-Steam games (appid 0) have none,
+   * and the head keeps its plain surface.
+   */
+  const cssURL = (url) => `url("${url.replace(/["\\\n]/g, encodeURIComponent)}")`;
+  const headArt = (appid) => {
+    const urls = (appid && run(() => SE.headerURLs(appid))) || [];
+    return urls.length ? ` style="${esc(`--art:${urls.map(cssURL).join(', ')}`)}"` : '';
+  };
 
   const flyHTML = (g) =>
     `<div class="se-fd-flyhead"${headArt(g.appid)}>` +

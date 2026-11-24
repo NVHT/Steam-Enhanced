@@ -3,7 +3,8 @@
  * (the game's art and name, a progress bar, percent, speed and time left; with nothing
  * downloading, the first queued game and how far it got), how many games are queued after it,
  * a Pause / Resume button and "Open Downloads"; a click again, a click elsewhere, Escape, or
- * the pointer leaving the button and the card closes it. A right click opens the Downloads page straight away (what a click did).
+ * the pointer leaving the button and the card closes it. A right click opens the Downloads page
+ * straight away; "Click opens: Page" swaps the two.
  *
  * Read from Steam's live download feeds (RegisterForDownloadOverview, RegisterForDownloadItems;
  * the download store as a fallback) and its app store, refreshed each second while open. Pause / Resume is Steam's own
@@ -294,24 +295,22 @@
     open.show(layer.besideRail(button, { foot: true }), build);
   }
 
-  // A click toggles the card; the button's own click (the Downloads page) is held back
-  function onClick(event) {
+  /*
+   * A click toggles the card (the button's own click, the Downloads page, held back) and a right
+   * click opens the page at once; the other way round with "Click opens: Page"
+   * (client/shared/settings.js), read at each click
+   */
+  function press(event, secondary) {
     const button = event.target.closest?.(BUTTON);
     if (!button || passThrough) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    if (open && !open.released) close();
+    if (secondary !== (SE.settings?.get('click-opens') === 'page')) openPage(button);
+    else if (open && !open.released) close();
     else show(button);
   }
-
-  // A right click: the Downloads page, at once
-  function onContextMenu(event) {
-    const button = event.target.closest?.(BUTTON);
-    if (!button) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    openPage(button);
-  }
+  const onClick = (event) => press(event, false);
+  const onContextMenu = (event) => press(event, true);
 
   // A press elsewhere closes the card (presses in its own window never reach here)
   function onDown(event) {
@@ -348,6 +347,7 @@
       removeEventListener('contextmenu', onContextMenu, true);
       removeEventListener('pointerdown', onDown, true);
       removeEventListener('keydown', onKey, true);
+      delete window.__seDownloadsCard;
     },
   };
 })(window.__se);

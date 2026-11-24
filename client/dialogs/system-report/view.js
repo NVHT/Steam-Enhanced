@@ -16,7 +16,7 @@
 
   /* ---------- Raw view ---------- */
 
-  const escapeHTML = SE.esc ?? (text => String(text).replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`));
+  const escapeHTML = SE.esc;
 
   /* One line of KeyValues to highlighted HTML: first string the key, the second the value */
   const highlightLine = (line) => {
@@ -361,6 +361,7 @@
       });
       chips.replaceChildren(...cards.map(entry => entry.chip));
       list.replaceChildren(...cards.map(entry => entry.card), empty);
+      observeCards();
       toggleAll.hidden = !groups.length;
       syncToggleAll();
     };
@@ -410,6 +411,7 @@
         cards = [];
         chips.replaceChildren();
         list.replaceChildren(empty);
+        observeCards();
       }
       status.replaceChildren(...[maker, parsed && `${entries.toLocaleString()} entries`, kb(report)].filter(Boolean).map(text => el('span', null, text)));
       setMode(parsed ? mode : 'raw', false);
@@ -509,7 +511,7 @@
       empty.hidden = !query || shown > 0;
       empty.textContent = query ? `Nothing matches “${filter}”` : '';
       syncToggleAll();
-      spy();
+      relayout();
     };
 
     const filterRaw = (query) => {
@@ -523,7 +525,6 @@
       }
       rawEmpty.hidden = !query || shown > 0;
       rawEmpty.textContent = query ? `Nothing matches “${filter}”` : '';
-      SE.attr?.(raw, 'data-filtered', query ? '' : null);
     };
 
     const applyFilter = () => {
@@ -559,17 +560,31 @@
 
     /* ---------- Scroll spy ---------- */
 
+    // The cards' tops and the list's size are read once and kept until a resize, filter, group
+    // toggle or redraw moves them: a scroll frame reads only scrollTop
     let active = -1;
     let spyFrame = 0;
-    const spy = () => {
+    let geometry = null;
+    const measure = () => {
       const visible = cards.filter(entry => !entry.card.hidden);
+      return {
+        visible,
+        tops: visible.map(entry => entry.card.offsetTop),
+        view: list.clientHeight,
+        height: list.scrollHeight,
+      };
+    };
+    const spy = () => {
+      geometry ??= measure();
+      const { visible, tops, view, height } = geometry;
       // A window that isn't laid out (hidden, minimised, Raw) has no scroll position to read
-      if (!visible.length || !list.clientHeight) return;
-      const top = list.scrollTop + SPY_OFFSET;
-      const atEnd = list.scrollTop > 0 && list.scrollTop + list.clientHeight >= list.scrollHeight - 2;
+      if (!visible.length || !view) return;
+      const scrolled = list.scrollTop;
+      const top = scrolled + SPY_OFFSET;
+      const atEnd = scrolled > 0 && scrolled + view >= height - 2;
       let current = visible[0];
       if (atEnd) current = visible[visible.length - 1];
-      else for (const entry of visible) if (entry.card.offsetTop <= top) current = entry;
+      else tops.forEach((cardTop, i) => { if (cardTop <= top) current = visible[i]; });
       const index = cards.indexOf(current);
       if (index === active) return;
       active = index;
@@ -580,22 +595,32 @@
       if (left < chips.scrollLeft) chips.scrollLeft = left - 8;
       else if (left + chip.offsetWidth > chips.scrollLeft + chips.clientWidth) chips.scrollLeft = left + chip.offsetWidth - chips.clientWidth + 8;
     };
-    listen(list, 'scroll', () => {
+    const queueSpy = () => {
       if (!spyFrame) spyFrame = win.requestAnimationFrame(() => {
         spyFrame = 0;
         spy();
       });
-    }, { passive: true });
+    };
+    listen(list, 'scroll', queueSpy, { passive: true });
     cleanups.push(() => win.cancelAnimationFrame(spyFrame));
 
-    if (win.ResizeObserver) {
-      const resize = new win.ResizeObserver(() => {
-        active = -1;
-        spy();
-      });
+    // The cards moved: measure again on the next frame, never inside an observer pass
+    const relayout = () => {
+      geometry = null;
+      active = -1;
+      queueSpy();
+    };
+
+    // A resize, a group opening or closing, or a window shown late: each card's size says so
+    const resize = win.ResizeObserver ? new win.ResizeObserver(relayout) : null;
+    const observeCards = () => {
+      if (!resize) return;
+      resize.disconnect();
       resize.observe(list);
-      cleanups.push(() => resize.disconnect());
-    }
+      for (const entry of cards) resize.observe(entry.card);
+    };
+    observeCards();
+    cleanups.push(() => resize?.disconnect());
 
     const reducedMotion = () => win.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const scrollToCard = (index) => {

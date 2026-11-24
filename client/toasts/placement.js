@@ -25,7 +25,6 @@
    * shows is divided out from then on. Resizing uses the standard API, which Steam allows.
    */
   const scWindow = () => window.SteamClient?.Window;
-  const dpr = () => window.devicePixelRatio || 1;
   const sane = (r) => Number.isFinite(r) && r > 0.2 && r < 5;
 
   // The ratio is the same for every toast window, so it's kept in Steam's shared context
@@ -212,9 +211,12 @@
     const h = BOX.padTop + BOX.trayH + BOX.padBottom;
     const left = s.availLeft ?? 0;
     const top = s.availTop ?? 0;
+    const x = Math.round(left + (s.availWidth - w) / 2);
+    // "Stage position: Top" (client/shared/settings.js): `lift` under the work area's top instead
+    if (SE.settings?.get('stage-position') === 'top') return { x, y: Math.round(top + BOX.lift - BOX.padTop), w, h };
     // Every toast window goes to the same spot; only the stage draws anything there.
     const bottom = top + s.availHeight - BOX.lift + BOX.padBottom;
-    return { x: Math.round(left + (s.availWidth - w) / 2), y: Math.round(bottom - h), w, h };
+    return { x, y: Math.round(bottom - h), w, h };
   }
 
   const fullArea = () => window.innerWidth >= screen.availWidth - 8 && window.innerHeight >= screen.availHeight / 2;

@@ -35,6 +35,7 @@
   window.__seGamePage?.destroy();
 
   let observer;
+  let offSettings; // a setting change (Rarity tiers) redraws the page's parts
 
   /*
    * [step, sections]: a step with sections runs only while one of those cards is on the page
@@ -118,6 +119,7 @@
     document.addEventListener('click', onCommentPill, true);
     document.addEventListener('scroll', onAnyScroll, { capture: true, passive: true });
     addEventListener('resize', onResizeTop);
+    offSettings = SE.settings?.on(schedule);
     schedule();
   }
 
@@ -134,6 +136,8 @@
     'data-se-stat',
     'data-se-status',
     'data-se-bare',
+    'data-se-action',
+    'data-se-busy',
     'data-se-label',
     'data-se-hidden',
     'data-se-cgrid',
@@ -178,6 +182,7 @@
       removeEventListener('se-hltb-ready', attachHltb);
       live.hltb?.destroy();
       observer?.disconnect();
+      offSettings?.();
       live.sizer?.disconnect();
       live.achSizer?.disconnect();
       live.topSizer?.disconnect();

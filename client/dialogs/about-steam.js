@@ -439,7 +439,7 @@
 
   /* ---------- View ---------- */
 
-  const createView = (dialog, inner, facts) => {
+  const createView = (dialog, facts) => {
     const doc = dialog.ownerDocument;
     const win = doc.defaultView;
     const { branch, version, client, web, api } = classifyFacts(facts);
@@ -560,8 +560,9 @@
       }, Math.max(0, MIN_CHECK_MS - (Date.now() - started)));
     };
 
-    const ticker = setInterval(renderStatus, TICK_MS);
-    cleanups.push(() => clearInterval(ticker));
+    // Steam has no change event for its update state: a poll, paused while the window is hidden
+    const ticker = SE.poll(renderStatus, TICK_MS, { document: doc });
+    cleanups.push(() => ticker.disconnect());
 
     /* Facts as icon tiles */
     const tiles = el('div', 'se-about-tiles');
@@ -725,7 +726,7 @@
 
     viewOf.get(dialog)?.destroy();
     inner.querySelectorAll(':scope > .se-about').forEach(node => node.remove());
-    const view = createView(dialog, inner, facts);
+    const view = createView(dialog, facts);
     viewOf.set(dialog, view);
     views.add(view);
     const footer = inner.querySelector(':scope > .DialogFooter');
@@ -743,7 +744,8 @@
     }
   };
 
-  const watcher = SE.watch(scan, { throttle: 100, scope: DIALOG });
+  // Inside the observer's own callback: the rebuild is in before the dialog's first paint
+  const watcher = SE.watch(scan, { sync: true, scope: DIALOG, ignore: SE.inside('.se-about') });
   scan();
 
   window.__seAboutSteam = {

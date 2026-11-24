@@ -196,6 +196,16 @@
   };
 
   /*
+   * "Dock at startup" (client/shared/settings.js): Open or Folded sets how this session starts,
+   * written where the dock keeps its choice; As left keeps what's there
+   */
+  const dockStart = SE.settings?.get('dock-start');
+  if (dockStart === 'open' || dockStart === 'folded') {
+    store.set('se-fdock-hidden', '0');
+    store.set('se-fdock', dockStart === 'open' ? 'open' : 'rail');
+  }
+
+  /*
    * State the dock's parts share (the dock, its chat flyout, Steam's embedded Friends, chat
    * routing, menus). One object, so every part reads and sets the same values.
    */

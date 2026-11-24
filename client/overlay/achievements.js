@@ -15,11 +15,17 @@
   const VIEW_ATTR = 'data-se-ov-view';
   const listState = { tab: null, query: '', tier: null };
 
-  // A view that has nothing to show (a game without achievements) falls back
-  // to the overview.
+  // A view switched off in the Views setting (client/shared/settings.js), its tab and panel hidden
+  const viewOff = (id) => {
+    const choices = SE.settings?.schema.find((item) => item.key === 'overlay-views')?.values;
+    return !!choices?.some((choice) => choice.v === id) && !SE.settings.get('overlay-views').includes(id);
+  };
+
+  // A view that has nothing to show (a game without achievements) or is switched off falls
+  // back to the overview.
   const setView = (next) => {
     const known = VIEWS.some(({ id }) => id === next);
-    const target = !known || (next === 'achievements' && !live.achData?.total) ? 'overview' : next;
+    const target = !known || viewOff(next) || (next === 'achievements' && !live.achData?.total) ? 'overview' : next;
     if (target === live.view) return;
     live.view = target;
     if (live.ui) {
@@ -73,6 +79,8 @@
       const pill = el('span', 'se-ov-achl-pill', `${tier.name} · ${fmtPct(item.pct)}%`);
       pill.dataset.seTier = tier.id;
       line.append(pill);
+    } else if (Number.isFinite(item.pct)) {
+      line.append(el('span', 'se-ov-achl-pill', `${fmtPct(item.pct)}%`)); // Rarity tiers off
     }
     if (right) line.append(el('span', 'se-ov-achl-when', right));
     text.append(line, el('span', 'se-ov-achl-desc', item.desc));
@@ -89,9 +97,11 @@
       unlocked: data.unlocked,
       locked: data.total - data.unlocked,
     };
-    // Open on In progress when anything is, else on the unlocks.
+    // "Achievements open on" (client/shared/settings.js): its tab; In progress falls back to the
+    // unlocks when nothing is in progress
     if (!listState.tab || (listState.tab === 'progress' && !counts.progress)) {
-      listState.tab = counts.progress ? 'progress' : 'unlocked';
+      const first = SE.settings?.get('overlay-ach-tab') || 'progress';
+      listState.tab = first === 'progress' && !counts.progress ? 'unlocked' : first;
     }
 
     part.bar.firstChild.style.width = `${((data.unlocked / data.total) * 100).toFixed(1)}%`;

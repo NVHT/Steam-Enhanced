@@ -28,7 +28,14 @@
   const layer = SE.layer;
 
   const AVATAR = '.avatarHolder';
-  const SHEETS = ['core/levels.css', 'client/shared/hover-cards.css', 'client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css'];
+  // The Friend cards and Card delay settings (client/shared/settings.js), for every card below
+  const cardsOff = () => SE.settings?.get('hover-cards') === 'off';
+  const CARD_DELAY = '--se-friend-card-delay';
+  const SHEETS = [
+    'core/levels.css', 'client/shared/hover-cards.css', 'client/friends/friends-dock.css',
+    'client/friends/friends-dock-chat.css', 'client/friends/friends-dock-chat-group.css',
+    'client/friends/friends-dock-chat-rail.css',
+  ];
   // On <body> while the theme's card stands in for Steam's hover (friends-dock.css hides it)
   const ATTR = 'data-se-friend-card';
 
@@ -100,6 +107,8 @@
 
   // Steam waits a moment before its hover too: a pointer passing over the list opens nothing
   const card = layer?.hover({
+    off: cardsOff,
+    delay: CARD_DELAY,
     sheets: SHEETS,
     steam: true,
     place: (avatar) => ({ right: dock.getBoundingClientRect().left - SE.px('--se-space-3'), top: avatar.getBoundingClientRect().top }),
@@ -163,6 +172,8 @@
   const FLY_ROW = '.se-fd-fly .se-fd-row[data-friend]';
 
   const flyCard = layer?.hover({
+    off: cardsOff,
+    delay: CARD_DELAY,
     sheets: SHEETS,
     steam: true,
     place: (row) => ({
@@ -191,6 +202,8 @@
   // Your card, from the title bar's avatar
   const ACCOUNT = `.${C.FocusNavigationRoot_TitleBarControls} .${C.AccountMenu}`;
   const selfCard = layer?.hover({
+    off: cardsOff,
+    delay: CARD_DELAY,
     sheets: SHEETS,
     steam: true,
     // Beside the rail, its foot on the avatar's
@@ -223,6 +236,8 @@
 
   // A friend's card beside an avatar elsewhere in the main window, at its right
   const besideCard = layer?.hover({
+    off: cardsOff,
+    delay: CARD_DELAY,
     sheets: SHEETS,
     steam: true,
     place: (avatar) => {

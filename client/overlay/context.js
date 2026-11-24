@@ -42,7 +42,7 @@
   const { live } = ns;
   live.achData = null;
   live.ui = null;
-  live.view = 'overview';
+  live.view = 'overview'; // main.js sets the "Opens on" view as the overlay opens
   live.instance = null;
   live.shotSample = null;
   live.guidesServiceError = null;

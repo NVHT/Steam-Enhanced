@@ -27,7 +27,7 @@
   margin: var(--se-space-2) 0 var(--se-space-half);
   padding-inline-end: var(--se-space-half);
   border-radius: var(--se-radius-sm);
-  transition: background-color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease);
 }
 
 .friendlist:not(.GamepadMode) .friendGroup .groupHeaderContainer:has(> .SortByRecent):hover {
@@ -52,7 +52,7 @@
   padding: 0 !important;
   border-radius: var(--se-radius-sm);
   color: var(--se-text-muted);
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out, opacity var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease), opacity var(--se-dur) var(--se-ease);
 }
 
 /* No tile of its own: the row lights on hover and the icon brightens */
@@ -111,7 +111,7 @@
   border-bottom: 1.75px solid currentColor;
   /* Offset by transform, not margin, so the turn animates on the compositor */
   transform: translateY(-3px) rotate(45deg);
-  transition: transform var(--se-dur) ease-out;
+  transition: transform var(--se-dur) var(--se-ease);
 }
 
 .friendlist:not(.GamepadMode) .friendGroup .groupName:is(.Collapsed, [data-se-fold="close"]) .ExpandPlusMinus::before {
@@ -129,7 +129,7 @@
   overflow: hidden !important;
   /* Layout transition on purpose: a fold has to move what sits below it, which a transform can't.
      It runs only while [data-se-folding] / a fold is in progress. */
-  transition: height var(--se-dur-relaxed) ease-in-out, opacity var(--se-dur-relaxed) ease-in-out, padding var(--se-dur-relaxed) ease-in-out, margin var(--se-dur-relaxed) ease-in-out;
+  transition: height var(--se-dur-relaxed) var(--se-ease-inout), opacity var(--se-dur-relaxed) var(--se-ease-inout), padding var(--se-dur-relaxed) var(--se-ease-inout), margin var(--se-dur-relaxed) var(--se-ease-inout);
 }
 
 .friendlist:not(.GamepadMode) [data-se-folding] :is([class*="friend-anim-appear"], [class*="friend-anim-enter"], [class*="friend-anim-exit"]) {

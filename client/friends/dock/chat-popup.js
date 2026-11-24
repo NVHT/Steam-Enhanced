@@ -33,11 +33,12 @@
   const layer = SE.layer;
   let popupFailure = false;
   // What the chat popup's window copies from the main window: the base tokens and icons, the
-  // dock's two files (friends-dock-chat.css sizes the host and places its buttons), and every
+  // dock's files (friends-dock-chat*.css size the host and place its buttons), and every
   // stylesheet the loader adds from the Friends list's and the chat's folders.
   const CHAT_SHEETS = new Set([
     'core/tokens.css', 'core/icons-nav.css', 'core/icons-ui.css', 'core/scrollbars.css',
     'client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css',
+    'client/friends/friends-dock-chat-group.css', 'client/friends/friends-dock-chat-rail.css',
   ]);
   const CHAT_FOLDERS = /^client\/friends\/(?:list|chat)\/[^/]+\.css$/;
 

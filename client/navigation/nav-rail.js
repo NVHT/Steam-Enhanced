@@ -1,7 +1,8 @@
 /*
  * Navigation, part 4 of 4, listed last (window.__seNavParts; client/navigation/title-bar-search.js
  * names the parts): routing, the rail's page icons and their section menus (opened on click;
- * a right click runs the menu's first row), and the update loop that runs every part.
+ * a right click runs the menu's first row, or the other way round with "Click opens: Page"; a
+ * rest opens it with "Menus open on hover"), and the update loop that runs every part.
  */
 ((SE) => {
   const { C, railMode, mainWindow, navigate: goLibrary } = SE;
@@ -355,35 +356,53 @@
     return Boolean(navMenu);
   }
 
-  function onNavClick(event) {
-    if (!railMode()) return;
-    const node = event.currentTarget;
-    const key = node.getAttribute('data-se-icon');
-    const entry = NAV_ITEMS[key];
-    if (!entry) return;
-    event.preventDefault();
-    event.stopPropagation();
-    if (!toggleNavMenu(key, node) && entry.click) activateTarget(entry.click);
+  // The section's menu, or its page if the menu couldn't open
+  function openSectionMenu(key, node) {
+    if (!toggleNavMenu(key, node) && NAV_ITEMS[key].click) activateTarget(NAV_ITEMS[key].click);
   }
 
   /*
-   * A right click skips the menu: the section's first row runs at once (Store: Featured,
-   * Library: Home, Community: Home, Profile: your profile), or its fixed page if Steam's items
-   * can't be read.
+   * The section's page at once: its first row runs (Store: Featured, Library: Home, Community:
+   * Home, Profile: your profile), or its fixed page if Steam's items can't be read.
    */
-  function onNavContext(event) {
-    if (!railMode()) return;
-    const node = event.currentTarget;
-    const key = node.getAttribute('data-se-icon');
-    const entry = NAV_ITEMS[key];
-    if (!entry) return;
-    event.preventDefault();
-    event.stopPropagation();
+  function openSectionPage(key, node) {
     closeNavMenu();
     const first = sectionRows(key, node)?.find((row) => typeof row.run === 'function');
     if (first) first.run();
-    else if (entry.click) activateTarget(entry.click);
+    else if (NAV_ITEMS[key].click) activateTarget(NAV_ITEMS[key].click);
   }
+
+  // The "Click opens" setting (client/shared/settings.js): a click opens the menu and a right
+  // click the page, or the other way round; read at each click, so a change applies at once
+  const clickOpensPage = () => SE.settings?.get('click-opens') === 'page';
+
+  function onNavButton(event, secondary) {
+    if (!railMode()) return;
+    const node = event.currentTarget;
+    const key = node.getAttribute('data-se-icon');
+    if (!NAV_ITEMS[key]) return;
+    event.preventDefault();
+    event.stopPropagation();
+    menuHover.cancel();
+    if (secondary !== clickOpensPage()) openSectionPage(key, node);
+    else openSectionMenu(key, node);
+  }
+  const onNavClick = (event) => onNavButton(event, false);
+  const onNavContext = (event) => onNavButton(event, true);
+
+  /*
+   * The "Menus open on hover" setting: resting on a section's button opens its menu (hover
+   * intent, --se-hover-delay); its leave-closer (SE.layer) closes it as for a clicked one.
+   */
+  const menuHover = SE.hoverIntent((node) => {
+    const key = node.getAttribute('data-se-icon');
+    if (!railMode() || !NAV_ITEMS[key] || (navMenu && !navMenu.released && navMenuKey === key)) return;
+    toggleNavMenu(key, node);
+  }, '--se-rail-hover-delay');
+  function onNavEnter(event) {
+    if (SE.settings?.get('menu-hover') === 'on') menuHover.enter(event.currentTarget);
+  }
+  const onNavLeave = () => menuHover.cancel();
 
   function bindNavItems() {
     for (const key of Object.keys(NAV_ITEMS)) {
@@ -393,9 +412,13 @@
       if (node !== prev) {
         prev?.removeEventListener('click', onNavClick, true);
         prev?.removeEventListener('contextmenu', onNavContext, true);
+        prev?.removeEventListener('pointerenter', onNavEnter);
+        prev?.removeEventListener('pointerleave', onNavLeave);
         if (node) {
           node.addEventListener('click', onNavClick, true);
           node.addEventListener('contextmenu', onNavContext, true);
+          node.addEventListener('pointerenter', onNavEnter);
+          node.addEventListener('pointerleave', onNavLeave);
           node.setAttribute('aria-haspopup', 'menu');
           navNodes.set(key, node);
         } else {
@@ -442,9 +465,12 @@
     ns.search.cleanup();
     ns.titleBar.cleanup();
     closeNavMenu();
+    menuHover.cancel();
     for (const node of navNodes.values()) {
       node.removeEventListener('click', onNavClick, true);
       node.removeEventListener('contextmenu', onNavContext, true);
+      node.removeEventListener('pointerenter', onNavEnter);
+      node.removeEventListener('pointerleave', onNavLeave);
       node.removeAttribute('aria-haspopup');
     }
     navNodes.clear();
@@ -476,6 +502,10 @@
   window.__seRailNav = {
     // The Games button at the rail's foot (client/header/header-actions.js) opens its menu here
     toggleGames: (button) => toggleNavMenu('games', button, { foot: true }),
+    // Opens the Games menu unless it's open already ("Menus open on hover", header-actions.js)
+    showGames: (button) => {
+      if (!(navMenu && !navMenu.released && navMenuKey === 'games')) toggleNavMenu('games', button, { foot: true });
+    },
     destroy() {
       observer?.disconnect();
       timer?.disconnect();

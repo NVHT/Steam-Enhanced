@@ -113,23 +113,22 @@
   const activityStore = () => SE.global('appActivityStore', (s) => typeof s.GetAppActivity === 'function');
   const friendStore = () => SE.global('g_FriendsUIApp', (a) => a.FriendStore)?.FriendStore;
 
-  // A presence for the avatar's ring (EPersonaState), as the rail's own avatar shows yours
-  const PRESENCE = { 0: 'offline', 1: 'online', 2: 'online', 3: 'away', 4: 'away', 5: 'online', 6: 'online', 7: 'offline' };
+  // Away and Snooze (EPersonaState 3, 4): in game, the avatar's ring dims (ingame-away)
+  const AWAY_STATES = new Set([3, 4]);
 
+  // A friend through SE.friendStatus (client/dialogs/friend-picker.js): no picture for Steam's "?"
   function friendOf(steamID) {
     const id = run(() => steamID.GetAccountID());
     const player = id ? run(() => friendStore().GetPlayer(id)) : null;
-    const persona = run(() => player.persona);
-    const presence = PRESENCE[run(() => persona.m_ePersonaState)] || 'offline';
-    const ingame = presence !== 'offline' && Boolean(run(() => persona.is_ingame));
-    const sid = run(() => steamID.ConvertTo64BitString()) || '';
+    const status = (player && run(() => SE.friendStatus(player))) || { name: '', state: 'offline', avatar: '' };
+    const away = AWAY_STATES.has(run(() => player.persona.m_ePersonaState));
     return {
       id,
-      sid,
-      name: run(() => player.display_name) || run(() => persona.m_strPlayerName) || 'A friend',
-      avatar: run(() => persona.avatar_url_medium) || '',
+      sid: run(() => steamID.ConvertTo64BitString()) || '',
+      name: status.name || 'A friend',
+      avatar: status.avatar,
       // online, away, offline; in game: ingame, or ingame-away
-      state: ingame ? (presence === 'away' ? 'ingame-away' : 'ingame') : presence,
+      state: status.state === 'ingame' && away ? 'ingame-away' : status.state,
     };
   }
 
@@ -409,7 +408,9 @@
         '<div class="se-hs-fcard-row">' +
         `<img src="${esc(a.strImage)}" alt=""${tier ? ` data-se-tier="${tier.id}"` : ''}>` +
         `<span class="se-hs-fcard-text"><b>${esc(a.strName)}</b><span>${esc(a.strDescription || '')}</span></span>` +
-        (tier ? `<span class="se-hs-fcard-rare" data-se-tier="${tier.id}">${esc(tier.name)}<span>${pct}</span></span>` : '') +
+        (tier
+          ? `<span class="se-hs-fcard-rare" data-se-tier="${tier.id}">${esc(tier.name)}<span>${pct}</span></span>`
+          : pct ? `<span class="se-hs-fcard-rare"><span>${pct}</span></span>` : '') + // Rarity tiers off
         '</div>'
       );
     });

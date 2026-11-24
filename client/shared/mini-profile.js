@@ -50,10 +50,13 @@
     SE.attr(picture, 'data-se-faces', trim ? Math.min(real, 4) : null);
   };
 
+  // The Profile backgrounds setting: Still drops the video (the still alone), Off gives none
   SE.profileBackground = async (accountId) => {
+    const mode = SE.settings?.get('profile-backgrounds') || 'video';
+    if (mode === 'off') return null;
     const bg = (await miniProfile(accountId))?.profile_background;
     if (!bg) return null;
-    const video = bg['video/webm'] || bg['video/mp4'] || '';
+    const video = mode === 'still' ? '' : bg['video/webm'] || bg['video/mp4'] || '';
     const still = [bg.image, bg['image/jpeg'], bg['image/png']].find((url) => typeof url === 'string') || '';
     return video || still ? { video, still } : null;
   };

@@ -127,7 +127,7 @@
   }
 
   /*
-   * A group's call, as a bar under its header (friends-dock-chat.css .se-fd-group-call, the look of
+   * A group's call, as a bar under its header (friends-dock-chat-group.css .se-fd-group-call, the look of
    * a one-to-one call's): the channel, the faces in it, then mic, headphones and leave. Those are
    * stand-ins: each runs Steam's own button (in the channel list, else the message box) through its
    * click handler and shows its state (muted: Steam's "disabled").
@@ -369,8 +369,6 @@
       }
     }
   }
-
-  // Steam's Friends & Chat embed entry (mount(FriendStore, ChatStore, elTarget)), its ReactDOM and JSX runtime.
 
   Object.assign(ns, {
     browserClickListeners, closeChat, closeGroupPanels, disposeGroupFlyouts, syncBrowserClicks,

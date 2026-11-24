@@ -171,16 +171,18 @@
    * there's no room. Steam's own React Tooltip can't be used here: this popup has no webpack,
    * and one mounted from the main window's React never shows in it.
    *
-   * One per view. set(node, label) gives a node a tip, relabels it (live, if showing) or, with
-   * no label, takes it away. Hover is delegated from the dialog root.
+   * One per view. set(node, label, when) gives a node a tip, relabels it (live, if showing) or,
+   * with no label, takes it away; when(node), if given, is asked as the tip is about to show (so
+   * a geometry check runs on hover, not in an observer pass). Hover is delegated from the
+   * dialog root.
    */
+  const TIP_DELAY_MS = 300; // Steam's own tooltip delay
+  const isCut = (line) => [...line.children].some(part => part.scrollWidth > part.clientWidth + 1);
   const createTips = (root) => {
     const doc = root.ownerDocument;
     const win = doc.defaultView;
-    const labels = new Map();
+    const labels = new Map(); // node -> { label, when }
     let shownFor = null; // the node whose tip is up
-    let pending = null; // the node whose tip is waiting out the delay
-    let timer = 0;
 
     const pop = el('div', `${OURS} ${OURS}-tooltip`);
     pop.setAttribute('popover', 'manual');
@@ -208,32 +210,29 @@
     doc.body.append(pop);
 
     const place = (node) => {
-      const box = node.getBoundingClientRect();
       const tip = pop.getBoundingClientRect();
-      const gap = 6;
-      const edge = 8;
-      const above = box.top - gap - tip.height;
-      const top = above >= edge ? above : box.bottom + gap;
-      const left = Math.min(Math.max(box.left + (box.width - tip.width) / 2, edge), win.innerWidth - tip.width - edge);
-      pop.style.setProperty('left', `${Math.round(left)}px`, 'important');
-      pop.style.setProperty('top', `${Math.round(top)}px`, 'important');
+      const { left, top } = SE.tipSpot(node.getBoundingClientRect(), tip.width, tip.height, 'top', { flip: true, win });
+      pop.style.setProperty('left', `${left}px`, 'important');
+      pop.style.setProperty('top', `${top}px`, 'important');
     };
 
+    const show = (node) => {
+      const entry = labels.get(node);
+      if (!node.isConnected || !entry || (entry.when && !entry.when(node))) return;
+      shownFor = node;
+      body.textContent = entry.label;
+      attempt(() => pop.showPopover?.());
+      place(node);
+      pop.setAttribute('data-shown', '');
+    };
+    const intent = SE.hoverIntent(show, TIP_DELAY_MS);
+
     const hide = () => {
-      clearTimeout(timer);
-      timer = 0;
+      intent.cancel();
       if (!shownFor) return;
       shownFor = null;
       pop.removeAttribute('data-shown');
       attempt(() => pop.hidePopover?.());
-    };
-
-    const show = (node) => {
-      shownFor = node;
-      body.textContent = labels.get(node);
-      attempt(() => pop.showPopover?.());
-      place(node);
-      pop.setAttribute('data-shown', '');
     };
 
     const owner = (target) => {
@@ -245,19 +244,13 @@
 
     const onOver = (event) => {
       const node = owner(event.target);
-      if (node === shownFor || (node && timer && node === pending)) return;
+      if (node && node === intent.node) return; // its tip is up or waiting out the delay
       hide();
-      if (!node) return;
-      pending = node;
-      timer = setTimeout(() => {
-        timer = 0;
-        if (node.isConnected && labels.has(node)) show(node);
-      }, 300);
+      if (node) intent.enter(node);
     };
 
     const onOut = (event) => {
-      if (owner(event.relatedTarget) === (shownFor ?? pending)) return;
-      pending = null;
+      if (owner(event.relatedTarget) === intent.node) return;
       hide();
     };
 
@@ -266,15 +259,16 @@
     root.addEventListener('pointerdown', hide, true);
     root.addEventListener('scroll', hide, true);
 
-    const set = (node, label) => {
+    const set = (node, label, when = null) => {
       if (!node) return;
       if (!label) {
         labels.delete(node);
-        if (node === shownFor || node === pending) hide();
+        if (node === intent.node) hide();
         return;
       }
-      if (labels.get(node) === label) return;
-      labels.set(node, label);
+      const entry = labels.get(node);
+      if (entry?.label === label && entry.when === when) return;
+      labels.set(node, { label, when });
       if (node === shownFor) {
         body.textContent = label;
         place(node);
@@ -590,15 +584,13 @@
 
       renderEmpty(visible.length, loading);
 
-      // Reads after the writes above: one layout pass. A path gets its full command line as a
-      // tip only while something in it is cut short; a Library tag explains itself.
+      // A path gets its full command line as a tip only while something in it is cut short
+      // (checked on hover: no layout read here); a Library tag explains itself.
       tips.prune();
-      const onScreen = new Set(visible);
       for (const row of all) {
         const info = rowInfo.get(row);
         if (!info) continue;
-        const cut = onScreen.has(row) && [...info.line.children].some(part => part.scrollWidth > part.clientWidth + 1);
-        tips.set(info.line, cut ? info.cmdline : null);
+        tips.set(info.line, info.cmdline, isCut);
         tips.set(info.tag, isOwned(row) ? 'Already in your Library. Adding it again makes a second shortcut.' : null);
       }
 
@@ -678,10 +670,6 @@
     browse?.after(summary);
     SE.mark(root, BUILT);
 
-    // A resize changes which paths are cut short
-    const resizer = new ResizeObserver(schedule);
-    resizer.observe(list);
-    cleanups.push(() => resizer.disconnect());
     // The search box value isn't a mutation
     listen(root, 'input', schedule);
 
@@ -732,7 +720,8 @@
     'Add a Non-Steam Game',
     () => [...document.querySelectorAll(C.root)].filter(isComplete),
     createView,
-    { throttle: 100, scope: C.root, ignore: isOurs }
+    // Inside the observer's own callback: the rebuild is in before the dialog's first paint
+    { sync: true, scope: C.root, ignore: isOurs }
   );
 
   window.__seAddNonSteam = {

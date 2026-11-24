@@ -1,8 +1,8 @@
 /*
  * The runtime every Steam window needs (window.__se): React fiber helpers, the shared
  * MutationObserver (SE.watch), views, layers, tokens and the rest. The class map it reads
- * (SE.C) is core/classmap.js; skin.json loads core.js, classmap.js, runtime.js, then
- * client/loader.js in each window.
+ * (SE.C) is core/classmap.js. skin.json patches core/core.js and client/loader.js into each
+ * window; the loader adds classmap.js, then this file, before any other script.
  */
 (() => {
   if (window.__se) return;
@@ -539,8 +539,7 @@
    * (core/images.css), so a failed copy never shows the broken-image icon. One chain for
    * both kinds of image: built ones listen themselves (they can fail before they're attached),
    * innerHTML-built ones (tag()) are caught by capture listeners on their container (onLoad,
-   * onError). Used by the Library Home, the picker (client/shared/picker.js), collection
-   * banners (client/library/collections.js) and toasts (client/toasts/stage.js).
+   * onError).
    */
   const ART_WAIT = 'data-se-art-wait';
   const artFailed = new WeakMap(); // img → called once its last copy has failed
@@ -594,7 +593,16 @@
     Object.freeze({ id: 'uncommon', name: 'Uncommon', max: 60, rank: 2 }),
     Object.freeze({ id: 'common', name: 'Common', max: Infinity, rank: 1 }),
   ]);
-  const tierOf = (pct) => (typeof pct === 'number' && Number.isFinite(pct) ? TIERS.find(t => pct <= t.max) : null);
+  /*
+   * The Rarity tiers setting (client/shared/settings.js keeps it here with setTiers): while off,
+   * nothing has a tier, so every feature draws its plain rarity (% of players) instead.
+   */
+  let tiersOn = true;
+  const setTiers = (on) => {
+    tiersOn = Boolean(on);
+  };
+  const tierOf = (pct) =>
+    (tiersOn && typeof pct === 'number' && Number.isFinite(pct) ? TIERS.find(t => pct <= t.max) : null);
   const fmtPct = (pct) => (pct > 0 && pct < 0.1 ? '<0.1' : pct.toFixed(1));
   // The layer over a tiered icon (styles: client/shared/achievement-tiers.css): one sparkle
   // per tier rank when unlocked, and the tier's initial so it reads without color.
@@ -608,7 +616,7 @@
     fx.appendChild(document.createElement('b')).textContent = tier.name[0];
     return fx;
   };
-  const rarity = Object.freeze({ TIERS, tierOf, fmtPct, fx: tierFx });
+  const rarity = Object.freeze({ TIERS, tierOf, fmtPct, fx: tierFx, setTiers });
 
   // Multiplexed document.body MutationObserver shared across feature modules.
   // Filters out no-op attribute/characterData writes to prevent observer feedback loops.

@@ -1,6 +1,6 @@
 /*
  * Column resize: the drag handle on a column's edge, for the columns whose width is a setting
- * ("Game list width" and "Friends dock width": Fixed | Adjustable, skin.json Conditions).
+ * ("Game list width" and "Friends dock width": Fixed | Adjustable, client/shared/settings.js).
  *
  * The handle writes the width to a user variable on <html> (--se-list-w-user, --se-fd-w-user)
  * and to localStorage, as a share of the window: the variable is a clamp() of that share in vw

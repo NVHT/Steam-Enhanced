@@ -250,9 +250,10 @@
    *   draw(node, data)   the build for show(); fallback(node, data) if drawing it throws
    *   blocked()        called when no panel can open (a browser page without a window): the
    *                    caller lets Steam's own hover show
+   *   off()            true while the caller's setting turns the cards off: nothing opens
    * Returns { enter(node, data), left(event), leave(), node }.
    */
-  function hover({ sheets, steam = false, delay, place: where, draw, fallback, blocked }) {
+  function hover({ sheets, steam = false, delay, place: where, draw, fallback, blocked, off }) {
     let open = null;
     const intent = SE.hoverIntent(show, delay);
 
@@ -281,7 +282,9 @@
     }
 
     return {
-      enter: (node, data) => intent.enter(node, data),
+      enter: (node, data) => {
+        if (!off?.()) intent.enter(node, data);
+      },
       left: (event) => intent.left(event),
       leave,
       get node() {

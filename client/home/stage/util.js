@@ -67,7 +67,7 @@
     `<button type="button" class="se-hs-pickbtn" data-panel-menu aria-label="${SE.esc(name)} settings" title="Settings" aria-haspopup="dialog" aria-expanded="false">${ICON_DOTS}</button>`;
 
   // The stage goes narrow at this width of its own (not the window's: the game list and the
-  // Friends dock take a share of it). stage.js reads the Home's width each pass.
+  // Friends dock take a share of it). stage.js reads the Home's width after a resize.
   const NARROW_AT = 1100;
 
   /*

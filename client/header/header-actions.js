@@ -25,6 +25,7 @@
   let gamesButton;
   let observer;
   let menuObserver;
+  let offSettings; // the Rail buttons setting's listener
   let frame = 0;
   let group;
   let styleReference;
@@ -343,7 +344,13 @@
           element.classList.add('se-menu-icon');
         }
         applyNativeButtonClasses(element);
-        const label = element.textContent.replace(/\s+/g, ' ').trim();
+        // Steam's own text only: the rail label (syncRailLabels) inside it repeats the name
+        const label = [...element.childNodes]
+          .filter((node) => !node.classList?.contains('se-rail-label'))
+          .map((node) => node.textContent)
+          .join('')
+          .replace(/\s+/g, ' ')
+          .trim();
         SE.mark(element, 'data-se-icon', names[index]);
         if (label) {
           SE.unmark(element, 'title');
@@ -419,26 +426,29 @@
       }
     };
 
-    // Friends & Chat: a click opens its menu, a right-click shows or folds the dock at once
-    button.addEventListener('click', (event) => {
-      const dock = action.key === 'friends' && window.__seFriendsDock;
+    /*
+     * Friends & Chat: a click opens its menu, a right-click shows or folds the dock at once; the
+     * other way round with "Click opens: Page" (client/shared/settings.js), read at each click
+     */
+    const friendsPress = (event, secondary) => {
+      const dock = window.__seFriendsDock;
       if (!dock) {
         forwardNative(event);
         return;
       }
       event.preventDefault();
       event.stopPropagation();
-      toggleFriendsMenu(button, () => dock.openWindow(() => forwardNative(event)));
+      if (secondary !== (SE.settings?.get('click-opens') === 'page')) onFriends();
+      else toggleFriendsMenu(button, () => dock.openWindow(() => forwardNative(event)));
+    };
+    button.addEventListener('click', (event) => {
+      if (action.key === 'friends') friendsPress(event, false);
+      else forwardNative(event);
     });
 
     if (action.key === 'friends') {
       button.setAttribute('aria-haspopup', 'menu');
-      button.addEventListener('contextmenu', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        if (window.__seFriendsDock) onFriends();
-        else forwardNative(event);
-      });
+      button.addEventListener('contextmenu', (event) => friendsPress(event, true));
     }
 
     button.addEventListener('keydown', (event) => {
@@ -654,13 +664,15 @@
   });
 
   /*
-   * Keyboard shortcuts, in the main window: Ctrl+` Steam Settings, Ctrl+1 Millennium (beside
+   * Keyboard shortcuts, in the main window: Ctrl+` Steam Settings, Ctrl+Shift+` the theme's
+   * settings (client/settings/theme/), Ctrl+1 Millennium (beside
    * Millennium's own Ctrl+2, the Library Manager), Ctrl+R Reload UI, Ctrl+Shift+R Restart Steam
    * (shown on the Settings menu's and the Steam menu's rows). By the key's place (event.code),
    * so they work on any keyboard layout.
    */
   const SHORTCUTS = {
     Backquote: openSteamSettings,
+    'Shift+Backquote': () => window.__seThemeSettings?.open(),
     Digit1: openMillennium,
     KeyR: reloadUI,
     'Shift+KeyR': restartSteam,
@@ -696,10 +708,10 @@
   }
 
   /*
-   * Settings: one button at the rail's foot, opening Steam Settings, Millennium and the Library
-   * Manager as a menu beside it, its foot on the button's (the popup layer's menu,
-   * client/shared/popup-layer.js): Steam's and Millennium's in two groups, each row with its
-   * icon and a line on what it opens.
+   * Settings: one button at the rail's foot, opening Steam Settings, the theme's settings
+   * (client/settings/theme/), Millennium and the Library Manager as a menu beside it, its foot on
+   * the button's (the popup layer's menu, client/shared/popup-layer.js): Steam's, the theme's and
+   * Millennium's in three groups, each row with its icon and a line on what it opens.
    */
   let settingsMenu = null;
 
@@ -713,6 +725,9 @@
       [
         { heading: 'Steam' },
         { label: 'Settings', hint: 'Account, downloads, display', icon: '--se-icon-settings', keys: 'Ctrl+`', run: openSteamSettings },
+        { separator: true },
+        { heading: 'Steam Enhanced' },
+        { label: 'Theme settings', hint: 'Look, startup, toasts, web pages', icon: '--se-icon-sliders', keys: 'Ctrl+Shift+`', run: () => window.__seThemeSettings?.open() },
         { separator: true },
         { heading: 'Millennium' },
         { label: 'Millennium', hint: 'Themes, plugins, updates', icon: '--se-icon-millennium', keys: 'Ctrl+1', run: openMillennium },
@@ -740,14 +755,31 @@
     window.__seRailNav?.toggleGames(gamesButton);
   }
 
+  /*
+   * "Menus open on hover" (client/shared/settings.js): resting on a foot button opens its menu,
+   * whose leave-closer closes it as for a clicked one. One wait for the rail's foot.
+   */
+  const footHover = SE.hoverIntent((button, show) => show(), '--se-rail-hover-delay');
+  function hoverOpens(button, show) {
+    button.addEventListener('pointerenter', () => {
+      if (SE.settings?.get('menu-hover') === 'on') footHover.enter(button, show);
+    });
+    button.addEventListener('pointerleave', footHover.cancel);
+    button.addEventListener('click', footHover.cancel);
+  }
+
   function ensureExtraButtons(target) {
     if (!settingsButton) {
       settingsButton = makeActionButton('settings', 'Settings', onSettings);
       settingsButton.setAttribute('aria-haspopup', 'menu');
+      hoverOpens(settingsButton, () => {
+        if (!settingsMenu || settingsMenu.released) onSettings();
+      });
     }
     if (!gamesButton) {
       gamesButton = makeActionButton('games', 'Games', onGames);
       gamesButton.setAttribute('aria-haspopup', 'menu');
+      hoverOpens(gamesButton, () => window.__seRailNav?.showGames(gamesButton));
     }
     if (settingsButton.parentElement !== target) target.appendChild(settingsButton);
     if (gamesButton.parentElement !== target) target.appendChild(gamesButton);
@@ -792,8 +824,95 @@
     PROXY_ACTIONS.forEach((action, index) => syncProxyButton(action, sources[index]));
     syncFriendsButton();
     decorateMenuIcons();
+    syncRailLabels();
+    syncRailButtons();
     if (!document.body.classList.contains('se-header-actions-ready')) {
       document.body.classList.add('se-header-actions-ready');
+    }
+  }
+
+  /*
+   * Rail labels: each rail button's name in a <span class="se-rail-label"> inside it, drawn only
+   * with the Rail labels setting on (options/appearance/rail-labels.css). Steam's page buttons
+   * give their own (localized) name; the foot's buttons a fixed one. The avatar has its own.
+   */
+  const RAIL_NAMES = [
+    [`.${C.NotificationsButton}`, 'Alerts'], // "Notifications" overflows the 60 px rail
+    [ANNOUNCEMENT_SELECTOR, 'News'],
+    ['.se-header-action[data-se-action="games"]', 'Games'],
+    ['.se-header-action[data-se-action="downloads"]', 'Downloads'],
+    ['.se-header-action[data-se-action="settings"]', 'Settings'],
+  ];
+  const railLabels = new Set();
+
+  function railLabel(button, name) {
+    if (!button || !name) return;
+    let label = button.querySelector(':scope > .se-rail-label');
+    if (!label) {
+      label = document.createElement('span');
+      label.className = 'se-rail-label';
+      label.setAttribute('aria-hidden', 'true');
+      button.append(label);
+      railLabels.add(label);
+    }
+    SE.setText(label, name);
+  }
+
+  // Steam's page names come in capitals ("STORE"): shown as the foot's are ("Store")
+  const sentenceCase = (text) => {
+    const lower = (text || '').toLocaleLowerCase();
+    return lower.charAt(0).toLocaleUpperCase() + lower.slice(1);
+  };
+
+  function syncRailLabels() {
+    for (const button of document.querySelectorAll(`.${C.SuperNavBar} .se-menu-icon[data-se-icon]`)) {
+      // Profile's own text is your name, which the avatar at the rail's foot already shows
+      const name = button.dataset.seIcon === 'profile' ? 'Profile' : button.getAttribute('aria-label');
+      railLabel(button, name === name?.toLocaleUpperCase() ? sentenceCase(name) : name);
+    }
+    for (const [selector, name] of RAIL_NAMES) railLabel(document.querySelector(selector), name);
+  }
+
+  /*
+   * Rail buttons (client/shared/settings.js): each one the setting turns off is marked
+   * data-se-rail-off (nav-rail.css hides it). The foot's buttons are placed by their number from
+   * the bottom (--se-foot-n: the avatar 0, Settings 1, then these), renumbered past hidden ones.
+   */
+  const FOOT_BUTTONS = [
+    ['downloads', () => document.querySelector('.se-header-action[data-se-action="downloads"]')],
+    ['games', () => gamesButton],
+    ['news', () => document.querySelector(ANNOUNCEMENT_SELECTOR)],
+    ['alerts', () => document.querySelector(`.${C.NotificationsButton}`)],
+  ];
+  const railOff = new Set();
+
+  // The element the rail places: the button itself, or its slot among the title-bar controls
+  const footSlot = (button) =>
+    button?.classList.contains('se-header-action')
+      ? button
+      : button?.closest(`:is(.${C.BranchBar_TitleBarControls}, .TitleBarControls) > *`);
+
+  function markRail(el, off) {
+    if (!el) return;
+    SE.attr(el, 'data-se-rail-off', off);
+    if (off) railOff.add(el);
+    else railOff.delete(el);
+  }
+
+  function syncRailButtons() {
+    const on = SE.settings?.get('rail-buttons');
+    if (!on) return;
+    for (const button of document.querySelectorAll(`.${C.SuperNavBar} .se-menu-icon[data-se-icon]`)) {
+      const key = button.dataset.seIcon;
+      if (key !== 'console') markRail(button.closest(`.${C.SuperNavMenu}`), !on.includes(key));
+    }
+    let n = 2;
+    for (const [key, find] of FOOT_BUTTONS) {
+      const slot = footSlot(find());
+      if (!slot) continue;
+      const shown = on.includes(key);
+      markRail(slot, !shown);
+      SE.cssVar(slot, '--se-foot-n', shown ? String(n++) : null);
     }
   }
 
@@ -809,6 +928,7 @@
   function start() {
     addEventListener('resize', remeasure);
     observer = SE.watch(update, { throttle: 200 });
+    offSettings = SE.settings?.on(schedule);
     // Steam's menu buttons get our icon classes; React rewriting their className would drop
     // them, so class changes inside the menu bars repaint the icons before the next paint.
     menuObserver = SE.watch(decorateMenuIcons, {
@@ -820,6 +940,13 @@
   }
 
   state.destroy = () => {
+    footHover.cancel();
+    offSettings?.();
+    for (const el of railOff) el.removeAttribute('data-se-rail-off');
+    railOff.clear();
+    for (const [, find] of FOOT_BUTTONS) SE.cssVar(footSlot(find()), '--se-foot-n', null);
+    for (const label of railLabels) label.remove();
+    railLabels.clear();
     for (const divider of coloredDividers) divider.classList.remove('se-library-strip');
     coloredDividers.clear();
     observer?.disconnect();

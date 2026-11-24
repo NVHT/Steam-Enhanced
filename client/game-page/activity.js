@@ -60,7 +60,7 @@
   const SVG_CHEV = (d) =>
     `<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const SVG_EXPAND =
-    '<svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="var(--se-accent, #7cc4ff)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    '<svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="var(--se-accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
   const okUrl = (u) => typeof u === 'string' && u.trim() !== '' && !/^(undefined|null)$/.test(u);
   const uniq = (a) => [...new Set(a)];

@@ -37,7 +37,10 @@
   const LABEL = 'data-se-label';
   const SEARCH = 'data-se-epicker-search';
   const HOST = 'data-se-epicker-host';
-  const ATTRS = [ROOT, FRAME, PART, STRIP, TAB, ITEM, ACTIVE, LABEL, SEARCH, HOST];
+  // The picker's own marks; ACTIVE and LABEL are shared names, so only the nodes marked here
+  // (sharedMarks) lose them on destroy
+  const ATTRS = [ROOT, FRAME, PART, STRIP, TAB, ITEM, SEARCH, HOST];
+  const sharedMarks = new Set();
   const FOOT = 'se-epicker-foot';
   const EDGE = 8;
   /* Emoticons in chat lines and reactions, never in a picker */
@@ -147,8 +150,25 @@
     return best;
   };
 
+  /*
+   * The underline is measured only when it or the tabs changed (its style or class, a tab
+   * replaced): an observer pass otherwise reuses the last answer, reading no geometry.
+   */
+  const underlineCache = new WeakMap(); // strip → { line, key, tabs, tab }
   const underlinedTab = (strip, tabs) => {
     const line = [...strip.children].find(child => !tabs.includes(child));
+    const key = line ? `${line.className}|${line.getAttribute('style') || ''}` : '';
+    const last = underlineCache.get(strip);
+    if (last && last.line === line && last.key === key && last.tabs.length === tabs.length && last.tabs.every((tab, i) => tab === tabs[i])) {
+      return last.tab;
+    }
+    const tab = measureUnderline(line, tabs);
+    // Kept only once found: an opening picker can measure before its first layout
+    if (tab) underlineCache.set(strip, { line, key, tabs, tab });
+    return tab;
+  };
+
+  const measureUnderline = (line, tabs) => {
     const r = line?.getBoundingClientRect();
     if (!r?.width) return null;
     const mid = r.left + r.width / 2;
@@ -233,7 +253,6 @@
     const opening = !root.hasAttribute(ROOT);
     if (opening) markFrames(root);
     SE.mark(root, ROOT);
-    markFrames(root);
     addFoot(root);
     if (opening) requestAnimationFrame(() => root.isConnected && place(root));
 
@@ -245,7 +264,10 @@
     for (const tab of tabs) SE.mark(tab, TAB);
     if (strip) SE.mark(strip, STRIP);
     const open = strip ? openTab(strip, tabs) : null;
-    for (const tab of tabs) SE.attr(tab, ACTIVE, tab === open ? '' : null);
+    for (const tab of tabs) {
+      SE.attr(tab, ACTIVE, tab === open ? '' : null);
+      if (tab === open) sharedMarks.add(tab);
+    }
 
     const search = root.querySelector('input');
     if (search) SE.mark(search, SEARCH);
@@ -269,11 +291,18 @@
       if (checkedLabels.has(el) || !hasOwnText(el)) continue;
       checkedLabels.add(el);
       if (el.closest(`[${STRIP}], [${ITEM}]`) || el.textContent.length > LABEL_MAX_LENGTH) continue;
-      if (getComputedStyle(el).textTransform === 'uppercase') SE.mark(el, LABEL);
+      // A style read (no layout), once per node: checkedLabels skips it on later passes
+      if (getComputedStyle(el).textTransform === 'uppercase') {
+        SE.mark(el, LABEL);
+        sharedMarks.add(el);
+      }
     }
   };
 
   const update = () => {
+    for (const el of sharedMarks) {
+      if (!el.isConnected) sharedMarks.delete(el);
+    }
     const roots = new Set(document.querySelectorAll(`[${ROOT}]`));
     for (const img of document.querySelectorAll(ART)) {
       if (elsewhere.has(img) || img.closest(`[${ROOT}], .GamepadMode`)) continue;
@@ -302,6 +331,11 @@
       for (const el of document.querySelectorAll(selector)) {
         for (const name of ATTRS) el.removeAttribute(name);
       }
+      for (const el of sharedMarks) {
+        el.removeAttribute(ACTIVE);
+        el.removeAttribute(LABEL);
+      }
+      sharedMarks.clear();
       delete window.__seEmoticonPicker;
     },
   };

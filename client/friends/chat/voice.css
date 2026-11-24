@@ -111,7 +111,7 @@
   box-shadow: none !important;
   color: var(--se-text-muted) !important;
   cursor: pointer;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
 .friendlist:not(.GamepadMode) .activeVoiceButtons :is(button, .VoiceControlPanelButton):hover,
@@ -268,7 +268,7 @@ a.connectionStatus:not(.GamepadMode *) {
  * over a dimmed backdrop, its title bar as a small-caps header with a close tile
  */
 .multiChatDialog[data-se-chat] .VoiceRoomChatHistory {
-  background-color: rgba(10, 12, 15, .55) !important;
+  background-color: color-mix(in srgb, var(--se-bg-ink) 55%, transparent) !important;
 }
 
 .multiChatDialog[data-se-chat] .VoiceRoomChatWindow {
@@ -456,7 +456,7 @@ a.connectionStatus:not(.GamepadMode *) {
   box-shadow: none !important;
   font: 600 var(--se-fs-base)/1 var(--se-font), sans-serif !important;
   white-space: nowrap;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
 /* Start Talking (you were invited): green */
@@ -520,7 +520,7 @@ a.connectionStatus:not(.GamepadMode *) {
   padding: 0 !important;
   border-radius: var(--se-radius-sm) !important;
   cursor: pointer;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
 /*
@@ -530,7 +530,7 @@ a.connectionStatus:not(.GamepadMode *) {
  * Talking and Decline stay while you're the one invited. The message box loses its call buttons
  * meanwhile (they're on the bar), and the header its call button.
  */
-/* A call's bar, one-to-one or a group's (friends-dock-chat.css .se-fd-group-call) */
+/* A call's bar, one-to-one or a group's (friends-dock-chat-group.css .se-fd-group-call) */
 .multiChatDialog[data-se-chat] {
   --se-call-bar-bg: color-mix(in srgb, var(--se-running) 10%, var(--se-sidebar));
   --se-call-bar-edge: inset 0 -1px 0 color-mix(in srgb, var(--se-running) 25%, transparent);
@@ -628,6 +628,7 @@ a.connectionStatus:not(.GamepadMode *) {
 
 /* The stand-ins: the voice tiles' look, Steam's glyphs (icons.css), red while muted */
 .se-call-tool {
+  position: relative;
   display: grid;
   place-items: center;
   width: var(--se-tile-sm);
@@ -639,11 +640,18 @@ a.connectionStatus:not(.GamepadMode *) {
   background: transparent;
   color: var(--se-text-muted);
   cursor: pointer;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
 .se-call-tool[hidden] {
   display: none;
+}
+
+/* A 32 px hit target around the 30 px tile, the tile's look unchanged */
+.se-call-tool::after {
+  content: '';
+  position: absolute;
+  inset: calc((var(--se-tile-sm) - 32px) / 2);
 }
 
 .se-call-tool:hover {

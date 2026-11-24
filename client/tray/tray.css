@@ -70,19 +70,24 @@ html[data-se-tray] :is([data-se-tray="status"], [data-se-tray-hide]) {
   object-fit: cover;
 }
 
-.se-tray-avatar[data-initial] img {
+.se-tray-avatar[data-initials] img {
   display: none;
 }
 
-/* No picture of your own (Steam's "?"): your initial */
-.se-tray-avatar[data-initial]::after {
-  content: attr(data-initial);
+/* No picture of your own (Steam's "?"): the initials tile (its edge left to the status ring) */
+.se-tray-avatar[data-initials] {
+  background: var(--se-initials-bg);
+}
+
+.se-tray-avatar[data-initials]::after {
+  content: attr(data-initials);
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  color: var(--se-text-dim);
-  font: 600 var(--se-fs-md) / 1 var(--se-font);
+  color: var(--se-initials-ink);
+  font: var(--se-initials-weight) var(--se-fs-sm) / 1 var(--se-font);
+  letter-spacing: var(--se-initials-spacing);
 }
 
 .se-tray-who {

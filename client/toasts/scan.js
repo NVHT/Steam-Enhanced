@@ -55,6 +55,7 @@
   function onTrayHover(e) {
     const h = hub();
     if (!e.target.closest?.('.se-tst-tray')) return;
+    if (!h.pausedAt && SE.settings?.get('toast-hover') === 'off') return; // "Pause on hover: Off"
     if (e.type === 'pointerover' && !h.pausedAt && h.active) {
       h.pausedAt = Date.now();
       hoverSteam(true);
@@ -153,7 +154,7 @@
     Object.assign(m, { title: info.title, text: info.text, seenIcon: info.icon, icon: info.icon || m.icon });
     m.rev++;
     // New content: Steam restarts its timer, and so does the stage if it's playing this one.
-    if (info.ms) m.deadline = Date.now() + info.ms;
+    if (info.ms) m.deadline = Date.now() + (info.steamMs || info.ms);
     const h = hub();
     if (m.id === h.active) {
       h.startedAt = Date.now();

@@ -156,7 +156,7 @@
       src,
       win: window,
       born: now,
-      deadline: !info.ms ? Infinity : now + info.ms,
+      deadline: !info.ms ? Infinity : now + (info.steamMs || info.ms), // Steam's window, not our pace
       done: false,
       stale: false,
       released: false,

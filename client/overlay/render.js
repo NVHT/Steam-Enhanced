@@ -12,15 +12,22 @@
 
   /* ---------- Render ---------- */
 
-  let renderQueued = false;
+  let renderFrame = 0;
+  let stopped = false;
 
   const scheduleRender = () => {
-    if (renderQueued) return;
-    renderQueued = true;
-    requestAnimationFrame(() => {
-      renderQueued = false;
+    if (renderFrame || stopped) return;
+    renderFrame = requestAnimationFrame(() => {
+      renderFrame = 0;
       ns.sync();
     });
+  };
+
+  // On destroy: a queued render dropped, and caches settling later rebuild nothing
+  const stopRender = () => {
+    stopped = true;
+    cancelAnimationFrame(renderFrame);
+    renderFrame = 0;
   };
 
   const achievementsCache = createCache({ ttl: 60_000, retry: 15_000, load: loadAchievements, onSettled: scheduleRender });
@@ -28,7 +35,6 @@
   const screenshotsCache = createCache({ ttl: 60_000, retry: 30_000, load: loadScreenshots, onSettled: scheduleRender });
   const guidesCache = createCache({ ttl: 30 * 60_000, retry: 2 * 60_000, load: loadGuides, onSettled: scheduleRender });
   const newsCache = createCache({ ttl: 30 * 60_000, retry: 2 * 60_000, load: loadNews, onSettled: scheduleRender });
-  // `loadNotes` is defined further down; resolve it at call time.
   const caches = [achievementsCache, recentCache, screenshotsCache, guidesCache, newsCache];
 
   const setStat = (cell, minutes) => {
@@ -202,7 +208,6 @@
     const current = VIEWS.find(({ id }) => id === live.view);
     setText(tabs.title, current.label);
     setText(tabs.note, notes[live.view] || '');
-    tabs.rail.dataset.view = live.view;
   };
 
   /* ---------- Timer ---------- */
@@ -246,7 +251,16 @@
     return `${pad(Math.floor(total / 3600))}:${pad(Math.floor(total / 60) % 60)}:${pad(total % 60)}`;
   };
 
-  const clockFormat = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
+  // The Clock setting (client/shared/settings.js): the locale's hours, or 12- or 24-hour (Off: CSS)
+  const clockFormats = new Map();
+  const clockFormat = () => {
+    const mode = SE.settings?.get('overlay-clock') || 'auto';
+    if (!clockFormats.has(mode)) {
+      const cycle = mode === '12' ? { hour12: true } : mode === '24' ? { hourCycle: 'h23' } : {};
+      clockFormats.set(mode, new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', ...cycle }));
+    }
+    return clockFormats.get(mode);
+  };
   const dayFormat = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 
   const renderTime = (part) => {
@@ -254,7 +268,7 @@
     const running = timer.running();
     const mode = running ? 'running' : elapsed > 0 ? 'paused' : 'clock';
     if (mode === 'clock') {
-      const parts = clockFormat.formatToParts(new Date());
+      const parts = clockFormat().formatToParts(new Date());
       setText(part.b, parts.filter(x => x.type !== 'dayPeriod').map(x => x.value).join('').trim());
       setText(part.small, parts.find(x => x.type === 'dayPeriod')?.value || '');
       setText(part.label, dayFormat.format(new Date()));
@@ -273,5 +287,5 @@
     }[mode];
   };
 
-  Object.assign(ns, { VIEWS, achievementsCache, caches, formatDate, guidesCache, newsCache, recentCache, renderAchievements, renderFriends, renderGuides, renderNews, renderScreenshots, renderTabs, renderTime, scheduleRender, screenshotsCache, setStat, setText, timer });
+  Object.assign(ns, { VIEWS, achievementsCache, caches, formatDate, guidesCache, newsCache, recentCache, renderAchievements, renderFriends, renderGuides, renderNews, renderScreenshots, renderTabs, renderTime, scheduleRender, screenshotsCache, setStat, stopRender, setText, timer });
 })(window.__se);

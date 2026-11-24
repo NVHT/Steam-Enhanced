@@ -351,7 +351,7 @@
 
   /*
    * The Friends dock's chat flyout with two or more chats: the open chats as faces down a rail on
-   * the left (friends-dock-chat.css .se-chat-rail), in place of Steam's tab strip. The strip stays
+   * the left (friends-dock-chat-rail.css .se-chat-rail), in place of Steam's tab strip. The strip stays
    * mounted, hidden, and does the work: a face's click goes to its tab, its × to the tab's close,
    * and each face reads its tab (picture, name, status, unread count, open).
    */

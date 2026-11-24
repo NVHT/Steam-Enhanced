@@ -294,8 +294,8 @@
   }
 
   /*
-   * The library menus' shared layout (this menu, client/library/collection-menu.js): every Steam
-   * row marked by its kind (spec.kindOf); kinds in spec.bar become bar buttons with a word under
+   * The library menus' shared layout (this menu and those added through ns.libraryMenus): every
+   * Steam row marked by its kind (spec.kindOf); kinds in spec.bar become bar buttons with a word under
    * their icon (spec.word) and Steam's whole name as their tooltip (spec.title, else the name);
    * the rest are rows with a hint (spec.hints); kinds in spec.danger are red. Sets the bar's
    * columns and its divider, there only when rows follow the bar. A bar needs MIN_BAR buttons:
@@ -609,9 +609,10 @@
 
   /*
    * The library's menus, each { name, test(props), layout(panel, instance), patched(element, instance) }:
-   * the game menu here; others (client/library/collection-menu.js, client/friends/friend-menu.js,
-   * listed after this file) through ns.libraryMenus.add, with this file's layoutRows, source and
-   * its own / divider / keep for the theme's nodes among Steam's rows
+   * the game menu here; others (client/library/collection-menu.js, home-menus.js;
+   * client/friends/friend-menu.js, group-menus.js; client/shared/text-menu.js, all listed after
+   * this file) through ns.libraryMenus.add, with this file's layoutRows, source and its own /
+   * divider / keep for the theme's nodes among Steam's rows
    */
   kinds.push({ name: 'game', test: isGameMenu, layout, patched: () => flattenManage(menuClass()?.prototype) });
   ns.libraryMenus = { add: (kind) => kinds.push(kind), layoutRows, source, targetApps, patchLibraryMenu, own, divider, keep };

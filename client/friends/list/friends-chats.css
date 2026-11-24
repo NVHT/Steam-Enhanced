@@ -73,7 +73,7 @@
   border-bottom: 1.75px solid currentColor;
   /* Offset by transform, not margin, so the turn animates on the compositor */
   transform: translateY(-3px) rotate(45deg);
-  transition: transform var(--se-dur) ease-out;
+  transition: transform var(--se-dur) var(--se-ease);
 }
 
 .friendlist:not(.GamepadMode) .FriendsListChatSection.Collapsed .chatSectionTitle .ToggleGroupChatList::before {
@@ -185,7 +185,7 @@
 .friendlist:not(.GamepadMode) .FriendsListChatSection:not(.ChatListResizing) .chatRoomListContainer {
   /* Layout transition on purpose: a fold has to move what sits below it, which a transform can't.
      It runs only while [data-se-folding] / a fold is in progress. */
-  transition: height var(--se-dur-relaxed) ease-in-out, max-height var(--se-dur-relaxed) ease-in-out, opacity var(--se-dur-relaxed) ease-in-out;
+  transition: height var(--se-dur-relaxed) var(--se-ease-inout), max-height var(--se-dur-relaxed) var(--se-ease-inout), opacity var(--se-dur-relaxed) var(--se-ease-inout);
 }
 
 .friendlist:not(.GamepadMode) .FriendsListChatSection.Collapsed .chatRoomListContainer {
@@ -462,7 +462,7 @@
   height: 14px;
   background: currentColor;
   transform: rotate(-90deg);
-  transition: transform var(--se-dur) ease-out;
+  transition: transform var(--se-dur) var(--se-ease);
   -webkit-mask: var(--se-fd-ico-chev) center / 14px 14px no-repeat;
   mask: var(--se-fd-ico-chev) center / 14px 14px no-repeat;
 }

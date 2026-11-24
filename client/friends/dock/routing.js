@@ -266,6 +266,11 @@
 
   const isNativeInteraction = () => nativeInteraction || performance.now() < nativeInteractionUntil;
 
+  /*
+   * Steam's own window instead of the dock: from the overlay, or while a game is in front of
+   * Steam. A game merely running (a launcher, a tool, one minimised) with Steam out of focus
+   * still uses the dock, which brings Steam forward (openRoutedChat).
+   */
   function shouldBypassDock(browser) {
     if (!isDesktopContext(browser)) return true;
     if (!isInGame()) return false;
@@ -273,18 +278,20 @@
     const ov = findOverlayState();
     if (ov?.focused) return true;
     if (performance.now() - desktopInteractionAt < 1200) return false;
-    return !document.hasFocus() && !live.chatPopup?.doc?.hasFocus?.();
+    return gameInForeground() && !document.hasFocus() && !live.chatPopup?.doc?.hasFocus?.();
   }
 
   function canRouteChat(browser, activate) {
     if (!canUseDock()) return false;
     if (activate && !isDesktopContext(browser)) return false;
-    if (gameInForeground() || (isInGame() && !desktopChatFocused())) return false;
+    if (gameInForeground()) return false; // a game in front: Steam's own path, over it
     return isDesktopContext(browser) || (!activate && isOverlayContext(browser));
   }
 
+  // "Chats open in: Window" (client/shared/settings.js): every chat takes Steam's own path
   function canUseDock() {
-    return !state.destroyed && !state.manualWindowOpen && !state.allowNativeWindow && SE.railMode();
+    return !state.destroyed && !state.manualWindowOpen && !state.allowNativeWindow && SE.railMode() &&
+      SE.settings?.get('chat-open') !== 'window';
   }
 
   function openRoutedChat(id, browser, chat, activate, room, mirror = activate) {
@@ -751,6 +758,9 @@
 
   function markDockInteraction() {
     installChatRouting();
+    // Using the dock again ends "Open window" (state.allowNativeWindow, main.js openWindow): its
+    // chats and the Friends list come back to the dock, while the window's own stay in it till then
+    state.allowNativeWindow = false;
     const now = performance.now();
     desktopInteractionAt = now;
     nativeInteraction = true;

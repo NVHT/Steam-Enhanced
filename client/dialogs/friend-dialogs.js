@@ -277,6 +277,7 @@
     };
     head.addEventListener('error', onError, true);
 
+    const titled = []; // Steam's checkboxes given a title and aria-label, cleared on destroy
     if (!nickname) {
       const body = root.querySelector('.DialogBody');
       const line = defaultsLine();
@@ -297,6 +298,7 @@
           if (!titles[i]) return;
           box.title = titles[i];
           box.setAttribute('aria-label', `${titles[i]}: ${label}`);
+          titled.push(box);
         });
       }
     }
@@ -322,6 +324,10 @@
         // A moving background stops with the dialog
         for (const video of art?.querySelectorAll('video') || []) video.pause();
         for (const node of nodes) node.remove();
+        for (const box of titled) {
+          box.removeAttribute('title');
+          box.removeAttribute('aria-label');
+        }
         SE.unmark(root, ROOT);
       },
     };

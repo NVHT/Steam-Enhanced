@@ -164,16 +164,22 @@
     let scroller = null; // what scrolls inside it
     let scrollCleanup = null;
     let words = -1;
+    let extent = null; // the scroller's scroll range, kept until a resize or another scroller
+    let drawn = null; // the toolbar last measured into
+    let measureFrame = 0;
 
     const content = () => root.querySelector(C.content);
 
-    /* Progress and edges from the scroller's position */
+    /* Progress and edges from the scroller's position: a scroll reads only scrollTop */
     const measure = () => {
       if (!tools || !scroller) return;
-      const max = scroller.scrollHeight - scroller.clientHeight;
+      drawn = tools;
+      extent ??= scroller.scrollHeight - scroller.clientHeight;
+      const max = extent;
+      const top = scroller.scrollTop;
       const scrollable = max > END_SLACK;
-      const atEnd = !scrollable || scroller.scrollTop >= max - END_SLACK;
-      const ratio = scrollable ? Math.min(1, scroller.scrollTop / max) : 1;
+      const atEnd = !scrollable || top >= max - END_SLACK;
+      const ratio = scrollable ? Math.min(1, top / max) : 1;
       const value = Math.round((atEnd ? 1 : ratio) * 100);
 
       tools.fill.style.transform = `scaleX(${value / 100})`;
@@ -181,7 +187,7 @@
       tools.meter.setAttribute('aria-valuenow', String(value));
       SE.attr(root, READ, atEnd ? '' : null);
 
-      const edge = !scrollable ? 'none' : scroller.scrollTop <= END_SLACK ? 'top' : atEnd ? 'end' : 'middle';
+      const edge = !scrollable ? 'none' : top <= END_SLACK ? 'top' : atEnd ? 'end' : 'middle';
       SE.attr(root, EDGE, edge);
       SE.attr(tools.jump, 'hidden', scrollable ? null : '');
       setIcon(tools.jumpIcon, atEnd ? 'up' : 'down');
@@ -232,18 +238,19 @@
       root.style.removeProperty(PANEL);
     });
 
+    let observeText = null;
     const bindScroller = (scrolling) => {
       if (scrolling && scrolling === watched) {
-        // Steam may only start scrolling an inner wrapper once the text has laid out
-        const next = scrollerOf(scrolling);
-        scroller = next;
+        observeText(); // a language switch can swap the text node
         return;
       }
       if (!scrolling && !watched) return;
       scrollCleanup?.();
       scrollCleanup = null;
+      observeText = null;
       watched = scrolling;
-      scroller = scrolling ? scrollerOf(scrolling) : null;
+      scroller = scrolling; // the ResizeObserver's first pass finds what scrolls inside it
+      extent = null;
       words = -1;
       if (!scrolling) return;
       scheduleFit();
@@ -251,14 +258,30 @@
       /* scroll doesn't bubble: capture it on the panel, from whichever element inside scrolls */
       const onScroll = (event) => {
         const target = event.target;
-        if (target !== scroller && target.nodeType === 1 && scrolling.contains(target)) scroller = target;
+        if (target !== scroller && target.nodeType === 1 && scrolling.contains(target)) {
+          scroller = target;
+          extent = null;
+        }
         measure();
       };
-      const resize = new ResizeObserver(() => schedule());
+      // Sizes moved: read the geometry again here, after layout, never in an observer pass.
+      // Steam may only start scrolling an inner wrapper once the text has laid out.
+      const resize = new ResizeObserver(() => {
+        scroller = scrollerOf(scrolling);
+        extent = null;
+        measure();
+      });
       scrolling.addEventListener('scroll', onScroll, { capture: true, passive: true });
       resize.observe(scrolling);
-      const text = scrolling.querySelector(C.text);
-      if (text) resize.observe(text);
+      let text = null;
+      observeText = () => {
+        const next = scrolling.querySelector(C.text);
+        if (next === text) return;
+        if (text) resize.unobserve(text);
+        text = next;
+        if (text) resize.observe(text);
+      };
+      observeText();
       const target = scrolling;
       scrollCleanup = () => {
         target.removeEventListener('scroll', onScroll, { capture: true });
@@ -322,12 +345,19 @@
           tools.timeText.parentElement.title = `${count.toLocaleString()} words`;
         }
       }
-      measure();
+      // A new toolbar is filled on the next frame; after that the ResizeObserver and scrolls keep
+      // it current
+      if (tools !== drawn && !measureFrame) {
+        measureFrame = requestAnimationFrame(() => {
+          measureFrame = 0;
+          measure();
+        });
+      }
     };
+    cleanups.push(() => cancelAnimationFrame(measureFrame));
 
     /* Loading, errors and language switches swap the agreement's nodes and text */
     const change = SE.onChange(root, sync, { characterData: true, ignore: isOurs });
-    const { schedule } = change;
     cleanups.push(change.disconnect);
 
     sync();
@@ -355,7 +385,8 @@
         .filter(node => !node.closest('.GamepadMode'))
         .map(node => node.closest(C.modal) ?? node.closest('.DialogContent')),
     createView,
-    { throttle: 120, scope: C.content, ignore: isOurs }
+    // Inside the observer's own callback: the rebuild is in before the dialog's first paint
+    { sync: true, scope: C.content, ignore: isOurs }
   );
 
   window.__seEula = {

@@ -101,12 +101,16 @@
     SE.run(checkNewScreenshot);
   };
 
+  // The view each opening starts on ("Opens on", client/shared/settings.js); Last view keeps it
+  const openingView = () => SE.settings?.get('overlay-open') || 'overview';
+
   // Unlocks made while playing should show as soon as the overlay opens.
   const onVisibility = () => {
-    // The overlay opens on the overview each time.
     if (document.visibilityState !== 'visible') {
       flushSave();
-      return setView('overview');
+      ns.listState.tab = null; // the achievements list opens on its setting's tab again
+      const view = openingView();
+      return setView(view === 'last' ? live.view : view); // setView drops a view switched off
     }
     achievementsCache.expire();
     SE.run(checkNewScreenshot);
@@ -114,6 +118,8 @@
   };
   document.addEventListener('visibilitychange', onVisibility);
   addEventListener('resize', scheduleRender);
+  // The open view switched off in Views: back to the overview
+  const offSettings = SE.settings?.on(() => setView(live.view));
 
   applyBackdrops();
   sync();
@@ -214,6 +220,8 @@
       clearInterval(prefetchTimer);
       document.removeEventListener('visibilitychange', onVisibility);
       removeEventListener('resize', scheduleRender);
+      offSettings?.();
+      ns.stopRender();
       teardown();
       applyBackdrops(true);
       for (const cache of caches) cache.clear();

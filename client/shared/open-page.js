@@ -9,7 +9,7 @@
  *             main window left its page, or the browser view asks for that address) and, if
  *             not, through ShowURL, checked again, then Steam's openurl link
  *
- * SE.openPage.didOpen(url, before) is that check, for a caller with a way of its own to try first.
+ * SE.openPage.CHECK_MS is that moment, for a caller with a way of its own to try first.
  */
 ((SE) => {
   if (!SE || SE.openPage) return;
@@ -63,7 +63,6 @@
     }
   }
 
-  openPage.didOpen = didOpen;
   openPage.CHECK_MS = CHECK_MS;
   SE.openPage = openPage;
 })(window.__se);

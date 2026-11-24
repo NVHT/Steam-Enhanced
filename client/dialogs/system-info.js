@@ -497,8 +497,8 @@
       });
       chips.replaceChildren(...cards.map(entry => entry.chip));
       list.replaceChildren(...cards.map(entry => entry.card), empty);
+      observeCards();
       applyFilter();
-      spy();
     };
 
     const shortTitle = (title) => SHORT_TITLES.find(([re]) => re.test(title))?.[1] ?? title;
@@ -569,7 +569,7 @@
       field.toggleAttribute('data-filled', !!filter);
       empty.hidden = !query || shown > 0;
       empty.textContent = query ? `Nothing matches “${filter}”` : '';
-      spy();
+      relayout();
     };
 
     const setFilter = (value) => {
@@ -582,17 +582,31 @@
 
     /* ---------- Scroll spy ---------- */
 
+    // The cards' tops and the list's size are read once and kept until a resize, filter or redraw
+    // moves them: a scroll frame reads only scrollTop
     let active = -1;
     let spyFrame = 0;
-    const spy = () => {
+    let geometry = null;
+    const measure = () => {
       const visible = cards.filter(entry => !entry.card.hidden);
+      return {
+        visible,
+        tops: visible.map(entry => entry.card.offsetTop),
+        view: list.clientHeight,
+        height: list.scrollHeight,
+      };
+    };
+    const spy = () => {
+      geometry ??= measure();
+      const { visible, tops, view, height } = geometry;
       // A window that isn't laid out (hidden, minimised) has no scroll position to read
-      if (!visible.length || !list.clientHeight) return;
-      const top = list.scrollTop + SPY_OFFSET;
-      const atEnd = list.scrollTop > 0 && list.scrollTop + list.clientHeight >= list.scrollHeight - 2;
+      if (!visible.length || !view) return;
+      const scrolled = list.scrollTop;
+      const top = scrolled + SPY_OFFSET;
+      const atEnd = scrolled > 0 && scrolled + view >= height - 2;
       let current = visible[0];
       if (atEnd) current = visible[visible.length - 1];
-      else for (const entry of visible) if (entry.card.offsetTop <= top) current = entry;
+      else tops.forEach((cardTop, i) => { if (cardTop <= top) current = visible[i]; });
       const index = cards.indexOf(current);
       if (index === active) return;
       active = index;
@@ -603,23 +617,32 @@
       if (left < chips.scrollLeft) chips.scrollLeft = left - 8;
       else if (left + chip.offsetWidth > chips.scrollLeft + chips.clientWidth) chips.scrollLeft = left + chip.offsetWidth - chips.clientWidth + 8;
     };
-    listen(list, 'scroll', () => {
+    const queueSpy = () => {
       if (!spyFrame) spyFrame = win.requestAnimationFrame(() => {
         spyFrame = 0;
         spy();
       });
-    }, { passive: true });
+    };
+    listen(list, 'scroll', queueSpy, { passive: true });
     cleanups.push(() => win.cancelAnimationFrame(spyFrame));
 
+    // The cards moved: measure again on the next frame, never inside an observer pass
+    const relayout = () => {
+      geometry = null;
+      active = -1;
+      queueSpy();
+    };
+
     // Resizing changes which card is at the top, and a window shown late gets its first layout here
-    if (win.ResizeObserver) {
-      const resize = new win.ResizeObserver(() => {
-        active = -1;
-        spy();
-      });
+    const resize = win.ResizeObserver ? new win.ResizeObserver(relayout) : null;
+    const observeCards = () => {
+      if (!resize) return;
+      resize.disconnect();
       resize.observe(list);
-      cleanups.push(() => resize.disconnect());
-    }
+      for (const entry of cards) resize.observe(entry.card);
+    };
+    observeCards();
+    cleanups.push(() => resize?.disconnect());
 
     const reducedMotion = () => win.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const scrollToCard = (index) => {
@@ -689,23 +712,30 @@
     SE.mark(root, BUILT);
   };
 
+  const isBuilt = (root) => viewOf.has(root) && root.hasAttribute(BUILT) && !!root.querySelector(':scope > .se-sysinfo-view');
+
+  // A new dialog is built inside the observer's own callback, before its first paint
   const scan = () => {
     for (const root of document.querySelectorAll(ROOT)) {
-      const view = viewOf.get(root);
-      if (view && root.hasAttribute(BUILT) && root.querySelector(':scope > .se-sysinfo-view')) {
-        view.update();
-        continue;
-      }
-      if (isSystemInfo(root)) build(root);
+      if (!isBuilt(root) && isSystemInfo(root)) build(root);
     }
   };
 
-  const watcher = SE.watch(scan, { throttle: 100, scope: ROOT, ignore: (node) => !!node.closest?.('.se-sysinfo') });
+  // A built view follows Steam's sections, throttled: they change many times while it collects
+  const refresh = () => {
+    for (const root of document.querySelectorAll(ROOT)) if (isBuilt(root)) viewOf.get(root).update();
+  };
+
+  const ignore = (node) => !!node.closest?.('.se-sysinfo');
+  const watchers = [
+    SE.watch(scan, { sync: true, scope: ROOT, ignore }),
+    SE.watch(refresh, { throttle: 100, scope: ROOT, ignore }),
+  ];
   scan();
 
   window.__seSystemInfo = {
     destroy() {
-      watcher.disconnect();
+      for (const watcher of watchers) watcher.disconnect();
       for (const view of [...views]) view.destroy();
       document.querySelectorAll('.se-sysinfo').forEach(node => node.remove());
       document.querySelectorAll(`[${BUILT}]`).forEach(node => SE.unmark(node, BUILT));

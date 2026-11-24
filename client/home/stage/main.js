@@ -65,6 +65,7 @@
 
   // Throttle ResizeObserver callbacks during window/splitter drags to 120ms.
   function scheduleSize() {
+    ns.staleGeometry();
     const wait = laidAt + 120 - performance.now();
     if (wait <= 0) {
       schedule();
@@ -92,6 +93,12 @@
     }
   }
 
+  // Back in sight: sizes may have changed while hidden
+  function onVisibility() {
+    ns.staleGeometry();
+    schedule();
+  }
+
   function onMotion() {
     if (live.stage) {
       select(live.selected);
@@ -109,7 +116,7 @@
     });
     sizes = typeof ResizeObserver === 'function' ? new ResizeObserver(scheduleSize) : null;
     addEventListener('resize', onResize);
-    document.addEventListener('visibilitychange', schedule);
+    document.addEventListener('visibilitychange', onVisibility);
     reducedMotion.addEventListener?.('change', onMotion);
     ns.startParallax();
     schedule();
@@ -120,7 +127,7 @@
       watcher?.disconnect();
       sizes?.disconnect();
       removeEventListener('resize', onResize);
-      document.removeEventListener('visibilitychange', schedule);
+      document.removeEventListener('visibilitychange', onVisibility);
       reducedMotion.removeEventListener?.('change', onMotion);
       cancelPass();
       clearTimeout(sizeTimer);

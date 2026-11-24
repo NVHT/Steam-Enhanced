@@ -30,6 +30,8 @@
 
   // One sparkle per tier rank (unlocked only) and the tier's initial (SE.rarity.fx).
   const tierFx = SE.rarity.fx;
+  // Tiers or the plain % (the Rarity tiers setting): part of every cache key below, so a change redraws
+  const tiersMode = () => (tierOf(1) ? 'tiers' : 'plain');
 
   function decorateTier(el, a) {
     const t = tierOf(a?.flAchieved);
@@ -82,7 +84,9 @@
       `<div class="se-ach-tip-info"><div class="se-ach-tip-when">${whenStr}</div>` +
       (tier
         ? `<div class="se-ach-tip-pct" data-se-tier="${tier.id}">${tier.name} · ${esc(fmtPct(pct))}% of players</div>`
-        : '') +
+        : Number.isFinite(pct)
+          ? `<div class="se-ach-tip-pct">${esc(fmtPct(pct))}% of players</div>` // Rarity tiers off
+          : '') +
       '</div>';
     tip.toggleAttribute('data-locked', Boolean(a.locked));
     placePopup(tip, anchor);
@@ -203,7 +207,7 @@
     }
     const times = unlocked.map((a) => a.rt).filter((rt) => rt > 0);
     const rarest = unlocked
-      .filter((a) => tierOf(a.flAchieved))
+      .filter((a) => typeof a.flAchieved === 'number')
       .reduce((best, a) => (!best || a.flAchieved < best.flAchieved ? a : best), null);
 
     return {
@@ -253,7 +257,7 @@
       ?.querySelector(`.${C.UnlockedLabel}`)
       ?.textContent.replace(/\s+/g, ' ') || '';
 
-  const clientLists = (row) => achData(appIdOf(row), unlockedKey(row));
+  const clientLists = (row) => achData(appIdOf(row), `${unlockedKey(row)}|${tiersMode()}`);
 
   /*
    * Steam's achievement objects no longer carry the global unlock rate (the row fetches it on
@@ -336,7 +340,7 @@
   }
 
   function placeAchIcons() {
-    const live = new Set();
+    const seen = new Set();
     for (const row of document.querySelectorAll(`[data-se-sec="achievements"] ${ACH_ROW}`)) {
       const locked = Boolean(row.closest(ACH_LOCKED));
       let list = rowList(row, locked);
@@ -351,7 +355,7 @@
         unmark(row, 'data-se-replaced');
         continue;
       }
-      live.add(row);
+      seen.add(row);
       if (!mine) {
         mine = own('div', 'se-ach-row');
         if (locked) mine.dataset.locked = '';
@@ -366,13 +370,13 @@
       }
       mine.__seList = list;
       mine.__seSteam = row;
-      mine.__seSig = `${list.length}:${list[0]?.name || ''}:${withRates(list, row)}`;
+      mine.__seSig = `${list.length}:${list[0]?.name || ''}:${withRates(list, row)}:${tiersMode()}`;
       if (row.nextElementSibling !== mine) row.after(mine);
       mark(row, 'data-se-replaced');
       fillAchRow(mine);
     }
     for (const [row, mine] of achRows) {
-      if (!live.has(row) || !row.isConnected) dropAchRow(row, mine);
+      if (!seen.has(row) || !row.isConnected) dropAchRow(row, mine);
     }
   }
 
@@ -389,7 +393,7 @@
   // Theme accent while in progress, easing into gold as the game nears 100%.
   const bannerAccent = (t) => {
     const k = Math.min(1, Math.max(0, t)) ** 3;
-    return `color-mix(in srgb, var(--se-accent, #7cc4ff), var(--se-gold, #f0c060) ${Math.round(k * 100)}%)`;
+    return `color-mix(in srgb, var(--se-accent), var(--se-gold) ${Math.round(k * 100)}%)`;
   };
 
   function listOf(parts) {
@@ -473,10 +477,10 @@
   }
 
   function placeAchBanner() {
-    const live = new Set();
+    const seen = new Set();
     const liveBodies = new Set();
     for (const hl of document.querySelectorAll(`[data-se-sec="achievements"] .${C.HighlightDiv}`)) {
-      const s = achData(appIdOf(hl), unlockedKey(hl))?.summary;
+      const s = achData(appIdOf(hl), `${unlockedKey(hl)}|${tiersMode()}`)?.summary;
       let el = banners.get(hl);
       if (!s?.total) {
         if (el) {
@@ -486,19 +490,21 @@
         unmark(hl, 'data-se-replaced');
         continue;
       }
-      live.add(hl);
+      seen.add(hl);
       if (!el) {
         el = own('div', 'se-ach-banner');
         el.setAttribute('role', 'group');
         banners.set(hl, el);
       }
       const done = s.got === s.total;
-      const sig = `${s.got}/${s.total}/${s.last}`;
-      if (el.__seSig !== sig) {
+      const sig = `${s.got}/${s.total}/${s.last}/${tiersMode()}`;
+      // A new summary too: after a Rarity tiers change, the fresh one lands under the same sig
+      if (el.__seSig !== sig || el.__seSum !== s) {
         el.__seSig = sig;
+        el.__seSum = s;
         el.toggleAttribute('data-done', done);
         el.setAttribute('aria-label', `Achievements: ${s.got} of ${s.total} unlocked`);
-        el.style.setProperty('--se-banner', done ? 'var(--se-gold, #f0c060)' : bannerAccent(s.got / s.total));
+        el.style.setProperty('--se-banner', done ? 'var(--se-gold)' : bannerAccent(s.got / s.total));
         el.style.setProperty('--se-pct', ((100 * s.got) / s.total).toFixed(1));
         el.innerHTML = bannerHtml(s, done);
       }
@@ -512,7 +518,7 @@
       mark(hl, 'data-se-replaced');
     }
     for (const [hl, el] of banners) {
-      if (!live.has(hl) || !hl.isConnected) {
+      if (!seen.has(hl) || !hl.isConnected) {
         drop(el);
         banners.delete(hl);
       }
@@ -537,7 +543,8 @@
     const name = card.querySelector(`.${C.Featured_Name}`);
     const text = name?.parentElement;
     if (!text) return;
-    const meta = [tier && `${tier.name} · ${fmtPct(a.flAchieved)}% of players`, a.rt && `Unlocked ${day(a.rt)}`]
+    const rate = typeof a.flAchieved === 'number' ? `${fmtPct(a.flAchieved)}% of players` : '';
+    const meta = [tier ? `${tier.name} · ${rate}` : rate, a.rt && `Unlocked ${day(a.rt)}`]
       .filter(Boolean)
       .join(' · ');
 

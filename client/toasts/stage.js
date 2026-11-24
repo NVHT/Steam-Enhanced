@@ -149,6 +149,8 @@
   const ambientHTML = () => AMBIENT_SVG.replaceAll('se-tst-glow-ID', `se-tst-glow-${++ambientSeq}`);
 
   const artURLs = (m) => {
+    // "Achievement art: Icon only": no game art, so the achievement's icon glows instead (fallback)
+    if (m.kind === 'ach' && SE.settings?.get('toast-ach-art') === 'icon') return [];
     const hero = m.appid && m.artKind !== 'ambient' ? SE.heroURLs(m.appid, SE.appStore()) : [];
     if (m.artKind === 'image' && m.shot) return [m.shot, ...hero];
     if (m.artKind === 'app' || m.artKind === 'image') return hero;
@@ -173,8 +175,9 @@
     if (m.kind === 'ach' && m.mastered) {
       return `<div class="se-tst-stat"><b>${m.mastered.total}<small> / ${m.mastered.total}</small></b><em class="se-tst-pill">100%</em></div>`;
     }
-    if (m.kind === 'ach' && tier) {
-      return `<div class="se-tst-stat"><b>${esc(rarity.fmtPct(m.pct))}%</b><em class="se-tst-pill">${tier.name}</em></div>`;
+    // With Rarity tiers off: the rate alone
+    if (m.kind === 'ach' && (tier || Number.isFinite(m.pct))) {
+      return `<div class="se-tst-stat"><b>${esc(rarity.fmtPct(m.pct))}%</b>${tier ? `<em class="se-tst-pill">${tier.name}</em>` : ''}</div>`;
     }
     return m.buttons
       .map((b, i) => {
@@ -308,7 +311,9 @@
    */
   function arm(v, h) {
     // The pointer is already on the tray (it just clicked): CSS holds the countdown, so does the hub.
-    if (h.slot && !h.pausedAt && run(() => live.tray.matches(':hover'))) h.pausedAt = Date.now();
+    if (h.slot && !h.pausedAt && SE.settings?.get('toast-hover') !== 'off' && run(() => live.tray.matches(':hover'))) {
+      h.pausedAt = Date.now();
+    }
     const left = -ns.elapsed(h);
     for (const el of [v.layer, v.thumb]) {
       el.style.setProperty('--se-tst-d', `${h.slot || 1}ms`);

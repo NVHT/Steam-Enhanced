@@ -225,10 +225,26 @@
     ns.paintArtMedia?.();
   }
 
+  /*
+   * The pass's geometry (Home's width, the room under the header, the board's width, the
+   * strip's columns), kept between passes: a mutation pass reads no layout. Read again after a
+   * resize (main.js's ResizeObserver and window resize call staleGeometry), a new stage, or a
+   * change to what shapes it (the board shown, a news post open, the strip's kind).
+   */
+  let geo = null;
+  let geoKey = '';
+  const staleGeometry = () => {
+    geo = null;
+  };
+
   // Cards the strip shows (set by stage-hero.css container queries), capped to the games.
   function stripCount() {
-    const strip = live.stage?.querySelector('.se-hs-strip');
-    const cols = strip ? parseInt(getComputedStyle(strip).getPropertyValue('--se-hs-cols'), 10) : NaN;
+    let cols = geo?.cols;
+    if (cols === undefined) {
+      const strip = live.stage?.querySelector('.se-hs-strip');
+      cols = strip ? parseInt(getComputedStyle(strip).getPropertyValue('--se-hs-cols'), 10) : NaN;
+      if (geo) geo.cols = cols;
+    }
     return Math.min(live.apps.length, cols > 0 ? cols : live.apps.length);
   }
 
@@ -318,6 +334,7 @@
     appliedVh = 0;
     pendingVh = 0;
     clearTimeout(settleTimer);
+    geo = null;
   }
 
   function setOn(on) {
@@ -329,7 +346,7 @@
     document.visibilityState !== 'hidden' &&
     innerWidth >= 480 &&
     innerHeight >= 360 &&
-    (!live.scroller || live.scroller === document.scrollingElement || live.scroller.clientHeight >= 300);
+    (!live.scroller || live.scroller === document.scrollingElement || (geo ? geo.view : live.scroller.clientHeight) >= 300);
 
   let isNarrow = false;
   // The board's bottom margin (--se-space-5), under the glass
@@ -345,6 +362,7 @@
       (live.scroller?.getBoundingClientRect?.().top || 0) +
       (live.scroller?.scrollTop || 0);
     return {
+      view,
       measured: Math.max(420, Math.round(view - Math.max(0, top)) - HEADROOM),
       boardW: ns.boardWidth(),
     };
@@ -433,7 +451,12 @@
     const eventOpen = Boolean(SE.run(() => SE.mainWindow().m_history.location.state.event_to_show));
     if (eventOpen) mark(live.scope, 'data-se-hs-event');
     else SE.unmark(live.scope, 'data-se-hs-event');
-    isNarrow = live.scope.clientWidth <= NARROW_AT;
+    const key = `${showBoard}|${eventOpen}|${stageSettings().nav}`;
+    if (key !== geoKey) {
+      geoKey = key;
+      geo = null;
+    }
+    if (!geo) isNarrow = live.scope.clientWidth <= NARROW_AT;
     if (isNarrow) mark(live.scope, 'data-se-hs-narrow');
     else SE.unmark(live.scope, 'data-se-hs-narrow');
 
@@ -456,8 +479,10 @@
     }
     setOn(true);
 
-    // Reads, then the writes they decide: sizes first, then the page of panels and their fit.
-    const dims = measureStage();
+    // Reads (kept from the last pass unless stale), then the writes they decide: sizes first,
+    // then the page of panels and their fit.
+    if (!geo) geo = measureStage();
+    const dims = geo;
     applyStageDimensions(dims, showBoard);
     const fits = showBoard ? ns.paintBoard(dims.boardW) : [];
     const boxes = fits.map((f) => boxOf(f.grid));
@@ -471,6 +496,6 @@
   }
 
   Object.assign(ns, {
-    forgetStage, layout, paintGame, restartCycle, select, setOn, teardown,
+    forgetStage, layout, paintGame, restartCycle, select, setOn, staleGeometry, teardown,
   });
 })(window.__se);

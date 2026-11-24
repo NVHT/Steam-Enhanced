@@ -187,16 +187,36 @@
 
   // Manage fits the window: the stylesheet lays it out from the height left below the tabs.
   const FIT_GAP = 24;
-  const fitWatched = new WeakSet();
+  let fitBox = null;
+  let fitScroller = null;
+  let fitObserver = null;
 
+  /*
+   * Measured from a ResizeObserver only, never in an observer pass: the scroller, and what sits
+   * above the box (its earlier siblings, and its ancestors' up to the scroller), as their sizes
+   * move its top. A new box or scroller rebinds; observe() measures once on its own.
+   */
   function fitManage(page) {
     const box = page.querySelector('#local-images-container');
     const scroller = box?.closest('.TabContentsScroll');
+    if (box === fitBox && scroller === fitScroller) return;
+    fitObserver?.disconnect();
+    fitObserver = null;
+    fitBox = fitScroller = null;
     if (!scroller) return;
-    if (!fitWatched.has(scroller)) {
-      fitWatched.add(scroller);
-      new ResizeObserver(() => fitManage(page)).observe(scroller);
+    fitBox = box;
+    fitScroller = scroller;
+    fitObserver = new ResizeObserver(measureFit);
+    fitObserver.observe(scroller);
+    for (let node = box; node && node !== scroller; node = node.parentElement) {
+      for (let prev = node.previousElementSibling; prev; prev = prev.previousElementSibling) fitObserver.observe(prev);
     }
+  }
+
+  function measureFit() {
+    const box = fitBox;
+    const scroller = fitScroller;
+    if (!box?.isConnected || !scroller?.isConnected) return;
     const top = box.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop;
     const fit = `${Math.max(0, Math.floor(scroller.clientHeight - top - FIT_GAP))}px`;
     if (box.style.getPropertyValue('--se-sgdb-fit') !== fit) box.style.setProperty('--se-sgdb-fit', fit);
@@ -358,9 +378,11 @@
     destroy() {
       waiting?.disconnect();
       watcher?.disconnect();
+      fitObserver?.disconnect();
       document.adoptedStyleSheets = document.adoptedStyleSheets.filter((sheet) => !adopted.includes(sheet));
       document.removeEventListener('input', onInput, true);
       document.querySelectorAll('.se-sgdb-paste, .se-sgdb-ok, .se-sgdb-label, .se-sgdb-count, .se-sgdb-size, #se-sgdb-layers').forEach((n) => n.remove());
+      delete window[KEY];
     },
   };
 })(window.__se);

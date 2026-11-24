@@ -132,9 +132,22 @@
     if (!document.querySelector(`.${C.TopBar}`)) SE.mark(document.documentElement, 'data-se-ntf-window');
   };
 
+  // Frames are measured when a panel appears or resizes, never in the observer pass. A removed
+  // panel reports one last resize and is let go then.
+  const sizer = new ResizeObserver((entries) => {
+    for (const { target } of entries) {
+      if (target.isConnected) markFrames(target);
+      else sizer.unobserve(target);
+    }
+  });
+  const sized = new WeakSet();
+
   const update = () => {
     for (const menu of document.querySelectorAll(`.${MENU_CLS}`)) {
-      markFrames(menu);
+      if (!sized.has(menu)) {
+        sized.add(menu);
+        sizer.observe(menu);
+      }
       for (const row of menu.querySelectorAll(`.${PINNED_CLS}`)) annotateSummaryRow(row);
       annotateNotificationItems([...menu.querySelectorAll(`.${ITEM_CLS}`)]);
     }
@@ -148,6 +161,7 @@
   window.__seNotifications = {
     destroy() {
       watcher.disconnect();
+      sizer.disconnect();
       delete window.__seNotifications;
     },
   };

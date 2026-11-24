@@ -190,7 +190,7 @@
       label: k.label,
       accent: k.accent,
       // Steam's own display time for this toast, so ours ends with it; sticky kinds stay sticky.
-      ms: k.ms && steamMs(key) > 0 ? steamMs(key) : k.ms,
+      ms: paced(k.ms && steamMs(key) > 0 ? steamMs(key) : k.ms),
       steamMs: steamMs(key),
       pri: !!k.pri,
       artKind: k.art,
@@ -224,6 +224,9 @@
    * A guard dismisses any toast the stage never finishes, so none can stay up forever.
    */
   const HOLD_MS = 10 * 60 * 1000;
+  // "How long toasts stay" (client/shared/settings.js): each toast's time on the stage, scaled
+  const PACE = { shorter: 0.6, steam: 1, longer: 1.75 };
+  const paced = (ms) => (ms > 0 ? Math.round(ms * (PACE[SE.settings?.get('toast-time')] || 1)) : ms);
   const GUARD_MS = 60 * 1000;          // past Steam's own time, unless hovered
   const origMs = new WeakMap();        // notification → Steam's original duration
 

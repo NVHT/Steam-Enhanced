@@ -1,5 +1,5 @@
 /*
- * Splash entrance (--se-entrance: splash), main window only; paired with entrance.css.
+ * Splash entrance (the Window entrance setting, Splash), main window only; paired with entrance.css.
  *
  * client/loader.js holds the main window under a cover until the Library has finished
  * building, and marks <html data-se-entrance> with the setting. With "splash", this mounts the
@@ -25,9 +25,8 @@
   window.__seEntrance?.destroy();
   const SE = window.__se;
   const root = document.documentElement;
-  // tokens.css's setting once it has loaded, else the loader's (the last value seen)
-  const setting = getComputedStyle(root).getPropertyValue('--se-entrance').trim().toLowerCase();
-  if (!SE || root.hasAttribute('data-se-styled') || (setting || root.dataset.seEntrance) !== 'splash') return;
+  // The loader's choice for this load (the setting, and "Show splash")
+  if (!SE || root.hasAttribute('data-se-styled') || root.dataset.seEntrance !== 'splash') return;
 
   const CREEP_MS = 3200;
   const FILL_MS = 320;
@@ -116,7 +115,11 @@
   place();
   addEventListener('resize', onResize);
 
-  /* ---------- The game: the last one played, read live ---------- */
+  /* ---------- The game: the last one played (or the "Splash art" setting's), read live ---------- */
+
+  // last | random (one of the most recently played, picked once) | none (no game's art)
+  const ART = SE.settings?.get('splash-art') || 'last';
+  const RANDOM_FROM = 8;
 
   let shown = 0; // its appid
   let hasArt = false;
@@ -149,12 +152,24 @@
     } catch {}
   };
 
-  const lastPlayed = (store) =>
+  // The games played, most recent first
+  const played = (store) =>
     SE.run(() =>
       store.allApps
         .filter((a) => a && a.rt_last_time_played > 0 && (a.app_type === 1 || a.app_type === 1073741824) && a.visible_in_game_list !== false)
-        .reduce((best, a) => (!best || a.rt_last_time_played > best.rt_last_time_played ? a : best), null)
-    );
+        .sort((a, b) => b.rt_last_time_played - a.rt_last_time_played)
+    ) || [];
+
+  let picked; // the random pick, kept across the app list's checks
+  const pickGame = (store) => {
+    const recent = played(store);
+    if (ART !== 'random') return recent[0] || null;
+    if (picked === undefined && recent.length) {
+      const pool = recent.slice(0, RANDOM_FROM);
+      picked = pool[Math.floor(Math.random() * pool.length)];
+    }
+    return picked || null;
+  };
 
   // { appid, name, hero: [urls], logo: [urls] }; a second call (the live game differs) replaces the first
   function paintGame(game) {
@@ -188,7 +203,8 @@
     el.dataset.game = 'back';
   }
 
-  const hint = readHint();
+  // The remembered game is last run's: only the "Last played" choice draws it ahead of the list
+  const hint = ART === 'last' ? readHint() : null;
   if (hint) paintGame({ appid: hint.appid, name: hint.name, hero: [hint.hero], logo: hint.logo ? [hint.logo] : [] });
 
   const firstRun = () => {
@@ -205,10 +221,14 @@
     // The library's size beside the bar: the games it lists, as the game list counts them
     const games = SE.run(() => store.allApps.filter((a) => a && (a.app_type === 1 || a.app_type === 1073741824)).length);
     if (games) el.querySelector('.se-ent-count').textContent = `${games.toLocaleString()} ${games === 1 ? 'game' : 'games'}`;
-    const game = lastPlayed(store);
+    const game = pickGame(store);
     // The remembered game stands unless the list names another, or its art no longer loads
     const stale = !shown || game?.appid !== shown || layer.querySelector('.se-hs-hero')?.hidden;
-    if (game && stale) {
+    if (game && ART === 'none') {
+      // A returning player, with no game's art: the greeting alone over the wireframe
+      el.querySelector('.se-ent-eyebrow').textContent = 'Welcome back';
+      el.dataset.game = 'back';
+    } else if (game && stale) {
       paintGame({
         appid: game.appid,
         name: game.display_name,
@@ -274,7 +294,7 @@
     waiting?.disconnect();
     waiting = null;
     removeEventListener('resize', onResize);
-    saveHint();
+    if (ART === 'last') saveHint(); // a random pick isn't last run's game
     // A failed hand-off (Home's stage not as expected) fades the art with the rest, never strands
     // the splash
     const moved = SE.run(moveArt) === true;

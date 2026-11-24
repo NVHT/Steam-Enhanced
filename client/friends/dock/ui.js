@@ -151,7 +151,10 @@
    */
   live.menu = null;
   // What the status dots in a menu window are styled by
-  const DOCK_SHEETS = ['client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css'];
+  const DOCK_SHEETS = [
+    'client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css',
+    'client/friends/friends-dock-chat-group.css', 'client/friends/friends-dock-chat-rail.css',
+  ];
   const menuOpen = () => Boolean(live.menu && !live.menu.released);
 
   function hideMenu() {

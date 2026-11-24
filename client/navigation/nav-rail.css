@@ -241,7 +241,10 @@ html body.se-header-actions-ready {
   --se-rail-gap: 9px;
   /* Where the page icons start: one gap under the hide-list toggle in the corner */
   --se-rail-top: calc((var(--se-rail-bar) + var(--se-rail-btn)) / 2 + var(--se-rail-gap));
-  /* The title-bar search field, and the Filters panel under it: centred until nav-rail.js
+  /* The distance between rail buttons beyond their gap: room for a name under each (Rail labels,
+     options/appearance/rail-labels.css); the title bar's buttons keep the plain gap */
+  --se-rail-label-room: 0px;
+  /* The title-bar search field, and the Filters panel under it: centred until title-bar.js
      measures its place into <body> */
   --se-title-search-w: min(600px, calc(100vw - 520px));
   --se-title-search-x: calc(50vw - var(--se-title-search-w) / 2);
@@ -308,7 +311,7 @@ html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy::before {
 }
 
 html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy ._2D64jIEK7wpUR_NlObDW76:not(#se-none) {
-  gap: var(--se-rail-gap);
+  gap: calc(var(--se-rail-gap) + var(--se-rail-label-room));
   width: 100%;
   padding: 0;
   margin: 0;
@@ -377,12 +380,12 @@ html body.se-header-actions-ready ._7AlhCx3XGzBeIrQaCneUD._1gqEjB5QsKT_NftD1dEsd
   content: '' !important;
   display: block !important;
   position: absolute;
-  left: -10px;
+  left: calc((var(--se-rail-btn) - var(--se-rail-width)) / 2); /* the rail's edge, at any rail width */
   top: 8px;
   bottom: 8px;
   width: 3px;
   height: auto;
-  border-radius: 0 3px 3px 0;
+  border-radius: 0 var(--se-radius-xs) var(--se-radius-xs) 0; /* a 3 px bar: rounds to 3 px */
   background: var(--se-accent);
   animation: none;
 }
@@ -456,7 +459,7 @@ html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u .se-download-ring-val
   stroke-linecap: round;
   stroke-dasharray: 0 100;
   filter: drop-shadow(0 0 3px color-mix(in srgb, var(--se-accent) 45%, transparent));
-  transition: stroke-dasharray .6s var(--se-ease);
+  transition: stroke-dasharray var(--se-dur-slower) var(--se-ease);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -564,7 +567,7 @@ html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > :is(._3LKQ3S_yqrebe
  * client/header/announcements.js), Games (its menu: Steam's Games
  * items, client/navigation/nav-rail.js), Downloads (its card on click,
  * client/header/downloads-card.js), Settings, your avatar and your
- * name under it (data-se-name, client/navigation/nav-rail.js). Their
+ * name under it (data-se-name, client/navigation/title-bar.js). Their
  * menus open beside it (client/header/menu/placement.js, client/header/header-actions.js);
  * hovering the avatar shows your card (client/friends/dock/friend-card.js).
  */
@@ -574,7 +577,8 @@ html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > :is(._5wILZhsLODVwG
   position: fixed;
   left: calc((var(--se-rail-width) - var(--se-rail-btn)) / 2);
   z-index: calc(var(--se-z-sticky) + 2);
-  --se-rail-name-h: calc(var(--se-fs-2xs) * 1.3 + var(--se-space-1));
+  /* The name under the avatar; 0 with "Name under avatar: Off" (options/navigation/avatar-name-off.css) */
+  --se-rail-name-h: var(--se-rail-name-room, calc(var(--se-fs-2xs) * 1.3 + var(--se-space-1)));
 }
 
 html body.se-header-actions-ready ._1-9sir4j_KQiMqdkZjQN0u ._3yD46y5pd3zOGR7CzKs0mC[data-se-name]:not(#se-none) {
@@ -609,21 +613,39 @@ html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > :is(._3yD46y5pd3zOG
 }
 
 html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > .se-header-action[data-se-action="settings"] {
-  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + var(--se-rail-btn) + var(--se-rail-gap));
+  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + var(--se-rail-btn) + var(--se-rail-gap) + var(--se-rail-label-room));
 }
 
 html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > .se-header-actions > .se-header-action[data-se-action="downloads"] {
-  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + 2 * (var(--se-rail-btn) + var(--se-rail-gap)));
+  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + var(--se-foot-n, 2) * (var(--se-rail-btn) + var(--se-rail-gap) + var(--se-rail-label-room)));
 }
 
 html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > .se-header-action[data-se-action="games"] {
-  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + 3 * (var(--se-rail-btn) + var(--se-rail-gap)));
+  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + var(--se-foot-n, 3) * (var(--se-rail-btn) + var(--se-rail-gap) + var(--se-rail-label-room)));
 }
 
 html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > :is(._5wILZhsLODVwGfcJ0hKmJ, :has(._5wILZhsLODVwGfcJ0hKmJ:not(.se-header-action))):not(.se-header-actions, .se-header-action, ._3LKQ3S_yqrebeNLF6aeiog, :has(._3LKQ3S_yqrebeNLF6aeiog)) {
-  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + 4 * (var(--se-rail-btn) + var(--se-rail-gap)));
+  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + var(--se-foot-n, 4) * (var(--se-rail-btn) + var(--se-rail-gap) + var(--se-rail-label-room)));
 }
 
 html body.se-header-actions-ready ._3cykd-VfN_xBxf3Qxriccm > :is(._3mGEzzp18imtSzGPkduedi, :has(.RtSv39ZoBOySnb8XQ5hJf)) {
-  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + 5 * (var(--se-rail-btn) + var(--se-rail-gap)));
+  bottom: calc(var(--se-space-3) + var(--se-rail-name-h) + var(--se-foot-n, 5) * (var(--se-rail-btn) + var(--se-rail-gap) + var(--se-rail-label-room)));
+}
+
+/*
+ * Rail labels (the Rail labels setting; options/appearance/rail-labels.css shows them and makes
+ * room): each rail button's name under it, stamped by client/header/header-actions.js
+ * (syncRailLabels). Hidden here by default.
+ */
+.se-rail-label {
+  display: none;
+}
+
+/*
+ * Rail buttons (the setting, client/shared/settings.js): a button turned off goes, and the foot's
+ * buttons above it close up (header-actions.js syncRailButtons numbers each, --se-foot-n).
+ * !important beats the rail's own display rules above and Steam's (its button classes).
+ */
+html body.se-header-actions-ready [data-se-rail-off] {
+  display: none !important;
 }

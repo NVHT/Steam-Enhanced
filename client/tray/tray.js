@@ -139,7 +139,7 @@
     const picture = url && !SE.isDefaultAvatar(url) ? url : '';
     if (picture && img.getAttribute('src') !== picture) img.src = picture;
     if (!picture) img.removeAttribute('src');
-    attr(avatar, 'data-initial', picture ? null : (name.trim()[0] || '?').toUpperCase());
+    attr(avatar, 'data-initials', picture ? null : SE.initials(name) || '?');
     attr(avatar, 'data-state', state);
     setText(head.querySelector('.se-tray-name'), name);
     const line = head.querySelector('.se-tray-state');

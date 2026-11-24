@@ -5,7 +5,7 @@
 ((SE) => {
   const ns = window.__seGamePageParts;
   if (!ns) return;
-  const { BODY, day, drop, HEADING, isWide, own, placePopup, SEEK, sharedParent, srcOf, steamClient } = ns;
+  const { BODY, day, drop, HEADING, isWide, own, placePopup, SEEK, sharedParent, srcOf } = ns;
 
   const { C, esc, fromProps, mark, unmark } = SE;
 
@@ -203,13 +203,6 @@
 
   const hideLabel = () => label?.removeAttribute('data-on');
 
-  function openStore(id) {
-    const sc = steamClient();
-    const url = `https://store.steampowered.com/app/${id}`;
-    if (sc?.URL?.ExecuteSteamURL) sc.URL.ExecuteSteamURL(`steam://openurl/${url}`);
-    else window.open(url);
-  }
-
   function dlcTile(d, tpl, steamGrid) {
     const id = String(d.unAppID);
     const file = d.strHeaderFilename;
@@ -261,7 +254,7 @@
       e.stopPropagation();
       const steamImg = [...steamGrid.querySelectorAll('img')].find((i) => srcOf(i).includes(`/apps/${id}/`));
       if (steamImg) (steamImg.closest('[role="link"], [tabindex]') || steamImg).click();
-      else openStore(id);
+      else SE.openPage(`https://store.steampowered.com/app/${id}`);
     });
     return b;
   }

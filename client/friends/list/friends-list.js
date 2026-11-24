@@ -14,6 +14,8 @@
   const LIST_SELECTOR = '.friendlist:not(.GamepadMode)';
   /* The list and the Friends & Chat frame around it (banners sit outside the list itself) */
   const SCOPE = '.friendsui-container, .friendlist';
+  /* Where a banner can be: markBanners' hosts */
+  const BANNER_SCOPE = `.chat_main, .friendsListContainer, ${SCOPE}`;
   const PLAYER_NAME_CLS = C.playerName;
   const COUNT_RE = /^\(\s*(\d[\d.,\s]*?)\s*\)$/;
 
@@ -92,15 +94,48 @@
    *   ::before) with a short text, or, should Steam repaint it, its English wording;
    * - "invite" ("Invite anyone to play", Remote Play Together while in a game): a solid strip
    *   with an icon and an uppercase label.
-   * A mark sticks to its element (the theme's look no longer matches Steam's paint), and the
-   * check runs at most once a second, as it reads computed styles.
+   * A mark sticks to its element (the theme's look no longer matches Steam's paint). The check
+   * reads geometry and computed styles, so it runs only once something above the list may have
+   * changed: a node added or removed outside the rows, a candidate or the frame resized (a
+   * ResizeObserver, which also sees a strip shown by a class change), or the window resized.
    */
   const BANNER = 'data-se-banner';
-  const BANNER_SCAN_MS = 1000;
   const BANNER_SCAN_LIMIT = 250;
+  /* Mutations in these never add a banner: the list's own rows, below the banners */
+  const ROWS = '.friendGroup, .quickAccessFriends, .FriendsListChatSection';
   const CONNECTION_TEXT = /^(?:disconnected|reconnecting|connecting|offline mode)\b/i;
   const BANNER_SKIP = '.statusHeaderGlow, .avatarHolder, .playerAvatar, .ContextMenuButton, [class^="se-"], [class*=" se-"]';
-  let bannerScanAt = -Infinity;
+  /* Debounced: a column drag or window resize settles before the scan reads anything */
+  const BANNER_SCAN_DELAY_MS = 150;
+  let bannersDirty = true;
+  let bannerTimer = 0;
+  /* What the ResizeObserver watches: each host and the candidates above its boundary */
+  const sized = new Set();
+  const sizer = new ResizeObserver(() => queueBannerScan());
+
+  const queueBannerScan = () => {
+    bannersDirty = true;
+    clearTimeout(bannerTimer);
+    bannerTimer = setTimeout(() => {
+      bannerTimer = 0;
+      scanAllBanners();
+    }, BANNER_SCAN_DELAY_MS);
+  };
+
+  const watchSize = (el) => {
+    if (sized.has(el)) return;
+    sized.add(el);
+    sizer.observe(el);
+  };
+
+  // Let go of nodes Steam has removed, so the observer holds none of them
+  const dropDetached = () => {
+    for (const el of sized) {
+      if (el.isConnected) continue;
+      sizer.unobserve(el);
+      sized.delete(el);
+    }
+  };
 
   const hasOwnText = (el) => [...el.childNodes].some(node => node.nodeType === 3 && node.textContent.trim());
 
@@ -139,10 +174,12 @@
     const host = list.closest('.chat_main, .friendsui-container') || list.closest('.friendsListContainer') || list;
     const boundary = host.querySelector('.quickAccessFriends, .socialTabSearchContainer, .friendGroup');
     const minWidth = list.getBoundingClientRect().width * .6;
+    watchSize(host);
     const nodes = host.getElementsByTagName('*');
     for (let i = 0; i < nodes.length && i < BANNER_SCAN_LIMIT; i++) {
       const node = nodes[i];
       if (boundary && (node === boundary || !(node.compareDocumentPosition(boundary) & Node.DOCUMENT_POSITION_FOLLOWING))) break;
+      watchSize(node);
       if (node.hasAttribute(BANNER)) continue;
       const kind = bannerKind(node, minWidth);
       if (kind) node.setAttribute(BANNER, kind);
@@ -351,16 +388,37 @@
 
   document.addEventListener('click', onSection, true);
 
+  const scanAllBanners = () => {
+    if (!bannersDirty) return;
+    bannersDirty = false;
+    dropDetached();
+    for (const list of document.querySelectorAll(LIST_SELECTOR)) markBanners(list);
+  };
+
+  /*
+   * A node added or removed in the list outside its rows, or beside it (its target holds the
+   * list), may be or hide a banner; the chats and rows next to it can't.
+   */
+  const nearBanners = (el) =>
+    !el.closest(ROWS) && (Boolean(el.closest('.friendlist')) || el.getElementsByClassName('friendlist').length > 0);
+
+  const onRecords = (records) => {
+    for (const record of records) {
+      if (record.type !== 'childList') continue;
+      const target = record.target.nodeType === 1 ? record.target : record.target.parentElement;
+      if (target && nearBanners(target)) {
+        queueBannerScan();
+        return;
+      }
+    }
+  };
+
   const update = () => {
     const lists = document.querySelectorAll(LIST_SELECTOR);
     if (!lists.length) return;
     const games = new Set();
 
-    const scanBanners = performance.now() - bannerScanAt > BANNER_SCAN_MS;
-    if (scanBanners) bannerScanAt = performance.now();
-
     for (const list of lists) {
-      if (scanBanners) markBanners(list);
       syncFavorites(list);
 
       for (const countEl of list.querySelectorAll('.friendGroup .groupName .groupCount')) {
@@ -423,11 +481,15 @@
    * there beyond a class lookup per mutation until a Friends list appears.
    */
   let watcher = null;
+  let bannerWatcher = null;
   let timer = null;
   const start = () => {
     if (watcher) return;
     gate.disconnect();
     watcher = SE.watch(update, { scope: SCOPE, throttle: 250 });
+    bannerWatcher = SE.watch(onRecords, { scope: BANNER_SCOPE, records: true });
+    addEventListener('resize', queueBannerScan);
+    queueBannerScan();
     // Persona changes come from FriendStore, not a SteamClient event; 2 s backstop for rows
     // that update without a DOM mutation, only while the list is visible.
     timer = SE.poll(update, 2000, { active: () => SE.visible(LIST_SELECTOR) });
@@ -445,7 +507,12 @@
       for (const el of document.querySelectorAll(`${LIST_SELECTOR} [data-se-fold]`)) el.removeAttribute('data-se-fold');
       gate.disconnect();
       watcher?.disconnect();
+      bannerWatcher?.disconnect();
       timer?.disconnect();
+      removeEventListener('resize', queueBannerScan);
+      clearTimeout(bannerTimer);
+      sizer.disconnect();
+      sized.clear();
       lastSeenPlayers.clear();
       for (const el of document.querySelectorAll(`[${BANNER}]`)) el.removeAttribute(BANNER);
       for (const el of document.querySelectorAll(`[${STRAY}]`)) el.removeAttribute(STRAY);
@@ -454,15 +521,13 @@
       }
       for (const el of document.querySelectorAll(`${LIST_SELECTOR} [${FOLDING}]`)) settleFold(el);
       for (const el of document.querySelectorAll(`${LIST_SELECTOR} .tabLabel[role="button"]`)) {
-        for (const name of ['role', 'tabindex', 'aria-expanded', 'data-se-count']) el.removeAttribute(name);
+        for (const name of ['role', 'tabindex', 'aria-expanded']) el.removeAttribute(name);
       }
-      for (const attrName of ['data-se-who', 'data-se-sub', 'data-se-voice', 'data-se-faces', 'data-se-bare']) {
+      // data-se-count: the group counts, the favorites' label and Group Chats' bar
+      for (const attrName of ['data-se-who', 'data-se-sub', 'data-se-voice', 'data-se-faces', 'data-se-bare', 'data-se-count']) {
         for (const el of document.querySelectorAll(`${LIST_SELECTOR} [${attrName}]`)) {
           el.removeAttribute(attrName);
         }
-      }
-      for (const el of document.querySelectorAll(`${LIST_SELECTOR} .voiceRoomDragBar[data-se-count]`)) {
-        el.removeAttribute('data-se-count');
       }
       delete window.__seFriendsList;
     },

@@ -78,7 +78,7 @@
     body.className = `${OURS}-body`;
     const n = apps.length;
     body.textContent = n
-      ? `${n.toLocaleString()} ${n === 1 ? 'game' : 'games'}. They stay in your library; only the collection goes.`
+      ? `${SE.dialogArt.count(n, 'game', 'games')}. They stay in your library; only the collection goes.`
       : 'It has no games. Only the collection goes.';
     text.append(title, body);
     return text;

@@ -1,0 +1,191 @@
+/*
+ * Friends dock chat, continued (client/friends/friends-dock-chat-group.css): minimize's place,
+ * the native popup, the friend card and the face rail. Loaded right after friends-dock-chat-group.css.
+ */
+
+/*
+ * Minimize beside close on the header tiles' rhythm (30 px tiles, 2 px apart): close's 10 px from
+ * the edge, its width and the gap. The header's end clears both by 80 px (the hairline after its
+ * tiles then sits 8 px from minimize, as from the tiles), in both Library and native chat popups.
+ */
+.se-fdock .se-fd-chat-minimize {
+  right: calc(var(--se-chat-right) + 10px + var(--se-tile-sm) + var(--se-space-half));
+}
+
+/*
+ * The native popup (client/shared/popup-layer.js) changes only the containing surface. Chat/chip
+ * appearance, dimensions, header spacing and control positions use the same rules (friends-dock-chat*.css).
+ */
+.se-fdock.se-fd-popup-host {
+  position: relative !important;
+  inset: auto !important;
+  width: var(--se-chat-host-width) !important;
+  height: var(--se-chat-host-height) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent;
+}
+
+.se-fdock.se-fd-popup-host[data-chat-minimized="1"] .se-fd-chat-chip {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * The theme renders the friend card (client/friends/dock/friend-card.js) in place of Steam's
+ * hover, which is hidden: its box (miniProfileHover) and card (miniProfile), by the hashes
+ * client/shared/hover-cards.css styles them by. The theme's rendering is the same card: kept,
+ * in the page (.se-layer-page) and in a popup layer window (which copies <body>'s attributes).
+ */
+/* !important: display can come inline from Steam's markup or scripts */
+html:not(.se-layer-document) body[data-se-friend-card] :is(._2AWayy-K0ZoNKv_Fr3CT_R, ._2QPdq7GZ_03AD1ioPixVXW):not(.se-layer-page *) {
+  display: none !important;
+}
+
+/*
+ * The face rail (client/friends/chat/chat.js): the open chats down the flyout's left edge, each
+ * face ringed in its status with its unread count; the open one marked by the accent bar at the
+ * rail's edge, as the nav rail marks its page. Hover shows the name (a tooltip) and a × to close.
+ */
+.se-fdock[data-chat="1"] .multiChatDialog[data-se-rail] .chatDialogs {
+  margin-inline-start: 56px;
+}
+
+.se-chat-rail {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  z-index: var(--se-z-raised);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--se-space-3);
+  width: 56px;
+  box-sizing: border-box;
+  padding: var(--se-space-4) 0;
+  overflow-y: auto;
+  background: var(--se-bg);
+  box-shadow: inset -1px 0 0 var(--se-hairline);
+}
+
+.se-chat-rail-face {
+  --se-rail-ring: var(--se-border-strong);
+  position: relative;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-avatar-radius);
+  background: var(--se-surface-2);
+  cursor: pointer;
+}
+
+.se-chat-rail-face[data-state="online"] {
+  --se-rail-ring: var(--se-online);
+}
+
+.se-chat-rail-face[data-state="awayOrSnooze"] {
+  --se-rail-ring: color-mix(in srgb, var(--se-online) 50%, transparent);
+}
+
+.se-chat-rail-face[data-state="ingame"] {
+  --se-rail-ring: var(--se-running);
+}
+
+.se-chat-rail-pic {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px var(--se-bg), 0 0 0 4px var(--se-rail-ring);
+  transition: opacity var(--se-dur) var(--se-ease);
+}
+
+.se-chat-rail-pic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.se-chat-rail-face[data-state="offline"]:not([aria-current]) .se-chat-rail-pic {
+  opacity: .7;
+}
+
+/* The open chat: the accent bar at the rail's edge */
+.se-chat-rail-face[aria-current]::before {
+  content: '';
+  position: absolute;
+  inset-block: var(--se-space-1);
+  inset-inline-start: calc(-1 * var(--se-space-3) + 1px);
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--se-accent);
+}
+
+.se-chat-rail-face:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: calc(var(--se-focus-offset) + 2px);
+}
+
+/* Unread: the accent count at the top right */
+.se-chat-rail-count {
+  position: absolute;
+  top: calc(-1 * var(--se-space-1));
+  inset-inline-end: calc(-1 * var(--se-space-1));
+  min-width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  padding: 0 var(--se-space-1);
+  border-radius: var(--se-radius-pill);
+  background: var(--se-accent);
+  box-shadow: 0 0 0 2px var(--se-bg);
+  font: 700 var(--se-fs-2xs) / 16px var(--se-font);
+  color: var(--se-on-accent);
+  text-align: center;
+}
+
+.se-chat-rail-count[hidden] {
+  display: none;
+}
+
+/*
+ * Close: a small × at the top left, on hover; over the face's tooltip hit box
+ * (client/friends/chat/chat-tooltips.js), which would take its click
+ */
+.se-chat-rail-close {
+  position: absolute;
+  z-index: var(--se-z-raised);
+  top: calc(-1 * var(--se-space-1));
+  inset-inline-start: calc(-1 * var(--se-space-1));
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--se-surface-2);
+  box-shadow: 0 0 0 2px var(--se-bg);
+  color: var(--se-text-muted);
+  opacity: 0;
+  transition: opacity var(--se-dur) var(--se-ease);
+}
+
+.se-chat-rail-close::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-close-sm) center / contain no-repeat;
+  mask: var(--se-icon-close-sm) center / contain no-repeat;
+}
+
+.se-chat-rail-face:is(:hover, :focus-visible) .se-chat-rail-close {
+  opacity: 1;
+}
+
+.se-chat-rail-close:hover {
+  background: color-mix(in srgb, var(--se-danger) 90%, transparent);
+  color: var(--se-text-strong);
+}

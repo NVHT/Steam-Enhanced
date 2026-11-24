@@ -228,7 +228,8 @@
         .filter(node => !node.closest('.GamepadMode'))
         .map(rootOf),
     createView,
-    { throttle: 120, scope: `${C.apps}, ${C.selector}`, ignore: isOurs }
+    // Inside the observer's own callback: the rebuild is in before the dialog's first paint
+    { sync: true, scope: `${C.apps}, ${C.selector}`, ignore: isOurs }
   );
 
   window.__seInstall = {

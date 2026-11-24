@@ -46,10 +46,12 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
   gap: var(--se-space-4);
   padding: var(--se-space-3) 0;
   overflow-y: auto;
-  scrollbar-width: none;
 }
 
+/* No bar; the wheel still scrolls. !important: core/scrollbars.css's width on every bar */
 .se-fdock[data-mode="rail"]::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
   display: none;
 }
 
@@ -321,9 +323,9 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
   min-height: 0;
   overflow-y: auto;
   padding: var(--se-space-2) var(--se-space-2) var(--se-space-4);
-  scrollbar-width: none !important;
 }
 
+/* !important: core/scrollbars.css's width on every bar */
 .se-fd-scroll::-webkit-scrollbar {
   width: 0 !important;
   height: 0 !important;
@@ -368,7 +370,7 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
 
 .se-fd-head .se-fd-chev {
   display: flex;
-  transition: transform var(--se-dur) ease-out;
+  transition: transform var(--se-dur) var(--se-ease);
 }
 
 .se-fd-head[aria-expanded="false"] .se-fd-chev {
@@ -479,7 +481,7 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
 .se-fd-game .se-fd-chev {
   display: flex;
   color: var(--se-text-faint);
-  transition: transform var(--se-dur) ease-out;
+  transition: transform var(--se-dur) var(--se-ease);
 }
 
 .se-fd-game.se-fd-open .se-fd-chev {
@@ -669,7 +671,12 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
   min-height: 64px;
   padding: var(--se-space-2) var(--se-space-3);
   box-sizing: border-box;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--se-bg-ink) 92%, transparent), color-mix(in srgb, var(--se-bg-ink) 40%, transparent)), var(--art, none) center 30% / cover, var(--se-surface-2);
+  /* --art: the header's copies as layers (templates.js headArt); a failed one leaves the next */
+  background-color: var(--se-surface-2);
+  background-image: linear-gradient(90deg, color-mix(in srgb, var(--se-bg-ink) 92%, transparent), color-mix(in srgb, var(--se-bg-ink) 40%, transparent)), var(--art, none);
+  background-position: center 30%;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .se-fd-flyhead .se-fd-name {

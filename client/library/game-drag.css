@@ -129,7 +129,7 @@ html[data-se-gamedrag] [data-se-dragsource] {
   width: 14px !important;
   height: 14px !important;
   margin: 0 var(--se-space-half) !important;
-  border-radius: 3px;
+  border-radius: var(--se-radius-xs);
   vertical-align: -2px;
   object-fit: cover;
 }
@@ -146,13 +146,23 @@ html[data-se-gamedrag] [data-se-dragsource] {
   color: var(--se-text-strong);
 }
 
-/* "Drag and hold": the card breathes while Steam's hold timer runs */
+/* "Drag and hold": the card breathes while Steam's hold timer runs (a deeper wash, faded in) */
 .se-gd-card[data-kind="add"][data-se-over] {
-  animation: se-gd-hold .9s ease-in-out infinite alternate;
+  isolation: isolate;
+}
+.se-gd-card[data-kind="add"][data-se-over]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: var(--se-z-under);
+  background: color-mix(in srgb, var(--se-gd-tone) 12%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  animation: se-gd-hold var(--se-dur-busy) var(--se-ease-inout) infinite alternate;
 }
 @keyframes se-gd-hold {
   to {
-    background-color: color-mix(in srgb, var(--se-gd-tone) 26%, var(--se-surface));
+    opacity: 1;
   }
 }
 
@@ -253,7 +263,8 @@ html[data-se-gamedrag] [data-se-dragsource] {
 
 @media (prefers-reduced-motion: reduce) {
   .se-gd-tray,
-  .se-gd-card {
+  .se-gd-card,
+  .se-gd-card::before {
     animation: none !important;
     transition: none !important;
   }

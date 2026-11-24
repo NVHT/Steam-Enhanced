@@ -4,9 +4,9 @@
  */
 
 /*
- * Header: the group and its actions
- * Only group chats fill.chatHeader (as.chatHeader.titleBarContainer). In a one-to-one chat
- * Steam renders it as an empty div; the friend is shown by the tab, so it folds away.
+ * Header: the group and its actions. Only group chats fill .chatHeader (as
+ * .chatHeader.titleBarContainer); in a one-to-one chat Steam renders it as an empty div, which
+ * folds away unless chat.js draws the friend into it (below).
  */
 .multiChatDialog[data-se-chat] .chatWindow .chatHeader:not(.titleBarContainer) {
   min-height: 0 !important;
@@ -16,7 +16,7 @@
   overflow: hidden;
 }
 
-/* Features/friends/chat.js draws the friend into it: avatar with ring, name, status or game, three tiles */
+/* chat.js (.se-chat-head) draws the friend into it: avatar with ring, name, status or game, tiles */
 .multiChatDialog[data-se-chat] .chatWindow .chatHeader:not(.titleBarContainer):has(> .se-chat-head) {
   display: block !important;
   height: auto !important;
@@ -124,7 +124,7 @@
   background: transparent;
   color: var(--se-text-muted);
   cursor: pointer;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
 .se-chat-head .se-chat-tile:hover {
@@ -149,7 +149,7 @@
 
 .se-chat-head .se-chat-tile svg .fill {
   fill: currentColor;
-  fill-opacity: .32;
+  fill-opacity: var(--se-icon-duo);
   stroke: none;
 }
 
@@ -277,7 +277,7 @@
   margin: 0 !important;
   padding: var(--se-space-1) var(--se-chat-gutter) var(--se-space-1) calc(var(--se-chat-gutter) + var(--se-chat-avatar) + 12px) !important;
   border-radius: 0;
-  transition: background-color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease);
 }
 
 .multiChatDialog[data-se-chat] .ChatMessageBlock:hover {

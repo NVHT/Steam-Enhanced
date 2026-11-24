@@ -5,8 +5,8 @@
  * the script has built the view ([data-se-ns] on the content root) the column header gives way to
  * the toolbar and the path splits into folder and file name.
  *
- * Icons are duotone: a soft fill layer (30%) under the stroke, in the control's text colour. The
- * search glyph is a CSS mask (its alpha carries both layers); the rest are inline SVG with a `.d`
+ * Icons are duotone: a soft fill layer (--se-icon-duo) under the stroke, in the control's text
+ * colour. The search glyph is the theme's magnifier mask; the rest are inline SVG with a `.d`
  * layer. Steam's buttons get theirs as SVG too: its own ::before styles on them win over a mask.
  *
  * Grid on the content root:
@@ -25,7 +25,7 @@
 
 /* ---------- Search ---------- */
 
-/* A search glyph inside the field; Steam's clear action stays at the end */
+/* The theme's search field: the magnifier at its start; Steam's clear action stays at the end */
 .zhaKeChn9HPNSMtk0ami_ > .DialogInput_Wrapper:not(#se-none) {
   position: relative;
   margin: 0 !important;
@@ -34,25 +34,39 @@
 .zhaKeChn9HPNSMtk0ami_ > .DialogInput_Wrapper::before {
   content: '';
   position: absolute;
-  inset-inline-start: 12px;
+  inset-inline-start: var(--se-search-pad);
   top: 50%;
   z-index: var(--se-z-raised);
-  width: 17px;
-  height: 17px;
+  width: var(--se-search-icon-size);
+  height: var(--se-search-icon-size);
   translate: 0 -50%;
-  background: var(--se-text-faint);
+  background: var(--se-search-icon-color);
   pointer-events: none;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='6.5' fill='black' fill-opacity='.3' stroke='none'/%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M20 20l-4.2-4.2'/%3E%3C/svg%3E") center / contain no-repeat;
-  transition: background-color var(--se-dur) ease-out;
+  -webkit-mask: var(--se-icon-search) center / contain no-repeat;
+  mask: var(--se-icon-search) center / contain no-repeat;
 }
 
-.zhaKeChn9HPNSMtk0ami_ > .DialogInput_Wrapper:focus-within::before {
-  background: var(--se-text-dim);
-}
-
+/* !important: dialogs.css's field rule (.DialogTextInputBase) sets these with it */
 .zhaKeChn9HPNSMtk0ami_ > .DialogInput_Wrapper .DialogTextInputBase:not(#se-none) {
-  height: var(--se-control-h);
-  padding-inline-start: var(--se-space-6) !important;
+  height: var(--se-search-h);
+  padding-inline-start: calc(var(--se-search-pad) + var(--se-search-icon-size) + var(--se-search-gap)) !important;
+  border-radius: var(--se-search-radius) !important;
+  background: var(--se-search-bg) !important;
+  box-shadow: var(--se-search-edge) !important;
+  font: var(--se-search-font) !important;
+  color: var(--se-search-text) !important;
+}
+
+.zhaKeChn9HPNSMtk0ami_ > .DialogInput_Wrapper .DialogTextInputBase:not(#se-none):hover:not(:focus) {
+  box-shadow: var(--se-search-edge-hover) !important;
+}
+
+.zhaKeChn9HPNSMtk0ami_ > .DialogInput_Wrapper .DialogTextInputBase:not(#se-none):focus {
+  box-shadow: var(--se-search-edge-focus) !important;
+}
+
+.zhaKeChn9HPNSMtk0ami_ > .DialogInput_Wrapper .DialogTextInputBase::placeholder {
+  color: var(--se-search-placeholder);
 }
 
 /* ---------- List ---------- */
@@ -272,7 +286,7 @@ button > svg.se-ns-btn-icon {
 
 button > svg.se-ns-btn-icon .d {
   fill: currentColor;
-  fill-opacity: .3;
+  fill-opacity: var(--se-icon-duo);
   stroke: none;
 }
 
@@ -518,7 +532,7 @@ button > svg.se-ns-btn-icon .d {
 
 .se-ns svg .d {
   fill: currentColor;
-  fill-opacity: .3;
+  fill-opacity: var(--se-icon-duo);
   stroke: none;
 }
 

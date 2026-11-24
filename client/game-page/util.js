@@ -1,6 +1,6 @@
 /*
  * Game Details page: helpers every part shares (owned nodes, formatters, popup placement,
- * Steam client lookup) and the frame pass that runs every step (index.js).
+ * Steam client lookup) and the frame pass that runs every step (main.js).
  */
 ((SE) => {
   const ns = (window.__seGamePageParts = { live: {} });
@@ -89,7 +89,7 @@
     SE.global('SteamClient', (sc) => typeof sc?.Apps?.GetMyAchievementsForApp === 'function');
 
   /*
-   * One pass of every step per frame. Parts ask for one with schedule(); index.js sets what a
+   * One pass of every step per frame. Parts ask for one with schedule(); main.js sets what a
    * pass runs (setPass) and cancels a pending one when it runs a pass itself (cancelPass).
    */
   let frame = 0;
