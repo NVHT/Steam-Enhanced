@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.4.2**](#v1-4-2) | Nov 24, 2026 | A Home tab and switch, Linux menu fix, splash and startup fixes |
 | [**1.4.1**](#v1-4-1) | Nov 24, 2026 | Stage toasts in the corner, Click opens Page first, core icons on the web |
 | [**1.4.0**](#v1-4-0) | Nov 24, 2026 | Theme settings in a window of their own, colour presets, a quality pass |
 | [**1.3.6**](#v1-3-6) | Nov 23, 2026 | Friend chats as bubbles, group chat and dialog redesigns, a new startup |
@@ -21,11 +22,33 @@
 
 <br>
 
+<a name="v1-4-2"></a>
+
+## 1.4.2 · Nov 24, 2026
+
+> Home gets its own settings tab and a switch in the title bar, menus stop showing black on Linux, and the splash and startup screens show the right game and account.
+
+**Settings**
+- **Home tab**: the Home stage's games, details, picker, auto-switch and background, and Steam's own Home as a choice, all in the settings window (the stage's menu edits the same).
+- **Home switch**: a button beside Friends & Chat turns the theme's Home on or off; a right click opens the stage's menu.
+- **Menu windows**: Solid drops the shadow and rounded corners around menus in their own window; on by default on Linux, where they showed black (#6).
+- **Menu hints** and **Keyboard shortcuts**: each can be turned off. The Downloads card opens on hover with Menus open on hover.
+- The settings window also opens from the Steam menu and Millennium's Library Manager.
+
+**Fixes**
+- The startup bar shows your account while Steam signs in.
+- The splash shows the game Home's stage opens on, so its art moves into the stage for every Games choice.
+
+**Under the hood**
+- Files past 40 KB are split into parts beside them.
+
+<br>
+
 <a name="v1-4-1"></a>
 
-## 1.4.1 · Nov 24, 2026
-
-> A corner for the Stage toast, page-first rail clicks, and the Store, Community and Help drawing the theme's own icons.
+<details>
+<summary><b>1.4.1</b> · Nov 24, 2026 · A corner for the Stage toast, page-first rail clicks, and the Store, Community and Help drawing the theme's own icons.</summary>
+<br>
 
 **Settings**
 - **Stage position**: a new Corner choice puts the Stage toast at the bottom right, where Steam shows its own.
@@ -40,7 +63,7 @@
 - Shared helpers replace copies across the client; Home's panels no longer measure on every update.
 - A toast preview for development (`dev/`), and the README shows the web pages.
 
-<br>
+</details>
 
 <a name="v1-4-0"></a>
 
