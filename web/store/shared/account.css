@@ -1,0 +1,137 @@
+/*
+ * Account UI parts: the looks the account pages share (/account/... and its sub-pages: Purchase
+ * History, Licenses, Add funds, Redeem a code, Phone), each defined once. Every block lists the
+ * elements that wear that look; the page files under web/store/account/ keep only placement,
+ * size and the odd variant (they load after this file, so they win).
+ *
+ * Loaded on every account page (web/store/loader.js, on: account), after the store's shared
+ * parts. Selectors are the members' own, at their own weight.
+ */
+
+/* ==========================================================================
+ * Cards: the store's card (shared/ui.css) on the account pages. No !important here, unlike
+ * ui.css: the pages vary it (the danger card, a tile's hover, the React panels' split cards)
+ * at their own weight.
+ * ========================================================================== */
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.left,
+.se-account-card,
+html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"],
+html.se-store-account:not(#se-none) .rightcol .accountInfoBlock,
+html.se-store-account:not(#se-none) table[data-se-table],
+.se-table-empty,
+html.se-store-addfunds:not(#se-none) .addfunds_area_purchase_game,
+html.se-store-redeem:not(#se-none) :is(.wallet_code_content_box, .upsell_and_graphic),
+html.se-store-phone:not(#se-none) .phone_left_col > :is(.current_phone_box, .phone_box) {
+  border-radius: var(--se-card-radius);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
+}
+
+/* ==========================================================================
+ * Icon chips: a glyph on a raised square (an Account details card's title, the current phone
+ * number). Members set their own size.
+ * ========================================================================== */
+.se-account-chip,
+.se-phone-chip {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--se-radius-md);
+  background: var(--se-pill);
+  box-shadow: var(--se-edge);
+  color: var(--se-text-dim);
+}
+
+/* ==========================================================================
+ * Icons: a core icon mask (--se-icon-*, named by --se-account-icon on the element) in
+ * currentColor (account/page.js, phone/page.js, parental/page.js). Holders set the size and tone.
+ * ========================================================================== */
+.se-account-icon {
+  flex: none;
+  display: inline-block;
+  background: currentColor;
+  -webkit-mask: var(--se-account-icon) center / contain no-repeat;
+  mask: var(--se-account-icon) center / contain no-repeat;
+}
+
+/* ==========================================================================
+ * Row links: a full-width link as a raised row with a chevron at its end (the Account details
+ * cards' actions, the wallet card's links).
+ * ========================================================================== */
+/* !important: Steam's own rules (account.css .account_manage_link, steamaccount.css
+   .addfunds_linkbar) set display, margin, padding, border-radius, background, color */
+html.se-store-account:not(#se-none) a.addfunds_linkbar,
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-3);
+  box-sizing: border-box;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 40px;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-pill) !important;
+  box-shadow: var(--se-edge);
+  color: var(--se-text) !important;
+  font: var(--se-type-body-lg) !important;
+  text-decoration: none !important;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-store-account:not(#se-none) a.addfunds_linkbar:hover,
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link:hover {
+  background: var(--se-hover) !important;
+}
+
+html.se-store-account:not(#se-none) a.addfunds_linkbar::after,
+html.se-store-account:not(#se-none) .se-account-card a.account_manage_link::after {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  opacity: .5;
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  rotate: -90deg; /* the core chevron points down */
+}
+
+/* ==========================================================================
+ * Steam's green buttons (btnv6_green_white_innerfade): the page's one main action, filled in
+ * the accent (Add funds' amount tiles, Redeem's Continue). Members set their own size and
+ * label padding.
+ * ========================================================================== */
+/* !important: Steam's own rules (buttons.css, game.css) set background, border, color, margin,
+   padding on the button and its label */
+html.se-store-addfunds:not(#se-none) .addfunds_area_purchase_game .game_purchase_action a,
+html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress) {
+  align-items: center;
+  justify-content: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-control) !important;
+  background: var(--se-btn-primary-bg) !important;
+  color: var(--se-btn-primary-color) !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur);
+}
+
+html.se-store-addfunds:not(#se-none) .addfunds_area_purchase_game .game_purchase_action a > span,
+html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress) > span {
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: var(--se-type-control-lg) !important;
+  text-shadow: none !important;
+}
+
+html.se-store-addfunds:not(#se-none) .addfunds_area_purchase_game .game_purchase_action a:hover,
+html.se-store-redeem:not(#se-none) #validate_btn:hover {
+  background: var(--se-btn-primary-bg-hover) !important;
+}

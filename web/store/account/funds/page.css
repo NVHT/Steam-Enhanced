@@ -16,7 +16,8 @@
  * a.addfunds_linkbar), .leftcol > #game_area_purchase > #prices_user >
  * .addfunds_area_purchase_game (.game_purchase_action > .game_purchase_price +
  * a.btnv6_green_white_innerfade, h1, p), .addfunds_footer. Tiles are buttons as a whole
- * (account/funds/page.js); the wallet card is account/page.css's. Rules use html.se-store-addfunds:not(#se-none) for ID-level weight.
+ * (account/funds/page.js); the wallet card is account/frame.css's, the tiles' card and green
+ * button shared/account.css's. Rules use html.se-store-addfunds:not(#se-none) for ID-level weight.
  */
 
 /* ---------- Layout: amounts beside the wallet card ---------- */
@@ -98,9 +99,6 @@ html.se-store-addfunds:not(#se-none) .addfunds_area_purchase_game {
   height: auto !important;
   margin: 0 !important;
   padding: var(--se-space-5) var(--se-space-5) var(--se-space-4) !important;
-  border-radius: var(--se-card-radius);
-  background: var(--se-card-bg) !important;
-  box-shadow: var(--se-card-edge);
   isolation: isolate;
   cursor: pointer;
   transition: background-color var(--se-dur), box-shadow var(--se-dur), transform var(--se-dur) var(--se-ease);
@@ -171,31 +169,18 @@ html.se-store-addfunds:not(#se-none) .addfunds_area_purchase_game .game_purchase
   display: none !important;
 }
 
+/* The tile's button: shared/account.css's green button, the tile's full width */
 html.se-store-addfunds:not(#se-none) .addfunds_area_purchase_game .game_purchase_action a {
   display: flex !important;
-  align-items: center;
-  justify-content: center;
   width: 100%;
   height: 38px;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-control) !important;
-  background: var(--se-btn-primary-bg) !important;
-  color: var(--se-btn-primary-color) !important;
-  text-decoration: none !important;
-  transition: background-color var(--se-dur);
 }
 
 html.se-store-addfunds:not(#se-none) .addfunds_area_purchase_game .game_purchase_action a > span {
   padding: 0 !important;
-  border: 0 !important;
-  background: none !important;
-  color: inherit !important;
-  font: var(--se-type-control-lg) !important;
-  text-shadow: none !important;
 }
 
+/* The whole tile is the button: hovering it lights the button */
 html.se-store-addfunds:not(#se-none) .addfunds_area_purchase_game:hover .game_purchase_action a {
   background: var(--se-btn-primary-bg-hover) !important;
 }

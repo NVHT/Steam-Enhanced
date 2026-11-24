@@ -1,7 +1,8 @@
 /*
  * Account tables (Purchase History, Licenses), as built by account/table.js: the toolbar
  * (search, type chips, count), the table as a card, its sticky header and the "nothing
- * matches" card. Page files (account/history/, account/licenses/) style their own columns.
+ * matches" card (the cards' look: shared/account.css). Page files (account/history/,
+ * account/licenses/) style their own columns.
  * Rules use html.se-store-account:not(#se-none) for ID-level weight over Steam's rules.
  */
 
@@ -21,51 +22,13 @@ html.se-store-account:not(#se-none) {
 
 .se-table-search {
   flex: 0 1 380px;
-  display: flex;
-  align-items: center;
-  gap: var(--se-space-2);
-  height: var(--se-ctl);
-  padding: 0 var(--se-space-2) 0 var(--se-space-4);
-  box-sizing: border-box;
-  border-radius: var(--se-radius-control);
-  background: var(--se-field);
-  box-shadow: var(--se-edge);
-  color: var(--se-text-faint);
-  cursor: text;
-  transition: box-shadow var(--se-dur);
+  display: block;
 }
 
-.se-table-search:focus-within {
-  box-shadow: var(--se-field-edge-focus);
-}
-
-:is(.se-table-search, .se-table-search-clear) > svg,
-.se-table-search-clear svg {
-  flex: none;
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
+/* The shared search field's input (web/shared/search-field.css), with room for the clear button */
 html.se-store-account:not(#se-none) .se-table-search-input {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  background: none;
-  box-shadow: none;
-  color: var(--se-text);
-  font: var(--se-type-control-lg);
-  outline: none;
-}
-
-.se-table-search-input::placeholder {
-  color: var(--se-text-faint);
+  width: 100%;
+  padding-inline-end: calc(var(--se-space-2) + var(--se-ctl-sm)) !important; /* !important: search-field.css sets padding with !important */
 }
 
 .se-table-search-input::-webkit-search-cancel-button {
@@ -73,10 +36,14 @@ html.se-store-account:not(#se-none) .se-table-search-input {
 }
 
 .se-table-search-clear {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: var(--se-space-1);
+  z-index: var(--se-z-raised);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
+  width: var(--se-ctl-sm);
   height: var(--se-ctl-sm);
   padding: 0;
   border: 0;
@@ -84,7 +51,17 @@ html.se-store-account:not(#se-none) .se-table-search-input {
   background: none;
   color: var(--se-text-faint);
   cursor: pointer;
+  transform: translateY(-50%);
   transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+.se-table-search-clear::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-close-sm) center / contain no-repeat;
+  mask: var(--se-icon-close-sm) center / contain no-repeat;
 }
 
 .se-table-search-clear:hover {
@@ -145,10 +122,7 @@ html.se-store-account:not(#se-none) table[data-se-table] {
   border: 0 !important;
   border-collapse: separate !important;
   border-spacing: 0 !important;
-  border-radius: var(--se-radius-card);
-  overflow: clip; /* rounds the corners without becoming a scroller, so the header can stick */
-  background: var(--se-surface) !important;
-  box-shadow: var(--se-edge);
+  overflow: clip; /* rounds the card's corners without becoming a scroller, so the header can stick */
   color: var(--se-text-dim) !important;
   font: var(--se-type-body-lg) !important;
 }
@@ -226,9 +200,6 @@ html.se-store-account:not(#se-none) table[data-se-table][data-se-table-stuck] [d
 
 .se-table-empty {
   padding: var(--se-space-7) var(--se-space-5);
-  border-radius: var(--se-radius-card);
-  background: var(--se-surface);
-  box-shadow: var(--se-edge);
   color: var(--se-text-muted);
   font: var(--se-type-body-lg);
   text-align: center;

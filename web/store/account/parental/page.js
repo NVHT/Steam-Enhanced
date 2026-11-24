@@ -12,14 +12,15 @@
   'use strict';
   const web = window.__seWeb;
 
+  /* Each row's icon: a core mask (core/icons-*.css), drawn by shared/account.css (.se-account-icon) */
   const ICONS = {
-    store: '<path class="d" d="M5 8h14l-1.2 10.5a1.5 1.5 0 0 1-1.5 1.5H7.7a1.5 1.5 0 0 1-1.5-1.5z"/><path d="M5 8h14l-1.2 10.5a1.5 1.5 0 0 1-1.5 1.5H7.7a1.5 1.5 0 0 1-1.5-1.5zM9 8V6.5a3 3 0 0 1 6 0V8"/>',
-    community: '<circle class="d" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.7 5.6 3.7 9s-1.2 6.4-3.7 9c-2.5-2.6-3.7-5.6-3.7-9S9.5 5.6 12 3z"/>',
-    friends: '<path class="d" d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4 4v-4h0A2 2 0 0 1 4 14z"/><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4 4v-4A2 2 0 0 1 4 14zM9 10h.01M12 10h.01M15 10h.01"/>',
-    profile: '<circle class="d" cx="12" cy="8" r="4"/><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>',
-    games: '<rect class="d" x="3" y="7" width="18" height="11" rx="4"/><rect x="3" y="7" width="18" height="11" rx="4"/><path d="M8 11v3M6.5 12.5h3M15.5 12h.01M17.5 14h.01"/>',
-    chosen: '<rect class="d" x="4" y="4" width="16" height="16" rx="3"/><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
-    dot: '<circle class="d" cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="4"/>',
+    store: 'store',
+    community: 'community',
+    friends: 'bubble',
+    profile: 'user',
+    games: 'console',
+    chosen: 'check-circle',
+    dot: 'dot',
   };
 
   /* Input ids to icons; first match wins ("nogames" is the chosen-games radio before it is games) */
@@ -32,11 +33,11 @@
     [/profile|info/i, 'profile'],
   ];
 
-  const svg = (name) => {
-    const node = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    node.setAttribute('viewBox', '0 0 24 24');
+  const icon = (name) => {
+    const node = document.createElement('span');
+    node.className = 'se-account-icon';
+    node.style.setProperty('--se-account-icon', `var(--se-icon-${ICONS[name] ?? ICONS.dot})`);
     node.setAttribute('aria-hidden', 'true');
-    node.innerHTML = ICONS[name] ?? ICONS.dot;
     return node;
   };
 
@@ -52,8 +53,8 @@
     for (const row of box.querySelectorAll('.feature_row')) {
       const input = row.querySelector('input[type="checkbox"], input[type="radio"]');
       if (!input) continue;
-      const icon = ICON_BY_ID.find(([test]) => test.test(input.id || input.name))?.[1] ?? 'dot';
-      const chip = dom.el('span', { class: 'se-parental-chip', 'data-se-parental': 'chip' }, svg(icon));
+      const kind = ICON_BY_ID.find(([test]) => test.test(input.id || input.name))?.[1] ?? 'dot';
+      const chip = dom.el('span', { class: 'se-parental-chip', 'data-se-parental': 'chip' }, icon(kind));
       row.prepend(chip);
       added.push(chip);
       dom.mark(row, 'data-se-parental-row', input.type);

@@ -256,20 +256,9 @@ html.se-store-parental:not(#se-none) .feature_row:has(> input:checked) {
   color: var(--se-accent);
 }
 
-.se-parental-chip svg {
+.se-parental-chip .se-account-icon {
   width: 18px;
   height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.se-parental-chip svg .d {
-  fill: currentColor;
-  fill-opacity: .3;
-  stroke: none;
 }
 
 html.se-store-parental:not(#se-none) .feature_row > label {
@@ -283,11 +272,18 @@ html.se-store-parental:not(#se-none) .feature_row > label {
   cursor: pointer;
 }
 
+/* The checkbox is the web's one switch (web/shared/switch.css); here only where it sits */
 html.se-store-parental:not(#se-none) .feature_row > input:is([type="checkbox"], [type="radio"]) {
   order: 2;
   flex: none;
-  position: relative;
-  margin: 0 !important;
+}
+
+/* Radio */
+html.se-store-parental:not(#se-none) .feature_row > input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border-radius: 50%;
   appearance: none;
   -webkit-appearance: none;
   background: var(--se-field-bg);
@@ -296,48 +292,12 @@ html.se-store-parental:not(#se-none) .feature_row > input:is([type="checkbox"], 
   transition: background-color var(--se-dur), box-shadow var(--se-dur);
 }
 
-/* Switch */
-html.se-store-parental:not(#se-none) .feature_row > input[type="checkbox"] {
-  width: 38px;
-  height: 22px;
-  border-radius: var(--se-radius-control);
-}
-
-html.se-store-parental:not(#se-none) .feature_row > input[type="checkbox"]::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--se-text-muted);
-  transition: transform var(--se-dur) var(--se-ease), background-color var(--se-dur);
-}
-
-html.se-store-parental:not(#se-none) .feature_row > input[type="checkbox"]:checked {
-  background: var(--se-accent);
-  box-shadow: none;
-}
-
-html.se-store-parental:not(#se-none) .feature_row > input[type="checkbox"]:checked::after {
-  background: var(--se-on-accent);
-  transform: translateX(16px);
-}
-
-/* Radio */
-html.se-store-parental:not(#se-none) .feature_row > input[type="radio"] {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-}
-
 html.se-store-parental:not(#se-none) .feature_row > input[type="radio"]:checked {
   box-shadow: inset 0 0 0 6px var(--se-accent);
   background: var(--se-on-accent);
 }
 
-html.se-store-parental:not(#se-none) .feature_row > input:focus-visible {
+html.se-store-parental:not(#se-none) .feature_row > input[type="radio"]:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: 2px;
 }

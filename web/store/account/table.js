@@ -19,19 +19,6 @@
   const ROW = 'data-se-table-row';
   const STUCK = 'data-se-table-stuck';
 
-  const ICONS = {
-    search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
-    clear: '<path d="M7 7l10 10M17 7L7 17"/>',
-  };
-
-  const svg = (name) => {
-    const node = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    node.setAttribute('viewBox', '0 0 24 24');
-    node.setAttribute('aria-hidden', 'true');
-    node.innerHTML = ICONS[name];
-    return node;
-  };
-
   /**
    * @param dom    the web runtime (web/shared/dom.js)
    * @param $      the page's scope; listeners and the observer are released with it
@@ -67,8 +54,10 @@
       autocomplete: 'off',
       spellcheck: false,
     });
-    const clear = dom.el('button', { class: 'se-table-search-clear', type: 'button', 'aria-label': 'Clear search', hidden: true }, svg('clear'));
-    const search = dom.el('label', { class: 'se-table-search' }, [svg('search'), field, clear]);
+    const clear = dom.el('button', { class: 'se-table-search-clear', type: 'button', 'aria-label': 'Clear search', hidden: true });
+    const search = dom.el('label', { class: 'se-table-search' }, [field, clear]);
+    // The shared search field (web/shared/search-field.css): its look and magnifier
+    $.search(field, search);
     const all = dom.el('button', { class: 'se-table-chip', type: 'button', text: 'All', 'aria-pressed': 'true' });
     const chips = dom.el('div', { class: 'se-table-chips', role: 'group', 'aria-label': opts.typesLabel }, all);
     const count = dom.el('span', { class: 'se-table-count', 'aria-live': 'polite' });

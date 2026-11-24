@@ -10,9 +10,6 @@ html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > 
   display: block !important;
   min-height: 240px;
   padding: var(--se-space-6) var(--se-space-6) var(--se-space-6) !important;
-  border-radius: var(--se-radius-card);
-  background: var(--se-surface) !important;
-  box-shadow: var(--se-edge);
   color: var(--se-text-dim) !important;
   font: var(--se-type-body-lg) !important;
 }
@@ -114,9 +111,9 @@ html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > 
   padding: 0;
   border: 0;
   border-radius: var(--se-radius-control);
-  background: var(--se-surface-2) !important;
-  box-shadow: var(--se-edge);
-  color: var(--se-text) !important;
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-btn-color) !important;
   font: var(--se-type-control-lg);
   text-decoration: none;
   text-shadow: none;
@@ -135,7 +132,7 @@ html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > 
 }
 
 html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(.btn_green_steamui, .btn_blue_steamui, .btn_grey_steamui, .btn_grey_black, .btnv6_blue_hoverfade, .btnv6_green_white_innerfade, .btn_darkblue_white_innerfade, .btnv6_lightblue_blue, .btnv6_grey_black, .btn_green_white_innerfade):hover {
-  background: var(--se-hover) !important;
+  background: var(--se-btn-bg-hover) !important;
 }
 
 html.se-store-account:not(#se-none) :is(.page_content:has(> .two_column.left) > .two_column.right, #main_content)[data-se-account-layout="panel"] :is(.btn_green_steamui, .btnv6_green_white_innerfade, .btn_green_white_innerfade) {
@@ -204,16 +201,14 @@ html.se-store-account:not(#se-none) #main_content[data-se-account-layout="panel"
 /* ---------- Wallet card (Add funds, Redeem a code) ----------
  * Steam's .rightcol > .block.accountInfoBlock: .block_header, .block_content > .accountBalance
  * (label and figure, moved into .se-account-balance by page.js), a.addfunds_linkbar(s), some
- * in a .wallent_actions_ctn. The pages place the card; this draws it.
+ * in a .wallent_actions_ctn. The pages place the card; this lays out its insides (the card itself
+ * and the link bars are shared/account.css's).
  */
 
 html.se-store-account:not(#se-none) .rightcol .accountInfoBlock {
   margin: 0 !important;
   padding: var(--se-space-5) var(--se-space-5) var(--se-space-4) !important;
   border: 0 !important;
-  border-radius: var(--se-radius-card);
-  background: var(--se-surface) !important;
-  box-shadow: var(--se-edge);
 }
 
 html.se-store-account:not(#se-none) .rightcol .accountInfoBlock .block_header {
@@ -276,43 +271,9 @@ html.se-store-account:not(#se-none) .wallent_actions_ctn {
   padding: 0 !important;
 }
 
-html.se-store-account:not(#se-none) a.addfunds_linkbar {
-  display: flex !important;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--se-space-3);
-  box-sizing: border-box;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 40px;
-  margin: 0 !important;
-  padding: var(--se-space-2) var(--se-space-4) !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-md);
-  background: var(--se-pill) !important;
-  box-shadow: var(--se-edge);
-  color: var(--se-text) !important;
-  font: var(--se-type-body-lg) !important;
-  text-decoration: none !important;
-  transition: background-color var(--se-dur);
-}
-
-html.se-store-account:not(#se-none) a.addfunds_linkbar::after {
-  content: "";
-  flex: none;
-  width: 14px;
-  height: 14px;
-  background: currentColor;
-  opacity: .5;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
-}
-
+/* The link bars are shared/account.css's row links */
 html.se-store-account:not(#se-none) .rightcol .accountInfoBlock .block_content > a.addfunds_linkbar + a.addfunds_linkbar {
   margin-top: var(--se-space-2) !important;
-}
-
-html.se-store-account:not(#se-none) a.addfunds_linkbar:hover {
-  background: var(--se-hover) !important;
 }
 
 /* Steam's own arrow images inside the link bars */

@@ -12,28 +12,19 @@
   'use strict';
   const web = window.__seWeb;
 
-  const ICONS = {
-    copyright: '<circle class="d" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M14.8 9.6a3.5 3.5 0 1 0 0 4.8"/>',
-    video: '<rect class="d" x="3" y="5" width="18" height="14" rx="3"/><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4.5-2.5z"/>',
-    notices: '<path class="d" d="M6 3h8l4 4v14H6z"/><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h4"/>',
-    claims: '<path class="d" d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6zM9 12l2 2 4-4"/>',
-    info: '<circle class="d" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
-  };
-
-  /* English headings to icons; others get the order's icon, then a plain one */
+  /* English headings to core icons (--se-icon-*); others get the order's icon, then a plain one */
   const ICON_BY_TITLE = [
-    [/infringement|claim|dmca/i, 'claims'],
+    [/infringement|claim|dmca/i, 'shield'],
     [/copyright/i, 'copyright'],
     [/video/i, 'video'],
-    [/third.?party|notice/i, 'notices'],
+    [/third.?party|notice/i, 'report'],
   ];
-  const ICON_BY_ORDER = ['copyright', 'video', 'notices', 'claims'];
+  const ICON_BY_ORDER = ['copyright', 'video', 'report', 'shield'];
 
-  const svg = (name) => {
-    const node = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    node.setAttribute('viewBox', '0 0 24 24');
-    node.setAttribute('aria-hidden', 'true');
-    node.innerHTML = ICONS[name] ?? ICONS.info;
+  /** A core icon mask as --se-legal-glyph (legal.css); its holder sets the size and tone. */
+  const glyph = (name) => {
+    const node = web.dom.el('span', { class: 'se-legal-glyph', 'aria-hidden': 'true' });
+    node.style.setProperty('--se-legal-glyph', `var(--se-icon-${name})`);
     return node;
   };
 
@@ -73,7 +64,7 @@
 
       const card = dom.el('section', { class: 'se-legal-card', 'data-se-legal': 'card' });
       if (part.heading) {
-        const head = dom.el('header', { class: 'se-legal-head' }, dom.el('span', { class: 'se-legal-icon' }, svg(icon)));
+        const head = dom.el('header', { class: 'se-legal-head' }, dom.el('span', { class: 'se-legal-icon' }, glyph(icon)));
         card.append(head);
         move(part.heading, head);
       }
@@ -90,7 +81,7 @@
 
     const header = document.querySelector('.page_header_ctn .page_content');
     const meta = header && titled > 1
-      ? dom.el('div', { class: 'se-legal-meta', 'data-se-legal': 'meta' }, [svg('notices'), dom.el('span', { text: `${titled} sections` })])
+      ? dom.el('div', { class: 'se-legal-meta', 'data-se-legal': 'meta' }, [glyph('report'), dom.el('span', { text: `${titled} sections` })])
       : null;
     if (meta) header.append(meta);
 

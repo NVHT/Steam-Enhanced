@@ -84,7 +84,7 @@ html.se-viewer-open {
 }
 
 .se-viewer__btn {
-  --se-viewer-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 5l-7 7 7 7'/%3E%3C/svg%3E");
+  --se-viewer-ico: var(--se-icon-chevron);
 
   display: grid;
   place-items: center;
@@ -103,6 +103,7 @@ html.se-viewer-open {
   width: 22px;
   height: 22px;
   background: var(--se-text);
+  -webkit-mask: var(--se-viewer-ico) center / contain no-repeat;
   mask: var(--se-viewer-ico) center / contain no-repeat;
 }
 
@@ -122,10 +123,12 @@ html.se-viewer-open {
 
 .se-viewer__btn--prev { grid-column: 1; }
 .se-viewer__btn--next { grid-column: 3; }
-.se-viewer__btn--next::before { transform: scaleX(-1); }
+/* The down chevron, turned to point back or on */
+.se-viewer__btn--prev::before { rotate: 90deg; }
+.se-viewer__btn--next::before { rotate: -90deg; }
 
 .se-viewer__btn--close {
-  --se-viewer-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E");
+  --se-viewer-ico: var(--se-icon-close-sm);
 
   width: 40px;
   height: var(--se-ctl);
@@ -185,6 +188,8 @@ html.se-viewer-open {
   position: relative;
 }
 
+/* The dark chip (::before), the mark laid over it as a mask (::after) */
+.se-viewer__thumb[data-se-video]::before,
 .se-viewer__thumb[data-se-video]::after {
   content: "";
   position: absolute;
@@ -192,8 +197,17 @@ html.se-viewer-open {
   bottom: 6px;
   width: 16px;
   height: 16px;
+}
+
+.se-viewer__thumb[data-se-video]::before {
   border-radius: var(--se-radius-control);
-  background: rgb(10 12 16 / .75) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M8 6v12l10-6z' fill='white' fill-opacity='.32' stroke='white' stroke-width='1.75' stroke-linejoin='round' stroke-linecap='round'%3E%3C/path%3E%3C/svg%3E") center / 10px no-repeat;
+  background: rgb(10 12 16 / .75);
+}
+
+.se-viewer__thumb[data-se-video]::after {
+  background: var(--se-white);
+  -webkit-mask: var(--se-icon-play) center / 10px no-repeat;
+  mask: var(--se-icon-play) center / 10px no-repeat;
 }
 
 /* ---------- The theme's video player (app/player.js), in the viewer ---------- */
@@ -361,27 +375,27 @@ html.se-viewer-open {
 
 .se-player__btn--play,
 .se-player__btn--big {
-  --se-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 4.5v15l12.5-7.5z' fill='%23000' fill-opacity='.32' stroke='%23000' stroke-width='1.75' stroke-linejoin='round' stroke-linecap='round'%3E%3C/path%3E%3C/svg%3E");
+  --se-ico: var(--se-icon-play);
 }
 
 .se-player:not([data-se-paused]) .se-player__btn--play {
-  --se-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='6' y='5' width='4' height='14' rx='1' fill='%23000' fill-opacity='.32' stroke='%23000' stroke-width='1.75' stroke-linejoin='round' stroke-linecap='round'%3E%3C/rect%3E%3Crect x='14' y='5' width='4' height='14' rx='1' fill='%23000' fill-opacity='.32' stroke='%23000' stroke-width='1.75' stroke-linejoin='round' stroke-linecap='round'%3E%3C/rect%3E%3C/svg%3E");
+  --se-ico: var(--se-icon-pause);
 }
 
 .se-player__btn--mute {
-  --se-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9.5h3.5L12 5.5v13l-4.5-4H4z' fill='%23000'/%3E%3Cpath d='M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11'/%3E%3C/svg%3E");
+  --se-ico: var(--se-icon-sound);
 }
 
 .se-player[data-se-muted] .se-player__btn--mute {
-  --se-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9.5h3.5L12 5.5v13l-4.5-4H4z' fill='%23000'/%3E%3Cpath d='M16 9.5l5 5M21 9.5l-5 5'/%3E%3C/svg%3E");
+  --se-ico: var(--se-icon-sound-off);
 }
 
 .se-player__btn--full {
-  --se-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5'/%3E%3C/svg%3E");
+  --se-ico: var(--se-icon-fullscreen);
 }
 
 .se-player[data-se-full] .se-player__btn--full {
-  --se-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5'/%3E%3C/svg%3E");
+  --se-ico: var(--se-icon-fullscreen-exit);
 }
 
 /* Volume: a short slider that opens beside the speaker on hover. */

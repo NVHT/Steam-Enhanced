@@ -16,7 +16,8 @@
  * .phone_header_description, .phone_left_col > .current_phone_box (.phone_header_description >
  * h2 + img + span), .phone_box × n (form, .phonebox_content_description, .phone_button_remove >
  * a.phone_button, a clearer, sometimes a status line), .phone_sms_warning. account/phone/page.js
- * adds the phone chip and moves each status line under its question.
+ * adds the phone chip and moves each status line under its question. The cards and the chip
+ * are shared/account.css's, the buttons shared/ui-buttons.css's.
  * Rules use html.se-store-phone:not(#se-none) for ID-level weight over Steam's rules.
  */
 
@@ -70,9 +71,6 @@ html.se-store-phone:not(#se-none) .phone_left_col > :is(.current_phone_box, .pho
   padding: var(--se-space-5) var(--se-space-5) !important;
   float: none !important;
   border: 0 !important;
-  border-radius: var(--se-card-radius);
-  background: var(--se-card-bg) !important;
-  box-shadow: var(--se-card-edge);
 }
 
 /* Current number: a phone chip, the label small, the number as the headline */
@@ -92,31 +90,13 @@ html.se-store-phone:not(#se-none) .current_phone_box .phone_header_description {
 .se-phone-chip {
   grid-column: 1;
   grid-row: 1 / span 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 44px;
   height: var(--se-ctl-lg);
-  border-radius: var(--se-radius-md);
-  background: var(--se-pill);
-  box-shadow: var(--se-edge);
-  color: var(--se-text-dim);
 }
 
-.se-phone-chip svg {
+.se-phone-chip .se-account-icon {
   width: 22px;
   height: 22px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.se-phone-chip svg .d {
-  fill: currentColor;
-  fill-opacity: var(--se-icon-duo);
-  stroke: none;
 }
 
 html.se-store-phone:not(#se-none) .current_phone_box .phone_header_description h2 {
@@ -189,36 +169,6 @@ html.se-store-phone:not(#se-none) .phone_box > [class*="phone_button"] {
   margin: 0 !important;
   padding: 0 !important;
   float: none !important;
-}
-
-html.se-store-phone:not(#se-none) .phone_box a[class*="btn"] {
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  height: var(--se-ctl);
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-control) !important;
-  background: var(--se-btn-bg) !important;
-  box-shadow: var(--se-btn-edge);
-  color: var(--se-btn-color) !important;
-  text-decoration: none !important;
-  transition: background-color var(--se-dur), color var(--se-dur);
-}
-
-html.se-store-phone:not(#se-none) .phone_box a[class*="btn"] > span {
-  padding: 0 var(--se-space-4) !important;
-  border: 0 !important;
-  background: none !important;
-  color: inherit !important;
-  font: 600 var(--se-fs-md)/36px var(--se-font) !important;
-  text-shadow: none !important;
-}
-
-html.se-store-phone:not(#se-none) .phone_box a[class*="btn"]:hover {
-  background: var(--se-btn-bg-hover) !important;
-  color: var(--se-btn-color-hover) !important;
 }
 
 /* The SMS notice: small print with a rule on its left */

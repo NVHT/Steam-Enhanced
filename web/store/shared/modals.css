@@ -99,43 +99,9 @@ html.se-store:not(#se-none) .newmodal .dq_settings_checkrow > label {
   cursor: pointer;
 }
 
-/* Checkboxes in dialogs: the theme's switch, at the row's end */
+/* Checkboxes in dialogs: the web's one switch (web/shared/switch.css), at the row's end */
 html.se-store:not(#se-none) .newmodal .dq_settings_checkrow > input[type="checkbox"] {
   order: 2;
-  flex: none;
-  position: relative;
-  width: 38px;
-  height: 22px;
-  margin: 0 !important;
-  border-radius: var(--se-radius-control);
-  appearance: none;
-  -webkit-appearance: none;
-  background: var(--se-field);
-  box-shadow: var(--se-edge);
-  cursor: pointer;
-  transition: background-color var(--se-dur), box-shadow var(--se-dur);
-}
-
-html.se-store:not(#se-none) .newmodal .dq_settings_checkrow > input[type="checkbox"]::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--se-text-muted);
-  transition: transform var(--se-dur) var(--se-ease), background-color var(--se-dur);
-}
-
-html.se-store:not(#se-none) .newmodal .dq_settings_checkrow > input[type="checkbox"]:checked {
-  background: var(--se-accent);
-  box-shadow: none;
-}
-
-html.se-store:not(#se-none) .newmodal .dq_settings_checkrow > input[type="checkbox"]:checked::after {
-  background: var(--se-on-accent);
-  transform: translateX(16px);
 }
 
 /* Excluded tags: chips with Steam's check toggle */
@@ -182,8 +148,19 @@ html.se-store:not(#se-none) .newmodal .app_tag_checkbox {
 }
 
 html.se-store:not(#se-none) .newmodal .app_tag_checkbox.checked {
-  background: var(--se-accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23071423' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center / 12px no-repeat !important;
+  background: var(--se-accent) !important;
   box-shadow: none;
+}
+
+/* The tick: a mask in the on-accent tone, over the box */
+html.se-store:not(#se-none) .newmodal .app_tag_checkbox.checked::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--se-on-accent);
+  -webkit-mask: var(--se-icon-check) center / 12px no-repeat;
+  mask: var(--se-icon-check) center / 12px no-repeat;
 }
 
 /* Tag search: field, then Add */

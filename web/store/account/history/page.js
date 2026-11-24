@@ -7,7 +7,7 @@
  *     Transactions", "Refund" ...), and a count
  *   - long item lists folded after a few lines behind a "+N more" toggle
  *   - wallet changes tagged up or down, so credits and spends read at a glance
- *   - Steam's "Problem with a transaction?" hint with an icon, under the toolbar
+ *   - Steam's "Problem with a transaction?" hint under the toolbar (its icon: page.css)
  *
  * Types are the rows' own words, numbers stripped ("9 Market Transactions"). Nothing of
  * Steam's moves; destroy() takes the theme's parts and marks back off.
@@ -17,16 +17,6 @@
   const web = window.__seWeb;
 
   const ITEMS_SHOWN = 4; // item lines before a row folds
-
-  const INFO = '<circle class="d" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>';
-
-  const svg = (markup) => {
-    const node = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    node.setAttribute('viewBox', '0 0 24 24');
-    node.setAttribute('aria-hidden', 'true');
-    node.innerHTML = markup;
-    return node;
-  };
 
   web.define(async (dom) => {
     const [{ mountTable }] = await Promise.all([Promise.resolve(web.parts.table), dom.ready()]);
@@ -88,14 +78,6 @@
       emptyText: 'No transactions match.',
       countText: (total) => `${total} transactions`,
     });
-
-    // Steam's hint ("Problem with a transaction? Select it below...") with an icon
-    const hint = document.querySelector('#main_content > .wallet_history_click_hint');
-    if (hint) {
-      const icon = svg(INFO);
-      added.push(icon);
-      hint.prepend(icon);
-    }
 
     mark(document.documentElement, 'data-se-history-ready');
 

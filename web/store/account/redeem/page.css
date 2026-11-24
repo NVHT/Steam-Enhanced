@@ -11,7 +11,7 @@
  *   [ Where can I purchase …   ( Purchase Digital Gift Cards )            ]
  *
  * Header, page colour, Steam ID chip and the wallet card come from account/page.css (the page
- * carries .se-store-account too). Steam's page (account.css, cart.css): #main_content >
+ * carries .se-store-account too); the cards and the green button from shared/account.css. Steam's page (account.css, cart.css): #main_content >
  * .leftcol > .wallet_code_content_box (#error_display, #wallet_code_form > .wallet_code_ctn >
  * form.wallet_code_input_ctn > input#wallet_code + button#validate_btn, #captcha_entry,
  * #validate_btn_in_progress; #address_form for codes that need one), .rightcol (wallet card);
@@ -59,9 +59,6 @@ html.se-store-redeem:not(#se-none) .wallet_code_content_box {
   margin: 0 !important;
   padding: var(--se-space-6) !important;
   border: 0 !important;
-  border-radius: var(--se-radius-card);
-  background: var(--se-surface) !important;
-  box-shadow: var(--se-edge);
   color: var(--se-text-dim) !important;
   font: var(--se-type-body-lg) !important;
 }
@@ -123,29 +120,16 @@ html.se-store-redeem:not(#se-none) input#wallet_code:focus-visible {
   box-shadow: var(--se-field-edge-focus);
 }
 
-/* Continue, and Steam's busy twin of it while the code is checked */
+/* Continue, and Steam's busy twin of it while the code is checked: shared/account.css's green
+   button, the field's height */
 html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress) {
   flex: none;
-  align-items: center;
-  justify-content: center;
   height: var(--se-ctl-lg) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-control) !important;
-  background: var(--se-btn-primary-bg) !important;
-  color: var(--se-btn-primary-color) !important;
-  cursor: pointer;
-  transition: background-color var(--se-dur);
 }
 
 /* Steam shows and hides these two with inline display; only the shown one becomes flex */
 html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress):not([style*="none"]) {
   display: inline-flex !important;
-}
-
-html.se-store-redeem:not(#se-none) #validate_btn:hover {
-  background: var(--se-btn-primary-bg-hover) !important;
 }
 
 html.se-store-redeem:not(#se-none) #validate_btn_in_progress {
@@ -156,11 +140,6 @@ html.se-store-redeem:not(#se-none) #validate_btn_in_progress {
 
 html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress) > span {
   padding: 0 var(--se-space-5) !important;
-  border: 0 !important;
-  background: none !important;
-  color: inherit !important;
-  font: 700 var(--se-fs-md)/48px var(--se-font) !important;
-  text-shadow: none !important;
 }
 
 html.se-store-redeem:not(#se-none) #captcha_entry {
@@ -208,9 +187,6 @@ html.se-store-redeem:not(#se-none) .upsell_and_graphic {
   margin-top: var(--se-space-6) !important;
   margin-bottom: 4rem !important;
   padding: var(--se-space-6) var(--se-space-6) !important;
-  border-radius: var(--se-radius-card);
-  background: var(--se-surface) !important;
-  box-shadow: var(--se-edge);
 }
 
 html.se-store-redeem:not(#se-none) .redeem_wallet_code_upsell {
@@ -240,9 +216,9 @@ html.se-store-redeem:not(#se-none) .redeem_wallet_code_upsell a[class*="btn"] {
   padding: 0 !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-surface-2) !important;
-  box-shadow: var(--se-edge);
-  color: var(--se-text) !important;
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-btn-color) !important;
   text-decoration: none !important;
   transition: background-color var(--se-dur);
 }
@@ -257,7 +233,7 @@ html.se-store-redeem:not(#se-none) .redeem_wallet_code_upsell a[class*="btn"] > 
 }
 
 html.se-store-redeem:not(#se-none) .redeem_wallet_code_upsell a[class*="btn"]:hover {
-  background: var(--se-hover) !important;
+  background: var(--se-btn-bg-hover) !important;
 }
 
 html.se-store-redeem:not(#se-none) .redeem_wallet_code_upsell a:not([class*="btn"]) {

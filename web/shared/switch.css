@@ -1,0 +1,114 @@
+/*
+ * The one on/off switch on the web, as client/settings/controls.css draws it in the client: a
+ * track (--se-switch-w x --se-switch-h) with a knob (--se-switch-knob) that slides to the end,
+ * off a dark field with a grey knob, on the accent with a dark knob.
+ *
+ * Steam's own checkboxes become it in place (they stay the state and keep their scripts). The
+ * pages that turn theirs into a switch, each listed below:
+ *   - Store preferences (web/store/account/settings.css): every checkbox row, and the Store and
+ *     Community columns of mature content; the language lists take a square box over this
+ *     (web/store/account/newer.css)
+ *   - Family View setup (web/store/account/parental/page.css): its checkbox rows
+ *   - Store dialogs (web/store/shared/modals.css): the discovery queue's settings rows
+ *   - Friend Activity Settings (web/community/activity-settings/page.css): each setting's input,
+ *     checkbox or radio
+ * Page files keep only where the switch sits in its row.
+ */
+
+:is(
+  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
+  html.se-store-parental .feature_row > input[type="checkbox"],
+  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
+  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
+) {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  display: block;
+  flex: none;
+  width: var(--se-switch-w);
+  height: var(--se-switch-h);
+  margin: 0;
+  border: 0;
+  border-radius: var(--se-radius-control);
+  background: var(--se-field-bg);
+  box-shadow: var(--se-field-edge);
+  cursor: pointer;
+  transition: background-color var(--se-dur), box-shadow var(--se-dur);
+}
+
+/* The knob */
+:is(
+  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
+  html.se-store-parental .feature_row > input[type="checkbox"],
+  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
+  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
+)::after {
+  content: "";
+  position: absolute;
+  top: calc((var(--se-switch-h) - var(--se-switch-knob)) / 2);
+  left: calc((var(--se-switch-h) - var(--se-switch-knob)) / 2);
+  width: var(--se-switch-knob);
+  height: var(--se-switch-knob);
+  border-radius: 50%;
+  background: var(--se-text-muted);
+  transition: transform var(--se-dur) var(--se-ease), background-color var(--se-dur);
+}
+
+:is(
+  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
+  html.se-store-parental .feature_row > input[type="checkbox"],
+  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
+  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
+):hover:not(:checked, :disabled) {
+  box-shadow: var(--se-field-edge-hover);
+}
+
+:is(
+  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
+  html.se-store-parental .feature_row > input[type="checkbox"],
+  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
+  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
+):checked {
+  background: var(--se-accent);
+  box-shadow: none;
+}
+
+:is(
+  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
+  html.se-store-parental .feature_row > input[type="checkbox"],
+  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
+  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
+):checked:hover:not(:disabled) {
+  background: var(--se-accent-hover);
+}
+
+:is(
+  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
+  html.se-store-parental .feature_row > input[type="checkbox"],
+  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
+  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
+):checked::after {
+  background: var(--se-on-accent);
+  transform: translateX(calc(var(--se-switch-w) - var(--se-switch-h)));
+}
+
+:is(
+  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
+  html.se-store-parental .feature_row > input[type="checkbox"],
+  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
+  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
+):focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+:is(
+  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
+  html.se-store-parental .feature_row > input[type="checkbox"],
+  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
+  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
+):disabled {
+  opacity: var(--se-btn-disabled-opacity);
+  cursor: default;
+}

@@ -2,8 +2,8 @@
  * Store bar redesign, "one capsule" (every store page). Styles the [data-se-nav] tags that
  * shared/nav.js puts on Steam's React store bar; everything is scoped under html.se-store
  * (web/store/loader.js) and the tags, so the file is inert where there is no bar.
- * Icons are the theme's duotone style (client/navigation/icons.css): 24px grid, 1.75 stroke, 32% fills,
- * drawn as ::before masks so React's own children are never touched.
+ * Icons are the theme's duotone tokens (core/icons-*.css), drawn as ::before masks so React's
+ * own children are never touched.
  *
  * Steam serves the store from two React builds with different hashed class names: the classic
  * pages (front page, app pages...) and the newer ones (age check and the like). Every hashed
@@ -16,15 +16,6 @@
 html.se-store {
   --se-nav-h: 46px;      /* capsule: Steam's own menu row height, so page layout still fits */
   --se-nav-ctl: 36px;    /* every control inside it */
-  --se-ni-browse: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Crect%20x='3.5'%20y='3.5'%20width='7'%20height='7'%20rx='1.5'/%3E%3Crect%20x='13.5'%20y='13.5'%20width='7'%20height='7'%20rx='1.5'/%3E%3C/g%3E%3Crect%20x='3.5'%20y='3.5'%20width='7'%20height='7'%20rx='1.5'/%3E%3Crect%20x='13.5'%20y='3.5'%20width='7'%20height='7'%20rx='1.5'/%3E%3Crect%20x='3.5'%20y='13.5'%20width='7'%20height='7'%20rx='1.5'/%3E%3Crect%20x='13.5'%20y='13.5'%20width='7'%20height='7'%20rx='1.5'/%3E%3C/svg%3E");
-  --se-ni-recommendations: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Cpath%20d='M11%203.5l1.9%205.1%205.1%201.9-5.1%201.9L11%2017.5l-1.9-5.1-5.1-1.9%205.1-1.9z'/%3E%3C/g%3E%3Cpath%20d='M11%203.5l1.9%205.1%205.1%201.9-5.1%201.9L11%2017.5l-1.9-5.1-5.1-1.9%205.1-1.9z'/%3E%3Cpath%20d='M18.5%2015.5v5M16%2018h5'/%3E%3C/svg%3E");
-  --se-ni-categories: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Cpath%20d='M3.5%2012.2V4.5a1%201%200%200%201%201-1h7.7l8.3%208.3a1.4%201.4%200%200%201%200%202l-6.2%206.2a1.4%201.4%200%200%201-2%200z'/%3E%3C/g%3E%3Cpath%20d='M3.5%2012.2V4.5a1%201%200%200%201%201-1h7.7l8.3%208.3a1.4%201.4%200%200%201%200%202l-6.2%206.2a1.4%201.4%200%200%201-2%200z'/%3E%3Ccircle%20cx='8'%20cy='8'%20r='1.5'/%3E%3C/svg%3E");
-  --se-ni-hardware: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Crect%20x='7.5'%20y='8.5'%20width='9'%20height='7'%20rx='1'/%3E%3C/g%3E%3Crect%20x='2.5'%20y='6.5'%20width='19'%20height='11'%20rx='3'/%3E%3Crect%20x='7.5'%20y='8.5'%20width='9'%20height='7'%20rx='1'/%3E%3Cpath%20d='M5%2010.5v1M19%2012.5v1'/%3E%3C/svg%3E");
-  --se-ni-play: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Cpath%20d='M7%208h10a4.5%204.5%200%200%201%204.4%205.4l-.6%203a2.5%202.5%200%200%201-4.3%201.2L15%2016H9l-1.5%201.6a2.5%202.5%200%200%201-4.3-1.2l-.6-3A4.5%204.5%200%200%201%207%208z'/%3E%3C/g%3E%3Cpath%20d='M7%208h10a4.5%204.5%200%200%201%204.4%205.4l-.6%203a2.5%202.5%200%200%201-4.3%201.2L15%2016H9l-1.5%201.6a2.5%202.5%200%200%201-4.3-1.2l-.6-3A4.5%204.5%200%200%201%207%208z'/%3E%3Cpath%20d='M8%2010.5v3M6.5%2012h3M15.5%2011h.01M17.5%2013h.01'/%3E%3C/svg%3E");
-  --se-ni-special: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Cpath%20d='M4.5%2010.5h15v9a1%201%200%200%201-1%201h-13a1%201%200%200%201-1-1z'/%3E%3C/g%3E%3Cpath%20d='M4.5%2010.5h15v9a1%201%200%200%201-1%201h-13a1%201%200%200%201-1-1zM3.5%207.5h17v3h-17zM12%207.5v13'/%3E%3Cpath%20d='M12%207.5C10.5%204%207%204.3%207.6%206.6%208%207.5%2012%207.5%2012%207.5zM12%207.5c1.5-3.5%205-3.2%204.4-.9-.4.9-4.4.9-4.4.9z'/%3E%3C/svg%3E");
-  --se-ni-wishlist: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Cpath%20d='M12%2020s-7.5-4.6-7.5-10A4.3%204.3%200%200%201%2012%206.6a4.3%204.3%200%200%201%207.5%203.4c0%205.4-7.5%2010-7.5%2010z'/%3E%3C/g%3E%3Cpath%20d='M12%2020s-7.5-4.6-7.5-10A4.3%204.3%200%200%201%2012%206.6a4.3%204.3%200%200%201%207.5%203.4c0%205.4-7.5%2010-7.5%2010z'/%3E%3C/svg%3E");
-  --se-ni-cart: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Cpath%20d='M6.2%207.5h13.6l-1.5%207a1.5%201.5%200%200%201-1.5%201.2H9.2a1.5%201.5%200%200%201-1.5-1.2z'/%3E%3C/g%3E%3Cpath%20d='M3%204.5h2.2l2.5%2010a1.5%201.5%200%200%200%201.5%201.2h7.6a1.5%201.5%200%200%200%201.5-1.2l1.5-7H6.2'/%3E%3Ccircle%20cx='9.5'%20cy='19.5'%20r='1.25'/%3E%3Ccircle%20cx='16.5'%20cy='19.5'%20r='1.25'/%3E%3C/svg%3E");
-  --se-ni-search: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23000'%20stroke-width='1.75'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20fill='%23000'%20fill-opacity='.32'%20stroke='none'%3E%3Ccircle%20cx='10.5'%20cy='10.5'%20r='6.5'/%3E%3C/g%3E%3Ccircle%20cx='10.5'%20cy='10.5'%20r='6.5'/%3E%3Cpath%20d='M20%2020l-4.6-4.6'/%3E%3C/svg%3E");
 }
 
 /* ---------- Band and capsule ---------- */
@@ -107,16 +98,16 @@ html.se-store [data-se-nav="item"]::before {
   width: 18px;
   height: 18px;
   background: currentColor;
-  -webkit-mask: var(--se-nav-icon, var(--se-ni-browse)) center / contain no-repeat;
-  mask: var(--se-nav-icon, var(--se-ni-browse)) center / contain no-repeat;
+  -webkit-mask: var(--se-nav-icon, var(--se-icon-grid)) center / contain no-repeat;
+  mask: var(--se-nav-icon, var(--se-icon-grid)) center / contain no-repeat;
 }
 
-html.se-store [data-se-icon="browse"] { --se-nav-icon: var(--se-ni-browse); }
-html.se-store [data-se-icon="recommendations"] { --se-nav-icon: var(--se-ni-recommendations); }
-html.se-store [data-se-icon="categories"] { --se-nav-icon: var(--se-ni-categories); }
-html.se-store [data-se-icon="hardware"] { --se-nav-icon: var(--se-ni-hardware); }
-html.se-store [data-se-icon="play"] { --se-nav-icon: var(--se-ni-play); }
-html.se-store [data-se-icon="special"] { --se-nav-icon: var(--se-ni-special); }
+html.se-store [data-se-icon="browse"] { --se-nav-icon: var(--se-icon-grid); }
+html.se-store [data-se-icon="recommendations"] { --se-nav-icon: var(--se-icon-sparkle); }
+html.se-store [data-se-icon="categories"] { --se-nav-icon: var(--se-icon-tag); }
+html.se-store [data-se-icon="hardware"] { --se-nav-icon: var(--se-icon-deck); }
+html.se-store [data-se-icon="play"] { --se-nav-icon: var(--se-icon-gamepad); }
+html.se-store [data-se-icon="special"] { --se-nav-icon: var(--se-icon-gift); }
 
 /* !important: another rule in this file sets color with !important */
 html.se-store [data-se-nav="item"]:hover,
@@ -223,13 +214,13 @@ html.se-store .se-nav-btn__icon {
   width: 19px;
   height: 19px;
   background: currentColor;
-  -webkit-mask: var(--se-ni-wishlist) center / contain no-repeat;
-  mask: var(--se-ni-wishlist) center / contain no-repeat;
+  -webkit-mask: var(--se-icon-heart) center / contain no-repeat;
+  mask: var(--se-icon-heart) center / contain no-repeat;
 }
 
 html.se-store .se-nav-btn[data-se-own="cart"] .se-nav-btn__icon {
-  -webkit-mask-image: var(--se-ni-cart);
-  mask-image: var(--se-ni-cart);
+  -webkit-mask-image: var(--se-icon-cart);
+  mask-image: var(--se-icon-cart);
 }
 
 /* Count bubble pinned to the top-right corner, ringed so it reads on the capsule. */

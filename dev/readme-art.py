@@ -70,7 +70,7 @@ def banner(title, c):
 
 
 def theme_icons():
-    css = ''.join(open(os.path.join(THEME, 'core', f), encoding='utf-8').read() for f in ('icons-nav.css', 'icons-ui.css'))
+    css = ''.join(open(os.path.join(THEME, 'core', f), encoding='utf-8').read() for f in ('icons-nav.css', 'icons-ui.css', 'icons-web.css'))
     found = {}
     for name in ICONS.values():
         m = re.search(r'--se-icon-' + re.escape(name) + r':\s*url\("data:image/svg\+xml,([^"]+)"\)', css)

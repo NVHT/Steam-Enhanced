@@ -11,6 +11,7 @@
  *   shared/     every store page: layout, Steam's controls (ui.css), store dialog content
  *               (modals.css; the dialog itself is web/shared/modals.css), the store bar (nav),
  *               sale-page sections (sale);
+ *               account.css: the account pages' cards, chips, icons, row links, green buttons;
  *               rows.css/js: the game rows of the front page and Explore
  *   front/      the store front (/)
  *   app/        game pages (/app/<id>/...); the parts summary.js and hero.js use (player,
@@ -91,6 +92,7 @@
       { css: 'shared/sale/sale-library.css' },
       { css: 'shared/sale/sale-controls.css' },
       { css: 'shared/sale/sale-browser.css' },
+      { css: 'shared/account.css', on: ['account'] },
       { js: 'front/hero-takeover.js', on: ['front'] },
       { css: 'front/hero.css', js: 'front/hero.js', on: ['front'] },
       { css: 'shared/rows.css', js: 'shared/rows.js', on: ['rows'] },

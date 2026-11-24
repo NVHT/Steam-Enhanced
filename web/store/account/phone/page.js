@@ -12,8 +12,6 @@
   'use strict';
   const web = window.__seWeb;
 
-  const PHONE = '<rect class="d" x="7" y="3" width="10" height="18" rx="2.5"/><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 17.5h2"/>';
-
   /** The box's own text outside the question and the button: the element holding it, or null. */
   const findNote = (box, dom) => {
     for (const node of box.querySelectorAll('*')) {
@@ -32,10 +30,9 @@
 
     const line = document.querySelector('.current_phone_box .phone_header_description');
     if (line) {
-      const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      icon.setAttribute('viewBox', '0 0 24 24');
-      icon.setAttribute('aria-hidden', 'true');
-      icon.innerHTML = PHONE;
+      // The shared account icon (web/store/shared/account.css), core's mobile phone
+      const icon = dom.el('span', { class: 'se-account-icon', 'aria-hidden': 'true' });
+      icon.style.setProperty('--se-account-icon', 'var(--se-icon-mobile)');
       const chip = dom.el('span', { class: 'se-phone-chip', 'data-se-phone': 'chip' }, icon);
       line.prepend(chip);
       added.push(chip);

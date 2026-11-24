@@ -94,23 +94,16 @@ html.se-store-ssa:not(#se-none) .page_title_area :is(.breadcrumbs, .page_name) >
   color: var(--se-text-muted);
 }
 
-.se-ssa-meta svg,
-.se-ssa-layout svg {
+/* Icons: a core mask (--se-icon-*, named by --se-ssa-icon on the element, agreement.js) */
+.se-ssa-icon {
   flex: none;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  display: block;
+  background: currentColor;
+  -webkit-mask: var(--se-ssa-icon) center / contain no-repeat;
+  mask: var(--se-ssa-icon) center / contain no-repeat;
 }
 
-:is(.se-ssa-meta, .se-ssa-layout) svg .d {
-  fill: currentColor;
-  fill-opacity: .3;
-  stroke: none;
-}
-
-.se-ssa-meta-item svg {
+.se-ssa-meta-item .se-ssa-icon {
   width: 16px;
   height: 16px;
   color: var(--se-text-faint);
@@ -379,7 +372,7 @@ html.se-store-ssa:not(#se-none) .se-ssa-title {
   transition: opacity var(--se-dur), background-color var(--se-dur), color var(--se-dur);
 }
 
-.se-ssa-link svg {
+.se-ssa-link .se-ssa-icon {
   width: 16px;
   height: 16px;
 }

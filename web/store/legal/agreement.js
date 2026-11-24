@@ -22,18 +22,10 @@
   const HEADER_OFFSET = 96; // px under the floating store bar that counts as "reading this"
   const WPM = 230;
 
-  const ICONS = {
-    link: '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>',
-    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
-    doc: '<path class="d" d="M6 3h8l4 4v14H6z"/><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6"/>',
-    clock: '<circle class="d" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-  };
-
-  const svg = (name) => {
-    const node = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    node.setAttribute('viewBox', '0 0 24 24');
-    node.setAttribute('aria-hidden', 'true');
-    node.innerHTML = ICONS[name];
+  /** A core icon mask (--se-icon-<name>) as --se-ssa-icon (agreement.css); its holder sets the size and tone. */
+  const icon = (name) => {
+    const node = web.dom.el('span', { class: 'se-ssa-icon', 'aria-hidden': 'true' });
+    node.style.setProperty('--se-ssa-icon', `var(--se-icon-${name})`);
     return node;
   };
 
@@ -147,10 +139,10 @@
     const copyLink = (button, hash) => {
       const url = `${location.origin}${location.pathname}${location.search}#${hash}`;
       navigator.clipboard?.writeText(url).catch(() => {});
-      button.replaceChildren(svg('check'));
+      button.replaceChildren(icon('check'));
       dom.mark(button, 'data-copied');
       $.timeout(() => {
-        button.replaceChildren(svg('link'));
+        button.replaceChildren(icon('link'));
         dom.unmark(button, 'data-copied');
       }, 1400);
     };
@@ -159,7 +151,7 @@
       const { heading, number } = entry;
       if (heading) mark(heading, 'data-se-ssa-hidden');
 
-      const link = dom.el('button', { class: 'se-ssa-link', type: 'button', 'aria-label': 'Copy link to this section', title: 'Copy link' }, svg('link'));
+      const link = dom.el('button', { class: 'se-ssa-link', type: 'button', 'aria-label': 'Copy link to this section', title: 'Copy link' }, icon('link'));
       $.listen(link, 'click', () => copyLink(link, entry.name));
       const head = dom.el('header', { class: 'se-ssa-head' }, [
         dom.el('span', { class: 'se-ssa-num', text: number }),
@@ -247,8 +239,8 @@
 
     const minutes = Math.max(1, Math.round(words(body.textContent) / WPM));
     const meta = dom.el('div', { class: 'se-ssa-meta', 'data-se-ssa': 'meta' }, [
-      dom.el('span', { class: 'se-ssa-meta-item' }, [svg('doc'), dom.el('span', { text: `${sections.length} sections` })]),
-      dom.el('span', { class: 'se-ssa-meta-item' }, [svg('clock'), dom.el('span', { text: `${minutes} min read` })]),
+      dom.el('span', { class: 'se-ssa-meta-item' }, [icon('report'), dom.el('span', { text: `${sections.length} sections` })]),
+      dom.el('span', { class: 'se-ssa-meta-item' }, [icon('clock'), dom.el('span', { text: `${minutes} min read` })]),
     ]);
     const languages = document.getElementById('languages');
     if (languages) {

@@ -6,7 +6,7 @@
  *
  *   - puts the common files first (COMMON): every site gets the runtime (dom.js), the tokens,
  *     the web base, the search field and the spinner; `common: 'full'` adds what the redesigned sites share
- *     (level badges, the friend card, Steam's dialogs, the dropdown, scroll to top)
+ *     (level badges, the switch, the friend card, Steam's dialogs, the dropdown, scroll to top)
  *   - puts the site class and one class per matched page on <html> before any stylesheet, so
  *     the CSS applies from the first paint
  *   - adds each matched stylesheet in list order (the cascade), a pass's new ones @imported by
@@ -38,14 +38,16 @@
 
   /** Files every site starts with, in cascade order, relative to this file. */
   const COMMON = {
-    lite: [{ js: 'dom.js' }, { css: '../../core/tokens.css' }, { css: '../../core/icons-nav.css' }, { css: '../../core/icons-ui.css' }, { css: 'base.css' }, { css: 'search-field.css' }, { css: '../../core/spinner.css' }],
+    lite: [{ js: 'dom.js' }, { css: '../../core/tokens.css' }, { css: '../../core/icons-nav.css' }, { css: '../../core/icons-ui.css' }, { css: '../../core/icons-web.css' }, { css: 'base.css' }, { css: 'search-field.css' }, { css: '../../core/spinner.css' }],
     full: [
       { js: 'dom.js' },
       { css: '../../core/tokens.css' },
       { css: '../../core/icons-nav.css' },
       { css: '../../core/icons-ui.css' },
+      { css: '../../core/icons-web.css' },
       { css: '../../core/levels.css' },
       { css: 'base.css' },
+      { css: 'switch.css' },
       { css: 'search-field.css' },
       { css: 'miniprofile.css' },
       { css: 'modals.css', js: 'modals.js' },

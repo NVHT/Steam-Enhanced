@@ -89,8 +89,8 @@ html.se-app-summary-on #queueActionsCtn .queue_menu_arrow > span {
   height: 12px;
   padding: 0 !important;
   background: currentColor !important;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
 }
 
 /* On Wishlist: the wishlist pink, with a heart instead of Steam's check. */
@@ -113,8 +113,8 @@ html.se-app-summary-on #add_to_wishlist_area_success .btnv6_blue_hoverfade > spa
   width: 14px;
   height: 14px;
   background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z' fill='%23000' fill-opacity='.32' stroke='%23000' stroke-width='1.75' stroke-linejoin='round' stroke-linecap='round'%3E%3C/path%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z' fill='%23000' fill-opacity='.32' stroke='%23000' stroke-width='1.75' stroke-linejoin='round' stroke-linecap='round'%3E%3C/path%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: var(--se-icon-heart) center / contain no-repeat;
+  mask: var(--se-icon-heart) center / contain no-repeat;
 }
 
 /* Following (Follow's active state): the accent tint. */
@@ -196,7 +196,7 @@ html.se-app-summary-on .queue_ctn .queue_reason_description a:hover {
   color: var(--se-accent-hover) !important;
 }
 
-/* "Customize your queue": a link with a small gear, after the reason. */
+/* "Customize your queue": a link with small sliders, after the reason. */
 html.se-app-summary-on .queue_ctn .queue_settings_link_ctn.queue_reason_description a::before {
   content: "";
   display: inline-block;
@@ -205,8 +205,8 @@ html.se-app-summary-on .queue_ctn .queue_settings_link_ctn.queue_reason_descript
   margin-right: var(--se-space-2);
   vertical-align: -1px;
   background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M4 7h10M18 7h2M4 17h2M10 17h10'/%3E%3Ccircle cx='16' cy='7' r='2'/%3E%3Ccircle cx='8' cy='17' r='2'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M4 7h10M18 7h2M4 17h2M10 17h10'/%3E%3Ccircle cx='16' cy='7' r='2'/%3E%3Ccircle cx='8' cy='17' r='2'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: var(--se-icon-sliders) center / contain no-repeat;
+  mask: var(--se-icon-sliders) center / contain no-repeat;
 }
 
 /* Next in Queue: the row's last pill. */
@@ -252,8 +252,9 @@ html.se-app-summary-on .btn_next_in_queue::after {
   margin: 0 var(--se-space-4) 0 0 !important;
   border: 0 !important;
   background: currentColor !important;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
+  rotate: -90deg; /* the down chevron, pointing on */
 }
 
 html.se-app-summary-on .btn_next_in_queue .next_in_queue_content {
@@ -560,59 +561,30 @@ html.se-app-summary-on [data-featuretarget="wishlist-item-categories"] button sv
   }
 }
 
-/* ---------- Duotone feature and reason icons ----------
- * The theme's icon recipe (1.75 stroke over a 32% fill), drawn as masks in the text colour.
- * app/summary.js picks the key from Steam's icon file name (ico_cloud.png -> cloud...), so
- * the match works in any store language; unknown features get the spark. Relevance reasons
- * use check / cross / info by their tone.
+/* ---------- Feature icons ----------
+ * The theme's duotone icons, drawn as masks in the text colour. app/summary.js picks the key
+ * from Steam's icon file name (ico_cloud.png -> cloud...), so the match works in any store
+ * language; unknown features get the sparkle (summary-details.css).
  */
-.se-app-summary {
-  --se-ico-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M8 12.5l2.6 2.6L16 9.6'/%3E%3C/svg%3E");
-  --se-ico-cross: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M9 9l6 6M15 9l-6 6'/%3E%3C/svg%3E");
-  --se-ico-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9' fill='%23000' fill-opacity='.32'/%3E%3Cpath d='M12 11v5M12 8h.01'/%3E%3C/svg%3E");
-  --se-ico-single: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='12' cy='8' r='3.5'/%3E%3C/g%3E%3Ccircle cx='12' cy='8' r='3.5'/%3E%3Cpath d='M5 20c.9-3.6 3.6-5.5 7-5.5s6.1 1.9 7 5.5'/%3E%3C/svg%3E");
-  --se-ico-multi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='9' cy='8.5' r='3.5'/%3E%3C/g%3E%3Ccircle cx='9' cy='8.5' r='3.5'/%3E%3Cpath d='M2.5 19.5c.9-3.3 3.4-5 6.5-5s5.6 1.7 6.5 5'/%3E%3Ccircle cx='17' cy='9' r='2.7'/%3E%3Cpath d='M17 14.3c2.3.1 3.9 1.7 4.6 4.7'/%3E%3C/svg%3E");
-  --se-ico-coop: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='7.5' cy='9' r='2.6'/%3E%3Ccircle cx='16.5' cy='9' r='2.6'/%3E%3C/g%3E%3Ccircle cx='7.5' cy='9' r='2.6'/%3E%3Ccircle cx='16.5' cy='9' r='2.6'/%3E%3Cpath d='M3 19c.6-2.8 2.3-4.3 4.5-4.3S11.4 16.2 12 19c.6-2.8 2.3-4.3 4.5-4.3S20.4 16.2 21 19'/%3E%3C/svg%3E");
-  --se-ico-versus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M9 15l-4 4-1-1 4-4z'/%3E%3Cpath d='M15 15l4 4 1-1-4-4z'/%3E%3C/g%3E%3Cpath d='M14.5 4H20v5.5L9 20.5 3.5 15z'/%3E%3Cpath d='M9.5 4H4v5.5L15 20.5l5.5-5.5'/%3E%3C/svg%3E");
-  --se-ico-screen: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='3' y='4.5' width='18' height='12.5' rx='2'/%3E%3C/g%3E%3Crect x='3' y='4.5' width='18' height='12.5' rx='2'/%3E%3Cpath d='M12 4.5V17M8.5 20.5h7'/%3E%3C/svg%3E");
-  --se-ico-trophy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M8 4h8v5a4 4 0 0 1-8 0z'/%3E%3C/g%3E%3Cpath d='M8 4h8v5a4 4 0 0 1-8 0z'/%3E%3Cpath d='M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v3.5M8.5 20h7M10 16.5h4V20h-4z'/%3E%3C/svg%3E");
-  --se-ico-cards: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='9' y='3' width='11' height='14.5' rx='2'/%3E%3C/g%3E%3Crect x='9' y='3' width='11' height='14.5' rx='2'/%3E%3Cpath d='M6.5 6.5H6a2 2 0 0 0-2 2V19a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-1.5'/%3E%3C/svg%3E");
-  --se-ico-cloud: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M7 18.5a4.2 4.2 0 0 1-.6-8.4A5.6 5.6 0 0 1 17.2 9a4.7 4.7 0 0 1 .3 9.5z'/%3E%3C/g%3E%3Cpath d='M7 18.5a4.2 4.2 0 0 1-.6-8.4A5.6 5.6 0 0 1 17.2 9a4.7 4.7 0 0 1 .3 9.5z'/%3E%3C/svg%3E");
-  --se-ico-stats: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='10.25' y='8' width='3.5' height='12' rx='1'/%3E%3C/g%3E%3Crect x='4' y='12' width='3.5' height='8' rx='1'/%3E%3Crect x='10.25' y='8' width='3.5' height='12' rx='1'/%3E%3Crect x='16.5' y='4' width='3.5' height='16' rx='1'/%3E%3C/svg%3E");
-  --se-ico-podium: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='9' y='7.5' width='6' height='12.5' rx='1'/%3E%3C/g%3E%3Crect x='9' y='7.5' width='6' height='12.5' rx='1'/%3E%3Cpath d='M9 12H4a1 1 0 0 0-1 1v7h18v-4a1 1 0 0 0-1-1h-5M12 3.5v1'/%3E%3C/svg%3E");
-  --se-ico-remote: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='2.5' y='10' width='14' height='9' rx='4.5'/%3E%3C/g%3E%3Crect x='2.5' y='10' width='14' height='9' rx='4.5'/%3E%3Cpath d='M6.5 13v3M5 14.5h3M12.5 14h.01M14 15.5h.01M17 3.5a5 5 0 0 1 4.5 4.5M17 6.5a2 2 0 0 1 1.5 1.5'/%3E%3C/svg%3E");
-  --se-ico-family: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='12' cy='12.5' r='2.2'/%3E%3C/g%3E%3Ccircle cx='7.5' cy='7' r='2.5'/%3E%3Ccircle cx='16.5' cy='7' r='2.5'/%3E%3Ccircle cx='12' cy='12.5' r='2.2'/%3E%3Cpath d='M3 17c.5-3 2.2-4.8 4.5-4.8M21 17c-.5-3-2.2-4.8-4.5-4.8M8 20.5c.5-2.3 2-3.5 4-3.5s3.5 1.2 4 3.5'/%3E%3C/svg%3E");
-  --se-ico-gamepad: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M7 7h10a4.5 4.5 0 0 1 4.4 5.5l-1 4.4a2.5 2.5 0 0 1-4.3 1.1L14.5 16h-5l-1.6 2a2.5 2.5 0 0 1-4.3-1.1l-1-4.4A4.5 4.5 0 0 1 7 7z'/%3E%3C/g%3E%3Cpath d='M7 7h10a4.5 4.5 0 0 1 4.4 5.5l-1 4.4a2.5 2.5 0 0 1-4.3 1.1L14.5 16h-5l-1.6 2a2.5 2.5 0 0 1-4.3-1.1l-1-4.4A4.5 4.5 0 0 1 7 7z'/%3E%3Cpath d='M8 10v3M6.5 11.5h3M15.5 10.5h.01M17 12h.01'/%3E%3C/svg%3E");
-  --se-ico-vr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='2.5' y='7' width='19' height='10' rx='4'/%3E%3C/g%3E%3Crect x='2.5' y='7' width='19' height='10' rx='4'/%3E%3Cpath d='M9.5 17l1-2a1.7 1.7 0 0 1 3 0l1 2'/%3E%3C/svg%3E");
-  --se-ico-workshop: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M14.5 4.2a4.3 4.3 0 0 0 5.3 5.3z'/%3E%3C/g%3E%3Cpath d='M14.5 4.2a4.3 4.3 0 0 0 5.3 5.3l-9.6 9.6a2.1 2.1 0 0 1-3-3z'/%3E%3C/svg%3E");
-  --se-ico-hdr: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3C/g%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4'/%3E%3C/svg%3E");
-  --se-ico-shield: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z'/%3E%3C/g%3E%3Cpath d='M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z'/%3E%3Cpath d='M9 12l2 2 4-4'/%3E%3C/svg%3E");
-  --se-ico-cart: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M6.2 8H21l-2.4 7H7.4z'/%3E%3C/g%3E%3Cpath d='M3 4h2l2.4 11h11L21 8H6.2'/%3E%3Ccircle cx='9' cy='19.5' r='1.4'/%3E%3Ccircle cx='17' cy='19.5' r='1.4'/%3E%3C/svg%3E");
-  --se-ico-captions: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='3' y='5' width='18' height='14' rx='2.5'/%3E%3C/g%3E%3Crect x='3' y='5' width='18' height='14' rx='2.5'/%3E%3Cpath d='M7 11h4M13 11h4M7 15h6M15 15h2'/%3E%3C/svg%3E");
-  --se-ico-lan: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Crect x='9' y='3' width='6' height='5' rx='1'/%3E%3C/g%3E%3Crect x='9' y='3' width='6' height='5' rx='1'/%3E%3Crect x='3' y='16' width='6' height='5' rx='1'/%3E%3Crect x='15' y='16' width='6' height='5' rx='1'/%3E%3Cpath d='M12 8v4M6 16v-4h12v4'/%3E%3C/svg%3E");
-  --se-ico-access: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3C/g%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='12' cy='7.5' r='1.3'/%3E%3Cpath d='M7.5 10.5l4.5 1 4.5-1M12 11.5v3M9.5 18l2.5-3.5 2.5 3.5'/%3E%3C/svg%3E");
-  --se-ico-spark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg fill='%23000' fill-opacity='.32' stroke='none'%3E%3Cpath d='M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z'/%3E%3C/g%3E%3Cpath d='M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z'/%3E%3C/svg%3E");
-}
-
-.se-app-summary__feature-icon[data-se-icon="single"] { --se-ico: var(--se-ico-single); }
-.se-app-summary__feature-icon[data-se-icon="multi"] { --se-ico: var(--se-ico-multi); }
-.se-app-summary__feature-icon[data-se-icon="coop"] { --se-ico: var(--se-ico-coop); }
-.se-app-summary__feature-icon[data-se-icon="versus"] { --se-ico: var(--se-ico-versus); }
-.se-app-summary__feature-icon[data-se-icon="screen"] { --se-ico: var(--se-ico-screen); }
-.se-app-summary__feature-icon[data-se-icon="trophy"] { --se-ico: var(--se-ico-trophy); }
-.se-app-summary__feature-icon[data-se-icon="cards"] { --se-ico: var(--se-ico-cards); }
-.se-app-summary__feature-icon[data-se-icon="cloud"] { --se-ico: var(--se-ico-cloud); }
-.se-app-summary__feature-icon[data-se-icon="stats"] { --se-ico: var(--se-ico-stats); }
-.se-app-summary__feature-icon[data-se-icon="podium"] { --se-ico: var(--se-ico-podium); }
-.se-app-summary__feature-icon[data-se-icon="remote"] { --se-ico: var(--se-ico-remote); }
-.se-app-summary__feature-icon[data-se-icon="family"] { --se-ico: var(--se-ico-family); }
-.se-app-summary__feature-icon[data-se-icon="gamepad"] { --se-ico: var(--se-ico-gamepad); }
-.se-app-summary__feature-icon[data-se-icon="vr"] { --se-ico: var(--se-ico-vr); }
-.se-app-summary__feature-icon[data-se-icon="workshop"] { --se-ico: var(--se-ico-workshop); }
-.se-app-summary__feature-icon[data-se-icon="hdr"] { --se-ico: var(--se-ico-hdr); }
-.se-app-summary__feature-icon[data-se-icon="shield"] { --se-ico: var(--se-ico-shield); }
-.se-app-summary__feature-icon[data-se-icon="cart"] { --se-ico: var(--se-ico-cart); }
-.se-app-summary__feature-icon[data-se-icon="captions"] { --se-ico: var(--se-ico-captions); }
-.se-app-summary__feature-icon[data-se-icon="lan"] { --se-ico: var(--se-ico-lan); }
-.se-app-summary__feature-icon[data-se-icon="access"] { --se-ico: var(--se-ico-access); }
-.se-app-summary__feature-icon[data-se-icon="spark"] { --se-ico: var(--se-ico-spark); }
+.se-app-summary__feature-icon[data-se-icon="single"] { --se-ico: var(--se-icon-user); }
+.se-app-summary__feature-icon[data-se-icon="multi"] { --se-ico: var(--se-icon-friends); }
+.se-app-summary__feature-icon[data-se-icon="coop"] { --se-ico: var(--se-icon-coop); }
+.se-app-summary__feature-icon[data-se-icon="versus"] { --se-ico: var(--se-icon-versus); }
+.se-app-summary__feature-icon[data-se-icon="screen"] { --se-ico: var(--se-icon-split-screen); }
+.se-app-summary__feature-icon[data-se-icon="trophy"] { --se-ico: var(--se-icon-trophy); }
+.se-app-summary__feature-icon[data-se-icon="cards"] { --se-ico: var(--se-icon-cards); }
+.se-app-summary__feature-icon[data-se-icon="cloud"] { --se-ico: var(--se-icon-cloud); }
+.se-app-summary__feature-icon[data-se-icon="stats"] { --se-ico: var(--se-icon-chart); }
+.se-app-summary__feature-icon[data-se-icon="podium"] { --se-ico: var(--se-icon-podium); }
+.se-app-summary__feature-icon[data-se-icon="remote"] { --se-ico: var(--se-icon-remote-play); }
+.se-app-summary__feature-icon[data-se-icon="family"] { --se-ico: var(--se-icon-family); }
+.se-app-summary__feature-icon[data-se-icon="gamepad"] { --se-ico: var(--se-icon-gamepad); }
+.se-app-summary__feature-icon[data-se-icon="vr"] { --se-ico: var(--se-icon-vr); }
+.se-app-summary__feature-icon[data-se-icon="workshop"] { --se-ico: var(--se-icon-workshop); }
+.se-app-summary__feature-icon[data-se-icon="hdr"] { --se-ico: var(--se-icon-sun); }
+.se-app-summary__feature-icon[data-se-icon="shield"] { --se-ico: var(--se-icon-shield); }
+.se-app-summary__feature-icon[data-se-icon="cart"] { --se-ico: var(--se-icon-cart); }
+.se-app-summary__feature-icon[data-se-icon="captions"] { --se-ico: var(--se-icon-captions); }
+.se-app-summary__feature-icon[data-se-icon="lan"] { --se-ico: var(--se-icon-lan); }
+.se-app-summary__feature-icon[data-se-icon="access"] { --se-ico: var(--se-icon-accessibility); }
+.se-app-summary__feature-icon[data-se-icon="spark"] { --se-ico: var(--se-icon-sparkle); }

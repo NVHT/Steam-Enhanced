@@ -81,99 +81,54 @@
     }
   };
 
-  // Feature groups: [pattern over "<link> <name>", icon]; the first match wins
+  // Feature groups: [pattern over "<link> <name>", core icon (--se-icon-*)]; the first match wins
   const GROUP_ICONS = [
-    [/filmmaker|\bsfm\b/i, 'film'],
+    [/filmmaker|\bsfm\b/i, 'art-trailer'],
     [/\bsdk\b|coding/i, 'code'],
-    [/beta/i, 'beta'],
+    [/beta/i, 'refresh'],
     [/trading|cards/i, 'cards'],
-    [/remote|stream|link/i, 'remote'],
+    [/remote|stream|link/i, 'video'],
     [/frame/i, 'vr'],
     [/vr\b|steamvr|virtual/i, 'vr'],
     [/deck/i, 'deck'],
-    [/market/i, 'market'],
-    [/universe/i, 'universe'],
-    [/linux|proton/i, 'linux'],
-    [/labs?\b/i, 'labs'],
+    [/market/i, 'tag'],
+    [/universe/i, 'globe'],
+    [/linux|proton/i, 'console'],
+    [/labs?\b/i, 'flask'],
     [/broadcast/i, 'broadcast'],
-    [/famil/i, 'families'],
+    [/famil/i, 'family'],
     [/music|soundtrack/i, 'music'],
-    [/controller/i, 'controller'],
-    [/machine/i, 'machine'],
-    [/chat/i, 'chat'],
+    [/controller/i, 'gamepad'],
+    [/machine/i, 'pc'],
+    [/chat/i, 'bubble'],
   ];
 
-  // Steam forums: [pattern over the forum's name, icon]; the first match wins. The language
+  // Steam forums: [pattern over the forum's name, core icon]; the first match wins. The language
   // forums are named in their own language, so they match on the word for "forum" and the
   // language's own name.
   const FORUM_ICONS = [
-    [/new to steam/i, 'new'],
+    [/new to steam/i, 'sparkle'],
     [/help|tips/i, 'help'],
     [/suggest|idea/i, 'idea'],
-    [/\bmac\b|macos/i, 'mac'],
+    [/\bmac\b|macos/i, 'display'],
     [/mobile/i, 'mobile'],
-    [/community/i, 'families'],
-    [/\bvac\b|cheat/i, 'vac'],
-    [/hardware|operating/i, 'hardware'],
-    [/off.?topic/i, 'offtopic'],
+    [/community/i, 'family'],
+    [/\bvac\b|cheat/i, 'shield'],
+    [/hardware|operating/i, 'cpu'],
+    [/off.?topic/i, 'mug'],
     [/server/i, 'server'],
-    [/level design|mapping/i, 'level'],
-    [/\bart\b|sound/i, 'art'],
+    [/level design|mapping/i, 'map'],
+    [/\bart\b|sound/i, 'palette'],
     [/coding|scripting|\bsdk\b/i, 'code'],
-    [/discussion/i, 'discuss'],
+    [/discussion/i, 'community'],
     [/форум|deutsch|franc|portugu|españ|espan|ital|polsk|nederl|türk|česk|magyar|中文|日本|한국|ไทย|\bfor[oum]+\b|fórum/i, 'language'],
   ];
 
-  // 24px duotone line icons: the outline in currentColor over a soft fill of it (the theme's
-  // duotone style, as core/tokens.css's --se-icon-* icons)
-  const ICON_SVG = {
-    new: '<path fill="currentColor" fill-opacity=".32" d="M12 3l1.8 4.9L19 9.7l-5.2 1.8L12 16.5l-1.8-5L5 9.7l5.2-1.8z"/><path fill="currentColor" fill-opacity=".32" d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>',
-    help: '<circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity=".32"/><circle cx="12" cy="12" r="3.5"/><path d="m5.6 5.6 4 4M14.4 14.4l4 4M18.4 5.6l-4 4M9.6 14.4l-4 4"/>',
-    idea: '<path d="M9 18h6M10 21h4"/><path fill="currentColor" fill-opacity=".32" d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>',
-    discuss: '<path fill="currentColor" fill-opacity=".32" d="M3 5h12a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H8l-4 3v-3H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M18 9h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-1v3l-4-3h-5a1 1 0 0 1-1-1v-1"/>',
-    mac: '<rect x="4" y="5" width="16" height="11" rx="1.5" fill="currentColor" fill-opacity=".32"/><path d="M2 19h20"/>',
-    mobile: '<rect x="6.5" y="2.5" width="11" height="19" rx="2.5" fill="currentColor" fill-opacity=".32"/><path d="M11 18h2"/>',
-    vac: '<path fill="currentColor" fill-opacity=".32" d="M12 3 4.5 6v5.5c0 4.6 3.2 8.2 7.5 9.5 4.3-1.3 7.5-4.9 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/>',
-    hardware: '<rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" fill-opacity=".32"/><rect x="9.5" y="9.5" width="5" height="5" rx=".5"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>',
-    offtopic: '<path fill="currentColor" fill-opacity=".32" d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 2.5v2.5M12 2.5v2.5"/>',
-    server: '<rect x="3" y="4" width="18" height="7" rx="2" fill="currentColor" fill-opacity=".32"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/>',
-    level: '<path fill="currentColor" fill-opacity=".32" d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/>',
-    art: '<path fill="currentColor" fill-opacity=".32" d="M12 3a9 9 0 0 0 0 18c1.1 0 1.8-.9 1.5-1.9-.3-1 .4-2.1 1.5-2.1H17a4 4 0 0 0 4-4c0-5.5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/>',
-    code: '<rect x="3" y="4" width="18" height="16" rx="2" fill="currentColor" fill-opacity=".32"/><path d="m9 9-3 3 3 3M15 9l3 3-3 3"/>',
-    film: '<rect x="3" y="5" width="18" height="14" rx="2" fill="currentColor" fill-opacity=".32"/><path d="M7 5v14M17 5v14M3 9.5h4M3 14.5h4M17 9.5h4M17 14.5h4"/>',
-    language: '<path fill="currentColor" fill-opacity=".32" d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-9l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="m9 14 3-7 3 7M10 12h4"/>',
-    beta: '<circle cx="12" cy="12" r="8" stroke="none" fill="currentColor" fill-opacity=".32"/><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v4h-4"/><path d="M12 8v4l2.5 1.5"/>',
-    cards: '<rect x="3.5" y="6" width="11" height="14" rx="2" fill="currentColor" fill-opacity=".32" transform="rotate(-8 9 13)"/><path d="M15.6 4.4 20.2 6l-3.4 12.6"/>',
-    remote: '<rect x="3" y="4" width="18" height="13" rx="2" fill="currentColor" fill-opacity=".32"/><path d="M8 21h8"/><path d="m10.5 8 4 2.5-4 2.5z"/>',
-    vr: '<path fill="currentColor" fill-opacity=".32" d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4l-2-2.5h-2L9 17H5a2 2 0 0 1-2-2z"/>',
-    deck: '<rect x="2" y="7" width="20" height="10" rx="3" fill="currentColor" fill-opacity=".32"/><rect x="8" y="9.5" width="8" height="5" rx="1"/>',
-    market: '<path d="M3 12V4h8l10 10-8 8z" fill="currentColor" fill-opacity=".32"/><circle cx="7.5" cy="8.5" r="1.5"/>',
-    universe: '<circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity=".32"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
-    linux: '<rect x="3" y="4" width="18" height="16" rx="2" fill="currentColor" fill-opacity=".32"/><path d="m7 9 3 3-3 3M13 15h4"/>',
-    labs: '<path stroke="none" fill="currentColor" fill-opacity=".32" d="M10.5 9.5 5 18.5A1.7 1.7 0 0 0 6.5 21h11a1.7 1.7 0 0 0 1.5-2.5l-5.5-9z"/><path d="M9.5 3h5M10.5 3v6.5L5 18.5A1.7 1.7 0 0 0 6.5 21h11a1.7 1.7 0 0 0 1.5-2.5l-5.5-9V3"/><path d="M7.5 15h9"/>',
-    broadcast: '<circle cx="12" cy="12" r="2" fill="currentColor" fill-opacity=".32"/><path d="M8.5 15.5a5 5 0 0 1 0-7M15.5 8.5a5 5 0 0 1 0 7M5.6 18.4a9 9 0 0 1 0-12.8M18.4 5.6a9 9 0 0 1 0 12.8"/>',
-    families: '<circle cx="9" cy="8" r="3.5" fill="currentColor" fill-opacity=".32"/><path d="M2.5 20c.6-3.6 3.2-5.8 6.5-5.8s5.9 2.2 6.5 5.8M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.6c1.7.8 2.7 2.7 3 5.4"/>',
-    music: '<path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor" fill-opacity=".32"/><circle cx="17.5" cy="16" r="2.5" fill="currentColor" fill-opacity=".32"/>',
-    controller: '<path fill="currentColor" fill-opacity=".32" d="M7 7h10a5 5 0 0 1 4.9 6l-.6 3a2.6 2.6 0 0 1-4.5 1.2L14.8 15H9.2l-2 2.2A2.6 2.6 0 0 1 2.7 16l-.6-3A5 5 0 0 1 7 7z"/><path d="M7.5 10v3M6 11.5h3M15.5 11h.01M17.5 12.5h.01"/>',
-    machine: '<rect x="4" y="3" width="16" height="18" rx="2" fill="currentColor" fill-opacity=".32"/><path d="M4 15h16M15 18h2"/>',
-    chat: '<path fill="currentColor" fill-opacity=".32" d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-9l-5 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/>',
-  };
-
-  const SVG_NS = 'http://www.w3.org/2000/svg';
-
+  /** A core icon mask as --se-dsc-line (home-forums.css); its tile sets the size and tone. */
   const lineIcon = (name) => {
-    const svg = document.createElementNS(SVG_NS, 'svg');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('fill', 'none');
-    svg.setAttribute('stroke', 'currentColor');
-    svg.setAttribute('stroke-width', '1.8');
-    svg.setAttribute('stroke-linecap', 'round');
-    svg.setAttribute('stroke-linejoin', 'round');
-    svg.setAttribute('aria-hidden', 'true');
-    svg.setAttribute('data-se-own', '');
-    // Static, theme-authored markup only
-    svg.innerHTML = ICON_SVG[name];
-    return svg;
+    const node = web.dom.el('span', { class: 'se-dsc-line' });
+    node.style.setProperty('--se-dsc-line', `var(--se-icon-${name})`);
+    return node;
   };
 
   const isTyping = (target) =>

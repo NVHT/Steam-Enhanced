@@ -17,7 +17,8 @@
  * .two_column.right. Account details fills the right column with .account_header_line bars over
  * .account_setting_block > .account_setting_sub_block floats. The layout keys on the frame
  * itself (.page_content:has(> .two_column.left)), so an /account/ page without the sidebar
- * (purchase history ...) keeps its own layout. Store looks follow shared/ui.css. Rules use
+ * (purchase history ...) keeps its own layout. Store looks follow shared/ui.css; the cards,
+ * chips, icons, row links and green buttons every account page shares, shared/account.css. Rules use
  * html.se-store-account:not(#se-none) for ID-level weight over Steam's rules. Until the
  * script is done ([data-se-account-ready]) the content column is held back so it never jumps
  * from Steam's look to the cards; if the script fails it shows after 1.5s anyway.
@@ -35,21 +36,6 @@ html.se-store-account:not(#se-none) :is(.responsive_page_frame, .responsive_page
 
 html.se-store-account:not(#se-none) [data-se-account-hidden] {
   display: none !important;
-}
-
-:is(.se-account-id, .se-account-nav-icon, .se-account-chip) svg {
-  flex: none;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-:is(.se-account-id, .se-account-nav-icon, .se-account-chip) svg .d {
-  fill: currentColor;
-  fill-opacity: var(--se-icon-duo);
-  stroke: none;
 }
 
 /* ---------- Header ---------- */
@@ -114,7 +100,7 @@ html.se-store-account:not(#se-none) .youraccount_steamid {
   color: var(--se-text-muted);
 }
 
-.se-account-id > svg {
+.se-account-id > .se-account-icon {
   width: 17px;
   height: 17px;
   color: var(--se-text-faint);
@@ -158,7 +144,7 @@ html.se-store-account:not(#se-none) .se-account-id-btn {
   inset: calc((var(--se-ctl-sm) - var(--se-hit)) / 2) calc((30px - var(--se-hit)) / 2);
 }
 
-.se-account-id-btn svg {
+.se-account-id-btn .se-account-icon {
   width: 16px;
   height: 16px;
 }
@@ -216,9 +202,6 @@ html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two
   gap: var(--se-space-half);
   height: auto !important;
   padding: var(--se-space-3) !important;
-  border-radius: var(--se-card-radius);
-  background: var(--se-card-bg) !important;
-  box-shadow: var(--se-card-edge);
 }
 
 html.se-store-account:not(#se-none) a.nav_item {
@@ -279,7 +262,7 @@ html.se-store-account:not(#se-none) a.nav_item[data-se-account-nav] > img {
   transition: background-color var(--se-dur), color var(--se-dur);
 }
 
-.se-account-nav-icon svg {
+.se-account-nav-icon .se-account-icon {
   width: 16px;
   height: 16px;
 }
@@ -303,9 +286,6 @@ html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two
 
 .se-account-card {
   padding: var(--se-space-5) var(--se-space-6) var(--se-space-6);
-  border-radius: var(--se-card-radius);
-  background: var(--se-card-bg);
-  box-shadow: var(--se-card-edge);
 }
 
 /* Header bar → card title */
@@ -337,19 +317,11 @@ html.se-store-account:not(#se-none) .se-account-card .account_header_line img {
 }
 
 .se-account-chip {
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 38px;
   height: var(--se-ctl);
-  border-radius: var(--se-radius-md);
-  background: var(--se-pill);
-  box-shadow: var(--se-edge);
-  color: var(--se-text-dim);
 }
 
-.se-account-chip svg {
+.se-account-chip .se-account-icon {
   width: 20px;
   height: 20px;
 }
@@ -461,18 +433,7 @@ html.se-store-account:not(#se-none) .se-account-card .account_setting_sub_block 
   height: 1.15em;
   margin: 0 var(--se-space-1) 0 var(--se-space-1);
   vertical-align: -.22em;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
   color: var(--se-text-muted);
-}
-
-.se-account-inline-icon .d {
-  fill: currentColor;
-  fill-opacity: var(--se-icon-duo);
-  stroke: none;
 }
 
 /* Named anchors between sections (scroll targets): out of the column's flow, so they add no gap */

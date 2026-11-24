@@ -38,22 +38,13 @@ html.se-store-account-history:not(#se-none) .wallet_history_click_hint {
   font: var(--se-type-body) !important;
 }
 
-html.se-store-account-history:not(#se-none) .wallet_history_click_hint > svg {
+html.se-store-account-history:not(#se-none) .wallet_history_click_hint::before {
+  content: "";
   flex: none;
   width: 16px;
   height: 16px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  color: var(--se-text-faint);
-}
-
-.wallet_history_click_hint > svg .d {
-  fill: currentColor;
-  fill-opacity: var(--se-icon-duo);
-  stroke: none;
+  background: var(--se-text-faint);
+  -webkit-mask: var(--se-icon-info) center / contain no-repeat;
 }
 
 /* The hint reads under the toolbar */
@@ -255,35 +246,9 @@ html.se-store-account-history:not(#se-none) .load_more_history_area {
   padding: 0 !important;
 }
 
+/* The button is shared/ui-buttons.css's; Steam gives it a fixed width */
 html.se-store-account-history:not(#se-none) #load_more_button {
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
   width: auto !important;
-  height: var(--se-ctl) !important;
-  margin: 0 !important;
-  padding: 0 var(--se-space-5) !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-control) !important;
-  background: var(--se-btn-bg) !important;
-  box-shadow: var(--se-btn-edge);
-  color: var(--se-btn-color) !important;
-  font: var(--se-type-control-lg) !important;
-  text-shadow: none !important;
-  cursor: pointer;
-  transition: background-color var(--se-dur), color var(--se-dur);
-}
-
-html.se-store-account-history:not(#se-none) #load_more_button > span {
-  padding: 0 !important;
-  background: none !important;
-  font: inherit !important;
-  line-height: inherit !important;
-}
-
-html.se-store-account-history:not(#se-none) #load_more_button:hover {
-  background: var(--se-btn-bg-hover) !important;
-  color: var(--se-btn-color-hover) !important;
 }
 
 /* ---------- Narrow windows: tax, shipping and the wallet columns give way ---------- */

@@ -56,22 +56,16 @@ html.se-store-legal:not(#se-none) h2.pageheader {
   color: var(--se-text-muted);
 }
 
-:is(.se-legal-meta, .se-legal-grid) svg {
+/* Icons: a core mask (--se-icon-*, named by --se-legal-glyph on the element, legal.js) */
+.se-legal-glyph {
   flex: none;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  display: block;
+  background: currentColor;
+  -webkit-mask: var(--se-legal-glyph) center / contain no-repeat;
+  mask: var(--se-legal-glyph) center / contain no-repeat;
 }
 
-:is(.se-legal-meta, .se-legal-grid) svg .d {
-  fill: currentColor;
-  fill-opacity: .3;
-  stroke: none;
-}
-
-.se-legal-meta svg {
+.se-legal-meta .se-legal-glyph {
   width: 16px;
   height: 16px;
   color: var(--se-text-faint);
@@ -152,7 +146,7 @@ html.se-store-legal:not(#se-none) #legal_box {
   color: var(--se-text-dim);
 }
 
-.se-legal-icon svg {
+.se-legal-icon .se-legal-glyph {
   width: 20px;
   height: 20px;
 }

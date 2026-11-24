@@ -3,45 +3,15 @@
  * card.
  */
 
-/* ---------- Action links: one row button each ---------- */
-
-html.se-store-account:not(#se-none) .se-account-card a.account_manage_link {
-  display: flex !important;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--se-space-3);
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 40px;
-  margin: 0 !important;
-  padding: var(--se-space-2) var(--se-space-4) !important;
-  border-radius: var(--se-radius-md) !important;
-  background: var(--se-pill) !important;
-  box-shadow: var(--se-edge);
-  color: var(--se-text) !important;
-  font: var(--se-type-body-lg) !important;
-  text-decoration: none !important;
-  transition: background-color var(--se-dur), color var(--se-dur);
-}
+/* ---------- Action links: shared/account.css's row links; the chevron nudges on hover ---------- */
 
 html.se-store-account:not(#se-none) .se-account-card a.account_manage_link::after {
-  content: "";
-  flex: none;
-  width: 14px;
-  height: 14px;
-  background: currentColor;
-  opacity: .5;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
-  transition: opacity var(--se-dur), transform var(--se-dur) var(--se-ease);
-}
-
-html.se-store-account:not(#se-none) .se-account-card a.account_manage_link:hover {
-  background: var(--se-hover) !important;
+  transition: opacity var(--se-dur), translate var(--se-dur) var(--se-ease);
 }
 
 html.se-store-account:not(#se-none) .se-account-card a.account_manage_link:hover::after {
   opacity: 1;
-  transform: translateX(2px);
+  translate: 2px 0; /* not transform: the chevron's rotate would turn it */
 }
 
 /* Add funds: the page's one primary action */
