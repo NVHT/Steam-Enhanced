@@ -6,8 +6,8 @@
  * the pointer leaving the button and the card closes it. A right click opens the Downloads page
  * straight away; "Click opens: Page" swaps the two.
  *
- * Read from Steam's live download feeds (RegisterForDownloadOverview, RegisterForDownloadItems;
- * the download store as a fallback) and its app store, refreshed each second while open. Pause / Resume is Steam's own
+ * Read from Steam's live download feeds (SE.downloadFeed, client/shared/download-feed.js; the
+ * download store as a fallback) and its app store, refreshed each second while open. Pause / Resume is Steam's own
  * SteamClient.Downloads.EnableAllDownloads. Drawn in a popup-layer panel
  * (client/shared/popup-layer.js), styled by client/header/downloads-card.css, opened as the
  * rail's other menus open: beside the rail, above the button.
@@ -51,7 +51,7 @@
           : Object.values(value);
       for (const child of children) walk(child, depth + 1);
     };
-    walk(liveItems || run(() => downloads?.m_DownloadItems), 0);
+    walk(feed?.items || run(() => downloads?.m_DownloadItems), 0);
     return [...found.values()]
       .filter((item) => !item.completed)
       .sort((a, b) => (Number(a.queue_index) || 0) - (Number(b.queue_index) || 0));
@@ -66,7 +66,7 @@
    */
   function readState() {
     const downloads = store();
-    const overview = liveOverview || window.__seDownloadsParts?.live?.liveOverview || downloads?.m_DownloadOverview || null;
+    const overview = feed?.overview || downloads?.m_DownloadOverview || null;
     const items = queueItems(downloads);
     const active = Number(overview?.update_appid) || 0;
     const appid = active || Number(items[0]?.appid) || 0;
@@ -124,26 +124,13 @@
   const queueText = (count) => (count ? `${count} ${count === 1 ? 'game' : 'games'} queued` : 'Nothing queued');
 
   /*
-   * Steam's live feeds (what its Downloads page reads): the store's copy can sit stale while no
-   * one subscribes, so the card keeps its own subscription from the start
+   * Steam's live feeds (SE.downloadFeed, client/shared/download-feed.js), watched from the start:
+   * the store's copy can sit stale while no one subscribes. The open card re-renders on each
+   * update, so it needs no timer of its own.
    */
-  let liveOverview = null;
-  let liveItems = null;
-  // The open card re-renders on each feed update (Steam sends them about once a second while
-  // something moves), so it needs no timer of its own
+  const feed = SE.downloadFeed;
   let onFeed = null;
-  const api = steamDownloads();
-  const subscriptions = [
-    run(() => api?.RegisterForDownloadOverview?.((overview) => {
-      liveOverview = overview;
-      onFeed?.();
-    })),
-    // (isDownloading, items) in the builds seen; whichever argument is the list
-    run(() => api?.RegisterForDownloadItems?.((...args) => {
-      liveItems = args.find((arg) => arg && typeof arg === 'object' && typeof arg !== 'boolean') ?? liveItems;
-      onFeed?.();
-    })),
-  ];
+  const unsubscribe = feed?.subscribe(() => onFeed?.());
 
   /* ---------- The card ---------- */
 
@@ -342,7 +329,7 @@
       destroyed = true;
       close();
       markPoll?.disconnect?.();
-      for (const subscription of subscriptions) run(() => subscription?.unregister());
+      unsubscribe?.();
       removeEventListener('click', onClick, true);
       removeEventListener('contextmenu', onContextMenu, true);
       removeEventListener('pointerdown', onDown, true);

@@ -13,8 +13,6 @@
 
   // Room under the menu's top the picker wants before it opens upward instead
   const PICKER_ROOM = 420;
-  // placePop's gap between a popup and its anchor (client/shared/picker.js)
-  const POP_GAP = 8;
   const RECENT_KEY = 'se-collections-recent';
   const RECENT_ROWS = 3;
   // Collection names shown in the Collections row's hint before "+n"
@@ -156,10 +154,11 @@
     run(() => instance.Hide());
 
     const below = innerHeight - place.top >= PICKER_ROOM;
+    const gap = SE.placePop.gap;
     const anchor = document.createElement('div');
     anchor.className = 'se-gm-anchor';
     anchor.style.left = `${place.left}px`;
-    anchor.style.top = `${below ? place.top - POP_GAP : place.bottom + POP_GAP}px`;
+    anchor.style.top = `${below ? place.top - gap : place.bottom + gap}px`;
     // As wide as the picker (placePop aligns their right edges), so it lines up with the menu's left
     anchor.style.width = `${SE.px('--se-menu-width')}px`;
     document.body.appendChild(anchor);

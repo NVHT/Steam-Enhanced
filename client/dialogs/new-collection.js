@@ -46,7 +46,7 @@
   ];
 
   const attempt = SE.attempt('New collection');
-  const isOurs = (node) => node.nodeType === 1 && node.closest?.(`.${OURS}`);
+  const isOurs = SE.inside(`.${OURS}`);
   const { el } = SE;
 
   // The games it opens with, the one the menu was opened on first: [{ appid, name }]

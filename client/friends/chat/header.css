@@ -147,11 +147,16 @@
   stroke-linejoin: round;
 }
 
-.se-chat-head .se-chat-tile svg .fill {
-  fill: currentColor;
-  fill-opacity: var(--se-icon-duo);
-  stroke: none;
+.se-chat-head .se-chat-tile .se-chat-tile-mask {
+  width: var(--se-tile-icon);
+  height: var(--se-tile-icon);
+  background: currentColor;
+  -webkit-mask: var(--se-chat-tile-mask) center / contain no-repeat;
+  mask: var(--se-chat-tile-mask) center / contain no-repeat;
 }
+
+.se-chat-tile-mask[data-icon="voice"] { --se-chat-tile-mask: var(--se-icon-phone); }
+.se-chat-tile-mask[data-icon="invite"] { --se-chat-tile-mask: var(--se-icon-invite); }
 
 .se-chat-head .se-chat-tile svg .dot {
   fill: currentColor;

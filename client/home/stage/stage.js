@@ -9,8 +9,8 @@
   const ns = window.__seHomeStageParts;
   if (!ns) return;
   const {
-    applyStageLook, artImg, boxOf, clearMarks, client, closeMenu, closePick, compact,
-    cycleSeconds, dropAllOwn, hours, ICON_INSTALL, ICON_PLAY, mark, NARROW_AT,
+    applyStageLook, artImg, clearMarks, client, closeMenu, closePick, compact,
+    cycleSeconds, dropAllOwn, fitGrids, hours, ICON_INSTALL, ICON_PLAY, mark, NARROW_AT,
     reducedMotion, schedule, scrollerOf, setHTML, stageSettings, when,
   } = ns;
   const { live } = ns;
@@ -485,8 +485,7 @@
     const dims = geo;
     applyStageDimensions(dims, showBoard);
     const fits = showBoard ? ns.paintBoard(dims.boardW) : [];
-    const boxes = fits.map((f) => boxOf(f.grid));
-    fits.forEach((f, i) => f.fit(f.entry, boxes[i]));
+    fitGrids(fits);
     fitStrip();
   }
 

@@ -31,11 +31,7 @@
   // The Friend cards and Card delay settings (client/shared/settings.js), for every card below
   const cardsOff = () => SE.settings?.get('hover-cards') === 'off';
   const CARD_DELAY = '--se-friend-card-delay';
-  const SHEETS = [
-    'core/levels.css', 'client/shared/hover-cards.css', 'client/friends/friends-dock.css',
-    'client/friends/friends-dock-chat.css', 'client/friends/friends-dock-chat-group.css',
-    'client/friends/friends-dock-chat-rail.css',
-  ];
+  const SHEETS = ['core/levels.css', 'client/shared/hover-cards.css', ...ns.dockSheets];
   // On <body> while the theme's card stands in for Steam's hover (friends-dock.css hides it)
   const ATTR = 'data-se-friend-card';
 

@@ -45,36 +45,12 @@
 
   const isOurs = SE.inside(`.${OURS}`);
 
-  const num = (value) => {
-    const n = Number(value);
-    return Number.isFinite(n) && n >= 0 ? n : null;
-  };
-
-  /* Bytes as Steam shows them: binary units, two decimals from GB up */
-  const UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-  const bytes = (value) => {
-    let n = Math.max(0, value);
-    let unit = 0;
-    while (n >= 1024 && unit < UNITS.length - 1) {
-      n /= 1024;
-      unit++;
-    }
-    const digits = unit >= 3 ? 2 : unit >= 1 ? 1 : 0;
-    return `${n.toLocaleString(undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits })} ${UNITS[unit]}`;
-  };
-
-  const pct = (part, whole) => `${Math.min(100, Math.max(0, (part / whole) * 100)).toFixed(3)}%`;
+  const { bytes, amount: num, percent: pct } = SE;
 
   /* ---------- Reading Steam's state ---------- */
 
-  const readApps = (node) => {
-    let fiber = SE.liveFiber?.(node);
-    for (let depth = 0; fiber && depth < MAX_DEPTH; fiber = fiber.return, depth++) {
-      const apps = fiber.memoizedProps?.rgApps;
-      if (Array.isArray(apps) && apps.length) return apps.map(Number).filter(id => id > 0);
-    }
-    return [];
-  };
+  const readApps = (node) =>
+    SE.fromProps(node, MAX_DEPTH, (p) => (Array.isArray(p.rgApps) && p.rgApps.length ? p.rgApps.map(Number).filter(id => id > 0) : undefined), { live: true }) ?? [];
 
   const overview = (appid) => attempt(() => SE.appStore?.()?.GetAppOverviewByAppID(appid), null);
 

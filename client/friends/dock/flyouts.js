@@ -128,25 +128,19 @@
 
   /*
    * A group's call, as a bar under its header (friends-dock-chat-group.css .se-fd-group-call, the look of
-   * a one-to-one call's): the channel, the faces in it, then mic, headphones and leave. Those are
-   * stand-ins: each runs Steam's own button (in the channel list, else the message box) through its
-   * click handler and shows its state (muted: Steam's "disabled").
+   * a one-to-one call's): the channel, the faces in it, then mic, headphones and leave: stand-ins
+   * for Steam's own (in the channel list, else the message box; SE.callTools,
+   * client/friends/call-tools.js). Muted: Steam's "disabled"; leave is never off.
    */
   const CALL_TOOLS = { mic: 'ToggleMicrophoneButton', out: 'ToggleVoiceOutputButton', end: 'chatEndVoiceChat' };
   const CALL_FACES = 4;
   const steamCallTool = (win, kind) =>
     win.querySelector(`.chatRoomGroupNavColumn .VoiceControlPanelButton.${CALL_TOOLS[kind]}`) ||
     win.querySelector(`.ChatMessageEntryVoice .${CALL_TOOLS[kind]}`);
+  const isMuted = (original, kind) => kind !== 'end' && original.classList.contains('disabled');
 
   function onCallTool(event) {
-    const button = event.target.closest?.('.se-call-tool');
-    const win = button?.closest('.chatWindow');
-    const original = win && steamCallTool(win, button.dataset.tool);
-    const onClick = original && SE.fromProps(original, 3, (p) => (typeof p.onClick === 'function' ? p.onClick : undefined));
-    if (!onClick) return;
-    event.stopPropagation();
-    run(() => onClick({ stopPropagation() {}, preventDefault() {}, currentTarget: original, target: original }));
-    schedule();
+    if (SE.callTools.click(event, steamCallTool)) schedule();
   }
 
   function buildCallBar(doc) {
@@ -191,17 +185,7 @@
         return face;
       }));
     }
-    for (const button of bar.querySelectorAll('.se-call-tool')) {
-      const original = steamCallTool(win, button.dataset.tool);
-      SE.attr(button, 'hidden', original ? null : '');
-      if (!original) continue;
-      SE.attr(button, 'data-off', button.dataset.tool !== 'end' && original.classList.contains('disabled') ? '' : null);
-      const label = original.getAttribute('title') || '';
-      if (label && button.getAttribute('aria-label') !== label) {
-        button.title = label;
-        button.setAttribute('aria-label', label);
-      }
-    }
+    SE.callTools.sync(win, bar.querySelectorAll('.se-call-tool'), steamCallTool, isMuted);
   }
 
   /*

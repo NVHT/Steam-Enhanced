@@ -27,32 +27,7 @@
   const BUILT = 'data-se-sysinfo';
   const KEY_PREFIX = /^#?SteamUI_ValveSurvey_Summary_/;
   const COPIED_MS = 1400;
-  const TIP_RETRY_MS = 250;
-  const TIP_RETRIES = 40;
   const SPY_OFFSET = 28; // px below the list's top edge that counts as "reading this section"
-
-  /* Duotone icons, as about-steam.js draws them: `d` is the soft fill layer under the stroke. */
-  const ICONS = {
-    pc: '<rect class="d" x="6" y="3" width="12" height="18" rx="2"/><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9.5 7h5M9.5 10h5"/><circle cx="12" cy="16" r="1.4"/>',
-    cpu: '<rect class="d" x="5" y="5" width="14" height="14" rx="2"/><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>',
-    gpu: '<rect class="d" x="3" y="6" width="18" height="11" rx="2"/><path d="M2 4h1v16M3 6h16a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H3M7 17v3h5v-3"/><circle cx="14" cy="11.5" r="3"/>',
-    ram: '<rect class="d" x="2" y="7" width="20" height="9" rx="1.5"/><rect x="2" y="7" width="20" height="9" rx="1.5"/><path d="M6 10v3M10 10v3M14 10v3M18 10v3M5 16v3M19 16v3"/>',
-    display: '<rect class="d" x="3" y="4" width="18" height="12" rx="2"/><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 20h6M12 16v4"/>',
-    os: '<rect class="d" x="3" y="4" width="18" height="5"/><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M6.5 6.5h.01M9.5 6.5h.01"/>',
-    audio: '<path class="d" d="M4 9h4l5-4v14l-5-4H4z"/><path d="M4 9h4l5-4v14l-5-4H4zM17 9a4 4 0 0 1 0 6M19.5 6.5a8 8 0 0 1 0 11"/>',
-    disk: '<rect class="d" x="3" y="13" width="18" height="7" rx="2"/><path d="M6 4h12l3 9v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5zM3 13h18M17 16.5h.01M13.5 16.5h.01"/>',
-    network: '<circle class="d" cx="12" cy="18.5" r="2"/><path d="M2.5 9a14 14 0 0 1 19 0M5.8 12.4a9 9 0 0 1 12.4 0M9 15.7a4.5 4.5 0 0 1 6 0"/><circle cx="12" cy="18.5" r="2"/>',
-    vr: '<path class="d" d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4l-3-3-3 3H5a2 2 0 0 1-2-2z"/><path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4l-3-3-3 3H5a2 2 0 0 1-2-2z"/>',
-    apps: '<rect class="d" x="4" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
-    alert: '<path class="d" d="M12 3.5l9 16H3z"/><path d="M12 3.5l9 16H3zM12 10v4M12 16.8h.01"/>',
-    game: '<path class="d" d="M7 7h10a5 5 0 0 1 4.9 6l-.6 3a2.5 2.5 0 0 1-4.3 1.2L15 15H9l-2 2.2A2.5 2.5 0 0 1 2.7 16l-.6-3A5 5 0 0 1 7 7z"/><path d="M7 7h10a5 5 0 0 1 4.9 6l-.6 3a2.5 2.5 0 0 1-4.3 1.2L15 15H9l-2 2.2A2.5 2.5 0 0 1 2.7 16l-.6-3A5 5 0 0 1 7 7zM7.5 10v4M5.5 12h4M15.5 11h.01M17.5 13h.01"/>',
-    info: '<circle class="d" cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
-    copy: '<rect class="d" x="8" y="8" width="12" height="12" rx="2.5"/><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
-    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
-    search: '<circle class="d" cx="11" cy="11" r="6.5"/><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
-    clear: '<path d="M7 7l10 10M17 7L7 17"/>',
-    eye: '<path class="d" d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
-  };
 
   /* Survey section keys (steamui_english SteamUI_ValveSurvey_Summary_*) to icons */
   const SECTION_ICONS = {
@@ -102,7 +77,13 @@
 
   const { el } = SE;
 
-  const { icon } = SE.icons(ICONS, 'info');
+  // Every icon is a core mask (core/icons-*.css), drawn by system-info.css (.se-sysinfo-icon)
+  const icon = (name) => {
+    const node = el('span', 'se-sysinfo-icon');
+    node.dataset.icon = name;
+    node.setAttribute('aria-hidden', 'true');
+    return node;
+  };
 
   const button = (className, children, onClick, label) => {
     const node = el('button', className);
@@ -261,95 +242,26 @@
       .filter(Boolean)
       .join('\n\n');
 
-  /* ---------- Steam tooltips (as about-steam.js mounts them) ---------- */
-
-  const nativeTooltips = () =>
-    attempt(() => SE.global?.('__seNativeTooltips', (api) => typeof api?.resolve === 'function')?.resolve() ?? null, null);
-
-  const mountTip = ({ React, DOM, Tooltip }, node, label, direction) => {
-    const host = el('span', 'se-sysinfo-tip');
-    node.setAttribute('data-se-sysinfo-tip', '');
-    node.append(host);
-    const root = DOM.createRoot(host);
-    root.render(
-      React.createElement(Tooltip, {
-        toolTipContent: label,
-        bTopmost: true,
-        nDelayShowMS: 300,
-        direction,
-        nBodyAlignment: 0.5,
-        nBodyDistance: 6,
-        bPortalToBody: true,
-        children: React.createElement('span', { className: 'se-sysinfo-tip-hitbox' }),
-      }),
-    );
-    return () => {
-      attempt(() => root.unmount());
-      host.remove();
-      node.removeAttribute('data-se-sysinfo-tip');
-    };
-  };
-
   /* ---------- View ---------- */
 
   const createView = (root) => {
     const doc = root.ownerDocument;
     const win = doc.defaultView;
     const cleanups = [];
-    const timers = new Map();
     const listen = SE.listenInto(cleanups);
 
-    /*
-     * Tooltips: Steam's own once webpack is up, `title` if it never is. Each tip belongs to a
-     * bucket (an array of unmounts), so a redraw can drop the tips of the nodes it replaces.
-     */
-    let native = null; // null: still looking; false: gave up
-    let tipTries = 0;
-    let tipTimer = 0;
-    const pendingTips = [];
-    const tip = (bucket, node, label, direction = 'top') => {
-      if (native) bucket.push(mountTip(native, node, label, direction));
-      else if (native === false) node.title = label;
-      else pendingTips.push([bucket, node, label, direction]);
-    };
-    const mountTips = () => {
-      native = nativeTooltips();
-      if (!native && ++tipTries < TIP_RETRIES) {
-        native = null;
-        tipTimer = setTimeout(mountTips, TIP_RETRY_MS);
-        return;
-      }
-      native ||= false;
-      for (const [bucket, node, label, direction] of pendingTips.splice(0)) if (node.isConnected) tip(bucket, node, label, direction);
-    };
+    // Tips in buckets, so a redraw drops the tips of the nodes it replaces
+    const tips = SE.nativeTips();
     const specTips = [];
     const cardTips = [];
-    const dropTips = (bucket) => {
-      for (const unmount of bucket.splice(0)) attempt(unmount);
-    };
-    cleanups.push(() => {
-      clearTimeout(tipTimer);
-      pendingTips.length = 0;
-      dropTips(specTips);
-      dropTips(cardTips);
-    });
+    const tip = (bucket, node, label) => tips.tip(node, label, { bucket });
+    const dropTips = (bucket) => tips.drop(bucket);
+    cleanups.push(() => tips.destroy());
 
     /* Copied feedback: the node shows a check for a moment */
-    const flash = (node) => {
-      clearTimeout(timers.get(node));
-      node.setAttribute('data-copied', '');
-      timers.set(node, setTimeout(() => {
-        node.removeAttribute('data-copied');
-        timers.delete(node);
-      }, COPIED_MS));
-    };
-    cleanups.push(() => {
-      for (const [node, id] of timers) {
-        clearTimeout(id);
-        node.removeAttribute('data-copied');
-      }
-      timers.clear();
-    });
+    const copied = SE.copiedFlash(COPIED_MS);
+    const flash = (node) => copied.flash(node);
+    cleanups.push(() => copied.destroy());
 
     /* System strip: OS, form factor, maker */
     const meta = el('div', 'se-sysinfo-meta');
@@ -401,7 +313,7 @@
       copyAll.labelTimer = setTimeout(() => (copyLabel.textContent = 'Copy specs'), COPIED_MS);
     });
     cleanups.push(() => clearTimeout(copyAll.labelTimer));
-    tip(cleanups, copyAll, 'Copy specs (Ctrl+C). IP and hardware IDs are left out.');
+    tips.tip(copyAll,'Copy specs (Ctrl+C). IP and hardware IDs are left out.');
 
     /* ---------- Render ---------- */
 
@@ -680,7 +592,6 @@
     });
 
     update();
-    mountTips();
 
     const nodes = [meta, view, copyAll];
     for (const node of nodes) node.classList.add('se-sysinfo');

@@ -31,7 +31,7 @@
   const COVERS = 4;
 
   const attempt = SE.attempt('Delete collection');
-  const isOurs = (node) => node.nodeType === 1 && node.closest?.(`.${OURS}`);
+  const isOurs = SE.inside(`.${OURS}`);
 
   // The dialog's own props ({ strCollectionId, strDisplayName }), and the collection they name
   function readCollection(root) {

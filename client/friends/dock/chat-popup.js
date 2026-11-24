@@ -37,8 +37,7 @@
   // stylesheet the loader adds from the Friends list's and the chat's folders.
   const CHAT_SHEETS = new Set([
     'core/tokens.css', 'core/icons-nav.css', 'core/icons-ui.css', 'core/scrollbars.css',
-    'client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css',
-    'client/friends/friends-dock-chat-group.css', 'client/friends/friends-dock-chat-rail.css',
+    ...ns.dockSheets,
   ]);
   const CHAT_FOLDERS = /^client\/friends\/(?:list|chat)\/[^/]+\.css$/;
 

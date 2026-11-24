@@ -126,40 +126,25 @@ button.se-about,
   display: none !important;
 }
 
-/* Steam's native tooltip: its hit box covers the control (about-steam.js mountTip) */
-[data-se-about-tip] {
-  position: relative;
-}
-
-.se-about-tip {
-  position: absolute;
-  inset: 0;
+/* Core's icons (core/icons-*.css) as masks, in currentColor (about-steam.js icon) */
+.se-about-icon {
   display: block;
-  border-radius: inherit;
-}
-
-.se-about-tip > *,
-.se-about-tip-hitbox {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* Duotone icons: the `d` layer is the soft fill under the stroke */
-.se-about svg {
   flex: none;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  background: currentColor;
+  -webkit-mask: var(--se-about-icon) center / contain no-repeat;
+  mask: var(--se-about-icon) center / contain no-repeat;
 }
 
-.se-about svg .d {
-  fill: currentColor;
-  fill-opacity: var(--se-icon-duo);
-  stroke: none;
-}
+.se-about-icon[data-icon="calendar"] { --se-about-icon: var(--se-icon-calendar); }
+.se-about-icon[data-icon="globe"] { --se-about-icon: var(--se-icon-globe); }
+.se-about-icon[data-icon="code"] { --se-about-icon: var(--se-icon-code); }
+.se-about-icon[data-icon="copy"] { --se-about-icon: var(--se-icon-copy); }
+.se-about-icon[data-icon="flag"] { --se-about-icon: var(--se-icon-flag); }
+.se-about-icon[data-icon="refresh"] { --se-about-icon: var(--se-icon-refresh); }
+.se-about-icon[data-icon="external"] { --se-about-icon: var(--se-icon-external); }
+.se-about-icon[data-icon="branch"] { --se-about-icon: var(--se-icon-branch); }
+.se-about-icon[data-icon="notes"] { --se-about-icon: var(--se-icon-report); }
+.se-about-icon[data-icon="back"] { --se-about-icon: var(--se-icon-chevron); rotate: 90deg; }
 
 /* Hero: Steam's version */
 .se-about-hero {
@@ -263,10 +248,9 @@ button.se-about,
   color: var(--se-text-dim);
 }
 
-.se-about-refresh svg {
+.se-about-refresh .se-about-icon {
   width: 11px;
   height: 11px;
-  stroke-width: 2.4;
 }
 
 .se-about-refresh:hover:not(:disabled) {
@@ -278,7 +262,7 @@ button.se-about,
   cursor: default;
 }
 
-.se-about-status[data-state="checking"] .se-about-refresh svg {
+.se-about-status[data-state="checking"] .se-about-refresh .se-about-icon {
   animation: se-turn var(--se-dur-busy) linear infinite;
 }
 
@@ -337,7 +321,7 @@ button.se-about,
   color: var(--se-text-muted);
 }
 
-.se-about-tile-icon svg {
+.se-about-tile-icon .se-about-icon {
   width: 14px;
   height: 14px;
   stroke-width: 2;
@@ -400,7 +384,7 @@ button.se-about,
   color: var(--se-text-dim);
 }
 
-.se-about-tool svg {
+.se-about-tool .se-about-icon {
   width: 15px;
   height: 15px;
 }
@@ -482,10 +466,9 @@ button.se-about,
   transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
 }
 
-.se-about-notes-back svg {
+.se-about-notes-back .se-about-icon {
   width: 16px;
   height: 16px;
-  stroke-width: 2.2;
 }
 
 .se-about-notes-back:hover {
@@ -638,7 +621,7 @@ button.se-about,
   font: 600 var(--se-fs-sm)/1 var(--se-font);
 }
 
-.se-about-copyall svg {
+.se-about-copyall .se-about-icon {
   width: 14px;
   height: 14px;
 }
@@ -682,7 +665,7 @@ button.se-about,
     transition: none;
   }
 
-  .se-about-status[data-state="checking"] .se-about-refresh svg {
+  .se-about-status[data-state="checking"] .se-about-refresh .se-about-icon {
     animation: none;
   }
 }

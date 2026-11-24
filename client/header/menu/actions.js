@@ -13,7 +13,7 @@
 ((SE) => {
   const ns = window.__seSteamMenuParts;
   if (!ns) return;
-  const { configurations, movedGroups } = ns;
+  const { configurations, heading, movedGroups } = ns;
   const { live } = ns;
 
   const h = (...args) => live.api.React.createElement(...args);
@@ -87,9 +87,6 @@
     '#Menu_SSA': { icon: '--se-icon-report' },
     '#Menu_SSA_China': { icon: '--se-icon-report' },
   };
-
-  const heading = (text, divided) =>
-    h('div', { className: divided ? 'se-acct-heading se-acct-heading-divided' : 'se-acct-heading', role: 'presentation' }, text);
 
   function SteamMenu() {
     if (!live.api) return null;

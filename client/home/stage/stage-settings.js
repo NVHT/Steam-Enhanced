@@ -116,11 +116,7 @@
 
   /* ---------- The games it features ---------- */
 
-  const playable = (a) =>
-    a &&
-    (a.app_type === 1 || a.app_type === 1073741824) &&
-    a.visible_in_game_list !== false &&
-    !(run(() => collectionStore().BIsHidden(a.appid)) || false);
+  const playable = (a) => SE.isLibraryGame(a, collectionStore());
 
   const appsCache = { at: 0, sig: '', list: [] };
 

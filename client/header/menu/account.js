@@ -10,7 +10,7 @@
   if (!ns) return;
   const { C, owners } = SE;
   const {
-    SIDE_HOVER, avatarLayouts, configurations, contextManager, exportNames, isLabel,
+    SIDE_HOVER, avatarLayouts, configurations, contextManager, exportNames, heading, isLabel,
     normalizeMenuLabel, patched, sidebarManagers,
   } = ns;
   const { live } = ns;
@@ -261,8 +261,6 @@
     if (!entry || permission !== live.api.allowed) return null;
     const props = entry.props;
 
-    const heading = (text, divided) =>
-      h('div', { className: divided ? 'se-acct-heading se-acct-heading-divided' : 'se-acct-heading', role: 'presentation' }, text);
     const section = (name, ...children) =>
       h('div', { 'data-se-avatar-section': name, style: { display: 'contents' }, ref: placeAvatarSection }, ...children);
 

@@ -112,8 +112,16 @@
     };
   }
 
+  // A group's heading in the account and Steam menus (account.js, actions.js); `divided` rules it off
+  const heading = (text, divided) =>
+    live.api.React.createElement(
+      'div',
+      { className: divided ? 'se-acct-heading se-acct-heading-divided' : 'se-acct-heading', role: 'presentation' },
+      text
+    );
+
   Object.assign(ns, {
-    animateClose, cleanups, createHooks,
+    animateClose, cleanups, createHooks, heading,
     ROOT_BTN_SELECTOR, SIDE_HOVER, SUBMENU_NAMES, avatarLayouts, hoverDocuments,
     movedGroups, patched, popupObservers, sideButtons, sidebarManagers,
   });

@@ -35,7 +35,7 @@
   const RANK = { ingame: 0, online: 0, away: 1, offline: 2 };
 
   const attempt = SE.attempt('Friend picker');
-  const isOurs = (node) => node.nodeType === 1 && !!node.closest?.(`.${OURS}`);
+  const isOurs = SE.inside(`.${OURS}`);
   const friendStore = () => run(() => SE.global('g_FriendsUIApp', (a) => a.FriendStore).FriendStore);
   let made = 0;
 

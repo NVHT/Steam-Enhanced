@@ -5,13 +5,16 @@
  * open it. Drawn in the settings menu's classes (client/shared/menu.css), placed and styled by
  * client/shared/picker.css.
  *   SE.picker  { open(anchor, opts), close(), place(), read(key), write(key, ids) }
- *   SE.placePop(el, button, side, opts)  places a popup by its button (the settings menu too)
+ *   SE.placePop(el, button, side, opts)  places a popup by its button (the settings menu too);
+ *                                        .gap, its distance from the button
  */
 ((SE) => {
   if (SE.picker) return;
 
   // Under this much room, a kept side (opts.keep) gives way to the other
   const KEEP_MIN = 200;
+  // Between a popup and its button (SE.placePop.gap: the game menu's Collections lines up by it)
+  const GAP = 8;
 
   /**
    * Places a popup (a menu, a picker) by its button: below when it fits, else on the side with
@@ -25,7 +28,6 @@
    */
   function placePop(el, button, side, { cap = Infinity, keep = false } = {}) {
     const r = button.getBoundingClientRect();
-    const GAP = 8;
     const EDGE = 12;
     const room = {
       below: Math.max(0, innerHeight - r.bottom - GAP - EDGE),
@@ -484,7 +486,7 @@
     (pickEl.querySelector('.se-pick-search') || pickEl.querySelector('input'))?.focus();
   }
 
-  SE.placePop = placePop;
+  SE.placePop = Object.assign(placePop, { gap: GAP });
   SE.picker = {
     open: openPick,
     close: closePick,

@@ -76,7 +76,7 @@
     ['content', 'client/shared/', ['open-page.js']],
     // Steam's own confirm dialog for a theme prompt (Reload UI during a call)
     ['main', 'client/shared/', ['steam-confirm.js']],
-    ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'popup-layer-panel.js', 'popup-layer-menu.js', 'picker.js', 'menu.js', 'menu.css', 'picker.css', 'news-feed.js', 'column-resize.css', 'column-resize.js', 'window-fold.js']],
+    ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'popup-layer-panel.js', 'popup-layer-menu.js', 'picker.js', 'menu.js', 'menu.css', 'picker.css', 'news-feed.js', 'download-feed.js', 'column-resize.css', 'column-resize.js', 'window-fold.js']],
     ['notify', 'client/friends/', ['friend-notification-clicks.js']],
     // In-game overlay
     ['overlay', 'client/overlay/', [
@@ -134,6 +134,8 @@
       'shared.js', 'native.js', 'library.js', 'backdrop.js', 'read.js', 'hero.js', 'transfer.js',
       'queue.js', 'drag.js', 'pass.js', 'support.js', 'main.js',
     ]],
+    // A call bar's stand-ins for Steam's call buttons (the dock's flyout, chat windows: SE.callTools)
+    ['desktop', 'client/friends/', ['call-tools.js']],
     // Friends dock
     ['main', 'client/friends/', [
       'friends-dock.css', 'friends-dock-chat.css', 'friends-dock-chat-group.css',
@@ -165,6 +167,8 @@
       'base.css', 'servers.css', 'media.css', 'library-tools.css', 'modals.css', 'friends.css',
       'standalone.css',
     ]],
+    // A rebuilt dialog's tooltips and copied flash (About Steam, System Information, System Report)
+    ['content', 'client/shared/', ['dialog-controls.css', 'dialog-controls.js']],
     ['content', 'client/dialogs/', ['about-steam.css', 'about-steam.js', 'system-info.css', 'system-info.js', 'survey.css', 'survey.js', 'system-report.css']],
     ['content', 'client/dialogs/system-report/', ['shared.js', 'parse.js', 'view.js', 'main.js']],
     ['content', 'client/dialogs/', ['add-non-steam.css', 'add-non-steam.js']],

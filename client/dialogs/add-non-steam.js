@@ -115,17 +115,15 @@
    * live fiber so it is this render's Set, not the previous one. The popup's objects come from
    * Steam's main window, so the type check can't use instanceof.
    */
-  const readSelection = (root) => {
-    let fiber = SE.liveFiber?.(root);
-    for (let depth = 0; fiber && depth < MAX_DEPTH; fiber = fiber.return, depth++) {
-      if (typeof fiber.type !== 'function') continue;
+  const readSelection = (root) =>
+    SE.fromProps(root, MAX_DEPTH, (_, fiber) => {
+      if (typeof fiber.type !== 'function') return undefined;
       let hook = fiber.memoizedState;
       for (let i = 0; hook && typeof hook === 'object' && 'next' in hook && i < MAX_HOOKS; hook = hook.next, i++) {
         if (Object.prototype.toString.call(hook.memoizedState) === '[object Set]') return hook.memoizedState;
       }
-    }
-    return null;
-  };
+      return undefined;
+    }, { live: true }) ?? null;
 
   /*
    * Which header cell carries the sort caret, and which way it points. Steam's Carat swaps the

@@ -61,14 +61,8 @@
 
   /* ---------- Reading Steam's state ---------- */
 
-  const readAppId = (node) => {
-    let fiber = SE.liveFiber?.(node);
-    for (let depth = 0; fiber && depth < MAX_DEPTH; fiber = fiber.return, depth++) {
-      const props = fiber.memoizedProps;
-      if (props && typeof props === 'object' && props.eulaWorkflow && Number(props.appid) > 0) return Number(props.appid);
-    }
-    return 0;
-  };
+  const readAppId = (node) =>
+    SE.fromProps(node, MAX_DEPTH, (p) => (p.eulaWorkflow && Number(p.appid) > 0 ? Number(p.appid) : undefined), { live: true }) ?? 0;
 
   const appName = (appid) => attempt(() => SE.appStore?.()?.GetAppOverviewByAppID(appid)?.display_name, '') || '';
 

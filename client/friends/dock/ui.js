@@ -150,11 +150,12 @@
    * keys and outside clicks itself.
    */
   live.menu = null;
-  // What the status dots in a menu window are styled by
-  const DOCK_SHEETS = [
-    'client/friends/friends-dock.css', 'client/friends/friends-dock-chat.css',
-    'client/friends/friends-dock-chat-group.css', 'client/friends/friends-dock-chat-rail.css',
-  ];
+  // The dock's stylesheets, from the loader's list (its .css is in before any script runs): what a
+  // popup window showing dock marks copies (here, chat-popup.js, friend-card.js)
+  const DOCK_SHEETS = [...(window.__seClient?.sheets?.keys() || [])].filter((file) =>
+    /^client\/friends\/friends-dock[^/]*\.css$/.test(file)
+  );
+  ns.dockSheets = DOCK_SHEETS;
   const menuOpen = () => Boolean(live.menu && !live.menu.released);
 
   function hideMenu() {

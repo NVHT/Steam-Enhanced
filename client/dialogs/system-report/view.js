@@ -1,5 +1,5 @@
 /*
- * System Report: the rebuilt view (highlighting, tooltips, createView).
+ * System Report: the rebuilt view (highlighting, createView).
  *
  * Part of client/dialogs/system-report/ (see shared.js).
  */
@@ -9,7 +9,7 @@
   const { el } = SE;
   const {
     BOOL_KEY, COPIED_MS, FLAG_KEY, FLAG_MIN, MODE_KEY, NAME_KEY, OPEN_MAX, PLACEHOLDER,
-    PRIVATE_KEY, SHORT_TITLES, SPY_OFFSET, TEXT, TEXT_BOX, TIP_RETRIES, TIP_RETRY_MS, attempt,
+    PRIVATE_KEY, SHORT_TITLES, SPY_OFFSET, TEXT, TEXT_BOX, attempt,
     button, bytes, clean, copyText, humanize, icon, indexValues, isBlock, kb, leafCount, parseKV,
     sectionText, singular, storage, summarise, toSections, views,
   } = ns;
@@ -33,35 +33,6 @@
     return html + escapeHTML(line.slice(from));
   };
 
-  /* ---------- Steam tooltips (as system-info.js mounts them) ---------- */
-
-  const nativeTooltips = () =>
-    attempt(() => SE.global?.('__seNativeTooltips', (api) => typeof api?.resolve === 'function')?.resolve() ?? null, null);
-
-  const mountTip = ({ React, DOM, Tooltip }, node, label, direction) => {
-    const host = el('span', 'se-sysreport-tip');
-    node.setAttribute('data-se-sysreport-tip', '');
-    node.append(host);
-    const root = DOM.createRoot(host);
-    root.render(
-      React.createElement(Tooltip, {
-        toolTipContent: label,
-        bTopmost: true,
-        nDelayShowMS: 300,
-        direction,
-        nBodyAlignment: 0.5,
-        nBodyDistance: 6,
-        bPortalToBody: true,
-        children: React.createElement('span', { className: 'se-sysreport-tip-hitbox' }),
-      }),
-    );
-    return () => {
-      attempt(() => root.unmount());
-      host.remove();
-      node.removeAttribute('data-se-sysreport-tip');
-    };
-  };
-
   /* ---------- Reading Steam's dialog ---------- */
 
   /* The full report from the Text component's props; the shown (maybe cut) text otherwise */
@@ -78,65 +49,22 @@
     const doc = root.ownerDocument;
     const win = doc.defaultView;
     const cleanups = [];
-    const timers = new Map();
     const listen = SE.listenInto(cleanups);
 
-    /*
-     * Tooltips: Steam's own once webpack is up, `title` if it never is. Each tip belongs to a
-     * bucket (an array of unmounts), so a redraw can drop the tips of the nodes it replaces.
-     */
-    let native = null; // null: still looking; false: gave up
-    let tipTries = 0;
-    let tipTimer = 0;
-    const pendingTips = [];
-    const tip = (bucket, node, label, direction = 'top') => {
-      if (native) bucket.push(mountTip(native, node, label, direction));
-      else if (native === false) node.title = label;
-      else pendingTips.push([bucket, node, label, direction]);
-    };
-    const mountTips = () => {
-      native = nativeTooltips();
-      if (!native && ++tipTries < TIP_RETRIES) {
-        native = null;
-        tipTimer = setTimeout(mountTips, TIP_RETRY_MS);
-        return;
-      }
-      native ||= false;
-      for (const [bucket, node, label, direction] of pendingTips.splice(0)) if (node.isConnected) tip(bucket, node, label, direction);
-    };
-    const fixedTips = [];
+    // Tips in buckets, so a redraw drops the tips of the nodes it replaces
+    const tips = SE.nativeTips();
     const specTips = [];
     const contentTips = [];
-    const dropTips = (bucket) => {
-      for (const unmount of bucket.splice(0)) attempt(unmount);
-    };
-    cleanups.push(() => {
-      clearTimeout(tipTimer);
-      pendingTips.length = 0;
-      dropTips(fixedTips);
-      dropTips(specTips);
-      dropTips(contentTips);
-    });
+    const tip = (bucket, node, label) => tips.tip(node, label, { bucket });
+    const dropTips = (bucket) => tips.drop(bucket);
+    cleanups.push(() => tips.destroy());
 
     /* Copied feedback: the node shows a check for a moment */
-    const flash = (node) => {
-      clearTimeout(timers.get(node));
-      node.setAttribute('data-copied', '');
-      timers.set(node, setTimeout(() => {
-        node.removeAttribute('data-copied');
-        timers.delete(node);
-      }, COPIED_MS));
-    };
-    cleanups.push(() => {
-      for (const [node, id] of timers) {
-        clearTimeout(id);
-        node.removeAttribute('data-copied');
-      }
-      timers.clear();
-    });
+    const copied = SE.copiedFlash(COPIED_MS);
+    cleanups.push(() => copied.destroy());
     const copy = (text, node) => {
       copyText(text, win);
-      flash(node);
+      copied.flash(node);
     };
 
     /* ---------- Static layout ---------- */
@@ -161,7 +89,7 @@
 
     const toggleIcon = el('span', 'se-sysreport-tool-icon');
     const toggleAll = button('se-sysreport-tool', [toggleIcon], () => setAllOpen(!allOpen()), 'Expand all');
-    tip(fixedTips, toggleAll, 'Expand or collapse all groups');
+    tips.tip(toggleAll, 'Expand or collapse all groups');
 
     const modes = el('div', 'se-seg se-sysreport-modes');
     modes.setAttribute('role', 'tablist');
@@ -654,7 +582,6 @@
     }, true);
 
     update();
-    mountTips();
 
     const nodes = [view, status];
     for (const node of nodes) node.classList.add('se-sysreport');

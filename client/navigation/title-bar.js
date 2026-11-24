@@ -185,15 +185,7 @@
     if (Date.now() - countCache.at < 5000) return countCache.count;
     const apps = SE.global('appStore', (store) => Array.isArray(store.allApps))?.allApps;
     const collections = SE.global('collectionStore');
-    const isHidden = (id) => !!SE.run(() => collections.BIsHidden(id));
-    const count = apps
-      ? apps.filter(
-          app =>
-            (app.app_type === 1 || app.app_type === 1073741824) &&
-            app.visible_in_game_list !== false &&
-            !isHidden(app.appid)
-        ).length
-      : null;
+    const count = apps ? apps.filter((app) => SE.isLibraryGame(app, collections)).length : null;
     countCache = { at: Date.now(), count };
     return count;
   }

@@ -52,12 +52,7 @@
     );
   }
 
-  const libraryGames = () =>
-    run(() =>
-      appStore().allApps.filter(
-        (a) => a && (a.app_type === 1 || a.app_type === 1073741824) && a.visible_in_game_list !== false
-      )
-    ) || [];
+  const libraryGames = () => run(() => appStore().allApps.filter((a) => SE.isLibraryGame(a))) || [];
 
 
   /*

@@ -45,17 +45,7 @@
   }
 
   // A day relative to today: Today, Yesterday, n days ago, then the date
-  function when(t) {
-    if (!t) return '';
-    const d = new Date(t * 1000);
-    const now = new Date();
-    const day = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
-    const days = Math.round((day(now) - day(d)) / 86400000);
-    if (days <= 0) return 'Today';
-    if (days === 1) return 'Yesterday';
-    if (days < 7) return `${days} days ago`;
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-  }
+  const when = (t) => SE.day(t, { recent: true });
 
   const ICON_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor" fill-opacity=".32" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"></path></svg>';
   const ICON_INSTALL = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>';

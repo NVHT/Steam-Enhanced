@@ -156,7 +156,7 @@
   const played = (store) =>
     SE.run(() =>
       store.allApps
-        .filter((a) => a && a.rt_last_time_played > 0 && (a.app_type === 1 || a.app_type === 1073741824) && a.visible_in_game_list !== false)
+        .filter((a) => a?.rt_last_time_played > 0 && SE.isLibraryGame(a))
         .sort((a, b) => b.rt_last_time_played - a.rt_last_time_played)
     ) || [];
 

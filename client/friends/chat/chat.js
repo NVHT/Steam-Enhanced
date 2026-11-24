@@ -26,20 +26,22 @@
   const compactNum = (n) => run(() => COMPACT.format(n)) || String(n);
 
   const ICONS = {
-    voice:
-      '<path class="fill" d="M5 4.5h3l1.5 4-2 1.5a11 11 0 0 0 6.5 6.5l1.5-2 4 1.5v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6.5a2 2 0 0 1 2-2z"/>' +
-      '<path d="M5 4.5h3l1.5 4-2 1.5a11 11 0 0 0 6.5 6.5l1.5-2 4 1.5v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6.5a2 2 0 0 1 2-2z"/>',
-    invite:
-      '<circle class="fill" cx="9.5" cy="8" r="3.5"/>' +
-      '<circle cx="9.5" cy="8" r="3.5"/>' +
-      '<path d="M3 20c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2M19.5 8.5v6M16.5 11.5h6"/>',
     more:
       '<circle class="dot" cx="6" cy="12" r="1.5"/>' +
       '<circle class="dot" cx="12" cy="12" r="1.5"/>' +
       '<circle class="dot" cx="18" cy="12" r="1.5"/>',
   };
 
+  // Voice and invite are core masks (--se-icon-phone / -invite, header.css); the dots stay drawn
+  const MASK_ICONS = new Set(['voice', 'invite']);
   const createIcon = (name) => {
+    if (MASK_ICONS.has(name)) {
+      const mask = document.createElement('span');
+      mask.className = 'se-chat-tile-mask';
+      mask.dataset.icon = name;
+      mask.setAttribute('aria-hidden', 'true');
+      return mask;
+    }
     const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('viewBox', '0 0 24 24');
     svg.setAttribute('aria-hidden', 'true');
@@ -305,13 +307,13 @@
 
   /*
    * A one-to-one call's bar (voice.css): Steam's strip over the log, with the mic and headphone
-   * buttons beside its own gear and hang-up. Those two live in the message box (React's, so they
-   * can't move): the bar's are stand-ins that run the originals' own click handlers and show their
-   * state (muted: Steam's "disabled") and labels.
+   * buttons beside its own gear and hang-up: stand-ins for the message box's (SE.callTools,
+   * client/friends/call-tools.js). Muted: Steam's "disabled", or no microphone.
    */
   const CALL_TOOLS = 'se-call-tools';
   const STEAM_TOOL = { mic: '.ToggleMicrophoneButton', out: '.ToggleVoiceOutputButton' };
   const steamTool = (win, kind) => win.querySelector(`.ChatMessageEntryVoice ${STEAM_TOOL[kind]}`);
+  const isMuted = (original) => original.classList.contains('disabled') || original.classList.contains('NoMicrophone');
 
   const syncCallTools = (win) => {
     const bar = win.querySelector('.OneOnOneVoiceRoomControls');
@@ -324,29 +326,13 @@
       tools.addEventListener('click', onCallTool);
       bar.append(tools);
     }
-    for (const button of tools.children) {
-      const original = steamTool(win, button.dataset.tool);
-      SE.attr(button, 'hidden', original ? null : '');
-      if (!original) continue;
-      SE.attr(button, 'data-off', original.classList.contains('disabled') || original.classList.contains('NoMicrophone') ? '' : null);
-      const label = original.getAttribute('title') || '';
-      if (label && button.getAttribute('aria-label') !== label) {
-        button.title = label;
-        button.setAttribute('aria-label', label);
-      }
-    }
+    SE.callTools.sync(win, tools.children, steamTool, isMuted);
   };
 
   function onCallTool(event) {
-    const button = event.target.closest?.('.se-call-tool');
-    const win = button?.closest('.chatWindow');
-    const original = win && steamTool(win, button.dataset.tool);
-    const onClick = original && SE.fromProps(original, 3, (p) => (typeof p.onClick === 'function' ? p.onClick : undefined));
-    if (!onClick) return;
-    event.stopPropagation();
-    run(() => onClick({ stopPropagation() {}, preventDefault() {}, currentTarget: original, target: original }));
+    const win = SE.callTools.click(event, steamTool);
     // Steam redraws the original's state; the stand-in follows next frame
-    requestAnimationFrame(() => win.isConnected && syncCallTools(win));
+    if (win) requestAnimationFrame(() => win.isConnected && syncCallTools(win));
   }
 
   /*

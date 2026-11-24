@@ -37,12 +37,14 @@
 
   function dropOwn(row) {
     const e = own.get(row);
+    if (e) forgetGrids(e.el);
     e?.el.remove();
     own.delete(row);
   }
 
   function dropAllOwn(keep) {
     for (const [row, e] of [...own]) {
+      forgetGrids(e.el);
       if (keep) {
         e.el.remove();
         own.delete(row);
@@ -139,8 +141,48 @@
     return entry;
   }
 
-  // A grid's size, read in layout()'s measuring pass.
-  const boxOf = (grid) => ({ W: grid?.clientWidth || 0, H: grid?.clientHeight || 0 });
+  /*
+   * The panels' fits (paintBoard's [{ entry, grid, fit }]), each given its grid's size. A size
+   * is read once, then kept: the grid's own ResizeObserver says when it changed (a resize, a
+   * cell's new span or height) and refits it there, before the frame paints, so a pass reads no
+   * layout. A grid is sized by its cell (stage-shelves.css), never by the tiles a fit writes, so
+   * a fit can't feed back into the observer.
+   */
+  const fitted = new Map(); // grid → { box, f }
+  const readBox = (grid) => ({ W: grid.clientWidth, H: grid.clientHeight });
+  const gridSizes = typeof ResizeObserver === 'function'
+    ? new ResizeObserver((entries) => {
+      for (const { target } of entries) {
+        const kept = fitted.get(target);
+        if (!kept) continue;
+        const box = readBox(target);
+        if (box.W === kept.box.W && box.H === kept.box.H) continue;
+        kept.box = box;
+        kept.f.fit(kept.f.entry, box);
+      }
+    })
+    : null;
+  function fitGrids(fits) {
+    // Reads first (only grids new to the board), then the writes
+    const boxes = fits.map((f) => {
+      if (!f.grid) return { W: 0, H: 0 };
+      return (gridSizes && fitted.get(f.grid)?.box) || readBox(f.grid);
+    });
+    fits.forEach((f, i) => {
+      if (f.grid && gridSizes) {
+        if (!fitted.has(f.grid)) gridSizes.observe(f.grid);
+        fitted.set(f.grid, { box: boxes[i], f });
+      }
+      f.fit(f.entry, boxes[i]);
+    });
+  }
+  // A panel leaves the board: stop observing its grid (a spare one is read afresh when back)
+  function forgetGrids(el) {
+    for (const grid of el.querySelectorAll('.se-hs-grid, .se-hs-cgrid')) {
+      gridSizes?.unobserve(grid);
+      fitted.delete(grid);
+    }
+  }
 
   // As many rows of capsules as the games need and the cell holds, the last one "+N" when
   // there are more (Favorites; entry.moreNoun names them). Writes only.
@@ -367,7 +409,7 @@
   }
 
   Object.assign(ns, {
-    boxOf, clearMarks, dropAllOwn, dropOwn, fitColl, fitTiles, mark, ownPanel,
+    clearMarks, dropAllOwn, dropOwn, fitColl, fitTiles, fitGrids, mark, ownPanel,
     paintColl, paintFav, scrollerOf, tileHTML, userCollections,
   });
 })(window.__se);

@@ -104,11 +104,7 @@
     const store = SE.global('appStore', (candidate) => candidate.allApps);
     const collections = SE.global('collectionStore');
     const items = SE.run(() => store?.allApps) || [];
-    const next = items.filter((app) =>
-      (app.app_type === 1 || app.app_type === 1073741824) &&
-      app.visible_in_game_list !== false && app.display_name &&
-      !SE.run(() => collections?.BIsHidden(app.appid))
-    ).map((app) => ({
+    const next = items.filter((app) => app?.display_name && SE.isLibraryGame(app, collections)).map((app) => ({
       appid: app.appid,
       name: app.display_name,
       searchName: app.display_name.toLocaleLowerCase(),

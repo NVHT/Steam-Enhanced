@@ -20,8 +20,7 @@
  * the store's partner events endpoint, fetched by the main window as news-hub.js does.
  * The patch notes open in a panel inside the dialog: the post's BBCode is turned into DOM nodes
  * here (never HTML), images and video are left out, and links open through Steam.
- * Tooltips are Steam's own React tooltip (client/shared/native-tooltips.js, from this window or the main
- * one), retried until webpack has it; `title` stands in only if it never turns up.
+ * Tooltips are Steam's own React tooltip (SE.nativeTips, client/shared/dialog-controls.js).
  */
 ((SE) => {
   window.__seAboutSteam?.destroy();
@@ -35,8 +34,6 @@
   const COPIED_MS = 1400;
   const RESTART_ARM_MS = 3000;
   const MIN_CHECK_MS = 700; // keep "Checking" on screen long enough to read
-  const TIP_RETRY_MS = 250;
-  const TIP_RETRIES = 40; // ~10 s for webpack and client/shared/native-tooltips.js to come up
   const TICK_MS = 5000;
   const STORAGE = { checked: 'se-about-last-check' };
   const STEAM_NEWS_APP = 593110;
@@ -50,25 +47,7 @@
   // Steam's updater states (sp.js module 25589). Below AVAILABLE, nothing is pending.
   const UPDATE = { CHECKING: 3, AVAILABLE: 4, APPLYING: 5, READY: 6 };
 
-  /* Duotone icons: `d` paths are the soft fill layer (about-steam.css), the rest is the stroke. */
-  const ICONS = {
-    calendar:
-      '<path class="d" d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3H4z"/><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM4 10h16M8 3v4M16 3v4"/>',
-    globe:
-      '<circle class="d" cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM3 12h18M12 3c2.5 2.6 3.7 5.6 3.7 9s-1.2 6.4-3.7 9c-2.5-2.6-3.7-5.6-3.7-9S9.5 5.6 12 3z"/>',
-    code: '<rect class="d" x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/>',
-    branch:
-      '<path class="d" d="M6 14a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM18 4a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/><path d="M6 4v10M6 14a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM18 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 10c0 4-6 3-12 6"/>',
-    copy: '<rect class="d" x="8" y="8" width="12" height="12" rx="2.5"/><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
-    notes:
-      '<path class="d" d="M7 3h7l5 5v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M7 3h7l5 5v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
-    flag: '<path class="d" d="M5 4h11l-2 4 2 4H5z"/><path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
-    refresh: '<circle class="d" cx="12" cy="12" r="8"/><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>',
-    back: '<path d="M15 6l-6 6 6 6"/>',
-    external:
-      '<rect class="d" x="4" y="6" width="14" height="14" rx="2"/><path d="M14 4h6v6M20 4l-9 9M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/>',
-  };
-
+  
   let themeVersion = '';
   let versionRequest = null;
   const flashes = new Map();
@@ -394,7 +373,13 @@
 
   const { el } = SE;
 
-  const { icon } = SE.icons(ICONS);
+  // Every icon is a core mask (core/icons-*.css), drawn by about-steam.css (.se-about-icon)
+  const icon = (name) => {
+    const node = el('span', 'se-about-icon');
+    node.dataset.icon = name;
+    node.setAttribute('aria-hidden', 'true');
+    return node;
+  };
 
   const button = (className, children, onClick, { label } = {}) => {
     const node = el('button', className);
@@ -403,38 +388,6 @@
     if (label) node.setAttribute('aria-label', label);
     node.addEventListener('click', onClick);
     return node;
-  };
-
-  /** Steam's React, ReactDOM and tooltip component, from this window or the main one. */
-  const nativeTooltips = () =>
-    attempt(() => SE.global('__seNativeTooltips', (api) => typeof api?.resolve === 'function')?.resolve() ?? null, null);
-
-  /*
-   * Steam's own tooltip on `node`, mounted into a hit box that covers it (as
-   * client/header/header-tooltips.js does). Returns the unmount.
-   */
-  const mountTip = ({ React, DOM, Tooltip }, node, label, direction) => {
-    const host = el('span', 'se-about-tip');
-    node.setAttribute('data-se-about-tip', '');
-    node.append(host);
-    const root = DOM.createRoot(host);
-    root.render(
-      React.createElement(Tooltip, {
-        toolTipContent: label,
-        bTopmost: true,
-        nDelayShowMS: 200,
-        direction,
-        nBodyAlignment: 0.5,
-        nBodyDistance: 6,
-        bPortalToBody: true,
-        children: React.createElement('span', { className: 'se-about-tip-hitbox' }),
-      }),
-    );
-    return () => {
-      attempt(() => root.unmount());
-      host.remove();
-      node.removeAttribute('data-se-about-tip');
-    };
   };
 
   /* ---------- View ---------- */
@@ -453,8 +406,9 @@
 
     let checking = false;
     latestPatchNotes(); // warm, so the button opens the post at once
-    const tips = [];
-    const tip = (node, label, direction = 'bottom') => tips.push([node, label, direction]);
+    const tips = SE.nativeTips({ delay: 200, direction: 'bottom' });
+    cleanups.push(() => tips.destroy());
+    const tip = (node, label, direction) => tips.tip(node, label, { direction });
 
     /* Credit */
     const credit = el('div', 'se-about-credit');
@@ -680,22 +634,6 @@
     });
 
     renderStatus();
-
-    /* Steam's tooltips, once webpack and client/shared/native-tooltips.js are up; `title` if they never are */
-    let tipTries = 0;
-    const mountTips = () => {
-      const native = nativeTooltips();
-      if (native) {
-        for (const [node, label, direction] of tips) cleanups.push(mountTip(native, node, label, direction));
-        return;
-      }
-      if (++tipTries < TIP_RETRIES) {
-        later(mountTips, TIP_RETRY_MS);
-        return;
-      }
-      for (const [node, label] of tips) node.title = label;
-    };
-    mountTips();
 
     const nodes = [credit, hero, status, tiles, tools, copyAll, panel];
     for (const node of nodes) node.classList.add('se-about');

@@ -48,37 +48,12 @@
 
   const isOurs = SE.inside(`.${OURS}`);
 
-  const num = (value) => {
-    const n = Number(value);
-    return Number.isFinite(n) && n >= 0 ? n : null;
-  };
-
-  /* Bytes as Steam shows them: binary units, two decimals from GB up */
-  const UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-  const bytes = (value) => {
-    let n = Math.max(0, value);
-    let unit = 0;
-    while (n >= 1024 && unit < UNITS.length - 1) {
-      n /= 1024;
-      unit++;
-    }
-    const digits = unit >= 3 ? 2 : unit >= 1 ? 1 : 0;
-    return `${n.toLocaleString(undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits })} ${UNITS[unit]}`;
-  };
-
-  const pct = (part, whole) => `${Math.min(100, Math.max(0, (part / whole) * 100)).toFixed(3)}%`;
+  const { bytes, amount: num, percent: pct } = SE;
 
   /* ---------- Reading Steam's state ---------- */
 
   /* The nearest props on the live fiber chain that pass `test` */
-  const propsUp = (node, test) => {
-    let fiber = SE.liveFiber?.(node);
-    for (let depth = 0; fiber && depth < MAX_DEPTH; fiber = fiber.return, depth++) {
-      const props = fiber.memoizedProps;
-      if (props && typeof props === 'object' && test(props)) return props;
-    }
-    return null;
-  };
+  const propsUp = (node, test) => SE.fromProps(node, MAX_DEPTH, (p) => (test(p) ? p : undefined), { live: true }) ?? null;
 
   const readRequest = (node) => propsUp(node, (p) => p.installRequest && Array.isArray(p.installRequest.rgApps))?.installRequest ?? null;
 

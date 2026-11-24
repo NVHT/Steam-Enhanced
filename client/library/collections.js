@@ -49,8 +49,6 @@
     notInstalled: 'Not installed',
     friendsSub: (n) => `${n} friend${n === 1 ? '' : 's'} playing`,
     gamesSub: (n) => `${n} game${n === 1 ? '' : 's'}`,
-    today: 'Today',
-    yesterday: 'Yesterday',
     az: 'A–Z',
     bySize: 'Size',
     recent: 'Recent',
@@ -185,19 +183,7 @@
   }
 
   function dateText(t) {
-    if (!t) return '—';
-    const d = new Date(t * 1000);
-    const now = new Date();
-    const day = (x) => Math.floor(new Date(x.getFullYear(), x.getMonth(), x.getDate()) / 864e5);
-    const diff = day(now) - day(d);
-    if (diff === 0) return COPY.today;
-    if (diff === 1) return COPY.yesterday;
-    return d.toLocaleDateString(
-      undefined,
-      d.getFullYear() === now.getFullYear()
-        ? { month: 'short', day: 'numeric' }
-        : { month: 'short', day: 'numeric', year: 'numeric' }
-    );
+    return SE.day(t) || '—';
   }
 
   function sizeText(app) {

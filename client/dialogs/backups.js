@@ -74,19 +74,7 @@
     return { name: bare.slice(cut) || bare, parent: bare.slice(0, cut) };
   };
 
-  /* Bytes as Steam shows sizes: 1 decimal from GB down, none for bytes */
-  const formatBytes = (value) => {
-    const bytes = Number(value);
-    if (!Number.isFinite(bytes) || bytes < 0) return '';
-    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    let size = bytes;
-    let unit = 0;
-    while (size >= 1024 && unit < units.length - 1) {
-      size /= 1024;
-      unit++;
-    }
-    return `${unit ? size.toFixed(size >= 100 ? 0 : 1) : Math.round(size)} ${units[unit]}`;
-  };
+  const formatBytes = (value) => SE.bytes(value, { short: true });
 
   const chip = (name, meta) => {
     const node = el('span', `${OURS}-game`);

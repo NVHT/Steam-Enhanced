@@ -40,8 +40,6 @@
   const ICON = {
     search:
       '<g fill="currentColor" stroke="none" style="fill-opacity:var(--se-icon-duo)"><circle cx="11" cy="11" r="6.5"/></g><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
-    add:
-      '<g fill="currentColor" stroke="none" style="fill-opacity:var(--se-icon-duo)"><circle cx="9.5" cy="8" r="3.5"/></g><circle cx="9.5" cy="8" r="3.5"/><path d="M3 20c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2M19.5 8.5v6M16.5 11.5h6"/>',
     chev: '<path d="M9 6l6 6-6 6"/>',
     down: '<path d="M6 9l6 6 6-6"/>',
     game: '<rect x="3" y="7" width="18" height="11" rx="4"/><path d="M8 11v3M6.5 12.5h3M15.5 12h.01M18 13.5h.01"/>',
@@ -137,7 +135,7 @@
     `<button type="button" class="se-fd-status" data-act="status"><span class="se-fd-myname">${esc(me?.name || '')}</span><span class="se-fd-mystate" data-state="${me?.state || 'online'}">${esc(statusLabel(me?.state))}${svg('down', 12)}</span></button>` +
     `<button type="button" class="se-fd-icon" data-act="search" data-se-tip="${ns.COPY.search}" aria-label="${ns.COPY.search}">${svg('search', 20)}</button>` +
     // Collapsing is the title bar's button, beside Friends & Chat (client/header/header-actions.js)
-    `<button type="button" class="se-fd-icon" data-act="add" data-se-tip="${ns.COPY.add}" aria-label="${ns.COPY.add}">${svg('add', 20)}</button></div>` +
+    `<button type="button" class="se-fd-icon" data-act="add" data-se-tip="${ns.COPY.add}" aria-label="${ns.COPY.add}"><span class="se-fd-mask" data-icon="invite" aria-hidden="true"></span></button></div>` +
     (ns.state.steamError ? `<div class="se-fd-error">${esc(ns.state.steamError)}</div>` : '');
 
   function panelHTML(d) {

@@ -1,8 +1,9 @@
 /*
  * System Information, as built by client/dialogs/system-info.js. Applies only once the script
  * has built the layout ([data-se-sysinfo]); until then utility/base.css gives the stock dialog
- * the theme's title and footer. The parts System Report draws the same way (spec icons, chips,
- * filter, section cards, empty state) are styled here for both; system-report.css keeps the rest.
+ * the theme's title and footer. The parts System Report draws the same way (icons, buttons, spec
+ * tiles, chips, filter, section cards, rows, empty state) are styled here for both, as
+ * :is(.se-sysinfo…, .se-sysreport…); system-report.css keeps the rest.
  *
  * Grid on the dialog root (600 × 500 window, resizable):
  *   [ title ........................................... ]
@@ -45,28 +46,49 @@
 }
 
 /* Shared */
-.se-sysinfo[hidden],
-.se-sysinfo [hidden] {
+:is(.se-sysinfo, .se-sysreport)[hidden],
+:is(.se-sysinfo, .se-sysreport) [hidden] {
   display: none !important;
 }
 
-.se-sysinfo svg {
+/* Core's icons (core/icons-*.css) as masks, in currentColor (system-info.js MASKS) */
+.se-sysinfo-icon {
+  display: block;
   flex: none;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  background: currentColor;
+  -webkit-mask: var(--se-sysinfo-icon) center / contain no-repeat;
+  mask: var(--se-sysinfo-icon) center / contain no-repeat;
 }
 
-.se-sysinfo svg .d {
-  fill: currentColor;
-  fill-opacity: var(--se-icon-duo);
-  stroke: none;
-}
+.se-sysinfo-icon[data-icon="copy"] { --se-sysinfo-icon: var(--se-icon-copy); }
+.se-sysinfo-icon[data-icon="check"] { --se-sysinfo-icon: var(--se-icon-check); }
+.se-sysinfo-icon[data-icon="search"] { --se-sysinfo-icon: var(--se-icon-search); }
+.se-sysinfo-icon[data-icon="clear"] { --se-sysinfo-icon: var(--se-icon-close-sm); }
+.se-sysinfo-icon[data-icon="eye"] { --se-sysinfo-icon: var(--se-icon-eye); }
+.se-sysinfo-icon[data-icon="pc"] { --se-sysinfo-icon: var(--se-icon-pc); }
+.se-sysinfo-icon[data-icon="cpu"] { --se-sysinfo-icon: var(--se-icon-cpu); }
+.se-sysinfo-icon[data-icon="gpu"] { --se-sysinfo-icon: var(--se-icon-gpu); }
+.se-sysinfo-icon[data-icon="ram"] { --se-sysinfo-icon: var(--se-icon-ram); }
+.se-sysinfo-icon[data-icon="display"] { --se-sysinfo-icon: var(--se-icon-display); }
+.se-sysinfo-icon[data-icon="os"] { --se-sysinfo-icon: var(--se-icon-os); }
+.se-sysinfo-icon[data-icon="audio"] { --se-sysinfo-icon: var(--se-icon-sound); }
+.se-sysinfo-icon[data-icon="disk"] { --se-sysinfo-icon: var(--se-icon-drive); }
+.se-sysinfo-icon[data-icon="network"] { --se-sysinfo-icon: var(--se-icon-network); }
+.se-sysinfo-icon[data-icon="vr"] { --se-sysinfo-icon: var(--se-icon-vr); }
+.se-sysinfo-icon[data-icon="apps"] { --se-sysinfo-icon: var(--se-icon-grid); }
+.se-sysinfo-icon[data-icon="alert"] { --se-sysinfo-icon: var(--se-icon-warning); }
+.se-sysinfo-icon[data-icon="game"] { --se-sysinfo-icon: var(--se-icon-gamepad); }
+.se-sysinfo-icon[data-icon="info"] { --se-sysinfo-icon: var(--se-icon-info); }
+.se-sysinfo-icon[data-icon="steam"] { --se-sysinfo-icon: var(--se-icon-steam); }
+.se-sysinfo-icon[data-icon="cards"] { --se-sysinfo-icon: var(--se-icon-view-expanded); }
+.se-sysinfo-icon[data-icon="code"] { --se-sysinfo-icon: var(--se-icon-code); }
+.se-sysinfo-icon[data-icon="expand"] { --se-sysinfo-icon: var(--se-icon-unfold); }
+.se-sysinfo-icon[data-icon="collapse"] { --se-sysinfo-icon: var(--se-icon-fold); }
+/* core's chevron points down: a closed group's points right (it turns down when open) */
+.se-sysinfo-icon[data-icon="chevron"] { --se-sysinfo-icon: var(--se-icon-chevron); rotate: -90deg; }
 
 /* Zero-specificity reset, so each control's own class sets its colours */
-:where(.se-sysinfo) button,
+:where(.se-sysinfo, .se-sysreport) button,
 :where(button.se-sysinfo) {
   appearance: none;
   margin: 0;
@@ -83,41 +105,21 @@
     opacity var(--se-dur) ease-out;
 }
 
-.se-sysinfo :is(button, input):focus-visible,
+:is(.se-sysinfo, .se-sysreport) :is(button, input, summary):focus-visible,
 button.se-sysinfo:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
 }
 
-/* Steam's native tooltip: its hit box covers the control */
-[data-se-sysinfo-tip] {
-  position: relative;
-}
-
-.se-sysinfo-tip {
-  position: absolute;
-  inset: 0;
-  display: block;
-  border-radius: inherit;
-}
-
-.se-sysinfo-tip > *,
-.se-sysinfo-tip-hitbox {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* The copied check: hidden until [data-copied] */
-.se-sysinfo :is(.se-sysinfo-spec, .se-sysinfo-row, .se-sysinfo-pill) > svg:last-of-type {
+/* The copied check (an eye on a hidden identifier): hidden until [data-copied] */
+:is(.se-sysinfo, .se-sysreport) :is(.se-sysinfo-spec, .se-sysinfo-row, .se-sysinfo-pill, .se-sysreport-spec, .se-sysreport-row) > :is([data-icon="check"], [data-icon="eye"]) {
   width: 13px;
   height: 13px;
-  stroke-width: 2.6;
   color: var(--se-text-strong);
   opacity: 0;
 }
 
-.se-sysinfo [data-copied] > svg:last-of-type {
+:is(.se-sysinfo, .se-sysreport) [data-copied] > :is([data-icon="check"], [data-icon="eye"]) {
   opacity: 1;
 }
 
@@ -173,7 +175,7 @@ button.se-sysinfo:focus-visible {
   text-overflow: ellipsis;
 }
 
-.se-sysinfo-meta-item svg {
+.se-sysinfo-meta-item .se-sysinfo-icon {
   width: 13px;
   height: 13px;
   color: var(--se-text-faint);
@@ -194,9 +196,13 @@ button.se-sysinfo:focus-visible {
 }
 
 .se-sysinfo-spec {
+  height: 52px;
+}
+
+.se-sysinfo-spec,
+.se-sysreport-spec {
   position: relative;
   min-width: 0;
-  height: 52px;
   display: flex;
   align-items: center;
   gap: var(--se-space-2);
@@ -207,7 +213,8 @@ button.se-sysinfo:focus-visible {
   color: var(--se-text);
 }
 
-.se-sysinfo-spec:hover {
+.se-sysinfo-spec:hover,
+.se-sysreport-spec:hover {
   background: var(--se-field);
   box-shadow: var(--se-edge-soft);
 }
@@ -230,7 +237,7 @@ button.se-sysinfo:focus-visible {
   height: 32px;
 }
 
-.se-sysinfo-spec-icon svg {
+.se-sysinfo-spec-icon .se-sysinfo-icon {
   width: 18px;
   height: 18px;
 }
@@ -244,35 +251,41 @@ button.se-sysinfo:focus-visible {
   gap: 1px;
 }
 
-.se-sysinfo-spec-text > span {
+.se-sysinfo-spec-text > span,
+.se-sysreport-spec-text > span {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.se-sysinfo-spec-label {
+.se-sysinfo-spec-label,
+.se-sysreport-spec-label {
   font: 700 var(--se-fs-2xs)/12px var(--se-font);
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--se-text-faint);
 }
 
-.se-sysinfo-spec-value {
+.se-sysinfo-spec-value,
+.se-sysreport-spec-value {
   font: 700 var(--se-fs-base)/16px var(--se-font);
   color: var(--se-text-strong);
 }
 
-.se-sysinfo-spec-sub {
+.se-sysinfo-spec-sub,
+.se-sysreport-spec-sub {
   font: 500 var(--se-fs-2xs)/12px var(--se-font);
   color: var(--se-text-muted);
 }
 
-.se-sysinfo-spec-sub:empty {
+.se-sysinfo-spec-sub:empty,
+.se-sysreport-spec-sub:empty {
   display: none;
 }
 
 /* Toolbar: section chips and the filter */
-.se-sysinfo-bar {
+.se-sysinfo-bar,
+.se-sysreport-bar {
   flex: none;
   display: flex;
   align-items: center;
@@ -292,7 +305,8 @@ button.se-sysinfo:focus-visible {
   mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
 }
 
-.se-sysinfo-chips::-webkit-scrollbar {
+.se-sysinfo-chips::-webkit-scrollbar,
+.se-sysreport-chips::-webkit-scrollbar {
   display: none;
 }
 
@@ -320,17 +334,20 @@ button.se-sysinfo:focus-visible {
   inset: calc((26px - var(--se-hit)) / 2) 0;
 }
 
-.se-sysinfo-chip svg {
+.se-sysinfo-chip .se-sysinfo-icon,
+.se-sysreport-chip .se-sysinfo-icon {
   width: 13px;
   height: 13px;
 }
 
-.se-sysinfo-chip:hover {
+.se-sysinfo-chip:hover,
+.se-sysreport-chip:hover {
   background: var(--se-surface-2);
   color: var(--se-text);
 }
 
-.se-sysinfo-chip[data-active] {
+.se-sysinfo-chip[data-active],
+.se-sysreport-chip[data-active] {
   background: var(--se-surface-2);
   color: var(--se-text-strong);
 }
@@ -354,17 +371,18 @@ button.se-sysinfo:focus-visible {
   transition: box-shadow var(--se-dur) ease-out;
 }
 
-.se-sysinfo-filter:focus-within {
+.se-sysinfo-filter:focus-within,
+.se-sysreport-filter:focus-within {
   box-shadow: var(--se-edge-lift);
   color: var(--se-text-muted);
 }
 
-.se-sysinfo-filter > svg {
+:is(.se-sysinfo-filter, .se-sysreport-filter) > [data-icon] {
   width: 13px;
   height: 13px;
 }
 
-.se-sysinfo-filter input {
+:is(.se-sysinfo-filter, .se-sysreport-filter) input {
   flex: 1;
   min-width: 0;
   height: 100%;
@@ -376,15 +394,15 @@ button.se-sysinfo:focus-visible {
   color: var(--se-text);
 }
 
-.se-sysinfo-filter input::placeholder {
+:is(.se-sysinfo-filter, .se-sysreport-filter) input::placeholder {
   color: var(--se-text-faint);
 }
 
-.se-sysinfo-filter input::-webkit-search-cancel-button {
+:is(.se-sysinfo-filter, .se-sysreport-filter) input::-webkit-search-cancel-button {
   display: none;
 }
 
-.se-sysinfo .se-sysinfo-filter input:focus-visible {
+:is(.se-sysinfo, .se-sysreport) :is(.se-sysinfo-filter, .se-sysreport-filter) input:focus-visible {
   outline: 0;
 }
 
@@ -404,7 +422,7 @@ button.se-sysinfo:focus-visible {
   visibility: hidden;
 }
 
-.se-sysinfo-filter[data-filled] .se-sysinfo-filter-clear {
+:is(.se-sysinfo-filter, .se-sysreport-filter)[data-filled] :is(.se-sysinfo-filter-clear, .se-sysreport-filter-clear) {
   visibility: visible;
 }
 
@@ -416,13 +434,13 @@ button.se-sysinfo:focus-visible {
   inset: calc((20px - var(--se-hit)) / 2);
 }
 
-.se-sysinfo-filter-clear svg {
+:is(.se-sysinfo-filter-clear, .se-sysreport-filter-clear) > [data-icon] {
   width: 10px;
   height: 10px;
-  stroke-width: 2.6;
 }
 
-.se-sysinfo-filter-clear:hover {
+.se-sysinfo-filter-clear:hover,
+.se-sysreport-filter-clear:hover {
   background: var(--se-white-14);
   color: var(--se-text-strong);
 }
@@ -451,20 +469,23 @@ button.se-sysinfo:focus-visible {
   box-shadow: var(--se-edge);
 }
 
-.se-sysinfo-card-head {
+.se-sysinfo-card-head,
+.se-sysreport-card-head {
   display: flex;
   align-items: center;
   gap: var(--se-space-2);
   padding: 0 var(--se-space-1) var(--se-space-1);
 }
 
-.se-sysinfo-card-icon {
+.se-sysinfo-card-icon,
+.se-sysreport-card-icon {
   width: 24px;
   height: 24px;
   border-radius: var(--se-radius-sm);
 }
 
-.se-sysinfo-card-icon svg {
+.se-sysinfo-card-icon .se-sysinfo-icon,
+.se-sysreport-card-icon .se-sysinfo-icon {
   width: 14px;
   height: 14px;
 }
@@ -521,23 +542,20 @@ button.se-sysinfo:focus-visible {
   inset: calc((24px - var(--se-hit)) / 2);
 }
 
-.se-sysinfo-card-copy svg {
+:is(.se-sysinfo-card-copy, .se-sysreport-card-copy) > [data-icon] {
   width: 13px;
   height: 13px;
 }
 
 .se-sysinfo-card:hover .se-sysinfo-card-copy,
-.se-sysinfo-card-copy:focus-visible,
-.se-sysinfo-card-copy[data-copied] {
+.se-sysreport-card:hover .se-sysreport-card-copy,
+:is(.se-sysinfo-card-copy, .se-sysreport-card-copy):is(:focus-visible, [data-copied]) {
   opacity: 1;
 }
 
-.se-sysinfo-card-copy:hover {
+/* Copied keeps the hover look, so it still reads once the pointer leaves */
+:is(.se-sysinfo-card-copy, .se-sysreport-card-copy):is(:hover, [data-copied]) {
   background: var(--se-surface-2);
-  color: var(--se-text-strong);
-}
-
-.se-sysinfo-card-copy[data-copied] {
   color: var(--se-text-strong);
 }
 
@@ -568,20 +586,25 @@ button.se-sysinfo:focus-visible {
   background: var(--se-hover);
 }
 
-.se-sysinfo-pill:not([data-copied]) > svg:last-of-type {
+.se-sysinfo-pill:not([data-copied]) > [data-icon="check"] {
   display: none;
 }
 
 /* Label/value rows */
-.se-sysinfo-rows {
+.se-sysinfo-rows,
+.se-sysreport-rows {
   display: flex;
   flex-direction: column;
 }
 
 .se-sysinfo-row {
+  grid-template-columns: minmax(96px, 36%) minmax(0, 1fr) 14px;
+}
+
+.se-sysinfo-row,
+.se-sysreport-row {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(96px, 36%) minmax(0, 1fr) 14px;
   align-items: baseline;
   column-gap: var(--se-space-3);
   width: 100%;
@@ -594,7 +617,8 @@ button.se-sysinfo:focus-visible {
   user-select: text;
 }
 
-.se-sysinfo-row + .se-sysinfo-row::before {
+.se-sysinfo-row + .se-sysinfo-row::before,
+.se-sysreport-row + .se-sysreport-row::before {
   content: "";
   position: absolute;
   top: 0;
@@ -604,26 +628,31 @@ button.se-sysinfo:focus-visible {
   background: var(--se-hairline);
 }
 
-.se-sysinfo-row:hover {
+.se-sysinfo-row:hover,
+.se-sysreport-row:hover {
   background: var(--se-white-04);
 }
 
 .se-sysinfo-row:hover::before,
-.se-sysinfo-row:hover + .se-sysinfo-row::before {
+.se-sysinfo-row:hover + .se-sysinfo-row::before,
+.se-sysreport-row:hover::before,
+.se-sysreport-row:hover + .se-sysreport-row::before {
   opacity: 0;
 }
 
-.se-sysinfo-row > svg:last-of-type {
+:is(.se-sysinfo-row, .se-sysreport-row) > :is([data-icon="check"], [data-icon="eye"]) {
   align-self: center;
 }
 
-.se-sysinfo-row-label {
+.se-sysinfo-row-label,
+.se-sysreport-row-label {
   min-width: 0;
   color: var(--se-text-muted);
   overflow-wrap: anywhere;
 }
 
-.se-sysinfo-row-value {
+.se-sysinfo-row-value,
+.se-sysreport-row-value {
   min-width: 0;
   font-weight: 600;
   color: var(--se-text);
@@ -638,22 +667,23 @@ button.se-sysinfo:focus-visible {
 }
 
 /* Identifiers: blurred, with an eye, until clicked */
-.se-sysinfo-row[data-private]:not([data-revealed]) .se-sysinfo-row-value {
+.se-sysinfo-row[data-private]:not([data-revealed]) .se-sysinfo-row-value,
+.se-sysreport-row[data-private]:not([data-revealed]) .se-sysreport-row-value {
   filter: blur(4.5px);
   user-select: none;
 }
 
-.se-sysinfo-row[data-private]:not([data-revealed]):not([data-copied]) > svg:last-of-type {
+:is(.se-sysinfo-row, .se-sysreport-row)[data-private]:not([data-revealed]):not([data-copied]) > [data-icon="eye"] {
   color: var(--se-text-faint);
   opacity: 1;
 }
 
-.se-sysinfo-row[data-private]:not([data-revealed]):hover > svg:last-of-type {
+:is(.se-sysinfo-row, .se-sysreport-row)[data-private]:not([data-revealed]):hover > [data-icon="eye"] {
   color: var(--se-text-strong);
 }
 
 /* Filter matches */
-.se-sysinfo mark {
+:is(.se-sysinfo, .se-sysreport) mark {
   border-radius: var(--se-radius-xs);
   background: var(--se-white-25);
   color: var(--se-text-strong);
@@ -707,7 +737,7 @@ button.se-sysinfo:focus-visible {
   white-space: nowrap;
 }
 
-.se-sysinfo-copyall svg {
+.se-sysinfo-copyall .se-sysinfo-icon {
   width: 14px;
   height: 14px;
 }
@@ -716,7 +746,7 @@ button.se-sysinfo:focus-visible {
   background: var(--se-hover);
 }
 
-.se-sysinfo-copyall[data-copied] svg {
+.se-sysinfo-copyall[data-copied] .se-sysinfo-icon {
   color: var(--se-text-strong);
 }
 
@@ -726,7 +756,7 @@ button.se-sysinfo:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :where(.se-sysinfo) button,
+  :where(.se-sysinfo, .se-sysreport) button,
   :where(button.se-sysinfo) {
     transition: none;
   }

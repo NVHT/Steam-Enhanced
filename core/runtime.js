@@ -58,11 +58,13 @@
     return key ? el[key] : null;
   };
 
-  const fromProps = (el, maxDepth, selector) => {
-    for (let cur = fiber(el), depth = 0; cur && depth < maxDepth; cur = cur.return, depth++) {
+  // The first value `selector(props, fiber)` gives up el's fiber chain; `live` starts from the
+  // current tree (liveFiber), for this render's props and hooks rather than the stale alternate's
+  const fromProps = (el, maxDepth, selector, { live = false } = {}) => {
+    for (let cur = live ? liveFiber(el) : fiber(el), depth = 0; cur && depth < maxDepth; cur = cur.return, depth++) {
       const memoized = cur.memoizedProps;
       if (!memoized || typeof memoized !== 'object') continue;
-      const val = selector(memoized);
+      const val = selector(memoized, cur);
       if (val !== undefined && val !== null) return val;
     }
     return undefined;
@@ -420,6 +422,43 @@
     return `${Math.round(day / 365)} yr ago`;
   };
 
+  // A Unix time's day: "Today", "Yesterday", then the date (with its year when not this one's);
+  // `recent` says "3 days ago" within the week
+  const dayLabel = (t, { recent = false } = {}) => {
+    if (!t) return '';
+    const d = new Date(t * 1000);
+    const now = new Date();
+    const midnight = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+    const days = Math.round((midnight(now) - midnight(d)) / 864e5);
+    if (days <= 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    if (recent && days < 7) return `${days} days ago`;
+    const year = d.getFullYear() === now.getFullYear() ? undefined : 'numeric';
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year });
+  };
+
+  // A size in binary units. Steam's dialogs: a decimal from KB, two from GB (localised); `short`:
+  // one decimal under 100, none for bytes. '' for no size.
+  const BYTE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+  const bytes = (value, { short = false } = {}) => {
+    let n = Number(value);
+    if (!Number.isFinite(n) || n < 0) return '';
+    let unit = 0;
+    for (; n >= 1024 && unit < BYTE_UNITS.length - 1; unit++) n /= 1024;
+    if (short) return `${!unit || n >= 100 ? Math.round(n) : n.toFixed(1)} ${BYTE_UNITS[unit]}`;
+    const digits = unit >= 3 ? 2 : unit ? 1 : 0;
+    return `${n.toLocaleString(undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits })} ${BYTE_UNITS[unit]}`;
+  };
+
+  // A size or count Steam reports: a number 0 or more, else null
+  const amount = (value) => {
+    const n = Number(value);
+    return Number.isFinite(n) && n >= 0 ? n : null;
+  };
+
+  // part of whole as a CSS width, kept within 0–100%
+  const percent = (part, whole) => `${Math.min(100, Math.max(0, (part / whole) * 100)).toFixed(3)}%`;
+
   // A name's initials, as Steam draws a group or friend without a picture: each word's first
   // letter or digit, so a symbol ("● Squad") never stands for a name
   const initials = (name) =>
@@ -443,6 +482,14 @@
   };
 
   const resolveAppStore = () => global('appStore');
+
+  // A game in the Library's list: a game or mod (app_type 1, 1073741824) not left out of it;
+  // given the collectionStore, not hidden by the user either
+  const isLibraryGame = (app, collections) =>
+    !!app &&
+    (app.app_type === 1 || app.app_type === 1073741824) &&
+    app.visible_in_game_list !== false &&
+    !(collections && run(() => collections.BIsHidden(app.appid)));
 
   const coverURLs = (app, store) => {
     const appStore = store || resolveAppStore();
@@ -1096,6 +1143,7 @@
     importOf,
     global,
     appStore: resolveAppStore,
+    isLibraryGame,
     cssVar,
     token,
     px,
@@ -1110,6 +1158,10 @@
     attr,
     esc,
     ago,
+    day: dayLabel,
+    bytes,
+    amount,
+    percent,
     initials,
     el,
     setText,
