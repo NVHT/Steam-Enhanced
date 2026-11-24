@@ -368,12 +368,14 @@ body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo ._3LKQ3S_yqrebeNLF6aeiog >
 }
 
 /*
- * Friends & Chat shows the dock's state (header-actions.js syncFriendsButton): a short line
+ * Friends & Chat shows the dock's state (header-actions.js syncFriendsButton), and Home whether
+ * the theme's Home is on (syncHomeButton): a short line
  * under the icon, like a tab's — full while the dock is open, half while it's a rail, none
  * while it's hidden. Under the icon, not beside it, so the tile keeps the window controls'
  * spacing (client/navigation/nav-rail.css).
  */
-body.se-header-actions-ready .se-header-action[data-se-action="friends"][data-se-dock]::after {
+body.se-header-actions-ready .se-header-action[data-se-action="friends"][data-se-dock]::after,
+body.se-header-actions-ready .se-header-action[data-se-action="home"][aria-pressed]::after {
   content: "";
   position: absolute;
   left: 50%;
@@ -391,6 +393,7 @@ body.se-header-actions-ready .se-header-action[data-se-action="friends"][data-se
   --se-dock-mark: .5;
 }
 
-body.se-header-actions-ready .se-header-action[data-se-action="friends"][data-se-dock="hidden"]::after {
+body.se-header-actions-ready .se-header-action[data-se-action="friends"][data-se-dock="hidden"]::after,
+body.se-header-actions-ready .se-header-action[data-se-action="home"][aria-pressed="false"]::after {
   --se-dock-mark: 0;
 }

@@ -882,3 +882,84 @@
     radial-gradient(circle at 25% 50%, color-mix(in srgb, var(--se-gold) 45%, transparent), transparent 60%),
     var(--se-ts-card);
 }
+
+/*
+ * Home and the stage's background: the Library's Home in miniature (a tile is 112 × 60). Home:
+ * the game list on the left, then the theme's stage (the game's art, its strip of thumbnails,
+ * two panels) or Steam's own shelves of covers. --se-ts-art is a game's art.
+ */
+.se-ts-pick-art:is([data-setting="home"], [data-setting="stage-motion"]) {
+  --se-ts-art: linear-gradient(160deg, color-mix(in srgb, var(--se-kind-teal) 40%, var(--se-bg-ink)), color-mix(in srgb, var(--se-kind-violet) 35%, var(--se-bg-ink)) 60%, color-mix(in srgb, var(--se-gold) 30%, var(--se-bg-ink)));
+  --se-ts-fill: linear-gradient(var(--se-surface-2), var(--se-surface-2));
+  background-color: var(--se-bg);
+}
+
+.se-ts-pick-art[data-setting="home"][data-value="theme"] {
+  background-image:
+    var(--se-ts-fill),
+    radial-gradient(circle, var(--se-accent) 2px, transparent 2.5px),
+    var(--se-ts-art),
+    repeating-linear-gradient(90deg, var(--se-white-18) 0 9px, transparent 9px 12px),
+    var(--se-ts-fill),
+    var(--se-ts-fill);
+  background-position: 6px 6px, 34px 22px, 30px 6px, 30px 36px, 30px 46px, 70px 46px;
+  background-size: 18px 48px, 6px 6px, 76px 26px, 45px 5px, 36px 8px, 36px 8px;
+}
+
+/* Steam's Home: a shelf's heading over its covers, then the next shelf's */
+.se-ts-pick-art[data-setting="home"][data-value="steam"] {
+  background-image:
+    var(--se-ts-fill),
+    linear-gradient(var(--se-white-18), var(--se-white-18)),
+    repeating-linear-gradient(90deg, var(--se-surface-2) 0 15px, transparent 15px 19px),
+    linear-gradient(var(--se-white-18), var(--se-white-18)),
+    repeating-linear-gradient(90deg, var(--se-surface-2) 0 15px, transparent 15px 19px);
+  background-position: 6px 6px, 30px 8px, 30px 15px, 30px 41px, 30px 48px;
+  background-size: 18px 48px, 36px 3px, 76px 22px, 28px 3px, 76px 6px;
+}
+
+/*
+ * Background: the stage's art and what it does. Zoom: corner marks pushing in; Parallax: the art's
+ * foreground offset from its ghost; Screenshots: three shots; Trailer: a play button; Still: the art.
+ */
+.se-ts-pick-art[data-setting="stage-motion"] {
+  background-image: var(--se-ts-art);
+  background-size: 100% 100%;
+}
+
+.se-ts-pick-art[data-setting="stage-motion"][data-value="zoom"] {
+  background-image:
+    linear-gradient(var(--se-white-32), var(--se-white-32)), linear-gradient(var(--se-white-32), var(--se-white-32)),
+    linear-gradient(var(--se-white-32), var(--se-white-32)), linear-gradient(var(--se-white-32), var(--se-white-32)),
+    linear-gradient(var(--se-white-32), var(--se-white-32)), linear-gradient(var(--se-white-32), var(--se-white-32)),
+    linear-gradient(var(--se-white-32), var(--se-white-32)), linear-gradient(var(--se-white-32), var(--se-white-32)),
+    var(--se-ts-art);
+  background-position:
+    left 30px top 14px, left 30px top 14px, right 30px top 14px, right 30px top 14px,
+    left 30px bottom 14px, left 30px bottom 14px, right 30px bottom 14px, right 30px bottom 14px, center;
+  background-size: 9px 2px, 2px 9px, 9px 2px, 2px 9px, 9px 2px, 2px 9px, 9px 2px, 2px 9px, 140% 140%;
+}
+
+.se-ts-pick-art[data-setting="stage-motion"][data-value="parallax"] {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--se-bg-ink) 75%, transparent), color-mix(in srgb, var(--se-bg-ink) 75%, transparent)),
+    linear-gradient(color-mix(in srgb, var(--se-bg-ink) 35%, transparent), color-mix(in srgb, var(--se-bg-ink) 35%, transparent)),
+    var(--se-ts-art);
+  background-position: left 8px bottom 0, left 20px bottom 0, center;
+  background-size: 62px 24px, 62px 30px, 100% 100%;
+}
+
+.se-ts-pick-art[data-setting="stage-motion"][data-value="shots"] {
+  background-image: var(--se-ts-art), var(--se-ts-art), var(--se-ts-art);
+  background-position: 7px center, center, right 7px center;
+  background-size: 29px 22px, 29px 22px, 29px 22px;
+}
+
+.se-ts-pick-art[data-setting="stage-motion"][data-value="trailer"] {
+  background-image:
+    conic-gradient(from 240deg at 100% 50%, var(--se-text-strong) 0 60deg, transparent 60deg),
+    radial-gradient(circle, color-mix(in srgb, var(--se-bg-ink) 70%, transparent) 11px, transparent 11.5px),
+    var(--se-ts-art);
+  background-position: 54px 25px, center, center;
+  background-size: 9px 10px, 24px 24px, 100% 100%;
+}

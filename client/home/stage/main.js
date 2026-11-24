@@ -111,7 +111,7 @@
       sync: true,
       ignore: (node) => {
         const el = node.nodeType === 1 ? node : node.parentElement;
-        return Boolean(el?.closest(`.se-hs-stage, .se-hs-board, .se-placed, .se-hs-back, ${SE.SIDE}`));
+        return Boolean(el?.closest(`.se-hs-stage, .se-hs-board, .se-placed, ${SE.SIDE}`));
       },
     });
     sizes = typeof ResizeObserver === 'function' ? new ResizeObserver(scheduleSize) : null;
@@ -134,7 +134,7 @@
       teardown();
       ns.stopParallax(); // after teardown(): its stopArtMedia() queues a centring frame
       setOn(false);
-      ns.paintBackButton(null);
+      ns.stopStageSettings?.();
       forgetStage();
       removeEventListener('DOMContentLoaded', start);
       delete window.__seHomeStage;

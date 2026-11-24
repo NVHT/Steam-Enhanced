@@ -44,8 +44,7 @@
       '</div>' +
       '</div>' +
       '</div>' +
-      '<div class="se-hs-strip" role="group" aria-label="Featured games"></div>' +
-      '<button type="button" class="se-hs-gear" data-act="settings" aria-label="Home stage settings" aria-haspopup="dialog" aria-expanded="false"></button>';
+      '<div class="se-hs-strip" role="group" aria-label="Featured games"></div>';
     el.addEventListener('click', onClick);
     el.addEventListener('pointerenter', () => {
       hovering = true;
@@ -65,10 +64,6 @@
     }
     const actEl = e.target.closest('[data-act]');
     const act = actEl?.dataset.act;
-    if (act === 'settings') {
-      ns.openStageMenu(actEl);
-      return;
-    }
     const app = live.apps[live.selected];
     if (!act || !app) return;
     const sc = client();
@@ -416,14 +411,12 @@
       if (live.scope) teardown(true);
       return;
     }
-    // Home: Steam (the Home stage menu's switch, home-mode.js): Steam's own Home, with the way back at its top
+    // Home off (the title bar's Home switch, home-mode.js): Steam's own Home
     if (ns.homeMode() === 'steam') {
       if (live.scope) teardown();
       setOn(false);
-      ns.paintBackButton(home);
       return;
     }
-    ns.paintBackButton(null);
     live.apps = ns.stageApps();
     if (!live.apps.length) {
       if (live.scope) teardown();

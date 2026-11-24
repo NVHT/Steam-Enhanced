@@ -1,56 +1,8 @@
 /*
- * The Home stage's settings button (stage-settings.js), in the stage's upper right corner,
- * shown while the pointer is over the stage, and the Home's own rows in its settings menus
- * (the stage's, and each board panel's ⋯): the menu itself is client/shared/menu.css.
+ * The Home's own rows in its settings menus (the stage's, opened by a right click on the title
+ * bar's Home switch, client/header/header-actions.js, and each board panel's ⋯): the menu
+ * itself is client/shared/menu.css.
  */
-.se-hs-gear {
-  position: absolute;
-  top: var(--se-space-4);
-  right: var(--se-space-4);
-  z-index: var(--se-z-raised);
-  display: grid;
-  place-items: center;
-  width: var(--se-hit);
-  height: var(--se-hit);
-  padding: 0;
-  border: 0;
-  border-radius: var(--se-radius-md);
-  background: var(--se-glass-btn);
-  box-shadow: inset 0 0 0 1px var(--se-glass-btn-line);
-  -webkit-backdrop-filter: var(--se-blur-chip);
-  backdrop-filter: var(--se-blur-chip);
-  color: var(--se-text);
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity var(--se-dur) var(--se-ease), background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
-}
-
-.se-hs-gear::before {
-  content: "";
-  width: 18px;
-  height: 18px;
-  background: currentColor;
-  -webkit-mask: var(--se-icon-home-stage) center / contain no-repeat;
-  mask: var(--se-icon-home-stage) center / contain no-repeat;
-}
-
-.se-hs-stage:hover .se-hs-gear,
-.se-hs-gear:focus-visible,
-.se-hs-gear[aria-expanded="true"] {
-  opacity: 1;
-}
-
-.se-hs-gear:hover,
-.se-hs-gear[aria-expanded="true"] {
-  background: var(--se-glass-btn-hover);
-  color: var(--se-text-strong);
-}
-
-.se-hs-gear:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: var(--se-focus-offset);
-}
-
 /* On/off rows two to a row (the stage's Details) */
 .se-hs-mn-pair {
   display: grid;
@@ -88,50 +40,6 @@
 
 .se-mn .se-hs-mn-widths button:is(:hover, [data-on])::before {
   opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .se-hs-gear {
-    transition: none;
-  }
-}
-
-/*
- * Back to the theme's Home, over Steam's (home-mode.js): Home: Steam in the Home stage menu
- * shows Steam's own Home with this button at its top.
- */
-.se-hs-back {
-  position: sticky;
-  top: var(--se-space-3);
-  z-index: var(--se-z-raised-3);
-  display: flex;
-  justify-content: flex-end;
-  height: 0;
-  padding-right: var(--se-space-4);
-  overflow: visible;
-}
-
-.se-hs-back button {
-  height: var(--se-control-h);
-  padding: 0 var(--se-space-4);
-  border: 0;
-  border-radius: var(--se-radius-pill);
-  background: var(--se-glass-bar);
-  box-shadow: var(--se-panel-shadow);
-  -webkit-backdrop-filter: var(--se-blur-bar);
-  backdrop-filter: var(--se-blur-bar);
-  color: var(--se-text-strong);
-  font: 600 var(--se-fs-base) var(--se-font);
-  cursor: pointer;
-}
-
-.se-hs-back button:hover {
-  background: var(--se-glass-btn-hover);
-}
-
-.se-hs-back button:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: var(--se-focus-offset);
 }
 
 /*

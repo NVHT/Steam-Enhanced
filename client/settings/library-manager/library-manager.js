@@ -11,6 +11,8 @@
  *   dot; an On / Off pair shows as a switch, a few short values as a segmented control; a found setting is scrolled to and
  *   flashed.
  * - A theme setting changed this session: a bar offering to reload Steam.
+ * - Steam Enhanced's own row and the overview's Customize open the theme's settings window
+ *   (client/settings/theme/): its settings aren't Millennium's.
  *
  * Millennium's editor stays the source of truth: the strip and the search call the props of its
  * own dropdowns, so values are always written by Millennium. If those props can't be found, its
@@ -92,6 +94,9 @@
   const plugins = (v) => (v.plugins || []).filter((p) => p && p.data?.name !== 'core');
   const themes = (v) => (v.themes || []).filter(Boolean);
   const isSelf = (theme) => theme?.data?.name === SELF;
+  // This theme's settings live in its own window (client/settings/theme/), not Millennium's editor
+  const openThemeSettings = () => window.__seThemeSettings?.open();
+  const hasThemeSettings = (theme) => isSelf(theme) || configurable(theme);
 
   // Plugin editability, from Millennium's registry of settings panels or, failing that, the
   // disabledReason flags on its own list (0 = editable, 1 = no settings, 2 = disabled).
@@ -364,7 +369,9 @@
         return;
       }
       const isTheme = b.dataset.kind === 'theme';
-      focusItem(bar, (isTheme ? themes(v) : plugins(v))[Number(b.dataset.i)], isTheme ? THEME : PLUGIN);
+      const item = (isTheme ? themes(v) : plugins(v))[Number(b.dataset.i)];
+      if (isTheme && isSelf(item)) openThemeSettings();
+      else focusItem(bar, item, isTheme ? THEME : PLUGIN);
     });
     list.addEventListener('keydown', (e) => {
       if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
@@ -430,9 +437,7 @@
 
     overview.addEventListener('click', (e) => {
       if (!e.target.closest('[data-act="customize"]')) return;
-      const v = context(bar);
-      const self = v && themes(v).find(isSelf);
-      if (self) focusItem(bar, self, THEME);
+      openThemeSettings();
     });
 
     notice.addEventListener('click', (e) => {
@@ -540,12 +545,12 @@
 
     const row = (item, i, kind) => {
       const off = kind === 'plugin' && !item.enabled;
-      const has = kind === 'plugin' ? !off && hasSettings(item) : configurable(item);
+      const has = kind === 'plugin' ? !off && hasSettings(item) : hasThemeSettings(item);
       // A plugin's state is read, not set here: a word in its details and a presence dot on its
       // tile, never a control-like chip.
       const meta =
         kind === 'theme'
-          ? [isSelf(item) && 'Active', has ? themeSummary(item) : 'No settings'].filter(Boolean).join(' · ')
+          ? [isSelf(item) && 'Active', isSelf(item) ? 'Theme settings' : has ? themeSummary(item) : 'No settings'].filter(Boolean).join(' · ')
           : [off ? 'Off' : 'On', has ? 'Plugin settings' : 'No settings'].join(' · ');
       const on = Boolean(focused && nameOf(item) === focused);
       return (
@@ -568,12 +573,12 @@
     const self = themes(v).find(isSelf);
     const P = plugins(v);
     const on = P.filter((p) => p.enabled).length;
-    const withSettings = P.filter((p) => p.enabled && hasSettings(p)).length + themes(v).filter(configurable).length;
+    const withSettings = P.filter((p) => p.enabled && hasSettings(p)).length + themes(v).filter(hasThemeSettings).length;
     const sig = [self && nameOf(self), self?.data?.version, on, P.length, withSettings].join('|');
     if (parts.overview.dataset.sig === sig) return;
     parts.overview.dataset.sig = sig;
 
-    const by = [self?.data?.version && `v${self.data.version}`, self?.data?.author && `by ${self.data.author}`, themeSummary(self)]
+    const by = [self?.data?.version && `v${self.data.version}`, self?.data?.author && `by ${self.data.author}`]
       .filter(Boolean)
       .join(' · ');
     const stat = (n, label) => `<div class="se-lmx-stat"><b>${n}</b><span>${label}</span></div>`;

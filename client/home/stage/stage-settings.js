@@ -1,15 +1,17 @@
 /*
  * The Home stage's own settings: what it features, which details it shows and how it moves
- * between games, and the menu that edits them (the sliders button in the stage's corner,
- * a settings menu, client/shared/menu.js).
- * Kept in localStorage (se-home-stage-settings); a change applies at once, no reload.
+ * between games, and the menu that edits them (a right click on the title bar's Home switch,
+ * client/header/header-actions.js; a settings menu, client/shared/menu.js).
+ * Kept in the theme's settings (SE.settings, client/shared/settings.js: the Home tab, where the
+ * settings window edits the same values); a change from either applies at once, no reload.
  *   source      recent | favorites (A–Z) | collection (+ collection id) | added (newest first)
  *   count       games featured: 4, 6, 8 or 10
  *   details     logo, by, reviews, live, desc, hours, ach, last: shown or not
  *   nav         thumbs | dots | none          cycle   off | slow | normal | fast
  *   motion      zoom | parallax | shots | trailer | still (the background art: stage-art.js)
  * The stage reads them through stageSettings(), stageApps(), cycleSeconds() and
- * applyStageLook(); stage-settings.css holds the button and the menu's Home rows.
+ * applyStageLook(); stage-settings.css holds the button and the menu's Home rows. Choices kept
+ * before (localStorage se-home-stage-settings) move into SE.settings once.
  */
 ((SE) => {
   const ns = window.__seHomeStageParts;
@@ -19,7 +21,6 @@
 
   const { run } = SE;
 
-  const KEY = 'se-home-stage-settings';
   const DETAILS = [
     ['logo', 'Logo'],
     ['by', 'Developer · year'],
@@ -51,43 +52,59 @@
 
   /* ---------- The settings ---------- */
 
+  // Each field's setting (SE.settings keys); details is the multi setting stage-details
+  const SETTING = {
+    source: 'stage-source',
+    collection: 'stage-collection',
+    count: 'stage-count',
+    nav: 'stage-nav',
+    cycle: 'stage-cycle',
+    motion: 'stage-motion',
+  };
+  const DETAIL_KEYS = DETAILS.map(([k]) => k);
+  const setting = (key) => SE.settings?.get(key);
+
   let current = null;
 
   function stageSettings() {
     if (current) return current;
-    let saved = null;
-    try {
-      saved = JSON.parse(localStorage.getItem(KEY) || 'null');
-    } catch {
-      saved = null;
-    }
     const s = { ...DEFAULTS, details: { ...DEFAULTS.details } };
-    if (saved && typeof saved === 'object') {
-      for (const k of Object.keys(OPTIONS)) {
-        if (OPTIONS[k].some(([id]) => id === saved[k])) s[k] = saved[k];
-      }
-      // "Not played yet" was a source before "Recently added" took its place
-      if (saved.source === 'backlog') s.source = 'added';
-      if (typeof saved.collection === 'string') s.collection = saved.collection;
-      for (const [k] of DETAILS) {
-        if (typeof saved.details?.[k] === 'boolean') s.details[k] = saved.details[k];
-      }
+    for (const [field, key] of Object.entries(SETTING)) {
+      const value = setting(key);
+      if (field === 'count') s.count = Number(value) || DEFAULTS.count;
+      else if (typeof value === 'string' && (field === 'collection' || OPTIONS[field].some(([id]) => id === value))) s[field] = value;
     }
+    const shown = setting('stage-details');
+    if (Array.isArray(shown)) for (const k of DETAIL_KEYS) s.details[k] = shown.includes(k);
     current = s;
-    return s;
+    return current;
   }
 
+  // Writes the settings (null: their defaults); onSettings below applies them
   function save(next) {
-    current = next;
-    try {
-      if (next) localStorage.setItem(KEY, JSON.stringify(next));
-      else localStorage.removeItem(KEY);
-    } catch {
-      // storage refused: the change still holds for this session
-    }
+    const s = next || { ...DEFAULTS, details: { ...DEFAULTS.details } };
+    for (const [field, key] of Object.entries(SETTING)) SE.settings?.set(key, String(s[field]));
+    SE.settings?.set('stage-details', DETAIL_KEYS.filter((k) => s.details[k]));
+  }
+
+  const change = (patch) => {
+    const s = stageSettings();
+    save({ ...s, ...patch, details: { ...s.details, ...patch.details } });
+  };
+
+  /*
+   * A change to the stage's settings or the Home switch, from the menu, the settings window or
+   * another window: the stage follows at once (the cycle and the strip's timer now, the games
+   * and details on the next pass).
+   */
+  let seen = '';
+  function onSettings() {
+    const sig = JSON.stringify([setting('home'), ...Object.values(SETTING).map(setting), setting('stage-details')]);
+    if (sig === seen) return;
+    seen = sig;
+    current = null;
     appsCache.sig = '';
     applyStageLook();
-    // The cycle and the strip's timer follow at once; the games and details on the next pass
     if (live.stage && live.apps.length) {
       ns.select(live.selected);
       ns.restartCycle();
@@ -95,10 +112,29 @@
     schedule();
   }
 
-  const change = (patch) => {
-    const s = stageSettings();
-    save({ ...s, ...patch, details: { ...s.details, ...patch.details } });
-  };
+  // Choices kept before the settings window: moved into SE.settings once, then dropped
+  const OLD_KEY = 'se-home-stage-settings';
+  function migrate() {
+    let saved = null;
+    try {
+      saved = JSON.parse(localStorage.getItem(OLD_KEY) || 'null');
+    } catch {
+      saved = null;
+    }
+    if (!saved || typeof saved !== 'object' || !SE.settings) return;
+    const s = { ...DEFAULTS, details: { ...DEFAULTS.details } };
+    for (const k of Object.keys(OPTIONS)) {
+      if (OPTIONS[k].some(([id]) => id === saved[k])) s[k] = saved[k];
+    }
+    // "Not played yet" was a source before "Recently added" took its place
+    if (saved.source === 'backlog') s.source = 'added';
+    if (typeof saved.collection === 'string') s.collection = saved.collection;
+    for (const k of DETAIL_KEYS) {
+      if (typeof saved.details?.[k] === 'boolean') s.details[k] = saved.details[k];
+    }
+    save(s);
+    run(() => localStorage.removeItem(OLD_KEY));
+  }
 
   const cycleSeconds = () => CYCLE_SECONDS[stageSettings().cycle];
 
@@ -382,7 +418,12 @@
     });
   }
 
+  migrate();
+  seen = JSON.stringify([setting('home'), ...Object.values(SETTING).map(setting), setting('stage-details')]);
+  const offSettings = SE.settings?.on(onSettings);
+  const stopStageSettings = () => offSettings?.();
+
   Object.assign(ns, {
-    applyStageLook, cycleSeconds, openStageMenu, playable, stageApps, stageSettings,
+    applyStageLook, cycleSeconds, openStageMenu, playable, stageApps, stageSettings, stopStageSettings,
   });
 })(window.__se);

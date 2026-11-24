@@ -292,12 +292,30 @@
     if (!button || passThrough) return;
     event.preventDefault();
     event.stopImmediatePropagation();
+    hover.cancel();
     if (secondary !== (SE.settings?.get('click-opens') === 'page')) openPage(button);
     else if (open && !open.released) close();
     else show(button);
   }
   const onClick = (event) => press(event, false);
   const onContextMenu = (event) => press(event, true);
+
+  /*
+   * "Menus open on hover" (client/shared/settings.js): resting on the button opens the card, as
+   * it opens the rail's menus (their wait, --se-rail-hover-delay); its leave-closer closes it.
+   * Delegated: Steam may redraw the button.
+   */
+  const hover = SE.hoverIntent((button) => {
+    if (!open || open.released) show(button);
+  }, '--se-rail-hover-delay');
+  function onOver(event) {
+    const button = event.target.closest?.(BUTTON);
+    if (!button || passThrough || button.contains(event.relatedTarget)) return;
+    if (SE.settings?.get('menu-hover') === 'on') hover.enter(button);
+  }
+  function onOut(event) {
+    if (hover.left(event)) hover.cancel();
+  }
 
   // A press elsewhere closes the card (presses in its own window never reach here)
   function onDown(event) {
@@ -323,6 +341,8 @@
   addEventListener('contextmenu', onContextMenu, true);
   addEventListener('pointerdown', onDown, true);
   addEventListener('keydown', onKey, true);
+  addEventListener('pointerover', onOver, true);
+  addEventListener('pointerout', onOut, true);
 
   window.__seDownloadsCard = {
     destroy() {
@@ -334,6 +354,9 @@
       removeEventListener('contextmenu', onContextMenu, true);
       removeEventListener('pointerdown', onDown, true);
       removeEventListener('keydown', onKey, true);
+      removeEventListener('pointerover', onOver, true);
+      removeEventListener('pointerout', onOut, true);
+      hover.cancel();
       delete window.__seDownloadsCard;
     },
   };

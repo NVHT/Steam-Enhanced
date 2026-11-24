@@ -1,50 +1,22 @@
 /*
- * Which Home shows: the theme's, or Steam's own (the Steam Enhanced | Steam switch beside the
- * Home stage menu's title, stage-settings.js; localStorage se-home-mode). Steam puts Steam's
- * Home back at once; a button over it brings the theme's back. stage.js asks homeMode() and
- * paints that button (paintBackButton).
+ * Which Home shows: the theme's, or Steam's own (the Home setting, SE.settings: the title bar's
+ * Home switch, client/header/header-actions.js; the settings window's Home tab; the switch beside
+ * the Home stage menu's title, stage-settings.js). Steam puts Steam's Home back at once; stage.js
+ * asks homeMode(). A change reaches the stage through stage-settings.js's settings listener.
  */
 ((SE) => {
   const ns = window.__seHomeStageParts;
   if (!ns) return;
-  const { schedule } = ns;
 
-  const MODE_KEY = 'se-home-mode';
+  const homeMode = () => (SE.settings?.get('home') === 'steam' ? 'steam' : 'theme');
+  const setHomeMode = (mode) => SE.settings?.set('home', mode === 'steam' ? 'steam' : 'theme');
 
-  function homeMode() {
-    try {
-      return localStorage.getItem(MODE_KEY) === 'steam' ? 'steam' : 'theme';
-    } catch {
-      return 'theme';
-    }
-  }
+  // The choice kept before the settings window (localStorage se-home-mode): moved in once
+  const OLD_KEY = 'se-home-mode';
+  SE.run(() => {
+    if (localStorage.getItem(OLD_KEY) === 'steam') setHomeMode('steam');
+    localStorage.removeItem(OLD_KEY);
+  });
 
-  function setHomeMode(mode) {
-    try {
-      if (mode === 'steam') localStorage.setItem(MODE_KEY, 'steam');
-      else localStorage.removeItem(MODE_KEY);
-    } catch {
-      // storage refused: the switch still holds for this session
-    }
-    schedule();
-  }
-
-  let back = null;
-
-  /** On Steam's Home (Home: Steam), the way back: a button at its top, `home` its container. */
-  function paintBackButton(home) {
-    if (!home) {
-      back?.remove();
-      return;
-    }
-    if (!back) {
-      back = document.createElement('div');
-      back.className = 'se-hs-back';
-      back.innerHTML = '<button type="button">Use Steam Enhanced Home</button>';
-      back.firstChild.addEventListener('click', () => setHomeMode('theme'));
-    }
-    if (home.firstElementChild !== back) home.prepend(back);
-  }
-
-  Object.assign(ns, { homeMode, paintBackButton, setHomeMode });
+  Object.assign(ns, { homeMode, setHomeMode });
 })(window.__se);

@@ -23,6 +23,7 @@
   const TABS = {
     Appearance: ['--se-icon-sliders', 'How the theme looks, in every window and web page.'],
     Navigation: ['--se-icon-compass', 'The rail and the title bar.'],
+    Home: ['--se-icon-home', "The Library's Home: its stage and the games it features."],
     Startup: ['--se-icon-power', 'What shows while Steam and its windows load.'],
     Library: ['--se-icon-library', 'The Library and its game list.'],
     Friends: ['--se-icon-friends', 'The Friends dock.'],
@@ -34,11 +35,13 @@
 
   // Each setting's icon in its row's tile (a mask token, core/icons-*.css)
   const ICONS = {
-    font: 'quote', contrast: 'eye', corners: 'grid', glass: 'dynamic', 'rail-labels': 'list',
+    font: 'quote', contrast: 'eye', corners: 'grid', glass: 'dynamic', popups: 'tux', 'menu-hints': 'list', 'rail-labels': 'list',
     'game-art': 'photo', motion: 'activity', entrance: 'play', 'startup-background': 'home-stage',
     spinner: 'refresh', 'game-list-width': 'view-expanded', 'dock-width': 'friends', toasts: 'bell',
     'toasts-in-game': 'console', 'toast-style': 'view-compact', 'toast-position': 'move', overlay: 'tv',
-    'overlay-darkness': 'moon', 'click-opens': 'external', 'menu-hover': 'fold',
+    'overlay-darkness': 'moon', 'click-opens': 'external', 'menu-hover': 'fold', shortcuts: 'key',
+    home: 'home', 'stage-source': 'heart', 'stage-count': 'list-ordered', 'stage-details': 'info',
+    'stage-nav': 'view-compact', 'stage-cycle': 'restore', 'stage-motion': 'art-zoom',
     'hover-delay': 'snooze', 'avatar-name': 'user', 'game-count': 'chart', 'rail-buttons': 'list-ordered',
     'dock-start': 'power', 'chat-open': 'bubble', 'hover-cards': 'user', 'hover-card-delay': 'snooze',
     'profile-backgrounds': 'photo',
@@ -434,13 +437,13 @@
       }
       let parts;
       if (words.length) {
-        const found = settings.schema.filter(matches);
+        const found = settings.schema.filter((item) => !item.hidden && matches(item));
         const rows = make('div', 'se-ts-rows');
         rows.append(...found.map((item) => row(item, true)));
         if (!found.length) rows.append(make('p', 'se-ts-empty', 'No settings match.'));
         parts = [header(`${found.length} ${found.length === 1 ? 'setting' : 'settings'}`), rows];
       } else {
-        const items = settings.schema.filter((item) => item.tab === tab);
+        const items = settings.schema.filter((item) => item.tab === tab && !item.hidden);
         const body = tab === 'Appearance' ? appearance(items) : sections(items);
         parts = [header(tab, TABS[tab]?.[1]), ...body];
       }

@@ -1,0 +1,39 @@
+/*
+ * Theme setting (client/shared/settings.js): Menu hints, Off. The line under each menu row's
+ * name goes, and the row takes a plain row's height: the rail's and the theme's menus
+ * (client/shared/popup-layer.css), the Steam menu (client/header/steam-menu.css), the account
+ * menu (account-menu.css), the library's right-click menus (client/library/game-menu.css) and
+ * the settings menus (client/shared/menu.css). Each rule outranks the one it undoes (named
+ * beside it), whose !important it keeps.
+ */
+.se-menu-hint,
+.se-sm-hint,
+.se-mn-sub {
+  display: none;
+}
+
+/* steam-menu.css: a row with a hint is 38 px, a plain one (.se-sm-plain) 32 */
+:root:root :has(> .se-sm-row):not(#se-none),
+:root:root [data-se-steam-menu] :has(> * > .se-sm-row):not(#se-none) {
+  min-height: var(--se-hit);
+}
+
+/* account-menu.css: [data-se-acct-hint] rows, the hint on ::after */
+:root:root [data-se-avatar-menu] [data-se-acct-hint] {
+  grid-template-areas: 'icon label';
+  min-height: var(--se-hit);
+}
+
+[data-se-avatar-menu] [data-se-acct-hint]::after {
+  display: none;
+}
+
+/* game-menu.css: [data-se-gm-hint] rows take the hintless rows' areas and height */
+:root:root [data-se-lib-menu] [data-se-gm][data-se-gm-hint]:not([data-se-gm-place='bar']):not(#se-none) {
+  grid-template-areas: 'icon label value';
+  min-height: var(--se-hit);
+}
+
+[data-se-lib-menu] [data-se-gm]::after {
+  display: none;
+}

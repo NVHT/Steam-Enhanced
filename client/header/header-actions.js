@@ -1,6 +1,7 @@
 /*
  * Proxy bottom-bar actions into the title bar (Settings into the rail) while keeping native
- * components mounted.
+ * components mounted. Part 2 of 2: the keyboard shortcuts, Reload UI and what the Settings menu
+ * opens are client/header/header-shortcuts.js, listed just before.
  */
 ((SE) => {
   const { C } = SE;
@@ -23,6 +24,7 @@
 
   let settingsButton;
   let gamesButton;
+  let homeButton;
   let observer;
   let menuObserver;
   let offSettings; // the Rail buttons setting's listener
@@ -595,117 +597,9 @@
     if (!friendsMenu) openWindow();
   }
 
-  function openSteamSettings() {
-    if (SE.run(() => window.SteamClient?.URL?.ExecuteSteamURL?.('steam://open/settings')) !== undefined) {
-      return;
-    }
-    location.href = 'steam://open/settings';
-  }
-
-  function openMillennium() {
-    if (!window.__seMillenniumWindow?.openDirect?.()) {
-      window.__seMillenniumWindow?.showError?.();
-    }
-  }
-
-  // false: a plain restart, as Steam's own Restart buttons make it (true is another kind of restart)
-  const restartSteam = (SE.restartSteam = () => SE.steamCall('User', 'StartRestart', false));
-  const reloadNow = () => SE.steamCall('Browser', 'RestartJSContext');
-
-  /*
-   * Reload UI during a voice call leaves the main window dropping timers and Steam's own menus
-   * taking no input until a full restart (CLAUDE.md, Windows and Millennium). So while a call is
-   * on it asks first, in Steam's own confirm dialog (SE.steamConfirm, the look of Mark as
-   * Private), else the action menu: leave the call and then reload (once Steam says the call is
-   * over, giving up after a few seconds rather than reload in it), restart Steam, or cancel.
-   * Shared with the Steam menu's rows (client/header/menu/actions.js).
-   */
-  const ASK = {
-    title: "You're in a voice call",
-    description: 'Reloading now can leave Steam not responding until it restarts. Leave the call first, or restart Steam (the call ends).',
-  };
-  const LEAVE_WAIT_MS = 5000;
-  const voice = () => SE.global('g_FriendsUIApp', (app) => app.VoiceStore)?.VoiceStore;
-  const inCall = () => SE.run(() => voice().IsAnyVoiceActive()) === true;
-
-  function leaveThenReload() {
-    SE.run(() => voice().OnUserEndVoiceChat());
-    const started = performance.now();
-    const check = () => {
-      if (!inCall()) reloadNow();
-      else if (performance.now() - started < LEAVE_WAIT_MS) setTimeout(check, 150);
-    };
-    setTimeout(check, 150);
-  }
-
-  const reloadUI = (SE.reloadUI = () => {
-    if (!inCall()) return reloadNow();
-    const asked = SE.steamConfirm?.({
-      ...ASK,
-      // Short: Steam's buttons share one width, and a longer label wrapped
-      ok: 'Leave and reload',
-      middle: 'Restart Steam',
-      cancel: 'Cancel',
-      onOK: leaveThenReload,
-      onMiddle: restartSteam,
-    });
-    if (asked || !SE.layer?.menu) return;
-    SE.layer.menu(
-      [
-        { heading: ASK.title },
-        { note: ASK.description },
-        { label: 'Leave the call and reload', icon: '--se-icon-refresh', run: leaveThenReload },
-        { label: 'Restart Steam', hint: 'The call ends', icon: '--se-icon-restart', run: restartSteam },
-        { label: 'Cancel', icon: '--se-icon-close-sm', run: () => {} },
-      ],
-      // In the middle of the window, a third of the way down: no button opened it
-      (width, height) => ({ left: Math.max(0, (innerWidth - width) / 2), top: Math.max(0, (innerHeight - height) / 3) })
-    );
-  });
-
-  /*
-   * Keyboard shortcuts, in the main window: Ctrl+` Steam Settings, Ctrl+Shift+` the theme's
-   * settings (client/settings/theme/), Ctrl+1 Millennium (beside
-   * Millennium's own Ctrl+2, the Library Manager), Ctrl+R Reload UI, Ctrl+Shift+R Restart Steam
-   * (shown on the Settings menu's and the Steam menu's rows). By the key's place (event.code),
-   * so they work on any keyboard layout.
-   */
-  const SHORTCUTS = {
-    Backquote: openSteamSettings,
-    'Shift+Backquote': () => window.__seThemeSettings?.open(),
-    Digit1: openMillennium,
-    KeyR: reloadUI,
-    'Shift+KeyR': restartSteam,
-  };
-
-  function onShortcut(event) {
-    if (!event.ctrlKey || event.altKey || event.metaKey || event.repeat) return;
-    const action = SHORTCUTS[(event.shiftKey ? 'Shift+' : '') + event.code];
-    if (!action) return;
-    event.preventDefault();
-    event.stopPropagation();
-    action();
-  }
-
-  addEventListener('keydown', onShortcut, true);
-
-  function openLibraryManager() {
-    if (window.__seMillenniumWindow?.openLibraryManager) {
-      window.__seMillenniumWindow.openLibraryManager();
-      return;
-    }
-    SE.run(() =>
-      document.dispatchEvent(
-        new KeyboardEvent('keydown', {
-          key: '2',
-          code: 'Digit2',
-          ctrlKey: true,
-          bubbles: true,
-          cancelable: true,
-        })
-      )
-    );
-  }
+  // What the Settings menu opens (client/header/header-shortcuts.js, listed just before)
+  const parts = window.__seHeaderActionsParts || {};
+  const { openSteamSettings, openMillennium, openLibraryManager } = parts;
 
   /*
    * Settings: one button at the rail's foot, opening Steam Settings, the theme's settings
@@ -768,7 +662,34 @@
     button.addEventListener('click', footHover.cancel);
   }
 
+  /*
+   * Home: a switch beside Friends & Chat between the theme's Home stage and Steam's own Home
+   * (the Home setting, client/shared/settings.js; client/home/stage/home-mode.js), its state the
+   * line under the icon as Friends & Chat shows the dock's. A right click opens the Home stage's
+   * own settings menu while the stage shows (client/home/stage/stage-settings.js).
+   */
+  const homeOn = () => SE.settings?.get('home') !== 'steam';
+  function onHome() {
+    SE.settings?.set('home', homeOn() ? 'steam' : 'theme');
+  }
+  function onHomeMenu(event) {
+    event.preventDefault();
+    const stage = window.__seHomeStageParts;
+    if (homeOn() && stage?.live?.stage) stage.openStageMenu(homeButton);
+  }
+  function syncHomeButton() {
+    const friends = proxies.get('friends')?.button;
+    if (homeButton.parentElement !== group || homeButton.nextElementSibling !== friends) group.insertBefore(homeButton, friends || null);
+    const on = homeOn();
+    SE.attr(homeButton, 'aria-pressed', String(on));
+    SE.attr(homeButton, 'data-se-tip', on ? 'Steam Enhanced Home: on' : 'Steam Enhanced Home: off');
+  }
+
   function ensureExtraButtons(target) {
+    if (!homeButton) {
+      homeButton = makeActionButton('home', 'Steam Enhanced Home', onHome);
+      homeButton.addEventListener('contextmenu', onHomeMenu);
+    }
     if (!settingsButton) {
       settingsButton = makeActionButton('settings', 'Settings', onSettings);
       settingsButton.setAttribute('aria-haspopup', 'menu');
@@ -797,6 +718,7 @@
       group?.remove();
       settingsButton?.remove();
       gamesButton?.remove();
+      homeButton?.remove();
       document.body?.classList.remove('se-header-actions-ready');
       return;
     }
@@ -823,6 +745,7 @@
     ensureExtraButtons(target);
     PROXY_ACTIONS.forEach((action, index) => syncProxyButton(action, sources[index]));
     syncFriendsButton();
+    syncHomeButton();
     decorateMenuIcons();
     syncRailLabels();
     syncRailButtons();
@@ -958,10 +881,10 @@
     downloadObserver?.disconnect();
     if (frame) cancelAnimationFrame(frame);
     removeEventListener('DOMContentLoaded', start);
-    removeEventListener('keydown', onShortcut, true);
     settingsMenu?.release();
     friendsMenu?.release();
     group?.remove();
+    homeButton?.remove();
     settingsButton?.remove();
     gamesButton?.remove();
     removeEventListener('resize', remeasure);

@@ -1,6 +1,7 @@
 /*
- * The theme's settings (SE.settings): what each one offers, where the choice is kept, and how
- * a change reaches every window and web page at once.
+ * The theme's settings (SE.settings), part 2 of 2 (the palette: settings-palette.js, listed
+ * just before): what each one offers, where the choice is kept, and how a change reaches every
+ * window and web page at once.
  *
  * Kept in localStorage "se-settings", which every client window shares:
  *   values   each setting not at its default, by key
@@ -23,7 +24,6 @@
 
   const KEY = 'se-settings';
   const HEX = /^#[0-9a-f]{6}$/i;
-  const COLOUR = /^(?:#[0-9a-f]{6}|rgba\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*(?:0|1|0?\.\d+)\s*\))$/i;
   const MAIN = Boolean(window.__seClient?.groups?.has('main'));
   const SEND = 'SteamEnhanced.Settings'; // the client → a page (core/core.js)
   const ASK = 'SteamEnhanced.SettingsRequest'; // a page → the client, as it loads
@@ -34,142 +34,10 @@
   const ON = opt('on', 'On', null, 'yes');
   const off = (file) => opt('off', 'Off', file, 'no');
 
-  /*
-   * The colour palette: the base tokens of core/tokens.css a preset sets, by key (the settings
-   * window's Custom editor shows them in this order, under `group`). Enhanced is tokens.css's
-   * own values; each other preset sets every one. group: the mood the settings window files it
-   * under (Neutral, Cool, Warm).
-   */
-  const PALETTE_TOKENS = [
-    ['bg', '--se-bg', 'Background', 'Surfaces'],
-    ['sidebar', '--se-sidebar', 'Sidebar', 'Surfaces'],
-    ['surface', '--se-surface', 'Surface', 'Surfaces'],
-    ['surface2', '--se-surface-2', 'Raised surface', 'Surfaces'],
-    ['field', '--se-field', 'Field', 'Surfaces'],
-    ['ink', '--se-bg-ink', 'Deepest ink', 'Surfaces'],
-    ['hover', '--se-hover', 'Hover', 'States and lines'],
-    ['selected', '--se-selected', 'Selected', 'States and lines'],
-    ['track', '--se-track', 'Track', 'States and lines'],
-    ['border', '--se-border-strong', 'Strong border', 'States and lines'],
-    ['hairline', '--se-hairline', 'Hairline', 'States and lines'],
-    ['divider', '--se-divider', 'Divider', 'States and lines'],
-    ['strong', '--se-text-strong', 'Strong', 'Text'],
-    ['text', '--se-text', 'Text', 'Text'],
-    ['dim', '--se-text-dim', 'Dim', 'Text'],
-    ['muted', '--se-text-muted', 'Muted', 'Text'],
-    ['faint', '--se-text-faint', 'Faint', 'Text'],
-    ['accent', '--se-color-accent', 'Accent', 'Accent'],
-    ['onAccent', '--se-on-accent', 'On the accent', 'Accent'],
-  ].map(([key, token, label, group]) => ({ key, token, label, group }));
-
-  // Text colours and what they sit on, for the editor's contrast marks (WCAG AA, 4.5:1)
-  const READ_ON = { strong: 'selected', text: 'surface2', dim: 'surface2', muted: 'selected', faint: 'surface2', onAccent: 'accent' };
-
-  const LINES = { hairline: 'rgba(255, 255, 255, .06)', divider: 'rgba(255, 255, 255, .08)' };
-  const PRESETS = [
-    {
-      v: 'enhanced', label: 'Enhanced', group: 'Neutral', colors: {
-        bg: '#171a20', sidebar: '#1d2128', surface: '#1f242b', surface2: '#262c35', field: '#15181d', ink: '#0f1115',
-        hover: '#2c3440', selected: '#33404f', track: '#3a424d', border: '#4a525e', ...LINES,
-        strong: '#ffffff', text: '#e6e8eb', dim: '#b8c0c8', muted: '#a2acb7', faint: '#8994a2', accent: '#7cc4ff', onAccent: '#0f1115',
-      },
-    },
-    {
-      v: 'graphite', label: 'Graphite', group: 'Neutral', colors: {
-        bg: '#1c1c1c', sidebar: '#202020', surface: '#262626', surface2: '#2e2e2e', field: '#161616', ink: '#0e0e0e',
-        hover: '#333333', selected: '#3b3b3b', track: '#444444', border: '#555555', ...LINES,
-        strong: '#ffffff', text: '#f3f3f3', dim: '#d6d6d6', muted: '#bdbdbd', faint: '#9a9a9a', accent: '#60cdff', onAccent: '#001a28',
-      },
-    },
-    {
-      v: 'nebula', label: 'Nebula', group: 'Cool', colors: {
-        bg: '#0d0f1e', sidebar: '#12152b', surface: '#151833', surface2: '#1d2142', field: '#0a0c18', ink: '#07081a',
-        hover: '#232852', selected: '#2c315e', track: '#343a6b', border: '#454c80', ...LINES,
-        strong: '#ffffff', text: '#e8e9ff', dim: '#c3c6ee', muted: '#a9add6', faint: '#8b90bf', accent: '#a493ff', onAccent: '#120b33',
-      },
-    },
-    {
-      v: 'mono', label: 'Mono', group: 'Neutral', colors: {
-        bg: '#111111', sidebar: '#151515', surface: '#191919', surface2: '#212121', field: '#0c0c0c', ink: '#0a0a0a',
-        hover: '#282828', selected: '#303030', track: '#3a3a3a', border: '#4a4a4a', ...LINES,
-        strong: '#ffffff', text: '#e8e8e8', dim: '#c4c4c4', muted: '#a6a6a6', faint: '#8c8c8c', accent: '#ececec', onAccent: '#111111',
-      },
-    },
-    {
-      v: 'tonal', label: 'Tonal', group: 'Cool', colors: {
-        bg: '#141218', sidebar: '#19171d', surface: '#1d1b20', surface2: '#2b2930', field: '#0f0d13', ink: '#0d0b10',
-        hover: '#36333d', selected: '#4a4458', track: '#49454f', border: '#5b5763', ...LINES,
-        strong: '#ffffff', text: '#e6e0e9', dim: '#ddd7e0', muted: '#cac4d0', faint: '#a49eac', accent: '#d0bcff', onAccent: '#381e72',
-      },
-    },
-    {
-      v: 'ember', label: 'Ember', group: 'Warm', colors: {
-        bg: '#1a1614', sidebar: '#1e1a18', surface: '#241f1c', surface2: '#2e2926', field: '#120f0e', ink: '#0a0908',
-        hover: '#37312d', selected: '#413b37', track: '#4d4742', border: '#625b56', ...LINES,
-        strong: '#ffffff', text: '#f2e6dc', dim: '#c9beb6', muted: '#b0a69f', faint: '#9a918a', accent: '#ffb366', onAccent: '#100d0c',
-      },
-    },
-    {
-      v: 'forest', label: 'Forest', group: 'Warm', colors: {
-        bg: '#121815', sidebar: '#161c19', surface: '#1a221e', surface2: '#242c28', field: '#0d110f', ink: '#070a08',
-        hover: '#2b3430', selected: '#353e39', track: '#414a45', border: '#545e59', ...LINES,
-        strong: '#ffffff', text: '#dcebe2', dim: '#b5c3bb', muted: '#9eaba4', faint: '#89968e', accent: '#7fd8a6', onAccent: '#0b0e0d',
-      },
-    },
-    {
-      v: 'abyss', label: 'Abyss', group: 'Cool', colors: {
-        bg: '#0b1619', sidebar: '#0e1b1f', surface: '#122126', surface2: '#1c2b30', field: '#080f12', ink: '#04090a',
-        hover: '#243338', selected: '#2e3e42', track: '#394a4e', border: '#4d5e63', ...LINES,
-        strong: '#ffffff', text: '#d7eef0', dim: '#b0c5c8', muted: '#96abae', faint: '#819598', accent: '#5fe1e8', onAccent: '#070d0f',
-      },
-    },
-    {
-      v: 'rosewood', label: 'Rosewood', group: 'Warm', colors: {
-        bg: '#1a1316', sidebar: '#1f171a', surface: '#251b20', surface2: '#2f252a', field: '#120d0f', ink: '#0a0809',
-        hover: '#372d32', selected: '#41363c', track: '#4e4247', border: '#62565b', ...LINES,
-        strong: '#ffffff', text: '#f0dfe5', dim: '#c7b8be', muted: '#afa0a5', faint: '#9b8c91', accent: '#ff8fab', onAccent: '#100b0d',
-      },
-    },
-    {
-      v: 'slate', label: 'Slate', group: 'Neutral', colors: {
-        bg: '#1b1f24', sidebar: '#1e2328', surface: '#22272e', surface2: '#2b3038', field: '#131619', ink: '#0b0c0e',
-        hover: '#33383f', selected: '#3c4149', track: '#474d54', border: '#5a6067', ...LINES,
-        strong: '#ffffff', text: '#dde4ec', dim: '#b8bec6', muted: '#a8afb7', faint: '#9399a1', accent: '#8fb3d9', onAccent: '#101316',
-      },
-    },
-    {
-      v: 'midnight', label: 'Midnight', group: 'Cool', colors: {
-        bg: '#090c14', sidebar: '#0c1019', surface: '#10151f', surface2: '#1a1f2a', field: '#06080e', ink: '#040508',
-        hover: '#232832', selected: '#2d323d', track: '#393f4a', border: '#4e545f', ...LINES,
-        strong: '#ffffff', text: '#dfe6f5', dim: '#b6bcca', muted: '#959ca9', faint: '#828894', accent: '#4d9fff', onAccent: '#05070c',
-      },
-    },
-    {
-      v: 'sand', label: 'Sand', group: 'Warm', colors: {
-        bg: '#1c1a17', sidebar: '#201e1b', surface: '#26231f', surface2: '#302d29', field: '#141210', ink: '#0b0a09',
-        hover: '#383530', selected: '#423f3a', track: '#4e4a45', border: '#625e58', ...LINES,
-        strong: '#ffffff', text: '#eee8de', dim: '#c6c1b8', muted: '#b1aca4', faint: '#9a958e', accent: '#e6c07b', onAccent: '#11100e',
-      },
-    },
-    {
-      v: 'void', label: 'Void', group: 'Neutral', colors: {
-        bg: '#000000', sidebar: '#000000', surface: '#0a0a0a', surface2: '#141414', field: '#000000', ink: '#000000',
-        hover: '#1c1c1c', selected: '#262626', track: '#303030', border: '#3d3d3d', ...LINES,
-        strong: '#ffffff', text: '#e6e6e6', dim: '#bababa', muted: '#929292', faint: '#7f7f7f', accent: '#ffffff', onAccent: '#000000',
-      },
-    },
-  ];
-  const presetOf = (v) => PRESETS.find((preset) => preset.v === v) || PRESETS[0];
-
-  // A Custom palette as kept: every token a colour, any missing one from `base`
-  const fillPalette = (colors, base = PRESETS[0].colors) => {
-    const out = {};
-    for (const { key } of PALETTE_TOKENS) {
-      const value = typeof colors?.[key] === 'string' ? colors[key].trim() : '';
-      out[key] = COLOUR.test(value) ? value.toLowerCase() : base[key];
-    }
-    return out;
-  };
+  // The colour palette and its presets (client/shared/settings-palette.js, listed just before)
+  const parts = window.__seSettingsParts || {};
+  const { PALETTE_TOKENS, PRESETS, READ_ON, fillPalette, presetOf } = parts;
+  if (!PRESETS) return;
 
   /*
    * Each setting: key, tab, label, hint, and its choices (the first is the default; type 'multi':
@@ -177,7 +45,8 @@
  * section: the heading its tab groups it under; requires: [[key, value], ...] the settings it
  * applies with (the window dims it otherwise); visual: its choices drawn as pictures
  * (client/settings/theme/theme-settings.css); hide (multi): a selector, % standing for a choice,
- * whose matches go while that choice is off (client/loader.js applyOptions). scope says
+ * whose matches go while that choice is off (client/loader.js applyOptions); type 'text' with hidden:
+ * a kept string, no choices, not drawn. scope says
    * where its stylesheets go: client windows (the default), web pages, or both. from: its name in
    * Millennium's old Conditions. The palette's choices are the presets and Custom (its colours
    * under the key 'palette-custom').
@@ -208,6 +77,19 @@
       values: [opt('on', 'On'), opt('off', 'Off', 'options/appearance/glass-off.css')],
     },
     {
+      // Linux (XWayland, or X11 without a compositor) draws a popup window's transparent parts
+      // black: the shadow's room and the rounded corners. Solid there unless chosen otherwise.
+      key: 'popups', tab: 'Appearance', label: 'Menu windows',
+      hint: 'Solid: no shadow or rounded edge on menus in their own window, for Linux, where those show black.',
+      values: [opt('shadowed', 'Shadowed'), opt('solid', 'Solid', 'options/appearance/popups-solid.css')],
+      def: /\bLinux\b/.test(navigator.userAgent) ? 'solid' : 'shadowed',
+    },
+    {
+      key: 'menu-hints', tab: 'Appearance', label: 'Menu hints',
+      hint: "The short line under each menu row's name.",
+      values: [opt('on', 'On'), opt('off', 'Off', 'options/appearance/menu-hints-off.css')],
+    },
+    {
       key: 'contrast', tab: 'Appearance', label: 'Contrast', scope: 'both',
       hint: 'High: brighter secondary text and stronger lines.',
       values: [opt('standard', 'Standard'), opt('high', 'High', 'options/appearance/contrast-high.css')],
@@ -229,7 +111,7 @@
     },
     {
       key: 'menu-hover', section: 'Clicks and menus', tab: 'Navigation', label: 'Menus open on hover',
-      hint: 'A rail menu opens when the pointer rests on its button.',
+      hint: 'A rail menu, or the downloads card, opens when the pointer rests on its button.',
       values: [opt('off', 'Off'), opt('on', 'On')],
     },
     {
@@ -266,6 +148,11 @@
       values: [opt('on', 'On'), opt('off', 'Off', 'options/navigation/game-count-off.css')],
     },
     {
+      key: 'shortcuts', section: 'Keyboard', tab: 'Navigation', label: 'Keyboard shortcuts',
+      hint: "The theme's Ctrl shortcuts, such as Ctrl+R Reload UI, shown in the menus.",
+      values: [opt('on', 'On'), opt('off', 'Off', 'options/navigation/shortcuts-off.css')],
+    },
+    {
       key: 'entrance', section: 'Entrance', visual: true, tab: 'Startup', label: 'Window entrance', from: 'Window entrance',
       hint: "How a window appears once loaded. Splash is the main window's; others use Logo.",
       values: [
@@ -274,19 +161,20 @@
       ],
     },
     {
+      key: 'startup-wait', section: 'Entrance', tab: 'Startup', label: 'Wait for Library',
+      hint: 'Until ready holds the window until the Library settles (up to 3 s).',
+      values: [opt('ready', 'Until ready'), opt('now', 'At once')],
+    },
+    {
       key: 'splash-when', section: 'Entrance', requires: [['entrance', 'splash']], tab: 'Startup', label: 'Show splash',
       hint: 'Other starts use Logo.',
       values: [opt('every', 'Every start'), opt('daily', 'Once a day'), opt('first', 'First start only')],
     },
     {
-      key: 'startup-wait', section: 'Loading', tab: 'Startup', label: 'Wait for Library',
-      hint: 'Until ready holds the window until the Library settles (up to 3 s).',
-      values: [opt('ready', 'Until ready'), opt('now', 'At once')],
-    },
-    {
       key: 'splash-art', section: 'Entrance', requires: [['entrance', 'splash']], tab: 'Startup', label: 'Splash art',
-      hint: 'The game the splash shows.',
-      values: [opt('last', 'Last played'), opt('random', 'Random recent'), opt('none', 'None')],
+      // 'last' is Home's first game (the last played with Home off): the value kept from before
+      hint: "The game the splash shows. Home's game moves into the Home stage as it opens.",
+      values: [opt('last', "Home's game"), opt('random', 'Random recent'), opt('none', 'None')],
     },
     {
       key: 'startup-background', section: 'Background', visual: true, tab: 'Startup', label: 'Startup background', from: 'Startup background',
@@ -331,6 +219,52 @@
       key: 'game-list-icons', section: 'Game list', tab: 'Library', label: 'Game icons',
       hint: "Each game's small icon before its name in the list.",
       values: [opt('on', 'On'), opt('off', 'Off', 'options/library/game-icons-off.css')],
+    },
+    /*
+     * Home: which Home shows, and the Home stage's own settings (client/home/stage/stage-settings.js,
+     * whose menu, a right click on the title bar's Home switch, edits the same values). The collection a stage features is kept as
+     * stage-collection (picked in that menu: hidden here).
+     */
+    {
+      key: 'home', section: 'Home', visual: true, tab: 'Home', label: 'Home',
+      hint: "The theme's stage and panels, or Steam's own Home.",
+      values: [opt('theme', 'Stage'), opt('steam', "Steam's")],
+    },
+    {
+      key: 'stage-source', section: 'Featured games', requires: [['home', 'theme']], tab: 'Home', label: 'Games',
+      hint: 'What the stage features. Pick a collection by right-clicking the Home button.',
+      values: [opt('recent', 'Recent'), opt('favorites', 'Favorites'), opt('collection', 'Collection'), opt('added', 'Added')],
+    },
+    { key: 'stage-collection', tab: 'Home', type: 'text', hidden: true, label: 'Collection', values: [], def: '' },
+    {
+      key: 'stage-count', section: 'Featured games', requires: [['home', 'theme']], tab: 'Home', label: 'How many',
+      hint: 'Games the stage cycles through.',
+      values: [opt('4', '4'), opt('6', '6'), opt('8', '8'), opt('10', '10')],
+      def: '6',
+    },
+    {
+      key: 'stage-details', section: 'Featured games', requires: [['home', 'theme']], tab: 'Home', label: 'Details',
+      type: 'multi', hint: 'What the stage shows about a game.',
+      values: [
+        opt('logo', 'Logo'), opt('by', 'Developer'), opt('reviews', 'Reviews'), opt('live', 'Playing now'),
+        opt('desc', 'Description'), opt('hours', 'Hours'), opt('ach', 'Achievements'), opt('last', 'Last played'),
+      ],
+    },
+    {
+      key: 'stage-nav', section: 'Switching games', requires: [['home', 'theme']], tab: 'Home', label: 'Game picker',
+      hint: 'Under the stage: thumbnails, dots, or nothing.',
+      values: [opt('thumbs', 'Thumbnails'), opt('dots', 'Dots'), opt('none', 'Hidden')],
+    },
+    {
+      key: 'stage-cycle', section: 'Switching games', requires: [['home', 'theme']], tab: 'Home', label: 'Auto-switch',
+      hint: 'How long each game stays before the next.',
+      values: [opt('off', 'Off'), opt('slow', '15 s'), opt('normal', '9 s'), opt('fast', '5 s')],
+      def: 'normal',
+    },
+    {
+      key: 'stage-motion', section: 'Background art', visual: true, requires: [['home', 'theme']], tab: 'Home', label: 'Background',
+      hint: 'Behind the featured game. Still with reduced motion.',
+      values: [opt('zoom', 'Zoom'), opt('parallax', 'Parallax'), opt('shots', 'Screenshots'), opt('trailer', 'Trailer'), opt('still', 'Still')],
     },
     {
       key: 'game-list-width', section: 'Game list', tab: 'Library', label: 'Game list width', from: 'Game list width',
@@ -501,10 +435,12 @@
   const TABS = [...new Set(SCHEMA.map((item) => item.tab))];
   const byKey = new Map(SCHEMA.map((item) => [item.key, item]));
 
-  const valid = (item, value) =>
-    item.type === 'multi'
-      ? Array.isArray(value) && value.every((v) => item.values.some((choice) => choice.v === v))
-      : item.values.some((choice) => choice.v === value);
+  const valid = (item, value) => {
+    if (item.type === 'multi') return Array.isArray(value) && value.every((v) => item.values.some((choice) => choice.v === v));
+    // A kept string with no choices (hidden: not drawn by the settings window), e.g. an id
+    if (item.type === 'text') return typeof value === 'string' && value.length <= 200;
+    return item.values.some((choice) => choice.v === value);
+  };
   const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   // A multi setting's choices on, in the schema's order
   const ordered = (item, value) => item.values.map((c) => c.v).filter((v) => value.includes(v));
@@ -564,7 +500,7 @@
   const listeners = new Set();
   let destroyed = false;
 
-  // Rarity tiers: SE.rarity (core/runtime.js) gives no tier while the setting is off
+  // Rarity tiers: SE.rarity (core/runtime-art.js) gives no tier while the setting is off
   const syncTiers = () => run(() => SE.rarity.setTiers(get('rarity-tiers') !== 'off'));
   syncTiers();
 

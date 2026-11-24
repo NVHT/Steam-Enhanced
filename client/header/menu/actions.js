@@ -1,7 +1,7 @@
 /*
  * The Steam menu, in the Settings menu's language (client/header/steam-menu.css): groups under
  * headings, each row an icon, a name and a hint.
- *   Steam:  About Steam, Check for Updates
+ *   Steam:  About Steam, Check for Updates, Theme settings
  *   Client: Big Picture Mode, Restart Steam, Reload UI
  *   Help:   Steam Support, System Information, System Report, Legal (Privacy Policy, Legal
  *           Information, Steam Subscriber Agreement)
@@ -52,6 +52,11 @@
         { name: '#Menu_CheckForSteamUpdates', dialog: 'CheckForUpdates' },
         { label: 'Check for Updates', hint: 'Get the latest client', icon: '--se-icon-install' }
       ),
+      row(
+        // The theme's settings window (client/settings/theme/), as the rail's Settings menu opens it
+        { name: 'se-theme-settings', onClick: () => window.__seThemeSettings?.open() },
+        { label: 'Theme settings', hint: 'Look, startup, toasts, web pages', icon: '--se-icon-sliders', keys: 'Ctrl+Shift+`' }
+      ),
     ],
     client: [
       row(
@@ -59,7 +64,7 @@
         { label: 'Big Picture Mode', hint: 'TV and controller mode', icon: '--se-icon-tv' }
       ),
       row(
-        // The action and its shortcut, and Reload UI's: client/header/header-actions.js
+        // The action and its shortcut, and Reload UI's: client/header/header-shortcuts.js
         { name: 'se-restart', onClick: () => SE.restartSteam() },
         { label: 'Restart Steam', hint: 'Close and reopen Steam', icon: '--se-icon-restart', keys: 'Ctrl+Shift+R' }
       ),
