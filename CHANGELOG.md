@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.4.4**](#v1-4-4) | Nov 24, 2026 | The Friends window reopens where you left it |
 | [**1.4.3**](#v1-4-3) | Nov 24, 2026 | Fixes: the overlay's Exit game?, review colours, centred labels |
 | [**1.4.2**](#v1-4-2) | Nov 24, 2026 | A Home tab and switch, Linux menu fix, splash and startup fixes |
 | [**1.4.1**](#v1-4-1) | Nov 24, 2026 | Stage toasts in the corner, Click opens Page first, core icons on the web |
@@ -23,11 +24,22 @@
 
 <br>
 
+<a name="v1-4-4"></a>
+
+## 1.4.4 · Nov 24, 2026
+
+> A Friends window left open when Steam closes comes back at startup, where you left it.
+
+**Fixes**
+- **Friends window**: left open when Steam closes, it reopens at startup in its last place, a second screen included, as in plain Steam (#4).
+
+<br>
+
 <a name="v1-4-3"></a>
 
-## 1.4.3 · Nov 24, 2026
-
-> The overlay's Exit game? shows in full, positive review scores keep their colour under any preset, and button and chip labels sit centred.
+<details>
+<summary><b>1.4.3</b> · Nov 24, 2026 · The overlay's Exit game? shows in full, positive review scores keep their colour under any preset, and button and chip labels sit centred.</summary>
+<br>
 
 **Fixes**
 - **Overlay**: Exit game? opens in a window sized to Steam's smaller dialog and was cut off, buttons included; its window now fits the dialog.
@@ -37,6 +49,8 @@
 
 **Under the hood**
 - The element picker (a theming aid) captures again.
+
+</details>
 
 <br>
 
