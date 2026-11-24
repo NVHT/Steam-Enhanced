@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.4.1**](#v1-4-1) | Nov 24, 2026 | Stage toasts in the corner, Click opens Page first, core icons on the web |
 | [**1.4.0**](#v1-4-0) | Nov 24, 2026 | Theme settings in a window of their own, colour presets, a quality pass |
 | [**1.3.6**](#v1-3-6) | Nov 23, 2026 | Friend chats as bubbles, group chat and dialog redesigns, a new startup |
 | [**1.3.5**](#v1-3-5) | Nov 22, 2026 | Friends and tray menus, Game Properties, shortcuts, a faster client |
@@ -20,11 +21,32 @@
 
 <br>
 
+<a name="v1-4-1"></a>
+
+## 1.4.1 · Nov 24, 2026
+
+> A corner for the Stage toast, page-first rail clicks, and the Store, Community and Help drawing the theme's own icons.
+
+**Settings**
+- **Stage position**: a new Corner choice puts the Stage toast at the bottom right, where Steam shows its own.
+- **Click opens**: now starts at Page; a right-click still opens the menu.
+- Toasts, the overlay and startup read their settings directly, without a style read each time.
+
+**Look**
+- Store, Community and Help icons use the theme's duotone set, following the text colour and the colour presets.
+- System Information and the System Report show the theme's hardware icons.
+
+**Under the hood**
+- Shared helpers replace copies across the client; Home's panels no longer measure on every update.
+- A toast preview for development (`dev/`), and the README shows the web pages.
+
+<br>
+
 <a name="v1-4-0"></a>
 
-## 1.4.0 · Nov 24, 2026
-
-> The theme's settings move out of Millennium into a window of their own, with colour presets, new options for every area, and a pass over the whole theme for leaks, speed and consistency.
+<details>
+<summary><b>1.4.0</b> · Nov 24, 2026 · The theme's settings move out of Millennium into a window of their own, with colour presets, new options for every area, and a pass over the whole theme for leaks, speed and consistency.</summary>
+<br>
 
 **Settings**
 - **Theme settings**: a window of its own, from the rail's Settings menu or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd>, with a search and a tab per area. Changes apply at once, everywhere.
@@ -46,7 +68,7 @@
 - Teardown cleans up everything it adds, for live reloads.
 - Colours, corners, timing and stacking follow the theme's tokens throughout; dead rules and stale notes removed.
 
-<br>
+</details>
 
 <a name="v1-3-6"></a>
 

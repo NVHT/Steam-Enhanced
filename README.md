@@ -151,6 +151,10 @@ Every screen has been rethought, from the moment Steam starts to the moment you 
 
 The redesign does not stop at the client. Every Store, Community and Support page uses the full window and the same cards, dropdowns, typography and search as the client, so browsing, buying and chatting feel like one product.
 
+<p align="center">
+  <img src="assets/web-loop.gif" alt="The Store, Community and Support pages in the theme" width="100%">
+</p>
+
 <details>
 <summary><b>Every page</b> &nbsp;<sub>Store, wishlist and checkout, account, Community, Support</sub></summary>
 <br>
@@ -337,7 +341,7 @@ Steam-Enhanced/
 ├── compat/       Plugin integrations, one folder per plugin
 ├── options/      A setting's stylesheets, switched on by the settings window, one folder per tab
 ├── dev/          Element inspector (Ctrl+Shift+E), profiler (Ctrl+Shift+P), class map tools, README art and quality checks
-└── assets/       Logos, Millennium header, splash and the README art (readme/)
+└── assets/       Logos, Millennium header, splash, web loop and the README art (readme/)
 ```
 
 </details>
