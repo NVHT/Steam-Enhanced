@@ -209,9 +209,10 @@
 
   const capture = async (el) => {
     if (!el) return;
-    const pending = report(el, '', lastPoint); // reads the page now, while a frozen popup is still open
+    // Reads the page now, while a frozen popup is still open; a failed report shows its error
+    const pending = report(el, '', lastPoint);
     stopPicking();
-    show('Element report', await pending);
+    show('Element report', await pending.catch((error) => `Report failed: ${error?.stack || error}`));
   };
   const capturePage = () => show('Page report', pageReport());
 

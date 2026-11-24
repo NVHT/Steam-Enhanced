@@ -25,6 +25,9 @@
 
   const short = (value, max = 80) => (value.length > max ? `${value.slice(0, max)}…` : value);
 
+  // The picker's own UI (inspector.js's <se-inspector> host; its shadow root stays hidden)
+  const own = (node) => Boolean(node.closest?.('se-inspector'));
+
   const label = (el) => {
     if (!(el instanceof Element)) return String(el);
     const id = el.id ? `#${el.id}` : '';
