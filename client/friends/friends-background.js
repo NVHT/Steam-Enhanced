@@ -1,6 +1,10 @@
 /*
  * Suppress automatic desktop Friends popup window creation on startup while preserving overlay and
- * manual opens.
+ * manual opens. One exception: a Friends window left open when Steam closed comes back, as in
+ * plain Steam. Steam's C++ side says so at startup (the desktop app's
+ * m_bShowFriendsListOnLoadFromLoader) and hands the first popup the window's last place
+ * (LoaderWindowRestoreDetails), the only restore that keeps a second screen; a window opened
+ * later from the dock restores in-session and lands on the primary.
  */
 ((SE) => {
   window.__seFriendsBackground?.destroy();
@@ -9,6 +13,20 @@
   const patchedApps = new Map();
   const patchedOwners = new Map();
   const patchedRestores = new Map();
+  const reopened = new WeakSet();
+
+  // After Steam's startup restore: the Friends window, if it was open at exit, through the dock's
+  // "Open window" (so the dock lets it through, as for a manual open)
+  function reopenIfLeftOpen(app) {
+    if (destroyed || reopened.has(app)) return;
+    if (SE.run(() => app.m_DesktopApp?.m_bShowFriendsListOnLoadFromLoader) !== true) return;
+    const show = patchedApps.get(app)?.original;
+    if (typeof show !== 'function') return;
+    reopened.add(app);
+    const open = () => show.call(app, true);
+    const dock = window.__seFriendsDock;
+    SE.run(() => (typeof dock?.openWindow === 'function' ? dock.openWindow(open) : open()));
+  }
 
   function suppressRestore(app) {
     const ui = SE.run(() => app?.UIStore);
@@ -17,7 +35,9 @@
     if (own && !own.configurable) return;
     const original = ui.RestoreFromStateObject;
     const wrapper = function (state, _suppressPopups, ...args) {
-      return original.call(this, state, true, ...args);
+      const result = original.call(this, state, true, ...args);
+      reopenIfLeftOpen(app);
+      return result;
     };
     Object.defineProperty(ui, 'RestoreFromStateObject', { configurable: true, writable: true, value: wrapper });
     patchedRestores.set(ui, { own, wrapper });
@@ -48,7 +68,7 @@
         writable: true,
         value: blocked,
       });
-      patchedApps.set(app, { own, blocked });
+      patchedApps.set(app, { own, blocked, original });
     } catch {}
   };
 
