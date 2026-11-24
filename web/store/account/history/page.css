@@ -52,7 +52,7 @@ html.se-store-account-history:not(#se-none) .wallet_history_click_hint > svg {
 
 .wallet_history_click_hint > svg .d {
   fill: currentColor;
-  fill-opacity: .3;
+  fill-opacity: var(--se-icon-duo);
   stroke: none;
 }
 
@@ -120,6 +120,7 @@ html.se-store-account-history:not(#se-none) td.wht_items:not([data-se-history-op
 }
 
 html.se-store-account-history:not(#se-none) .se-history-more {
+  position: relative;
   margin-top: var(--se-space-2);
   height: 26px;
   padding: 0 var(--se-space-3);
@@ -130,6 +131,13 @@ html.se-store-account-history:not(#se-none) .se-history-more {
   font: var(--se-type-label);
   cursor: pointer;
   transition: background-color var(--se-dur);
+}
+
+/* A --se-hit tall hit box around the slim face, so the row keeps its height */
+html.se-store-account-history:not(#se-none) .se-history-more::before {
+  content: "";
+  position: absolute;
+  inset: calc((26px - var(--se-hit)) / 2) 0;
 }
 
 html.se-store-account-history:not(#se-none) .se-history-more:hover {
@@ -188,15 +196,17 @@ html.se-store-account-history:not(#se-none) .wht_base_price_discounted {
   background: none !important;
 }
 
+/* The price chip's discount badge (web/store/shared/ui-price.css) */
 html.se-store-account-history:not(#se-none) .wht_discount_pct {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
-  height: 22px;
-  padding: 0 var(--se-space-2);
-  border-radius: var(--se-radius-xs);
+  height: var(--se-price-pct-h);
+  padding: 0 var(--se-price-pct-pad);
+  border-radius: var(--se-price-pct-radius);
   background: var(--se-cart) !important;
-  color: var(--se-on-accent) !important;
-  font: 800 var(--se-fs-sm)/1 var(--se-font) !important;
+  color: var(--se-price-pct-ink) !important;
+  font: 800 var(--se-price-pct-size)/1 var(--se-font) !important;
 }
 
 html.se-store-account-history:not(#se-none) .wht_base_price_discounted > div:not(.wht_discount_pct) {
@@ -255,13 +265,13 @@ html.se-store-account-history:not(#se-none) #load_more_button {
   padding: 0 var(--se-space-5) !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-surface-2) !important;
-  box-shadow: var(--se-edge);
-  color: var(--se-text) !important;
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-btn-color) !important;
   font: var(--se-type-control-lg) !important;
   text-shadow: none !important;
   cursor: pointer;
-  transition: background-color var(--se-dur);
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-store-account-history:not(#se-none) #load_more_button > span {
@@ -272,7 +282,8 @@ html.se-store-account-history:not(#se-none) #load_more_button > span {
 }
 
 html.se-store-account-history:not(#se-none) #load_more_button:hover {
-  background: var(--se-hover) !important;
+  background: var(--se-btn-bg-hover) !important;
+  color: var(--se-btn-color-hover) !important;
 }
 
 /* ---------- Narrow windows: tax, shipping and the wallet columns give way ---------- */

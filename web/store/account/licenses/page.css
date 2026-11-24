@@ -56,19 +56,20 @@ html.se-store-account-licenses:not(#se-none) .license_paginator_ctn a {
   display: inline-flex;
   align-items: center;
   gap: var(--se-space-2);
-  height: 34px;
-  padding: 0 var(--se-space-4);
+  height: var(--se-btn-h);
+  padding: var(--se-btn-pad);
   border-radius: var(--se-radius-control);
-  background: var(--se-surface-2);
-  box-shadow: var(--se-edge);
-  color: var(--se-text) !important;
-  font: var(--se-type-control);
+  background: var(--se-btn-bg);
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-btn-color) !important;
+  font: var(--se-btn-font);
   text-decoration: none !important;
-  transition: background-color var(--se-dur);
+  transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-store-account-licenses:not(#se-none) .license_paginator_ctn a:hover {
-  background: var(--se-hover);
+  background: var(--se-btn-bg-hover);
+  color: var(--se-btn-color-hover) !important;
 }
 
 html.se-store-account-licenses:not(#se-none) .license_paginator_ctn a[data-se-licenses-page] > img {
@@ -81,11 +82,12 @@ html.se-store-account-licenses:not(#se-none) .license_paginator_ctn a[data-se-li
   width: 12px;
   height: 12px;
   background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 5l7 7-7 7'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  transform: rotate(-90deg); /* the core chevron points down */
 }
 
 html.se-store-account-licenses:not(#se-none) .license_paginator_ctn a[data-se-licenses-page="prev"]::before {
-  transform: scaleX(-1);
+  transform: rotate(90deg);
 }
 
 html.se-store-account-licenses:not(#se-none) .license_paginator_ctn a[data-se-licenses-page="prev"]::after {
@@ -126,6 +128,7 @@ html.se-store-account-licenses:not(#se-none) .free_license_remove_link {
 }
 
 html.se-store-account-licenses:not(#se-none) .free_license_remove_link a {
+  position: relative;
   display: inline-flex;
   align-items: center;
   height: 22px;
@@ -145,8 +148,15 @@ html.se-store-account-licenses:not(#se-none) .free_license_remove_link a:focus-v
 }
 
 html.se-store-account-licenses:not(#se-none) .free_license_remove_link a:hover {
-  background: color-mix(in srgb, var(--se-danger) 16%, transparent);
+  background: var(--se-danger-surface);
   color: var(--se-danger) !important;
+}
+
+/* A --se-hit tall hit box around the slim pill, so the row keeps its height */
+html.se-store-account-licenses:not(#se-none) .free_license_remove_link a::before {
+  content: "";
+  position: absolute;
+  inset: calc((22px - var(--se-hit)) / 2) 0;
 }
 
 @media (max-width: 760px) {

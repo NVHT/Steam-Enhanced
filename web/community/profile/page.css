@@ -26,13 +26,13 @@ html.se-community-profile {
   --se-profile-width: var(--se-community-width);
   --se-profile-side: 400px;
   --se-profile-card: color-mix(in srgb, var(--se-bg) 84%, transparent);
-  --se-profile-card-solid: #1a1e25;
-  --se-profile-blur: blur(20px) saturate(1.25);
+  --se-profile-card-solid: color-mix(in srgb, var(--se-surface) 50%, var(--se-bg));
+  --se-profile-blur: var(--se-blur-bar);
   --se-profile-avatar: 128px;
   --se-profile-level: 44px;
   --se-profile-cover-h: clamp(190px, 15vw, 290px);
   --se-profile-overlap: 64px;
-  --se-profile-pad: 32px;
+  --se-profile-pad: var(--se-space-6);
   --se-chevron-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E");
 }
 
@@ -65,7 +65,7 @@ html.se-community-profile div.profile_page[data-se-art]:not([data-se-art="none"]
   z-index: var(--se-z-under);
   height: 1200px;
   background: var(--se-profile-art) center 25% / cover no-repeat;
-  filter: blur(72px) saturate(1.4);
+  filter: var(--se-blur-ambient) saturate(1.4);
   opacity: .38;
   -webkit-mask-image: linear-gradient(180deg, #000 0, var(--se-black-55) 45%, transparent 100%);
   pointer-events: none;
@@ -119,8 +119,8 @@ html.se-community-profile div.profile_page > :is(.profile_header_bg, .profile_co
     inset: 0;
     z-index: var(--se-z-raised);
     background:
-      linear-gradient(180deg, rgba(26, 30, 37, .1) 0, rgba(26, 30, 37, .55) 50%, rgba(26, 30, 37, .88) 80%, var(--se-profile-card-solid) 100%),
-      linear-gradient(90deg, rgba(26, 30, 37, .45), transparent 55%);
+      linear-gradient(180deg, color-mix(in srgb, var(--se-profile-card-solid) 10%, transparent) 0, color-mix(in srgb, var(--se-profile-card-solid) 55%, transparent) 50%, color-mix(in srgb, var(--se-profile-card-solid) 88%, transparent) 80%, var(--se-profile-card-solid) 100%),
+      linear-gradient(90deg, color-mix(in srgb, var(--se-profile-card-solid) 45%, transparent), transparent 55%);
     pointer-events: none;
   }
 
@@ -375,9 +375,13 @@ html.se-community-profile .se-profile-status:not([data-se-state="offline"])::aft
   animation: se-profile-pulse var(--se-dur-breathe) var(--se-ease) infinite;
 }
 
+/* The dot and its ring breathe together (transform and opacity only: a box-shadow pulse repaints
+   every frame) */
 @keyframes se-profile-pulse {
-  0%, 100% { box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 25%, transparent); }
-  50% { box-shadow: 0 0 0 5px color-mix(in srgb, currentColor 8%, transparent); }
+  50% {
+    opacity: .6;
+    transform: scale(1.3);
+  }
 }
 
 html.se-community-profile .header_real_name {
@@ -421,7 +425,7 @@ html.se-community-profile .profile_flag {
   order: -1;
   width: 18px;
   height: auto;
-  border-radius: 2px;
+  border-radius: var(--se-radius-xs);
 }
 
 /* Info row (profile/page.js), four columns behind hairlines: the favourite badge, the summary
@@ -705,7 +709,8 @@ html.se-community-profile .profile_summary_footer {
   display: none !important;
 }
 
-/* Actions: pills on the right, glass over the cover's lower edge */
+/* Actions: the shared buttons (shared/ui.css) on the right, over the cover's lower edge (the
+   card's own blur behind them: no second backdrop-filter) */
 html.se-community-profile .profile_header_actions {
   display: flex !important;
   flex-wrap: wrap;
@@ -721,13 +726,6 @@ html.se-community-profile .profile_header_actions > * {
 
 html.se-community-profile .profile_header_actions .btn_profile_action {
   height: 38px;
-  padding: 0 var(--se-space-4) !important;
-  background: var(--se-divider) !important;
-  backdrop-filter: var(--se-blur-chip);
-}
-
-html.se-community-profile .profile_header_actions .btn_profile_action:hover {
-  background: var(--se-hover) !important;
 }
 
 html.se-community-profile .profile_header_actions #profile_action_dropdown_link {

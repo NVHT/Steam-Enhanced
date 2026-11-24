@@ -538,6 +538,17 @@ html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) :is(
   color: var(--se-text) !important;
   font: var(--se-type-body-lg) !important;
   outline: 0 !important;
+  transition: box-shadow var(--se-dur);
+}
+
+/* !important: the rule above sets box-shadow with !important */
+html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) :is(input[type="text"], textarea):hover:not(:focus) {
+  box-shadow: var(--se-field-edge-hover) !important;
+}
+
+/* !important: the rule above sets box-shadow with !important */
+html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) :is(input[type="text"], textarea):focus {
+  box-shadow: var(--se-field-edge-focus) !important;
 }
 
 /* Search results */
@@ -551,7 +562,7 @@ html.se-community-discussions .post_searchresult {
 }
 
 html.se-community-discussions .searchmatch_highlight {
-  border-radius: 3px;
+  border-radius: var(--se-radius-xs);
   background: var(--se-accent-surface) !important;
   color: var(--se-white) !important;
 }

@@ -8,6 +8,8 @@
  *    [data-se-guide-list] for the two-column grid.
  *  - Paging: Steam writes the "..." as bare text between its buttons; it is wrapped
  *    (.se-page-gap) so the shared page buttons (shared/ui.css) can place it.
+ *  - Side search: the shared search field (web/shared/search-field.css), Steam's image button
+ *    its magnifier.
  *  - Summaries: runs of blank-looking filler characters some authors pad with collapse to a
  *    space, so the text starts at the left like the rest.
  *
@@ -23,6 +25,7 @@
   const GUIDE = '#ig_bottom a.workshopItemCollection';
   const SUMMARY = '#ig_bottom .workshopItemShortDesc';
   const LIST = 'data-se-guide-list';
+  const SEARCH_BOX = '#ig_bottom .searchTextContainer';
 
   /** Wrap the paging's bare "..." (Steam writes it as text between its buttons); returns how to
       put it back. */
@@ -79,6 +82,8 @@
         wrapped.add(desc);
         $.add(unpad(desc));
       }
+      const searchBox = document.querySelector(SEARCH_BOX);
+      if (searchBox) $.search(searchBox.querySelector(':scope > input.searchText'), searchBox, searchBox.querySelector(':scope > .searchTextSubmitImg'));
       for (const guide of document.querySelectorAll(GUIDE)) {
         const list = (guide.closest('.workshopItemCollectionContainer') ?? guide).parentElement;
         if (list && !list.matches('.guides_home_list_ctn') && !list.hasAttribute(LIST)) $.mark(list, LIST);

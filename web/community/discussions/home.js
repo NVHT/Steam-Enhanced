@@ -6,7 +6,7 @@
  *     Submitting copies the query into Steam's input and clicks Steam's submit image, so
  *     Steam's own search runs; without one it submits Steam's form. Steam's field is hidden
  *     ([data-se-dsc-search]) only while the theme's is in place. "/" focuses the field from
- *     anywhere on the page.
+ *     anywhere on the page. The Game Forums tab's game search is the shared search field.
  *   - Hero extras, from the page's own data: a "Popular" row (the five Steam forums with the most
  *     threads, as chips) and a stats row (forum count, total threads, the newest post's time).
  *     Rebuilt only when their data changes.
@@ -493,6 +493,14 @@
       titles.clear();
     });
 
+    /* ---------- Game search: the shared search field, Steam's image button its magnifier ---------- */
+
+    const placeGameSearch = () => {
+      const input = document.querySelector('#game_search_form .discussionSearchText');
+      const box = input?.closest('.discussionSearchTextContainer');
+      if (box) $.search(input, box, box.querySelector('.discussionSearchTextSubmitImg'));
+    };
+
     /* ---------- Quick list: the web's one dropdown over Steam's ---------- */
 
     // enhanceDivSelect does a dropdown once; choosing clicks Steam's own item
@@ -506,6 +514,7 @@
 
     const scan = () => {
       placeSearch();
+      placeGameSearch();
       placeTabs();
       placeRecent();
       placeArt();

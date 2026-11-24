@@ -30,7 +30,7 @@
 html.se-community-inventory {
   --se-inv-panel: 380px; /* the item panel's minimum: it takes the width the grid leaves */
   --se-inv-tile: clamp(120px, 8.5vw, 190px);
-  --se-inv-gap: 12px;
+  --se-inv-gap: var(--se-space-3);
 }
 
 /* ---------- Page ---------- */
@@ -89,7 +89,7 @@ html.se-community-inventory:not(#se-none) .new_trade_offer_btn {
 
 html.se-community-inventory:not(#se-none) .new_trade_offer_btn:hover {
   background: var(--se-btn-primary-bg-hover) !important;
-  color: var(--se-on-accent) !important;
+  color: var(--se-btn-primary-color) !important;
 }
 
 html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_actions, .item_owner_actions, .item_scrap_actions) a {
@@ -105,17 +105,17 @@ html.se-community-inventory #inventory_more_trigger {
   margin: 0 !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-pill) !important;
+  background: var(--se-btn-bg) !important;
   box-shadow: var(--se-btn-edge) !important;
-  color: var(--se-text) !important;
-  font: var(--se-type-control) !important;
+  color: var(--se-btn-color) !important;
+  font: var(--se-btn-font) !important;
   cursor: pointer;
   transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-community-inventory #inventory_more_trigger:hover {
-  background: var(--se-hover) !important;
-  color: var(--se-white) !important;
+  background: var(--se-btn-bg-hover) !important;
+  color: var(--se-btn-color-hover) !important;
 }
 
 /* More... dropdown */
@@ -151,7 +151,7 @@ html.se-community-inventory #inventory_more_trigger::after {
 html.se-community-inventory #inventory_more_listctn {
   right: 0;
   left: auto !important;
-  z-index: 50;
+  z-index: var(--se-z-dropdown);
 }
 
 /* The list: the web's one dropdown list (web/shared/select.css); here only where it sits */
@@ -402,91 +402,10 @@ html.se-community-inventory .se-inv-head-count {
   font-variant-numeric: tabular-nums;
 }
 
-/* Context picker (Steam inventory: Community / Gifts / Rewards...) */
+/* Context picker (Steam inventory: Community / Gifts / Rewards...): Steam's DSelect
+   (#contextselect_trigger, economy_v2.js), drawn as the web's one dropdown by web/shared/select.css */
 html.se-community-inventory #context_selector {
   margin: 0 0 var(--se-space-4) !important;
-}
-
-/* "All Steam Items": Steam's black box as a pill picker */
-html.se-community-inventory #context_selector :is(.contextselect, #contextselect) {
-  display: inline-block;
-  width: auto !important;
-  height: auto !important;
-  margin: 0 !important;
-  border: 0 !important;
-  background: none !important;
-}
-
-html.se-community-inventory #context_selector :is(.contextselect_activecontext, #contextselect_activecontext) {
-  position: relative;
-  display: inline-flex !important;
-  align-items: center;
-  box-sizing: border-box;
-  min-width: 220px;
-  height: var(--se-ctl) !important;
-  padding: 0 var(--se-space-7) 0 var(--se-space-4) !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-control) !important;
-  background: var(--se-pill) !important;
-  box-shadow: var(--se-btn-edge);
-  color: var(--se-text) !important;
-  cursor: pointer;
-  transition: background-color var(--se-dur);
-}
-
-html.se-community-inventory #context_selector :is(.contextselect_activecontext, #contextselect_activecontext):hover {
-  background: var(--se-hover) !important;
-}
-
-/* Steam's arrow image: the theme's chevron instead */
-html.se-community-inventory #context_selector :is(.contextselect_activecontext, #contextselect_activecontext) img {
-  display: none !important;
-}
-
-html.se-community-inventory #context_selector :is(.contextselect_activecontext, #contextselect_activecontext)::after {
-  content: "";
-  position: absolute;
-  right: 18px;
-  top: 50%;
-  width: 6px;
-  height: 6px;
-  margin-top: calc(-1 * var(--se-space-1));
-  border: solid currentColor;
-  border-width: 0 1.5px 1.5px 0;
-  transform: rotate(45deg);
-  opacity: .7;
-}
-
-html.se-community-inventory #context_selector .context_name {
-  margin: 0 !important;
-  padding: 0 !important;
-  background: none !important;
-  color: inherit !important;
-  font: var(--se-type-control-lg) !important;
-}
-
-html.se-community-inventory :is(#contextselect_options, .contextselect_options) {
-  min-width: 220px;
-  margin-top: var(--se-space-2) !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-md) !important;
-  background: var(--se-panel-bg) !important;
-  box-shadow: var(--se-panel-shadow) !important;
-  backdrop-filter: var(--se-blur-panel);
-  overflow: hidden;
-}
-
-html.se-community-inventory :is(#contextselect_options, .contextselect_options) :is(.context_name, .popup_menu_item) {
-  padding: var(--se-space-2) var(--se-space-4) !important;
-  background: none !important;
-  color: var(--se-text-dim) !important;
-  font: var(--se-type-body) !important;
-  cursor: pointer;
-}
-
-html.se-community-inventory :is(#contextselect_options, .contextselect_options) :is(.context_name, .popup_menu_item):hover {
-  background: var(--se-hover) !important;
-  color: var(--se-white) !important;
 }
 
 /* Search row */
@@ -521,25 +440,42 @@ html.se-community-inventory:not(#se-none) #filter_control {
   padding-inline-end: var(--se-space-7) !important; /* the shared field's padding is !important, at lower weight */
 }
 
+/* The clear button: a full hit target, its 22px disc (::before) and the cross (::after) drawn
+   inside. !important: Steam's own rules (economy_inventory.css) set its size, place and image */
 html.se-community-inventory #filter_clear_btn {
+  --se-inv-clear: 22px;
   position: absolute !important;
-  right: 10px !important;
+  right: calc(10px - (var(--se-hit) - var(--se-inv-clear)) / 2) !important;
   top: 50% !important;
-  width: 22px !important;
-  height: 22px !important;
-  margin-top: calc(-1 * var(--se-space-3)) !important;
-  border-radius: 50%;
-  background: var(--se-pill) !important;
+  width: var(--se-hit) !important;
+  height: var(--se-hit) !important;
+  margin-top: calc(-1 * var(--se-hit) / 2) !important;
+  background: none !important;
   cursor: pointer;
   z-index: var(--se-z-raised);
 }
 
-html.se-community-inventory #filter_clear_btn::before {
+html.se-community-inventory #filter_clear_btn::before,
+html.se-community-inventory #filter_clear_btn::after {
   content: "";
   position: absolute;
-  inset: 6px;
+  inset: calc((var(--se-hit) - var(--se-inv-clear)) / 2);
+}
+
+html.se-community-inventory #filter_clear_btn::before {
+  border-radius: 50%;
+  background: var(--se-pill);
+}
+
+html.se-community-inventory #filter_clear_btn::after {
   background: var(--se-text-muted);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' stroke='black' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M1 1l8 8M9 1L1 9'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: var(--se-icon-close-sm) center / contain no-repeat;
+  mask: var(--se-icon-close-sm) center / contain no-repeat;
+  transition: background-color var(--se-dur);
+}
+
+html.se-community-inventory #filter_clear_btn:hover::after {
+  background: var(--se-text);
 }
 
 html.se-community-inventory .filter_tag_button {

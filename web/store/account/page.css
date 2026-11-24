@@ -48,7 +48,7 @@ html.se-store-account:not(#se-none) [data-se-account-hidden] {
 
 :is(.se-account-id, .se-account-nav-icon, .se-account-chip) svg .d {
   fill: currentColor;
-  fill-opacity: .3;
+  fill-opacity: var(--se-icon-duo);
   stroke: none;
 }
 
@@ -136,6 +136,7 @@ html.se-store-account:not(#se-none) .youraccount_steamid {
 }
 
 html.se-store-account:not(#se-none) .se-account-id-btn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -148,6 +149,13 @@ html.se-store-account:not(#se-none) .se-account-id-btn {
   color: var(--se-text-faint);
   cursor: pointer;
   transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+/* A --se-hit box around the smaller face, so the row keeps its look */
+.se-account-id-btn::before {
+  content: "";
+  position: absolute;
+  inset: calc((var(--se-ctl-sm) - var(--se-hit)) / 2) calc((30px - var(--se-hit)) / 2);
 }
 
 .se-account-id-btn svg {
@@ -208,9 +216,9 @@ html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two
   gap: var(--se-space-half);
   height: auto !important;
   padding: var(--se-space-3) !important;
-  border-radius: var(--se-radius-card);
-  background: var(--se-surface) !important;
-  box-shadow: var(--se-edge);
+  border-radius: var(--se-card-radius);
+  background: var(--se-card-bg) !important;
+  box-shadow: var(--se-card-edge);
 }
 
 html.se-store-account:not(#se-none) a.nav_item {
@@ -295,9 +303,9 @@ html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two
 
 .se-account-card {
   padding: var(--se-space-5) var(--se-space-6) var(--se-space-6);
-  border-radius: var(--se-radius-card);
-  background: var(--se-surface);
-  box-shadow: var(--se-edge);
+  border-radius: var(--se-card-radius);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
 }
 
 /* Header bar → card title */
@@ -375,9 +383,9 @@ html.se-store-account:not(#se-none) .se-account-card :is(.account_setting_sub_bl
   margin: 0 !important;
   padding: var(--se-space-4) var(--se-space-5) !important;
   float: none !important;
-  border-radius: var(--se-radius-card);
-  background: var(--se-surface-2) !important;
-  box-shadow: var(--se-edge);
+  border-radius: var(--se-card-radius);
+  background: var(--se-surface-2) !important; /* a card inside a card: one step up */
+  box-shadow: var(--se-card-edge);
   color: var(--se-text-dim) !important;
   font: var(--se-type-body-lg) !important;
 }
@@ -463,7 +471,7 @@ html.se-store-account:not(#se-none) .se-account-card .account_setting_sub_block 
 
 .se-account-inline-icon .d {
   fill: currentColor;
-  fill-opacity: .3;
+  fill-opacity: var(--se-icon-duo);
   stroke: none;
 }
 

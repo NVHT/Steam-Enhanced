@@ -87,7 +87,7 @@ html.se-community-hub-guides #ig_bottom #create_guide_btn {
 /* !important: Steam's own rules (buttons.css) set color with !important */
 html.se-community-hub-guides #ig_bottom #create_guide_btn:hover {
   background: var(--se-btn-primary-bg-hover);
-  color: var(--se-on-accent) !important;
+  color: var(--se-btn-primary-color) !important;
 }
 
 html.se-community-hub-guides #ig_bottom #create_guide_btn:active {
@@ -566,8 +566,8 @@ html.se-community-hub-guides #ig_bottom #rightContents :is(form, .sidebar) {
   background: none;
 }
 
-/* Search: a pill field; Steam's image button stays the click target, drawn as the theme's icon */
-/* Steam sizes the box to its old field (295px wide) */
+/* Search: the shared search field (web/shared/search-field.css; hub/guides.js tags it, Steam's
+   image button is its magnifier). Steam sizes the box to its old field (295px wide). */
 /* !important: Steam sets height, margin, width at a weight the id-scoped rule doesn't beat */
 html.se-community-hub-guides #ig_bottom .searchTextContainer {
   position: relative;
@@ -586,61 +586,15 @@ html.se-community-hub-guides #ig_bottom .searchTextContainer {
 /* !important: Steam sets the field's width at a weight the id-scoped rule doesn't beat */
 html.se-community-hub-guides #ig_bottom .searchTextContainer > input.searchText {
   position: static;
-  box-sizing: border-box;
   width: 100% !important;
   max-width: none !important;
-  height: var(--se-ctl);
-  margin: 0 !important;
-  padding: 0 calc(var(--se-hit) + var(--se-space-2)) 0 var(--se-space-4);
-  border: 0;
-  border-radius: var(--se-radius-control);
-  background: var(--se-field-bg);
-  box-shadow: var(--se-field-edge);
-  color: var(--se-text);
-  font: var(--se-type-control);
-  outline: 0;
-  transition: box-shadow var(--se-dur);
 }
 
-html.se-community-hub-guides #ig_bottom .searchTextContainer > input.searchText:hover {
-  box-shadow: var(--se-edge-mid);
-}
-
-/* Steam writes its hint into the field as text (.defaultText) */
+/* Steam writes its hint into the field as text (.defaultText)
+   !important: the shared field sets color with !important */
 html.se-community-hub-guides #ig_bottom .searchTextContainer > input.searchText.defaultText {
-  color: var(--se-text-muted);
+  color: var(--se-search-placeholder) !important;
   font-style: normal;
-}
-
-html.se-community-hub-guides #ig_bottom .searchTextContainer > .searchTextSubmitImg {
-  position: absolute;
-  inset: 50% var(--se-space-1) auto auto;
-  z-index: var(--se-z-raised-2);
-  width: var(--se-hit);
-  height: var(--se-hit);
-  margin: 0;
-  translate: 0 -50%;
-  opacity: 0;
-  cursor: pointer;
-}
-
-html.se-community-hub-guides #ig_bottom .searchTextContainer::after {
-  content: "";
-  position: absolute;
-  inset: 50% calc(var(--se-space-1) + (var(--se-hit) - var(--se-icon-md)) / 2) auto auto;
-  z-index: var(--se-z-raised);
-  width: var(--se-icon-md);
-  height: var(--se-icon-md);
-  translate: 0 -50%;
-  background: var(--se-text-muted);
-  -webkit-mask: var(--se-icon-search) center / contain no-repeat;
-  mask: var(--se-icon-search) center / contain no-repeat;
-  pointer-events: none;
-  transition: background-color var(--se-dur);
-}
-
-html.se-community-hub-guides #ig_bottom .searchTextContainer:has(> .searchTextSubmitImg:hover)::after {
-  background: var(--se-white);
 }
 
 /* Boxes: cards (Steam collapses Filter by Category to 15px; here the class hides its content) */
@@ -1006,8 +960,6 @@ html.se-community-hub-guides #ig_bottom .guide_category_tags .tag_filter_control
   height: 100%;
   opacity: 0;
 }
-
-/* Languages: Steam's select is drawn as the theme's dropdown (hub/guides.js, web/shared/select.css) */
 
 /* More About Guides: Steam's art banner becomes a plain link tile */
 /* !important: Steam sets width at a weight the id-scoped rule doesn't beat */
