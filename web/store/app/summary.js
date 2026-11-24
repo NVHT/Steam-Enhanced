@@ -385,6 +385,20 @@
         measure.disconnect();
         root.style.removeProperty('--se-app-actions-h');
       });
+
+      // Steam spaces each label from its icon with &nbsp;s ("View Your Queue&nbsp;&nbsp;&nbsp;"),
+      // which CSS can't collapse: with the icons hidden they pushed the words off centre
+      const trimmed = [];
+      for (const label of actions.querySelectorAll('#queueActionsCtn .btnv6_blue_hoverfade > span')) {
+        for (const node of label.childNodes) {
+          if (node.nodeType !== Node.TEXT_NODE || node.data.trim() === node.data) continue;
+          trimmed.push([node, node.data]);
+          node.data = node.data.trim();
+        }
+      }
+      life.add(() => {
+        for (const [node, data] of trimmed) node.data = data;
+      });
     }
 
     /*

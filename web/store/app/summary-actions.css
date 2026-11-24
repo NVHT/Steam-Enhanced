@@ -43,7 +43,14 @@ html.se-app-summary-on #ignoreBtn:not([style*="none"]) {
 /* Every button: a pill on the raised surface. */
 html.se-app-summary-on #queueActionsCtn .btnv6_blue_hoverfade,
 html.se-app-summary-on #queueActionsCtn .queue_menu_arrow {
+  /* The words centred both ways (Steam's inline display: none still hides a button); top-aligned,
+     so a button in Steam's wrapper div doesn't sit lower on its line of text */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   height: 40px;
+  vertical-align: top;
   padding: 0 !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
@@ -61,15 +68,18 @@ html.se-app-summary-on #queueActionsCtn .queue_menu_arrow:hover {
 html.se-app-summary-on #queueActionsCtn .btnv6_blue_hoverfade > span {
   display: flex !important;
   align-items: center;
+  justify-content: center; /* View Your Queue is wider than its words */
   gap: var(--se-space-2);
-  height: var(--se-ctl);
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%; /* the whole button, its words centred in it */
   padding: 0 var(--se-space-4) !important;
   border-radius: inherit !important;
   background: none !important;
   color: inherit !important;
   font-size: var(--se-fs-base) !important;
   font-weight: 700;
-  line-height: var(--se-ctl) !important;
+  line-height: 1.2 !important; /* !important: Steam's .btn_medium > span line-height (shared/css/buttons.css) */
 }
 
 /* Ignore's menu arrow: a round button with a chevron. */
