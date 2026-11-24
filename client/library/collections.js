@@ -161,7 +161,7 @@
     return list.filter((c) => c && c.id !== 'uncategorized' && (c.bIsEditable || (c.visibleApps || []).length));
   }
 
-  // A cover working through its copies, local first (core/runtime.js SE.art)
+  // A cover working through its copies, local first (core/runtime-art.js SE.art)
   const coverImg = (app, cls) => SE.art.img(coverURLs(app), cls, null, { lazy: true });
 
   const { appOf } = SE;

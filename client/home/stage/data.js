@@ -35,7 +35,7 @@
   const CDN = (id) => `https://shared.steamstatic.com/store_item_assets/steam/apps/${id}`;
 
   /*
-   * Hero and logo art: Steam's own lists first, then the bare names (core/runtime.js). The Home
+   * Hero and logo art: Steam's own lists first, then the bare names (core/runtime-art.js). The Home
    * finds Steam's art module itself (libraryArt scans); the core lists only reuse it.
    */
   const heroURLs = (app) => {

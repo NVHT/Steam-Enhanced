@@ -17,7 +17,7 @@
     return match ? match[1] || match[2] : null;
   };
 
-  // The downloading game's logo, Steam's own list first (core/runtime.js)
+  // The downloading game's logo, Steam's own list first (core/runtime-art.js)
   const logoURLs = (appid) => SE.logoURLs(appid);
 
   function syncBackdrop(page, art) {

@@ -14,7 +14,7 @@
   const collectionStore = () => collectionStoreFound || (collectionStoreFound = SE.global('collectionStore'));
   const client = () => SE.global('SteamClient', (sc) => !!sc.Apps) || window.SteamClient;
 
-  // Steam's own source for a game's library art (core/runtime.js)
+  // Steam's own source for a game's library art (core/runtime-art.js)
   const { libraryArt } = SE;
 
   // The settings menu (client/shared/menu.js), under the names the Home's parts use
@@ -25,7 +25,7 @@
     openMenu: M.open, placeMenu: M.place, repaintMenu: M.repaint,
   });
 
-  // The art fallback chain (core/runtime.js SE.art)
+  // The art fallback chain (core/runtime-art.js SE.art)
   const { img: artImg, tag: imgTag, onLoad: onImgLoad, onError: onImgError } = SE.art;
 
   // innerHTML only when the markup changed (compared with what was last written, not with the

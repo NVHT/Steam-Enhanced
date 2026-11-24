@@ -42,7 +42,7 @@
     return { name: props.strDisplayName || collection?.displayName || '', apps };
   }
 
-  // A cover working through its copies, local first (core/runtime.js SE.art); none left: no img
+  // A cover working through its copies, local first (core/runtime-art.js SE.art); none left: no img
   function cover(app) {
     const urls = SE.run(() => SE.coverURLs(app)) || [];
     if (!urls.length) return null;

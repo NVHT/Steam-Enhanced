@@ -346,10 +346,11 @@
     const url = new URL(`../dev/${file}`, coreSrc);
     if (!cached) url.searchParams.set('v', String(Date.now()));
     script.src = url.href;
+    script.async = false; // in call order: a split tool's parts rely on it
     (document.head ?? document.documentElement).append(script);
   };
   const loadInspector = () => {
-    if (coreSrc) load('inspector.js');
+    if (coreSrc) ['inspector-report.js', 'inspector.js'].forEach((file) => load(file));
     else console.warn('[Steam Enhanced] Element picker: theme folder not found from this window.');
   };
   const inClient = () => Boolean(window.__seClient && coreSrc);

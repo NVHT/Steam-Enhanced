@@ -310,11 +310,19 @@ def unnamed_classes(files):
     return notes
 
 
+# Generated, left whole (CLAUDE.md, CSS): the file, or the line in it that doesn't count
+GENERATED_FILES = {'client/settings/theme/spinner-previews.css'}
+GENERATED_LINES = {'client/loader.js': '  const BRAND = '}  # dev/brand.py's mark
+
+
 def big_files(files):
     notes = []
     for f in files:
-        if f.endswith(('.js', '.css')) and 'vendor/' not in f and f != 'core/classmap.js':
+        if f.endswith(('.js', '.css')) and 'vendor/' not in f and f != 'core/classmap.js' and f not in GENERATED_FILES:
             size = os.path.getsize(os.path.join(ROOT, f))
+            if f in GENERATED_LINES:
+                with open(os.path.join(ROOT, f), 'rb') as fh:
+                    size -= sum(len(line) for line in fh if line.decode('utf8').startswith(GENERATED_LINES[f]))
             if size > SPLIT_SIZE:
                 notes.append(f'size: {f} is {size // 1024} KB (split at ~40 KB)')
     return notes

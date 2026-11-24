@@ -2,7 +2,7 @@
  * A rebuilt dialog's game art (Install, Uninstall, EULA, Mark as Private, New Collection, Exit
  * Game, CD Keys), or a friend's (Nickname, Notifications): the art behind its top (.se-dialog-art) and the game capsules
  * (.se-dialog-capsules), styled in client/dialogs/dialogs.css. Both work through a game's copies with Steam's own list first
- * (SE.heroURLs / SE.headerURLs, SE.art in core/runtime.js), so newer games' hashed art loads,
+ * (SE.heroURLs / SE.headerURLs, SE.art in core/runtime-art.js), so newer games' hashed art loads,
  * and both are marked [data-ready] once their image has loaded.
  *
  *   SE.dialogArt.hero(host, appid, className?)  appends the art to host; null when there is none

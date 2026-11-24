@@ -15,7 +15,7 @@
  *               rows.css/js: the game rows of the front page and Explore
  *   front/      the store front (/)
  *   app/        game pages (/app/<id>/...); the parts summary.js and hero.js use (player,
- *               viewer, trailers, highlights, deck) are listed before them
+ *               viewer, trailers, highlights, details, deck) are listed before them
  *   explore/    New On Steam (/explore/new/), Upcoming (/explore/upcoming/)
  *   charts/     Steam Charts (/charts/...)
  *   labs/       Steam Labs (/labs/)
@@ -105,6 +105,7 @@
       { js: 'app/viewer.js', on: ['app'] },
       { js: 'app/trailers.js', on: ['app'] },
       { js: 'app/highlights.js', on: ['app'] },
+      { js: 'app/details.js', on: ['app'] },
       { css: 'app/summary.css', js: 'app/summary.js', on: ['app'] },
       { css: 'app/summary-details.css', on: ['app'] },
       { css: 'app/summary-actions.css', on: ['app'] },
@@ -120,6 +121,7 @@
       { css: 'dlc/browse.css', on: ['dlc'] },
       { css: 'agecheck/page.css', js: 'agecheck/page.js', on: ['agecheck'] },
       { css: 'cart/page.css', js: 'cart/page.js', on: ['cart'] },
+      { js: 'wishlist/data.js', on: ['wishlist'] },
       { js: 'wishlist/grid.js', on: ['wishlist'] },
       { css: 'wishlist/page.css', js: 'wishlist/page.js', on: ['wishlist'] },
       { css: 'wishlist/column.css', on: ['wishlist'] },

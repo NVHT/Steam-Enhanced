@@ -306,7 +306,7 @@
   };
 
   /*
-   * A one-to-one call's bar (voice.css): Steam's strip over the log, with the mic and headphone
+   * A one-to-one call's bar (calls.css): Steam's strip over the log, with the mic and headphone
    * buttons beside its own gear and hang-up: stand-ins for the message box's (SE.callTools,
    * client/friends/call-tools.js). Muted: Steam's "disabled", or no microphone.
    */

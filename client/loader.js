@@ -67,7 +67,7 @@
     ['all', 'core/', ['font.css', 'tokens.css', 'icons-nav.css', 'icons-ui.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
     ['all', 'client/shared/', ['popup-layer.css', 'search-field.css', 'segmented.css']],
     // The theme's settings, kept in step in every window (their stylesheets: applyOptions below)
-    ['all', 'client/shared/', ['settings.js']],
+    ['all', 'client/shared/', ['settings-palette.js', 'settings.js']],
     // A friend's profile background and Steam's "?" picture (toasts, tray, chat, friend dialogs)
     ['content', 'client/shared/', ['mini-profile.js']],
     ['toasts', 'client/shared/', ['mini-profile.js']],
@@ -101,7 +101,7 @@
     ['main', 'client/library/', ['artwork.css']],
     ['main', 'client/game-page/', ['always-open-game-details.js']],
     ['main', 'client/home/', ['news-hub.js']],
-    ['main', 'client/header/', ['header-actions.css', 'header-actions.js']],
+    ['main', 'client/header/', ['header-actions.css', 'header-shortcuts.js', 'header-actions.js']],
     ['main', 'client/browser/', ['url-bar.css', 'url-bar.js']],
     ['main', 'client/navigation/', ['icons.css']],
     ['main', 'client/header/', ['header-tooltips.js', 'downloads-card.css', 'downloads-card.js', 'announcements.js']],
@@ -205,7 +205,7 @@
       'friends-chats.css', 'friends-window.css', 'friends-list.js',
     ]],
     ['desktop', 'client/friends/chat/', [
-      'tabs.css', 'header.css', 'messages.css', 'bubbles.css', 'input.css', 'voice.css', 'members.css',
+      'tabs.css', 'header.css', 'messages.css', 'bubbles.css', 'input.css', 'voice.css', 'calls.css', 'members.css',
       'icons.css', 'groups.css', 'chat.js',
     ]],
     ['all', 'core/', ['scrollbars.css', 'scrollbars.js']],
@@ -301,6 +301,8 @@
    * game: their body is just hidden until ready, then shown.
    */
   const MENU = /(?:Menu|Supernav)$/.test(document.title); // menus and the store's dropdowns
+  // For window-level rules (options/appearance/popups-solid.css)
+  if (MENU) root.setAttribute('data-se-menu-window', '');
   const TRANSPARENT = /^(?:SP Overlay:|notificationtoasts_|OverlayBrowser_|OverlayTab\d+_|QuickAccess_|MainMenu_)/;
   const MAIN = groups.has('main');
   const LOGO_MS = 250;
@@ -646,11 +648,11 @@
   };
 
   /*
-   * Stylesheets go in at once. Scripts wait for the runtime (window.__se): core/classmap.js and
-   * core/runtime.js, which this loader adds first, in order; the wait holds the cover like any
-   * pending file.
+   * Stylesheets go in at once. Scripts wait for the runtime (window.__se): core/classmap.js,
+   * core/runtime.js and its part runtime-art.js, which this loader adds first, in order; the
+   * wait holds the cover like any pending file.
    */
-  const RUNTIME = ['core/classmap.js', 'core/runtime.js'];
+  const RUNTIME = ['core/classmap.js', 'core/runtime.js', 'core/runtime-art.js'];
   const load = () => {
     const scripts = [];
     for (const [group, file] of FILES) {

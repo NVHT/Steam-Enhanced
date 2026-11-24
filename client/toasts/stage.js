@@ -37,7 +37,7 @@
     document.body.appendChild(live.dock);
   }
 
-  // An <img> working through its copies (core/runtime.js SE.art)
+  // An <img> working through its copies (core/runtime-art.js SE.art)
   const artImg = SE.art.img;
 
   // A friend's profile background as the toast's art (SE.profileBackground, client/shared/mini-profile.js)
