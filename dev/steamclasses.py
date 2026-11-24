@@ -5,6 +5,9 @@ import re
 
 PAIR_RE = re.compile(r'([A-Za-z_$][\w$]*)\s*:\s*"([^"\\]+)"')
 HASH_RE = re.compile(r'^-?[_a-zA-Z][\w-]{16,26}$')
+# Steam's friends setting names (bNotifications_ShowIngame, bSounds_PlayOnline), which sit in
+# objects shaped like CSS modules: words only, never a hash
+SETTING_NAME_RE = re.compile(r'^b[A-Z][a-z]+_[A-Z][A-Za-z]+$')
 OBJECT_RUN_RE = re.compile(
     r'(?:[A-Za-z_$][\w$]*\s*:\s*"[^"\\\n]{1,80}"\s*,\s*)*'
     r'[A-Za-z_$][\w$]*\s*:\s*"[^"\\\n]{1,80}"'
@@ -29,7 +32,7 @@ def index(src_dir):
         with open(path, encoding='utf-8', errors='ignore') as fh:
             content = fh.read()
         for match in OBJECT_RUN_RE.finditer(content):
-            mod = {k: v for k, v in PAIR_RE.findall(match.group(0)) if is_hash(v)}
+            mod = {k: v for k, v in PAIR_RE.findall(match.group(0)) if is_hash(v) and not SETTING_NAME_RE.match(v)}
             if not mod:
                 continue
             mod_idx = len(modules)
