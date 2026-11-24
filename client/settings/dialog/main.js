@@ -215,6 +215,7 @@
       if (live.frame) cancelAnimationFrame(live.frame);
       if (syncReset) cancelAnimationFrame(syncReset);
       clearTimeout(live.scanTimer);
+      ns.stopSizers();
       live.search?.remove();
       live.results?.remove();
       resetProps();

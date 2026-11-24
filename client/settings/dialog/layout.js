@@ -29,7 +29,30 @@
     }
   }
 
+  // A picker's label takes its radio group's width (--se-seg-w). The observer pass reads no
+  // geometry: a ResizeObserver reports each group's width after layout.
+  const segLabels = new Map(); // a radio group → its label
+  const onSegResize = (entries) => {
+    for (const entry of entries) {
+      const label = segLabels.get(entry.target);
+      const w = entry.borderBoxSize?.[0]?.inlineSize;
+      if (label?.isConnected && w) SE.cssVar(label, '--se-seg-w', `${Math.round(w)}px`);
+    }
+  };
+  const watchSeg = (group, label) => {
+    if (segLabels.get(group) === label) return;
+    live.segSizer ||= new ResizeObserver(onSegResize);
+    live.segSizer.unobserve(group);
+    segLabels.set(group, label);
+    live.segSizer.observe(group); // its first report sets the width
+  };
+
   function pickers(content) {
+    for (const [group] of segLabels) {
+      if (group.isConnected) continue;
+      live.segSizer?.unobserve(group);
+      segLabels.delete(group);
+    }
     for (const group of content.querySelectorAll('.Shared_Radio_Group')) {
       if (group.closest(FIELD)) continue;
       let host = group;
@@ -49,9 +72,29 @@
       setAttr(label, 'data-se-sec', null);
       setAttr(label, 'data-se-secsub', null);
       setAttr(host, 'data-se-seg', '');
-      const w = group.offsetWidth;
-      if (w) SE.cssVar(label, '--se-seg-w', `${w}px`);
+      watchSeg(group, label);
     }
+  }
+
+  // Storage's drive picker and the usage bar under it drawn as one (--se-join closes the gap),
+  // measured in a ResizeObserver: the pair, their parent, and again as any of them resizes
+  function join() {
+    const [drive, usage] = live.join || [];
+    if (!drive?.isConnected || !usage?.isConnected) return;
+    const cur = parseFloat(usage.style.getPropertyValue('--se-join')) || 0;
+    const gap = usage.getBoundingClientRect().top - drive.getBoundingClientRect().bottom;
+    const want = Math.round(cur - gap);
+    if (Math.abs(gap) > 0.5 && want <= 0 && want > -80) SE.cssVar(usage, '--se-join', `${want}px`);
+  }
+
+  function watchJoin(drive, usage) {
+    const pair = drive && usage && !usage.contains(drive) ? [drive, usage] : null;
+    if (live.join?.[0] === pair?.[0] && live.join?.[1] === pair?.[1]) return;
+    live.joinSizer?.disconnect();
+    live.join = pair;
+    if (!pair) return;
+    live.joinSizer ||= new ResizeObserver(join);
+    for (const el of [drive, usage, usage.parentElement]) if (el) live.joinSizer.observe(el);
   }
 
   function preLabels(content) {
@@ -184,12 +227,7 @@
     const drive = content.querySelector(`.${C.DriveDropdownControl}`);
     const usage = content.querySelector(`.${C.DriveUsage}`)?.parentElement;
     markOnly(content, 'data-se-drive', usage);
-    if (drive && usage && !usage.contains(drive)) {
-      const cur = parseFloat(usage.style.getPropertyValue('--se-join')) || 0;
-      const gap = usage.getBoundingClientRect().top - drive.getBoundingClientRect().bottom;
-      const want = Math.round(cur - gap);
-      if (Math.abs(gap) > 0.5 && want <= 0 && want > -80) SE.cssVar(usage, '--se-join', `${want}px`);
-    }
+    watchJoin(drive, usage);
 
     const familyBox = content.querySelector(`.${C.TrySteamFamiliesButtonContainer}`)?.parentElement;
     markOnly(content, 'data-se-family', familyBox);
@@ -233,5 +271,11 @@
     scrollers.forEach((el) => setAttr(el, 'data-se-noxs', ''));
     sticky.forEach((el) => setAttr(el, 'data-se-sticky', ''));
   }
-  Object.assign(ns, { cards, pickers, preLabels, rows, scheduleScan, sections });
+  function stopSizers() {
+    live.segSizer?.disconnect();
+    live.joinSizer?.disconnect();
+    live.join = null;
+    segLabels.clear();
+  }
+  Object.assign(ns, { cards, pickers, preLabels, rows, scheduleScan, sections, stopSizers });
 })(window.__se);

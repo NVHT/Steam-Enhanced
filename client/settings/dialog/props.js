@@ -163,11 +163,13 @@
       [...el.children].every((c) => /^(SPAN|A|B|I|BR)$/.test(c.tagName) && !c.children.length) &&
       text(el).length > 0;
 
+    // The first shown block: checkVisibility() (a box at all) needs styles, not the layout
+    // getClientRects() forced in this observer pass; checked last, on candidates only
     const firstBlock = [...body.querySelectorAll(`${PROPS_BLOCK}, div`)].find(
       (el) =>
-        el.getClientRects().length &&
         !el.parentElement.closest(PROPS_BLOCK) &&
-        (el.matches(PROPS_BLOCK) || isText(el))
+        (el.matches(PROPS_BLOCK) || isText(el)) &&
+        el.checkVisibility()
     );
     const isSub = (el) => el.matches('.SettingsDialogBodyText, [data-se-ptext]') || (!el.matches(PROPS_BLOCK) && isText(el));
     const subs = [];

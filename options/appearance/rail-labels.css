@@ -1,0 +1,51 @@
+/*
+ * Theme setting (client/shared/settings.js): Rail labels, On. Each rail button's name under it
+ * (.se-rail-label, stamped by client/header/header-actions.js), inside the rail's own width so
+ * nothing beside it moves. The rail buttons' step grows by a label's height
+ * (--se-rail-label-room, client/navigation/nav-rail.css): the page buttons' gap and the foot's
+ * fixed offsets; the title bar's buttons keep theirs.
+ */
+html body.se-header-actions-ready {
+  --se-rail-label-h: calc(var(--se-fs-2xs) * 1.3 + var(--se-space-1));
+  --se-rail-label-room: var(--se-rail-label-h);
+}
+
+/* A button holding a label lets it show below its own box */
+html body.se-header-actions-ready :has(> .se-rail-label) {
+  overflow: visible;
+}
+
+html body.se-header-actions-ready .se-rail-label {
+  display: block;
+  position: absolute;
+  top: calc(100% + var(--se-space-half));
+  left: 50%;
+  width: var(--se-rail-width);
+  transform: translateX(-50%);
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-2xs) / 1.3 var(--se-font);
+  letter-spacing: normal; /* Steam's page buttons space and capitalise their own text */
+  text-transform: none;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+html body.se-header-actions-ready :hover > .se-rail-label {
+  color: var(--se-text-strong);
+}
+
+/* The current page's name in its accent, as its icon (the same match as nav-rail.css's) */
+html body.se-header-actions-ready ._7AlhCx3XGzBeIrQaCneUD._1gqEjB5QsKT_NftD1dEsdZ:not(._2cO0HdvLEGAdhosLekWsmo) .se-menu-icon > .se-rail-label {
+  color: var(--se-accent);
+}
+
+/*
+ * The page buttons' column scrolls (nav-rail.css): room under its last button for that one's
+ * label, which no gap follows. Its selector is nav-rail.css's padding rule's, later in the cascade.
+ */
+html body.se-header-actions-ready ._3Z3ohQ8-1NKnCZkbS6fvy ._2D64jIEK7wpUR_NlObDW76:not(#se-none) {
+  padding-bottom: var(--se-rail-label-h);
+}

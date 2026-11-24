@@ -31,15 +31,16 @@
     const box = document.createElement('div');
     box.setAttribute('role', 'alert');
     box.style.cssText =
-      'position:fixed;top:70px;right:24px;z-index:var(--se-z-max);max-width:480px;padding:18px;' +
+      'position:fixed;top:70px;right:24px;z-index:var(--se-z-max);max-width:480px;padding:var(--se-space-4);' +
       'border-radius:var(--se-radius-ml);background:var(--se-surface);box-shadow:var(--se-shadow-pop);' +
       'color:var(--se-text);font:var(--se-fs-md)/1.5 var(--se-font)';
     const text = document.createElement('div');
     text.textContent = `Millennium popup: ${failure || 'Popup runtime unavailable.'}`;
     const close = document.createElement('button');
     close.type = 'button';
+    close.className = 'DialogButton'; // Steam's button, as the theme restyles it
     close.textContent = 'Dismiss';
-    close.style.marginTop = '12px';
+    close.style.marginTop = 'var(--se-space-3)';
     close.addEventListener('click', () => {
       box.remove();
       if (errorNotice === box) errorNotice = null;
@@ -698,6 +699,8 @@
 
   window.__seMillenniumWindow = {
     openDirect,
+    // Steam's React and popup modal, for the theme's own popup windows (client/settings/theme/)
+    popupRuntime: () => findRuntime(),
     showError,
     openLibraryManager: (target) => millBridge.openLibraryManager(target),
     yieldToManager,

@@ -1,0 +1,15 @@
+/*
+ * Theme setting (client/shared/settings.js): Contrast, High. The quieter text tones and the lines
+ * step toward the palette's text, so they read on every surface (faint text clears AA on
+ * --se-selected under every preset). Each is mixed from --se-text and --se-surface, never from
+ * itself, so it follows whichever colour preset or Custom palette is on. Tripled :root outranks
+ * the palette's :root:root rule (client/loader.js, after this file).
+ */
+:root:root:root {
+  --se-text-dim: color-mix(in srgb, var(--se-text) 90%, var(--se-surface));
+  --se-text-muted: color-mix(in srgb, var(--se-text) 82%, var(--se-surface));
+  --se-text-faint: color-mix(in srgb, var(--se-text) 70%, var(--se-surface));
+  --se-hairline: color-mix(in srgb, var(--se-text) 12%, transparent);
+  --se-divider: color-mix(in srgb, var(--se-text) 16%, transparent);
+  --se-border-strong: color-mix(in srgb, var(--se-text) 42%, var(--se-surface));
+}

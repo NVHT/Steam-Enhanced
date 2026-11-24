@@ -1,0 +1,878 @@
+/*
+ * The theme's settings window (theme-settings.js): a sidebar (the theme's name and version, a
+ * search, a tab per group) beside the tab's page. Appearance: the colour presets and Custom as
+ * swatch tiles by mood (--se-ts-p-*, set per tile), Custom's colour editor, then rows. Every
+ * other setting is a row: a segmented control (client/shared/segmented.css), picture tiles for a
+ * visual one, chips for a multi one. Fills the popup under Steam's title bar (--se-ts-top, read
+ * once as it mounts).
+ */
+.se-ts {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  height: calc(100vh - var(--se-ts-top, 0px));
+  background: var(--se-bg);
+  color: var(--se-text);
+  font: var(--se-type-body);
+}
+
+/* ---------- Sidebar ---------- */
+
+.se-ts-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-4);
+  min-height: 0;
+  padding: var(--se-space-5) var(--se-space-3);
+  background: var(--se-sidebar);
+  box-shadow: inset -1px 0 0 var(--se-hairline);
+}
+
+.se-ts-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  padding: 0 var(--se-space-2);
+}
+
+.se-ts-mark {
+  flex: none;
+  width: var(--se-tile);
+  height: var(--se-tile);
+  border-radius: var(--se-radius-ml);
+  background: var(--se-brand-mark) center / 70% no-repeat, var(--se-accent-surface);
+}
+
+.se-ts-name {
+  color: var(--se-text-strong);
+  font: var(--se-type-title);
+}
+
+.se-ts-version {
+  margin-top: var(--se-space-half);
+  color: var(--se-text-faint);
+  font: var(--se-type-small);
+}
+
+.se-ts-search {
+  display: flex;
+  align-items: center;
+  gap: var(--se-search-gap);
+  height: var(--se-search-h);
+  padding: 0 var(--se-search-pad);
+  border-radius: var(--se-search-radius);
+  background: var(--se-search-bg);
+  box-shadow: var(--se-search-edge);
+  color: var(--se-search-icon-color);
+  cursor: text;
+}
+
+.se-ts-search:hover {
+  box-shadow: var(--se-search-edge-hover);
+}
+
+.se-ts-search:focus-within {
+  box-shadow: var(--se-search-edge-focus);
+}
+
+.se-ts-search input {
+  all: unset;
+  flex: 1;
+  min-width: 0;
+  color: var(--se-search-text);
+  font: var(--se-search-font);
+}
+
+.se-ts-search input::placeholder {
+  color: var(--se-search-placeholder);
+}
+
+.se-ts-search input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.se-ts-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-half);
+  overflow-y: auto;
+}
+
+/* A tab: its icon (--se-ts-icon, a duotone mask token) and name */
+.se-ts-tab {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  height: var(--se-ctl);
+  padding: 0 var(--se-space-3);
+  border-radius: var(--se-radius-control);
+  color: var(--se-text-muted);
+  font: var(--se-type-control-lg);
+  cursor: pointer;
+  transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.se-ts-tab::before {
+  content: '';
+  flex: none;
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: currentColor;
+  -webkit-mask: var(--se-ts-icon) center / contain no-repeat;
+  mask: var(--se-ts-icon) center / contain no-repeat;
+}
+
+.se-ts-tab:hover {
+  background: var(--se-hairline);
+  color: var(--se-text-strong);
+}
+
+.se-ts-tab[aria-selected="true"] {
+  background: var(--se-selected);
+  color: var(--se-text-strong);
+}
+
+.se-ts-tab:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: calc(-1 * var(--se-focus-offset));
+}
+
+/* ---------- Page ---------- */
+
+.se-ts-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* The title and its line stay; only the content under them scrolls */
+.se-ts-page-head {
+  flex: none;
+  padding: var(--se-space-6) var(--se-space-6) var(--se-space-4);
+}
+
+.se-ts-page-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-4);
+  min-height: 0;
+  padding: 0 var(--se-space-6) var(--se-space-5);
+  overflow-y: auto;
+}
+
+.se-ts-title {
+  margin: 0;
+  color: var(--se-text-strong);
+  font: var(--se-type-heading-lg);
+}
+
+.se-ts-intro {
+  margin: var(--se-space-1) 0 0;
+  color: var(--se-text-muted);
+  font: var(--se-type-body-lg);
+}
+
+.se-ts-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--se-space-4);
+  margin-top: var(--se-space-3);
+}
+
+.se-ts-eyebrow {
+  margin: 0;
+  color: var(--se-label-color);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+}
+
+.se-ts-label {
+  color: var(--se-text);
+  font: var(--se-type-control-lg);
+}
+
+.se-ts-hint {
+  color: var(--se-text-muted);
+  font: var(--se-type-small);
+}
+
+.se-ts-label + .se-ts-hint {
+  margin-top: var(--se-space-1);
+}
+
+/* Rows: a card of them, as Steam Settings' (client/settings/controls.css), each an icon tile, a
+   name and a line, then a segmented control; a hairline between rows */
+.se-ts-rows {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--se-space-5);
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+}
+
+.se-ts-row {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-4);
+  padding: var(--se-space-4) 0;
+}
+
+.se-ts-row + .se-ts-row {
+  box-shadow: inset 0 1px 0 var(--se-hairline);
+}
+
+.se-ts-row-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  color: var(--se-text-muted);
+}
+
+.se-ts-row-icon::before {
+  content: '';
+  width: 17px;
+  height: 17px;
+  background: currentColor;
+  -webkit-mask: var(--se-ts-icon) center / contain no-repeat;
+  mask: var(--se-ts-icon) center / contain no-repeat;
+}
+
+.se-ts-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.se-ts-row-tab {
+  margin-bottom: var(--se-space-1);
+  color: var(--se-label-color);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+}
+
+.se-ts-row > .se-seg {
+  flex: none;
+}
+
+/* A setting that doesn't apply with the others as set (its requires): dimmed, its controls off */
+.se-ts-row-off > :not(.se-ts-row-icon) {
+  opacity: var(--se-btn-disabled-opacity);
+}
+
+/* A row of toggles (a multi setting) goes under its text, lined up with it */
+.se-ts-row-wide {
+  flex-wrap: wrap;
+  row-gap: var(--se-space-3);
+}
+
+.se-ts-row-wide > .se-ts-text {
+  flex-basis: calc(100% - 34px - var(--se-space-4)); /* fills its line: the toggles go under */
+}
+
+.se-ts-row-wide > :is(.se-ts-chips, .se-seg, .se-ts-picks) {
+  margin-inline-start: calc(34px + var(--se-space-4)); /* past the icon tile and its gap */
+}
+
+/* A multi setting's chips: each its icon and name; on, lit in the accent; off, a faint outline */
+.se-ts-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+}
+
+.se-ts-chip {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: var(--se-ctl);
+  padding: 0 var(--se-space-3) 0 var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  box-shadow: inset 0 0 0 1px var(--se-divider);
+  color: var(--se-text-faint);
+  font: var(--se-chip-font);
+  cursor: pointer;
+  transition: background var(--se-dur) var(--se-ease), box-shadow var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.se-ts-chip::before {
+  content: '';
+  flex: none;
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  background: currentColor;
+  -webkit-mask: var(--se-ts-icon) center / contain no-repeat;
+  mask: var(--se-ts-icon) center / contain no-repeat;
+}
+
+.se-ts-chip:hover {
+  box-shadow: var(--se-edge-lift);
+  color: var(--se-text-dim);
+}
+
+.se-ts-chip[aria-pressed="true"] {
+  background: var(--se-chip-bg-on);
+  box-shadow: var(--se-chip-edge-on);
+  color: var(--se-text-strong);
+}
+
+.se-ts-chip[aria-pressed="true"]::before {
+  background: var(--se-accent);
+}
+
+.se-ts-chip:active {
+  transform: scale(var(--se-press-scale));
+}
+
+.se-ts-chip:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-ts-empty {
+  margin: 0;
+  padding: var(--se-space-4) 0;
+  color: var(--se-text-faint);
+  font: var(--se-type-small);
+}
+
+/* ---------- Colours: swatch tiles by mood, each in its own palette, in a card ---------- */
+
+.se-ts-palettes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-3);
+  padding: var(--se-space-4) var(--se-space-5);
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+}
+
+.se-ts-palette-group {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: var(--se-space-3);
+}
+
+/* The mood, level with the swatches' middle (their 60 px height) */
+.se-ts-palette-mood {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  color: var(--se-text-muted);
+  font: var(--se-type-label);
+}
+
+.se-ts-palette-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: var(--se-space-3);
+}
+
+.se-ts-palette {
+  /* The tile's palette, set per tile (theme-settings.js); the one in use until then */
+  --se-ts-p-bg: var(--se-bg);
+  --se-ts-p-surface2: var(--se-surface-2);
+  --se-ts-p-text: var(--se-text);
+  --se-ts-p-accent: var(--se-accent);
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  cursor: pointer;
+}
+
+/* The swatch: a heading, a line, a raised panel and an accent bar on its background */
+.se-ts-palette-art {
+  height: 60px;
+  border-radius: var(--se-radius-md);
+  background:
+    linear-gradient(var(--se-ts-p-text), var(--se-ts-p-text)) 9px 10px / 42% 5px no-repeat,
+    linear-gradient(color-mix(in srgb, var(--se-ts-p-text) 45%, transparent), color-mix(in srgb, var(--se-ts-p-text) 45%, transparent)) 9px 20px / 60% 3px no-repeat,
+    linear-gradient(var(--se-ts-p-surface2), var(--se-ts-p-surface2)) 9px 29px / calc(100% - 18px) 13px no-repeat,
+    linear-gradient(var(--se-ts-p-accent), var(--se-ts-p-accent)) right 9px bottom 6px / 24px 8px no-repeat,
+    var(--se-ts-p-bg);
+  box-shadow: inset 0 0 0 1px var(--se-white-07);
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-ts-palette:hover .se-ts-palette-art {
+  box-shadow: inset 0 0 0 1px var(--se-white-18);
+}
+
+/* Chosen: a ring in the palette's own accent, clear of the swatch (the card's colour between) */
+.se-ts-palette[aria-checked="true"] .se-ts-palette-art {
+  box-shadow: 0 0 0 2px var(--se-surface), 0 0 0 4px var(--se-ts-p-accent);
+}
+
+.se-ts-palette:active .se-ts-palette-art {
+  transform: scale(var(--se-press-scale));
+}
+
+.se-ts-palette:focus-visible .se-ts-palette-art {
+  outline: var(--se-focus-outline);
+  outline-offset: 5px;
+}
+
+.se-ts-palette-name {
+  color: var(--se-text-dim);
+  font: var(--se-type-label);
+}
+
+.se-ts-palette[aria-checked="true"] .se-ts-palette-name {
+  color: var(--se-text-strong);
+}
+
+/* Custom: a dashed tile with a pencil, not a palette of its own */
+.se-ts-palette-custom .se-ts-palette-art {
+  display: grid;
+  place-items: center;
+  background: none;
+  box-shadow: none;
+  outline: 1.5px dashed var(--se-border-strong);
+  outline-offset: -1.5px;
+  color: var(--se-text-muted);
+}
+
+.se-ts-palette-custom .se-ts-palette-art::before {
+  content: '';
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-edit) center / contain no-repeat;
+  mask: var(--se-icon-edit) center / contain no-repeat;
+}
+
+.se-ts-palette-custom:hover .se-ts-palette-art {
+  box-shadow: none;
+  color: var(--se-text-strong);
+}
+
+.se-ts-palette-custom[aria-checked="true"] .se-ts-palette-art {
+  outline: 2px solid var(--se-accent);
+  outline-offset: 2px;
+  color: var(--se-text-strong);
+}
+
+/* ---------- Custom's colours ---------- */
+
+.se-ts-custom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-4);
+  padding: var(--se-space-4) var(--se-space-5);
+  border-radius: var(--se-radius-card);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+}
+
+.se-ts-custom-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--se-space-4);
+}
+
+.se-ts-starts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--se-space-1);
+}
+
+.se-ts-start {
+  all: unset;
+  box-sizing: border-box;
+  height: var(--se-control-h-sm);
+  padding: 0 var(--se-space-2);
+  border-radius: var(--se-radius-control-inner);
+  background: var(--se-pill);
+  color: var(--se-text-muted);
+  font: var(--se-type-label);
+  cursor: pointer;
+}
+
+.se-ts-start:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.se-ts-start:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-ts-custom-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--se-space-5);
+}
+
+.se-ts-custom-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+}
+
+.se-ts-colour {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 176px; /* wide enough for an rgba() line */
+  align-items: center;
+  gap: var(--se-space-2);
+}
+
+.se-ts-colour-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-ts-swatch);
+  box-shadow: inset 0 0 0 1px var(--se-white-18);
+}
+
+.se-ts-colour-name {
+  overflow: hidden;
+  color: var(--se-text);
+  font: var(--se-type-small);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Text below 4.5:1 on what it sits on */
+.se-ts-aa {
+  margin-inline-start: var(--se-space-1);
+  color: var(--se-warning);
+  font: var(--se-type-badge);
+}
+
+.se-ts-hex {
+  all: unset;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--se-control-h-sm);
+  padding: 0 var(--se-space-2);
+  border-radius: var(--se-radius-control-inner);
+  background: var(--se-field-bg);
+  box-shadow: var(--se-field-edge);
+  color: var(--se-text);
+  font: 500 var(--se-fs-sm) / 1 var(--se-font-mono);
+}
+
+.se-ts-hex:hover {
+  box-shadow: var(--se-field-edge-hover);
+}
+
+.se-ts-hex:focus {
+  box-shadow: var(--se-field-edge-focus);
+}
+
+/* ---------- Picture tiles: a visual setting's choices, each a drawing of itself ---------- */
+
+.se-ts-picks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 112px);
+  gap: var(--se-space-3);
+}
+
+/* In its row, under the text: the row's width past the icon tile, or the grid shrinks to a column */
+.se-ts-row-wide > .se-ts-picks {
+  flex: 1 0 calc(100% - 34px - var(--se-space-4));
+}
+
+.se-ts-pick {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  cursor: pointer;
+}
+
+/* The drawing: a small screen in the window's own colours (the drawings below), framed */
+.se-ts-pick-art {
+  position: relative;
+  height: 60px;
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+  background-color: var(--se-bg-ink);
+  background-repeat: no-repeat;
+  box-shadow: inset 0 0 0 1px var(--se-white-07);
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-ts-pick:hover .se-ts-pick-art {
+  box-shadow: inset 0 0 0 1px var(--se-white-18);
+}
+
+/* Chosen: an accent ring, clear of the drawing (the card's colour between) */
+.se-ts-pick[aria-checked="true"] .se-ts-pick-art {
+  box-shadow: 0 0 0 2px var(--se-surface), 0 0 0 4px var(--se-accent);
+}
+
+.se-ts-pick:active .se-ts-pick-art {
+  transform: scale(var(--se-press-scale));
+}
+
+.se-ts-pick:focus-visible .se-ts-pick-art {
+  outline: var(--se-focus-outline);
+  outline-offset: 5px;
+}
+
+.se-ts-pick-name {
+  color: var(--se-text-dim);
+  font: var(--se-type-label);
+}
+
+.se-ts-pick[aria-checked="true"] .se-ts-pick-name {
+  color: var(--se-text-strong);
+}
+
+/* Loading spinner: each style's own picture (spinner-previews.css, written by dev/spinner_svg.py) */
+.se-ts-pick-art[data-setting="spinner"] {
+  background-position: center;
+  background-size: 36px;
+}
+
+/*
+ * Startup background: each as its screen draws it (client/startup/startup.css), in miniature.
+ * Library and Wall stand in for the Library's wireframe and Steam's picture of covers.
+ */
+.se-ts-pick-art[data-value="aurora"] {
+  background-image:
+    radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--se-accent) 55%, transparent), transparent 45%),
+    radial-gradient(circle at 75% 110%, color-mix(in srgb, color-mix(in srgb, var(--se-accent) 55%, var(--se-running)) 45%, transparent), transparent 50%),
+    radial-gradient(circle at 25% -20%, color-mix(in srgb, color-mix(in srgb, var(--se-accent) 55%, var(--se-danger)) 40%, transparent), transparent 50%);
+}
+
+.se-ts-pick-art[data-value="library"] {
+  background-image:
+    linear-gradient(var(--se-surface-2), var(--se-surface-2)) 10px 10px / 22px calc(100% - 20px),
+    linear-gradient(var(--se-white-07), var(--se-white-07)) 38px 10px / calc(100% - 48px) 20px,
+    repeating-linear-gradient(90deg, var(--se-white-07) 0 10px, transparent 10px 14px) 38px 34px / calc(100% - 48px) 16px;
+}
+
+.se-ts-pick-art[data-value="mosaic"] {
+  background-image:
+    repeating-linear-gradient(90deg, var(--se-bg-ink) 0 3px, transparent 3px 15px),
+    repeating-linear-gradient(0deg, var(--se-bg-ink) 0 3px, transparent 3px 21px),
+    linear-gradient(135deg, color-mix(in srgb, var(--se-accent) 22%, var(--se-surface)), var(--se-surface));
+}
+
+.se-ts-pick-art[data-value="wall"] {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--se-bg-ink) 45%, transparent), color-mix(in srgb, var(--se-bg-ink) 45%, transparent)),
+    repeating-linear-gradient(90deg, var(--se-kind-violet) 0 16px, var(--se-kind-teal) 16px 32px, var(--se-gold) 32px 48px, var(--se-kind-pink) 48px 64px);
+}
+
+.se-ts-pick-art[data-value="plain"] {
+  background-image: radial-gradient(ellipse 60% 50% at 50% 20%, color-mix(in srgb, var(--se-accent) 12%, transparent), transparent 70%);
+  background-color: var(--se-bg);
+}
+
+.se-ts-pick-art[data-value="dots"] {
+  background-image: radial-gradient(circle, var(--se-white-25) 1px, transparent 1.5px);
+  background-size: 8px 8px;
+  -webkit-mask-image: linear-gradient(180deg, #000 20%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 20%, transparent 100%);
+}
+
+.se-ts-pick-art[data-value="steam"] {
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0 13px, var(--se-bg-ink) 13px 15px),
+    linear-gradient(color-mix(in srgb, var(--se-bg-ink) 45%, transparent), color-mix(in srgb, var(--se-bg-ink) 45%, transparent)),
+    linear-gradient(90deg, var(--se-kind-teal), var(--se-accent) 40%, var(--se-kind-violet) 75%, var(--se-gold));
+}
+
+/*
+ * Window entrance: a window (a panel in the middle) and how it arrives. Splash: the art box and
+ * its bar; Logo: the theme's mark; Fade: the window half in; None: the window, there at once.
+ */
+.se-ts-pick-art[data-setting="entrance"] {
+  background-image: linear-gradient(var(--se-surface-2), var(--se-surface-2));
+  background-position: center;
+  background-size: calc(100% - 24px) calc(100% - 18px);
+}
+
+.se-ts-pick-art[data-setting="entrance"][data-value="splash"] {
+  background-image:
+    linear-gradient(var(--se-accent), var(--se-accent)),
+    linear-gradient(var(--se-white-10), var(--se-white-10)),
+    linear-gradient(135deg, color-mix(in srgb, var(--se-accent) 45%, var(--se-surface-2)), var(--se-surface-2));
+  background-position: 18px calc(100% - 13px), 18px calc(100% - 13px), center;
+  background-size: 34px 3px, calc(100% - 36px) 3px, calc(100% - 24px) calc(100% - 18px);
+}
+
+.se-ts-pick-art[data-setting="entrance"][data-value="logo"] {
+  background-image: var(--se-brand-mark), linear-gradient(var(--se-bg), var(--se-bg));
+  background-size: 24px, calc(100% - 24px) calc(100% - 18px);
+}
+
+.se-ts-pick-art[data-setting="entrance"][data-value="fade"] {
+  background-image: linear-gradient(90deg, transparent, var(--se-surface-2));
+}
+
+/*
+ * Toasts and the overlay: a small screen (the desktop, or a game: --se-ts-game) with the toast or
+ * the overlay drawn on it. The theme's toast: a raised card with an accent dot; Steam's: its
+ * accent-tinted strip in the corner.
+ */
+.se-ts-pick-art:is([data-setting^="toast"], [data-setting="stage-position"], [data-setting^="overlay"]) {
+  --se-ts-game: linear-gradient(160deg, color-mix(in srgb, var(--se-kind-teal) 40%, var(--se-bg-ink)), color-mix(in srgb, var(--se-kind-violet) 35%, var(--se-bg-ink)) 60%, color-mix(in srgb, var(--se-gold) 30%, var(--se-bg-ink)));
+  --se-ts-card: linear-gradient(var(--se-surface-2), var(--se-surface-2));
+  --se-ts-dot: radial-gradient(circle, var(--se-accent) 2.5px, transparent 3px);
+  background-color: var(--se-bg);
+}
+
+/* Restyle toasts: the theme's card, or Steam's own toast, in the desktop's corner */
+.se-ts-pick-art[data-setting="toasts"][data-value="on"] {
+  background-image: var(--se-ts-dot), var(--se-ts-card);
+  background-position: calc(100% - 41px) calc(100% - 9px), calc(100% - 8px) calc(100% - 6px);
+  background-size: 10px 10px, 42px 16px;
+}
+
+.se-ts-pick-art[data-setting="toasts"][data-value="off"] {
+  background-image: linear-gradient(180deg, color-mix(in srgb, var(--se-accent) 35%, var(--se-surface-2)), var(--se-bg-ink));
+  background-position: calc(100% - 6px) calc(100% - 6px);
+  background-size: 44px 18px;
+}
+
+/* Toasts in game: the theme's card over the game, or the game alone */
+.se-ts-pick-art[data-setting="toasts-in-game"][data-value="on"] {
+  background-image: var(--se-ts-dot), var(--se-ts-card), var(--se-ts-game);
+  background-position: calc(100% - 41px) calc(100% - 9px), calc(100% - 8px) calc(100% - 6px), center;
+  background-size: 10px 10px, 42px 16px, cover;
+}
+
+.se-ts-pick-art[data-setting="toasts-in-game"][data-value="off"] {
+  background-image: var(--se-ts-game);
+  background-size: cover;
+}
+
+/* Toast style: the Stage's one wide card at the foot's centre, or Compact's small one */
+.se-ts-pick-art[data-setting="toast-style"][data-value="stage"] {
+  background-image: var(--se-ts-dot), linear-gradient(var(--se-surface-2), var(--se-surface-2));
+  background-position: 22px calc(100% - 10px), center calc(100% - 6px);
+  background-size: 10px 10px, calc(100% - 24px) 18px;
+}
+
+.se-ts-pick-art[data-setting="toast-style"][data-value="compact"] {
+  background-image: var(--se-ts-dot), var(--se-ts-card);
+  background-position: calc(100% - 41px) calc(100% - 9px), calc(100% - 8px) calc(100% - 6px);
+  background-size: 10px 10px, 42px 16px;
+}
+
+/* Compact toast position: the foot's centre, or Steam's corner */
+.se-ts-pick-art[data-setting="toast-position"][data-value="centre"] {
+  background-image: var(--se-ts-dot), var(--se-ts-card);
+  background-position: calc(50% - 15px) calc(100% - 9px), center calc(100% - 6px);
+  background-size: 10px 10px, 42px 16px;
+}
+
+.se-ts-pick-art[data-setting="toast-position"][data-value="corner"] {
+  background-image: var(--se-ts-dot), var(--se-ts-card);
+  background-position: calc(100% - 41px) calc(100% - 9px), calc(100% - 8px) calc(100% - 6px);
+  background-size: 10px 10px, 42px 16px;
+}
+
+/*
+ * Restyle the overlay: the theme's (a rail and cards over the dimmed game), or Steam's own (its
+ * bar along the top over the dimmed game)
+ */
+.se-ts-pick-art[data-setting="overlay"][data-value="on"] {
+  background-image:
+    var(--se-ts-card), var(--se-ts-card),
+    linear-gradient(var(--se-sidebar), var(--se-sidebar)),
+    linear-gradient(color-mix(in srgb, var(--se-bg-ink) 70%, transparent), color-mix(in srgb, var(--se-bg-ink) 70%, transparent)),
+    var(--se-ts-game);
+  background-position: 26px 10px, 26px 32px, 0 0, 0 0, center;
+  background-size: calc(100% - 36px) 18px, calc(60% - 22px) 18px, 16px 100%, 100% 100%, cover;
+}
+
+.se-ts-pick-art[data-setting="overlay"][data-value="off"] {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--se-accent) 30%, var(--se-bg-ink)), color-mix(in srgb, var(--se-accent) 30%, var(--se-bg-ink))),
+    linear-gradient(color-mix(in srgb, var(--se-bg-ink) 70%, transparent), color-mix(in srgb, var(--se-bg-ink) 70%, transparent)),
+    var(--se-ts-game);
+  background-position: 0 0, 0 0, center;
+  background-size: 100% 12px, 100% 100%, cover;
+}
+
+/* Overlay darkness: the game under the backdrop at each strength (--se-overlay-dim's steps) */
+.se-ts-pick-art[data-setting="overlay-darkness"] {
+  --se-ts-dim: 55%;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--se-bg-ink) var(--se-ts-dim), transparent), color-mix(in srgb, var(--se-bg-ink) var(--se-ts-dim), transparent)),
+    var(--se-ts-game);
+  background-size: 100% 100%, cover;
+}
+
+.se-ts-pick-art[data-setting="overlay-darkness"][data-value="light"] {
+  --se-ts-dim: 30%;
+}
+
+.se-ts-pick-art[data-setting="overlay-darkness"][data-value="dark"] {
+  --se-ts-dim: 92%;
+}
+
+/* Queue: the Stage card with what waits under it: thumbnails, a count, or nothing */
+.se-ts-pick-art[data-setting="toast-queue"] {
+  background-image:
+    var(--se-ts-dot), var(--se-ts-card),
+    linear-gradient(var(--se-white-10), var(--se-white-10));
+  background-position: 22px calc(100% - 20px), center calc(100% - 16px), 18px calc(100% - 6px);
+  background-size: 10px 10px, calc(100% - 24px) 18px, 0 0;
+}
+
+.se-ts-pick-art[data-setting="toast-queue"][data-value="strip"] {
+  background-image:
+    var(--se-ts-dot), var(--se-ts-card),
+    repeating-linear-gradient(90deg, var(--se-white-18) 0 12px, transparent 12px 16px);
+  background-size: 10px 10px, calc(100% - 24px) 18px, 44px 6px;
+}
+
+.se-ts-pick-art[data-setting="toast-queue"][data-value="count"] {
+  background-image:
+    var(--se-ts-dot), var(--se-ts-card),
+    linear-gradient(var(--se-white-25), var(--se-white-25));
+  background-position: 22px calc(100% - 20px), center calc(100% - 16px), calc(100% - 14px) calc(100% - 6px);
+  background-size: 10px 10px, calc(100% - 24px) 18px, 16px 5px;
+}
+
+/* Stage position: the Stage card at the desktop's foot or top */
+.se-ts-pick-art[data-setting="stage-position"] {
+  background-image: var(--se-ts-dot), var(--se-ts-card);
+  background-position: 22px calc(100% - 10px), center calc(100% - 6px);
+  background-size: 10px 10px, calc(100% - 24px) 18px;
+}
+
+.se-ts-pick-art[data-setting="stage-position"][data-value="top"] {
+  background-position: 22px 10px, center 6px;
+}
+
+/* Achievement art: the game's art behind the card, or the achievement's icon glowing */
+.se-ts-pick-art[data-setting="toast-ach-art"] {
+  background-image:
+    radial-gradient(circle, var(--se-gold) 2.5px, transparent 3px),
+    linear-gradient(color-mix(in srgb, var(--se-bg-ink) 35%, transparent), color-mix(in srgb, var(--se-bg-ink) 35%, transparent)),
+    var(--se-ts-game);
+  background-position: 22px calc(100% - 10px), center calc(100% - 6px), center calc(100% - 6px);
+  background-size: 10px 10px, calc(100% - 24px) 18px, calc(100% - 24px) 18px;
+}
+
+.se-ts-pick-art[data-setting="toast-ach-art"][data-value="icon"] {
+  background-image:
+    radial-gradient(circle, var(--se-gold) 2.5px, transparent 3px),
+    radial-gradient(circle at 25% 50%, color-mix(in srgb, var(--se-gold) 45%, transparent), transparent 60%),
+    var(--se-ts-card);
+}

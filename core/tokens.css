@@ -5,6 +5,11 @@
  * The font face and the theme-wide font rule are core/font.css.
  */
 :root {
+  /*
+   * The base palette: surfaces, lines and text. A colour preset or Custom palette re-points
+   * these (client/shared/settings.js); every other colour of the theme's own derives from them
+   * or is a fixed status, brand or art colour.
+   */
   /* Surface hierarchy (darkest to lightest) */
   --se-bg: #171a20;
   --se-sidebar: #1d2128;
@@ -19,8 +24,8 @@
   --se-border-strong: #4a525e;
   --se-field: #15181d;
   --se-check: var(--se-white-07);
-  --se-chip: rgba(12, 14, 18, .55);
-  --se-chip-hover: rgba(12, 14, 18, .75);
+  --se-chip: color-mix(in srgb, var(--se-bg-ink) 55%, transparent);
+  --se-chip-hover: color-mix(in srgb, var(--se-bg-ink) 75%, transparent);
 
   /* Typography colors */
   --se-text: #e6e8eb;
@@ -34,7 +39,7 @@
   --se-on-danger: var(--se-bg-ink); /* text on a danger fill (a count badge, a mention): 8:1 */
 
   /* Semantic & status accents */
-  /* The accent is a theme setting: --se-color-accent, from core/colors.css (skin.json RootColors) */
+  /* The accent is a theme setting: --se-color-accent, set by client/shared/settings.js when not the default */
   --se-accent: var(--se-color-accent, #7cc4ff);
   --se-accent-hover: color-mix(in srgb, var(--se-accent), #fff 25%);
   --se-accent-surface: color-mix(in srgb, var(--se-accent) 18%, var(--se-bg));
@@ -66,7 +71,7 @@
   --se-mc-bad: #ff6874;
   /* Text and glass over game art */
   --se-on-art: #d0d7de;
-  --se-glass: rgba(16, 18, 23, .8);
+  --se-glass: color-mix(in srgb, var(--se-bg-ink) 80%, transparent);
   --se-danger-text: #ffb0b3;
   --se-danger-surface: color-mix(in srgb, var(--se-danger) 16%, var(--se-bg));
   /* The danger button (Delete, Leave, Revoke): a red tint, deep red on hover. One recipe, read
@@ -86,10 +91,10 @@
   --se-live: #ff4d5e;
 
   /* Glass: chips on art (flags, DLC, price, titles) and round buttons (carousel arrows) */
-  --se-glass-chip: rgba(10, 12, 16, .62);
+  --se-glass-chip: color-mix(in srgb, var(--se-bg-ink) 62%, transparent);
   --se-glass-chip-line: var(--se-white-10);
   --se-glass-btn: color-mix(in srgb, var(--se-bg) 78%, transparent);
-  --se-glass-btn-hover: rgba(44, 52, 64, .9);
+  --se-glass-btn-hover: color-mix(in srgb, var(--se-hover) 90%, transparent);
   --se-glass-btn-line: var(--se-white-12);
   --se-blur-chip: blur(10px) saturate(1.4);
   --se-blur-panel: blur(16px);
@@ -184,7 +189,7 @@
    */
   --se-price-h: 36px;
   /* The chip's own surface: a lifted slate on cards, still frosted (with the glass blur) over art */
-  --se-price-bg: rgba(42, 47, 55, .82);
+  --se-price-bg: color-mix(in srgb, var(--se-surface-2) 82%, transparent);
   --se-price-edge: inset 0 0 0 1px var(--se-white-10);
   --se-price-radius: var(--se-radius-md);
   --se-price-pct-h: 24px;
@@ -229,7 +234,7 @@
   --se-shadow-underline: inset 0 -1px 0 currentColor; /* a text link's underline, drawn as a shadow */
   --se-glass-btn-shadow: var(--se-shadow-sm);
   /* Pop-up panels (menus, dropdowns, tooltips, hover cards): one recipe everywhere */
-  --se-panel-bg: rgba(31, 36, 43, .96);
+  --se-panel-bg: color-mix(in srgb, var(--se-surface) 96%, transparent);
   --se-panel-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-lg);
   --se-menu-width: 320px; /* the settings menu and the picker (.se-mn, client/shared/menu.css) */
   --se-menu-row-h: var(--se-control-h); /* a row of either menu (.se-menu, .se-mn); taller with a hint */
@@ -264,9 +269,9 @@
   --se-stop-tint: color-mix(in srgb, var(--se-stop) 45%, transparent);
   --se-stop-tint-hover: color-mix(in srgb, var(--se-stop) 65%, transparent);
   --se-lime: #c6ef5a; /* a bright label on dark art (Labs, sale tiers) */
-  --se-control-off: #4b5866; /* a checkbox that is on but disabled, and its unchecked ring */
-  --se-text-halo: 0 0 3px #0b0d10, 0 1px 2px #0b0d10; /* text-shadow for small text over art */
-  --se-art-scrim: rgba(8, 10, 14, .55); /* the dark end of a scrim over art */
+  --se-control-off: var(--se-border-strong); /* a checkbox that is on but disabled, and its unchecked ring */
+  --se-text-halo: 0 0 3px var(--se-bg-ink), 0 1px 2px var(--se-bg-ink); /* text-shadow for small text over art */
+  --se-art-scrim: color-mix(in srgb, var(--se-bg-ink) 55%, transparent); /* the dark end of a scrim over art */
   --se-media-bg: #000; /* behind video and screenshots (letterbox) */
 
   /* Page art: drawn illustration, not UI. The store front's event dots. */
@@ -347,6 +352,8 @@
   --se-dur-sweep: 4.5s;   /* a light sweep or a fade cycle across art */
   /* Hover intent: how long the pointer rests before a card opens; tips wait as Steam's do */
   --se-hover-delay: .15s;
+  --se-rail-hover-delay: var(--se-hover-delay);
+  --se-friend-card-delay: var(--se-hover-delay); /* a friend's card ("Card delay", options/friends/) */ /* a rail menu's ("Hover delay", options/navigation/) */
   --se-tip-delay: .2s;
   /* Scroll to top: the game page's button and the web's, one design */
   --se-top-size: 48px;
@@ -363,6 +370,7 @@
   --se-z-raised: 1;
   --se-z-raised-2: 2;
   --se-z-raised-3: 3;
+  --se-z-over-steam: 5; /* above Steam's own chat layers (z 2-3); +1, +2 for what stacks on it */
   --se-z-sticky: 20;
   --se-z-flyout: 40; /* the dock's game card, above the sticky bars */
   --se-z-dropdown: 100;
@@ -485,16 +493,6 @@
 
   /* Startup background: aurora | library | mosaic | wall | plain | dots | steam */
   --se-startup-background: aurora;
-
-  /*
-   * Window entrance, once a window has loaded:
-   *   splash  the main window plays the Steam Enhanced splash while the Library builds, and
-   *           reaches "Ready" as the Library shows; other windows use logo
-   *   logo    the theme's mark breathes while the window loads, then dissolves into it
-   *   fade    the window fades in
-   *   none    the window appears at once
-   */
-  --se-entrance: splash;
 
   /* In-game overlay restyle: on | off; backdrop dim: 0.4-1.4 (edges black at 1, all black at 1.4) */
   --se-overlay: on;

@@ -40,14 +40,102 @@
     addEventListener('blur', relay);
     window.__seBrowserChatClicks = true;
   }
-  // "Web pages" setting, Steam's own: Millennium puts options/web/restyle-off.css in the page's
-  // HTML as a <link>, ahead of this script, and the theme stays out of the page entirely.
-  if (document.querySelector('link[href*="/options/web/restyle-off.css"]')) return;
-
-  const { loader } = site;
   const coreSrc = document.currentScript?.src ||
     [...document.scripts].find((script) => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;
-  if (!coreSrc || document.querySelector('[data-se-feature]')) return;
+  if (!coreSrc) return;
+
+  /*
+   * The theme's settings (client/shared/settings.js): the option stylesheets and colour palette
+   * the client sent this site, kept in its own localStorage "se-settings" and put in one
+   * <style id="se-options"> before anything shows. The main window sends a change to its browser
+   * view as it happens and answers a page that asks as it loads; the site's other views follow
+   * through the storage event.
+   */
+  const SETTINGS_KEY = 'se-settings';
+  const readSettings = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+      return saved && typeof saved === 'object' ? saved : {};
+    } catch {
+      return {};
+    }
+  };
+  if (!window.__seWebSettings) {
+    window.__seWebSettings = true;
+    const OPTION_FILE = /^options\/[a-z-]+\/[a-z0-9-]+\.css$/;
+    let version = null;
+    try {
+      version = localStorage.getItem('se-theme-version');
+    } catch {}
+    let current = null;
+    const apply = (saved) => {
+      const files = (Array.isArray(saved.web) ? saved.web : []).filter((file) => OPTION_FILE.test(file));
+      // The colour palette's base tokens, each name and colour checked
+      const pairs = Object.entries(saved.vars && typeof saved.vars === 'object' ? saved.vars : {}).filter(([name, value]) =>
+        /^--se-[a-z0-9-]+$/.test(name) &&
+        /^(?:#[0-9a-f]{6}|rgba\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*(?:0|1|0?\.\d+)\s*\))$/i.test(value));
+      const palette = pairs.length ? `:root:root{${pairs.map(([name, value]) => `${name}:${value}`).join(';')}}` : '';
+      const imports = files.map((file) => {
+        const url = new URL(`../${file}`, coreSrc);
+        if (version) url.searchParams.set('v', version);
+        return `@import url("${url.href}");`;
+      });
+      const css = [...imports, palette].join('\n');
+      if (current?.textContent === css) return;
+      const style = document.createElement('style');
+      style.id = 'se-options';
+      style.textContent = css;
+      const old = current;
+      current = style;
+      if (!old) {
+        (document.head ?? document.documentElement).append(style);
+      } else if (!files.length) {
+        old.replaceWith(style);
+      } else {
+        // The old look stays until the new one is in
+        old.after(style);
+        style.addEventListener('load', () => old.remove(), { once: true });
+        style.addEventListener('error', () => old.remove(), { once: true });
+      }
+    };
+    apply(readSettings());
+    addEventListener('storage', (event) => {
+      if (event.key === SETTINGS_KEY) apply(readSettings());
+    });
+    try {
+      window.SteamClient?.BrowserView?.RegisterForMessageFromParent?.((message, args) => {
+        if (message !== 'SteamEnhanced.Settings') return;
+        let saved = null;
+        try {
+          saved = JSON.parse(args);
+        } catch {}
+        if (!saved || typeof saved !== 'object') return;
+        try {
+          localStorage.setItem(SETTINGS_KEY, JSON.stringify(saved));
+        } catch {}
+        apply(saved);
+      });
+      window.SteamClient?.BrowserView?.PostMessageToParent?.('SteamEnhanced.SettingsRequest', '');
+    } catch {}
+  }
+
+  /*
+   * "Themed sites" (client/shared/settings.js): a site turned off is left as Steam draws it, the
+   * theme out of the page entirely but for options/web/restyle-off.css, which gives Steam's font
+   * back (core/font.css reaches every web view). Applies as a page loads.
+   */
+  const SITE_KEYS = { __seStore: 'store', __seCommunity: 'community', __seHelp: 'help', __seCheckout: 'checkout' };
+  const themed = readSettings().values?.['web-sites'];
+  if (Array.isArray(themed) && !themed.includes(SITE_KEYS[site.global])) {
+    const plain = document.createElement('link');
+    plain.rel = 'stylesheet';
+    plain.href = new URL('../options/web/restyle-off.css', coreSrc).href;
+    (document.head ?? document.documentElement).append(plain);
+    return;
+  }
+
+  const { loader } = site;
+  if (document.querySelector('[data-se-feature]')) return;
 
   // No flash of Steam's own look: until the site's loader has its first stylesheets and page
   // scripts in ([data-se-styled], set by the loader), the page shows only the theme's
@@ -363,6 +451,36 @@
       const script = document.createElement('script');
       script.src = new URL('../dev/perf.js', coreSrc).href;
       (document.head ?? document.documentElement).append(script);
+    },
+    true
+  );
+})();
+
+/*
+ * Dev reload (client/loader.js devReload), a theming aid: Ctrl+Shift+U in a client window loads
+ * every client window's stylesheets again, Ctrl+Shift+Alt+U their scripts too, without Reload
+ * UI. Armed only while dev/live-reload.json says {"enabled": true} (excluded from git), read at
+ * each press, so released builds never reload.
+ */
+(() => {
+  if (window.__seDevReloadHotkey) return;
+  window.__seDevReloadHotkey = true;
+  const coreSrc = document.currentScript?.src ||
+    [...document.scripts].find((script) => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;
+  addEventListener(
+    'keydown',
+    (event) => {
+      if (!event.ctrlKey || !event.shiftKey || event.metaKey || event.code !== 'KeyU') return;
+      if (!window.__seClient?.devReload || !coreSrc) return; // client windows only
+      event.preventDefault();
+      event.stopPropagation();
+      const scripts = event.altKey;
+      fetch(new URL(`../dev/live-reload.json?t=${Date.now()}`, coreSrc), { cache: 'no-store' })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((config) => {
+          if (config?.enabled) window.__seClient.devReload(scripts);
+        })
+        .catch(() => {});
     },
     true
   );

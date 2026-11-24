@@ -4,7 +4,9 @@ Usage:
   python3 spinner_svg.py <THEME_DIR>
       Rewrite --se-spinner-image in core/spinner.css (the default style) and in each
       options/startup/spinner-<style>.css, drawn around the mark core/spinner.css holds
-      (--se-brand-mark), so the pictures and the CSS spinner can't drift apart.
+      (--se-brand-mark), so the pictures and the CSS spinner can't drift apart; and write
+      client/settings/theme/spinner-previews.css, every style's picture at once for the
+      settings window's Loading spinner tiles.
 
 A picture is for the places a pseudo-element can't reach (an <img> swapped by `content`, a
 background). It draws what the CSS recipe in core/spinner.css draws for the same style, in the
@@ -158,9 +160,17 @@ def main(theme):
     mark = re.search(r'--se-brand-mark: url\("(data:image/png;base64,[A-Za-z0-9+/=]+)"\)', core.read_text(encoding='utf-8'))
     if not mark:
         sys.exit(f'spinner_svg: no --se-brand-mark in {core}')
+    previews = []
     for name, style in STYLES.items():
         target = core if name == DEFAULT else root / 'options' / 'startup' / f'spinner-{name}.css'
-        rewrite(target, build(style, mark.group(1)))
+        svg = build(style, mark.group(1))
+        rewrite(target, svg)
+        previews.append(f'.se-ts-pick-art[data-setting="spinner"][data-value="{name}"] {{\n'
+                        f'  background-image: {as_css_url(svg)};\n}}\n')
+    (root / 'client' / 'settings' / 'theme' / 'spinner-previews.css').write_text(
+        "/*\n * The settings window's Loading spinner tiles (theme-settings.css): each style's picture.\n"
+        ' * Written by dev/spinner_svg.py; never edit by hand.\n */\n' + '\n'.join(previews),
+        encoding='utf-8')
 
 
 if __name__ == '__main__':
