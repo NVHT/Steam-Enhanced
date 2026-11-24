@@ -15,11 +15,13 @@
  *            classes so it lands looking the same; then it fades and the splash removes itself
  *
  * Only the Library: the startup window before it has already
- * shown Network and sign-in. The game is last run's (its art's loaded copies kept in
- * localStorage, so it draws at once), checked against Steam's app store once that arrives (the
- * splash comes after sign-in); with none played yet it says "Welcome" over the wireframe alone. The move is
- * skipped (the art fades with the rest) under reduced motion, when Home's stage isn't on show
- * or shows another game. If the loader never calls finish(), SAFETY_MS does.
+ * shown Network and sign-in. The game is the one Home's stage will feature first (its Games
+ * setting: recent, favorites, a collection, added; client/home/stage/stage-settings.js), or the
+ * last played with Home off; its art's loaded copies are kept in localStorage, so it draws at
+ * once, and checked against Steam's stores once they arrive (the splash comes after sign-in).
+ * With none played yet it says "Welcome" over the wireframe alone. The move is skipped (the art
+ * fades with the rest) under reduced motion, when Home's stage isn't on show or shows another
+ * game. If the loader never calls finish(), SAFETY_MS does.
  */
 (() => {
   window.__seEntrance?.destroy();
@@ -117,7 +119,8 @@
 
   /* ---------- The game: the last one played (or the "Splash art" setting's), read live ---------- */
 
-  // last | random (one of the most recently played, picked once) | none (no game's art)
+  // last (Home's game: the stage's first, or the last played with Home off) | random (one of the
+  // most recently played, picked once) | none (no game's art)
   const ART = SE.settings?.get('splash-art') || 'last';
   const RANDOM_FROM = 8;
 
@@ -130,10 +133,17 @@
    * still decides: a different game there replaces it.
    */
   const HINT_KEY = 'se-splash-game';
+  /*
+   * What picks the game: Home's stage, by its Games setting (and collection), or with Home off
+   * the last played. The remembered game is used only while this still matches, so a changed
+   * setting never flashes the old pick.
+   */
+  const followsStage = SE.settings?.get('home') !== 'steam';
+  const choice = followsStage ? `${SE.settings?.get('stage-source') || 'recent'}|${SE.settings?.get('stage-collection') || ''}` : 'played';
   const readHint = () => {
     try {
       const hint = JSON.parse(localStorage.getItem(HINT_KEY));
-      return hint?.appid && hint.hero ? hint : null;
+      return hint?.appid && hint.hero && hint.choice === choice ? hint : null;
     } catch {
       return null;
     }
@@ -145,6 +155,7 @@
     try {
       localStorage.setItem(HINT_KEY, JSON.stringify({
         appid: shown,
+        choice,
         name: el.querySelector('.se-ent-name').textContent,
         hero: hero.currentSrc,
         logo: logo && !logo.hasAttribute('data-se-art-wait') ? logo.currentSrc : '',
@@ -160,10 +171,29 @@
         .sort((a, b) => b.rt_last_time_played - a.rt_last_time_played)
     ) || [];
 
+  // A source that needs Steam's collections waits this long for them (inside FIRST_RUN_MS, so a
+  // returning player never reads "Welcome" first), then takes what the stage has
+  const COLLECTIONS_MS = 1200;
+  const started = performance.now();
+
+  /*
+   * The game Home's stage will open on: its featured list's first (stageApps, which falls back to
+   * the recently played as the stage does). undefined while that can't be told yet: the stage's
+   * scripts not run, or a favorites or collection source before Steam's collections load.
+   */
+  const stageGame = () => {
+    const stage = window.__seHomeStageParts;
+    if (!stage?.stageApps || !stage.collectionApps) return undefined;
+    const source = SE.settings?.get('stage-source');
+    const id = source === 'favorites' ? 'favorite' : source === 'collection' ? SE.settings?.get('stage-collection') : '';
+    if (id && stage.collectionApps(id) === null && performance.now() - started < COLLECTIONS_MS) return undefined;
+    return SE.run(() => stage.stageApps()[0]) || null;
+  };
+
   let picked; // the random pick, kept across the app list's checks
   const pickGame = (store) => {
     const recent = played(store);
-    if (ART !== 'random') return recent[0] || null;
+    if (ART !== 'random') return followsStage ? stageGame() : recent[0] || null;
     if (picked === undefined && recent.length) {
       const pool = recent.slice(0, RANDOM_FROM);
       picked = pool[Math.floor(Math.random() * pool.length)];
@@ -222,6 +252,7 @@
     const games = SE.run(() => store.allApps.filter((a) => a && (a.app_type === 1 || a.app_type === 1073741824)).length);
     if (games) el.querySelector('.se-ent-count').textContent = `${games.toLocaleString()} ${games === 1 ? 'game' : 'games'}`;
     const game = pickGame(store);
+    if (game === undefined) return; // not told yet: asked again
     // The remembered game stands unless the list names another, or its art no longer loads
     const stale = !shown || game?.appid !== shown || layer.querySelector('.se-hs-hero')?.hidden;
     if (game && ART === 'none') {

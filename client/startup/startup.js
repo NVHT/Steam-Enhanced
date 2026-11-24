@@ -18,7 +18,10 @@
     guard: C.ProtectingAccount,
     // A failed sign-in's title (Can't connect, Too many retries...)
     failure: C.FailureTitle,
-    spinner: C.SpinnerLoaderContainer,
+    // The status screen's user box, its avatar and persona name (readAccount)
+    user: C.UserContainer,
+    avatar: C.Avatar,
+    persona: C.PersonaName,
   };
 
   const SIGNIN_ATTR = 'data-se-si';
@@ -164,17 +167,18 @@
   };
 
   /*
-   * The account Steam shows under its status line: the box holding the status screen's only
-   * image outside the spinner. Read by structure (no class of its own in the class map), then
+   * The account Steam shows under its status line: its user box (avatar and persona name), which
+   * Steam draws inside the spinner's component, so it's found by its own classes. Before Steam
+   * knows the account the box is hidden with a blank name: no account then. Once read, the box is
    * hidden: its name and avatar move into the bar.
    */
   const readAccount = (statusBox) => {
-    const img = [...statusBox.querySelectorAll('img')].find(el => !el.closest(`.${CLS.spinner}`));
-    let chip = img;
-    while (chip && chip !== statusBox && !chip.textContent.trim()) chip = chip.parentElement;
-    if (!img || !chip || chip === statusBox) return null;
+    const chip = statusBox.querySelector(`.${CLS.user}`);
+    const name = chip?.querySelector(`.${CLS.persona}`)?.textContent.trim();
+    const img = chip?.querySelector(`.${CLS.avatar} img`);
+    if (!name || !img) return null;
     SE.mark(chip, 'data-se-startup-account');
-    return { name: chip.textContent.trim(), avatar: img.currentSrc || img.src };
+    return { name, avatar: img.currentSrc || img.src };
   };
 
   const resolveWallImage = (host) => {
@@ -442,14 +446,6 @@
   // for a few frames); check() is two querySelector calls when nothing startup-related is up.
   watcher = SE.watch(check, { sync: true });
   check();
-
-  // The Hero background (gone) saved art here; drop what it left.
-  try {
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const key = localStorage.key(i);
-      if (key && /^se-startup-(art|diag|hero:)/.test(key)) localStorage.removeItem(key);
-    }
-  } catch {}
 
   window.__seStartup = {
     destroy() {
