@@ -211,9 +211,13 @@
     const h = BOX.padTop + BOX.trayH + BOX.padBottom;
     const left = s.availLeft ?? 0;
     const top = s.availTop ?? 0;
-    const x = Math.round(left + (s.availWidth - w) / 2);
-    // "Stage position: Top" (client/shared/settings.js): `lift` under the work area's top instead
-    if (SE.settings?.get('stage-position') === 'top') return { x, y: Math.round(top + BOX.lift - BOX.padTop), w, h };
+    const where = SE.settings?.get('stage-position');
+    // "Stage position: Corner" (client/shared/settings.js): `lift` in from the work area's right
+    const x = where === 'corner'
+      ? Math.round(left + s.availWidth - BOX.lift + BOX.padX - w)
+      : Math.round(left + (s.availWidth - w) / 2);
+    // "Stage position: Top": `lift` under the work area's top instead
+    if (where === 'top') return { x, y: Math.round(top + BOX.lift - BOX.padTop), w, h };
     // Every toast window goes to the same spot; only the stage draws anything there.
     const bottom = top + s.availHeight - BOX.lift + BOX.padBottom;
     return { x, y: Math.round(bottom - h), w, h };
@@ -233,6 +237,8 @@
     const bottom = full ? BOX.lift : live.mover >= 0 ? BOX.padBottom : 4;
     const scale = Math.min(1, (window.innerWidth - 8) / BOX.trayW, (window.innerHeight - bottom - 4) / BOX.trayH);
     live.dock.style.setProperty('--se-tst-bottom', `${bottom}px`);
+    // The tray's right inset at Stage position: Corner (options/toasts/stage-corner.css)
+    live.dock.style.setProperty('--se-tst-side', `${full ? BOX.lift : BOX.padX}px`);
     live.dock.style.setProperty('--se-tst-scale', String(Math.max(0.5, Math.round(scale * 1000) / 1000)));
   }
 

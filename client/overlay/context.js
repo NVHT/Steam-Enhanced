@@ -94,8 +94,8 @@
 
   const root = document.documentElement;
 
-  const enabled = () =>
-    getComputedStyle(root).getPropertyValue('--se-overlay').trim().toLowerCase() !== 'off';
+  // Restyle the overlay (client/shared/settings.js), read live
+  const enabled = () => SE.settings?.get('overlay') !== 'off';
 
   /* ---------- Steam context ---------- */
 

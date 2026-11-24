@@ -225,7 +225,7 @@
     {
       key: 'click-opens', section: 'Clicks and menus', tab: 'Navigation', label: 'Click opens',
       hint: 'Store, Library, Community, Profile, Friends, Downloads. A right-click opens the other.',
-      values: [opt('menu', 'Menu'), opt('page', 'Page')],
+      values: [opt('page', 'Page'), opt('menu', 'Menu')],
     },
     {
       key: 'menu-hover', section: 'Clicks and menus', tab: 'Navigation', label: 'Menus open on hover',
@@ -292,10 +292,10 @@
       key: 'startup-background', section: 'Background', visual: true, tab: 'Startup', label: 'Startup background', from: 'Startup background',
       hint: 'Behind the sign-in and startup screens.',
       values: [
-        opt('aurora', 'Aurora'), opt('library', 'Library', 'options/startup/background-library.css'),
-        opt('mosaic', 'Mosaic', 'options/startup/background-mosaic.css'), opt('wall', 'Wall', 'options/startup/background-wall.css'),
-        opt('plain', 'Plain', 'options/startup/background-plain.css'), opt('dots', 'Dots', 'options/startup/background-dots.css'),
-        opt('steam', 'Steam', 'options/startup/background-steam.css'),
+        opt('aurora', 'Aurora'), opt('library', 'Library'),
+        opt('mosaic', 'Mosaic'), opt('wall', 'Wall'),
+        opt('plain', 'Plain'), opt('dots', 'Dots'),
+        opt('steam', 'Steam'),
       ],
     },
     {
@@ -377,27 +377,30 @@
     {
       key: 'toasts', section: 'Toasts', visual: true, tab: 'Toasts', label: 'Restyle toasts', from: 'Notification toasts',
       hint: "Steam's notification toasts in the theme's design.",
-      values: [ON, off('options/toasts/off.css')],
+      values: [ON, off()],
     },
     {
       key: 'toasts-in-game', section: 'Toasts', visual: true, requires: [['toasts', 'on']], tab: 'Toasts', label: 'Toasts in game', from: 'Toasts in game',
       hint: 'Show the restyled toasts while a game is running.',
-      values: [ON, off('options/toasts/in-game-off.css')],
+      values: [ON, off()],
     },
     {
       key: 'toast-style', section: 'Look', visual: true, requires: [['toasts', 'on']], tab: 'Toasts', label: 'Toast style', from: 'Toast style',
       hint: "Stage: one card at the bottom centre. Compact: Steam's toasts, restyled.",
-      values: [opt('stage', 'Stage'), opt('compact', 'Compact', 'options/toasts/style-compact.css')],
+      values: [opt('stage', 'Stage'), opt('compact', 'Compact')],
     },
     {
       key: 'toast-position', section: 'Look', visual: true, requires: [['toasts', 'on'], ['toast-style', 'compact']], tab: 'Toasts', label: 'Compact toast position', from: 'Compact toast position',
       hint: "The centre of the screen edge, or Steam's corner.",
-      values: [opt('centre', 'Centre'), opt('corner', 'Corner', 'options/toasts/position-corner.css')],
+      values: [opt('centre', 'Centre'), opt('corner', 'Corner')],
     },
     {
       key: 'stage-position', section: 'Look', visual: true, requires: [['toasts', 'on'], ['toast-style', 'stage']],
-      tab: 'Toasts', label: 'Stage position', hint: "Where the Stage card sits: the screen's bottom or top centre.",
-      values: [opt('bottom', 'Bottom'), opt('top', 'Top', 'options/toasts/stage-top.css')],
+      tab: 'Toasts', label: 'Stage position', hint: "Where the Stage card sits: the screen's bottom or top centre, or the bottom-right corner.",
+      values: [
+        opt('bottom', 'Bottom'), opt('top', 'Top', 'options/toasts/stage-top.css'),
+        opt('corner', 'Corner', 'options/toasts/stage-corner.css'),
+      ],
     },
     {
       key: 'toast-ach-art', section: 'Look', visual: true, requires: [['toasts', 'on'], ['toast-style', 'stage']],
@@ -425,7 +428,7 @@
     {
       key: 'overlay', section: 'Look', visual: true, tab: 'Overlay', label: 'Restyle the overlay', from: 'In-game overlay restyle',
       hint: "The in-game overlay in the theme's design, from its next opening.",
-      values: [ON, off('options/overlay/restyle-off.css')],
+      values: [ON, off()],
     },
     {
       key: 'overlay-darkness', section: 'Look', visual: true, requires: [['overlay', 'on']], tab: 'Overlay', label: 'Overlay darkness', from: 'Overlay darkness',

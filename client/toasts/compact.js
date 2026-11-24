@@ -7,7 +7,7 @@
   const ns = window.__seToastsParts;
   if (!ns) return;
   const { esc, run } = SE;
-  const { IN_GAME, describe, icon, keyOf, root, sane, shared, stillAfter, token } = ns;
+  const { IN_GAME, describe, icon, keyOf, root, sane, shared, setting, stillAfter } = ns;
   const { live } = ns;
 
   /*
@@ -39,7 +39,7 @@
   }
 
   /*
-   * Bottom centre for compact toasts (`--se-toasts-position: center`, the default). Steam has no
+   * Bottom centre for compact toasts (the Compact toast position setting at Centre, the default). Steam has no
    * centre position: SharedJSContext stacks the toast windows in a corner (TopLeft, TopRight,
    * BottomLeft, BottomRight; in game the game picks it, with insets capped at a quarter of the
    * screen) and moves each one every frame it changes with this window's
@@ -158,7 +158,7 @@
   }
 
   function startCompact() {
-    if (token('--se-toasts-position') !== 'corner') installCentre();
+    if (setting('toast-position') !== 'corner') installCentre();
     // React may redraw the toast (a grouped message): the eyebrow is put back when it does.
     live.compactWatcher = SE.watch(dressCompact, { throttle: 60, characterData: true, ignore: SE.inside(`.${EYEBROW}`) });
     dressCompact();

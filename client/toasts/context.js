@@ -3,7 +3,7 @@
  * (`notificationtoasts_<n>_desktop`) and in game, where the overlay opens its own
  * (`notificationtoasts_uid<appid>-<n>`, drawn into the game).
  *
- * Two styles, `--se-toasts-style`, the same on the desktop and in game:
+ * Two styles (the Toast style setting), the same on the desktop and in game:
  *
  * Stage (the default): a miniature Library Home stage at the bottom centre of the screen.
  *
@@ -22,7 +22,7 @@
  * to Steam's own toast and buttons, so what they do, and the language they're in, stay Steam's.
  *
  * Fail-safe: a Steam toast is hidden only once it's queued; a toast this script can't read
- * stays as Steam drew it. `--se-toasts: off` (core/tokens.css) turns it all off.
+ * stays as Steam drew it. Restyle toasts at Off (client/shared/settings.js) turns it all off.
  * Debug, in a toast window's console: `__seToasts.why()` shows the shared queue, which window
  * is the stage and the placement; `__seToasts.probe()` shows the React components and props
  * above the window's text.

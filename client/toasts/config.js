@@ -7,7 +7,7 @@
   const ns = window.__seToastsParts;
   if (!ns) return;
   const { run } = SE;
-  const { IN_GAME, root } = ns;
+  const { IN_GAME } = ns;
 
   /* ---------- Config ---------- */
 
@@ -125,10 +125,11 @@
   const icon = (name, cls = '') =>
     `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ICONS.steam}</svg>`;
 
-  const token = (name) => getComputedStyle(root).getPropertyValue(name).trim().toLowerCase();
-  const enabled = () => token('--se-toasts') !== 'off' && !(IN_GAME && token('--se-toasts-ingame') === 'off');
+  // The Toasts settings (client/shared/settings.js), read live: a change applies to the next toast
+  const setting = (key) => SE.settings?.get(key);
+  const enabled = () => setting('toasts') !== 'off' && !(IN_GAME && setting('toasts-in-game') === 'off');
   // The Stage unless compact is asked for (decided once: a window shows one toast).
-  const COMPACT = token('--se-toasts-style') === 'compact';
+  const COMPACT = setting('toast-style') === 'compact';
 
   /* ---------- Steam data ---------- */
 
@@ -142,5 +143,5 @@
     return undefined;
   };
 
-  Object.assign(ns, { ADOPT_TIMEOUT_MS, BOX, CLASS_RULES, COMPACT, KINDS, ON_ATTR, PRUNE_MS, SRC_ATTR, STALE_MAX_MS, TYPE_KINDS, WAIT_ATTR, ZOOM, enabled, field, icon, token });
+  Object.assign(ns, { ADOPT_TIMEOUT_MS, BOX, CLASS_RULES, COMPACT, KINDS, ON_ATTR, PRUNE_MS, SRC_ATTR, STALE_MAX_MS, TYPE_KINDS, WAIT_ATTR, ZOOM, enabled, field, icon, setting });
 })(window.__se);

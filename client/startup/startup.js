@@ -41,16 +41,10 @@
   let loginEvents = null;
   let watcher = null;
   let mosaicResizeObserver = null;
-  let bgSetting = { at: -Infinity, kind: 'aurora' };
-
-  // Read at most every 2 s: getComputedStyle on the root forces a style recalc, and update() polls.
+  // The Startup background setting (client/shared/settings.js), read live
   const resolveBackgroundSetting = () => {
-    const now = performance.now();
-    if (now - bgSetting.at > 2000) {
-      const val = getComputedStyle(docRoot).getPropertyValue('--se-startup-background').trim().toLowerCase();
-      bgSetting = { at: now, kind: VALID_BACKGROUNDS.includes(val) ? val : 'aurora' };
-    }
-    return bgSetting.kind;
+    const val = SE.settings?.get('startup-background');
+    return VALID_BACKGROUNDS.includes(val) ? val : 'aurora';
   };
 
   const resolveLoginStore = () => {
