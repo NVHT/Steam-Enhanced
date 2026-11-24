@@ -13,8 +13,9 @@
  *                                               blurred into a wash
  *   SE.dialogArt.capsules(appids)               the first three games' capsules, fanned
  *   SE.dialogArt.fitWindow(root, { shrink })    grows a popped-out dialog's window to the
- *                                               rebuilt dialog (shrink: or sheds the room it
- *                                               doesn't use); returns the cancel
+ *                                               rebuilt dialog, taller or wider (shrink: or
+ *                                               sheds the height it doesn't use); returns
+ *                                               the cancel
  *   SE.dialogArt.count(n, one, many)            "1 game", "1,204 games"
  *   SE.dialogArt.names(names)                   several games' names: "A and B", "A, B and 3 more"
  */
@@ -110,9 +111,13 @@
       // A body that scrolls hides its overflow from the dialog's own height: add what it hides
       const body = root.querySelector('.DialogBody');
       const hidden = body ? body.scrollHeight - body.clientHeight : 0;
-      const need = Math.ceil(Math.max(root.getBoundingClientRect().top + root.scrollHeight, innerHeight + hidden));
-      if (need > innerHeight + 1) {
-        SE.run(() => win.ResizeTo(innerWidth, Math.min(need, screen.availHeight || need), true));
+      const box = root.getBoundingClientRect();
+      const need = Math.ceil(Math.max(box.top + root.scrollHeight, innerHeight + hidden));
+      // A dialog wider than Steam's (its min-width) is cut at the window's right edge: the same
+      // margin both sides
+      const needW = Math.ceil(Math.max(2 * Math.max(box.left, 0) + root.scrollWidth, innerWidth));
+      if (need > innerHeight + 1 || needW > innerWidth + 1) {
+        SE.run(() => win.ResizeTo(Math.min(needW, screen.availWidth || needW), Math.min(need, screen.availHeight || need), true));
         return;
       }
       if (!shrink) return;

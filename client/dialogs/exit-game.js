@@ -49,10 +49,13 @@
     const cancel = root.querySelector('.DialogFooter .DialogButton:not(.Primary)');
     SE.attr(ok, 'aria-label', 'Exit game');
     SE.attr(cancel, 'aria-label', 'Keep playing');
+    // From the overlay it opens in its own window, sized to Steam's smaller dialog
+    const unfit = SE.dialogArt.fitWindow(root);
 
     return {
       root,
       destroy() {
+        unfit();
         for (const node of nodes) node?.remove();
         SE.unmark(root, ROOT);
         SE.unmark(ok, 'aria-label');
