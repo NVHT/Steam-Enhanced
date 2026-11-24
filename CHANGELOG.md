@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.4.3**](#v1-4-3) | Nov 24, 2026 | Fixes: the overlay's Exit game?, review colours, centred labels |
 | [**1.4.2**](#v1-4-2) | Nov 24, 2026 | A Home tab and switch, Linux menu fix, splash and startup fixes |
 | [**1.4.1**](#v1-4-1) | Nov 24, 2026 | Stage toasts in the corner, Click opens Page first, core icons on the web |
 | [**1.4.0**](#v1-4-0) | Nov 24, 2026 | Theme settings in a window of their own, colour presets, a quality pass |
@@ -22,11 +23,28 @@
 
 <br>
 
+<a name="v1-4-3"></a>
+
+## 1.4.3 · Nov 24, 2026
+
+> The overlay's Exit game? shows in full, positive review scores keep their colour under any preset, and button and chip labels sit centred.
+
+**Fixes**
+- **Overlay**: Exit game? opens in a window sized to Steam's smaller dialog and was cut off, buttons included; its window now fits the dialog.
+- **Store**: positive review scores no longer follow the colour preset (mixed and negative never did).
+- **Store game page**: the Buy row's labels are centred, View Your Queue included.
+- **Game page**: the feature chips' labels (Single-Player, Achievements…) are centred.
+
+**Under the hood**
+- The element picker (a theming aid) captures again.
+
+<br>
+
 <a name="v1-4-2"></a>
 
-## 1.4.2 · Nov 24, 2026
-
-> Home gets its own settings tab and a switch in the title bar, menus stop showing black on Linux, and the splash and startup screens show the right game and account.
+<details>
+<summary><b>1.4.2</b> · Nov 24, 2026 · Home gets its own settings tab and a switch in the title bar, menus stop showing black on Linux, and the splash and startup screens show the right game and account.</summary>
+<br>
 
 **Settings**
 - **Home tab**: the Home stage's games, details, picker, auto-switch and background, and Steam's own Home as a choice, all in the settings window (the stage's menu edits the same).
@@ -41,6 +59,8 @@
 
 **Under the hood**
 - Files past 40 KB are split into parts beside them.
+
+</details>
 
 <br>
 
