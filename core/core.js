@@ -331,157 +331,102 @@
 })();
 
 /*
- * Element picker (dev/inspector.js), a theming aid: Ctrl+Shift+E in any Steam window or
- * web page. Loaded only on the first press, so it costs nothing until then, or at once when
- * its "Catch next dialog" wait is armed in this tab (it survives a reload to catch dialogs
- * a page shows while it loads).
+ * Dev hotkeys, theming and performance aids: Ctrl+Shift+<key> loads a dev/ script on its first
+ * press, so each costs nothing until then. One listener for all; a key whose `ready` fails
+ * passes through to Steam untouched.
  */
 (() => {
-  if (window.__seInspectorHotkey) return;
-  window.__seInspectorHotkey = true;
+  if (window.__seDevHotkeys) return;
+  window.__seDevHotkeys = true;
   const coreSrc = document.currentScript?.src ||
     [...document.scripts].find((script) => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;
-  const load = () => {
-    if (!coreSrc) {
-      console.warn('[Steam Enhanced] Element picker: theme folder not found from this window.');
-      return;
-    }
+  // A dev/ script, fresh from disk unless `cached` (perf.js: the loader loads it plain too)
+  const load = (file, cached = false) => {
     const script = document.createElement('script');
-    const url = new URL('../dev/inspector.js', coreSrc);
-    url.searchParams.set('v', String(Date.now()));
+    const url = new URL(`../dev/${file}`, coreSrc);
+    if (!cached) url.searchParams.set('v', String(Date.now()));
     script.src = url.href;
     (document.head ?? document.documentElement).append(script);
   };
+  const loadInspector = () => {
+    if (coreSrc) load('inspector.js');
+    else console.warn('[Steam Enhanced] Element picker: theme folder not found from this window.');
+  };
+  const inClient = () => Boolean(window.__seClient && coreSrc);
+
+  // event.code → { alt: Alt allowed, ready: client-only gate, run }
+  const HOTKEYS = new Map([
+    // Element picker (inspector.js): any Steam window or web page; later presses toggle it
+    ['KeyE', { run: () => (window.__seInspector ? window.__seInspector.toggle() : loadInspector()) }],
+    // Startup preview (startup-preview.js): draws the startup window's screens; runs client/startup/
+    ['KeyL', { ready: inClient, run: () => load('startup-preview.js') }],
+    // Dialog launcher (dialog-launcher.js): opens Steam's own dialogs; later presses toggle it
+    [
+      'KeyD',
+      {
+        ready: inClient,
+        run: () => (window.__seDialogLauncher ? window.__seDialogLauncher.toggle() : load('dialog-launcher.js')),
+      },
+    ],
+    // Toast preview (toast-preview.js): fires Steam's test toasts; later presses toggle it
+    [
+      'KeyT',
+      {
+        ready: inClient,
+        run: () => (window.__seToastPreview ? window.__seToastPreview.toggle() : load('toast-preview.js')),
+      },
+    ],
+    // Profiler (perf.js): arms it in every client window (localStorage "se-perf"; client/loader.js
+    // then loads it before the runtime) and opens its panel here
+    [
+      'KeyP',
+      {
+        run: () => {
+          if (window.__sePerf) return window.__sePerf.toggle();
+          if (!coreSrc) return;
+          try {
+            localStorage.setItem('se-perf', '1');
+          } catch {}
+          load('perf.js', true);
+        },
+      },
+    ],
+    // Dev reload (client/loader.js devReload): stylesheets, with Alt scripts too, in every client
+    // window. Armed only while dev/live-reload.json says {"enabled": true} (excluded from git),
+    // read at each press, so released builds never reload.
+    [
+      'KeyU',
+      {
+        alt: true,
+        ready: () => Boolean(window.__seClient?.devReload && coreSrc),
+        run: (event) => {
+          const scripts = event.altKey;
+          fetch(new URL(`../dev/live-reload.json?t=${Date.now()}`, coreSrc), { cache: 'no-store' })
+            .then((response) => (response.ok ? response.json() : null))
+            .then((config) => {
+              if (config?.enabled) window.__seClient.devReload(scripts);
+            })
+            .catch(() => {});
+        },
+      },
+    ],
+  ]);
+
   addEventListener(
     'keydown',
     (event) => {
-      if (!event.ctrlKey || !event.shiftKey || event.altKey || event.metaKey || event.code !== 'KeyE') return;
+      const hotkey = HOTKEYS.get(event.code);
+      if (!hotkey || !event.ctrlKey || !event.shiftKey || event.metaKey || (event.altKey && !hotkey.alt)) return;
+      if (hotkey.ready && !hotkey.ready()) return;
       event.preventDefault();
       event.stopPropagation();
-      if (window.__seInspector) window.__seInspector.toggle();
-      else load();
+      hotkey.run(event);
     },
     true
   );
+  // The picker's "Catch next dialog" wait survives a reload to catch dialogs a page shows while
+  // it loads: armed in this tab, load it at once
   try {
-    if (sessionStorage.getItem('se-inspector-catch') === '1') load();
+    if (sessionStorage.getItem('se-inspector-catch') === '1') loadInspector();
   } catch {} // storage blocked: no armed catch to resume
-})();
-
-/*
- * Startup preview (dev/startup-preview.js), a theming aid: Ctrl+Shift+L in a client window
- * draws the startup window's screens. Loaded only on the first press.
- */
-(() => {
-  if (window.__seStartupPreviewHotkey) return;
-  window.__seStartupPreviewHotkey = true;
-  const coreSrc = document.currentScript?.src ||
-    [...document.scripts].find((script) => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;
-  addEventListener(
-    'keydown',
-    (event) => {
-      if (!event.ctrlKey || !event.shiftKey || event.altKey || event.metaKey || event.code !== 'KeyL') return;
-      if (!window.__seClient || !coreSrc) return; // client windows only: it runs client/startup/
-      event.preventDefault();
-      event.stopPropagation();
-      const script = document.createElement('script');
-      const url = new URL('../dev/startup-preview.js', coreSrc);
-      url.searchParams.set('v', String(Date.now()));
-      script.src = url.href;
-      (document.head ?? document.documentElement).append(script);
-    },
-    true
-  );
-})();
-
-/*
- * Dialog launcher (dev/dialog-launcher.js), a theming aid: Ctrl+Shift+D in a client window
- * opens Steam's dialogs on demand. Loaded only on the first press; later presses hide or show it.
- */
-(() => {
-  if (window.__seDialogLauncherHotkey) return;
-  window.__seDialogLauncherHotkey = true;
-  const coreSrc = document.currentScript?.src ||
-    [...document.scripts].find((script) => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;
-  addEventListener(
-    'keydown',
-    (event) => {
-      if (!event.ctrlKey || !event.shiftKey || event.altKey || event.metaKey || event.code !== 'KeyD') return;
-      if (!window.__seClient || !coreSrc) return; // client windows only: it opens Steam's own dialogs
-      event.preventDefault();
-      event.stopPropagation();
-      if (window.__seDialogLauncher) {
-        window.__seDialogLauncher.toggle();
-        return;
-      }
-      const script = document.createElement('script');
-      const url = new URL('../dev/dialog-launcher.js', coreSrc);
-      url.searchParams.set('v', String(Date.now()));
-      script.src = url.href;
-      (document.head ?? document.documentElement).append(script);
-    },
-    true
-  );
-})();
-
-/*
- * Profiler (dev/perf.js), a performance aid: Ctrl+Shift+P arms it in every client window
- * (localStorage "se-perf"; client/loader.js then loads it before the runtime) and opens its
- * panel here. Costs nothing until pressed.
- */
-(() => {
-  if (window.__sePerfHotkey) return;
-  window.__sePerfHotkey = true;
-  const coreSrc = document.currentScript?.src ||
-    [...document.scripts].find((script) => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;
-  addEventListener(
-    'keydown',
-    (event) => {
-      if (!event.ctrlKey || !event.shiftKey || event.altKey || event.metaKey || event.code !== 'KeyP') return;
-      event.preventDefault();
-      event.stopPropagation();
-      if (window.__sePerf) {
-        window.__sePerf.toggle();
-        return;
-      }
-      if (!coreSrc) return;
-      try {
-        localStorage.setItem('se-perf', '1');
-      } catch {}
-      const script = document.createElement('script');
-      script.src = new URL('../dev/perf.js', coreSrc).href;
-      (document.head ?? document.documentElement).append(script);
-    },
-    true
-  );
-})();
-
-/*
- * Dev reload (client/loader.js devReload), a theming aid: Ctrl+Shift+U in a client window loads
- * every client window's stylesheets again, Ctrl+Shift+Alt+U their scripts too, without Reload
- * UI. Armed only while dev/live-reload.json says {"enabled": true} (excluded from git), read at
- * each press, so released builds never reload.
- */
-(() => {
-  if (window.__seDevReloadHotkey) return;
-  window.__seDevReloadHotkey = true;
-  const coreSrc = document.currentScript?.src ||
-    [...document.scripts].find((script) => /\/core\/core\.js(?:[?#]|$)/.test(script.src))?.src;
-  addEventListener(
-    'keydown',
-    (event) => {
-      if (!event.ctrlKey || !event.shiftKey || event.metaKey || event.code !== 'KeyU') return;
-      if (!window.__seClient?.devReload || !coreSrc) return; // client windows only
-      event.preventDefault();
-      event.stopPropagation();
-      const scripts = event.altKey;
-      fetch(new URL(`../dev/live-reload.json?t=${Date.now()}`, coreSrc), { cache: 'no-store' })
-        .then((response) => (response.ok ? response.json() : null))
-        .then((config) => {
-          if (config?.enabled) window.__seClient.devReload(scripts);
-        })
-        .catch(() => {});
-    },
-    true
-  );
 })();
