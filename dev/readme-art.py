@@ -35,7 +35,7 @@ ICONS = {
     'downloads': 'install',
     'overlay': 'tv',
     'startup': 'power',
-    'about': 'info',
+    'settings': 'settings',
     'toasts': 'bell',
 }
 
