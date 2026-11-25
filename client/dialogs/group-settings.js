@@ -20,7 +20,6 @@
   const { run } = SE;
   const ROOT = 'data-se-groupset';
   const OURS = 'se-gs';
-  const COPIED_MS = 1500;
 
   const attempt = SE.attempt('Group settings');
   const isOurs = (node) => node.nodeType === 1 && !!node.closest?.(`.se-friend-head, .${OURS}-copy, .se-dialog-art`);
@@ -56,11 +55,15 @@
       }
       const cell = row.querySelector('.buttonCell');
       if (!cell || cell.querySelector(`.${OURS}-copy`)) return;
-      const copy = doc.createElement('button');
-      copy.type = 'button';
-      copy.className = `${OURS}-copy`;
-      copy.title = 'Copy link';
-      copy.setAttribute('aria-label', 'Copy link');
+      // The theme's copy button (SE.copyButton), filled to sit beside Delete
+      const copy = SE.copyButton({
+        text: () => row.querySelector('.inviteURLLink')?.value || '',
+        label: 'Copy link',
+        doc,
+        win: doc.defaultView,
+      });
+      copy.classList.add(`${OURS}-copy`);
+      copy.dataset.tone = 'button';
       cell.prepend(copy);
     });
   }
@@ -74,7 +77,6 @@
     const title = nav?.querySelector(`.${SE.C.NavTitle}`);
     if (!title) return null;
     const doc = root.ownerDocument;
-    const win = doc.defaultView;
 
     const { head, picture, destroy: unhead } = SE.chatHead(doc, group, run(() => group.name) || '');
     title.after(head);
@@ -83,24 +85,6 @@
     // A saved group's Leave shows as its icon alone (group-settings.css): its name on hover
     const leave = named ? nav.querySelector('.SVGIcon_ExitIcon')?.parentElement : null;
     if (leave && !leave.title) leave.title = leave.textContent.trim();
-
-    // A row's Copy: its link to the clipboard, the button ticked for a moment
-    const timers = new Set();
-    const onClick = (event) => {
-      const button = event.target.closest?.(`.${OURS}-copy`);
-      const url = button?.closest('tr')?.querySelector('.inviteURLLink')?.value;
-      if (!url) return;
-      SE.copy(url, win).then((copied) => {
-        if (!copied || !button.isConnected) return;
-        button.dataset.copied = '';
-        const timer = win.setTimeout(() => {
-          timers.delete(timer);
-          delete button.dataset.copied;
-        }, COPIED_MS);
-        timers.add(timer);
-      });
-    };
-    root.addEventListener('click', onClick);
 
     // Pages swap and rows load: the rows get theirs. The window keeps Steam's size; the page
     // scrolls under the head (group-settings.css)
@@ -112,8 +96,6 @@
       root,
       destroy() {
         changes.disconnect();
-        root.removeEventListener('click', onClick);
-        for (const timer of timers) win.clearTimeout(timer);
         for (const node of root.querySelectorAll(`.${OURS}-copy`)) node.remove();
         for (const cell of root.querySelectorAll('.dateCell[data-se-left]')) {
           delete cell.dataset.seLeft;

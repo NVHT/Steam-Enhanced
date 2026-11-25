@@ -1,0 +1,99 @@
+/*
+ * Settings › page specifics, continued from pages.css: Broadcast (client/settings/dialog/
+ * broadcast.js). The hero card is pages-hero.css; here, a screen of your last game as viewers
+ * see it: their chat at its place, the microphone and upload stats when on.
+ */
+.se-bc-screen {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 420px);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  transition: opacity var(--se-dur) var(--se-ease);
+}
+
+.se-bc-screen[data-off] {
+  opacity: .4;
+}
+
+.se-bc-screen > img {
+  position: absolute;
+  inset: 0;
+  z-index: var(--se-z-under);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--se-dur-slow) var(--se-ease);
+}
+
+.se-bc-screen[data-ready] > img {
+  opacity: 1;
+}
+
+/* Viewers' chat: three lines in a box at its place */
+.se-bc-chat {
+  position: absolute;
+  display: none;
+  gap: var(--se-space-half);
+  width: 30%;
+  padding: var(--se-space-1);
+  border-radius: var(--se-radius-xs);
+  background: var(--se-black-60);
+}
+
+.se-bc-chat > i {
+  height: 3px;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-white-40);
+}
+
+.se-bc-chat > i:nth-child(2) { width: 70%; }
+.se-bc-chat > i:nth-child(3) { width: 85%; }
+
+.se-bc-screen[data-chat] .se-bc-chat { display: grid; }
+.se-bc-screen[data-chat^="t"] .se-bc-chat { top: var(--se-space-2); }
+.se-bc-screen[data-chat^="b"] .se-bc-chat { bottom: var(--se-space-2); }
+.se-bc-screen[data-chat$="l"] .se-bc-chat { left: var(--se-space-2); }
+.se-bc-screen[data-chat$="r"] .se-bc-chat { right: var(--se-space-2); }
+
+.se-bc-screen[data-chat$="c"] .se-bc-chat {
+  left: 50%;
+  translate: -50% 0;
+}
+
+/* The microphone and upload stats: tags in the bottom corners, moved up when chat sits there */
+.se-bc-mic,
+.se-bc-stats {
+  position: absolute;
+  bottom: var(--se-space-2);
+  display: none;
+  padding: var(--se-space-half) var(--se-space-1);
+  border-radius: var(--se-radius-xs);
+  background: var(--se-black-60);
+  font: 700 var(--se-fs-2xs) / 1.2 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.se-bc-mic { left: var(--se-space-2); }
+.se-bc-stats { right: var(--se-space-2); }
+
+.se-bc-screen[data-mic] .se-bc-mic,
+.se-bc-screen[data-stats] .se-bc-stats {
+  display: block;
+}
+
+.se-bc-screen:is([data-chat="bl"], [data-chat="bc"]) .se-bc-mic,
+.se-bc-screen:is([data-chat="br"], [data-chat="bc"]) .se-bc-stats {
+  top: var(--se-space-2);
+  bottom: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-bc-screen,
+  .se-bc-screen > img {
+    transition: none;
+  }
+}

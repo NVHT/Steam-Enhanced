@@ -150,6 +150,8 @@
       best.closest(
         `${FIELD}, [data-se-c], .${C.RecordingModeOption}, .${C.ActionSection} button, .${C.NotificationSectionHeader}`
       ) || best;
+    // A page that hides some rows (In Game's tabs) shows the found one before it's scrolled to
+    for (const reveal of ns.revealers) reveal(row);
 
     let sc = row.parentElement;
     while (sc && sc !== document.body) {

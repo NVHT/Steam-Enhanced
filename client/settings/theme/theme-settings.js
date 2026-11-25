@@ -40,7 +40,7 @@
     spinner: 'refresh', 'game-list-width': 'view-expanded', 'dock-width': 'friends', toasts: 'bell',
     'toasts-in-game': 'console', 'toast-style': 'view-compact', 'toast-position': 'move', overlay: 'tv',
     'overlay-darkness': 'moon', 'click-opens': 'external', 'menu-hover': 'fold', shortcuts: 'key',
-    home: 'home', 'stage-source': 'heart', 'stage-count': 'list-ordered', 'stage-details': 'info',
+    home: 'home', 'steam-home-parts': 'grid', 'stage-source': 'heart', 'stage-count': 'list-ordered', 'stage-details': 'info',
     'stage-nav': 'view-compact', 'stage-cycle': 'restore', 'stage-motion': 'art-zoom',
     'hover-delay': 'snooze', 'avatar-name': 'user', 'game-count': 'chart', 'rail-buttons': 'list-ordered',
     'dock-start': 'power', 'chat-open': 'bubble', 'hover-cards': 'user', 'hover-card-delay': 'snooze',
@@ -255,11 +255,12 @@
       if (item.type === 'multi' || item.visual || item.values.length > 4) node.classList.add('se-ts-row-wide');
       const control = item.type === 'multi' ? toggles(item) : item.visual ? pictures(item) : segmented(item);
       node.append(text, control);
-      // A setting that applies only with others (requires) dims, its controls off, until they hold
+      // A setting that applies only with others (requires) dims, its controls off, until they hold;
+      // one marked hideOff goes instead (another choice brings settings of its own)
       if (item.requires) {
         updates.push(() => {
           const off = !item.requires.every(([key, value]) => settings.get(key) === value);
-          node.classList.toggle('se-ts-row-off', off);
+          node.classList.toggle(item.hideOff ? 'se-ts-row-gone' : 'se-ts-row-off', off);
           for (const control of node.querySelectorAll('button')) control.disabled = off;
         });
       }
@@ -277,7 +278,16 @@
       return [...groups].flatMap(([name, list]) => {
         const rows = make('div', 'se-ts-rows');
         rows.append(...list.map((item) => row(item)));
-        return name ? [heading(name), rows] : [rows];
+        const head = name ? heading(name) : null;
+        // A section whose every row is gone goes with them, its heading too
+        if (list.some((item) => item.hideOff)) {
+          updates.push(() => {
+            const gone = [...rows.children].every((node) => node.classList.contains('se-ts-row-gone'));
+            rows.classList.toggle('se-ts-row-gone', gone);
+            head?.classList.toggle('se-ts-row-gone', gone);
+          });
+        }
+        return head ? [head, rows] : [rows];
       });
     };
 
@@ -461,7 +471,11 @@
       else updates.forEach(run);
     });
 
+    // Typing searches once it pauses, not on every key: each search redraws the whole page
+    const SEARCH_MS = 120;
+    let searchTimer = 0;
     const showTab = (name) => {
+      clearTimeout(searchTimer);
       tab = name;
       query = '';
       input.value = '';
@@ -481,8 +495,11 @@
       tabButtons.get(next).focus();
     });
     input.addEventListener('input', () => {
-      query = input.value;
-      render();
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        query = input.value;
+        render();
+      }, SEARCH_MS);
     });
     render();
 
@@ -494,6 +511,7 @@
     view = { doc, destroy: null };
     const destroy = () => {
       cancelAnimationFrame(frame);
+      clearTimeout(searchTimer);
       off();
       host.replaceChildren();
       if (view?.doc === doc) view = null;

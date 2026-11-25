@@ -388,10 +388,9 @@
         iconChip.append(icon(kind));
         const title = el('h3', 'se-sysinfo-card-title', section.title);
         const count = el('span', 'se-sysinfo-card-count', String(section.rows.length));
-        const copy = button('se-sysinfo-card-copy', [icon('copy')], () => {
-          SE.copy(specsText([section]));
-          flash(copy);
-        }, 'Copy section');
+        const copy = SE.copyButton({ text: () => specsText([section]), label: 'Copy section' });
+        copy.classList.add('se-sysinfo-card-copy');
+        copy.removeAttribute('title'); // Steam's own tooltip names it
         tip(cardTips, copy, 'Copy section');
         const head = el('header', 'se-sysinfo-card-head');
         head.append(iconChip, title, count, copy);

@@ -1,0 +1,158 @@
+/*
+ * Settings › page specifics, continued from pages.css: the pages' hero card (ns.pageHero,
+ * client/settings/dialog/shared.js), first in a page's body.
+ *
+ *   [ Title                                          ]
+ *   [ A line under it                                ]
+ *   [ (the page's own parts: body)                   ]
+ *
+ * With art (data-art): the art fills the card behind it, the text's side darkened, the card
+ * taller. A page's own parts are its pages-<page>.css.
+ */
+.CFTLX2wIKOK3hNV-fS7_V .se-page-hero.se-page-view {
+  margin-top: var(--se-space-5);
+}
+
+/* A page's view that has nothing to say there (Controller's sub-views) */
+.se-page-hero[hidden] {
+  display: none;
+}
+
+.se-page-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex: none; /* the page's body is a flex column that would squeeze it */
+  flex-direction: column;
+  gap: var(--se-space-4);
+  padding: var(--se-space-5);
+  overflow: hidden;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+}
+
+.se-page-hero[data-art] {
+  justify-content: flex-end;
+  min-height: 168px;
+}
+
+/* The page's own parts, one under another */
+.se-page-hero-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-3);
+}
+
+/* Nothing to show: no parts, or all of them hidden (Downloads' bar while idle) */
+.se-page-hero-body:not(:has(> :not([hidden]))) {
+  display: none;
+}
+
+.se-page-hero-text {
+  min-width: 0;
+}
+
+.se-page-hero-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 800 var(--se-fs-2xl) / 1.3 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.se-page-hero-line {
+  margin-top: var(--se-space-1);
+  font: 500 var(--se-fs-base) / 1.45 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-page-hero-line:empty {
+  display: none;
+}
+
+/* ---------- Line art on the right ---------- */
+
+/* The page's drawing (side), centred on the card's right; the text keeps clear of it */
+.se-page-hero-side {
+  position: absolute;
+  top: 0;
+  right: var(--se-space-6);
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  pointer-events: none;
+}
+
+.se-page-hero-side:empty {
+  display: none;
+}
+
+.se-page-hero:has(> .se-page-hero-side:not(:empty)) > .se-page-hero-text {
+  padding-right: 240px;
+}
+
+/* ---------- Art behind the card ---------- */
+
+.se-page-hero-art {
+  position: absolute;
+  inset: 0;
+  z-index: var(--se-z-under);
+}
+
+.se-page-hero-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  opacity: 0;
+  transition: opacity var(--se-dur-slow) var(--se-ease);
+}
+
+.se-page-hero-art[data-ready] img {
+  opacity: 1;
+}
+
+.se-page-hero-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--se-surface) 0%, color-mix(in srgb, var(--se-surface) 70%, transparent) 45%, transparent 90%);
+}
+
+/* A row of covers: six across, in Steam's 98×45 header shape (Storage's list's) */
+.se-page-hero-covers {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--se-space-2);
+  transition: opacity var(--se-dur) var(--se-ease);
+}
+
+.se-page-hero-cover {
+  aspect-ratio: 98 / 45;
+  overflow: hidden;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-white-07);
+  transition: opacity var(--se-dur) var(--se-ease);
+}
+
+.se-page-hero-cover[hidden] {
+  display: none;
+}
+
+.se-page-hero-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-page-hero-art img,
+  .se-page-hero-covers,
+  .se-page-hero-cover {
+    transition: none;
+  }
+}

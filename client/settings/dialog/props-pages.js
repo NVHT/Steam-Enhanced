@@ -67,16 +67,6 @@
     return parseFloat(m[1].replace(',', '.')) * 1024 ** ' KMGT'.indexOf((m[2] || ' ').toUpperCase());
   }
 
-  function fmtBytes(n) {
-    const u = ['B', 'KB', 'MB', 'GB', 'TB'];
-    let i = 0;
-    while (n >= 1024 && i < u.length - 1) {
-      n /= 1024;
-      i++;
-    }
-    return `${n >= 100 || i === 0 ? Math.round(n) : n.toFixed(1)} ${u[i]}`;
-  }
-
   let folders = null;
   let folderAsk = 0;
 
@@ -96,9 +86,6 @@
     }
     return null;
   }
-
-  const COPY_SVG =
-    '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" fill="currentColor" fill-opacity=".32" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"></rect><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" fill="currentColor" fill-opacity=".32" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"></path></svg>';
 
   /*
    * General: the cloud space as help text and a bar inside the cloud toggle's row ("1.8 MB of
@@ -120,7 +107,7 @@
       }
       const total = Math.max(1, used + avail);
       box.querySelector('.se-pbar').style.setProperty('--f', Math.max(0.02, Math.min(1, used / total)).toFixed(4));
-      const label = `${fmtBytes(used)} of ${fmtBytes(total)}`;
+      const label = `${SE.bytes(used, { short: true })} of ${SE.bytes(total, { short: true })}`;
       const t = box.querySelector('.se-cloud-text');
       if (t.textContent !== label) t.textContent = label;
       if (box.parentElement !== column) column.append(box);
@@ -151,16 +138,8 @@
       let c = d.querySelector(':scope > .se-copy');
       const copyable = m && /^\d+$/.test(m[2]);
       if (copyable && !c) {
-        c = own('button', 'se-copy');
-        c.type = 'button';
-        c.title = 'Copy';
-        c.innerHTML = COPY_SVG;
-        c.addEventListener('click', (e) => {
-          e.stopPropagation();
-          SE.copy(c.parentElement?.getAttribute('data-se-v') || '');
-          c.setAttribute('data-done', '');
-          setTimeout(() => c.removeAttribute('data-done'), 1200);
-        });
+        c = SE.copyButton({ text: () => c.parentElement?.getAttribute('data-se-v') || '' });
+        c.setAttribute(OWN, 'settings');
         d.append(c);
       } else if (!copyable && c) {
         c.remove();
@@ -183,7 +162,7 @@
         disk = own('div', 'se-disk');
         disk.innerHTML = '<span class="se-disk-text"></span><div class="se-pbar"></div>';
       }
-      const t = `${fmtBytes(f.nFreeSpace)} free of ${fmtBytes(f.nCapacity)}`;
+      const t = `${SE.bytes(f.nFreeSpace, { short: true })} free of ${SE.bytes(f.nCapacity, { short: true })}`;
       const st = disk.querySelector('.se-disk-text');
       if (st.textContent !== t) st.textContent = t;
       disk.querySelector('.se-pbar').style.setProperty('--f', ((f.nCapacity - f.nFreeSpace) / f.nCapacity).toFixed(4));
@@ -220,7 +199,7 @@
     if (visit) setAttr(visit, 'data-se-paccent', '');
   }
   Object.assign(ns, {
-    OWN, P, PRE_FOR, PROPS_BLOCK, PROPS_NAMES, PROPS_ROOT, ROW_FOR, bytesOf, fmtBytes,
+    OWN, P, PRE_FOR, PROPS_BLOCK, PROPS_NAMES, PROPS_ROOT, ROW_FOR, bytesOf,
     propsFilesPage, propsGeneralPage, propsUpdatesPage, propsWorkshopPage,
   });
 })(window.__se);

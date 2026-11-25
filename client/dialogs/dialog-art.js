@@ -1,7 +1,8 @@
 /*
- * A rebuilt dialog's game art (Install, Uninstall, EULA, Mark as Private, New Collection, Exit
- * Game, CD Keys), or a friend's (Nickname, Notifications): the art behind its top (.se-dialog-art) and the game capsules
- * (.se-dialog-capsules), styled in client/dialogs/dialogs.css. Both work through a game's copies with Steam's own list first
+ * The art behind a rebuilt dialog's top (.se-dialog-art) and its game capsules
+ * (.se-dialog-capsules), styled in client/dialogs/dialogs.css: a game's art in the game and
+ * collection dialogs, a friend's or a group's in the friend and group dialogs; also used beyond
+ * client/dialogs/ (the Settings window's pages, client/shared/mini-profile.js). Both work through a game's copies with Steam's own list first
  * (SE.heroURLs / SE.headerURLs, SE.art in core/runtime-art.js), so newer games' hashed art loads,
  * and both are marked [data-ready] once their image has loaded.
  *

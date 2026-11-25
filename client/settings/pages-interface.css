@@ -1,0 +1,238 @@
+/*
+ * Settings › page specifics, continued from pages.css: Interface.
+ */
+
+/*
+ * Interface (client/settings/dialog/interface.js): a hero over Steam's rows, a live preview of
+ * the client on its right and what it says on its left.
+ *
+ *   [ Opens on Library                  [ ·Beta·      (bell) 9:40 PM ] ]
+ *   [ When your computer starts         [ wireframe: the start page  ] ]
+ *   [ (English · Hello) (Drawn at 150%) [                            ] ]
+ *   [ Language ····························· [English] ]
+ *
+ * Narrower, the hero goes.
+ */
+[id$="/settings/interface_Content"] .DialogBody > .se-ifc-preview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  align-items: center;
+  gap: var(--se-space-5);
+  margin-top: var(--se-space-5);
+  padding: var(--se-space-5);
+  border-radius: var(--se-radius-xl);
+  background: linear-gradient(110deg, var(--se-surface) 40%, color-mix(in srgb, var(--se-accent) 10%, var(--se-surface)) 100%);
+  box-shadow: var(--se-edge);
+}
+
+/* The window: its bar, then the wireframe at the scale Steam draws at */
+.se-ifc-window {
+  --se-ifc-u: calc(360px / 1920);
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+  /* No ground of its own: the faint wireframe straight on the card, a faint outline around it */
+  box-shadow: inset 0 0 0 1px var(--se-white-14);
+}
+
+.se-ifc-window[data-scaled] {
+  --se-ifc-u: calc(360px / 1920 * 1.25);
+}
+
+.se-ifc-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--se-space-2);
+  height: 24px;
+  padding: 0 var(--se-space-3);
+  box-shadow: inset 0 -1px 0 var(--se-hairline);
+  font: 600 var(--se-fs-xs) / 1 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-ifc-beta {
+  display: none;
+  margin-right: auto;
+  padding: var(--se-space-half) var(--se-space-1);
+  border-radius: var(--se-radius-xs);
+  background: var(--se-accent-tint);
+  font: 700 var(--se-fs-2xs) / 1 var(--se-font);
+  color: var(--se-accent);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.se-ifc-beta[data-on] {
+  display: block;
+}
+
+/* The bell (its own pseudo-element), a dot on it when Steam may tell you about games */
+.se-ifc-bell {
+  position: relative;
+  width: 12px;
+  height: 12px;
+}
+
+.se-ifc-bell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-bell) center / contain no-repeat;
+  mask: var(--se-icon-bell) center / contain no-repeat;
+}
+
+.se-ifc-bell[data-on]::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--se-accent);
+}
+
+.se-ifc-clock {
+  font-variant-numeric: tabular-nums;
+}
+
+.se-ifc-screen {
+  position: relative;
+  aspect-ratio: 16 / 10;
+}
+
+/* The wireframe fills the screen: the window is its frame */
+.se-ifc-screen > .se-wf {
+  --u: var(--se-ifc-u);
+  position: absolute;
+  inset: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Ask which account: the picker over the client, as Steam opens */
+.se-ifc-account {
+  position: absolute;
+  inset: 24px 0 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--se-space-3);
+  background: color-mix(in srgb, var(--se-bg-ink) 78%, transparent);
+}
+
+.se-ifc-account[data-on] {
+  display: flex;
+}
+
+.se-ifc-account > b {
+  width: 36px;
+  height: 36px;
+  border-radius: 23%;
+  box-shadow: inset 0 0 0 2px var(--se-accent-line);
+}
+
+.se-ifc-account > b:first-child {
+  box-shadow: inset 0 0 0 2px var(--se-accent);
+}
+
+/* The left side: where and when Steam opens, then the chips */
+.se-ifc-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.se-ifc-title {
+  font: 800 var(--se-fs-2xl) / 1.3 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.se-ifc-line {
+  margin-top: var(--se-space-1);
+  font: 500 var(--se-fs-base) / 1.45 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-ifc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  margin-top: var(--se-space-4);
+}
+
+.se-ifc-chip {
+  display: inline-flex;
+  align-items: center;
+  height: var(--se-chip-h);
+  padding: var(--se-chip-pad);
+  border-radius: var(--se-radius-control);
+  background: var(--se-chip-bg);
+  font: var(--se-chip-font);
+  color: var(--se-text-muted);
+}
+
+.se-ifc-chip:empty {
+  display: none;
+}
+
+/* A row hovered: its part lit, the rest of the preview quieter */
+.se-ifc-preview :is(.se-ifc-window, .se-ifc-chip, .se-ifc-title, .se-ifc-line, .se-ifc-bar > *) {
+  transition: opacity var(--se-dur) var(--se-ease), box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-ifc-preview[data-focus] .se-ifc-chip:not([data-lit]) {
+  opacity: .5;
+}
+
+.se-ifc-preview[data-focus] :is(.se-ifc-title, .se-ifc-line):not([data-lit]) {
+  opacity: .5;
+}
+
+.se-ifc-preview :is(.se-ifc-title, .se-ifc-line)[data-lit] {
+  color: var(--se-accent);
+}
+
+.se-ifc-chip[data-lit] {
+  opacity: 1;
+  background: var(--se-chip-bg-on);
+  box-shadow: var(--se-chip-edge-on);
+  color: var(--se-text-strong);
+}
+
+/* The bell and the clock: a ring round them, not a fill */
+.se-ifc-bar > [data-lit] {
+  border-radius: var(--se-radius-xs);
+  outline: 2px solid var(--se-accent);
+  outline-offset: 2px;
+}
+
+.se-ifc-window[data-lit],
+.se-ifc-screen[data-lit] {
+  box-shadow: inset 0 0 0 2px var(--se-accent);
+}
+
+/* The screen's ring above the wireframe */
+.se-ifc-screen[data-lit]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--se-z-raised);
+  box-shadow: inset 0 0 0 2px var(--se-accent);
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  [id$="/settings/interface_Content"] .DialogBody > .se-ifc-preview {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-ifc-preview :is(.se-ifc-window, .se-ifc-chip, .se-ifc-title, .se-ifc-line, .se-ifc-bar > *) {
+    transition: none;
+  }
+}

@@ -1,0 +1,219 @@
+/*
+ * Settings › page specifics, continued from pages.css: Controller (client/settings/dialog/
+ * controller.js). The hero card is pages-hero.css; here, its picture on the right, one per view of
+ * the page (data-ctl-mode):
+ * - list: Steam's drawings of its hardware in a row, upright, each brighter while one of its kind
+ *   is connected
+ * - details: the controller's face buttons as games show them, buzz marks while rumble is on
+ * - advanced: the controller families through Steam Input, or around it, to the game
+ * - add: Steam's Steam Controller drawing and its cable on the way in (add-any: the list's
+ *   drawings), in place of Steam's picture; its Bluetooth note a card of its own
+ *
+ * Every picture's height comes from the card's width (--se-ctl-art-h: a wider card gets a bigger
+ * one, up to a cap), the card grows to hold it whole, and the text keeps clear of it: its width is
+ * that height times the picture's aspect ratio (the list's drawings summed: triton 456/320, deck
+ * 449/181, frame 728.9/648: ~5.03; the face 160/120; the map 440/128; the plug: triton and its
+ * cable 200/140, ~2.85), plus its gaps.
+ */
+[id$="/settings/controller/:type/:controllerIndex_Content"] .se-page-hero {
+  --se-ctl-art-h: clamp(64px, 11cqw, 120px);
+  container-type: inline-size;
+}
+
+[id$="/settings/controller/:type/:controllerIndex_Content"] .se-page-hero > .se-page-hero-text {
+  min-height: calc(var(--se-ctl-art-h) - var(--se-space-3)); /* the card: the picture and a margin */
+}
+
+[id$="/settings/controller/:type/:controllerIndex_Content"] .se-page-hero > .se-page-hero-side {
+  right: var(--se-space-5);
+}
+
+[id$="/settings/controller/:type/:controllerIndex_Content"] .se-page-hero:is([data-ctl-mode="list"], [data-ctl-mode="add-any"]) > .se-page-hero-text {
+  padding-right: calc(5.03 * var(--se-ctl-art-h) + 2 * var(--se-space-4) + var(--se-space-6));
+}
+
+[id$="/settings/controller/:type/:controllerIndex_Content"] .se-page-hero[data-ctl-mode="details"] > .se-page-hero-text {
+  padding-right: calc(4 / 3 * var(--se-ctl-art-h) + var(--se-space-6));
+}
+
+[id$="/settings/controller/:type/:controllerIndex_Content"] .se-page-hero[data-ctl-mode="add"] > .se-page-hero-text {
+  padding-right: calc(2.85 * var(--se-ctl-art-h) + var(--se-space-6));
+}
+
+/* The map, bigger than the other pictures: its labels need room */
+[id$="/settings/controller/:type/:controllerIndex_Content"] .se-page-hero[data-ctl-mode="advanced"] {
+  --se-ctl-art-h: clamp(130px, 18cqw, 170px);
+}
+
+[id$="/settings/controller/:type/:controllerIndex_Content"] .se-page-hero[data-ctl-mode="advanced"] > .se-page-hero-text {
+  padding-right: calc(440 / 128 * var(--se-ctl-art-h) + var(--se-space-6));
+}
+
+/* ---------- The list ---------- */
+
+.se-ctl-art {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-4);
+}
+
+/* Steam's drawings as lines alone (controller.js), every line one tone, faint by default */
+.se-ctl-piece {
+  flex: none;
+  height: var(--se-ctl-art-h);
+  opacity: .5;
+  transition: opacity var(--se-dur-mid) var(--se-ease);
+}
+
+.se-ctl-piece > svg {
+  display: block;
+  width: auto;
+  height: 100%;
+}
+
+.se-ctl-piece > svg [stroke]:not([stroke="none"]) {
+  stroke: var(--se-text-strong);
+}
+
+.se-ctl-piece > svg [fill]:not([fill="none"]) {
+  fill: var(--se-text-strong);
+}
+
+.se-ctl-piece[data-lit] {
+  opacity: .85;
+}
+
+/* ---------- Details: the face buttons ---------- */
+
+.se-ctl-face,
+.se-ctl-map {
+  display: block;
+  width: auto;
+  height: var(--se-ctl-art-h);
+  overflow: visible;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.se-ctl-btn {
+  stroke: var(--se-text-muted);
+  stroke-width: 2;
+}
+
+.se-ctl-face > :is(path, rect, circle):not(.se-ctl-btn, .se-ctl-buzz) {
+  stroke: var(--se-text-strong);
+  stroke-width: 2;
+}
+
+.se-ctl-letter {
+  fill: var(--se-text-strong);
+  stroke: none;
+  font: 700 var(--se-fs-lg) var(--se-font); /* the SVG's own units, scaled with it */
+}
+
+/* A universal glyph's dots: the button's own place filled */
+.se-ctl-face g > circle {
+  stroke: var(--se-text-strong);
+  stroke-width: 1.4;
+  opacity: .5;
+}
+
+.se-ctl-face g > circle.se-ctl-dot-on {
+  fill: var(--se-text-strong);
+  opacity: 1;
+}
+
+.se-ctl-buzz {
+  stroke: var(--se-accent);
+  stroke-width: 2;
+}
+
+/* ---------- Advanced: the Steam Input map ---------- */
+
+.se-ctl-link {
+  stroke: var(--se-text-faint);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 4;
+  opacity: .6;
+}
+
+.se-ctl-link:is([data-state="on"], [data-state="part"]) {
+  stroke: var(--se-accent);
+  stroke-width: 2;
+  opacity: 1;
+}
+
+.se-ctl-link[data-state="on"] {
+  stroke-dasharray: none;
+}
+
+.se-ctl-link[data-state="part"] {
+  stroke-dasharray: 6 4;
+}
+
+.se-ctl-family {
+  fill: var(--se-text-faint);
+  font: 600 var(--se-fs-md) var(--se-font); /* the SVG's own units, scaled with it */
+}
+
+.se-ctl-family:is([data-state="on"], [data-state="part"]) {
+  fill: var(--se-text-strong);
+}
+
+.se-ctl-node rect {
+  fill: var(--se-surface-2);
+  stroke: var(--se-text-muted);
+  stroke-width: 1.5;
+}
+
+.se-ctl-node[data-on] rect {
+  stroke: var(--se-accent);
+}
+
+.se-ctl-node text {
+  fill: var(--se-text-strong);
+  font: 700 var(--se-fs-md) var(--se-font);
+}
+
+/* ---------- Add a new controller ---------- */
+
+.se-ctl-plug {
+  display: flex;
+  align-items: center;
+}
+
+.se-ctl-cable {
+  display: block;
+  width: auto;
+  height: var(--se-ctl-art-h);
+  fill: none;
+  stroke: var(--se-text-muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.se-ctl-cable-arrow {
+  stroke: var(--se-accent);
+}
+
+/* Steam's picture and Puck note while connecting: the hero card shows them (controller.js) */
+[id$="/settings/controller/:type/:controllerIndex_Content"] [data-se-ctl-moved] {
+  display: none;
+}
+
+/* Steam's Bluetooth note as a card, its separator gone */
+[id$="/settings/controller/:type/:controllerIndex_Content"] :has(+ [data-se-ctl-bluetooth]) {
+  display: none;
+}
+
+[id$="/settings/controller/:type/:controllerIndex_Content"] [data-se-ctl-bluetooth] {
+  margin-top: var(--se-space-4);
+  padding: var(--se-space-4) var(--se-space-5);
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+  font: var(--se-fs-base) / 1.5 var(--se-font);
+  color: var(--se-text-muted);
+}

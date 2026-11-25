@@ -1,0 +1,193 @@
+/*
+ * Settings › page specifics, continued from pages.css: Store.
+ */
+
+/*
+ * Store (client/settings/dialog/store.js): a hero (pages-hero.css) over Steam's preference rows
+ * as tiles in three groups.
+ *
+ *   [ Your Store             (Store front, ]
+ *   [ What it shows you…  as a wireframe) ]
+ *   WHAT YOU SEE
+ *   [ Mature ] [ Exclude ] [ Platforms ]
+ *   QUEUES
+ *   [ Discovery ] [ New on Steam ]
+ *   MORE
+ *   [ Steam Deck ] [ Broadcasts ]
+ *
+ * The groups' order is CSS's (order: each row's group and place, --se-store-i), so Steam's nodes
+ * stay where they are. Narrower, two tiles a row.
+ */
+[id$="/settings/store_Content"] .DialogBody:has(> .se-page-hero):not(#se-none) {
+  display: grid !important; /* !important: the theme's DialogBody reset (layout.css) */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--se-space-3);
+  align-content: start;
+}
+
+[id$="/settings/store_Content"] .DialogBody > :is(.se-page-hero, .se-store-head) {
+  grid-column: 1 / -1;
+}
+
+/*
+ * The hero: the theme's Store front page on its right (store.js), the wireframe's page alone,
+ * drawn 420px wide (its page is 1400 units of the client's 1920) straight on the card in a faint
+ * outline, rising from its foot, cut by its edge. Its lines a step brighter than the wireframe's
+ * own, so the page reads at a glance.
+ */
+[id$="/settings/store_Content"] .se-page-hero {
+  min-height: 200px;
+  justify-content: flex-end;
+}
+
+[id$="/settings/store_Content"] .se-page-hero > .se-page-hero-side {
+  top: var(--se-space-5);
+  align-items: flex-start;
+}
+
+[id$="/settings/store_Content"] .se-page-hero:has(> .se-page-hero-side:not(:empty)) > .se-page-hero-text {
+  padding-right: 460px;
+}
+
+.se-store-front {
+  width: 420px;
+  aspect-ratio: 1400 / 1080;
+  overflow: hidden;
+  border-radius: var(--se-radius-md);
+  box-shadow: inset 0 0 0 1px var(--se-white-14); /* a faint outline, as Interface's preview window */
+}
+
+.se-store-front > .se-wf {
+  --u: calc(420px / 1400);
+  --se-wf-line: color-mix(in srgb, var(--se-accent) 38%, transparent);
+  --se-wf-line-soft: color-mix(in srgb, var(--se-accent) 22%, transparent);
+  --se-wf-line-strong: color-mix(in srgb, var(--se-accent) 70%, transparent);
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* The page alone: the client around it left out */
+.se-store-front :is(.se-wf-rail, .se-wf-list, .se-wf-friends, .se-wf-sweep) {
+  display: none;
+}
+
+/* Each group's heading, then its tiles in their order */
+[id$="/settings/store_Content"] .DialogBody > [data-group="see"] { order: 10; }
+[id$="/settings/store_Content"] .DialogBody > [data-group="queues"] { order: 20; }
+[id$="/settings/store_Content"] .DialogBody > [data-group="more"] { order: 30; }
+[id$="/settings/store_Content"] .DialogBody > [data-se-store-group="see"] { order: calc(11 + var(--se-store-i)); }
+[id$="/settings/store_Content"] .DialogBody > [data-se-store-group="queues"] { order: calc(21 + var(--se-store-i)); }
+[id$="/settings/store_Content"] .DialogBody > [data-se-store-group="more"] { order: calc(31 + var(--se-store-i)); }
+
+/* ---------- Group headings ---------- */
+
+.se-store-head {
+  margin: var(--se-space-4) 0 calc(-1 * var(--se-space-1));
+  padding: 0 var(--se-space-1);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  color: var(--se-label-color);
+}
+
+/* ---------- The tiles ---------- */
+
+/*
+ * Each row its own card, laid out as a tile: the icon at the top, the label and its line under
+ * it, the Manage button as an open glyph in the corner. [data-se-c] twice and !important: the
+ * card rows' look and the row icon's place (layout.css, controls.css), themselves !important
+ * against Steam's.
+ */
+[id$="/settings/store_Content"] .DialogBody > [data-se-store-group][data-se-c][data-se-c]:not(#se-none) {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  min-height: 140px !important;
+  margin: 0 !important;
+  padding: 68px var(--se-space-4) var(--se-space-4) !important;
+  border-radius: var(--se-radius-lg) !important;
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur) var(--se-ease);
+}
+
+[id$="/settings/store_Content"] .DialogBody > [data-se-store-group][data-se-c][data-se-c]:hover:not(#se-none) {
+  background: color-mix(in srgb, var(--se-hover), var(--se-surface)) !important;
+}
+
+[id$="/settings/store_Content"] .DialogBody > [data-se-store-group][data-se-c][data-se-c]:focus-within:not(#se-none) {
+  box-shadow: var(--se-edge), inset 0 0 0 2px var(--se-accent) !important;
+}
+
+/* The icon's tile and glyph at the top left */
+[id$="/settings/store_Content"] .DialogBody > [data-se-store-group][data-se-c][data-se-row]::before {
+  top: var(--se-space-4);
+  left: var(--se-space-4);
+  margin-top: 0;
+}
+
+[id$="/settings/store_Content"] .DialogBody > [data-se-store-group][data-se-c][data-se-row]::after {
+  top: calc(var(--se-space-4) + 8.5px);
+  left: calc(var(--se-space-4) + 8.5px);
+  margin-top: 0;
+}
+
+/* The label and its line fill the tile */
+[id$="/settings/store_Content"] .DialogBody > [data-se-store-group] > .FieldLeftColumn:not(#se-none) {
+  flex: none !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+/*
+ * Manage: an open glyph in the tile's top right (the whole tile runs it, store.js). Its words
+ * stay for screen readers. !important: Steam's dialog button sizes and padding.
+ */
+[id$="/settings/store_Content"] .DialogBody > [data-se-store-group] > .FieldRightColumn:not(#se-none) {
+  position: absolute !important;
+  top: var(--se-space-4);
+  right: var(--se-space-4);
+  margin: 0 !important;
+}
+
+[id$="/settings/store_Content"] .DialogBody > [data-se-store-group] button.DialogButton:not(#se-none) {
+  position: relative;
+  width: 34px !important;
+  min-width: 0 !important;
+  height: 34px !important;
+  padding: 0 !important;
+  overflow: hidden;
+  font-size: 0 !important;
+  color: var(--se-text-muted) !important;
+}
+
+[id$="/settings/store_Content"] .DialogBody > [data-se-store-group] button.DialogButton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-external) center / contain no-repeat;
+  mask: var(--se-icon-external) center / contain no-repeat;
+}
+
+[id$="/settings/store_Content"] .DialogBody > [data-se-store-group]:hover button.DialogButton:not(#se-none) {
+  color: var(--se-text-strong) !important;
+}
+
+@media (max-width: 760px) {
+  [id$="/settings/store_Content"] .DialogBody:has(> .se-page-hero):not(#se-none) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [id$="/settings/store_Content"] .DialogBody > [data-se-store-group][data-se-c][data-se-c]:not(#se-none) {
+    transition: none;
+  }
+}

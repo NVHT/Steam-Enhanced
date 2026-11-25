@@ -231,7 +231,7 @@
   /* ---------- Small view helpers ---------- */
 
   // state: a plugin's 'on' / 'off', drawn as a presence dot on the tile's corner.
-  const tile = (item, kind, { cls = '', state = '' } = {}) =>
+  const tile = (kind, { cls = '', state = '' } = {}) =>
     `<span class="se-lmx-tile${cls}"${state ? ` data-state="${state}"` : ''}>${kind === 'theme' ? ICON.theme : ICON.plugin}</span>`;
 
   const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
@@ -287,7 +287,13 @@
     v.setFocusedItem(item, type);
   }
 
+  // SE.reloadUI asks first during a voice call (header-shortcuts.js, main window); Steam's own
+  // reload from any window that has it otherwise
   function reloadSteam() {
+    if (SE.reloadUI) {
+      SE.reloadUI();
+      return;
+    }
     for (const o of [window, ...SE.owners()]) {
       try {
         if (o.SteamClient?.Browser?.RestartJSContext) {
@@ -555,7 +561,7 @@
       const on = Boolean(focused && nameOf(item) === focused);
       return (
         `<button type="button" class="se-lmx-item" data-kind="${kind}" data-i="${i}"${on ? ' data-on aria-current="true"' : ''}${off ? ' data-off' : ''}${has ? '' : ' disabled'}>` +
-        tile(item, kind, { state: kind === 'plugin' ? (off ? 'off' : 'on') : '' }) +
+        tile(kind, { state: kind === 'plugin' ? (off ? 'off' : 'on') : '' }) +
         `<span class="se-lmx-text"><span class="se-lmx-name">${esc(nameOf(item))}</span><span class="se-lmx-meta">${esc(meta)}</span></span>` +
         `${has ? `<span class="se-lmx-go">${ICON.chevron}</span>` : ''}</button>`
       );
@@ -585,7 +591,7 @@
     parts.overview.innerHTML =
       '<span class="se-lmx-label">Overview</span>' +
       (self
-        ? `<article class="se-lmx-hero">${tile(self, 'theme', { cls: ' se-lmx-tile-lg' })}<div class="se-lmx-hero-text"><span class="se-lmx-kicker">Active theme</span><b>${esc(nameOf(self))}</b><span>${esc(by)}</span></div>` +
+        ? `<article class="se-lmx-hero">${tile('theme', { cls: ' se-lmx-tile-lg' })}<div class="se-lmx-hero-text"><span class="se-lmx-kicker">Active theme</span><b>${esc(nameOf(self))}</b><span>${esc(by)}</span></div>` +
           '<button type="button" class="se-lmx-btn" data-primary data-act="customize">Customize</button></article>'
         : '') +
       `<div class="se-lmx-stats">${stat(on, 'Plugins on')}${stat(P.length - on, 'Plugins off')}${stat(withSettings, 'With settings')}</div>` ;
@@ -598,7 +604,7 @@
     const ph = parts.ph;
     if (ph.dataset.key !== key) {
       ph.dataset.key = key;
-      ph.querySelector('.se-lmx-ph-tile').innerHTML = item ? tile(item, kind) : '';
+      ph.querySelector('.se-lmx-ph-tile').innerHTML = item ? tile(kind) : '';
       setText(ph.querySelector('b'), nameOf(item));
       const chips = [kind === 'theme' ? 'Theme' : 'Plugin', item?.data?.version && `v${item.data.version}`, item?.data?.author && `by ${item.data.author}`];
       ph.querySelector('.se-lmx-chips').innerHTML = chips

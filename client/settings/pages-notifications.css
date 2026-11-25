@@ -1,0 +1,266 @@
+/*
+ * Settings › page specifics, continued from pages.css: Notifications.
+ */
+
+/*
+ * Notifications (client/settings/dialog/notifications.js): Steam's toast switches in a hero beside
+ * a sample toast, then Steam's groups as they are.
+ *
+ *   [ Show Notification Toasts [Anytime]     [ (game art)              ] ]
+ *   [ Play a sound ················ (on)     [ Achievement unlocked    ] ]
+ *   [ Client 3 of 3 ] [ Friends 5 of 6 ] [ Store 4 groups ] [ Email ]   (one at a time)
+ *   CLIENT NOTIFICATIONS        TOAST  SOUND
+ *   [ … ]
+ *
+ * Narrower, the sample goes and the switches keep their plain card.
+ */
+[id$="/settings/notifications_Content"] .DialogBody:has(> .se-ntf-hero):not(#se-none) {
+  display: grid !important; /* !important: the theme's DialogBody reset (layout.css) */
+  /* the sample (280 px) and the hero's inset beside it, so it never reaches the switches */
+  grid-template-columns: minmax(0, 1fr) calc(280px + 2 * var(--se-space-5));
+  align-content: start;
+}
+
+[id$="/settings/notifications_Content"] .DialogBody:has(> .se-ntf-hero) > * {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+/* A page heading Steam draws inside the body keeps the first row; the hero and its switches
+   share the next (the hero follows the heading: ns.pageView) */
+[id$="/settings/notifications_Content"] .DialogBody:has(> .se-ntf-hero) > .DialogHeader {
+  grid-row: 1;
+}
+
+[id$="/settings/notifications_Content"] .DialogBody:has(> .DialogHeader) > :is(.se-ntf-hero, [data-se-ntf-main]) {
+  grid-row: 2;
+}
+
+/* The hero's card under both: the switches on its left, the sample on its right */
+[id$="/settings/notifications_Content"] .DialogBody > .se-ntf-hero {
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: var(--se-space-5);
+  padding: var(--se-space-5);
+  border-radius: var(--se-radius-xl);
+  background: linear-gradient(110deg, var(--se-surface) 40%, color-mix(in srgb, var(--se-accent) 10%, var(--se-surface)) 100%);
+  box-shadow: var(--se-edge);
+}
+
+[id$="/settings/notifications_Content"] .DialogBody > [data-se-ntf-main] {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  z-index: var(--se-z-raised);
+  margin-top: var(--se-space-5) !important; /* !important: the sections' reset (layout.css) */
+  padding: var(--se-space-3) 0 var(--se-space-3) var(--se-space-3) !important;
+}
+
+/* The group tiles (notifications.js): icon, name, count; the chosen one ringed in the accent */
+[id$="/settings/notifications_Content"] .DialogBody > .se-ntf-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--se-space-3);
+  margin-top: var(--se-space-5);
+}
+
+.se-ntf-tile {
+  all: unset;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  column-gap: var(--se-space-3);
+  align-items: center;
+  padding: var(--se-space-3) var(--se-space-4);
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+  cursor: pointer;
+  transition: background var(--se-dur) var(--se-ease), box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-ntf-tile:hover {
+  background: color-mix(in srgb, var(--se-hover), var(--se-surface));
+}
+
+.se-ntf-tile:active {
+  transform: scale(var(--se-press-scale));
+}
+
+.se-ntf-tile:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-ntf-tile[aria-selected="true"] {
+  background: color-mix(in srgb, var(--se-accent) 8%, var(--se-surface));
+  box-shadow: inset 0 0 0 2px var(--se-accent);
+}
+
+/* The group's icon on a disc, as the sample's (one mask, its own pseudo-element) */
+.se-ntf-tile::before {
+  content: "";
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-white-07);
+}
+
+.se-ntf-tile::after {
+  content: "";
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  justify-self: center;
+  width: 18px;
+  height: 18px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-icon-pc) center / contain no-repeat;
+  mask: var(--se-icon-pc) center / contain no-repeat;
+}
+
+.se-ntf-tile[aria-selected="true"]::before {
+  background: var(--se-accent-tint);
+}
+
+.se-ntf-tile[aria-selected="true"]::after {
+  background: var(--se-accent);
+}
+
+.se-ntf-tile[data-key="friends"]::after {
+  -webkit-mask-image: var(--se-icon-friends);
+  mask-image: var(--se-icon-friends);
+}
+
+.se-ntf-tile[data-key="store"]::after {
+  -webkit-mask-image: var(--se-icon-store);
+  mask-image: var(--se-icon-store);
+}
+
+.se-ntf-tile[data-key="email"]::after {
+  -webkit-mask-image: var(--se-ic-mail);
+  mask-image: var(--se-ic-mail);
+}
+
+.se-ntf-tile-name,
+.se-ntf-tile-line {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Placed by hand: the disc and its icon are grid items too */
+.se-ntf-tile-name {
+  grid-area: 1 / 2;
+  align-self: end;
+  font: 700 var(--se-fs-base) / 1.3 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.se-ntf-tile-line {
+  grid-area: 2 / 2;
+  align-self: start;
+  font: 500 var(--se-fs-sm) / 1.3 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-ntf-tile {
+    transition: none;
+  }
+}
+
+[id$="/settings/notifications_Content"] .DialogBody > [data-se-ntf-hidden]:not(#se-none) {
+  display: none !important; /* !important: the sections' display (layout.css) */
+}
+
+/* The switches sit on the hero: no card of their own, the hairline between them kept */
+@media (min-width: 901px) {
+  /* [data-se-c] twice: above the card rows' first/last rules (layout.css) */
+  [id$="/settings/notifications_Content"] .DialogBody > [data-se-ntf-main] [data-se-c][data-se-c]:not(#se-none) {
+    margin-top: 0 !important; /* !important: the card rows' look (layout.css) */
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
+/* The sample: the theme's own toast (client/toasts/card.css), a little smaller than the real one */
+.se-ntf-sample {
+  position: relative;
+  width: 280px; /* notifications.js SAMPLE_W */
+}
+
+/* Its row's toast is off: the sample greys out under a "Toast off" chip */
+.se-ntf-sample[data-off] > * {
+  opacity: .4;
+  filter: grayscale(1);
+}
+
+.se-ntf-sample[data-off]::after {
+  content: "Toast off";
+  position: absolute;
+  right: var(--se-space-3);
+  bottom: var(--se-space-3); /* the corner the toast leaves empty */
+  z-index: var(--se-z-raised);
+  padding: var(--se-space-1) var(--se-space-2);
+  border-radius: var(--se-radius-control);
+  background: var(--se-glass-chip);
+  font: 700 var(--se-fs-xs) var(--se-font);
+  color: var(--se-text-strong);
+}
+
+@media (max-width: 900px) {
+  [id$="/settings/notifications_Content"] .DialogBody > .se-ntf-hero {
+    display: none;
+  }
+
+  [id$="/settings/notifications_Content"] .DialogBody > [data-se-ntf-main] {
+    grid-column: 1 / -1;
+    padding: 0 !important;
+  }
+}
+
+/* Notifications: Toast / Sound columns. */
+.CFTLX2wIKOK3hNV-fS7_V ._2zGUtyw-lRSsEUPY1qaqf7 {
+  /* NotificationSectionHeader */
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: space-between !important;
+  margin: var(--se-space-5) 0 var(--se-space-2) !important;
+  padding: 0 var(--se-space-4) 0 var(--se-space-1) !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2zGUtyw-lRSsEUPY1qaqf7 [data-se-sec]:not(#se-none) {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._27r3CjIYhU20TsukVgm25C {
+  display: grid !important;
+  grid-template-columns: 104px 104px; /* wide enough for the uppercase "Play Sound" heading */
+  justify-items: center;
+  align-items: center;
+  gap: 0 !important;
+  margin: 0 !important;
+}
+
+/* Toggles */
+.CFTLX2wIKOK3hNV-fS7_V ._27r3CjIYhU20TsukVgm25C > * {
+  margin: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2zGUtyw-lRSsEUPY1qaqf7 ._27r3CjIYhU20TsukVgm25C > * {
+  white-space: nowrap;
+  padding: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2zGUtyw-lRSsEUPY1qaqf7 ._27r3CjIYhU20TsukVgm25C > * {
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  text-transform: uppercase !important;
+  color: var(--se-label-color) !important;
+}

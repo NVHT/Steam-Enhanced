@@ -1,0 +1,236 @@
+/*
+ * Settings › page specifics, continued from pages.css: In Game.
+ */
+
+/*
+ * In Game (client/settings/dialog/ingame.js): a game with the overlay over it, then the page's
+ * sections as tabs.
+ *
+ *   [FPS 391 ↓333 ↑473 | CPU 16%/↑76% … | GPU 8% … | RAM … ]
+ *   [                               [screenshot toast] ]
+ *   [Shift+Tab] Overlay  [KP *] Monitor  [F12] Screenshot
+ *   ( The Steam Overlay | Performance monitor | Screenshots | More )
+ *
+ * The monitor sits where its dropdown says; hovering a row lights its part.
+ */
+[id$="/settings/ingame_Content"] .DialogBody > .se-ig-view {
+  margin-top: var(--se-space-5);
+}
+
+.se-ig-screen {
+  position: relative;
+  isolation: isolate;
+  aspect-ratio: 16 / 5;
+  overflow: hidden;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+}
+
+.se-ig-screen > img {
+  position: absolute;
+  inset: 0;
+  z-index: var(--se-z-under);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  opacity: 0;
+  transition: opacity var(--se-dur-slow) var(--se-ease);
+}
+
+.se-ig-screen[data-ready] > img {
+  opacity: 1;
+}
+
+/* ---------- The performance monitor, at its place ---------- */
+
+/*
+ * Drawn as Steam draws it in a game (ingame.js): one strip flush in its corner on a dark band, its
+ * parts split by thin bars, each label in its colour (--se-perf-*), values white, units small and
+ * raised. Steam's sliders reach it through three variables: --se-ig-scale (text size), --se-ig-ink
+ * (text contrast), --se-ig-back (background opacity).
+ */
+.se-ig-monitor {
+  position: absolute;
+  display: none;
+  align-items: center;
+  gap: calc(var(--se-space-1) * var(--se-ig-scale, 1));
+  padding: 0 var(--se-space-1);
+  background: color-mix(in srgb, var(--se-bg-ink) var(--se-ig-back, 70%), transparent);
+  font: 500 calc(var(--se-fs-2xs) * var(--se-ig-scale, 1)) / 1.5 var(--se-font);
+  white-space: nowrap;
+  color: var(--se-text-strong);
+}
+
+.se-ig-screen[data-monitor] .se-ig-monitor {
+  display: flex;
+}
+
+.se-ig-monitor > * {
+  opacity: var(--se-ig-ink, 1);
+}
+
+.se-ig-monitor b {
+  font-weight: 700;
+}
+
+.se-ig-monitor b[data-tone="fps"] { color: var(--se-perf-fps); }
+.se-ig-monitor b[data-tone="cpu"] { color: var(--se-perf-cpu); }
+.se-ig-monitor b[data-tone="gpu"] { color: var(--se-perf-gpu); }
+.se-ig-monitor b[data-tone="ram"] { color: var(--se-perf-ram); }
+
+.se-ig-monitor sup {
+  margin-left: 1px;
+  font-size: .6em;
+  color: var(--se-text-muted);
+}
+
+/* The thin bar between parts */
+.se-ig-sep {
+  width: 1px;
+  height: .9em;
+  background: var(--se-white-32);
+}
+
+/* The graphs: tiny bars on a baseline, inline in the strip */
+.se-ig-graph {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  width: calc(22px * var(--se-ig-scale, 1));
+  height: .9em;
+}
+
+.se-ig-graph > i {
+  flex: 1;
+  background: var(--se-perf-gpu);
+}
+
+/* What the detail level leaves out (0 FPS alone; 1 its low and high; 2 CPU and GPU use) */
+.se-ig-screen[data-detail="0"] .se-ig-monitor [data-level]:not([data-level="0"]),
+.se-ig-screen[data-detail="1"] .se-ig-monitor :is([data-level="2"], [data-level="3"]),
+.se-ig-screen[data-detail="2"] .se-ig-monitor [data-level="3"],
+.se-ig-screen:not([data-fps-graph]) .se-ig-monitor [data-need="fps"],
+.se-ig-screen:not([data-core-graph]) .se-ig-monitor [data-need="cores"],
+.se-ig-screen:not([data-temps]) .se-ig-monitor [data-need="temps"] {
+  display: none;
+}
+
+/* Flush in its corner or edge, as in a game */
+.se-ig-screen[data-monitor^="t"] .se-ig-monitor { top: 0; }
+.se-ig-screen[data-monitor^="b"] .se-ig-monitor { bottom: 0; }
+.se-ig-screen[data-monitor$="l"] .se-ig-monitor { left: 0; }
+.se-ig-screen[data-monitor$="r"] .se-ig-monitor { right: 0; }
+
+.se-ig-screen[data-monitor$="c"] .se-ig-monitor {
+  left: 50%;
+  translate: -50% 0;
+}
+
+/*
+ * ---------- The screenshot toast (above the monitor when it shares the corner) ----------
+ * The theme's own toast (SE.toastCard's sample, still: client/toasts/card.css draws it), 170px
+ * wide.
+ */
+
+.se-ig-toast {
+  position: absolute;
+  right: var(--se-space-3);
+  bottom: var(--se-space-3);
+  display: none;
+  width: 170px; /* ingame.js TOAST_W */
+  border-radius: var(--se-radius-lg);
+}
+
+.se-ig-screen[data-toast] .se-ig-toast {
+  display: block;
+}
+
+.se-ig-screen[data-monitor="br"] .se-ig-toast {
+  bottom: calc(var(--se-space-3) + 16px); /* over the monitor's strip */
+}
+
+/* ---------- The keys, under the screen ---------- */
+
+.se-ig-keys {
+  display: flex;
+  gap: var(--se-space-2);
+  margin-top: var(--se-space-3);
+}
+
+.se-ig-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: 32px;
+  padding: 0 var(--se-space-3) 0 var(--se-space-1);
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+  font: 600 var(--se-fs-sm) / 1 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-ig-key {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 var(--se-space-2);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  font: 700 var(--se-fs-xs) / 1 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+/* The overlay off: its key reads Off, faded */
+.se-ig-screen[data-overlay-off] [data-part="overlay"] {
+  opacity: .5;
+}
+
+/* ---------- A row hovered: its part lit ---------- */
+
+.se-ig-preview [data-part] {
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-ig-preview [data-part][data-lit] {
+  box-shadow: inset 0 0 0 2px var(--se-accent);
+}
+
+/* ---------- Tabs ---------- */
+
+.se-ig-tabs {
+  display: flex;
+  margin: var(--se-space-4) 0 var(--se-space-4);
+}
+
+.se-ig-tabs > button {
+  flex: 1;
+}
+
+/*
+ * Only the chosen tab's rows; the headings go (the tabs name them). !important: the card rows'
+ * display (layout.css, controls.css), themselves !important against Steam's.
+ */
+[id$="/settings/ingame_Content"] .DialogBody[data-se-ig-show] [data-se-ig-tab] > [data-se-sec]:not(#se-none),
+[id$="/settings/ingame_Content"] .DialogBody[data-se-ig-show="0"] [data-se-ig-tab]:not([data-se-ig-tab="0"]),
+[id$="/settings/ingame_Content"] .DialogBody[data-se-ig-show="1"] [data-se-ig-tab]:not([data-se-ig-tab="1"]),
+[id$="/settings/ingame_Content"] .DialogBody[data-se-ig-show="2"] [data-se-ig-tab]:not([data-se-ig-tab="2"]),
+[id$="/settings/ingame_Content"] .DialogBody[data-se-ig-show="3"] [data-se-ig-tab]:not([data-se-ig-tab="3"]),
+[id$="/settings/ingame_Content"] .DialogBody[data-se-ig-show="4"] [data-se-ig-tab]:not([data-se-ig-tab="4"]) {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  .se-ig-view > .se-ig-preview {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-ig-screen > img,
+  .se-ig-preview [data-part] {
+    transition: none;
+  }
+}

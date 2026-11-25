@@ -1,0 +1,30 @@
+/*
+ * Settings › page specifics, continued from pages.css: Downloads (client/settings/dialog/
+ * downloads.js). The hero card is pages-hero.css (the game's art behind it while one
+ * downloads); here, how far it is: a track the fill grows along (scaleX).
+ */
+.se-dl-bar {
+  width: min(100%, 360px);
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-14);
+}
+
+.se-dl-bar[hidden] {
+  display: none;
+}
+
+.se-dl-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--se-accent);
+  transform-origin: left center;
+  transition: transform var(--se-dur-slow) linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-dl-bar > span {
+    transition: none;
+  }
+}

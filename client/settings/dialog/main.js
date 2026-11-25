@@ -10,7 +10,7 @@
   const { fromProps, attr: setAttr } = SE;
   const {
     ACTIVE, BY_NAME, CONTENT, ITEM, LIST, MILL_BY_KEY, OWN, PRE_FOR, PROPS_ROOT, PROPS_SIZE, SIZE,
-    TITLE, bytesOf, cards, fmtBytes, isSteamSettings, learn, millPageOf, norm, pageNameOf, pickers,
+    TITLE, cards, isSteamSettings, learn, millPageOf, norm, pageNameOf, pickers,
     preLabels, propsPage, propsSidebar, resetProps, revealHit, rows, scheduleScan, sections,
     sidebar, fillWindow, sizeWindow, unfillWindow,
   } = ns;
@@ -23,8 +23,6 @@
    */
   const millApi = {
     pre: (el, label) => (label ? PRE_FOR.set(el, label) : PRE_FOR.delete(el)),
-    bytesOf,
-    fmtBytes,
   };
 
   function millHook(name, content, key) {

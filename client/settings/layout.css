@@ -1,14 +1,13 @@
 /*
- * Steam Settings and Game Properties window styles (`PagedSettingsDialog`).
- *
- * Styles the 248px navigation sidebar, live cross-page search results, grouped
- * option cards (`[data-se-c]`), compact segmented radio controls, custom
- * switches and sliders, keyboard shortcut badges, Storage drive usage cards,
- * and Game Properties tabs (`html[data-se-props]`). Paired with
+ * Steam Settings and Game Properties window styles (`PagedSettingsDialog`), paired with
  * `client/settings/dialog/`.
  *
- * This file: the sidebar, the page frame, titles, cards and rows. Settings styles load in
- * order: layout, controls, pages, storage, search, game-properties, spacing.
+ * This file: the 248px navigation sidebar and its search field, the page frame, titles,
+ * grouped option cards (`[data-se-c]`) and their rows. The rest, in load order:
+ * controls.css (buttons, dropdowns, inputs, segmented radios, switches, sliders, checkboxes,
+ * keyboard badges), pages.css and its pages-*.css parts, storage.css (Storage's games list,
+ * every window's row icons, no visible scrollbars), search.css (the search results),
+ * game-properties*.css (Game Properties, `html[data-se-props]`), spacing.css.
  */
 /* Sidebar */
 ._2kwFFHckg8jvnwJfg9-la8 {
@@ -144,7 +143,7 @@
   background: transparent !important;
   color: var(--se-text-dim) !important;
   font: 500 var(--se-fs-md) var(--se-font) !important;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
 ._1-vlriAtKYDViAEunue4VO:hover:not(._2DpXjzK3WWsOtUWUrcuOG7) {
@@ -263,7 +262,7 @@
 }
 
 .CFTLX2wIKOK3hNV-fS7_V::-webkit-scrollbar:horizontal,
-.CFTLX2wIKOK3hNV-fS7_V *::-webkit-scrollbar:horizontal,
+.CFTLX2wIKOK3hNV-fS7_V [data-se-noxs]::-webkit-scrollbar:horizontal,
 .OX7USkJ5dDP_icD00Gal6::-webkit-scrollbar:horizontal {
   height: 0 !important;
   display: none !important;
@@ -393,6 +392,7 @@
   position: relative;
   box-sizing: border-box !important;
   min-height: 64px !important;
+  flex-shrink: 0; /* a tall page's flex body would squeeze a long description under its card */
   margin: 0 !important;
   padding: var(--se-space-3) var(--se-space-4) !important;
   border: 0 !important;
@@ -435,15 +435,17 @@
   gap: var(--se-space-3) !important;
 }
 
+/* Steam's separators */
 .CFTLX2wIKOK3hNV-fS7_V .eKmEXJCm_lgme24Fp_HWt::after {
   display: none !important;
 }
 
-/* Steam's separators */
+/* A clickable row */
 .CFTLX2wIKOK3hNV-fS7_V .eKmEXJCm_lgme24Fp_HWt._2HuzvKQ2QMUJ-JJOeApaF1:hover {
   background-color: var(--se-hover) !important;
 }
 
+/* FieldLeftColumn */
 .CFTLX2wIKOK3hNV-fS7_V ._2tALpM7z8naXJ35Pp5fNAG {
   flex: 1 1 auto !important;
   min-width: 0 !important;
@@ -451,7 +453,6 @@
   margin: 0 !important;
 }
 
-/* FieldLeftColumn */
 .CFTLX2wIKOK3hNV-fS7_V .PSZtxj2h3MlyYv-c9dgke {
   /* FieldRightColumn */
   flex: 0 0 auto !important;
@@ -462,13 +463,13 @@
   align-items: center !important;
 }
 
+/* FieldLabelRow */
 .CFTLX2wIKOK3hNV-fS7_V ._2VcTlXFC64Jtg9gvtT6cmY {
   margin: 0 !important;
   padding: 0 !important;
   min-height: 0 !important;
 }
 
-/* FieldLabelRow */
 .CFTLX2wIKOK3hNV-fS7_V ._3jMlJm4PQCA8SfNlUR99Fo {
   /* FieldLabel */
   font: 600 var(--se-fs-md)/19px var(--se-font) !important;
@@ -495,20 +496,20 @@
   color: var(--se-text-faint) !important;
 }
 
+/* FieldChildrenWithIcon */
 .CFTLX2wIKOK3hNV-fS7_V ._1aw7cA3mAZfWt8idAlVJWi {
   display: flex;
   align-items: center;
   gap: var(--se-space-2);
 }
 
-/* FieldChildrenWithIcon */
+/* FieldChildrenInner */
 .CFTLX2wIKOK3hNV-fS7_V ._2o2fXzn99OddeqZMjbDuxQ {
   display: flex;
   align-items: center;
   gap: var(--se-space-2);
 }
 
-/* FieldChildrenInner */
 /*
  * Children shown below the label (sliders, pickers): label and description on the
  * left, the control on the right, like every other row.

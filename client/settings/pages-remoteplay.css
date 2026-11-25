@@ -1,0 +1,58 @@
+/*
+ * Settings › page specifics, continued from pages.css: Remote Play (client/settings/dialog/
+ * remoteplay.js). The hero card is pages-hero.css; here, this computer linked to a TV, a phone
+ * and another computer, each glyph its own element. Off, the link and devices dim.
+ */
+.se-rp-map {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+}
+
+.se-rp-host {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  font: 600 var(--se-fs-sm) / 1 var(--se-font);
+  color: var(--se-text);
+}
+
+.se-rp-device {
+  position: relative;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+}
+
+.se-rp-device::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 20px;
+  height: 20px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-rp-ic, var(--se-icon-pc)) center / contain no-repeat;
+  mask: var(--se-rp-ic, var(--se-icon-pc)) center / contain no-repeat;
+}
+
+.se-rp-device[data-kind="tv"] { --se-rp-ic: var(--se-icon-tv); }
+.se-rp-device[data-kind="phone"] { --se-rp-ic: var(--se-icon-phone); }
+
+/* The link: a dashed line from this computer to the devices */
+.se-rp-link {
+  flex: 1;
+  min-width: var(--se-space-6);
+  border-top: 2px dashed var(--se-accent-line);
+}
+
+.se-rp-devices {
+  display: inline-flex;
+  gap: var(--se-space-2);
+}
+
+.se-rp-map[data-off] :is(.se-rp-link, .se-rp-devices) {
+  opacity: .3;
+}

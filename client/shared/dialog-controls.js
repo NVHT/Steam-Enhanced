@@ -8,6 +8,10 @@
  *       drop(bucket)                            unmounts a bucket's tips (and its waiting ones)
  *       destroy()                               every tip and the lookup
  *   SE.copiedFlash(ms)  marks a control [data-copied] for `ms`. Returns { flash(node), destroy() }.
+ *   SE.copyButton({ text, label, doc, win })  the theme's one copy button (.se-copy,
+ *     dialog-controls.css): copies text() on click, then shows a tick a moment. Placement and size
+ *     are the holder's (--se-copy-size, --se-copy-icon); data-tone="button" fills it beside a
+ *     Steam button.
  *
  * The tip's hit box covers its control: dialog-controls.css.
  */
@@ -90,6 +94,26 @@
         buckets.clear();
       },
     };
+  };
+
+  const COPIED_MS = 1200;
+  SE.copyButton = ({ text, label = 'Copy', doc = document, win = window } = {}) => {
+    const button = doc.createElement('button');
+    button.type = 'button';
+    button.className = 'se-copy';
+    button.title = label;
+    button.setAttribute('aria-label', label);
+    let timer = 0;
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      SE.copy(String(text?.() ?? ''), win).then((copied) => {
+        if (!copied || !button.isConnected) return;
+        win.clearTimeout(timer);
+        button.setAttribute('data-copied', '');
+        timer = win.setTimeout(() => button.removeAttribute('data-copied'), COPIED_MS);
+      });
+    });
+    return button;
   };
 
   SE.copiedFlash = (ms) => {

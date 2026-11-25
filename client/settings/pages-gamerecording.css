@@ -1,0 +1,79 @@
+/*
+ * Settings › page specifics, continued from pages.css: Game Recording (client/settings/dialog/
+ * gamerecording.js). The hero card is pages-hero.css; here, its timeline.
+ *
+ *   120 min ago [▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒] ● Now     Background: all of it kept
+ *               [          ▓▓▓▓▓▓             ]   Now     Manual: one clip
+ *               [                             ]   Now     Off: nothing
+ */
+/* On a dark backing: it sits over the art's brightest side */
+.se-rec-line {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  padding: var(--se-space-2) var(--se-space-3);
+  border-radius: var(--se-radius-md);
+  background: var(--se-black-60);
+  font: 600 var(--se-fs-xs) / 1 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-rec-from:empty,
+.se-rec-line:not([data-mode="background"]) .se-rec-from {
+  display: none;
+}
+
+.se-rec-track {
+  position: relative;
+  flex: 1;
+  height: 10px;
+  overflow: hidden;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-black-50);
+}
+
+.se-rec-track > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: none;
+  border-radius: inherit;
+}
+
+/* Background: everything kept, its oldest minutes fading out */
+.se-rec-kept {
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--se-danger) 70%, transparent) 35%, var(--se-danger));
+}
+
+.se-rec-line[data-mode="background"] .se-rec-kept {
+  display: block;
+}
+
+/* Manual: one clip you recorded */
+.se-rec-clip {
+  left: 38%;
+  width: 22%;
+  background: var(--se-text);
+}
+
+.se-rec-line[data-mode="manual"] .se-rec-clip {
+  display: block;
+}
+
+/* Now, a live dot while Steam records in the background */
+.se-rec-now {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--se-space-1);
+  color: var(--se-text-strong);
+}
+
+.se-rec-line[data-mode="background"] .se-rec-now::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--se-danger);
+}

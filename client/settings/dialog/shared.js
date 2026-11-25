@@ -22,10 +22,12 @@
  * - props-pages.js  Game Properties: the General, Updates, Files and Workshop pages
  * - props-header.js Game Properties: the game's hero art across the window's top
  * - props.js        Game Properties: the page pass (row icons, DLC names), the sidebar
+ * - account.js … music.js  a Steam Settings page's own view each (Account, Friends, … Music)
  * - main.js         the update pass, watchers, start, and the API (destroy())
  */
 ((SE) => {
-  const ns = (window.__seSettingsParts = { live: {} });
+  // revealers: a page that hides rows (In Game's tabs) shows one search found (search.js)
+  const ns = (window.__seSettingsParts = { live: {}, revealers: new Set() });
   const { C } = SE;
   const { live } = ns;
   live.search = undefined;
@@ -103,6 +105,9 @@
     [/^family view/i, 'security'],
     [/^account name/i, 'account'],
     [/^steam guard$/i, 'check'],
+    [/^don't save account credentials/i, 'device'],
+    [/^backup steam guard codes/i, 'key'],
+    [/^deauthori[sz]e all/i, 'signout'],
     [/^enable steam cloud/i, 'cloud'],
     [/^screenshot management/i, 'interface'],
     [/^add a new controller/i, 'add'],
@@ -113,10 +118,19 @@
     [/^friend code/i, 'friendsic'],
     [/^email address/i, 'mail'],
     [/^vac status/i, 'check'],
+    // Store (store.js): each preference's tile
+    [/^mature content/i, 'mature'],
+    [/^exclude from my store/i, 'exclude'],
+    [/^platform preference/i, 'platform'],
+    [/^discovery queue/i, 'discovery'],
+    [/^new on steam queue/i, 'newonsteam'],
+    [/^steam deck feedback/i, 'deck'],
+    [/^live broadcasts/i, 'broadcasts'],
   ];
 
   const PRE_LABELS = [
     [/^friend code/i, 'Account'],
+    [/^account name/i, 'Sign-in'],
     [/^append nicknames/i, 'Friends list'],
     [/^family view/i, 'Restrictions'],
     [/^voice transmission type/i, 'Transmission'],
@@ -126,6 +140,18 @@
 
   const text = (el) => (el?.textContent || '').replace(/\s+/g, ' ').trim();
   const fieldLabel = (n) => text(n.querySelector?.(LABEL));
+  // A row's slider: its place from 0 to 1 and its default's (Steam's --normalized-slider-value
+  // and --normalized-slider-default-value on the slider), null without one. Its style attribute
+  // changes as it moves.
+  const SLIDER = '.SliderControlAndNotches';
+  const sliderAt = (field) => {
+    const style = field.querySelector(SLIDER)?.style;
+    const read = (name) => Number.parseFloat(style?.getPropertyValue(name));
+    const at = read('--normalized-slider-value');
+    if (!Number.isFinite(at)) return null;
+    const def = read('--normalized-slider-default-value');
+    return { at: Math.max(0, Math.min(1, at)), def: Number.isFinite(def) ? def : null };
+  };
   const KEY_RE = /^(?:(?:shift|ctrl|control|alt|cmd|win)\s*\+\s*)*(?:f\d{1,2}|tab|space|insert|delete|home|end|page ?(?:up|down)|key ?pad.*|num.*|[a-z0-9]|none|[^\s]+\s*\+\s*[^\s]+)$/i;
   // Steam draws a connected controller's icon inside its name (no CSS-module key in core's map).
   const CONTROLLER_ICON = `:is(.${C.ControllerLabel}, .${C.DongleLabel}, .${C.DisconnectedControllerLabel}) > .${C.AllControllersContainer_Icon}`;
@@ -134,10 +160,187 @@
     'activate a product': 'Enter a product code',
     'browse the steam store': 'Find something new',
   };
+  /* ---------- Page views: a theme part over a Steam page, redrawn from its rows ---------- */
+
+  // A row's switch: its On class
+  const switchOn = (field) => Boolean(field?.querySelector('.Toggle')?.classList.contains('On'));
+
+  // A row's choice as its place in the list, the same in every language: a radio group's checked
+  // button, else a dropdown's shown option found in its options (its live React props: the
+  // element's own fiber can hold the last choice), by its label (some dropdowns' option data
+  // aren't unique), else by selectedOption. null without one.
+  const choiceAt = (field) => {
+    const radios = [...(field?.querySelectorAll('.Shared_Radio_Group [role="radio"]') || [])];
+    if (radios.length) {
+      const i = radios.findIndex((r) => r.getAttribute('aria-checked') === 'true');
+      return i < 0 ? null : i;
+    }
+    const drop = field?.querySelector('.DialogDropDown');
+    if (!drop) return null;
+    const shown = text(drop.querySelector('.DialogDropDown_CurrentDisplay'));
+    const i = SE.run(() =>
+      SE.fromProps(
+        drop,
+        8,
+        (p) => {
+          if (!Array.isArray(p.rgOptions) || !('selectedOption' in p)) return undefined;
+          const byLabel = p.rgOptions.findIndex((o) => typeof o?.label === 'string' && o.label.trim() === shown);
+          return byLabel >= 0 ? byLabel : p.rgOptions.findIndex((o) => o?.data === p.selectedOption);
+        },
+        { live: true }
+      )
+    );
+    return Number.isInteger(i) && i >= 0 ? i : null;
+  };
+
+  // A page's rows by what they do: [[label regex, key]] → { key: field }
+  const rowsOf = (page, rows) => {
+    const found = {};
+    for (const field of page.querySelectorAll(FIELD)) {
+      const label = fieldLabel(field);
+      const key = rows.find(([re]) => re.test(label))?.[1];
+      if (key && !(key in found)) found[key] = field;
+    }
+    return found;
+  };
+
+  // Your Library's played games, last played first: { store, apps } (at most count)
+  const recentGames = (count) => {
+    const store = SE.run(() => SE.global('appStore', (st) => st.allApps));
+    const apps = (SE.run(() => store.allApps) || [])
+      .filter((a) => a?.rt_last_time_played > 0 && SE.isLibraryGame(a))
+      .sort((a, b) => b.rt_last_time_played - a.rt_last_time_played)
+      .slice(0, count);
+    return { store, apps };
+  };
+
+  // Your last played game: { appid, name, played, store } or null
+  const lastGame = () => {
+    const { store, apps } = recentGames(1);
+    const app = apps[0];
+    return app ? { appid: app.appid, name: app.display_name || '', played: app.rt_last_time_played, store } : null;
+  };
+
+  /*
+   * A page's hero card (pages-hero.css): a title and a line (no glyph: most rows have none),
+   * room below for the page's own parts (body), line art on its right (side), and art behind it
+   * all while setArt() has some
+   * (other art replaces it, none takes it away).
+   * aria-hidden: a picture of the page's state; Steam's rows stay the controls.
+   */
+  const pageHero = () => {
+    const el = (tag, cls, text) => SE.el(tag, cls, text);
+    const root = el('div', 'se-page-hero');
+    root.setAttribute('aria-hidden', 'true');
+    const title = el('div', 'se-page-hero-title');
+    const line = el('div', 'se-page-hero-line');
+    const text = el('div', 'se-page-hero-text');
+    text.append(title, line);
+    const body = el('div', 'se-page-hero-body');
+    // Line art on the card's right (the page's own, e.g. Security's phone), beside the text
+    const side = el('div', 'se-page-hero-side');
+    root.append(text, body, side);
+    let art = null;
+    let artKey = '';
+    const set = (node, value) => {
+      if (node.textContent !== value) node.textContent = value;
+    };
+    return {
+      root,
+      body,
+      side,
+      title: (value) => set(title, value),
+      line: (value) => set(line, value),
+      setArt(urls) {
+        const key = urls?.[0] || '';
+        if (key === artKey) return;
+        artKey = key;
+        art?.remove();
+        art = null;
+        SE.unmark(root, 'data-art');
+        if (!key) return;
+        art = el('div', 'se-page-hero-art');
+        const img = SE.art.img(urls, '', () => art.remove());
+        img.addEventListener('load', () => SE.mark(art, 'data-ready'), { once: true });
+        art.append(img);
+        root.prepend(art);
+        SE.mark(root, 'data-art');
+      },
+    };
+  };
+
+  /*
+   * A theme part over one Steam page, kept in step with the page's rows:
+   *   route       the page's route ("voice": its content's id ends "/settings/voice_Content");
+   *               some carry parameters ("controller/:type/:controllerIndex")
+   *   make(body)  → a view { root, destroy? }, put first in the page's body before its first paint
+   *   read(page)  → the page's state; draw(view, state) shows it (both after every change)
+   *   attributes  what to watch besides the rows Steam adds (class: switches and radios)
+   *   characterData  watch text changes too (rows whose values Steam rewrites in place)
+   *   header      a header of the page's own views to follow instead (Controller's sub-views)
+   * → { PAGE, views (the live ones), sync(), destroy() }
+   */
+  const pageView = ({ route, make, read, draw, header: viewHeader, attributes = ['class'], characterData = false }) => {
+    const PAGE = `[id$="/settings/${route}_Content"]`;
+    const views = new Set();
+    const ignore = SE.inside('.se-page-view');
+    // First, after the page's header where Steam draws it inside the body (Controller: in a panel),
+    // or a view's own; again when Steam redraws it (Controller's views swap it), moved only when out
+    // of place
+    const place = (v) => {
+      const header =
+        (viewHeader && v.body.querySelector(`:scope ${viewHeader}`)) ||
+        v.body.querySelector(':scope > .DialogHeader, :scope > .Panel > .DialogHeader');
+      if (header) {
+        if (header.nextElementSibling !== v.root) header.after(v.root);
+      } else if (v.body.firstElementChild !== v.root) v.body.prepend(v.root);
+    };
+    const sync = () => {
+      const page = document.querySelector(PAGE);
+      if (!page) return;
+      const state = read(page);
+      for (const v of views) {
+        place(v);
+        draw(v, state);
+      }
+    };
+    const mounted = SE.mount(
+      `Settings ${route}`,
+      () => [...document.querySelectorAll(`${PAGE} .DialogBody`)],
+      (body) => {
+        const v = make(body);
+        v.body = body;
+        v.root.classList.add('se-page-view');
+        place(v);
+        views.add(v);
+        SE.run(sync);
+        return {
+          destroy() {
+            views.delete(v);
+            v.destroy?.();
+            v.root.remove();
+          },
+        };
+      },
+      { sync: true, scope: PAGE, ignore }
+    );
+    const watcher = SE.watch(sync, { scope: PAGE, attributes, characterData, throttle: 50, ignore });
+    return {
+      PAGE,
+      views,
+      sync,
+      destroy() {
+        mounted.destroy();
+        watcher.disconnect();
+      },
+    };
+  };
+
   Object.assign(ns, {
+    choiceAt, lastGame, pageHero, pageView, recentGames, rowsOf, switchOn,
     ACCOUNT_HEADER, ACTIVE, BODY_TEXT, BY_NAME, CONTENT, CONTROLLER_ICON, FIELD, FIELD_BG, GROUPS,
     ITEM, KEY_RE, LABEL, LIST, MILL_BY_KEY, MILL_BY_NAME, MILL_GROUPS, MILL_PAGES, PAGES,
-    PRE_LABELS, PROPS_SIZE, ROW_ICONS, SECTION, SEP, SIZE, TEXT, TILE_SUBS, TITLE, UPDATE_TIMING,
-    fieldLabel, text,
+    PRE_LABELS, PROPS_SIZE, ROW_ICONS, SECTION, SEP, SIZE, SLIDER, TEXT, TILE_SUBS, TITLE,
+    UPDATE_TIMING, fieldLabel, sliderAt, text,
   });
 })(window.__se);

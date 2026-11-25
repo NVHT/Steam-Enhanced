@@ -1,0 +1,59 @@
+/*
+ * Settings › page specifics, continued from pages.css: Voice (client/settings/dialog/voice.js).
+ * The hero card is pages-hero.css; here, its level meter: bars of a speaking voice, the
+ * threshold a dashed line across them (--se-voice-gate) and named under it, the bars below it
+ * held back (dim).
+ */
+.se-voice-meter {
+  --se-voice-gate: .32; /* the threshold's share of the bars' height */
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--se-space-half);
+  box-sizing: border-box;
+  height: 64px;
+  padding: var(--se-space-2) var(--se-space-3);
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+}
+
+.se-voice-meter > i {
+  flex: 1;
+  border-radius: var(--se-radius-xs) var(--se-radius-xs) 0 0;
+  background: var(--se-accent);
+  transition: opacity var(--se-dur) var(--se-ease);
+}
+
+.se-voice-meter > i[data-held] {
+  opacity: .25;
+}
+
+/* The threshold: a dashed line at its share of the bars' height (64px less the padding) */
+.se-voice-gate {
+  position: absolute;
+  right: var(--se-space-3);
+  bottom: calc(var(--se-space-2) + (64px - 2 * var(--se-space-2)) * var(--se-voice-gate));
+  left: var(--se-space-3);
+  border-top: 1px dashed var(--se-text-strong);
+}
+
+.se-voice-gate[data-off] {
+  display: none;
+}
+
+/* Its name, close under the meter (inside the card body's gap) */
+.se-voice-caption {
+  margin-top: calc(-1 * var(--se-space-2));
+  font: 600 var(--se-fs-xs) / 1.3 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+.se-voice-caption:empty {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-voice-meter > i {
+    transition: none;
+  }
+}

@@ -51,7 +51,7 @@
   display: none !important;
 }
 
-/* Core's icons (core/icons-*.css) as masks, in currentColor (system-info.js MASKS) */
+/* Core's icons (core/icons-*.css) as masks, in currentColor (system-info.js icon()) */
 .se-sysinfo-icon {
   display: block;
   flex: none;
@@ -517,46 +517,24 @@ button.se-sysinfo:focus-visible {
   color: var(--se-text-faint);
 }
 
+/* A card's Copy: the theme's copy button (dialog-controls.css), shown while the card is hovered,
+   focused or just copied */
 .se-sysinfo-card-copy,
 .se-sysreport-card-copy {
-  position: relative;
-  width: 24px;
-  height: 24px;
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  --se-copy-size: 24px;
+  --se-copy-icon: 13px;
   margin-left: auto;
-  padding: 0;
-  border-radius: var(--se-radius-sm);
-  background: none;
-  color: var(--se-text-faint);
   opacity: 0;
-}
-
-/* The hit area grows to --se-hit around the 24px button; the look stays */
-.se-sysinfo-card-copy::after,
-.se-sysreport-card-copy::after {
-  content: '';
-  position: absolute;
-  inset: calc((24px - var(--se-hit)) / 2);
-}
-
-:is(.se-sysinfo-card-copy, .se-sysreport-card-copy) > [data-icon] {
-  width: 13px;
-  height: 13px;
+  transition:
+    background-color var(--se-dur) var(--se-ease),
+    color var(--se-dur) var(--se-ease),
+    opacity var(--se-dur) var(--se-ease);
 }
 
 .se-sysinfo-card:hover .se-sysinfo-card-copy,
 .se-sysreport-card:hover .se-sysreport-card-copy,
 :is(.se-sysinfo-card-copy, .se-sysreport-card-copy):is(:focus-visible, [data-copied]) {
   opacity: 1;
-}
-
-/* Copied keeps the hover look, so it still reads once the pointer leaves */
-:is(.se-sysinfo-card-copy, .se-sysreport-card-copy):is(:hover, [data-copied]) {
-  background: var(--se-surface-2);
-  color: var(--se-text-strong);
 }
 
 /* Standalone facts as pills */
@@ -669,7 +647,7 @@ button.se-sysinfo:focus-visible {
 /* Identifiers: blurred, with an eye, until clicked */
 .se-sysinfo-row[data-private]:not([data-revealed]) .se-sysinfo-row-value,
 .se-sysreport-row[data-private]:not([data-revealed]) .se-sysreport-row-value {
-  filter: blur(4.5px);
+  filter: var(--se-blur-private);
   user-select: none;
 }
 

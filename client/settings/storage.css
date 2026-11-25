@@ -1,5 +1,7 @@
 /*
- * Settings › Storage: the games list, its header, selection bar and sort menus.
+ * Settings › Storage: the games list, its header, selection bar and sort menus. Also every
+ * Settings window's row icons (a row's --se-ic, from core/icons-ui.css's --se-ic-*), the
+ * Library tiles' icons, and no visible scrollbars in Settings and Properties.
  * Settings styles load in order: layout, controls, pages, storage, search, game-properties (and its parts), spacing.
  */
 
@@ -179,7 +181,7 @@
   box-shadow: inset 0 0 0 1px var(--se-accent-line), 0 10px 24px -8px var(--se-black-70) !important;
 }
 
-.CFTLX2wIKOK3hNV-fS7_V ._35T-OYn63jW6GmmpnEm8-b:not(:has(._1dFOkDnInbUQgf2eUbF2G9)) {
+.CFTLX2wIKOK3hNV-fS7_V ._35T-OYn63jW6GmmpnEm8-b:not(:has(._1dFOkDnInbUQgf2eUbF2G9)):not(#se-none) {
   display: none !important;
 }
 
@@ -268,8 +270,20 @@
 }
 
 .CFTLX2wIKOK3hNV-fS7_V ._1O1Jq87hokErcc093uvh6L {
+  /* Steam's 98×45 (a header's shape) for every row's picture, never squeezed by the row */
+  flex: none;
+  width: 98px;
+  height: 45px;
   border-radius: var(--se-radius-sm) !important;
   overflow: hidden;
+}
+
+/* The Screenshots row's picture fills it */
+.CFTLX2wIKOK3hNV-fS7_V ._1O1Jq87hokErcc093uvh6L ._3A0YTyMl9nF8feHrX4VdDt {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* portrait */
@@ -292,7 +306,6 @@
   color: var(--se-text) !important;
 }
 
-/* AppSize */
 /* Remote Play / Controller sub-tables */
 .CFTLX2wIKOK3hNV-fS7_V ._1HL6KuwUJaZQ7x2rmAxxSz {
   font: var(--se-label-font) !important;
@@ -306,33 +319,7 @@
   color: var(--se-text-muted) !important;
 }
 
-/* Icons (generated: duotone, as masks) */
-:root {
-  --se-ic-mail: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223%22 y=%225%22 width=%2218%22 height=%2214%22 rx=%222.5%22/%3E%3C/g%3E%3Crect x=%223%22 y=%225%22 width=%2218%22 height=%2214%22 rx=%222.5%22/%3E%3Cpath d=%22M4 7l8 6 8-6%22/%3E%3C/svg%3E");
-  --se-ic-account: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223%22 y=%225%22 width=%2218%22 height=%2214%22 rx=%222.5%22/%3E%3C/g%3E%3Crect x=%223%22 y=%225%22 width=%2218%22 height=%2214%22 rx=%222.5%22/%3E%3Ccircle cx=%229%22 cy=%2211%22 r=%222.2%22/%3E%3Cpath d=%22M5.8 16.2c.6-1.6 1.8-2.4 3.2-2.4s2.6.8 3.2 2.4M14.5 10h4M14.5 13.5h3%22/%3E%3C/svg%3E");
-  --se-ic-friendsic: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%229%22 cy=%228.5%22 r=%223.5%22/%3E%3C/g%3E%3Ccircle cx=%229%22 cy=%228.5%22 r=%223.5%22/%3E%3Cpath d=%22M2.5 19.5c.9-3.3 3.4-5 6.5-5s5.6 1.7 6.5 5%22/%3E%3Ccircle cx=%2217%22 cy=%229%22 r=%222.7%22/%3E%3Cpath d=%22M17 14.3c2.3.1 3.9 1.7 4.6 4.7%22/%3E%3C/svg%3E");
-  --se-ic-family: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%222%22/%3E%3C/g%3E%3Ccircle cx=%227.5%22 cy=%228%22 r=%222.5%22/%3E%3Ccircle cx=%2216.5%22 cy=%228%22 r=%222.5%22/%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%222%22/%3E%3Cpath d=%22M3 18c.6-2.6 2.3-4 4.5-4M21 18c-.6-2.6-2.3-4-4.5-4M8.5 20c.5-1.8 1.8-2.8 3.5-2.8s3 1 3.5 2.8%22/%3E%3C/svg%3E");
-  --se-ic-security: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z%22/%3E%3C/g%3E%3Cpath d=%22M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z%22/%3E%3Cpath d=%22M9 12l2 2 4-4%22/%3E%3C/svg%3E");
-  --se-ic-notify: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z%22/%3E%3C/g%3E%3Cpath d=%22M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z%22/%3E%3Cpath d=%22M10 20.5a2 2 0 0 0 4 0%22/%3E%3C/svg%3E");
-  --se-ic-interface: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223%22 y=%224%22 width=%2218%22 height=%2213%22 rx=%222.5%22/%3E%3C/g%3E%3Crect x=%223%22 y=%224%22 width=%2218%22 height=%2213%22 rx=%222.5%22/%3E%3Cpath d=%22M9 20.5h6M12 17v3.5%22/%3E%3C/svg%3E");
-  --se-ic-storeic: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8z%22/%3E%3C/g%3E%3Cpath d=%22M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8z%22/%3E%3Cpath d=%22M9 10V7a3 3 0 0 1 6 0v3%22/%3E%3C/svg%3E");
-  --se-ic-libic: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223.5%22 y=%224%22 width=%224.5%22 height=%2216%22 rx=%221%22/%3E%3Crect x=%2210%22 y=%224%22 width=%224.5%22 height=%2216%22 rx=%221%22/%3E%3C/g%3E%3Crect x=%223.5%22 y=%224%22 width=%224.5%22 height=%2216%22 rx=%221%22/%3E%3Crect x=%2210%22 y=%224%22 width=%224.5%22 height=%2216%22 rx=%221%22/%3E%3Cpath d=%22M16.6 5.4l3.1-.8 3 14.2-3.1.8z%22/%3E%3C/svg%3E");
-  --se-ic-dl: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M4 15.5v2.5A2 2 0 0 0 6 20h12a2 2 0 0 0 2-2v-2.5z%22/%3E%3C/g%3E%3Cpath d=%22M12 3.5v11m-4.5-4.5L12 14.5 16.5 10%22/%3E%3Cpath d=%22M4 15.5v2.5A2 2 0 0 0 6 20h12a2 2 0 0 0 2-2v-2.5%22/%3E%3C/svg%3E");
-  --se-ic-storage: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223%22 y=%2213%22 width=%2218%22 height=%227%22 rx=%222%22/%3E%3C/g%3E%3Crect x=%223%22 y=%2213%22 width=%2218%22 height=%227%22 rx=%222%22/%3E%3Cpath d=%22M5 13l2.2-7.2A1.5 1.5 0 0 1 8.6 4.8h6.8a1.5 1.5 0 0 1 1.4 1l2.2 7.2%22/%3E%3Cpath d=%22M16.5 16.5h.01%22/%3E%3C/svg%3E");
-  --se-ic-cloud: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M7 18.5a4.5 4.5 0 0 1-.6-9 6 6 0 0 1 11.5 1.6 3.8 3.8 0 0 1-.4 7.4z%22/%3E%3C/g%3E%3Cpath d=%22M7 18.5a4.5 4.5 0 0 1-.6-9 6 6 0 0 1 11.5 1.6 3.8 3.8 0 0 1-.4 7.4z%22/%3E%3C/svg%3E");
-  --se-ic-ingame: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%2211%22 y=%229%22 width=%227%22 height=%225%22 rx=%221.2%22/%3E%3C/g%3E%3Crect x=%223%22 y=%224%22 width=%2218%22 height=%2213%22 rx=%222.5%22/%3E%3Cpath d=%22M7 21h10%22/%3E%3Crect x=%2211%22 y=%229%22 width=%227%22 height=%225%22 rx=%221.2%22/%3E%3C/svg%3E");
-  --se-ic-access: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%229%22/%3E%3C/g%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%229%22/%3E%3Ccircle cx=%2212%22 cy=%227.6%22 r=%221.3%22/%3E%3Cpath d=%22M7.5 10h9M12 10v4l-2.5 4M12 14l2.5 4%22/%3E%3C/svg%3E");
-  --se-ic-controller: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M7.2 7.5h9.6a4 4 0 0 1 3.9 3.2l1 4.8a2.4 2.4 0 0 1-4.2 2L15.4 15H8.6l-2.1 2.5a2.4 2.4 0 0 1-4.2-2l1-4.8a4 4 0 0 1 3.9-3.2z%22/%3E%3C/g%3E%3Cpath d=%22M7.2 7.5h9.6a4 4 0 0 1 3.9 3.2l1 4.8a2.4 2.4 0 0 1-4.2 2L15.4 15H8.6l-2.1 2.5a2.4 2.4 0 0 1-4.2-2l1-4.8a4 4 0 0 1 3.9-3.2z%22/%3E%3Cpath d=%22M7.5 10.2v3M6 11.7h3%22/%3E%3Cpath d=%22M15.6 11.2h.01M17.6 12.6h.01%22/%3E%3C/svg%3E");
-  --se-ic-rec: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%229%22 cy=%2212%22 r=%222.5%22/%3E%3C/g%3E%3Crect x=%223%22 y=%225%22 width=%2218%22 height=%2214%22 rx=%223%22/%3E%3Ccircle cx=%229%22 cy=%2212%22 r=%222.5%22/%3E%3Cpath d=%22M14 10.5h4M14 13.5h3%22/%3E%3C/svg%3E");
-  --se-ic-voice: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%229%22 y=%223%22 width=%226%22 height=%2211%22 rx=%223%22/%3E%3C/g%3E%3Crect x=%229%22 y=%223%22 width=%226%22 height=%2211%22 rx=%223%22/%3E%3Cpath d=%22M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21%22/%3E%3C/svg%3E");
-  --se-ic-remote: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223%22 y=%224%22 width=%2218%22 height=%2212%22 rx=%222.5%22/%3E%3C/g%3E%3Crect x=%223%22 y=%224%22 width=%2218%22 height=%2212%22 rx=%222.5%22/%3E%3Cpath d=%22M3 19.5a3 3 0 0 1 3 0M3 16.5a6 6 0 0 1 6 3%22/%3E%3C/svg%3E");
-  --se-ic-broadcast: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%222.2%22/%3E%3C/g%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%222.2%22/%3E%3Cpath d=%22M8.2 8.2a5.4 5.4 0 0 0 0 7.6M15.8 8.2a5.4 5.4 0 0 1 0 7.6M5.4 5.4a9.3 9.3 0 0 0 0 13.2M18.6 5.4a9.3 9.3 0 0 1 0 13.2%22/%3E%3C/svg%3E");
-  --se-ic-music: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%227.5%22 cy=%2217.5%22 r=%222.5%22/%3E%3C/g%3E%3Ccircle cx=%227.5%22 cy=%2217.5%22 r=%222.5%22/%3E%3Ccircle cx=%2217.5%22 cy=%2215.5%22 r=%222.5%22/%3E%3Cpath d=%22M10 17.5V6l10-2v11.5%22/%3E%3C/svg%3E");
-  --se-ic-check: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%229%22/%3E%3C/g%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%229%22/%3E%3Cpath d=%22M8 12.2l2.6 2.6L16 9.4%22/%3E%3C/svg%3E");
-  --se-ic-add: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223.5%22 y=%223.5%22 width=%2217%22 height=%2217%22 rx=%224.5%22/%3E%3C/g%3E%3Crect x=%223.5%22 y=%223.5%22 width=%2217%22 height=%2217%22 rx=%224.5%22/%3E%3Cpath d=%22M12 8v8M8 12h8%22/%3E%3C/svg%3E");
-  --se-ic-family-tile: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%222%22/%3E%3C/g%3E%3Ccircle cx=%227.5%22 cy=%228%22 r=%222.5%22/%3E%3Ccircle cx=%2216.5%22 cy=%228%22 r=%222.5%22/%3E%3Ccircle cx=%2212%22 cy=%2213.5%22 r=%222%22/%3E%3Cpath d=%22M3 18c.6-2.6 2.3-4 4.5-4M21 18c-.6-2.6-2.3-4-4.5-4M8.5 20c.5-1.8 1.8-2.8 3.5-2.8s3 1 3.5 2.8%22/%3E%3C/svg%3E");
-}
-
+/* Row icons: a row's data-se-row (or data-se-icon) picks its --se-ic (core/icons-ui.css) */
 [data-se-icon="account"],
 [data-se-row="account"] {
   --se-ic: var(--se-ic-account);
@@ -442,16 +429,58 @@
   --se-ic: var(--se-ic-mail);
 }
 
+[data-se-row="device"] {
+  --se-ic: var(--se-ic-device);
+}
+
+[data-se-row="key"] {
+  --se-ic: var(--se-ic-key);
+}
+
+/* Store's preferences (client/settings/dialog/store.js) */
+[data-se-row="mature"] {
+  --se-ic: var(--se-icon-shield);
+}
+
+[data-se-row="exclude"] {
+  --se-ic: var(--se-icon-eye-off);
+}
+
+[data-se-row="platform"] {
+  --se-ic: var(--se-icon-pc);
+}
+
+[data-se-row="discovery"] {
+  --se-ic: var(--se-icon-compass);
+}
+
+[data-se-row="newonsteam"] {
+  --se-ic: var(--se-icon-calendar);
+}
+
+[data-se-row="deck"] {
+  --se-ic: var(--se-icon-gamepad);
+}
+
+[data-se-row="broadcasts"] {
+  --se-ic: var(--se-icon-broadcast);
+}
+
+[data-se-row="signout"] {
+  --se-ic: var(--se-ic-signout);
+}
+
+/* Library's three tiles: their chip's icon (pages.css) */
 .CFTLX2wIKOK3hNV-fS7_V button.DialogButton[data-se-tile="add"] {
-  --se-tile-ic: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2242%22 height=%2242%22 viewBox=%220 0 42 42%22%3E%3Cg transform=%22translate%2810.5 10.5%29 scale%28.875%29%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Crect x=%223.5%22 y=%223.5%22 width=%2217%22 height=%2217%22 rx=%224.5%22/%3E%3C/g%3E%3Crect x=%223.5%22 y=%223.5%22 width=%2217%22 height=%2217%22 rx=%224.5%22/%3E%3Cpath d=%22M12 8v8M8 12h8%22/%3E%3C/g%3E%3C/svg%3E");
+  --se-tile-ic: var(--se-ic-add);
 }
 
 .CFTLX2wIKOK3hNV-fS7_V button.DialogButton[data-se-tile="tag"] {
-  --se-tile-ic: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2242%22 height=%2242%22 viewBox=%220 0 42 42%22%3E%3Cg transform=%22translate%2810.5 10.5%29 scale%28.875%29%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1.5 1.5 0 0 1 0 2.1l-6.6 6.6a1.5 1.5 0 0 1-2.1 0z%22/%3E%3C/g%3E%3Cpath d=%22M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1.5 1.5 0 0 1 0 2.1l-6.6 6.6a1.5 1.5 0 0 1-2.1 0z%22/%3E%3Ccircle cx=%228%22 cy=%228%22 r=%221.5%22/%3E%3C/g%3E%3C/svg%3E");
+  --se-tile-ic: var(--se-ic-tag);
 }
 
 .CFTLX2wIKOK3hNV-fS7_V button.DialogButton[data-se-tile="storeic"] {
-  --se-tile-ic: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2242%22 height=%2242%22 viewBox=%220 0 42 42%22%3E%3Cg transform=%22translate%2810.5 10.5%29 scale%28.875%29%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%221.75%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cg fill=%22%23000%22 fill-opacity=%22.32%22 stroke=%22none%22%3E%3Cpath d=%22M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8z%22/%3E%3C/g%3E%3Cpath d=%22M5 8h14l-1.2 11.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8z%22/%3E%3Cpath d=%22M9 10V7a3 3 0 0 1 6 0v3%22/%3E%3C/g%3E%3C/svg%3E");
+  --se-tile-ic: var(--se-ic-storeic);
 }
 
 /*
@@ -466,14 +495,19 @@ html:is([data-se-props], [data-se-mill]) ._1ZpBQtDqcKBbfIIv01Vs1R:not(:has(._1Zt
   transform: translateY(4px) !important;
 }
 
-/* Settings / Properties: no visible scrollbars; wheel, keys and dragging still scroll. */
-._2sssIwe0duyIrFvat2oXzH,
-._2sssIwe0duyIrFvat2oXzH * {
-  scrollbar-width: none !important;
-}
-
+/*
+ * Settings / Properties (PagedSettingsDialog): no visible scrollbars; wheel, keys and dragging
+ * still scroll. Its scrollers by name: the dialog, the page list, the content column and page,
+ * Steam's dialog bodies and lists, inner scrollers the theme marks (data-se-noxs, layout.css),
+ * and the theme's own (search results, Theme settings, Millennium's panes). Hidden through
+ * ::-webkit-scrollbar, which core/scrollbars.css also styles (scrollbar-width would switch it off).
+ */
 ._2sssIwe0duyIrFvat2oXzH::-webkit-scrollbar,
-._2sssIwe0duyIrFvat2oXzH *::-webkit-scrollbar {
+._2sssIwe0duyIrFvat2oXzH :is(
+  ._18QCu-7MTzd51UpVbYysDy, .OX7USkJ5dDP_icD00Gal6, .CFTLX2wIKOK3hNV-fS7_V, .DialogBody, .DialogContent,
+  .DialogListBuilderInput_List, ._3ZhiKhciPyiGGxDFuGOYpc, [data-se-noxs], .se-settings-results,
+  .se-ts-tabs, .se-ts-page-body, .se-qc-ta, .se-logv-body, .se-upd-rows, .MillenniumLogs_Text
+)::-webkit-scrollbar {
   width: 0 !important;
   height: 0 !important;
   display: none !important;

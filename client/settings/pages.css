@@ -1,19 +1,320 @@
 /*
- * Settings › page specifics: Family, Notifications, Library, Voice.
+ * Settings › page specifics: Account, Friends & Chat, Family, Security, Library, Downloads,
+ * Game Recording, Voice, Storage. Parts, listed after it: pages-notifications.css,
+ * pages-interface.css, pages-store.css, pages-library.css, pages-downloads.css, pages-cloud.css,
+ * pages-ingame.css, pages-accessibility.css, pages-hero.css (the pages' hero card),
+ * pages-controller.css, pages-gamerecording.css, pages-voice.css, pages-remoteplay.css,
+ * pages-broadcast.css, pages-music.css, each named for its page.
  * Settings styles load in order: layout, controls, pages, storage, search, game-properties (and its parts), spacing.
  */
 
 /*
- * Family: the "Steam Families" intro and its button become one header card (row 1 of
- * the panel); anything else in the panel (Family View…) runs full width below it.
+ * Account (client/settings/dialog/account.js): a profile banner over Steam's own order.
+ *
+ *   [ your profile background ······························· ]
+ *   [ (avatar) NVHT                    [$5.00] [View Profile] ]
+ *   [ Add Funds ]  [ Privacy Settings ]  [ Account Details ]
+ *   ACCOUNT
+ *   [ Friend code  [copy] [Add Friends] / Email (blurred) / VAC ]
+ *
+ * Scoped by the page's route (the content's id), the same in every language. !important here
+ * beats the theme's own field and tile rules (layout.css, controls.css), themselves !important
+ * against Steam's.
  */
-.CFTLX2wIKOK3hNV-fS7_V [data-se-family]:not(#se-none) {
+
+/* The banner: Steam's header row over the art */
+[id$="/settings/account_Content"] .Field[data-se-acct-banner]:not(#se-none) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 208px !important;
+  align-items: flex-end !important;
+  margin: var(--se-space-5) 0 0 !important;
+  padding: var(--se-space-6) !important;
+  border-radius: var(--se-radius-xl) !important;
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge) !important;
+}
+
+[data-se-acct-banner] > :not(.se-acct-art) {
+  position: relative;
+  z-index: var(--se-z-raised);
+  align-self: flex-end;
+}
+
+/* The art fills the whole banner (a dialog's art only its top: dialogs.css) */
+[data-se-acct-banner] > .se-acct-art {
+  inset: 0;
+  height: auto;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+[data-se-acct-banner] > .se-acct-art[data-ready] :is(img, video) {
+  opacity: .9;
+}
+
+/* One even shade from the foot up, so the name and buttons read on any background (two crossed
+   gradients pooled into a dark patch in the corner) */
+[data-se-acct-banner] > .se-acct-art::after {
+  background: linear-gradient(0deg, color-mix(in srgb, var(--se-bg-ink) 88%, transparent) 0%, color-mix(in srgb, var(--se-bg-ink) 55%, transparent) 40%, transparent 80%);
+}
+
+/* The name as the banner's title; the status stays in its colour under it */
+[data-se-acct-banner] .playerName:not(#se-none) {
+  font: 800 var(--se-fs-3xl) / 1.2 var(--se-font) !important;
+  color: var(--se-text-strong) !important;
+}
+
+[data-se-acct-banner] .FieldRightColumn:not(#se-none) {
+  gap: var(--se-space-2);
+  max-width: none !important;
+}
+
+/* The wallet: its balance on a glass button ($0.00 when empty), which opens Add Funds (account.js) */
+.se-acct-wallet {
+  box-sizing: border-box;
+  display: inline-flex;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: var(--se-ctl);
+  padding: 0 var(--se-space-3);
+  border-radius: var(--se-radius-control);
+  background: var(--se-glass-chip);
+  backdrop-filter: var(--se-blur-chip);
+  font: 600 var(--se-fs-sm) var(--se-font);
+  color: var(--se-text-strong);
+  white-space: nowrap;
+  transition: background-color var(--se-dur) var(--se-ease);
+}
+
+.se-acct-wallet:hover {
+  background: var(--se-glass-btn-hover);
+}
+
+.se-acct-wallet:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+.se-acct-wallet::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-wallet) center / contain no-repeat;
+  mask: var(--se-icon-wallet) center / contain no-repeat;
+}
+
+/* The friend code's copy button (SE.copyButton, dialog-controls.css): beside Add Friends, at the
+   buttons' height */
+[id$="/settings/account_Content"] .se-acct-copy {
+  --se-copy-size: var(--se-ctl);
+}
+
+[id$="/settings/account_Content"] .Field[data-se-c] .FieldRightColumn:has(> .se-acct-copy):not(#se-none) {
+  gap: var(--se-space-2);
+}
+
+/* The email, blurred until hovered or focused (screenshots, streams) */
+[data-se-private] .EntryValue {
+  filter: blur(5px);
+  transition: filter var(--se-dur) var(--se-ease);
+}
+
+[data-se-private]:is(:hover, :focus-within) .EntryValue {
+  filter: none;
+}
+
+/* Add Funds' tile with no balance: its empty line goes, so the label centres (account.js) */
+[id$="/settings/account_Content"] .FatButton[data-se-acct-empty] .Details:not(#se-none) {
+  display: none !important;
+}
+
+[id$="/settings/account_Content"] .FatButton[data-se-acct-empty] > .Label:not(#se-none) {
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+/*
+ * Friends & Chat (client/settings/dialog/friends.js): a header over a wall of your friends'
+ * pictures, then Steam's sections as cards in two columns, the font size under
+ * Chat so both columns run about as long.
+ *
+ *   [ (friends' pictures) 38 friends · 6 online ················ ]
+ *   FRIENDS LIST                  CHAT
+ *   [ toggles ·············· ]   [ toggles ·············· ]
+ *   [ ······················ ]   [ Chat font size  S M L  ]  (Chat's last row)
+ *
+ * Narrower, one column.
+ */
+[id$="/settings/friends_Content"] .DialogBody:not(#se-none) {
+  display: grid !important; /* !important: the theme's DialogBody reset (layout.css) */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* header, Chat, the font size: the friends list spans the last two, and its extra length goes
+     to the last row, so the font size sits right under Chat */
+  grid-template-rows: auto auto 1fr;
+  gap: var(--se-space-4);
+  align-content: start; /* the body has a fixed height: rows stay their own size */
+  align-items: start;
+}
+
+/* A page heading Steam draws inside the body: a row of its own above the header */
+[id$="/settings/friends_Content"] .DialogBody:has(> .DialogHeader):not(#se-none) {
+  grid-template-rows: auto auto auto 1fr;
+}
+
+[id$="/settings/friends_Content"] .DialogBody > .DialogHeader {
+  grid-column: 1 / -1;
+}
+
+[id$="/settings/friends_Content"] .DialogBody > .DialogControlsSection:not(#se-none) {
+  min-width: 0;
+  margin: 0 !important; /* !important: the sections' stacking gap (layout.css); the grid spaces them */
+}
+
+/* The friends list: the left column, beside Chat and the font size (the one unlabelled section) */
+[id$="/settings/friends_Content"] .DialogBody > .DialogControlsSection:not(.DialogLabelledControlsSection) {
+  grid-row: span 2;
+}
+
+/* The font size's own section label (blank: its row names it) would hold it off Chat */
+[id$="/settings/friends_Content"] .DialogBody > .DialogControlsSection:last-child > [data-se-sec]:not(#se-none) {
+  display: none !important; /* !important: the section labels' display (layout.css) */
+}
+
+/*
+ * The font size joins Chat's card: its row is Chat's last, under a hairline (Steam keeps it a
+ * section of its own). !important: the card rows' corners, edges and gap (layout.css).
+ */
+[id$="/settings/friends_Content"] .DialogBody > .DialogControlsSection:last-child:not(#se-none) {
+  margin-top: calc(-1 * var(--se-space-4)) !important; /* the grid's gap */
+}
+
+[id$="/settings/friends_Content"] .DialogBody > .DialogLabelledControlsSection:not(:last-child) [data-se-c~="l"]:not(#se-none) {
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  box-shadow: inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline) !important;
+}
+
+[id$="/settings/friends_Content"] .DialogBody > .DialogControlsSection:last-child [data-se-c~="f"]:not(#se-none) {
+  margin-top: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  background-image: linear-gradient(var(--se-hairline), var(--se-hairline)) !important;
+  box-shadow: inset 0 -1px 0 var(--se-hairline), inset 1px 0 0 var(--se-hairline), inset -1px 0 0 var(--se-hairline) !important;
+}
+
+/* Steam's sample friend under "Append nicknames": its name cut short inside the card */
+[id$="/settings/friends_Content"] .FakeFriend,
+[id$="/settings/friends_Content"] .FakeFriend > :last-child,
+[id$="/settings/friends_Content"] .FakeFriend .statusAndName {
+  max-width: 100%;
+  min-width: 0;
+}
+
+[id$="/settings/friends_Content"] .FakeFriend .playerName {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 760px) {
+  [id$="/settings/friends_Content"] .DialogBody:not(#se-none),
+  [id$="/settings/friends_Content"] .DialogBody:has(> .DialogHeader):not(#se-none) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+
+  [id$="/settings/friends_Content"] .DialogBody > .DialogControlsSection:not(.DialogLabelledControlsSection) {
+    grid-row: auto;
+  }
+}
+
+/* The header: a wall of your friends' pictures under one shade, the count over it */
+.se-fc-head {
+  grid-column: 1 / -1;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  min-height: 112px;
+  margin-top: var(--se-space-5);
+  padding: var(--se-space-5);
+  box-sizing: border-box;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+}
+
+.se-fc-wall {
+  position: absolute;
+  inset: 0;
+  z-index: var(--se-z-under);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 36px);
+  grid-auto-rows: 36px;
+  gap: var(--se-space-1);
+  justify-content: center;
+  align-content: center;
+  pointer-events: none;
+}
+
+.se-fc-wall::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, color-mix(in srgb, var(--se-bg-ink) 90%, transparent) 0%, color-mix(in srgb, var(--se-bg-ink) 40%, transparent) 60%, transparent 100%);
+}
+
+/* Online friends bright, offline ones faded into the wall */
+.se-fc-wall img {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--se-avatar-radius);
+  object-fit: cover;
+  opacity: .25;
+}
+
+.se-fc-wall img[data-on] {
+  opacity: .85;
+}
+
+.se-fc-count {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 600 var(--se-fs-md) var(--se-font);
+  color: var(--se-text-strong);
+}
+
+.se-fc-online {
+  color: var(--se-online);
+}
+
+/*
+ * Family (client/settings/dialog/family.js): the Steam Families intro as a hero over your
+ * library's art, its button under the text; Family View below.
+ *
+ *   [ Steam Families                          (your games' art  ) ]
+ *   [ Use the Steam Families feature to…       (in rows, fading ) ]
+ *   [ [Create or Join a Steam Family]          (in from the left) ]
+ *   RESTRICTIONS
+ *   [ Family View ··································· [Manage] ]
+ *
+ * In a family Steam drops the intro's button, the body isn't marked, and the page keeps the
+ * plain layout.
+ */
+[id$="/settings/family_Content"] [data-se-family]:not(#se-none) {
   position: relative;
   display: grid !important;
-  grid-template-columns: 22px 52px 18px minmax(0, 1fr) 18px auto 22px;
-  align-items: center;
+  grid-template-columns: var(--se-space-6) minmax(0, 400px) minmax(0, 1fr);
   align-content: start !important;
-  grid-auto-rows: auto;
   height: auto !important;
   min-height: 0 !important;
   max-height: none !important;
@@ -27,118 +328,231 @@
   mask: none !important;
 }
 
-.CFTLX2wIKOK3hNV-fS7_V [data-se-family]::after {
-  content: '';
+/* The hero's card, under the art (a library without art keeps the plain card) */
+[id$="/settings/family_Content"] [data-se-family]::after {
+  content: "";
   grid-column: 1 / -1;
-  grid-row: 1;
-  align-self: stretch;
-  z-index: 0;
-  border-radius: var(--se-radius-lg);
-  background: linear-gradient(110deg, var(--se-surface-2) 0%, var(--se-surface) 65%);
+  grid-row: 1 / span 2;
+  isolation: isolate;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-surface);
   box-shadow: var(--se-edge);
 }
 
-.CFTLX2wIKOK3hNV-fS7_V [data-se-family]::before {
-  content: '';
-  grid-column: 2;
-  grid-row: 1;
-  z-index: var(--se-z-raised);
-  width: 52px;
-  height: 52px;
-  margin: var(--se-space-5) 0;
-  border-radius: var(--se-radius-lg);
-  /* One mask in the muted text tone: the icon over a faint fill of the same tone (::after is
-     the card, so the tile and its icon share this one pseudo-element) */
-  background: var(--se-text-muted);
-  -webkit-mask: var(--se-ic-family-tile) center / 26px 26px no-repeat, linear-gradient(rgb(0 0 0 / .06) 0 0);
-  mask: var(--se-ic-family-tile) center / 26px 26px no-repeat, linear-gradient(rgb(0 0 0 / .06) 0 0);
-}
-
-.CFTLX2wIKOK3hNV-fS7_V [data-se-family] > * {
+[id$="/settings/family_Content"] [data-se-family] > * {
   grid-column: 1 / -1;
   position: relative;
-  z-index: var(--se-z-raised);
+  z-index: var(--se-z-raised-2);
 }
 
-.CFTLX2wIKOK3hNV-fS7_V [data-se-family] > :first-child:not(.WIVHxIb79kMHNG7iA_Q9H) {
-  grid-column: 4;
+/* Your games' capsules in rows on the right, fading in from the text's side */
+[id$="/settings/family_Content"] [data-se-family] > .se-fam-art {
+  grid-row: 1 / span 2;
+  z-index: var(--se-z-raised);
+  overflow: hidden;
+  border-radius: var(--se-radius-xl);
+  pointer-events: none;
+}
+
+.se-fam-wall {
+  position: absolute;
+  top: 50%;
+  right: calc(-1 * var(--se-space-6));
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--se-space-2);
+  width: 60%;
+  transform: translateY(-50%);
+}
+
+.se-fam-wall img {
+  width: 100%;
+  aspect-ratio: 460 / 215;
+  border-radius: var(--se-radius-md);
+  object-fit: cover;
+  opacity: .75;
+}
+
+.se-fam-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--se-surface) 38%, color-mix(in srgb, var(--se-surface) 55%, transparent) 62%, transparent 100%);
+}
+
+[id$="/settings/family_Content"] [data-se-family] > :first-child:not(.WIVHxIb79kMHNG7iA_Q9H) {
+  grid-column: 2;
   grid-row: 1;
-  padding: var(--se-space-5) 0 !important;
+  padding: var(--se-space-6) 0 var(--se-space-4) !important;
   margin: 0 !important;
   font: 500 var(--se-fs-base)/1.45 var(--se-font) !important;
   color: var(--se-text-muted) !important;
 }
 
-.CFTLX2wIKOK3hNV-fS7_V [data-se-family] > :first-child[data-se-head]::before {
+[id$="/settings/family_Content"] [data-se-family] > :first-child[data-se-head]::before {
   content: attr(data-se-head);
   display: block;
   margin-bottom: var(--se-space-1);
-  font: 700 var(--se-fs-lg) var(--se-font);
+  font: 800 var(--se-fs-2xl) var(--se-font);
   color: var(--se-text-strong);
 }
 
-.CFTLX2wIKOK3hNV-fS7_V [data-se-family] a {
+[id$="/settings/family_Content"] [data-se-family] a {
   color: var(--se-accent) !important;
 }
 
-.CFTLX2wIKOK3hNV-fS7_V .WIVHxIb79kMHNG7iA_Q9H:not(#se-none) {
-  grid-column: 6;
-  grid-row: 1;
+[id$="/settings/family_Content"] .WIVHxIb79kMHNG7iA_Q9H:not(#se-none) {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: start;
   margin: 0 !important;
-  padding: 0 !important;
+  padding: 0 0 var(--se-space-6) !important;
   display: flex !important;
 }
 
-.CFTLX2wIKOK3hNV-fS7_V .WIVHxIb79kMHNG7iA_Q9H ._3W3GOfKp-DI8NI_UMouX-S {
+[id$="/settings/family_Content"] .WIVHxIb79kMHNG7iA_Q9H ._3W3GOfKp-DI8NI_UMouX-S {
   display: none !important;
 }
 
-/* placeholder */
-.CFTLX2wIKOK3hNV-fS7_V .QXpTLSmzoZutYgh3fp02Y:not(#se-none):not(#se-p) {
+/* Create or Join: the page's one primary action */
+[id$="/settings/family_Content"] .QXpTLSmzoZutYgh3fp02Y:not(#se-none):not(#se-p) {
   width: auto !important;
   background: var(--se-accent) !important;
   color: var(--se-bg-ink) !important;
 }
 
-/* Notifications: Toast / Sound columns. */
-.CFTLX2wIKOK3hNV-fS7_V ._2zGUtyw-lRSsEUPY1qaqf7 {
-  /* NotificationSectionHeader */
-  display: flex !important;
-  align-items: flex-end !important;
-  justify-content: space-between !important;
-  margin: var(--se-space-5) 0 var(--se-space-2) !important;
-  padding: 0 var(--se-space-4) 0 var(--se-space-1) !important;
+/*
+ * Security (client/settings/dialog/security.js): the hero card (pages-hero.css) saying how
+ * protected the account is, tinted by it, over Steam's own rows.
+ *
+ *   [ Protected                                            ]
+ *   [ 2FA protection on via the Steam Mobile App…          ]
+ *   SIGN-IN
+ *   [ Account Name (blurred)  [Change Password] / Don't save credentials ]
+ *   STEAM GUARD
+ *   [ Steam Guard [Manage] / … / Deauthorize (danger) ]
+ */
+.se-page-hero[data-sec-state] {
+  --se-sec-tone: var(--se-success);
+  background: linear-gradient(110deg, color-mix(in srgb, var(--se-sec-tone) 12%, var(--se-surface)) 0%, var(--se-surface) 60%);
 }
 
-.CFTLX2wIKOK3hNV-fS7_V ._2zGUtyw-lRSsEUPY1qaqf7 [data-se-sec]:not(#se-none) {
-  margin: 0 !important;
-  padding: 0 !important;
+.se-page-hero[data-sec-state="email"] {
+  --se-sec-tone: var(--se-warning);
 }
 
-.CFTLX2wIKOK3hNV-fS7_V ._27r3CjIYhU20TsukVgm25C {
-  display: grid !important;
-  grid-template-columns: 76px 76px;
-  justify-items: center;
+.se-page-hero[data-sec-state="off"] {
+  --se-sec-tone: var(--se-danger);
+}
+
+/*
+ * How the codes come, on the card's right (security.js): a phone with a Steam Guard code and the
+ * bar that runs out before the next one (app), an envelope with a code (email), an empty dashed
+ * phone (off). The phone rises from the card's foot, cut by its edge.
+ */
+.se-page-hero[data-sec-state] > .se-page-hero-side {
+  top: var(--se-space-4);
+  align-items: flex-start;
+}
+
+.se-sec-art {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0 !important;
-  margin: 0 !important;
+  gap: var(--se-space-2);
+  width: 92px;
+  height: 160px;
+  box-sizing: border-box;
+  padding: var(--se-space-6) var(--se-space-3) 0;
+  border: 1.5px solid var(--se-text-faint);
+  border-radius: var(--se-radius-xl);
 }
 
-/* Toggles */
-.CFTLX2wIKOK3hNV-fS7_V ._27r3CjIYhU20TsukVgm25C > * {
-  margin: 0 !important;
+/* The phone's speaker slot */
+.se-sec-art::before {
+  content: "";
+  position: absolute;
+  top: var(--se-space-2);
+  left: 50%;
+  width: 22px;
+  height: 4px;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-text-faint);
+  translate: -50% 0;
 }
 
-.CFTLX2wIKOK3hNV-fS7_V ._2zGUtyw-lRSsEUPY1qaqf7 ._27r3CjIYhU20TsukVgm25C > * {
-  white-space: nowrap;
-  padding: 0 !important;
+.se-sec-code {
+  font: 700 var(--se-fs-md) / 1 var(--se-font-mono);
+  letter-spacing: .12em;
+  color: var(--se-text-strong);
 }
 
-.CFTLX2wIKOK3hNV-fS7_V ._2zGUtyw-lRSsEUPY1qaqf7 ._27r3CjIYhU20TsukVgm25C > * {
-  font: var(--se-label-font) !important;
-  letter-spacing: var(--se-label-spacing) !important;
-  text-transform: uppercase !important;
-  color: var(--se-label-color) !important;
+/* The time left on the code: a fill running out (scaleX) */
+.se-sec-bar {
+  width: 100%;
+  height: 3px;
+  overflow: hidden;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-14);
+}
+
+.se-sec-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--se-sec-tone);
+  transform-origin: left center;
+  animation: se-sec-code 30s linear infinite;
+}
+
+@keyframes se-sec-code {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+/* Email: an envelope instead of the phone, the code under it */
+.se-sec-device {
+  display: none;
+  width: 56px;
+  height: 56px;
+  background: var(--se-text-faint);
+  -webkit-mask: var(--se-ic-mail) center / contain no-repeat;
+  mask: var(--se-ic-mail) center / contain no-repeat;
+}
+
+.se-page-hero[data-sec-state="email"] .se-sec-art {
+  height: auto;
+  padding: 0;
+  border: 0;
+}
+
+.se-page-hero[data-sec-state="email"] .se-sec-art::before {
+  content: none;
+}
+
+.se-page-hero[data-sec-state="email"] .se-sec-device {
+  display: block;
+}
+
+/* Off: the phone empty, dashed */
+.se-page-hero[data-sec-state="off"] .se-sec-art {
+  border-style: dashed;
+}
+
+.se-page-hero[data-sec-state="off"] :is(.se-sec-code, .se-sec-bar) {
+  visibility: hidden;
+}
+
+/* Reduced motion: the bar stands (no new code without its turn) */
+@media (prefers-reduced-motion: reduce) {
+  .se-sec-bar > span {
+    animation: none;
+  }
+}
+
+/* Deauthorize: the danger button without Delete's bin (it signs devices out, deletes nothing) */
+[id$="/settings/security_Content"].CFTLX2wIKOK3hNV-fS7_V button.DialogButton[data-se-danger]::before {
+  display: none !important; /* !important: the bin's display (game-properties-extras.css) */
 }
 
 /* Library: the three actions become tiles with an icon. */
@@ -170,7 +584,7 @@
   white-space: normal !important;
 }
 
-/* The tile's icon chip (the icon from --se-tile-ic, client/settings/storage.css): one mask in the
+/* The tile's icon chip (the icon from --se-tile-ic: a --se-ic-* of core/icons-ui.css, set in client/settings/storage.css): one mask in the
    muted text tone, the icon over a faint fill of the same tone.
    !important: client/dialogs/dialogs.css hides a button's ::before with !important, and
    Steam's button styles place it */
@@ -185,8 +599,8 @@
   transform: translateY(-50%) !important;
   border-radius: var(--se-radius-md);
   background: var(--se-text-muted);
-  -webkit-mask: var(--se-tile-ic) center / 42px 42px no-repeat, linear-gradient(rgb(0 0 0 / .09) 0 0);
-  mask: var(--se-tile-ic) center / 42px 42px no-repeat, linear-gradient(rgb(0 0 0 / .09) 0 0);
+  -webkit-mask: var(--se-tile-ic) center / 21px 21px no-repeat, linear-gradient(rgb(0 0 0 / .09) 0 0);
+  mask: var(--se-tile-ic) center / 21px 21px no-repeat, linear-gradient(rgb(0 0 0 / .09) 0 0);
 }
 
 .CFTLX2wIKOK3hNV-fS7_V .RoSh6WoygUX6LLAoB20f3 button.DialogButton:not(#se-none):not(#se-t1):not(#se-t2):hover {
@@ -427,7 +841,7 @@
 }
 
 .CFTLX2wIKOK3hNV-fS7_V :is(._2W7tN4vCUKpfU8L0WFTIJT) {
-  background: #b9a3ff !important;
+  background: var(--se-kind-violet) !important;
 }
 
 .CFTLX2wIKOK3hNV-fS7_V :is(._1W6jWiFmoiCg9NZKWnF1sn) {
@@ -439,7 +853,7 @@
 }
 
 .CFTLX2wIKOK3hNV-fS7_V :is(._1GOFGeTHq8sYkjxutW5G-a) {
-  background: #ff9ad5 !important;
+  background: var(--se-kind-pink) !important;
 }
 
 .CFTLX2wIKOK3hNV-fS7_V :is(._2h-2O3n134sdwgtdM_Fuqr) {
@@ -450,10 +864,11 @@
   background: var(--se-gold) !important;
 }
 
+/* The keys in even columns, three a row: six never fit one line, and a lone key wrapping looks stray */
 .CFTLX2wIKOK3hNV-fS7_V ._2g2Ot3OPmLYBoz7PgpMnu6 {
-  display: flex !important;
-  flex-wrap: wrap;
-  gap: var(--se-space-1) var(--se-space-4) !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, max-content));
+  gap: var(--se-space-1) var(--se-space-6) !important;
   margin: var(--se-space-2) 0 0 !important;
 }
 

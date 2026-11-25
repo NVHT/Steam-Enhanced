@@ -278,7 +278,9 @@
         iconChip.append(icon(section.icon));
         const title = el('h3', 'se-sysreport-card-title', section.title);
         const count = el('span', 'se-sysreport-count', String(section.entries.reduce((sum, node) => sum + leafCount(node), 0)));
-        const copyButton = button('se-sysreport-card-copy', [icon('copy')], () => copy(sectionText(section), copyButton), 'Copy section');
+        const copyButton = SE.copyButton({ text: () => sectionText(section), label: 'Copy section', doc: win.document, win });
+        copyButton.classList.add('se-sysreport-card-copy');
+        copyButton.removeAttribute('title'); // Steam's own tooltip names it
         tip(contentTips, copyButton, 'Copy section');
         const head = el('header', 'se-sysreport-card-head');
         head.append(iconChip, title, count, copyButton);

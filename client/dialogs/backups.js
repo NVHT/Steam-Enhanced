@@ -23,7 +23,6 @@
  */
 ((SE) => {
   window.__seBackups?.destroy();
-  window.__seRestoreBackup?.destroy(); // the Restore-only module this replaces
 
   /* BackupAppsDialog CSS module (sp.js 32609) */
   const C = {
@@ -106,17 +105,7 @@
     return null;
   };
 
-  /* The window that owns Steam's stores (the main window) */
-  const storeWindow = () => {
-    for (const win of SE.owners?.() ?? [window]) {
-      try {
-        if (win.appStore?.GetAppOverviewByAppID) return win;
-      } catch {}
-    }
-    return null;
-  };
-
-  const overviewOf = (appid) => attempt(() => storeWindow()?.appStore.GetAppOverviewByAppID(appid), null);
+  const overviewOf = (appid) => attempt(() => SE.appStore()?.GetAppOverviewByAppID(appid), null);
 
   const appName = (appid) => overviewOf(appid)?.display_name || `App ${appid}`;
 

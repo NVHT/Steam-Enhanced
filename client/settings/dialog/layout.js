@@ -139,8 +139,12 @@
           ? prev.nextElementSibling
           : prev;
       // A list's edge between two fields (Privacy's per-DLC list opening under its row) keeps one card
+      // So do the rows of a draggable list (In Game's Toolbar Preferences), each in its own drag
+      // wrapper (react-beautiful-dnd's data-rbd-draggable-id), the wrappers side by side
+      const dragged = (f) => f?.parentElement?.matches('[data-rbd-draggable-id]') && f.parentElement;
+      const draggedNext = prev && dragged(prev) && dragged(n) && dragged(prev).nextElementSibling === dragged(n);
       if (prev && !prev.hasAttribute('data-se-sec') && !n.hasAttribute('data-se-pre') && start &&
-        adjacent(start, n, '[role="list"]:empty')) {
+        (draggedNext || adjacent(start, n, '[role="list"]:empty'))) {
         runNodes.push(n);
       } else {
         flush();
