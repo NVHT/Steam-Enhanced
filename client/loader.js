@@ -202,7 +202,7 @@
     ['desktop', 'client/friends/', ['chat/chat-tooltips.js']],
     ['desktop', 'client/friends/list/', [
       'friends.css', 'friends-search.css', 'friends-rows.css', 'friends-requests.css',
-      'friends-chats.css', 'friends-window.css', 'friends-list.js',
+      'friends-chats.css', 'friends-window.css', 'friends-list.js', 'friends-place.js',
     ]],
     ['desktop', 'client/friends/chat/', [
       'tabs.css', 'header.css', 'messages.css', 'bubbles.css', 'input.css', 'voice.css', 'calls.css', 'members.css',
