@@ -42,8 +42,11 @@
    * button. Never under --se-space-2.
    */
   function leftRoom(button) {
+    const side = SE.px('--se-pop-room-side');
+    // No room at all in Solid (options/appearance/popups-solid.css): any left would draw black on Linux
+    if (!side) return 0;
     const fromEdge = window.screenX + button.getBoundingClientRect().left - (screen.availLeft || 0);
-    return Math.max(SE.px('--se-space-2'), Math.min(SE.px('--se-pop-room-side'), Math.floor(fromEdge)));
+    return Math.max(SE.px('--se-space-2'), Math.min(side, Math.floor(fromEdge)));
   }
 
   // One hidden anchor per button, shared by every menu instance Steam makes for it.

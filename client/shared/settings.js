@@ -81,9 +81,9 @@
     },
     {
       // Linux (XWayland, or X11 without a compositor) draws a popup window's transparent parts
-      // black: the shadow's room and the rounded corners. Solid there unless chosen otherwise.
+      // black: the shadow's room and what's past the rounded corners. Solid there unless chosen otherwise.
       key: 'popups', tab: 'Appearance', label: 'Menu windows',
-      hint: 'Solid: no shadow or rounded edge on menus in their own window, for Linux, where those show black.',
+      hint: 'Solid: no shadow around menus in their own window, for Linux, where it shows black.',
       values: [opt('shadowed', 'Shadowed'), opt('solid', 'Solid', 'options/appearance/popups-solid.css')],
       def: /\bLinux\b/.test(navigator.userAgent) ? 'solid' : 'shadowed',
     },
@@ -473,16 +473,17 @@
   const paletteColors = (values) =>
     values.palette === 'custom' ? fillPalette(values['palette-custom']) : { ...presetOf(values.palette).colors };
 
-  // What's kept: the values not at their default, the stylesheets they switch on and the
-  // palette's tokens (none for Enhanced: tokens.css holds it)
+  // What's kept: the values not at their default, the stylesheets the chosen values switch on
+  // (a default's too: Menu windows defaults to Solid on Linux) and the palette's tokens (none
+  // for Enhanced: tokens.css holds it)
   const pack = (values) => {
     const kept = {};
     const client = [];
     const web = [];
     for (const item of SCHEMA) {
-      const value = values[item.key];
-      if (!valid(item, value) || same(value, item.def)) continue;
-      kept[item.key] = value;
+      let value = values[item.key];
+      if (!valid(item, value) || same(value, item.def)) value = item.def;
+      else kept[item.key] = value;
       const file = item.values.find((choice) => choice.v === value)?.file;
       if (!file) continue;
       if (item.scope !== 'web') client.push(file);
@@ -685,10 +686,13 @@
     // The browser view appears once Steam has built the main window: look again as it changes
     if (!asking.size) browserWatch = SE.watch(listen, { throttle: 1000 });
     migrate();
-    // The kept hide list follows the schema: a choice's selector changed, or a Steam class
-    // rehashed, is packed again at once instead of on the next change
+    // What's kept follows the schema and this machine: a choice's selector or stylesheet
+    // changed, a Steam class rehashed, or a default's stylesheet never kept (a first start
+    // on Linux) is packed again at once instead of on the next change
     const saved = read();
-    if (saved.values && JSON.stringify(saved.hide || []) !== JSON.stringify(pack(saved.values).hide)) write(saved.values);
+    const packed = pack(saved.values || {});
+    const stale = ['hide', 'client', 'web'].some((part) => JSON.stringify(saved[part] || []) !== JSON.stringify(packed[part]));
+    if (stale) write(saved.values || {});
   }
 
   SE.settings = {

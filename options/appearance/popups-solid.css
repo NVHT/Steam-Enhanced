@@ -1,24 +1,19 @@
 /* Theme setting (client/shared/settings.js): Menu windows, Solid. Where a popup window can't be
    transparent (Linux under XWayland), its see-through parts draw black: no room for the shadow
-   around a panel in its own window (--se-pop-room-*, placement.js reads it), and square corners
-   in menu windows, popup-layer ones included (client/loader.js marks them data-se-menu-window).
-   Doubled :root outranks core/tokens.css; the window rules also outrank corners-*.css. */
+   around a panel in its own window (--se-pop-room-*, placement.js reads it; the Steam menu's
+   left room follows), and the window's page in the surface colour, so what's past a rounded
+   corner or a menu Steam sized a little small shows that, not black (client/loader.js marks
+   menu windows data-se-menu-window). Corners keep their radius. Doubled :root outranks
+   core/tokens.css. */
 :root:root {
   --se-pop-room-top: 0px;
   --se-pop-room-side: 0px;
   --se-pop-room-bottom: 0px;
 }
 
-html:root[data-se-menu-window] {
-  --se-radius-xs: 0px;
-  --se-radius-sm: 0px;
-  --se-radius-md: 0px;
-  --se-radius-ml: 0px;
-  --se-radius-lg: 0px;
-  --se-radius-xl: 0px;
-}
-
-/* A menu window Steam sized a little past its menu shows the page colour there, not black */
+/* !important: beats client/dialogs/dialogs.css's transparent context-menu canvas (its own
+   !important, "Keep the detached context-menu canvas clear") */
+html:root[data-se-menu-window],
 html:root[data-se-menu-window] body {
-  background: var(--se-surface);
+  background: var(--se-surface) !important;
 }
