@@ -308,7 +308,7 @@
    */
   const PARTS = [
     '__seGamePageParts', '__seHomeStageParts', '__seFriendsDockParts', '__seNavParts', '__seSteamMenuParts',
-    '__seDownloadsParts', '__seSettingsParts', '__seToastsParts', '__seOverlayParts', '__seSystemReportParts',
+    '__seDownloadsParts', '__seSettingsParts', '__seSettingsPaletteParts', '__seToastsParts', '__seOverlayParts', '__seSystemReportParts',
     '__seMillParts', '__seLayerParts',
   ];
   const partTargets = new WeakSet();

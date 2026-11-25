@@ -189,8 +189,8 @@
   /*
    * Which theme files this page actually loaded, with their ?v= build. Only nodes that load a
    * file count: <script src> and stylesheet <link>s. Other <link>s to theme scripts (preload
-   * hints beside the <script>s Millennium injects) fetch nothing new and used to list every
-   * injected script twice, so they're counted on a line of their own. A file really injected
+   * hints beside the <script>s Millennium injects) fetch nothing new, so they're counted on a
+   * line of their own rather than listing every injected script twice. A file really injected
    * twice (two <script>s, two sheets) is flagged instead of silently repeated. Stylesheets come
    * as the @imports of the theme's one sheet per window (#se-sheets, [data-se-sheets]).
    */
@@ -223,7 +223,62 @@
       menu = layer.menuOpen() ? 'a Steam menu counts as open' : 'no Steam menu open';
     } catch {}
     const browser = SE.browserShown ? (SE.browserShown() ? 'browser page shown' : 'no browser page') : '';
-    return `Popup layer: ${found}; ${menu}; ${browser}`;
+    let last = '';
+    try {
+      last = `; last window ${layer.lastOpen?.() || '?'}; parked window ${layer.spareRect?.() || '?'}`;
+    } catch {}
+    return `Popup layer: ${found}; ${menu}; ${browser}${last}`;
+  };
+
+  /*
+   * Steam's open popup windows (g_PopupManager), each with its title, its size and place on the
+   * screen and whether it lies over this window's left edge (where the rail is): an unseen window
+   * there takes the rail's clicks
+   */
+  const popupsState = () => {
+    const SE = window.__se;
+    const seen = new Set();
+    const lines = [];
+    const railRight = screenX + 80;
+    for (const owner of SE?.owners?.() || [window]) {
+      let popups;
+      try {
+        popups = owner.g_PopupManager?.m_mapPopups;
+      } catch {
+        continue;
+      }
+      if (!popups?.values || seen.has(popups)) continue;
+      seen.add(popups);
+      for (const popup of popups.values()) {
+        try {
+          const win = popup.window;
+          if (!win || win === window || win.closed) continue;
+          const x = win.screenX;
+          const y = win.screenY;
+          const w = win.outerWidth;
+          const h = win.outerHeight;
+          const overRail = x < railRight && x + w > screenX && y < screenY + outerHeight && y + h > screenY;
+          const state = win.document.visibilityState === 'hidden' ? ', hidden' : '';
+          lines.push(`  "${win.document.title || popup.m_strName || '?'}" ${w}×${h} at ${x},${y}${state}${overRail ? ', OVER THE RAIL' : ''}`);
+        } catch {}
+      }
+    }
+    return lines.length ? ['Popup windows:', ...lines].join('\n') : 'Popup windows: none';
+  };
+
+  // The rail's page icons (client/navigation/nav-rail.js) and the startup Library pass
+  // (client/library/start-on-page.js), in the main window
+  const railState = () => {
+    const rail = window.__seRailNav?.why;
+    const start = window.__seStartOnPage?.state;
+    if (!rail && !start) return null;
+    let text = 'Rail: ';
+    try {
+      text += rail ? rail() : '(none)';
+    } catch (err) {
+      text += `check failed (${err?.message || err})`;
+    }
+    return [text, start ? `Start on a page: ${start}` : '', popupsState()].filter(Boolean).join('\n');
   };
 
   // The loader's wait (client/loader.js): a window that never got [data-se-styled] names what held it
@@ -396,6 +451,7 @@
       `Root classes: html.${[...document.documentElement.classList].join('.') || '(none)'}`,
       loaderState(),
       layerState(),
+      ...[railState()].filter(Boolean),
       'Theme files loaded:',
       themeFiles(),
       '',
@@ -459,6 +515,7 @@
       `Root classes: html.${[...document.documentElement.classList].join('.') || '(none)'}`,
       loaderState(),
       layerState(),
+      ...[railState()].filter(Boolean),
       `Body: ${label(body)}  (background ${short(bodyStyle.backgroundColor, 40)}, ${short(bodyStyle.backgroundImage, 100)})`,
       `Window: ${innerWidth}×${innerHeight}, page ${document.documentElement.scrollWidth}×${document.documentElement.scrollHeight}, scale ${devicePixelRatio}`,
       'Theme files loaded:',
