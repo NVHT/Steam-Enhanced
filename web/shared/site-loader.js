@@ -209,7 +209,14 @@
     };
 
     apply();
-    Promise.race([Promise.allSettled(firstPass), new Promise((resolve) => setTimeout(resolve, REVEAL_MAX_MS))]).then(() => {
+    let revealTimer = 0;
+    let stopped = false;
+    const revealCap = new Promise((resolve) => {
+      revealTimer = setTimeout(resolve, REVEAL_MAX_MS);
+    });
+    Promise.race([Promise.allSettled(firstPass), revealCap]).then(() => {
+      clearTimeout(revealTimer);
+      if (stopped) return;
       revealed = true;
       firstPass.length = 0;
       root.setAttribute('data-se-styled', '');
@@ -222,6 +229,8 @@
 
     window[global] = {
       destroy() {
+        stopped = true;
+        clearTimeout(revealTimer);
         window.navigation?.removeEventListener('currententrychange', apply);
         removeEventListener('popstate', apply);
         for (const file of [...running.keys()].reverse()) stopScript(file);

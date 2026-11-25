@@ -124,7 +124,8 @@ html.se-community-discussions-home #game_search_form .discussionSearchText {
 }
 
 /* Suggestions: one popup the field's width (Steam places it inline; the search option is its
-   containing block), Steam's inner panels flattened, rows that highlight */
+   containing block), the web's menu panel (--se-panel-* / --se-menu-*, as web/shared/select.css),
+   Steam's inner panels flattened, rows that highlight */
 html.se-community-discussions-home #game_select_suggestions_ctn {
   position: absolute !important;
   top: calc(100% + 6px) !important;
@@ -133,14 +134,16 @@ html.se-community-discussions-home #game_select_suggestions_ctn {
   z-index: var(--se-z-dropdown);
   box-sizing: border-box;
   width: auto !important;
-  max-height: 420px;
+  max-height: var(--se-menu-max-h);
   margin: 0 !important;
-  padding: var(--se-space-2) !important;
+  padding: var(--se-menu-pad) !important;
   border: 0 !important;
-  border-radius: var(--se-radius-md);
-  background: var(--se-surface-2) !important;
-  box-shadow: var(--se-shadow-pop) !important;
+  border-radius: var(--se-menu-radius);
+  background: var(--se-panel-bg) !important;
+  box-shadow: var(--se-panel-shadow) !important;
+  backdrop-filter: var(--se-blur-panel);
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 /* Steam can leave the popup open with no rows (after the field is cleared): hide it then */
@@ -161,11 +164,11 @@ html.se-community-discussions-home #game_select_suggestions_ctn :not(a, .match, 
 
 html.se-community-discussions-home #game_select_suggestions_ctn :is(a, .match, .popup_menu_item) {
   display: block;
-  padding: var(--se-space-2) var(--se-space-3) !important;
-  border-radius: var(--se-radius-sm);
+  padding: var(--se-menu-item-pad) !important;
+  border-radius: var(--se-menu-item-radius);
   background: none !important;
   color: var(--se-text-dim) !important;
-  font: var(--se-type-body-lg) !important;
+  font: var(--se-menu-item-font) !important;
   text-decoration: none !important;
   cursor: pointer;
   transition: background-color var(--se-dur), color var(--se-dur);
@@ -490,7 +493,7 @@ html.se-community-discussions-home .discussions_recentlyplayed a::after {
   border-radius: inherit;
 }
 
-/* Unread: the "New" pill (above), placed in the corner; the card's own ::before/::after are
+/* Unread: the "New" pill (home-tabs.css), placed in the corner; the card's own ::before/::after are
    the art */
 html.se-community-discussions-home .discussions_recentlyplayed.unread a::before {
   position: absolute;
@@ -507,12 +510,6 @@ html.se-community-discussions-home .discussions_recentlyplayed.unread a::before 
 }
 
 @media (max-width: 1100px) {
-  html.se-community-discussions-home .forum_list_ctn,
-  html.se-community-discussions-home #forum_list_games > .maincontent {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-
-
   html.se-community-discussions-home #game_results_area {
     grid-template-columns: minmax(0, 1fr);
   }

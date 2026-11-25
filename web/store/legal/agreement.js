@@ -9,7 +9,7 @@
  *     reading progress bar
  *   - each numbered part as a card under its own heading (number badge, the contents' title,
  *     copy link), lettered sub-headings ("D. Enforcement") set apart, all-caps clauses toned down
- *   - the ⏶ links give way to the store's scroll-to-top button (shared/scroll-top.js)
+ *   - the ⏶ links give way to the store's scroll-to-top button (web/shared/scroll-top.js)
  *
  * The page is server-rendered once and Steam never touches it again, so nodes are moved into
  * the theme's wrappers; destroy() puts every one back where it was. Sections follow Steam's
@@ -136,9 +136,10 @@
     const intro = dom.el('section', { class: 'se-ssa-card se-ssa-intro', 'data-se-ssa': 'intro' });
     for (const node of read.intro) move(node, intro);
 
-    const copyLink = (button, hash) => {
+    const copyLink = async (button, hash) => {
       const url = `${location.origin}${location.pathname}${location.search}#${hash}`;
-      navigator.clipboard?.writeText(url).catch(() => {});
+      const copied = await dom.copy(url);
+      if (!copied || !$.alive) return;
       button.replaceChildren(icon('check'));
       dom.mark(button, 'data-copied');
       $.timeout(() => {
@@ -267,38 +268,71 @@
       history.replaceState(history.state, '', `#${section.name}`);
     };
 
+    // The page's geometry, in page coordinates: read once, and again only when something resizes
+    // (the window, the document as its images load, the sidebar), so a scroll frame reads only scrollY.
+    let geometry = null;
+    const measure = () => {
+      const docRect = doc.getBoundingClientRect();
+      geometry = {
+        docTop: docRect.top + scrollY,
+        docHeight: docRect.height,
+        pageEnd: document.documentElement.scrollHeight,
+        tops: sections.map((section) => section.card.getBoundingClientRect().top + scrollY),
+        items: sections.map(({ item }) => ({ top: item.offsetTop, height: item.offsetHeight })),
+        navHeight: nav.clientHeight,
+      };
+    };
+
     let active = null;
     const update = dom.perFrame(() => {
-      const docRect = doc.getBoundingClientRect();
-      const span = docRect.height - innerHeight + HEADER_OFFSET;
-      const progress = span > 0 ? Math.min(1, Math.max(0, (HEADER_OFFSET - docRect.top) / span)) : 1;
+      if (!geometry) measure();
+      const { docTop, docHeight, pageEnd, tops, items, navHeight } = geometry;
+      const y = scrollY;
+      const span = docHeight - innerHeight + HEADER_OFFSET;
+      const progress = span > 0 ? Math.min(1, Math.max(0, (HEADER_OFFSET - (docTop - y)) / span)) : 1;
       dom.setVar(aside, '--se-ssa-progress', progress.toFixed(4));
       dom.setText(progressText, `${Math.round(progress * 100)}%`);
 
-      let current = sections[0];
-      for (const section of sections) if (section.card.getBoundingClientRect().top <= HEADER_OFFSET + 8) current = section;
+      let index = 0;
+      tops.forEach((top, i) => {
+        if (top - y <= HEADER_OFFSET + 8) index = i;
+      });
       // The last sections can't scroll up to the bar: at the page's end, the last one is the one read
-      if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2) current = sections[sections.length - 1];
+      if (innerHeight + y >= pageEnd - 2) index = sections.length - 1;
+      const current = sections[index];
       if (current !== active) {
         active?.item.removeAttribute('aria-current');
         current.item.setAttribute('aria-current', 'true');
         active = current;
-        // Keep the active entry in the sidebar's view without moving the page
-        const item = current.item;
-        if (item.offsetTop < nav.scrollTop || item.offsetTop + item.offsetHeight > nav.scrollTop + nav.clientHeight) {
-          nav.scrollTo({ top: item.offsetTop - nav.clientHeight / 2 + item.offsetHeight / 2, behavior: 'auto' });
+        // Keep the active entry in the sidebar's view without moving the page (read only on a change)
+        const { top, height } = items[index];
+        const navTop = nav.scrollTop;
+        if (top < navTop || top + height > navTop + navHeight) {
+          nav.scrollTo({ top: top - navHeight / 2 + height / 2, behavior: 'auto' });
         }
       }
     });
+    const remeasure = () => {
+      geometry = null;
+      update();
+    };
+    const resized = new ResizeObserver(remeasure);
+    for (const node of [document.documentElement, doc, nav]) resized.observe(node);
+    $.add(() => resized.disconnect());
     $.listen(window, 'scroll', update, { passive: true });
-    $.listen(window, 'resize', update, { passive: true });
+    $.listen(window, 'resize', remeasure, { passive: true });
     $.add(update.cancel);
     update();
 
     // A link in from outside (#3) lands on its card once the layout has settled
-    if (location.hash) {
-      const target = sections.find((section) => `#${section.name}` === decodeURIComponent(location.hash));
-      if (target) requestAnimationFrame(() => target.card.scrollIntoView({ block: 'start' }));
+    let hash = '';
+    try {
+      hash = decodeURIComponent(location.hash);
+    } catch {} // a malformed escape: no card to land on
+    const target = hash && sections.find((section) => `#${section.name}` === hash);
+    if (target) {
+      const frame = requestAnimationFrame(() => target.card.scrollIntoView({ block: 'start' }));
+      $.add(() => cancelAnimationFrame(frame));
     }
 
     return () => {

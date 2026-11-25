@@ -1,8 +1,9 @@
 /*
  * Discussions home (/discussions/): the parts CSS can't do alone. Styles are discussions/home.css.
  *
- *   - Search: the theme's own field (input, "/" key hint, round search button) in place of
- *     Steam's, whose absolutely placed input and box art (forums.css) fight every restyle.
+ *   - Search: the theme's own field in place of Steam's, whose absolutely placed input and box
+ *     art (forums.css) fight every restyle: the shared search field (its submit button the
+ *     magnifier) with a "/" key hint.
  *     Submitting copies the query into Steam's input and clicks Steam's submit image, so
  *     Steam's own search runs; without one it submits Steam's form. Steam's field is hidden
  *     ([data-se-dsc-search]) only while the theme's is in place. "/" focuses the field from
@@ -150,9 +151,10 @@
     const field = el('input', { type: 'text', class: 'se-dsc-search-input', autocomplete: 'off', enterKeyHint: 'search' });
     field.spellcheck = false; // el() skips false values
     const hint = el('kbd', { class: 'se-dsc-key', text: '/', 'aria-hidden': 'true' });
-    const go = el('button', { type: 'submit', class: 'se-dsc-search-go', 'aria-label': 'Search' });
+    const go = el('button', { type: 'submit', 'aria-label': 'Search' });
     const search = el('form', { class: 'se-dsc-search', role: 'search' }, [field, hint, go]);
     $.add(() => search.remove());
+    $.search(field, search, go);
 
     const steamForm = () => document.getElementById('GlobalDiscussionSearchForm');
 
@@ -204,12 +206,18 @@
 
     const tabs = () => [...document.querySelectorAll('.discussions_header > a.group_tab')];
 
-    const movePill = () => {
+    // Geometry is read only when the open tab changes or the ResizeObserver says a tab moved
+    // (`measure`), never on a plain observer pass
+    let pillOn = null;
+    const movePill = (measure = false) => {
       const active = tabs().find((tab) => tab.classList.contains('active'));
       if (!active) {
+        pillOn = null;
         pill.style.opacity = '0';
         return;
       }
+      if (active === pillOn && !measure) return;
+      pillOn = active;
       dom.slidePill(pill, { x: active.offsetLeft, w: active.offsetWidth });
       pill.style.opacity = '1';
     };
@@ -219,8 +227,12 @@
       if (!bar) return;
       mark(bar, 'role', 'tablist');
       mark(bar, 'data-se-dsc-tabs');
-      if (pill.parentElement !== bar) bar.prepend(pill);
+      if (pill.parentElement !== bar) {
+        bar.prepend(pill);
+        resize.observe(bar);
+      }
       for (const tab of tabs()) {
+        resize.observe(tab); // a no-op for a tab already observed
         const selected = tab.classList.contains('active');
         mark(tab, 'role', 'tab');
         mark(tab, 'aria-selected', String(selected));
@@ -241,7 +253,7 @@
       list[next].click();
     });
 
-    const resize = new ResizeObserver(() => movePill());
+    const resize = new ResizeObserver(() => movePill(true));
     $.add(() => resize.disconnect());
 
     $.add(() => {
@@ -334,17 +346,21 @@
       return n * UNITS[match[2]];
     };
 
+    // A forum row's name: the name node's own text nodes (not its child elements' text), else
+    // all of its text
+    const forumName = (row) => {
+      const nameNode = row.querySelector('.discussions_forumlist_forumname');
+      const own = [...(nameNode?.childNodes ?? [])].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join(' ');
+      return squash(own) || squash(nameNode?.textContent);
+    };
+
     const forumRows = () =>
-      [...document.querySelectorAll('#forum_list_general .discussions_forum_row')].map((row) => {
-        const nameNode = row.querySelector('.discussions_forumlist_forumname');
-        const ownText = [...(nameNode?.childNodes ?? [])].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join(' ');
-        return {
-          name: squash(ownText) || squash(nameNode?.textContent),
-          href: row.querySelector('.discussions_forumlist_linkoverlay a[href]')?.getAttribute('href') ?? '',
-          threads: Number((row.querySelector('.discussions_forumlist_topiccount')?.textContent ?? '').replace(/\D/g, '')) || 0,
-          last: squash(row.querySelector('.discussions_forumlist_lastpost')?.textContent),
-        };
-      });
+      [...document.querySelectorAll('#forum_list_general .discussions_forum_row')].map((row) => ({
+        name: forumName(row),
+        href: row.querySelector('.discussions_forumlist_linkoverlay a[href]')?.getAttribute('href') ?? '',
+        threads: Number((row.querySelector('.discussions_forumlist_topiccount')?.textContent ?? '').replace(/\D/g, '')) || 0,
+        last: squash(row.querySelector('.discussions_forumlist_lastpost')?.textContent),
+      }));
 
     const popular = el('div', { class: 'se-dsc-popular' });
     const stats = el('div', { class: 'se-dsc-stats' });
@@ -390,9 +406,7 @@
       for (const row of document.querySelectorAll('.discussions_forum_row')) {
         const icon = row.querySelector('.discussions_forumlist_icon');
         if (!icon || icon.querySelector(':scope > .se-dsc-mono')) continue;
-        const nameNode = row.querySelector('.discussions_forumlist_forumname');
-        const own = [...(nameNode?.childNodes ?? [])].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join(' ');
-        const name = squash(own) || squash(nameNode?.textContent);
+        const name = forumName(row);
         if (!name) continue;
         const match = FORUM_ICONS.find(([pattern]) => pattern.test(name))?.[1];
         const mono = el('span', { class: 'se-dsc-mono', 'aria-hidden': 'true' });
@@ -417,7 +431,6 @@
         const glyph = el('span', { class: 'se-dsc-glyph', 'aria-hidden': 'true' });
         if (icon) glyph.append(lineIcon(icon));
         else glyph.textContent = [...name][0] ?? '';
-        if (!icon) mark(glyph, 'data-se-dsc-letter');
         avatar.append(glyph);
       }
     };
@@ -483,9 +496,6 @@
 
     $.observe(scan, { attributes: ['class'] });
     scan();
-
-    const bar = document.querySelector('.discussions_header');
-    if (bar) resize.observe(bar);
 
     return () => $.destroy();
   });

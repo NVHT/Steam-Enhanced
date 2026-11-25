@@ -4,7 +4,7 @@
  * a stock "Set a reminder" button and a bare share link. Restyled as the store front:
  *  - the logo on the page colour with a soft accent glow behind it;
  *  - the text section as one hero card: eyebrow, the dates as the headline, a countdown in
- *    tiles (nextfest/page.js builds both), the copy, then the reminder as the accent pill;
+ *    tiles (nextfest/page.js builds both), the copy, then the reminder as the accent button;
  *  - "Share with Friends" under the card is the shared footer row (shared/sale/sale.css).
  * While the fest runs, its game sections keep the sale look from shared/sale/sale.css.
  *
@@ -229,8 +229,8 @@ html.se-store-nextfest:not(#se-none) [data-se-nf-live] [data-se-nf-status]::befo
 }
 
 @keyframes se-nf-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(181, 223, 32, .55); }
-  100% { box-shadow: 0 0 0 10px rgba(181, 223, 32, 0); }
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--se-prepurchase) 55%, transparent); }
+  100% { box-shadow: 0 0 0 10px transparent; }
 }
 
 html.se-store-nextfest:not(#se-none) [data-se-nf-tiles] {
@@ -311,10 +311,10 @@ html.se-store-nextfest:not(#se-none) .RemindMeWidget {
   padding: 0 var(--se-space-4) 0 var(--se-space-5) !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-accent) !important;
+  background: var(--se-btn-primary-bg) !important;
   background-image: none !important;
-  box-shadow: 0 12px 28px -12px color-mix(in srgb, var(--se-accent) 60%, transparent) !important;
-  color: var(--se-on-accent) !important;
+  box-shadow: 0 12px 28px -12px color-mix(in srgb, var(--se-btn-primary-bg) 60%, transparent) !important;
+  color: var(--se-btn-primary-color) !important;
   font-family: inherit !important;
   font-size: var(--se-fs-md) !important;
   font-weight: 700 !important;
@@ -341,7 +341,7 @@ html.se-store-nextfest:not(#se-none) .RemindMeWidget > * {
 }
 
 /*
- * The dropdown arrow: Steam's is a white sprite (35x32 slot), invisible on the accent pill and
+ * The dropdown arrow: Steam's is a white sprite (35x32 slot), invisible on the accent button and
  * leaving a blank gap that pushes the label off centre. It's redrawn as the theme's chevron,
  * a mask in the text colour, sized to the label: down on the page's button, up on the copy
  * the open menu lays over it.
@@ -371,8 +371,8 @@ html.se-store-nextfest:not(#se-none) .RemindMeWidget :is(svg, path) {
 }
 
 html.se-store-nextfest:not(#se-none) .RemindMeWidget:hover {
-  background: var(--se-accent-hover) !important;
-  box-shadow: 0 14px 30px -12px color-mix(in srgb, var(--se-accent) 75%, transparent) !important;
+  background: var(--se-btn-primary-bg-hover) !important;
+  box-shadow: 0 14px 30px -12px color-mix(in srgb, var(--se-btn-primary-bg) 75%, transparent) !important;
 }
 
 html.se-store-nextfest:not(#se-none) .RemindMeWidget:focus-visible {
@@ -479,9 +479,13 @@ html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .DialogCheckbox_Container {
 }
 
 html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .DialogCheckbox_Container:is(:hover, :focus-visible) {
-  outline: 0;
   background: var(--se-hover) !important;
   color: var(--se-white) !important;
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .DialogCheckbox_Container:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .DialogCheckbox {
@@ -534,7 +538,7 @@ html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .DialogCheckbox_Container > 
   display: none;
 }
 
-/* Calendar links: Apple / Google / Outlook as pills on one row. */
+/* Calendar links: Apple / Google / Outlook as buttons on one row. */
 html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .kuZjNUoyxrA- {
   display: flex !important;
   flex-wrap: wrap;
@@ -552,9 +556,9 @@ html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .kuZjNUoyxrA- > a {
   margin: 0 !important;
   padding: 0 var(--se-space-3) !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-surface-2) !important;
-  box-shadow: var(--se-edge) !important;
-  color: var(--se-text-dim) !important;
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge) !important;
+  color: var(--se-btn-color) !important;
   font-size: var(--se-fs-sm) !important;
   font-weight: 600 !important;
   text-decoration: none !important;
@@ -563,9 +567,13 @@ html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .kuZjNUoyxrA- > a {
 }
 
 html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .kuZjNUoyxrA- > a:is(:hover, :focus-visible) {
-  outline: 0;
-  background: var(--se-hover) !important;
-  color: var(--se-white) !important;
+  background: var(--se-btn-bg-hover) !important;
+  color: var(--se-btn-color-hover) !important;
+}
+
+html.se-store-nextfest:not(#se-none) ._8D33ZtA7ymg- .kuZjNUoyxrA- > a:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 /* ---------- Narrow windows ---------- */

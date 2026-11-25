@@ -255,7 +255,7 @@
 
     /* List or Grid: an icon switch leading the View row, shown once the store data (which the grid is
        drawn from) has loaded. The choice is kept for next time. */
-    const layoutButton = (value, label) => dom.el('button', { type: 'button', [ROLE]: 'own-layout-btn', 'data-se-wl-layout': value, 'aria-pressed': 'false', 'aria-label': label, title: label });
+    const layoutButton = (value, label) => dom.el('button', { type: 'button', [ROLE]: 'own-layout-btn', 'data-se-wl-layout-option': value, 'aria-pressed': 'false', 'aria-label': label, title: label });
     const layoutList = layoutButton('list', 'List');
     const layoutGrid = layoutButton('grid', 'Grid');
     const layoutSwitch = $.owned(dom.el('div', { [ROLE]: 'own-layout', role: 'group', 'aria-label': 'Layout', hidden: true }, [layoutList, layoutGrid]));
@@ -401,7 +401,7 @@
       const gridOn = layout === 'grid' && Boolean(grid) && !layoutSwitch.hidden;
       if (page) dom.mark(page, LAYOUT, gridOn ? 'grid' : 'list');
       for (const button of [layoutList, layoutGrid]) {
-        const on = button.dataset.seWlLayout === (gridOn ? 'grid' : 'list');
+        const on = button.dataset.seWlLayoutOption === (gridOn ? 'grid' : 'list');
         if (button.getAttribute('aria-pressed') !== String(on)) button.setAttribute('aria-pressed', String(on));
       }
       if (grid) {
@@ -410,10 +410,10 @@
       }
     };
     $.listen(layoutSwitch, 'click', (event) => {
-      const button = event.target.closest('[data-se-wl-layout]');
+      const button = event.target.closest('[data-se-wl-layout-option]');
       if (!button) return;
-      if (button.dataset.seWlLayout === layout) return;
-      layout = button.dataset.seWlLayout;
+      if (button.dataset.seWlLayoutOption === layout) return;
+      layout = button.dataset.seWlLayoutOption;
       try {
         localStorage.setItem(LAYOUT_KEY, layout);
       } catch {}

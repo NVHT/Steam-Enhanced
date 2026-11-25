@@ -2,8 +2,8 @@
  * Wishlist store data (a part: web.parts.wishlistData, used by wishlist/page.js): the
  * wishlist's apps (IWishlistService/GetWishlist), then their prices, release and top tags
  * (IStoreBrowseService/GetItems) and the tags' names (IStoreService/GetLocalizedNameForTags),
- * from Steam's Web API as the store page itself does. load(own, signal) resolves to the
- * page's summary and tags, or null for an empty list.
+ * from Steam's Web API as the store page itself does. load(own, signal) resolves to
+ * { total, apps, summary, onSale, comingSoon, tags }, or null for an empty list.
  */
 (() => {
   'use strict';
@@ -130,8 +130,10 @@
   };
 
   /**
-   * The wishlist's store data: how many are on sale and coming soon, and its tags by how many
-   * games carry them ([{ name, count }], most first). The owner is the address's SteamID, else
+   * The wishlist's store data: `total` (games on the list), `apps` (each game's store item with
+   * its `rank`, `date_added` and `tagNames`), `summary` (a one-line count of what loaded),
+   * `onSale` and `comingSoon` (counts), and `tags` by how many games carry them
+   * ([{ name, count }], most first). The owner is the address's SteamID, else
    * the one Steam's own wishlist request asked for, else on your own list (`own`) the signed-in
    * user. Null for an empty list.
    */

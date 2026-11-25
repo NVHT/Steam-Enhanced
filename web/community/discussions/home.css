@@ -3,7 +3,7 @@
  * discussions/page.css, which still styles the shared parts (search field, side boxes).
  *
  *   - Width: every band at the store's page width.
- *   - Hero: centered title, the theme's search pill with a "/" key hint, a "Popular" row of
+ *   - Hero: centered title, the shared search field (large) with a "/" key hint, a "Popular" row of
  *     forum chips and a stats row; under them a row of four cards: Steam's three intro
  *     paragraphs (bold lead as the title, an icon each) and Links & Resources in the same style.
  *   - Tabs: Steam Forums / Game Forums / Tools & Servers as a segmented control with a sliding
@@ -129,8 +129,8 @@ html.se-community-discussions-home .steam_discussions_intro > p {
   max-width: none;
   padding: 4.5rem var(--se-space-5) var(--se-space-5) !important;
   border-radius: var(--se-radius-lg);
-  background: var(--se-white-03);
-  box-shadow: var(--se-edge);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
   color: var(--se-text-muted) !important;
   font: var(--se-type-body-lg) !important;
 }
@@ -180,79 +180,26 @@ html.se-community-discussions-home .discussions_page > .grouppage_content_area >
 }
 
 /* Search: the theme's own field (home.js) in place of Steam's, which is hidden only while
-   the theme's is in place */
+   the theme's is in place. The look is the shared search field (web/shared/search-field.css);
+   here only its hero size and the "/" key hint at its end. */
 html.se-community-discussions-home .global_discussion_search_ctn[data-se-dsc-search] {
   display: none !important;
 }
 
 html.se-community-discussions-home .se-dsc-search {
-  position: relative;
-  height: var(--se-ctl-lg);
+  --se-search-h: var(--se-ctl-lg);
+  --se-search-font: var(--se-type-title);
   margin: 0;
 }
 
 html.se-community-discussions-home .se-dsc-search-input {
-  box-sizing: border-box;
   width: 100%;
-  height: var(--se-ctl-lg);
-  margin: 0;
-  padding: 0 6rem 0 var(--se-space-5);
-  border: 0;
-  border-radius: var(--se-radius-control);
-  background: var(--se-field-bg);
-  box-shadow: var(--se-edge), 0 8px 20px -12px var(--se-black-70);
-  color: var(--se-text);
-  font: var(--se-type-title);
-  outline: 0;
-  transition: box-shadow var(--se-dur);
-}
-
-html.se-community-discussions-home .se-dsc-search-input::placeholder {
-  color: var(--se-text-faint);
-}
-
-html.se-community-discussions-home .se-dsc-search-input:focus {
-  box-shadow: inset 0 0 0 1px var(--se-accent), 0 0 0 4px var(--se-accent-tint);
-}
-
-html.se-community-discussions-home .se-dsc-search-go {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  display: grid;
-  place-items: center;
-  box-sizing: border-box;
-  width: 36px;
-  height: var(--se-ctl);
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: var(--se-pill);
-  box-shadow: var(--se-edge);
-  color: var(--se-text-muted);
-  cursor: pointer;
-  transition: background-color var(--se-dur), color var(--se-dur);
-}
-
-html.se-community-discussions-home .se-dsc-search-go::before {
-  content: "";
-  width: 18px;
-  height: 18px;
-  background: currentColor;
-  -webkit-mask: var(--se-icon-search) center / contain no-repeat;
-  mask: var(--se-icon-search) center / contain no-repeat;
-}
-
-html.se-community-discussions-home .se-dsc-search-go:hover {
-  background: var(--se-hover);
-  color: var(--se-white);
 }
 
 html.se-community-discussions-home .se-dsc-key {
   position: absolute;
-  top: 12px;
-  right: 52px;
+  top: 50%;
+  right: var(--se-search-pad);
   display: grid;
   place-items: center;
   box-sizing: border-box;
@@ -265,6 +212,7 @@ html.se-community-discussions-home .se-dsc-key {
   box-shadow: inset 0 -1px 0 var(--se-black-40), inset 0 0 0 1px var(--se-hairline);
   color: var(--se-text-muted);
   font: var(--se-type-label);
+  transform: translateY(-50%);
   pointer-events: none;
   transition: opacity var(--se-dur);
 }
@@ -282,8 +230,8 @@ html.se-community-discussions-home .discussions_page > .grouppage_content_area >
   margin: 0 !important;
   padding: 4.5rem var(--se-space-5) var(--se-space-5) !important;
   border-radius: var(--se-radius-lg);
-  background: var(--se-white-03) !important;
-  box-shadow: var(--se-edge);
+  background: var(--se-card-bg) !important;
+  box-shadow: var(--se-card-edge);
 }
 
 html.se-community-discussions-home .discussions_page > .grouppage_content_area > .maincontent .rightbox::before,
@@ -407,13 +355,13 @@ html.se-community-discussions-home .se-dsc-popular-label {
 html.se-community-discussions-home a.se-dsc-chip {
   display: inline-flex;
   align-items: center;
-  height: var(--se-ctl-sm);
-  padding: 0 var(--se-space-4);
+  height: var(--se-chip-h);
+  padding: var(--se-chip-pad);
   border-radius: var(--se-radius-control);
-  background: var(--se-pill);
+  background: var(--se-chip-bg);
   box-shadow: var(--se-edge);
   color: var(--se-text-dim) !important;
-  font: var(--se-type-label);
+  font: var(--se-chip-font);
   text-decoration: none !important;
   white-space: nowrap;
   transition: background-color var(--se-dur), color var(--se-dur), box-shadow var(--se-dur);

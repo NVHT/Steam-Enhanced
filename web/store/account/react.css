@@ -209,16 +209,16 @@ html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two
 html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton {
   border: 0 !important;
   border-radius: var(--se-radius-card) !important;
-  background: var(--se-surface-2) !important;
-  box-shadow: var(--se-edge) !important;
-  color: var(--se-text) !important;
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge) !important;
+  color: var(--se-btn-color) !important;
   font-family: var(--se-font) !important;
   cursor: pointer;
   transition: background-color var(--se-dur), box-shadow var(--se-dur);
 }
 
 html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:hover {
-  background: var(--se-hover) !important;
+  background: var(--se-btn-bg-hover) !important;
   box-shadow: inset 0 0 0 1px var(--se-accent-surface) !important;
 }
 
@@ -280,7 +280,7 @@ html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two
 }
 
 /* Small buttons (a device's expand chevron): a 32px circle that stays inside its row; Steam's
-   focus ring (a pseudo-element and outline) gives way to the theme's */
+   focus ring (a pseudo-element, below) gives way to the theme's (web/shared/base.css) */
 html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Small {
   display: inline-flex !important;
   flex: none !important;
@@ -293,7 +293,6 @@ html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two
   margin: 0 !important;
   padding: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  outline: none !important;
   line-height: 1 !important;
 }
 
@@ -338,14 +337,14 @@ html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two
   display: none !important;
 }
 
-/* A small button with a label instead of a glyph ("Sign out everywhere"): a pill, as wide as
-   its words */
 /* A box that only holds a dialog button: Steam's dark backing goes, the button carries the look */
 html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) :has(> .DialogButton:only-child) {
   background: none !important;
   box-shadow: none !important;
 }
 
+/* A small button with a label instead of a glyph ("Sign out everywhere"): a pill, as wide as
+   its words */
 html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton.Small:not(:has(svg)) {
   width: max-content !important;
   min-width: max-content !important;
@@ -361,12 +360,9 @@ html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two
   height: 14px !important;
 }
 
-html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:focus {
+/* Steam's outline on a clicked button goes; the keyboard ring stays base.css's */
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:focus:not(:focus-visible) {
   outline: none !important;
-}
-
-html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton:focus-visible {
-  box-shadow: var(--se-field-edge-focus) !important;
 }
 
 html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .DialogButton svg {
@@ -465,15 +461,15 @@ html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two
   padding: 0 var(--se-space-4) !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-surface-2) !important;
-  box-shadow: var(--se-edge);
-  color: var(--se-text) !important;
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-btn-color) !important;
   font: var(--se-type-control-lg) !important;
   cursor: pointer;
 }
 
 html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) .account_settings_container > .Panel.Focusable > .Focusable:hover {
-  background: var(--se-hover) !important;
+  background: var(--se-btn-bg-hover) !important;
 }
 
 /* Steam's own blue and grey boxes in these sections (Steam Guard's authenticator panel, its
@@ -515,9 +511,9 @@ html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two
   padding: 0 var(--se-space-4) !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-pill) !important;
-  box-shadow: var(--se-edge) !important;
-  color: var(--se-text) !important;
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge) !important;
+  color: var(--se-btn-color) !important;
   font: var(--se-type-control-lg) !important;
   text-decoration: none !important;
   cursor: pointer;
@@ -531,7 +527,7 @@ html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two
 }
 
 html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-tone="button"]:hover {
-  background: var(--se-hover) !important;
+  background: var(--se-btn-bg-hover) !important;
 }
 
 /* Steam's picture icons (Steam Guard shield, device phone / PC): page.js hides each and puts the
@@ -539,17 +535,10 @@ html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two
    mask on ::before. An <img>'s icon draws at 16px, an <svg>'s at 20px, as Steam's did. */
 html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-glyph] {
   box-sizing: border-box;
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-flex; /* the shared icon chip (shared/account.css) is a flex box; inline here */
   width: 40px;
   height: 40px;
   min-width: 40px;
-  border-radius: var(--se-radius-md);
-  background: var(--se-pill);
-  box-shadow: var(--se-edge);
-  color: var(--se-text-dim);
 }
 
 html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-glyph]::before {

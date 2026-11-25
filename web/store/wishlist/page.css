@@ -46,15 +46,6 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="wash"] {
  */
 html.se-store-wishlist:not(#se-none) [data-se-wl="page"] {
   --se-wl-rail: 18.5rem;
-  /* The mockup's in-between steps: chips and icon gaps, the compact row's inset and line gap,
-     the cart button's sides. */
-  --se-wl-6: 6px;
-  --se-wl-3: 3px;
-  --se-wl-14: 14px;
-  --se-wl-7: 7px;
-  --se-wl-10: 10px;
-  --se-wl-20: 20px;
-  --se-wl-15: 15px;
   box-sizing: border-box;
   display: grid;
   grid-template-columns: var(--se-wl-rail) minmax(0, 1fr);
@@ -363,9 +354,6 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="list"] {
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="card"] {
   --se-wl-handle-w: 48px;
-  --se-wl-gap: 18px;
-  --se-wl-pad-y: 14px;
-  --se-wl-pad-end: 18px;
   position: relative;
   isolation: isolate;
   box-sizing: border-box;
@@ -381,8 +369,8 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="card"] {
     "handle capsule tags  cats  added"
     "handle capsule .     .     .    ";
   align-items: start;
-  gap: var(--se-space-2) var(--se-wl-gap);
-  padding: var(--se-wl-pad-y) var(--se-wl-pad-end) var(--se-wl-pad-y) var(--se-space-3);
+  gap: var(--se-space-2) var(--se-space-4);
+  padding: var(--se-space-4) var(--se-space-4) var(--se-space-4) var(--se-space-3);
   border: 0;
   color: var(--se-text-dim);
 }
@@ -424,7 +412,7 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="handle"] {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--se-wl-6);
+  gap: var(--se-space-2);
   width: auto;
   min-width: 0;
   height: auto;
@@ -476,8 +464,8 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="rank"] {
   padding: 0;
   border: 0;
   border-radius: var(--se-radius-sm);
-  background: var(--se-field);
-  box-shadow: var(--se-edge);
+  background: var(--se-field-bg);
+  box-shadow: var(--se-field-edge);
   color: var(--se-text);
   font: 700 var(--se-fs-md)/1 var(--se-font);
   font-variant-numeric: tabular-nums;
@@ -576,7 +564,7 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="facts"] {
 html.se-store-wishlist:not(#se-none) [data-se-wl="fact"] {
   display: inline-flex;
   align-items: center;
-  gap: var(--se-wl-6);
+  gap: var(--se-space-2);
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="fact"]::before {
@@ -591,10 +579,6 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="fact"]::before {
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="fact"]:last-child:not(:first-child) {
   order: -1;
-}
-
-html.se-store-wishlist:not(#se-none) [data-se-wl="fact"]:last-child:not(:first-child) {
-  color: var(--se-review-positive);
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="fact"]:last-child:not(:first-child)::before {
@@ -613,11 +597,15 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="fact-label"] {
 
 /* How the reviews lean (page.js reads Steam's words): Mixed in amber with the thumb on its
    side, negative in red with the thumb down. Positive in --se-review-positive with the thumb up. */
-html.se-store-wishlist:not(#se-none) [data-se-wl="fact"][data-se-wl-review][data-se-wl-review="mixed"] {
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact"][data-se-wl-review="positive"] {
+  color: var(--se-review-positive);
+}
+
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact"][data-se-wl-review="mixed"] {
   color: var(--se-warning);
 }
 
-html.se-store-wishlist:not(#se-none) [data-se-wl="fact"][data-se-wl-review][data-se-wl-review="negative"] {
+html.se-store-wishlist:not(#se-none) [data-se-wl="fact"][data-se-wl-review="negative"] {
   color: var(--se-danger);
 }
 
@@ -651,7 +639,7 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="extras"] {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--se-wl-6);
+  gap: var(--se-space-2);
   max-height: var(--se-ctl-sm);
   min-width: 0;
   overflow: hidden;
@@ -699,17 +687,17 @@ html.se-store-wishlist:not(#se-none) :is([data-se-wl="tags-label"], [data-se-wl=
 }
 
 /* Your categories: a small label, its chips and the add button. */
-/* Right after the tags: 6px from the last one, as chips are spaced (the column gap is wider). */
+/* Right after the tags, spaced from the last one as chips are (the column gap is wider). */
 html.se-store-wishlist:not(#se-none) [data-se-wl="cats"] {
   grid-area: cats;
   align-self: start;
   display: flex;
   align-items: center;
-  gap: var(--se-wl-6);
+  gap: var(--se-space-2);
   width: auto;
   height: auto;
   min-width: 0;
-  margin: 0 0 0 calc(var(--se-wl-6) - var(--se-wl-gap));
+  margin: 0 0 0 calc(var(--se-space-2) - var(--se-space-4)); /* the column gap, less a chip gap */
 }
 
 /* Steam's category list and its box, while you have none on this game: out of the line, so
@@ -726,7 +714,7 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="cats"] > * > * {
 html.se-store-wishlist:not(#se-none) [data-se-wl="cats"] > * {
   display: flex;
   align-items: center;
-  gap: var(--se-wl-6);
+  gap: var(--se-space-2);
   width: auto;
   height: auto;
 }
@@ -744,7 +732,7 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="cats-label"] {
 /* !important: the shared icon button (shared/ui-buttons.css) sizes it square */
 html.se-store-wishlist:not(#se-none) [data-se-wl="cat-add"] {
   display: inline-flex;
-  gap: var(--se-wl-6);
+  gap: var(--se-space-2);
   width: auto !important;
   height: var(--se-chip-h) !important;
   padding: var(--se-chip-pad);
@@ -802,7 +790,7 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="buy"] a:has([data-se-price]) {
    button: 14px each side, the icon 8px from the label. */
 html.se-store-wishlist:not(#se-none) [data-se-wl="cart"] {
   gap: var(--se-space-2);
-  padding: 0 var(--se-wl-14);
+  padding: 0 var(--se-space-4);
 }
 
 html.se-store-wishlist:not(#se-none) [data-se-wl="cart"]::before {
@@ -828,7 +816,7 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="added"] {
   align-self: center;
   display: flex;
   align-items: center;
-  gap: var(--se-wl-6);
+  gap: var(--se-space-2);
   margin: 0;
   color: var(--se-text-muted);
   font: 500 var(--se-fs-sm)/1.3 var(--se-font);
@@ -893,7 +881,7 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="remove"]:active {
  * Add to Cart as an icon and remove. Steam keeps its own row height, so rows are spaced by it.
  */
 html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="list"] {
-  padding-block: var(--se-wl-6);
+  padding-block: var(--se-space-2);
   border-radius: var(--se-radius-card);
   background: var(--se-card-bg);
   box-shadow: var(--se-card-edge);
@@ -908,9 +896,9 @@ html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="ca
     "handle capsule facts added buy remove";
   align-content: center;
   align-items: center;
-  gap: var(--se-wl-3) var(--se-space-3);
-  margin-inline: var(--se-wl-6);
-  padding: var(--se-wl-6) var(--se-space-2) var(--se-wl-6) var(--se-space-1);
+  gap: var(--se-space-1) var(--se-space-3);
+  margin-inline: var(--se-space-2);
+  padding: var(--se-space-2) var(--se-space-2) var(--se-space-2) var(--se-space-1);
   border-radius: var(--se-radius-ml) !important;
   background: transparent !important;
   box-shadow: none !important;

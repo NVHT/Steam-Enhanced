@@ -324,11 +324,12 @@
           const doc = new DOMParser().parseFromString(html, 'text/html');
           const next = squash(doc.querySelector('.profile_xp_block_remaining')?.textContent);
           const xp = squash(doc.querySelector('.profile_xp_block_xp')?.textContent);
-          const width = doc.querySelector('.profile_xp_block_remaining_bar_progress')?.style.width;
+          // Steam's bar width ("45%") as the fill's scale, 0 to 1
+          const width = parseFloat(doc.querySelector('.profile_xp_block_remaining_bar_progress')?.style.width ?? '');
           setText(levelNext, next);
           setText(levelXp, xp);
-          if (width) {
-            levelBar.firstChild.style.setProperty('--se-pct', width);
+          if (Number.isFinite(width)) {
+            levelBar.firstChild.style.setProperty('--se-fill', String(Math.min(Math.max(width / 100, 0), 1)));
             levelBar.hidden = false;
           }
         })

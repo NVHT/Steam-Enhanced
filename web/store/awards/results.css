@@ -42,7 +42,7 @@ html.se-store-awards:not(#se-none) .steamawards_page :is(.steamaward_header_titl
 
 /* ---------- Previous years ---------- */
 
-/* The row: the page column, the pill at its right end. */
+/* The row: the page column, the button at its right end. */
 html.se-store-awards:not(#se-none) div:has(> #steamaward_years_pulldown) {
   box-sizing: border-box;
   width: var(--se-page-width) !important;
@@ -56,17 +56,15 @@ html.se-store-awards:not(#se-none) #steamaward_years_pulldown {
   display: inline-flex !important;
   align-items: center;
   gap: var(--se-space-2);
-  height: 34px;
-  padding: 0 var(--se-space-4) 0 var(--se-space-4) !important;
+  height: var(--se-btn-h);
+  padding: var(--se-btn-pad) !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-surface-2) !important;
+  background: var(--se-btn-bg) !important;
   background-image: none !important;
-  box-shadow: var(--se-edge) !important;
-  color: var(--se-text-dim) !important;
-  font-size: var(--se-fs-base) !important;
-  font-weight: 600 !important;
-  line-height: 1 !important;
+  box-shadow: var(--se-btn-edge) !important;
+  color: var(--se-btn-color) !important;
+  font: var(--se-btn-font) !important;
   cursor: pointer;
   transition: background-color var(--se-dur), color var(--se-dur);
 }
@@ -82,8 +80,8 @@ html.se-store-awards:not(#se-none) #steamaward_years_pulldown::after {
 }
 
 html.se-store-awards:not(#se-none) #steamaward_years_pulldown:is(:hover, .focus) {
-  background: var(--se-hover) !important;
-  color: var(--se-white) !important;
+  background: var(--se-btn-bg-hover) !important;
+  color: var(--se-btn-color-hover) !important;
 }
 
 /* Its menu (Steam's popup_block_new / popup_menu). */
@@ -475,7 +473,7 @@ html.se-store-awards:not(#se-none) .results_carousel .runnerup {
   aspect-ratio: 231 / 87;
 }
 
-/* Chips on the art: "Winner" (page.js) in gold, Steam's "Your Vote" as a glass chip. */
+/* Chips on the art: "Winner" (awards/results.js) in gold, Steam's "Your Vote" as a glass chip. */
 html.se-store-awards:not(#se-none) [data-se-award-winner-chip],
 html.se-store-awards:not(#se-none) .results_carousel .your_vote {
   position: absolute !important;

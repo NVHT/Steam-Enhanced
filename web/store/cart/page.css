@@ -243,25 +243,26 @@ html.se-store-cart:not(#se-none) [data-se-cart~="item-body"] [data-se-cart~="pri
 /* Item actions (Remove, gift options): quiet text buttons, no underline */
 /* !important: another rule in this file sets color with !important; margin can come inline from
    Steam's markup or scripts */
-html.se-store-cart:not(#se-none) :is([data-se-cart~="item-action"], [data-se-cart~="item-action"], [data-se-cart~="item-action"], [data-se-cart~="item-action"]) {
+html.se-store-cart:not(#se-none) [data-se-cart~="item-action"] {
   display: inline-flex;
   align-items: center;
   height: var(--se-ctl-sm);
   margin: 0 !important;
   padding: 0 var(--se-space-3);
   border-radius: var(--se-radius-control);
-  color: var(--se-text-muted) !important;
+  background: var(--se-btn-ghost-bg);
+  color: var(--se-btn-ghost-color) !important;
   font: var(--se-type-label);
   text-decoration: none;
 }
 
 /* !important: another rule in this file sets color with !important */
-html.se-store-cart:not(#se-none) :is([data-se-cart~="item-action"], [data-se-cart~="item-action"], [data-se-cart~="item-action"], [data-se-cart~="item-action"]):hover {
-  background: var(--se-hover);
-  color: var(--se-white) !important;
+html.se-store-cart:not(#se-none) [data-se-cart~="item-action"]:hover {
+  background: var(--se-btn-ghost-bg-hover);
+  color: var(--se-btn-ghost-color-hover) !important;
 }
 
-html.se-store-cart:not(#se-none) :is([data-se-cart~="item-action"], [data-se-cart~="item-action"], [data-se-cart~="item-action"], [data-se-cart~="item-action"]):active {
+html.se-store-cart:not(#se-none) [data-se-cart~="item-action"]:active {
   transform: scale(var(--se-press-scale));
 }
 
@@ -275,9 +276,9 @@ html.se-store-cart:not(#se-none) [data-se-cart~="item-body"] div[role="combobox"
   padding: 0 var(--se-space-3) !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-pill) !important;
+  background: var(--se-btn-bg) !important;
   box-shadow: var(--se-btn-edge) !important;
-  color: var(--se-text);
+  color: var(--se-btn-color);
   font: 600 var(--se-fs-sm)/var(--se-hit) var(--se-font);
 }
 
@@ -315,7 +316,7 @@ html.se-store-cart:not(#se-none) [data-se-cart~="remove-all"] span:hover {
   color: var(--se-danger-text) !important;
 }
 
-/* Every button on the page (Steam's Button module): the theme's pill */
+/* Every button on the page (Steam's Button module): the theme's button */
 /* !important: another rule in this file sets background, box-shadow, color, height with
    !important; display, padding can come inline from Steam's markup or scripts */
 html.se-store-cart:not(#se-none) [data-se-cart~="page"] [data-se-cart~="button"] {
@@ -327,17 +328,17 @@ html.se-store-cart:not(#se-none) [data-se-cart~="page"] [data-se-cart~="button"]
   padding: 0 var(--se-space-5) !important;
   border: 0;
   border-radius: var(--se-radius-control);
-  background: var(--se-pill) !important;
+  background: var(--se-btn-bg) !important;
   box-shadow: var(--se-btn-edge) !important;
-  color: var(--se-text) !important;
-  font: var(--se-type-control);
+  color: var(--se-btn-color) !important;
+  font: var(--se-btn-font);
   text-decoration: none;
 }
 
 /* !important: another rule in this file sets background, color with !important */
 html.se-store-cart:not(#se-none) [data-se-cart~="page"] [data-se-cart~="button"]:hover {
-  background: var(--se-hover) !important;
-  color: var(--se-white) !important;
+  background: var(--se-btn-bg-hover) !important;
+  color: var(--se-btn-color-hover) !important;
 }
 
 html.se-store-cart:not(#se-none) [data-se-cart~="page"] [data-se-cart~="button"]:active {
@@ -355,7 +356,7 @@ html.se-store-cart:not(#se-none) [data-se-cart~="continue"] > [data-se-cart~="bu
 /* !important: another rule in this file sets background, color with !important */
 html.se-store-cart:not(#se-none) [data-se-cart~="continue"] > [data-se-cart~="button"]:hover {
   background: var(--se-btn-primary-bg-hover) !important;
-  color: var(--se-on-accent) !important;
+  color: var(--se-btn-primary-color) !important;
 }
 
 html.se-store-cart:not(#se-none) [data-se-cart~="continue"] > [data-se-cart~="button"]:active {
@@ -366,8 +367,9 @@ html.se-store-cart:not(#se-none) [data-se-cart~="continue"] > [data-se-cart~="bu
 /* !important: another rule in this file sets color with !important */
 html.se-store-cart:not(#se-none) [data-se-cart~="page"] [data-se-cart~="button"]:is(:disabled, [aria-disabled="true"]),
 html.se-store-cart:not(#se-none) [data-se-cart~="continue"] > [data-se-cart~="button"]:is(:disabled, [aria-disabled="true"]) {
-  background: var(--se-surface-2) !important; /* beats the pill and accent fills above */
-  color: var(--se-text-faint) !important;
+  background: var(--se-btn-bg) !important; /* beats the hover and accent fills above */
+  color: var(--se-btn-color) !important;
+  opacity: var(--se-btn-disabled-opacity);
   cursor: not-allowed;
   transform: none;
 }

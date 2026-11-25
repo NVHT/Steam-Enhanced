@@ -61,7 +61,8 @@
     const all = dom.el('button', { class: 'se-table-chip', type: 'button', text: 'All', 'aria-pressed': 'true' });
     const chips = dom.el('div', { class: 'se-table-chips', role: 'group', 'aria-label': opts.typesLabel }, all);
     const count = dom.el('span', { class: 'se-table-count', 'aria-live': 'polite' });
-    table.before(add(dom.el('div', { class: 'se-table-toolbar', 'data-se-table': 'toolbar' }, [search, chips, count])));
+    const toolbar = add(dom.el('div', { class: 'se-table-toolbar', 'data-se-table': 'toolbar' }, [search, chips, count]));
+    table.before(toolbar);
 
     const empty = add(dom.el('div', { class: 'se-table-empty', 'data-se-table': 'empty', hidden: true, text: opts.emptyText }));
     table.after(empty);
@@ -139,15 +140,28 @@
 
     /* ---------- Sticky header: mark when it has left its place ---------- */
 
+    // The header sits at the table's top until the table's top passes the header's sticky line.
+    // The toolbar above the table is the sentinel: once its bottom (the table's top, less the gap
+    // between them) leaves the band under that line, the header has stuck. The line and the gap
+    // are read once, and again on a resize, which rebuilds the observer; no read per scroll.
     if (head) {
-      const check = dom.perFrame(() => {
-        if (head.getBoundingClientRect().top - table.getBoundingClientRect().top > 1) dom.mark(table, STUCK);
-        else dom.unmark(table, STUCK);
+      let sentinel = null;
+      const watchLine = dom.perFrame(() => {
+        sentinel?.disconnect();
+        const line = parseFloat(getComputedStyle(head).top) || 0;
+        const gap = table.getBoundingClientRect().top - toolbar.getBoundingClientRect().bottom;
+        sentinel = new IntersectionObserver(([entry]) => {
+          if (!entry.isIntersecting && entry.boundingClientRect.bottom <= (entry.rootBounds?.top ?? 0) + 1) dom.mark(table, STUCK);
+          else dom.unmark(table, STUCK);
+        }, { rootMargin: `${-Math.max(0, line - gap)}px 0px 0px 0px` });
+        sentinel.observe(toolbar);
       });
-      $.listen(window, 'scroll', check, { passive: true });
-      $.listen(window, 'resize', check, { passive: true });
-      $.add(check.cancel);
-      check();
+      $.listen(window, 'resize', watchLine, { passive: true });
+      $.add(() => {
+        watchLine.cancel();
+        sentinel?.disconnect();
+      });
+      watchLine();
     }
 
     apply();

@@ -25,7 +25,7 @@
 html.se-community-profile {
   --se-profile-width: var(--se-community-width);
   --se-profile-side: 400px;
-  --se-profile-card: color-mix(in srgb, var(--se-bg) 84%, transparent);
+  --se-profile-card: var(--se-card-glass);
   --se-profile-card-solid: color-mix(in srgb, var(--se-surface) 50%, var(--se-bg));
   --se-profile-blur: var(--se-blur-bar);
   --se-profile-avatar: 128px;
@@ -126,7 +126,7 @@ html.se-community-profile div.profile_page > :is(.profile_header_bg, .profile_co
   html.se-community-profile .se-profile-cover .profile_animated_background {
     position: absolute !important;
     inset: 0 !important;
-    z-index: 0;
+    z-index: var(--se-z-base);
     width: auto !important;
     height: auto !important;
     overflow: hidden;
@@ -304,7 +304,7 @@ html.se-community-profile .namehistory_link {
   cursor: pointer;
 }
 
-/* Steam's arrow image: the name is the control now */
+/* Steam's arrow image: the name itself is the control */
 html.se-community-profile .namehistory_link > * {
   display: none !important;
 }
@@ -855,12 +855,13 @@ html.se-community-profile .se-level-card-bar {
   background: var(--se-white-07);
 }
 
+/* The fill scales from the left (scaleX, never a width change); the bar's own corners clip it */
 html.se-community-profile .se-level-card-bar > span {
   display: block;
-  width: var(--se-pct, 0%);
   height: 100%;
-  border-radius: inherit;
   background: var(--se-accent);
+  transform: scaleX(var(--se-fill, 0));
+  transform-origin: left;
 }
 
 html.se-community-profile .se-level-card-bar[hidden] {

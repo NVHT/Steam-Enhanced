@@ -13,7 +13,7 @@
  */
 
 html.se-store-rows {
-  --se-sh-gap: 16px;
+  --se-sh-gap: var(--se-space-4);
 }
 
 /* ---------- Shared pieces ---------- */
@@ -33,26 +33,30 @@ html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLK
   line-height: inherit !important;
 }
 
-html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLKwjtCwE- :is(a, button), .title_grid .see_more_link > a)::after {
+/* The chevron, on these and on New On Steam's "See more" links (explore/page.css) */
+html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLKwjtCwE- :is(a, button), .title_grid .see_more_link > a)::after,
+html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) a::after {
   content: "";
   flex: none;
-  width: 6px;
-  height: 6px;
-  border: solid currentColor;
-  border-width: 1.75px 1.75px 0 0;
-  transform: rotate(45deg);
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
+  transform: rotate(-90deg); /* the core chevron points down */
   transition: transform var(--se-dur-slow) var(--se-ease);
 }
 
-html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLKwjtCwE- :is(a, button), .title_grid .see_more_link > a):hover::after {
-  transform: translateX(2px) rotate(45deg);
+html.se-store-rows:not(#se-none) :is([data-se-shelf-more], .nHdn-Ea4zSg- ._37RLKwjtCwE- :is(a, button), .title_grid .see_more_link > a):hover::after,
+html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) a:hover::after {
+  transform: translateX(2px) rotate(-90deg);
 }
 
 /* Round glass carousel arrows, riding the edges of the row. */
 /* !important: the theme's shared rules (web/store/shared/sale/sale.css) set margin, min-width, z-index with
    !important */
 html.se-store-rows:not(#se-none) :is([data-se-arrow], :is(.CarouselBtnLeft, .CarouselBtnRight)) {
-  z-index: 4 !important;
+  z-index: var(--se-z-over-steam) !important;
   min-width: 0 !important;
   margin: 0 !important;
   opacity: 1;
@@ -518,7 +522,7 @@ html.se-store-rows:not(#se-none) [data-se-tile] .prepurchase_tag {
   bottom: calc(12px + var(--se-price-h) + 6px) !important;
   left: auto !important;
   top: auto !important;
-  z-index: 4;
+  z-index: var(--se-z-over-steam);
   height: 20px;
   padding: 0 var(--se-space-2) 0 var(--se-space-5) !important;
   background-color: var(--se-glass-chip) !important;
@@ -544,7 +548,7 @@ html.se-store-rows:not(#se-none) [data-se-tile] .curated_app_curators {
   position: absolute !important;
   left: 12px !important;
   bottom: 12px !important;
-  z-index: 4;
+  z-index: var(--se-z-over-steam);
   display: flex !important;
   gap: var(--se-space-1);
   width: auto !important;
@@ -583,7 +587,7 @@ html.se-store-rows:not(#se-none) [data-se-tile] .broadcast_live_stream_icon {
   position: absolute !important;
   top: 10px !important;
   left: 10px !important;
-  z-index: 4;
+  z-index: var(--se-z-over-steam);
   display: inline-flex !important;
   align-items: center;
   gap: var(--se-space-2);
@@ -678,7 +682,7 @@ html.se-store-rows:not(#se-none) :is([data-se-slot], .nHdn-Ea4zSg-) .ds_flag {
   bottom: auto !important;
   right: 10px !important;
   left: auto !important;
-  z-index: 4;
+  z-index: var(--se-z-over-steam);
 }
 
 /* Steam dims owned/ignored art behind a flag; the chip alone says it. */

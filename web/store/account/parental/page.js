@@ -68,13 +68,10 @@
       row.querySelector('input')?.click();
     });
 
-    dom.mark(document.documentElement, 'data-se-parental-ready');
-
     return () => {
       $.destroy();
       for (const row of rows) dom.unmark(row, 'data-se-parental-row');
       for (const node of added) node.remove();
-      dom.unmark(document.documentElement, 'data-se-parental-ready');
     };
   });
 })();

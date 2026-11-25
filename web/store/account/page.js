@@ -101,7 +101,7 @@
     }
   };
 
-  /** Clipboard API first; the hidden-textarea fallback covers web views that refuse it. */
+  /** The Steam ID (and its label) an account page last showed, for the pages that carry neither. */
   const cache = {
     read() {
       try {
@@ -236,7 +236,7 @@
      * The theme finds its parts by shape: the column of /account links is the sidebar, the
      * element after it the content, the h2 over them the title; inside the content, a short
      * text-only child is a section heading and anything else a section body. It marks them and
-     * page.css styles the marks; nothing inside React's tree moves. Sidebar icons ride a CSS
+     * newer.css styles the marks; nothing inside React's tree moves. Sidebar icons ride a CSS
      * variable on each link (a mask in newer.css), since React owns the links' children.
      */
     if (!nav && document.getElementById('StoreTemplate')) {
@@ -248,12 +248,17 @@
         tagged.push(node);
       };
       const here = location.pathname.replace(/\/+$/, '');
+      const template = document.getElementById('StoreTemplate');
       let chip = null;
+      let panel = null;
 
       const scan = () => {
-        const panel = [...document.querySelectorAll('#StoreTemplate a[href*="/account"]')]
-          .map((link) => link.parentElement)
-          .find((parent) => parent && parent.querySelectorAll(':scope > a[href*="/account"]').length >= 4);
+        // The sidebar found once is kept while React leaves it in place
+        if (!panel?.isConnected) {
+          panel = [...template.querySelectorAll('a[href*="/account"]')]
+            .map((link) => link.parentElement)
+            .find((parent) => parent && parent.querySelectorAll(':scope > a[href*="/account"]').length >= 4) ?? null;
+        }
         const body = panel?.nextElementSibling;
         if (!panel || !body) return;
         const frame = panel.parentElement;
@@ -272,7 +277,8 @@
           tag(title, 'title');
           tag(title.previousElementSibling, 'crumbs');
           const account = readSteamId(null);
-          if (account && !chip) {
+          // A React re-render can drop the chip with the header: a new one goes after the title
+          if (account && !chip?.isConnected) {
             chip = makeChip(account);
             title.after(chip);
           }
@@ -295,7 +301,7 @@
       };
 
       scan();
-      $.observe(scan);
+      $.observe(scan, { filter: (record) => template.contains(record.target) });
       return () => {
         $.destroy();
         for (const node of tagged) {
@@ -351,9 +357,12 @@
     // Steam paints parts of these React sections in its own blues and greys (Steam Guard's
     // authenticator panel, its link buttons) under hashed classes. Any box whose background is
     // none of the theme's colours gets a tone mark, read by shape: small, narrow beside its row,
-    // short-texted and clickable, a button; anything else, a tile. page.css repaints both.
+    // short-texted and clickable, a button; anything else, a tile. react.css repaints both.
+    // A box is read once: one settled (toned, or in a theme colour) is never read again; an
+    // unsized or empty one waits for the next change around it.
     const TONE = 'data-se-account-tone';
     const toned = new Set();
+    const settled = new WeakSet();
     const themeColors = (() => {
       const probe = dom.el('div', { 'aria-hidden': 'true' });
       probe.style.cssText = 'position:absolute;width:0;height:0;visibility:hidden';
@@ -367,29 +376,46 @@
       return colors;
     })();
     const SKIP = '[data-se-own], .account_header_line, .DialogButton, [class*="DialogToggle"], .ActiveTab, input, textarea, select, img, svg';
-    const toneReact = () => {
-      // Measured against the content column, not the box's parent: Steam wraps buttons in
-      // wrappers exactly their size
-      const section = content.getBoundingClientRect().width || Infinity;
-      for (const box of content.querySelectorAll('div, a, span')) {
-        if (box.hasAttribute(TONE) || box.closest('.se-account-card') || box.matches(SKIP) || box.closest('.DialogButton, [class*="DialogToggle"]')) continue;
-        const style = getComputedStyle(box);
-        if (themeColors.has(style.backgroundColor) || style.backgroundImage !== 'none') continue;
-        const { height, width } = box.getBoundingClientRect();
-        if (!height) continue;
-        const text = dom.squash(box.textContent);
-        // An empty box is decoration (the hairline between Security's two columns): leave it
-        if (!text && !box.firstElementChild) continue;
-        // A box that only holds a dialog button is its holder ("Sign out everywhere"): the button
-        // carries the look
-        if (box.children.length === 1 && box.firstElementChild.matches('.DialogButton')) continue;
-        // A button is short, under half the column wide (a full-width bar of the same height is
-        // a header) and clickable-looking
-        const button = height <= 52 && width < section * 0.5 && text.length > 0 && text.length <= 60
-          && !box.querySelector('div div') && (box.matches('a, [role="button"], .Focusable') || style.cursor === 'pointer');
-        dom.mark(box, TONE, button ? 'button' : 'tile');
-        toned.add(box);
+    // Measured against the content column, not the box's parent: Steam wraps buttons in wrappers
+    // exactly their size. Its width is kept from the ResizeObserver below.
+    let section = Infinity;
+    const toneBox = (box) => {
+      if (settled.has(box) || box.hasAttribute(TONE) || box.closest('.se-account-card') || box.matches(SKIP) || box.closest('.DialogButton, [class*="DialogToggle"]')) return;
+      const style = getComputedStyle(box);
+      if (themeColors.has(style.backgroundColor) || style.backgroundImage !== 'none') {
+        settled.add(box);
+        return;
       }
+      const { height, width } = box.getBoundingClientRect();
+      if (!height) return;
+      const text = dom.squash(box.textContent);
+      // An empty box is decoration (the hairline between Security's two columns): leave it
+      if (!text && !box.firstElementChild) return;
+      // A box that only holds a dialog button is its holder ("Sign out everywhere"): the button
+      // carries the look
+      if (box.children.length === 1 && box.firstElementChild.matches('.DialogButton')) {
+        settled.add(box);
+        return;
+      }
+      // A button is short, under half the column wide (a full-width bar of the same height is
+      // a header) and clickable-looking
+      const button = height <= 52 && width < section * 0.5 && text.length > 0 && text.length <= 60
+        && !box.querySelector('div div') && (box.matches('a, [role="button"], .Focusable') || style.cursor === 'pointer');
+      dom.mark(box, TONE, button ? 'button' : 'tile');
+      toned.add(box);
+    };
+    /** Each subtree's boxes, the subtree's root among them. */
+    const boxesIn = (roots, selector) => {
+      const found = new Set();
+      for (const node of roots) {
+        if (!node.isConnected || !content.contains(node)) continue;
+        if (node.matches(selector)) found.add(node);
+        for (const box of node.querySelectorAll(selector)) found.add(box);
+      }
+      return found;
+    };
+    const toneReact = (roots) => {
+      for (const box of boxesIn(roots, 'div, a, span')) toneBox(box);
     };
 
     // Steam's picture icons in these sections (the green Steam Guard shield, a device's phone or
@@ -417,19 +443,24 @@
       dom.unmark(picture, 'data-se-account-hidden');
       glyphs.delete(picture);
     };
-    const glyphReact = () => {
+    const smallPictures = new WeakSet(); // measured under a chip's size: never read again
+    const glyphReact = (roots) => {
       for (const [picture, chip] of glyphs) {
         if (!picture.isConnected || chip.nextElementSibling !== picture) dropGlyph(picture, chip);
       }
-      for (const picture of content.querySelectorAll('img, svg')) {
-        if (glyphs.has(picture) || picture.closest('[data-se-own], .DialogButton, a, .account_header_line, .se-account-card')) continue;
+      for (const picture of boxesIn(roots, 'img, svg')) {
+        if (glyphs.has(picture) || smallPictures.has(picture) || picture.closest('[data-se-own], .DialogButton, a, .account_header_line, .se-account-card')) continue;
         if (picture.parentElement?.closest('svg')) continue;
         // An icon inside a button ("Sign out everywhere") is the button's own: a short label next
         // to it says so. A device row is clickable too, but its text runs long.
         const holder = picture.closest('button, [role="button"], .Focusable');
         if (holder && dom.squash(holder.textContent).length < 40) continue;
         const { width, height } = picture.getBoundingClientRect();
-        if (width < 24 || height < 24) continue;
+        if (!width || !height) continue; // not laid out yet
+        if (width < 24 || height < 24) {
+          smallPictures.add(picture);
+          continue;
+        }
         const row = picture.closest('.Panel, [data-se-account-tone]') ?? picture.parentElement?.parentElement ?? picture.parentElement;
         const name = pick(GLYPH_ICON, dom.squash(row?.textContent)) ?? 'display';
         standIn(picture, name, picture.tagName.toLowerCase() === 'img' ? 'img' : 'svg');
@@ -443,13 +474,30 @@
     };
 
     if (!sections) {
+      // The observer only gathers what changed; the reads run in the frame after, over those
+      // subtrees alone, with the column's width from the ResizeObserver
+      section = content.getBoundingClientRect().width || Infinity;
+      const changed = new Set();
+      const measure = dom.perFrame(() => {
+        const roots = [...changed];
+        changed.clear();
+        toneReact(roots);
+        glyphReact(roots);
+      });
+      $.add(measure.cancel);
+      const resize = new ResizeObserver(([entry]) => {
+        section = entry.borderBoxSize?.[0]?.inlineSize || entry.contentRect.width || Infinity;
+      });
+      resize.observe(content);
+      $.add(() => resize.disconnect());
+
       decorateReact();
-      toneReact();
-      glyphReact();
-      $.observe(() => {
+      toneReact([content]);
+      glyphReact([content]);
+      $.observe((records) => {
         decorateReact();
-        toneReact();
-        glyphReact();
+        for (const record of records) changed.add(record.target);
+        measure();
       }, { filter: (record) => content.contains(record.target) });
       $.add(() => {
         for (const node of toned) node.removeAttribute(TONE);

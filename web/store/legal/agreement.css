@@ -109,7 +109,7 @@ html.se-store-ssa:not(#se-none) .page_title_area :is(.breadcrumbs, .page_name) >
   color: var(--se-text-faint);
 }
 
-/* Language flags: round chips, the page's own language lit */
+/* Language flags: square chips, the page's own language lit */
 html.se-store-ssa:not(#se-none) .se-ssa-meta #languages {
   display: flex !important;
   flex-wrap: wrap;
@@ -130,20 +130,20 @@ html.se-store-ssa:not(#se-none) .se-ssa-meta #languages a {
   height: 32px;
   margin: 0 !important;
   border-radius: var(--se-radius-control);
-  background: var(--se-surface-2);
+  background: var(--se-chip-bg);
   box-shadow: var(--se-edge);
   transition: background-color var(--se-dur);
 }
 
 html.se-store-ssa:not(#se-none) .se-ssa-meta #languages a:hover {
-  background: var(--se-hover);
+  background: var(--se-btn-bg-hover);
 }
 
 html.se-store-ssa:not(#se-none) .se-ssa-meta #languages img {
   width: 18px !important;
   height: auto !important;
   margin: 0 !important;
-  border-radius: 3px;
+  border-radius: var(--se-radius-xs);
   opacity: .85;
 }
 
@@ -203,9 +203,9 @@ html.se-store-ssa:not(#se-none) [data-se-ssa-hidden] {
   max-height: calc(100vh - var(--se-nav-h, 46px) - 62px);
   padding: var(--se-space-4) var(--se-space-3) var(--se-space-3);
   box-sizing: border-box;
-  border-radius: var(--se-radius-card);
-  background: var(--se-surface);
-  box-shadow: var(--se-edge);
+  border-radius: var(--se-card-radius);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
 }
 
 .se-ssa-aside-head {
@@ -255,8 +255,6 @@ html.se-store-ssa:not(#se-none) [data-se-ssa-hidden] {
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-width: auto !important; /* thin (or any width) drops the theme's bar (core/scrollbars.css) for Chromium's */
-  scrollbar-color: auto !important;
 }
 
 html.se-store-ssa:not(#se-none) a.se-ssa-toc-item {
@@ -319,9 +317,9 @@ html.se-store-ssa:not(#se-none) a.se-ssa-toc-item[aria-current] {
 .se-ssa-card {
   scroll-margin-top: calc(var(--se-nav-h, 46px) + 38px);
   padding: var(--se-space-6) var(--se-space-6) var(--se-space-5);
-  border-radius: var(--se-radius-card);
-  background: var(--se-surface);
-  box-shadow: var(--se-edge);
+  border-radius: var(--se-card-radius);
+  background: var(--se-card-bg);
+  box-shadow: var(--se-card-edge);
 }
 
 .se-ssa-head {
@@ -475,7 +473,7 @@ html.se-store-ssa:not(#se-none) .se-ssa-card li > br:last-child {
 }
 
 /* <br> pairs inside a card (the Privacy Policy is all text and breaks): the second is the
-   paragraph gap. Breaks at a card's edges are hidden by page.js. */
+   paragraph gap. Breaks at a card's edges are hidden by legal/agreement.js. */
 html.se-store-ssa:not(#se-none) .se-ssa-card > br + br {
   display: block;
   content: "";
@@ -488,7 +486,7 @@ html.se-store-ssa:not(#se-none) .se-ssa-card > :is(b, strong) {
   font-weight: 700;
 }
 
-/* Loose links under Steam's box ("Privacy Feedback"): the store's pill button, at the sidebar's foot */
+/* Loose links under Steam's box ("Privacy Feedback"): the store's button, at the sidebar's foot */
 .se-ssa-foot {
   flex: none;
   display: flex;
@@ -506,17 +504,17 @@ html.se-store-ssa:not(#se-none) .se-ssa-foot a {
   height: 32px;
   padding: 0 var(--se-space-4);
   border-radius: var(--se-radius-control);
-  background: var(--se-surface-2);
-  box-shadow: var(--se-edge);
-  color: var(--se-text-muted) !important;
-  font: var(--se-type-control);
+  background: var(--se-btn-bg);
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-btn-ghost-color) !important;
+  font: var(--se-btn-font);
   text-decoration: none !important;
   transition: background-color var(--se-dur), color var(--se-dur);
 }
 
 html.se-store-ssa:not(#se-none) .se-ssa-foot a:hover {
-  background: var(--se-hover);
-  color: var(--se-text) !important;
+  background: var(--se-btn-bg-hover);
+  color: var(--se-btn-color) !important;
 }
 
 /* ---------- Narrow windows: contents above the document ---------- */

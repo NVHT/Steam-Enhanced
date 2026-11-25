@@ -1,6 +1,6 @@
 /*
  * Continues summary.css (in order, see web/store/loader.js): Steam's buttons as a centred row of
- * pills; In a discovery queue; Buy; Wishlist and Ignore menus.
+ * pills; In a discovery queue; Buy; Wishlist and Ignore menus; Narrow windows; Feature icons.
  */
 
 /* ---------- Steam's buttons as a centred row of pills ---------- */
@@ -54,15 +54,15 @@ html.se-app-summary-on #queueActionsCtn .queue_menu_arrow {
   padding: 0 !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-surface-2) !important;
+  background: var(--se-btn-bg) !important;
   box-shadow: none !important;
-  color: var(--se-text) !important;
+  color: var(--se-btn-color) !important;
   transition: background var(--se-dur), color var(--se-dur);
 }
 
 html.se-app-summary-on #queueActionsCtn .btnv6_blue_hoverfade:hover,
 html.se-app-summary-on #queueActionsCtn .queue_menu_arrow:hover {
-  background: var(--se-hover) !important;
+  background: var(--se-btn-bg-hover) !important;
 }
 
 html.se-app-summary-on #queueActionsCtn .btnv6_blue_hoverfade > span {
@@ -338,8 +338,8 @@ html.se-app-summary-on .queue_controls_description {
   padding: 0 var(--se-space-2) 0 var(--se-space-5);
   border: 0;
   border-radius: var(--se-radius-control);
-  background: var(--se-accent);
-  color: var(--se-on-accent);
+  background: var(--se-btn-primary-bg);
+  color: var(--se-btn-primary-color);
   font: inherit;
   font-size: var(--se-fs-base);
   font-weight: 800;
@@ -348,12 +348,12 @@ html.se-app-summary-on .queue_controls_description {
 }
 
 .se-app-buy:hover {
-  background: var(--se-accent-hover);
+  background: var(--se-btn-primary-bg-hover);
 }
 
 .se-app-buy:focus-visible {
   outline: var(--se-focus-outline);
-  outline-offset: 2px;
+  outline-offset: var(--se-focus-offset);
 }
 
 /* Only "Buy" or Steam's free label: even padding. */
@@ -368,7 +368,7 @@ html.se-app-summary-on .queue_controls_description {
   height: 28px;
   padding: 0 var(--se-space-3);
   border-radius: var(--se-radius-control);
-  background: rgb(15 17 21 / .16);
+  background: color-mix(in srgb, var(--se-bg-ink) 16%, transparent);
   font-variant-numeric: tabular-nums;
 }
 
@@ -422,7 +422,7 @@ html.se-app-summary-on .queue_menu_flyout {
   right: auto !important;
   bottom: auto !important;
   left: 0 !important;
-  z-index: 30;
+  z-index: var(--se-z-flyout);
   box-sizing: border-box;
   width: 320px !important;
   height: auto !important;

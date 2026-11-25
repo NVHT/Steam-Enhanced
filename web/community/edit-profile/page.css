@@ -15,8 +15,7 @@
  */
 
 html.se-community-edit-profile {
-  --se-edit-card: color-mix(in srgb, var(--se-bg) 84%, transparent);
-  --se-edit-blur: blur(20px) saturate(1.25);
+  --se-edit-card: var(--se-card-glass);
 }
 
 /* ---------- Page frame ---------- */
@@ -104,7 +103,7 @@ html.se-community-edit-profile [data-se-edit="nav"] {
   border-radius: var(--se-radius-xl);
   background: var(--se-edit-card) !important;
   box-shadow: var(--se-edge);
-  backdrop-filter: var(--se-edit-blur);
+  backdrop-filter: var(--se-blur-bar);
 }
 
 html.se-community-edit-profile [data-se-edit="link"] {
@@ -221,7 +220,7 @@ html.se-community-edit-profile [data-se-edit="main"] {
   border-radius: var(--se-radius-xl);
   background: var(--se-edit-card) !important;
   box-shadow: var(--se-edge);
-  backdrop-filter: var(--se-edit-blur);
+  backdrop-filter: var(--se-blur-bar);
   color: var(--se-text-dim);
 }
 
@@ -366,9 +365,9 @@ html.se-community-edit-profile [data-se-edit="main"] button.DialogButton {
   padding: 0 var(--se-space-5) !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-pill) !important;
+  background: var(--se-btn-bg) !important;
   box-shadow: var(--se-btn-edge) !important;
-  color: var(--se-text) !important;
+  color: var(--se-btn-color) !important;
   font: var(--se-type-control-lg) !important;
   text-transform: none !important;
   cursor: pointer;
@@ -376,8 +375,8 @@ html.se-community-edit-profile [data-se-edit="main"] button.DialogButton {
 }
 
 html.se-community-edit-profile [data-se-edit="main"] button.DialogButton:hover {
-  background: var(--se-hover) !important;
-  color: var(--se-white) !important;
+  background: var(--se-btn-bg-hover) !important;
+  color: var(--se-btn-color-hover) !important;
 }
 
 html.se-community-edit-profile [data-se-edit="main"] button.DialogButton.Primary {
@@ -388,7 +387,7 @@ html.se-community-edit-profile [data-se-edit="main"] button.DialogButton.Primary
 
 html.se-community-edit-profile [data-se-edit="main"] button.DialogButton.Primary:hover {
   background: var(--se-btn-primary-bg-hover) !important;
-  color: var(--se-on-accent) !important;
+  color: var(--se-btn-primary-color) !important;
 }
 
 html.se-community-edit-profile [data-se-edit="main"] button.DialogButton:disabled {
@@ -396,7 +395,8 @@ html.se-community-edit-profile [data-se-edit="main"] button.DialogButton:disable
   cursor: default;
 }
 
-/* Save / Cancel: a bar that stays in view at the foot of the window */
+/* Save / Cancel: a bar that stays in view at the foot of the window. No backdrop-filter of its
+   own: the editor card around it already blurs, and its panel is near opaque */
 html.se-community-edit-profile [data-se-edit="actions"] {
   position: sticky !important;
   bottom: 16px;
@@ -412,7 +412,6 @@ html.se-community-edit-profile [data-se-edit="actions"] {
   border-radius: var(--se-radius-lg);
   background: var(--se-panel-bg) !important;
   box-shadow: var(--se-panel-shadow);
-  backdrop-filter: var(--se-blur-panel);
 }
 
 /* ---------- Below Steam's breakpoint ---------- */

@@ -1,6 +1,7 @@
 /*
  * Continues summary.css (in order, see web/store/loader.js): Screenshot viewer; Rail; The
- * theme's video player; Steam's store CSS styles every select and range input on the page.
+ * theme's video player; Steam's store CSS styles every select and range input on the page;
+ * Narrow strip.
  */
 
 /* ---------- Screenshot viewer (app/viewer.js) ---------- */
@@ -118,7 +119,7 @@ html.se-viewer-open {
 .se-viewer__btn:focus-visible,
 .se-viewer__thumb:focus-visible {
   outline: var(--se-focus-outline);
-  outline-offset: 2px;
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-viewer__btn--prev { grid-column: 1; }
@@ -201,7 +202,7 @@ html.se-viewer-open {
 
 .se-viewer__thumb[data-se-video]::before {
   border-radius: var(--se-radius-control);
-  background: rgb(10 12 16 / .75);
+  background: color-mix(in srgb, var(--se-bg-ink) 75%, transparent);
 }
 
 .se-viewer__thumb[data-se-video]::after {
@@ -223,7 +224,7 @@ html.se-viewer-open {
 }
 
 .se-player {
-  --se-player-bar: rgb(10 12 16 / .78);
+  --se-player-bar: color-mix(in srgb, var(--se-bg-ink) 78%, transparent);
 
   position: relative;
   aspect-ratio: 16 / 9;
@@ -545,7 +546,6 @@ html.se-viewer-open {
 
 @media (prefers-reduced-motion: reduce) {
   .se-viewer[open] { animation: none; }
-  .se-player[data-se-waiting]::after { animation-duration: 2s; }
 }
 
 /* Narrow strip: the details row's columns stack. */

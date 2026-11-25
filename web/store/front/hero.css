@@ -116,7 +116,7 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
   overflow: hidden;
   /* Animated art layers get their own compositing layer, which overflow+radius doesn't
      clip in Chromium; clip-path does, so all four corners stay rounded. */
-  clip-path: inset(0 round 18px);
+  clip-path: inset(0 round var(--se-radius-card));
   isolation: isolate;
   background: var(--se-surface);
   color: var(--se-text);
@@ -133,14 +133,14 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
 .se-cinema__art {
   position: absolute;
   inset: 0;
-  z-index: -2;
+  z-index: var(--se-z-under-2);
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center 30%;
   opacity: 0;
   transform: scale(1.04);
-  transition: opacity .8s var(--se-ease), transform 8s linear;
+  transition: opacity var(--se-dur-crossfade) var(--se-ease), transform var(--se-dur-drift-long) linear;
 }
 
 /* Round the layers themselves too, so the corners hold even if the parent clip doesn't. */
@@ -183,7 +183,7 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
 
 .se-cinema__top .se-cinema__label {
   flex: none;
-  /* Level with the tab names: tab padding 4 + track 3 + gap 7, same 16px line box. */
+  /* Level with the tab names (tab padding 4 + track 3 + gap 8), same 16px line box. */
   padding-top: var(--se-space-4);
   line-height: 16px;
   font-weight: 700;
@@ -427,38 +427,38 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
   font-size: var(--se-fs-sm);
 }
 
-.se-chip {
+.se-cinema .se-chip {
   display: inline-flex;
   align-items: center;
   gap: var(--se-space-2);
-  height: var(--se-ctl-sm);
-  padding: 0 var(--se-space-3);
+  height: var(--se-chip-h);
+  padding: var(--se-chip-pad);
   border-radius: var(--se-radius-control);
-  background: var(--se-pill);
+  background: var(--se-chip-bg);
   font-size: var(--se-fs-sm);
   color: var(--se-on-art);
   white-space: nowrap;
 }
 
-.se-chip__dot {
+.se-cinema .se-chip__dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: currentColor;
 }
 
-.se-chip__muted {
+.se-cinema .se-chip__muted {
   color: var(--se-text-muted);
 }
 
-.se-chip__muted::before {
+.se-cinema .se-chip__muted::before {
   content: "·";
   margin-right: var(--se-space-2);
 }
 
-.se-chip--review.is-positive { color: var(--se-review-positive); }
-.se-chip--review.is-mixed { color: var(--se-gold); }
-.se-chip--review.is-negative { color: var(--se-danger); }
+.se-cinema .se-chip--review.is-positive { color: var(--se-review-positive); }
+.se-cinema .se-chip--review.is-mixed { color: var(--se-gold); }
+.se-cinema .se-chip--review.is-negative { color: var(--se-danger); }
 
 /*
  * Screenshots: hover previews one as the hero art. Fixed-size 16:9 tiles; a slide with
@@ -500,9 +500,11 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
   opacity: 1;
   transform: translateY(-2px);
   box-shadow: none;
+}
+
+.se-cinema__shot:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
-  outline: none;
 }
 
 /* Price, call to action, wishlist */
@@ -551,27 +553,23 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
   height: var(--se-cinema-buy-h);
   padding: 0 var(--se-space-5);
   border-radius: var(--se-radius-md);
-  background: var(--se-accent);
-  color: var(--se-on-accent);
+  background: var(--se-btn-primary-bg);
+  color: var(--se-btn-primary-color);
   font-size: var(--se-fs-md);
   font-weight: 700;
   white-space: nowrap;
   text-decoration: none;
-  transition: transform var(--se-dur) var(--se-ease);
+  transition: background-color var(--se-dur), transform var(--se-dur) var(--se-ease);
 }
 
-/* Same hover as the store's other accent buttons (front/tabs.css .se-tabs__view): a touch
-   brighter, never a different colour. */
+/* The shared primary button's hover and press */
 .se-cinema__cta:is(:hover, :focus-visible) {
-  filter: brightness(1.1);
+  background: var(--se-btn-primary-bg-hover);
 }
 
 .se-cinema__cta:active {
-  filter: brightness(.95);
-  transform: scale(.98);
+  transform: scale(var(--se-press-scale));
 }
-
-/* The arrow nudges on hover; the button itself never changes size. */
 
 .se-cinema__wish {
   --se-cinema-heart: var(--se-icon-heart);
@@ -615,7 +613,7 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
 }
 
 .se-cinema__wish:active {
-  transform: scale(.94);
+  transform: scale(var(--se-press-scale));
 }
 
 /* Wishlisted: pink heart on a pink-tinted tile, so the state reads without hovering. */

@@ -54,8 +54,6 @@
     if (!media || !glance) return () => life.destroy();
 
     const text = (node) => squash(node?.textContent);
-    // Steam hides overflow tags with inline styles; computed display ignores our hiding of the glance.
-    const shown = (node) => getComputedStyle(node).display !== 'none';
 
     /* ---------- Left: overview ---------- */
 
@@ -208,9 +206,11 @@
 
     /** Rebuild `target` from `build()` only when `key` changed since last time. */
     const keys = new WeakMap();
+    let rebuilt = false; // a part rebuilt since the last balance: the row needs measuring again
     const render = (target, key, build) => {
       if (keys.get(target) === key) return;
       keys.set(target, key);
+      rebuilt = true;
       target.replaceChildren(...(key ? build() : []));
       target.hidden = !key;
     };
@@ -339,7 +339,6 @@
       ['features', detailsRow.syncFeatures],
       ['languages', detailsRow.syncLanguages],
       ['details', detailsRow.syncRow],
-      ['balance', detailsRow.balance],
     ];
     const sync = () => {
       for (const [name, part] of PARTS) {
@@ -359,11 +358,29 @@
     media.before(section);
     document.documentElement.classList.add(ROOT_FLAG);
 
+    // The balance reads the columns' geometry, so it never runs in the observer's pass: a frame
+    // later, and only after a part was rebuilt or the row or the media beside it resized.
+    const balanceRow = () => {
+      rebuilt = false;
+      try {
+        detailsRow.balance();
+      } catch (error) {
+        console.error('[Steam Enhanced] app/summary.js balance:', error);
+      }
+    };
+    const rebalance = dom.perFrame(balanceRow);
+    life.add(rebalance.cancel);
+    life.add(() => detailsRow.destroy());
+
     sync();
-    life.observe(sync);
+    balanceRow(); // before first paint, so the columns never show uncut
+    life.observe(() => {
+      sync();
+      if (rebuilt) rebalance();
+    });
 
     // Re-balance when the row or the media beside it resizes (window, fonts, images).
-    const balance = new ResizeObserver(() => requestAnimationFrame(detailsRow.balance));
+    const balance = new ResizeObserver(rebalance);
     balance.observe(detailsRow.node);
     balance.observe(middleCell); // the room beside the media follows its height
     balance.observe(highlights.node); // the cards above the row move it down as they fill in

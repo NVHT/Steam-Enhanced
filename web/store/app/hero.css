@@ -114,7 +114,8 @@ html.se-app-hero-on .page_title_area .breadcrumbs .blockbg > a:not(:last-of-type
   content: "";
   width: 12px;
   height: 12px;
-  /* Centred in the 22px margin without widening the pill: 16 padding + 5, then back out. */
+  /* Past the pill's edge: 24px out from the label (its 16px padding plus 8), then 32px back,
+     so the pill grows 4px and the chevron sits 4px outside it. */
   margin: 0 calc(-1 * var(--se-space-6)) 0 var(--se-space-5);
   background: var(--se-text-faint);
   -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
@@ -189,7 +190,7 @@ html.se-app-hero-on [data-se-tools-source] {
 
 .se-app-hero__tool:focus-visible {
   outline: var(--se-focus-outline);
-  outline-offset: 2px;
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-app-hero__tool::before {
@@ -280,7 +281,7 @@ html.se-app-hero-on .apphub_OtherSiteInfo > a > span {
 .se-app-hero__art {
   position: absolute;
   inset: 0;
-  z-index: -2;
+  z-index: var(--se-z-under-2);
   background-position: center 25%;
   background-size: cover;
   background-repeat: no-repeat;
@@ -297,7 +298,7 @@ html.se-app-hero-on .apphub_OtherSiteInfo > a > span {
 /* A small capsule stretched to hero size: blur it into a glow rather than show its pixels. */
 .se-app-hero__art[data-se-soft] {
   inset: -48px;
-  filter: blur(28px) saturate(1.2);
+  filter: var(--se-blur-glow);
 }
 
 /* Shade: darker at the top for the title row, clear in the middle, the page colour at the foot. */
@@ -490,7 +491,7 @@ button.se-app-hero__chip[data-se-tone]:hover {
 
 button.se-app-hero__chip:focus-visible {
   outline: var(--se-focus-outline);
-  outline-offset: 2px;
+  outline-offset: var(--se-focus-offset);
 }
 
 /* Steam's age rating, Metacritic, achievements, Points Shop and franchise boxes: their chips

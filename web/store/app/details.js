@@ -12,6 +12,7 @@
  *   row.syncRelevance / syncFeatures / syncLanguages  re-read Steam's page (cheap when unchanged)
  *   row.syncRow()                                    show the columns that have content
  *   row.balance()                                    cut the columns to the room
+ *   row.destroy()                                    cancel a pending re-balance
  */
 (() => {
   'use strict';
@@ -131,7 +132,7 @@
      */
     const LANGUAGE_ROWS = 6;
     const LANGUAGE_ROWS_MIN = 2;
-    /** The built table's row control ({ total, show(n), open() }), or null. */
+    /** The built table's row control ({ total, show(n), open(), tops() }), or null. */
     let languageView = null;
 
     const languagesTitle = el('h2', { class: 'se-app-summary__heading', id: 'se-app-languages-title' });
@@ -184,7 +185,7 @@
         grid.toggleAttribute('data-se-open', open);
         more.setAttribute('aria-expanded', String(open));
         more.textContent = label(open);
-        requestAnimationFrame(balanceDetails);
+        rebalance();
       });
 
       languageView = {
@@ -195,6 +196,8 @@
           rowNodes.forEach((node, i) => node.toggleAttribute('data-se-extra', i >= count));
           more.hidden = count >= rows.length;
         },
+        /** Each row's top in the grid (read with every row shown). */
+        tops: () => rowNodes.map((node) => node.offsetTop),
       };
       languageView.show(LANGUAGE_ROWS);
       return [grid, more];
@@ -230,7 +233,7 @@
     };
 
 
-    /** A duotone icon (app/summary.css masks), aria-hidden: the label says what it is. */
+    /** A duotone icon (masks in app/summary-actions.css and summary-details.css), aria-hidden: the label says what it is. */
     const icon = (key) => el('span', { class: 'se-app-summary__feature-icon', 'data-se-icon': key, 'aria-hidden': 'true' });
 
     /**
@@ -363,13 +366,23 @@
      * Languages keeps its own "Show all N languages", so it is never cut: beside the media it
      * shows as many rows as fit the room instead (fewest LANGUAGE_ROWS_MIN), else LANGUAGE_ROWS.
      */
+    // Two reads, not one per row: every row shown (its height, and each row's top), then the
+    // fewest rows (the height with "Show all" under them); each row more adds its step.
     const fitLanguages = (room) => {
       const view = languageView;
       if (!view || languages.hidden) return;
       if (!room || view.open()) return view.show(LANGUAGE_ROWS);
-      let count = view.total;
+      view.show(view.total);
+      if (view.total <= LANGUAGE_ROWS_MIN || languages.scrollHeight <= room) return;
+      const tops = view.tops();
+      view.show(LANGUAGE_ROWS_MIN);
+      let height = languages.scrollHeight;
+      let count = LANGUAGE_ROWS_MIN;
+      while (count < view.total - 1 && height + tops[count + 1] - tops[count] <= room) {
+        height += tops[count + 1] - tops[count];
+        count++;
+      }
       view.show(count);
-      while (count > LANGUAGE_ROWS_MIN && languages.scrollHeight > room) view.show(--count);
     };
 
     const balanceDetails = () => {
@@ -408,6 +421,9 @@
       for (const column of columns) column.style.setProperty('min-height', `${row}px`);
     };
 
+    // The language toggle's re-balance, a frame after the grid opens or closes
+    const rebalance = dom.perFrame(balanceDetails);
+
     const details = el('div', { class: 'se-app-summary__details' }, [relevance, features, languages]);
     for (const column of [relevance, features, languages]) column.append(columnToggle(column));
 
@@ -418,6 +434,7 @@
       syncLanguages,
       syncRow: syncDetails,
       balance: balanceDetails,
+      destroy: rebalance.cancel,
     };
   };
 

@@ -80,7 +80,7 @@ html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   /* The footer's two halves (social links, feed note) share one row in any DOM order: on tabs
-     where they're added, the note can come first, which pushed the links to a row of their own */
+     where they're added the note can come first, and dense flow keeps the links beside it */
   grid-auto-flow: row dense;
   align-items: center;
   margin: var(--se-space-5) auto var(--se-space-6) !important;
@@ -289,9 +289,9 @@ html.se-community-hub .apphub_Stats {
   height: auto !important;
   padding: 0 !important;
   color: var(--se-text-dim);
-  /* Steam puts "&nbsp;" around a separator; each became a spaced flex item and widened one
-     gap. At font-size 0 they have no width, and the chips space themselves (margin below), so
-     an empty item adds nothing */
+  /* Steam puts "&nbsp;" around a separator; each is a flex item that would widen its gap. At
+     font-size 0 they have no width, and the chips space themselves (margin below), so an empty
+     item adds nothing */
   font: 600 0/1 var(--se-font);
 }
 
@@ -429,12 +429,12 @@ html.se-community-hub .apphub_Stats #statsselect_arrow {
   mask: var(--se-icon-chevron) center / contain no-repeat;
 }
 
-/* Friends who play: the count as a pill, then the avatars in a row, each with its whole status
-   ring (overlapped, the covered ring was cut or hidden) */
+/* Friends who play: the count, then the avatars in a row, each with its whole status ring (not
+   overlapped, so no ring is covered) */
 /* !important: Steam's own rules (apphub_gamepad.css) set display, padding at equal or higher
    weight; another rule in this file sets display with !important; height, width can come inline
-   from Steam's markup or scripts. Steam clips the area (overflow: hidden), which cut the first
-   avatar's ring and the hover lift. */
+   from Steam's markup or scripts. Steam clips the area (overflow: hidden), which would cut the
+   first avatar's ring and the hover lift: overflow is visible. */
 html.se-community-hub .apphub_recentFriendsArea {
   grid-area: friends;
   display: flex !important;

@@ -21,7 +21,9 @@ html.se-store-account:not(#se-none) table[data-se-table],
 .se-table-empty,
 html.se-store-addfunds:not(#se-none) .addfunds_area_purchase_game,
 html.se-store-redeem:not(#se-none) :is(.wallet_code_content_box, .upsell_and_graphic),
-html.se-store-phone:not(#se-none) .phone_left_col > :is(.current_phone_box, .phone_box) {
+html.se-store-phone:not(#se-none) .phone_left_col > :is(.current_phone_box, .phone_box),
+html.se-store-parental:not(#se-none) .parental_settings_box,
+html.se-store-account:not(#se-none) [data-se-account-modern="nav"] {
   border-radius: var(--se-card-radius);
   background: var(--se-card-bg);
   box-shadow: var(--se-card-edge);
@@ -29,10 +31,13 @@ html.se-store-phone:not(#se-none) .phone_left_col > :is(.current_phone_box, .pho
 
 /* ==========================================================================
  * Icon chips: a glyph on a raised square (an Account details card's title, the current phone
- * number). Members set their own size.
+ * number, a Family View feature, Steam Guard's and a device's picture). Members set their own
+ * size and tone.
  * ========================================================================== */
 .se-account-chip,
-.se-phone-chip {
+.se-phone-chip,
+.se-parental-chip,
+html.se-store-account:not(#se-none) :is(#main_content, .page_content):has(> .two_column.left) > .two_column.right[data-se-account-layout="panel"]:has(.account_header_line) [data-se-account-glyph] {
   flex: none;
   display: flex;
   align-items: center;
@@ -97,18 +102,22 @@ html.se-store-account:not(#se-none) .se-account-card a.account_manage_link::afte
   background: currentColor;
   opacity: .5;
   -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
   rotate: -90deg; /* the core chevron points down */
 }
 
 /* ==========================================================================
  * Steam's green buttons (btnv6_green_white_innerfade): the page's one main action, filled in
- * the accent (Add funds' amount tiles, Redeem's Continue). Members set their own size and
+ * the accent (Add funds' amount tiles, Redeem's Continue, Notification Settings' Save, Family
+ * View's main action). Members set their own size and
  * label padding.
  * ========================================================================== */
 /* !important: Steam's own rules (buttons.css, game.css) set background, border, color, margin,
    padding on the button and its label */
 html.se-store-addfunds:not(#se-none) .addfunds_area_purchase_game .game_purchase_action a,
-html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress) {
+html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress),
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.right > a[class*="btn_green"],
+html.se-store-parental:not(#se-none) .parental_settings_box :is(button, a):is(.btn_blue_white_innerfade, .btn_green_white_innerfade, .btnv6_green_white_innerfade) {
   align-items: center;
   justify-content: center;
   margin: 0 !important;
@@ -123,7 +132,8 @@ html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress)
 }
 
 html.se-store-addfunds:not(#se-none) .addfunds_area_purchase_game .game_purchase_action a > span,
-html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress) > span {
+html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress) > span,
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.right > a[class*="btn_green"] > span {
   border: 0 !important;
   background: none !important;
   color: inherit !important;
@@ -132,6 +142,8 @@ html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress)
 }
 
 html.se-store-addfunds:not(#se-none) .addfunds_area_purchase_game .game_purchase_action a:hover,
-html.se-store-redeem:not(#se-none) #validate_btn:hover {
+html.se-store-redeem:not(#se-none) #validate_btn:hover,
+html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two_column.right > a[class*="btn_green"]:hover,
+html.se-store-parental:not(#se-none) .parental_settings_box :is(button, a):is(.btn_blue_white_innerfade, .btn_green_white_innerfade, .btnv6_green_white_innerfade):hover {
   background: var(--se-btn-primary-bg-hover) !important;
 }

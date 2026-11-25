@@ -10,7 +10,7 @@
  */
 
 html.se-store-explore {
-  --se-explore-gap: 16px;
+  --se-explore-gap: var(--se-space-4);
 }
 
 /* ---------- Page ---------- */
@@ -125,7 +125,7 @@ html.se-store-explore:not(#se-none) [data-se-explore-cap]::after {
   inset: 0;
   z-index: var(--se-z-raised);
   background:
-    linear-gradient(180deg, rgba(8, 10, 14, .45) 0%, transparent 28%),
+    linear-gradient(180deg, color-mix(in srgb, var(--se-bg-ink) 45%, transparent) 0%, transparent 28%),
     linear-gradient(0deg, var(--se-art-scrim) 0%, transparent 40%);
   pointer-events: none;
 }
@@ -292,12 +292,13 @@ html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_item_price {
   display: none !important;
 }
 
-/* A soft shade over the row so the centred button always reads. */
+/* A soft shade over the row so the centred button always reads. Its z-index and the call to
+   action's stack inside the card (isolated), over the tiles' own layers. */
 html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_static::after {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 10;
+  z-index: var(--se-z-sticky);
   background: radial-gradient(60% 90% at 50% 50%, var(--se-art-scrim), transparent 75%);
   pointer-events: none;
   transition: opacity var(--se-dur-slow);
@@ -309,14 +310,11 @@ html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_sta
 
 /* "Click here to begin exploring": the whole card is the link; its message is a centred button. */
 html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay {
-  border: 0 !important;
-  border-radius: var(--se-radius-xl);
-}
-
-html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay {
   position: absolute !important;
   inset: 0 !important;
-  z-index: 30;
+  z-index: var(--se-z-flyout);
+  border: 0 !important;
+  border-radius: var(--se-radius-xl);
 }
 
 html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay_position {
@@ -341,36 +339,37 @@ html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_ove
   align-items: center;
   gap: var(--se-space-3);
   padding: 0 var(--se-space-5) !important;
-  height: 44px;
+  height: var(--se-ctl-lg);
   border-radius: var(--se-radius-md);
-  background: var(--se-accent);
-  color: var(--se-on-accent) !important;
+  background: var(--se-btn-primary-bg);
+  color: var(--se-btn-primary-color) !important;
   font-family: inherit !important;
   font-size: var(--se-fs-md) !important;
   font-weight: 600 !important;
-  line-height: 44px !important;
+  line-height: var(--se-ctl-lg) !important;
   box-shadow: var(--se-shadow-md);
   transition: background-color var(--se-dur);
 }
 
 html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay:hover .discovery_queue_overlay_message {
-  background: var(--se-accent-hover);
-  color: var(--se-on-accent) !important;
+  background: var(--se-btn-primary-bg-hover);
+  color: var(--se-btn-primary-color) !important;
 }
 
 /* The arrow, as on the hero's call to action. */
 html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay_message::after {
   content: "";
-  width: 7px;
-  height: 7px;
-  border: solid currentColor;
-  border-width: 2px 2px 0 0;
-  transform: rotate(45deg);
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
+  transform: rotate(-90deg); /* the core chevron points down */
   transition: transform var(--se-dur);
 }
 
 html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_overlay:hover .discovery_queue_overlay_message::after {
-  transform: translateX(3px) rotate(45deg);
+  transform: translateX(3px) rotate(-90deg);
 }
 
 /* Signed-in "begin exploring" and "Start another queue": the same accent button. */
@@ -1044,20 +1043,7 @@ html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right,
   line-height: inherit !important;
 }
 
-/* The store front's chevron. */
-html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) a::after {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border: solid currentColor;
-  border-width: 1.75px 1.75px 0 0;
-  transform: rotate(45deg);
-  transition: transform var(--se-dur-slow) var(--se-ease);
-}
-
-html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) a:hover::after {
-  transform: translateX(2px) rotate(45deg);
-}
+/* Their chevron is the store front's (web/store/shared/rows.css, "Pill button with a chevron"). */
 
 /* ---------- Narrow windows ---------- */
 

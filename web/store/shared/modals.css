@@ -1,6 +1,7 @@
 /*
  * Content particular to the store's classic dialogs: the example-product lists (Store
- * preferences → Mature content) and the Discovery Queue settings. The dialog itself (scrim,
+ * preferences → Mature content), the Discovery Queue settings, Review Score Settings, and the
+ * choice rows and text area of the Report dialogs. The dialog itself (scrim,
  * frame, header, close, buttons, focus, the wait dialog) is web/shared/modals.css, shared with
  * Community. Rules use html.se-store:not(#se-none) for ID-level weight.
  */
@@ -194,8 +195,8 @@ html.se-store:not(#se-none) .newmodal .gray_bevel.for_text_input input {
   padding: 0 var(--se-space-3) !important;
   border: 0 !important;
   border-radius: var(--se-radius-md);
-  background: var(--se-field) !important;
-  box-shadow: var(--se-edge);
+  background: var(--se-field-bg) !important;
+  box-shadow: var(--se-field-edge);
   color: var(--se-text) !important;
   font: var(--se-type-control-lg) !important;
   outline: none;
@@ -218,10 +219,16 @@ html.se-store:not(#se-none) .newmodal button[class*="btnv6_"] {
   padding: 0 !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-surface-2) !important;
-  box-shadow: var(--se-edge);
-  color: var(--se-text) !important;
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-btn-color) !important;
   cursor: pointer;
+  transition: background-color var(--se-dur), color var(--se-dur);
+}
+
+html.se-store:not(#se-none) .newmodal button[class*="btnv6_"]:hover {
+  background: var(--se-btn-bg-hover) !important;
+  color: var(--se-btn-color-hover) !important;
 }
 
 html.se-store:not(#se-none) .newmodal button[class*="btnv6_"] > span {
@@ -229,7 +236,7 @@ html.se-store:not(#se-none) .newmodal button[class*="btnv6_"] > span {
   border: 0 !important;
   background: none !important;
   color: inherit !important;
-  font: 600 var(--se-fs-md)/36px var(--se-font) !important;
+  font: 600 var(--se-fs-md)/var(--se-ctl) var(--se-font) !important;
   text-shadow: none !important;
 }
 
@@ -372,27 +379,7 @@ html.se-store:not(#se-none) .newmodal .review_event_preference > label:has(> inp
 }
 
 html.se-store:not(#se-none) .newmodal .review_event_preference input[type="radio"] {
-  flex: none;
-  width: 20px;
-  height: 20px;
   margin: 0 !important;
-  border-radius: 50%;
-  appearance: none;
-  -webkit-appearance: none;
-  background: var(--se-field);
-  box-shadow: var(--se-edge);
-  cursor: pointer;
-  transition: box-shadow var(--se-dur);
-}
-
-html.se-store:not(#se-none) .newmodal .review_event_preference input[type="radio"]:checked {
-  background: var(--se-on-accent);
-  box-shadow: inset 0 0 0 6px var(--se-accent);
-}
-
-html.se-store:not(#se-none) .newmodal .review_event_preference input[type="radio"]:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: 2px;
 }
 
 /* ---------- Choice rows and text areas (Report dialogs and the like) ----------
@@ -447,27 +434,31 @@ html.se-store:not(#se-none) .newmodal [data-se-choice-title] {
 }
 
 html.se-store:not(#se-none) .newmodal label[data-se-choice] > input[type="radio"] {
+  margin: 1px 0 0 !important; /* level with the row's first line */
+}
+
+/* The theme's radio, in Review Score Settings and the choice rows alike */
+html.se-store:not(#se-none) .newmodal :is(.review_event_preference input, label[data-se-choice] > input)[type="radio"] {
   flex: none;
   width: 18px;
   height: 18px;
-  margin: 1px 0 0 !important;
   border-radius: 50%;
   appearance: none;
   -webkit-appearance: none;
-  background: var(--se-field);
+  background: var(--se-field-bg);
   box-shadow: inset 0 0 0 1px var(--se-white-25);
   cursor: pointer;
   transition: box-shadow var(--se-dur);
 }
 
-html.se-store:not(#se-none) .newmodal label[data-se-choice] > input[type="radio"]:checked {
+html.se-store:not(#se-none) .newmodal :is(.review_event_preference input, label[data-se-choice] > input)[type="radio"]:checked {
   background: var(--se-on-accent);
   box-shadow: inset 0 0 0 5px var(--se-accent);
 }
 
-html.se-store:not(#se-none) .newmodal label[data-se-choice] > input[type="radio"]:focus-visible {
+html.se-store:not(#se-none) .newmodal :is(.review_event_preference input, label[data-se-choice] > input)[type="radio"]:focus-visible {
   outline: var(--se-focus-outline);
-  outline-offset: 2px;
+  outline-offset: var(--se-focus-offset);
 }
 
 /* Steam's bevelled box around the textarea: the field carries the look instead. */
@@ -488,8 +479,8 @@ html.se-store:not(#se-none) .newmodal textarea {
   padding: var(--se-space-3) var(--se-space-4) !important;
   border: 0 !important;
   border-radius: var(--se-radius-md) !important;
-  background: var(--se-field) !important;
-  box-shadow: var(--se-edge) !important;
+  background: var(--se-field-bg) !important;
+  box-shadow: var(--se-field-edge) !important;
   color: var(--se-text) !important;
   font: var(--se-type-body-lg) !important;
   outline: 0 !important;
@@ -502,5 +493,5 @@ html.se-store:not(#se-none) .newmodal textarea::placeholder {
 }
 
 html.se-store:not(#se-none) .newmodal textarea:focus {
-  box-shadow: var(--se-search-edge-focus) !important;
+  box-shadow: var(--se-field-edge-focus) !important;
 }

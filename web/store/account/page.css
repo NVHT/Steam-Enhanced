@@ -68,7 +68,9 @@ html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs :is(.pageheade
   text-transform: none !important;
 }
 
-html.se-store-account:not(#se-none) h2.pageheader {
+/* The page title; the newer pages' (newer.css) the same */
+html.se-store-account:not(#se-none) h2.pageheader,
+html.se-store-account:not(#se-none) [data-se-account-modern="title"] {
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
@@ -131,8 +133,8 @@ html.se-store-account:not(#se-none) .se-account-id-btn {
   padding: 0;
   border: 0;
   border-radius: var(--se-radius-control);
-  background: none;
-  color: var(--se-text-faint);
+  background: var(--se-btn-ghost-bg);
+  color: var(--se-btn-ghost-color);
   cursor: pointer;
   transition: background-color var(--se-dur), color var(--se-dur);
 }
@@ -150,8 +152,8 @@ html.se-store-account:not(#se-none) .se-account-id-btn {
 }
 
 html.se-store-account:not(#se-none) .se-account-id-btn:hover {
-  background: var(--se-hover);
-  color: var(--se-white);
+  background: var(--se-btn-ghost-bg-hover);
+  color: var(--se-btn-ghost-color-hover);
 }
 
 html.se-store-account:not(#se-none) .se-account-id-btn[data-copied] {
@@ -204,7 +206,9 @@ html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two
   padding: var(--se-space-3) !important;
 }
 
-html.se-store-account:not(#se-none) a.nav_item {
+/* Sidebar links; the newer pages' (newer.css) the same, their icon chip drawn by pseudo-elements */
+html.se-store-account:not(#se-none) a.nav_item,
+html.se-store-account:not(#se-none) :is([data-se-account-modern="link"], [data-se-account-modern="link-active"]) {
   display: flex !important;
   align-items: center;
   gap: var(--se-space-3);
@@ -226,7 +230,8 @@ html.se-store-account:not(#se-none) a.nav_item {
   transition: background-color var(--se-dur), color var(--se-dur);
 }
 
-html.se-store-account:not(#se-none) a.nav_item:hover {
+html.se-store-account:not(#se-none) a.nav_item:hover,
+html.se-store-account:not(#se-none) [data-se-account-modern="link"]:hover {
   background: var(--se-hover) !important;
   color: var(--se-text) !important;
 }
@@ -239,7 +244,8 @@ html.se-store-account:not(#se-none) a.nav_item::after {
   display: none !important;
 }
 
-html.se-store-account:not(#se-none) a.nav_item.active {
+html.se-store-account:not(#se-none) a.nav_item.active,
+html.se-store-account:not(#se-none) [data-se-account-modern="link-active"] {
   background: var(--se-accent-surface) !important;
   color: var(--se-text) !important;
 }
@@ -249,7 +255,8 @@ html.se-store-account:not(#se-none) a.nav_item[data-se-account-nav] > img {
   display: none !important;
 }
 
-.se-account-nav-icon {
+.se-account-nav-icon,
+html.se-store-account:not(#se-none) :is([data-se-account-modern="link"], [data-se-account-modern="link-active"])::before {
   flex: none;
   display: flex;
   align-items: center;
@@ -271,7 +278,8 @@ a.nav_item:hover > .se-account-nav-icon {
   color: var(--se-text-dim);
 }
 
-a.nav_item.active > .se-account-nav-icon {
+a.nav_item.active > .se-account-nav-icon,
+html.se-store-account:not(#se-none) [data-se-account-modern="link-active"]::before {
   background: var(--se-accent);
   color: var(--se-on-accent);
 }

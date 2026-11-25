@@ -63,10 +63,8 @@ html.se-store-parental:not(#se-none) .parental_settings_box {
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
-  border-radius: var(--se-radius-card);
   overflow: clip;
-  background: var(--se-surface) !important;
-  box-shadow: var(--se-edge);
+  background: var(--se-card-bg) !important; /* the shared card's, past Steam's own (account.css) */
   color: var(--se-text-dim) !important;
   font: var(--se-type-body-lg) !important;
 }
@@ -115,7 +113,7 @@ html.se-store-parental:not(#se-none) .parental_status_title1 {
   height: 26px;
   padding: 0 var(--se-space-3);
   border-radius: var(--se-radius-control);
-  background: var(--se-pill);
+  background: var(--se-chip-bg);
   box-shadow: var(--se-edge);
   color: var(--se-text) !important;
   font: var(--se-type-control) !important;
@@ -239,14 +237,10 @@ html.se-store-parental:not(#se-none) .feature_row:has(> input:checked) {
 }
 
 .se-parental-chip {
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 34px;
   height: var(--se-ctl);
   border-radius: var(--se-radius-sm);
-  background: var(--se-pill);
+  box-shadow: none;
   color: var(--se-text-faint);
   transition: background-color var(--se-dur), color var(--se-dur);
 }
@@ -299,7 +293,7 @@ html.se-store-parental:not(#se-none) .feature_row > input[type="radio"]:checked 
 
 html.se-store-parental:not(#se-none) .feature_row > input[type="radio"]:focus-visible {
   outline: var(--se-focus-outline);
-  outline-offset: 2px;
+  outline-offset: var(--se-focus-offset);
 }
 
 /* Text fields of later steps (email, PIN) */
@@ -332,9 +326,9 @@ html.se-store-parental:not(#se-none) .parental_settings_box :is(button, a)[class
   padding: 0 !important;
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
-  background: var(--se-surface-2) !important;
-  box-shadow: var(--se-edge);
-  color: var(--se-text) !important;
+  background: var(--se-btn-bg) !important;
+  box-shadow: var(--se-btn-edge);
+  color: var(--se-btn-color) !important;
   cursor: pointer;
   text-decoration: none !important;
   transition: background-color var(--se-dur);
@@ -350,15 +344,10 @@ html.se-store-parental:not(#se-none) .parental_settings_box :is(button, a)[class
 }
 
 html.se-store-parental:not(#se-none) .parental_settings_box :is(button, a)[class*="btn_"]:hover {
-  background: var(--se-hover) !important;
+  background: var(--se-btn-bg-hover) !important;
 }
 
+/* The main action wears the shared green button (shared/account.css), flat beside the others */
 html.se-store-parental:not(#se-none) .parental_settings_box :is(button, a):is(.btn_blue_white_innerfade, .btn_green_white_innerfade, .btnv6_green_white_innerfade) {
-  background: var(--se-btn-primary-bg) !important;
   box-shadow: none;
-  color: var(--se-btn-primary-color) !important;
-}
-
-html.se-store-parental:not(#se-none) .parental_settings_box :is(button, a):is(.btn_blue_white_innerfade, .btn_green_white_innerfade, .btnv6_green_white_innerfade):hover {
-  background: var(--se-btn-primary-bg-hover) !important;
 }
