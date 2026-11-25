@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.5.1**](#v1-5-1) | Nov 25, 2026 | Linux menus without black edges, Square corners |
 | [**1.5.0**](#v1-5-0) | Nov 25, 2026 | Every Steam Settings page redesigned, a start on any page, a cleaner theme |
 | [**1.4.5**](#v1-4-5) | Nov 24, 2026 | The Friends window opens on the screen you left it |
 | [**1.4.4**](#v1-4-4) | Nov 24, 2026 | The Friends window reopens where you left it |
@@ -26,11 +27,26 @@
 
 <br>
 
+<a name="v1-5-1"></a>
+
+## 1.5.1 · Nov 25, 2026
+
+> Menus in their own window lose their black edges on Linux, and Corners gains a Square choice.
+
+**Fixes**
+- **Menu windows**: Solid, the default on Linux, now applies without being chosen; the Steam menu keeps no strip on its left, and a menu's window is filled behind it, so nothing past its corners shows black. Buttons and cards in menus keep the Corners setting's radius (#6).
+
+**Settings**
+- **Corners**: a Square choice; the choices now run from Square to Round.
+- **Appearance**: Fine-tune grouped: font, corners, contrast and animations, then glass and game art, then menus.
+
+<br>
+
 <a name="v1-5-0"></a>
 
-## 1.5.0 · Nov 25, 2026
-
-> Every page of Steam's Settings has its own design: a card on top that shows what the page's settings do, drawn from Steam's own rows. Steam can start on a Store or Community page with the theme's Library beside it, the Friends window keeps its screen, and the whole theme went through a quality pass.
+<details>
+<summary><b>1.5.0</b> · Nov 25, 2026 · Every page of Steam's Settings has its own design: a card on top that shows what the page's settings do, drawn from Steam's own rows. Steam can start on a Store or Community page with the theme's Library beside it, the Friends window keeps its screen, and the whole theme went through a quality pass.</summary>
+<br>
 
 **Settings**
 - **A card for every page**: Account, Friends & Chat, Family, Security, Notifications, Interface, Store, Library, Downloads, Storage, Cloud, In Game, Accessibility, Controller, Game Recording, Voice, Remote Play, Broadcast and Music each open with a card that shows the page's effect instead of repeating its rows: a preview, your games, a wireframe or a picture.
@@ -61,6 +77,8 @@
 - A release audit of every file changed since 1.4.0: dead code and CSS removed, raw colours, spacing, durations and blurs moved onto tokens, the web pages' controls onto the shared button, field, chip and card tokens, and stale comments rewritten.
 - Fewer layout reads: the legal pages, purchase history, the Store's account and game pages and Community discussions no longer read layout on every scroll or change.
 - Features clean up only their own marks when they unload: a JS reload (a theming aid) keeps the rail's buttons.
+
+</details>
 
 <br>
 
