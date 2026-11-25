@@ -109,7 +109,7 @@ Every screen has been rethought, from the moment Steam starts to the moment you 
     <td valign="top">
       <picture><source media="(prefers-color-scheme: light)" srcset="assets/readme/icon-startup-light.svg"><img src="assets/readme/icon-startup.svg" width="32" height="32" alt=""></picture><br>
       <h3>Startup</h3>
-      <sub>A polished first impression: the theme's lockup over a Network and sign-in bar, then a splash that welcomes you back with your last game while the Library loads. Seven backgrounds and five spinner styles.</sub>
+      <sub>A polished first impression: the theme's lockup over a Network and sign-in bar, then a splash that welcomes you back with your last game while the Library loads, or draws the Store or Community page Steam starts on. Seven backgrounds and five spinner styles.</sub>
     </td>
     <td valign="top">
       <picture><source media="(prefers-color-scheme: light)" srcset="assets/readme/icon-about-light.svg"><img src="assets/readme/icon-about.svg" width="32" height="32" alt=""></picture><br>
@@ -134,7 +134,7 @@ Every screen has been rethought, from the moment Steam starts to the moment you 
 - **Menus:** a consistent design for every menu, including those of the friends list. The game context menu has no submenus: Play, Favorite, Files, Hide and Uninstall appear in a toolbar, and Collections opens a searchable list for adding, renaming, deleting and creating collections.
 - **Tray menu:** account status, the active download, recent games and shortcuts to Steam's pages.
 - **Theme settings:** a window of its own, with thirteen colour presets or your own colours, a search and a tab per area.
-- **Settings and dialogs:** Steam Settings, Millennium Settings, Library Manager, and Game Properties with the game's artwork as a header. Install, uninstall, backup, product activation, Mark as Private, Exit Game and collection dialogs all display the game's artwork.
+- **Settings and dialogs:** every Steam Settings page opens with a card that shows what its settings do: previews of the In Game overlay and your UI scale, your games, the controllers connected and which go through Steam Input. Millennium Settings, Library Manager, and Game Properties with the game's artwork as a header. Install, uninstall, backup, product activation, Mark as Private, Exit Game and collection dialogs all display the game's artwork.
 - **Keyboard shortcuts:** <kbd>Ctrl</kbd>+<kbd>`</kbd> Steam Settings, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd> Theme settings, <kbd>Ctrl</kbd>+<kbd>1</kbd> Millennium, <kbd>Ctrl</kbd>+<kbd>R</kbd> reload the interface, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> restart Steam.
 - **System Information and Report:** specification tiles and section cards with quick navigation and a filter. IP addresses, MAC addresses and hardware IDs remain blurred until selected.
 

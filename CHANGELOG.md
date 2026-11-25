@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.5.0**](#v1-5-0) | Nov 25, 2026 | Every Steam Settings page redesigned, a start on any page, a cleaner theme |
 | [**1.4.5**](#v1-4-5) | Nov 24, 2026 | The Friends window opens on the screen you left it |
 | [**1.4.4**](#v1-4-4) | Nov 24, 2026 | The Friends window reopens where you left it |
 | [**1.4.3**](#v1-4-3) | Nov 24, 2026 | Fixes: the overlay's Exit game?, review colours, centred labels |
@@ -25,14 +26,54 @@
 
 <br>
 
+<a name="v1-5-0"></a>
+
+## 1.5.0 · Nov 25, 2026
+
+> Every page of Steam's Settings has its own design: a card on top that shows what the page's settings do, drawn from Steam's own rows. Steam can start on a Store or Community page with the theme's Library beside it, the Friends window keeps its screen, and the whole theme went through a quality pass.
+
+**Settings**
+- **A card for every page**: Account, Friends & Chat, Family, Security, Notifications, Interface, Store, Library, Downloads, Storage, Cloud, In Game, Accessibility, Controller, Game Recording, Voice, Remote Play, Broadcast and Music each open with a card that shows the page's effect instead of repeating its rows: a preview, your games, a wireframe or a picture.
+- **In Game**: the performance monitor and a toast drawn where they'll show, following the page's switches.
+- **Accessibility**: a slice of the Library at your UI scale, with high contrast and reduced motion.
+- **Controller**: Steam's own drawings of its hardware, lit for the kinds connected; a controller's Details shows its face buttons as games will (layout, Nintendo swap, universal glyphs, rumble); Advanced Settings maps which controller families go through Steam Input; Add a new controller shows the cable and the Puck's note.
+- **Security**: Steam Guard's state as a phone with its code; Deauthorize marked as the dangerous one in any language.
+- **Interface**: the start page and the beta badge read in any language.
+- **Steam's Home**: with Home set to Steam's, the Home tab shows its own settings instead of the stage's: hide What's New or the Add shelf row.
+- **One copy button**: Settings, Game Properties, group chat invites and System Information share one, ticked once copied.
+
+**Client**
+- **Start on a page**: with Start Up Location on the Store or Community, the Library loads once under the splash so the theme's game list is there beside the page, and the splash draws the page you start on.
+- **Splash with Steam's Home**: Steam's Home drawn as the wireframe (What's New, a shelf, Add shelf) with the greeting and no game's art, in the startup window's background too (Splash art applies with the theme's Home). With no art, the words sit in the box's outline alone.
+- **Toasts**: one card for every kind, with the Compact sample in Settings › Notifications in each kind's colour.
+- **Menus over the Store and Community**: they open reliably, after Reload UI too.
+
+**Fixes**
+- **Friends window**: it reopens where you left it, on either screen, including a second screen with another scale (#4); after Reload UI it no longer reopens by itself.
+- **Store**: the front page's event dots follow Steam's renamed class.
+- **Announcements**: a post is dated by when it came out, not by its event's date, so a post about an event months ahead (Next Fest) no longer sits on top as new.
+- **Game page**: clickable stats no longer show Steam's hover tile.
+- **Wishlist**: a review summary the theme can't read is no longer shown as positive.
+- **Focus rings**: back on the Store's front page tiles, navigation buttons, Next Fest and Replay.
+- **Library Manager**: its reload asks first during a voice call, as the theme's Reload UI does.
+
+**Under the hood**
+- A release audit of every file changed since 1.4.0: dead code and CSS removed, raw colours, spacing, durations and blurs moved onto tokens, the web pages' controls onto the shared button, field, chip and card tokens, and stale comments rewritten.
+- Fewer layout reads: the legal pages, purchase history, the Store's account and game pages and Community discussions no longer read layout on every scroll or change.
+- Features clean up only their own marks when they unload: a JS reload (a theming aid) keeps the rail's buttons.
+
+<br>
+
 <a name="v1-4-5"></a>
 
-## 1.4.5 · Nov 24, 2026
-
-> The Friends window opens where you left it every time, a second screen included.
+<details>
+<summary><b>1.4.5</b> · Nov 24, 2026 · The Friends window opens where you left it every time, a second screen included.</summary>
+<br>
 
 **Fixes**
 - **Friends window**: the theme keeps its place and screen and opens it there every time, from the dock's Open chat window too; if that screen is gone, it opens where Steam puts it (#4).
+
+</details>
 
 <br>
 
