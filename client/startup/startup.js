@@ -93,10 +93,6 @@
     return el;
   };
 
-  /*
-   * Each step's state, fill and words: a login screen waits on the second step; the Library
-   * phase is the signed-in beat (its own progress is the splash's bar); shutting down ends both.
-   */
   // The status screen's title (Steam's own status line is often empty); none on a login screen.
   const HEADINGS = {
     net: ['Connecting…', ''],
@@ -105,6 +101,10 @@
     off: ['Shutting down…', ''],
   };
 
+  /*
+   * Each step's state, fill and words: a login screen waits on the second step; the Library
+   * phase is the signed-in beat (its own progress is the splash's bar); shutting down ends both.
+   */
   const stepStates = (phase, account) => {
     const who = account?.name;
     const signingIn = who ? `Signing in as ${who}…` : 'Signing in…';
@@ -239,7 +239,7 @@
     if (kind === 'mosaic') bgLayer.innerHTML = '<div class="se-startup-mosaic"></div>';
     // The Library's wireframe, alive and busy (client/shared/wireframe.js); Aurora draws it
     // faintly over three glows (startup.css)
-    const wireframe = SE.wireframe?.({ alive: true, busy: true }) || '';
+    const wireframe = SE.wireframe?.({ alive: true, busy: true, view: SE.settings?.get('home') === 'steam' ? 'steamhome' : 'library' }) || '';
     if (kind === 'library') bgLayer.innerHTML = wireframe;
     if (kind === 'aurora') bgLayer.innerHTML = '<i class="se-startup-glow"></i>'.repeat(3) + wireframe;
     host.append(bgLayer);

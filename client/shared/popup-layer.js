@@ -38,10 +38,35 @@
   // a layer window after it closes, and a layer window never counts as an open menu.
   const handles = new WeakSet();
 
+  /*
+   * The context-menu manager Steam's own menus in this window use, read off one of them (the
+   * rail's page buttons keep theirs in a hook). After Reload UI the bundles can hold more than
+   * one manager for this window, and a menu given to one whose renderer isn't mounted is never
+   * drawn (it stays keyless, with no window).
+   */
+  const isManager = (value) => typeof value?.CreateContextMenuInstance === 'function';
+  function liveManager() {
+    for (const node of document.querySelectorAll('.se-menu-icon')) {
+      for (let fiber = SE.fiber(node), depth = 0; fiber && depth < 15; fiber = fiber.return, depth++) {
+        const fromProps = run(() => fiber.memoizedProps?.refPopupMenu?.current?.m_ContextMenuManager);
+        if (isManager(fromProps)) return fromProps;
+        for (let hook = fiber.memoizedState; hook && typeof hook === 'object'; hook = hook.next) {
+          const manager = run(() => hook.memoizedState?.current?.m_ContextMenuManager);
+          if (isManager(manager)) return manager;
+        }
+      }
+    }
+    return null;
+  }
+
   // React, this window's context-menu manager and ReactDOM's createPortal/flushSync.
   function findRuntime() {
-    if (runtime) return runtime;
-    const found = {};
+    const live = liveManager();
+    if (runtime) {
+      if (live && runtime.manager !== live) runtime = { ...runtime, manager: live };
+      return runtime;
+    }
+    const found = live ? { manager: live } : {};
     const complete = () =>
       found.React && found.manager && found.createPortal && found.flushSync ? { ...found } : null;
     const inspect = (exp) => {
@@ -62,6 +87,10 @@
       }
     };
 
+    // Steam's own React and ReactDOM first (Millennium's SP_REACT / SP_REACTDOM): the bundles
+    // also hold plugins' copies, which Steam's menu window may not render
+    inspect(SE.global('SP_REACT', (react) => typeof react?.createElement === 'function'));
+    inspect(SE.global('SP_REACTDOM', (dom) => typeof dom?.createPortal === 'function'));
     for (const req of SE.requires()) {
       for (const module of Object.values(req.c || {})) inspect(module?.exports);
     }
@@ -126,12 +155,11 @@
    *   - once, from the first window: its content's corner from its outer and inner sizes;
    *   - exactly, whenever the pointer is over a popup: screen - client is the content corner.
    */
-  const OFFSET_KEY = 'se-layer-offset-v2'; // v1 was learned against a placement that ignored it
+  const OFFSET_KEY = 'se-layer-offset-v2';
   const OFFSET_LIMIT = 120;
   const SETTLE_MS = 150;
   const offset = { x: 0, y: 0, measured: false };
   try {
-    localStorage.removeItem('se-layer-offset'); // v1, never read again
     const saved = JSON.parse(localStorage.getItem(OFFSET_KEY));
     if (Number.isFinite(saved?.x) && Number.isFinite(saved?.y)) Object.assign(offset, saved, { measured: true });
   } catch {}
@@ -299,9 +327,23 @@
    *   entry      an object of the caller's to fill in
    * Returns the entry, or null if Steam's popup machinery is missing or a menu is open.
    */
+  // How the last window open went, for the element report (dev/inspector-report.js)
+  let lastOpen = 'none yet';
+  const menuName = () => {
+    const active = runtime?.manager.ActiveMenu;
+    return run(() => active?.m_element?.ownerDocument?.title) || run(() => active?.m_strTitle) || 'untitled';
+  };
+
   function open(options) {
     const rt = findRuntime();
-    if (!rt || menuOpen()) return null;
+    if (!rt) {
+      lastOpen = `failed: no Steam runtime (${missing || '?'})`;
+      return null;
+    }
+    if (menuOpen()) {
+      lastOpen = `failed: a Steam menu counted as open (${menuName()})`;
+      return null;
+    }
 
     const entry = Object.assign(options.entry || {}, {
       rect: options.rect,
@@ -387,8 +429,10 @@
       handle.SetOnHideCallback(entry.onHide);
       handles.add(handle);
       handle.Show();
+      lastOpen = 'opened';
       return entry;
-    } catch {
+    } catch (err) {
+      lastOpen = `failed: Steam made no popup (${err?.message || err})`;
       close(entry);
       return null;
     }
@@ -477,10 +521,19 @@
    * Only one is kept, never refilled in a loop: a pool refilling itself against Steam closing
    * its windows would open windows without end. A spare Steam closes while unused stops
    * warming until the next browser page (cool()); popups then open windows on demand.
+   *
+   * A spare whose content never mounts is never placed either: its window stays where Steam put
+   * it, unseen, over the main window. One not mounted in MOUNT_MS is closed and another opened
+   * in its place, up to MOUNT_TRIES times per browser page; after that popups open windows on
+   * demand.
    */
+  const MOUNT_MS = 4000;
+  const MOUNT_TRIES = 3;
   let spare = null;
   let warming = true;
   let inUse = 0;
+  let mountCheck = 0;
+  let mountTries = 0;
 
   function openWindow() {
     return open({
@@ -510,10 +563,21 @@
     inUse++; // nothing reenters while this one opens
     const entry = openWindow();
     inUse--;
-    if (entry && !entry.closed) spare = entry;
+    if (!entry || entry.closed) return;
+    spare = entry;
+    clearTimeout(mountCheck);
+    mountCheck = setTimeout(() => {
+      if (spare !== entry || entry.node) return;
+      spare = null;
+      close(entry);
+      if (++mountTries < MOUNT_TRIES) warm();
+      else warming = false;
+    }, MOUNT_MS);
   }
 
   function cool() {
+    clearTimeout(mountCheck);
+    mountTries = 0;
     warming = true;
     const entry = spare;
     spare = null;
@@ -566,7 +630,17 @@
     { throttle: 250 }
   );
 
+  // Where the parked window is, in screen pixels (the element report)
+  const spareRect = () => {
+    const win = spare?.doc?.defaultView;
+    if (!spare) return 'none';
+    if (!win) return 'mounting';
+    return `${win.outerWidth}×${win.outerHeight} at ${win.screenX},${win.screenY}`;
+  };
+
   window.__seLayerParts = {
+    spareRect,
+    lastOpen: () => lastOpen,
     findRuntime,
     missing: () => missing,
     place,

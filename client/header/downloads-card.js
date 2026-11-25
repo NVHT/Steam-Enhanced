@@ -7,7 +7,7 @@
  * straight away; "Click opens: Page" swaps the two.
  *
  * Read from Steam's live download feeds (SE.downloadFeed, client/shared/download-feed.js; the
- * download store as a fallback) and its app store, refreshed each second while open. Pause / Resume is Steam's own
+ * download store as a fallback) and its app store, redrawn on each feed update while open. Pause / Resume is Steam's own
  * SteamClient.Downloads.EnableAllDownloads. Drawn in a popup-layer panel
  * (client/shared/popup-layer.js), styled by client/header/downloads-card.css, opened as the
  * rail's other menus open: beside the rail, above the button.

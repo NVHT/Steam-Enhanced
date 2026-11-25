@@ -77,6 +77,9 @@
   let pickMenu = null;
   let pickAnchor = null;
   let pickSide = null;
+  // One frame for a resize's re-place and a search's repaint (and re-place), however many come
+  let pickFrame = 0;
+  let pickRepaint = false;
   // A picker's tallest: about 7 rows under its search; a taller menu it replaces sets its own
   const PICK_MAX = 420;
 
@@ -90,9 +93,12 @@
     const { onClose } = pickOpts || {};
     pickOpts = null;
     pickSide = null;
+    cancelAnimationFrame(pickFrame);
+    pickFrame = 0;
+    pickRepaint = false;
     document.removeEventListener('pointerdown', onPickOutside, true);
     document.removeEventListener('keydown', onPickKey, true);
-    removeEventListener('resize', placePick);
+    removeEventListener('resize', onPickResize);
     pickAnchor?.setAttribute('aria-expanded', 'false');
     pickAnchor = null;
     onClose?.();
@@ -130,6 +136,21 @@
       keep: Boolean(pickOpts.side),
     });
   }
+
+  function pickSoon(repaint) {
+    pickRepaint ||= repaint;
+    if (pickFrame) return;
+    pickFrame = requestAnimationFrame(() => {
+      pickFrame = 0;
+      const paint = pickRepaint;
+      pickRepaint = false;
+      if (!pickEl) return;
+      if (paint) paintPick();
+      placePick();
+    });
+  }
+
+  const onPickResize = () => pickSoon(false);
 
   const pickedNow = () => (pickOpts.single ? [String(pickOpts.current())] : readPick(pickOpts.key) || pickOpts.defaults());
   // A row's mark: the picker's own state (`checked`, e.g. Steam's collections) or the saved choice
@@ -344,6 +365,14 @@
   // Enter in the search: makes what it names when the create row shows
   function onPickEnter(e) {
     if (e.key !== 'Enter' || !e.target.matches('.se-pick-search')) return;
+    // A search typed this frame: its rows first, so Create reads what was typed
+    if (pickRepaint) {
+      cancelAnimationFrame(pickFrame);
+      pickFrame = 0;
+      pickRepaint = false;
+      paintPick();
+      placePick();
+    }
     const make = pickEl?.querySelector('[data-pk-create]');
     if (!make) return;
     e.preventDefault();
@@ -412,10 +441,7 @@
     pickEl.addEventListener('error', SE.art.onError, true);
     pickEl.addEventListener('load', SE.art.onLoad, true);
     pickEl.addEventListener('input', (e) => {
-      if (e.target.matches('.se-pick-search')) {
-        paintPick();
-        placePick();
-      }
+      if (e.target.matches('.se-pick-search')) pickSoon(true);
     });
     pickEl.addEventListener('keydown', onPickEnter);
     pickEl.addEventListener('contextmenu', onPickContext);
@@ -480,7 +506,7 @@
     document.addEventListener('pointerdown', onPickOutside, true);
     document.addEventListener('keydown', onPickKey, true);
     // Follows the window's size wherever it opened (Home's layout pass also calls SE.picker.place)
-    addEventListener('resize', placePick);
+    addEventListener('resize', onPickResize);
     paintPick();
     placePick();
     (pickEl.querySelector('.se-pick-search') || pickEl.querySelector('input'))?.focus();

@@ -4,7 +4,7 @@
 ((SE) => {
   const ns = window.__seDownloadsParts;
   if (!ns) return;
-  const { COPY, ICON, ROW, SEL, STAT_ICON, findPause, logoURLs, mountedNodes, readTransfer, round, setAttr, setHidden, setText, textOf } = ns;
+  const { COPY, ICON, ROW, SEL, STAT_ICON, findPause, mountedNodes, readTransfer, round, setAttr, setHidden, setText, textOf } = ns;
 
   let heroCount = 0;
 
@@ -250,7 +250,7 @@
     setAttr(refs.hero, 'data-logo', null);
     refs.logo.alt = name;
     if (!appid) return;
-    refs.logoQueue = logoURLs(appid);
+    refs.logoQueue = SE.logoURLs(appid); // Steam's own list first (core/runtime-art.js)
     refs.logo.src = refs.logoQueue.shift();
   }
 

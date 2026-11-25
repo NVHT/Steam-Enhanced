@@ -63,9 +63,9 @@
 
   /*
    * Group chat avatars. A chat without its own art still reports an avatar URL, one with an
-   * empty or all-zero hash that 404s, so the rail showed broken-image tiles. Such URLs are
-   * dropped, any URL that fails to load is remembered (see onAvatarError), and both fall back
-   * to the chat's initials, as Steam draws them.
+   * empty or all-zero hash that 404s (a broken-image tile). Such URLs are dropped, any URL that
+   * fails to load is remembered (see onAvatarError), and both fall back to the chat's initials,
+   * as Steam draws them.
    */
   const EMPTY_AVATAR = /\/(?:0{40})?(?:_medium|_full)?\.jpg(?:[?#]|$)/i;
   const deadAvatars = new Set();

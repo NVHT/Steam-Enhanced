@@ -16,7 +16,7 @@
  * (shared helpers), tray.js (panel shell, Favorites, Collections), picks.js, stage-settings.js
  * (the stage's settings and the Steam Enhanced | Steam switch), panels-library.js and panels-community.js (more panels), board.js (the board, its
  * pages, adding and removing panels and each panel's ⋯ menu), home-mode.js (which Home shows),
- * stage.js (the stage and the layout pass), data.js, and this one, main.js, which watches Home, runs one layout pass per frame and undoes
+ * stage.js (the stage and the layout pass), stage-art.js (the stage's background art), data.js, and this one, main.js, which watches Home, runs one layout pass per frame and undoes
  * everything in destroy().
  */
 ((SE) => {

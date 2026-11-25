@@ -139,13 +139,13 @@
     return { left: r.left + dx, top: r.top + dy, bottom: r.bottom + dy };
   }
 
+  // Whether the open picker is this file's: teardown closes only its own, never Home's
+  let ownsPicker = false;
+
   /*
    * The picker in the menu's place: its top where the menu's was (its bottom, when the menu
    * opened near the window's foot), left edges lined up
    */
-  // Whether the open picker is this file's: teardown closes only its own, never Home's
-  let ownsPicker = false;
-
   function openCollections(panel, instance) {
     const apps = targetApps(panel, instance);
     if (!apps.length || !SE.picker) return;

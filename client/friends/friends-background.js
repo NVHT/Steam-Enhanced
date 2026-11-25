@@ -15,14 +15,24 @@
   const patchedRestores = new Map();
   const reopened = new WeakSet();
 
-  // After Steam's startup restore: the Friends window, if it was open at exit, through the dock's
-  // "Open window" (so the dock lets it through, as for a manual open)
+  /*
+   * After Steam's startup restore: the Friends window, if it was open at exit, through the dock's
+   * "Open window" (so the dock lets it through, as for a manual open). Once per Steam session:
+   * Steam keeps saying so after a Reload UI (its flag is set when Steam starts), so the session
+   * (the page's CLIENT_SESSION, the same until Steam restarts) is kept once it reopened.
+   */
+  const SESSION_KEY = 'se-friends-reopened';
+  const session = new URLSearchParams(location.search).get('CLIENT_SESSION');
   function reopenIfLeftOpen(app) {
     if (destroyed || reopened.has(app)) return;
     if (SE.run(() => app.m_DesktopApp?.m_bShowFriendsListOnLoadFromLoader) !== true) return;
     const show = patchedApps.get(app)?.original;
     if (typeof show !== 'function') return;
     reopened.add(app);
+    if (session) {
+      if (SE.run(() => localStorage.getItem(SESSION_KEY)) === session) return;
+      SE.run(() => localStorage.setItem(SESSION_KEY, session));
+    }
     const open = () => show.call(app, true);
     const dock = window.__seFriendsDock;
     SE.run(() => (typeof dock?.openWindow === 'function' ? dock.openWindow(open) : open()));
@@ -84,7 +94,7 @@
     patchedApps.delete(app);
   };
 
-  // Every owner trapped and its app patched: the setter covers any later app, so polling can stop.
+  // Every owner trapped and its app patched: the setter covers a later app, so a slower poll will do.
   const settled = () =>
     [...SE.owners()].every(owner => {
       const app = SE.run(() => owner.g_FriendsUIApp);
@@ -133,7 +143,8 @@
 
   let timer = null;
   scanOwners();
-  // Keeps checking (cheaply) after everything is patched: Steam can swap an app's UIStore later.
+  // Never stops: new windows bring new owners and Steam can swap an app's UIStore later. The rate is
+  // picked once: slower when everything is already patched as this runs.
   timer = SE.poll(scanOwners, settled() ? 2000 : 1000);
 
   window.__seFriendsBackground = {

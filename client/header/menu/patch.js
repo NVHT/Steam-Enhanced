@@ -29,8 +29,9 @@
           ),
         });
       }
-      // Steam's own rows stay mounted (hidden by placeGroup()); the theme's menu is drawn after
-      // them (client/header/menu/actions.js). Without it, Steam's menu stays as it is.
+      // Steam's own rows stay mounted (hidden by client/header/steam-menu.css); the theme's menu
+      // is drawn after them (client/header/menu/actions.js). Without it, Steam's menu stays as
+      // it is.
       if (typeof SteamMenu !== 'function') return element;
       return live.api.React.cloneElement(element, {
         children: live.api.React.createElement(

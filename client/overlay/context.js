@@ -61,7 +61,6 @@
     backToGame: `.${C.AchievementContent_TopSection} .${C.BackToGameBtn}`,
     // Steam's Exit game button in the time stats column (hidden; the rail's clicks it).
     exitGame: `.${C.AchievementContent_TopSection} .${C.TimeStats} .${C.ExitGameBtn}`,
-    // ToolbarContainer > ToolbarButton (module 13, not in the core class map).
     toolbarButton: `.${C.ToolbarContainer} .${C.ToolbarButton}`,
   });
   // ToolbarButton's "widget open" state.
@@ -188,17 +187,17 @@
     SE.run(() => contextGlobal('SteamClient').URL.ExecuteSteamURL(`steam://openurl/${url}`));
   };
 
+  const accountIdOf = (steamid64) => SE.run(() => Number(BigInt(steamid64) & 0xffffffffn)) || 0;
+
   // Steam's own overlay path for a friend's chat: the chat window opens in
   // this overlay (and still goes through the theme's chat routing).
   const openChat = (steamid64) => {
-    const accountId = SE.run(() => Number(BigInt(steamid64) & 0xffffffffn));
+    const accountId = accountIdOf(steamid64);
     if (!accountId) return;
     const browserInfo = SE.run(() => findInstance().params.browserInfo);
     const friend = SE.run(() => contextGlobal('g_FriendsUIApp').FriendStore.GetFriend(accountId));
     if (friend && browserInfo) SE.run(() => friend.OpenChatDialog(browserInfo));
   };
-
-  const accountIdOf = (steamid64) => SE.run(() => Number(BigInt(steamid64) & 0xffffffffn)) || 0;
 
   const selfSteamId = () =>
     SE.run(() => contextGlobal('App').m_CurrentUser.strSteamID) ||

@@ -7,9 +7,16 @@
 ((SE) => {
   window.__seHeaderShortcuts?.destroy();
 
+  // ExecuteSteamURL returns nothing: only a missing method or a throw falls back to the link
   function openSteamSettings() {
-    if (SE.run(() => window.SteamClient?.URL?.ExecuteSteamURL?.('steam://open/settings')) !== undefined) {
-      return;
+    const url = window.SteamClient?.URL;
+    if (typeof url?.ExecuteSteamURL === 'function') {
+      try {
+        url.ExecuteSteamURL('steam://open/settings');
+        return;
+      } catch {
+        // fall through to the link
+      }
     }
     location.href = 'steam://open/settings';
   }

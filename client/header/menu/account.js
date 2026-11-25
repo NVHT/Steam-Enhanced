@@ -18,28 +18,15 @@
   function trimAccountStatus(root) {
     if (!root) return;
     const itemClass = live.api.menuStyles.MenuItem.split(' ')[0];
-    const separatorClass = live.api.menuStyles.Separator?.split(' ')[0];
-    const mode = root.getAttribute('data-se-account-status');
-    const choicesOnly = mode === 'choices';
-    let hasStatus = false;
 
+    // The status row keeps only the state choices: every other row and divider is hidden.
     for (const item of root.querySelectorAll(`.${itemClass}, hr`)) {
-      const label = normalizeMenuLabel(item.textContent);
-      const stateChoice = isLabel('state', label, /^(?:Online|Away|Invisible|Offline)$/i);
-      const unwanted = isLabel('unwanted', label.replace(/\s*\(\d+\)$/, ''), /^(?:View Friends List(?:\s*\(|$)|Add a Friend(?:\.\.\.|$))/i);
-      const separator = item.tagName === 'HR' || (separatorClass && item.classList.contains(separatorClass));
-      const editName = isLabel('editName', label, /^Edit Profile Name(?:\s*\/\s*Avatar)?(?:\.\.\.)?$/i);
-      const excluded = mode === 'edit' ? !editName : choicesOnly ? !stateChoice : stateChoice || editName;
-
-      if (unwanted || excluded || (separator && !hasStatus)) {
-        if (item.style.getPropertyValue('display') !== 'none' || item.style.getPropertyPriority('display') !== 'important') {
-          item.style.setProperty('display', 'none', 'important');
-        }
-      } else if (!separator && label) {
-        hasStatus = true;
+      if (isLabel('state', normalizeMenuLabel(item.textContent), /^(?:Online|Away|Invisible|Offline)$/i)) continue;
+      if (item.style.getPropertyValue('display') !== 'none' || item.style.getPropertyPriority('display') !== 'important') {
+        item.style.setProperty('display', 'none', 'important');
       }
     }
-    if (choicesOnly) markCurrentState(root, itemClass);
+    markCurrentState(root, itemClass);
   }
 
   // The status row's current state (account-menu.css): Steam's order is Online, Away, Invisible,
@@ -64,7 +51,7 @@
     return null;
   }
 
-  const avatarItemClass = () => [live.api.menuStyles.MenuItem, C.contextMenuItem, 'contextMenuItem', 'se-avatar-menu-item'].join(' ');
+  const avatarItemClass = () => [live.api.menuStyles.MenuItem, C.contextMenuItem, 'contextMenuItem'].join(' ');
   const avatarItemStyle = {
     textAlign: 'left',
     cursor: 'pointer',
@@ -224,7 +211,6 @@
       'button',
       {
         type: 'button',
-        'data-se-native-rename-action': '',
         'data-se-acct-icon': 'edit',
         className: avatarItemClass(),
         style: avatarItemStyle,

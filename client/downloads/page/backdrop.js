@@ -1,12 +1,12 @@
 /*
- * The downloading game's art behind the page and its logo over it.
+ * The downloading game's art behind the page (its logo over it is hero.js's).
  */
 ((SE) => {
   const ns = window.__seDownloadsParts;
   if (!ns) return;
   const { setAttr } = ns;
 
-  // Art backdrop and logo for the game downloading
+  // Nodes the theme mounted on the page (the backdrop, the hero, the drag grips), removed on teardown
   const mountedNodes = new Set();
 
   // Steam's art URLs carry the app id: /assets/<appid>/… (cache), …/apps/<appid>/… (CDN),
@@ -16,9 +16,6 @@
     const match = ART_APPID.exec(src || '');
     return match ? match[1] || match[2] : null;
   };
-
-  // The downloading game's logo, Steam's own list first (core/runtime-art.js)
-  const logoURLs = (appid) => SE.logoURLs(appid);
 
   function syncBackdrop(page, art) {
     let layer = page.querySelector(':scope > .se-dl-backdrop');
@@ -38,5 +35,5 @@
     setAttr(page, 'data-se-dl-art', '1');
   }
 
-  Object.assign(ns, { appIdFromArt, logoURLs, mountedNodes, syncBackdrop });
+  Object.assign(ns, { appIdFromArt, mountedNodes, syncBackdrop });
 })(window.__se);

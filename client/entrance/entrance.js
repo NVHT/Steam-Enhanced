@@ -16,12 +16,30 @@
  *
  * Only the Library: the startup window before it has already
  * shown Network and sign-in. The game is the one Home's stage will feature first (its Games
- * setting: recent, favorites, a collection, added; client/home/stage/stage-settings.js), or the
- * last played with Home off; its art's loaded copies are kept in localStorage, so it draws at
+ * setting: recent, favorites, a collection, added; client/home/stage/stage-settings.js); with
+ * Home off (Steam's own) or Splash art None, no game's art, only the greeting. Its art's loaded copies are kept in localStorage, so it draws at
  * once, and checked against Steam's stores once they arrive (the splash comes after sign-in).
  * With none played yet it says "Welcome" over the wireframe alone. The move is skipped (the art
  * fades with the rest) under reduced motion, when Home's stage isn't on show or shows another
  * game. If the loader never calls finish(), SAFETY_MS does.
+ *
+ * Steam set to start on a Store or Community page (client/library/start-on-page.js): Steam's page
+ * view draws over everything in the window, the splash too, so while the splash is up the box
+ * Steam sizes it from is held at 1 px ([data-se-ent-hold], entrance.css): the page loads out of
+ * sight and shows as the splash leaves. Told so (toPage()), the art fades with the rest, Home
+ * not being where the window goes.
+ *
+ * The splash draws the page the window opens on (Start Up Location): its wireframe (SE.wireframe's
+ * views) and the step's words ("Opening the Store"). The game's art is the Library's alone (it
+ * hands into Home's stage): a page gets the greeting over its wireframe, the block in that page's
+ * hero (the Store's Cinema hero, Friend Activity's first event, Community's cards, News' list of
+ * stories), its inside left out under the words, and no game count. Steam says
+ * where it starts only after the splash is up, so the last startup's page is remembered
+ * (START_KEY, written by start-on-page.js) and setView() corrects it once Steam tells.
+ *
+ * A page is let out from under the splash only once it's styled: the page tells (core/core.js
+ * posts SteamEnhanced.Styled; start-on-page.js passes it in toPage(isStyled)), and the splash
+ * stays at Ready until then, PAGE_WAIT_MS at most, so Steam's own look never shows.
  */
 (() => {
   window.__seEntrance?.destroy();
@@ -36,6 +54,8 @@
   const MOVE_MS = 650;
   const FADE_MS = 400;
   const SAFETY_MS = 6000;
+  const PAGE_WAIT_MS = 4000;
+  const PAGE_CHECK_MS = 100;
   // How long the app store may stay empty before this counts as a first run ("Welcome")
   const FIRST_RUN_MS = 1500;
   // The art box's corner in design px (entrance.css draws the same)
@@ -44,13 +64,30 @@
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
+  // Where the window opens: the wireframe's view, the art's box in it, the step's words. The
+  // Library with Home on Steam's (the Home setting) is Steam's Home: no stage, no game's art
+  const homeOn = SE.settings?.get('home') !== 'steam';
+  const VIEWS = {
+    library: { box: '.se-wf-stage', step: 'Loading your library' },
+    steamhome: { box: '.se-wf-sh-news', step: 'Loading your library' },
+    store: { box: '.se-wf-cinema', step: 'Opening the Store' },
+    activity: { box: '.se-wf-event', step: 'Opening Friend Activity' },
+    community: { box: '.se-wf-masonry', step: 'Opening Community' },
+    news: { box: '.se-wf-hub-list', step: 'Opening News' },
+  };
+  const START_KEY = 'se-start-view';
+  const viewOf = (name) => (name === 'library' && !homeOn ? 'steamhome' : name);
+  let view = viewOf(SE.run(() => localStorage.getItem(START_KEY)));
+  if (!VIEWS[view]) view = viewOf('library');
+
   const el = document.createElement('div');
   el.id = 'se-entrance';
   el.dataset.phase = 'loading';
+  el.dataset.view = view;
   el.setAttribute('aria-hidden', 'true');
   el.innerHTML =
     '<div class="se-ent-ground"><div class="se-ent-ambient"></div>' +
-    `${SE.wireframe?.({ alive: true, busy: true }) || ''}<div class="se-ent-shadow"></div></div>` + // client/shared/wireframe.js
+    `${SE.wireframe?.({ alive: true, busy: true, view }) || ''}<div class="se-ent-shadow"></div></div>` + // client/shared/wireframe.js
     // The stage's own art classes (client/home/stage/stage-hero.css), so it hands off unchanged
     '<div class="se-ent-art"><div class="se-hs-art"><div class="se-hs-layer" data-on></div><div class="se-hs-grade"></div></div></div>' +
     '<div class="se-ent-block"><div class="se-ent-game"><span class="se-ent-eyebrow"></span>' +
@@ -58,10 +95,14 @@
     '<div class="se-ent-progress"><div class="se-ent-bar"><span></span></div>' +
     // The step as in the startup window: the theme's spinner while it runs, a tick once done
     '<div class="se-ent-meta"><span class="se-ent-status"><i class="se-ent-spin se-spin-arc"></i><b class="se-ent-tick"></b>' +
-    '<span class="se-ent-step">Loading your library</span></span>' +
+    `<span class="se-ent-step">${VIEWS[view].step}</span></span>` +
     '<span class="se-ent-count"></span></div></div></div>';
   // Outside <body>: the loader watches the body's DOM to tell when the Library is built
   root.append(el);
+  root.setAttribute('data-se-ent-hold', '');
+  const release = () => root.removeAttribute('data-se-ent-hold');
+  let toPage = false;
+  let pageStyled = null; // () => whether the page has its look (start-on-page.js)
 
   const art = el.querySelector('.se-ent-art');
   const layer = el.querySelector('.se-hs-layer');
@@ -97,10 +138,16 @@
   /* ---------- The art box: the wireframe's stage ---------- */
 
   let box = null;
-  const wfStage = el.querySelector('.se-wf-stage');
+  // The wireframe's box the art sits in (marked: entrance.css hides it under the art)
+  let wfBox = null;
+  const markBox = () => {
+    wfBox = el.querySelector(VIEWS[view].box);
+    wfBox?.setAttribute('data-se-ent-box', '');
+  };
+  markBox();
   // One read, then the writes it decides: the art, its shadow and the game's block follow it
   const place = () => {
-    const r = wfStage?.getBoundingClientRect();
+    const r = wfBox?.getBoundingClientRect();
     if (!r?.width) return;
     box = { left: r.left, top: r.top, width: r.width, height: r.height };
     for (const [name, value] of [['x', r.left], ['y', r.top], ['w', r.width], ['h', r.height], ['foot', innerHeight - r.bottom]]) {
@@ -119,9 +166,10 @@
 
   /* ---------- The game: the last one played (or the "Splash art" setting's), read live ---------- */
 
-  // last (Home's game: the stage's first, or the last played with Home off) | random (one of the
-  // most recently played, picked once) | none (no game's art)
-  const ART = SE.settings?.get('splash-art') || 'last';
+  // last (Home's game: the stage's first) | random (one of the most recently played, picked once)
+  // | none (no game's art). With Home off (Steam's own Home) there's no stage for the art to land
+  // in: no game's art either
+  const ART = homeOn ? SE.settings?.get('splash-art') || 'last' : 'none';
   const RANDOM_FROM = 8;
 
   let shown = 0; // its appid
@@ -134,12 +182,10 @@
    */
   const HINT_KEY = 'se-splash-game';
   /*
-   * What picks the game: Home's stage, by its Games setting (and collection), or with Home off
-   * the last played. The remembered game is used only while this still matches, so a changed
-   * setting never flashes the old pick.
+   * What picks the game: Home's stage, by its Games setting (and collection). The remembered game
+   * is used only while this still matches, so a changed setting never flashes the old pick.
    */
-  const followsStage = SE.settings?.get('home') !== 'steam';
-  const choice = followsStage ? `${SE.settings?.get('stage-source') || 'recent'}|${SE.settings?.get('stage-collection') || ''}` : 'played';
+  const choice = `${SE.settings?.get('stage-source') || 'recent'}|${SE.settings?.get('stage-collection') || ''}`;
   const readHint = () => {
     try {
       const hint = JSON.parse(localStorage.getItem(HINT_KEY));
@@ -193,7 +239,8 @@
   let picked; // the random pick, kept across the app list's checks
   const pickGame = (store) => {
     const recent = played(store);
-    if (ART !== 'random') return followsStage ? stageGame() : recent[0] || null;
+    if (ART === 'none') return recent[0] || null; // only whether one was played: the greeting
+    if (ART !== 'random') return stageGame();
     if (picked === undefined && recent.length) {
       const pool = recent.slice(0, RANDOM_FROM);
       picked = pool[Math.floor(Math.random() * pool.length)];
@@ -213,7 +260,7 @@
       layer.style.setProperty('--se-hs-art', url);
       el.style.setProperty('--ent-art', url);
       hasArt = true;
-      el.dataset.art = '';
+      if (view === 'library') el.dataset.art = '';
     }, { once: true });
     layer.append(hero);
 
@@ -309,6 +356,7 @@
   }
 
   const destroy = () => {
+    release();
     for (const job of timers) cancelAnimationFrame(job.frame);
     timers.clear();
     waiting?.disconnect();
@@ -321,14 +369,21 @@
     if (window.__seEntrance === api) delete window.__seEntrance;
   };
 
+  // A page waits for its look (toPage's isStyled), PAGE_WAIT_MS at most, before the splash goes
+  const leaveWhenStyled = (since = performance.now()) => {
+    if (!toPage || !pageStyled || SE.run(pageStyled) || performance.now() - since > PAGE_WAIT_MS) leave();
+    else later(() => leaveWhenStyled(since), PAGE_CHECK_MS);
+  };
+
   const leave = () => {
     waiting?.disconnect();
     waiting = null;
     removeEventListener('resize', onResize);
     if (ART === 'last') saveHint(); // a random pick isn't last run's game
     // A failed hand-off (Home's stage not as expected) fades the art with the rest, never strands
-    // the splash
-    const moved = SE.run(moveArt) === true;
+    // the splash; so does a page to show instead of Home, let out from under it now
+    const moved = !toPage && SE.run(moveArt) === true;
+    release();
     // Moved, the art waits in the stage's place, then fades over the real one; else it all fades
     el.dataset.phase = 'leave';
     if (moved) {
@@ -354,13 +409,36 @@
       status.textContent = 'Ready';
       el.dataset.phase = 'ready';
     }, FILL_MS);
-    later(leave, FILL_MS + READY_HOLD_MS);
+    later(leaveWhenStyled, FILL_MS + READY_HOLD_MS);
   };
 
   later(finish, SAFETY_MS);
   // Last resort: gone after the longest run it could have (Ready, the move, the fade), whatever
   // stopped it. If even these never run, entrance.css's se-ent-strand hides it
-  later(destroy, SAFETY_MS + FILL_MS + READY_HOLD_MS + MOVE_MS + FADE_MS + 1000);
-  const api = { finish, destroy };
+  later(destroy, SAFETY_MS + FILL_MS + READY_HOLD_MS + PAGE_WAIT_MS + MOVE_MS + FADE_MS + 1000);
+  const api = {
+    finish,
+    destroy,
+    // A page shows instead of Home: isStyled() says when it has its look
+    toPage(isStyled) {
+      toPage = true;
+      pageStyled = typeof isStyled === 'function' ? isStyled : null;
+    },
+    // The page Steam opens on, once it tells (start-on-page.js): the wireframe and words follow
+    setView(next) {
+      next = viewOf(next);
+      if (!VIEWS[next] || next === view) return;
+      view = next;
+      el.dataset.view = view;
+      SE.attr(el, 'data-art', hasArt && view === 'library' ? '' : null);
+      const old = el.querySelector('.se-ent-ground > .se-wf');
+      const tmp = document.createElement('div');
+      tmp.innerHTML = SE.wireframe?.({ alive: true, busy: true, view }) || '';
+      if (old && tmp.firstElementChild) old.replaceWith(tmp.firstElementChild);
+      if (el.dataset.phase === 'loading') status.textContent = VIEWS[view].step;
+      markBox();
+      place();
+    },
+  };
   window.__seEntrance = api;
 })();

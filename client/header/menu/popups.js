@@ -6,8 +6,8 @@
   if (!ns) return;
   const { C, owners } = SE;
   const {
-    anyMenuOpen, bindMenuHoverDocument, contextManager, hoverDocuments, movedGroups, patched,
-    placeGroup, popupObservers, retainedMenu, sideFor, sidebarManagers,
+    anyMenuOpen, bindMenuHoverDocument, contextManager, hoverDocuments, patched, retainedMenu,
+    sideFor, sidebarManagers,
   } = ns;
   const { live } = ns;
 
@@ -39,26 +39,10 @@
           const doc = popup.window?.document;
           if (!doc || doc.title !== 'Steam Root Menu') continue;
           bindMenuHoverDocument(doc);
-          if (!popupObservers.has(doc)) {
-            // Own observer on purpose: the Steam menu's own popup window (one observer per window)
-            const obs = new MutationObserver(() => placeGroup(doc));
-            obs.observe(doc.body, { subtree: true, childList: true });
-            popupObservers.set(doc, obs);
-          }
-          placeGroup(doc);
         } catch {}
       }
     }
 
-    for (const parent of movedGroups.keys()) {
-      if (!parent.isConnected) movedGroups.delete(parent);
-    }
-    for (const [doc, obs] of popupObservers) {
-      if (doc.defaultView?.closed) {
-        obs.disconnect();
-        popupObservers.delete(doc);
-      }
-    }
     for (const doc of hoverDocuments) {
       if (!doc.defaultView || doc.defaultView.closed) hoverDocuments.delete(doc);
     }
@@ -90,15 +74,6 @@
     };
     live.manager.CreateContextMenuInstance = live.wrappedCreate;
     return true;
-  }
-
-  function restorePopups() {
-    for (const obs of popupObservers.values()) obs.disconnect();
-    popupObservers.clear();
-    for (const saved of movedGroups.values()) {
-      for (const [node, display] of saved.hidden) node.style.display = display;
-    }
-    movedGroups.clear();
   }
 
   function isSteam(instance) {
@@ -156,6 +131,6 @@
     }
   }
   Object.assign(ns, {
-    bindManager, inspectPopups, instanceManager, isSteam, patchSidebarMenus, restorePopups,
+    bindManager, inspectPopups, instanceManager, isSteam, patchSidebarMenus,
   });
 })(window.__se);

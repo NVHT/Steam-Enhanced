@@ -114,6 +114,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
   width: 26px;
   height: 26px;
   margin: 0 !important;
@@ -123,6 +124,13 @@
   background: none !important;
   color: var(--se-text-muted) !important;
   cursor: pointer;
+}
+
+/* The hit area grows to --se-hit around the 26px button; the look stays */
+.friendlist:not(.GamepadMode) .chatSectionTitle .createChatRoomButton::after {
+  content: "";
+  position: absolute;
+  inset: calc((26px - var(--se-hit)) / 2);
 }
 
 /* No tile of its own: the row lights on hover and the icon brightens */
@@ -183,7 +191,8 @@
  */
 .friendlist:not(.GamepadMode) .FriendsListChatSection:not(.ChatListResizing) .chatRoomListContainer {
   /* Layout transition on purpose: a fold has to move what sits below it, which a transform can't.
-     It runs only while [data-se-folding] / a fold is in progress. */
+     Steam changes these sizes only to fold or open the chats (a drag is ChatListResizing, left
+     out), so it runs only then. */
   transition: height var(--se-dur-relaxed) var(--se-ease-inout), max-height var(--se-dur-relaxed) var(--se-ease-inout), opacity var(--se-dur-relaxed) var(--se-ease-inout);
 }
 
@@ -439,11 +448,19 @@
   align-items: center;
   justify-content: center;
   order: 4;
+  position: relative;
   width: 24px !important;
   height: 24px !important;
   margin: 0 !important;
   border-radius: var(--se-radius-sm) !important;
   color: var(--se-text-muted);
+}
+
+/* The hit area grows to --se-hit around the 24px tile; the look stays */
+.friendlist:not(.GamepadMode) .ChatRoomListGroupItem .openGroupButton::after {
+  content: "";
+  position: absolute;
+  inset: calc((24px - var(--se-hit)) / 2);
 }
 
 .friendlist:not(.GamepadMode) .ChatRoomListGroupItem .openGroupButton:hover {

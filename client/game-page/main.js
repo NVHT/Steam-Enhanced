@@ -202,8 +202,13 @@
         el.style.removeProperty('--se-top-y');
       });
       document.querySelectorAll([...ownClasses].map((c) => `.${c}`).join(', ')).forEach((el) => el.remove());
-      for (const name of ATTRS) {
-        document.querySelectorAll(`[${name}]`).forEach((el) => el.removeAttribute(name));
+      // Only the game page's own marks: several names (data-se-icon, data-se-action, data-se-label…)
+      // are other features' too, the rail's and the title bar's among them
+      const marked = ATTRS.map((name) => `[${name}]`).join(', ');
+      for (const page of document.querySelectorAll(ON_PAGE)) {
+        for (const el of [page, ...page.querySelectorAll(marked)]) {
+          for (const name of ATTRS) el.removeAttribute(name);
+        }
       }
       document.querySelectorAll('.se-assoc-collapsed').forEach((el) => el.classList.remove('se-assoc-collapsed'));
       document.querySelectorAll('[style*="--se-span"]').forEach((el) => el.style.removeProperty('--se-span'));

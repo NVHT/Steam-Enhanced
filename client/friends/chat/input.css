@@ -1,6 +1,7 @@
 /*
  * Chat › the message input.
- * Chat styles load in order: tabs, header, messages, bubbles, input, voice, members, icons, groups.
+ * Chat styles load in order: tabs, header, messages, bubbles, input, voice, calls, members, icons,
+ * groups.
  */
 
 /*
@@ -162,15 +163,7 @@
   position: static !important;
 }
 
-/* Voice: a green strip with the controls; leave is the only red */
-.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls {
-  margin: var(--se-space-2) var(--se-chat-gutter) 0 !important;
-  padding: var(--se-space-1) var(--se-space-1) var(--se-space-1) var(--se-space-3) !important;
-  border-radius: var(--se-radius-md) !important;
-  background: color-mix(in srgb, var(--se-running) 10%, transparent) !important;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-running) 25%, transparent) !important;
-}
-
+/* Voice controls: the call's names in green; leave is the only red (the bar itself: calls.css) */
 .multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls .friend {
   background: none !important;
 }
@@ -204,15 +197,13 @@
 }
 
 .multiChatDialog[data-se-chat] .activeVoiceButtons .chatEndVoiceChat,
-.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls .chatEndVoiceChat,
-.multiChatDialog[data-se-chat] .OneOnOneVoiceClose {
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls .chatEndVoiceChat {
   background: color-mix(in srgb, var(--se-danger) 16%, transparent) !important;
   color: var(--se-danger) !important;
 }
 
 .multiChatDialog[data-se-chat] .activeVoiceButtons .chatEndVoiceChat:hover,
-.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls .chatEndVoiceChat:hover,
-.multiChatDialog[data-se-chat] .OneOnOneVoiceClose:hover {
+.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls .chatEndVoiceChat:hover {
   background: color-mix(in srgb, var(--se-danger) 90%, transparent) !important;
   color: var(--se-text-strong) !important;
 }

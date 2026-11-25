@@ -191,22 +191,14 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
 
 /*
  * Your avatar is at the rail's foot (client/navigation/nav-rail.css), its card on hover: the
- * dock's header (its own, and Steam's list embedded in it) keeps its tools
- * under a "Friends" heading. Status is in the avatar's menu there.
+ * dock's own header keeps its tools under a "Friends" heading. Status is in the avatar's menu
+ * there. (Steam's list in the dock hides its status row: .friendListHeaderContainer below.)
  */
-html .se-fd-me > :is(.se-fd-av, .se-fd-status),
-html .se-fd-steam .currentUserContainer :is(.AvatarAndUser, .ContextMenuButton) {
-  /* Steam's header children are sized and shown by client/friends/list/friends.css with !important */
-  display: none !important;
+.se-fd-me > :is(.se-fd-av, .se-fd-status) {
+  display: none;
 }
 
-html .se-fd-steam .currentUserContainer {
-  display: flex;
-  align-items: center;
-  min-height: var(--se-control-h);
-}
-
-html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
+html .se-fd-me::before {
   content: "Friends";
   flex: 1;
   font: var(--se-label-font);
@@ -286,22 +278,33 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
   background: var(--se-border-strong);
 }
 
+/* The dock's search and the flyout's: the client search field (--se-search-*) */
 .se-fd-search {
   display: flex;
   align-items: center;
-  gap: var(--se-space-2);
-  height: 34px;
+  gap: var(--se-search-gap);
+  height: var(--se-search-h);
   margin: var(--se-space-2) var(--se-space-3) 0;
-  padding: 0 var(--se-space-3);
-  border-radius: var(--se-radius-sm);
-  background: var(--se-field);
-  box-shadow: var(--se-edge);
-  color: var(--se-text-faint);
+  padding: 0 var(--se-search-pad);
+  border-radius: var(--se-search-radius);
+  background: var(--se-search-bg);
+  box-shadow: var(--se-search-edge);
+  color: var(--se-search-icon-color);
+}
+
+.se-fd-search:hover {
+  box-shadow: var(--se-search-edge-hover);
 }
 
 .se-fd-search:focus-within {
   outline: 0;
   box-shadow: var(--se-search-edge-focus);
+}
+
+.se-fd-search > svg {
+  flex: none;
+  width: var(--se-search-icon-size);
+  height: var(--se-search-icon-size);
 }
 
 .se-fd-search input {
@@ -312,8 +315,12 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
   border: 0;
   outline: 0;
   background: transparent;
-  color: var(--se-text);
-  font: normal 500 var(--se-fs-base) var(--se-font), sans-serif;
+  color: var(--se-search-text);
+  font: var(--se-search-font), sans-serif;
+}
+
+.se-fd-search input::placeholder {
+  color: var(--se-search-placeholder);
 }
 
 /* The list */
@@ -634,7 +641,6 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
   color: var(--se-text-muted);
 }
 
-/* A game's card beside the rail */
 /* The dock's cards: the game flyout and the friend card */
 .se-fd-fly,
 .se-fd-card {
@@ -779,8 +785,8 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
  * The Friends bar (search, requests, add a friend) leads the dock, level with the game list's
  * Favorites header (--se-fd-bar-y, client/friends/dock/dock.js); the favorites follow. The
  * collapse button is in the title bar, beside Friends & Chat (client/header/header-actions.js). Steam draws your status, the favorites and the bar all inside its
- * header (friendListHeaderContainer, SteamTracking sp.js): the status row (the "Friends"
- * heading here) is hidden and the bar moved first. A connection banner stays above it.
+ * header (friendListHeaderContainer, SteamTracking sp.js): the status row is hidden and the bar
+ * moved first. A connection banner stays above it.
  */
 .se-fd-steam .friendlist:not(.GamepadMode) .friendListHeaderContainer {
   display: flex !important;
@@ -908,10 +914,6 @@ html :is(.se-fd-me, .se-fd-steam .currentUserContainer)::before {
  */
 .se-fd-steam .friendsListContainer {
   background: var(--se-sidebar) !important;
-}
-
-.se-fd-steam .friendlist:not(.GamepadMode) .currentUserContainer {
-  padding-inline-end: 84px !important;
 }
 
 .se-fd-steam .friendlist:not(.GamepadMode) .friendListButtons {

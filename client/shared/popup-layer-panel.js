@@ -93,22 +93,71 @@
     };
   }
 
-  // A panel in a popup window (the spare, when one is ready): above a browser page's view.
+  /*
+   * A panel in a popup window (the spare, when one is ready): above a browser page's view.
+   *
+   * A menu's window (options.room) keeps the popup menus' room around the panel for its shadow
+   * (--se-pop-room-*, as Steam's own menu windows: 0 with Menu windows at Solid, where the room
+   * would draw black), trimmed on a side where it would lie over options.avoid (the menu's
+   * button: a window that appears under a still pointer takes it off the button, and the
+   * menu's leave-closer shuts it). Others stay the panel's size, the shadow off (data-se-flat):
+   * a hover card's room would lie over what it points at. The panel waits unseen (data-se-waiting,
+   * popup-layer.css) until its window has moved to its spot, then plays its opening animation
+   * there, as in the page.
+   */
   function windowPanel(options) {
-    const view = { win: null, pending: null, shown: null, released: false, check: 0 };
+    const view = { win: null, pending: null, shown: null, released: false, check: 0, waiting: false };
+    const room = options?.room
+      ? { top: SE.px('--se-pop-room-top'), side: SE.px('--se-pop-room-side'), bottom: SE.px('--se-pop-room-bottom') }
+      : { top: 0, side: 0, bottom: 0 };
+    const flat = !room.top && !room.side && !room.bottom;
 
-    // To the window's corner, wherever its own placement or Steam's container put it: one read
-    // against the shift already applied, then the writes.
+    // The panel to the window's corner plus its room, wherever its own placement or Steam's
+    // container put it: reads (the panel against the shift already applied, the button), then
+    // the writes.
     const shift = { x: 0, y: 0 };
     function fit(content) {
       const win = view.win;
       if (view.released || !win?.wrap || gone(win)) return;
       const at = content.getBoundingClientRect();
-      shift.x -= at.left;
-      shift.y -= at.top;
+      const to = spot(view.pending.rect, at.width, at.height);
+      const edge = roomAround(to);
+      shift.x += edge.left - at.left;
+      shift.y += edge.top - at.top;
       SE.cssVar(win.wrap, '--se-wrap-x', `${shift.x}px`);
       SE.cssVar(win.wrap, '--se-wrap-y', `${shift.y}px`);
-      place(win, spot(view.pending.rect, at.width, at.height));
+      place(win, {
+        left: to.left - edge.left,
+        top: to.top - edge.top,
+        width: to.width + edge.left + edge.right,
+        height: to.height + edge.top + edge.bottom,
+      });
+      if (view.waiting) reveal(win);
+    }
+
+    // The room on each side of the panel's spot, less where it would lie over options.avoid
+    function roomAround(to) {
+      const edge = { left: room.side, right: room.side, top: room.top, bottom: room.bottom };
+      const box = options?.avoid?.isConnected ? options.avoid.getBoundingClientRect() : null;
+      if (!box) return edge;
+      const right = to.left + to.width;
+      const bottom = to.top + to.height;
+      const across = box.top < bottom + edge.bottom && box.bottom > to.top - edge.top;
+      const along = box.left < right + edge.right && box.right > to.left - edge.left;
+      if (across && box.right <= to.left) edge.left = Math.min(edge.left, to.left - box.right);
+      if (across && box.left >= right) edge.right = Math.min(edge.right, box.left - right);
+      if (along && box.bottom <= to.top) edge.top = Math.min(edge.top, to.top - box.bottom);
+      if (along && box.top >= bottom) edge.bottom = Math.min(edge.bottom, box.top - bottom);
+      return edge;
+    }
+
+    // Two of the window's frames after its first placement: the move has landed, the panel opens
+    function reveal(win) {
+      view.waiting = false;
+      const host = win.doc.defaultView;
+      host.requestAnimationFrame(() =>
+        host.requestAnimationFrame(() => !view.released && SE.unmark(win.wrap, 'data-se-waiting'))
+      );
     }
 
     function draw() {
@@ -125,6 +174,9 @@
       SE.cssVar(wrap, '--se-wrap-h', `${innerHeight}px`);
       view.shown?.dispose();
       wrap.replaceChildren();
+      SE.attr(wrap, 'data-se-flat', flat ? '' : null);
+      SE.mark(wrap, 'data-se-waiting');
+      view.waiting = true;
       shift.x = 0;
       shift.y = 0;
       SE.cssVar(wrap, '--se-wrap-x', '0px');
@@ -234,8 +286,9 @@
    * elsewhere. show(rect, build) empties it, lets build(container) put the content in (in the
    * container's own document; it may return a cleanup), and places it by spot(), again as the
    * content grows. options: { sheets: the theme files the content is styled by, steam: true
-   * when it renders a Steam component (Steam's own stylesheets then go in too) }; a window gets
-   * only those beside the base. Returns { show(), release(), released }, or null if a window was
+   * when it renders a Steam component (Steam's own stylesheets then go in too), room: true for a
+   * menu (room for its shadow round its window), avoid: an element (the opener) the room is
+   * trimmed off where it would lie over it }; a window gets only those beside the base. Returns { show(), release(), released }, or null if a window was
    * needed and none could open.
    */
   const panel = (options) => (SE.browserShown() ? windowPanel(options) : pagePanel());

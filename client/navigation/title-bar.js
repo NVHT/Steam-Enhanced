@@ -49,7 +49,6 @@
   let topBtn;
   let topScroller = null;
   /* Until measured: the rail's width, plus the fixed list width (--se-list-w) */
-  let listLeft = 60;
   let listRight = 410;
   /* The game list's header lockup (the Steam button's face while the list shows) */
   let listBrand;
@@ -130,7 +129,6 @@
 
   const applyListEdgeVars = () => {
     for (const el of [listToggleBtn, topBtn, document.querySelector('.se-sidebar-icons')]) {
-      SE.cssVar(el, '--se-list-left', `${listLeft}px`);
       SE.cssVar(el, '--se-list-right', `${listRight}px`);
     }
   };
@@ -241,12 +239,9 @@
     const rect = listRect;
     const isVisible = !!rect && rect.width > 0 && rect.height > 0;
     if (isVisible) {
-      listLeft = Math.round(rect.left);
       listRight = Math.round(rect.right);
     }
 
-    SE.cssVar(document.body, '--se-list-left', null);
-    SE.cssVar(document.body, '--se-list-right', null);
     syncListHandle(list, isVisible);
     if (isVisible !== document.body.hasAttribute('data-se-list')) {
       document.body.toggleAttribute('data-se-list', isVisible);
@@ -405,6 +400,11 @@
     topBtn?.remove();
     listResize?.handle.remove();
     topScroller = null;
+    SE.cssVar(document.querySelector('.se-sidebar-icons'), '--se-list-right', null);
+    const account = document.querySelector(`.${C.FocusNavigationRoot_TitleBarControls} .${C.AccountMenu}`);
+    SE.attr(account, 'data-se-status', null);
+    SE.attr(account, 'data-se-name', null);
+    SE.attr(document.querySelector(`${LIST_SELECTOR} .${C.MenuHeader}`), 'data-se-count', null);
     document.body?.classList.remove('se-list-hidden');
     document.body?.removeAttribute('data-se-list');
   }

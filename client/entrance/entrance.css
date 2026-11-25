@@ -24,7 +24,7 @@
 #se-entrance {
   --u: min(calc(100vw / 1920), calc(100vh / 1080));
   --ent-bg: var(--se-bg-ink);
-  --ent-ease: cubic-bezier(.4, 0, .2, 1);
+  --ent-ease: var(--se-ease-standard);
   position: fixed;
   inset: 0;
   z-index: 2147483647; /* over the loader's cover (2147483646) */
@@ -35,13 +35,14 @@
   /* se-ent-strand: gone without JS. After Reload UI during a voice call, the window kept the
      splash while its script's timers never ran. 9.5s outlasts entrance.js's longest run (SAFETY_MS,
      then Ready, the move and the fade) */
-  animation: se-ent-in .35s ease-out forwards, se-ent-strand var(--se-dur-long) var(--ent-ease) 9.5s forwards;
+  animation: se-ent-in var(--se-dur-settle) ease-out forwards, se-ent-strand var(--se-dur-long) var(--ent-ease) 9.5s forwards;
   user-select: none;
 }
 
-#se-entrance *,
-#se-entrance *::before,
-#se-entrance *::after {
+/* Every box sized border-box: the tags entrance.js and the wireframe build with, and the art's images */
+#se-entrance :is(div, span, i, b, s, img),
+#se-entrance :is(div, span, i, b, s)::before,
+#se-entrance :is(div, span, i, b, s)::after {
   box-sizing: border-box;
 }
 
@@ -61,6 +62,18 @@
 @keyframes se-ent-out {
   from { opacity: 1; }
   to { opacity: 0; }
+}
+
+/*
+ * Steam's page view (a Store page Steam starts on) draws over the whole window, the splash too:
+ * the box it's sized from is held at 1 px while the splash is up (entrance.js), so a page loads
+ * out of sight. !important: Steam's BrowserWrapper sizing (sp.css, height and width 100%).
+ */
+html[data-se-ent-hold] .BrowserWrapper {
+  position: fixed !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
 }
 
 /* Hidden lets clicks through and stops its art and wireframe painting */
@@ -113,8 +126,8 @@
   animation: none;
 }
 
-/* Under the art, the wireframe's stage would show at the art box's rounded corners */
-#se-entrance[data-art] .se-wf-stage {
+/* Under the art, the wireframe's box it sits in (entrance.js) would show at its rounded corners */
+#se-entrance[data-art] [data-se-ent-box] {
   visibility: hidden;
 }
 
@@ -185,6 +198,12 @@
   transition: opacity var(--se-dur-mid) ease;
 }
 
+/* Steam's Home: the block in What's New's panel, lower left */
+#se-entrance[data-view="steamhome"] .se-ent-block {
+  bottom: calc(var(--ent-foot) + 48 * var(--u));
+  left: calc(var(--ent-x) + 48 * var(--u));
+}
+
 /* A soft dark pool behind the block, so it reads over any art */
 #se-entrance .se-ent-block::before {
   content: "";
@@ -214,6 +233,29 @@
 
 #se-entrance[data-game] .se-ent-game {
   opacity: 1;
+}
+
+/* Opening on a page: the greeting alone, the game's art and count being the Library's (entrance.js) */
+#se-entrance:not([data-view="library"]) :is(.se-ent-logo, .se-ent-name) {
+  display: none;
+}
+
+#se-entrance:not(:is([data-view="library"], [data-view="steamhome"])) .se-ent-count {
+  display: none;
+}
+
+/*
+ * With no game's art (a page, Steam's Home, Splash art None, a first run), the box the words sit
+ * in: its outline alone, its inside (the stage's logo and Play, the Cinema hero's tabs and bar,
+ * an event's author and picture, What's New's cards) left out under the words
+ */
+#se-entrance:not([data-art]) [data-se-ent-box] {
+  border-radius: calc(18 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-strong);
+}
+
+#se-entrance:not([data-art]) [data-se-ent-box] > * {
+  visibility: hidden;
 }
 
 /* Ready: the game lifts a little toward the Library it hands into */
@@ -363,7 +405,7 @@
 }
 
 #se-entrance[data-phase="ready"] .se-ent-bar::after {
-  animation: se-ent-shine .7s var(--se-ease) forwards;
+  animation: se-ent-shine var(--se-dur-shine) var(--se-ease) forwards;
 }
 
 @keyframes se-ent-shine {

@@ -1,14 +1,18 @@
 /*
- * The Library as a wireframe, drawn from the theme's real Library: rail, game list, Home (search
- * bar, stage, board) and friends. One drawing for the splash (client/entrance/) and the startup
- * window's background (client/startup/), built by SE.wireframe() (wireframe.js). Every size is a
- * multiple of --u, 1 px of a 1920 x 1080 design scaled to the window (a caller may set its own);
+ * The client as a wireframe, drawn from the theme's real pages: rail, game list, Home (search
+ * bar, stage, board) and friends; with a view, another page (store, activity, community or news
+ * in place of Home; friends or bigpicture on its own). One drawing for the splash
+ * (client/entrance/), the startup window's background (client/startup/) and the previews on
+ * Settings › Interface and Store (client/settings/dialog/), built by SE.wireframe()
+ * (wireframe.js). Every size is a multiple of --u, 1 px of a 1920 x 1080 design scaled to the window (a caller may set its own);
  * the frame stands for the window at 0.88 of its size: the columns keep their widths, Home takes
  * the rest. The caller places the frame; --se-wf-bg is the ground its cut-outs show.
  */
-.se-wf *,
-.se-wf *::before,
-.se-wf *::after {
+
+/* Every box sized border-box: the tags wireframe.js builds with */
+.se-wf :is(div, span, i, b, s),
+.se-wf :is(div, span, i, b, s)::before,
+.se-wf :is(div, span, i, b, s)::after {
   box-sizing: border-box;
 }
 
@@ -39,7 +43,7 @@
   inset: 0;
   pointer-events: none;
   background: linear-gradient(100deg, transparent 40%, color-mix(in srgb, var(--se-accent) 9%, transparent) 50%, transparent 60%);
-  animation: se-wf-sweep 5s linear infinite;
+  animation: se-wf-sweep var(--se-dur-sweep) linear infinite;
 }
 
 @keyframes se-wf-sweep {
@@ -426,11 +430,524 @@
   box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-green);
 }
 
+/* ---------- Other views (SE.wireframe({ view })): Store, Friend Activity, Community, Friends, Big Picture ---------- */
+
+/* Store and the community pages: one page between the game list and the friends */
+.se-wf-page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: calc(14 * var(--u));
+  min-width: 0;
+  padding: 0 calc(24 * var(--u)) calc(18 * var(--u));
+  overflow: hidden;
+}
+
+/* The Store's bar: a capsule of its menu, the search at its end */
+.se-wf-storebar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: calc(28 * var(--u));
+  height: calc(40 * var(--u));
+  margin-top: calc(10 * var(--u));
+  padding: 0 calc(10 * var(--u)) 0 calc(20 * var(--u));
+  border-radius: calc(10 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-soft);
+}
+
+.se-wf-storebar > .se-wf-search {
+  width: calc(220 * var(--u));
+  margin-left: auto;
+}
+
+/* The Cinema hero: game tabs over the art, the glass bar along its foot */
+.se-wf-cinema {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(420 * var(--u));
+  padding: calc(22 * var(--u)) calc(20 * var(--u)) calc(20 * var(--u));
+  border-radius: calc(18 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-strong);
+}
+
+.se-wf-cinema-top {
+  display: flex;
+  align-items: center;
+  gap: calc(24 * var(--u));
+  padding: 0 calc(12 * var(--u));
+}
+
+.se-wf-cinema-top > span {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+  gap: calc(12 * var(--u));
+}
+
+/* A game tab: its progress track */
+.se-wf-cinema-top b {
+  width: calc(120 * var(--u));
+  height: calc(3 * var(--u));
+  background: var(--se-wf-line-soft);
+}
+
+.se-wf-cinema-top b[data-on] {
+  background: var(--se-accent);
+}
+
+.se-wf-cinema-bar {
+  display: flex;
+  align-items: center;
+  gap: calc(24 * var(--u));
+  height: calc(104 * var(--u));
+  padding: 0 calc(16 * var(--u)) 0 calc(24 * var(--u));
+  border-radius: calc(14 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+.se-wf-cinema-bar > span:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: calc(10 * var(--u));
+}
+
+.se-wf-shots {
+  display: flex;
+  gap: calc(6 * var(--u));
+  margin-left: auto;
+}
+
+.se-wf-shots > b {
+  width: calc(112 * var(--u));
+  height: calc(63 * var(--u));
+  border-radius: calc(6 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-soft);
+}
+
+.se-wf-buy {
+  width: calc(130 * var(--u));
+  height: calc(40 * var(--u));
+  border-radius: calc(8 * var(--u));
+  background: color-mix(in srgb, var(--se-accent) 45%, transparent);
+}
+
+/* The tabbed list: ranked rows (art and name) beside the spotlight */
+.se-wf-tabbed {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) calc(380 * var(--u));
+  gap: calc(24 * var(--u));
+  min-height: calc(200 * var(--u));
+}
+
+.se-wf-ranked {
+  display: flex;
+  flex-direction: column;
+  gap: calc(10 * var(--u));
+}
+
+.se-wf-ranked > span {
+  display: flex;
+  align-items: center;
+  gap: calc(16 * var(--u));
+  height: calc(56 * var(--u));
+  padding-right: calc(16 * var(--u));
+  border-radius: calc(8 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-soft);
+}
+
+.se-wf-ranked > span > b {
+  width: calc(110 * var(--u));
+  height: 100%;
+  border-radius: calc(8 * var(--u)) 0 0 calc(8 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+.se-wf-tabbed > b {
+  border-radius: calc(12 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+/* Discounts & Events: a row of rounded art tiles */
+.se-wf-caps > b {
+  border-radius: calc(12 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+/* Discounts & Events' row */
+.se-wf-caps {
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: calc(10 * var(--u));
+  height: calc(120 * var(--u));
+}
+
+/* A web page's head: its title on the left, the search on the right */
+.se-wf-pagehead {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(60 * var(--u));
+}
+
+.se-wf-pagehead > .se-wf-txt {
+  height: calc(10 * var(--u));
+}
+
+.se-wf-pagehead > .se-wf-search {
+  width: calc(240 * var(--u));
+}
+
+/* A page's tabs: a row of labels over a hairline, the first one lit */
+.se-wf-menu {
+  display: flex;
+  flex: none;
+  gap: calc(28 * var(--u));
+  padding-bottom: calc(12 * var(--u));
+  box-shadow: 0 calc(2 * var(--u)) 0 var(--se-wf-line-soft);
+}
+
+/* Friend Activity: shortcuts, the feed, the friends in game */
+.se-wf-activity {
+  display: grid;
+  flex: 1;
+  grid-template-columns: calc(180 * var(--u)) minmax(0, 1fr) calc(230 * var(--u));
+  gap: calc(24 * var(--u));
+  min-height: 0;
+}
+
+.se-wf-shortcuts {
+  display: flex;
+  flex-direction: column;
+  gap: calc(18 * var(--u));
+}
+
+.se-wf-shortcuts > b {
+  width: calc(48 * var(--u));
+  height: calc(48 * var(--u));
+  margin-bottom: calc(6 * var(--u));
+  border-radius: 23%;
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-accent);
+}
+
+.se-wf-events {
+  display: flex;
+  flex-direction: column;
+  gap: calc(16 * var(--u));
+  min-width: 0;
+}
+
+/* The status box as a composer card */
+.se-wf-compose {
+  flex: none;
+  height: calc(70 * var(--u));
+  border-radius: calc(10 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+/* An event: its author, wide art, a line of actions */
+.se-wf-event {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: calc(12 * var(--u));
+  padding: calc(16 * var(--u));
+  border-radius: calc(10 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-soft);
+}
+
+.se-wf-event > span {
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+}
+
+.se-wf-event > span > b {
+  width: calc(28 * var(--u));
+  height: calc(28 * var(--u));
+  border-radius: 23%;
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-strong);
+}
+
+.se-wf-event > i:not(.se-wf-txt) {
+  /* Tall: the first holds the splash's art (client/entrance/), near Home stage's shape */
+  height: calc(440 * var(--u));
+  border-radius: calc(8 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+/* The right column: the friends button, friends in game as one card, the groups */
+.se-wf-side {
+  display: flex;
+  flex-direction: column;
+  gap: calc(16 * var(--u));
+}
+
+.se-wf-side > b {
+  height: calc(40 * var(--u));
+  border-radius: calc(8 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+.se-wf-side > b:last-child {
+  height: calc(120 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-soft);
+}
+
+.se-wf-side > span {
+  display: flex;
+  flex-direction: column;
+  gap: calc(14 * var(--u));
+  padding: calc(14 * var(--u));
+  border-radius: calc(10 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-soft);
+}
+
+.se-wf-side > span > span {
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+}
+
+.se-wf-side > span > span > b {
+  width: calc(24 * var(--u));
+  height: calc(24 * var(--u));
+  border-radius: 23%;
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-green);
+}
+
+/* News Hub: its navigation column beside Coming soon's cards and Today's stories */
+.se-wf-hub {
+  display: grid;
+  flex: 1;
+  grid-template-columns: calc(220 * var(--u)) minmax(0, 1fr);
+  gap: calc(24 * var(--u));
+  min-height: 0;
+  margin-top: calc(20 * var(--u));
+}
+
+.se-wf-hub-side {
+  display: flex;
+  flex-direction: column;
+  gap: calc(18 * var(--u));
+  padding: calc(16 * var(--u));
+  border-radius: calc(10 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-soft);
+}
+
+/* The hub's name block */
+.se-wf-hub-side > b {
+  height: calc(70 * var(--u));
+  margin-bottom: calc(10 * var(--u));
+  border-radius: calc(6 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-strong);
+}
+
+.se-wf-hub-main {
+  display: flex;
+  flex-direction: column;
+  gap: calc(14 * var(--u));
+  min-width: 0;
+}
+
+.se-wf-hub-soon {
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: calc(12 * var(--u));
+  height: calc(110 * var(--u));
+}
+
+.se-wf-hub-soon > b {
+  border-radius: calc(8 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+/* Today: stories, each a wide picture beside its title and summary */
+.se-wf-hub-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: calc(14 * var(--u));
+  min-height: 0;
+}
+
+.se-wf-hub-list > span {
+  display: flex;
+  flex: none;
+  gap: calc(20 * var(--u));
+  height: calc(150 * var(--u));
+  border-radius: calc(8 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-soft);
+}
+
+.se-wf-hub-list > span > i {
+  width: calc(300 * var(--u));
+  border-radius: calc(8 * var(--u)) 0 0 calc(8 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+.se-wf-hub-list > span > span {
+  display: flex;
+  flex-direction: column;
+  gap: calc(12 * var(--u));
+  padding-top: calc(24 * var(--u));
+}
+
+/* Community Home: a masonry of cards in four columns */
+.se-wf-masonry {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: calc(14 * var(--u));
+  min-height: 0;
+  overflow: hidden;
+}
+
+.se-wf-masonry > span {
+  display: flex;
+  flex-direction: column;
+  gap: calc(14 * var(--u));
+}
+
+.se-wf-masonry b {
+  flex: none;
+  border-radius: calc(8 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+/* Friends on its own: the list fills the frame */
+.se-wf[data-view="friends"] > .se-wf-friends {
+  flex: 1;
+  width: auto;
+  box-shadow: none;
+}
+
+/* Big Picture: a top bar, a hero, a row of tall capsules, the first focused */
+.se-wf-bp {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: calc(24 * var(--u));
+  min-width: 0;
+  padding: calc(24 * var(--u)) calc(48 * var(--u));
+}
+
+.se-wf-bp-top {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: calc(16 * var(--u));
+}
+
+.se-wf-bp-top > .se-wf-txt:last-child {
+  margin-left: auto;
+}
+
+.se-wf-bp-hero {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: calc(14 * var(--u));
+  min-height: 0;
+  padding: calc(24 * var(--u));
+  border-radius: calc(14 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+/* Steam's own Home: What's New in its panel, two shelves, Add shelf; each its own height */
+.se-wf-sh {
+  padding-top: calc(18 * var(--u));
+}
+
+.se-wf-sh-news {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: calc(12 * var(--u));
+  height: calc(320 * var(--u));
+  padding: calc(16 * var(--u));
+  box-sizing: border-box;
+  border-radius: calc(14 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-soft);
+}
+
+.se-wf-sh-cards {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: calc(12 * var(--u));
+  min-height: 0;
+}
+
+.se-wf-sh-cards > span {
+  display: flex;
+  flex-direction: column;
+  gap: calc(8 * var(--u));
+  min-width: 0;
+}
+
+.se-wf-sh-cards > span > b {
+  flex: 1;
+  border-radius: calc(8 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+.se-wf-sh-shelf {
+  display: grid;
+  flex: none;
+  grid-template-columns: 2fr repeat(6, minmax(0, 1fr));
+  gap: calc(10 * var(--u));
+  height: calc(210 * var(--u));
+}
+
+.se-wf-sh-shelf > b {
+  border-radius: calc(8 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line);
+}
+
+.se-wf-sh-add {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: calc(12 * var(--u));
+}
+
+.se-wf-sh-add > i {
+  flex: 1;
+  height: calc(2 * var(--u));
+  background: var(--se-wf-line-soft);
+}
+
+.se-wf-bp-row {
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: calc(16 * var(--u));
+  height: calc(300 * var(--u));
+}
+
+.se-wf-bp-row > b {
+  border-radius: calc(10 * var(--u));
+  box-shadow: inset 0 0 0 calc(2 * var(--u)) var(--se-wf-line-soft);
+}
+
+.se-wf-bp-row > b[data-on] {
+  box-shadow: inset 0 0 0 calc(3 * var(--u)) var(--se-accent);
+}
+
 /*
  * Alive (SE.wireframe({ alive: true })): the columns draw in one after another (rail, list,
  * Home, friends), each fading up into place; then the selection steps down the Favorites rows
  * (2 s a row) and the friends in games come online one by one (2.5 s each), each item's turn set
- * by wireframe.js. Opacity on pseudo-elements only, so nothing repaints.
+ * by wireframe.js. Transform and opacity only, so nothing lays out: the columns once, then the
+ * looping selection and friends on pseudo-elements.
  */
 .se-wf[data-alive] > :is(.se-wf-rail, .se-wf-list, .se-wf-home, .se-wf-friends) {
   animation: se-wf-in var(--se-dur-slower) var(--se-ease) both;
@@ -510,18 +1027,18 @@
  * (2.5 s each), the search field's caret blinks, the updating game's dot and the Library tab
  * pulse. Transform and opacity on pseudo-elements only.
  */
-.se-wf[data-busy] .se-wf-grid > b {
+.se-wf[data-busy] :is(.se-wf-grid, .se-wf-sh-shelf) > b {
   position: relative;
   overflow: hidden;
 }
 
-.se-wf[data-busy] .se-wf-grid > b::after {
+.se-wf[data-busy] :is(.se-wf-grid, .se-wf-sh-shelf) > b::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--se-accent) 24%, transparent) 50%, transparent 70%);
   transform: translateX(-100%);
-  animation: se-wf-shimmer var(--se-dur-shimmer) ease-in-out calc(var(--se-wf-i) * .12s) infinite;
+  animation: se-wf-shimmer var(--se-dur-shimmer) var(--se-ease-inout) calc(var(--se-wf-i) * .12s) infinite;
 }
 
 @keyframes se-wf-shimmer {
@@ -568,7 +1085,7 @@
 
 .se-wf[data-busy] .se-wf-dot {
   opacity: .4;
-  animation: se-wf-pulse var(--se-dur-pulse) ease-in-out infinite;
+  animation: se-wf-pulse var(--se-dur-pulse) var(--se-ease-inout) infinite;
 }
 
 .se-wf[data-busy] .se-wf-rail-on::after {
@@ -578,7 +1095,7 @@
   border-radius: inherit;
   box-shadow: 0 0 calc(14 * var(--u)) color-mix(in srgb, var(--se-accent) 55%, transparent);
   opacity: 0;
-  animation: se-wf-pulse var(--se-dur-breathe) ease-in-out infinite;
+  animation: se-wf-pulse var(--se-dur-breathe) var(--se-ease-inout) infinite;
 }
 
 @keyframes se-wf-pulse {
@@ -592,7 +1109,7 @@
   .se-wf[data-alive] > *,
   .se-wf[data-alive] .se-wf-row::after,
   .se-wf[data-alive] .se-wf-friend > b::before,
-  .se-wf[data-busy] .se-wf-grid > b::after,
+  .se-wf[data-busy] :is(.se-wf-grid, .se-wf-sh-shelf) > b::after,
   .se-wf[data-busy] .se-wf-act > b::before,
   .se-wf[data-busy] .se-wf-search::after,
   .se-wf[data-busy] .se-wf-dot,

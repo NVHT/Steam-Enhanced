@@ -734,8 +734,8 @@
   const poll = (fn, delay, opts = {}) => {
     const doc = opts.document || document;
     const win = doc.defaultView;
-    // While inactive, re-check `active` every 0.5-1.5 s (the old fixed 500 ms ran a layout read
-    // twice a second per poll). Watchers call refresh() to wake it sooner.
+    // While inactive, re-check `active` every 0.5-1.5 s, scaled to the poll's own
+    // delay, so an idle poll's layout read stays rare. Watchers call refresh() to wake it sooner.
     const idleInterval = Number(opts.idle) || Math.min(Math.max(delay, 500), 1500);
     let lastWake = 0;
     let timer = null;

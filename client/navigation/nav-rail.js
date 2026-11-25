@@ -198,7 +198,6 @@
     }
   }
 
-  /* Steam's word for a menu token in the client's language; "#Menu_PointsShop" -> "Points Shop" else */
   /*
    * Steam's own localizer first (the one its menus use, found by client/header/menu/api.js),
    * then its LocalizationManager; a word made from the token only if neither knows it.
@@ -248,12 +247,8 @@
     return null;
   }
 
-  /*
-   * Steam's items as menu rows. An item carries a route (the library's pages), a steamURL (a
-   * Store or Community page, resolved by Steam) or its own onClick; hidden ones (visible:
-   * false) are left out, and "Separator" rows become dividers, never doubled or at an end.
-   */
-  // What a Steam menu item does: a route (the library's pages), a steamURL, or its own onClick
+  // What a Steam menu item does: a route (the library's pages), a steamURL (a Store or Community
+  // page), or its own onClick; nothing for a hidden one (visible: false)
   function itemAction(item) {
     if (!item || item.visible === false) return null;
     if (item.route) return () => navigateToLibraryRoute(item.route);
@@ -325,6 +320,7 @@
 
   let navMenu = null;
   let navMenuKey = '';
+  let lastToggle = 'none yet'; // the last menu a click tried to open (the element report)
   function closeNavMenu() {
     navMenu?.release();
     navMenu = null;
@@ -353,6 +349,7 @@
         )
       : null;
     if (navMenu) navMenuKey = key;
+    lastToggle = `${key}: ${!rows ? 'no rows' : navMenu ? 'opened' : 'its popup failed'}`;
     return Boolean(navMenu);
   }
 
@@ -499,7 +496,31 @@
     schedule();
   }
 
+  // For the element report (dev/inspector-report.js): each page icon's state, what a click
+  // finds (its button, Steam's menu items, the rows made of them)
+  function why() {
+    if (!railMode()) return 'rail off';
+    return Object.keys(NAV_ITEMS)
+      .filter((key) => !NAV_ITEMS[key].items)
+      .map((key) => {
+        const node = navNodes.get(key);
+        if (!node) return `${key}: no button`;
+        const bound = node.isConnected ? '' : ' (detached)';
+        // How many buttons match, and what a click at the bound one's centre lands on
+        const count = document.querySelectorAll(`.${C.SuperNavBar} .se-menu-icon[data-se-icon="${key}"]`).length;
+        const box = node.getBoundingClientRect();
+        const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+        const lands = !box.width ? 'not drawn' : hit === node || node.contains(hit) ? 'clicks land on it' :
+          `clicks land on ${hit ? `${hit.tagName.toLowerCase()}.${[...hit.classList].join('.')}` : 'nothing'}`;
+        const items = superNavProps(node)?.menuItems;
+        const steam = Array.isArray(items) ? `${items.length} items, ${SE.run(() => sectionRows(key, node))?.length || 0} rows` : 'no Steam items';
+        return `${key}: ${steam}, ${count} button(s), ${lands}${bound}`;
+      })
+      .join('; ') + `; last menu ${lastToggle}`;
+  }
+
   window.__seRailNav = {
+    why,
     // The Games button at the rail's foot (client/header/header-actions.js) opens its menu here
     toggleGames: (button) => toggleNavMenu('games', button, { foot: true }),
     // Opens the Games menu unless it's open already ("Menus open on hover", header-actions.js)
@@ -507,6 +528,7 @@
       if (!(navMenu && !navMenu.released && navMenuKey === 'games')) toggleNavMenu('games', button, { foot: true });
     },
     destroy() {
+      removeEventListener('DOMContentLoaded', start);
       observer?.disconnect();
       timer?.disconnect();
       if (frame) cancelAnimationFrame(frame);

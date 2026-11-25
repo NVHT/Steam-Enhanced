@@ -30,7 +30,8 @@
    *   at      where: a spot for show() ({ left | right, top }, or a function of the menu's size)
    *   options { sheets: the theme files styling the marks; owner: the button that opened it,
    *           whose press never counts as an outside click (it toggles) and which carries
-   *           aria-expanded while the menu is open }
+   *           aria-expanded while the menu is open; closeOnLeave: with an owner, the menu
+   *           closes a moment after the pointer leaves both it and the owner (leaveCloser) }
    * Keys: in the page the rows take focus; a popup window never does, so the main window hears
    * Up / Down / Enter / Escape and moves a highlight ([data-se-active]) through the rows. A menu
    * opens with no row lit: only the pointer or the keys light one.
@@ -111,7 +112,8 @@
 
   function menu(items, at, { sheets = [], owner = null, closeOnLeave = false } = {}) {
     openMenu?.release();
-    const open = panel({ sheets });
+    // Room for the menu's shadow round its window (popup-layer-panel.js)
+    const open = panel({ sheets, room: true, avoid: owner });
     if (!open) return null;
     let rows = [];
     let shown = null;
@@ -279,7 +281,8 @@
       }
       container.append(list);
       shown = list;
-      leaving?.watch(list);
+      // In a window, the whole window: its room around the menu can lie over the button
+      leaving?.watch(list.ownerDocument === document ? list : list.ownerDocument.documentElement);
       rows = [...list.querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"]')];
     };
 
@@ -312,6 +315,9 @@
   const layer = {
     besideRail,
     runtime: ns.findRuntime,
+    // How the last popup window open went (the element report)
+    lastOpen: ns.lastOpen,
+    spareRect: ns.spareRect,
     missing: ns.missing,
     place: ns.place,
     copyStyles: ns.copyStyles,

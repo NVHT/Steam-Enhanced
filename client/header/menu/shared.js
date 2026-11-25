@@ -1,10 +1,10 @@
 /*
  * Root menu bar consolidation and context menu positioning.
  *
- * Patches Steam's ContextMenuManager instances so View, Friends, Games, and Help
- * render as native submenus inside the main Steam root menu, adds restart and
- * reload actions, and adds online status and profile rename controls to the
- * account menu when the vertical rail is active.
+ * Patches Steam's ContextMenuManager instances: hides the menu bar's View, Friends, Games and
+ * Help buttons, lays out the Steam menu (Help's rows join it, with restart and reload
+ * actions), and adds online status and profile rename controls to the account menu when the
+ * vertical rail is active.
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
  * window.__seSteamMenuParts (values parts reassign live on its `live`). Not strict
@@ -47,8 +47,8 @@
 
   const ROOT_BTN_SELECTOR = `.${C.RootMenuBar} .${C.RootMenuButton}`;
   // Steam's menu-bar buttons the theme takes over (their bar buttons hidden). Help's rows join
-  // the Steam menu (client/header/menu/actions.js); View's went elsewhere (Hidden Games and
-  // Soundtracks to the rail's Library menu, Big Picture Mode to the Steam menu) or were dropped;
+  // the Steam menu (client/header/menu/actions.js); View's rows live elsewhere (Hidden Games
+  // and Soundtracks in the rail's Library menu, Big Picture Mode in the Steam menu) or not at all;
   // Friends is the dock's; Games is a button at the rail's foot (client/navigation/nav-rail.js).
   const SUBMENU_NAMES = ['View', 'Friends', 'Games', 'Help'];
   const SIDE_HOVER = {
@@ -62,8 +62,6 @@
   const sideButtons = new Map();
   const hoverDocuments = new Set();
   const avatarLayouts = new Map();
-  const popupObservers = new Map();
-  const movedGroups = new Map();
   /*
    * Other features' say in Steam's menus: each create hook sees every menu the main window's
    * manager makes (popups.js bindManager), each cleanup runs on destroy (main.js). The game
@@ -123,6 +121,6 @@
   Object.assign(ns, {
     animateClose, cleanups, createHooks, heading,
     ROOT_BTN_SELECTOR, SIDE_HOVER, SUBMENU_NAMES, avatarLayouts, hoverDocuments,
-    movedGroups, patched, popupObservers, sideButtons, sidebarManagers,
+    patched, sideButtons, sidebarManagers,
   });
 })(window.__se);

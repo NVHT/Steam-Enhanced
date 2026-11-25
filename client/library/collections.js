@@ -189,9 +189,7 @@
   function sizeText(app) {
     const b = Number(app.size_on_disk || 0);
     if (!b) return '—';
-    if (b >= 1e12) return `${(b / 1e12).toFixed(2)} TB`;
-    if (b >= 1e9) return `${(b / 1e9).toFixed(1)} GB`;
-    return `${Math.max(1, Math.round(b / 1e6))} MB`;
+    return SE.bytes(b, { short: true });
   }
 
   function el(tag, cls, text) {
@@ -773,9 +771,10 @@
           '.se-cb-art, .se-cb-icon, .se-cb-eyebrow, .se-cb-stats, .se-cb-ctrl, .se-clist, .se-cc-strip, .se-cc-badges'
         )
         .forEach((e) => e.remove());
-      for (const a of ['data-se-cbanner', 'data-se-cpage', 'data-se-view', 'data-se-coll']) {
+      for (const a of ['data-se-cbanner', 'data-se-cpage', 'data-se-view', 'data-se-coll', 'data-se-note']) {
         document.querySelectorAll(`[${a}]`).forEach((e) => e.removeAttribute(a));
       }
+      delete window.__seCollections;
     },
   };
 })(window.__se);

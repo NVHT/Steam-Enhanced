@@ -1,16 +1,15 @@
 /*
  * The theme's settings, part 1 of 2 (client/shared/settings.js names what they do), listed just
  * before it: the colour palette's base tokens, the presets that set them, and a Custom palette
- * filled from a base. Shared with settings.js on window.__seSettingsParts.
+ * filled from a base. Shared with settings.js on window.__seSettingsPaletteParts.
  */
 (() => {
   const COLOUR = /^(?:#[0-9a-f]{6}|rgba\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*(?:0|1|0?\.\d+)\s*\))$/i;
 
   /*
-   * The colour palette: the base tokens of core/tokens.css a preset sets, by key (the settings
-   * window's Custom editor shows them in this order, under `group`). Enhanced is tokens.css's
-   * own values; each other preset sets every one. group: the mood the settings window files it
-   * under (Neutral, Cool, Warm).
+   * The colour palette: the base tokens of core/tokens.css a preset sets, by key. The settings
+   * window's Custom editor shows them in this order, under their `group` (the editor's section:
+   * Surfaces, States and lines, Text, Accent).
    */
   const PALETTE_TOKENS = [
     ['bg', '--se-bg', 'Background', 'Surfaces'],
@@ -38,6 +37,10 @@
   const READ_ON = { strong: 'selected', text: 'surface2', dim: 'surface2', muted: 'selected', faint: 'surface2', onAccent: 'accent' };
 
   const LINES = { hairline: 'rgba(255, 255, 255, .06)', divider: 'rgba(255, 255, 255, .08)' };
+  /*
+   * The presets: Enhanced is tokens.css's own values; each other preset sets every token. A
+   * preset's `group` is the mood the settings window files it under (Neutral, Cool, Warm).
+   */
   const PRESETS = [
     {
       v: 'enhanced', label: 'Enhanced', group: 'Neutral', colors: {
@@ -143,5 +146,5 @@
     return out;
   };
 
-  window.__seSettingsParts = { PALETTE_TOKENS, PRESETS, READ_ON, fillPalette, presetOf };
+  window.__seSettingsPaletteParts = { PALETTE_TOKENS, PRESETS, READ_ON, fillPalette, presetOf };
 })();

@@ -7,7 +7,7 @@
   const {
     anchors, avatarLayouts, cancelHoverClose, closeAfterHover, enterMenuPopup, hoverDocuments,
     leaveMenuPopup, onMainMouseMove, openMillenniumWindow, openSideOnHover, patched,
-    restorePopups, sideButtons, sidebarManagers, start, unpatchInstance,
+    sideButtons, sidebarManagers, start, unpatchInstance,
   } = ns;
   const { live } = ns;
 
@@ -33,7 +33,6 @@
       document.removeEventListener('click', openMillenniumWindow, true);
       for (const obs of avatarLayouts.values()) obs.disconnect();
       avatarLayouts.clear();
-      restorePopups();
       live.observer?.disconnect();
       removeEventListener('DOMContentLoaded', start);
 

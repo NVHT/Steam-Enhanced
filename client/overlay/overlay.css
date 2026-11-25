@@ -21,7 +21,6 @@
  * this file in client/loader.js: together they keep one file's order.
  */
 html[data-se-ov] {
-  --se-ov-ink: 15, 17, 21;
   /* Left column width (rail + drawer); it stops short of the game's own menu. */
   --se-ov-col: 520px;
   --se-ov-rail-btn: 44px;
@@ -30,14 +29,14 @@ html[data-se-ov] {
 /* ---------- Backdrop ---------- */
 
 /* --se-overlay-dim runs 0.4-1.4: the edges are opaque from 1, the centre
-   (72% of it) from 1.4. Alphas over 1 clamp. */
+   (72% of it) from 1.4. The ink (--se-bg-ink) is mixed at most 100% (min()). */
 html[data-se-ov] ._3b_pllMxcr_an1aQ5goWvB:not(._2hcWZXLXQaKJxwEEsiUibw) {
   background: radial-gradient(
     ellipse at 50% 45%,
-    rgba(var(--se-ov-ink), calc(var(--se-overlay-dim) * 0.72)),
-    rgba(var(--se-ov-ink), var(--se-overlay-dim))
+    color-mix(in srgb, var(--se-bg-ink) min(calc(var(--se-overlay-dim) * 72%), 100%), transparent),
+    color-mix(in srgb, var(--se-bg-ink) min(calc(var(--se-overlay-dim) * 100%), 100%), transparent)
   ) !important;
-  box-shadow: inset 0 0 240px 20px rgba(var(--se-ov-ink), 0.85) !important;
+  box-shadow: inset 0 0 240px 20px color-mix(in srgb, var(--se-bg-ink) 85%, transparent) !important;
   font-family: var(--se-font) !important;
 }
 
@@ -242,15 +241,19 @@ html[data-se-ov] .se-ov-overview {
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-width: none;
   font-family: var(--se-font);
   user-select: none;
+}
+
+/* It scrolls without a bar: the fade says there is more */
+html[data-se-ov] .se-ov-overview::-webkit-scrollbar {
+  display: none;
 }
 
 /* Bright game art can sit behind the column: a soft shadow keeps small
    labels and links readable on it. */
 html[data-se-ov] :is(.se-ov-overview, .se-ov-card) {
-  text-shadow: 0 1px 2px rgba(var(--se-ov-ink), 0.85), 0 0 12px rgba(var(--se-ov-ink), 0.6);
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--se-bg-ink) 85%, transparent), 0 0 12px color-mix(in srgb, var(--se-bg-ink) 60%, transparent);
 }
 
 html[data-se-ov] .se-ov-overview::-webkit-scrollbar {
@@ -303,7 +306,7 @@ html[data-se-ov] .se-ov-sec-link {
   font: 600 var(--se-fs-base)/1 var(--se-font);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
 html[data-se-ov] .se-ov-sec-link:hover {
@@ -441,9 +444,9 @@ html[data-se-ov] .se-ov-avatar {
   border: 0;
   border-radius: var(--se-avatar-radius);
   background: var(--se-surface-2);
-  box-shadow: 0 0 0 2px rgb(var(--se-ov-ink)), 0 0 0 4px var(--se-ov-ring);
+  box-shadow: 0 0 0 2px var(--se-bg-ink), 0 0 0 4px var(--se-ov-ring);
   cursor: pointer;
-  transition: box-shadow var(--se-dur) ease-out;
+  transition: box-shadow var(--se-dur) var(--se-ease);
 }
 
 html[data-se-ov] .se-ov-avatar[data-status='online'] {
@@ -470,7 +473,7 @@ html[data-se-ov] .se-ov-avatar[data-status='online'][data-away] {
   height: 100%;
   border-radius: var(--se-avatar-radius);
   object-fit: cover;
-  transition: filter var(--se-dur) ease-out, opacity var(--se-dur) ease-out;
+  transition: filter var(--se-dur) var(--se-ease), opacity var(--se-dur) var(--se-ease);
 }
 
 .se-ov-avatar[data-status='offline'] img {
@@ -484,7 +487,7 @@ html[data-se-ov] .se-ov-avatar:hover img {
 }
 
 html[data-se-ov] .se-ov-avatar[data-steamid]:hover {
-  box-shadow: 0 0 0 2px rgb(var(--se-ov-ink)), 0 0 0 4px var(--se-ov-ring), 0 0 0 7px var(--se-hover);
+  box-shadow: 0 0 0 2px var(--se-bg-ink), 0 0 0 4px var(--se-ov-ring), 0 0 0 7px var(--se-hover);
 }
 
 html[data-se-ov] .se-ov-avatar[data-away]:hover {
@@ -543,7 +546,7 @@ html[data-se-ov] .se-ov-shot {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--se-dur) ease-out, filter var(--se-dur) ease-out;
+  transition: transform var(--se-dur) var(--se-ease), filter var(--se-dur) var(--se-ease);
 }
 
 html[data-se-ov] .se-ov-shot:hover img {
@@ -570,7 +573,7 @@ html[data-se-ov] .se-ov-guide {
   padding: 0 var(--se-space-2);
   border-radius: var(--se-radius-sm);
   color: var(--se-text-muted);
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
 html[data-se-ov] .se-ov-guide[data-fav='true'] {
@@ -623,7 +626,7 @@ html[data-se-ov] .se-ov-news-lead {
   border-radius: var(--se-radius-sm);
   object-fit: cover;
   background: var(--se-surface-2);
-  transition: filter var(--se-dur) ease-out;
+  transition: filter var(--se-dur) var(--se-ease);
 }
 
 html[data-se-ov] .se-ov-news-lead:hover .se-ov-news-art {
@@ -659,7 +662,7 @@ html[data-se-ov] .se-ov-news-row {
   padding-top: var(--se-space-2);
   box-shadow: var(--se-rule-top);
   color: var(--se-text-muted);
-  transition: color var(--se-dur) ease-out;
+  transition: color var(--se-dur) var(--se-ease);
 }
 
 html[data-se-ov] .se-ov-news-row:hover {

@@ -64,7 +64,7 @@ html.se-layer-document .se-layer-popup {
 }
 
 /*
- * The shift is measured against the box's current place (fit() in popup-layer.js), so it must
+ * The shift is measured against the box's current place (fit() in popup-layer-panel.js), so it must
  * land at once. Reduced motion (core/motion.css, options/appearance/motion-reduced.css) gives
  * every element a .01ms transition of `all`: the transform would lag a frame, the next fit()
  * would read the old place and shift again, and the panel would land twice as far off.
@@ -84,13 +84,22 @@ html.se-layer-document .se-layer-popup {
 }
 
 /*
- * No drop shadow in a window, as Steam does for its own popup windows (HoverPositionPopup): the
- * window is only as big as the card, so a shadow is cut square at its edges and darkens the
- * corners outside the card's rounded ones. !important, and the cards' own weight plus one: the
- * "Playing now" card's shadow carries !important (client/friends/friend-hover.css).
+ * A window keeps room around its panel for the shadow (popup-layer-panel.js). Without room
+ * (Menu windows at Solid: data-se-flat) the window is only as big as the panel, so a shadow
+ * would be cut square at its edges: none then. !important, and the cards' own weight plus one:
+ * the "Playing now" card's shadow carries !important (client/friends/friend-hover.css).
  */
-html.se-layer-document .se-layer-wrap > *:not(#se-none) {
+html.se-layer-document .se-layer-wrap[data-se-flat] > *:not(#se-none) {
   box-shadow: none !important;
+}
+
+/*
+ * Until its window has moved to its spot the panel waits unseen, its opening animation held:
+ * it plays once the window is there (popup-layer-panel.js reveal()).
+ */
+html.se-layer-document .se-layer-wrap[data-se-waiting] > * {
+  visibility: hidden;
+  animation: none !important; /* !important: each panel's own opening animation */
 }
 
 /* A panel drawn in the main window (no browser view in the way): moved to its spot */
@@ -108,7 +117,7 @@ html.se-layer-document .se-layer-wrap > *:not(#se-none) {
 }
 
 /*
- * The theme's action menu (menu() in client/shared/popup-layer.js): rows that run and close it,
+ * The theme's action menu (menu() in client/shared/popup-layer-menu.js): rows that run and close it,
  * over a Store page too (the dock's menus, the rail's, Settings). One of the theme's two menus:
  * controls that stay open (segments, toggles, a list to reorder) go in the settings menu
  * (client/shared/menu.css), which needs focus a popup window can't take. Both share the panel
@@ -132,7 +141,7 @@ html.se-layer-document .se-layer-wrap > *:not(#se-none) {
 }
 
 .se-menu[data-se-closing] {
-  animation: se-menu-out var(--se-dur-fast) ease-in forwards;
+  animation: se-menu-out var(--se-dur-fast) var(--se-ease-in) forwards;
   pointer-events: none;
 }
 
@@ -264,7 +273,7 @@ html.se-layer-document .se-layer-wrap > *:not(#se-none) {
   border-radius: var(--se-radius-pill);
   background: var(--se-field);
   box-shadow: var(--se-edge);
-  transition: background-color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease);
 }
 
 .se-menu button:has(.se-menu-switch) .se-menu-text {
@@ -280,7 +289,7 @@ html.se-layer-document .se-layer-wrap > *:not(#se-none) {
   height: var(--se-switch-knob);
   border-radius: 50%;
   background: var(--se-text-muted);
-  transition: transform var(--se-dur) ease-out, background-color var(--se-dur) ease-out;
+  transition: transform var(--se-dur) var(--se-ease), background-color var(--se-dur) var(--se-ease);
 }
 
 .se-menu [aria-checked="true"] .se-menu-switch {

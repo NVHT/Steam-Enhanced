@@ -294,7 +294,7 @@
     referenceObserver?.disconnect();
 
     const measure = () => {
-      let headerSurface = '#171d25';
+      let headerSurface = 'var(--se-bg)';
       for (let header = document.querySelector(`.${C.TopBar}`); header; header = header.parentElement) {
         const color = window.getComputedStyle(header).backgroundColor;
         if (!color || color === 'transparent') continue;
@@ -380,7 +380,7 @@
     if (!home || !menu || !geometryDirty) return;
     const rect = home.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return;
-    for (const [key, number] of Object.entries({ width: rect.width, height: rect.height, inset: 6 })) {
+    for (const [key, number] of Object.entries({ width: rect.width, height: rect.height })) {
       setBodyProperty(`--se-steam-home-${key}`, `${number}px`);
     }
   }

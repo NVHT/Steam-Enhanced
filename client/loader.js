@@ -11,7 +11,7 @@
  * classic scripts sharing one namespace object (window.__se<Feature>Parts): each takes what
  * earlier parts published, looks up later parts' names when it calls them, and publishes what
  * others use; a value parts reassign lives on the namespace's `live`. Not ES modules: in Steam's
- * popup windows a module's imports can stall (they did for the toasts), and a module's strict
+ * popup windows a module's imports can stall (the toasts' windows among them), and a module's strict
  * mode throws on writes to Steam's objects that a classic script skips, which the theme's
  * patching relies on (the Steam menu). Every script here is a classic one.
  *
@@ -76,7 +76,10 @@
     ['content', 'client/shared/', ['open-page.js']],
     // Steam's own confirm dialog for a theme prompt (Reload UI during a call)
     ['main', 'client/shared/', ['steam-confirm.js']],
-    ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'popup-layer-panel.js', 'popup-layer-menu.js', 'picker.js', 'menu.js', 'menu.css', 'picker.css', 'news-feed.js', 'download-feed.js', 'column-resize.css', 'column-resize.js', 'window-fold.js']],
+    ['main', 'client/shared/', ['plugin-rpc.js', 'popup-layer.js', 'popup-layer-panel.js', 'popup-layer-menu.js', 'picker.js', 'menu.js', 'menu.css', 'picker.css', 'news-feed.js', 'column-resize.css', 'column-resize.js', 'window-fold.js']],
+    // Steam's live download feed: the rail's card and the Downloads page (main), Settings ›
+    // Downloads (the settings window)
+    ['desktop', 'client/shared/', ['download-feed.js']],
     ['notify', 'client/friends/', ['friend-notification-clicks.js']],
     // In-game overlay
     ['overlay', 'client/overlay/', [
@@ -88,7 +91,7 @@
     ['main', 'client/friends/', ['friends-background.js']],
     // Notification toasts
     ['toasts', 'client/toasts/', [
-      'toasts.css', 'context.js', 'config.js', 'steam.js', 'stage.js', 'hub.js', 'placement.js',
+      'card.css', 'toasts.css', 'card.js', 'context.js', 'config.js', 'steam.js', 'stage.js', 'hub.js', 'placement.js',
       'scan.js', 'compact.js', 'main.js',
     ]],
     // Loading spinner (also holds the mark), the Library wireframe, then startup, sign-in, entrance
@@ -118,6 +121,8 @@
       'library.css', 'library-home.css', 'library-covers.css', 'game-list.css', 'game-list.js',
       'game-drag.css', 'game-drag.js', 'collections.css', 'collections.js',
     ]],
+    // Started on a Store or Community page: the Library rendered once, so its list is beside it
+    ['main', 'client/library/', ['start-on-page.js']],
     // The library's right-click menus (games, collections, Home's updates and shelves): part of the Steam menu's patching
     // (client/header/menu/)
     ['main', 'client/library/', ['game-menu.js', 'game-menu-collections.js', 'collection-menu.js', 'home-menus.js']],
@@ -212,12 +217,21 @@
     ['all', 'core/', ['emoticon-picker.css', 'emoticon-picker.js']],
     // Settings, game properties, Millennium, storage
     ['desktop', 'client/settings/', [
-      'layout.css', 'controls.css', 'pages.css', 'storage.css', 'search.css', 'game-properties.css',
+      'layout.css', 'controls.css', 'pages.css', 'pages-notifications.css', 'pages-interface.css',
+      'pages-store.css', 'pages-library.css', 'pages-downloads.css', 'pages-cloud.css', 'pages-ingame.css',
+      'pages-accessibility.css', 'pages-hero.css', 'pages-controller.css', 'pages-gamerecording.css',
+      'pages-voice.css', 'pages-remoteplay.css', 'pages-broadcast.css', 'pages-music.css', 'storage.css',
+      'search.css', 'game-properties.css',
       'game-properties-install.css', 'game-properties-extras.css', 'spacing.css',
     ]],
+    // A toast as the theme draws it, for the sample on Settings › Notifications
+    ['desktop', 'client/toasts/', ['card.css', 'card.js']],
     ['desktop', 'client/settings/dialog/', [
       'shared.js', 'options.js', 'search.js', 'window.js', 'sidebar.js', 'layout.js', 'props-pages.js',
-      'props-header.js', 'props.js', 'main.js',
+      'props-header.js', 'props.js', 'account.js', 'friends.js', 'family.js', 'security.js',
+      'notifications.js', 'interface.js', 'store.js', 'library.js', 'downloads.js', 'cloud.js', 'ingame.js',
+      'accessibility.js', 'controller.js', 'gamerecording.js', 'voice.js', 'remoteplay.js', 'broadcast.js',
+      'music.js', 'main.js',
     ]],
     ['desktop', 'client/settings/millennium/', [
       'millennium.css', 'millennium-window.css', 'millennium-redesign.css', 'millennium-editor.css',
@@ -471,8 +485,8 @@
       reveal();
     };
     /*
-     * After Reload UI during a voice call the first check's timer never fired and the window was
-     * never revealed, while later timers ran. A second way out, past the longest wait, that
+     * After Reload UI during a voice call the window can drop the first check's timer while later
+     * timers run, and so never be revealed. A second way out, past the longest wait, that
      * needs no timer: a frame loop watching the clock (a hidden window has no frames, but there
      * the first check ends the wait)
      */
@@ -497,8 +511,8 @@
     const check = () => {
       if (over) return;
       const now = performance.now();
-      // A check that threw would end this loop without a reveal (the loop stalled once after
-      // Reload UI during a voice call): an error counts as quiet, kept for the element picker's
+      // A check that threw would end this loop without a reveal (Steam's state can be half-made
+      // after Reload UI during a voice call): an error counts as quiet, kept for the element picker's
       // report, and each check stamps the step's time
       try {
         if (added > SETTLE_BURST || loadingScreen() || imagesLoading()) busyAt = now;
@@ -604,10 +618,11 @@
 
   /*
    * What a chip setting turns off (its `hide` selectors, client/shared/settings.js), each checked
-   * to be a plain attribute selector. !important beats the features' own display rules.
+   * to be a plain attribute selector or a single class (a Steam one). !important beats the
+   * features' own display rules and Steam's.
    */
   const hideCSS = (selectors) => {
-    const list = (Array.isArray(selectors) ? selectors : []).filter((s) => /^\[data-[a-z-]+="[a-z0-9-]+"\]$/.test(s));
+    const list = (Array.isArray(selectors) ? selectors : []).filter((s) => /^(?:\[data-[a-z-]+="[a-z0-9-]+"\]|\.-?[A-Za-z_][\w-]*)$/.test(s));
     return list.length ? `${list.join(',')}{display:none!important}` : '';
   };
 

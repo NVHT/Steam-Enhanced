@@ -128,21 +128,16 @@ html body.se-header-actions-ready .se-title-search:focus-within {
  * tile. In the title-bar search: the native view toggles (Recent, Ready to play, Linux, plugin
  * toggles) at its end, before Filters. They are native controls, only positioned (fixed), so
  * their menus and state are unchanged. client/navigation/title-bar.js measures the list column
- * (--se-list-left/right); title-bar-search.js the toggles (--se-title-views-w, placed at
+ * (--se-list-right); title-bar-search.js the toggles (--se-title-views-w, placed at
  * --se-title-views-x).
  */
+/* The Steam button's bar; its left and width follow the lockup (.se-list-brand, below) */
 html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo ._3s0lkohH8wU2do0K1il28Y:not(#se-none) {
   top: 4px;
-  left: 0;
-  width: var(--se-rail-width) !important;
   height: 40px !important;
 }
 
 html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-button[data-se-icon="steam"]:not(#se-none) {
-  width: 40px !important;
-  min-width: 40px !important;
-  max-width: 40px !important;
-  flex: 0 0 40px !important;
   height: 40px !important;
   min-height: 40px !important;
   max-height: 40px !important;
@@ -161,28 +156,8 @@ html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-but
   height: 20px !important;
   flex-basis: 20px;
   color: inherit;
-  /* Keeps its space (the menu still anchors to the button) but the theme's logo is drawn instead */
+  /* Keeps its space (the menu still anchors to the button); the lockup draws the mark instead */
   visibility: hidden;
-}
-
-/* The Steam menu button wears the theme's logo as a duotone icon in the rail's grey; white on hover. */
-html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-button[data-se-icon="steam"]:not(#se-none) {
-  position: relative;
-}
-
-html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-button[data-se-icon="steam"]:not(#se-none)::after {
-  content: "";
-  /* header-actions.css hides every .se-menu-icon::after with !important; the icon needs it back */
-  display: block !important;
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: 22px;
-  height: 22px;
-  background-color: currentColor;
-  -webkit-mask: var(--se-brand-icon) center / contain no-repeat;
-  mask: var(--se-brand-icon) center / contain no-repeat;
-  pointer-events: none;
 }
 
 /* The page icons start one rail gap under the hide-list toggle in the corner (--se-rail-top) */
@@ -261,7 +236,7 @@ html body.se-header-actions-ready[data-se-list] .se-sidebar-icons {
 
 /*
  * Game-type picker as an icon tile at the list header's right edge, one rail gap before
- * scroll-to-top: the classic toolbar's tile (its gamepad icon and "Games 4,382" tip,
+ * scroll-to-top: the classic toolbar's tile (its layers icon and "Games 4,382" tip,
  * sidebar-icons.*) at the rail's 40 px size and grey, so its native menu and state are
  * unchanged. Only while the list shows: it acts on the list.
  */
@@ -370,7 +345,7 @@ html body.se-header-actions-ready[data-se-list] .se-sidebar-icons ._1PgAonvorr0o
   --se-sidebar-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%221.75%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cg%20fill%3D%22%23000%22%20fill-opacity%3D%22.32%22%20stroke%3D%22none%22%3E%3Ccircle%20cx%3D%2212.2%22%20cy%3D%2212%22%20r%3D%227.6%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M4.2%2013a8%208%200%201%200%201.9-7.2%22%2F%3E%3Cpath%20d%3D%22M5%203.8v4.4h4.4%22%2F%3E%3Cpath%20d%3D%22M12%208v4.2l2.9%201.8%22%2F%3E%3C%2Fsvg%3E");
 }
 
-html body.se-header-actions-ready[data-se-list] .se-sidebar-icons ._1PgAonvorr0o_NMxNKiDFU > ._3mzKdQXht__YHo6PX1LmB6[data-se-view="linux"] {
+html body.se-header-actions-ready[data-se-list] .se-sidebar-icons ._1PgAonvorr0o_NMxNKiDFU > ._3mzKdQXht__YHo6PX1LmB6[data-se-os-view="linux"] {
   --se-sidebar-icon: var(--se-icon-tux);
 }
 
@@ -431,7 +406,7 @@ html body.se-header-actions-ready .se-list-top {
   background: transparent;
   color: var(--se-text-muted);
   cursor: pointer;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
   -webkit-app-region: no-drag;
 }
 
@@ -457,8 +432,8 @@ html body.se-header-actions-ready .se-list-top::before {
 }
 
 /*
- * Steam's 12 px strip that replaces the URL bar above local pages
- * (LocalContentContainer › URLBarReplacement) showed as a band under the title
+ * Steam's 12 px strip in place of the URL bar above local pages
+ * (LocalContentContainer › URLBarReplacement) would show as a band under the title
  * bar, most visibly with the game list hidden. The title bar already separates
  * the page, so the strip is collapsed.
  */
@@ -579,10 +554,10 @@ html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo .se-native-header-but
 }
 
 /*
- * Steam's other menu-bar buttons (View, Friends, Games, Help) share the Steam button's bar.
- * The bar was a 40 px corner tile, which hid them; stretched to the lockup's width, it showed
- * them over the wordmark. They stay mounted (the rail's Games menu reads Steam's Games items
- * off its button, nav-rail.js), only out of sight.
+ * Steam's other menu-bar buttons (View, Friends, Games, Help) share the Steam button's bar,
+ * which is stretched to the lockup's width: shown, they would sit over the wordmark. They stay
+ * mounted (the rail's Games menu reads Steam's Games items off its button, nav-rail.js), only
+ * out of sight.
  */
 html body.se-header-actions-ready ._3s0lkohH8wU2do0K1il28Y .se-menu-icon:is([data-se-icon="view"], [data-se-icon="friends"], [data-se-icon="games"], [data-se-icon="help"]) {
   display: none !important;

@@ -18,8 +18,6 @@
   const MENU_TOKENS = {
     state: ['#PersonaStateOnline', '#PersonaStateAway', '#PersonaStateInvisible', '#PersonaStateOffline',
       '#Menu_Online', '#Menu_Away', '#Menu_Invisible', '#Menu_Offline'],
-    unwanted: ['#Menu_ViewFriendsList', '#Menu_FriendsList', '#Menu_AddFriend', '#Menu_AddAFriend'],
-    editName: ['#Menu_ChangeProfileName', '#Menu_EditProfileName', '#Menu_ChangePersonaName'],
     profile: ['#Menu_ViewMyProfile', '#Menu_ViewProfile', '#AccountMenu_ViewProfile'],
     account: ['#Menu_ChangeAccount', '#AccountMenu_ChangeAccount'],
     details: ['#Menu_AccountDetails', '#AccountMenu_AccountDetails'],

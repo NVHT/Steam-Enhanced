@@ -52,6 +52,7 @@
    * through the storage event.
    */
   const SETTINGS_KEY = 'se-settings';
+  const VERSION_KEY = 'se-theme-version'; // the theme build last seen on this site
   const readSettings = () => {
     try {
       const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY));
@@ -65,7 +66,7 @@
     const OPTION_FILE = /^options\/[a-z-]+\/[a-z0-9-]+\.css$/;
     let version = null;
     try {
-      version = localStorage.getItem('se-theme-version');
+      version = localStorage.getItem(VERSION_KEY);
     } catch {}
     let current = null;
     const apply = (saved) => {
@@ -153,6 +154,23 @@
     (document.head ?? root).append(guard);
   }
   const reveal = () => root.setAttribute('data-se-styled', '');
+
+  // The client hears when the page has its look (SteamEnhanced.Styled): the main window's splash
+  // lets a page Steam starts on show only then (client/library/start-on-page.js)
+  const tellStyled = () => {
+    try {
+      window.SteamClient?.BrowserView?.PostMessageToParent?.('SteamEnhanced.Styled', location.href);
+    } catch {}
+  };
+  if (root.hasAttribute('data-se-styled')) tellStyled();
+  else {
+    const styled = new MutationObserver(() => {
+      if (!root.hasAttribute('data-se-styled')) return;
+      styled.disconnect();
+      tellStyled();
+    });
+    styled.observe(root, { attributes: true, attributeFilter: ['data-se-styled'] });
+  }
 
   const SITE_LOADER = '../web/shared/site-loader.js';
 
@@ -288,9 +306,8 @@
    * The build to load: the version last seen on this site, so the page doesn't wait on a
    * skin.json round trip. skin.json is still read on every load; if it names another version
    * (the theme was updated), that build swaps in once the first one has started, as live reload
-   * does. First visit: wait for skin.json, as before.
+   * does. On a first visit, with no version seen yet, the load waits for skin.json.
    */
-  const VERSION_KEY = 'se-theme-version';
   let seen = null;
   try {
     seen = localStorage.getItem(VERSION_KEY);

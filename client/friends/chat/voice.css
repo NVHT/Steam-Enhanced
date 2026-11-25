@@ -208,8 +208,8 @@ a.connectionStatus:not(.GamepadMode *) {
 }
 
 /*
- * Who is in a voice channel: full brightness (Steam dims everyone outside your own call to 70 %),
- * with the muted marks as small red glyphs at the row's end
+ * Who is in a voice channel: Steam's dimming filter off, 75 % outside your own call and full
+ * brightness in it, with the muted marks as small red glyphs at the row's end
  */
 .multiChatDialog[data-se-chat] .VoiceChannelParticipants .friend {
   filter: none !important;
@@ -348,11 +348,11 @@ a.connectionStatus:not(.GamepadMode *) {
 
 /*
  * One-to-one voice
- * The strip over the log: Steam sizes it at 100 % of the window and then the theme's side
- * margins pushed its end (and the hang-up button) off the right edge; now it fits. Your
- * avatar and your friend's are round with a green ring (an empty dashed ring while they
- * haven't joined); End / Stop Voice Chat is the theme's red button (Steam reuses its green
- * "join" class for it), Start Talking the green one, Decline a plain one.
+ * The strip over the log: Steam sizes it at 100 % of the window, past the theme's side margins;
+ * auto width keeps its end (and the hang-up button) inside. Your avatar and your friend's are
+ * round with a green ring (an empty dashed ring while they haven't joined); Start Talking is the
+ * green button, Decline a plain one. End / Stop Voice Chat (Steam's green "join" class again) is
+ * hidden on the bar: the hang-up does it (calls.css).
  */
 .multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls {
   box-sizing: border-box !important;
@@ -468,17 +468,6 @@ a.connectionStatus:not(.GamepadMode *) {
 
 .multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls.WaitingForYou .inviteButton.inviteButtonJoinVoice:hover {
   filter: brightness(1.1);
-}
-
-/* End / Stop Voice Chat (you are in it): red */
-.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls:not(.WaitingForYou) .inviteButton.inviteButtonJoinVoice {
-  background: color-mix(in srgb, var(--se-danger) 16%, transparent) !important;
-  color: var(--se-danger) !important;
-}
-
-.multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls:not(.WaitingForYou) .inviteButton.inviteButtonJoinVoice:hover {
-  background: color-mix(in srgb, var(--se-danger) 90%, transparent) !important;
-  color: var(--se-text-strong) !important;
 }
 
 .multiChatDialog[data-se-chat] .OneOnOneVoiceRoomControls .inviteButton.inviteButtonDeclineVoice {

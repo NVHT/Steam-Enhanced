@@ -8,6 +8,8 @@
  *   client   the option stylesheets (options/) those values switch on in client windows
  *   web      the same for Store, Community, Support and Checkout pages
  *   vars     the colour palette's base tokens ({ '--se-bg': '#…' }), when not the default
+ *   hide     selectors whose matches go in client windows: a multi setting's choices that are
+ *            off, through its `hide`
  * client/loader.js puts `client` and `vars` in each window's <style id="se-options"> before
  * its first paint (__seClient.applyOptions) and this file re-applies them on a change, in its own
  * window directly and in the others through the storage event. Web pages keep their own copy
@@ -35,21 +37,22 @@
   const off = (file) => opt('off', 'Off', file, 'no');
 
   // The colour palette and its presets (client/shared/settings-palette.js, listed just before)
-  const parts = window.__seSettingsParts || {};
+  const parts = window.__seSettingsPaletteParts || {};
   const { PALETTE_TOKENS, PRESETS, READ_ON, fillPalette, presetOf } = parts;
   if (!PRESETS) return;
 
   /*
-   * Each setting: key, tab, label, hint, and its choices (the first is the default; type 'multi':
- * any of them on, all by default).
- * section: the heading its tab groups it under; requires: [[key, value], ...] the settings it
- * applies with (the window dims it otherwise); visual: its choices drawn as pictures
- * (client/settings/theme/theme-settings.css); hide (multi): a selector, % standing for a choice,
- * whose matches go while that choice is off (client/loader.js applyOptions); type 'text' with hidden:
- * a kept string, no choices, not drawn. scope says
-   * where its stylesheets go: client windows (the default), web pages, or both. from: its name in
-   * Millennium's old Conditions. The palette's choices are the presets and Custom (its colours
-   * under the key 'palette-custom').
+   * Each setting: key, tab, label, hint, and its choices. def: its default, else the first
+   * choice (type 'multi': any of them on, all by default; type 'text': a string).
+   * section: the heading its tab groups it under; requires: [[key, value], ...] the settings it
+   * applies with (the window dims it otherwise; hideOff: hides it, and a section left empty);
+   * visual: its choices drawn as pictures
+   * (client/settings/theme/theme-settings.css); hide (multi): a selector, % standing for a
+   * choice (or { choice: selector }, a Steam class through SE.C), whose matches go while that choice is off (client/loader.js applyOptions); type
+   * 'text' with hidden: a kept string, no choices, not drawn. scope says where its stylesheets
+   * go: client windows (the default), web pages, or both. from: its name in Millennium's old
+   * Conditions. The palette's choices are the presets and Custom (its colours under the key
+   * 'palette-custom').
    */
   const SCHEMA = [
     {
@@ -171,8 +174,8 @@
       values: [opt('every', 'Every start'), opt('daily', 'Once a day'), opt('first', 'First start only')],
     },
     {
-      key: 'splash-art', section: 'Entrance', requires: [['entrance', 'splash']], tab: 'Startup', label: 'Splash art',
-      // 'last' is Home's first game (the last played with Home off): the value kept from before
+      key: 'splash-art', section: 'Entrance', requires: [['entrance', 'splash'], ['home', 'theme']], tab: 'Startup', label: 'Splash art',
+      // 'last': Home's first game. With Steam's Home there's no stage to land in: no art
       hint: "The game the splash shows. Home's game moves into the Home stage as it opens.",
       values: [opt('last', "Home's game"), opt('random', 'Random recent'), opt('none', 'None')],
     },
@@ -231,19 +234,27 @@
       values: [opt('theme', 'Stage'), opt('steam', "Steam's")],
     },
     {
-      key: 'stage-source', section: 'Featured games', requires: [['home', 'theme']], tab: 'Home', label: 'Games',
+      key: 'steam-home-parts', section: "Steam's Home", requires: [['home', 'steam']], hideOff: true, tab: 'Home',
+      label: 'Shown', type: 'multi', hint: "Parts of Steam's Home; the rest go.",
+      // Steam's own classes (no stable attribute on them): What's New (its Updates container), and the
+      // Add shelf row
+      hide: { whatsnew: `.${SE.C.UpdatesContainer}`, addshelf: `.${SE.C.AddShowcaseRow}` },
+      values: [opt('whatsnew', "What's New"), opt('addshelf', 'Add shelf')],
+    },
+    {
+      key: 'stage-source', section: 'Featured games', requires: [['home', 'theme']], hideOff: true, tab: 'Home', label: 'Games',
       hint: 'What the stage features. Pick a collection by right-clicking the Home button.',
       values: [opt('recent', 'Recent'), opt('favorites', 'Favorites'), opt('collection', 'Collection'), opt('added', 'Added')],
     },
     { key: 'stage-collection', tab: 'Home', type: 'text', hidden: true, label: 'Collection', values: [], def: '' },
     {
-      key: 'stage-count', section: 'Featured games', requires: [['home', 'theme']], tab: 'Home', label: 'How many',
+      key: 'stage-count', section: 'Featured games', requires: [['home', 'theme']], hideOff: true, tab: 'Home', label: 'How many',
       hint: 'Games the stage cycles through.',
       values: [opt('4', '4'), opt('6', '6'), opt('8', '8'), opt('10', '10')],
       def: '6',
     },
     {
-      key: 'stage-details', section: 'Featured games', requires: [['home', 'theme']], tab: 'Home', label: 'Details',
+      key: 'stage-details', section: 'Featured games', requires: [['home', 'theme']], hideOff: true, tab: 'Home', label: 'Details',
       type: 'multi', hint: 'What the stage shows about a game.',
       values: [
         opt('logo', 'Logo'), opt('by', 'Developer'), opt('reviews', 'Reviews'), opt('live', 'Playing now'),
@@ -251,18 +262,18 @@
       ],
     },
     {
-      key: 'stage-nav', section: 'Switching games', requires: [['home', 'theme']], tab: 'Home', label: 'Game picker',
+      key: 'stage-nav', section: 'Switching games', requires: [['home', 'theme']], hideOff: true, tab: 'Home', label: 'Game picker',
       hint: 'Under the stage: thumbnails, dots, or nothing.',
       values: [opt('thumbs', 'Thumbnails'), opt('dots', 'Dots'), opt('none', 'Hidden')],
     },
     {
-      key: 'stage-cycle', section: 'Switching games', requires: [['home', 'theme']], tab: 'Home', label: 'Auto-switch',
+      key: 'stage-cycle', section: 'Switching games', requires: [['home', 'theme']], hideOff: true, tab: 'Home', label: 'Auto-switch',
       hint: 'How long each game stays before the next.',
       values: [opt('off', 'Off'), opt('slow', '15 s'), opt('normal', '9 s'), opt('fast', '5 s')],
       def: 'normal',
     },
     {
-      key: 'stage-motion', section: 'Background art', visual: true, requires: [['home', 'theme']], tab: 'Home', label: 'Background',
+      key: 'stage-motion', section: 'Background art', visual: true, requires: [['home', 'theme']], hideOff: true, tab: 'Home', label: 'Background',
       hint: 'Behind the featured game. Still with reduced motion.',
       values: [opt('zoom', 'Zoom'), opt('parallax', 'Parallax'), opt('shots', 'Screenshots'), opt('trailer', 'Trailer'), opt('still', 'Still')],
     },
@@ -491,7 +502,10 @@
     for (const item of SCHEMA) {
       if (item.type !== 'multi' || !item.hide || !kept[item.key]) continue;
       for (const choice of item.values) {
-        if (!kept[item.key].includes(choice.v)) hide.push(item.hide.replace('%', choice.v));
+        if (kept[item.key].includes(choice.v)) continue;
+        // `hide`: a selector, % for the choice; or a selector per choice
+        const selector = typeof item.hide === 'string' ? item.hide.replace('%', choice.v) : item.hide[choice.v];
+        if (selector) hide.push(selector);
       }
     }
     return { values: kept, client, web, vars, hide };
@@ -591,7 +605,7 @@
 
   /* ---------- First run: Millennium's old Conditions (main window) ---------- */
 
-  const OLD_ENTRANCE_KEY = 'se-entrance'; // the loader's copy of the entrance, before this file
+  const OLD_ENTRANCE_KEY = 'se-entrance'; // a separate entrance choice in localStorage, also taken over
 
   // Millennium's config, wherever its answer keeps it: the theme's Conditions are the object
   // naming "Window entrance", its colours the one naming --se-color-accent
@@ -671,6 +685,10 @@
     // The browser view appears once Steam has built the main window: look again as it changes
     if (!asking.size) browserWatch = SE.watch(listen, { throttle: 1000 });
     migrate();
+    // The kept hide list follows the schema: a choice's selector changed, or a Steam class
+    // rehashed, is packed again at once instead of on the next change
+    const saved = read();
+    if (saved.values && JSON.stringify(saved.hide || []) !== JSON.stringify(pack(saved.values).hide)) write(saved.values);
   }
 
   SE.settings = {

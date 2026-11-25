@@ -146,6 +146,20 @@
       return null;
     });
 
+  /*
+   * When a post came out: its visibility start (when Steam showed it), else its post time. Never
+   * its start time: an event's is its date, months ahead for an announced one (Next Fest), which
+   * would date the post as new and sort it first. Never later than now.
+   */
+  const publishedAt = (ev) => {
+    const t =
+      Number(run(() => ev.GetVisibilityStartTimeAndDateUnixSeconds())) ||
+      Number(run(() => ev.GetPostTimeAndDateUnixSeconds())) ||
+      Number(run(() => ev.GetStartTimeAndDateUnixSeconds())) ||
+      0;
+    return Math.min(t, Date.now() / 1000);
+  };
+
   function eventItem(ev, lang) {
     const appid = Number(ev.appid) || 0;
     const source = steamSource(appid, clanOf(ev));
@@ -165,7 +179,7 @@
       kind: source ? 'steam' : eventKind(ev, title, game),
       excerpt: excerptOf(run(() => ev.GetSummaryWithFallback(lang, 320)), title, game),
       ev,
-      t: Number(run(() => ev.GetStartTimeAndDateUnixSeconds())) || 0,
+      t: publishedAt(ev),
     };
   }
 
@@ -239,7 +253,7 @@
       event.GetNameWithFallback(lang),
       event.GetSummaryWithFallback(lang, 320),
       `https://store.steampowered.com/news/${path}/view/${event.GID}`,
-      event.GetStartTimeAndDateUnixSeconds(),
+      publishedAt(event),
       event.GetImageURL('capsule', lang) || event.GetImageURL('header', lang),
       clanOf(event) || source.clan
     ));

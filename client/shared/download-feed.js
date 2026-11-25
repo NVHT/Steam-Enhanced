@@ -1,9 +1,9 @@
 /*
  * Steam's live download feeds (SteamClient.Downloads' RegisterForDownloadOverview and
  * RegisterForDownloadItems), one subscription for every part that reads them: the rail's
- * Downloads card (client/header/downloads-card.js) and the Downloads page
- * (client/downloads/page/). Steam's download store can sit stale while no one subscribes, so
- * these are the source of truth. Registered while anyone listens, dropped with the last.
+ * Downloads card (client/header/downloads-card.js), the Downloads page (client/downloads/page/)
+ * and Settings › Downloads (client/settings/dialog/downloads.js). Steam's download store can
+ * sit stale while no one subscribes, so these are the source of truth. Registered while anyone listens, dropped with the last.
  *   SE.downloadFeed  { overview, items, subscribe(fn) → unsubscribe }
  */
 ((SE) => {
@@ -56,6 +56,7 @@
     listeners.clear();
     unregister();
     if (SE.downloadFeed === feed) delete SE.downloadFeed;
+    if (window.__seDownloadFeed === state) delete window.__seDownloadFeed;
   };
 
   SE.downloadFeed = feed;

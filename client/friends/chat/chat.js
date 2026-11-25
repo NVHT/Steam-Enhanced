@@ -5,7 +5,9 @@
  * (data-se-streak: its time only, no face or name again), each line knows its place in its run
  * (data-se-pos: first, mid, last or only, so a run's bubbles join), the speaker line's time
  * shows the hour only (data-se-time: the day lines give the date), and a day line with nothing under it hides
- * (data-se-trailing). Styles: messages.css, bubbles.css.
+ * (data-se-trailing). Styles: messages.css, bubbles.css. A one-to-one call's bar gets stand-ins
+ * for the message box's mic and headphone buttons (se-call-tools, calls.css), and the Friends
+ * dock's chat flyout a rail of the open chats' faces (se-chat-rail, friends-dock-chat-rail.css).
  */
 ((SE) => {
   const previousDocuments = window.__seChat?.documents?.() || [];
@@ -332,7 +334,12 @@
   function onCallTool(event) {
     const win = SE.callTools.click(event, steamTool);
     // Steam redraws the original's state; the stand-in follows next frame
-    if (win) requestAnimationFrame(() => win.isConnected && syncCallTools(win));
+    if (!win) return;
+    cancelAnimationFrame(toolFrame);
+    toolFrame = requestAnimationFrame(() => {
+      toolFrame = 0;
+      if (win.isConnected) syncCallTools(win);
+    });
   }
 
   /*
@@ -425,6 +432,8 @@
 
   const attachedDocuments = new Map();
   let frame = 0;
+  // The call tools' resync after a click, cancelled on destroy
+  let toolFrame = 0;
 
   // Live collections: cheap enough to read on every mutation, before the frame paints.
   const markDialogs = (doc) => {
@@ -532,13 +541,20 @@
       watcher?.disconnect();
       timer?.disconnect();
       if (frame) cancelAnimationFrame(frame);
+      if (toolFrame) cancelAnimationFrame(toolFrame);
 
       for (const doc of docs) {
         for (const el of doc.querySelectorAll('.se-chat-head, .se-group-channel, .se-chat-rail, .se-call-tools')) el.remove();
         for (const el of doc.querySelectorAll('[data-se-rail]')) el.removeAttribute('data-se-rail');
         for (const el of doc.querySelectorAll('[data-se-stats]')) el.removeAttribute('data-se-stats');
-        for (const el of doc.querySelectorAll('[data-se-run], [data-se-streak], [data-se-time], [data-se-trailing], [data-se-pos], [data-se-faces], [data-se-bare]')) {
-          for (const name of ['data-se-run', 'data-se-streak', 'data-se-time', 'data-se-trailing', 'data-se-pos', 'data-se-faces', 'data-se-bare']) el.removeAttribute(name);
+        for (const el of doc.querySelectorAll('[data-se-run], [data-se-streak], [data-se-time], [data-se-trailing], [data-se-pos]')) {
+          for (const name of ['data-se-run', 'data-se-streak', 'data-se-time', 'data-se-trailing', 'data-se-pos']) el.removeAttribute(name);
+        }
+        // Only the group headers' pictures (markGroupPicture): the Friends list and mini-profiles
+        // mark their own with SE.markGroupFaces, and the game page uses data-se-bare too
+        for (const picture of doc.querySelectorAll('.multiChatDialog .chatWindow > .chatHeader .ChatRoomMultiFriendAvatar')) {
+          picture.removeAttribute('data-se-faces');
+          for (const face of picture.querySelectorAll('[data-se-bare]')) face.removeAttribute('data-se-bare');
         }
         for (const el of doc.querySelectorAll('[data-se-grouplayout], [data-se-friendchat]')) {
           el.removeAttribute('data-se-grouplayout');
@@ -554,6 +570,7 @@
           el.removeAttribute('placeholder');
           el.removeAttribute('data-se-placeholder');
         }
+        for (const el of doc.querySelectorAll('textarea[data-se-own-placeholder]')) el.removeAttribute('data-se-own-placeholder');
       }
       delete window.__seChat;
     },

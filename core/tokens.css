@@ -58,6 +58,8 @@
   --se-accent-strong: color-mix(in srgb, var(--se-accent) 55%, transparent);
   --se-danger: #ef8f95; /* 4.5:1 on --se-selected (AA text) */
   --se-warning: #f0c060;
+  /* A good state (an account protected): the in-game green */
+  --se-success: var(--se-running);
   /* A positive review score: the default accent, fixed (scores never follow a colour preset) */
   --se-review-positive: #7cc4ff;
   /* Status accents beyond the core set */
@@ -103,7 +105,9 @@
   --se-blur-scrim: blur(6px); /* the page dimmed behind a dialog (client and web) */
   --se-glass-bar: color-mix(in srgb, var(--se-bg) 72%, transparent); /* a bar floating over art (the game page's play bar) */
   --se-blur-bar: blur(18px) saturate(1.15);
+  --se-blur-glow: blur(28px) saturate(1.2); /* a small picture blown up into a soft glow (a game's capsule as its hero) */
   --se-blur-ambient: blur(48px); /* a picture blurred into its own backdrop (the Home stage's fill) */
+  --se-blur-private: blur(4.5px); /* a private value hidden until clicked (System Information); not glass, so Glass effects Off keeps it */
   /* Glass round buttons on art ("•••" options, share): the dots, light at rest, ink on accent */
   --se-icon-dots-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='6' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='18' cy='12' r='1.8'/%3E%3C/svg%3E");
   --se-icon-dots-ink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230f1115'%3E%3Ccircle cx='6' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='18' cy='12' r='1.8'/%3E%3C/svg%3E");
@@ -225,8 +229,8 @@
   --se-pop-room-side: var(--se-space-6);
   --se-pop-room-bottom: var(--se-space-7);
   --se-shadow-hero: 0 20px 50px -20px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .06);
-  /* Hovered cover/card: accent ring plus lift */
   --se-shadow-tooltip: 0 10px 24px -8px rgba(0, 0, 0, .8), inset 0 0 0 1px var(--se-hairline);
+  /* Hovered cover/card: accent ring plus lift */
   --se-shadow-ring: 0 0 0 2px var(--se-accent), 0 18px 30px -12px rgba(0, 0, 0, .85);
   --se-shadow-sm: 0 6px 16px -8px rgba(0, 0, 0, .9);
   --se-shadow-md: 0 18px 40px -16px rgba(0, 0, 0, .9);
@@ -279,6 +283,14 @@
   /* Page art: drawn illustration, not UI. The store front's event dots. */
   --se-event-pink: #ff5fa2;
   --se-event-teal: #3ddbd0;
+  /* Steam's in-game performance monitor's labels, as it draws them (Settings › In Game's preview) */
+  --se-perf-fps: #f06a6a;
+  --se-perf-cpu: #c2d25e;
+  --se-perf-gpu: #7fd35a;
+  --se-perf-ram: #b7a2f0;
+  /* A toast's stage (client/toasts/card.css): the warm corner light on its art, the deep red behind an error */
+  --se-art-warm-light: #ffc496;
+  --se-art-error-wash: #28080a;
 
   /* White overlays on dark surfaces, weakest to strongest (.06 is --se-hairline, .08 --se-divider);
      .3 and up is translucent text and marks over art. */
@@ -321,7 +333,7 @@
   --se-focus-outline: 2px solid var(--se-accent);
   --se-focus-offset: 2px;
 
-  /* Sizes read by single features (were fallbacks only, so defined here once) */
+  /* Sizes read by single features, each defined here once */
   --se-link: var(--se-accent);           /* links in theme text (overlay notes) */
   --se-fr-ring-style: solid;             /* friend avatar status ring line */
   --se-steam-home-inset: 6px;            /* title-bar Steam/Home button inset */
@@ -335,13 +347,20 @@
   --se-ease-spring: cubic-bezier(.34, 1.56, .64, 1); /* a small overshoot: a control popping into place */
   --se-ease-in: cubic-bezier(.5, 0, .75, 0); /* speeding up as it leaves (a toast closing) */
   --se-ease-inout: cubic-bezier(.65, 0, .35, 1); /* symmetric: a looping move that eases both ways */
+  --se-ease-standard: cubic-bezier(.4, 0, .2, 1); /* quick start, long settle: a whole view fading (the splash) */
   --se-dur-fast: .12s;
   --se-dur: .15s;
   --se-dur-mid: .2s;
   --se-dur-slow: .25s;
   --se-dur-relaxed: .3s; /* a row or card settling (lists, toasts) */
+  --se-dur-settle: .35s; /* a view fading in or folding away (the splash, a toast's stage closing) */
   --se-dur-long: .4s;
+  --se-dur-rise: .45s; /* lines rising into place (a toast's content) */
   --se-dur-slower: .5s;
+  --se-dur-enter: .55s; /* a panel rising onto the screen (a toast's tray) */
+  --se-dur-reveal: .6s; /* art unveiled (a toast's stage opening like a letterbox) */
+  --se-dur-shine: .7s; /* a light running once along a bar (the splash's Ready) */
+  --se-dur-crossfade: .8s; /* one picture fading into the next (a spotlight's art) */
   --se-press-scale: .97; /* a pressed control (:active), the same everywhere */
   --se-dur-ambient: 1.2s; /* slow art drift (the age check's backdrop settling in) */
   /* Loops, by what they do */
@@ -349,13 +368,18 @@
   --se-dur-shimmer: 1.4s; /* a skeleton shimmer or a waiting pulse */
   --se-dur-pulse: 1.6s;   /* a live dot or a twinkle */
   --se-dur-breathe: 2.4s; /* a slow breathe (running, snoozed, the startup mark) */
+  --se-dur-ripple: 2.6s;  /* a status ring swelling and easing back (a toast's wireframe) */
   --se-dur-reduced: 3s;   /* a spinner slowed for reduced motion */
   --se-dur-glow: 4s;      /* a soft glow rising and falling */
   --se-dur-sweep: 4.5s;   /* a light sweep or a fade cycle across art */
+  --se-dur-pass: 5s;      /* a light passing over a drawing (a toast's wireframe) */
+  --se-dur-cycle: 7s;     /* a drawing stepping through its states (a toast's wireframe selection) */
+  --se-dur-drift: 6s;     /* art zooming in slowly while it shows (the DLC spotlight) */
+  --se-dur-drift-long: 8s; /* the same over a larger picture (the front page hero) */
   /* Hover intent: how long the pointer rests before a card opens; tips wait as Steam's do */
   --se-hover-delay: .15s;
-  --se-rail-hover-delay: var(--se-hover-delay);
-  --se-friend-card-delay: var(--se-hover-delay); /* a friend's card ("Card delay", options/friends/) */ /* a rail menu's ("Hover delay", options/navigation/) */
+  --se-rail-hover-delay: var(--se-hover-delay); /* a rail menu's ("Hover delay", options/navigation/) */
+  --se-friend-card-delay: var(--se-hover-delay); /* a friend's card ("Card delay", options/friends/) */
   --se-tip-delay: .2s;
   /* Scroll to top: the game page's button and the web's, one design */
   --se-top-size: 48px;
@@ -369,6 +393,7 @@
   /* Stacking layers */
   --se-z-under: -1; /* behind its parent's content: washes and art layers */
   --se-z-under-2: -2; /* behind an --se-z-under layer (the dialogs' third capsule) */
+  --se-z-base: 0; /* its own stacking context, level with its siblings */
   --se-z-raised: 1;
   --se-z-raised-2: 2;
   --se-z-raised-3: 3;
@@ -490,6 +515,7 @@
   --se-menu-item-font: 500 var(--se-fs-base)/1.3 var(--se-font);
   /* Cards: the dark surface every grouped block sits on */
   --se-card-bg: var(--se-surface);
+  --se-card-glass: color-mix(in srgb, var(--se-bg) 84%, transparent); /* a card over a profile's art */
   --se-card-edge: var(--se-edge);
   --se-card-radius: var(--se-radius-card);
 

@@ -163,7 +163,7 @@
     live.menu = null;
   }
 
-  // At (x, y), kept a margin inside the main window as the menu always has been.
+  // At (x, y), kept a margin inside the main window.
   function showMenu(items, x, y, owner) {
     hideMenu();
     const margin = SE.px('--se-space-2');

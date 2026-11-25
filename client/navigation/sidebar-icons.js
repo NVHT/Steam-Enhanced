@@ -17,7 +17,7 @@
 
   const ROOT = document.documentElement;
   const VIEW_N = '--se-view-n';
-  const VIEW = 'data-se-view';
+  const VIEW = 'data-se-os-view'; // not data-se-view: collections.js marks its pages with that
   // Steam shows the OS toggle only on its own platform; it is drawn with the Linux icon only there.
   const OS_VIEW = /Linux/.test(navigator.userAgent) && !/Android/.test(navigator.userAgent) ? 'linux' : null;
 

@@ -184,10 +184,8 @@
     }
   }
 
-  // As many rows of capsules as the games need and the cell holds, the last one "+N" when
-  // there are more (Favorites; entry.moreNoun names them). Writes only.
   // Capsules across a panel: 3 for every 4 of the board's 12 columns it spans (its cell's span
-  // out of the board's columns now, board.js)
+  // out of the board's current columns, board.js)
   function tilesAcross(el) {
     const cell = el.closest('.se-hs-cell');
     const span = parseInt(cell?.style.gridColumn.replace('span', ''), 10);
@@ -196,6 +194,8 @@
     return Math.max(1, Math.round(((span / boardCols) * 12) / 4)) * 3;
   }
 
+  // As many rows of capsules as the games need and the cell holds, the last one "+N" when
+  // there are more (Favorites; entry.moreNoun names them). Writes only.
   function fitTiles(entry, { W, H }) {
     const grid = entry.el.querySelector('.se-hs-grid');
     const tiles = [...grid.querySelectorAll('.se-hs-tile')];

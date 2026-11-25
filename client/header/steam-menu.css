@@ -46,6 +46,15 @@ html.Steam_Root_Menu ._2EstNjFIIZm_WUSKm5Wt7n[data-se-closing]:not(#se-none) {
 }
 
 /*
+ * Steam's own rows: hidden, the theme's section left (client/header/menu/actions.js), rows Steam
+ * or a plugin adds later too. By CSS, so they never paint: hidden from script, the first open
+ * after a reload showed them a frame. !important: Steam's menu items set their display.
+ */
+html.Steam_Root_Menu :has(> [data-se-steam-menu]) > :not([data-se-steam-menu]):not(#se-none) {
+  display: none !important;
+}
+
+/*
  * !important and :root…:not(#se-none): Steam's menu item padding, and the theme's right-click
  * menu row (client/dialogs/dialogs.css, 8px 14px), which these rows must beat. Not scoped to
  * the menu's section: Legal's rows sit in the submenu's own window, outside it.

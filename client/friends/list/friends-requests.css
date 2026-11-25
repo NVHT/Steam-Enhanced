@@ -124,12 +124,12 @@
 }
 
 .friendlist:not(.GamepadMode) .friendInviteContainer .mutualFriendNumber {
-  margin-inline-end: .25em;
+  margin-inline-end: var(--se-space-1);
   font-weight: 700;
   color: var(--se-online) !important;
 }
 
-/* A request isn't a friend yet: its avatar shows in full, with a neutral ring */
+/* A request isn't a friend yet: its avatar shows in full, without Steam's dimming */
 .friendlist:not(.GamepadMode) .friendInviteContainer .friend .avatarHolder img.avatar {
   filter: none !important;
   opacity: 1 !important;
@@ -261,6 +261,13 @@
   color: var(--se-text-muted);
   cursor: pointer;
   z-index: calc(var(--se-z-raised) + 1);
+}
+
+/* The hit area grows to --se-hit around the 26px tile; the look stays */
+.friendlist:not(.GamepadMode) .confirmInviteRequestContainer .cancelAddFriends::after {
+  content: "";
+  position: absolute;
+  inset: calc((26px - var(--se-hit)) / 2);
 }
 
 .friendlist:not(.GamepadMode) .confirmInviteRequestContainer .cancelAddFriends:hover {

@@ -13,7 +13,7 @@
 ((SE) => {
   const ns = window.__seSteamMenuParts;
   if (!ns) return;
-  const { configurations, heading, movedGroups } = ns;
+  const { configurations, heading } = ns;
   const { live } = ns;
 
   const h = (...args) => live.api.React.createElement(...args);
@@ -137,23 +137,5 @@
     );
   }
 
-  /*
-   * Once the menu is drawn: every row of Steam's own is hidden, leaving the theme's section
-   * (rows Steam or a plugin adds later are hidden too). Remembered so restorePopups()
-   * (client/header/menu/popups.js) shows them again.
-   */
-  function placeGroup(doc) {
-    const section = doc.querySelector('[data-se-steam-menu]');
-    const parent = section?.parentElement;
-    if (!parent) return;
-    if (!movedGroups.has(parent)) movedGroups.set(parent, { hidden: [] });
-    const saved = movedGroups.get(parent);
-    for (const node of parent.children) {
-      if (node === section || node.style.display === 'none') continue;
-      saved.hidden.push([node, node.style.display]);
-      node.style.display = 'none';
-    }
-  }
-
-  Object.assign(ns, { SteamMenu, placeGroup });
+  Object.assign(ns, { SteamMenu });
 })(window.__se);

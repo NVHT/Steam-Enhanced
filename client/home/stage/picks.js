@@ -5,28 +5,21 @@
 ((SE) => {
   const ns = window.__seHomeStageParts;
   if (!ns) return;
-  const { appStore, collectionStore, hours, libraryArt, schedule, userCollections } = ns;
+  const { appStore, collectionStore, hours, schedule, userCollections } = ns;
 
   const { coverURLs, run } = SE;
   const { close: closePick, open: openPick, place: placePick, read: readPick, write: writePick } = SE.picker;
 
   /**
-   * A game's wide capsule: Steam's own list first, then the file Steam names for it (newer
-   * games keep theirs under a hashed path, so a bare header.jpg can miss), then its hero art.
+   * A game's wide capsule: its header copies (SE.headerURLs: Steam's own list first), then the
+   * file Steam names for it (newer games keep theirs under a hashed path, so a bare header.jpg
+   * can miss), then its hero art.
    */
   function wideURLs(app) {
     const s = appStore();
-    const list = [];
-    const add = (v) => {
-      if (Array.isArray(v)) list.push(...v.filter((u) => typeof u === 'string' && u));
-      else if (typeof v === 'string' && v) list.push(v);
-    };
-    add(run(() => libraryArt()?.GetHeaderImages(app)));
-    if (s && app.rt_custom_image_mtime) add(run(() => s.GetCustomLandcapeImageURLs(app)));
-    const file = app.header_filename || 'header.jpg';
-    list.push(`/assets/${app.appid}/${file}`, `${ns.CDN(app.appid)}/${file}`);
-    if (file !== 'header.jpg') list.push(`/assets/${app.appid}/header.jpg`, `${ns.CDN(app.appid)}/header.jpg`);
-    add(SE.heroURLs(app.appid, s));
+    const list = SE.headerURLs(app.appid, s);
+    if (app.header_filename) list.push(`/assets/${app.appid}/${app.header_filename}`, `${ns.CDN(app.appid)}/${app.header_filename}`);
+    list.push(...SE.heroURLs(app.appid, s));
     return [...new Set(list)];
   }
 
