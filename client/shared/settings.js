@@ -72,12 +72,31 @@
     {
       key: 'corners', tab: 'Appearance', label: 'Corners', from: 'Corners', scope: 'both',
       hint: 'How rounded corners are, everywhere.',
-      values: [opt('default', 'Default'), opt('sharp', 'Sharp', 'options/appearance/corners-sharp.css'), opt('round', 'Round', 'options/appearance/corners-round.css')],
+      values: [
+        opt('square', 'Square', 'options/appearance/corners-square.css'), opt('sharp', 'Sharp', 'options/appearance/corners-sharp.css'),
+        opt('default', 'Default'), opt('round', 'Round', 'options/appearance/corners-round.css'),
+      ],
+      def: 'default',
+    },
+    {
+      key: 'contrast', tab: 'Appearance', label: 'Contrast', scope: 'both',
+      hint: 'High: brighter secondary text and stronger lines.',
+      values: [opt('standard', 'Standard'), opt('high', 'High', 'options/appearance/contrast-high.css')],
+    },
+    {
+      key: 'motion', tab: 'Appearance', label: 'Animations', from: 'Animations', scope: 'both',
+      hint: 'Reduced: hovers and panels change at once; spinners still play.',
+      values: [opt('full', 'Full'), opt('reduced', 'Reduced', 'options/appearance/motion-reduced.css')],
     },
     {
       key: 'glass', tab: 'Appearance', label: 'Glass effects', from: 'Glass effects', scope: 'both',
       hint: 'The frosted blur behind panels and bars. Off is lighter on slower PCs.',
       values: [opt('on', 'On'), opt('off', 'Off', 'options/appearance/glass-off.css')],
+    },
+    {
+      key: 'game-art', tab: 'Appearance', label: 'Game art',
+      hint: "The game's art behind the top of a dialog and of Game Properties.",
+      values: [opt('on', 'On'), opt('off', 'Off', 'options/appearance/game-art-off.css')],
     },
     {
       // Linux (XWayland, or X11 without a compositor) draws a popup window's transparent parts
@@ -91,21 +110,6 @@
       key: 'menu-hints', tab: 'Appearance', label: 'Menu hints',
       hint: "The short line under each menu row's name.",
       values: [opt('on', 'On'), opt('off', 'Off', 'options/appearance/menu-hints-off.css')],
-    },
-    {
-      key: 'contrast', tab: 'Appearance', label: 'Contrast', scope: 'both',
-      hint: 'High: brighter secondary text and stronger lines.',
-      values: [opt('standard', 'Standard'), opt('high', 'High', 'options/appearance/contrast-high.css')],
-    },
-    {
-      key: 'game-art', tab: 'Appearance', label: 'Game art',
-      hint: "The game's art behind the top of a dialog and of Game Properties.",
-      values: [opt('on', 'On'), opt('off', 'Off', 'options/appearance/game-art-off.css')],
-    },
-    {
-      key: 'motion', tab: 'Appearance', label: 'Animations', from: 'Animations', scope: 'both',
-      hint: 'Reduced: hovers and panels change at once; spinners still play.',
-      values: [opt('full', 'Full'), opt('reduced', 'Reduced', 'options/appearance/motion-reduced.css')],
     },
     {
       key: 'click-opens', section: 'Clicks and menus', tab: 'Navigation', label: 'Click opens',
