@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.4.5**](#v1-4-5) | Nov 24, 2026 | The Friends window opens on the screen you left it |
 | [**1.4.4**](#v1-4-4) | Nov 24, 2026 | The Friends window reopens where you left it |
 | [**1.4.3**](#v1-4-3) | Nov 24, 2026 | Fixes: the overlay's Exit game?, review colours, centred labels |
 | [**1.4.2**](#v1-4-2) | Nov 24, 2026 | A Home tab and switch, Linux menu fix, splash and startup fixes |
@@ -24,14 +25,27 @@
 
 <br>
 
+<a name="v1-4-5"></a>
+
+## 1.4.5 · Nov 24, 2026
+
+> The Friends window opens where you left it every time, a second screen included.
+
+**Fixes**
+- **Friends window**: the theme keeps its place and screen and opens it there every time, from the dock's Open chat window too; if that screen is gone, it opens where Steam puts it (#4).
+
+<br>
+
 <a name="v1-4-4"></a>
 
-## 1.4.4 · Nov 24, 2026
-
-> A Friends window left open when Steam closes comes back at startup, where you left it.
+<details>
+<summary><b>1.4.4</b> · Nov 24, 2026 · A Friends window left open when Steam closes comes back at startup, where you left it.</summary>
+<br>
 
 **Fixes**
 - **Friends window**: left open when Steam closes, it reopens at startup in its last place, a second screen included, as in plain Steam (#4).
+
+</details>
 
 <br>
 
