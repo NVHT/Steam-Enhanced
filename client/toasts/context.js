@@ -28,11 +28,12 @@
  * above the window's text.
  *
  * Plain scripts, listed part by part in client/loader.js and run in this order, sharing
- * window.__seToastsParts (values parts reassign live on its `live`):
+ * window.__seToastsParts (values parts reassign live on its `live`), after card.js (SE.toastCard:
+ * the kinds, their glyphs and drawing a toast, shared with Settings › Notifications' sample):
  * - context.js    which window this is (this one: outside a toast window nothing goes on)
- * - config.js     attributes, sizes, toast kinds and their glyphs, the settings
+ * - config.js     attributes, sizes, the rules that tell a toast's kind, the settings
  * - steam.js      reading Steam's toasts: React props, text, buttons, achievements
- * - stage.js      the view: dock, tray, stage and strip, and drawing a toast on it
+ * - stage.js      the view: dock, tray, stage and strip, and playing toasts on it
  * - hub.js        the queue the toast windows share, and which window is the stage
  * - placement.js  where the toast window goes, wrapping Steam's moves and sizes
  * - scan.js       clicks and hovers on the dock, scanning for new toasts, the watchers

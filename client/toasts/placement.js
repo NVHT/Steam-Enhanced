@@ -31,7 +31,8 @@
   // (this window's opener) once measured; later toasts land in one move.
   const shared = () => run(() => window.opener) || window;
 
-  // v3: measured with the display's dpi and a strict x/y check (earlier values may be off).
+  // Measured with the display's dpi and a strict x/y check; the key's version keeps values
+  // measured any other way from being read.
   const MOVE_RATIO = `__seToastMoveRatio.v3:${SURFACE}`;
   const getRatio = () => run(() => shared()[MOVE_RATIO]) || null;
   const setRatio = (r) => run(() => { shared()[MOVE_RATIO] = r; });

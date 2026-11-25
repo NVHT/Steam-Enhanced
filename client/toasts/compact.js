@@ -6,14 +6,14 @@
 ((SE) => {
   const ns = window.__seToastsParts;
   if (!ns) return;
-  const { esc, run } = SE;
-  const { IN_GAME, describe, icon, keyOf, root, sane, shared, setting, stillAfter } = ns;
+  const { run } = SE;
+  const { IN_GAME, describe, keyOf, root, sane, shared, setting, stillAfter } = ns;
   const { live } = ns;
 
   /*
    * Compact style: Steam's toast stays Steam's (its spot, size, timer and clicks). Once
    * it can be read, <html> gets its kind's accent and the toast an eyebrow with the kind's glyph;
-   * toasts.css does the rest, with a countdown that runs on Steam's own --toast-duration.
+   * card.css does the rest, with a countdown that runs on Steam's own --toast-duration.
    * Unreadable toasts are left exactly as Steam drew them.
    */
   const COMPACT_ATTR = 'data-se-tst-compact';
@@ -29,10 +29,7 @@
       root.setAttribute(COMPACT_ATTR, info.accent);
       const content = el.querySelector('.Content');
       if (content && !content.querySelector(`:scope > .${EYEBROW}`)) {
-        content.insertAdjacentHTML(
-          'afterbegin',
-          `<div class="${EYEBROW}">${icon(info.glyph, 'se-tst-cmp-gl')}<span>${esc(info.label)}</span></div>`,
-        );
+        content.insertAdjacentHTML('afterbegin', SE.toastCard.compactEyebrow(info));
       }
       return; // one toast per window: the first hit is its root
     }
@@ -50,7 +47,7 @@
    * Steam's first move (where it asked for vs. where the window landed) and shared per surface,
    * so later toasts land centred at once. If MoveTo can't be wrapped, toasts stay in Steam's corner.
    */
-  // v2: scales stored by 1.100–1.101 could have been read mid-move; they're ignored.
+  // The key's version: a stored scale under another version is never read.
   const SCALE_KEY = `__seToastCentreScale.v2:${IN_GAME ? 'game' : 'desktop'}`;
   let centre = null; // { W, native, wrapped }
 
