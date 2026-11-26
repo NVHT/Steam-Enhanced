@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.5.7**](#v1-5-7) | Nov 26, 2026 | Cover chips, Home shelves and What's New redone, Brew Hub 1.2, a tidier Store game page |
 | [**1.5.6**](#v1-5-6) | Nov 26, 2026 | Offline friends in the dock, tip and header fixes |
 | [**1.5.5**](#v1-5-5) | Nov 26, 2026 | Fixes from your reports, logo and offline friends settings |
 | [**1.5.4**](#v1-5-4) | Nov 26, 2026 | Millennium's settings work with Millennium 3.7 |
@@ -32,17 +33,55 @@
 
 <br>
 
+<a name="v1-5-7"></a>
+
+## 1.5.7 · Nov 26, 2026
+
+> Library covers say at a glance what's ready to play, Home's shelves and What's New are easier to arrange and read, Brew Hub 1.2 looks native again, Millennium Settings can open as a window, an overlay or a page, and a Store game page keeps its long extras out of the way.
+
+**Library**
+- **Covers**: one chip in each cover's corner says ready, not installed or updating, with a progress ring; click it to play or install. Coming soon, pre-load and new to library get a chip of their own.
+- **Covers**: Library settings for the chips, friends playing, the Steam Deck badge (on hover or always) and dimming uninstalled games.
+- **Home shelves**: Arrange shelves from a button, each shelf drawn beside its card, ↑/↓ to move it. A shelf's name opens a searchable picker with Remove shelf, and expanding a shelf slides the ones below smoothly.
+- **Home shelves**: resting on a cover opens its card sideways, the covers beside it making room. Sort by is one button naming the order.
+- **What's New**: cards end level and fill the row, their summary rising over the art on hover, with settings for pictures, the summary and how many cards fit across. Its settings show a preview of what "Only show product updates" keeps.
+
+**Store**
+- **Game page**: Early Access, the developers' AI and mature content notes are chips in the hero, each opening its text in a dialog; the bug-report banner's discussions link moves into the Early Access one.
+- **Game page**: review quotes and developers' promo sections wait behind one Read more.
+- **Game page**: a game not out yet shows its release date as a row in Buy.
+
+**Millennium**
+- **Settings open in**: a new Millennium tab in the theme's settings. Window keeps Millennium Settings in a window of its own; Overlay opens it as a dialog over the client (Esc or a click outside closes it); Page shows it inside the main window, as Millennium does.
+
+**Plugins**
+- **Brew Hub 1.2**: its new Unofficial tab (plugins from GitHub) in the theme's look: the add field where search sits, cards with their versions and release state, GitHub and Link buttons, and Remove from list.
+- **Brew Hub**: Details leaves no gaps for a missing picture, description or latest change; README sections and tables, and the plugin's own settings page (its narrow layout, "copied" note and copy box), match the theme.
+
+**Fixes**
+- **Brew Hub 1.2**: no longer makes the client redraw every couple of seconds, and Millennium Settings keeps its pages with it installed.
+- **Settings**: the current page's accent bar shows again in Steam Settings, Game Properties and Millennium Settings; the theme's settings window marks its current tab the same way.
+- **Store hero**: a sale's slide no longer repeats its art in a small card over the art's own title or offers a wishlist heart; its bar names the sale over its tagline, beside View in store.
+- **Store game page**: the summary strip ends level with the trailers instead of stretching far below them.
+- **Friends dock**: over a Store or Community page, its menus open whole and no longer close at once under a friend's card.
+- **Game page**: opens and scrolls more smoothly, with no long pause while the logo is measured.
+- **Theme settings**: settings that don't apply are hidden until they do; opening Theme settings again brings its window to the front.
+
+<br>
+
 <a name="v1-5-6"></a>
 
-## 1.5.6 · Nov 26, 2026
-
-> Offline friends now really shows them in the dock, open or folded.
+<details>
+<summary><b>1.5.6</b> · Nov 26, 2026 · Offline friends now really shows them in the dock, open or folded.</summary>
+<br>
 
 **Fixes**
 - **Offline friends**: Shown lists offline friends in the dock (Steam's Offline section and your categories) and in the folded dock, behind a "+N"; Hidden keeps the dock as before. The Friends window lists everyone.
 - **Friends list**: a folded Offline header no longer shows a "Sorting alphabetically" tip for a hidden button, and fills its row.
 - **Rail**: a menu opened on hover no longer shows its button's tip over it.
 - **Theme settings**: Logo place and the offline settings have their own icons.
+
+</details>
 
 <br>
 
