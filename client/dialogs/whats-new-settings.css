@@ -1,0 +1,405 @@
+/*
+ * What's New settings (the gear on What's New; client/dialogs/whats-new-settings.js), filling the
+ * window Steam opens it in (842 × 720): the title with an ⓘ holding Steam's explanation; a card
+ * showing what the settings do (What's New's row as a wireframe, the news that isn't a product
+ * update fading while the switch is on); the switch; the hidden-games count as a quiet line; and
+ * the two priority lists side by side to the window's foot, game rows with an undo button, or a
+ * dashed box while empty.
+ * WhatsNewSettingsContainer holds Steam's generic dialog parts (DialogHeader, DialogLabel,
+ * _DialogInputContainer, DialogToggle), so they are styled only in here.
+ * !important: Steam's modal and dialog rules (steamui library.css, sp.css: the container, the
+ * explainers' 20 px margin, the priority lists' box and scroll).
+ */
+
+/*
+ * WhatsNewSettingsContainer is Steam's ModalPosition, the whole window (842 × 720): clear. The
+ * sheet is its ModalPosition_Content (corners and edge: the modal frame in dialogs.css), filling
+ * the window; the form scrolls when it holds more.
+ */
+._2JKpGzeAiwmBdY73bfRXz- {
+  background: none !important;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- > .ModalPosition_Content {
+  display: flex;
+  flex-direction: column;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  background: var(--se-surface) !important;
+}
+
+._1I-uT20jYsj5wUT4VIGjW8 {
+  /* WhatsNewSettingsContent: the window's height, the form scrolling inside it */
+  flex: 1;
+  min-height: 0;
+  padding: var(--se-space-5) !important;
+}
+
+/*
+ * WhatsNewSettings, the form: a grid, everything across it but the two priority lists, which
+ * share the last row and stretch it to the window's foot (its rows: the switch, the hidden-games
+ * count, the Priority label, the lists; the explainers and the Visibility label are hidden)
+ */
+._1n-sV5GdQis4Wh9XN3GJ7L {
+  display: grid !important;
+  flex: 1 1 auto !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: auto auto auto minmax(120px, 1fr);
+  column-gap: var(--se-space-3);
+  min-height: 0;
+  overflow-y: auto !important;
+}
+
+._1n-sV5GdQis4Wh9XN3GJ7L > * {
+  grid-column: 1 / -1;
+}
+
+._1n-sV5GdQis4Wh9XN3GJ7L > ._25JfLo9lwRM2V_2fUDsAaA {
+  grid-column: auto;
+}
+
+/* The title, its ⓘ beside it */
+._2JKpGzeAiwmBdY73bfRXz- .DialogHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  margin-bottom: 0 !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.01em !important;
+  text-transform: none !important;
+  color: var(--se-text) !important;
+}
+
+.se-wns-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: none;
+  color: var(--se-text-muted);
+  cursor: help;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+.se-wns-info::after {
+  content: "";
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-info) center / contain no-repeat;
+  mask: var(--se-icon-info) center / contain no-repeat;
+}
+
+.se-wns-info:hover {
+  background: var(--se-hover);
+  color: var(--se-text);
+}
+
+/*
+ * The ⓘ's tip, inside the button: the theme's tip look (.se-tip, dialogs.css), under the ⓘ, shown
+ * after the pointer rests on it (--se-hover-delay) or at once on keyboard focus, Steam's
+ * paragraphs kept apart
+ */
+.se-wns-info {
+  position: relative;
+  /* the ⓘ sits under Steam's title bar (TitleBar: 64 px, clear, z 2, the window's drag strip),
+     which takes the pointer: above it, out of the drag */
+  z-index: var(--se-z-over-steam);
+  -webkit-app-region: no-drag;
+}
+
+.se-wns-tip {
+  position: absolute;
+  top: calc(100% + var(--se-space-2));
+  inset-inline-start: 0;
+  z-index: var(--se-z-popover);
+  width: max-content;
+  max-width: 360px;
+  white-space: pre-line;
+  text-align: start;
+  cursor: default;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--se-dur) ease-out, visibility 0s linear var(--se-dur);
+}
+
+.se-wns-info:hover .se-wns-tip {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--se-dur) ease-out var(--se-hover-delay), visibility 0s linear var(--se-hover-delay);
+}
+
+.se-wns-info:focus-visible .se-wns-tip {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--se-dur) ease-out;
+}
+
+.se-wns-info:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* The card: What's New's row as a wireframe, five news cards in the theme's wireframe lines */
+.se-wns-preview {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--se-space-3);
+  margin: var(--se-space-3) 0 var(--se-space-4);
+  padding: var(--se-space-4);
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-edge);
+}
+
+.se-wns-news {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  min-width: 0;
+  transition: opacity var(--se-dur) ease-out;
+}
+
+.se-wns-art {
+  position: relative;
+  margin-bottom: var(--se-space-1);
+  aspect-ratio: 16 / 9;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-white-03);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+}
+
+.se-wns-art > span {
+  /* the kind of news, as the row's badge draws it */
+  position: absolute;
+  top: var(--se-space-2);
+  inset-inline-start: var(--se-space-2);
+  max-width: calc(100% - 16px);
+  padding: 1px var(--se-space-1);
+  overflow: hidden;
+  border-radius: var(--se-radius-xs);
+  box-shadow: inset 0 0 0 1px var(--se-accent-line);
+  font: 700 var(--se-fs-2xs)/1.4 var(--se-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--se-eyebrow-color);
+}
+
+.se-wns-line {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--se-accent-line);
+}
+
+.se-wns-title + .se-wns-title {
+  width: 60%;
+}
+
+.se-wns-game {
+  width: 45%;
+  margin-top: var(--se-space-1);
+  background: var(--se-white-12);
+}
+
+/* Only product updates (Steam's switch on, its knob marked on): the other news fades, outlined dashed */
+._2JKpGzeAiwmBdY73bfRXz-:has(.DialogToggleField ._3IWp5BnnsY_aMKCxhCjShP._317lekDG36odwSaDLtFQgd) .se-wns-news[data-other] {
+  opacity: .3;
+}
+
+._2JKpGzeAiwmBdY73bfRXz-:has(.DialogToggleField ._3IWp5BnnsY_aMKCxhCjShP._317lekDG36odwSaDLtFQgd) .se-wns-news[data-other] .se-wns-art {
+  outline: 1px dashed var(--se-accent-line);
+  outline-offset: -1px;
+  box-shadow: none;
+}
+
+/* Section labels: "Priority settings"; "Visibility settings" goes, the card above saying it */
+._2JKpGzeAiwmBdY73bfRXz- .DialogLabel {
+  margin: var(--se-space-4) 0 var(--se-space-2) !important;
+  text-transform: uppercase !important;
+  font: var(--se-label-font) !important;
+  letter-spacing: var(--se-label-spacing) !important;
+  color: var(--se-label-color) !important;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- .DialogLabel:has(+ .DialogToggleField) {
+  display: none !important;
+}
+
+/* The explainers (WhatsNewHeaderText): both in the ⓘ */
+._2JKpGzeAiwmBdY73bfRXz- .fyxt0H7Cwfirf9908slPp {
+  display: none !important;
+}
+
+/* A setting row: the switch */
+._2JKpGzeAiwmBdY73bfRXz- ._DialogInputContainer {
+  margin: 0 0 var(--se-space-2) !important;
+  padding: var(--se-space-3) var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-edge) !important;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- .DialogToggle_Label {
+  font-size: var(--se-fs-md) !important;
+  font-weight: 500 !important;
+  color: var(--se-text) !important;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- .DialogToggle_Description {
+  margin-top: var(--se-space-half) !important;
+  font-size: var(--se-fs-sm) !important;
+  color: var(--se-text-muted) !important;
+}
+
+/* The hidden-games count (the row that isn't the switch or a list): a quiet line with an eye-off */
+._2JKpGzeAiwmBdY73bfRXz- ._DialogInputContainer:not(._25JfLo9lwRM2V_2fUDsAaA, .DialogToggleField):has(> .displayColumn > .DialogToggle_Label) {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  padding: var(--se-space-1) var(--se-space-half) !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- ._DialogInputContainer:not(._25JfLo9lwRM2V_2fUDsAaA, .DialogToggleField):has(> .displayColumn > .DialogToggle_Label)::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-icon-eye-off) center / contain no-repeat;
+  mask: var(--se-icon-eye-off) center / contain no-repeat;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- ._DialogInputContainer:not(._25JfLo9lwRM2V_2fUDsAaA, .DialogToggleField):has(> .displayColumn > .DialogToggle_Label) .DialogToggle_Label {
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 400 !important;
+  color: var(--se-text-muted) !important;
+}
+
+/*
+ * WhatsNewPriorityContainer: a list of games filling its half, or a dashed box while it has none,
+ * its message in the middle
+ */
+._2JKpGzeAiwmBdY73bfRXz- ._DialogInputContainer._25JfLo9lwRM2V_2fUDsAaA {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-3) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- ._25JfLo9lwRM2V_2fUDsAaA > .displayColumn {
+  /* Steam's alignSelfCenter, kept for the empty message only */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  align-self: stretch;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- ._DialogInputContainer._25JfLo9lwRM2V_2fUDsAaA:not(:has(._2C3-Rj_GA3KP7GklMymoPM)) {
+  justify-content: center;
+  padding: var(--se-space-4) !important;
+  border: 1px dashed var(--se-white-12) !important;
+  background: none !important;
+  box-shadow: none !important;
+  text-align: center;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- ._25JfLo9lwRM2V_2fUDsAaA:not(:has(._2C3-Rj_GA3KP7GklMymoPM)) > .displayColumn {
+  flex: 0 0 auto;
+  justify-content: center;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- ._25JfLo9lwRM2V_2fUDsAaA ._3Hf53stS1-9flruoPqwO0O {
+  /* DialogLabelSoft: the list's heading, or the empty message */
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+  color: var(--se-text-muted) !important;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- .VwcCoDMU0ROCpRAJ_cXTx {
+  /* WhatsNewGameListSection: its half's height, then it scrolls */
+  flex: 1;
+  min-height: 0;
+  max-height: none !important;
+  margin-top: var(--se-space-1) !important;
+  padding: 0 !important;
+  overflow-y: auto !important;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- .VwcCoDMU0ROCpRAJ_cXTx ._2C3-Rj_GA3KP7GklMymoPM {
+  /* WhatsNewGameListRow */
+  align-items: center;
+  gap: var(--se-space-2);
+  min-height: 36px;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- .VwcCoDMU0ROCpRAJ_cXTx .DialogToggle_Description {
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  font-size: var(--se-fs-md) !important;
+  color: var(--se-text) !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/*
+ * WhatsNewSettingsUndoButton: takes the game off the list (Steam draws an ✕), the theme's close
+ * glyph at the row's end, red on the danger fill on hover (as the theme's other removes); its other class (UpdateLoweredPriorityUndo,
+ * shared with What's New's Undo note) brings Steam's grey fill, cleared here
+ */
+._2JKpGzeAiwmBdY73bfRXz- .VwcCoDMU0ROCpRAJ_cXTx ._3XBggeqHxK4fIrbu_ULi1y {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 32px !important;
+  height: 32px !important;
+  margin: 0 0 0 auto !important;
+  padding: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background: none !important;
+  color: var(--se-text-muted);
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- .VwcCoDMU0ROCpRAJ_cXTx ._3XBggeqHxK4fIrbu_ULi1y:hover {
+  background: var(--se-danger-surface) !important;
+  color: var(--se-danger);
+}
+
+._2JKpGzeAiwmBdY73bfRXz- .VwcCoDMU0ROCpRAJ_cXTx ._3XBggeqHxK4fIrbu_ULi1y svg {
+  display: none;
+}
+
+._2JKpGzeAiwmBdY73bfRXz- .VwcCoDMU0ROCpRAJ_cXTx ._3XBggeqHxK4fIrbu_ULi1y::after {
+  content: "";
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-close-sm) center / contain no-repeat;
+  mask: var(--se-icon-close-sm) center / contain no-repeat;
+}
