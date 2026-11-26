@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.5.3**](#v1-5-3) | Nov 26, 2026 | The store's hero: no blank tiles, cleaner promotions |
 | [**1.5.2**](#v1-5-2) | Nov 26, 2026 | Toasts in game show every time, fullscreen too |
 | [**1.5.1**](#v1-5-1) | Nov 25, 2026 | Linux menus without black edges, Square corners |
 | [**1.5.0**](#v1-5-0) | Nov 25, 2026 | Every Steam Settings page redesigned, a start on any page, a cleaner theme |
@@ -28,15 +29,32 @@
 
 <br>
 
+<a name="v1-5-3"></a>
+
+## 1.5.3 · Nov 26, 2026
+
+> The store's front page hero shows only art Steam provides, so no more blank tiles, and a promotion like the Steam Awards shows as its own art with one button.
+
+**Fixes**
+- **Store hero**: a promotion (the Steam Awards) no longer shows an empty white box where the logo goes (#11); art comes only from what Steam lists for each game, never guessed file names.
+- **Store hero**: the large title shows at its full size when a game has no logo.
+
+**Store**
+- **Store hero**: a promotion shows its art and "View in store" alone, the button in the same place as on every other slide; tab names and the slide count read on pale art.
+
+<br>
+
 <a name="v1-5-2"></a>
 
-## 1.5.2 · Nov 26, 2026
-
-> Toasts in a game show on the stage every time, in fullscreen too, instead of only sometimes.
+<details>
+<summary><b>1.5.2</b> · Nov 26, 2026 · Toasts in a game show on the stage every time, in fullscreen too, instead of only sometimes.</summary>
+<br>
 
 **Fixes**
 - **Toasts in game**: the stage now lands in its place in a game's overlay every time; before, the overlay could keep the window in Steam's corner, and the toast never showed.
 - **Toasts in game**: a toast that still can't take the stage shows as a compact card for Steam's full time, instead of closing unseen.
+
+</details>
 
 <br>
 
