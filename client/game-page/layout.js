@@ -24,6 +24,9 @@
   const RIGHT_CONTROLS = `.${C.RightControls}`;
   const APP_BUTTONS = `.${C.AppButtonsContainer}`;
   const ASSOCIATION = `.${C.ConciseContainer_Container} .${C.Association}`;
+  // The info card's own box: InnerContainer (the cover, Description, Stats, Features) and, beside
+  // it, Steam's notes about how the game runs (a shortcut's explanation, Steam Play's tool)
+  const INFO = `:scope > .${C.AppGameInfoContainer} > .${C.ConciseContainer_Container}`;
   const NAME = `.${C.ConciseContainer_Name}`;
 
   const NAMES = new Set([
@@ -45,6 +48,9 @@
     fromProps(el, 6, (p) => (typeof p.name === 'string' && NAMES.has(p.name) ? p.name : null));
 
   function tagSections(c) {
+    for (const el of c.querySelector(INFO)?.children || []) {
+      if (!el.classList.contains(C.InnerContainer)) mark(el, 'data-se-sec', 'notice');
+    }
     const cols = c.querySelector(COLUMNS);
     if (!cols) return;
     for (const [col, side] of [
@@ -77,10 +83,10 @@
 
   function pieces(c) {
     const out = [];
-    const info = c.querySelector(
-      `:scope > .${C.AppGameInfoContainer} > .${C.ConciseContainer_Container} > .${C.InnerContainer}`
-    );
-    if (info) out.push(...info.children);
+    for (const el of c.querySelector(INFO)?.children || []) {
+      if (el.classList.contains(C.InnerContainer)) out.push(...el.children);
+      else out.push(el);
+    }
     const cols = c.querySelector(COLUMNS);
     if (cols) {
       for (const el of cols.children) {
