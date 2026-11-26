@@ -113,6 +113,9 @@
 
   const steamURL = (url) => run(() => window.SteamClient.URL.ExecuteSteamURL(url));
 
+  // An individual account's SteamID64 is this plus its 32-bit account id
+  const STEAMID64_BASE = 76561197960265728n;
+
   function applyMode(m) {
     state.mode = m;
     hideFly(true);
@@ -220,12 +223,11 @@
         label: COPY.profile,
         icon: '--se-icon-user',
         hint: COPY.profileHint,
+        // The SteamID64 from the account id, opened as Steam's own menus open a page
+        // (SE.openPage: also after a game has run)
         run: () => {
-          const u =
-            run(() => f.persona.GetCommunityProfileURL?.()) ||
-            run(() => f.GetCommunityProfileURL?.()) ||
-            `https://steamcommunity.com/profiles/${run(() => f.persona.GetSteamIDAsString())}/`;
-          steamURL(`steam://openurl/${u}`);
+          const account = run(() => f.accountid) ?? run(() => f.persona.GetAccountID());
+          if (account) SE.openPage(`https://steamcommunity.com/profiles/${STEAMID64_BASE + BigInt(account)}/`);
         },
       },
     ];
