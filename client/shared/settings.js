@@ -459,6 +459,11 @@
         opt('wide', 'Edge to edge', 'options/web/width-wide.css'),
       ],
     },
+    {
+      key: 'millennium-open', tab: 'Millennium', label: 'Settings open in',
+      hint: 'Window: a window of its own. Overlay: a dialog over the client. Page: inside the main window, as Millennium does.',
+      values: [opt('window', 'Window'), opt('overlay', 'Overlay'), opt('page', 'Page')],
+    },
   ];
   // A 'multi' setting is a set of the choices turned on (all by default), kept in list order
   for (const item of SCHEMA) item.def ??= item.type === 'multi' ? item.values.map((c) => c.v) : item.values[0].v;

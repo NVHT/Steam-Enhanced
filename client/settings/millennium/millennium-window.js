@@ -1,9 +1,14 @@
 /*
- * Standalone Millennium Settings popup host.
- *
- * Mounts Millennium's registered settings route inside a detached Steam legacy
- * popup modal instead of navigating the main Library viewport, and exposes an
- * FFI / Library Manager bridge (`__seMillBridge`) to the popup window.
+ * Where Millennium Settings opens, as Theme settings › Millennium › Settings open in says
+ * (`millennium-open`):
+ * - window (the default): Millennium's registered settings route mounted in a detached Steam
+ *   legacy popup modal, never the main Library viewport;
+ * - overlay: the same route in a Steam dialog over the client (Steam's ModalPosition frame
+ *   through its showModal, never popped out), in a box of the theme's with a close button;
+ * - page: Millennium's own way, the route in the main window.
+ * The route guard (PopupOnlySettings) stays in every mode and lets the route through on Page,
+ * so switching never has to unwrap what plugins wrapped around it. Also exposes an FFI /
+ * Library Manager bridge (`__seMillBridge`) to the popup window.
  */
 ((SE) => {
   const { C } = SE;
@@ -13,6 +18,12 @@
   window.__seMillenniumWindow?.destroy();
 
   let popup;
+  // How the open one was opened: 'window' or 'overlay'
+  let popupMode = null;
+  const mode = () => {
+    const how = SE.settings?.get?.('millennium-open');
+    return how === 'overlay' || how === 'page' ? how : 'window';
+  };
   let failure = '';
   let errorNotice = null;
 
@@ -20,7 +31,12 @@
   const managerEmbeds = new Map();
   const dialogHosts = new Map();
   let popupModalManagers = null;
+  // Route entry -> Millennium's own settings component, kept while the guard stands in for it
   const guardedRoutes = new Map();
+  // The last one guarded: a guard still inside a plugin's wrapper after destroy() renders it
+  let lastReal = null;
+  // The prop the popup hands the guard Millennium's component through (see PopupOnlySettings)
+  const REAL = '__seRealSettings';
   const guardedNavigation = new Map();
   let redirectPending = false;
   let leaveRoute = false;
@@ -235,14 +251,22 @@
   // The popup is a modal owned by the main window, so it always sits above it: the Library
   // Manager (in the main window) can only be seen once the popup is closed.
   function yieldToManager() {
+    if (!closePopup()) return false;
+    raiseMain();
+    return true;
+  }
+
+  // Closes the window or overlay that's open; false when none was
+  function closePopup() {
     if (!popup) return false;
     const open = popup;
     popup = null;
+    popupMode = null;
     stopPopupTracking();
+    stopOverlay();
     try {
       open.Close();
     } catch {}
-    raiseMain();
     return true;
   }
 
@@ -445,14 +469,16 @@
     return state?._routes?.has?.(SETTINGS_ROUTE) ? state._routes : state?.publicState?.().routes;
   }
 
-  function settingsComponent() {
+  const isComponent = (value) => typeof value === 'function' || Boolean(value?.$$typeof);
+
+  // What the popup renders: the route's component as it stands (the guard, or a plugin's wrapper
+  // around it) and Millennium's own under the guard
+  function settingsRoute() {
     for (const owner of SE.owners()) {
       try {
         const entry = settingsRoutes(owner)?.get(SETTINGS_ROUTE);
-        const component = entry?.component === PopupOnlySettings
-          ? guardedRoutes.get(entry)
-          : entry?.component;
-        if (typeof component === 'function' || component?.$$typeof) return component;
+        if (!isComponent(entry?.component)) continue;
+        return { component: entry.component, real: guardedRoutes.get(entry) || null };
       } catch {}
     }
     return null;
@@ -477,8 +503,23 @@
     if (node) redirectToPopup(true);
   }
 
-  function PopupOnlySettings() {
+  /*
+   * The settings route's component while the guard stands: in the main window a hidden span that
+   * sends the route to the popup. A plugin may wrap it (Brew Hub calls it as a function and adds
+   * its page to the tree it returns), so in the popup it renders Millennium's own component the
+   * same way, handed down through the REAL prop: the wrapper then sees Millennium's pages.
+   */
+  function PopupOnlySettings(props) {
     const React = findRuntime(false)?.React;
+    // Page: Millennium's own, in the main window. Switching to it or away while the route is
+    // up would change this render's hooks, so a change of mode leaves the route first (onMode)
+    const real = props?.[REAL] || (destroyed || mode() === 'page' ? lastReal : null);
+    if (real && React) {
+      const rest = { ...props };
+      delete rest[REAL];
+      const plain = typeof real === 'function' && !real.prototype?.isReactComponent;
+      return plain ? real(rest) : React.createElement(real, rest);
+    }
     return React?.createElement('span', { hidden: true, ref: redirectMountedRoute }) ?? null;
   }
 
@@ -487,7 +528,7 @@
     if (typeof original !== 'function' || guardedNavigation.get(store)?.wrapped === original) return;
     const descriptor = Object.getOwnPropertyDescriptor(store, 'Navigate');
     function wrapped(route, ...args) {
-      if (isSettingsRoute(route)) {
+      if (isSettingsRoute(route) && mode() !== 'page') {
         redirectToPopup();
         return;
       }
@@ -497,14 +538,30 @@
     if (store.Navigate === wrapped) guardedNavigation.set(store, { wrapped, descriptor });
   }
 
+  /*
+   * An entry needs the guard when it's new (Millennium registering its route again makes a new
+   * entry) or when Millennium's own component is back on it (a plugin's teardown). A guarded
+   * entry whose component changed to anything else is a plugin wrapping the guard (Brew Hub 1.2
+   * re-checks every 1.5 s and force-renders the main window each time it wraps): left as it is,
+   * or the two would replace each other forever.
+   */
+  function needsGuard(entry) {
+    const component = entry.component;
+    if (component === PopupOnlySettings || !isComponent(component)) return false;
+    return !guardedRoutes.has(entry) || component === guardedRoutes.get(entry);
+  }
+
   function installRouteGuards() {
     for (const owner of SE.owners()) {
       try {
         const entry = settingsRoutes(owner)?.get(SETTINGS_ROUTE);
-        const component = entry?.component;
-        if (component !== PopupOnlySettings && (typeof component === 'function' || component?.$$typeof)) {
+        if (entry && needsGuard(entry)) {
+          const component = entry.component;
           entry.component = PopupOnlySettings;
-          if (entry.component === PopupOnlySettings) guardedRoutes.set(entry, component);
+          if (entry.component === PopupOnlySettings) {
+            guardedRoutes.set(entry, component);
+            lastReal = component;
+          }
         }
       } catch {}
       for (const getStore of [
@@ -613,12 +670,160 @@
     };
   }
 
+  /*
+   * Overlay: the main window's own document holds the dialog, so the parts the popup windows
+   * get (scanPopupDocuments) are set up here: the Library Manager's sidebar label, page clicks
+   * kept from moving the main window, and Millennium's start-page flags taken back.
+   */
+  let overlayView = null;
+
+  function startOverlay() {
+    if (overlayView) return;
+    document.addEventListener('click', onPopupTabClick, true);
+    const roots = document.getElementsByClassName('se-mill-overlay-box');
+    const views = SE.mount(
+      'Millennium overlay',
+      () => [...roots].filter((box) => box.querySelector('.MillenniumSettings')),
+      () => {
+        installManagerTab(document);
+        if (!managerEmbeds.has(document)) return null;
+        releasePopupNavigation();
+        return {
+          destroy() {
+            const dispose = managerEmbeds.get(document);
+            managerEmbeds.delete(document);
+            SE.run(() => dispose?.());
+          },
+        };
+      }
+    );
+    overlayView = {
+      destroy() {
+        views.destroy();
+        document.removeEventListener('click', onPopupTabClick, true);
+      },
+    };
+  }
+
+  function stopOverlay() {
+    overlayView?.destroy();
+    overlayView = null;
+  }
+
+  /*
+   * Steam's ModalPosition: the frame of every in-window dialog (the dim behind it, Esc and a
+   * click outside through onEscKeypress). Millennium exports it, but finds it by a search that
+   * can miss on a newer Steam (its ModalRoot already does), so Steam's modules are the fallback:
+   * the module that draws ModalPosition_Content, its component reading the frame from context.
+   */
+  function modalFrame() {
+    const exported = window.MILLENNIUM_API?.ModalPosition;
+    if (isComponent(exported)) return exported;
+    return fromModules(
+      'se-mill-modal-position',
+      (src) => src.includes('ModalPosition_Content') && src.includes('onEscKeypress'),
+      (value) => typeof value === 'function' && String(value).includes('.ModalPosition')
+    );
+  }
+
+  // Opens a dialog in this window: Millennium's showModal (Steam's, never popped out), else the
+  // window's own modal manager, as Steam's showModal does for an in-window dialog
+  function showInWindow(element, onClosed) {
+    const show = window.MILLENNIUM_API?.showModal;
+    if (typeof show === 'function') return show(element, window, { bNeverPopOut: true, fnOnClose: onClosed });
+    const manager = findRuntime()?.modalManagers?.get(window);
+    if (typeof manager?.ShowModal !== 'function') throw new Error('No modal manager in the main window.');
+    const handle = manager.ShowModal(element);
+    handle?.ClosedPromise?.then?.(onClosed, onClosed);
+    return handle;
+  }
+
+  function openOverlay(route, beforeOpen) {
+    const React = findRuntime(false)?.React;
+    const Frame = React && modalFrame();
+    if (!Frame) {
+      failure = React ? "Steam's dialog frame (ModalPosition) was not found." : 'Steam React runtime was not found.';
+      return false;
+    }
+    let handle = null;
+    const record = {
+      Close() {
+        if (handle) SE.run(() => handle.Close());
+        else record.closed = true;
+      },
+    };
+    const onClosed = () => {
+      if (popup !== record) return;
+      popup = null;
+      popupMode = null;
+      stopOverlay();
+    };
+    const body = React.createElement(route.component, route.real ? { [REAL]: route.real } : null);
+    const close = React.createElement('button', {
+      type: 'button',
+      className: 'se-mill-overlay-close',
+      'aria-label': 'Close',
+      title: 'Close',
+      onClick: () => record.Close(),
+    });
+    // Steam's own close icon hidden: the box draws the theme's
+    const element = React.createElement(
+      Frame,
+      { className: 'se-mill-overlay', onEscKeypress: () => record.Close(), bHideCloseIcon: true },
+      React.createElement('div', { className: 'se-mill-overlay-box' }, body, close)
+    );
+    try {
+      beforeOpen?.();
+      popup = record;
+      popupMode = 'overlay';
+      startOverlay();
+      // Steam's showModal is async: the handle comes once the dialog is placed
+      Promise.resolve(showInWindow(element, onClosed)).then(
+        (result) => {
+          handle = result;
+          if (record.closed || popup !== record) SE.run(() => result?.Close());
+        },
+        (error) => {
+          console.warn('[Steam Enhanced] Millennium overlay:', error);
+          onClosed();
+        }
+      );
+      return true;
+    } catch (error) {
+      onClosed();
+      failure = error?.message || String(error);
+      console.warn('[Steam Enhanced] Millennium overlay:', error);
+      return false;
+    }
+  }
+
   function openDirect(beforeOpen) {
+    const how = mode();
+    if (popup && popupMode !== how) closePopup();
+    if (how === 'page') {
+      beforeOpen?.();
+      return SE.navigate(SETTINGS_ROUTE);
+    }
+    if (how === 'overlay') {
+      if (popup) {
+        beforeOpen?.();
+        return true;
+      }
+      window.__seFriendsDock?.prepareModal?.();
+      const route = settingsRoute();
+      if (!route) {
+        failure = 'Millennium settings route was not found.';
+        return false;
+      }
+      return openOverlay(route, beforeOpen);
+    }
+
     if (popup) {
       scanPopupDocuments();
       if (!popupDocuments.size) {
         const stale = popup;
         popup = null;
+        popupMode = null;
         stopPopupTracking();
         try {
           stale.Close();
@@ -638,15 +843,15 @@
     }
 
     window.__seFriendsDock?.prepareModal?.();
-    const component = settingsComponent();
+    const route = settingsRoute();
     const runtime = findRuntime();
-    if (!component || !runtime) {
-      if (!component) failure = 'Millennium settings route was not found.';
+    if (!route || !runtime) {
+      if (!route) failure = 'Millennium settings route was not found.';
       return false;
     }
 
     try {
-      const element = runtime.React.createElement(component);
+      const element = runtime.React.createElement(route.component, route.real ? { [REAL]: route.real } : null);
       let result;
       const options = {
         bForcePopOut: true,
@@ -658,6 +863,7 @@
         fnOnClose: () => {
           if (popup !== result) return;
           popup = null;
+          popupMode = null;
           stopPopupTracking();
         },
       };
@@ -668,11 +874,13 @@
         return false;
       }
       popup = result;
+      popupMode = 'window';
       popupModalManagers = runtime.modalManagers;
       if (typeof result.ClosedPromise?.then === 'function') {
         const clearPopup = () => {
           if (popup === result) {
             popup = null;
+            popupMode = null;
             stopPopupTracking();
           }
         };
@@ -683,6 +891,7 @@
       return true;
     } catch (error) {
       popup = null;
+      popupMode = null;
       stopPopupTracking();
       failure = error?.message || String(error);
       console.warn('[Steam Enhanced] Millennium window:', error);
@@ -696,11 +905,12 @@
     if (!guardedRoutes.size || !guardedNavigation.size) return true;
     const main = SE.mainWindow();
     if (main && typeof main.Navigate === 'function' && !guardedNavigation.has(main)) return true;
-    for (const entry of guardedRoutes.keys()) if (entry.component !== PopupOnlySettings) return true;
-    // A re-registered route is a new entry object the guard has never seen.
+    // A re-registered route is a new entry object the guard has never seen; a plugin's wrapper
+    // over the guard needs nothing (needsGuard)
+    for (const entry of guardedRoutes.keys()) if (needsGuard(entry)) return true;
     for (const owner of SE.owners()) {
       const entry = SE.run(() => settingsRoutes(owner)?.get(SETTINGS_ROUTE));
-      if (entry && entry.component !== PopupOnlySettings) return true;
+      if (entry && needsGuard(entry)) return true;
     }
     for (const [store, { wrapped }] of guardedNavigation) if (store.Navigate !== wrapped) return true;
     return false;
@@ -710,6 +920,21 @@
   // Steam re-registers routes and Navigate without an event; 500 ms only while a guard is
   // missing (guardsNeeded), otherwise one check every 5 s.
   const routeGuardPoll = SE.poll(installRouteGuards, 500, { active: guardsNeeded, idle: 5000 });
+
+  /*
+   * A new place for Millennium Settings: what's open elsewhere closes, and the page in the main
+   * window is left (to the Library's Home) when Page is no longer chosen. Never left up across a
+   * change: the guard would render it another way and React would see other hooks.
+   */
+  let lastMode = mode();
+  function onMode() {
+    const how = mode();
+    if (how === lastMode) return;
+    lastMode = how;
+    if (popup && popupMode !== how) closePopup();
+    if (document.querySelector('.MillenniumSettings:not(.se-mill-overlay-box *)')) SE.navigate('/library/home');
+  }
+  const offMode = SE.settings?.on?.(onMode);
 
   window.__seMillenniumWindow = {
     openDirect,
@@ -722,12 +947,11 @@
     destroy() {
       destroyed = true;
       routeGuardPoll.disconnect();
+      offMode?.();
       removeRouteGuards();
-      try {
-        popup?.Close();
-      } catch {}
-      popup = null;
+      closePopup();
       stopPopupTracking();
+      stopOverlay();
       errorNotice?.remove();
       errorNotice = null;
       delete window.__seMillenniumWindow;

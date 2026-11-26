@@ -30,6 +30,7 @@
     Toasts: ['--se-icon-bell', "Steam's notification toasts."],
     Overlay: ['--se-icon-tv', 'The in-game Steam Overlay.'],
     'Web pages': ['--se-icon-globe', 'Store, Community, Support and Checkout.'],
+    Millennium: ['--se-icon-millennium', "Millennium's own settings."],
   };
 
 
@@ -40,6 +41,7 @@
     spinner: 'refresh', 'game-list-width': 'view-expanded', 'dock-width': 'friends', toasts: 'bell',
     'toasts-in-game': 'console', 'toast-style': 'view-compact', 'toast-position': 'move', overlay: 'tv',
     'overlay-darkness': 'moon', 'click-opens': 'external', 'menu-hover': 'fold', shortcuts: 'key',
+    'millennium-open': 'millennium',
     home: 'home', 'steam-home-parts': 'grid', 'stage-source': 'heart', 'stage-count': 'list-ordered', 'stage-details': 'info',
     'stage-nav': 'view-compact', 'stage-cycle': 'restore', 'stage-motion': 'art-zoom',
     'hover-delay': 'snooze', 'avatar-name': 'user', 'game-count': 'chart', 'rail-buttons': 'list-ordered',

@@ -1,6 +1,6 @@
 /*
  * Continues millennium.css (in order, see client/loader.js): Themes; Row menus; Logs › one log;
- * Page buttons and row buttons.
+ * Page buttons and row buttons; Overlay.
  */
 
 /* Millennium window pages */
@@ -413,4 +413,76 @@ html[data-se-qce] .DialogHeader::after {
 .MillenniumQuickCss_CodeEditor .cm-panel.cm-search button[name="close"] {
   color: var(--se-text-muted) !important;
   font-size: var(--se-fs-lg) !important;
+}
+
+/*
+ * Overlay (Theme settings › Millennium › Settings open in, millennium-window.js): the settings
+ * in a Steam dialog over the client, in a box of the theme's. Millennium draws its settings to fill a
+ * window, so the box gives them the window's size (shrunk to fit a small client) and every
+ * wrapper between the box and .MillenniumSettings passes that height down.
+ */
+.se-mill-overlay-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(1080px, calc(100vw - 2 * var(--se-space-7)));
+  height: min(800px, calc(100vh - 2 * var(--se-space-7)));
+  overflow: hidden;
+  border-radius: var(--se-radius-xl);
+  background: var(--se-bg);
+  box-shadow: var(--se-shadow-pop);
+}
+
+.se-mill-overlay-box div:has(.MillenniumSettings),
+.se-mill-overlay-box .MillenniumSettings {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.se-mill-overlay-box div:has(.MillenniumSettings) {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Close: the window's close button, which the dialog has none of */
+.se-mill-overlay-close {
+  position: absolute;
+  top: var(--se-space-2);
+  right: var(--se-space-2);
+  z-index: var(--se-z-sticky);
+  display: grid;
+  place-items: center;
+  width: var(--se-hit);
+  height: var(--se-hit);
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: transparent;
+  color: var(--se-text-muted);
+  cursor: pointer;
+  transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.se-mill-overlay-close::before {
+  content: "";
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-window-close) center / contain no-repeat;
+  mask: var(--se-icon-window-close) center / contain no-repeat;
+}
+
+.se-mill-overlay-close:hover {
+  background: var(--se-hover);
+  color: var(--se-text-strong);
+}
+
+.se-mill-overlay-close:active {
+  transform: scale(var(--se-press-scale));
+}
+
+.se-mill-overlay-close:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
