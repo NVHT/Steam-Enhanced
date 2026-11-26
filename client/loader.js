@@ -596,10 +596,13 @@
    * "se-toast-log"): a toast window (a game's overlay or the desktop, its title says which:
    * notificationtoasts_uid<app>-<id> / notificationtoasts_<id>_desktop) notes how far its loading
    * and placing got, so a toast that never showed traces to the theme never running there (no
-   * entry), a file that stalled (no "revealed"), or a window revealed and still unseen. The last
-   * TOAST_LOG_MAX windows are kept in "se-toast-log-data".
+   * entry), a file that stalled (no "revealed"), or a window revealed and still unseen. Each
+   * window writes only its own entry, "se-toast-log:<opened at>:<title>": toast windows open
+   * together, and a shared list read and written back by each lost the others' lines. The last
+   * TOAST_LOG_MAX are kept.
    */
   const TOAST_LOG_MAX = 12;
+  const TOAST_LOG_PREFIX = 'se-toast-log:';
   const toastLog = (() => {
     try {
       const title = document.title;
@@ -608,17 +611,19 @@
     } catch {
       return null;
     }
-    const id = `${document.title}@${Date.now()}`;
+    const at = Date.now();
+    const key = `${TOAST_LOG_PREFIX}${at}:${document.title}`;
+    const entry = { name: document.title, at, steps: [] };
+    // The oldest entries go, past TOAST_LOG_MAX (this one counted); the old shared list too
+    try {
+      localStorage.removeItem('se-toast-log-data');
+      const keys = Object.keys(localStorage).filter((k) => k.startsWith(TOAST_LOG_PREFIX)).sort();
+      for (const old of keys.slice(0, Math.max(0, keys.length - TOAST_LOG_MAX + 1))) localStorage.removeItem(old);
+    } catch {}
     return (text) => {
       try {
-        const list = JSON.parse(localStorage.getItem('se-toast-log-data') || '[]');
-        let entry = list.find((item) => item.id === id);
-        if (!entry) {
-          entry = { id, name: document.title, at: Date.now(), steps: [] };
-          list.push(entry);
-        }
         entry.steps.push([Math.round(performance.now() - started), text]);
-        localStorage.setItem('se-toast-log-data', JSON.stringify(list.slice(-TOAST_LOG_MAX)));
+        localStorage.setItem(key, JSON.stringify(entry));
       } catch {}
     };
   })();

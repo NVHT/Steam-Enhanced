@@ -138,13 +138,18 @@
   /* ---------- Record: the toast recorder (client/loader.js) ---------- */
 
   const LOG_FLAG = 'se-toast-log';
-  const LOG_DATA = 'se-toast-log-data';
+  // One key per toast window (client/loader.js): "se-toast-log:<opened at>:<title>"
+  const LOG_PREFIX = 'se-toast-log:';
+  const logKeys = () => SE.run(() => Object.keys(localStorage).filter((k) => k.startsWith(LOG_PREFIX))) || [];
   const recording = () => SE.run(() => localStorage.getItem(LOG_FLAG) === '1') === true;
 
   // Each recorded window: when it opened, its name's end, and every step with its time
   function renderLog() {
     recordButton.textContent = recording() ? 'Recording' : 'Record';
-    const list = SE.run(() => JSON.parse(localStorage.getItem(LOG_DATA) || '[]')) || [];
+    const list = logKeys()
+      .map((k) => SE.run(() => JSON.parse(localStorage.getItem(k))))
+      .filter((entry) => entry && Array.isArray(entry.steps))
+      .sort((a, b) => a.at - b.at);
     log.hidden = !recording() && !list.length;
     if (!list.length) {
       logLines.textContent = 'None yet: the next toasts, in game or on the desktop, show here.';
@@ -312,7 +317,7 @@
     else if (button.hasAttribute('data-copy-log')) copyText(button, logLines.textContent);
     else if (button.hasAttribute('data-record')) toggleRecord();
     else if (button.hasAttribute('data-clear')) {
-      SE.run(() => localStorage.removeItem(LOG_DATA));
+      for (const k of logKeys()) SE.run(() => localStorage.removeItem(k));
       renderLog();
     }
     else if (button.dataset.i) SE.run(current[Number(button.dataset.i)]?.run);
