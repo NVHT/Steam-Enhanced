@@ -1,0 +1,226 @@
+/*
+ * A Home shelf's cover opening sideways into its hover card (client/home/shelf-hover.js marks
+ * <html> while the pointer is on a shelf's cover, with where the card goes and its side, holds
+ * that cover still, and marks the shelf while the card shows). The card is
+ * client/shared/hover-cards.css's; here it is pinned edge to edge with the cover at its height,
+ * the corners where they meet squared, and unfolds from that edge into the room the covers on its
+ * side make, sliding away by its width; its screenshot fills it behind a caption.
+ * The shelf's other covers step back.
+ *
+ * Fixed in the window, so Steam placing its popover again (on every render of the card) can't
+ * move it; the popover has no transform, so `fixed` is the window's.
+ *
+ * HoverPosition ._3vg1vYU7iTWqONciv9cuJN (Steam's popover), AppPortraitHover
+ * ._2sGn0cBsD44TjnUIh-lx9d, Content ._12UNIdjT-Kv1ib31jk6J37, ScreenshotCrossfade
+ * ._2R6-lF5h4f0SPrOL9B9IAw, AppTitleContainer ._1RfxlV1H3JsSs-aRaXVJQt, LibraryItemBox
+ * .WYgDg9NyCcMIVuMyZ_NBC.
+ */
+
+/* One piece with the cover: no ring or shadow of its own, the cover's corners on its far side */
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d:not(#se-none) {
+  position: fixed;
+  left: var(--se-shelf-x);
+  top: var(--se-shelf-y);
+  height: var(--se-shelf-h);
+  margin: 0;
+  border-radius: 0 var(--se-radius-md) var(--se-radius-md) 0;
+  background: var(--se-bg-ink);
+  box-shadow: none;
+  animation: se-unfold var(--se-dur-slower) var(--se-ease) backwards;
+}
+
+html[data-se-shelf-hot="left"] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d:not(#se-none) {
+  --se-unfold-from: inset(0 0 0 100%);
+  border-radius: var(--se-radius-md) 0 0 var(--se-radius-md);
+}
+
+/* The cover under the pointer holds still (Steam's lift off at once), so the card is placed
+   where it stays. !important: beats Steam's hover tilt (an inline transform) */
+.V7RuDNUxhxoBRaiGWbk3B .WYgDg9NyCcMIVuMyZ_NBC[data-se-still] {
+  transform: none !important;
+  transition-property: filter, box-shadow, opacity;
+}
+
+/* The open cover: no ring, its corners (and its picture's, artwork.css) squared against the
+   card. !important: beats library.css's cover corners and ring */
+html[data-se-shelf-hot] .V7RuDNUxhxoBRaiGWbk3B[data-se-peek] .WYgDg9NyCcMIVuMyZ_NBC[data-se-peeked] {
+  box-shadow: none !important;
+}
+
+html[data-se-shelf-hot="right"] .V7RuDNUxhxoBRaiGWbk3B[data-se-peek] .WYgDg9NyCcMIVuMyZ_NBC[data-se-peeked],
+html[data-se-shelf-hot="right"] .V7RuDNUxhxoBRaiGWbk3B[data-se-peek] .WYgDg9NyCcMIVuMyZ_NBC[data-se-peeked] img {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+html[data-se-shelf-hot="left"] .V7RuDNUxhxoBRaiGWbk3B[data-se-peek] .WYgDg9NyCcMIVuMyZ_NBC[data-se-peeked],
+html[data-se-shelf-hot="left"] .V7RuDNUxhxoBRaiGWbk3B[data-se-peek] .WYgDg9NyCcMIVuMyZ_NBC[data-se-peeked] img {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+/*
+ * A caption over the art: the title on one line, then one quiet line of facts (playtime, total,
+ * friends playing), "Updated …" under it when Steam shows it. The card's content wraps as a row:
+ * the title and the status take the whole width, the facts sit side by side.
+ */
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d ._12UNIdjT-Kv1ib31jk6J37:not(#se-none) {
+  box-sizing: border-box;
+  height: 100%;
+  /* Held off the art: the facts are small, the art can be bright */
+  text-shadow: 0 1px 8px var(--se-black-60);
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  align-content: flex-end;
+  align-items: center;
+  gap: var(--se-space-1) var(--se-space-3);
+  padding: 0 var(--se-space-3) var(--se-space-3);
+  overflow: hidden;
+}
+
+/* The screenshot fills the card edge to edge, as the cover's art fills it, darkened at the foot
+   under the caption */
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d ._2R6-lF5h4f0SPrOL9B9IAw:not(#se-none) {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+/* A game without screenshots: Steam's fallback (its wide capsule, NoScreenshotFallbackWrapper
+   ._25nyFwRA-U4dFGgdVhK6y8, Asset ._13_ZZhj8LJVp4sybgKO6Uj, NoScreenshotFallback
+   ._2I4_RhvxHcAw8MQXjPimFk) keeps its own height: filling the card too, cropped as a cover */
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d ._2R6-lF5h4f0SPrOL9B9IAw ._25nyFwRA-U4dFGgdVhK6y8 {
+  width: 100%;
+  height: 100%;
+}
+
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d ._2R6-lF5h4f0SPrOL9B9IAw ._13_ZZhj8LJVp4sybgKO6Uj {
+  object-fit: cover;
+}
+
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d ._2R6-lF5h4f0SPrOL9B9IAw ._2I4_RhvxHcAw8MQXjPimFk {
+  background-size: cover;
+}
+
+/* Its library hero over that, when it loads (shelf-hover.js) */
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d .se-shelf-hero {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d ._2R6-lF5h4f0SPrOL9B9IAw::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, color-mix(in srgb, var(--se-bg-ink) 80%, transparent) 0%, color-mix(in srgb, var(--se-bg-ink) 30%, transparent) 30%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Everything else in the card over the art */
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._12UNIdjT-Kv1ib31jk6J37 > :not(._2R6-lF5h4f0SPrOL9B9IAw) {
+  position: relative;
+  z-index: var(--se-z-raised-2);
+}
+
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d ._1RfxlV1H3JsSs-aRaXVJQt:not(#se-none) {
+  flex: 0 0 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d ._1Kdi2PBxcdQwDpa-48hrf2:not(#se-none) {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: 700 var(--se-fs-lg)/1.3 var(--se-font);
+}
+
+/* Playtime: "7 min Last two weeks   492.9 hrs Total", the value lit, its label quiet */
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._12UNIdjT-Kv1ib31jk6J37 > div:has(> ._1VGPO4xU5sgRK6DFt4t74O):not(#se-none) {
+  flex: none;
+  margin: 0;
+}
+
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._1VGPO4xU5sgRK6DFt4t74O:not(#se-none) {
+  display: flex;
+  flex-direction: row;
+  gap: var(--se-space-3);
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._1VGPO4xU5sgRK6DFt4t74O > div:not(.MIHa_O-B1JXrzkoGc255n):not(#se-none) {
+  display: flex;
+  align-items: baseline;
+  gap: var(--se-space-1);
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._1VGPO4xU5sgRK6DFt4t74O > div[data-se-value]::before {
+  display: inline;
+  font: 600 var(--se-fs-sm)/1.4 var(--se-font);
+  color: var(--se-text-strong);
+}
+
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._1VGPO4xU5sgRK6DFt4t74O > div[data-se-value]::after {
+  display: inline;
+  font: 500 var(--se-fs-sm)/1.4 var(--se-font);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--se-text-muted);
+}
+
+/* Friends playing: its dot and count in the same line, no panel or faces */
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._3_0Qbu8IAsqsv_6W5AxRhe:not(#se-none) {
+  flex: none;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._3_0Qbu8IAsqsv_6W5AxRhe > :not(.dfy8sRBn82Ozvw4RiqewN) {
+  display: none;
+}
+
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._3_0Qbu8IAsqsv_6W5AxRhe ._1hOV3SIw5_c3VcGS_sZ_yU:not(#se-none) {
+  font: 500 var(--se-fs-sm)/1.4 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+/* "Updated …": its own quiet line, no panel */
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN .My_SveQxVY_oRxfkK5mqN:not(#se-none) {
+  flex: 0 0 100%;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+/* The shelf's other covers step back while one is open (those on the card's side slide away,
+   shelf-hover.js). On the cover box (LibraryItemBox): the items around it are display: contents,
+   and a filter on it didn't paint. Steam's own transitions kept (.6 s, its easing), opacity added. */
+.V7RuDNUxhxoBRaiGWbk3B .WYgDg9NyCcMIVuMyZ_NBC {
+  transition-property: filter, box-shadow, transform, opacity;
+}
+
+.V7RuDNUxhxoBRaiGWbk3B[data-se-peek] .WYgDg9NyCcMIVuMyZ_NBC:not([data-se-peeked]) {
+  opacity: var(--se-dim-others);
+}
+
+/* While the page scrolls, and the card of a cover a scroll left behind until Steam takes it
+   away (shelf-hover.js): faded out whole (visibility wouldn't reach Steam's screenshot) */
+html[data-se-shelf-scrolling] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d,
+._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d[data-se-gone] {
+  opacity: 0;
+}

@@ -1,77 +1,8 @@
 /*
- * Continues library.css (in order, see client/loader.js): Home polish (What's New cards); Sort
- * by; Labels on covers when a shelf is sorted; The label Steam gives its completion icon;
+ * Continues library.css (in order, see client/loader.js): Sort by; Labels on covers when a shelf is sorted; The label Steam gives its completion icon;
  * Steam's medal; One edge for the whole home; What's New arrows, card options and header;
- * Shelf collapse button; "Add shelf"; Recent Games and Play Next.
+ * Shelf collapse button; Shelf tools (Add shelf, Arrange shelves); Recent Games and Play Next.
  */
-
-/* Home polish */
-/* What's New: the date strip becomes a small frosted pill on the image */
-._3OSZu24hLN7YKjqGi7I2Xp {
-  /* EventTimeSpan */
-  bottom: 8px !important;
-  inset-inline-end: 8px !important;
-  padding: var(--se-space-half) var(--se-space-2) !important;
-  border-radius: var(--se-radius-pill);
-  background: var(--se-chip-hover) !important;
-  /* Solid fill: no per-card backdrop blur */
-  color: var(--se-text) !important;
-  font-size: var(--se-fs-sm) !important;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-/* What's New cards lift on hover, like the covers */
-._3YO5BpDmZERh_G8kaWbaSJ {
-  /* PartnerEventRowCapsule */
-  overflow: visible !important;
-  transition: transform var(--se-dur) ease-out;
-}
-
-._3YO5BpDmZERh_G8kaWbaSJ:hover {
-  transform: translateY(-3px);
-}
-
-/*
- * The hover ring and shadow: a layer on the image's container (PartnerEventRowCapsule_Container)
- * that fades in (composited), since the image box itself clips. The container is the image's
- * size: its other children (the summary overlay, the date strip) are absolutely placed.
- */
-._3YO5BpDmZERh_G8kaWbaSJ .B-vCdL38RiJlhfSRgZv78 {
-  /* PartnerEventRowCapsule_Container */
-  isolation: isolate;
-}
-
-._3YO5BpDmZERh_G8kaWbaSJ .B-vCdL38RiJlhfSRgZv78::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: var(--se-z-under);
-  border-radius: var(--se-radius-md);
-  box-shadow: var(--se-shadow-ring);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--se-dur) ease-out;
-}
-
-._3YO5BpDmZERh_G8kaWbaSJ:hover .B-vCdL38RiJlhfSRgZv78::before {
-  opacity: 1;
-}
-
-._3YO5BpDmZERh_G8kaWbaSJ:hover .DVBcpUzJ0x6kaRMfug0OJ {
-  /* TextTitle */
-  color: var(--se-text-strong) !important;
-}
-
-._3uMa3icVa3JTCGQKPeUikO svg,
-._2kWWyBO7w_F76NB8sBw86c svg,
-._14b-hQsLwSwYcELtknxCUX svg,
-._3IIEUTw03Vm3Mk54jlnUaT svg {
-  width: 14px !important;
-  height: 14px !important;
-  max-width: 14px;
-  max-height: 14px;
-}
 
 ._3bkuozxKIatrWG3aeisthc._2zIRlEsAfHhI-_3bZ3X60z {
   /* PlaytimeDetails Header */
@@ -232,13 +163,17 @@
 /*
  * One left and right edge for the whole home
  * Hero, stat tiles and What's New start 20 px in. Shelves started further in:
- * Showcase has an invisible 2 px border (shown dashed only while reordering),
- * ShowcaseHeader pads 4 px plus a 1 px border, and ChildrenContainer (the covers)
- * has 8 px margins. All go to 0, so headers and covers line up with the hero.
+ * Showcase has an invisible 2 px border, ShowcaseHeader pads 4 px plus a 1 px border, and
+ * ChildrenContainer (the covers) has 8 px margins. All go to 0, so headers and covers line up
+ * with the hero. The shelf's border goes on every side and never animates (Steam's
+ * transition: border .3s): leaving Arrange shelves (its own border: 0, shelf-arrange.css) it
+ * grew back from 0 in a fading grey and pushed the covers down. A game dragged over the shelves
+ * keeps Steam's dashed outline (DropOption, DropTarget).
  */
-.V7RuDNUxhxoBRaiGWbk3B:not(._1HgDLE-DG3HVYV4bVvKdAJ *, ._3oXyqYCk5syor0ZiuqyboQ *, ._2Ho8z58cxQIJljp55uGkdt *) {
-  border-inline-width: 0 !important;
+.V7RuDNUxhxoBRaiGWbk3B:not(._1HgDLE-DG3HVYV4bVvKdAJ *, ._3oXyqYCk5syor0ZiuqyboQ *) {
+  border-width: 0 !important;
   padding-inline: 0 !important;
+  transition: none !important;
 }
 
 ._23SnllqT_AqZ1C_QHcNQ4Z:not(._2Ho8z58cxQIJljp55uGkdt) {
@@ -257,6 +192,33 @@
 .V7RuDNUxhxoBRaiGWbk3B ._1VMQWnw-9FBp-MVXUbWfS_ {
   /* ChildrenContainer: the covers */
   margin-inline: 0 !important;
+}
+/*
+ * Expanding or collapsing a shelf: the grid's box takes its new size at once (Steam's height
+ * transition, Container.Animate, laid out every shelf below on each frame and let the new rows
+ * lie over the next shelf); client/home/shelf-expand.js slides the shelves below and opens the
+ * grid's clip on the compositor. The rows past the first fade down into place as they come (a
+ * row scrolled into a long shelf too). Reduced motion: core/motion.css,
+ * options/appearance/motion-reduced.css.
+ */
+.V7RuDNUxhxoBRaiGWbk3B .DGRkX_HYUzbFaqRysWQVi._1IbFazcMmDTDEKFF0UG34d {
+  transition: none;
+}
+
+.V7RuDNUxhxoBRaiGWbk3B ._1IbFazcMmDTDEKFF0UG34d [role="row"]:not([aria-rowindex="1"]) > * {
+  animation: se-menu-in var(--se-dur-long) var(--se-ease) backwards;
+}
+
+.V7RuDNUxhxoBRaiGWbk3B ._1IbFazcMmDTDEKFF0UG34d [role="row"]:not([aria-rowindex="1"], [aria-rowindex="2"]) > * {
+  animation-delay: var(--se-dur-fast);
+}
+
+/*
+ * Home's scroll box (InnerContainer) keeps its scrollbar's room while nothing scrolls (Arrange
+ * shelves, a short Home), so What's New and the shelves never shift as the bar comes and goes
+ */
+._2AUVZlzQq67qe3yhLZsPPB {
+  scrollbar-gutter: stable;
 }
 
 /* "Add shelf" row lines up too */
@@ -289,7 +251,7 @@
 /*
  * What's New card options
  * The button in a card's corner on hover (EventOptions) that opens Remove / Show Less /
- * Show More: a frosted round "⋯" like the date pills, instead of the 15 px gray square.
+ * Show More: a rounded-square "⋯" like the header's buttons, instead of the 15 px gray square.
  */
 ._2-p7shAZYrRijpaTU9bAFR {
   top: 8px !important;
@@ -300,13 +262,13 @@
 ._2-p7shAZYrRijpaTU9bAFR > div {
   width: 28px !important;
   height: 28px !important;
-  border-radius: 50%;
+  border-radius: var(--se-radius-sm);
   position: relative;
   background: var(--se-chip-hover) !important;
   box-shadow: 0 4px 12px -4px var(--se-black-70), inset 0 0 0 1px var(--se-white-10);
 }
 
-/* The hit area grows to --se-hit around the 28 px disc; the look stays */
+/* The hit area grows to --se-hit around the 28 px button; the look stays */
 ._2-p7shAZYrRijpaTU9bAFR > div::before {
   content: "";
   position: absolute;
@@ -334,54 +296,58 @@
 }
 
 /*
- * Shelf collapse button (Collapser), e.g. at the end of "Collections View": the same
- * 30 px round button as the page arrows, with its chevrons centered (Steam offsets them
- * with fixed margins).
+ * Shelf expand / collapse button (Collapser), at a shelf heading's end: the same 32 px rounded
+ * square as the page arrows and the Sort button, 8 px from it (the heading's 16 px gap, less 8).
+ * A toggle with one icon, the theme's duotone rows: muted while the shelf shows one row, lit as
+ * selected while it shows all. Steam turns its arrow to say which (rotate(270deg) collapsed).
  */
 ._23SnllqT_AqZ1C_QHcNQ4Z ._3sz4Ldugm_cV_JaHOErVR8 {
   box-sizing: border-box;
-  width: 30px !important;
-  height: 30px !important;
-  margin-inline-start: var(--se-space-2) !important;
-  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+  margin-inline-start: calc(var(--se-space-2) - var(--se-space-4)) !important;
+  border-radius: var(--se-radius-sm) !important;
   background: var(--se-surface-2) !important;
+  color: var(--se-text-muted);
   display: flex !important;
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
   position: relative;
-}
-
-/* The hit area grows to --se-hit around the 30 px button; the look stays */
-._23SnllqT_AqZ1C_QHcNQ4Z ._3sz4Ldugm_cV_JaHOErVR8::before {
-  content: "";
-  position: absolute;
-  inset: calc((30px - var(--se-hit)) / 2);
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
 }
 
 ._23SnllqT_AqZ1C_QHcNQ4Z ._3sz4Ldugm_cV_JaHOErVR8:hover {
   background: var(--se-hover) !important;
+  color: var(--se-text);
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z ._3sz4Ldugm_cV_JaHOErVR8:not(:has(svg[style*="270deg"])) {
+  /* expanded */
+  background: var(--se-selected) !important;
+  color: var(--se-text-strong);
 }
 
 ._23SnllqT_AqZ1C_QHcNQ4Z ._3sz4Ldugm_cV_JaHOErVR8 svg {
-  width: 14px !important;
-  height: 14px !important;
-  margin: 0 !important;
+  display: none !important;
 }
 
-._23SnllqT_AqZ1C_QHcNQ4Z ._3sz4Ldugm_cV_JaHOErVR8 polyline {
-  stroke: var(--se-text-dim) !important;
-}
-
-._23SnllqT_AqZ1C_QHcNQ4Z ._3sz4Ldugm_cV_JaHOErVR8:hover polyline {
-  stroke: var(--se-text-strong) !important;
+._23SnllqT_AqZ1C_QHcNQ4Z ._3sz4Ldugm_cV_JaHOErVR8::after {
+  content: "";
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-view-expanded) center / contain no-repeat;
+  mask: var(--se-icon-view-expanded) center / contain no-repeat;
+  pointer-events: none;
 }
 
 /*
- * The game pill under a What's New card stays inside its card: long names end
- * in "…" instead of running into the next card; the icon is a clean circle.
+ * The game pill under a basic What's New card stays inside its card: long names end
+ * in "…" instead of running into the next card; the icon is a clean circle. (The row's
+ * cards: client/home/whats-new.css.)
  */
-._3_xMyCJAh_Dv99KgZ54P3j,
 ._2hemZcvJgBSV9YvlToW1Zv {
   box-sizing: border-box;
   max-width: 100% !important;
@@ -390,7 +356,6 @@
   font-weight: 400 !important;
 }
 
-._3_xMyCJAh_Dv99KgZ54P3j ._28IqrZIgxpqkUQyhdaLDUN,
 ._2hemZcvJgBSV9YvlToW1Zv ._28IqrZIgxpqkUQyhdaLDUN {
   /* GameName */
   min-width: 0;
@@ -400,12 +365,10 @@
   color: var(--se-text-dim) !important;
 }
 
-._3_xMyCJAh_Dv99KgZ54P3j:hover,
 ._2hemZcvJgBSV9YvlToW1Zv:hover {
   background: var(--se-hover) !important;
 }
 
-._3_xMyCJAh_Dv99KgZ54P3j:hover ._28IqrZIgxpqkUQyhdaLDUN,
 ._2hemZcvJgBSV9YvlToW1Zv:hover ._28IqrZIgxpqkUQyhdaLDUN {
   color: var(--se-text-strong) !important;
 }
@@ -428,14 +391,83 @@
 
 /*
  * What's New header, matching the shelf headers
- * The name in Steam's pageable header (HeaderPageControls / Name) at 20 px bold, and the
- * settings gear (SettingsButton) as a quiet 28 px round button beside it.
+ * The name in Steam's pageable header (HeaderPageControls / Name) at 20 px bold; the settings
+ * button (SettingsButton) at the far end with the page arrows, one set of 32 px rounded-square
+ * buttons.
  */
 ._17uEBe5Ri8TMsnfELvs8-N ._2o5c89vAnrXN8C60QTSMqO {
   /* HeaderPageControls */
   align-items: center !important;
-  gap: var(--se-space-1);
+  gap: var(--se-space-2);
   min-height: 48px;
+}
+
+._17uEBe5Ri8TMsnfELvs8-N .bsNegRKT1Hbv4tqHrOk9- {
+  /* PageClickContainer: the arrows as far apart as the settings button is from them */
+  gap: var(--se-space-2);
+  /* Steam's auto start split the free space with the title's, leaving the gear mid-row */
+  margin-inline-start: 0;
+}
+
+/*
+ * After Show Less / Show More on a news card, Steam puts the settings button and a note with Undo
+ * in one box (SettingsAndUndoContainer): the note first, then the button beside the arrows. The
+ * note's text muted, Undo a small button.
+ */
+._17uEBe5Ri8TMsnfELvs8-N .woCAUvqQuIps1o6Odrfb3 {
+  align-items: center;
+  gap: var(--se-space-2);
+}
+
+/*
+ * Steam fades the note after 28 s by shrinking its max-width too, so the settings button slid
+ * with it and jumped back once the note went: the fade is opacity only (Steam's timing kept),
+ * the note's room closing at once when Steam removes it.
+ */
+@keyframes se-wn-note-out {
+  to {
+    opacity: 0;
+  }
+}
+
+._17uEBe5Ri8TMsnfELvs8-N ._2Yry4I6mF5baTtagAVA_cr {
+  /* UpdateLoweredPriorityNotice */
+  animation-name: se-wn-note-out;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  order: -1;
+  max-height: none;
+  margin: 0 !important;
+  padding: 0;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 400;
+  color: var(--se-text-muted) !important;
+}
+
+._17uEBe5Ri8TMsnfELvs8-N ._2Yry4I6mF5baTtagAVA_cr ._2sdvic79rOzTYDZw2nrgmL {
+  /* UpdateLoweredPriorityUndo */
+  display: flex;
+  align-items: center;
+  height: 32px;
+  margin: 0 !important;
+  padding: 0 var(--se-space-3) !important;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2) !important;
+  font-size: var(--se-fs-sm) !important;
+  font-weight: 600;
+  color: var(--se-text) !important;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+._17uEBe5Ri8TMsnfELvs8-N ._2Yry4I6mF5baTtagAVA_cr ._2sdvic79rOzTYDZw2nrgmL:hover {
+  background: var(--se-hover) !important;
+}
+
+/* Steam's empty slot after the settings button */
+._17uEBe5Ri8TMsnfELvs8-N ._2o5c89vAnrXN8C60QTSMqO > div:empty {
+  display: none;
 }
 
 ._17uEBe5Ri8TMsnfELvs8-N ._2hfibYuzyMOQ0sj2egsHh0 {
@@ -444,6 +476,8 @@
   letter-spacing: -.01em !important;
   color: var(--se-text) !important;
   text-transform: none !important;
+  /* the buttons after it go to the far end */
+  margin-inline-end: auto;
 }
 
 ._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC {
@@ -451,104 +485,169 @@
   display: flex !important;
   align-items: center;
   justify-content: center;
-  width: 28px !important;
-  height: 28px !important;
-  margin: 0 0 0 var(--se-space-1) !important;
-  position: relative;
-  border-radius: 50%;
-  background: transparent;
-  transition: background var(--se-dur) ease-out;
-}
-
-/* The hit area grows to --se-hit around the 28 px button; the look stays */
-._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC::before {
-  content: "";
-  position: absolute;
-  inset: calc((28px - var(--se-hit)) / 2);
+  width: 32px !important;
+  height: 32px !important;
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  color: var(--se-text-muted);
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
 }
 
 ._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC:hover {
-  background: var(--se-surface-2);
+  background: var(--se-hover);
+  color: var(--se-text);
 }
 
+/* Steam's filled gear goes; the core settings icon (duotone in its mask) */
 ._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC svg {
-  width: 15px !important;
-  height: 15px !important;
+  display: none !important;
 }
 
-._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC svg path,
-._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC svg circle,
-._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC svg polyline {
-  fill: var(--se-text-muted);
-}
-
-._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC:hover svg path,
-._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC:hover svg circle,
-._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC:hover svg polyline {
-  fill: var(--se-text) !important;
-}
-
-._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC:hover svg {
-  transform: rotate(45deg);
+._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC::after {
+  content: "";
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-settings) center / contain no-repeat;
+  mask: var(--se-icon-settings) center / contain no-repeat;
+  pointer-events: none;
 }
 
 /*
- * "Add shelf" as a dashed full-width row
- * AddShowcaseRow: Steam's faint side rules go; the AddShowcase button spans the row as a
- * dashed, rounded slot that fills with the accent on hover.
+ * Shelf tools: "Add shelf" (Steam's AddShowcase) drawn as a shelf's name, the picker's look
+ * (20 px bold, a muted glyph after it where the picker's chevron sits, the same hover fill and
+ * -8 px start: sort-segments.css), and the theme's "Arrange shelves" (client/home/
+ * shelf-arrange.js, which opens Steam's reorder mode) a 32 px icon button at the end. Between
+ * them, as in a shelf's header, the slim bar with its grip while the row is hovered (RuleRight,
+ * drawn by library.css), only a picture here: nothing to drag. AddShowcaseRow's left rule goes.
  */
 ._3SkuN_ykQuWGF94fclHdhJ {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center;
+  gap: var(--se-space-3);
   margin: 0 0 var(--se-space-5) !important;
   padding: 0 !important;
 }
 
-._3SkuN_ykQuWGF94fclHdhJ > ._1PhK8scyztOxjJwWUpkiLJ,
-._3SkuN_ykQuWGF94fclHdhJ > ._1fD3LfL2EuzDHoKxB5ts7,
 ._3SkuN_ykQuWGF94fclHdhJ > .XTpoZLWc4Qj5P6VF4s1_X {
-  /* Rule, RuleRight, RuleLeft */
+  /* RuleLeft */
   display: none !important;
+}
+
+._3SkuN_ykQuWGF94fclHdhJ > ._1fD3LfL2EuzDHoKxB5ts7 {
+  /* RuleRight: the bar's place, after Add shelf and before Arrange shelves (Steam shows it only
+     while Add shelf is hovered; here, while the row is) */
+  flex: 1 1 auto !important;
+  opacity: 1;
+  order: 1;
+  min-width: var(--se-space-6);
+  margin: 0 !important;
+  cursor: default !important;
+  pointer-events: none;
+}
+
+._3SkuN_ykQuWGF94fclHdhJ:not(:hover) > ._1fD3LfL2EuzDHoKxB5ts7 {
+  /* no line at rest, as a shelf's header */
+  background: transparent !important;
+}
+
+.se-shelf-arrange {
+  order: 2;
 }
 
 ._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5 {
   /* AddShowcase */
-  flex: 1 1 auto;
-  justify-content: center;
+  display: inline-flex !important;
+  flex: none !important;
+  align-items: center;
   gap: var(--se-space-2);
-  height: 44px;
-  margin: 0 !important;
-  padding: 0 var(--se-space-4) !important;
-  border: 1px dashed var(--se-white-12);
-  border-radius: var(--se-radius-lg) !important;
-  background: transparent !important;
-  color: var(--se-text-muted) !important;
-  font-size: var(--se-fs-md);
-  font-weight: 600;
+  box-sizing: border-box;
+  height: 36px;
+  margin: 0 0 0 calc(-1 * var(--se-space-2)) !important;
+  padding: 0 var(--se-space-2) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md) !important;
+  background: none !important;
+  font: 700 var(--se-fs-2xl)/1 var(--se-font) !important;
+  letter-spacing: -.01em;
+  color: var(--se-text) !important;
   opacity: 1 !important;
-  transition: background var(--se-dur) ease-out, border-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out;
 }
 
 ._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5:hover,
 ._3SkuN_ykQuWGF94fclHdhJ._3dQDoCmoAJqOiOK7oAJIKM ._2aw5aUUo3lrK6wxJb4_ms5 {
   /* ButtonHovered */
-  border-color: var(--se-accent-strong);
-  background: var(--se-accent-tint) !important;
-  color: var(--se-text-strong) !important;
+  background: var(--se-surface-2) !important;
 }
 
+/* Steam's ringed plus goes; the core plus after the words, muted as the picker's chevron */
 ._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5 svg {
-  width: 16px !important;
-  height: 16px !important;
-  margin: 0 !important;
+  display: none !important;
 }
 
-._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5 svg line,
-._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5 svg circle {
-  stroke: currentColor !important;
+._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5::after {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-icon-plus) center / contain no-repeat;
+  mask: var(--se-icon-plus) center / contain no-repeat;
+  transition: background-color var(--se-dur) ease-out;
 }
 
-._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5._1MNhU5EYdeegJRmQ51prWb {
-  /* Disabled */
-  opacity: .4 !important;
+._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5:hover::after {
+  background: var(--se-text);
+}
+
+.se-shelf-arrange {
+  /* an icon button, as What's New's settings button (its name in the theme's tip) */
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  color: var(--se-text-muted);
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+}
+
+.se-shelf-arrange:hover {
+  background: var(--se-hover);
+  color: var(--se-text);
+}
+
+.se-shelf-arrange:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* Its icon: the cards' grip */
+.se-shelf-arrange::before {
+  content: "";
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-grip) center / 20px no-repeat;
+  mask: var(--se-icon-grip) center / 20px no-repeat;
+}
+
+:is(._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5._1MNhU5EYdeegJRmQ51prWb, .se-shelf-arrange:disabled) {
+  /* Disabled: an empty shelf waiting to be set (Steam's); fewer than two shelves (the theme's) */
+  opacity: var(--se-btn-disabled-opacity) !important;
   cursor: default;
 }
 
@@ -579,10 +678,7 @@
 }
 
 /*
- * The wide first Recent Games card: art and footer as one card. hid the blurred
- * copy of the art Steam puts behind the footer, so the footer floated on bare
- * background with a gap above it; the blur is back under a dark glass, the art's own
- * corners are square inside the rounded card, and the play button is the theme's.
+ * The wide first Recent Games card: one rounded card, its art's own corners square inside it.
  */
 .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 {
   /* LibraryItemBox.Landscape */
@@ -595,97 +691,80 @@
   border-radius: 0 !important;
 }
 
+/*
+ * The wide card's art is a game's header capsule (about 2.1:1, the card about 1.4:1): whole and
+ * centred, never cropped, over Steam's own blurred copy of it filling the card. That copy lives
+ * in the card's footer (RecentGameFooter ._2d1hSvdpY5L2-GN1EnUb9Z: FooterBlurImageContainer
+ * .RhmvOTLHkomDhCTDX9hLA, its img ._2nq-zpLz_Efnz7D3Qzi4mA), so the footer becomes the card's
+ * backdrop and the rest of it goes: Time played and its lines (the hover card says the same).
+ * The Play button sits under the theme's chip like any cover's (client/home/home-shelves.js,
+ * client/library/cover-state.css), or goes with the chips off (cover-chips-off.css).
+ * !important: Steam's own footer and image rules (sp.css), some at equal weight.
+ */
 ._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z {
-  /* RecentGameFooter */
-  background: color-mix(in srgb, var(--se-bg-ink) 58%, transparent) !important;
-  box-shadow: var(--se-rule-top);
+  inset: 0 !important;
+  z-index: var(--se-z-base) !important;
+  height: auto !important;
+  background: none !important;
+  box-shadow: none !important;
+  pointer-events: none;
 }
 
-._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z .RhmvOTLHkomDhCTDX9hLA {
-  /* FooterBlurImageContainer */
+._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z > :not(.RhmvOTLHkomDhCTDX9hLA) {
+  display: none !important;
+}
+
+._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z > .RhmvOTLHkomDhCTDX9hLA {
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
   opacity: 1 !important;
 }
 
-._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z ._3bkuozxKIatrWG3aeisthc {
-  /* PlaytimeDetails */
-  font-size: var(--se-fs-md) !important;
-  line-height: 1.5 !important;
-}
-
-:is(.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ~ *, .xp7A-08Y404Of3FBHqX32) ._3AjoLnMNKxYmNTGTJCLfgs {
-  /* LibraryItemActionButton.Landscape */
-  width: 44px !important;
-  height: 44px !important;
-  border-radius: var(--se-radius-md) !important;
-  box-shadow: 0 6px 18px -8px var(--se-play-glow) !important;
-}
-
-:is(.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ~ *, .xp7A-08Y404Of3FBHqX32) ._3AjoLnMNKxYmNTGTJCLfgs._1_Bo2Ied5s2Od4YKYTOsau {
-  /* …Play */
-  background: var(--se-play) !important;
-}
-
-:is(.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ~ *, .xp7A-08Y404Of3FBHqX32) ._3AjoLnMNKxYmNTGTJCLfgs._1_Bo2Ied5s2Od4YKYTOsau:hover {
-  background: var(--se-play-hover) !important;
-}
-
-:is(.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5, .WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5 ~ *, .xp7A-08Y404Of3FBHqX32) ._3AjoLnMNKxYmNTGTJCLfgs svg {
-  width: 16px !important;
-  height: 16px !important;
+/* Steam places the copy by offsets of its own; the blur thins its edges, so it overhangs them */
+._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z ._2nq-zpLz_Efnz7D3Qzi4mA {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  object-fit: cover;
+  opacity: .55 !important;
+  transform: scale(1.25) !important;
 }
 
 /*
- * The wide Recent Games card's art fills the whole card. Steam pins it to the
- * top only (PortraitImage.Landscape: bottom: inherit), so it ended short of the footer
- * and left a dark band; pinned to both edges and cropped to fill, the footer's glass
- * now sits over the bottom of the art.
+ * The wide card (Recent Games' and Play Next's first) takes the art's shape (a header capsule,
+ * 460 × 215) at Steam's height: the art fills it whole. Steam sizes the card and its holders to
+ * the carousel's item width: !important. The item (RecentGame ._1esfEVxhqNfh8fzr_kEGKa,
+ * PlayNextSuggestion ._2a9SnCjTTOhX5y6SfbKFkC), its media container (._2XftMcBO9aY7VXCivzuW7-,
+ * ._2AcrNSWTpZfTiTG4z0ZQpk) and Draggable ._1pwP4eeP1zQD7PEgmsep0W follow the card
+ * (FeaturedCapsule .xp7A-08Y404Of3FBHqX32).
  */
+:is(._1esfEVxhqNfh8fzr_kEGKa, ._2a9SnCjTTOhX5y6SfbKFkC):has(.xp7A-08Y404Of3FBHqX32),
+:is(._1esfEVxhqNfh8fzr_kEGKa, ._2a9SnCjTTOhX5y6SfbKFkC):has(.xp7A-08Y404Of3FBHqX32) :is(._2XftMcBO9aY7VXCivzuW7-, ._2AcrNSWTpZfTiTG4z0ZQpk, ._1pwP4eeP1zQD7PEgmsep0W) {
+  width: auto !important;
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC.xp7A-08Y404Of3FBHqX32 {
+  width: auto !important;
+  aspect-ratio: 460 / 215;
+}
+
+/* PortraitImage.Landscape: the card's height (Steam pins it to the top only), above the backdrop */
 ._2IYf7aM4eYQ2Oh-ntmzHbm._3VOR2AeYATx3qSE0I-Pm-5 {
-  /* PortraitImage.Landscape */
   top: 0 !important;
   bottom: 0 !important;
+  z-index: var(--se-z-raised);
   height: 100% !important;
+  background: none !important;
 }
 
 ._2IYf7aM4eYQ2Oh-ntmzHbm._3VOR2AeYATx3qSE0I-Pm-5 img,
 img._2IYf7aM4eYQ2Oh-ntmzHbm._3VOR2AeYATx3qSE0I-Pm-5 {
   width: 100% !important;
   height: 100% !important;
-  object-fit: cover !important;
-  /*
-   * Filling the taller card zooms the art; Steam's capsules put the logo on the left,
-   * so the crop keeps the left edge (logo whole) and trims scenery on the right
-   */
-  object-position: 4% 30% !important;
+  object-fit: contain !important;
+  object-position: center !important;
 }
 
-/*
- * Wide Recent Games card: footer text centered on the Play button
- * A fixed 76 px footer with the 44 px button 16 px in from its corner, and the playtime
- * lines centered beside it.
- */
-._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z {
-  /* RecentGameFooter */
-  height: 76px !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
-._3VOR2AeYATx3qSE0I-Pm-5 ._2d1hSvdpY5L2-GN1EnUb9Z > ._3bkuozxKIatrWG3aeisthc {
-  /* PlaytimeDetails (the box; its lines carry the same class) */
-  position: relative;
-  z-index: var(--se-z-raised);
-  width: auto !important;
-  margin: 0 !important;
-  padding: 0 var(--se-space-4) 0 76px !important;
-  display: flex !important;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--se-space-half);
-  line-height: 1.35 !important;
-}
-
-:is(.WYgDg9NyCcMIVuMyZ_NBC._3VOR2AeYATx3qSE0I-Pm-5, .xp7A-08Y404Of3FBHqX32) ._3AjoLnMNKxYmNTGTJCLfgs {
-  inset-inline-start: 16px !important;
-  bottom: 16px !important;
-}

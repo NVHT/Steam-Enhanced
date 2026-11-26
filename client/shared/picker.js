@@ -25,8 +25,10 @@
    *   opts.cap   its tallest, whatever the room (a long list scrolls inside instead)
    *   opts.keep  stay on `side` even when it doesn't fit whole (a page taking a menu's place),
    *              unless that side has under KEEP_MIN of room and the other has more
+   *   opts.align 'end' (its right edge on the button's, by default) or 'start' (its left edge on
+   *              the button's: a button at the start of a row, a Home shelf's name)
    */
-  function placePop(el, button, side, { cap = Infinity, keep = false } = {}) {
+  function placePop(el, button, side, { cap = Infinity, keep = false, align = 'end' } = {}) {
     const r = button.getBoundingClientRect();
     const EDGE = 12;
     const room = {
@@ -41,7 +43,8 @@
     let s = side && fits(side) ? side : null;
     s ??= need <= room.below || room.below >= room.above ? 'below' : 'above';
     const w = el.offsetWidth;
-    el.style.left = `${Math.max(EDGE, Math.min(r.right - w, innerWidth - w - EDGE))}px`;
+    const left = align === 'start' ? r.left : r.right - w;
+    el.style.left = `${Math.max(EDGE, Math.min(left, innerWidth - w - EDGE))}px`;
     if (s === 'below') {
       el.style.top = `${r.bottom + GAP}px`;
       el.style.bottom = '';
@@ -134,6 +137,7 @@
     pickSide = placePop(pickEl, pickAnchor, pickSide, {
       cap: Math.max(pickOpts.height || 0, PICK_MAX),
       keep: Boolean(pickOpts.side),
+      align: pickOpts.align,
     });
   }
 
@@ -157,7 +161,8 @@
   const isOn = (id, chosen) => (pickOpts.checked ? Boolean(pickOpts.checked(String(id))) : chosen.has(String(id)));
 
   /*
-   * The rows, as the menu's: art, name, a quiet line at the end (hours, games), the square mark;
+   * The rows, as the menu's: art or an icon (a row's `icon`, an --se-icon-* name), name, a quiet
+   * line at the end (hours, games), the square mark;
    * the checkbox kept for the keyboard and the change, not seen
    */
   function paintPick() {
@@ -179,6 +184,7 @@
                 const on = isOn(r.id, chosen);
                 const inner =
                   (r.img ? `<span class="se-pick-pic">${SE.art.tag(r.img, 'se-pick-img')}</span>` : '') +
+                  (r.icon ? `<span class="se-mn-icon" style="--se-mn-icon: var(--se-icon-${r.icon})"></span>` : '') +
                   `<span class="se-mn-name">${SE.esc(r.name)}</span>` +
                   (r.sub ? `<span class="se-mn-value">${SE.esc(r.sub)}</span>` : '');
                 return pickOpts.single
@@ -390,6 +396,7 @@
    * none in the footer. Every tick applies at once.
    *   opts { key, title, placeholder, defaults(), items(q), back(side), side, height }
    *     side, height   the menu it takes the place of: its side of the button, its height
+   *     align          its edge on the button's: 'end' (by default) or 'start' (SE.placePop)
    *     clearable      none chosen means none kept (Clear in the footer, not Show all / none)
    *     single         one to choose, current() the one set: rows with a round mark, choosing
    *                    one calls onChoose(id) and goes back; no count, no footer

@@ -1,20 +1,19 @@
 /*
  * Library Home card and carousel refinements.
  *
- * Aligns shelf cover edges, deduplicates adjacent What's New date labels, and
+ * Aligns shelf cover edges, deduplicates adjacent basic What's New date labels, and
  * expands cover action buttons (`Play` / `Install` / `Stream`) across card
  * footers on hover. Paired with `client/home/home-shelves.js`.
  */
-/* What's New: a date repeated from the card before is hidden, its line kept */
-._2rlKqvybYupc-uk64cdQ8D,
+/* Basic What's New: a date repeated from the card before is hidden, its line kept */
 ._1xu4iu0Qa3cGcIr-rZAsVb {
-  /* EventTime (both card layouts) */
+  /* EventTime */
   font-size: var(--se-fs-sm) !important;
   font-weight: 600 !important;
   color: var(--se-text-muted) !important;
 }
 
-:is(._2rlKqvybYupc-uk64cdQ8D, ._1xu4iu0Qa3cGcIr-rZAsVb)[data-se-repeat] {
+._1xu4iu0Qa3cGcIr-rZAsVb[data-se-repeat] {
   visibility: hidden;
 }
 
@@ -147,4 +146,33 @@
 ._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn][data-se-act="stream"]:not(#se-none):is([data-se-hot], :hover)::after,
 .WYgDg9NyCcMIVuMyZ_NBC:hover ._8YrRmy_c6O0FCxFT8gjqo[data-se-cover-btn][data-se-act="stream"]:not(#se-none)::after {
   content: "Stream";
+}
+
+/* The shelf picker's Remove shelf (client/home/shelf-picker.js): red, as the theme's other removes,
+   set apart under a hairline, with no choice mark */
+.se-pick-row[data-pk-row="__remove"] {
+  margin-top: var(--se-space-1);
+  box-shadow: 0 -1px 0 var(--se-hairline);
+  color: var(--se-danger);
+}
+
+.se-pick-row[data-pk-row="__remove"] .se-mn-mark {
+  display: none;
+}
+
+.se-pick-row[data-pk-row="__remove"]:is(:hover, :focus-visible) {
+  background: var(--se-danger-surface);
+  color: var(--se-danger-text);
+}
+
+/*
+ * Recent Games and Play Next spaced as the collection shelves' covers (--se-shelf-gap, read by
+ * client/home/shelf-spacing.js; Steam's 16 px until it's read). RecentGame, PlayNextSuggestion.
+ */
+.V7RuDNUxhxoBRaiGWbk3B ._1esfEVxhqNfh8fzr_kEGKa:not(:last-child) {
+  margin-right: var(--se-shelf-gap, 16px);
+}
+
+.V7RuDNUxhxoBRaiGWbk3B ._2a9SnCjTTOhX5y6SfbKFkC:not(:last-child) {
+  margin-inline-end: var(--se-shelf-gap, 16px);
 }

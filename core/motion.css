@@ -12,9 +12,15 @@
     scroll-behavior: auto !important;
   }
 
-  /* Menus just appear (the library's right-click menus: client/library/game-menu.css) */
+  /* Menus just appear (the library's right-click menus: client/library/game-menu.css), and so do
+     theme settings coming and going (client/settings/theme/theme-settings.css), an expanded
+     shelf's rows (client/library/library-home.css) and a shelf's hover card (shelf-hover.css) */
   html:is(.Steam_Root_Menu, .Account_Menu) ._2EstNjFIIZm_WUSKm5Wt7n,
   [data-se-lib-menu],
+  [data-se-ts-appear],
+  [data-se-ts-leave],
+  .V7RuDNUxhxoBRaiGWbk3B ._1IbFazcMmDTDEKFF0UG34d [role="row"] > *,
+  html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d,
   .se-menu {
     animation: none !important;
   }
@@ -24,7 +30,8 @@
  * A menu opening and closing: a short fade as it settles 4 px down into place, and back up as it
  * goes, a little quicker. The Steam menu, the account menu (client/header/steam-menu.css,
  * account-menu.css), the theme's own menus (client/shared/popup-layer.css) and Brew Hub's use
- * them; closing is [data-se-closing], held until it ends (SE.layer.closeWith,
+ * them, and a theme setting coming and going in its window (client/settings/theme/theme-settings.css);
+ * closing is [data-se-closing], held until it ends (SE.layer.closeWith,
  * client/shared/popup-layer.js). The web's counterpart is se-drop-in (web/shared/base.css).
  * Under reduced motion (here and options/appearance/motion-reduced.css) menus just appear and go.
  */
@@ -56,6 +63,14 @@
 @keyframes se-fade-in {
   from {
     opacity: 0;
+  }
+}
+
+/* Something unfolding sideways from the edge it belongs to: --se-unfold-from is the clip it
+   starts as (by default from its left edge; a Home shelf's hover card, client/home/shelf-hover.css) */
+@keyframes se-unfold {
+  from {
+    clip-path: var(--se-unfold-from, inset(0 100% 0 0));
   }
 }
 

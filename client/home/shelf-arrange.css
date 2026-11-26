@@ -1,0 +1,352 @@
+/*
+ * Arrange shelves (Steam's Home, its shelves' reorder mode; client/home/shelf-arrange.js): a
+ * heading, the shelves as cards (a grip, the name and what it is, Steam's delete button) and
+ * beside each its shelf as a wireframe, in the theme's wireframe lines. Steam drags a shelf by the first shelf's
+ * height, so the gap between cards is padding inside each shelf, never a margin, and every card
+ * has one height.
+ * !important: Steam's reorder rules (steamui sp.css: Showcase, ShowcaseHeader.Reordering,
+ * DoneReorderingRow, DragElement) and the theme's resting shelf rules
+ * (client/library/library.css, library-home.css).
+ */
+
+/*
+ * AddShowcaseRow: Steam hides it in reorder mode; the shelf tools' display (library-home.css)
+ * would bring it back over the heading
+ */
+._2Ho8z58cxQIJljp55uGkdt > ._3SkuN_ykQuWGF94fclHdhJ {
+  display: none !important;
+}
+
+/* LibraryShowCases.Reordering > DoneReorderingRow: the heading, its hint and Done */
+._2Ho8z58cxQIJljp55uGkdt > ._1dy2s5YuBOYnRrupJmLfRR {
+  display: grid !important;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  height: auto !important;
+  margin-bottom: var(--se-space-4);
+}
+
+._2Ho8z58cxQIJljp55uGkdt > ._1dy2s5YuBOYnRrupJmLfRR::before {
+  content: "Arrange shelves";
+  grid-column: 1;
+  grid-row: 1;
+  font: 700 var(--se-fs-2xl)/1.3 var(--se-font);
+  color: var(--se-text);
+}
+
+._2Ho8z58cxQIJljp55uGkdt > ._1dy2s5YuBOYnRrupJmLfRR::after {
+  content: "Drag a shelf, or move a focused one with the arrow keys.";
+  grid-column: 1;
+  grid-row: 2;
+  font: 400 var(--se-fs-base)/1.4 var(--se-font);
+  color: var(--se-text-muted);
+}
+
+._1dy2s5YuBOYnRrupJmLfRR > .MXh6nju1KU9_oaQCaR06e {
+  /* DoneReordering */
+  grid-column: 2;
+  grid-row: 1 / 3;
+  margin: 0 !important;
+}
+
+/* Showcase: no margin (no border either: library-home.css), the gap below each card inside its height */
+._2Ho8z58cxQIJljp55uGkdt .V7RuDNUxhxoBRaiGWbk3B {
+  margin: 0 !important;
+  padding: 0 0 var(--se-space-2) !important;
+  border-radius: 0 !important;
+}
+
+/* ShowcaseHeader.Reordering: the card */
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt {
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) 32px;
+  grid-template-rows: auto auto;
+  align-content: center;
+  align-items: center;
+  /* the resting header's 16 px gap (sort-segments.css) would split the name from its line */
+  gap: var(--se-space-half) var(--se-space-3) !important;
+  box-sizing: border-box;
+  height: 60px;
+  margin: 0 !important;
+  padding: 0 var(--se-space-3) 0 var(--se-space-4) !important;
+  border: 1px solid var(--se-hairline) !important;
+  border-radius: var(--se-radius-md) !important;
+  background: var(--se-surface) !important;
+  cursor: grab;
+  transition: background-color var(--se-dur) ease-out, border-color var(--se-dur) ease-out;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt:hover {
+  border-color: var(--se-white-12) !important;
+  background: var(--se-surface-2) !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* Rule, SortingDropDown (and the theme's segments over it), PageButtons, Collapser, DragHandle */
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > :is(._1PhK8scyztOxjJwWUpkiLJ, ._30PVtUudUBJBzac0vEncl_, [data-se-sortseg], ._29NTOneobxPjUfxHUk9N8Y, ._3sz4Ldugm_cV_JaHOErVR8, ._1OGfHXv6ksR1Ub-OuLN2NB) {
+  display: none !important;
+}
+
+/* The grip */
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt::before {
+  content: "";
+  grid-column: 1;
+  grid-row: 1 / 3;
+  width: 18px;
+  height: 22px;
+  background: var(--se-text-muted);
+  /* the core grip at its own 24 px, centred in the 18 × 22 box */
+  -webkit-mask: var(--se-icon-grip) center / 24px 24px no-repeat;
+  mask: var(--se-icon-grip) center / 24px 24px no-repeat;
+  pointer-events: none;
+}
+
+/* The first child, a tooltip without a class: the name (Steam's shelf picker, disabled here and
+   drawn dim) and its count */
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > :first-child {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: end;
+  min-width: 0;
+}
+
+/* The resting picker's 36 px box and its -8 px start (sort-segments.css) go: the name sits on
+   its line's edge, at its own height */
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > :first-child :is(._1YdRdM9TZ_3Xolwv9aVEv-, ._DialogInputContainer, .DialogDropDown, .DialogDropDown_CurrentDisplay, .tfg3_RdonFKIGYRd12bKl, .DialogInputLabelGroup) {
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+  background: none !important;
+  font: 600 var(--se-fs-lg)/1.3 var(--se-font) !important;
+  color: var(--se-text) !important;
+  cursor: inherit !important;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > :first-child .DialogDropDown_Arrow {
+  display: none !important;
+}
+
+.se-arrange-kind {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
+  overflow: hidden;
+  font-size: var(--se-fs-sm);
+  color: var(--se-text-muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* DeleteButton: always shown, the theme's trash over Steam's drawing */
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > ._3cK5jtEHkhfw50DntUGWjp {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: var(--se-radius-sm);
+  opacity: 1 !important;
+  color: var(--se-text-muted);
+  transition: color var(--se-dur) ease-out, background-color var(--se-dur) ease-out;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > ._3cK5jtEHkhfw50DntUGWjp:hover {
+  color: var(--se-danger);
+  background: var(--se-hover);
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > ._3cK5jtEHkhfw50DntUGWjp > svg {
+  opacity: 0;
+}
+
+._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt > ._3cK5jtEHkhfw50DntUGWjp::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-trash) center / contain no-repeat;
+  mask: var(--se-icon-trash) center / contain no-repeat;
+  pointer-events: none;
+}
+
+/* DragElement: the shelf being dragged, lifted */
+._176H2JawcvTj3qzNqyhSGl ._23SnllqT_AqZ1C_QHcNQ4Z._2Ho8z58cxQIJljp55uGkdt {
+  border-color: var(--se-accent) !important;
+  background: var(--se-surface-2) !important;
+  box-shadow: var(--se-shadow-md) !important;
+  cursor: grabbing;
+}
+
+/*
+ * The list beside its wireframes: Steam's shelf list (its only class is Reordering) in two
+ * columns, the heading across both. A narrow Home drops the wireframes.
+ */
+._2Ho8z58cxQIJljp55uGkdt:has(> .se-arrange-map) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  container-type: inline-size;
+}
+
+._2Ho8z58cxQIJljp55uGkdt:has(> .se-arrange-map) > ._1dy2s5YuBOYnRrupJmLfRR {
+  /* DoneReorderingRow: the first row, across both columns */
+  grid-row: 1;
+  grid-column: 1 / -1;
+}
+
+._2Ho8z58cxQIJljp55uGkdt:has(> .se-arrange-map) > ._2Z9gJ6Pd7eZn-kfODcXJuR {
+  /* Sortable: the cards */
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+}
+
+/*
+ * One card beside the list, a row for each shelf card: rows the cards' 60 px, the gap between
+ * them their shelves' 8 px padding, so each row sits level with its card. The edge is a shadow,
+ * not a border, so the first row starts on the first card's top.
+ */
+.se-arrange-map {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  box-sizing: border-box;
+  width: 280px;
+  margin-inline-start: var(--se-space-3);
+  padding-inline: var(--se-space-1);
+  border-radius: var(--se-radius-ml);
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-hairline), var(--se-shadow-card);
+}
+
+@container (max-width: 760px) {
+  .se-arrange-map {
+    display: none;
+  }
+}
+
+/*
+ * A shelf as Home draws it, in wireframe lines over a faint fill. A hairline between rows; the
+ * shelf dragged, pointed at or focused on a lit band, its lines stronger.
+ */
+.se-arrange-map-shelf {
+  --se-arrange-line: var(--se-accent-line);
+  --se-arrange-fill: var(--se-white-03);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-1);
+  box-sizing: border-box;
+  height: 60px;
+  padding-inline: var(--se-space-2);
+  border-radius: var(--se-radius-sm);
+  transition: background-color var(--se-dur) ease-out;
+}
+
+.se-arrange-map-shelf + .se-arrange-map-shelf::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  inset-inline: var(--se-space-2);
+  height: 1px;
+  background: var(--se-hairline);
+}
+
+.se-arrange-map-shelf[data-selected] {
+  --se-arrange-line: var(--se-accent-strong);
+  --se-arrange-fill: var(--se-accent-tint);
+  background: var(--se-white-04);
+}
+
+/* Covers share the row; a lead (recent games, Play Next) is two covers and their gap across */
+.se-arrange-map-cover {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 40px;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-arrange-fill);
+  box-shadow: inset 0 0 0 1px var(--se-arrange-line);
+  transition: background-color var(--se-dur) ease-out, box-shadow var(--se-dur) ease-out;
+}
+
+.se-arrange-map-cover[data-lead] {
+  flex: 2 1 var(--se-space-1);
+}
+
+/* An empty shelf: the room its games will take */
+.se-arrange-map-empty {
+  flex: 1;
+  height: 40px;
+  border: 1px dashed var(--se-arrange-line);
+  background: var(--se-arrange-fill);
+  border-radius: var(--se-radius-xs);
+}
+
+/* The collections view: Steam's square tile, three covers fanned over the collection's name */
+.se-arrange-map-shelf[data-shape="tile"] {
+  gap: var(--se-space-2);
+}
+
+.se-arrange-map-tile {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 40px;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-arrange-fill);
+  box-shadow: inset 0 0 0 1px var(--se-arrange-line);
+}
+
+.se-arrange-map-tile::after {
+  /* the name */
+  content: "";
+  position: absolute;
+  left: 5px;
+  bottom: 5px;
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--se-arrange-line);
+}
+
+.se-arrange-map-fan {
+  position: absolute;
+  top: 5px;
+  left: calc(50% - 6px);
+  width: 12px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--se-surface);
+  box-shadow: inset 0 0 0 1px var(--se-arrange-line);
+}
+
+.se-arrange-map-shelf[data-selected] .se-arrange-map-fan {
+  /* the lit band under it */
+  background: color-mix(in srgb, var(--se-surface), var(--se-white) 4%);
+}
+
+.se-arrange-map-fan:first-child {
+  transform: translateX(-8px) rotate(-10deg);
+}
+
+.se-arrange-map-fan:last-child {
+  transform: translateX(8px) rotate(10deg);
+}
+
+.se-arrange-map-fan:nth-child(2) {
+  /* the front cover */
+  z-index: 1;
+}

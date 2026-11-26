@@ -260,8 +260,11 @@
  * On hover Steam grows the rule into a 17 px slab and shows its drag handle at the
  * middle of the whole header, which lands off-center on the rule. Instead the rule
  * becomes a slim 10 px pill with a dotted grip at its own center; Steam's handle hides.
+ * The Add shelf row's RuleRight wears it too while the row is hovered, as a picture
+ * (library-home.css).
  */
-._23SnllqT_AqZ1C_QHcNQ4Z:not(._32LI4zWUnYi5k50-LHnhdN *):hover ._1PhK8scyztOxjJwWUpkiLJ {
+._23SnllqT_AqZ1C_QHcNQ4Z:not(._32LI4zWUnYi5k50-LHnhdN *):hover ._1PhK8scyztOxjJwWUpkiLJ,
+._3SkuN_ykQuWGF94fclHdhJ:hover > ._1fD3LfL2EuzDHoKxB5ts7 {
   height: 10px !important;
   position: relative;
   background: var(--se-surface-2) !important;
@@ -269,7 +272,8 @@
 }
 
 /* The grip: a mask in the muted text tone */
-._23SnllqT_AqZ1C_QHcNQ4Z:not(._32LI4zWUnYi5k50-LHnhdN *):hover ._1PhK8scyztOxjJwWUpkiLJ::after {
+._23SnllqT_AqZ1C_QHcNQ4Z:not(._32LI4zWUnYi5k50-LHnhdN *):hover ._1PhK8scyztOxjJwWUpkiLJ::after,
+._3SkuN_ykQuWGF94fclHdhJ:hover > ._1fD3LfL2EuzDHoKxB5ts7::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -325,27 +329,32 @@
   background: var(--se-hover) !important;
 }
 
-/* Page arrows (PageLeft, PageRight): round buttons; Steam's icon is sized inside them */
+/*
+ * Page arrows (PageLeft, PageRight): 32 px rounded-square buttons with the theme's chevron in
+ * the muted tone, like What's New's settings button beside them (library-home.css)
+ */
 ._3uMa3icVa3JTCGQKPeUikO,
 ._2kWWyBO7w_F76NB8sBw86c,
 ._14b-hQsLwSwYcELtknxCUX,
 ._3IIEUTw03Vm3Mk54jlnUaT {
   box-sizing: border-box;
-  width: 30px !important;
-  height: 30px !important;
+  display: flex !important;
+  width: 32px !important;
+  height: 32px !important;
   margin-inline-end: var(--se-space-1) !important;
-  padding: var(--se-space-2) !important;
-  border-radius: 50%;
+  padding: 0 !important;
+  border-radius: var(--se-radius-sm);
   align-items: center;
   justify-content: center;
   background: var(--se-surface-2) !important;
-  color: var(--se-text);
+  color: var(--se-text-muted);
+  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
   opacity: 1 !important;
   font-size: var(--se-fs-lg) !important;
   line-height: 0;
 }
 
-/* The hit area grows to --se-hit around the round button (30 px, 28 px on Sort by's bar) */
+/* The hit area grows to --se-hit around the button (28 px on Sort by's bar) */
 ._3uMa3icVa3JTCGQKPeUikO,
 ._2kWWyBO7w_F76NB8sBw86c,
 ._14b-hQsLwSwYcELtknxCUX,
@@ -366,25 +375,39 @@
 ._2kWWyBO7w_F76NB8sBw86c:hover,
 ._14b-hQsLwSwYcELtknxCUX:hover,
 ._3IIEUTw03Vm3Mk54jlnUaT:hover {
-  background: var(--se-hover);
+  background: var(--se-hover) !important;
+  color: var(--se-text);
+}
+
+/* Steam's white polyline goes; the core chevron (drawn pointing down) turned to its side */
+:is(._3uMa3icVa3JTCGQKPeUikO, ._2kWWyBO7w_F76NB8sBw86c, ._14b-hQsLwSwYcELtknxCUX, ._3IIEUTw03Vm3Mk54jlnUaT) svg {
+  display: none !important;
+}
+
+:is(._3uMa3icVa3JTCGQKPeUikO, ._2kWWyBO7w_F76NB8sBw86c, ._14b-hQsLwSwYcELtknxCUX, ._3IIEUTw03Vm3Mk54jlnUaT)::after {
+  content: "";
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
+  pointer-events: none;
+}
+
+:is(._3uMa3icVa3JTCGQKPeUikO, ._14b-hQsLwSwYcELtknxCUX)::after {
+  /* PageLeft */
+  transform: rotate(90deg);
+}
+
+:is(._2kWWyBO7w_F76NB8sBw86c, ._3IIEUTw03Vm3Mk54jlnUaT)::after {
+  /* PageRight */
+  transform: rotate(-90deg);
 }
 
 :is(._3uMa3icVa3JTCGQKPeUikO, ._2kWWyBO7w_F76NB8sBw86c, ._14b-hQsLwSwYcELtknxCUX, ._3IIEUTw03Vm3Mk54jlnUaT):is(._1MNhU5EYdeegJRmQ51prWb, ._16nHYucq6xgfe67DrVWLCI) {
   /* Disabled */
   opacity: .35 !important;
-}
-
-/* "Add shelf" */
-._2aw5aUUo3lrK6wxJb4_ms5 {
-  /* AddShowcase */
-  border-radius: var(--se-radius-pill) !important;
-  padding: var(--se-space-1) var(--se-space-3) !important;
-  color: var(--se-text-muted) !important;
-}
-
-._2aw5aUUo3lrK6wxJb4_ms5:hover {
-  background: var(--se-surface-2) !important;
-  color: var(--se-text) !important;
 }
 
 /* What's New */
@@ -398,11 +421,11 @@
   padding-top: var(--se-space-4) !important;
   background: var(--se-bg) !important;
   /*
-   * The card row scrolled under the container's right padding, so the last card ran past
-   * the hero's right edge. Clip at the same 20 px edge (a little room is left above and
-   * below for the hover lift and ring).
+   * The card row scrolls under the container's right padding: clip at its edge, so the row
+   * ends where it starts on the left (a little room is left above and below for the hover
+   * lift and ring). The cards fill the row to that edge (client/home/whats-new.css).
    */
-  clip-path: inset(-12px 20px -12px -12px);
+  clip-path: inset(-12px var(--se-space-4) -12px -12px);
 }
 
 /* Center the initial What's New loader within the entire panel. */
@@ -426,15 +449,6 @@
   padding-inline: var(--se-space-4) !important;
 }
 
-.fyxt0H7Cwfirf9908slPp {
-  /* WhatsNewHeaderText */
-  font-size: var(--se-fs-2xl) !important;
-  font-weight: 700 !important;
-  letter-spacing: -.01em !important;
-  text-transform: none !important;
-  color: var(--se-text) !important;
-}
-
 .SPz0ipLqfF1oAO7tdrkdY,
 ._3Yd9bnm5cESPzqV_j5-WJt {
   /* Event image: row capsule, carousel */
@@ -443,8 +457,7 @@
   box-shadow: var(--se-shadow-card);
 }
 
-/* The game the news is about: a small pill under each card */
-._3_xMyCJAh_Dv99KgZ54P3j,
+/* The game the news is about: a small pill under each basic What's New card */
 ._2hemZcvJgBSV9YvlToW1Zv {
   /* GameIconAndName */
   display: inline-flex !important;
@@ -455,7 +468,6 @@
   background: var(--se-surface-2) !important;
 }
 
-._3_xMyCJAh_Dv99KgZ54P3j img,
 ._2hemZcvJgBSV9YvlToW1Zv img {
   border-radius: 50%;
 }

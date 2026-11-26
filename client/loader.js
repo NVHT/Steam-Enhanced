@@ -64,7 +64,7 @@
   /** @type {[group: string, folder: string, files: string[]][]} */
   const FEATURES = [
     // Shared runtime pieces
-    ['all', 'core/', ['font.css', 'tokens.css', 'icons-nav.css', 'icons-ui.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
+    ['all', 'core/', ['font.css', 'tokens.css', 'icons-nav.css', 'icons-ui.css', 'icons-ui-settings.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
     ['all', 'client/shared/', ['popup-layer.css', 'search-field.css', 'segmented.css']],
     // The theme's settings, kept in step in every window (their stylesheets: applyOptions below)
     ['all', 'client/shared/', ['settings-palette.js', 'settings.js']],
@@ -119,7 +119,8 @@
     ]],
     ['main', 'client/library/', [
       'library.css', 'library-home.css', 'library-covers.css', 'game-list.css', 'game-list.js',
-      'game-drag.css', 'game-drag.js', 'collections.css', 'collections.js',
+      'game-drag.css', 'game-drag.js', 'collections.css', 'collections.js', 'dim-uninstalled.js',
+      'cover-state.css', 'cover-state.js',
     ]],
     // Started on a Store or Community page: the Library rendered once, so its list is beside it
     ['main', 'client/library/', ['start-on-page.js']],
@@ -153,7 +154,7 @@
     ['main', 'client/friends/', ['playing-card.js']],
     ['main', 'client/library/', ['sort-segments.css', 'sort-segments.js']],
     // Library Home
-    ['main', 'client/home/', ['home-shelves.css', 'home-shelves.js']],
+    ['main', 'client/home/', ['home-shelves.css', 'home-shelves.js', 'whats-new.css', 'shelf-arrange.css', 'shelf-arrange.js', 'shelf-picker.js', 'shelf-expand.js', 'shelf-hover.css', 'shelf-hover.js', 'shelf-spacing.js']],
     ['main', 'client/home/stage/', ['stage.css', 'stage-hero.css', 'stage-settings.css', 'stage-tray.css', 'stage-shelves.css', 'stage-panels.css', 'stage-narrow.css', 'util.js', 'tray.js', 'picks.js', 'stage-settings.js', 'panels-library.js', 'panels-community.js', 'board.js', 'home-mode.js', 'stage.js', 'stage-art.js', 'data.js', 'main.js']],
     // Menus, hover cards, notifications, dialogs
     ['all', 'client/dialogs/', ['dialogs.css', 'confirm.css']],
@@ -183,7 +184,7 @@
       'delete-collection.css', 'delete-collection.js', 'mark-private.css', 'mark-private.js',
       'exit-game.css', 'exit-game.js', 'cd-keys.css', 'cd-keys.js', 'friend-picker.css',
       'friend-picker.js', 'friend-dialogs.css', 'friend-dialogs.js', 'group-settings.css', 'group-settings.js',
-      'report-content.css',
+      'report-content.css', 'whats-new-settings.css', 'whats-new-settings.js',
     ]],
     // Plugin integrations
     ['main', 'compat/hltb-for-steam/', ['hltb-for-steam.css', 'hltb-for-steam.js']],
