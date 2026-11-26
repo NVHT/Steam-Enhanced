@@ -503,9 +503,22 @@ html.se-community-discussions :is(.discussionSearchTextContainer, .DiscussionSea
   background: none !important; /* Steam's own rules set it at equal or higher weight */
 }
 
-/* !important: width can come inline from Steam's markup or scripts */
+/* Steam's box (forums.css) is sized for its old image: 46px tall, 40px short of the column, its
+   end piece a ::before past it. The box hugs the field instead, full width. */
+html.se-community-discussions .discussionSearchTextContainer {
+  width: 100%;
+  height: auto;
+}
+
+html.se-community-discussions .discussionSearchTextContainer::before {
+  content: none;
+}
+
+/* !important: width can come inline from Steam's markup or scripts. Static: forums.css places
+   it absolutely, 13px down its box, so it spilled over the Start a New Discussion card. */
 html.se-community-discussions .discussionSearchText {
   --se-search-h: var(--se-ctl);
+  position: static;
   width: 100% !important;
 }
 
