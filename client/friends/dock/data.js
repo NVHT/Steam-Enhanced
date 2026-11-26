@@ -28,7 +28,7 @@
     noMatch: 'No one matches',
     unread: (name, n) => `${name}, ${n} unread`,
     // The rail's sections (its labels must fit 60 px in capitals)
-    rail: { chats: 'Chats', favorites: 'Favorites', playing: 'Playing', online: 'Online', groups: 'Groups' },
+    rail: { chats: 'Chats', favorites: 'Favorites', playing: 'Playing', online: 'Online', offline: 'Offline', groups: 'Groups' },
     friendsIn: (n) => `${n} friend${n === 1 ? '' : 's'} playing`,
     message: 'Send message',
     messageHint: 'Open a chat with them',
@@ -246,12 +246,10 @@
   const flyoutOwnedTabs = new Map();
   const managerTimers = new Set();
   const openGames = new Set();
-  // The Offline section starts folded unless Offline friends says open (main.js follows changes)
-  const offlineFriends = () => SE.settings?.get('offline-friends') || 'folded';
-  const closedSections = new Set(offlineFriends() === 'open' ? [] : ['offline']);
+  const closedSections = new Set(['offline']);
 
   Object.assign(ns, {
-    COPY, STATE, ago: SE.ago, app, closedSections, offlineFriends, ctx, flyoutOwnedTabs, friendsOf, groupsOf, importOf,
+    COPY, STATE, ago: SE.ago, app, closedSections, ctx, flyoutOwnedTabs, friendsOf, groupsOf, importOf,
     managerTimers, openGames, read, state, store,
   });
 })(window.__se);

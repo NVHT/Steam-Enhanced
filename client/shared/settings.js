@@ -298,8 +298,8 @@
     },
     {
       key: 'offline-friends', section: 'Dock', tab: 'Friends', label: 'Offline friends',
-      hint: "The dock's Offline section: folded until you open it, open, or not there at all.",
-      values: [opt('folded', 'Folded'), opt('open', 'Open'), opt('hidden', 'Hidden')],
+      hint: "In the dock, open or folded: the Offline section and offline friends in your categories. The Friends window lists everyone.",
+      values: [opt('hidden', 'Hidden', 'options/friends/offline-hidden.css'), opt('shown', 'Shown')],
     },
     {
       key: 'dock-width', section: 'Dock', tab: 'Friends', label: 'Friends dock width', from: 'Friends dock width',

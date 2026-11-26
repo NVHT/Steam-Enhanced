@@ -191,15 +191,13 @@
   window.addEventListener('focus', onDesktopChatFocus);
   document.addEventListener('visibilitychange', requestChatHandoff);
 
-  // Offline friends and Offline group members, changed: the section folds or opens as chosen
-  // (only when that setting changed: a fold of the viewer's own stays), the members list redraws
-  let offlineFriends = ns.offlineFriends();
+  // Offline friends and Offline group members, changed: the theme's own list (shown when Steam's
+  // can't be) drops or brings back its Offline section, and group members lists redraw
+  let offlineFriends = SE.settings?.get('offline-friends');
   const offSettings = SE.settings?.on(() => {
-    const next = ns.offlineFriends();
+    const next = SE.settings.get('offline-friends');
     if (next !== offlineFriends) {
       offlineFriends = next;
-      if (next === 'open') closedSections.delete('offline');
-      else closedSections.add('offline');
       state.sig = '';
       render();
     }

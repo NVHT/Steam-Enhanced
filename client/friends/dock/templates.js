@@ -156,7 +156,8 @@
       '<div class="se-fd-scroll">' +
       (games ? `<div class="se-fd-label se-fd-pad">${ns.COPY.playing}</div>${games}` : '') +
       section('online', ns.COPY.online, on.length, on.map((f) => friendRow(f, statusLabel(f.state))).join('')) +
-      (ns.offlineFriends() === 'hidden'
+      // Offline friends, Hidden: no section (Steam's list: options/friends/offline-hidden.css)
+      (SE.settings?.get('offline-friends') === 'hidden'
         ? ''
         : section(
             'offline',
@@ -184,7 +185,7 @@
    * settings: compact favorites shrinks Favorites, the compact friends list every other section
    * (smaller faces in a 32 px tile, so the hit target stays, and higher caps).
    */
-  const RAIL_CAP = { favorites: [4, 6], online: [3, 5], groups: [2, 3] };
+  const RAIL_CAP = { favorites: [4, 6], online: [3, 5], offline: [2, 3], groups: [2, 3] };
   const RAIL_AV = [32, 24];
   const RAIL_GAME = [38, 28];
 
@@ -214,6 +215,8 @@
       ['favorites', favorites],
       ['playing', [...shared, ...solo]],
       ['online', take(d.online)],
+      // Offline friends, Shown: the latest online first (data.js), the rest behind "+N"
+      ['offline', SE.settings?.get('offline-friends') === 'shown' ? take(d.offline) : []],
       ['groups', take(d.groups)],
     ];
     return sections
