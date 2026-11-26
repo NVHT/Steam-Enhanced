@@ -90,16 +90,22 @@
   display: none;
 }
 
+/* Padded out past the sidebar's edge, so the current tab's accent bar at the column edge isn't
+   clipped by the list's scrolling (as Steam Settings' page list, client/settings/layout.css) */
 .se-ts-tabs {
   display: flex;
   flex-direction: column;
   gap: var(--se-space-half);
+  margin: 0 calc(-1 * var(--se-space-3));
+  padding: 0 var(--se-space-3);
   overflow-y: auto;
 }
 
-/* A tab: its icon (--se-ts-icon, a duotone mask token) and name */
+/* A tab: its icon (--se-ts-icon, a duotone mask token) and name; its states those of Steam
+   Settings' sidebar (client/settings/layout.css, game-properties.css) */
 .se-ts-tab {
   all: unset;
+  position: relative;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -123,14 +129,31 @@
   mask: var(--se-ts-icon) center / contain no-repeat;
 }
 
-.se-ts-tab:hover {
-  background: var(--se-hairline);
+.se-ts-tab:hover:not([aria-selected="true"]) {
+  background: var(--se-hover);
   color: var(--se-text-strong);
 }
 
 .se-ts-tab[aria-selected="true"] {
-  background: var(--se-selected);
-  color: var(--se-text-strong);
+  background: var(--se-accent-tint);
+  color: var(--se-text);
+  font-weight: 600;
+}
+
+.se-ts-tab[aria-selected="true"]::before {
+  background: var(--se-accent);
+}
+
+/* The current tab's accent bar, on the column's edge */
+.se-ts-tab[aria-selected="true"]::after {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--se-space-3));
+  top: var(--se-space-2);
+  bottom: var(--se-space-2);
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--se-accent);
 }
 
 .se-ts-tab:focus-visible {

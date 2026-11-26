@@ -190,12 +190,15 @@
   background: var(--se-accent);
 }
 
+/* The current page's accent bar, on the column's edge: the PageList scrolls (overflow: auto,
+   Steam's sp.js CSS), so it shows only inside the list's padding (layout.css, --se-space-3);
+   any further out it was clipped to a 1 px sliver */
 html:is([data-se-settings], [data-se-props], [data-se-mill]) ._1-vlriAtKYDViAEunue4VO._2DpXjzK3WWsOtUWUrcuOG7::after {
   content: '';
   position: absolute;
-  left: -14px;
-  top: 8px;
-  bottom: 8px;
+  left: calc(-1 * var(--se-space-3));
+  top: var(--se-space-2);
+  bottom: var(--se-space-2);
   width: 3px;
   border-radius: 0 3px 3px 0;
   background: var(--se-accent);
