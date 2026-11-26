@@ -247,20 +247,42 @@
     else setTimeout(run, 200);
   });
 
-  function measureLogoCrop(img) {
+  /*
+   * The logo shrunk to the sample's size off the main thread: createImageBitmap decodes and scales
+   * a fetched file (a Blob) there, while from an <img> it works on the main thread. Drawn full
+   * size into the canvas, the decode and scale took ~140 ms of one idle callback, a long task.
+   * A file the fetch can't have (no CORS) is shrunk from the image itself.
+   */
+  async function sampleOf(img, source) {
     const scale = Math.min(1, LOGO_SAMPLE / Math.max(img.naturalWidth, img.naturalHeight));
-    const width = Math.max(1, Math.round(img.naturalWidth * scale));
-    const height = Math.max(1, Math.round(img.naturalHeight * scale));
+    const size = {
+      resizeWidth: Math.max(1, Math.round(img.naturalWidth * scale)),
+      resizeHeight: Math.max(1, Math.round(img.naturalHeight * scale)),
+      resizeQuality: 'low',
+    };
+    try {
+      const response = await fetch(source);
+      if (response.ok) return await createImageBitmap(await response.blob(), size);
+    } catch {}
+    return createImageBitmap(img, size);
+  }
+
+  function measureLogoCrop(bitmap) {
+    const { width, height } = bitmap;
     const canvas = Object.assign(document.createElement('canvas'), { width, height });
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    if (!ctx) return '';
+    if (!ctx) {
+      bitmap.close();
+      return '';
+    }
     let data;
     try {
-      ctx.drawImage(img, 0, 0, width, height);
+      ctx.drawImage(bitmap, 0, 0);
       ({ data } = ctx.getImageData(0, 0, width, height));
     } finally {
-      // Free the backing store now rather than at the next GC.
+      // Free the backing stores now rather than at the next GC.
       canvas.width = canvas.height = 0;
+      bitmap.close();
     }
 
     let left = width;
@@ -290,7 +312,8 @@
 
   async function readLogoCrop(img, source) {
     try {
-      return await whenIdle(() => measureLogoCrop(img));
+      const bitmap = await sampleOf(img, source);
+      return await whenIdle(() => measureLogoCrop(bitmap));
     } catch (error) {
       if (error.name !== 'SecurityError') return '';
     }
@@ -301,7 +324,8 @@
     copy.src = source;
     try {
       await copy.decode();
-      return await whenIdle(() => measureLogoCrop(copy));
+      const bitmap = await sampleOf(copy, source);
+      return await whenIdle(() => measureLogoCrop(bitmap));
     } catch {
       return '';
     }

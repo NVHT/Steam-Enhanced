@@ -731,6 +731,28 @@
     return [...nodes].some(el => el?.isConnected && !el.closest('[hidden]') && hasBox(el));
   };
 
+  /*
+   * fn runs once right after the window's next layout: a ResizeObserver's first callback on el,
+   * which Chromium calls once layout is done, so reading geometry or visibility there costs
+   * nothing. For reads that would otherwise land mid-build (a page still drawing, a big grid
+   * redrawing under a scroll) and force a style pass and a layout of their own.
+   */
+  const afterLayoutQueue = new Map(); // el → [fn]
+  let afterLayoutObserver = null;
+  const afterLayout = (el, fn) => {
+    afterLayoutObserver ??= new ResizeObserver((entries) => {
+      for (const { target } of entries) {
+        afterLayoutObserver.unobserve(target);
+        const fns = afterLayoutQueue.get(target) || [];
+        afterLayoutQueue.delete(target);
+        for (const queued of fns) run(queued);
+      }
+    });
+    if (!afterLayoutQueue.has(el)) afterLayoutQueue.set(el, []);
+    afterLayoutQueue.get(el).push(fn);
+    afterLayoutObserver.observe(el);
+  };
+
   const poll = (fn, delay, opts = {}) => {
     const doc = opts.document || document;
     const win = doc.defaultView;
@@ -981,6 +1003,7 @@
     noteMenuApp,
     watch,
     visible,
+    afterLayout,
     poll,
     inside,
     attempt,

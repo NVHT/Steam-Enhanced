@@ -12,8 +12,8 @@
   const TOP_BTN = `:is(.${C.ScrollToTopButton}, .ScrollToTopButton)`;
 
   /*
-   * A button's place follows its scroller's box, so it is measured when that moves: a scroll,
-   * a window resize, or the scroller resizing (topSizer). The page's pass, which runs on any
+   * A button's place follows its scroller's box, so it is measured when that moves: a window
+   * resize, or the scroller resizing (topSizer); a scroll only moves its ring. The page's pass, which runs on any
    * class change in the window, only places a button not yet placed for its scroller: measuring
    * every button on every pass forced a layout each time, on every page.
    */
@@ -40,6 +40,10 @@
     live.topSizer.observe(sc);
   }
 
+  // How far down its scroller is, as the button's ring shows it (0 to 1)
+  const setProgress = (btn, top, max) =>
+    setVar(btn, '--se-scroll', String(max > 0 ? Math.min(1, Math.max(0, top / max)).toFixed(3) : 0));
+
   function placeTop(btn) {
     const sc = btn.__seSc;
     if (!sc?.isConnected) return;
@@ -49,8 +53,7 @@
       btn.__seSc = null;
       return;
     }
-    const max = sc.scrollHeight - sc.clientHeight;
-    setVar(btn, '--se-scroll', String(max > 0 ? Math.min(1, Math.max(0, sc.scrollTop / max)).toFixed(3) : 0));
+    setProgress(btn, sc.scrollTop, sc.scrollHeight - sc.clientHeight);
     const wrap = btn.parentElement;
     if (!wrap) return;
     const o = wrap.getBoundingClientRect();
@@ -75,23 +78,40 @@
     return a.width > 0 && overlap >= a.width * 0.5;
   }
 
-  // Scroll events arrive many times a frame: keep the latest scroller and place once per frame.
+  /*
+   * The button follows a scroll once it settles (SCROLL_SETTLE_MS after the last event), its reads
+   * taken right after the next layout (SE.afterLayout), where they cost nothing. Read in the
+   * event, its frame or after its paint, each cost a style pass and a layout while the page was
+   * still being drawn (a game page building, a virtualized grid redrawing under the scroll: Home's
+   * Uncategorized). A scroll doesn't move the scroller's box or the button's place: those are
+   * measured when a button first serves a scroller, and when either resizes (topSizer,
+   * onResizeTop).
+   */
+  const SCROLL_SETTLE_MS = 120;
   let scrolled = null;
-  live.scrollFrame = 0;
+  live.scrollTimer = 0;
   const topFor = new WeakMap();
 
   function onAnyScroll(e) {
     scrolled = e.target === document ? document.scrollingElement : e.target;
-    if (!live.scrollFrame) live.scrollFrame = requestAnimationFrame(placeScrolled);
+    // Debounced: placed once the scroll has settled
+    clearTimeout(live.scrollTimer);
+    live.scrollTimer = setTimeout(() => {
+      live.scrollTimer = 0;
+      const t = scrolled;
+      scrolled = null;
+      if (t instanceof Element) SE.afterLayout(t, () => placeScrolled(t));
+    }, SCROLL_SETTLE_MS);
   }
 
-  function placeScrolled() {
-    live.scrollFrame = 0;
-    const t = scrolled;
-    scrolled = null;
-    if (!(t instanceof Element) || t.clientHeight < innerHeight * 0.6 || t.scrollHeight - t.clientHeight < 50) return;
-    if (t.closest(SE.SIDE)) return;
+  function placeScrolled(t) {
+    if (!t.isConnected || t.closest(SE.SIDE)) return;
     const known = topFor.get(t);
+    if (known?.isConnected && known.__seSc === t && placedFor.get(known) === t) {
+      setProgress(known, t.scrollTop, t.scrollHeight - t.clientHeight);
+      return;
+    }
+    if (t.clientHeight < innerHeight * 0.6 || t.scrollHeight - t.clientHeight < 50) return;
     if (known?.isConnected && known.__seSc === t) {
       placeTop(known);
       return;

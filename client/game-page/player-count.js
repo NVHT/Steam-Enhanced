@@ -256,15 +256,7 @@
   };
 
   const refreshBadge = async () => {
-    if (
-      destroyed ||
-      !currentAppId ||
-      !badge?.isConnected ||
-      !SE.visible(badge) ||
-      document.visibilityState === 'hidden'
-    ) {
-      return;
-    }
+    if (destroyed || !currentAppId || !badge?.isConnected || document.visibilityState === 'hidden') return;
 
     const id = currentAppId;
     const cached = cache.get(id);
@@ -273,6 +265,8 @@
       return;
     }
     if (activeRequest?.id === id) return;
+    // Only a request asks whether the badge shows (a style pass): this runs on every page pass
+    if (!SE.visible(badge)) return;
 
     abortActiveRequest();
     const job = { id, controller: new AbortController(), timeout: null, timedOut: false };
@@ -357,6 +351,9 @@
     renderBadge(cache.get(currentAppId));
   };
 
+  let placedRoute = null; // the route the badge's row was found for
+  let settling = false; // in the after-layout pass that settles a tie
+  let settleQueued = false;
   const update = () => {
     if (destroyed) return;
     if (document.visibilityState === 'hidden') {
@@ -380,16 +377,44 @@
       return;
     }
 
-    // One visibility check per stats row, not one per stat.
-    const target = [...document.querySelectorAll(`.${C.InPage} .${C.GameStatsSection}`)].find(
-      row => [...row.querySelectorAll(`.${C.GameStat}`)].some(node => node !== badge) && SE.visible(row)
+    // Placed already, in a row still there, the route unchanged: only kept in its place. A
+    // visibility check (checkVisibility) is a style pass, and this runs on every class change in
+    // the game page while it builds: the rows are checked again only when the route changes.
+    const route = routePath();
+    if (badge?.isConnected && hostRow?.isConnected && hostRow.contains(badge) && route === placedRoute) {
+      positionBadge(hostRow);
+      void refreshBadge();
+      return;
+    }
+
+    // The stats row of the game on show: Steam keeps an earlier game's page mounted, hidden, and
+    // its row's game isn't the route's (resolveSelectedAppId gives 0). A tie (the same game's page
+    // twice) is settled by visibility, checked right after the next layout (SE.afterLayout): in
+    // the pass, while the page builds, each check was a style pass of its own.
+    const rows = [...document.querySelectorAll(`.${C.InPage} .${C.GameStatsSection}`)].filter(
+      row => [...row.querySelectorAll(`.${C.GameStat}`)].some(node => node !== badge) && resolveSelectedAppId(row)
     );
+    if (rows.length > 1 && !settling) {
+      if (!settleQueued) {
+        settleQueued = true;
+        SE.afterLayout(document.body, () => {
+          settleQueued = false;
+          settling = true;
+          update();
+          settling = false;
+        });
+      }
+      return;
+    }
+    const target = rows.length > 1 ? rows.find((row) => SE.visible(row)) : rows[0];
     const nextAppId = target && resolveSelectedAppId(target);
 
     if (!target || !nextAppId) {
       unmountBadge();
+      placedRoute = null;
       return;
     }
+    placedRoute = route;
     if (nextAppId !== currentAppId || target !== hostRow || !badge?.isConnected) {
       unmountBadge();
       currentAppId = nextAppId;

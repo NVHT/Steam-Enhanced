@@ -190,7 +190,8 @@
       if (live.muteAll) document.removeEventListener('pointerout', live.muteAll, true);
       unbindTips();
       cancelPass();
-      for (const id of [live.fitQueued, live.scrollFrame]) if (id) cancelAnimationFrame(id);
+      if (live.fitQueued) cancelAnimationFrame(live.fitQueued);
+      clearTimeout(live.scrollTimer);
       clearTimeout(live.shotRetry);
       document.removeEventListener('click', onEmoClick, true);
       document.removeEventListener('click', onCommentPill, true);

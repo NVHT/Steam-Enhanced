@@ -362,7 +362,9 @@
         achRows.set(row, mine);
         if (!live.achSizer) {
           live.achSizer = new ResizeObserver((es) => {
-            for (const e of es) e.target.__seW = e.target.clientWidth;
+            // The entry's own width (the row has no side padding, so it is clientWidth): reading
+            // clientWidth here forced a layout once Steam's own observers had changed the page
+            for (const e of es) e.target.__seW = e.contentBoxSize?.[0]?.inlineSize ?? e.contentRect.width;
             for (const e of es) fillAchRow(e.target);
           });
         }
