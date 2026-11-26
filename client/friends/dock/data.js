@@ -246,10 +246,12 @@
   const flyoutOwnedTabs = new Map();
   const managerTimers = new Set();
   const openGames = new Set();
-  const closedSections = new Set(['offline']);
+  // The Offline section starts folded unless Offline friends says open (main.js follows changes)
+  const offlineFriends = () => SE.settings?.get('offline-friends') || 'folded';
+  const closedSections = new Set(offlineFriends() === 'open' ? [] : ['offline']);
 
   Object.assign(ns, {
-    COPY, STATE, ago: SE.ago, app, closedSections, ctx, flyoutOwnedTabs, friendsOf, groupsOf, importOf,
+    COPY, STATE, ago: SE.ago, app, closedSections, offlineFriends, ctx, flyoutOwnedTabs, friendsOf, groupsOf, importOf,
     managerTimers, openGames, read, state, store,
   });
 })(window.__se);

@@ -156,12 +156,14 @@
       '<div class="se-fd-scroll">' +
       (games ? `<div class="se-fd-label se-fd-pad">${ns.COPY.playing}</div>${games}` : '') +
       section('online', ns.COPY.online, on.length, on.map((f) => friendRow(f, statusLabel(f.state))).join('')) +
-      section(
-        'offline',
-        ns.COPY.offline,
-        off.length,
-        off.map((f) => friendRow(f, f.last ? ns.COPY.lastOnline(ns.ago(f.last)) : ns.COPY.offline)).join('')
-      ) +
+      (ns.offlineFriends() === 'hidden'
+        ? ''
+        : section(
+            'offline',
+            ns.COPY.offline,
+            off.length,
+            off.map((f) => friendRow(f, f.last ? ns.COPY.lastOnline(ns.ago(f.last)) : ns.COPY.offline)).join('')
+          )) +
       (d.groups.length
         ? section(
             'groups',

@@ -273,8 +273,8 @@
         entry.members.setAttribute('aria-label', membersLabel);
       }
       syncCallBar(win, entry.callBar);
-      // Its members menu lists the online ones (member-list.js)
-      ns.hideOfflineMembers?.(win);
+      // Its members menu: the online ones, or everyone (Offline group members; member-list.js)
+      ns.syncOfflineMembers?.(win);
       // ...as tall as its rows: Steam's list is virtualized (no height of its own), and its inner
       // box's inline height is the rows' total, read with no layout
       const rows = win.querySelector('.MemberListColumn > .Panel [style*="will-change"] > div')?.style.height || '';

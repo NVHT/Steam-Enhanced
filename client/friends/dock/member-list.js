@@ -1,5 +1,6 @@
 /*
- * A group's members without the offline ones (the members menu, flyouts.js). Steam's list is a
+ * A group's members without the offline ones (the members menu, flyouts.js), while Offline
+ * group members is Hidden (the default). Steam's list is a
  * virtualized list of fixed slots, so rows can't be hidden by CSS (they'd leave holes): the
  * component that draws it (its render reads GroupMemberStore.GetGroupMemberList, rank buckets)
  * is handed copies of those buckets without offline members while it renders. The store itself
@@ -15,6 +16,7 @@
   const WRAPPED = Symbol('se-online-members');
   let hook = null; // { proto, original, store, getList }
   let rendering = null; // the list component while it renders
+  const trimmed = new WeakSet(); // lists drawn without their offline members
 
   const isOnline = (member) => run(() => member.persona.is_online) !== false;
 
@@ -43,6 +45,7 @@
     const wrapped = function (...args) {
       const outer = rendering;
       rendering = this;
+      if (hook) trimmed.add(this);
       try {
         return render.apply(this, args);
       } finally {
@@ -111,5 +114,23 @@
     hook = null;
   }
 
-  Object.assign(ns, { hideOfflineMembers: install, showOfflineMembers: uninstall });
+  // A group window's list as Offline group members says: trimmed, or redrawn in full once
+  function sync(win) {
+    const hide = SE.settings?.get('offline-members') !== 'shown';
+    if (hide) install(win);
+    else uninstall();
+    // A list drawn the other way (this window's, while another installed or removed the hook),
+    // redrawn once: noted as done first, so a redraw that doesn't take never repeats each pass
+    const instance = listComponent(win);
+    if (!instance || trimmed.has(instance) === hide || (hide && !hook)) return;
+    if (hide) {
+      wrapOwn(instance);
+      trimmed.add(instance);
+    } else {
+      trimmed.delete(instance);
+    }
+    run(() => instance.forceUpdate());
+  }
+
+  Object.assign(ns, { syncOfflineMembers: sync, showOfflineMembers: uninstall });
 })(window.__se);

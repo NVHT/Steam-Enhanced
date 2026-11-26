@@ -297,6 +297,11 @@
       values: [opt('last', 'As left'), opt('open', 'Open'), opt('folded', 'Folded')],
     },
     {
+      key: 'offline-friends', section: 'Dock', tab: 'Friends', label: 'Offline friends',
+      hint: "The dock's Offline section: folded until you open it, open, or not there at all.",
+      values: [opt('folded', 'Folded'), opt('open', 'Open'), opt('hidden', 'Hidden')],
+    },
+    {
       key: 'dock-width', section: 'Dock', tab: 'Friends', label: 'Friends dock width', from: 'Friends dock width',
       hint: "Adjustable: drag the dock's left edge (double-click resets).",
       values: [opt('fixed', 'Fixed'), opt('adjustable', 'Adjustable', 'options/friends/dock-adjustable.css')],
@@ -305,6 +310,11 @@
       key: 'chat-open', section: 'Chats', tab: 'Friends', label: 'Chats open in',
       hint: "Dock: a chat opens beside the dock. Window: in Steam's own chat window.",
       values: [opt('dock', 'Dock'), opt('window', 'Window')],
+    },
+    {
+      key: 'offline-members', section: 'Chats', tab: 'Friends', label: 'Offline group members',
+      hint: "In a group chat's members list.",
+      values: [opt('hidden', 'Hidden'), opt('shown', 'Shown')],
     },
     {
       key: 'hover-cards', section: 'Friend cards', tab: 'Friends', label: 'Friend cards',

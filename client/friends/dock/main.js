@@ -190,6 +190,21 @@
   const chatWatcher = SE.watch(syncChatTabs, { scope: '.se-fd-steam', throttle: 100 });
   window.addEventListener('focus', onDesktopChatFocus);
   document.addEventListener('visibilitychange', requestChatHandoff);
+
+  // Offline friends and Offline group members, changed: the section folds or opens as chosen
+  // (only when that setting changed: a fold of the viewer's own stays), the members list redraws
+  let offlineFriends = ns.offlineFriends();
+  const offSettings = SE.settings?.on(() => {
+    const next = ns.offlineFriends();
+    if (next !== offlineFriends) {
+      offlineFriends = next;
+      if (next === 'open') closedSections.delete('offline');
+      else closedSections.add('offline');
+      state.sig = '';
+      render();
+    }
+    ns.syncGroupFlyouts();
+  });
   const focusRegistration = run(() => window.SteamClient?.System?.UI?.RegisterForFocusChangeEvents?.((event) => {
     const focused = event?.focusedApp;
     state.foregroundApp = focused ? { appid: Number(focused.appid), pid: Number(focused.pid) } : null;
@@ -311,6 +326,7 @@
       timer?.disconnect();
       if (live.frame) cancelAnimationFrame(live.frame);
       window.removeEventListener('focus', onDesktopChatFocus);
+      offSettings?.();
       document.removeEventListener('visibilitychange', requestChatHandoff);
       run(() => focusRegistration?.unregister?.());
       run(() => notificationRegistration?.unregister?.());
