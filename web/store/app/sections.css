@@ -1,0 +1,26 @@
+/*
+ * Game page: Steam's page-column sections, hidden behind one "Read more" (app/sections.js).
+ * The button is the web's shared button (web/store/shared/ui-buttons.css).
+ */
+
+/* Opened sections show whole: Steam's own cap goes. !important: Steam's autocollapse sets
+   max-height inline (game.js InitAutocollapse). */
+html.se-app-sections-on .game_description_column .game_page_autocollapse {
+  max-height: none !important;
+}
+
+/* Steam's fade and READ MORE: the theme's button stands in. !important: Steam's own rule for
+   the fade (a hashed store stylesheet, not game.css) outranks this one. */
+html.se-app-sections-on .game_description_column .game_page_autocollapse_fade {
+  display: none !important;
+}
+
+/* The sections, until Read more. */
+html.se-app-sections-on [data-se-folded] {
+  display: none;
+}
+
+/* The button, where the first section was: Steam's sections' own gap above. */
+.se-app-sections {
+  margin-top: var(--se-space-6);
+}

@@ -113,6 +113,7 @@
       { css: 'app/about.css', js: 'app/about.js', on: ['app'] },
       { css: 'app/hidden.css', on: ['app'] },
       { css: 'app/purchase.css', js: 'app/purchase.js', on: ['app'] },
+      { css: 'app/sections.css', js: 'app/sections.js', on: ['app'] },
       { css: 'explore/page.css', js: 'explore/page.js', on: ['explore'] },
       { css: 'charts/page.css', on: ['charts'] },
       { css: 'labs/page.css', js: 'labs/page.js', on: ['labs'] },
