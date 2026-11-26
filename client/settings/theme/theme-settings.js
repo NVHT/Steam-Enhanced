@@ -43,13 +43,13 @@
     home: 'home', 'steam-home-parts': 'grid', 'stage-source': 'heart', 'stage-count': 'list-ordered', 'stage-details': 'info',
     'stage-nav': 'view-compact', 'stage-cycle': 'restore', 'stage-motion': 'art-zoom',
     'hover-delay': 'snooze', 'avatar-name': 'user', 'game-count': 'chart', 'rail-buttons': 'list-ordered',
-    'dock-start': 'power', 'chat-open': 'bubble', 'hover-cards': 'user', 'hover-card-delay': 'snooze',
+    'dock-start': 'power', 'offline-friends': 'eye-off', 'offline-members': 'group', 'chat-open': 'bubble', 'hover-cards': 'user', 'hover-card-delay': 'snooze',
     'profile-backgrounds': 'photo',
     'toast-time': 'snooze', 'toast-queue': 'list', 'stage-position': 'move', 'toast-ach-art': 'art-zoom',
     'toast-hover': 'pause', 'overlay-open': 'tv', 'overlay-ach-tab': 'badge', 'overlay-panels': 'grid',
     'overlay-views': 'list', 'overlay-clock': 'calendar', 'overlay-playtime': 'activity',
     'web-sites': 'globe', 'page-width': 'view-expanded',
-    'game-sections': 'folder', 'game-list-icons': 'tag', 'rarity-tiers': 'badge',
+    'game-sections': 'folder', 'game-list-icons': 'tag', 'rarity-tiers': 'badge', 'logo-place': 'move',
     'splash-when': 'calendar', 'startup-wait': 'pause', 'splash-art': 'art-zoom', 'background-motion': 'art-parallax',
   };
 
