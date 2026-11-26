@@ -118,6 +118,18 @@
   steamHost.addEventListener('click', onNativeChannelClick);
   steamHost.addEventListener('mouseover', ns.friendCard.over);
   steamHost.addEventListener('mouseout', ns.friendCard.out);
+  steamHost.addEventListener('pointerdown', ns.friendCard.press, true);
+
+  /*
+   * Over a Store or Community page, a menu Steam draws in the main window (its choice when it
+   * fits) lies under the page's native view, cut off where they meet. The dock's menus (group
+   * chats, sections, a chat's messages) open in a window of their own then, as the friend menu
+   * always does (Steam's bForcePopup).
+   */
+  const menuParts = window.__seSteamMenuParts;
+  const popOverPage = (element, options) =>
+    SE.browserShown() && element?.closest?.('.se-fdock') && !options.bForcePopup ? { ...options, bForcePopup: true } : null;
+  menuParts?.optionHooks.add(popOverPage);
   dock.addEventListener('mouseover', ns.friendCard.overRail);
   dock.addEventListener('mouseout', ns.friendCard.outRail);
   dock.addEventListener('pointerdown', ns.friendCard.pressRail);
@@ -324,6 +336,7 @@
       timer?.disconnect();
       if (live.frame) cancelAnimationFrame(live.frame);
       window.removeEventListener('focus', onDesktopChatFocus);
+      menuParts?.optionHooks.delete(popOverPage);
       offSettings?.();
       document.removeEventListener('visibilitychange', requestChatHandoff);
       run(() => focusRegistration?.unregister?.());
@@ -349,6 +362,7 @@
       steamHost.removeEventListener('click', onNativeChannelClick);
       steamHost.removeEventListener('mouseover', ns.friendCard.over);
       steamHost.removeEventListener('mouseout', ns.friendCard.out);
+      steamHost.removeEventListener('pointerdown', ns.friendCard.press, true);
       dock.removeEventListener('mouseover', ns.friendCard.overRail);
       dock.removeEventListener('mouseout', ns.friendCard.outRail);
       dock.removeEventListener('pointerdown', ns.friendCard.pressRail);

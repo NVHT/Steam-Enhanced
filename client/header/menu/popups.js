@@ -67,6 +67,7 @@
     live.manager = candidate;
     live.originalCreate = live.manager.CreateContextMenuInstance;
     live.wrappedCreate = function (...args) {
+      ns.menuOptions(args);
       const instance = live.originalCreate.apply(this, args);
       ns.patchInstance(instance);
       for (const hook of ns.createHooks) SE.run(hook, instance);
@@ -89,6 +90,7 @@
     if (owner !== live.manager && !sidebarManagers.has(owner)) {
       const original = owner.CreateContextMenuInstance;
       const wrapped = function (...args) {
+        ns.menuOptions(args);
         const menu = original.apply(this, args);
         ns.patchInstance(menu);
         return menu;

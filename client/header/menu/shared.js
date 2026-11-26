@@ -71,6 +71,20 @@
   const cleanups = [];
 
   /*
+   * Option hooks see a menu's options before Steam makes it, (element, options) -> options or
+   * nothing (client/friends/dock/main.js: the dock's menus in a window of their own over a
+   * browser page). menuOptions(args) runs them on CreateContextMenuInstance's arguments
+   * (content, element, x, y, options); every wrap of it calls it first.
+   */
+  const optionHooks = new Set();
+  const menuOptions = (args) => {
+    for (const hook of optionHooks) {
+      const next = SE.run(hook, args[1], args[4] || {});
+      if (next) args[4] = next;
+    }
+  };
+
+  /*
    * Closing with the menus' animation: every way Steam hides a menu ends in InternalHide, which
    * drops its window at once. Wrapped, the panel (panelOf(instance)) plays the closing animation
    * first (SE.layer.closeWith, core/motion.css) and the window goes when it ends. Hidden again
@@ -119,7 +133,7 @@
     );
 
   Object.assign(ns, {
-    animateClose, cleanups, createHooks, heading,
+    animateClose, cleanups, createHooks, heading, menuOptions, optionHooks,
     ROOT_BTN_SELECTOR, SIDE_HOVER, SUBMENU_NAMES, avatarLayouts, hoverDocuments,
     patched, sideButtons, sidebarManagers,
   });

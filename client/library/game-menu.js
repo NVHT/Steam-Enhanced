@@ -589,6 +589,7 @@
     if (!proto) return false;
     const original = proto.CreateContextMenuInstance;
     const wrapped = function (...args) {
+      ns.menuOptions(args);
       const instance = original.apply(this, args);
       run(patchLibraryMenu, instance);
       return instance;

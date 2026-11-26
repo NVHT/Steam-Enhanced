@@ -139,6 +139,13 @@
     if (card?.left(event)) card.leave();
   }
 
+  /*
+   * A press in the panel (a click opens a chat, a right click Steam's friend menu): the card
+   * makes way first. Over a browser page both are popup windows, and the card's, still open as
+   * the menu's opened, closed the menu at once.
+   */
+  const press = () => card?.leave();
+
   // A friend's face in the collapsed rail (templates.js railTile): the card beside the rail
   const RAIL_FACE = '.se-fd-railfriend';
 
@@ -271,6 +278,6 @@
   }
 
   ns.friendCard = {
-    over, out, overRail, outRail, pressRail, overFly, outFly, leaveFly, dispose, showFor, leaveFor, dropFor,
+    over, out, press, overRail, outRail, pressRail, overFly, outFly, leaveFly, dispose, showFor, leaveFor, dropFor,
   };
 })(window.__se);
