@@ -15,7 +15,10 @@
  * A new version swaps the build in place: copies of the current stylesheets hold the page's
  * look, the site's destroy() undoes every feature, the loader starts again at the new version,
  * and the copies go once the new sheets have loaded. No page reload, no Steam restart. A
- * "Live <version>" badge (bottom-left) shows it is running and flashes on each swap.
+ * "Live <version>" badge (bottom-left) shows it is running and flashes on each swap. While it is
+ * on, pages also load the theme's files afresh: ?v= carries the version and a stamp of the page
+ * load (tagOf), since the web view keeps a file long unchanged on disk for hours under the same
+ * version. It takes effect from the next page load after live reload is switched on.
  */
 (() => {
   const SITES = {
@@ -53,6 +56,14 @@
    */
   const SETTINGS_KEY = 'se-settings';
   const VERSION_KEY = 'se-theme-version'; // the theme build last seen on this site
+  const LIVE_KEY = 'se-live-reload'; // set while dev/live-reload.json is on (startLiveReload)
+  let fresh = false;
+  try {
+    fresh = localStorage.getItem(LIVE_KEY) === '1';
+  } catch {}
+  const STAMP = Date.now().toString(36);
+  /** The ?v= value for a build: its version, and this page load's stamp under live reload. */
+  const tagOf = (version) => (version && fresh ? `${version}.${STAMP}` : version);
   const readSettings = () => {
     try {
       const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY));
@@ -78,7 +89,7 @@
       const palette = pairs.length ? `:root:root{${pairs.map(([name, value]) => `${name}:${value}`).join(';')}}` : '';
       const imports = files.map((file) => {
         const url = new URL(`../${file}`, coreSrc);
-        if (version) url.searchParams.set('v', version);
+        if (version) url.searchParams.set('v', tagOf(version));
         return `@import url("${url.href}");`;
       });
       const css = [...imports, palette].join('\n');
@@ -179,7 +190,7 @@
   const load = (version) => {
     const versioned = (file) => {
       const url = new URL(file, coreSrc);
-      if (version) url.searchParams.set('v', version);
+      if (version) url.searchParams.set('v', tagOf(version));
       return url.href;
     };
     const head = document.head ?? document.documentElement;
@@ -295,6 +306,10 @@
     fetch(new URL(`../dev/live-reload.json?t=${Date.now()}`, coreSrc), { cache: 'no-store' })
       .then((response) => (response.ok ? response.json() : null))
       .then((config) => {
+        try {
+          if (config?.enabled) localStorage.setItem(LIVE_KEY, '1');
+          else localStorage.removeItem(LIVE_KEY);
+        } catch {}
         if (!config?.enabled) return;
         if (document.body) showBadge();
         else addEventListener('DOMContentLoaded', showBadge, { once: true });
