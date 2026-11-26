@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.5.2**](#v1-5-2) | Nov 26, 2026 | Toasts in game show every time, fullscreen too |
 | [**1.5.1**](#v1-5-1) | Nov 25, 2026 | Linux menus without black edges, Square corners |
 | [**1.5.0**](#v1-5-0) | Nov 25, 2026 | Every Steam Settings page redesigned, a start on any page, a cleaner theme |
 | [**1.4.5**](#v1-4-5) | Nov 24, 2026 | The Friends window opens on the screen you left it |
@@ -27,11 +28,23 @@
 
 <br>
 
+<a name="v1-5-2"></a>
+
+## 1.5.2 · Nov 26, 2026
+
+> Toasts in a game show on the stage every time, in fullscreen too, instead of only sometimes.
+
+**Fixes**
+- **Toasts in game**: the stage now lands in its place in a game's overlay every time; before, the overlay could keep the window in Steam's corner, and the toast never showed.
+- **Toasts in game**: a toast that still can't take the stage shows as a compact card for Steam's full time, instead of closing unseen.
+
+<br>
+
 <a name="v1-5-1"></a>
 
-## 1.5.1 · Nov 25, 2026
-
-> Menus in their own window lose their black edges on Linux, and Corners gains a Square choice.
+<details>
+<summary><b>1.5.1</b> · Nov 25, 2026 · Menus in their own window lose their black edges on Linux, and Corners gains a Square choice.</summary>
+<br>
 
 **Fixes**
 - **Menu windows**: Solid, the default on Linux, now applies without being chosen; the Steam menu keeps no strip on its left, and a menu's window is filled behind it, so nothing past its corners shows black. Buttons and cards in menus keep the Corners setting's radius (#6).
@@ -39,6 +52,8 @@
 **Settings**
 - **Corners**: a Square choice; the choices now run from Square to Round.
 - **Appearance**: Fine-tune grouped: font, corners, contrast and animations, then glass and game art, then menus.
+
+</details>
 
 <br>
 
