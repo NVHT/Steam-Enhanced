@@ -286,14 +286,21 @@
   flex: none;
 }
 
-/* A setting that doesn't apply with the others as set (its requires): dimmed, its controls off */
-.se-ts-row-off > :not(.se-ts-row-icon) {
-  opacity: var(--se-btn-disabled-opacity);
-}
-
-/* One marked hideOff, and a section left with none of its rows: gone (theme-settings.js) */
+/* A setting that doesn't apply with the others as set (its requires), and a section left with
+   none of its rows: gone (theme-settings.js) */
 .se-ts-row-gone {
   display: none !important; /* !important: the rows' and headings' own display (this file) */
+}
+
+/* A row or section coming back (theme-settings.js): it fades in, settling from just above, as a
+   menu opens; going, it fades and lifts as a menu closes, a little quicker, then hides
+   (core/motion.css) */
+[data-se-ts-appear] {
+  animation: se-menu-in var(--se-dur-mid) var(--se-ease);
+}
+
+[data-se-ts-leave] {
+  animation: se-menu-out var(--se-dur) var(--se-ease-in) forwards;
 }
 
 /* A row of toggles (a multi setting) goes under its text, lined up with it */

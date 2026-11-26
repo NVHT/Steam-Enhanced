@@ -45,7 +45,7 @@
    * Each setting: key, tab, label, hint, and its choices. def: its default, else the first
    * choice (type 'multi': any of them on, all by default; type 'text': a string).
    * section: the heading its tab groups it under; requires: [[key, value], ...] the settings it
-   * applies with (the window dims it otherwise; hideOff: hides it, and a section left empty);
+   * applies with (the window hides it otherwise, and a section left empty);
    * visual: its choices drawn as pictures
    * (client/settings/theme/theme-settings.css); hide (multi): a selector, % standing for a
    * choice (or { choice: selector }, a Steam class through SE.C), whose matches go while that choice is off (client/loader.js applyOptions); type
@@ -232,6 +232,38 @@
       hint: "Each game's small icon before its name in the list.",
       values: [opt('on', 'On'), opt('off', 'Off', 'options/library/game-icons-off.css')],
     },
+    {
+      key: 'cover-chips', section: 'Covers', tab: 'Library', label: 'Status chips',
+      hint: "A chip in each cover's corner: ready to play, not installed, or updating. Off: no marks, Steam's buttons too.",
+      // client/library/cover-state.js draws them
+      values: [opt('on', 'On'), opt('off', 'Off', 'options/library/cover-chips-off.css')],
+    },
+    {
+      key: 'cover-chips-show', section: 'Covers', requires: [['cover-chips', 'on']], tab: 'Library', label: 'Show chips',
+      hint: "On hover: a cover's chip shows while you point at it, as Steam's Deck badge does; a download's stays.",
+      values: [opt('hover', 'On hover', 'options/library/cover-chips-hover.css'), opt('always', 'Always')],
+    },
+    {
+      key: 'cover-friends', section: 'Covers', tab: 'Library', label: 'Friends playing',
+      hint: "Friends in the game, as faces or a count in a cover's corner. Its hover card still lists them.",
+      values: [opt('on', 'On'), opt('off', 'Off', 'options/library/cover-friends-off.css')],
+    },
+    {
+      key: 'deck-badge-show', section: 'Covers', tab: 'Library', label: 'Steam Deck badge',
+      hint: "How a game runs on Steam Deck, in a cover's corner. On hover: while you point at the cover, as Steam shows it.",
+      values: [opt('hover', 'On hover'), opt('always', 'Always', 'options/library/deck-badge-always.css')],
+    },
+    {
+      key: 'release-chips', section: 'Covers', tab: 'Library', label: 'Release chips',
+      hint: "Coming soon, ready to pre-load, or new to your library, in a cover's top corner. Off: no mark, Steam's banner too.",
+      values: [opt('on', 'On'), opt('off', 'Off')], // client/library/cover-state.js
+    },
+    {
+      key: 'dim-uninstalled', section: 'Covers', tab: 'Library', label: 'Dim uninstalled games',
+      hint: "Covers of games that aren't installed fade back until you point at one.",
+      def: 'off',
+      values: [opt('on', 'On', 'options/library/dim-uninstalled.css'), opt('off', 'Off')],
+    },
     /*
      * Home: which Home shows, and the Home stage's own settings (client/home/stage/stage-settings.js,
      * whose menu, a right click on the title bar's Home switch, edits the same values). The collection a stage features is kept as
@@ -243,27 +275,46 @@
       values: [opt('theme', 'Stage'), opt('steam', "Steam's")],
     },
     {
-      key: 'steam-home-parts', section: "Steam's Home", requires: [['home', 'steam']], hideOff: true, tab: 'Home',
+      key: 'steam-home-parts', section: "Steam's Home", requires: [['home', 'steam']], tab: 'Home',
       label: 'Shown', type: 'multi', hint: "Parts of Steam's Home; the rest go.",
       // Steam's own classes (no stable attribute on them): What's New (its Updates container), and the
       // Add shelf row
       hide: { whatsnew: `.${SE.C.UpdatesContainer}`, addshelf: `.${SE.C.AddShowcaseRow}` },
       values: [opt('whatsnew', "What's New"), opt('addshelf', 'Add shelf')],
     },
+    // What's New, its own group under Steam's Home (client/home/whats-new.css, options/home/)
     {
-      key: 'stage-source', section: 'Featured games', requires: [['home', 'theme']], hideOff: true, tab: 'Home', label: 'Games',
+      key: 'whats-new-art', section: "What's New", requires: [['home', 'steam']], tab: 'Home',
+      label: 'Pictures', hint: 'Off: each news item as its title, game and date only.',
+      values: [opt('on', 'On'), opt('off', 'Off', 'options/home/whats-new-art-off.css')],
+    },
+    {
+      key: 'whats-new-summary', section: "What's New", requires: [['home', 'steam'], ['whats-new-art', 'on']],
+      tab: 'Home', label: 'Summary on hover', hint: "The news's summary, rising over its picture.",
+      values: [opt('on', 'On'), opt('off', 'Off', 'options/home/whats-new-summary-off.css')],
+    },
+    {
+      key: 'whats-new-cards', section: "What's New", requires: [['home', 'steam']], tab: 'Home',
+      label: 'Cards across', hint: 'How many news items fill the row, 6 at least. Auto: more on a wider window.',
+      values: [
+        opt('auto', 'Auto'), opt('6', '6', 'options/home/whats-new-6.css'), opt('8', '8', 'options/home/whats-new-8.css'),
+        opt('10', '10', 'options/home/whats-new-10.css'),
+      ],
+    },
+    {
+      key: 'stage-source', section: 'Featured games', requires: [['home', 'theme']], tab: 'Home', label: 'Games',
       hint: 'What the stage features. Pick a collection by right-clicking the Home button.',
       values: [opt('recent', 'Recent'), opt('favorites', 'Favorites'), opt('collection', 'Collection'), opt('added', 'Added')],
     },
     { key: 'stage-collection', tab: 'Home', type: 'text', hidden: true, label: 'Collection', values: [], def: '' },
     {
-      key: 'stage-count', section: 'Featured games', requires: [['home', 'theme']], hideOff: true, tab: 'Home', label: 'How many',
+      key: 'stage-count', section: 'Featured games', requires: [['home', 'theme']], tab: 'Home', label: 'How many',
       hint: 'Games the stage cycles through.',
       values: [opt('4', '4'), opt('6', '6'), opt('8', '8'), opt('10', '10')],
       def: '6',
     },
     {
-      key: 'stage-details', section: 'Featured games', requires: [['home', 'theme']], hideOff: true, tab: 'Home', label: 'Details',
+      key: 'stage-details', section: 'Featured games', requires: [['home', 'theme']], tab: 'Home', label: 'Details',
       type: 'multi', hint: 'What the stage shows about a game.',
       values: [
         opt('logo', 'Logo'), opt('by', 'Developer'), opt('reviews', 'Reviews'), opt('live', 'Playing now'),
@@ -271,18 +322,18 @@
       ],
     },
     {
-      key: 'stage-nav', section: 'Switching games', requires: [['home', 'theme']], hideOff: true, tab: 'Home', label: 'Game picker',
+      key: 'stage-nav', section: 'Switching games', requires: [['home', 'theme']], tab: 'Home', label: 'Game picker',
       hint: 'Under the stage: thumbnails, dots, or nothing.',
       values: [opt('thumbs', 'Thumbnails'), opt('dots', 'Dots'), opt('none', 'Hidden')],
     },
     {
-      key: 'stage-cycle', section: 'Switching games', requires: [['home', 'theme']], hideOff: true, tab: 'Home', label: 'Auto-switch',
+      key: 'stage-cycle', section: 'Switching games', requires: [['home', 'theme']], tab: 'Home', label: 'Auto-switch',
       hint: 'How long each game stays before the next.',
       values: [opt('off', 'Off'), opt('slow', '15 s'), opt('normal', '9 s'), opt('fast', '5 s')],
       def: 'normal',
     },
     {
-      key: 'stage-motion', section: 'Background art', visual: true, requires: [['home', 'theme']], hideOff: true, tab: 'Home', label: 'Background',
+      key: 'stage-motion', section: 'Background art', visual: true, requires: [['home', 'theme']], tab: 'Home', label: 'Background',
       hint: 'Behind the featured game. Still with reduced motion.',
       values: [opt('zoom', 'Zoom'), opt('parallax', 'Parallax'), opt('shots', 'Screenshots'), opt('trailer', 'Trailer'), opt('still', 'Still')],
     },

@@ -42,7 +42,8 @@
     'toasts-in-game': 'console', 'toast-style': 'view-compact', 'toast-position': 'move', overlay: 'tv',
     'overlay-darkness': 'moon', 'click-opens': 'external', 'menu-hover': 'fold', shortcuts: 'key',
     'millennium-open': 'millennium',
-    home: 'home', 'steam-home-parts': 'grid', 'stage-source': 'heart', 'stage-count': 'list-ordered', 'stage-details': 'info',
+    home: 'home', 'steam-home-parts': 'grid', 'whats-new-art': 'photo', 'whats-new-summary': 'news',
+    'whats-new-cards': 'view-compact', 'stage-source': 'heart', 'stage-count': 'list-ordered', 'stage-details': 'info',
     'stage-nav': 'view-compact', 'stage-cycle': 'restore', 'stage-motion': 'art-zoom',
     'hover-delay': 'snooze', 'avatar-name': 'user', 'game-count': 'chart', 'rail-buttons': 'list-ordered',
     'dock-start': 'power', 'offline-friends': 'eye-off', 'offline-members': 'group', 'chat-open': 'bubble', 'hover-cards': 'user', 'hover-card-delay': 'snooze',
@@ -51,7 +52,7 @@
     'toast-hover': 'pause', 'overlay-open': 'tv', 'overlay-ach-tab': 'badge', 'overlay-panels': 'grid',
     'overlay-views': 'list', 'overlay-clock': 'calendar', 'overlay-playtime': 'activity',
     'web-sites': 'globe', 'page-width': 'view-expanded',
-    'game-sections': 'folder', 'game-list-icons': 'tag', 'rarity-tiers': 'badge', 'logo-place': 'move',
+    'game-sections': 'folder', 'game-list-icons': 'tag', 'dim-uninstalled': 'drive-download', 'cover-chips': 'check-circle', 'cover-chips-show': 'eye', 'cover-friends': 'friends', 'deck-badge-show': 'gamepad', 'release-chips': 'sparkle', 'rarity-tiers': 'badge', 'logo-place': 'move',
     'splash-when': 'calendar', 'startup-wait': 'pause', 'splash-art': 'art-zoom', 'background-motion': 'art-parallax',
   };
 
@@ -257,16 +258,46 @@
       if (item.type === 'multi' || item.visual || item.values.length > 4) node.classList.add('se-ts-row-wide');
       const control = item.type === 'multi' ? toggles(item) : item.visual ? pictures(item) : segmented(item);
       node.append(text, control);
-      // A setting that applies only with others (requires) dims, its controls off, until they hold;
-      // one marked hideOff goes instead (another choice brings settings of its own)
+      // A setting that applies only with others (requires) is hidden until they hold
       if (item.requires) {
+        let wasOff = null;
         updates.push(() => {
           const off = !item.requires.every(([key, value]) => settings.get(key) === value);
-          node.classList.toggle(item.hideOff ? 'se-ts-row-gone' : 'se-ts-row-off', off);
-          for (const control of node.querySelectorAll('button')) control.disabled = off;
+          node.toggleAttribute('data-se-ts-off', off);
+          shown(node, !off, wasOff === null ? null : !wasOff);
+          wasOff = off;
         });
       }
       return node;
+    };
+
+    /*
+     * A row or section shown or hidden as another setting changes: it eases in, or out before it
+     * goes (theme-settings.css, a menu's motion); when the window opens (was: null) it simply is.
+     * Without the animation (reduced motion) it goes at once; coming back mid-way cancels the going.
+     */
+    const shown = (node, on, was) => {
+      if (was === null) {
+        node.classList.toggle('se-ts-row-gone', !on);
+        return;
+      }
+      if (on === was) return;
+      if (on) {
+        node.removeAttribute('data-se-ts-leave');
+        node.classList.remove('se-ts-row-gone');
+        node.setAttribute('data-se-ts-appear', '');
+        node.addEventListener('animationend', () => node.removeAttribute('data-se-ts-appear'), { once: true });
+        return;
+      }
+      const gone = () => {
+        if (!node.hasAttribute('data-se-ts-leave')) return;
+        node.removeAttribute('data-se-ts-leave');
+        node.classList.add('se-ts-row-gone');
+      };
+      node.removeAttribute('data-se-ts-appear');
+      node.setAttribute('data-se-ts-leave', '');
+      if (getComputedStyle(node).animationName === 'none') gone();
+      else node.addEventListener('animationend', gone, { once: true });
     };
 
     // A tab's rows: a card per section (its heading over it), else one card
@@ -282,11 +313,14 @@
         rows.append(...list.map((item) => row(item)));
         const head = name ? heading(name) : null;
         // A section whose every row is gone goes with them, its heading too
-        if (list.some((item) => item.hideOff)) {
+        if (list.some((item) => item.requires)) {
+          let wasGone = null;
           updates.push(() => {
-            const gone = [...rows.children].every((node) => node.classList.contains('se-ts-row-gone'));
-            rows.classList.toggle('se-ts-row-gone', gone);
-            head?.classList.toggle('se-ts-row-gone', gone);
+            const gone = [...rows.children].every((node) => node.hasAttribute('data-se-ts-off'));
+            const was = wasGone === null ? null : !wasGone;
+            shown(rows, !gone, was);
+            if (head) shown(head, !gone, was);
+            wasGone = gone;
           });
         }
         return head ? [head, rows] : [rows];
@@ -524,9 +558,20 @@
 
   /* ---------- The popup ---------- */
 
+  /*
+   * Already open, maybe behind another window or minimized: shown and raised as Steam raises its
+   * own windows, each call in the popup's own window (focus() alone leaves it where it is)
+   */
+  function raise(win) {
+    const client = win.SteamClient?.Window;
+    run(() => client?.ShowWindow?.());
+    run(() => client?.BringToFront?.());
+    run(() => win.focus());
+  }
+
   function open() {
     if (popup && view?.doc) {
-      run(() => view.doc.defaultView.focus());
+      raise(view.doc.defaultView);
       return true;
     }
     const runtime = window.__seMillenniumWindow?.popupRuntime?.();
