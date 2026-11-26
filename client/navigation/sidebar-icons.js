@@ -5,7 +5,7 @@
  * Recent and Ready to play can be joined by more toggles in their row: Steam's Linux-games
  * toggle (Tux, Linux only) and plugin buttons (ProtonDB Library Badges' dots). The row's tile
  * count goes to --se-view-n on <html> so this toolbar lays out a slot for each; Steam's own
- * extra toggle is marked for its icon. While the list shows, the whole row sits in the title-bar
+ * toggles are marked by what they are, for their icons. While the list shows, the whole row sits in the title-bar
  * search (client/navigation/nav-rail.js measures it).
  */
 ((SE) => {
@@ -17,23 +17,26 @@
 
   const ROOT = document.documentElement;
   const VIEW_N = '--se-view-n';
-  const VIEW = 'data-se-os-view'; // not data-se-view: collections.js marks its pages with that
-  // Steam shows the OS toggle only on its own platform; it is drawn with the Linux icon only there.
-  const OS_VIEW = /Linux/.test(navigator.userAgent) && !/Android/.test(navigator.userAgent) ? 'linux' : null;
-
+  const VIEW = 'data-se-view-toggle'; // not data-se-view: collections.js marks its pages with that
   /*
-   * Recent and Ready to play are the row's first two children. A native toggle after them is
-   * Steam's OS toggle; a plugin's is wrapped (ProtonDB's .pdb-dots-toggle), so not marked.
+   * Steam's own toggles, in its order: off Windows its OS toggle comes first (Linux games, Mac
+   * games), then Recent and Ready to play. The Mac one has no theme icon, so it stays unmarked.
+   * A plugin's toggle is wrapped (ProtonDB's .pdb-dots-toggle), so never counted.
    */
+  const UA = navigator.userAgent;
+  const OS_VIEW = /Windows/.test(UA) ? [] : [/Linux/.test(UA) && !/Android/.test(UA) ? 'linux' : null];
+  const VIEWS = [...OS_VIEW, 'recent', 'ready'];
+
   const syncViewToggles = (root) => {
     const bar = root.querySelector(`.${C.CheckboxWithImage}`)?.parentElement;
     if (!bar) return;
     const toggles = [...bar.children];
     SE.cssVar(ROOT, VIEW_N, toggles.length > 2 ? String(toggles.length) : null);
-    toggles.forEach((node, i) => {
-      const native = i > 1 && node.classList.contains(C.CheckboxWithImage);
-      SE.attr(node, VIEW, native ? OS_VIEW : null);
-    });
+    let native = 0;
+    for (const node of toggles) {
+      const view = node.classList.contains(C.CheckboxWithImage) ? VIEWS[native++] : null;
+      SE.attr(node, VIEW, view ?? null);
+    }
   };
 
   function restoreRoot(root, entry) {
