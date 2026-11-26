@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.5.4**](#v1-5-4) | Nov 26, 2026 | Millennium's settings work with Millennium 3.7 |
 | [**1.5.3**](#v1-5-3) | Nov 26, 2026 | The store's hero: no blank tiles, cleaner promotions |
 | [**1.5.2**](#v1-5-2) | Nov 26, 2026 | Toasts in game show every time, fullscreen too |
 | [**1.5.1**](#v1-5-1) | Nov 25, 2026 | Linux menus without black edges, Square corners |
@@ -29,11 +30,23 @@
 
 <br>
 
+<a name="v1-5-4"></a>
+
+## 1.5.4 · Nov 26, 2026
+
+> Millennium's settings switch pages and keep the theme's look on Millennium 3.7 (beta).
+
+**Fixes**
+- **Millennium settings**: on Millennium 3.7, clicking a page no longer leaves you on General.
+- **Millennium settings**: every page keeps the theme's design on Millennium 3.7; the Themes page no longer shows Millennium's plain card.
+
+<br>
+
 <a name="v1-5-3"></a>
 
-## 1.5.3 · Nov 26, 2026
-
-> The store's front page hero shows only art Steam provides, so no more blank tiles, and a promotion like the Steam Awards shows as its own art with one button.
+<details>
+<summary><b>1.5.3</b> · Nov 26, 2026 · The store's front page hero shows only art Steam provides, so no more blank tiles, and a promotion like the Steam Awards shows as its own art with one button.</summary>
+<br>
 
 **Fixes**
 - **Store hero**: a promotion (the Steam Awards) no longer shows an empty white box where the logo goes (#11); art comes only from what Steam lists for each game, never guessed file names.
@@ -41,6 +54,8 @@
 
 **Store**
 - **Store hero**: a promotion shows its art and "View in store" alone, the button in the same place as on every other slide; tab names and the slide count read on pale art.
+
+</details>
 
 <br>
 
