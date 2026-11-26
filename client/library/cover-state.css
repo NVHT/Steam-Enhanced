@@ -1,0 +1,201 @@
+/*
+ * A cover's state chip (client/library/cover-state.js adds it to each cover, LibraryItemBox
+ * .WYgDg9NyCcMIVuMyZ_NBC): one 32 px chip in the cover's corner, every state the same size, its
+ * colour saying which (data-state):
+ *   ready    green play: installed
+ *   install  grey download: not installed
+ *   update   accent download with a ring: updating or downloading; the active one's ring shows
+ *            how far it got (--se-chip-progress), a queued one's ring is whole and faint
+ * Pointing at the cover fills the chip with its action's colour. A ready or install chip is its
+ * own button (cover-state.js: Play, or Steam's install dialog); an updating one passes the click
+ * to the cover. Steam's own buttons (Play, Install; the install mark, UninstalledIcon
+ * ._8YrRmy_c6O0FCxFT8gjqo) sit under it drawn as nothing, so a cover shows one mark and never a
+ * growing bar.
+ */
+.se-cover-chip {
+  position: absolute;
+  /* The friends' avatars' size and inset on the cover's other corner (library.css: 24 px faces
+     10 px in, ringed 4 px out), so the two marks match */
+  inset-inline-start: 6px;
+  bottom: 6px;
+  z-index: 3;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--se-radius-sm);
+  background: color-mix(in srgb, var(--se-bg-ink) 80%, transparent);
+  box-shadow: inset 0 0 0 1px var(--se-white-12);
+  color: var(--se-text-muted);
+  pointer-events: none;
+  transition: color var(--se-dur) var(--se-ease), transform var(--se-dur) var(--se-ease);
+}
+
+.se-cover-chip:is([data-state="ready"], [data-state="install"]) {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.se-cover-chip:is([data-state="ready"], [data-state="install"]):active {
+  transform: scale(.92);
+}
+
+/* The glyph */
+.se-cover-chip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-install) center / 18px no-repeat;
+  mask: var(--se-icon-install) center / 18px no-repeat;
+}
+
+.se-cover-chip[data-state="ready"] {
+  color: var(--se-running);
+}
+
+.se-cover-chip[data-state="ready"]::after {
+  -webkit-mask-image: var(--se-icon-play);
+  mask-image: var(--se-icon-play);
+}
+
+.se-cover-chip[data-state="update"] {
+  color: var(--se-accent);
+}
+
+/* The update ring: how far the active download got, whole and faint for a queued one */
+.se-cover-chip[data-state="update"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: var(--se-space-half);
+  background: conic-gradient(var(--se-accent) var(--se-chip-progress, 100%), color-mix(in srgb, var(--se-accent) 25%, transparent) 0);
+  opacity: .9;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+.se-cover-chip[data-state="update"]:not([style*="--se-chip-progress"])::before {
+  opacity: .45;
+}
+
+/* The pointer on the cover: the chip takes its action's button face, as the game page's Play and
+   Install (--se-play-fill, --se-install-fill; Update shares Install's) */
+.WYgDg9NyCcMIVuMyZ_NBC:is(:hover, [data-se-still]) > .se-cover-chip {
+  background: var(--se-install-fill);
+  box-shadow: none;
+  color: var(--se-text-strong);
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC:is(:hover, [data-se-still]) > .se-cover-chip[data-state="ready"] {
+  background: var(--se-play-fill);
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC:is(:hover, [data-se-still]) > .se-cover-chip[data-state="update"]::before {
+  opacity: 0;
+}
+
+/*
+ * Steam's cover buttons (Play, Install: growing across the cover on hover, client/home/
+ * home-shelves.css; the install mark of Recent Games and Play Next) sit under the chip, sized
+ * and placed as it and drawn as nothing, so they never show; the chip takes the click first. !important and the second
+ * :not(#…): beat home-shelves.css's hover rules (their own !important, :not(#se-none)).
+ */
+.WYgDg9NyCcMIVuMyZ_NBC:has(> .se-cover-chip) [data-se-cover-btn]:not(#se-none):not(#se-chip) {
+  inset-inline-start: calc(var(--se-cl, 0px) + 6px) !important;
+  bottom: calc(var(--se-cb, 0px) + 6px) !important;
+  width: 32px !important;
+  height: 32px !important;
+  opacity: 0 !important;
+  transition: none !important;
+}
+
+/*
+ * The release chip: the same chip in the top corner, named in the theme's tip (so it takes the
+ * pointer, unlike the status chip), in place of Steam's wide banner on that cover
+ * (data-se-release-banner, cover-state.js):
+ *   soon     a calendar, muted: nothing to play or install yet
+ *   preload  a clock in the accent: it can be pre-loaded now
+ *   new      a sparkle in the accent: new to the library
+ * !important: beats library-covers.css's banner placement (display: flex on
+ * AppPortraitBannerContainer).
+ */
+.se-cover-release {
+  position: absolute;
+  inset-inline-start: 6px;
+  top: 6px;
+  z-index: 3;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--se-radius-sm);
+  background: color-mix(in srgb, var(--se-bg-ink) 80%, transparent);
+  box-shadow: inset 0 0 0 1px var(--se-white-12);
+  color: var(--se-accent);
+}
+
+.se-cover-release::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-sparkle) center / 18px no-repeat;
+  mask: var(--se-icon-sparkle) center / 18px no-repeat;
+}
+
+.se-cover-release[data-kind="soon"] {
+  color: var(--se-text-muted);
+}
+
+.se-cover-release[data-kind="soon"]::after {
+  -webkit-mask-image: var(--se-icon-calendar);
+  mask-image: var(--se-icon-calendar);
+}
+
+.se-cover-release[data-kind="preload"]::after {
+  -webkit-mask-image: var(--se-icon-clock);
+  mask-image: var(--se-icon-clock);
+}
+
+[data-se-release-banner] {
+  display: none !important;
+}
+
+/*
+ * Steam's Steam Deck badge on a hovered cover (SteamDeckCompatInfo ._3VPnvw_CDKU-PQKK1pSDlN, in
+ * the cover's SteamDeckCompatIcon ._3kDT9HSaC2BYFyAndTzQY4): a chip as the state chip, only the
+ * verdict in it (its icon ._3hAj0iMJsfhKwnm2mfE098) in the theme's status colours (Verified
+ * kEODDe6M5cuHWuPlcQexX, Playable mPD42Bwx3VAs0qw9wubf2; Unsupported and Unknown muted).
+ * Steam's Deck mark (._1dzQL1mVR8GTmmSi_kpDgr) goes, the tip names it (cover-state.js), and so
+ * does its blur (no stacked backdrop-filter). Steam places it.
+ */
+.WYgDg9NyCcMIVuMyZ_NBC ._3VPnvw_CDKU-PQKK1pSDlN {
+  box-sizing: border-box;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: var(--se-radius-sm);
+  background: color-mix(in srgb, var(--se-bg-ink) 80%, transparent);
+  box-shadow: inset 0 0 0 1px var(--se-white-12);
+  backdrop-filter: none;
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC ._3VPnvw_CDKU-PQKK1pSDlN ._1dzQL1mVR8GTmmSi_kpDgr {
+  display: none;
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC ._3VPnvw_CDKU-PQKK1pSDlN ._3hAj0iMJsfhKwnm2mfE098 {
+  width: 18px;
+  height: 18px;
+  color: var(--se-text-muted);
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC ._3VPnvw_CDKU-PQKK1pSDlN ._3hAj0iMJsfhKwnm2mfE098.kEODDe6M5cuHWuPlcQexX {
+  color: var(--se-success);
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC ._3VPnvw_CDKU-PQKK1pSDlN ._3hAj0iMJsfhKwnm2mfE098.mPD42Bwx3VAs0qw9wubf2 {
+  color: var(--se-warning);
+}

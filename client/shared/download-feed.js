@@ -4,7 +4,8 @@
  * Downloads card (client/header/downloads-card.js), the Downloads page (client/downloads/page/)
  * and Settings › Downloads (client/settings/dialog/downloads.js). Steam's download store can
  * sit stale while no one subscribes, so these are the source of truth. Registered while anyone listens, dropped with the last.
- *   SE.downloadFeed  { overview, items, subscribe(fn) → unsubscribe }
+ *   SE.downloadFeed  { overview, items, subscribe(fn) → unsubscribe, queue(fallback) }
+ *     queue: the games still to come, in queue order (fallback: a list to read while the feed has none)
  */
 ((SE) => {
   window.__seDownloadFeed?.destroy?.();
@@ -13,7 +14,7 @@
 
   const listeners = new Set();
   let registrations = [];
-  const feed = { overview: null, items: null, subscribe };
+  const feed = { overview: null, items: null, subscribe, queue };
 
   const notify = () => {
     for (const fn of listeners) run(fn);
@@ -40,6 +41,35 @@
     // Unwatched, the last values go stale
     feed.overview = null;
     feed.items = null;
+  }
+
+  /*
+   * The queue's games still to come, in queue order. Steam's live feed gives a list per client
+   * ({ remote_client_id, ... } with the games in a list inside), the store a flat list, an
+   * observable array or a map depending on the build: every object with an appid within a few
+   * levels counts, once.
+   */
+  function queue(fallback) {
+    const found = new Map();
+    const seen = new Set();
+    const walk = (value, depth) => {
+      if (!value || typeof value !== 'object' || seen.has(value) || depth > 3) return;
+      seen.add(value);
+      if (Number(value.appid) && 'completed' in value) {
+        if (!found.has(Number(value.appid))) found.set(Number(value.appid), value);
+        return;
+      }
+      const children = Array.isArray(value)
+        ? value
+        : typeof value.values === 'function' && !(value instanceof String)
+          ? run(() => [...value.values()]) || Object.values(value)
+          : Object.values(value);
+      for (const child of children) walk(child, depth + 1);
+    };
+    walk(feed.items || fallback, 0);
+    return [...found.values()]
+      .filter((item) => !item.completed)
+      .sort((a, b) => (Number(a.queue_index) || 0) - (Number(b.queue_index) || 0));
   }
 
   /** fn runs on each update (about once a second while something moves); returns the unsubscribe. */

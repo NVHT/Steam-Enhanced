@@ -1,0 +1,14 @@
+/*
+ * Theme setting (client/shared/settings.js): Show chips, On hover (the default). A cover's status
+ * chip (client/library/cover-state.css) shows while the cover is pointed at, held open beside its
+ * hover card ([data-se-still], Home's shelves) or focused, as Steam's Steam Deck badge does
+ * (LibraryItemBox .WYgDg9NyCcMIVuMyZ_NBC). An updating game's chip stays: its ring is the
+ * download's progress.
+ */
+.WYgDg9NyCcMIVuMyZ_NBC > .se-cover-chip {
+  transition: opacity var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease), transform var(--se-dur) var(--se-ease);
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC:not(:hover, [data-se-still], :focus-within) > .se-cover-chip:not([data-state="update"]) {
+  opacity: 0;
+}

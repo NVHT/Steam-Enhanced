@@ -28,34 +28,9 @@
   const appName = (appid) =>
     run(() => SE.global('appStore')?.GetAppOverviewByAppID(Number(appid))?.display_name) || '';
 
-  /*
-   * The queue's games still to come, in queue order. Steam's live feed gives a list per client
-   * ({ remote_client_id, ... } with the games in a list inside), the store a flat list, an
-   * observable array or a map depending on the build: every object with an appid within a few
-   * levels counts, once.
-   */
-  function queueItems(downloads) {
-    const found = new Map();
-    const seen = new Set();
-    const walk = (value, depth) => {
-      if (!value || typeof value !== 'object' || seen.has(value) || depth > 3) return;
-      seen.add(value);
-      if (Number(value.appid) && 'completed' in value) {
-        if (!found.has(Number(value.appid))) found.set(Number(value.appid), value);
-        return;
-      }
-      const children = Array.isArray(value)
-        ? value
-        : typeof value.values === 'function' && !(value instanceof String)
-          ? run(() => [...value.values()]) || Object.values(value)
-          : Object.values(value);
-      for (const child of children) walk(child, depth + 1);
-    };
-    walk(feed?.items || run(() => downloads?.m_DownloadItems), 0);
-    return [...found.values()]
-      .filter((item) => !item.completed)
-      .sort((a, b) => (Number(a.queue_index) || 0) - (Number(b.queue_index) || 0));
-  }
+  // The queue's games still to come, in queue order (SE.downloadFeed.queue; the download store
+  // as a fallback)
+  const queueItems = (downloads) => SE.downloadFeed?.queue(run(() => downloads?.m_DownloadItems)) || [];
 
   const numberOrNull = (value) => (value == null || !Number.isFinite(Number(value)) ? null : Number(value));
   const percentOf = (done, total) => (total > 0 ? Math.min(100, (done / total) * 100) : null);
