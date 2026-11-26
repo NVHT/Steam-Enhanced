@@ -360,6 +360,53 @@
   const settings = readSettings();
 
   /*
+   * Steam's moves in an in-game toast window, held from here until the toast code takes them
+   * over (client/toasts/placement.js holdSpot). The overlay takes a window's moves only until it
+   * first places it, and that can come before client/toasts/ has started (~40 ms in): the window
+   * then stays in Steam's corner for good, and the stage can't draw (CLAUDE.md, Windows and
+   * Millennium). So while the stage would draw here (Restyle toasts and Toasts in game on, the
+   * Stage style), Steam's first moves wait here, not passed on, for at most MOVE_HOLD_MS; after
+   * that they pass on as Steam made them, so a toast code that never comes still leaves Steam's
+   * toast placed (its slide-in lasts ~300 ms).
+   */
+  const MOVE_HOLD_MS = 250;
+  const moveHold = (() => {
+    const title = document.title;
+    if (!/^notificationtoasts_/.test(title) || /_desktop$/.test(title)) return null;
+    const chosen = settings.values || {};
+    if (chosen.toasts === 'off' || chosen['toasts-in-game'] === 'off' || chosen['toast-style'] === 'compact') return null;
+    const W = window.SteamClient?.Window;
+    if (typeof W?.MoveTo !== 'function') return null;
+    const native = W.MoveTo;
+    const until = performance.now() + MOVE_HOLD_MS;
+    let taker = null;
+    let held = 0;
+    const early = function MoveTo(...args) {
+      if (taker) return taker.apply(this, args);
+      if (performance.now() < until) {
+        held++;
+        return undefined;
+      }
+      return native.apply(this, args);
+    };
+    try {
+      W.MoveTo = early;
+    } catch {}
+    if (W.MoveTo !== early) return null;
+    return {
+      native,
+      held: () => held,
+      take(fn) {
+        taker = fn;
+      },
+      release() {
+        taker = null;
+        if (W.MoveTo === early) W.MoveTo = native;
+      },
+    };
+  })();
+
+  /*
    * The entrance is a setting (splash | logo | fade | none), read from the settings above;
    * <html data-se-entrance> carries it.
    *
@@ -765,6 +812,9 @@
 
   window.__seClient = {
     groups, files: added, sheets, waiting, applyOptions,
+    // Steam's moves held for the stage in an in-game toast window (null elsewhere): its `native`
+    // MoveTo, `take(fn)` hands the moves to fn, `release()` gives them back to Steam
+    moveHold,
     devReload(scripts) {
       devReload(scripts);
       try {

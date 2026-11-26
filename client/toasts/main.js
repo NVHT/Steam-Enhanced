@@ -136,7 +136,8 @@
       live.poller?.disconnect();
       live.compactWatcher?.disconnect();
       uninstallCentre();
-      if (live.spotHold && live.spotHold.W.MoveTo === live.spotHold.wrapped) run(() => { live.spotHold.W.MoveTo = live.spotHold.native; });
+      if (live.spotHold?.early) run(() => live.spotHold.early.release());
+      else if (live.spotHold && live.spotHold.W.MoveTo === live.spotHold.wrapped) run(() => { live.spotHold.W.MoveTo = live.spotHold.native; });
       root.removeAttribute(COMPACT_ATTR);
       for (const el of document.querySelectorAll(`.${EYEBROW}`)) el.remove();
       live.early?.disconnect();

@@ -7,7 +7,7 @@
   const ns = window.__seToastsParts;
   if (!ns) return;
   const { mark, run, unmark } = SE;
-  const { BOX, IN_GAME, SURFACE, isStage } = ns;
+  const { BOX, IN_GAME, SURFACE, isStage, note } = ns;
   const { live } = ns;
 
   /* ---------- Placement ---------- */
@@ -262,8 +262,10 @@
       live.steamRect = { x: window.screenX, y: window.screenY, w: window.outerWidth, h: window.outerHeight };
     }
     live.target = wanted();
+    note(`placing (desktop): Steam put the window at ${live.steamRect.x},${live.steamRect.y} ${live.steamRect.w}×${live.steamRect.h}, spot ${live.target.x},${live.target.y}`);
     if (landed(live.target)) {
       if (live.mover < 0) live.mover = 0;
+      note('already on the spot');
       await ensureSize(live.target);
       return;
     }
@@ -275,12 +277,14 @@
       live.attempts.push({ mover: MOVERS[i].name, x: window.screenX, y: window.screenY, ratio: getRatio() });
       if (landed(live.target)) {
         live.mover = i;
+        note(`landed at ${window.screenX},${window.screenY} by ${MOVERS[i].name}`);
         // Then the size; a resize can shift the window, so it's put back if it did.
         if (await ensureSize(live.target) && !landed(live.target)) await applyMove(i, live.target);
         return;
       }
     }
     if (live.mover >= 0) return;
+    note(`gave up: window at ${window.screenX},${window.screenY}, tried ${live.attempts.map((a) => a.mover).join(', ') || 'nothing'}`);
     live.mover = -2;
     // Couldn't land it: put the window back as Steam had it (size and spot), so it stays on
     // screen in Steam's corner and the tray scales down to fit.
@@ -311,12 +315,17 @@
   async function placeInGame() {
     if (!placeable()) for (const end = Date.now() + 2000; Date.now() < end && !placeable(); ) await sleep(50);
     live.target ||= placeable() ? wanted() : null;
-    if (live.target) for (const end = Date.now() + 2500; Date.now() < end && !landed(live.target); ) await sleep(50);
+    const s = placeScreen();
+    note(`placing: screen ${placeable() ? `${s.width}×${s.height}` : 'unknown'}, window at ${window.screenX},${window.screenY} ${window.outerWidth}×${window.outerHeight}, Steam moves so far ${live.spotHold?.moves ?? 0}`);
+    // Steam's slide-in moves land a window within ~300 ms; past this, they won't
+    if (live.target) for (const end = Date.now() + 1200; Date.now() < end && !landed(live.target); ) await sleep(50);
     live.attempts.push({ mover: MOVERS[0].name, x: window.screenX, y: window.screenY, ratio: getRatio() });
     if (!live.target || !landed(live.target)) {
+      note(`gave up: window at ${window.screenX},${window.screenY}, spot ${live.target ? `${live.target.x},${live.target.y}` : 'unknown'}, Steam moves ${live.spotHold?.moves ?? 0}`);
       live.mover = -2;
       return;
     }
+    note(`landed at ${window.screenX},${window.screenY} after ${live.spotHold?.moves ?? 0} Steam moves`);
     live.mover = 0;
     await ensureSize(live.target);
   }
@@ -331,6 +340,7 @@
    */
 
   let spotCalibrating = false;
+  const MOVES_NOTED = 8; // Steam moves every frame while sliding in: the recorder takes the first few
 
   function ratioFrom(sx, sy) {
     const rx = sx ? window.screenX / sx : NaN;
@@ -375,23 +385,48 @@
   function holdSpot() {
     const W = scWindow();
     if (!W || typeof W.MoveTo !== 'function') return;
-    const native = W.MoveTo;
+    // In game the loader has held Steam's moves since the window opened (client/loader.js
+    // moveHold): it hands them over here, so none placed the window before this ran
+    const early = run(() => window.__seClient?.moveHold) || null;
+    const native = early?.native || W.MoveTo;
     const wrapped = function MoveTo(x, y, dpi, ...rest) {
       live.spotHold.lastDpi = dpi;
-      if (live.mover === -2) return native.call(this, x, y, dpi, ...rest);
+      const n = ++live.spotHold.moves;
+      const logged = n <= MOVES_NOTED;
+      if (live.mover === -2) {
+        if (logged) note(`Steam move ${n}: ${x},${y}, passed on (placing gave up)`);
+        return native.call(this, x, y, dpi, ...rest);
+      }
       if (!live.target && placeable()) live.target = wanted();
-      if (!live.target) return native.call(this, x, y, dpi, ...rest);
+      if (!live.target) {
+        if (logged) note(`Steam move ${n}: ${x},${y}, passed on (spot unknown: screen not sized)`);
+        return native.call(this, x, y, dpi, ...rest);
+      }
       const known = getRatio();
       const r = known || UNIT;
-      const sent = { x: Math.round(live.target.x / r.x), y: Math.round(live.target.y / r.y) };
+      /*
+       * Until the window lands, each move a pixel off the last: the overlay places a window itself
+       * when Steam shows it (ShowWindow, at Steam's end of slide), and when that comes after a
+       * redirected move it keeps drawing the window there while holding the spot as its
+       * position, dropping every later move to that same spot. Landed, the moves stay put.
+       */
+      const nudge = landed(live.target) ? 0 : n % 2;
+      const sent = { x: Math.round(live.target.x / r.x) + nudge, y: Math.round(live.target.y / r.y) };
+      if (logged) note(`Steam move ${n}: ${x},${y} → spot ${sent.x},${sent.y}`);
       const out = native.call(this, sent.x, sent.y, dpi, ...rest);
       if (!known && !spotCalibrating) checkSpot(sent);
       return out;
     };
-    live.spotHold = { W, native, wrapped, lastDpi: undefined };
+    live.spotHold = { W, native, wrapped, lastDpi: undefined, moves: 0, early };
+    if (early) {
+      early.take(wrapped);
+      note(`holding Steam's moves from the loader (${early.held()} held before; window at ${window.screenX},${window.screenY} ${window.outerWidth}×${window.outerHeight})`);
+      return;
+    }
     run(() => { W.MoveTo = wrapped; });
     if (W.MoveTo !== wrapped) run(() => Object.defineProperty(W, 'MoveTo', { value: wrapped, configurable: true, writable: true }));
     if (W.MoveTo !== wrapped) live.spotHold = null;
+    note(live.spotHold ? `holding Steam's moves (window at ${window.screenX},${window.screenY})` : "couldn't wrap Steam's MoveTo");
   }
 
   /*

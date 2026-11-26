@@ -66,7 +66,7 @@
   live.steamRect = null; // where and how big Steam made the window
   live.lastScan = null; // for __seToasts.why()
   live.compactWatcher = null;
-  live.spotHold = null; // { W, native, wrapped, lastDpi }
+  live.spotHold = null; // { W, native, wrapped, lastDpi, moves, early: the loader's hold }
   live.replaceTimer = 0;
   live.syncTimer = 0;
 
@@ -80,5 +80,8 @@
     ? `game:${/_uid(\d+)$/.exec(window.name || '')?.[1] || /uid(\d+)/.exec(document.title || '')?.[1] || '0'}`
     : 'desktop';
 
-  Object.assign(ns, { IN_GAME, SURFACE, root });
+  // A line in the toast recorder (client/loader.js; armed from dev/toast-preview.js)
+  const note = (text) => SE.run(() => window.__seClient?.toastLog?.(text));
+
+  Object.assign(ns, { IN_GAME, SURFACE, note, root });
 })(window.__se);

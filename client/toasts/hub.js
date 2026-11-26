@@ -7,7 +7,7 @@
   const ns = window.__seToastsParts;
   if (!ns) return;
   const { mark, run, unmark } = SE;
-  const { GUARD_MS, IN_GAME, SRC_ATTR, STALE_MAX_MS, SURFACE, enrichAchievement, letGo, prepare, ready, render, teardown } = ns;
+  const { GUARD_MS, IN_GAME, SRC_ATTR, STALE_MAX_MS, SURFACE, enrichAchievement, letGo, note, prepare, ready, render, teardown } = ns;
   const { live } = ns;
 
   /* ---------- One stage for every toast window ---------- */
@@ -256,6 +256,7 @@
       h.pausedAt = 0;
     }
     h.stage = window;
+    note('stage drawn here');
     render(true);
     setTimeout(notify, HANDOFF_MS); // the old stage steps down once this one is drawn
   }
@@ -284,20 +285,24 @@
   }
 
   /*
-   * In game, if no window could be placed (so nothing can draw the stage) a few seconds after
-   * this window's toast came, its toast is shown as a compact card instead: Steam's timers
-   * restored, the Stage's hold on the window released, and the compact style (Steam's own toast,
-   * restyled, centred along the edge) takes over. The overlay sometimes ignores every move for a
-   * window, Steam's own included; a toast is never left unseen.
+   * In game, if no window could be placed (so nothing can draw the stage) once this window's
+   * toast came, its toast is shown as a compact card instead: Steam's timers restored, the
+   * Stage's hold on the window released, and the compact style (Steam's own toast, restyled,
+   * centred along the edge) takes over. The overlay sometimes ignores every move for a window,
+   * Steam's own included; a toast is never left unseen. Steam's own toast was hidden until now,
+   * so it gets its whole time from here: counted from its birth, it was already over, and
+   * Steam closed it the moment it was handed back (an in-game toast lasts about as long as
+   * the old wait).
    */
-  const NO_STAGE_MS = 3500;
+  const NO_STAGE_MS = 1000;
   function noStageFallback(h) {
     if (h.stage || !live.prepared || live.mover !== -2) return;
     const own = [...byKey.values()].filter(e => !e.done);
     if (!own.length || Date.now() - Math.min(...own.map(e => e.born)) < NO_STAGE_MS) return;
     if (h.wins.some(w => w !== window && alive(w) && run(() => w.__seToasts?.ready?.()))) return;
+    note(`fallback: compact card for ${own.length} toast(s)`);
     for (const e of own) {
-      letGo(e.key, e.src, e.born);
+      letGo(e.key, e.src, Date.now());
       finish(e, 'no stage in game: compact card');
     }
     window.__seToasts?.destroy();
