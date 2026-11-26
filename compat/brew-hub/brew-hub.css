@@ -3,11 +3,12 @@
  * paired with brew-hub.js. Laid out like the other Millennium pages, Themes above all.
  *
  * Browse: the page title and its sub-line (a .DialogHeader of the theme's, so it is every page's
- * title); the toolbar (Themes | Plugins as the segmented control, search, Sort, Tags); the pager
+ * title); the toolbar (Themes | Plugins | Unofficial as the segmented control, search, Sort, Tags); the pager
  * row (the pager and Refresh at its right, no label: the tab says what is listed); then the
  * cards three across, as many rows as the window holds (Themes' card: picture, name, one-line
  * description, the action and an icon button). Details: Back and the title as a sub-page title,
  * the item as the "theme in use" card, then the README filling the rest and scrolling on its own.
+ * Unofficial (1.2 and later): the add field in search's place, then the cards, unpaged.
  *
  * The plugin's React owns every node: nothing of its is moved. The root is one grid with the
  * plugin's two bars as `display: contents`; brew-hub.js marks the view ([data-se-bh]), sizes the
@@ -53,17 +54,18 @@
   -webkit-app-region: no-drag !important;
 }
 
-/* Browse: title, toolbar, label row, cards */
-.MillenniumSettings .bh-root[data-se-bh="grid"] {
+/* Browse: title, toolbar, label row, cards. Columns: the three tabs (Themes, Plugins,
+   Unofficial), search, Sort, Tags; on Unofficial the add field spans search and Sort, Add takes
+   Tags' place. */
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) {
   display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  grid-template-columns: auto auto auto minmax(0, 1fr) auto auto;
   grid-template-rows: auto auto auto minmax(0, 1fr);
   gap: var(--se-space-3) var(--se-space-2);
   align-items: center;
 }
 
-.MillenniumSettings .bh-root[data-se-bh="grid"] > .bh-bar1,
-.MillenniumSettings .bh-root[data-se-bh="grid"] > .bh-bar2 {
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) > :is(.bh-bar1, .bh-bar2) {
   display: contents;
 }
 
@@ -79,21 +81,21 @@
   display: none;
 }
 
-.MillenniumSettings .bh-root[data-se-bh="grid"] > .se-bh-head {
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) > .se-bh-head {
   grid-column: 1 / -1;
   grid-row: 1;
   align-self: start;
 }
 
 /* The plugin's Refresh: the pager row's Refresh (.se-bh-refresh, brew-hub.js) presses it */
-.MillenniumSettings .bh-root[data-se-bh="grid"] .bh-bar1 > div:not(.bh-tab):not(.bh-grow) {
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) .bh-bar1 > div:not(.bh-tab):not(.bh-grow) {
   display: none;
 }
 
 /* The foot and Back icon buttons draw their glyph on Steam's ::before. !important: Steam's own
    DialogButton ::before (Steam's sp.js CSS module) and the plugin's injected <style> (BrewHub's
    frontend) both set these */
-.MillenniumSettings .bh-root .bh-foot > .bh-btn:not(#se-none):not(#se-p2):not(#se-p3)::before,
+.MillenniumSettings .bh-root:not([data-se-bh="unofficial"]) .bh-foot > .bh-btn:not(#se-none):not(#se-p2):not(#se-p3)::before,
 .MillenniumSettings .bh-root .bh-dhead .bh-btn:not(#se-none):not(#se-p2):not(#se-p3)::before {
   content: '' !important;
   display: block !important;
@@ -113,7 +115,7 @@
    tabs are separate grid items, so brew-hub.js draws the track behind them (.se-bh-track); the
    tabs are positioned, so they paint over it. */
 .MillenniumSettings .se-bh-track {
-  grid-column: 1 / 3;
+  grid-column: 1 / 4;
   grid-row: 2;
   align-self: stretch;
   height: var(--se-control-h);
@@ -122,7 +124,7 @@
   box-shadow: var(--se-search-edge);
 }
 
-.MillenniumSettings .bh-root[data-se-bh="grid"] .bh-tab {
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) .bh-tab {
   position: relative;
   grid-row: 2;
   display: inline-flex;
@@ -137,33 +139,44 @@
   transition: background var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
-.MillenniumSettings .bh-root[data-se-bh="grid"] .bh-tab:first-child {
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) .bh-tab:first-child {
   grid-column: 1;
   margin-left: var(--se-space-half);
 }
 
-.MillenniumSettings .bh-root[data-se-bh="grid"] .bh-tab:nth-child(2) {
-  grid-column: 2;
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) .bh-tab:nth-child(3) {
+  grid-column: 3;
+}
+
+/* Tabs 2px apart inside the track (the column gap less a margin), the last 2px off its end */
+.MillenniumSettings .bh-root .bh-tab + .bh-tab {
   margin-left: calc(var(--se-space-half) - var(--se-space-2));
+}
+
+.MillenniumSettings .bh-root .bh-tab:not(:has(+ .bh-tab)) {
   margin-right: var(--se-space-half);
 }
 
-.MillenniumSettings .bh-root[data-se-bh="grid"] .bh-tab:hover {
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) .bh-tab:nth-child(2) {
+  grid-column: 2;
+}
+
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) .bh-tab:hover {
   background: transparent;
   color: var(--se-text-strong);
 }
 
-.MillenniumSettings .bh-root[data-se-bh="grid"] .bh-tab.bh-on {
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) .bh-tab.bh-on {
   background: var(--se-selected);
   color: var(--se-text-strong);
 }
 
-.MillenniumSettings .bh-root[data-se-bh="grid"] .bh-tab:focus-visible {
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) .bh-tab:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
 }
 
-.MillenniumSettings .bh-root[data-se-bh="grid"] .bh-tab:active {
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) .bh-tab:active {
   transform: scale(var(--se-press-scale));
 }
 
@@ -189,7 +202,7 @@
 
 /* Search: the theme's search field */
 .MillenniumSettings .bh-root[data-se-bh="grid"] .bh-search {
-  grid-column: 3;
+  grid-column: 4;
   grid-row: 2;
   width: auto;
   height: var(--se-control-h);
@@ -241,12 +254,12 @@
 
 /* Sort (brew-hub.js) and Tags (the plugin's): one dropdown field */
 .MillenniumSettings .bh-root[data-se-bh="grid"] .se-bh-sort {
-  grid-column: 4;
+  grid-column: 5;
   grid-row: 2;
 }
 
 .MillenniumSettings .bh-root[data-se-bh="grid"] .bh-filter {
-  grid-column: 5;
+  grid-column: 6;
   grid-row: 2;
   width: 150px;
   height: var(--se-control-h);
@@ -577,7 +590,8 @@
 
 /* Icon buttons: Details (a card), Back (Details' title) */
 /* No gap: the hidden label is still a flex item, and the gap beside it pushed the icon off centre */
-.MillenniumSettings .bh-root :is(.bh-foot, .bh-dhead) > .bh-btn:not(#se-none):not(#se-p2):not(#se-p3) {
+.MillenniumSettings .bh-root:not([data-se-bh="unofficial"]) .bh-foot > .bh-btn:not(#se-none):not(#se-p2):not(#se-p3),
+.MillenniumSettings .bh-root .bh-dhead > .bh-btn:not(#se-none):not(#se-p2):not(#se-p3) {
   flex: none !important;
   gap: 0 !important;
   justify-content: center !important;
@@ -588,12 +602,12 @@
 
 /* Details: the Themes cards' icon buttons (millennium.css): the info icon in the dim icon tone
    at 18px, the strong tone on hover */
-.MillenniumSettings .bh-root .bh-foot > .bh-btn:not(#se-none):not(#se-p2):not(#se-p3) {
+.MillenniumSettings .bh-root:not([data-se-bh="unofficial"]) .bh-foot > .bh-btn:not(#se-none):not(#se-p2):not(#se-p3) {
   width: 30px !important;
   color: var(--se-text-dim) !important;
 }
 
-.MillenniumSettings .bh-root .bh-foot > .bh-btn:not(#se-none):not(#se-p2):not(#se-p3)::before {
+.MillenniumSettings .bh-root:not([data-se-bh="unofficial"]) .bh-foot > .bh-btn:not(#se-none):not(#se-p2):not(#se-p3)::before {
   width: 18px !important;
   height: 18px !important;
   -webkit-mask-image: var(--se-icon-info) !important;
@@ -648,6 +662,136 @@
 }
 
 /*
+ * Unofficial (1.2 and later: plugins added from GitHub, data-se-bh="unofficial"): the toolbar
+ * with the add field where search sits and Add beside it, the plugin's note on the pager row's
+ * left (Refresh stays at its right), then the cards and the plugins found on this computer, the
+ * page scrolling as one. Its cards keep their lines (by, versions, the release state) and their
+ * buttons in words: GitHub, Link.
+ */
+.MillenniumSettings .bh-root[data-se-bh="unofficial"] {
+  grid-template-rows: auto auto auto;
+  grid-auto-rows: auto;
+  align-content: start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Every part the plugin lists under the toolbar, one full-width row each, in its order. :where()
+   keeps it under the note's place below */
+.MillenniumSettings .bh-root[data-se-bh="unofficial"] > :where(:not(.bh-bar1, .bh-bar2, [data-se-bh-own])) {
+  grid-column: 1 / -1;
+}
+
+.MillenniumSettings .bh-root[data-se-bh="unofficial"] > .bh-bar1 + .bh-note {
+  grid-column: 1 / 5;
+  grid-row: 3;
+  align-self: center;
+}
+
+.MillenniumSettings .bh-root[data-se-bh="unofficial"] > .se-bh-bar {
+  grid-column: 5 / -1;
+  grid-row: 3;
+  justify-content: flex-end;
+  margin: 0;
+}
+
+.MillenniumSettings .bh-root .bh-note {
+  opacity: 1;
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm) / 1.45 var(--se-font);
+}
+
+.MillenniumSettings .bh-root[data-se-bh="unofficial"] .bh-addinput {
+  grid-column: 4 / 6;
+  grid-row: 2;
+}
+
+.MillenniumSettings .bh-root[data-se-bh="unofficial"] .bh-addbtn {
+  grid-column: 6;
+  grid-row: 2;
+  width: auto;
+}
+
+/* The add field and a found plugin's Link field: the theme's field */
+.MillenniumSettings .bh-root :is(.bh-addinput, .bh-card .bh-input) {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: var(--se-control-h);
+  padding: 0 var(--se-space-3);
+  border: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field-bg);
+  box-shadow: var(--se-field-edge);
+  color: var(--se-text);
+  font: 500 var(--se-fs-base) / normal var(--se-font);
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.MillenniumSettings .bh-root :is(.bh-addinput, .bh-card .bh-input)::placeholder {
+  color: var(--se-search-placeholder);
+}
+
+.MillenniumSettings .bh-root :is(.bh-addinput, .bh-card .bh-input):hover {
+  box-shadow: var(--se-field-edge-hover);
+}
+
+.MillenniumSettings .bh-root :is(.bh-addinput, .bh-card .bh-input):focus {
+  box-shadow: var(--se-field-edge-focus);
+}
+
+/* Add: the tab's one main action, in the accent and as tall as the field. !important and the
+   three ids: as the plugin's buttons above */
+.MillenniumSettings .bh-root .bh-addbtn > .bh-btn:not(#se-none):not(#se-p2):not(#se-p3) {
+  height: var(--se-control-h) !important;
+  background: var(--se-accent) !important;
+  color: var(--se-on-accent) !important;
+  line-height: var(--se-control-h) !important;
+}
+
+.MillenniumSettings .bh-root .bh-addbtn > .bh-btn:hover:not(:disabled):not(#se-none):not(#se-p2):not(#se-p3) {
+  background: var(--se-accent-hover) !important;
+  color: var(--se-on-accent) !important;
+}
+
+/* "Installed, not on steambrew.app": a section heading over its note and cards */
+.MillenniumSettings .bh-root[data-se-bh="unofficial"] > .bh-name {
+  margin-top: var(--se-space-4);
+  color: var(--se-label-color);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  text-transform: uppercase;
+}
+
+.MillenniumSettings .bh-root[data-se-bh="unofficial"] > .bh-name + .bh-note {
+  margin-top: calc(-1 * var(--se-space-2));
+}
+
+/* No picture: the text sits in from the card's edge as the other cards' does */
+.MillenniumSettings .bh-root[data-se-bh="unofficial"] .bh-card .bh-body > div:not(.bh-foot) {
+  padding-left: var(--se-space-1);
+}
+
+.MillenniumSettings .bh-root[data-se-bh="unofficial"] .bh-card .bh-meta {
+  display: block;
+}
+
+.MillenniumSettings .bh-root[data-se-bh="unofficial"] .bh-card .bh-desc {
+  margin-top: var(--se-space-1);
+}
+
+/* Remove from list: a quiet link under the buttons, the danger tone on hover */
+.MillenniumSettings .bh-root .bh-card .bh-link {
+  color: var(--se-text-faint);
+  cursor: pointer;
+  transition: color var(--se-dur) var(--se-ease);
+}
+
+.MillenniumSettings .bh-root .bh-card .bh-link:hover {
+  color: var(--se-danger-text);
+}
+
+/*
  * Details: Back and the title as a sub-page title (client/settings/layout.css), the item as the
  * "theme in use" card on Themes (picture | description, chips, actions), then the README.
  * The card is the grid's ::before, laid behind its rows: the title row stays outside it.
@@ -667,12 +811,21 @@
   gap: var(--se-space-4);
 }
 
+/* Rows: title, the card's top inset, description, chips, the latest change, actions, the card's
+   foot. No row gap: each part brings its own margin, so a part the item lacks (a description, a
+   latest change) leaves no empty gap behind. */
 .MillenniumSettings .bh-root .bh-dmain {
   display: grid;
   grid-template-columns: var(--se-space-4) 276px var(--se-space-5) minmax(0, 1fr) var(--se-space-4);
-  grid-template-rows: auto var(--se-space-4) auto auto minmax(0, 1fr) var(--se-space-4);
-  gap: var(--se-space-3) 0;
+  grid-template-rows: auto var(--se-space-4) auto auto auto minmax(0, 1fr) var(--se-space-4);
+  gap: 0;
   align-items: start;
+}
+
+/* No picture (plugins, or one that failed to load: the plugin sets display: none on it): the
+   text takes the picture's column */
+.MillenniumSettings .bh-root .bh-dmain:not(:has(> .bh-dhero:not([style*="none"]))) {
+  grid-template-columns: var(--se-space-4) 0 0 minmax(0, 1fr) var(--se-space-4);
 }
 
 .MillenniumSettings .bh-root .bh-dmain::before {
@@ -700,6 +853,7 @@
   grid-column: 1 / -1;
   grid-row: 1;
   gap: var(--se-space-3);
+  margin-bottom: var(--se-space-3);
 }
 
 .MillenniumSettings .bh-root .bh-dtitle {
@@ -709,7 +863,7 @@
 
 .MillenniumSettings .bh-root .bh-dhero {
   grid-column: 2;
-  grid-row: 3 / 6;
+  grid-row: 3 / 7;
   flex: none;
   width: 276px;
   height: 156px;
@@ -735,6 +889,20 @@
   gap: var(--se-space-1);
 }
 
+.MillenniumSettings .bh-root .bh-dinfo > div:not([class]) ~ .bh-chips {
+  margin-top: var(--se-space-3);
+}
+
+/* The latest change (Details' own .bh-meta): under the chips, wrapping to two lines */
+.MillenniumSettings .bh-root .bh-dinfo > .bh-meta {
+  grid-row: 5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  margin-top: var(--se-space-2);
+  white-space: normal;
+}
+
 .MillenniumSettings .bh-root .bh-chip {
   display: inline-flex;
   align-items: center;
@@ -754,9 +922,10 @@
 }
 
 .MillenniumSettings .bh-root .bh-dactions {
-  grid-row: 5;
+  grid-row: 6;
   align-self: end;
   gap: var(--se-space-2);
+  margin-top: var(--se-space-3);
 }
 
 .MillenniumSettings .bh-root .bh-dactions .bh-act {
@@ -855,8 +1024,10 @@
   overflow-x: auto;
 }
 
+/* border: the plugin's own 1px line, doubled with the theme's edge */
 .MillenniumSettings .bh-md details {
   margin: 0 0 var(--se-space-3);
+  border: 0;
   border-radius: var(--se-radius-md);
   background: var(--se-surface-2);
   box-shadow: var(--se-edge);
@@ -869,8 +1040,16 @@
   cursor: pointer;
 }
 
+.MillenniumSettings .bh-md details[open] > summary {
+  border-bottom: 1px solid var(--se-divider);
+}
+
 .MillenniumSettings .bh-md details[open] > :not(summary) {
   margin: 0 var(--se-space-3) var(--se-space-3);
+}
+
+.MillenniumSettings .bh-md details[open] > summary + * {
+  margin-top: var(--se-space-3);
 }
 
 .MillenniumSettings .bh-md table {
@@ -918,6 +1097,7 @@
 }
 
 .MillenniumSettings .bh-md th {
+  background: transparent;
   font: var(--se-label-font);
   letter-spacing: var(--se-label-spacing);
   text-transform: uppercase;
@@ -943,6 +1123,10 @@
  */
 .MillenniumSettings .bhd-wrap {
   --bhd-r: var(--se-radius-md);
+}
+
+.MillenniumSettings .bhd-wrap .bhd-sections {
+  margin-top: var(--se-space-4);
 }
 
 .MillenniumSettings .bhd-wrap .bhd-section {
@@ -1039,4 +1223,68 @@
 .MillenniumSettings .bhd-wrap .bhd-copy:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
+}
+
+/* A narrow page (the plugin's .bhd-narrow, under 560 px): selector, description and Copy stack */
+.MillenniumSettings .bhd-wrap.bhd-narrow :is(.bhd-head, .bhd-item) {
+  padding: var(--se-space-3);
+}
+
+/*
+ * "… copied", and the box with the text when Steam refused the clipboard: the plugin draws both
+ * with inline styles (a black strip with green text, a black textarea), so they have no class;
+ * told apart by their sticky position and their textarea. !important beats the inline styles.
+ */
+.MillenniumSettings .bhd-wrap > div[style*="sticky"] {
+  margin: 0 0 var(--se-space-3) !important;
+  padding: var(--se-space-2) var(--se-space-3) !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-panel-bg) !important;
+  box-shadow: var(--se-panel-shadow);
+  -webkit-backdrop-filter: var(--se-blur-panel);
+  backdrop-filter: var(--se-blur-panel);
+  color: var(--se-text-strong) !important;
+  font: 600 var(--se-fs-sm) / 1.4 var(--se-font) !important;
+}
+
+.MillenniumSettings .bhd-wrap > div[style*="sticky"]::before {
+  content: "";
+  display: inline-block;
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
+  margin-right: var(--se-space-2);
+  vertical-align: -3px;
+  background: var(--se-success);
+  -webkit-mask: var(--se-icon-check) center / contain no-repeat;
+  mask: var(--se-icon-check) center / contain no-repeat;
+}
+
+.MillenniumSettings .bhd-wrap > div:has(> textarea) {
+  margin: 0 0 var(--se-space-3) !important;
+  padding: var(--se-space-3) !important;
+  border-radius: var(--se-card-radius);
+  background: var(--se-card-bg) !important;
+  box-shadow: var(--se-card-edge);
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm) / 1.45 var(--se-font);
+}
+
+.MillenniumSettings .bhd-wrap > div:has(> textarea) > div {
+  font-size: inherit !important;
+}
+
+.MillenniumSettings .bhd-wrap > div > textarea {
+  padding: var(--se-space-2) var(--se-space-3) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: var(--se-field-bg) !important;
+  box-shadow: var(--se-field-edge);
+  color: var(--se-text) !important;
+  font: 500 var(--se-fs-sm) / 1.45 var(--se-font-mono) !important;
+  outline: none;
+  resize: vertical;
+}
+
+.MillenniumSettings .bhd-wrap > div > textarea:focus {
+  box-shadow: var(--se-field-edge-focus);
 }

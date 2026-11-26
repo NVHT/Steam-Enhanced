@@ -3,22 +3,24 @@
  * paired with brew-hub.css, laid out like the other Millennium pages.
  *
  * The plugin's React owns every node, so nothing of its is moved or rebuilt. This marks the view
- * on the root ([data-se-bh] grid / detail), sizes the root to the window (--se-bh-h, through
- * millennium-pages.js's fillHeight), hides the cards off the current page ([data-se-bh-hide]:
- * a mark of its own, as leaving another Millennium page clears that page's data-se-hide across
- * the window) and adds four theme elements as the root's last children, where React's updates
+ * on the root ([data-se-bh] grid / unofficial / detail: Unofficial, 1.2 and later, is the tab of
+ * plugins added from GitHub, told by its add field, never by its localized name), sizes the
+ * root to the window (--se-bh-h, through millennium-pages.js's fillHeight), hides the cards off
+ * the current page ([data-se-bh-hide]: a mark of its own, as leaving another Millennium page
+ * clears that page's data-se-hide across the window) and adds four theme elements as the root's last children, where React's updates
  * never touch them ([data-se-bh-own]):
  * - the page title: a .DialogHeader with its sub-line, so it is every settings page's title. Its
  *   words are the page's entry in the settings dialog's MILL_PAGES list, which also gives the
  *   page its sidebar icon and the sub-line on the dialog's own passes;
- * - the segmented track behind the Themes | Plugins tabs, whose labels read "Themes 27"
+ * - the segmented track behind the Themes | Plugins | Unofficial tabs, whose labels read "Themes 27"
  *   ([data-se-name] / [data-se-count], drawn by brew-hub.css);
  * - a Sort dropdown standing in for the plugin's sort pills (choosing clicks the pill, so the
  *   plugin still does the sorting);
  * - the pager row: the pager and a Refresh that presses the plugin's own (hidden) and turns
  *   while it is busy. No label: the tab already says what is listed and how many. A page holds
  *   as many rows of cards as the window does; a new list (search, sort, tags, tab) goes back to
- *   page one.
+ *   page one. Unofficial isn't paged (a short list of the user's own, with a second list under
+ *   it): the page scrolls, and the row keeps only Refresh.
  *
  * Classic script, listed after client/settings/millennium/ in client/loader.js: it reads the
  * icons and fillHeight from window.__seMillParts.
@@ -201,8 +203,14 @@
     }
 
     // The pager: one page of the cards the plugin shows, in its order
-    function syncPage() {
+    function syncPage(paged = true) {
       const list = cards();
+      if (!paged) {
+        listSig = null;
+        list.forEach((c) => SE.attr(c, HIDE, null));
+        SE.attr(pager, 'hidden', '');
+        return;
+      }
       const sig = list.map((c) => text(c.querySelector('.bh-name'))).join('\n');
       if (sig !== listSig) {
         listSig = sig;
@@ -277,9 +285,16 @@
       if (!frame) frame = win.requestAnimationFrame(layout);
     };
 
+    function viewOf() {
+      if (root.querySelector(':scope > .bh-detail')) return 'detail';
+      if (root.querySelector(':scope > .bh-bar2 > .bh-addinput')) return 'unofficial';
+      return 'grid';
+    }
+
     function sync() {
-      const detail = Boolean(root.querySelector(':scope > .bh-detail'));
-      SE.attr(root, 'data-se-bh', detail ? 'detail' : 'grid');
+      const view = viewOf();
+      const detail = view === 'detail';
+      SE.attr(root, 'data-se-bh', view);
       const mine = [head, track, sort, bar];
       if (mine.some((el, i) => el !== root.children[root.children.length - mine.length + i])) root.append(...mine);
       if (detail) {
@@ -287,7 +302,7 @@
       } else {
         syncTabs();
         syncSort();
-        syncPage();
+        syncPage(view === 'grid');
         syncRefresh();
       }
       relayout();
