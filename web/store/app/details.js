@@ -200,8 +200,11 @@
           rowNodes.forEach((node, i) => node.toggleAttribute('data-se-extra', i >= count));
           more.hidden = count >= rows.length;
         },
-        /** Each row's top in the grid (read with every row shown). */
-        tops: () => rowNodes.map((node) => node.offsetTop),
+        /**
+         * Each row's top in the grid (read with every row shown), from its name cell: a row is
+         * display: contents (summary-details.css), which has no box and an offsetTop of 0.
+         */
+        tops: () => rowNodes.map((node) => node.firstElementChild.offsetTop),
       };
       languageView.show(LANGUAGE_ROWS);
       return [grid, more];
