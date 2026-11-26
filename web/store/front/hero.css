@@ -165,7 +165,8 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
   pointer-events: none;
   background:
     linear-gradient(0deg, color-mix(in srgb, var(--se-bg-ink) 95%, transparent) 0%, color-mix(in srgb, var(--se-bg-ink) 45%, transparent) 38%, color-mix(in srgb, var(--se-bg-ink) 0%, transparent) 62%),
-    linear-gradient(180deg, color-mix(in srgb, var(--se-bg-ink) 55%, transparent) 0%, color-mix(in srgb, var(--se-bg-ink) 0%, transparent) 18%);
+    /* The tab row's shade: still 40% where its names sit (~9% down), so they read on pale art too */
+    linear-gradient(180deg, color-mix(in srgb, var(--se-bg-ink) 70%, transparent) 0%, color-mix(in srgb, var(--se-bg-ink) 40%, transparent) 10%, color-mix(in srgb, var(--se-bg-ink) 0%, transparent) 22%);
 }
 
 /* ---- Top: game tabs with progress ---- */
@@ -293,8 +294,9 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
   color: var(--se-accent);
 }
 
+/* The tab names' tone: faint text disappears on pale art */
 .se-cinema__count {
-  color: var(--se-text-faint);
+  color: var(--se-text-muted);
   letter-spacing: .06em;
   font-variant-numeric: tabular-nums;
 }
@@ -326,7 +328,8 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
   display: block;
 }
 
-/* No logo or capsule: the title, set large like a logo lockup. */
+/* No logo or capsule: the title, set large like a logo lockup (a div with the heading role:
+   hero.js, out of Steam's h2 rule) */
 .se-cinema__title {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -354,7 +357,9 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
 
 /* With a logo or capsule the title stays for screen readers only. */
 .se-cinema.has-capsule .se-cinema__title,
-.se-cinema.has-logo .se-cinema__title {
+.se-cinema.has-logo .se-cinema__title,
+/* A promotion (hero.js is-promo): its art names it, so the title goes too */
+.se-cinema.is-promo .se-cinema__title {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -389,6 +394,38 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
   background: var(--se-glass);
   backdrop-filter: var(--se-blur-panel);
   box-shadow: var(--se-edge);
+}
+
+/* A slide with nothing for the bar (hero.js is-bare, a promotion): the buy controls alone, on
+   the art; no glass, which would only frame the button. The bar keeps its padding, the height a
+   game's bar takes (its screenshot tiles and padding; 104px where the tiles hide) and the heart
+   its room, so the button stays where every other slide has it. */
+.se-cinema.is-bare {
+  --se-cinema-bare-h: max(104px, calc(var(--se-cinema-shot-w) * 9 / 16 + 2 * var(--se-space-4)));
+}
+
+.se-cinema.is-bare .se-cinema__bar {
+  left: auto;
+  min-height: var(--se-cinema-bare-h);
+  grid-template-columns: [buy] auto;
+  background: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.se-cinema.is-bare .se-cinema__wish[hidden] {
+  display: grid;
+  visibility: hidden;
+}
+
+.se-cinema.is-bare :is(.se-cinema__meta, .se-cinema__desc, .se-cinema__shots) {
+  display: none;
+}
+
+/* The title comes down beside it, its foot level with the button's: the bar's 20px inset, then
+   half of what its height leaves around the button */
+.se-cinema.is-bare .se-cinema__head {
+  bottom: calc(20px + (var(--se-cinema-bare-h) - var(--se-ctl-lg)) / 2);
 }
 
 .se-cinema__meta {
@@ -636,6 +673,11 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
 
   .se-cinema__shots {
     display: none;
+  }
+
+  /* No tiles: a game's bar is its 104px minimum, and so is a bare one */
+  .se-cinema.is-bare {
+    --se-cinema-bare-h: 104px;
   }
 
   .se-cinema__top .se-cinema__label {

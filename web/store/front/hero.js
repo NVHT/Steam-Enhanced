@@ -76,32 +76,25 @@
     };
 
     /*
-     * Asset folders for an app. Older art lives at apps/<id>/<file>; newer uploads at
-     * apps/<id>/<hash>/<file>. Logos aren't in any store API and newer ones sit under their own
-     * per-file hash, so only older games resolve here; the rest come from the library art lookup
-     * or fall back to the store capsule, which carries the game's logo.
+     * The game a slide is for: the app its link opens (store.steampowered.com/app/<id>), else
+     * the first of its data-ds-appid. A promotion (the Steam Awards, a sale) links to its own page
+     * and names app 0; a bundle links to /bundle/: no game, so no game art, wishlist or lookups.
      */
-    const ASSET_PATH = /^(https:\/\/[^/]+\/store_item_assets\/steam\/apps\/\d+\/)([0-9a-f]{16,}\/)?/i;
-
-    const assetFolders = (...urls) => {
-      const folders = new Set();
-      for (const url of urls) {
-        const match = ASSET_PATH.exec(url ?? '');
-        if (!match) continue;
-        folders.add(match[1]);
-        if (match[2]) folders.add(match[1] + match[2]);
-      }
-      return [...folders];
+    const appOf = (link) => {
+      const id = /\/app\/(\d+)/.exec(link?.href ?? '')?.[1] ?? link?.dataset.dsAppid?.split(',')[0]?.trim();
+      return id && /^[1-9]\d*$/.test(id) ? id : null;
     };
 
     /* ---------- Remote data, cached per app ---------- */
 
     /*
-     * Logos and library heroes sit under per-file hashes that only the app's PICS info lists
-     * (common.library_assets_full); api.steamcmd.net serves that publicly with open CORS. Short
-     * descriptions and full screenshot lists come from the store's own /api/appdetails. Both are
-     * cached in localStorage: hits for a week, misses for a day. Fetched only for the slide on
-     * screen and the next one.
+     * Art is never guessed from file names: newer games keep theirs under per-file hashes, and
+     * the CDN answers some missing files with a 1×1 picture instead of an error. A slide starts
+     * from the images its own capsule shows, then takes what Steam lists for the game: logos and
+     * library heroes from the app's PICS info (common.library_assets_full; api.steamcmd.net
+     * serves it publicly with open CORS), and the header, capsule, background, short description
+     * and screenshots from the store's own /api/appdetails. Both are cached in localStorage: hits
+     * for a week, misses for a day. Fetched only for the slide on screen and the next one.
      */
     const APPINFO_URL = 'https://api.steamcmd.net/v1/info/';
     const ASSET_BASE = 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/';
@@ -150,7 +143,11 @@
     };
 
     const artCache = createCache('se-store-library-art-v1', (entry) => Boolean(entry.logo || entry.hero));
-    const detailsCache = createCache(`se-store-details-v1-${pageLanguage}`, (entry) => Boolean(entry.description || entry.shots?.length));
+    const detailsCache = createCache(`se-store-details-v2-${pageLanguage}`, (entry) => Boolean(entry.description || entry.shots?.length || entry.header));
+    // v1 had no art fields; its entries would keep a slide from fetching them for a week
+    try {
+      localStorage.removeItem(`se-store-details-v1-${pageLanguage}`);
+    } catch {}
 
     const fetchLibraryArt = async (appid) => {
       try {
@@ -174,6 +171,9 @@
         const details = {
           description: decodeHtml(data?.short_description),
           shots: (data?.screenshots ?? []).slice(0, 4).map((shot) => ({ thumb: shot.path_thumbnail, full: shot.path_full })),
+          header: data?.header_image || '',
+          capsule: data?.capsule_imagev5 || data?.capsule_image || '',
+          background: data?.background_raw || data?.background || '',
         };
         detailsCache.set(appid, details);
         return details;
@@ -182,9 +182,22 @@
       }
     };
 
-    /** Fill a slide's description and top up its screenshots to four; true if anything changed. */
+    /*
+     * Fill a slide's description, top up its screenshots to four, and add the store's art after
+     * what the slide has (background, then header, for the art; capsule and header for the
+     * framed tile); true if anything changed.
+     */
     const applyStoreDetails = (slide, details) => {
       let changed = false;
+      const add = (list, url) => {
+        if (!url || list.includes(url)) return;
+        list.push(url);
+        changed = true;
+      };
+      add(slide.art, details?.background);
+      add(slide.art, details?.header);
+      add(slide.capsule, details?.capsule);
+      add(slide.capsule, details?.header);
       if (details?.description && slide.description !== details.description) {
         slide.description = details.description;
         changed = true;
@@ -213,14 +226,13 @@
     };
 
     const readSlide = (capsule) => {
-      const appid = capsule.dataset.dsAppid?.split(',')[0] ?? null;
+      const appid = appOf(capsule);
       const mainCapsule = capsule.querySelector('.main_capsule');
       const thumb = mainCapsule?.dataset.backgroundImageUrl ?? '';
       const thumb2x = mainCapsule?.dataset.backgroundImage2xUrl ?? '';
       const shots = [...capsule.querySelectorAll('.screenshots > div')]
         .map((node) => node.dataset.backgroundImageUrl || /url\(["']?([^"')]+)/.exec(node.style.backgroundImage)?.[1])
         .filter(Boolean);
-      const folders = assetFolders(thumb, shots[0]);
       const full = (url) => url?.replace(/\.\d+x\d+\.jpg/, '.1920x1080.jpg');
       const slide = {
         appid,
@@ -232,9 +244,10 @@
         price: readPrice(capsule),
         shots: shots.slice(0, 4).map((url) => ({ thumb: url, art: [full(url), url] })),
         description: '',
-        // Best art first; each candidate is tried in order on load error.
-        art: [...folders.map((folder) => `${folder}library_hero.jpg`), full(shots[0]), shots[0], thumb].filter(Boolean),
-        logo: folders.map((folder) => `${folder}logo.png`),
+        // Best art first; each candidate is tried in order on load error. The library hero and
+        // logo join from the lookups.
+        art: [full(shots[0]), shots[0], thumb].filter(Boolean),
+        logo: [],
         capsule: [thumb2x, thumb].filter(Boolean),
         requested: false,
       };
@@ -250,8 +263,10 @@
 
     /*
      * Load the first candidate that works into an image. A newer call on the same image settles
-     * the older one (false) instead of leaving it pending.
+     * the older one (false) instead of leaving it pending. A picture of PLACEHOLDER_PX or less
+     * counts as missing: the CDN answers some absent files with a 1×1 one.
      */
+    const PLACEHOLDER_PX = 8;
     const pending = new WeakMap();
     const loadFirst = (img, candidates) => {
       pending.get(img)?.(false);
@@ -267,7 +282,7 @@
         const next = () => {
           const src = queue.shift();
           if (!src) return settle(false);
-          img.onload = () => settle(true);
+          img.onload = () => (img.naturalWidth > PLACEHOLDER_PX && img.naturalHeight > PLACEHOLDER_PX ? settle(true) : next());
           img.onerror = next;
           img.src = src;
         };
@@ -341,7 +356,8 @@
       /* Lower left, on the art: the logo (or capsule, or title). */
       const logo = el('img', { class: 'se-cinema__logo', alt: '', decoding: 'async' });
       const capsuleArt = el('img', { class: 'se-cinema__capsule', alt: '', decoding: 'async' });
-      const title = el('h2', { class: 'se-cinema__title' });
+      // A heading by role, not an <h2>: Steam's store styles h2 small and grey, over the hero's own size
+      const title = el('div', { class: 'se-cinema__title', role: 'heading', 'aria-level': '2' });
       const head = el('div', { class: 'se-cinema__head' }, [logo, capsuleArt, title]);
 
       /* Bottom: one glass bar with facts, screenshots and the buy controls. */
@@ -489,10 +505,14 @@
         renderPrice(price, slide.price);
         renderWish(slide);
         renderShots(slide, ticket);
+        // Nothing for the bar (a promotion: no facts, description, screenshots or price): only
+        // its buy controls show (hero.css); a refresh that brings any of them redraws it full
+        hero.classList.toggle('is-bare', !meta.childElementCount && !slide.description && !slide.shots.length && !slide.price);
 
         hero.classList.remove('has-logo', 'has-capsule');
         hero.classList.add('is-art-pending');
         hero.classList.toggle('is-long-title', slide.title.length > 28);
+        hero.classList.toggle('is-promo', Boolean(slide.promo));
         loadFirst(logo, slide.logo).then(async (ok) => {
           if (ticket !== token) return;
           if (ok) hero.classList.add('has-logo');
@@ -588,33 +608,38 @@
      * and an aria-label of "<Title>. <Tagline>." It becomes the hero's first slide; the art,
      * logo, description and screenshots come from the same remote lookups as every other slide.
      * The title may contain periods ("S.T.A.L.K.E.R. 2"), so the tagline is the last sentence.
+     * Its art is the takeover's own (front/hero-takeover.js), then what the lookups list; an
+     * event's takeover (the Steam Awards, a sale) has no game behind it (appOf), so only its own
+     * art, its title in the logo's place.
      */
     const TAKEOVER_SELECTOR = '.home_page_takeover_link a.home_page_takeover_sizer[data-ds-appid]';
     const TAKEOVER_LABEL = /^(.+?)\.\s+([^.]+?)\.?$/s;
 
     const readTakeover = () => {
       const link = document.querySelector(TAKEOVER_SELECTOR);
-      const appid = link?.dataset.dsAppid?.split(',')[0];
-      if (!appid) return null;
+      if (!link) return null;
+      const appid = appOf(link);
       const label = squash(link.getAttribute('aria-label'));
       const [, name, tagline] = TAKEOVER_LABEL.exec(label) ?? [null, label.replace(/\.$/, ''), ''];
       if (!name) return null;
-      const folder = `${ASSET_BASE}${appid}/`;
       const slide = {
         appid,
         href: link.href,
         title: name,
         reason: tagline ? { kind: 'takeover', badge: tagline } : null,
+        // A promotion (no game behind it): its art names it; Steam's label is only "Featured Promotion"
+        promo: !appid,
         review: null,
         reviewCount: '',
         price: null,
         shots: [],
         description: '',
-        art: [`${folder}library_hero.jpg`, `${folder}page_bg_raw.jpg`, `${folder}header.jpg`],
-        logo: [`${folder}logo.png`],
-        capsule: [`${folder}capsule_616x353.jpg`, `${folder}header.jpg`],
+        art: [],
+        logo: [],
+        capsule: [],
         requested: false,
       };
+      if (!appid) return slide;
       applyLibraryArt(slide, artCache.get(appid));
       applyStoreDetails(slide, detailsCache.get(appid));
       return slide;
@@ -652,7 +677,7 @@
       const takeover = readTakeover();
       const featured = capsules.map(readSlide).filter((slide) => slide.title && slide.art.length);
       const slides = takeover
-        ? [takeover, ...featured.filter((slide) => slide.appid !== takeover.appid)].slice(0, MAX_SLIDES)
+        ? [takeover, ...featured.filter((slide) => !takeover.appid || slide.appid !== takeover.appid)].slice(0, MAX_SLIDES)
         : featured;
       if (!source || !slides.length) return;
       const hero = buildHero(slides);
@@ -664,11 +689,12 @@
       });
       // Before html.se-takeover: hideTakeoverArt reads the takeover's art while it still paints
       if (takeover && takeoverPart) {
-        // The takeover's own art goes in before header.jpg, the smallest candidate.
+        // The takeover's own art goes in after a library hero, before the store's background and
+        // header (applyStoreDetails adds those last).
         takeoverPart.hideTakeoverArt(hero.element, life, (urls) => {
           const fresh = urls.filter((url) => !takeover.art.includes(url));
           if (!fresh.length) return;
-          const at = takeover.art.findIndex((url) => url.endsWith('/header.jpg'));
+          const at = takeover.art.findIndex((url) => !/library_hero/.test(url));
           takeover.art.splice(at < 0 ? takeover.art.length : at, 0, ...fresh);
           hero.refresh(takeover);
         });
