@@ -325,13 +325,16 @@
     });
   }
 
+  // Only the centred logo is trimmed (options/library/logo-centred.css): Steam's place draws it whole
+  const centredLogo = () => SE.settings?.get('logo-place') !== 'steam';
+
   function sizeLogos() {
-    if (logoSizingActive) document.querySelectorAll(LOGO).forEach(sizeLogo);
+    if (logoSizingActive && centredLogo()) document.querySelectorAll(LOGO).forEach(sizeLogo);
   }
 
   function onLogoLoad(event) {
     const img = event.target;
-    if (!logoSizingActive || !img.matches?.(LOGO)) return;
+    if (!logoSizingActive || !centredLogo() || !img.matches?.(LOGO)) return;
     logoSources.delete(img);
     sizeLogo(img);
   }

@@ -1,0 +1,52 @@
+/*
+ * Theme setting (client/shared/settings.js): Logo place, Centred (the default). A game page's
+ * logo sits centred above the play bar (client/game-page/layout.css), in one box for every game,
+ * trimmed to its drawn part (--se-logo-crop, client/game-page/play-bar.js). Steam's own place,
+ * set with Move and size the logo, can't show here, so the hero menu's two place rows go
+ * (data-se-gm, client/library/home-menus.js). Steam's place: none of this; Steam draws the logo.
+ */
+
+/* BoxSizer: !important beats Steam's inline place (the saved logo position) */
+._2gZXhRmKUk68pA28-5ZmGQ ._2Eh7Soh97QONu_grMi2m66 {
+  left: 50% !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: calc(var(--se-gp-overlap) + 2px) !important;
+  transform: translateX(-50%);
+}
+
+/* TitleImageContainer */
+._2gZXhRmKUk68pA28-5ZmGQ ._2Eh7Soh97QONu_grMi2m66 ._2DVdg_N1qLNDdnxJqN-RBX {
+  justify-content: center !important;
+  align-items: flex-end !important;
+}
+
+/* TitleLogo: !important beats Steam's own place rules for it */
+._2gZXhRmKUk68pA28-5ZmGQ ._2Eh7Soh97QONu_grMi2m66 ._3NBxSLAZLbbbnul8KfDFjw {
+  left: 50% !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: 0 !important;
+  margin: 0 !important;
+  transform: translateX(-50%);
+  object-position: bottom center !important;
+}
+
+/* One box for every logo, shrinking on narrow game pages; !important beats Steam's size rules */
+._2gZXhRmKUk68pA28-5ZmGQ ._2Eh7Soh97QONu_grMi2m66 img._3NBxSLAZLbbbnul8KfDFjw {
+  width: min(580px, 78cqw) !important;
+  height: min(172px, 23cqw) !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-view-box: var(--se-logo-crop, none) !important;
+  object-fit: contain !important;
+}
+
+/*
+ * The hero menu's Move and size the logo and Back to where Steam puts it, with their slots.
+ * :root…:not(#se-none) and !important: the row rule's display: grid (client/library/game-menu.css).
+ */
+:root [data-se-lib-menu] :is([data-se-gm="logoedit"], [data-se-gm="logoreset"]):not(#se-none),
+:root [data-se-lib-menu] [data-se-gm-list] > :is([data-se-gm-slot="logoedit"], [data-se-gm-slot="logoreset"]):not(#se-none) {
+  display: none !important;
+}

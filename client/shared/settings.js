@@ -223,6 +223,11 @@
       values: [opt('on', 'On'), opt('off', 'Off')],
     },
     {
+      key: 'logo-place', section: 'Game page', tab: 'Library', label: 'Logo place',
+      hint: "Centred above the play bar, or where Steam puts it: there Move and size the logo, in the art's right-click menu, places it.",
+      values: [opt('centred', 'Centred', 'options/library/logo-centred.css'), opt('steam', "Steam's")],
+    },
+    {
       key: 'game-list-icons', section: 'Game list', tab: 'Library', label: 'Game icons',
       hint: "Each game's small icon before its name in the list.",
       values: [opt('on', 'On'), opt('off', 'Off', 'options/library/game-icons-off.css')],
