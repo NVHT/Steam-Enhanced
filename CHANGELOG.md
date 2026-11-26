@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.5.6**](#v1-5-6) | Nov 26, 2026 | Offline friends in the dock, tip and header fixes |
 | [**1.5.5**](#v1-5-5) | Nov 26, 2026 | Fixes from your reports, logo and offline friends settings |
 | [**1.5.4**](#v1-5-4) | Nov 26, 2026 | Millennium's settings work with Millennium 3.7 |
 | [**1.5.3**](#v1-5-3) | Nov 26, 2026 | The store's hero: no blank tiles, cleaner promotions |
@@ -31,11 +32,25 @@
 
 <br>
 
+<a name="v1-5-6"></a>
+
+## 1.5.6 · Nov 26, 2026
+
+> Offline friends now really shows them in the dock, open or folded.
+
+**Fixes**
+- **Offline friends**: Shown lists offline friends in the dock (Steam's Offline section and your categories) and in the folded dock, behind a "+N"; Hidden keeps the dock as before. The Friends window lists everyone.
+- **Friends list**: a folded Offline header no longer shows a "Sorting alphabetically" tip for a hidden button, and fills its row.
+- **Rail**: a menu opened on hover no longer shows its button's tip over it.
+- **Theme settings**: Logo place and the offline settings have their own icons.
+
+<br>
+
 <a name="v1-5-5"></a>
 
-## 1.5.5 · Nov 26, 2026
-
-> Fixes from your reports, a setting for where a game's logo sits, and two for offline friends.
+<details>
+<summary><b>1.5.5</b> · Nov 26, 2026 · Fixes from your reports, a setting for where a game's logo sits, and two for offline friends.</summary>
+<br>
 
 **Library**
 - **Logo place**: a new setting (Library › Game page). Centred keeps the logo above the play bar; Steam's leaves it where Steam puts it, and Move and size the logo works (#14).
@@ -51,6 +66,8 @@
 - **Discussions**: the search field no longer covers Start a New Discussion (#14).
 - **Friends dock**: View profile opens the profile (#14).
 - **Toasts**: the stage works on Linux.
+
+</details>
 
 <br>
 
