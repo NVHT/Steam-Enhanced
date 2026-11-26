@@ -457,6 +457,7 @@ a.se-app-hero__chip:hover {
 .se-app-hero__chip[data-se-tone="verified"] { --tone: var(--se-cart); }
 .se-app-hero__chip[data-se-tone="achievements"] { --tone: var(--se-gold); }
 .se-app-hero__chip[data-se-tone="points"] { --tone: var(--se-gold); }
+.se-app-hero__chip[data-se-tone="early-access"] { --tone: var(--se-accent-hover); }
 
 a.se-app-hero__chip[data-se-tone]:hover {
   background: color-mix(in srgb, var(--tone) 24%, var(--se-glass-chip));
@@ -512,6 +513,96 @@ html.se-app-hero-on .game_meta_data :is(div:has(> a[href*="steamcommunity.com/ac
 /* !important: another rule in this file sets color with !important */
 .se-app-hero__chip[data-se-kind="franchise"] {
   color: var(--se-text) !important;
+}
+
+/* ---------- Steam's dialog, opened by a hero chip (app/hero.js showCopy) ----------
+ * A copy of one of Steam's blocks, .se-app-dialog: Early Access (.se-app-ea) or a developers'
+ * disclosure (.se-app-note: a p introducing it, a p > i with their words).
+ * Early Access is a copy of Steam's #earlyAccessHeader, renamed .se-app-ea so Steam's blue-framed rules
+ * (game.css div.early_access_header) stay off it: .heading (subtitle; a note whose "Note:" is a
+ * span; a link), then .devnotes (.devs_say, the answers' h3s, text and lists; .likely_stale
+ * and .leaving_early_access notices), then the bug-report banner's line and link
+ * (.se-app-ea__report). Paragraphs take the dialog's own look (modals.css).
+ */
+
+/* Steam places a dialog once, as it opens (shared_global.js CModal.AdjustSizing; in the client's
+   touch-friendly mode offset by the page's scroll too), which left this tall one low: centred in
+   the window instead. !important: Steam sets position, left and top inline. */
+html.se-app-hero-on .newmodal:has(.se-app-dialog) {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%);
+}
+
+.se-app-dialog {
+  box-sizing: border-box;
+  max-width: 640px;
+  max-height: min(60vh, 560px);
+  overflow-y: auto;
+  padding-inline-end: var(--se-space-2);
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-base);
+  line-height: 1.55;
+}
+
+.se-app-note i {
+  color: var(--se-text);
+}
+
+.se-app-ea .heading p span {
+  color: var(--se-gold);
+  font-weight: 700;
+}
+
+.se-app-ea .devnotes {
+  padding-top: var(--se-space-4);
+  border-top: 1px solid var(--se-divider);
+}
+
+.se-app-ea .devs_say {
+  font: var(--se-eyebrow-font);
+  letter-spacing: var(--se-eyebrow-spacing);
+  text-transform: uppercase;
+  color: var(--se-eyebrow-color);
+}
+
+/* The dialog's weight: something of Steam's outranked the bare .se-app-ea h3 */
+.newmodal .se-app-ea h3 {
+  margin: var(--se-space-4) 0 var(--se-space-1);
+  color: var(--se-white);
+  font-size: var(--se-fs-md);
+  font-weight: 700;
+}
+
+.se-app-ea strong {
+  color: var(--se-text);
+}
+
+.se-app-ea ul {
+  margin: var(--se-space-2) 0;
+  padding-inline-start: var(--se-space-5);
+}
+
+.se-app-ea__report {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--se-space-2) var(--se-space-4);
+  margin-top: var(--se-space-4);
+  padding-top: var(--se-space-4);
+  border-top: 1px solid var(--se-divider);
+}
+
+.se-app-ea__report a {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.se-app-ea :is(.likely_stale, .leaving_early_access) {
+  margin-top: var(--se-space-3);
+  color: var(--se-gold);
 }
 
 /* ---------- Steam Deck details (Steam's modal, opened by the hero's Deck chip) ----------

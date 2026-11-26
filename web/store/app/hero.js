@@ -24,7 +24,8 @@
  * Also over the art: Steam's Share / Embed / Report buttons as round glass icons beside
  * Community Hub (they click Steam's own, which stay hidden in the right column), and the age
  * rating, Metacritic score, achievements and Points Shop as chips (Steam's own boxes for
- * them are hidden).
+ * them are hidden). Early Access and the developers' disclosures are chips too, each opening
+ * Steam's block in a dialog.
  *
  * Art: the library hero image (store CDN), else Steam's generated page background, else the
  * header capsule blurred. Steam's title row stays in the DOM: html.se-app-hero-on hides its
@@ -464,6 +465,80 @@
       return links.length ? { boxes: [...new Set(links.map(blockOf))], href: `https://store.steampowered.com/points/shop/app/${appId}` } : null;
     };
 
+    /* ---------- Chips that open Steam's block in a dialog ---------- */
+
+    /*
+     * A copy of one of Steam's blocks in Steam's own dialog (ShowAlertDialog, shared_global.js;
+     * its look: web/shared/modals.css, the copy's: app/hero.css .se-app-dialog), titled with the
+     * block's heading, which the copy drops. Without the dialog function there is no chip and the
+     * block stays.
+     */
+    const canDialog = () => typeof window.ShowAlertDialog === 'function';
+    const showCopy = (title, box, drop, className, extra) => {
+      const copy = box.cloneNode(true);
+      copy.querySelectorAll(`${drop}, script`).forEach((node) => node.remove());
+      // Ids would repeat Steam's; inline styles (a max-height cutting text short) go too
+      for (const node of [copy, ...copy.querySelectorAll('[id], [style]')]) {
+        node.removeAttribute('id');
+        node.removeAttribute('style');
+      }
+      copy.className = `se-app-dialog ${className}`;
+      if (extra) copy.append(extra);
+      window.ShowAlertDialog(title, copy, 'Close');
+    };
+
+    /* ---------- Early Access chip ---------- */
+
+    /*
+     * Steam's Early Access block in the page column (#earlyAccessHeader: .heading with its h2,
+     * "Early Access Game" or "Coming Soon To Early Access", a subtitle and a note; .devnotes with
+     * "What the developers have to say" and their answers in #devnotes_expander, cut short by an
+     * inline max-height until Read more). The chip, labelled with the h2, opens the block whole
+     * (showCopy; app/hero.css .se-app-ea). Steam's block is hidden while the chip shows.
+     * Steam's bug-report banner (div.early_access_banner: a bug picture, a p, and an a.btn_medium
+     * to the discussion boards) goes too: its line and link end the dialog.
+     */
+    const readEarlyAccess = () => {
+      const box = document.getElementById('earlyAccessHeader');
+      const label = text(box?.querySelector('.heading h2'));
+      const banner = document.querySelector('.early_access_banner');
+      const report = banner?.querySelector('a[href]');
+      return label && canDialog()
+        ? { box, label, banner, report: report && { line: text(banner.querySelector('p')), link: text(report), href: report.href } }
+        : null;
+    };
+
+    const openEarlyAccess = () => {
+      const early = readEarlyAccess();
+      if (!early) return;
+      const { report } = early;
+      const footer = report?.link
+        ? el('div', { class: 'se-app-ea__report' }, [report.line, el('a', { href: report.href, text: report.link })].filter(Boolean))
+        : null;
+      showCopy(early.label, early.box, '.heading h2, #devnotes_more', 'se-app-ea', footer);
+    };
+
+    /* ---------- Disclosure chips ---------- */
+
+    /*
+     * The developers' disclosures (AI Generated Content, Mature Content Description), each a
+     * div.game_area_description > h2, a p introducing it and a p > i with their words, alone in
+     * a .game_page_autocollapse_ctn in the page column. Steam gives every one the same id
+     * (game_area_content_descriptors), so all are read, not the first. A chip each, labelled
+     * with its h2, opens it (showCopy; app/hero.css .se-app-note); its wrapper is hidden.
+     */
+    const readNotes = () =>
+      canDialog()
+        ? [...document.querySelectorAll('[id="game_area_content_descriptors"]')]
+          .map((box) => ({ box, label: text(box.querySelector('h2')) }))
+          .filter((note) => note.label)
+        : [];
+
+    const openNote = (index) => {
+      const note = readNotes()[index];
+      if (note) showCopy(note.label, note.box, 'h2', 'se-app-note');
+    };
+
     /* ---------- Franchise chip ---------- */
 
     /*
@@ -519,7 +594,12 @@
       const achievements = readAchievements();
       const points = readPoints();
       const franchise = readFranchise();
+      const early = readEarlyAccess();
+      const notes = readNotes();
       syncChipSources([
+        ...notes.map((note) => note.box.closest('.game_page_autocollapse_ctn') ?? note.box),
+        early?.box,
+        early?.report ? early.banner : null,
         rating ? ratingBox() : null,
         metacritic ? metaScore().closest('.block') ?? metaScore() : null,
         franchise?.box,
@@ -527,13 +607,14 @@
         ...(points?.boxes ?? []),
       ].filter(Boolean));
       syncTools();
-      const key = JSON.stringify([reviews, tags, deck, canOpen, rating, descriptors, metacritic, achievements && [achievements.count, achievements.href], points?.href, franchise && [franchise.label, franchise.href]]);
+      const key = JSON.stringify([reviews, tags, deck, canOpen, rating, descriptors, metacritic, achievements && [achievements.count, achievements.href], points?.href, franchise && [franchise.label, franchise.href], early?.label, early?.report, notes.map((note) => note.label)]);
       if (key === chipsKey) return;
       chipsKey = key;
 
       const tagNodes = tags.map((tag) => chip(tag.label, { href: tag.href }));
       tagNodes.forEach((node) => node.setAttribute('role', 'listitem'));
       const nodes = [];
+      if (early) nodes.push(chip(early.label, { tone: 'early-access', kind: 'early-access', onClick: openEarlyAccess }));
       if (reviews) {
         const label = reviews.count ? `${reviews.summary} · ${reviews.count}` : reviews.summary;
         const target = document.getElementById('app_reviews_hash') ? '#app_reviews_hash' : undefined;
@@ -564,6 +645,7 @@
         if (descriptors) node.title = descriptors;
         nodes.push(node);
       }
+      notes.forEach((note, index) => nodes.push(chip(note.label, { kind: 'note', onClick: () => openNote(index) })));
       franchiseRow.replaceChildren(...(franchise ? [chip(franchise.label, { href: franchise.href, kind: 'franchise' })] : []));
       franchiseRow.hidden = !franchise;
       tagRow.replaceChildren(...tagNodes);
