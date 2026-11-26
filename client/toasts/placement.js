@@ -7,7 +7,9 @@
   const ns = window.__seToastsParts;
   if (!ns) return;
   const { mark, run, unmark } = SE;
-  const { BOX, IN_GAME, SURFACE, isStage, note } = ns;
+  const { BOX, IN_GAME, LINUX, SURFACE, isStage, note } = ns;
+  // The room around the tray for its shadow; none on Linux, where it would draw black (context.js)
+  const PAD = LINUX ? { x: 0, top: 0, bottom: 0 } : { x: BOX.padX, top: BOX.padTop, bottom: BOX.padBottom };
   const { live } = ns;
 
   /* ---------- Placement ---------- */
@@ -178,9 +180,12 @@
       sizeAttempts.push({ sizer: SIZERS[i].name, w: window.innerWidth, h: window.innerHeight });
       if (sized(t)) {
         live.sizer = i;
+        note(`sized ${window.innerWidth}×${window.innerHeight} by ${SIZERS[i].name}`);
         return true;
       }
     }
+    // The tray then scales down to the window (fit()): a stage drawn small
+    note(`couldn't size: window ${window.innerWidth}×${window.innerHeight}, wanted ${t.w}×${t.h}, tried ${sizeAttempts.map((a) => `${a.sizer} → ${a.w}×${a.h}`).join(', ') || 'nothing'}`);
     return false;
   }
 
@@ -206,21 +211,23 @@
   const placeScreen = () => (window.screen.width > 200 ? window.screen : (IN_GAME && overlayScreen()) || window.screen);
   const placeable = () => placeScreen().width > 200;
 
-  function wanted() {
+  // trayH: the tray's height now on Linux (followTray, kept in live.trayH so every re-placing,
+  // restack()'s too, keeps it), else its tallest (with the queue strip)
+  function wanted(trayH = (LINUX && live.trayH) || BOX.trayH) {
     const s = placeScreen();
-    const w = BOX.trayW + BOX.padX * 2;
-    const h = BOX.padTop + BOX.trayH + BOX.padBottom;
+    const w = BOX.trayW + PAD.x * 2;
+    const h = PAD.top + trayH + PAD.bottom;
     const left = s.availLeft ?? 0;
     const top = s.availTop ?? 0;
     const where = SE.settings?.get('stage-position');
     // "Stage position: Corner" (client/shared/settings.js): `lift` in from the work area's right
     const x = where === 'corner'
-      ? Math.round(left + s.availWidth - BOX.lift + BOX.padX - w)
+      ? Math.round(left + s.availWidth - BOX.lift + PAD.x - w)
       : Math.round(left + (s.availWidth - w) / 2);
     // "Stage position: Top": `lift` under the work area's top instead
-    if (where === 'top') return { x, y: Math.round(top + BOX.lift - BOX.padTop), w, h };
+    if (where === 'top') return { x, y: Math.round(top + BOX.lift - PAD.top), w, h };
     // Every toast window goes to the same spot; only the stage draws anything there.
-    const bottom = top + s.availHeight - BOX.lift + BOX.padBottom;
+    const bottom = top + s.availHeight - BOX.lift + PAD.bottom;
     return { x, y: Math.round(bottom - h), w, h };
   }
 
@@ -235,12 +242,38 @@
   function fit() {
     if (!live.dock) return;
     const full = fullArea();
-    const bottom = full ? BOX.lift : live.mover >= 0 ? BOX.padBottom : 4;
-    const scale = Math.min(1, (window.innerWidth - 8) / BOX.trayW, (window.innerHeight - bottom - 4) / BOX.trayH);
+    const bottom = full ? BOX.lift : live.mover >= 0 ? PAD.bottom : 4;
+    // Linux: the tray fills its window, whose height follows it (followTray): only its width counts
+    const scale = LINUX
+      ? Math.min(1, window.innerWidth / BOX.trayW)
+      : Math.min(1, (window.innerWidth - 8) / BOX.trayW, (window.innerHeight - bottom - 4) / BOX.trayH);
     live.dock.style.setProperty('--se-tst-bottom', `${bottom}px`);
     // The tray's right inset at Stage position: Corner (options/toasts/stage-corner.css)
-    live.dock.style.setProperty('--se-tst-side', `${full ? BOX.lift : BOX.padX}px`);
+    live.dock.style.setProperty('--se-tst-side', `${full ? BOX.lift : PAD.x}px`);
     live.dock.style.setProperty('--se-tst-scale', String(Math.max(0.5, Math.round(scale * 1000) / 1000)));
+    followTray();
+  }
+
+  /*
+   * Linux: nothing past the tray can be see-through, so the window takes the tray's height as it
+   * changes (the queue strip comes and goes), its foot kept on the spot. Observed on the dock: as
+   * tall as the tray, and never animated (the tray is, as it opens and closes).
+   */
+  function followTray() {
+    if (!LINUX || !live.dock || live.trayFollow) return;
+    let last = 0;
+    live.trayFollow = new ResizeObserver(([entry]) => {
+      const h = Math.ceil(entry.contentRect.height);
+      if (!h || Math.abs(h - last) < 2) return;
+      last = h;
+      live.trayH = h;
+      const t = wanted(h);
+      live.target = t;
+      const W = scWindow();
+      run(() => (typeof W?.MoveTo === 'function' ? W.MoveTo(t.x, t.y, DPI()) : window.moveTo(t.x, t.y)));
+      ensureSize(t);
+    });
+    live.trayFollow.observe(live.dock);
   }
 
   async function place() {
@@ -257,6 +290,7 @@
     // A new overlay window reads a 1×1 screen until the overlay sizes it.
     for (const end = Date.now() + 2000; Date.now() < end && !(screen.width > 200 && window.outerWidth > 1); ) await sleep(50);
     if (fullArea()) return;
+    if (LINUX) return placeUnseen();
     if (!live.steamRect) {
       await steamPlaced();
       live.steamRect = { x: window.screenX, y: window.screenY, w: window.outerWidth, h: window.outerHeight };
@@ -304,6 +338,23 @@
       placeWarned = true;
       console.warn('[Steam Enhanced] Toasts: could not move the toast window; showing it where Steam put it.', { want: live.target, attempts: live.attempts });
     }
+  }
+
+  /*
+   * Linux: the window's place reads 0,0 wherever it is (context.js), so a move can't be checked.
+   * Steam's own moves already go to the spot (holdSpot); one more is sent and taken as landed.
+   * Its size can be read, so the resize is still checked (ensureSize).
+   */
+  async function placeUnseen() {
+    live.target = wanted();
+    const t = live.target;
+    const W = scWindow();
+    if (typeof W?.MoveTo === 'function') run(() => W.MoveTo(t.x, t.y, DPI()));
+    else run(() => window.moveTo(t.x, t.y));
+    await sleep(120);
+    live.mover = 0;
+    note(`placing (position unreadable): sent to ${t.x},${t.y}, taken as landed`);
+    await ensureSize(t);
   }
 
   /*
@@ -451,7 +502,8 @@
 
   let fixing = false;
   let fights = [];
-  const guarding = () => isStage() && !!live.tray?.hasAttribute('data-show') && live.mover >= 0 && !!live.target;
+  // Not on Linux: the window's place can't be read there, so every frame would look like a drift
+  const guarding = () => !LINUX && isStage() && !!live.tray?.hasAttribute('data-show') && live.mover >= 0 && !!live.target;
   function guardPlace() {
     if (!fixing && (!landed(live.target) || (live.sizer >= 0 && !sized(live.target)))) {
       const now = Date.now();

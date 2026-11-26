@@ -34,6 +34,8 @@
    * Steam's own toast never flashes in its corner first.
    */
   if (enabled() && !COMPACT) mark(root, WAIT_ATTR);
+  // Linux: the stage's window drawn solid, nothing in it see-through (context.js, toasts.css)
+  if (enabled() && !COMPACT && ns.LINUX) mark(root, 'data-se-tst-solid');
 
   if (document.body) start();
   else addEventListener('DOMContentLoaded', start, { once: true });
@@ -135,6 +137,8 @@
       live.watcher?.disconnect();
       live.poller?.disconnect();
       live.compactWatcher?.disconnect();
+      live.trayFollow?.disconnect();
+      live.trayFollow = null;
       uninstallCentre();
       if (live.spotHold?.early) run(() => live.spotHold.early.release());
       else if (live.spotHold && live.spotHold.W.MoveTo === live.spotHold.wrapped) run(() => { live.spotHold.W.MoveTo = live.spotHold.native; });
@@ -152,6 +156,7 @@
       for (const el of document.querySelectorAll(`[${SRC_ATTR}]`)) unmark(el, SRC_ATTR);
       unmark(root, ON_ATTR);
       unmark(root, WAIT_ATTR);
+      unmark(root, 'data-se-tst-solid');
       teardown();
       delete window.__seToasts;
     },

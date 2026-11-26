@@ -24,6 +24,30 @@ html[data-se-tst-wait] body > :not(#se-tst) {
   pointer-events: none !important;
 }
 
+/*
+ * Linux (data-se-tst-solid, main.js): a window can't be see-through there, its clear parts draw
+ * black, so the stage's window is the tray's size exactly, its height following the tray
+ * (placement.js followTray), and drawn solid: the window in the tray's colour, the tray without
+ * padding, corners or shadow, the card filling it. !important: beats
+ * the transparent window above (its own !important), later in the file at equal specificity.
+ */
+html[data-se-tst-solid],
+html[data-se-tst-solid] body {
+  background: var(--se-bg-ink) !important;
+}
+
+html[data-se-tst-solid] .se-tst-tray {
+  padding: 0;
+  border-radius: 0;
+  background: var(--se-bg-ink);
+  box-shadow: none;
+}
+
+/* The card fills the window to its edges: square, no frame around it */
+html[data-se-tst-solid] .se-tst-stage {
+  border-radius: 0;
+}
+
 /* ---------- Dock ---------- */
 
 #se-tst {

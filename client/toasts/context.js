@@ -66,6 +66,8 @@
   live.steamRect = null; // where and how big Steam made the window
   live.lastScan = null; // for __seToasts.why()
   live.compactWatcher = null;
+  live.trayFollow = null; // Linux: the window following the tray's height (placement.js)
+  live.trayH = 0; // and that height, as last seen
   live.spotHold = null; // { W, native, wrapped, lastDpi, moves, early: the loader's hold }
   live.replaceTimer = 0;
   live.syncTimer = 0;
@@ -80,8 +82,16 @@
     ? `game:${/_uid(\d+)$/.exec(window.name || '')?.[1] || /uid(\d+)/.exec(document.title || '')?.[1] || '0'}`
     : 'desktop';
 
+  /*
+   * Linux (X11, XWayland): Steam reports a toast window's place as 0,0 wherever it is, so a move
+   * can't be checked (placement.js takes it as landed), and a window can't be see-through: its
+   * clear parts draw black, so the stage's window is the tray's size exactly and solid
+   * (data-se-tst-solid, toasts.css).
+   */
+  const LINUX = /\bLinux\b/.test(navigator.userAgent);
+
   // A line in the toast recorder (client/loader.js; armed from dev/toast-preview.js)
   const note = (text) => SE.run(() => window.__seClient?.toastLog?.(text));
 
-  Object.assign(ns, { IN_GAME, SURFACE, note, root });
+  Object.assign(ns, { IN_GAME, LINUX, SURFACE, note, root });
 })(window.__se);
