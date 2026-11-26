@@ -591,8 +591,65 @@
   // them while the cover waits
   const waiting = new Set();
   let settledBy = ''; // set when the settle wait ended other than by its checks
+  /*
+   * The toast recorder, armed from the toast preview (dev/toast-preview.js, localStorage
+   * "se-toast-log"): a toast window (a game's overlay or the desktop, its title says which:
+   * notificationtoasts_uid<app>-<id> / notificationtoasts_<id>_desktop) notes how far its loading
+   * and placing got, so a toast that never showed traces to the theme never running there (no
+   * entry), a file that stalled (no "revealed"), or a window revealed and still unseen. The last
+   * TOAST_LOG_MAX windows are kept in "se-toast-log-data".
+   */
+  const TOAST_LOG_MAX = 12;
+  const toastLog = (() => {
+    try {
+      const title = document.title;
+      if (!/^notificationtoasts_/.test(title)) return null;
+      if (localStorage.getItem('se-toast-log') !== '1') return null;
+    } catch {
+      return null;
+    }
+    const id = `${document.title}@${Date.now()}`;
+    return (text) => {
+      try {
+        const list = JSON.parse(localStorage.getItem('se-toast-log-data') || '[]');
+        let entry = list.find((item) => item.id === id);
+        if (!entry) {
+          entry = { id, name: document.title, at: Date.now(), steps: [] };
+          list.push(entry);
+        }
+        entry.steps.push([Math.round(performance.now() - started), text]);
+        localStorage.setItem('se-toast-log-data', JSON.stringify(list.slice(-TOAST_LOG_MAX)));
+      } catch {}
+    };
+  })();
+  if (toastLog) {
+    // The window's place and size now: an overlay window still 1×1 hasn't been placed yet (moves land)
+    toastLog(`started (${document.visibilityState}, window at ${window.screenX},${window.screenY} ${window.outerWidth}×${window.outerHeight}, ${[...groups].join(' ')})`);
+    // Where it stood when the CSS fallback shows the body anyway, and when Steam closed it
+    setTimeout(() => {
+      if (!revealed) toastLog(`fallback: still waiting for ${[...waiting].join(', ') || 'nothing'}`);
+    }, FALLBACK_MS);
+    // The toast code's side at the close (client/toasts/main.js why()): whether it ran, where its
+    // window got to, the stage, why its toasts ended, and whether Steam's own drawing was hidden
+    const toastsAtClose = () => {
+      try {
+        const why = window.__seToasts?.why?.();
+        if (!why) return 'no toast code';
+        const hidden = ['data-se-tst-wait', 'data-se-tst-on'].filter((name) => root.hasAttribute(name)).join(' ') || 'none';
+        const ended = (why.history || []).map((item) => item.why).join(' / ') || 'none';
+        return `restyle ${why.enabled ? 'on' : 'off'}, mover ${why.placement?.mover}, stage ${why.stage?.stage || 'none'}, ended ${ended}, Steam's toast hidden by ${hidden}`;
+      } catch (err) {
+        return `toast code unreadable (${err?.message || err})`;
+      }
+    };
+    addEventListener('pagehide', () => {
+      const state = revealed ? 'closed' : `closed, never revealed (waiting for ${[...waiting].join(', ') || 'nothing'})`;
+      toastLog(`${state}: ${toastsAtClose()}`);
+    }, { once: true });
+  }
   const step = (name) => {
     if (window.__seClient) window.__seClient.step = `${name} at ${Math.round(performance.now() - started)} ms`;
+    toastLog?.(name);
   };
   const track = (el, name) => {
     if (revealed) return;
@@ -652,6 +709,10 @@
     style.textContent = sheetImports();
     if (MENU) style.addEventListener('load', remeasureMenu, { once: true });
     track(style, 'stylesheets');
+    if (toastLog) {
+      style.addEventListener('load', () => toastLog('stylesheets in'), { once: true });
+      style.addEventListener('error', () => toastLog('stylesheets failed'), { once: true });
+    }
     head.append(style);
   };
 
@@ -745,6 +806,7 @@
       'se-core',
       () => {
         waiting.delete('se-core event');
+        toastLog?.('se-core');
         scripts.forEach(addScript);
         if (--pending === 0) settle();
       },
@@ -812,6 +874,8 @@
 
   window.__seClient = {
     groups, files: added, sheets, waiting, applyOptions,
+    // The toast recorder, null unless armed in a toast window (client/toasts/)
+    toastLog,
     // Steam's moves held for the stage in an in-game toast window (null elsewhere): its `native`
     // MoveTo, `take(fn)` hands the moves to fn, `release()` gives them back to Steam
     moveHold,
