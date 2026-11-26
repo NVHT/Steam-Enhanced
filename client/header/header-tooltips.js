@@ -204,7 +204,8 @@
     // Core already batches non-sync watchers into one frame; the throttle keeps hover-driven
     // class churn from re-reading the title bar more than ten times a second.
     observer = SE.watch(update, {
-      attributes: ['aria-label', 'class', 'data-se-icon', 'data-se-tip'],
+      // aria-expanded: a menu opened by resting on its button (no press to hide the tip)
+      attributes: ['aria-expanded', 'aria-label', 'class', 'data-se-icon', 'data-se-tip'],
       throttle: 100,
     });
     schedule();
