@@ -12,7 +12,7 @@
     ACTIVE, BY_NAME, CONTENT, ITEM, LIST, MILL_BY_KEY, OWN, PRE_FOR, PROPS_ROOT, PROPS_SIZE, SIZE,
     TITLE, cards, isSteamSettings, learn, millPageOf, norm, pageNameOf, pickers,
     preLabels, propsPage, propsSidebar, resetProps, revealHit, rows, scheduleScan, sections,
-    sidebar, fillWindow, sizeWindow, unfillWindow,
+    sidebar, fillWindow, sizeWindow, unfillWindow, activeContent,
   } = ns;
   const { live } = ns;
 
@@ -90,7 +90,11 @@
       return;
     }
     const items = [...list.querySelectorAll(ITEM)];
-    const content = document.querySelector(CONTENT);
+    const content = activeContent();
+    // Pages kept mounted but hidden lose the page mark, so the page code finds the one on show
+    for (const other of document.querySelectorAll(CONTENT)) {
+      if (other !== content) setAttr(other, 'data-se-mill-page', null);
+    }
     const mill = Boolean(list.closest('.MillenniumSettings'));
     const isProps = !mill && isPropsDialog(items, content);
     const steam = !mill && !isProps && isSteamSettings(list, items);

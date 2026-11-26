@@ -10,7 +10,7 @@
   const { C, attr: setAttr } = SE;
   const {
     ACCOUNT_HEADER, BODY_TEXT, CONTENT, CONTROLLER_ICON, FIELD, FIELD_BG, KEY_RE, LABEL,
-    PRE_LABELS, ROW_ICONS, SECTION, TILE_SUBS, UPDATE_TIMING, adjacent, fieldLabel, text,
+    PRE_LABELS, ROW_ICONS, SECTION, TILE_SUBS, UPDATE_TIMING, activeContent, adjacent, fieldLabel, text,
   } = ns;
   const { live } = ns;
 
@@ -253,7 +253,7 @@
 
   function layoutScan() {
     live.scanTimer = 0;
-    const content = document.querySelector(CONTENT);
+    const content = activeContent();
     if (!content) return;
     const scrollers = [];
     for (const el of [content, ...content.querySelectorAll('*')]) {

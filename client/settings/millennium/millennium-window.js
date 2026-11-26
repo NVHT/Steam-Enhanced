@@ -103,9 +103,23 @@
     const label = (titleEl?.textContent || item.textContent || '').trim();
     if (!label) return;
 
+    /*
+     * Steam's paged settings dialog keys its pages by `identifier`. Steam's route sidebar (what
+     * Millennium's SidebarNavigation was up to 3.6) gives each page its route as identifier and
+     * switches by replacing the router's location, which here would move the main window: so its
+     * click is taken over below. Millennium 3.7's SDK hands its pages to the dialog directly,
+     * with no identifier: given a route as `page` it matches none and shows the first page, while
+     * its own click switches in place, never touching the main window. So the click is left
+     * alone when the dialog's pages carry no identifier.
+     */
+    let keyed = null;
     let selection = null;
     for (let fiber = SE.fiber(item), depth = 0; fiber && depth < 40; fiber = fiber.return, depth++) {
       const props = fiber.memoizedProps;
+      if (keyed === null && Array.isArray(props?.pages)) {
+        keyed = props.pages.some((page) => page && typeof page === 'object' && page.identifier);
+        if (!keyed) return;
+      }
       if (!Array.isArray(props?.pages) || typeof props.onPageRequested !== 'function') continue;
       const page = props.pages.find(
         (entry) =>

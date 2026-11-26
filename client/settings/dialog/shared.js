@@ -47,6 +47,13 @@
   const TEXT = `.${C.PageListItem_Title}`;
   const ACTIVE = C.PagedSettingsDialog_Active;
   const CONTENT = `.${C.PagedSettingsDialog_PageContent}`;
+  /*
+   * The page on show. Steam's paged dialog can keep every page visited mounted, the others
+   * hidden by an inline display: none (Millennium 3.7's settings: its SDK hands the pages to the
+   * dialog directly); the first page content in the document can then be a hidden one.
+   */
+  const activeContent = (root = document) =>
+    [...root.querySelectorAll(CONTENT)].find((el) => el.style.display !== 'none') || null;
   const FIELD = `.${C.Field}`;
   const FIELD_BG = C.Background;
   const LABEL = `.${C.FieldLabel}`;
@@ -341,6 +348,6 @@
     ACCOUNT_HEADER, ACTIVE, BODY_TEXT, BY_NAME, CONTENT, CONTROLLER_ICON, FIELD, FIELD_BG, GROUPS,
     ITEM, KEY_RE, LABEL, LIST, MILL_BY_KEY, MILL_BY_NAME, MILL_GROUPS, MILL_PAGES, PAGES,
     PRE_LABELS, PROPS_SIZE, ROW_ICONS, SECTION, SEP, SIZE, SLIDER, TEXT, TILE_SUBS, TITLE,
-    UPDATE_TIMING, fieldLabel, sliderAt, text,
+    UPDATE_TIMING, activeContent, fieldLabel, sliderAt, text,
   });
 })(window.__se);
