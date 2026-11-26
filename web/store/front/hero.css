@@ -396,10 +396,33 @@ html.se-cinema-on.se-takeover .has_takeover .home_page_gutter {
   box-shadow: var(--se-edge);
 }
 
-/* A slide with nothing for the bar (hero.js is-bare, a promotion): the buy controls alone, on
-   the art; no glass, which would only frame the button. The bar keeps its padding, the height a
-   game's bar takes (its screenshot tiles and padding; 104px where the tiles hide) and the heart
-   its room, so the button stays where every other slide has it. */
+/* A promotion (hero.js is-promo): the event's name over its line, then the button; no
+   screenshots, price or heart, so the line takes their room. Before is-bare, which wins. */
+.se-cinema.is-promo .se-cinema__bar {
+  grid-template-columns: [meta] minmax(0, 1fr) [buy] auto;
+}
+
+.se-cinema__event {
+  font-size: var(--se-fs-xl);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--se-white);
+}
+
+.se-cinema__event-line {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: var(--se-fs-base);
+  line-height: 1.45;
+  color: var(--se-text-dim);
+}
+
+/* A slide with nothing for the bar (hero.js is-bare, a promotion with no line): the buy
+   controls alone, on the art; no glass, which would only frame the button. The bar keeps its
+   padding, the height a game's bar takes (its screenshot tiles and padding; 104px where the
+   tiles hide) and the heart its room, so the button stays where every other slide has it. */
 .se-cinema.is-bare {
   --se-cinema-bare-h: max(104px, calc(var(--se-cinema-shot-w) * 9 / 16 + 2 * var(--se-space-4)));
 }

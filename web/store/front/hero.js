@@ -78,7 +78,8 @@
     /*
      * The game a slide is for: the app its link opens (store.steampowered.com/app/<id>), else
      * the first of its data-ds-appid. A promotion (the Steam Awards, a sale) links to its own page
-     * and names app 0; a bundle links to /bundle/: no game, so no game art, wishlist or lookups.
+     * and names app 0 or an advertising app (its store details' type, applyStoreDetails); a bundle
+     * links to /bundle/: no game, so no game art, wishlist or lookups.
      */
     const appOf = (link) => {
       const id = /\/app\/(\d+)/.exec(link?.href ?? '')?.[1] ?? link?.dataset.dsAppid?.split(',')[0]?.trim();
@@ -93,8 +94,9 @@
      * from the images its own capsule shows, then takes what Steam lists for the game: logos and
      * library heroes from the app's PICS info (common.library_assets_full; api.steamcmd.net
      * serves it publicly with open CORS), and the header, capsule, background, short description
-     * and screenshots from the store's own /api/appdetails. Both are cached in localStorage: hits
-     * for a week, misses for a day. Fetched only for the slide on screen and the next one.
+     * and screenshots from the store's own /api/appdetails, and its type (a sale's advertising
+     * app is a promotion). Both are cached in localStorage: hits for a week, misses for a day.
+     * Fetched only for the slide on screen and the next one.
      */
     const APPINFO_URL = 'https://api.steamcmd.net/v1/info/';
     const ASSET_BASE = 'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/';
@@ -143,10 +145,10 @@
     };
 
     const artCache = createCache('se-store-library-art-v1', (entry) => Boolean(entry.logo || entry.hero));
-    const detailsCache = createCache(`se-store-details-v2-${pageLanguage}`, (entry) => Boolean(entry.description || entry.shots?.length || entry.header));
-    // v1 had no art fields; its entries would keep a slide from fetching them for a week
+    const detailsCache = createCache(`se-store-details-v3-${pageLanguage}`, (entry) => Boolean(entry.description || entry.shots?.length || entry.header));
+    // v2 had no type; its entries would keep a sale's slide drawn as a game for a week
     try {
-      localStorage.removeItem(`se-store-details-v1-${pageLanguage}`);
+      localStorage.removeItem(`se-store-details-v2-${pageLanguage}`);
     } catch {}
 
     const fetchLibraryArt = async (appid) => {
@@ -169,6 +171,7 @@
         const url = `/api/appdetails?appids=${appid}&l=${encodeURIComponent(pageLanguage)}`;
         const data = (await fetchJson(url, { credentials: 'same-origin' }))?.[appid]?.data;
         const details = {
+          type: data?.type || '',
           description: decodeHtml(data?.short_description),
           shots: (data?.screenshots ?? []).slice(0, 4).map((shot) => ({ thumb: shot.path_thumbnail, full: shot.path_full })),
           header: data?.header_image || '',
@@ -185,10 +188,15 @@
     /*
      * Fill a slide's description, top up its screenshots to four, and add the store's art after
      * what the slide has (background, then header, for the art; capsule and header for the
-     * framed tile); true if anything changed.
+     * framed tile); true if anything changed. An advertising app (a sale's takeover) makes the
+     * slide a promotion.
      */
     const applyStoreDetails = (slide, details) => {
       let changed = false;
+      if (details?.type === 'advertising' && !slide.promo) {
+        slide.promo = true;
+        changed = true;
+      }
       const add = (list, url) => {
         if (!url || list.includes(url)) return;
         list.push(url);
@@ -239,6 +247,7 @@
         href: capsule.href,
         title: squash(capsule.querySelector('.app_name')?.textContent),
         reason: readReason(capsule),
+        promo: false,
         review: capsule.querySelector('.game_review_summary'),
         reviewCount: squash(capsule.querySelector('.review_count')?.textContent),
         price: readPrice(capsule),
@@ -423,7 +432,7 @@
 
       const wished = new Map(); // appid → boolean, optimistic local state
       const renderWish = (slide) => {
-        const canWish = wishlist.available() && Boolean(slide.appid);
+        const canWish = wishlist.available() && Boolean(slide.appid) && !slide.promo;
         heart.hidden = !canWish;
         if (!canWish) return;
         const on = wished.get(slide.appid) ?? wishlist.has(slide.appid);
@@ -432,7 +441,7 @@
       };
       life.listen(heart, 'click', async () => {
         const slide = slides[current];
-        if (!slide?.appid || heart.disabled) return;
+        if (!slide?.appid || slide.promo || heart.disabled) return;
         const next = heart.getAttribute('aria-pressed') !== 'true';
         heart.disabled = true;
         wished.set(slide.appid, next);
@@ -493,27 +502,41 @@
         tabs[target].firstChild.append(progress);
         counter.textContent = `${target + 1} / ${slides.length}`;
         title.textContent = slide.title;
-        description.textContent = slide.description;
-        description.hidden = !slide.description;
         cta.href = slide.href;
         cta.setAttribute('aria-label', `View ${slide.title} in store`);
 
-        meta.replaceChildren(...[
-          renderReview(slide),
-          slide.reason?.badge && el('span', { class: 'se-cinema__badge', text: slide.reason.badge }),
-        ].filter(Boolean));
-        renderPrice(price, slide.price);
+        if (slide.promo) {
+          // A promotion's bar names the event over its line (the takeover's tagline, else the
+          // store's description); with no line (Steam's generic "Featured Promotion") it is bare
+          const line = slide.reason?.badge || slide.description;
+          meta.replaceChildren(...(line ? [
+            el('span', { class: 'se-cinema__event', text: slide.title }),
+            el('span', { class: 'se-cinema__event-line', text: line }),
+          ] : []));
+          description.hidden = true;
+          shots.replaceChildren();
+          shots.hidden = true;
+        } else {
+          meta.replaceChildren(...[
+            renderReview(slide),
+            slide.reason?.badge && el('span', { class: 'se-cinema__badge', text: slide.reason.badge }),
+          ].filter(Boolean));
+          description.textContent = slide.description;
+          description.hidden = !slide.description;
+          renderShots(slide, ticket);
+        }
+        renderPrice(price, slide.promo ? null : slide.price);
         renderWish(slide);
-        renderShots(slide, ticket);
-        // Nothing for the bar (a promotion: no facts, description, screenshots or price): only
-        // its buy controls show (hero.css); a refresh that brings any of them redraws it full
-        hero.classList.toggle('is-bare', !meta.childElementCount && !slide.description && !slide.shots.length && !slide.price);
+        // Nothing for the bar (a promotion with no line): only its buy controls show (hero.css);
+        // a refresh that brings anything redraws it full
+        hero.classList.toggle('is-bare', !meta.childElementCount && description.hidden && shots.hidden && price.hidden);
 
         hero.classList.remove('has-logo', 'has-capsule');
-        hero.classList.add('is-art-pending');
         hero.classList.toggle('is-long-title', slide.title.length > 28);
         hero.classList.toggle('is-promo', Boolean(slide.promo));
-        loadFirst(logo, slide.logo).then(async (ok) => {
+        // A promotion's art names it: no logo or capsule repeating it
+        hero.classList.toggle('is-art-pending', !slide.promo);
+        if (!slide.promo) loadFirst(logo, slide.logo).then(async (ok) => {
           if (ticket !== token) return;
           if (ok) hero.classList.add('has-logo');
           else if (await loadFirst(capsuleArt, slide.capsule) && ticket === token) hero.classList.add('has-capsule');
@@ -610,7 +633,8 @@
      * The title may contain periods ("S.T.A.L.K.E.R. 2"), so the tagline is the last sentence.
      * Its art is the takeover's own (front/hero-takeover.js), then what the lookups list; an
      * event's takeover (the Steam Awards, a sale) has no game behind it (appOf), so only its own
-     * art, its title in the logo's place.
+     * art, its title in the logo's place. One that links to a sale or event page, not a game's,
+     * is a promotion even when it names an app (an advertising one).
      */
     const TAKEOVER_SELECTOR = '.home_page_takeover_link a.home_page_takeover_sizer[data-ds-appid]';
     const TAKEOVER_LABEL = /^(.+?)\.\s+([^.]+?)\.?$/s;
@@ -628,7 +652,7 @@
         title: name,
         reason: tagline ? { kind: 'takeover', badge: tagline } : null,
         // A promotion (no game behind it): its art names it; Steam's label is only "Featured Promotion"
-        promo: !appid,
+        promo: !appid || !/\/app\/\d+/.test(link.href),
         review: null,
         reviewCount: '',
         price: null,
