@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.5.5**](#v1-5-5) | Nov 26, 2026 | Fixes from your reports, logo and offline friends settings |
 | [**1.5.4**](#v1-5-4) | Nov 26, 2026 | Millennium's settings work with Millennium 3.7 |
 | [**1.5.3**](#v1-5-3) | Nov 26, 2026 | The store's hero: no blank tiles, cleaner promotions |
 | [**1.5.2**](#v1-5-2) | Nov 26, 2026 | Toasts in game show every time, fullscreen too |
@@ -30,15 +31,40 @@
 
 <br>
 
+<a name="v1-5-5"></a>
+
+## 1.5.5 · Nov 26, 2026
+
+> Fixes from your reports, a setting for where a game's logo sits, and two for offline friends.
+
+**Library**
+- **Logo place**: a new setting (Library › Game page). Centred keeps the logo above the play bar; Steam's leaves it where Steam puts it, and Move and size the logo works (#14).
+
+**Friends**
+- **Offline friends**: the dock's Offline section folded, open, or hidden (#14).
+- **Offline group members**: a group chat's members list with or without them (#14).
+
+**Fixes**
+- **Game page**: on Linux, the Steam Play compatibility line shows under the Description instead of behind the art (#10).
+- **Library**: on Linux and macOS, the filter buttons' icons match what each does (#12).
+- **Store**: a game's languages no longer stack one letter per line on narrow pages; the column headers show as icons there (#13).
+- **Discussions**: the search field no longer covers Start a New Discussion (#14).
+- **Friends dock**: View profile opens the profile (#14).
+- **Toasts**: the stage works on Linux.
+
+<br>
+
 <a name="v1-5-4"></a>
 
-## 1.5.4 · Nov 26, 2026
-
-> Millennium's settings switch pages and keep the theme's look on Millennium 3.7 (beta).
+<details>
+<summary><b>1.5.4</b> · Nov 26, 2026 · Millennium's settings switch pages and keep the theme's look on Millennium 3.7 (beta).</summary>
+<br>
 
 **Fixes**
 - **Millennium settings**: on Millennium 3.7, clicking a page no longer leaves you on General.
 - **Millennium settings**: every page keeps the theme's design on Millennium 3.7; the Themes page no longer shows Millennium's plain card.
+
+</details>
 
 <br>
 
