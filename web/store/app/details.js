@@ -132,6 +132,7 @@
      */
     const LANGUAGE_ROWS = 6;
     const LANGUAGE_ROWS_MIN = 2;
+    const LANGUAGE_COLUMNS = ['interface', 'audio', 'subtitles'];
     /** The built table's row control ({ total, show(n), open(), tops() }), or null. */
     let languageView = null;
 
@@ -174,7 +175,10 @@
       const grid = el('div', { class: 'se-app-summary__lang-grid', role: 'table', 'aria-labelledby': 'se-app-languages-title' }, [
         el('div', { class: 'se-app-summary__lang-row se-app-summary__lang-row--head', role: 'row' }, [
           el('span', { role: 'columnheader' }),
-          ...columns.map((column) => el('span', { role: 'columnheader', text: column })),
+          // Steam's order is fixed: a narrow column shows these as icons (summary-details.css)
+          ...columns.map((column, k) =>
+            el('span', { role: 'columnheader', title: column, 'data-se-lang-col': LANGUAGE_COLUMNS[k] ?? null, text: column }),
+          ),
         ]),
         ...rowNodes,
       ]);
