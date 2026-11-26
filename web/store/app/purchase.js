@@ -12,6 +12,9 @@
  *          (.game_purchase_price, or .discount_pct / .discount_original_price /
  *          .discount_final_price) and buttons (a.btn_*steamui). Each row's buttons click
  *          Steam's own, so cart, gifting and bundle pages stay Steam's.
+ *   soon   .game_area_comingsoon, a game not out yet (no buy boxes): .not_yet, the h1 release
+ *          date and the unlock estimate, then .wishlist_add_reminder (a second Add to your
+ *          wishlist, left out: the summary row's Wishlist is the page's one). Shown as a row.
  *   dlc    #gameAreaDLCSection (inside #game_area_purchase): its h2 title with "Browse all
  *          (N)" (.note a), a.game_area_dlc_row per item (.game_area_dlc_name, a price or
  *          discount block in .game_area_dlc_price, data-ds-appid for the capsule art), and
@@ -302,18 +305,43 @@
       return started >= 0 ? started : rows.findIndex((row) => !row.owned);
     };
 
+    /** A game not out yet: Steam's coming-soon box, read as { kicker, name, note }. */
+    let soonBox = null;
+    const readSoon = () => {
+      soonBox = column.querySelector('.game_area_comingsoon');
+      if (!soonBox) return null;
+      const rest = (soonBox.querySelector('.content') ?? soonBox).cloneNode(true);
+      rest.querySelectorAll('.not_yet, h1, .wishlist_add_reminder, script, style').forEach((node) => node.remove());
+      const name = text(soonBox.querySelector('h1'));
+      return name ? { kicker: text(soonBox.querySelector('.not_yet')), name, note: squash(rest.textContent) } : null;
+    };
+
+    /** The release date as a row: the game's art, Steam's lines, no price or buttons. */
+    const buildSoon = (soon) =>
+      el('div', { class: 'se-app-purchase__row' }, [
+        el('span', { class: 'se-app-purchase__frame' }, [headerArt(pageApp, 'se-app-purchase__art')]),
+        el('span', { class: 'se-app-purchase__info' }, [
+          soon.kicker ? el('span', { class: 'se-app-purchase__kicker', text: soon.kicker }) : null,
+          el('span', { class: 'se-app-purchase__name', text: soon.name }),
+          soon.note ? el('span', { class: 'se-app-purchase__note', text: soon.note, title: soon.note }) : null,
+        ]),
+      ]);
+
     let buyKey = '';
     const syncBuy = () => {
       const rows = boxes().map(readBox);
-      const key = JSON.stringify(rows);
-      if (key === buyKey) return rows.length;
+      const soon = rows.length ? null : readSoon();
+      if (rows.length) soonBox = null;
+      const count = rows.length || (soon ? 1 : 0);
+      const key = JSON.stringify([rows, soon]);
+      if (key === buyKey) return count;
       buyKey = key;
       const lead = leadOf(rows);
       const built = rows.map((row, index) => (row.items.length ? buildBundle : buildRow)(row, index, index === lead));
       if (lead > 0 && rows[lead].items.length) built.unshift(...built.splice(lead, 1));
-      buyRows.replaceChildren(...built);
-      buy.hidden = !rows.length;
-      return rows.length;
+      buyRows.replaceChildren(...built, ...(soon ? [buildSoon(soon)] : []));
+      buy.hidden = !count;
+      return count;
     };
 
     /* ---------- DLC capsules ---------- */
@@ -496,7 +524,8 @@
     const syncSources = (shownBuy, shownSpecs) => {
       const area = purchase();
       const sysreq = document.querySelector('.sysreq_contents');
-      const sources = [shownBuy && area ? blockOf(area) : null, shownSpecs && sysreq ? blockOf(sysreq) : null].filter(Boolean);
+      // The coming-soon box goes itself too: it can sit outside the purchase area
+      const sources = [shownBuy && area ? blockOf(area) : null, shownBuy ? soonBox : null, shownSpecs && sysreq ? blockOf(sysreq) : null].filter(Boolean);
       for (const node of column.querySelectorAll(`[${SOURCE}]`)) if (!sources.includes(node)) node.removeAttribute(SOURCE);
       sources.forEach((node) => mark(node, SOURCE));
     };
