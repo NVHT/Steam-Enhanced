@@ -5,8 +5,9 @@
  * Recent and Ready to play can be joined by more toggles in their row: Steam's Linux-games
  * toggle (Tux, Linux only) and plugin buttons (ProtonDB Library Badges' dots). The row's tile
  * count goes to --se-view-n on <html> so this toolbar lays out a slot for each; Steam's own
- * toggles are marked by what they are, for their icons. While the list shows, the whole row sits in the title-bar
- * search (client/navigation/nav-rail.js measures it).
+ * toggles are marked by what they are, for their icons. While the list shows, the whole row sits
+ * in the title-bar search's views slot (client/navigation/title-bar-search.js sizes it,
+ * title-bar.css places it).
  */
 ((SE) => {
   const { C } = SE;

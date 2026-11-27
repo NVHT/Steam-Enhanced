@@ -33,7 +33,7 @@
 
   /*
    * Reload UI during a voice call leaves the main window dropping timers and Steam's own menus
-   * taking no input until a full restart (CLAUDE.md, Windows and Millennium). So while a call is
+   * taking no input until a full restart. So while a call is
    * on it asks first, in Steam's own confirm dialog (SE.steamConfirm, the look of Mark as
    * Private), else the action menu: leave the call and then reload (once Steam says the call is
    * over, giving up after a few seconds rather than reload in it), restart Steam, or cancel.

@@ -291,11 +291,7 @@
 
   // The text on the clipboard; the button says how it went
   async function copyText(button, text) {
-    let ok = false;
-    try {
-      await navigator.clipboard.writeText(text);
-      ok = true;
-    } catch {}
+    const ok = Boolean(await SE.copy?.(text));
     button.textContent = ok ? 'Copied' : 'Copy failed';
     const timer = setTimeout(() => {
       timers.delete(timer);

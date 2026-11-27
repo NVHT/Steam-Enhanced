@@ -342,7 +342,7 @@
     const metrics = titleMetrics;
     writeListBrandWidth(metrics?.brandWidth);
     syncTitleBar(metrics, isVisible);
-    // After the search's place is set: the toggles line up with its views slot
+    // The toggles go in the search's views slot (title-bar.css places it)
     const views = list?.querySelector(`.${C.CheckboxWithImage}`)?.parentElement?.parentElement;
     ns.search.syncViews(isVisible && !downloadsList ? views : null);
     geometryDirty = false;

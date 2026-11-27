@@ -364,11 +364,10 @@
    * Steam's moves in an in-game toast window, held from here until the toast code takes them
    * over (client/toasts/placement.js holdSpot). The overlay takes a window's moves only until it
    * first places it, and that can come before client/toasts/ has started (~40 ms in): the window
-   * then stays in Steam's corner for good, and the stage can't draw (CLAUDE.md, Windows and
-   * Millennium). So while the stage would draw here (Restyle toasts and Toasts in game on, the
-   * Stage style), Steam's first moves wait here, not passed on, for at most MOVE_HOLD_MS; after
-   * that they pass on as Steam made them, so a toast code that never comes still leaves Steam's
-   * toast placed (its slide-in lasts ~300 ms).
+   * then stays in Steam's corner for good, and the stage can't draw. So while the stage would
+   * draw here (Restyle toasts and Toasts in game on, the Stage style), Steam's first moves wait
+   * here, not passed on, for at most MOVE_HOLD_MS; after that they pass on as Steam made them, so
+   * a toast code that never comes still leaves Steam's toast placed (its slide-in lasts ~300 ms).
    */
   const MOVE_HOLD_MS = 250;
   const moveHold = (() => {

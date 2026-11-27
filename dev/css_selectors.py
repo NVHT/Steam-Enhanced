@@ -1,5 +1,5 @@
 """Selector parsing for dev/css-check.py: specificity (Selectors 4), Chromium's rule keys, and
-writing out a multi-argument :is() key so Chromium can index the rule (CLAUDE.md, CSS).
+writing out a multi-argument :is() key so Chromium can index the rule.
 
 A rule whose last compound is only `:is(.a, .b)` can't be indexed: Chromium tests it on every
 element in every style pass, as it does a `*` key. Written out (`X .a, X .b`), each branch keeps

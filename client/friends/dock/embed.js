@@ -125,7 +125,7 @@
         if (r.map.set !== r.set) continue;
         if (r.saved) Object.defineProperty(r.map, 'set', r.saved);
         else delete r.map.set;
-      } catch { /* a frozen or replaced object refuses the patch: Steam's own stays */ }
+      } catch { /* a frozen or replaced object refuses the undo: the theme's wrapper stays */ }
     }
     libraryManagers = null;
   }

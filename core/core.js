@@ -128,7 +128,7 @@
         apply(saved);
       });
       window.SteamClient?.BrowserView?.PostMessageToParent?.('SteamEnhanced.SettingsRequest', '');
-    } catch { /* storage refused (full or blocked): kept in memory only */ }
+    } catch { /* no message channel to the client here: the page keeps the settings it has */ }
   }
 
   /*

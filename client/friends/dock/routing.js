@@ -445,7 +445,7 @@
         if (p.target[p.name] !== p.wrapper) continue;
         if (p.own) Object.defineProperty(p.target, p.name, p.own);
         else delete p.target[p.name];
-      } catch { /* a frozen or replaced object refuses the patch: Steam's own stays */ }
+      } catch { /* a frozen or replaced object refuses the undo: the theme's wrapper stays */ }
     }
     routingPatches.length = 0;
     routingApp = null;

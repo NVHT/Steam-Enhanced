@@ -712,7 +712,7 @@
       } else if (act === 'disarm') {
         try {
           localStorage.removeItem(ARM_KEY);
-        } catch {}
+        } catch { /* storage refused: the site stays armed until it's cleared */ }
         event.target.textContent = 'Disarmed';
       } else if (act === 'close') toggle();
       render();

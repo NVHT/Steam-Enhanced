@@ -13,7 +13,7 @@ Flags (each one is a fix before the release):
   - scrollbar-width or scrollbar-color other than none/auto (it drops core/scrollbars.css for
     Chromium's native bar)
   - a vendor file without its license beside it, or without a row in the README's Licenses
-  - runtime rules (CLAUDE.md, JS) with no comment saying why: a `setInterval` (SE.poll pauses
+  - runtime rules with no comment saying why: a `setInterval` (SE.poll pauses
     while hidden), a `new MutationObserver` outside core/runtime.js and web/shared/dom.js (one
     shared observer per window), an empty `catch`
 
@@ -313,7 +313,7 @@ def unnamed_classes(files):
     return notes
 
 
-# Left whole (CLAUDE.md, CSS): a generated file, and client/loader.js (Millennium patches it as
+# Left whole, never split: a generated file, and client/loader.js (Millennium patches it as
 # one file, so it can't split)
 WHOLE_FILES = {'client/settings/theme/spinner-previews.css', 'client/loader.js'}
 

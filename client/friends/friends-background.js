@@ -90,7 +90,7 @@
         if (saved.own) Object.defineProperty(app, 'ShowPopupFriendsListAtStartup', saved.own);
         else delete app.ShowPopupFriendsListAtStartup;
       }
-    } catch { /* a frozen or replaced object refuses the patch: Steam's own stays */ }
+    } catch { /* a frozen or replaced object refuses the undo: the theme's wrapper stays */ }
     patchedApps.delete(app);
   };
 
@@ -168,7 +168,7 @@
           } else {
             delete owner.g_FriendsUIApp;
           }
-        } catch { /* a frozen or replaced object refuses the patch: Steam's own stays */ }
+        } catch { /* a frozen or replaced object refuses the undo: the theme's wrapper stays */ }
       }
       for (const app of [...patchedApps.keys()]) restoreApp(app);
       for (const [ui, { own, wrapper }] of patchedRestores) {

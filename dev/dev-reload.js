@@ -3,7 +3,7 @@
  * stylesheets again, and with `scripts` its scripts too, without Reload UI. client/loader.js loads
  * this file on the first reload in a window and hands it its own parts (`loader`). The new sheets
  * go in beside the old and take over once loaded, so nothing flashes; each script, run again,
- * calls its old copy's destroy() first (CLAUDE.md, JS), in list order. The runtime stays: features
+ * calls its old copy's destroy() first, in list order. The runtime stays: features
  * hold it. Other client windows follow through the storage event (the loader's listener).
  */
 (() => {
