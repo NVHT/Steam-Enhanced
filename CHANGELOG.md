@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.6.1**](#v1-6-1) | Nov 27, 2026 | Taskbar Preferences, readable hover rows, the dock's full friend menu |
 | [**1.6.0**](#v1-6-0) | Nov 26, 2026 | A faster client and Store, the stage's collection in Theme settings |
 | [**1.5.7**](#v1-5-7) | Nov 26, 2026 | Cover chips, Home shelves and What's New redone, Brew Hub 1.2, a tidier Store game page |
 | [**1.5.6**](#v1-5-6) | Nov 26, 2026 | Offline friends in the dock, tip and header fixes |
@@ -34,11 +35,43 @@
 
 <br>
 
+<a name="v1-6-1"></a>
+
+## 1.6.1 · Nov 27, 2026
+
+> Steam's Taskbar Preferences now shows the tray menu its switches build, and the tray follows them. Text on a hovered or selected row is easier to read everywhere, and the dock's right-click opens Steam's full friend menu.
+
+**Settings**
+- **Taskbar Preferences**: beside the switches, the tray menu they build; hovering a switch lights what it changes.
+
+**Tray**
+- **Statuses**: the header offers only the statuses Steam made rows for, Offline too; pages and modes share one set of tiles.
+- **Downloads**: the download line opens Downloads.
+
+**Friends**
+- **Dock**: right-clicking a friend opens Steam's full friend menu (Voice, Favorite, Manage, Trading) in the theme's look.
+
+**Readability**
+- **Hover and selected rows**: faint text, labels and offline names switch to the muted tone, so they pass contrast in every colour preset, in the client and on web pages.
+- **Offline**: the offline colour passes contrast on raised surfaces too.
+
+**Fixes**
+- **Millennium Settings**: the Extend label stays with Brew Hub's page or in another language.
+- **Brew Hub**: its settings page works from the keyboard, and Copy ticks once it copies.
+- **Store**: a bundle slide in the hero no longer shows one of its games' art; the Discovery Queue banner's arrow follows the colour preset.
+- **Toasts**: on Linux, in-game toasts no longer fall back to compact after a wait.
+
+**Under the hood**
+- Motion uses the theme's easing tokens everywhere; files near 40 KB are split by section; timers and observers that could run after a feature stopped are cancelled.
+- Dev tools: the dialog launcher, element picker, profiler, dev reload and toast preview each do more.
+
+<br>
+
 <a name="v1-6-0"></a>
 
-## 1.6.0 · Nov 26, 2026
-
-> A release for speed and care. The theme stops making Steam lay pages out again while it is still building them, so game pages, Downloads, Settings and the Store do a fraction of the work they did. About a thousand style rules are written so Chromium can look them up instead of testing every element. The code underneath is easier to keep right, and Theme settings can now pick the Home stage's collection.
+<details>
+<summary><b>1.6.0</b> · Nov 26, 2026 · A release for speed and care. The theme stops making Steam lay pages out again while it is still building them, so game pages, Downloads, Settings and the Store do a fraction of the work they did. About a thousand style rules are written so Chromium can look them up instead of testing every element. The code underneath is easier to keep right, and Theme settings can now pick the Home stage's collection.</summary>
+<br>
 
 **Faster** (the theme's own work, measured with its profiler, 1.5.7 → 1.6.0)
 - **Store**: the front page 49 → 4 ms, a sale page 72 → 10 ms, a game's page 38 → 14 ms.
@@ -65,6 +98,8 @@
 - Duplicate animations share one set of keyframes; long procedures are split by what they do; every empty `catch` says why.
 - The class map is rebuilt from the installed client; the settings list lives in its own file; the dev reload loads on first use.
 - `dev/css-check.py` finds `:is()` keys Chromium can't index and writes them out (`--fix-is`); `dev/audit.py` flags timers, observers and catches without a reason.
+
+</details>
 
 <br>
 
