@@ -23,26 +23,44 @@
       scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
     });
 
-    const update = dom.perFrame(() => {
-      const root = document.documentElement;
-      const range = root.scrollHeight - innerHeight;
-      const progress = range > 0 ? Math.min(1, Math.max(0, scrollY / range)) : 0;
+    /*
+     * The page's height comes with <body>'s ResizeObserver entries (pages grow after load: rows,
+     * React routes), never a read: read in a frame callback, or even right after layout once
+     * Steam's own ResizeObserver callbacks had redrawn, it paid the style pass of a page still
+     * being drawn on every growth. The scroll position is read in its scroll event (where the
+     * page is laid out), not on a growth; the ring is written after the next layout.
+     */
+    let pageH = 0;
+    let y = 0;
+    const update = dom.afterLayout(() => {
+      const range = pageH - innerHeight;
+      const progress = range > 0 ? Math.min(1, Math.max(0, y / range)) : 0;
       dom.setVar(button, '--se-scroll', progress.toFixed(4));
-      button.toggleAttribute('data-shown', scrollY > innerHeight * SHOW_AFTER);
+      button.toggleAttribute('data-shown', y > innerHeight * SHOW_AFTER);
     });
-    $.listen(window, 'scroll', update, { passive: true });
+    $.listen(window, 'scroll', () => {
+      y = scrollY;
+      update();
+    }, { passive: true });
     $.listen(window, 'resize', update, { passive: true });
     $.add(update.cancel);
 
     (document.body ?? document.documentElement).append(button);
     $.add(() => button.remove());
-    // Pages that grow after load (rows, React routes) change the range without a scroll
-    if (window.ResizeObserver && document.body) {
-      const resize = new ResizeObserver(update);
-      resize.observe(document.body);
-      $.add(() => resize.disconnect());
-    }
-    update();
+    const page = document.body ?? document.documentElement;
+    // The page scrolls <body>'s box and its margins: those read once, in the first entry (right
+    // after a layout), as no site changes them later
+    let margins = null;
+    const resize = new ResizeObserver(([entry]) => {
+      if (margins === null) {
+        const style = getComputedStyle(page);
+        margins = (parseFloat(style.marginTop) || 0) + (parseFloat(style.marginBottom) || 0);
+      }
+      pageH = (entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height) + margins;
+      update();
+    });
+    resize.observe(page);
+    $.add(() => resize.disconnect());
 
     return () => $.destroy();
   });

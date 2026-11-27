@@ -150,7 +150,8 @@
         Math.abs(a.width - b.width) < 1 && Math.abs(a.height - b.height) < 1;
     };
 
-    const tagTiles = (carousel) => {
+    // A carousel's tiles: their marks now; returns the [slot, tile] pairs whose fit is read later
+    const markTiles = (carousel) => {
       const pairs = [];
       for (const slot of slotsOf(carousel)) {
         const img = slot.querySelector('img');
@@ -176,9 +177,7 @@
           mark(bar, 'data-se-price-bar');
         }
       }
-      // Reads for every tile first, then the marks: one layout pass, not one per tile.
-      const fills = pairs.map(([slot, tile]) => fillsSlot(slot, tile));
-      pairs.forEach(([slot], i) => (fills[i] ? mark(slot, 'data-se-tile-fill') : unmark(slot, 'data-se-tile-fill')));
+      return pairs;
     };
 
     const tagArrowsAndPips = (root) => {
@@ -188,40 +187,55 @@
       for (const pips of root.querySelectorAll(PIPS)) mark(pips, 'data-se-pips');
     };
 
-    const tagShelf = (carousel) => {
-      if (carousel.closest(SKIP) || carousel.closest('[data-se-slot]')) return;
-      // "Recommended by the community" (one large review card per page) and the category tiles
-      // are not rows of game tiles; front/sections.css styles them by class.
-      const byClass = carousel.closest(BY_CLASS);
-      if (byClass) {
-        for (const price of byClass.querySelectorAll(PRICE)) tagPrice(price);
-        tagArrowsAndPips(byClass);
-        return;
-      }
-      const found = findShelf(carousel);
-      if (!found || found.shelf.closest(SKIP)) return;
-      const { shelf, heading } = found;
+    /*
+     * A batch of carousels in three steps, each over all of them: the marks that need no layout,
+     * then every read (the backdrops' computed styles and the tiles' boxes), then the marks those
+     * decide. Shelf by shelf, each read paid a style pass after the shelf before had marked its
+     * own: two passes a shelf on a page of a dozen.
+     */
+    const tagShelves = (carousels) => {
+      const shelves = [];
+      for (const carousel of carousels) {
+        if (carousel.closest(SKIP) || carousel.closest('[data-se-slot]')) continue;
+        // "Recommended by the community" (one large review card per page) and the category tiles
+        // are not rows of game tiles; front/sections.css styles them by class.
+        const byClass = carousel.closest(BY_CLASS);
+        if (byClass) {
+          for (const price of byClass.querySelectorAll(PRICE)) tagPrice(price);
+          tagArrowsAndPips(byClass);
+          continue;
+        }
+        const found = findShelf(carousel);
+        if (!found || found.shelf.closest(SKIP)) continue;
+        const { shelf, heading } = found;
 
-      const head = headRowOf(shelf, heading, carousel);
-      mark(head, 'data-se-shelf-head');
-      mark(heading, 'data-se-shelf-title');
-      for (const button of head.querySelectorAll('a[href], button')) {
-        if (!heading.contains(button)) mark(button, 'data-se-shelf-more');
+        const head = headRowOf(shelf, heading, carousel);
+        mark(head, 'data-se-shelf-head');
+        mark(heading, 'data-se-shelf-title');
+        for (const button of head.querySelectorAll('a[href], button')) {
+          if (!heading.contains(button)) mark(button, 'data-se-shelf-more');
+        }
+        shelves.push({ carousel, shelf, head });
       }
 
       // Steam's backdrop (the blue panel): any painted box between the shelf and the carousel,
       // from the container itself (the four-packs paint the panel on it).
-      let panel = false;
-      for (let node = carousel; node && node !== shelf; node = node.parentElement) {
-        if (!node.contains(head) && visibleBackdrop(node)) {
-          mark(node, 'data-se-shelf-panel');
-          panel = true;
+      for (const entry of shelves) {
+        entry.panels = [];
+        for (let node = entry.carousel; node && node !== entry.shelf; node = node.parentElement) {
+          if (!node.contains(entry.head) && visibleBackdrop(node)) entry.panels.push(node);
         }
       }
-      mark(shelf, 'data-se-shelf', panel ? 'panel' : 'bare');
+      for (const entry of shelves) {
+        for (const node of entry.panels) mark(node, 'data-se-shelf-panel');
+        mark(entry.shelf, 'data-se-shelf', entry.panels.length ? 'panel' : 'bare');
+        entry.pairs = markTiles(entry.carousel);
+      }
 
-      tagTiles(carousel);
-      tagArrowsAndPips(shelf);
+      const pairs = shelves.flatMap((entry) => entry.pairs);
+      const fills = pairs.map(([slot, tile]) => fillsSlot(slot, tile));
+      pairs.forEach(([slot], i) => (fills[i] ? mark(slot, 'data-se-tile-fill') : unmark(slot, 'data-se-tile-fill')));
+      for (const entry of shelves) tagArrowsAndPips(entry.shelf);
     };
 
     /** Carousels in or around the given nodes. */
@@ -241,7 +255,7 @@
     const root = () => document.querySelector(ROOT) ?? document.body;
     const scanAll = () => {
       const container = root();
-      if (container) for (const carousel of container.querySelectorAll(CAROUSEL)) tagShelf(carousel);
+      if (container) tagShelves(container.querySelectorAll(CAROUSEL));
     };
 
     /*
@@ -268,7 +282,7 @@
     life.observe((records) => {
       const container = root();
       const added = records.flatMap((record) => [...record.addedNodes]).filter((node) => container?.contains(node));
-      for (const carousel of carouselsIn(added)) tagShelf(carousel);
+      tagShelves(carouselsIn(added));
       if (isFront && added.length) tagEventChips();
     });
     dom.ready().then(() => {

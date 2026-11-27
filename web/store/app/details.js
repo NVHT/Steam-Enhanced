@@ -304,10 +304,19 @@
     };
 
     // React: a heading ("Full Controller Support") over <a> rows, each an SVG icon and a label.
-    // Steam colours the controllers you own green; that colour marks our row as yours.
+    // Steam colours the controllers you own green; that colour marks our row as yours. Kept per
+    // node, read again only when its class or style, or its parent's class, changes (what a
+    // recolour would change): read on every pass, the computed colour paid the style pass of the
+    // page still being drawn.
+    const greens = new WeakMap(); // node → { key, green }
     const isGreen = (node) => {
+      const key = `${node.getAttribute('class')}|${node.getAttribute('style')}|${node.parentElement?.getAttribute('class')}`;
+      const kept = greens.get(node);
+      if (kept?.key === key) return kept.green;
       const [r, g, b] = (getComputedStyle(node).color.match(/\d+/g) ?? []).map(Number);
-      return g > r + 40 && g > b + 40;
+      const green = g > r + 40 && g > b + 40;
+      greens.set(node, { key, green });
+      return green;
     };
 
     const syncController = (block) => {

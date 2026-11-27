@@ -278,6 +278,42 @@
     return run;
   };
 
+  /*
+   * Coalesce calls to `fn` into one right after the page's next layout (a ResizeObserver's first
+   * callback on <html>), where its reads cost nothing: a timer or a frame callback lands while
+   * the page is still being drawn, and its first read paid that style pass. A page that draws
+   * no frame (hidden) runs it after LAYOUT_BACKSTOP_MS.
+   */
+  const LAYOUT_BACKSTOP_MS = 1000;
+  const laidOut = new Set();
+  let layoutObserver = null;
+  let layoutBackstop = 0;
+  const flushLayout = () => {
+    layoutObserver?.unobserve(document.documentElement);
+    clearTimeout(layoutBackstop);
+    layoutBackstop = 0;
+    const due = [...laidOut];
+    laidOut.clear();
+    for (const fn of due) {
+      try {
+        fn();
+      } catch (error) {
+        console.error('[Steam Enhanced]', error);
+      }
+    }
+  };
+  const afterLayout = (fn) => {
+    const run = () => {
+      laidOut.add(fn);
+      if (layoutBackstop) return;
+      layoutObserver ??= new ResizeObserver(flushLayout);
+      layoutObserver.observe(document.documentElement);
+      layoutBackstop = setTimeout(flushLayout, LAYOUT_BACKSTOP_MS);
+    };
+    run.cancel = () => laidOut.delete(fn);
+    return run;
+  };
+
   /* ---------- Feature scope ---------- */
 
   /** A feature's resources, released in reverse order by destroy(). */
@@ -355,5 +391,5 @@
     };
   };
 
-  web.dom = { OWN, mark, unmark, setText, setVar, slidePill, squash, el, isOwn, ready, copy, tagPrice, untagPrice, untagPrices, heroURLs, firstLoaded, observe, perFrame, scope };
+  web.dom = { OWN, mark, unmark, setText, setVar, slidePill, squash, el, isOwn, ready, copy, tagPrice, untagPrice, untagPrices, heroURLs, firstLoaded, observe, perFrame, afterLayout, scope };
 })();

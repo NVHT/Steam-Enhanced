@@ -129,9 +129,13 @@
       layout();
     };
 
-    // Images, videos and the theme font change the text's height once they arrive.
-    life.listen(columns, 'load', relayout, true);
-    life.listen(columns, 'loadedmetadata', relayout, true);
+    // Images, videos and the theme font change the text's height once they arrive: one relayout
+    // after the next layout for every load that lands before it (dom.afterLayout). Run on each
+    // load, a description of 40 images measured its columns 40 times while the page was drawn.
+    const relayoutSoon = dom.afterLayout(relayout);
+    life.add(relayoutSoon.cancel);
+    life.listen(columns, 'load', relayoutSoon, true);
+    life.listen(columns, 'loadedmetadata', relayoutSoon, true);
     document.fonts?.ready.then(() => {
       if (about.isConnected) layout();
     });

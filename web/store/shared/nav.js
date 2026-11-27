@@ -381,13 +381,17 @@
       while (walker.nextNode()) found.push(walker.currentNode);
       for (const node of found) node.setAttribute('data-se-wide', '');
     };
+    // Debounced, then walked right after the next layout (dom.afterLayout): walked when the
+    // timer fired, its first read paid the style pass of a page still being drawn
     let columnTimer = 0;
+    const columnsAfterLayout = dom.afterLayout(widenColumns);
     const scheduleColumns = () => {
       clearTimeout(columnTimer);
-      columnTimer = setTimeout(widenColumns, 120);
+      columnTimer = setTimeout(columnsAfterLayout, 120);
     };
     life.add(() => {
       clearTimeout(columnTimer);
+      columnsAfterLayout.cancel();
       document.querySelectorAll('[data-se-wide]').forEach((node) => node.removeAttribute('data-se-wide'));
     });
 

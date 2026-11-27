@@ -96,8 +96,25 @@
       ui = null;
     };
 
-    const activeContent = (section) =>
-      [...section.querySelectorAll('.home_tab_content')].find((node) => getComputedStyle(node).display !== 'none') ?? null;
+    /*
+     * The list on show, kept until a tab changes (a class or style change in the tab row, or on
+     * a list itself: either way Steam shows one) or Steam drops it: asked on every pass, its
+     * computed style paid the style pass of the page still loading. A row's own changes (its
+     * hover focus) leave it.
+     */
+    let shownList = null;
+    const tabChanged = (records) =>
+      records?.some(
+        (record) =>
+          record.type === 'attributes' &&
+          (record.target.matches?.('.home_tab_content') || record.target.closest?.('.home_tabs_row_ctn')),
+      );
+    const activeContent = (section, records) => {
+      if (!shownList?.isConnected || !section.contains(shownList) || tabChanged(records)) {
+        shownList = [...section.querySelectorAll('.home_tab_content')].find((node) => getComputedStyle(node).display !== 'none') ?? null;
+      }
+      return shownList;
+    };
 
     // Steam builds a row's preview on its first hover. Open the focused (or first) row's preview
     // through Steam's own handler, without moving keyboard focus.
@@ -109,7 +126,7 @@
       if (row && typeof window.$J === 'function') window.$J(row).triggerHandler('focus');
     };
 
-    const update = () => {
+    const update = (records) => {
       const tabsRow = document.querySelector('.home_tabs_row_ctn');
       const section = tabsRow?.closest('.home_pagecontent_ctn');
       const menu = tabsRow?.closest('.tabs_menu_ctn');
@@ -139,7 +156,7 @@
         if (container) ui = buildUi(section, menu, container);
       }
 
-      const content = activeContent(section);
+      const content = activeContent(section, records);
       const rows = content ? [...content.querySelectorAll('.tab_row_item')] : [];
       rows.forEach(decorateRow);
       if (!ui) return;

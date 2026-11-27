@@ -368,7 +368,9 @@
         console.error('[Steam Enhanced] app/summary.js balance:', error);
       }
     };
-    const rebalance = dom.perFrame(balanceRow);
+    // After the next layout (dom.afterLayout): its measures, in a frame callback, paid the style
+    // pass of Steam's latest render
+    const rebalance = dom.afterLayout(balanceRow);
     life.add(rebalance.cancel);
     life.add(() => detailsRow.destroy());
 

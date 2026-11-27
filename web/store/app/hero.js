@@ -286,10 +286,13 @@
     };
     const fitTitle = () => [prefixLine, lead, tail].forEach(fitLine);
 
+    // The hero's width, from its ResizeObserver entries: read on every pass (Steam's renders wake
+    // it), it paid the style pass of the page still being drawn
+    let heroWidth = 0;
     let titleKey = '';
     const syncTitle = () => {
       const name = readName();
-      const key = `${name}|${hero.clientWidth}`;
+      const key = `${name}|${heroWidth}`;
       if (key === titleKey) return;
       titleKey = key;
       const { prefix, big, gold } = splitTitle(name);
@@ -304,7 +307,10 @@
     };
 
     // Widths change with the window and once the hero's font has loaded.
-    const titleSize = new ResizeObserver(() => syncTitle());
+    const titleSize = new ResizeObserver(([entry]) => {
+      heroWidth = Math.round(entry.borderBoxSize?.[0]?.inlineSize ?? entry.contentRect.width);
+      syncTitle();
+    });
     titleSize.observe(hero);
     life.add(() => titleSize.disconnect());
     document.fonts?.ready.then(() => {
