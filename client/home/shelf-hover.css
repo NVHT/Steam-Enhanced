@@ -60,9 +60,9 @@ html[data-se-shelf-hot="left"] .V7RuDNUxhxoBRaiGWbk3B[data-se-peek] .WYgDg9NyCcM
 }
 
 /*
- * A caption over the art: the title on one line, then one quiet line of facts (playtime, total,
- * friends playing), "Updated …" under it when Steam shows it. The card's content wraps as a row:
- * the title and the status take the whole width, the facts sit side by side.
+ * A caption over the art: the title on up to two lines, then one quiet line of facts (playtime,
+ * total, friends playing), "Updated …" under it when Steam shows it. The card's content wraps as
+ * a row: the title and the status take the whole width, the facts sit side by side.
  */
 html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d ._12UNIdjT-Kv1ib31jk6J37:not(#se-none) {
   box-sizing: border-box;
@@ -117,7 +117,9 @@ html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d ._2R6-
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, color-mix(in srgb, var(--se-bg-ink) 80%, transparent) 0%, color-mix(in srgb, var(--se-bg-ink) 30%, transparent) 30%, transparent 50%);
+  /* Deep up to the caption's top (a two-line name and the facts, about a quarter of the card),
+     so it reads over bright art */
+  background: linear-gradient(to top, color-mix(in srgb, var(--se-bg-ink) 90%, transparent) 0%, color-mix(in srgb, var(--se-bg-ink) 75%, transparent) 25%, color-mix(in srgb, var(--se-bg-ink) 30%, transparent) 45%, transparent 60%);
   pointer-events: none;
 }
 
@@ -134,10 +136,14 @@ html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d ._1Rfx
   padding: 0;
 }
 
+/* The name on up to two lines before it's cut */
 html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._2sGn0cBsD44TjnUIh-lx9d ._1Kdi2PBxcdQwDpa-48hrf2:not(#se-none) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: anywhere;
   font: 700 var(--se-fs-lg)/1.3 var(--se-font);
 }
 
@@ -156,7 +162,7 @@ html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._1VGPO4xU5sgRK6DFt4t74O:not(#s
   padding: 0;
 }
 
-html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._1VGPO4xU5sgRK6DFt4t74O > div:not(.MIHa_O-B1JXrzkoGc255n):not(#se-none) {
+html[data-se-shelf-hot] ._3vg1vYU7iTWqONciv9cuJN ._1VGPO4xU5sgRK6DFt4t74O > div:not(.MIHa_O-B1JXrzkoGc255n, [data-se-zero]):not(#se-none) {
   display: flex;
   align-items: baseline;
   gap: var(--se-space-1);
