@@ -19,9 +19,16 @@
  * Steam's own registrations pass straight through. Long animation frames (50 ms+, Steam's and
  * the theme's) are listed separately with Chromium's own script attribution.
  *
- * Panel: Reset clears the counts, Copy puts the report on the clipboard, Disarm stops it loading
- * in new windows (this one keeps it until Steam restarts). The panel lives in a closed shadow
- * root. Wrapping and stack reads add a little overhead of their own: compare rows, not totals.
+ * The report opens with totals per folder of the registering file (a feature's).
+ *
+ * Panel: Reset clears the counts (and the snapshot), Copy puts the full report on the clipboard,
+ * Disarm stops it loading in new windows (this one keeps it until Steam restarts). Its rows sort
+ * by self time, calls, slowest call or layout and filter by site or kind; Live redraws it every
+ * second while it's shown (off: it redraws on its controls); Snapshot keeps the counts so far,
+ * and each row then shows what it added since ("new": first seen since), as Copy's "Since
+ * snapshot" does for the top changes. The panel (dev/perf-panel.js) loads on its first open,
+ * so an armed window that never opens it carries none of it. Wrapping and
+ * stack reads add a little overhead of their own: compare rows, not totals.
  */
 (() => {
   const KEY = '__sePerf';
@@ -34,11 +41,15 @@
   const SELF = document.currentScript?.src || '';
   const BASE = SELF ? new URL('../', SELF).href.replace(/[?#].*$/, '') : '';
   const SELF_PATH = 'dev/perf.js';
+  const PANEL_PATH = 'dev/perf-panel.js';
   const late = !!(window.__se || window.__seWeb);
   const now = () => performance.now();
-  // The panel's own timer, taken before the wrapping below
+  // The panel's own timers, taken before the wrapping below
   const plainSetInterval = window.setInterval;
+  const plainClearInterval = window.clearInterval;
   const plainSetTimeout = window.setTimeout;
+  const plainFrame = window.requestAnimationFrame;
+  const plainCancelFrame = window.cancelAnimationFrame;
   // Set while the profiler builds its own panel, whose listeners aren't the theme's
   let quiet = 0;
 
@@ -58,7 +69,7 @@
       const url = match[1].replace(/[?#].*$/, '');
       if (!url.startsWith(BASE)) return null;
       const path = url.slice(BASE.length);
-      if (path === SELF_PATH || (skipRuntime && path === 'core/runtime.js')) continue;
+      if (path === SELF_PATH || path === PANEL_PATH || (skipRuntime && path === 'core/runtime.js')) continue;
       return `${path}:${match[2]}`;
     }
     return null;
@@ -74,7 +85,7 @@
   const rowOf = (kind, site) => {
     const label = `${kind}  ${site}`;
     let row = rows.get(label);
-    if (!row) rows.set(label, (row = { label, calls: 0, self: 0, max: 0, layout: 0 }));
+    if (!row) rows.set(label, (row = { label, kind, site, calls: 0, self: 0, max: 0, layout: 0 }));
     return row;
   };
 
@@ -430,7 +441,96 @@
   /* ---------- Report ---------- */
 
   const ms = (value) => value.toFixed(1).padStart(8);
-  const report = () => {
+  const count = (value) => String(value).padStart(8);
+  const signed = (value, digits) => `${value > 0 ? '+' : ''}${value.toFixed(digits)}`;
+  const heads = (...names) => names.map((name) => name.padStart(8)).join('');
+  const COPY_ROWS = 40;
+  const PANEL_ROWS = 80;
+  const FOLDERS = 12;
+  const SINCE_ROWS = 20;
+
+  // The panel's view of the rows; Copy (report() with no argument) ignores it
+  const view = { sort: 'self', filter: '', live: false };
+  // The counts at the press of Snapshot: { at, rows: Map(label → { self, calls, layout }) }
+  let snapshot = null;
+  const takeSnapshot = () => {
+    const kept = new Map();
+    for (const row of rows.values()) kept.set(row.label, { self: row.self, calls: row.calls, layout: row.layout });
+    snapshot = { at: now(), rows: kept };
+  };
+  const changeOf = (row) => {
+    const was = snapshot?.rows.get(row.label);
+    return { self: row.self - (was?.self || 0), calls: row.calls - (was?.calls || 0), layout: row.layout - (was?.layout || 0), fresh: !was?.calls };
+  };
+  const changeCols = (change) =>
+    `${signed(change.self, 1).padStart(9)}${signed(change.calls, 0).padStart(8)}${signed(change.layout, 1).padStart(9)}${change.fresh ? '  new' : '     '}`;
+  const CHANGE_HEAD = `${'+self'.padStart(9)}${'+calls'.padStart(8)}${'+layout'.padStart(9)}     `;
+  const SORTS = {
+    self: (row) => row.self,
+    calls: (row) => row.calls,
+    max: (row) => row.max,
+    layout: (row) => row.layout,
+    change: (row) => changeOf(row).self,
+  };
+
+  // "client/friends/dock/ui.js:40" → "client/friends/dock"
+  const folderOf = (site) => site.replace(/:\d+$/, '').split('/').slice(0, -1).join('/') || '.';
+  const folderLines = (list, seconds) => {
+    const folders = new Map();
+    for (const row of list) {
+      const name = folderOf(row.site);
+      let folder = folders.get(name);
+      if (!folder) folders.set(name, (folder = { name, self: 0, calls: 0, layout: 0 }));
+      folder.self += row.self;
+      folder.calls += row.calls;
+      folder.layout += row.layout;
+    }
+    const top = [...folders.values()].sort((a, b) => b.self - a.self).slice(0, FOLDERS);
+    if (!top.length) return [];
+    return [
+      '',
+      `By folder (top ${FOLDERS} of ${folders.size}, by self time):`,
+      `${heads('self ms', 'ms/s', 'calls', 'layout')}  folder`,
+      ...top.map((folder) => `${ms(folder.self)}${ms(folder.self / seconds)}${count(folder.calls)}${ms(folder.layout)}  ${folder.name}`),
+    ];
+  };
+
+  // The rows as the panel shows them: its sort and filter, the change since a snapshot
+  const panelRows = (list, seconds) => {
+    const needle = view.filter.trim().toLowerCase();
+    const matching = needle ? list.filter((row) => row.site.toLowerCase().includes(needle) || row.kind.toLowerCase().includes(needle)) : list;
+    const key = SORTS[view.sort] || SORTS.self;
+    const sorted = [...matching].sort((a, b) => key(b) - key(a));
+    const lines = [
+      '',
+      `Rows by ${view.sort === 'max' ? 'slowest call' : view.sort === 'change' ? 'self time since snapshot' : view.sort}${needle ? `, ${matching.length} of ${list.length} matching "${view.filter.trim()}"` : ''}` +
+        (snapshot ? `; snapshot ${((now() - snapshot.at) / 1000).toFixed(0)} s ago` : ''),
+      `${heads('self ms', 'ms/s', 'calls', 'max ms', 'layout')}${snapshot ? CHANGE_HEAD : ''}  site`,
+    ];
+    for (const row of sorted.slice(0, PANEL_ROWS)) {
+      lines.push(`${ms(row.self)}${ms(row.self / seconds)}${count(row.calls)}${ms(row.max)}${ms(row.layout)}${snapshot ? changeCols(changeOf(row)) : ''}  ${row.label}`);
+    }
+    if (sorted.length > PANEL_ROWS) lines.push(`  … ${sorted.length - PANEL_ROWS} more`);
+    return lines;
+  };
+
+  // The rows whose self time grew most since the snapshot (Copy's)
+  const sinceLines = (list) => {
+    if (!snapshot) return [];
+    const changed = list
+      .map((row) => [row, changeOf(row)])
+      .filter(([, change]) => change.calls || change.self)
+      .sort((a, b) => b[1].self - a[1].self)
+      .slice(0, SINCE_ROWS);
+    return [
+      '',
+      `Since snapshot (${((now() - snapshot.at) / 1000).toFixed(0)} s ago; top ${SINCE_ROWS} by self time added, new: first seen since):`,
+      `${CHANGE_HEAD}  site`,
+      ...changed.map(([row, change]) => `${changeCols(change)}  ${row.label}`),
+    ];
+  };
+
+  const report = (panel = false) => {
     const seconds = Math.max(0.001, (now() - started) / 1000);
     const list = [...rows.values()].filter((row) => row.calls).sort((a, b) => b.self - a.self);
     const self = list.reduce((sum, row) => sum + row.self, 0);
@@ -442,10 +542,15 @@
       frames.unsupported
         ? 'Long frames: not supported in this Chromium'
         : `Long frames (50 ms+): ${frames.count}, ${(frames.total / seconds).toFixed(1)} ms/s, blocking ${(frames.blocking / seconds).toFixed(1)} ms/s, worst ${frames.worst.toFixed(0)} ms`,
-      '',
-      '  self ms    ms/s   calls   max ms  layout  site',
-      ...list.slice(0, 40).map((row) =>
-        `${ms(row.self)}${ms(row.self / seconds)}${String(row.calls).padStart(8)}${ms(row.max)}${ms(row.layout)}  ${row.label}`),
+      ...folderLines(list, seconds),
+      ...(panel
+        ? panelRows(list, seconds)
+        : [
+          '',
+          '  self ms    ms/s   calls   max ms  layout  site',
+          ...list.slice(0, COPY_ROWS).map((row) =>
+            `${ms(row.self)}${ms(row.self / seconds)}${count(row.calls)}${ms(row.max)}${ms(row.layout)}  ${row.label}`),
+        ]),
     ];
     const scripts = [...frames.scripts.values()].sort((a, b) => b.total - a.total).slice(0, 12);
     if (scripts.length) {
@@ -466,6 +571,7 @@
       }
     }
     if (probe) lines.push('', ...probe.lines());
+    if (!panel) lines.push(...sinceLines(list));
     return lines.join('\n');
   };
 
@@ -664,76 +770,44 @@
     frames.count = frames.total = frames.blocking = frames.worst = 0;
     frames.scripts.clear();
     started = now();
+    // Its counts were taken before the reset: every change would read negative
+    snapshot = null;
   };
 
-  /* ---------- Panel (closed shadow root, untouched by any page CSS) ---------- */
+  /* ---------- Panel: dev/perf-panel.js, loaded on its first open ---------- */
 
-  let host = null;
-  let output = null;
-  let ticker = 0;
-
-  const render = () => {
-    if (output) output.textContent = report();
-  };
-
-  const build = () => {
-    host = document.createElement('se-perf');
-    const shadow = host.attachShadow({ mode: 'closed' });
-    shadow.innerHTML = `
-      <style>
-        :host { all: initial; position: fixed; right: 12px; bottom: 12px; z-index: 2147483647; }
-        .panel { width: min(880px, calc(100vw - 24px)); max-height: 70vh; display: flex; flex-direction: column;
-          background: #10131a; color: #e6e8eb; border: 1px solid #2b3240; border-radius: 8px;
-          box-shadow: 0 12px 40px rgba(0, 0, 0, .5); font: 12px/1.45 Consolas, monospace; }
-        .bar { display: flex; gap: 8px; align-items: center; padding: 8px 12px; border-bottom: 1px solid #2b3240; }
-        .bar b { flex: 1; font-weight: 600; }
-        button { font: inherit; color: inherit; background: #1d2330; border: 1px solid #2b3240; border-radius: 4px;
-          padding: 4px 10px; cursor: pointer; }
-        button:hover { background: #283042; }
-        pre { margin: 0; padding: 8px 12px; overflow: auto; white-space: pre; }
-      </style>
-      <div class="panel">
-        <div class="bar"><b>Profiler</b>
-          <button data-act="reset">Reset</button><button data-act="probe">Probe CSS</button><button data-act="copy">Copy</button>
-          <button data-act="disarm">Disarm</button><button data-act="close">Close</button>
-        </div>
-        <pre></pre>
-      </div>`;
-    output = shadow.querySelector('pre');
-    shadow.querySelector('.bar').addEventListener('click', async (event) => {
-      const act = event.target.closest?.('button')?.dataset.act;
-      if (act === 'reset') reset();
-      else if (act === 'probe') runProbe();
-      else if (act === 'copy') {
-        const text = report();
-        const done = await navigator.clipboard?.writeText(text).then(() => true, () => false);
-        if (!done) window.__se?.copy?.(text);
-        event.target.textContent = 'Copied';
-      } else if (act === 'disarm') {
-        try {
-          localStorage.removeItem(ARM_KEY);
-        } catch { /* storage refused: the site stays armed until it's cleared */ }
-        event.target.textContent = 'Disarmed';
-      } else if (act === 'close') toggle();
-      render();
-    });
-  };
-
+  // What the panel reads and drives; perf-panel.js adds `toggle`
+  const parts = (window.__sePerfParts = {
+    report, reset, runProbe, takeSnapshot, view, ARM_KEY,
+    hasSnapshot: () => !!snapshot,
+    clearSnapshot: () => {
+      snapshot = null;
+    },
+    // The panel's own listeners, added while this is set, aren't timed as the theme's
+    quietly: (fn) => {
+      quiet++;
+      try {
+        return fn();
+      } finally {
+        quiet--;
+      }
+    },
+    plainSetInterval, plainClearInterval, plainFrame, plainCancelFrame, addListener, removeListener,
+  });
+  let panelFile = null;
   const toggle = () => {
-    if (host?.isConnected) {
-      host.remove();
-      clearInterval(ticker);
-      return;
-    }
-    quiet++;
-    try {
-      if (!host) build();
-    } finally {
-      quiet--;
-    }
-    document.documentElement.append(host);
-    render();
-    ticker = plainSetInterval.call(window, render, 1000);
+    if (parts.toggle) return parts.toggle();
+    panelFile ??= new Promise((done) => {
+      const script = document.createElement('script');
+      // Beside this file, fresh from disk when this one was (core/core.js's ?t=)
+      const url = new URL(PANEL_PATH.slice('dev/'.length), SELF || location.href);
+      if (SELF) url.search = new URL(SELF).search;
+      script.src = url.href;
+      addListener.call(script, 'load', () => done(), { once: true });
+      addListener.call(script, 'error', () => done(), { once: true });
+      (document.head || document.documentElement).append(script);
+    });
+    panelFile.then(() => parts.toggle?.());
   };
 
   window[KEY] = { toggle, report, reset, probe: runProbe };

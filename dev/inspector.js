@@ -11,7 +11,9 @@
  *                    can't be pointed at (hidden, covered, gone when the pointer moves)
  *   P                report the whole page instead (or the "Whole page" button)
  *   D                catch the next dialog (or the "Catch next dialog" button)
- *   Esc              close (or stop waiting for a dialog)
+ *   R                capture the shown report's element again, found anew by its CSS path (or
+ *                    the report's "Again" button): after a dev reload, a page reload or a change
+ *   Esc              close (or stop waiting for a dialog, or drop an armed compare)
  *
  * A capture copies a plain-text report to the clipboard and shows it in a panel: the page,
  * the theme files actually loaded (to spot a stale build), the ancestor chain with classes,
@@ -23,7 +25,13 @@
  * shadow, filter, opacity, blend, clip, mask) on itself and its ::before/::after, plus the
  * shadows of nearby elements that reach the point (a box's shadow paints outside its box, so
  * hit-testing alone never finds it). For colour that has no visible owner. Pasted back into
- * a chat, that is enough to target the element.
+ * a chat, that is enough to target the element. It also lists the theme tokens (--se-*) its
+ * rules and inline style read or set, with their values on it.
+ *
+ * The panel keeps the last 5 reports (tabs over the text; Copy copies the one shown), in
+ * sessionStorage so they outlast a reload of the window or tab. Compare arms a diff: the next
+ * capture's report opens with the computed styles that differ from the shown one's (A → B),
+ * once; with R, the same element before and after a change.
  *
  * Catch next dialog: for dialogs too brief to point at (a wait dialog shown while a page
  * loads). It waits for the next dialog to appear (a <dialog>, a [role=dialog], Steam's
@@ -42,7 +50,7 @@
     return;
   }
   // The report builder: dev/inspector-report.js, loaded just before this file
-  const { report, pageReport } = window.__seInspectorReport || {};
+  const { report, pageReport, pathOf, snapshot, diff } = window.__seInspectorReport || {};
   if (!report) return;
 
   /* ---------- UI (closed shadow root) ---------- */
@@ -52,6 +60,12 @@
   const root = host.attachShadow({ mode: 'closed' });
   root.innerHTML = `
     <style>
+      /* The theme's thin dark scrollbar (core/scrollbars.css doesn't reach a shadow root) */
+      ::-webkit-scrollbar { width: 10px; height: 10px; background: transparent; }
+      ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
+      ::-webkit-scrollbar-button { display: none; }
+      ::-webkit-scrollbar-thumb { min-height: 40px; border: 3px solid transparent; border-radius: 999px; background: rgba(255, 255, 255, .18) padding-box; }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .3) padding-box; }
       :host { all: initial; }
       * { box-sizing: border-box; font: 500 12px/1.45 "Segoe UI", system-ui, sans-serif; }
       .box { position: fixed; pointer-events: none; border: 2px solid #7cc4ff; border-radius: 3px;
@@ -67,8 +81,14 @@
       .panel { position: fixed; right: 16px; bottom: 16px; width: min(560px, calc(100vw - 32px)); max-height: 70vh;
                display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 14px; pointer-events: auto;
                background: #171a20; color: #e6e8eb; box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 24px 48px -16px #000; }
-      .panel header { display: flex; align-items: center; gap: 8px; }
-      .panel header span { flex: 1; font-weight: 700; }
+      .panel header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+      .panel header span { flex: 1 1 120px; font-weight: 700; }
+      .tabs { display: flex; flex-wrap: wrap; gap: 4px; }
+      .tabs button { height: 22px; padding: 0 8px; font: 500 11px/1 Consolas, monospace; color: #b8c0c8; }
+      .tabs button.on { background: rgba(124, 196, 255, .2); color: #7cc4ff; }
+      .note { padding: 6px 10px; border-radius: 8px; background: rgba(255, 184, 107, .12); color: #ffb86b; }
+      button:disabled { opacity: .4; cursor: default; }
+      .hint .cmp { color: #7cc4ff; font-weight: 700; }
       .panel textarea { flex: 1; min-height: 240px; resize: none; padding: 10px; border: 0; border-radius: 10px;
                         background: #0f1115; color: #b8c0c8; font: 11px/1.5 Consolas, monospace; white-space: pre; }
       button { height: 28px; padding: 0 12px; border: 0; border-radius: 999px; background: #262c35; color: #e6e8eb;
@@ -86,17 +106,20 @@
     </style>
     <div class="box" hidden></div>
     <div class="tag" hidden></div>
-    <div class="hint" hidden>Pick an element: <kbd>Click</kbd> or <kbd>Space</kbd> capture · <kbd>[</kbd> <kbd>]</kbd> parent / child · <kbd>F</kbd> <span class="freeze-state">freeze hovers</span> · <kbd>S</kbd> by selector · <kbd>P</kbd> whole page · <kbd>D</kbd> next dialog · <kbd>Esc</kbd> close<button class="page primary">Whole page</button><button class="ask-open">By selector</button><button class="catch">Catch next dialog</button></div>
+    <div class="hint" hidden>Pick an element: <kbd>Click</kbd> or <kbd>Space</kbd> capture · <kbd>[</kbd> <kbd>]</kbd> parent / child · <kbd>F</kbd> <span class="freeze-state">freeze hovers</span> · <kbd>S</kbd> by selector · <kbd>P</kbd> whole page · <kbd>D</kbd> next dialog · <kbd>R</kbd> again · <kbd>Esc</kbd> close<span class="cmp" hidden></span><button class="page primary">Whole page</button><button class="ask-open">By selector</button><button class="catch">Catch next dialog</button></div>
     <form class="ask" hidden><input name="selector" placeholder="CSS selector, e.g. #workshop_item_hover .hover_box" autocomplete="off" spellcheck="false"><button class="primary" type="submit">Report</button><button class="ask-cancel" type="button">Cancel</button></form>
     <div class="hint wait" hidden>Waiting for the next dialog: reload the page or do what opens it · <kbd>Esc</kbd> stop</div>
     <div class="panel" hidden>
-      <header><span class="title">Element report</span><button class="copy primary">Copy</button><button class="page">Whole page</button><button class="catch">Catch next dialog</button><button class="again">Pick another</button><button class="close">Close</button></header>
+      <header><span class="title">Element report</span><button class="copy primary">Copy</button><button class="recapture" title="Capture this report's element again, found anew by its path (R)">Again</button><button class="compare" title="Diff the next capture against this report">Compare</button><button class="page">Whole page</button><button class="catch">Catch next dialog</button><button class="pick">Pick another</button><button class="close">Close</button></header>
+      <div class="tabs" hidden></div>
+      <div class="note" hidden></div>
       <textarea readonly spellcheck="false"></textarea>
     </div>`;
   const $ = (selector) => root.querySelector(selector);
   const ui = {
     box: $('.box'), tag: $('.tag'), hint: $('.hint'), wait: $('.wait'), panel: $('.panel'), text: $('textarea'),
     copy: $('.copy'), title: $('.panel .title'), ask: $('.ask'), askInput: $('.ask input'),
+    tabs: $('.tabs'), note: $('.note'), recapture: $('.recapture'), compare: $('.compare'), cmp: $('.cmp'),
   };
 
   /* ---------- Picking ---------- */
@@ -143,22 +166,19 @@
     try {
       matches = document.querySelectorAll(selector);
     } catch {
-      show('Selector report', `Not a valid CSS selector: ${selector}`);
+      notice(`Not a valid CSS selector: ${selector}`);
       return;
     }
     const el = [...matches].find((node) => !own(node));
     if (!el) {
-      show('Selector report', `No element matches: ${selector}`);
+      notice(`No element matches: ${selector}`);
       return;
     }
     closeAsk();
     const r = el.getBoundingClientRect();
-    // The paint stack is read at the element's centre (or its top-left corner when it has no size)
-    lastPoint = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     const note = `  — by selector ${selector}${matches.length > 1 ? ` (first of ${matches.length})` : ''}${r.width && r.height ? '' : '; it has no size now (hidden or empty)'}`;
-    const pending = report(el, note, lastPoint); // reads the page now, while a frozen popup is still open
-    stopPicking();
-    show('Selector report', await pending);
+    // Found again by the selector typed, not a built path: it names what was meant
+    take(el, { title: 'Selector report', note, path: selector });
   };
 
   const outline = (el) => {
@@ -199,22 +219,125 @@
     setTimeout(() => (button.textContent = original), 1400);
   };
 
-  const show = async (title, text) => {
-    stopPicking();
-    ui.title.textContent = title;
-    ui.text.value = text;
-    ui.panel.hidden = false;
-    flash(ui.copy, (await copy(text)) ? 'Copied' : 'Select and copy');
+  /*
+   * History: the last MAX_HISTORY reports, each { title, text, at, path, snap, page }: path finds
+   * its element again (R, Again), snap is its computed styles for a compare. Kept in
+   * sessionStorage, so a reload of the window or tab keeps them (and an armed compare).
+   */
+  const HISTORY_KEY = 'se-inspector-history';
+  const MAX_HISTORY = 5;
+  const loadHistory = () => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(HISTORY_KEY) || 'null');
+      return Array.isArray(saved?.entries) ? saved : null;
+    } catch {
+      return null; // storage blocked or unreadable: start empty
+    }
+  };
+  const saved = loadHistory();
+  const history = saved ? saved.entries.slice(-MAX_HISTORY) : [];
+  let shownAt = history.length - 1;
+  let compareWith = (saved && history.find((entry) => entry.at === saved.compareAt && entry.snap)) || null;
+  const saveHistory = () => {
+    try {
+      sessionStorage.setItem(HISTORY_KEY, JSON.stringify({ entries: history, compareAt: compareWith?.at ?? null }));
+    } catch { /* storage blocked or full: the history lasts for this page only */ }
   };
 
-  const capture = async (el) => {
-    if (!el) return;
-    // Reads the page now, while a frozen popup is still open; a failed report shows its error
-    const pending = report(el, '', lastPoint);
-    stopPicking();
-    show('Element report', await pending.catch((error) => `Report failed: ${error?.stack || error}`));
+  const clock = (at) => new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const nameOf = (entry) => `${entry.title.split(' ')[0]} ${clock(entry.at)}`;
+
+  // The shown report, its tabs (newest first) and which header buttons apply to it
+  const render = () => {
+    const entry = history[shownAt];
+    ui.title.textContent = entry ? entry.title : 'Element report';
+    ui.text.value = entry ? entry.text : '';
+    ui.note.hidden = true;
+    ui.tabs.replaceChildren(...history.map((item, i) => {
+      const tab = document.createElement('button');
+      tab.type = 'button';
+      tab.className = i === shownAt ? 'on' : '';
+      tab.dataset.index = String(i);
+      tab.textContent = nameOf(item);
+      tab.title = item.path || item.title;
+      return tab;
+    }).reverse());
+    ui.tabs.hidden = history.length < 2;
+    ui.recapture.disabled = !entry || !(entry.path || entry.page);
+    ui.compare.disabled = !entry?.snap || !snapshot;
   };
-  const capturePage = () => show('Page report', pageReport());
+
+  const display = async () => {
+    stopPicking();
+    render();
+    ui.panel.hidden = false;
+    flash(ui.copy, (await copy(ui.text.value)) ? 'Copied' : 'Select and copy');
+  };
+
+  // A message in the panel over the shown report, kept out of the history
+  const notice = (message) => {
+    stopPicking();
+    render();
+    ui.note.textContent = message;
+    ui.note.hidden = false;
+    ui.panel.hidden = false;
+  };
+
+  /** A new report into the history, shown and copied; an armed compare opens it with the diff. */
+  const record = (title, text, { path = null, snap = null, page = false } = {}) => {
+    const at = Date.now();
+    let body = text;
+    if (compareWith && snap && diff) {
+      body = `${diff(compareWith.snap, snap, nameOf(compareWith), nameOf({ title, at }))}\n\n${text}`;
+      compareWith = null;
+    }
+    history.push({ title, text: body, at, path, snap, page });
+    if (history.length > MAX_HISTORY) history.shift();
+    shownAt = history.length - 1;
+    saveHistory();
+    return display();
+  };
+
+  const failed = (error) => `Report failed: ${error?.stack || error}`;
+
+  /** Reports an element: at `point` (the pointer), else at its centre (its corner when it has no size). */
+  const take = async (el, { title = 'Element report', note = '', path = pathOf?.(el) ?? null, point = null } = {}) => {
+    if (!point) {
+      const r = el.getBoundingClientRect();
+      point = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+    lastPoint = point;
+    const snap = snapshot?.(el) ?? null;
+    const pending = report(el, note, point); // reads the page now, while a frozen popup is still open
+    stopPicking();
+    record(title, await pending.catch(failed), { path, snap });
+  };
+
+  const capture = (el) => el && take(el, { point: lastPoint });
+  const capturePage = () => record('Page report', pageReport(), { page: true });
+
+  // R / Again: the shown report's element, found anew by its path (a page report runs again)
+  const recapture = () => {
+    const entry = history[shownAt];
+    if (!entry) return notice('Nothing captured yet in this window.');
+    if (entry.page) return capturePage();
+    if (!entry.path) return notice('This report has no path to find its element by.');
+    let el = null;
+    try {
+      el = [...document.querySelectorAll(entry.path)].find((node) => !own(node)) || null;
+    } catch { /* a path that no longer parses: reported below as matching nothing */ }
+    if (!el) return notice(`Nothing matches ${entry.path} now.`);
+    return take(el, { title: entry.title, note: `  — again, by ${entry.path}`, path: entry.path });
+  };
+
+  // Compare: the next capture is diffed against the shown report; picking starts at once
+  const armCompare = () => {
+    const entry = history[shownAt];
+    if (!entry?.snap) return;
+    compareWith = entry;
+    saveHistory();
+    startPicking();
+  };
 
   /* ---------- Catching the next dialog ---------- */
 
@@ -271,11 +394,14 @@
     const at = () => {
       const r = dialog.getBoundingClientRect();
       lastPoint = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-      return report(dialog, '', lastPoint);
+      return { pending: report(dialog, '', lastPoint), snap: snapshot?.(dialog) ?? null, path: pathOf?.(dialog) ?? null };
     };
     // Now, while it surely shows; a frame later its content may have filled in, if it's still up.
     const first = at();
-    requestAnimationFrame(async () => show('Dialog report', await (dialog.isConnected && shown(dialog) ? at() : first)));
+    requestAnimationFrame(async () => {
+      const taken = dialog.isConnected && shown(dialog) ? at() : first;
+      record('Dialog report', await taken.pending.catch(failed), taken);
+    });
   };
 
   function startCatching() {
@@ -352,6 +478,9 @@
     } else if (event.key === 'd' || event.key === 'D') {
       block(event);
       startCatching();
+    } else if ((event.key === 'r' || event.key === 'R') && !event.ctrlKey && !event.altKey && !event.metaKey && !event.shiftKey) {
+      block(event);
+      recapture();
     } else if (event.key === '[' && current?.parentElement && current.parentElement !== document.documentElement) {
       block(event);
       trail.push(current);
@@ -371,6 +500,8 @@
     active = true;
     ui.panel.hidden = true;
     ui.hint.hidden = false;
+    ui.cmp.hidden = !compareWith;
+    ui.cmp.textContent = compareWith ? ` · next capture compared with ${nameOf(compareWith)}` : '';
     addEventListener('pointermove', onMove, true);
     for (const [type, fn] of PICK_EVENTS) addEventListener(type, fn, true);
     for (const type of HOVER_EVENTS) addEventListener(type, shield, true);
@@ -394,10 +525,22 @@
     closeAsk();
     ui.panel.hidden = true;
     host.remove();
+    if (compareWith) {
+      compareWith = null; // closing drops an armed compare
+      saveHistory();
+    }
   }
 
   ui.copy.addEventListener('click', async () => flash(ui.copy, (await copy(ui.text.value)) ? 'Copied' : 'Select and copy'));
-  $('.again').addEventListener('click', startPicking);
+  $('.pick').addEventListener('click', startPicking);
+  ui.recapture.addEventListener('click', recapture);
+  ui.compare.addEventListener('click', armCompare);
+  ui.tabs.addEventListener('click', (event) => {
+    const tab = event.target.closest('button');
+    if (!tab) return;
+    shownAt = Number(tab.dataset.index);
+    render();
+  });
   for (const button of root.querySelectorAll('.page')) button.addEventListener('click', capturePage);
   for (const button of root.querySelectorAll('.catch')) button.addEventListener('click', startCatching);
   $('.close').addEventListener('click', close);

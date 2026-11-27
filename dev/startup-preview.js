@@ -398,6 +398,12 @@
   bar.style.cssText = 'all: initial; position: fixed; left: 50%; top: 16px; z-index: 2147483602; transform: translateX(-50%);';
   const barRoot = bar.attachShadow({ mode: 'closed' });
   barRoot.innerHTML = `<style>
+    /* The theme's thin dark scrollbar (core/scrollbars.css doesn't reach a shadow root) */
+    ::-webkit-scrollbar { width: 10px; height: 10px; background: transparent; }
+    ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
+    ::-webkit-scrollbar-button { display: none; }
+    ::-webkit-scrollbar-thumb { min-height: 40px; border: 3px solid transparent; border-radius: 999px; background: rgba(255, 255, 255, .18) padding-box; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .3) padding-box; }
     div { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; max-width: 760px; padding: 6px; border-radius: 8px; background: #16191e; box-shadow: 0 8px 24px rgba(0, 0, 0, .5); font: 600 12px system-ui, sans-serif; }
     button { padding: 6px 10px; border: 0; border-radius: 6px; background: #252a31; color: #c6ccd4; font: inherit; cursor: pointer; }
     button:hover { background: #313741; color: #fff; }

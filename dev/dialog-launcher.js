@@ -8,6 +8,10 @@
  *   Steam calls        SteamClient methods that open a dialog or window
  *   Steam functions    Steam's own show functions (desktop, then Steam Deck), found in its bundles
  *                      by the text their dialog shows
+ *   Steam UI           dialogs Steam opens from its own UI, opened the same way: Mark as private
+ *                      (the main window's router state), Rename collection (the library's store
+ *                      flag, on the collection's page), the collection menu (Steam's own, at the
+ *                      button: its Delete opens Delete Collection)
  * Their buttons are live: an entry marked "acts" does something when opened, one marked
  * "confirm acts" does it if its dialog is confirmed. Commands that only change something
  * (status, settings, exit) are left out.
@@ -15,8 +19,14 @@
  * Mock (Steam's own React components, shown through Steam's own modal call; nothing acts):
  *   Generic dialog     Steam's confirm dialog in each of its forms, with harmless callbacks
  *   Recorded           every dialog Steam shows while the launcher is loaded (in any window of
- *                      this JS context) is kept for this session and can be shown again: its
- *                      component and props, with every onX / fnX callback replaced by a no-op
+ *                      this JS context) is kept and can be shown again: its component and props,
+ *                      with every onX / fnX callback replaced by a no-op. The list outlives Stop
+ *                      and a JS reload (window.__seDialogLauncherRecorded), not Reload UI; Clear
+ *                      empties it
+ *
+ * The head's filter narrows every group by name; the game field finds a game by typing (kept in
+ * sessionStorage, so it survives Stop). Repeat, or R while the panel shows and no field has
+ * focus, reopens the last entry run; one that acts still needs its second press.
  *
  * Steam's internals are found by what their source says, not by module ids or export names
  * (both change between builds); an entry whose piece isn't found is shown greyed out.
@@ -95,8 +105,8 @@
     }
   };
 
-  // Recording: every element Steam hands its modal manager, until Stop
-  const recorded = [];
+  // Recording: every element Steam hands its modal manager, until Stop; the list stays for the next launcher
+  const recorded = window.__seDialogLauncherRecorded || (window.__seDialogLauncherRecorded = []);
   let unrecord = null;
   const record = (element, title, where) => {
     if (reopening || !element?.type || !element.props) return;
@@ -163,8 +173,8 @@
    * Steam's own show functions (sp.js), each found by text its dialog shows and called as Steam
    * calls it: [group, name, module needles, test on the function's source, args, note]. Left out:
    * the ones that only open from inside a button (React components), the ones needing Steam
-   * objects the launcher can't make (chat groups, screenshots, a EULA workflow, cloud conflicts:
-   * Recorded catches those), and Restart / Shut down PC, which act before any dialog.
+   * objects the launcher can't make (chat groups, screenshots, a EULA workflow: Recorded catches
+   * those), and Restart / Shut down PC, which act before any dialog.
    */
   const none = () => {};
   const STEAM_FUNCTIONS = [
@@ -188,6 +198,21 @@
       () => [String(appid), window], 'a borrowed game'],
     ['Steam functions', 'Steam Input notice', ['k_eIntroToSteamInputGames'], has('k_eIntroToSteamInputGames'),
       () => [appid, none, none], 'game'],
+    // Two made-up launch options; always shown (a remembered choice would skip the dialog)
+    ['Steam functions', 'Launch options', ['#LaunchOptionsDialog_SelectHeader'], has('showing launch options'),
+      () => {
+        const name = overview()?.display_name || '';
+        return [{ appid, alwaysShowDialog: true, continue: none, onCancel: none, ownerWindow: window }, [
+          { nIndex: 0, strDescription: 'Play', strGameName: name, eType: 0 },
+          { nIndex: 1, strDescription: 'Play in safe mode', strGameName: name, eType: 0 },
+        ]];
+      }, 'game'],
+    ['Steam functions', 'Cloud conflict', ['#CloudConflict_AppLaunch_Header'], has('showing cloud conflict dialog'),
+      () => [{ appid, bOnAppLaunch: true, keepLocal: none, keepRemote: none, onCancel: none }, window], 'game'],
+    ['Steam functions', 'Cloud pending operations', ['#CloudConflict_AppLaunch_Header'], has('showing cloud pending operations dialog'),
+      () => [{ appid, onOK: none, onCancel: none, onChoose: none }, window], 'game'],
+    ['Steam functions', 'Cloud sync failed', ['#CloudConflict_AppLaunch_Header'], has('showing cloud sync failed dialog'),
+      () => [{ appid, bOnAppLaunch: true, onOK: none, onCancel: none }, window], 'game'],
     ['Steam functions', 'Activation failed', ['#Activate_InvalidCode_Headline'], tiny, () => [window]],
     ['Steam functions', 'Video unsupported', ['#VideoError_PlaybackUnsupported'], has('#VideoError_PlaybackUnsupported'), () => [window]],
     ['Steam functions', 'Network sign-in page', ['strManualCaptivePortalURL'], has('strManualCaptivePortalURL'),
@@ -210,8 +235,45 @@
   ];
 
   /*
-   * [group, name, run, note]: `run` opens it; `note` is "acts" / "confirm acts" or what the
-   * entry needs. A function that returns false means its piece wasn't found.
+   * Steam UI: the library's UI store (its collection rename flag), the collection menu
+   * component, and Steam's context-menu call (show(element, event or anchor, options)).
+   */
+  const libraryUI = () => moduleWith('library-ui', ['m_bIsCollectionRenameOpen'], (exports) =>
+    Object.values(exports).find((value) => typeof value?.SetCollectionRenameOpen === 'function') || null);
+  const collectionMenu = () => moduleWith('collection-menu', ['#CollectionAction_DeleteDialog', 'SetCollectionRenameOpen'], (exports) =>
+    Object.values(exports).find(Boolean) || null);
+  const contextMenu = () => moduleWith('context-menu', ['GetContextMenuManagerFromWindow', 'bCreateHidden'], (exports) =>
+    exportWhere(exports, (fn) => fnSource(fn).includes('preventDefault') && fnSource(fn).includes('CreateContextMenuInstance')));
+  // Your first collection that can be renamed and deleted
+  const ownCollection = () =>
+    SE.run(() => SE.global('collectionStore').userCollections.find((c) => c.bIsEditable && c.bIsDeletable)) || null;
+
+  // Mark as private: Steam's dialog watches the main window's router state for its target
+  const markPrivate = () => {
+    const history = SE.run(() => SE.mainWindow().m_history);
+    if (!history || !appid) return false;
+    history.replace(history.location.pathname, { ...history.location.state, PrivateAppDialogTarget: String(appid) });
+  };
+  // Rename: Steam's menu row goes to the collection's page and sets the store's flag
+  const renameCollection = () => {
+    const ui = libraryUI();
+    const collection = ownCollection();
+    if (!ui || !collection) return false;
+    SE.navigate(`/library/collection/${encodeURIComponent(collection.id)}`);
+    ui.SetCollectionRenameOpen(true);
+  };
+  const openCollectionMenu = (button) => {
+    const Menu = collectionMenu();
+    const show = contextMenu();
+    const collection = ownCollection();
+    if (!Menu || !show || !steam.React || !collection) return false;
+    show(steam.React.createElement(Menu, { strCollectionId: collection.id, strDisplayName: collection.displayName }), button);
+  };
+
+  /*
+   * [group, name, run, note]: `run` opens it (handed the entry's button); `note` is "acts" /
+   * "confirm acts" or what the entry needs. A function that returns false means its piece wasn't
+   * found.
    */
   const ENTRIES = [
     ['Steam commands', 'Activate a product', url('open/activateproduct')],
@@ -243,6 +305,9 @@
     ['Steam calls', 'Controller configurator', call('Apps', 'ShowControllerConfigurator', () => [appid]), 'game'],
     ['Steam calls', 'Install wizard', call('Installs', 'OpenInstallWizard', () => [[appid]]), 'game, confirm acts'],
     ['Steam calls', 'Uninstall wizard', call('Installs', 'OpenUninstallWizard', () => [[appid], false]), 'game, confirm acts'],
+    ['Steam UI', 'Mark as private', markPrivate, 'game, confirm acts'],
+    ['Steam UI', 'Rename collection', renameCollection, 'a collection, confirm acts'],
+    ['Steam UI', 'Collection menu (Delete)', openCollectionMenu, 'a collection, its rows act'],
     ...STEAM_FUNCTIONS.map(([group, name, needles, test, args, note]) => [group, name, () => {
       const fn = steamFunction(name, needles, test);
       if (!fn) return false;
@@ -263,48 +328,106 @@
   host.style.cssText = 'all: initial; position: fixed; top: 48px; right: 16px; bottom: 16px; z-index: 2147483600;';
   const root = host.attachShadow({ mode: 'closed' });
   root.innerHTML = `<style>
+    /* The theme's thin dark scrollbar (core/scrollbars.css doesn't reach a shadow root) */
+    ::-webkit-scrollbar { width: 10px; height: 10px; background: transparent; }
+    ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
+    ::-webkit-scrollbar-button { display: none; }
+    ::-webkit-scrollbar-thumb { min-height: 40px; border: 3px solid transparent; border-radius: 999px; background: rgba(255, 255, 255, .18) padding-box; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .3) padding-box; }
     .panel { box-sizing: border-box; display: flex; flex-direction: column; width: 320px; max-height: 100%; border-radius: 10px; background: #16191e; color: #c6ccd4; box-shadow: 0 12px 40px rgba(0, 0, 0, .6); font: 12px/1.4 system-ui, sans-serif; overflow: hidden; }
     .head { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-bottom: 1px solid #252a31; }
     .title { display: flex; align-items: center; justify-content: space-between; font-weight: 700; font-size: 13px; color: #fff; }
-    select, button { font: inherit; color: inherit; }
-    select { width: 100%; padding: 6px; border: 0; border-radius: 6px; background: #252a31; }
+    input, button { font: inherit; color: inherit; }
+    input { box-sizing: border-box; width: 100%; padding: 6px; border: 0; border-radius: 6px; background: #252a31; }
+    input::placeholder { color: #6f7883; }
     .list { overflow: auto; padding: 4px 8px 12px; }
-    h3 { margin: 12px 4px 4px; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: #6f7883; }
+    h3 { display: flex; align-items: center; justify-content: space-between; margin: 12px 4px 4px; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: #6f7883; }
+    h3 .small { font-size: 11px; letter-spacing: normal; text-transform: none; }
     .entry { display: flex; width: 100%; align-items: baseline; justify-content: space-between; gap: 8px; padding: 6px 8px; border: 0; border-radius: 6px; background: none; text-align: left; cursor: pointer; }
     .entry:hover { background: #252a31; color: #fff; }
-    .entry:focus-visible, select:focus-visible, .small:focus-visible { outline: 2px solid #7cc4ff; outline-offset: 1px; }
+    .entry:focus-visible, input:focus-visible, .small:focus-visible { outline: 2px solid #7cc4ff; outline-offset: 1px; }
     .entry[aria-disabled="true"] { opacity: .4; cursor: default; }
     .note { flex: none; font-size: 11px; color: #6f7883; }
     .note.acts { color: #ffb36b; }
     .entry[data-armed] .note { color: #ff7b7b; }
     .small { padding: 3px 8px; border: 0; border-radius: 6px; background: #252a31; cursor: pointer; }
-    .small:hover { background: #313741; color: #fff; }
+    .small:hover:not(:disabled) { background: #313741; color: #fff; }
+    .small:disabled { opacity: .4; cursor: default; }
+    .small[data-armed] { color: #ff7b7b; }
     .empty { padding: 6px 8px; color: #6f7883; }
   </style>
   <div class="panel" role="dialog" aria-label="Dialog launcher">
     <div class="head">
-      <div class="title">Dialogs <span><button class="small" data-hide>Hide</button> <button class="small" data-stop>Stop</button></span></div>
-      <select data-game aria-label="Game for the real entries"></select>
+      <div class="title">Dialogs <span><button class="small" data-repeat disabled>Repeat</button> <button class="small" data-hide>Hide</button> <button class="small" data-stop>Stop</button></span></div>
+      <input data-game list="se-dl-games" autocomplete="off" spellcheck="false" placeholder="Game" aria-label="Game for the real entries">
+      <datalist id="se-dl-games"></datalist>
+      <input data-filter type="search" autocomplete="off" spellcheck="false" placeholder="Filter dialogs" aria-label="Filter dialogs">
     </div>
     <div class="list" data-list></div>
   </div>`;
 
   const list = root.querySelector('[data-list]');
-  const select = root.querySelector('[data-game]');
+  const gameField = root.querySelector('[data-game]');
+  const gameList = root.querySelector('datalist');
+  const filter = root.querySelector('[data-filter]');
+  const repeatButton = root.querySelector('[data-repeat]');
   const failed = new Set();
 
+  // The game picked, kept for the session so Stop and a new launcher start on it
+  const GAME_KEY = 'se-dialog-launcher-game';
+  const savedGame = () => {
+    try {
+      return Number(sessionStorage.getItem(GAME_KEY)) || 0;
+    } catch {
+      return 0; // storage refused: start on the first game
+    }
+  };
+  const saveGame = () => {
+    try {
+      sessionStorage.setItem(GAME_KEY, String(appid));
+    } catch { /* storage refused: the pick lasts until Stop */ }
+  };
+
+  // Each game's label in the field: a name shared by two games carries its appid
+  let labels = new Map();
   const fillGames = () => {
     const options = games();
-    select.replaceChildren(...options.map((game) => {
+    const counts = new Map();
+    options.forEach((game) => counts.set(game.name, (counts.get(game.name) || 0) + 1));
+    labels = new Map(options.map((game) => [game.appid,
+      `${game.name}${counts.get(game.name) > 1 ? ` (${game.appid})` : ''}${game.installed ? '' : ' (not installed)'}`]));
+    gameList.replaceChildren(...options.map((game) => {
       const option = document.createElement('option');
-      option.value = String(game.appid);
-      option.textContent = `${game.name}${game.installed ? '' : ' (not installed)'}`;
+      option.value = labels.get(game.appid);
       return option;
     }));
-    appid = options[0]?.appid || 0;
+    const saved = savedGame();
+    appid = labels.has(saved) ? saved : options[0]?.appid || 0;
+    gameField.value = labels.get(appid) || '';
+  };
+  const pickGame = () => {
+    const text = gameField.value.trim();
+    for (const [id, label] of labels) {
+      if (label === text) {
+        appid = id;
+        saveGame();
+        return;
+      }
+    }
+    gameField.value = labels.get(appid) || ''; // not a listed game: keep the current one
+  };
+
+  // The entry last run (a list key), for Repeat and R
+  let last = '';
+  const nameOf = (key) => (key.startsWith('r') ? recorded[Number(key.slice(1))]?.name : ENTRIES[Number(key.slice(1))]?.[1]) || '';
+  const syncRepeat = () => {
+    repeatButton.disabled = !last;
+    repeatButton.title = last ? `Repeat ${nameOf(last)} (R)` : 'Nothing run yet';
   };
 
   function renderList() {
+    disarm();
+    const query = filter.value.trim().toLowerCase();
     const groups = new Map();
     ENTRIES.forEach(([group, name, , note], i) => {
       if (!groups.has(group)) groups.set(group, []);
@@ -313,53 +436,104 @@
     groups.set('Recorded', recorded.map((item, i) => ({ key: `r${i}`, name: item.name, note: item.at.toLocaleTimeString() })));
     const parts = [];
     for (const [group, items] of groups) {
-      parts.push(`<h3>${group}</h3>`);
+      const matches = query ? items.filter((item) => item.name.toLowerCase().includes(query)) : items;
+      if (query && !matches.length) continue;
+      parts.push(group === 'Recorded'
+        ? `<h3>${group} <button class="small" data-clear${recorded.length ? '' : ' disabled'}>Clear</button></h3>`
+        : `<h3>${group}</h3>`);
       if (!items.length) {
         parts.push(`<div class="empty">${unrecord ? 'Dialogs Steam shows from now on appear here.' : "Steam's modal manager wasn't found: nothing is recorded."}</div>`);
       }
-      for (const { key, name, note } of items) {
+      for (const { key, name, note } of matches) {
         const acts = note && note.includes('acts');
-        const label = name.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
-        parts.push(`<button class="entry" data-key="${key}"${failed.has(key) ? ' aria-disabled="true"' : ''}><span>${label}</span>${note ? `<span class="note${acts ? ' acts' : ''}">${note}</span>` : ''}</button>`);
+        parts.push(`<button class="entry" data-key="${key}"${failed.has(key) ? ' aria-disabled="true"' : ''}><span>${SE.esc(name)}</span>${note ? `<span class="note${acts ? ' acts' : ''}">${SE.esc(note)}</span>` : ''}</button>`);
       }
     }
+    if (!parts.length) parts.push('<div class="empty">No dialog matches.</div>');
     list.innerHTML = parts.join('');
   }
 
-  // An entry that acts needs a second click, so a stray click can't run it
+  // An entry that acts needs a second click (or R), so a stray one can't run it
   let armed = '';
-  const runEntry = (button) => {
-    const key = button.dataset.key;
+  function disarm() {
+    const button = list.querySelector('[data-armed]');
+    if (button) {
+      button.removeAttribute('data-armed');
+      button.querySelector('.note').textContent = ENTRIES[Number(button.dataset.key.slice(1))][3];
+    }
+    repeatButton.removeAttribute('data-armed');
+    repeatButton.textContent = 'Repeat';
+    armed = '';
+  }
+  // `anchor`: what a menu opens at when the entry's own button is filtered out
+  const runEntry = (key, anchor) => {
     if (failed.has(key)) return;
+    const button = list.querySelector(`[data-key="${key}"]`);
     if (key.startsWith('r')) {
       const item = recorded[Number(key.slice(1))];
-      if (item) showMock(item.type, neutralized(item.props));
+      if (!item) return;
+      disarm();
+      last = key;
+      syncRepeat();
+      showMock(item.type, neutralized(item.props));
       return;
     }
     const [, , run, note = ''] = ENTRIES[Number(key.slice(1))];
     if (note.includes('acts') && armed !== key) {
+      disarm();
       armed = key;
-      list.querySelector('[data-armed]')?.removeAttribute('data-armed');
-      button.setAttribute('data-armed', '');
-      button.querySelector('.note').textContent = 'click again';
+      if (button) {
+        button.setAttribute('data-armed', '');
+        button.querySelector('.note').textContent = 'click again';
+      }
+      if (key === last) {
+        repeatButton.setAttribute('data-armed', '');
+        repeatButton.textContent = 'Again';
+      }
       return;
     }
-    armed = '';
-    if (SE.run(run) === false) {
+    disarm();
+    last = key;
+    syncRepeat();
+    if (SE.run(run, button || anchor) === false) {
       failed.add(key);
       renderList();
     }
   };
+  const repeatLast = () => {
+    if (last) runEntry(last, repeatButton);
+  };
 
   const onClick = (event) => {
     const button = event.target.closest('button');
-    if (!button) return;
+    if (!button || button.disabled) return;
     if (button.hasAttribute('data-hide')) toggle();
     else if (button.hasAttribute('data-stop')) destroy();
-    else if (button.dataset.key) runEntry(button);
+    else if (button.hasAttribute('data-repeat')) repeatLast();
+    else if (button.hasAttribute('data-clear')) {
+      recorded.length = 0;
+      if (last.startsWith('r')) last = '';
+      syncRepeat();
+      renderList();
+    } else if (button.dataset.key) runEntry(button.dataset.key, button);
   };
-  const onChange = () => {
-    appid = Number(select.value) || 0;
+  // Typing re-renders once a frame at most
+  let filterFrame = 0;
+  const onFilter = () => {
+    cancelAnimationFrame(filterFrame);
+    filterFrame = requestAnimationFrame(renderList);
+  };
+  const onGameFocus = () => gameField.select();
+  const editable = (el) => !!el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
+  const onKey = (event) => {
+    if (!shown || event.repeat || event.key.toLowerCase() !== 'r') return;
+    if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) return;
+    // From outside, a closed shadow root's target is its host: the panel's focus says which field
+    const target = event.composedPath()[0];
+    if (editable(target === host ? root.activeElement : target) || !last) return;
+    event.preventDefault();
+    event.stopPropagation();
+    repeatLast();
   };
 
   let shown = true;
@@ -370,17 +544,25 @@
   };
   const destroy = () => {
     unrecord?.();
+    cancelAnimationFrame(filterFrame);
     root.removeEventListener('click', onClick);
-    select.removeEventListener('change', onChange);
+    gameField.removeEventListener('change', pickGame);
+    gameField.removeEventListener('focus', onGameFocus);
+    filter.removeEventListener('input', onFilter);
+    document.removeEventListener('keydown', onKey, true);
     host.remove();
-    delete window.__seDialogLauncher;
+    delete window.__seDialogLauncher; // the recorded list stays for the next launcher
   };
 
   root.addEventListener('click', onClick);
-  select.addEventListener('change', onChange);
+  gameField.addEventListener('change', pickGame);
+  gameField.addEventListener('focus', onGameFocus);
+  filter.addEventListener('input', onFilter);
+  document.addEventListener('keydown', onKey, true);
   startRecording();
   fillGames();
   renderList();
+  syncRepeat();
   document.body.append(host);
 
   window.__seDialogLauncher = { toggle, destroy };

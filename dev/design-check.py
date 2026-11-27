@@ -4,12 +4,17 @@
 
 Flags (each one breaks a rule):
   - contrast: a rule setting both a text colour and a solid background below WCAG AA
-    (4.5:1, 3:1 from 24 px; disabled controls are exempt)
+    (4.5:1, 3:1 from 24 px; disabled controls are exempt); a rule painting --se-hover or
+    --se-selected without re-pointing --se-text-faint, --se-label-color and --se-offline to
+    --se-text-muted (too faint there)
   - focus: a :focus / :focus-visible rule taking the outline away with no other focus style
     for that control anywhere in the theme (background, shadow, border, colour, opacity,
     transform, filter, a custom property; on it or a part of it)
   - motion: a transition or keyframes moving a layout property (width, height, top, margin...)
     with no comment in or right before the rule saying why
+  - easing: a bare CSS easing keyword (ease, ease-in, ease-out, ease-in-out) in a transition or
+    animation: a --se-ease-* token (the generated spinner pictures, whose SVGs carry their own
+    CSS, are left out)
   - font: a typeface named in a feature file, fallbacks too (only --se-font and
     --se-font-mono; core/font.css and the font options name faces)
   - icon colour: an inline SVG in a script with a baked fill or stroke (icons are
@@ -17,12 +22,12 @@ Flags (each one breaks a rule):
   - blur: a raw blur() in backdrop-filter (always a --se-blur-* token: settings flip them)
 
 Notes (look, then decide):
-  - contrast: text tokens under AA on a surface token (fine if that pair never meets)
+  - contrast: text tokens under AA on a surface token (fine if that pair never meets; the
+    re-pointed three skip hover and selected)
   - hit target: a theme button or link sized under 32 px (one whose ::before or ::after reaches
     past it with a negative inset counts as grown and is not listed)
   - duplicates: the same @keyframes in more than one place, a spinning keyframes outside
     core/spinner.css and core/motion.css
-  - blur: a raw blur() in filter (art blur; glass goes through --se-blur-*)
 
 Reads core/tokens.css for token values. Skips hidden folders, dev/, vendor files and
 core/tokens.css itself.
@@ -47,6 +52,11 @@ GENERIC_FACES ={'inherit', 'initial', 'unset', 'revert', 'sans-serif', 'serif', 
 TEXT_TOKENS = ['text', 'text-strong', 'text-dim', 'text-muted', 'text-faint', 'label-color', 'offline', 'danger',
                'danger-text', 'gold-text', 'accent', 'link']
 SURFACE_TOKENS = ['bg', 'sidebar', 'surface', 'surface-2', 'hover', 'selected', 'field']
+# Too faint for a hover or selected row: every rule painting one re-points them to muted
+REPOINTED = ['text-faint', 'label-color', 'offline']
+ROW_SURFACES = {'hover', 'selected'}
+ROW_BG = re.compile(r'^var\(--se-(?:hover|selected)\)(?:\s*!important)?$')
+PSEUDO_END = re.compile(r'::?(?:before|after|-webkit-scrollbar[\w-]*|placeholder|selection|marker)\s*$')
 
 
 def rel(path):
@@ -203,11 +213,26 @@ def contrast_checks(sheets, tokens):
             continue
         low = []
         for s in SURFACE_TOKENS:
+            if t in REPOINTED and s in ROW_SURFACES:
+                continue
             bg = parse_color(f'var(--se-{s})', tokens)
             if bg and contrast(fg, bg) < 4.5:
                 low.append(f'{s} {contrast(fg, bg):.2f}')
         if low:
             notes.append(f'contrast: --se-{t} under AA on ' + ', '.join(low))
+    # A hover or selected background without the faint tokens re-pointed
+    for f, raw in sheets.items():
+        for selector, decls, start, end, line in rules(raw):
+            d = dict(decls)
+            bgv = d.get('background-color') or d.get('background') or ''
+            if not ROW_BG.match(bgv.strip()):
+                continue
+            if all(PSEUDO_END.search(x) for x in selector.split(',') if x.strip()):
+                continue
+            missing = [t for t in REPOINTED if f'--se-{t}' not in d]
+            if missing:
+                flags.append(f'contrast: {f}:{line}: {selector}: paints {bgv.strip()} without re-pointing '
+                             + ', '.join(f'--se-{t}' for t in missing) + ' (to var(--se-text-muted))')
     return flags, notes
 
 
@@ -271,6 +296,24 @@ def motion_checks(sheets):
     return flags
 
 
+EASING = re.compile(r'(?<![\w-])(?:ease-in-out|ease-out|ease-in|ease)(?![\w-])')
+TIMED = {'transition', 'animation', 'transition-timing-function', 'animation-timing-function'}
+# Generated SVG pictures whose own CSS (in a data URL, which no token reaches) animates
+GENERATED = {'client/settings/theme/spinner-previews.css'}
+
+
+def easing_checks(sheets):
+    flags = []
+    for f, raw in sheets.items():
+        if f in GENERATED:
+            continue
+        for selector, decls, start, end, line in rules(raw):
+            for p, v in decls:
+                if p in TIMED and EASING.search(v):
+                    flags.append(f'easing: {f}:{line}: {selector}: {p}: {v.strip()} (a --se-ease-* token)')
+    return flags
+
+
 # ---------- Type, icons, blur ----------
 
 def font_checks(sheets):
@@ -308,7 +351,7 @@ def icon_checks(scripts):
 
 
 def blur_checks(sheets):
-    flags, notes = [], []
+    flags = []
     for f, raw in sheets.items():
         for selector, decls, start, end, line in rules(raw):
             for p, v in decls:
@@ -316,9 +359,9 @@ def blur_checks(sheets):
                     continue
                 if p in ('backdrop-filter', '-webkit-backdrop-filter'):
                     flags.append(f'blur: {f}:{line}: {selector}: {p}: {v} (a --se-blur-* token)')
-                elif p == 'filter':
-                    notes.append(f'blur: {f}:{line}: {selector}: filter: {v}')
-    return flags, notes
+                # filter: blur() is art's own (a backdrop, a glow), drawn like the "Page art"
+                # tokens: not the glass that --se-blur-* and the Glass setting reach
+    return flags
 
 
 # ---------- Hit targets and duplicates ----------
@@ -398,9 +441,10 @@ def main():
     sheets = {f: read(os.path.join(ROOT, f)) for f in sorted(walk('.css')) if f != 'core/tokens.css'}
     scripts = {f: read(os.path.join(ROOT, f)) for f in sorted(walk('.js'))}
     c_flags, c_notes = contrast_checks(sheets, tokens)
-    b_flags, b_notes = blur_checks(sheets)
-    flags = c_flags + focus_checks(sheets) + motion_checks(sheets) + font_checks(sheets) + icon_checks(scripts) + b_flags
-    notes = c_notes + hit_notes(sheets, scripts, tokens) + duplicate_notes(sheets) + b_notes
+    b_flags = blur_checks(sheets)
+    flags = (c_flags + focus_checks(sheets) + motion_checks(sheets) + easing_checks(sheets) + font_checks(sheets)
+             + icon_checks(scripts) + b_flags)
+    notes = c_notes + hit_notes(sheets, scripts, tokens) + duplicate_notes(sheets)
     for line in flags:
         print(line)
     if notes:

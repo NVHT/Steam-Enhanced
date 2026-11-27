@@ -1,8 +1,10 @@
 /*
  * Element picker, part 1 of 2 (dev/inspector.js names what it does), loaded just before it by
  * core/core.js: the plain-text reports, an element's (report(el, note, point): its page, theme
- * files, ancestors, outline, markup, styles, matching rules and the paint stack at `point`) and
- * the whole page's (pageReport()), on window.__seInspectorReport.
+ * files, ancestors, outline, markup, styles, matching rules, the theme tokens they read and the
+ * paint stack at `point`) and the whole page's (pageReport()), on window.__seInspectorReport;
+ * with them pathOf(el) (a CSS path that finds the element again after a reload), snapshot(el)
+ * (its computed styles, kept with a capture) and diff(a, b) (two snapshots compared).
  */
 (() => {
   if (window.__seInspectorReport) return;
@@ -20,6 +22,16 @@
     'background-color', 'background-image', 'color', 'border', 'border-radius', 'box-shadow',
     'font-family', 'font-size', 'font-weight', 'line-height', 'transform', 'translate', 'pointer-events',
   ];
+  // Compare: the report's styles and the common layout and paint ones beside them
+  const COMPARE_PROPS = [...new Set([
+    ...STYLE_PROPS, 'box-sizing', 'top', 'right', 'bottom', 'left', 'min-width', 'max-width', 'min-height',
+    'max-height', 'overflow-x', 'overflow-y', 'visibility', 'flex-direction', 'flex-wrap', 'flex', 'order',
+    'align-items', 'align-self', 'justify-content', 'gap', 'grid-template-columns', 'grid-template-rows',
+    'grid-area', 'border-top', 'border-right', 'border-bottom', 'border-left', 'outline', 'background-position',
+    'background-size', 'filter', 'backdrop-filter', 'clip-path', 'mask-image', 'mix-blend-mode', 'isolation',
+    'scale', 'rotate', 'letter-spacing', 'text-align', 'text-transform', 'text-overflow', 'white-space',
+    'cursor', 'transition', 'animation-name', 'contain', 'content-visibility',
+  ])];
 
   /* ---------- Describing elements ---------- */
 
@@ -156,13 +168,45 @@
     return out;
   };
 
-  /** Rules that match the element, in cascade order, from every stylesheet (Steam's included). */
-  const matchedRules = async (el) => {
+  /*
+   * Theme tokens: every --se-* a declaration reads (a var() fallback's nested vars too: the regex
+   * finds each var( on its own) and every --se-* one declares.
+   */
+  const TOKEN_USE = /var\(\s*(--se-[\w-]+)/g;
+  const tokensIn = (text, used) => {
+    for (const [, name] of text.matchAll(TOKEN_USE)) used.add(name);
+  };
+  const declared = (style, set) => {
+    for (let i = 0; i < (style?.length || 0); i++) if (style[i].startsWith('--se-')) set.add(style[i]);
+  };
+  // The element's --se-* values now, before the report waits on Steam's sheets (a hover may end)
+  const tokenValues = (el) => {
+    const style = getComputedStyle(el);
+    const values = new Map();
+    for (let i = 0; i < style.length; i++) {
+      if (style[i].startsWith('--se-')) values.set(style[i], style.getPropertyValue(style[i]).trim());
+    }
+    return values;
+  };
+  const tokenList = (el, used, set, early) => {
+    const names = [...new Set([...used, ...set])].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    const live = getComputedStyle(el);
+    return names.map((name) => {
+      const value = early.get(name) ?? live.getPropertyValue(name).trim();
+      return `  ${name}: ${value ? short(value, 140) : '(unset)'}${set.has(name) ? '  (set on it)' : ''}`;
+    });
+  };
+
+  /*
+   * Rules that match the element, in cascade order, from every stylesheet (Steam's included):
+   * the first MAX_RULES listed, every one read for tokens.
+   */
+  const matchedRules = async (el, used, set) => {
     const found = [];
+    let matched = 0;
     let blocked = 0;
     const visit = (rules, source, context) => {
       for (const rule of rules) {
-        if (found.length >= MAX_RULES) return;
         if (rule.cssRules && !rule.selectorText) {
           // @media and @container that don't apply now are skipped; @supports, @layer kept
           const condition = rule.media?.mediaText ?? rule.conditionText;
@@ -171,9 +215,15 @@
           continue;
         }
         if (!rule.selectorText) continue;
+        let hit = false;
         try {
-          if (el.matches(rule.selectorText)) found.push(`/* ${source}${context ? ` ${context.trim()}` : ''} */ ${short(rule.cssText, 500)}`);
-        } catch {} // selectors this engine rejects
+          hit = el.matches(rule.selectorText);
+        } catch { /* a selector this engine rejects: no match */ }
+        if (!hit) continue;
+        matched++;
+        if (found.length < MAX_RULES) found.push(`/* ${source}${context ? ` ${context.trim()}` : ''} */ ${short(rule.cssText, 500)}`);
+        tokensIn(rule.cssText, used);
+        declared(rule.style, set);
       }
     };
     const sheets = allSheets();
@@ -183,7 +233,7 @@
       if (lists[i]) visit(lists[i], source, '');
       else blocked++;
     });
-    return { found, blocked };
+    return { found, matched, blocked };
   };
 
   /*
@@ -437,6 +487,77 @@
   };
 
   /*
+   * A CSS path that finds the element again after a reload: up from it, each step its tag and
+   * stable attributes, then its classes, then :nth-of-type, only as far as it takes to tell it
+   * from its siblings, until the path matches it alone (or a unique id anchors it). Ids that look
+   * generated (React's :r1:, long numbers) aren't trusted. Null inside a shadow root.
+   */
+  const STABLE_ATTRS = ['data-testid', 'data-se-feature', 'data-se-action', 'data-se-icon', 'role', 'name'];
+  const quote = (value) => `"${value.replace(/["\\]/g, '\\$&')}"`;
+  const count = (selector) => {
+    try {
+      return document.querySelectorAll(selector).length;
+    } catch {
+      return 0; // a class or value this engine won't parse back: not unique
+    }
+  };
+  const matchesAny = (nodes, selector) => {
+    try {
+      return nodes.some((node) => node.matches(selector));
+    } catch {
+      return true; // unparsable: it tells nothing apart
+    }
+  };
+  const pathStep = (node) => {
+    let step = CSS.escape(node.localName);
+    for (const name of STABLE_ATTRS) {
+      const value = node.getAttribute(name);
+      if (value && value.length <= 60) step += `[${name}=${quote(value)}]`;
+    }
+    const siblings = node.parentElement ? [...node.parentElement.children] : [node];
+    const others = siblings.filter((child) => child !== node);
+    if (!matchesAny(others, step)) return step;
+    const classes = [...node.classList].map((c) => `.${CSS.escape(c)}`).join('');
+    if (classes && !matchesAny(others, step + classes)) return step + classes;
+    const index = siblings.filter((child) => child.localName === node.localName).indexOf(node) + 1;
+    return `${step}:nth-of-type(${index})`;
+  };
+  const pathOf = (el) => {
+    if (!(el instanceof Element) || el.getRootNode() !== document) return null;
+    const steps = [];
+    for (let node = el; node && node !== document.documentElement && steps.length < MAX_DEPTH; node = node.parentElement) {
+      if (node.id && !/:|\d{4,}/.test(node.id) && count(`#${CSS.escape(node.id)}`) === 1) {
+        steps.unshift(`#${CSS.escape(node.id)}`);
+        break;
+      }
+      steps.unshift(pathStep(node));
+      if (count(steps.join(' > ')) === 1) break;
+    }
+    return steps.join(' > ');
+  };
+
+  /** The element's computed styles for a later compare (plain data: it's kept in sessionStorage). */
+  const snapshot = (el) => {
+    const style = getComputedStyle(el);
+    const props = {};
+    for (const prop of COMPARE_PROPS) props[prop] = style.getPropertyValue(prop);
+    return { label: label(el), props };
+  };
+
+  /** Two snapshots' differing styles, A → B: the compare section at the top of B's report. */
+  const diff = (a, b, aName = 'A', bName = 'B') => {
+    const lines = COMPARE_PROPS
+      .filter((prop) => (a.props[prop] ?? '') !== (b.props[prop] ?? ''))
+      .map((prop) => `  ${prop}: ${short(a.props[prop] || '(none)', 140)} → ${short(b.props[prop] || '(none)', 140)}`);
+    return [
+      `Compare (computed styles that differ, A → B, of ${COMPARE_PROPS.length}):`,
+      `  A: ${a.label}  (${aName})`,
+      `  B: ${b.label}  (${bName})`,
+      ...(lines.length ? lines : ['  (no differences)']),
+    ].join('\n');
+  };
+
+  /*
    * Everything read from the live page is read first, in one go, before the report waits on
    * Steam's stylesheets: by the time they arrive a hover popup may have closed.
    */
@@ -445,6 +566,11 @@
     const inline = el.getAttribute('style');
     const before = styles(el, '::before');
     const after = styles(el, '::after');
+    const used = new Set();
+    const set = new Set();
+    tokensIn(inline || '', used);
+    declared(el.style, set);
+    const early = tokenValues(el);
     const head = [
       'Steam Enhanced element report',
       `Page: ${document.title || '(untitled)'} — ${location.href}`,
@@ -477,18 +603,22 @@
       `Paint stack at the pointer (${lastPoint ? `${Math.round(lastPoint.x)},${Math.round(lastPoint.y)}` : '?'}; front to back):`,
       stack(lastPoint),
     ];
-    const { found, blocked } = await matchedRules(el);
+    const { found, matched, blocked } = await matchedRules(el, used, set);
+    const tokens = tokenList(el, used, set, early);
     return [
       ...head,
       '',
-      `Matching rules (${found.length}${found.length >= MAX_RULES ? '+' : ''}; ${blocked} stylesheet(s) unreadable even fetched):`,
+      `Matching rules (${matched}${matched > found.length ? `, first ${found.length} listed` : ''}; ${blocked} stylesheet(s) unreadable even fetched):`,
       found.join('\n') || '  (none)',
+      '',
+      `Theme tokens (${tokens.length}; read or set by its rules and inline style, values on it):`,
+      tokens.join('\n') || '  (none)',
       '',
       ...tail,
     ]
       .filter((line) => line !== '')
       .join('\n')
-      .replace(/\n(?=Element:|Ancestors|Structure:|Markup:|Inline style|Computed style:|Matching rules|Paint stack|Shadows reaching)/g, '\n\n');
+      .replace(/\n(?=Element:|Ancestors|Structure:|Markup:|Inline style|Computed style:|Matching rules|Theme tokens|Paint stack|Shadows reaching)/g, '\n\n');
   };
 
   /*
@@ -532,5 +662,5 @@
       .replace(/\n(?=Steam stylesheets:|Structure)/g, '\n\n');
   };
 
-  window.__seInspectorReport = { report, pageReport };
+  window.__seInspectorReport = { report, pageReport, pathOf, snapshot, diff };
 })();

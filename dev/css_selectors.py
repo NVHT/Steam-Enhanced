@@ -135,8 +135,8 @@ def last_compound(sel):
 def write_out(sel):
     """The selector's `:is()` key written out as a list keeping its weight, or None when it has no
     such key, or writing it out would change what it matches or outweigh it by more than a tag
-    (an argument with no key, an id against a class, a complex argument starting at html, body
-    or :root under a prefix)."""
+    (an argument with no key, an id against a class, a complex argument under a prefix: in
+    `X :is(A B)` A may sit outside X, which `X A B` doesn't match)."""
     start, r = last_compound(sel)
     if not r or keyed(r) or not r.startswith(':is('):
         return None
@@ -146,7 +146,7 @@ def write_out(sel):
         return None
     rest = r[end + 1:]
     prefix = sel[:start]
-    if prefix.strip() and any(len(compounds(a)) > 1 and re.match(r'^(html|body|:root)\b', compounds(a)[0]) for a in args):
+    if prefix.strip() and any(len(compounds(a)) > 1 for a in args):
         return None
     if not all(keyed(compounds(a)[-1]) for a in args):
         return None
