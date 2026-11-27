@@ -49,12 +49,14 @@
     $.add(() => button.remove());
     const page = document.body ?? document.documentElement;
     // The page scrolls <body>'s box and its margins: those read once, in the first entry (right
-    // after a layout), as no site changes them later
+    // after a layout), as no site changes them later; the scroll too, for a page that opened
+    // already scrolled (no scroll event follows)
     let margins = null;
     const resize = new ResizeObserver(([entry]) => {
       if (margins === null) {
         const style = getComputedStyle(page);
         margins = (parseFloat(style.marginTop) || 0) + (parseFloat(style.marginBottom) || 0);
+        y = scrollY;
       }
       pageH = (entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height) + margins;
       update();

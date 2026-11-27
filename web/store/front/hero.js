@@ -146,10 +146,10 @@
 
     const artCache = createCache('se-store-library-art-v1', (entry) => Boolean(entry.logo || entry.hero));
     const detailsCache = createCache(`se-store-details-v3-${pageLanguage}`, (entry) => Boolean(entry.description || entry.shots?.length || entry.header));
-    // v2 had no type; its entries would keep a sale's slide drawn as a game for a week
+    // Older versions' entries (v1, 1.5.0's; v2 had no type), unused: dropped from storage
     try {
-      localStorage.removeItem(`se-store-details-v2-${pageLanguage}`);
-    } catch { /* storage refused: the old entry stays, unused */ }
+      for (const v of [1, 2]) localStorage.removeItem(`se-store-details-v${v}-${pageLanguage}`);
+    } catch { /* storage refused: the old entries stay, unused */ }
 
     const fetchLibraryArt = async (appid) => {
       try {

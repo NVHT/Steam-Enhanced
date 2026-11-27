@@ -797,9 +797,13 @@
 
     // `active` usually asks visibility and fn often reads layout: both wait for the next
     // layout (settled), where a timer landing mid-build no longer pays the style pass.
+    // A refresh() while a pass waits joins it: that pass then runs fn too
     let settling = false;
-    const pass = (runFn) => {
+    let runPending = false;
+    const pass = () => {
+      const runFn = runPending;
       settling = false;
+      runPending = false;
       if (stopped || !isDocumentVisible()) {
         isActive = false;
         return;
@@ -823,9 +827,10 @@
         isActive = false;
         return;
       }
+      runPending ||= runFn;
       if (settling) return;
       settling = true;
-      settled(() => pass(runFn), doc);
+      settled(pass, doc);
     };
 
     const wake = () => {
