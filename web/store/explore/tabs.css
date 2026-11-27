@@ -1,0 +1,511 @@
+/*
+ * The explore lists, continued (page.css, listed just before): the tabbed list ("Popular New
+ * Releases" / "New Releases"), its preview card, the block footers and links, and narrow windows
+ * (which re-lay page.css's sections too).
+ */
+
+/* ---------- Tabbed list ("Popular New Releases" / "New Releases") ----------
+ * Classic markup: .home_tab_col > .home_tabs_row_ctn (div.home_tab tabs, TabSelect) and
+ * .home_tabs_content > .tab_content > .tab_content_items > a.tab_item. Styled as the store
+ * front's ranked list: segmented tabs, numbered rows with tag chips (explore/page.js) and the
+ * shared price chip.
+ */
+
+/*
+ * Two columns: the list, and Steam's right column ("Under $10", "Under $5") beside it. Steam
+ * floats them at fixed widths; a flex row lets the list take the room the side column leaves.
+ */
+html.se-store-explore:not(#se-none) .page_content:has(> [data-se-explore-tabs]) {
+  display: flex !important;
+  align-items: flex-start;
+  gap: var(--se-space-6);
+}
+
+html.se-store-explore:not(#se-none) .page_content:has(> [data-se-explore-tabs]) > div[style*="clear"] {
+  display: none !important;
+}
+
+html.se-store-explore:not(#se-none) .page_content:has(> [data-se-explore-tabs]) > :not([data-se-explore-tabs], input) {
+  flex: 0 0 clamp(340px, 30%, 520px);
+  float: none !important;
+  width: auto !important;
+  min-width: 0;
+  margin-inline: 0 !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] {
+  flex: 1 1 auto;
+  min-width: 0;
+  float: none !important;
+  width: auto !important;
+  margin: var(--se-space-7) 0 0 !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tab_bg {
+  display: none !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tabs_row_ctn {
+  display: inline-flex;
+  width: auto !important;
+  max-width: 100%;
+  margin: 0 0 var(--se-space-5) !important;
+  padding: var(--se-space-1) !important;
+  border-radius: var(--se-radius-lg) !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .store_horizontal_minislider_ctn {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .store_horizontal_minislider_ctn > .slider_left,
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .store_horizontal_minislider_ctn > .slider_right {
+  display: none !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tabs_row {
+  display: flex !important;
+  gap: var(--se-space-1);
+  overflow: visible !important;
+  white-space: nowrap;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tab {
+  display: inline-flex !important;
+  align-items: center;
+  height: var(--se-ctl);
+  margin: 0 !important;
+  padding: 0 var(--se-space-4) !important;
+  border: 0 !important;
+  border-radius: var(--se-radius-md);
+  background: transparent !important;
+  color: var(--se-text-muted) !important;
+  cursor: pointer;
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600;
+  transition: color var(--se-dur), background-color var(--se-dur);
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tab .tab_content {
+  padding: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  text-transform: none !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tab:hover {
+  color: var(--se-text) !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tab.active {
+  background: var(--se-selected) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
+  color: var(--se-white) !important;
+}
+
+/* Rows */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_content_items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  counter-reset: se-explore-rank;
+}
+
+/* Upcoming lists its rows straight in .tab_content (no .tab_content_items); Steam toggles
+   that box's display, so it stays a block and the rows space themselves. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .home_tabs_content > .tab_content {
+  counter-reset: se-explore-rank;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_content > .tab_item + .tab_item {
+  margin-top: var(--se-space-2) !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-4);
+  height: auto !important;
+  min-height: 0;
+  margin: 0 !important;
+  padding: var(--se-space-2) var(--se-space-3) var(--se-space-2) var(--se-space-2) !important;
+  border-radius: var(--se-radius-lg);
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--se-text);
+  text-decoration: none !important;
+  counter-increment: se-explore-rank;
+  transition: background-color var(--se-dur);
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item:is(:hover, :focus-visible) {
+  background: var(--se-surface-2) !important;
+  outline: none;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item::before {
+  content: counter(se-explore-rank);
+  order: -2;
+  flex: none;
+  width: 28px;
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-xl);
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item:hover::before {
+  color: var(--se-text);
+}
+
+/* Steam places the art and price absolutely and pads the text past them; all back in the row. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .tab_item_cap,
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .tab_item_discount,
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .tab_item_content,
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .release_date,
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .prepurchase_price_ctn {
+  position: static !important;
+  inset: auto !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item_cap {
+  order: -1;
+  flex: none;
+  float: none !important;
+  width: 152px !important;
+  height: auto !important;
+  aspect-ratio: 184 / 69;
+  margin: 0 !important;
+  border-radius: var(--se-radius-md);
+  overflow: hidden;
+  background: var(--se-black-30);
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item_cap_img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item_content {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex !important;
+  flex-direction: column;
+  gap: var(--se-space-1);
+  float: none !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item_name {
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-lg) !important;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item_details {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  min-width: 0;
+}
+
+/* Steam's comma-joined tag line gives way to explore/page.js's chips. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item[data-se-explore-row] .tab_item_top_tags {
+  display: none !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .platform_img {
+  flex: none;
+  opacity: .55;
+}
+
+/* Price: the shared chip, right-aligned in a fixed column so prices line up row to row. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item_discount {
+  order: 2;
+  flex: none;
+  float: none !important;
+  margin: 0 0 0 auto !important;
+}
+
+/* Upcoming: release date, then Pre-Purchase over the price, at the row's end. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] {
+  --se-explore-price-w: 190px;
+}
+
+/* A row with no price yet keeps its date in the same column as the others. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item:not(:has(.tab_item_discount)) .release_date {
+  margin-right: calc(var(--se-explore-price-w) + var(--se-space-4)) !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .release_date {
+  order: 1;
+  flex: none;
+  width: 96px;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-sm) !important;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .prepurchase_price_ctn {
+  order: 2;
+  flex: none;
+  display: flex !important;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--se-space-1);
+  width: var(--se-explore-price-w) !important; /* fixed column: dates line up row to row */
+  margin: 0 !important;
+  padding: 0 !important;
+  float: none !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .prepurchase_price_ctn .tab_item_discount {
+  margin: 0 !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item > div[style*="clear"] {
+  display: none !important;
+}
+
+/* The "•••" options button: on the art's top-right corner. Art starts at 8 + 28 + 16px. */
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .ds_options {
+  position: absolute !important;
+  top: 12px !important;
+  left: calc(52px + 152px - 30px) !important;
+  right: auto !important;
+  z-index: var(--se-z-raised-2);
+  margin: 0 !important;
+}
+
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .ds_flag {
+  top: 12px !important;
+  left: 56px !important;
+  z-index: var(--se-z-raised-2);
+  padding: var(--se-space-half) var(--se-space-2) !important;
+}
+
+/* A bucket heading's "Browse All" (span.right): the same pill, at the row's far end. */
+html.se-store-explore:not(#se-none) .bucket > h2 .right {
+  float: none !important;
+  align-self: center;
+  margin-left: auto !important;
+}
+
+/* Steam paints the side column itself with the preview's light blue gradient (a strip shows
+   above the card); the column stays clear. */
+html.se-store-explore:not(#se-none) .home_rightcol {
+  background: none !important;
+  background-image: none !important;
+}
+
+/* ---------- Preview card (#tab_preview_container) ----------
+ * Upcoming's right column: Steam's preview of the list's focused row (title, reviews, tags,
+ * four screenshots) on a light blue gradient. Here a theme card like the store front's
+ * spotlight, as tall as the list: the first screenshot edge to edge, the details, then the
+ * other screenshots stacked. Steam still swaps .focus between rows as you point at them.
+ */
+/*
+ * The card runs the list's full height: the row stretches both columns, the side column
+ * hands its height to the card, and the card's screenshots share whatever is left. Steam's
+ * scroll-follow (an inline margin-top it updates on scroll) is off; the card no longer moves.
+ */
+html.se-store-explore:not(#se-none) .page_content:has(> [data-se-explore-tabs]):has(#tab_preview_container) {
+  align-items: stretch;
+}
+
+html.se-store-explore:not(#se-none) .home_rightcol:has(> #tab_preview_container) {
+  display: flex !important;
+  flex-direction: column;
+  height: auto !important;
+  margin-top: var(--se-space-7) !important; /* level with the list's tabs */
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container {
+  position: relative !important;
+  inset: auto !important;
+  flex: 1 1 auto;
+  min-height: 640px;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  background-image: none !important;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_preview:not(.focus) {
+  display: none !important;
+}
+
+/* The focused preview fills the card: hero, title, reviews, tags, then the remaining
+   screenshots stacked full width, sharing the height that is left. */
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_preview.focus {
+  position: absolute !important;
+  inset: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: var(--se-space-3);
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 var(--se-space-4) var(--se-space-4) !important;
+  background: none !important;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_preview > * {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .screenshot {
+  grid-column: 1 / -1;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0;
+  margin: 0 !important;
+  border-radius: var(--se-radius-sm);
+  background-size: cover !important;
+  background-position: center !important;
+  background-color: var(--se-on-accent);
+}
+
+/* The first shot is the card's hero, edge to edge at the top. */
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_preview > .screenshot:not(.screenshot ~ .screenshot) {
+  order: -1;
+  grid-column: 1 / -1;
+  aspect-ratio: 16 / 9;
+  margin: 0 calc(-1 * var(--se-space-4)) var(--se-space-1) !important;
+  border-radius: 0;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_title {
+  display: block;
+  height: auto !important;
+  padding: 0 !important;
+  overflow: hidden;
+  color: var(--se-text) !important;
+  font-size: var(--se-fs-2xl) !important;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Reviews: the label muted, the verdict in its colour. */
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_review_summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--se-space-2);
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .tab_review_summary .title {
+  color: var(--se-text-faint) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .game_review_summary {
+  font-size: var(--se-fs-base) !important;
+  font-weight: 600;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .game_review_summary.positive { color: var(--se-review-positive) !important; }
+html.se-store-explore:not(#se-none) #tab_preview_container .game_review_summary.mixed { color: var(--se-gold) !important; }
+html.se-store-explore:not(#se-none) #tab_preview_container .game_review_summary.negative { color: var(--se-danger) !important; }
+html.se-store-explore:not(#se-none) #tab_preview_container .game_review_summary.no_reviews { color: var(--se-text-muted) !important; }
+
+/* Tags: the list rows' chips, as links. */
+html.se-store-explore:not(#se-none) #tab_preview_container .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--se-space-2);
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html.se-store-explore:not(#se-none) #tab_preview_container .tags a {
+  box-shadow: none !important;
+}
+
+/* ---------- Block footers ("Browse all: Under $10 · Under $5"), "See more" and heading links ----------
+ * Steam's dark strip with blue fade buttons becomes a muted label and the store front's pill
+ * buttons, sitting on the page under the block.
+ */
+
+html.se-store-explore:not(#se-none) :is(.home_block_footer, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: auto !important;
+  margin: var(--se-space-4) 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: var(--se-text-muted) !important;
+  font-size: var(--se-fs-base) !important;
+  line-height: 1.2 !important;
+}
+
+html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right, [data-se-explore-tabs] :is(.tab_see_more, .see_more_link)) a > span {
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+  color: inherit !important;
+  font: inherit !important;
+  line-height: inherit !important;
+}
+
+/* Their chevron is the store front's (web/store/shared/rows.css, "Pill button with a chevron"). */
+
+/* ---------- Narrow windows ---------- */
+
+@media (max-width: 1400px) {
+  html.se-store-explore:not(#se-none) .bucket .store_horizontal_autoslider_ctn {
+    --se-explore-row-cols: 4;
+  }
+}
+
+@media (max-width: 910px) {
+  html.se-store-explore:not(#se-none) [data-se-explore-feature] {
+    grid-template-columns: 1fr;
+  }
+
+  html.se-store-explore:not(#se-none) .bucket .store_horizontal_autoslider_ctn {
+    --se-explore-row-cols: 2;
+  }
+
+  html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_static_pos_4,
+  html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_static_pos_5 {
+    display: none !important;
+  }
+}

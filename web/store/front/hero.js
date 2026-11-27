@@ -78,11 +78,15 @@
     /*
      * The game a slide is for: the app its link opens (store.steampowered.com/app/<id>), else
      * the first of its data-ds-appid. A promotion (the Steam Awards, a sale) links to its own page
-     * and names app 0 or an advertising app (its store details' type, applyStoreDetails); a bundle
-     * links to /bundle/: no game, so no game art, wishlist or lookups.
+     * and names app 0 or an advertising app (its store details' type, applyStoreDetails). A bundle
+     * or package links to /bundle/ or /sub/ and lists every app in it in data-ds-appid beside its
+     * data-ds-bundleid / -packageid (Steam's dynamicstore.js): no game, so no game art, wishlist
+     * or lookups.
      */
     const appOf = (link) => {
-      const id = /\/app\/(\d+)/.exec(link?.href ?? '')?.[1] ?? link?.dataset.dsAppid?.split(',')[0]?.trim();
+      const ds = link?.dataset;
+      const listed = ds?.dsBundleid || ds?.dsPackageid ? null : ds?.dsAppid?.split(',')[0]?.trim();
+      const id = /\/app\/(\d+)/.exec(link?.href ?? '')?.[1] ?? listed;
       return id && /^[1-9]\d*$/.test(id) ? id : null;
     };
 

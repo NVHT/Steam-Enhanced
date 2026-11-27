@@ -361,7 +361,7 @@ html.se-store-rows:not(#se-none) .content_hub_capsule_ctn .label {
 /* !important: opacity can come inline from Steam's markup or scripts */
 html.se-store-rows:not(#se-none) .content_hub_capsule_ctn .gradient {
   opacity: 1 !important;
-  background: linear-gradient(180deg, transparent 35%, rgba(8, 10, 14, .72));
+  background: linear-gradient(180deg, transparent 35%, color-mix(in srgb, var(--se-bg-ink) 72%, transparent));
 }
 
 /* ---------- Recommended by the community: one review card per page ---------- */
@@ -657,21 +657,37 @@ html.se-store-rows:not(#se-none) .mzAzU7-I6qg- .MFeNsPbs3Hc- {
   font-weight: 400;
 }
 
-/* Call to action: a round accent button under the text, its arrow nudging on hover. */
+/*
+ * Call to action: a round accent button under the text, its arrow nudging on hover. The disc is
+ * ::after (the text block's last flex item: Steam's discoveryqueuewidget.css makes it a column);
+ * the arrow, a mask in --se-on-accent, is ::before, moved after the disc (order) and pulled up
+ * over it by the disc's height and the column's gap.
+ */
 html.se-store-rows:not(#se-none) .mzAzU7-I6qg- .dycaOmod9zw-::after {
   content: "";
   width: 36px;
   height: 36px;
   margin-top: var(--se-space-2);
   border-radius: 50%;
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f1115' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E") center / 18px no-repeat,
-    var(--se-accent);
+  background: var(--se-accent);
   box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--se-accent) 70%, transparent);
   transition: transform var(--se-dur-slow) var(--se-ease), background-color var(--se-dur);
 }
 
-html.se-store-rows:not(#se-none) .mzAzU7-I6qg-:hover .dycaOmod9zw-::after {
+html.se-store-rows:not(#se-none) .mzAzU7-I6qg- .dycaOmod9zw-::before {
+  content: "";
+  order: 1;
+  width: 36px;
+  height: 36px;
+  margin-top: calc(-36px - var(--se-space-2));
+  background: var(--se-on-accent);
+  -webkit-mask: var(--se-icon-arrow-right) center / 18px no-repeat;
+  mask: var(--se-icon-arrow-right) center / 18px no-repeat;
+  transition: transform var(--se-dur-slow) var(--se-ease);
+}
+
+html.se-store-rows:not(#se-none) .mzAzU7-I6qg-:hover .dycaOmod9zw-::after,
+html.se-store-rows:not(#se-none) .mzAzU7-I6qg-:hover .dycaOmod9zw-::before {
   transform: translateX(4px);
 }
 
