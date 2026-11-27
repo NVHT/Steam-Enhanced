@@ -164,7 +164,7 @@
 
   const onOver = (event) => {
     const cover = event.target instanceof Element ? event.target.closest(COVER) : null;
-    if (scrollTimer) {
+    if (scrollTimer || held) {
       pending = cover;
       return;
     }
@@ -240,6 +240,35 @@
     clearHot();
   };
   document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+
+  /*
+   * A choice in one of the theme's popups (a shelf's sort picker, SE.placePop's .se-placed) closes
+   * it over the covers, and the cover under the pointer would open its card though the pointer
+   * never moved: the cards stay faded (data-se-shelf-held, shelf-hover.css) and no cover opens
+   * until the pointer moves, then the cover under it is taken up.
+   */
+  const HELD = 'data-se-shelf-held';
+  let held = null; // where the pointer was at the choice: { x, y }
+  const onChoose = (event) => {
+    if (!(event.target instanceof Element) || !event.target.closest('.se-placed')) return;
+    held = { x: event.clientX, y: event.clientY };
+    pending = null;
+    root.setAttribute(HELD, '');
+    clearPeek(true);
+    clearHot();
+  };
+  // A pointermove comes too when the page changes under a pointer standing still: a few px off
+  // the choice's place is a move
+  const onMove = (event) => {
+    if (!held || Math.abs(event.clientX - held.x) + Math.abs(event.clientY - held.y) < 4) return;
+    held = null;
+    root.removeAttribute(HELD);
+    const cover = pending?.isConnected ? pending : null;
+    pending = null;
+    enter(cover);
+  };
+  document.addEventListener('click', onChoose, true);
+  document.addEventListener('pointermove', onMove, { capture: true, passive: true });
   const onResize = () => { cardWidth = 0; };
   addEventListener('resize', onResize);
 
@@ -248,6 +277,9 @@
       watcher.disconnect();
       document.removeEventListener('pointerover', onOver, true);
       document.removeEventListener('scroll', onScroll, { capture: true });
+      document.removeEventListener('click', onChoose, true);
+      document.removeEventListener('pointermove', onMove, { capture: true });
+      root.removeAttribute(HELD);
       clearTimeout(scrollTimer);
       root.removeAttribute(SCROLLING);
       for (const card of gone) card.removeAttribute('data-se-gone');
