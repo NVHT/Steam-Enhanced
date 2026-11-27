@@ -1,5 +1,5 @@
 /*
- * Settings › page specifics, continued from pages.css: Interface.
+ * Settings › page specifics, continued from pages.css: Interface, and its Taskbar Preferences.
  */
 
 /*
@@ -13,13 +13,15 @@
  *
  * Narrower, the hero goes.
  */
+/* Kept short (a 240px window) so Steam's rows below fit the window with it */
 [id$="/settings/interface_Content"] .DialogBody > .se-ifc-preview {
+  --se-ifc-w: 240px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) var(--se-ifc-w);
   align-items: center;
   gap: var(--se-space-5);
-  margin-top: var(--se-space-5);
-  padding: var(--se-space-5);
+  margin-top: var(--se-space-4);
+  padding: var(--se-space-4) var(--se-space-5);
   border-radius: var(--se-radius-xl);
   background: linear-gradient(110deg, var(--se-surface) 40%, color-mix(in srgb, var(--se-accent) 10%, var(--se-surface)) 100%);
   box-shadow: var(--se-edge);
@@ -27,7 +29,7 @@
 
 /* The window: its bar, then the wireframe at the scale Steam draws at */
 .se-ifc-window {
-  --se-ifc-u: calc(360px / 1920);
+  --se-ifc-u: calc(var(--se-ifc-w) / 1920);
   position: relative;
   overflow: hidden;
   border-radius: var(--se-radius-lg);
@@ -36,7 +38,7 @@
 }
 
 .se-ifc-window[data-scaled] {
-  --se-ifc-u: calc(360px / 1920 * 1.25);
+  --se-ifc-u: calc(var(--se-ifc-w) / 1920 * 1.25);
 }
 
 .se-ifc-bar {
@@ -44,8 +46,8 @@
   align-items: center;
   justify-content: flex-end;
   gap: var(--se-space-2);
-  height: 24px;
-  padding: 0 var(--se-space-3);
+  height: 20px;
+  padding: 0 var(--se-space-2);
   box-shadow: inset 0 -1px 0 var(--se-hairline);
   font: 600 var(--se-fs-xs) / 1 var(--se-font);
   color: var(--se-text-muted);
@@ -115,11 +117,11 @@
 /* Ask which account: the picker over the client, as Steam opens */
 .se-ifc-account {
   position: absolute;
-  inset: 24px 0 0;
+  inset: 20px 0 0;
   display: none;
   align-items: center;
   justify-content: center;
-  gap: var(--se-space-3);
+  gap: var(--se-space-2);
   background: color-mix(in srgb, var(--se-bg-ink) 78%, transparent);
 }
 
@@ -128,8 +130,8 @@
 }
 
 .se-ifc-account > b {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border-radius: 23%;
   box-shadow: inset 0 0 0 2px var(--se-accent-line);
 }
@@ -235,5 +237,198 @@
 @media (prefers-reduced-motion: reduce) {
   .se-ifc-preview :is(.se-ifc-window, .se-ifc-chip, .se-ifc-title, .se-ifc-line, .se-ifc-bar > *) {
     transition: none;
+  }
+}
+
+/*
+ * Taskbar Preferences (client/settings/dialog/taskbar.js): the tray menu its switches build,
+ * beside them as you scroll, in the tray's look (client/tray/tray.css); each option's glyph is
+ * its --se-tray-icon (core/icons-nav.css). Narrower, the preview goes.
+ *
+ *   [ switches ··················· ]  [ (NV) NVHT              ]
+ *   [ ···························· ]  [ [▣] [▣] [▣] [▣] [▣]    ]
+ *   [ ···························· ]  [ [▣] [▣] [▣] [▣] [▣]    ]
+ *   [ ···························· ]  [ Exit Steam             ]
+ */
+[data-se-jl] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  column-gap: var(--se-space-5);
+  align-items: start;
+}
+
+[data-se-jl] > div:not(.se-jl) {
+  grid-column: 1;
+}
+
+/* Beside every row: Steam's sections and rows are the block's children, one grid row each */
+[data-se-jl] > .se-jl {
+  position: sticky;
+  top: var(--se-space-4);
+  grid-column: 2;
+  grid-row: 1 / span 40;
+}
+
+.se-jl-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-2);
+  padding: var(--se-space-3);
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+}
+
+.se-jl-head {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  padding-bottom: var(--se-space-2);
+  box-shadow: inset 0 -1px 0 var(--se-hairline);
+}
+
+.se-jl-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  border-radius: var(--se-avatar-radius);
+  background: var(--se-initials-bg);
+  font: var(--se-initials-weight) var(--se-fs-xs) var(--se-font);
+  letter-spacing: var(--se-initials-spacing);
+  color: var(--se-initials-ink);
+}
+
+.se-jl-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.se-jl-who {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-half);
+  min-width: 0;
+}
+
+.se-jl-name {
+  overflow: hidden;
+  font: 600 var(--se-fs-base) var(--se-font);
+  color: var(--se-text);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-jl-statuses {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--se-space-2);
+}
+
+.se-jl-statuses:empty {
+  display: none;
+}
+
+.se-jl-status {
+  font: 500 var(--se-fs-xs) var(--se-font);
+  color: var(--se-text-faint);
+}
+
+/* Pages and modes: icon tiles, five across, as in the tray */
+.se-jl-pages {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--se-space-1);
+}
+
+.se-jl-tile {
+  display: grid;
+  place-items: center;
+  height: 36px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+}
+
+/* Exit: a glyph and a word */
+
+.se-jl-pages[data-empty] {
+  display: none;
+}
+
+.se-jl-row {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-2);
+  height: 30px;
+  padding: 0 var(--se-space-2);
+  border-radius: var(--se-radius-sm);
+  overflow: hidden;
+  font: 500 var(--se-fs-sm) var(--se-font);
+  color: var(--se-text);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.se-jl-exit {
+  color: var(--se-danger);
+}
+
+.se-jl-tile::before,
+.se-jl-row::before {
+  content: "";
+  flex: none;
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  background: currentColor;
+  -webkit-mask: var(--se-tray-icon) center / contain no-repeat;
+  mask: var(--se-tray-icon) center / contain no-repeat;
+}
+
+.se-jl-tile::before {
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  color: var(--se-text);
+}
+
+.se-jl-note {
+  margin-top: var(--se-space-2);
+  font: 500 var(--se-fs-xs) / 1.4 var(--se-font);
+  color: var(--se-text-faint);
+}
+
+/* The hovered switch's part lit, the rest dimmed */
+.se-jl-tile,
+.se-jl-row,
+.se-jl-status,
+.se-jl-note {
+  transition: opacity var(--se-dur) var(--se-ease), background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.se-jl[data-focus] [data-se-tray-option]:not([data-lit]) {
+  opacity: .5;
+}
+
+.se-jl-tile[data-lit],
+.se-jl-row[data-lit] {
+  background: var(--se-accent-tint);
+  color: var(--se-accent);
+}
+
+.se-jl-tile[data-lit]::before,
+.se-jl-status[data-lit],
+.se-jl-note[data-lit] {
+  color: var(--se-accent);
+}
+
+@media (max-width: 900px) {
+  [data-se-jl] {
+    display: block;
+  }
+
+  [data-se-jl] > .se-jl {
+    display: none;
   }
 }

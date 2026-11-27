@@ -212,9 +212,42 @@
     );
   }
 
-  function friendMenu(id, x, y) {
+  const sourceOf = (fn) => Function.prototype.toString.call(fn);
+  // Steam's own friend menu (sp.js: show(browserContext, context, friend, event), a forced popup),
+  // found once by its source: the friend menu's props and bForcePopup
+  const steamFriendMenuFn = () =>
+    SE.findModule('friends-dock:friend-menu', (src, id, req) => {
+      if (!src.includes('bForcePopup') || !src.includes('browserContext:')) return null;
+      return Object.values(run(() => req(id)) || {}).find(
+        (v) => typeof v === 'function' && sourceOf(v).includes('bForcePopup') && /browserContext:[\w$]+,context:[\w$]+,friend:[\w$]+,ownerWindow:/.test(sourceOf(v))
+      ) || null;
+    });
+  // The friends UI's browser context for a window (what Steam's rows hand the friend menu)
+  const browserContextFn = () =>
+    SE.findModule('friends-dock:browser-context', (src, id, req) => {
+      if (!src.includes('__FriendsUIBrowserContext')) return null;
+      return Object.values(run(() => req(id)) || {}).find(
+        (v) => typeof v === 'function' && sourceOf(v).includes('__FriendsUIBrowserContext')
+      ) || null;
+    });
+
+  /*
+   * A friend's menu: Steam's own (Voice, Favorite, Manage, Trading...; drawn in the theme's look by
+   * client/friends/friend-menu.js), opened as a friends list row opens it, from a right-click in
+   * this window. A right-click elsewhere (a friend card's window), or Steam's pieces not found:
+   * the theme's short menu (Message, Profile, the game they play)
+   */
+  function friendMenu(id, x, y, event) {
     const f = ns.findFriend(id);
     if (!f) return;
+    const show = event?.view === window ? steamFriendMenuFn() : null;
+    const contextOf = show && browserContextFn();
+    if (show && contextOf) {
+      try {
+        show(contextOf(window), {}, f, event);
+        return;
+      } catch { /* Steam's menu threw (its pieces changed): the theme's below */ }
+    }
     const appid = run(() => f.persona.m_unGamePlayedAppID) || 0;
     const items = [
       // Glyphs and hints as the friend menu's rows (client/friends/friend-menu.css, friend-menu.js)
@@ -284,9 +317,10 @@
     showMenu(items, x, y);
   }
 
-  // A right-click on a friend or a group: its menu at (x, y), main-window pixels
-  function rowMenu(row, x, y) {
-    if (row.dataset.friend) friendMenu(row.dataset.friend, x, y);
+  // A right-click on a friend or a group: its menu at (x, y), main-window pixels (event: the
+  // right-click, when it came in this window)
+  function rowMenu(row, x, y, event) {
+    if (row.dataset.friend) friendMenu(row.dataset.friend, x, y, event);
     else groupMenu(row.dataset.group, x, y);
   }
 
@@ -463,7 +497,7 @@
     if (!row || ns.steamHost.contains(row) || !(ns.dock.contains(row) || ns.fly.contains(row))) return;
     e.preventDefault();
     e.stopPropagation();
-    rowMenu(row, e.clientX, e.clientY);
+    rowMenu(row, e.clientX, e.clientY, e);
   }
 
   live.frame = 0;

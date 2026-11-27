@@ -15,7 +15,7 @@
   const VIEW_ATTR = 'data-se-ov-view';
   const listState = { tab: null, query: '', tier: null };
 
-  // A view switched off in the Views setting (client/shared/settings.js), its tab and panel hidden
+  // A view switched off in the Rail views setting (client/shared/settings.js), its tab and panel hidden
   const viewOff = (id) => {
     const choices = SE.settings?.schema.find((item) => item.key === 'overlay-views')?.values;
     return !!choices?.some((choice) => choice.v === id) && !SE.settings.get('overlay-views').includes(id);

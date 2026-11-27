@@ -19,14 +19,15 @@
   const WIDTH = 1120;
   const HEIGHT = 820;
 
-  // Each tab's icon (a mask token, core/icons-*.css) and the line under its title
+  // Each tab's icon (a mask token, core/icons-*.css) and the line under its title. The tabs run in
+  // the order the schema first names them (client/shared/settings-schema.js); this list follows it
   const TABS = {
-    Appearance: ['--se-icon-sliders', 'How the theme looks, in every window and web page.'],
-    Navigation: ['--se-icon-compass', 'The rail and the title bar.'],
-    Home: ['--se-icon-home', "The Library's Home: its stage and the games it features."],
+    Appearance: ['--se-icon-palette', 'How the theme looks, in every window and web page.'],
+    Navigation: ['--se-icon-rail', 'The rail, the title bar, menus and shortcuts.'],
     Startup: ['--se-icon-power', 'What shows while Steam and its windows load.'],
-    Library: ['--se-icon-library', 'The Library and its game list.'],
-    Friends: ['--se-icon-friends', 'The Friends dock.'],
+    Home: ['--se-icon-home', "The Library's Home: its stage and the games it features."],
+    Library: ['--se-icon-library', 'Game pages, the game list and covers.'],
+    Friends: ['--se-icon-friends', 'The Friends dock, chats and friend cards.'],
     Toasts: ['--se-icon-bell', "Steam's notification toasts."],
     Overlay: ['--se-icon-tv', 'The in-game Steam Overlay.'],
     'Web pages': ['--se-icon-globe', 'Store, Community, Support and Checkout.'],
@@ -36,24 +37,42 @@
 
   // Each setting's icon in its row's tile (a mask token, core/icons-*.css)
   const ICONS = {
-    font: 'quote', contrast: 'eye', corners: 'grid', glass: 'dynamic', popups: 'tux', 'menu-hints': 'list', 'rail-labels': 'list',
-    'game-art': 'photo', motion: 'activity', entrance: 'play', 'startup-background': 'home-stage',
-    spinner: 'refresh', 'game-list-width': 'view-expanded', 'dock-width': 'friends', toasts: 'bell',
+    font: 'typeface', contrast: 'contrast', corners: 'corner', glass: 'glass', popups: 'menu-shadow', 'menu-hints': 'list', 'rail-labels': 'rail-labels',
+    'game-art': 'photo', motion: 'motion', entrance: 'play', 'startup-background': 'startup-screen',
+    spinner: 'refresh', 'game-list-width': 'view-expanded', 'dock-width': 'view-expanded', toasts: 'bell',
     'toasts-in-game': 'console', 'toast-style': 'view-compact', 'toast-position': 'move', overlay: 'tv',
-    'overlay-darkness': 'moon', 'click-opens': 'external', 'menu-hover': 'fold', shortcuts: 'key',
+    'overlay-darkness': 'moon', 'click-opens': 'click', 'menu-hover': 'hover', shortcuts: 'key',
     'millennium-open': 'millennium',
     home: 'home', 'steam-home-parts': 'grid', 'whats-new-art': 'photo', 'whats-new-summary': 'news',
-    'whats-new-cards': 'view-compact', 'stage-source': 'home-stage', 'stage-collection': 'folder', 'stage-count': 'list-ordered', 'stage-details': 'info',
-    'stage-nav': 'view-compact', 'stage-cycle': 'restore', 'stage-motion': 'art-zoom',
-    'hover-delay': 'snooze', 'avatar-name': 'user', 'game-count': 'chart', 'rail-buttons': 'list-ordered',
-    'dock-start': 'power', 'offline-friends': 'eye-off', 'offline-members': 'group', 'chat-open': 'bubble', 'hover-cards': 'user', 'hover-card-delay': 'snooze',
+    'whats-new-cards': 'cards-row', 'stage-source': 'home-stage', 'stage-collection': 'folder', 'stage-count': 'list-ordered', 'stage-details': 'info',
+    'stage-nav': 'stage-picker', 'stage-cycle': 'restore', 'stage-motion': 'art-zoom',
+    'hover-delay': 'clock', 'avatar-name': 'user', 'game-count': 'library', 'rail-buttons': 'rail',
+    'dock-start': 'power', 'offline-friends': 'user-offline', 'offline-members': 'user-offline', 'chat-open': 'bubble', 'hover-cards': 'id-card', 'hover-card-delay': 'clock',
     'profile-backgrounds': 'photo',
-    'toast-time': 'snooze', 'toast-queue': 'list', 'stage-position': 'move', 'toast-ach-art': 'art-zoom',
-    'toast-hover': 'pause', 'overlay-open': 'tv', 'overlay-ach-tab': 'badge', 'overlay-panels': 'grid',
-    'overlay-views': 'list', 'overlay-clock': 'calendar', 'overlay-playtime': 'activity',
+    'toast-time': 'clock', 'toast-queue': 'list', 'stage-position': 'move', 'toast-ach-art': 'photo',
+    'toast-hover': 'pause', 'overlay-open': 'open-on', 'overlay-ach-tab': 'badge', 'overlay-panels': 'grid',
+    'overlay-views': 'rail', 'overlay-clock': 'clock', 'overlay-playtime': 'activity',
     'web-sites': 'globe', 'page-width': 'view-expanded',
-    'game-sections': 'folder', 'game-list-icons': 'tag', 'dim-uninstalled': 'drive-download', 'cover-chips': 'check-circle', 'cover-chips-show': 'eye', 'cover-friends': 'friends', 'deck-badge-show': 'gamepad', 'release-chips': 'sparkle', 'rarity-tiers': 'badge', 'logo-place': 'move',
-    'splash-when': 'calendar', 'startup-wait': 'pause', 'splash-art': 'art-zoom', 'background-motion': 'art-parallax',
+    'game-sections': 'grid', 'game-list-icons': 'list-icons', 'dim-uninstalled': 'drive-download', 'cover-chips': 'check-circle', 'cover-chips-show': 'eye', 'cover-friends': 'friends', 'deck-badge-show': 'deck', 'release-chips': 'sparkle', 'rarity-tiers': 'badge', 'logo-place': 'move',
+    'splash-when': 'calendar', 'startup-wait': 'pause', 'splash-art': 'photo', 'background-motion': 'art-parallax',
+  };
+
+  /*
+   * Startup background: each choice as its screen draws it (client/startup/startup.js and .css), in
+   * miniature (theme-settings.css). Steam's picture of covers is the startup window's own wall; the
+   * Library's wireframe is drawn as its columns, as SE.wireframe()'s lines vanish at this size.
+   */
+  const STARTUP_WALL = `url("${new URL('/images/client_login_bg_grid.jpg', location.href).href}")`;
+  const MINI_WIREFRAME =
+    '<span class="se-ts-sb-wf"><i data-col="rail"></i><i data-col="list"></i>' +
+    '<i data-col="home"><b data-part="search"></b><b data-part="stage"></b><b data-part="board"></b></i>' +
+    '<i data-col="friends"></i></span>';
+  const STARTUP_SCENES = {
+    aurora: () => '<i class="se-ts-sb-glow"></i>'.repeat(3) + MINI_WIREFRAME,
+    library: () => MINI_WIREFRAME,
+    mosaic: () => '<span class="se-ts-sb-mosaic"></span>',
+    wall: () => '<span class="se-ts-sb-wall"></span>',
+    dots: () => '<span class="se-ts-sb-dots"></span>',
   };
 
   // A multi setting's choices' icons, by setting (Rail buttons: each rail button's own)
@@ -220,6 +239,10 @@
         art.setAttribute('aria-hidden', 'true');
         art.dataset.setting = item.key;
         art.dataset.value = choice.v;
+        if (item.key === 'startup-background') {
+          art.style.setProperty('--se-ts-wall', STARTUP_WALL);
+          art.innerHTML = STARTUP_SCENES[choice.v]?.() || '';
+        }
         tile.append(art, make('span', 'se-ts-pick-name', choice.label));
         group.append(tile);
         return tile;

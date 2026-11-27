@@ -126,6 +126,9 @@
 
 .se-urlbar-btn:hover {
   background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong);
 }
 
@@ -301,7 +304,7 @@
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--se-dur-slow) ease-out;
+  transition: opacity var(--se-dur-slow) var(--se-ease);
 }
 
 .se-urlbar-progress::before {
@@ -315,7 +318,7 @@
 
 [data-se-loading] > .se-urlbar-progress {
   opacity: 1;
-  transition-duration: .1s;
+  transition-duration: var(--se-dur-fast);
 }
 
 [data-se-loading] > .se-urlbar-progress::before {

@@ -97,7 +97,10 @@
     if (list.querySelector('.se-mill-label[data-se-label="Extend"]')) return;
 
     const pages = [...list.querySelectorAll(`.${C.PagedSettingsDialog_PageListItem}`)];
-    const plugins = pages.length === 6 ? pages[3] : null;
+    // Found as the sidebar finds its pages (client/settings/dialog/sidebar.js): by route, so a
+    // plugin's page (Brew Hub) or another language doesn't lose the label
+    const pageOf = window.__seSettingsParts?.millPageOf;
+    const plugins = pages.find((item) => pageOf?.(item, pages)?.[3] === 'plugins') || null;
     const extend = doc.createElement('div');
     extend.className = `${C.PageListSeparator} se-mill-label`;
     extend.setAttribute('data-se-label', 'Extend');
@@ -773,7 +776,7 @@
     // Steam's own close icon hidden: the box draws the theme's
     const element = React.createElement(
       Frame,
-      { className: 'se-mill-overlay', onEscKeypress: () => record.Close(), bHideCloseIcon: true },
+      { onEscKeypress: () => record.Close(), bHideCloseIcon: true },
       React.createElement('div', { className: 'se-mill-overlay-box' }, body, close)
     );
     try {

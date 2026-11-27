@@ -131,6 +131,9 @@
 
 .se-ts-tab:hover:not([aria-selected="true"]) {
   background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong);
 }
 
@@ -144,17 +147,7 @@
   background: var(--se-accent);
 }
 
-/* The current tab's accent bar, on the column's edge */
-.se-ts-tab[aria-selected="true"]::after {
-  content: '';
-  position: absolute;
-  left: calc(-1 * var(--se-space-3));
-  top: var(--se-space-2);
-  bottom: var(--se-space-2);
-  width: 3px;
-  border-radius: 0 3px 3px 0;
-  background: var(--se-accent);
-}
+/* The current tab's accent bar: game-properties.css, with Settings' pages' */
 
 .se-ts-tab:focus-visible {
   outline: var(--se-focus-outline);
@@ -548,6 +541,9 @@
 
 .se-ts-start:hover {
   background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong);
 }
 
@@ -687,53 +683,171 @@
 }
 
 /*
- * Startup background: each as its screen draws it (client/startup/startup.css), in miniature.
- * Library and Wall stand in for the Library's wireframe and Steam's picture of covers.
+ * Startup background: each as its screen draws it (client/startup/startup.css), in miniature, on
+ * the window's ground. Steam's picture of covers is --se-ts-wall (theme-settings.js, with the
+ * tiles' markup). Every choice but Steam's gets the startup shade on top (dark on the left where
+ * the form sits, and along the foot), drawn by ::after, which also carries the tile's ring (the
+ * drawing covers the art's own). Drawn bolder than the screens (lighter shade, brighter parts):
+ * at this size their faint layers would all read as the same dark tile.
  */
-.se-ts-pick-art[data-value="aurora"] {
-  background-image:
-    radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--se-accent) 55%, transparent), transparent 45%),
-    radial-gradient(circle at 75% 110%, color-mix(in srgb, color-mix(in srgb, var(--se-accent) 55%, var(--se-running)) 45%, transparent), transparent 50%),
-    radial-gradient(circle at 25% -20%, color-mix(in srgb, color-mix(in srgb, var(--se-accent) 55%, var(--se-danger)) 40%, transparent), transparent 50%);
-}
-
-.se-ts-pick-art[data-value="library"] {
-  background-image:
-    linear-gradient(var(--se-surface-2), var(--se-surface-2)) 10px 10px / 22px calc(100% - 20px),
-    linear-gradient(var(--se-white-07), var(--se-white-07)) 38px 10px / calc(100% - 48px) 20px,
-    repeating-linear-gradient(90deg, var(--se-white-07) 0 10px, transparent 10px 14px) 38px 34px / calc(100% - 48px) 16px;
-}
-
-.se-ts-pick-art[data-value="mosaic"] {
-  background-image:
-    repeating-linear-gradient(90deg, var(--se-bg-ink) 0 3px, transparent 3px 15px),
-    repeating-linear-gradient(0deg, var(--se-bg-ink) 0 3px, transparent 3px 21px),
-    linear-gradient(135deg, color-mix(in srgb, var(--se-accent) 22%, var(--se-surface)), var(--se-surface));
-}
-
-.se-ts-pick-art[data-value="wall"] {
-  background-image:
-    linear-gradient(color-mix(in srgb, var(--se-bg-ink) 45%, transparent), color-mix(in srgb, var(--se-bg-ink) 45%, transparent)),
-    repeating-linear-gradient(90deg, var(--se-kind-violet) 0 16px, var(--se-kind-teal) 16px 32px, var(--se-gold) 32px 48px, var(--se-kind-pink) 48px 64px);
-}
-
-.se-ts-pick-art[data-value="plain"] {
-  background-image: radial-gradient(ellipse 60% 50% at 50% 20%, color-mix(in srgb, var(--se-accent) 12%, transparent), transparent 70%);
+.se-ts-pick-art[data-setting="startup-background"] {
   background-color: var(--se-bg);
 }
 
-.se-ts-pick-art[data-value="dots"] {
-  background-image: radial-gradient(circle, var(--se-white-25) 1px, transparent 1.5px);
-  background-size: 8px 8px;
-  -webkit-mask-image: linear-gradient(180deg, #000 20%, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 20%, transparent 100%);
+.se-ts-pick-art[data-setting="startup-background"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--se-bg) 55%, transparent), color-mix(in srgb, var(--se-bg) 25%, transparent) 55%, transparent), linear-gradient(0deg, color-mix(in srgb, var(--se-bg) 45%, transparent), transparent 50%);
+  box-shadow: inset 0 0 0 1px var(--se-white-07);
+  transition: box-shadow var(--se-dur) var(--se-ease);
 }
 
-.se-ts-pick-art[data-value="steam"] {
-  background-image:
-    repeating-linear-gradient(90deg, transparent 0 13px, var(--se-bg-ink) 13px 15px),
-    linear-gradient(color-mix(in srgb, var(--se-bg-ink) 45%, transparent), color-mix(in srgb, var(--se-bg-ink) 45%, transparent)),
-    linear-gradient(90deg, var(--se-kind-teal), var(--se-accent) 40%, var(--se-kind-violet) 75%, var(--se-gold));
+.se-ts-pick:hover .se-ts-pick-art[data-setting="startup-background"]::after {
+  box-shadow: inset 0 0 0 1px var(--se-white-18);
+}
+
+/* Steam: its own wall of covers, as Steam draws it, no shade */
+.se-ts-pick-art[data-setting="startup-background"][data-value="steam"] {
+  background: var(--se-ts-wall) center / cover, var(--se-bg);
+}
+
+.se-ts-pick-art[data-setting="startup-background"][data-value="steam"]::after {
+  background: none;
+}
+
+/* Wall: the same picture, blurred and dimmed */
+.se-ts-sb-wall {
+  position: absolute;
+  inset: -3px;
+  background: var(--se-ts-wall) center / cover;
+  filter: var(--se-blur-mini);
+  opacity: .8;
+}
+
+/*
+ * Mosaic: the picture cut into 2:3 tiles, 12 across (a 9.25 x 13.375 px step, 1px apart), each
+ * at its own brightness as startup.css's tiles breathe. One element: the ground's lines cut the
+ * tiles, two shade bands of different steps dim some of them, and the picture sits at 160% of the
+ * width from its bottom-left, where startup.css starts its drift.
+ */
+.se-ts-sb-mosaic {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, var(--se-bg) 0 1px, transparent 1px 9.25px),
+    repeating-linear-gradient(180deg, var(--se-bg) 0 1px, transparent 1px 13.375px),
+    repeating-linear-gradient(90deg, transparent 0 18.5px, color-mix(in srgb, var(--se-bg) 40%, transparent) 18.5px 27.75px),
+    repeating-linear-gradient(180deg, transparent 0 13.375px, color-mix(in srgb, var(--se-bg) 30%, transparent) 13.375px 26.75px, transparent 26.75px 40.125px),
+    var(--se-ts-wall) 0 100% / 179px auto no-repeat,
+    var(--se-surface);
+}
+
+/* Aurora: three glows (the accent, a teal and a violet) on the right and top, 70% of the width each */
+.se-ts-sb-glow {
+  position: absolute;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--se-ts-glow), transparent);
+}
+
+.se-ts-sb-glow:nth-child(1) {
+  --se-ts-glow: color-mix(in srgb, var(--se-accent) 85%, transparent);
+  right: -20px;
+  top: -27px;
+}
+
+.se-ts-sb-glow:nth-child(2) {
+  --se-ts-glow: color-mix(in srgb, color-mix(in srgb, var(--se-accent) 55%, var(--se-running)) 75%, transparent);
+  right: 2px;
+  bottom: -36px;
+}
+
+.se-ts-sb-glow:nth-child(3) {
+  --se-ts-glow: color-mix(in srgb, color-mix(in srgb, var(--se-accent) 55%, var(--se-danger)) 70%, transparent);
+  left: 16px;
+  top: -40px;
+}
+
+/*
+ * Library (and faintly over Aurora): the wireframe's frame and columns (client/shared/wireframe.css),
+ * placed as startup.css places it: the rail, the game list, Home (search, stage, board), friends.
+ */
+.se-ts-sb-wf {
+  position: absolute;
+  inset: 4px 5px;
+  display: flex;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 60%, transparent);
+  opacity: 1;
+}
+
+.se-ts-pick-art[data-value="aurora"] .se-ts-sb-wf {
+  opacity: .35;
+}
+
+.se-ts-sb-wf > i {
+  flex: none;
+  box-sizing: border-box;
+}
+
+.se-ts-sb-wf > [data-col="rail"] {
+  width: 4px;
+  border-right: 1px solid color-mix(in srgb, var(--se-accent) 40%, transparent);
+}
+
+/* The game list and the friends: a line per row */
+.se-ts-sb-wf > [data-col="list"],
+.se-ts-sb-wf > [data-col="friends"] {
+  width: 15px;
+  background: repeating-linear-gradient(180deg, color-mix(in srgb, var(--se-accent) 55%, transparent) 0 1px, transparent 1px 4px) 3px 5px / 8px calc(100% - 9px) no-repeat;
+}
+
+.se-ts-sb-wf > [data-col="friends"] {
+  border-left: 1px solid color-mix(in srgb, var(--se-accent) 40%, transparent);
+}
+
+.se-ts-sb-wf > [data-col="home"] {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--se-space-half);
+  padding: var(--se-space-half);
+}
+
+.se-ts-sb-wf b {
+  border-radius: 1px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--se-accent) 55%, transparent);
+}
+
+.se-ts-sb-wf > [data-col="home"] > [data-part="search"] {
+  width: 45%;
+  height: 3px;
+  align-self: center;
+}
+
+.se-ts-sb-wf > [data-col="home"] > [data-part="stage"] {
+  flex: 1;
+}
+
+.se-ts-sb-wf > [data-col="home"] > [data-part="board"] {
+  height: 11px;
+}
+
+/* Plain: the ground and a faint accent glow behind the spinner */
+.se-ts-pick-art[data-setting="startup-background"][data-value="plain"] {
+  background-image: radial-gradient(ellipse 60% 55% at 50% 22%, color-mix(in srgb, var(--se-accent) 35%, transparent), transparent 70%);
+}
+
+/* Dots: a fine grid fading out toward the foot */
+.se-ts-sb-dots {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, var(--se-white-40) .7px, transparent 1.1px) 0 0 / 5px 5px;
+  -webkit-mask-image: linear-gradient(180deg, #000 20%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 20%, transparent 100%);
 }
 
 /*
@@ -814,7 +928,7 @@
   background-size: 10px 10px, 42px 16px;
 }
 
-/* Compact toast position: the foot's centre, or Steam's corner */
+/* Compact position: the foot's centre, or Steam's corner */
 .se-ts-pick-art[data-setting="toast-position"][data-value="centre"] {
   background-image: var(--se-ts-dot), var(--se-ts-card);
   background-position: calc(50% - 15px) calc(100% - 9px), center calc(100% - 6px);

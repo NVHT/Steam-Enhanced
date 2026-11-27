@@ -59,7 +59,7 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity var(--se-dur-ambient) ease;
+  transition: opacity var(--se-dur-ambient) var(--se-ease-standard);
 }
 
 .se-hs-layer[data-on] {
@@ -103,7 +103,7 @@
 
 /* A slow push-in on the art that is showing; held while the stage is out of sight */
 .se-hs-layer[data-on] .se-hs-hero {
-  animation: se-hs-push 26s ease-in-out infinite alternate;
+  animation: se-hs-push 26s var(--se-ease-inout) infinite alternate;
 }
 
 .se-hs-stage[data-se-hs-idle] .se-hs-hero {
@@ -123,7 +123,7 @@
 .se-hs-grade {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 50% 45% at 88% 6%, rgba(255, 196, 150, .16), transparent 70%), linear-gradient(90deg, var(--se-black-70) 0%, var(--se-black-30) 38%, transparent 62%), radial-gradient(ellipse 85% 75% at 50% 40%, transparent 45%, var(--se-black-50) 100%), linear-gradient(180deg, rgba(0, 0, 0, .35) 0%, transparent 14%, transparent 46%, rgba(10, 12, 16, .78) 84%, var(--se-bg) 100%);
+  background: radial-gradient(ellipse 50% 45% at 88% 6%, rgba(255, 196, 150, .16), transparent 70%), linear-gradient(90deg, var(--se-black-70) 0%, var(--se-black-30) 38%, transparent 62%), radial-gradient(ellipse 85% 75% at 50% 40%, transparent 45%, var(--se-black-50) 100%), linear-gradient(180deg, rgba(0, 0, 0, .35) 0%, transparent 14%, transparent 46%, color-mix(in srgb, var(--se-bg-ink) 78%, transparent) 84%, var(--se-bg) 100%);
 }
 
 /* Toward the tray the art settles into the page's ground, so the shelves read cleanly over it */
@@ -131,7 +131,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(14, 16, 21, 0) calc(var(--se-hs-h, 60%) - 260px), rgba(14, 16, 21, .62) calc(var(--se-hs-h, 60%) - 40px), rgba(14, 16, 21, .9) calc(var(--se-hs-h, 60%) + 90px), var(--se-bg) 100%);
+  background: linear-gradient(180deg, transparent calc(var(--se-hs-h, 60%) - 260px), color-mix(in srgb, var(--se-bg) 62%, transparent) calc(var(--se-hs-h, 60%) - 40px), color-mix(in srgb, var(--se-bg) 90%, transparent) calc(var(--se-hs-h, 60%) + 90px), var(--se-bg) 100%);
 }
 
 /* Film grain, still (an animated one costs a repaint of the whole view every frame) */
@@ -229,7 +229,7 @@
   inset: -130px -140px -70px -110px;
   z-index: var(--se-z-under);
   pointer-events: none;
-  background: radial-gradient(closest-side, rgba(8, 10, 14, .8) 0%, rgba(8, 10, 14, .74) 55%, rgba(8, 10, 14, .42) 80%, rgba(8, 10, 14, 0) 100%);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--se-bg-ink) 80%, transparent) 0%, color-mix(in srgb, var(--se-bg-ink) 74%, transparent) 55%, color-mix(in srgb, var(--se-bg-ink) 42%, transparent) 80%, transparent 100%);
 }
 
 .se-hs-desc,
@@ -722,7 +722,7 @@
   object-fit: contain;
   object-position: center top;
   opacity: 0;
-  transition: opacity var(--se-dur-ambient) ease;
+  transition: opacity var(--se-dur-ambient) var(--se-ease-standard);
   -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
   mask-image: linear-gradient(to bottom, #000 55%, transparent 96%);
 }
@@ -735,7 +735,7 @@
 /* Each screenshot drifts in a little while it shows, from its top edge, so all of it stays in view */
 .se-hs-shot[data-on] {
   transform-origin: center top;
-  animation: se-hs-shot 8s ease-out both;
+  animation: se-hs-shot 8s var(--se-ease) both;
 }
 
 @keyframes se-hs-shot {
@@ -748,7 +748,7 @@
 }
 
 .se-hs-hero {
-  transition: opacity var(--se-dur-ambient) ease;
+  transition: opacity var(--se-dur-ambient) var(--se-ease-standard);
 }
 
 .se-hs-layer[data-media] .se-hs-hero {

@@ -1,0 +1,750 @@
+/*
+ * Extendium, continued (extendium.css, listed just before): 3. Extensions manager, the
+ * "Extensions" dialog redesigned (page head, search, card grid, list, details, settings).
+ */
+
+/* ---------- 3. Extensions manager ---------- */
+
+/*
+ * The "Extensions" dialog window. Paired with compat/extendium/manager.js, which adds the page
+ * head and the search field (.se-ext-*) and filters cards ([data-se-filtered]).
+ *
+ * List:
+ *
+ *   Extensions
+ *   3 installed · 2 on
+ *   [ Search extensions ............ ] [Install extension] [Advanced …] [⚙]
+ *
+ *   ┌───────────────────────────────┐ ┌───────────────────────────────┐
+ *   │ [icon] Name  1.2.0  Great  (●)│ │ ...                           │
+ *   │        Two lines of description│ │                               │
+ *   │ Details                 Remove │ │                               │
+ *   └───────────────────────────────┘ └───────────────────────────────┘
+ *
+ * The enable switch sits in the card's corner; a card that's off dims. All three routes share one
+ * frame: full width, a page head (Details and Settings with a back tile), then cards. manager.js
+ * sizes the window to fit (920 px). Steam's switches come themed from
+ * client/settings/controls.css; buttons from client/dialogs/dialogs.css (with !important, so
+ * overrides here use it too).
+ *
+ * Settings drops Extendium's bar margin sliders: they only move the bar for other skins, and the
+ * theme places the bar itself (section 1).
+ */
+.extension-manager-popup:not(#se-none) {
+  box-sizing: border-box;
+  /*
+   * The window's title bar (64 px, a drag region that takes clicks) overlaps the top of the
+   * dialog's content, which starts 24 px down: start below it.
+   */
+  margin: var(--se-space-6) auto 0;
+  padding: var(--se-space-1) var(--se-space-1) var(--se-space-6);
+  color: var(--se-text-dim);
+  font-family: var(--se-font);
+}
+
+.extension-manager-popup .secondary-text:not(#se-none) {
+  color: var(--se-text-muted);
+}
+
+.extension-manager-popup .hr:not(#se-none) {
+  border-top: 1px solid var(--se-hairline);
+}
+
+/* Back / settings tiles (Extendium's round icon buttons) */
+.extension-manager-popup .md-button:not(#se-none) {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-edge);
+  color: var(--se-text-dim);
+  font-size: var(--se-fs-xl);
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+.extension-manager-popup .md-button:not(#se-none):hover {
+  background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
+  color: var(--se-text-strong);
+}
+
+/*
+ * Steam's dialog sizes to its content, so each route came out a different width (the list
+ * narrower than Settings). The dialog's inner box and its form fill the dialog (already the
+ * window, less its padding) instead.
+ */
+.DialogContent_InnerWidth:has(> .extension-manager-popup, > form > .extension-manager-popup):not(#se-none),
+form:not(.se-none):has(> .extension-manager-popup, > form > .extension-manager-popup):not(#se-none) {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.extension-manager-popup:not(#se-none) {
+  width: 100%;
+}
+
+/* ===== List ===== */
+
+.se-ext-head {
+  margin: 0 0 var(--se-space-4);
+}
+
+.se-ext-title {
+  margin: 0;
+  color: var(--se-text);
+  font: 700 var(--se-fs-2xl)/1.2 var(--se-font);
+}
+
+.se-ext-summary {
+  margin: var(--se-space-1) 0 0;
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm)/1.4 var(--se-font);
+}
+
+/* Toolbar: search, then Extendium's three buttons */
+.extension-manager-popup .root-buttons:not(#se-none) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--se-space-2);
+}
+
+.se-ext-search {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.se-ext-search::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: var(--se-search-pad);
+  width: var(--se-search-icon-size);
+  height: var(--se-search-icon-size);
+  margin-top: calc(var(--se-search-icon-size) / -2);
+  background: var(--se-search-icon-color);
+  -webkit-mask: var(--se-icon-search) center / contain no-repeat;
+  pointer-events: none;
+  mask: var(--se-icon-search) center / contain no-repeat;
+}
+
+.se-ext-search input {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--se-search-h);
+  padding: 0 var(--se-search-pad) 0 calc(var(--se-search-pad) + var(--se-search-icon-size) + var(--se-search-gap));
+  border: 0;
+  border-radius: var(--se-search-radius);
+  outline: none;
+  background: var(--se-search-bg);
+  box-shadow: var(--se-search-edge);
+  color: var(--se-search-text);
+  font: var(--se-search-font);
+  transition: box-shadow var(--se-dur) var(--se-ease);
+}
+
+.se-ext-search input::placeholder {
+  color: var(--se-search-placeholder) !important;
+  font-style: normal !important;
+}
+
+.se-ext-search input:hover {
+  box-shadow: var(--se-search-edge-hover);
+}
+
+.se-ext-search input:focus {
+  box-shadow: var(--se-search-edge-focus);
+}
+
+.se-ext-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.extension-manager-popup .root-buttons button.DialogButton:not(#se-none) {
+  flex: none;
+  width: auto;
+  min-width: 0;
+  height: var(--se-control-h);
+  min-height: 0;
+  margin: 0;
+  padding: 0 var(--se-space-4);
+  gap: var(--se-space-2) !important;
+}
+
+.extension-manager-popup .root-buttons button.DialogButton:not(#se-none) svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* Install extension: the one solid accent button */
+.extension-manager-popup .root-buttons > button.DialogButton:first-of-type:not(#se-none) {
+  background: var(--se-accent) !important;
+  color: var(--se-bg-ink) !important;
+}
+
+.extension-manager-popup .root-buttons > button.DialogButton:first-of-type:not(#se-none):hover {
+  background: var(--se-accent-hover) !important;
+}
+
+/* Settings: a square tile */
+.extension-manager-popup .root-buttons > div:not(#se-none) {
+  display: flex;
+}
+
+.extension-manager-popup .root-buttons > div button.DialogButton:not(#se-none) {
+  width: var(--se-control-h) !important;
+  padding: 0;
+}
+
+/* Cards */
+.extension-manager-popup .card-container:not(#se-none) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--se-space-3);
+  max-width: none;
+  margin: var(--se-space-4) 0 0;
+  font-size: var(--se-fs-sm);
+}
+
+/* Nothing installed */
+.extension-manager-popup .card-container:empty::before {
+  content: 'No extensions yet. Use Install extension to add one from the Chrome Web Store.';
+  grid-column: 1 / -1;
+  padding: var(--se-space-6) var(--se-space-5);
+  border-radius: var(--se-radius-lg);
+  background: var(--se-white-02);
+  box-shadow: var(--se-edge);
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm)/1.5 var(--se-font);
+  text-align: center;
+}
+
+.se-ext-nomatch {
+  margin: 0;
+  padding: var(--se-space-6) var(--se-space-5);
+  color: var(--se-text-muted);
+  font: 500 var(--se-fs-sm)/1.5 var(--se-font);
+  text-align: center;
+}
+
+.extension-card[data-se-filtered] {
+  display: none !important;
+}
+
+.extension-card:not(#se-none) {
+  position: relative;
+  height: auto;
+  overflow: hidden;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface);
+  box-shadow: var(--se-edge);
+  transition: box-shadow var(--se-dur-fast);
+}
+
+.extension-card:not(#se-none):hover {
+  box-shadow: var(--se-edge-mid);
+}
+
+.extension-card .extension-main:not(#se-none) {
+  align-items: flex-start;
+  padding: var(--se-space-4) var(--se-space-4) var(--se-space-3);
+}
+
+.extension-card .extension-main .icon:not(#se-none) {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: var(--se-radius-md);
+  background: var(--se-surface-2);
+}
+
+.extension-card .extension-main .icon:not(#se-none) img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.extension-card .extension-main .content:not(#se-none) {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-left: var(--se-space-3);
+  padding-right: var(--se-space-7); /* the switch */
+}
+
+.extension-card .name-and-version:not(#se-none) {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--se-space-1) var(--se-space-2);
+  margin: var(--se-space-half) 0 var(--se-space-1);
+  color: var(--se-text);
+}
+
+.extension-card .name-and-version .name:not(#se-none) {
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  font: 600 var(--se-fs-base)/1.3 var(--se-font);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.extension-card .name-and-version .version:not(#se-none) {
+  margin: 0;
+  color: var(--se-text-faint);
+  font: 500 var(--se-fs-xs) var(--se-font);
+}
+
+.extension-card .description:not(#se-none) {
+  display: -webkit-box;
+  height: auto;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.45;
+}
+
+/* Compatibility pill: theme tones by status (Extendium's colour is inline) */
+.extension-card .compatibility-pill:not(#se-none) {
+  height: 20px;
+  padding: 0 var(--se-space-2);
+  border: 0;
+  border-radius: var(--se-radius-pill);
+  background: var(--se-white-07) !important;
+  box-shadow: none;
+  color: var(--se-text-muted);
+  font: 700 var(--se-fs-2xs) var(--se-font);
+  text-shadow: none;
+}
+
+.extension-card .compatibility-pill[title^="Compatibility: Perfect"]:not(#se-none) {
+  background: var(--se-accent-surface) !important;
+  color: var(--se-accent);
+}
+
+.extension-card .compatibility-pill[title^="Compatibility: Great"]:not(#se-none) {
+  background: color-mix(in srgb, var(--se-running) 14%, transparent) !important;
+  color: var(--se-running);
+}
+
+.extension-card .compatibility-pill[title^="Compatibility: Okay"]:not(#se-none) {
+  background: color-mix(in srgb, var(--se-warning) 14%, transparent) !important;
+  color: var(--se-warning);
+}
+
+.extension-card .compatibility-pill[title^="Compatibility: Broken"]:not(#se-none) {
+  background: color-mix(in srgb, var(--se-danger) 16%, transparent) !important;
+  color: var(--se-danger-text);
+}
+
+/* Update / warning pills and the icon's update badge */
+.extension-card .update-pill:not(#se-none),
+.extension-card .warn-pill:not(#se-none) {
+  height: 20px;
+  border-radius: var(--se-radius-pill);
+  box-shadow: none;
+  font: 700 var(--se-fs-2xs) var(--se-font);
+}
+
+.extension-card .update-pill:not(#se-none) {
+  border-color: color-mix(in srgb, var(--se-running) 35%, transparent);
+  background: color-mix(in srgb, var(--se-running) 14%, transparent);
+  color: var(--se-running);
+}
+
+.extension-card .warn-pill:not(#se-none) {
+  border-color: color-mix(in srgb, var(--se-warning) 35%, transparent);
+  background: color-mix(in srgb, var(--se-warning) 14%, transparent);
+  color: var(--se-warning);
+}
+
+.extension-card .update-badge:not(#se-none) {
+  top: -5px;
+  right: -5px;
+  border-color: color-mix(in srgb, var(--se-running) 40%, transparent);
+  background: color-mix(in srgb, var(--se-running) 16%, var(--se-surface));
+  box-shadow: 0 0 0 2px var(--se-surface);
+}
+
+.extension-card .update-badge:not(#se-none) svg {
+  color: var(--se-running);
+}
+
+/* Footer: Details on the left, Remove on the right; the switch goes to the card's corner */
+.extension-card .extension-buttons:not(#se-none) {
+  align-items: center;
+  gap: var(--se-space-1);
+  height: auto;
+  padding: var(--se-space-2) var(--se-space-2);
+  border-top: 1px solid var(--se-hairline);
+}
+
+.extension-card .extension-buttons button.DialogButton:not(#se-none) {
+  flex: none;
+  width: auto;
+  min-width: 0;
+  height: 30px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 var(--se-space-3);
+  background: transparent !important;
+  color: var(--se-text-dim) !important;
+  font-size: var(--se-fs-sm) !important;
+}
+
+.extension-card .extension-buttons button.DialogButton:not(#se-none):hover {
+  background: var(--se-hover) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
+  color: var(--se-text-strong) !important;
+}
+
+.extension-card .extension-buttons button.DialogButton:nth-of-type(2):not(#se-none) {
+  margin-left: auto;
+}
+
+.extension-card .extension-buttons button.DialogButton:nth-of-type(2):not(#se-none):hover {
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent) !important;
+  color: var(--se-danger-text) !important;
+}
+
+.extension-card .extension-buttons > .Toggle:not(#se-none) {
+  position: absolute;
+  top: 20px;
+  right: 18px;
+  margin: 0;
+}
+
+/* Off: the card dims, the switch and buttons stay full strength */
+.extension-card:has(.Toggle:not(.On)) .extension-main > * {
+  opacity: .5;
+  filter: grayscale(.6);
+  transition: opacity var(--se-dur), filter var(--se-dur);
+}
+
+/* ===== Details ===== */
+
+/*
+ * Same frame as Settings: a page head (back tile, icon, name) over one card of rows. Extendium
+ * draws it all as one box, so the box goes and its rows make the card.
+ */
+.extension-manager-popup .extension-detail-info:not(#se-none) {
+  width: auto;
+  margin: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.extension-detail-info .page-header:not(#se-none) {
+  gap: var(--se-space-3);
+  height: auto;
+  margin: 0 0 var(--se-space-4);
+  padding: 0;
+  border: 0;
+  color: var(--se-text);
+}
+
+.extension-detail-info .page-header:not(#se-none) > img {
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: var(--se-space-1);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  object-fit: contain;
+}
+
+.extension-detail-info .page-header:not(#se-none) > span {
+  font: 700 var(--se-fs-2xl)/1.2 var(--se-font);
+}
+
+/* Rows: label column, value column; together one card */
+.extension-detail-info .section:not(#se-none) {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--se-space-4);
+  padding: var(--se-space-3) var(--se-space-4);
+  background: var(--se-surface);
+  box-shadow: inset 1px 0 var(--se-hairline), inset -1px 0 var(--se-hairline);
+  font-size: var(--se-fs-sm);
+}
+
+.extension-detail-info .page-header + .section:not(#se-none) {
+  border-radius: var(--se-radius-lg) var(--se-radius-lg) 0 0;
+  box-shadow: inset 1px 0 var(--se-hairline), inset -1px 0 var(--se-hairline), inset 0 1px var(--se-hairline);
+}
+
+.extension-detail-info .section:last-child:not(#se-none) {
+  border-radius: 0 0 var(--se-radius-lg) var(--se-radius-lg);
+  box-shadow: inset 1px 0 var(--se-hairline), inset -1px 0 var(--se-hairline), inset 0 -1px var(--se-hairline);
+}
+
+.extension-detail-info .section:not(#se-none) .heading {
+  color: var(--se-text-muted);
+  font: 600 var(--se-fs-sm) var(--se-font);
+}
+
+.extension-detail-info .section:not(#se-none) .content {
+  color: var(--se-text-dim);
+  font: 400 var(--se-fs-sm)/1.5 var(--se-font);
+  overflow-wrap: anywhere;
+}
+
+.extension-detail-info .section:nth-of-type(4):not(#se-none) .content {
+  font: 400 var(--se-fs-xs)/1.5 var(--se-font-mono); /* Id */
+}
+
+.extension-detail-info #errors:not(#se-none) .heading {
+  color: var(--se-danger-text);
+}
+
+.extension-detail-info #errors:not(#se-none) code {
+  color: var(--se-text-dim);
+}
+
+.extension-detail-info a:not(#se-none) {
+  color: var(--se-accent);
+}
+
+.extension-detail-info a:not(#se-none):hover {
+  color: var(--se-accent-hover);
+}
+
+/* Extension options / remove: whole-row actions */
+.extension-detail-info .clickable-row:not(#se-none) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--se-text);
+  font: 500 var(--se-fs-base) var(--se-font);
+}
+
+.extension-detail-info .clickable-row:not(#se-none):hover {
+  background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
+}
+
+.extension-detail-info .clickable-row:not(#se-none) > button {
+  color: var(--se-text-faint);
+  font-size: var(--se-fs-lg);
+}
+
+/* ===== Settings ===== */
+
+.extension-manager-popup > .DialogBody:not(#se-none) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--se-space-3);
+  margin: 0;
+  padding: 0;
+  background: none;
+}
+
+.extension-manager-popup > .DialogBody > .header:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-3);
+  margin: 0 0 var(--se-space-1);
+  padding: 0;
+}
+
+.extension-manager-popup > .DialogBody > .header:not(#se-none) h1 {
+  margin: 0;
+  color: var(--se-text);
+  font: 700 var(--se-fs-2xl)/1.2 var(--se-font);
+}
+
+/* Bar margins: no effect with the theme (see the top of this section) */
+.extension-manager-popup > .DialogBody > .header + .Field,
+.extension-manager-popup > .DialogBody > .DialogSlider_Container {
+  display: none !important;
+}
+
+/* Each setting a card */
+.extension-manager-popup > .DialogBody > .Field:not(#se-none),
+.extension-manager-popup > .DialogBody > .ext-links-manager:not(#se-none) {
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--se-space-4) var(--se-space-4) !important;
+  border-radius: var(--se-radius-lg);
+  background: var(--se-surface) !important;
+  box-shadow: var(--se-edge);
+}
+
+.extension-manager-popup .DialogBody .Field:not(#se-none)::before,
+.extension-manager-popup .DialogBody .Field:not(#se-none)::after {
+  display: none; /* Steam's separators */
+}
+
+.extension-manager-popup > .DialogBody > .Field:not(#se-none) {
+  display: flex;
+  align-items: center;
+  gap: var(--se-space-4);
+}
+
+.extension-manager-popup .DialogBody .FieldLabel:not(#se-none) {
+  color: var(--se-text);
+  font: 500 var(--se-fs-base)/1.4 var(--se-font);
+}
+
+.extension-manager-popup .DialogBody .FieldDescription:not(#se-none) {
+  margin: 0;
+  color: var(--se-text-muted);
+  font: 400 var(--se-fs-sm)/1.5 var(--se-font);
+}
+
+/* The switch's own caption repeats the label: just the switch */
+.extension-manager-popup .DialogBody .FieldChildrenInner > div:not(#se-none) {
+  margin: 0 !important;
+}
+
+.extension-manager-popup .DialogBody .FieldChildrenInner > div > span {
+  display: none;
+}
+
+/* External links */
+.extension-manager-popup .ext-links-manager:not(#se-none) {
+  gap: var(--se-space-2);
+}
+
+.extension-manager-popup .ext-links-manager .Field:not(#se-none) {
+  margin: 0;
+  padding: 0 !important;
+  background: none !important;
+}
+
+.ext-links-manager:not(#se-none) .ext-links-title {
+  color: var(--se-text);
+  font: 500 var(--se-fs-base)/1.4 var(--se-font);
+}
+
+.ext-links-manager:not(#se-none) .ext-links-list {
+  gap: var(--se-space-1);
+}
+
+.ext-links-manager:not(#se-none) .ext-links-empty {
+  padding: var(--se-space-3);
+  border-radius: var(--se-radius-sm);
+  background: var(--se-white-02);
+  box-shadow: var(--se-edge);
+  color: var(--se-text-faint);
+  font: 500 var(--se-fs-sm) var(--se-font);
+  font-style: normal;
+  text-align: center;
+  opacity: 1;
+}
+
+.styled-input:not(#se-none) {
+  height: var(--se-control-h-sm);
+  padding: 0 var(--se-space-2);
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-field);
+  box-shadow: var(--se-edge);
+  color: var(--se-text);
+  font: 500 var(--se-fs-sm) var(--se-font);
+  transition: box-shadow var(--se-dur-fast);
+}
+
+.styled-input:not(#se-none):hover {
+  box-shadow: var(--se-edge-lift);
+}
+
+.styled-input:not(#se-none):focus {
+  border: 0;
+  box-shadow: var(--se-search-edge-focus);
+}
+
+.ext-links-manager:not(#se-none) .ext-links-toggle,
+.ext-links-manager:not(#se-none) .ext-links-remove,
+.ext-links-manager:not(#se-none) .ext-links-add {
+  height: var(--se-control-h-sm);
+  padding: 0 var(--se-space-3);
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  box-shadow: var(--se-edge);
+  color: var(--se-text-dim);
+  font: 600 var(--se-fs-sm) var(--se-font);
+  transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
+}
+
+.ext-links-manager:not(#se-none) .ext-links-toggle:hover,
+.ext-links-manager:not(#se-none) .ext-links-remove:hover,
+.ext-links-manager:not(#se-none) .ext-links-add:hover {
+  background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
+  color: var(--se-text-strong);
+}
+
+.ext-links-manager:not(#se-none) .ext-links-add {
+  background: var(--se-accent-surface);
+  box-shadow: none;
+  color: var(--se-accent);
+}
+
+.ext-links-manager:not(#se-none) .ext-links-add:hover {
+  background: color-mix(in srgb, var(--se-accent) 22%, transparent);
+  color: var(--se-accent-hover);
+}
+
+.ext-links-manager:not(#se-none) .ext-links-remove:hover {
+  background: color-mix(in srgb, var(--se-danger) 14%, transparent);
+  color: var(--se-danger-text);
+}
+
+.ext-links-manager:not(#se-none) .ext-links-toggle input[type='checkbox'] {
+  border: 0;
+  border-radius: var(--se-radius-xs);
+  background: var(--se-field);
+  box-shadow: inset 0 0 0 1px var(--se-white-18);
+}
+
+.ext-links-manager:not(#se-none) .ext-links-toggle input[type='checkbox']::after {
+  background: var(--se-accent);
+}
+
+/* Storage manager (Details, dev mode) */
+.storage-manager:not(#se-none) {
+  color: var(--se-text-dim);
+}
+
+.storage-manager:not(#se-none) .header {
+  color: var(--se-text);
+}
+
+.storage-manager:not(#se-none) .storage-manager-row:not(.se-none):not(se-none),
+.storage-manager:not(#se-none) .storage-manager-item:not(:has(> details[open])) {
+  border-bottom-color: var(--se-hairline);
+}
+
+.storage-manager:not(#se-none) .storage-manager-row button {
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-dim);
+}
+
+.storage-manager:not(#se-none) .storage-manager-row button:hover {
+  background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
+  color: var(--se-text-strong);
+}

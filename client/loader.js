@@ -119,7 +119,7 @@
     ]],
     ['main', 'client/library/', [
       'library.css', 'library-home.css', 'library-covers.css', 'game-list.css', 'game-list.js',
-      'game-drag.css', 'game-drag.js', 'collections.css', 'collections.js', 'dim-uninstalled.js',
+      'game-drag.css', 'game-drag.js', 'collections.css', 'collections.js',
       'cover-state.css', 'cover-state.js',
     ]],
     // Started on a Store or Community page: the Library rendered once, so its list is beside it
@@ -148,7 +148,7 @@
       'friends-dock-chat-rail.css',
     ]],
     ['main', 'client/friends/dock/', [
-      'templates.js', 'data.js', 'ui.js', 'routing.js', 'flyouts.js', 'member-list.js', 'embed.js',
+      'templates.js', 'data.js', 'ui.js', 'routing.js', 'routing-patches.js', 'flyouts.js', 'member-list.js', 'embed.js',
       'dock.js', 'chat-popup.js', 'friend-card.js', 'main.js',
     ]],
     ['main', 'client/friends/', ['playing-card.js']],
@@ -157,7 +157,7 @@
     ['main', 'client/home/', ['home-shelves.css', 'home-shelves.js', 'whats-new.css', 'shelf-arrange.css', 'shelf-arrange.js', 'shelf-picker.js', 'shelf-expand.js', 'shelf-hover.css', 'shelf-hover.js', 'shelf-spacing.js']],
     ['main', 'client/home/stage/', ['stage.css', 'stage-hero.css', 'stage-settings.css', 'stage-tray.css', 'stage-shelves.css', 'stage-panels.css', 'stage-narrow.css', 'util.js', 'tray.js', 'picks.js', 'stage-settings.js', 'panels-library.js', 'panels-community.js', 'board.js', 'home-mode.js', 'stage.js', 'stage-art.js', 'data.js', 'main.js']],
     // Menus, hover cards, notifications, dialogs
-    ['all', 'client/dialogs/', ['dialogs.css', 'confirm.css']],
+    ['all', 'client/dialogs/', ['dialogs.css', 'dialogs-rebuilt.css', 'confirm.css']],
     ['content', 'client/dialogs/', ['install.css', 'eula.css']],
     ['all', 'client/shared/', ['hover-cards.css']],
     ['all', 'client/friends/', ['friend-hover.css', 'friend-hover.js']],
@@ -188,7 +188,7 @@
     ]],
     // Plugin integrations
     ['main', 'compat/hltb-for-steam/', ['hltb-for-steam.css', 'hltb-for-steam.js']],
-    ['all', 'compat/extendium/', ['extendium.css']],
+    ['all', 'compat/extendium/', ['extendium.css', 'extendium-manager.css']],
     ['content', 'compat/extendium/', ['manager.js']],
     ['desktop', 'compat/steam-size-on-disk/', ['size-on-disk.css', 'size-on-disk.js']],
     ['main', 'compat/playercount-badge/', ['playercount-badge.css']],
@@ -230,9 +230,9 @@
     ['desktop', 'client/settings/dialog/', [
       'shared.js', 'options.js', 'search.js', 'window.js', 'sidebar.js', 'layout.js', 'props-pages.js',
       'props-header.js', 'props.js', 'account.js', 'friends.js', 'family.js', 'security.js',
-      'notifications.js', 'interface.js', 'store.js', 'library.js', 'downloads.js', 'cloud.js', 'ingame.js',
-      'accessibility.js', 'controller.js', 'gamerecording.js', 'voice.js', 'remoteplay.js', 'broadcast.js',
-      'music.js', 'main.js',
+      'notifications.js', 'interface.js', 'taskbar.js', 'store.js', 'library.js', 'downloads.js', 'cloud.js',
+      'ingame.js', 'accessibility.js', 'controller.js', 'gamerecording.js', 'voice.js', 'remoteplay.js',
+      'broadcast.js', 'music.js', 'main.js',
     ]],
     ['desktop', 'client/settings/millennium/', [
       'millennium.css', 'millennium-window.css', 'millennium-redesign.css', 'millennium-editor.css',
@@ -241,13 +241,13 @@
       'millennium-pages.js',
     ]],
     // Brew Hub's page in Millennium Settings: after the Millennium files, whose icons and fillHeight it reads
-    ['desktop', 'compat/brew-hub/', ['brew-hub.css', 'brew-hub-settings.css', 'brew-hub.js']],
+    ['desktop', 'compat/brew-hub/', ['brew-hub.css', 'brew-hub-readme.css', 'brew-hub-settings.css', 'brew-hub.js']],
     ['main', 'client/settings/millennium/', ['millennium-window.js']],
     // The theme's own settings window: drawn from the main window into a Steam popup (its
     // popup runtime: millennium-window.js), styled in that popup
     ['desktop', 'client/settings/theme/', ['theme-settings.css', 'spinner-previews.css']],
     ['main', 'client/settings/theme/', ['theme-settings.js']],
-    ['main', 'client/settings/library-manager/', ['library-manager.css', 'library-manager.js']],
+    ['main', 'client/settings/library-manager/', ['library-manager.css', 'library-manager-data.js', 'library-manager.js']],
     ['main', 'client/game-page/', ['player-count.js']],
   ];
   /** [group, file] in list order */
@@ -273,7 +273,7 @@
   }
 
   const query = new URL(self).search;
-  let fresh = ''; // a dev reload's stamp (devReload below): every file again, past the cache
+  let fresh = ''; // a dev reload's stamp (devReload below): a URL built after it comes past the cache
   const asset = (file) => {
     const url = new URL(`../${file}`, self);
     url.search = query;
@@ -368,6 +368,8 @@
    * draw here (Restyle toasts and Toasts in game on, the Stage style), Steam's first moves wait
    * here, not passed on, for at most MOVE_HOLD_MS; after that they pass on as Steam made them, so
    * a toast code that never comes still leaves Steam's toast placed (its slide-in lasts ~300 ms).
+   * It stays in place for the window's life: a toast code torn down hands its moves back
+   * (take(null)), and one run again (a dev JS reload) takes them over the same way.
    */
   const MOVE_HOLD_MS = 250;
   const moveHold = (() => {
@@ -398,10 +400,6 @@
       held: () => held,
       take(fn) {
         taker = fn;
-      },
-      release() {
-        taker = null;
-        if (W.MoveTo === early) W.MoveTo = native;
       },
     };
   })();
@@ -777,10 +775,10 @@
 
   /*
    * Stylesheets go in at once. Scripts wait for the runtime (window.__se): core/classmap.js,
-   * core/runtime.js and its part runtime-art.js, which this loader adds first, in order; the
-   * wait holds the cover like any pending file.
+   * core/runtime.js and its parts runtime-text.js and runtime-art.js, which this loader adds
+   * first, in order; the wait holds the cover like any pending file.
    */
-  const RUNTIME = ['core/classmap.js', 'core/runtime.js', 'core/runtime-art.js'];
+  const RUNTIME = ['core/classmap.js', 'core/runtime.js', 'core/runtime-text.js', 'core/runtime-art.js'];
   const load = () => {
     const scripts = [];
     for (const [group, file] of FILES) {
@@ -821,8 +819,9 @@
 
   /*
    * Dev reload (Ctrl+Shift+U, core/core.js; only with dev/live-reload.json on): dev/dev-reload.js,
-   * loaded on the first reload in this window, reloads its sheets (and scripts) through the
-   * loader's own parts. Other client windows follow through the storage event.
+   * loaded on the first reload in this window, reloads its changed sheets (and scripts) through
+   * the loader's own parts. Other client windows follow through the storage event; the one-file
+   * list (devPick, Ctrl+Shift+Y) stays in this window.
    */
   const RELOAD_KEY = 'se-dev-reload';
   const devParts = {
@@ -866,6 +865,7 @@
         localStorage.setItem(RELOAD_KEY, JSON.stringify({ at: Date.now(), scripts: Boolean(scripts) }));
       } catch { /* storage refused (full or blocked): kept in memory only */ }
     },
+    devPick: () => devReload('pick'),
   };
   load();
   if (!pending) settle(); // nothing to wait for

@@ -78,6 +78,8 @@
   function register() {
     const h = hub();
     if (!h.wins.includes(window)) h.wins.push(window);
+    // Held by the toast preview: this window's paused animations too (scan.js holdToasts)
+    SE.attr(document.documentElement, 'data-se-tst-hold', h.held ? '' : null);
   }
 
   // Every window (this one too) re-syncs on its next tick.
@@ -250,8 +252,8 @@
     }
     const h = hub();
     if (candidate(h) !== window) return;
-    // Hover pauses don't carry over (the pointer is on the old window).
-    if (h.pausedAt) {
+    // Hover pauses don't carry over (the pointer is on the old window); a hold does.
+    if (h.pausedAt && !h.held) {
       h.startedAt += Date.now() - h.pausedAt;
       h.pausedAt = 0;
     }

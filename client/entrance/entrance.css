@@ -35,7 +35,7 @@
   /* se-ent-strand: gone without JS. After Reload UI during a voice call, the window kept the
      splash while its script's timers never ran. 9.5s outlasts entrance.js's longest run (SAFETY_MS,
      then Ready, the move and the fade) */
-  animation: se-ent-in var(--se-dur-settle) ease-out forwards, se-ent-strand var(--se-dur-long) var(--ent-ease) 9.5s forwards;
+  animation: se-ent-in var(--se-dur-settle) var(--se-ease) forwards, se-ent-strand var(--se-dur-long) var(--ent-ease) 9.5s forwards;
   user-select: none;
 }
 
@@ -111,7 +111,7 @@ html[data-se-ent-hold] .BrowserWrapper {
   background: var(--ent-art) center 30% / cover no-repeat;
   filter: var(--se-blur-ambient);
   opacity: 0;
-  transition: opacity var(--se-dur-ambient) ease;
+  transition: opacity var(--se-dur-ambient) var(--se-ease-standard);
 }
 
 #se-entrance[data-art] .se-ent-ambient {
@@ -155,7 +155,7 @@ html[data-se-ent-hold] .BrowserWrapper {
   background: var(--ent-bg);
   box-shadow: var(--se-shadow-lg);
   opacity: 0;
-  transition: opacity var(--se-dur-ambient) ease;
+  transition: opacity var(--se-dur-ambient) var(--se-ease-standard);
 }
 
 #se-entrance[data-art] .se-ent-shadow {
@@ -208,7 +208,7 @@ html[data-se-ent-hold] .BrowserWrapper {
   gap: calc(36 * var(--u));
   width: calc(520 * var(--u));
   isolation: isolate; /* the scrim sits behind it */
-  transition: opacity var(--se-dur-mid) ease;
+  transition: opacity var(--se-dur-mid) var(--se-ease-standard);
 }
 
 /* Steam's Home: the block in What's New's panel, lower left */
@@ -241,7 +241,7 @@ html[data-se-ent-hold] .BrowserWrapper {
   align-items: flex-start;
   gap: calc(14 * var(--u));
   opacity: 0;
-  transition: opacity var(--se-dur-long) ease;
+  transition: opacity var(--se-dur-long) var(--se-ease-standard);
 }
 
 #se-entrance[data-game] .se-ent-game {

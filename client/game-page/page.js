@@ -111,8 +111,9 @@
    * resizes (topSizer, onResizeTop).
    */
   const SCROLL_SETTLE_MS = 120;
-  let scrolled = null;
+  const scrolled = new Set(); // every scroller moved since the last settle, not just the last one
   live.scrollTimer = 0;
+  live.layoutWaits = new Set(); // queued placeScrolled reads, cancelled by destroy (main.js)
   const topFor = new WeakMap();
 
   // Scrollers already scrolled once
@@ -125,21 +126,28 @@
     // a button placed before keeps that place meanwhile.
     if (t instanceof Element && !tried.has(t)) {
       tried.add(t);
-      SE.afterLayout(t, () => placeScrolled(t));
+      placeAfterLayout(t);
     }
     // Then debounced: the ring follows once the scroll has settled
     settleLater(t);
   }
 
   function settleLater(t) {
-    scrolled = t;
+    if (t instanceof Element) scrolled.add(t);
     clearTimeout(live.scrollTimer);
     live.scrollTimer = setTimeout(() => {
       live.scrollTimer = 0;
-      const t = scrolled;
-      scrolled = null;
-      if (t instanceof Element) SE.afterLayout(t, () => placeScrolled(t));
+      for (const el of scrolled) placeAfterLayout(el);
+      scrolled.clear();
     }, SCROLL_SETTLE_MS);
+  }
+
+  function placeAfterLayout(t) {
+    const wait = SE.afterLayout(t, () => {
+      live.layoutWaits.delete(wait);
+      placeScrolled(t);
+    });
+    live.layoutWaits.add(wait);
   }
 
   function placeScrolled(t) {
@@ -173,8 +181,14 @@
     placeTop(best);
   }
 
+  // A window resize, throttled to a frame: a drag fires resize many times between frames
+  live.resizeFrame = 0;
   function onResizeTop() {
-    for (const btn of document.querySelectorAll(TOP_BTN)) placeTop(btn);
+    if (live.resizeFrame) return;
+    live.resizeFrame = requestAnimationFrame(() => {
+      live.resizeFrame = 0;
+      for (const btn of document.querySelectorAll(TOP_BTN)) placeTop(btn);
+    });
   }
 
   const RV_BOX = `.${C.ReviewContainer}`;

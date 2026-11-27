@@ -54,7 +54,7 @@
   // Hovering the tray pauses the countdown (CSS); the hub keeps the time so a new stage agrees.
   function onTrayHover(e) {
     const h = hub();
-    if (!e.target.closest?.('.se-tst-tray')) return;
+    if (h.held || !e.target.closest?.('.se-tst-tray')) return; // held: the pointer leaving lets nothing go
     if (!h.pausedAt && SE.settings?.get('toast-hover') === 'off') return; // "Pause on hover: Off"
     if (e.type === 'pointerover' && !h.pausedAt && h.active) {
       h.pausedAt = Date.now();
@@ -63,6 +63,30 @@
       h.startedAt += Date.now() - h.pausedAt;
       h.pausedAt = 0;
       hoverSteam(false);
+    }
+  }
+
+  /*
+   * Held (the toast preview's Hold, dev/toast-preview.js): the countdown paused as a hover pauses
+   * it, in every window of this surface (the hub is shared), until let go. Each window's <html>
+   * says so (data-se-tst-hold) for the paused animations (card.css); a window registering later
+   * takes it up (hub.js register).
+   */
+  const HOLD_ATTR = 'data-se-tst-hold';
+  function holdToasts(on) {
+    const h = hub();
+    if (Boolean(h.held) === on) return;
+    h.held = on;
+    if (on && !h.pausedAt) {
+      h.pausedAt = Date.now();
+      hoverSteam(true);
+    } else if (!on && h.pausedAt) {
+      h.startedAt += Date.now() - h.pausedAt;
+      h.pausedAt = 0;
+      hoverSteam(false);
+    }
+    for (const w of new Set([...h.wins, window])) {
+      if (alive(w)) run(() => w.document.documentElement.toggleAttribute(HOLD_ATTR, on));
     }
   }
 
@@ -198,5 +222,5 @@
     for (const w of others) run(() => w.__seToasts?.wake?.());
   }
 
-  Object.assign(ns, { busy, onDockAnimationEnd, onDockClick, onPageHide, onTrayHover, step });
+  Object.assign(ns, { busy, holdToasts, onDockAnimationEnd, onDockClick, onPageHide, onTrayHover, step });
 })(window.__se);

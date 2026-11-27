@@ -17,6 +17,7 @@
  * - data.js        copy, Steam lookups, saved settings and the shared `state`
  * - ui.js          native list clicks, menus, the hover flyout and the frame pass
  * - routing.js     which surface opens a chat (dock, overlay, native window)
+ * - routing-patches.js  Steam's chat methods patched to route through it
  * - flyouts.js     browser clicks, game group flyouts and chat tabs
  * - member-list.js a group's members menu without the offline ones
  * - embed.js      mounting Steam's own Friends & Chat tree

@@ -319,7 +319,9 @@
 
   const start = () => {
     observer = SE.watch(schedule, { throttle: 100, ignore: SE.inSide });
-    earlyObserver = SE.watch(applyKnownShifts, { sync: true, ignore: SE.inSide });
+    // Sync, so a redrawn shelf's covers keep their shift before paint: scoped to the Home, its
+    // shelves' only home, so Store pages and the rest of the window never run it
+    earlyObserver = SE.watch(applyKnownShifts, { sync: true, scope: '.LibraryHome', ignore: SE.inSide });
     addEventListener('resize', onResize);
     // A cover image that loads late can change the cover's size without any DOM change.
     document.addEventListener('load', onImageLoad, true);

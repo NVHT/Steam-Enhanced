@@ -14,6 +14,7 @@
   let hostRow = null;
   let currentAppId = 0;
   let activeRequest = null;
+  let shownWait = 0; // the appid whose badge waits for its visibility read (SE.settled)
   let destroyed = false;
   // The row's fiber walk is cached until the row or the route changes (React reuses the row).
   let resolved = { target: null, route: '', id: 0 };
@@ -264,10 +265,13 @@
       renderBadge(cached);
       return;
     }
-    if (activeRequest?.id === id) return;
+    if (activeRequest?.id === id || shownWait === id) return;
     // Only a request asks whether the badge shows, after the next layout (SE.settled): asked
-    // here, right after the page pass mounted it, the read paid the page's style pass
+    // here, right after the page pass mounted it, the read paid the page's style pass. One wait
+    // at a time: each pass of a page build calls here, and each wait keeps a 1 s backstop
+    shownWait = id;
     const shown = await new Promise((done) => SE.settled(() => done(!!badge && SE.visible(badge))));
+    if (shownWait === id) shownWait = 0;
     if (!shown || destroyed || currentAppId !== id || !badge?.isConnected || activeRequest?.id === id) return;
 
     abortActiveRequest();

@@ -1,6 +1,8 @@
 /*
  * Settings › page specifics, continued from pages.css: Game Recording (client/settings/dialog/
- * gamerecording.js). The hero card is pages-hero.css; here, its timeline.
+ * gamerecording.js). The hero card is pages-hero.css; here, its timeline, then the Background
+ * mode rows Steam draws its own way (Game-specific Settings, the Recordings folder) and the
+ * first-visit intro.
  *
  *   120 min ago [▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒] ● Now     Background: all of it kept
  *               [          ▓▓▓▓▓▓             ]   Now     Manual: one clip
@@ -76,4 +78,432 @@
   height: 8px;
   border-radius: 50%;
   background: var(--se-danger);
+}
+
+/*
+ * Game-specific Settings (Background mode): Steam's rows (BackgroundSettingRow), joined into a
+ * card by client/settings/dialog/layout.js, each the game on the left and what it keeps on the
+ * right; the small labels only on the card's first row.
+ *
+ *   [ (icon) All Other Games      LENGTH         QUALITY          DISK SPACE ]
+ *   [                             [120 min v] x [High v]     =  1.2 - 5.4 GB ]
+ *   [ (icon) Hellraiser  (bin)    [Infinite v] x [Ultra v]                   ]
+ *   [ Add game-specific settings here                          [Add Game v] ]
+ */
+.CFTLX2wIKOK3hNV-fS7_V ._2qEiBY2V1cc3dNa4Jzvk37[data-se-c] {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--se-space-4);
+  row-gap: var(--se-space-2);
+  border-bottom: 0;
+}
+
+/* The game: its icon, name and remove button */
+.CFTLX2wIKOK3hNV-fS7_V ._2qEiBY2V1cc3dNa4Jzvk37 ._7FcMqD2i9RxkMwkBReNi8 {
+  flex: 1 1 180px;
+  min-width: 0;
+  gap: var(--se-space-2);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2qEiBY2V1cc3dNa4Jzvk37 .MeVUVecBNIjNDqDChleJ1 {
+  flex: 0 1 auto;
+  min-width: 0;
+  gap: var(--se-space-3);
+  margin: 0;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2qEiBY2V1cc3dNa4Jzvk37 .MeVUVecBNIjNDqDChleJ1 img,
+.CFTLX2wIKOK3hNV-fS7_V ._2qEiBY2V1cc3dNa4Jzvk37 .MeVUVecBNIjNDqDChleJ1 svg {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--se-radius-xs);
+  color: var(--se-text-muted);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2qEiBY2V1cc3dNa4Jzvk37 .MeVUVecBNIjNDqDChleJ1 span {
+  overflow: hidden;
+  font: 600 var(--se-fs-base) var(--se-font);
+  color: var(--se-text);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V div._1IsPTEXf7ua_4XbMa3sXyW {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  max-width: none;
+  max-height: none;
+  border-radius: var(--se-radius-sm);
+  color: var(--se-text-faint);
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V div._1IsPTEXf7ua_4XbMa3sXyW:hover,
+.CFTLX2wIKOK3hNV-fS7_V div._1IsPTEXf7ua_4XbMa3sXyW:focus-visible {
+  background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
+  color: var(--se-danger);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V div._1IsPTEXf7ua_4XbMa3sXyW svg {
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  color: inherit;
+}
+
+/* Length x Quality = Disk space, the controls on one line under their labels */
+.CFTLX2wIKOK3hNV-fS7_V ._2qEiBY2V1cc3dNa4Jzvk37 ._1AB0nSExYg5ySkMJD7qnbA {
+  flex: 0 1 auto;
+  align-items: flex-end;
+  gap: var(--se-space-2);
+  margin-left: auto;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2qEiBY2V1cc3dNa4Jzvk37 .T6_c7Drjq_lR7R_4pBr0i {
+  flex-grow: 0;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .T6_c7Drjq_lR7R_4pBr0i > ._1RUoX0kTOBfqpwCaBZGDLJ {
+  margin-bottom: var(--se-space-1);
+  font: var(--se-label-font);
+  letter-spacing: var(--se-label-spacing);
+  color: var(--se-label-color);
+}
+
+/* Past the first row the labels repeat nothing: kept for screen readers (Length labels its button) */
+.CFTLX2wIKOK3hNV-fS7_V ._2qEiBY2V1cc3dNa4Jzvk37[data-se-c]:not([data-se-c~="f"]) .T6_c7Drjq_lR7R_4pBr0i > ._1RUoX0kTOBfqpwCaBZGDLJ {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/*
+ * The two pickers, narrower than the theme's dropdowns (150px): three controls share the row.
+ * !important and the ids beat controls.css's dropdown rule, itself !important against Steam's.
+ */
+.CFTLX2wIKOK3hNV-fS7_V ._3-VwgX1vckmS4IkCS_byIB.v8oJcDOQF6xmlVTw4VhOr:not(#se-none):not(#se-dd),
+.CFTLX2wIKOK3hNV-fS7_V ._28RIt9NO4opxOwGCgtx5Ot.v8oJcDOQF6xmlVTw4VhOr:not(#se-none):not(#se-dd) {
+  min-width: 128px !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3-VwgX1vckmS4IkCS_byIB ._3NedfiBR2Wz4MV3x2Aef1U {
+  font: 500 var(--se-fs-base) var(--se-font);
+}
+
+/* Infinite and Do Not Record: their glyph beside the word */
+.CFTLX2wIKOK3hNV-fS7_V ._3-VwgX1vckmS4IkCS_byIB .uteWMMK9lJcMk07ubhX9i {
+  gap: var(--se-space-2);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V .uteWMMK9lJcMk07ubhX9i ._3OpPGLtM0J24F1qbLug0Zn,
+.CFTLX2wIKOK3hNV-fS7_V .uteWMMK9lJcMk07ubhX9i ._2L6G7URxWCPbSADYt-LZv9 {
+  flex: none;
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
+  color: var(--se-text-muted);
+}
+
+/* x and =: quiet marks between the controls; x drawn as the theme's glyph (Steam's is a fixed grey) */
+.CFTLX2wIKOK3hNV-fS7_V ._2qEiBY2V1cc3dNa4Jzvk37 ._2LFofoioTgY3rvDzT6weFr {
+  flex: none;
+  width: var(--se-space-3);
+  height: 34px;
+  margin: 0;
+  font: 500 var(--se-fs-lg) / 34px var(--se-font);
+  color: var(--se-text-faint);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2LFofoioTgY3rvDzT6weFr._1sbBZAZRXHfMoWMsqXNXYW svg {
+  display: none;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2LFofoioTgY3rvDzT6weFr._1sbBZAZRXHfMoWMsqXNXYW::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: currentColor;
+  -webkit-mask: var(--se-icon-close-sm) center / contain no-repeat;
+  mask: var(--se-icon-close-sm) center / contain no-repeat;
+}
+
+/* Disk space: the estimate as the row's figure, red when the drive can't hold it */
+.CFTLX2wIKOK3hNV-fS7_V ._2qEiBY2V1cc3dNa4Jzvk37 ._2cqbeEdfABzGgoD3Ox7dKc {
+  flex-basis: auto;
+  min-width: 96px;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2cqbeEdfABzGgoD3Ox7dKc .F0pWKDM9f53LhtDYnOQyF {
+  gap: var(--se-space-2);
+  font: 600 var(--se-fs-md) var(--se-font);
+  font-variant-numeric: tabular-nums;
+  color: var(--se-text-strong);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._2cqbeEdfABzGgoD3Ox7dKc .F0pWKDM9f53LhtDYnOQyF._2KyOX9ao-RXzgIuk3YTQtO {
+  color: var(--se-danger);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1cHyyyeO-rfD0IFU2bJuRg ._1CPrv4woAFAo_OHJEvZdQ2 {
+  width: var(--se-icon-sm);
+  color: var(--se-text-faint);
+}
+
+/* Add Game: the card's last row, its line and Steam's game picker */
+.CFTLX2wIKOK3hNV-fS7_V .zSrNTpxAxcxNr72Ykpxld[data-se-c] {
+  justify-content: space-between;
+  font: 500 var(--se-fs-base) var(--se-font);
+  color: var(--se-text-dim);
+}
+
+/*
+ * Recordings folder: the path as the row's label, a folder glyph before it (a click opens it),
+ * and Reset Folder as an icon button beside Change Folder.
+ */
+.CFTLX2wIKOK3hNV-fS7_V ._3-HNMwdHCRRWXOn0RiYvzj ._2Hfx7Bzi9FSN4E81QXHgnl {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  padding-left: var(--se-space-5);
+  font: 500 var(--se-fs-base) var(--se-font);
+  color: var(--se-text-dim);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3-HNMwdHCRRWXOn0RiYvzj ._2Hfx7Bzi9FSN4E81QXHgnl:hover {
+  color: var(--se-text-strong);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3-HNMwdHCRRWXOn0RiYvzj ._2Hfx7Bzi9FSN4E81QXHgnl::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: var(--se-icon-md);
+  height: var(--se-icon-md);
+  margin-top: calc(-1 * var(--se-space-2));
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-icon-folder) center / contain no-repeat;
+  mask: var(--se-icon-folder) center / contain no-repeat;
+}
+
+/*
+ * Steam's "X" as the close glyph, a square button beside Change Folder in its look, centred on
+ * it (with no text left, its baseline would lift it). !important and the ids beat controls.css's
+ * button rule.
+ */
+.CFTLX2wIKOK3hNV-fS7_V ._3-HNMwdHCRRWXOn0RiYvzj ._3coumbNlruNENR4HCBn5S2:not(#se-none):not(#se-dd) {
+  position: relative !important;
+  display: inline-block !important;
+  align-self: center;
+  vertical-align: middle;
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  margin-inline-start: 0 !important; /* the row's gap spaces it (Steam adds 8px of its own) */
+  padding: 0 !important;
+  color: var(--se-text-muted) !important;
+  font-size: 0 !important;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3-HNMwdHCRRWXOn0RiYvzj ._3coumbNlruNENR4HCBn5S2:not(#se-none):not(#se-dd):hover,
+.CFTLX2wIKOK3hNV-fS7_V ._3-HNMwdHCRRWXOn0RiYvzj ._3coumbNlruNENR4HCBn5S2:not(#se-none):not(#se-dd):focus-visible {
+  background: var(--se-hover) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
+  color: var(--se-text-strong) !important;
+}
+
+/* !important: client/dialogs/dialogs.css hides a button's ::before with !important, and Steam's
+   button styles place it */
+.CFTLX2wIKOK3hNV-fS7_V ._3-HNMwdHCRRWXOn0RiYvzj ._3coumbNlruNENR4HCBn5S2::before {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important; /* out of the flow: Steam's hidden "X" text keeps a row of its own */
+  inset: 0 !important;
+  margin: auto;
+  opacity: 1 !important;
+  transform: none !important;
+  width: var(--se-icon-sm);
+  height: var(--se-icon-sm);
+  background: currentColor;
+  -webkit-mask: var(--se-icon-close-sm) center / contain no-repeat;
+  mask: var(--se-icon-close-sm) center / contain no-repeat;
+}
+
+/*
+ * The first-visit intro (Steam's SinglePageIntro over the page): a theme panel on the page's
+ * dimmed ground, its points as rows with accent tiles, Got it the one primary button.
+ *
+ *   [ Game Recording                                   (x) ]
+ *   [ A built-in system for creating and sharing…          ]
+ *   [ [rec] Record   Never miss a moment                   ]
+ *   [ ...                                                  ]
+ *   [ [gear] Plus  Customize…        [Got it] [Learn more] ]
+ */
+.CFTLX2wIKOK3hNV-fS7_V ._20ZzHxTmtWU8kWGA6YqWfa {
+  background: color-mix(in srgb, var(--se-bg) 82%, transparent);
+  backdrop-filter: var(--se-blur-scrim);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1TV2TLk7RNa3PqD1_WKqfs {
+  width: 460px;
+  padding: var(--se-space-6);
+  border-radius: var(--se-radius-card);
+  background: var(--se-panel-bg);
+  box-shadow: var(--se-panel-shadow);
+  color: var(--se-text);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1TV2TLk7RNa3PqD1_WKqfs ._3hZw8LtSmDa2ToD2GgJea4 {
+  padding-right: var(--se-space-6);
+  font: 700 var(--se-fs-2xl) var(--se-font);
+  letter-spacing: 0;
+  text-transform: none;
+  text-align: start;
+  color: var(--se-text-strong);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1TV2TLk7RNa3PqD1_WKqfs ._22PtA83qCSBVvw_H3awXtj {
+  margin-top: var(--se-space-1);
+  padding: 0;
+  font: 500 var(--se-fs-base) / 1.45 var(--se-font);
+  text-align: start;
+  color: var(--se-text-muted);
+}
+
+/* Close: the theme's glyph in a 32px button (Steam's is a faded white cross) */
+.CFTLX2wIKOK3hNV-fS7_V ._1TV2TLk7RNa3PqD1_WKqfs ._3LcuuuaTcyQg5AsF4kwCl8 {
+  inset-inline-end: var(--se-space-4);
+  top: var(--se-space-4);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3LcuuuaTcyQg5AsF4kwCl8 ._15GEboHKZf01mzV0rQgP1p {
+  display: block;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  padding: var(--se-space-2);
+  border-radius: var(--se-radius-sm);
+  opacity: 1;
+  color: var(--se-text-muted);
+  transform: none;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3LcuuuaTcyQg5AsF4kwCl8 ._15GEboHKZf01mzV0rQgP1p:hover {
+  background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
+  color: var(--se-text-strong);
+  opacity: 1;
+  transform: none;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._15GEboHKZf01mzV0rQgP1p line {
+  stroke: currentColor;
+  stroke-width: 24;
+  stroke-linecap: round;
+}
+
+/* The points: a tile, a title and its line */
+.CFTLX2wIKOK3hNV-fS7_V ._1TV2TLk7RNa3PqD1_WKqfs ._2AIX9xwDcBjVKfN4K7rQRS {
+  gap: var(--se-space-4);
+  margin: var(--se-space-5) 0;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1TV2TLk7RNa3PqD1_WKqfs ._1ARpYhIZ6djOb8YryXoRTt {
+  display: flex;
+  align-items: center;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1ARpYhIZ6djOb8YryXoRTt ._35OPW6SSVNT98PMn5YpdWe {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-accent-tint);
+  color: var(--se-accent);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1ARpYhIZ6djOb8YryXoRTt ._35OPW6SSVNT98PMn5YpdWe ._5cxOx9Q0JsyfyMd6Q3Rqf {
+  width: var(--se-icon-glyph);
+  height: var(--se-icon-glyph);
+  color: inherit;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1ARpYhIZ6djOb8YryXoRTt ._3WQNzDS4GjPSrni0X1Aq6a {
+  gap: var(--se-space-half);
+  margin-inline-start: var(--se-space-3);
+  line-height: 1.3;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3WQNzDS4GjPSrni0X1Aq6a ._3ydcnZaaRQByQKKRWlgbe2 {
+  font: 600 var(--se-fs-md) var(--se-font);
+  text-transform: none;
+  color: var(--se-text);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._3WQNzDS4GjPSrni0X1Aq6a ._12cLzLcx6DHJs6OhIjX2YF {
+  font: 500 var(--se-fs-base) var(--se-font);
+  font-style: normal;
+  color: var(--se-text-muted);
+}
+
+/* Plus, beside the buttons: a quiet note, its tile grey */
+.CFTLX2wIKOK3hNV-fS7_V ._1ARpYhIZ6djOb8YryXoRTt._1pAbz17S-TpVy4rtNcwjlr ._35OPW6SSVNT98PMn5YpdWe {
+  width: 32px;
+  height: 32px;
+  background: var(--se-surface-2);
+  color: var(--se-text-faint);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1pAbz17S-TpVy4rtNcwjlr ._3WQNzDS4GjPSrni0X1Aq6a ._3ydcnZaaRQByQKKRWlgbe2 {
+  font-size: var(--se-fs-sm);
+  color: var(--se-text-dim);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1pAbz17S-TpVy4rtNcwjlr ._3WQNzDS4GjPSrni0X1Aq6a ._12cLzLcx6DHJs6OhIjX2YF {
+  font-size: var(--se-fs-xs);
+  color: var(--se-text-faint);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1TV2TLk7RNa3PqD1_WKqfs .bCcxBeg8e3Smf9BlLoJDq {
+  align-items: center;
+  gap: var(--se-space-2);
+  padding-top: var(--se-space-4);
+  box-shadow: inset 0 1px 0 var(--se-hairline);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1TV2TLk7RNa3PqD1_WKqfs .bCcxBeg8e3Smf9BlLoJDq ._1OtMaay61p9hiuPgZW_iDB {
+  min-width: 0;
+  margin-inline-end: var(--se-space-2);
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1TV2TLk7RNa3PqD1_WKqfs .bCcxBeg8e3Smf9BlLoJDq .PeE6cOMmXDDV_1oQfFUtD {
+  min-width: 0;
+}
+
+/* Got it: the view's one primary. !important and the ids beat controls.css's button rule. */
+.CFTLX2wIKOK3hNV-fS7_V ._1TV2TLk7RNa3PqD1_WKqfs button.DialogButton.Primary:not(#se-none):not(#se-dd) {
+  background: var(--se-btn-primary-bg) !important;
+  color: var(--se-btn-primary-color) !important;
+  filter: none;
+}
+
+.CFTLX2wIKOK3hNV-fS7_V ._1TV2TLk7RNa3PqD1_WKqfs button.DialogButton.Primary:not(#se-none):not(#se-dd):hover,
+.CFTLX2wIKOK3hNV-fS7_V ._1TV2TLk7RNa3PqD1_WKqfs button.DialogButton.Primary:not(#se-none):not(#se-dd):focus-visible {
+  background: var(--se-btn-primary-bg-hover) !important;
+  color: var(--se-btn-primary-color) !important;
 }

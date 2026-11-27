@@ -368,10 +368,13 @@
     live.target ||= placeable() ? wanted() : null;
     const s = placeScreen();
     note(`placing: screen ${placeable() ? `${s.width}×${s.height}` : 'unknown'}, window at ${window.screenX},${window.screenY} ${window.outerWidth}×${window.outerHeight}, Steam moves so far ${live.spotHold?.moves ?? 0}`);
-    // Steam's slide-in moves land a window within ~300 ms; past this, they won't
-    if (live.target) for (const end = Date.now() + 1200; Date.now() < end && !landed(live.target); ) await sleep(50);
+    // Steam's slide-in moves land a window within ~300 ms; past this, they won't. On Linux the
+    // window's place reads 0,0 (context.js), so a landing can't be seen: a Steam move sent to the
+    // spot is taken as landed, as placeUnseen does on the desktop
+    const done = () => (LINUX ? live.spotHold?.sent > 0 : landed(live.target));
+    if (live.target) for (const end = Date.now() + 1200; Date.now() < end && !done(); ) await sleep(50);
     live.attempts.push({ mover: MOVERS[0].name, x: window.screenX, y: window.screenY, ratio: getRatio() });
-    if (!live.target || !landed(live.target)) {
+    if (!live.target || !done()) {
       note(`gave up: window at ${window.screenX},${window.screenY}, spot ${live.target ? `${live.target.x},${live.target.y}` : 'unknown'}, Steam moves ${live.spotHold?.moves ?? 0}`);
       live.mover = -2;
       return;
@@ -465,10 +468,11 @@
       const sent = { x: Math.round(live.target.x / r.x) + nudge, y: Math.round(live.target.y / r.y) };
       if (logged) note(`Steam move ${n}: ${x},${y} → spot ${sent.x},${sent.y}`);
       const out = native.call(this, sent.x, sent.y, dpi, ...rest);
+      live.spotHold.sent++;
       if (!known && !spotCalibrating) checkSpot(sent);
       return out;
     };
-    live.spotHold = { W, native, wrapped, lastDpi: undefined, moves: 0, early };
+    live.spotHold = { W, native, wrapped, lastDpi: undefined, moves: 0, sent: 0, early };
     if (early) {
       early.take(wrapped);
       note(`holding Steam's moves from the loader (${early.held()} held before; window at ${window.screenX},${window.screenY} ${window.outerWidth}×${window.outerHeight})`);

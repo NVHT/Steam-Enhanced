@@ -24,7 +24,7 @@
   background: color-mix(in srgb, var(--se-bg-ink) 82%, transparent);
   box-shadow: inset 0 0 0 1px var(--se-divider), 0 6px 18px -6px var(--se-black-80);
   pointer-events: auto;
-  transition: box-shadow var(--se-dur-long) ease;
+  transition: box-shadow var(--se-dur-long) var(--se-ease-standard);
   /* Drawn at 420 px, scaled as a whole (art, text, buttons, strip) to the size stage.js and card.js set. */
   zoom: var(--se-tst-zoom, 1);
 }
@@ -146,7 +146,7 @@
   opacity: 0;
   pointer-events: none;
   cursor: pointer;
-  transition: opacity var(--se-dur-slower) ease;
+  transition: opacity var(--se-dur-slower) var(--se-ease-standard);
 }
 
 .se-tst-layer[data-on] {
@@ -224,7 +224,7 @@
 .se-tst-wf-glow {
   transform-box: fill-box;
   transform-origin: center;
-  animation: se-tst-wf-breathe var(--se-dur-glow) ease-in-out infinite alternate;
+  animation: se-tst-wf-breathe var(--se-dur-glow) var(--se-ease-inout) infinite alternate;
 }
 
 @keyframes se-tst-wf-breathe {
@@ -234,7 +234,7 @@
 
 /* The cards below it light up in turn. */
 .se-tst-wf-card {
-  animation: se-tst-wf-card var(--se-dur-sweep) ease-in-out infinite;
+  animation: se-tst-wf-card var(--se-dur-sweep) var(--se-ease-inout) infinite;
   animation-delay: calc(var(--i) * 1.5s);
 }
 
@@ -256,7 +256,7 @@
 .se-tst-wf-fr:not([data-st="off"]) {
   transform-box: fill-box;
   transform-origin: center;
-  animation: se-tst-wf-ring var(--se-dur-ripple) ease-in-out infinite;
+  animation: se-tst-wf-ring var(--se-dur-ripple) var(--se-ease-inout) infinite;
   animation-delay: calc(var(--i) * -.7s);
 }
 
@@ -305,7 +305,7 @@
 
 /* A slow push-in over the toast's lifetime. */
 .se-tst-layer[data-on]:not([data-sticky]) .se-tst-hero {
-  animation: se-tst-push var(--se-tst-d, 6000ms) ease-out var(--se-tst-delay, 0ms) forwards;
+  animation: se-tst-push var(--se-tst-d, 6000ms) var(--se-ease) var(--se-tst-delay, 0ms) forwards;
 }
 
 @keyframes se-tst-push {
@@ -373,7 +373,7 @@
 .se-tst-ct > * {
   opacity: 0;
   transform: translateY(10px);
-  transition: opacity var(--se-dur-relaxed) ease, transform var(--se-dur-rise) var(--se-ease);
+  transition: opacity var(--se-dur-relaxed) var(--se-ease-standard), transform var(--se-dur-rise) var(--se-ease);
 }
 
 .se-tst-layer[data-on] .se-tst-ct > * {
@@ -381,9 +381,9 @@
   transform: none;
 }
 
-.se-tst-layer[data-on] .se-tst-ct > :nth-child(1) { transition-delay: .3s; }
-.se-tst-layer[data-on] .se-tst-ct > :nth-child(2) { transition-delay: .38s; }
-.se-tst-layer[data-on] .se-tst-ct > :nth-child(3) { transition-delay: .46s; }
+.se-tst-layer[data-on] .se-tst-ct > :nth-child(1) { transition-delay: var(--se-dur-relaxed); }
+.se-tst-layer[data-on] .se-tst-ct > :nth-child(2) { transition-delay: calc(var(--se-dur-relaxed) + var(--se-stagger)); }
+.se-tst-layer[data-on] .se-tst-ct > :nth-child(3) { transition-delay: calc(var(--se-dur-relaxed) + 2 * var(--se-stagger)); }
 
 .se-tst-tile {
   position: relative;
@@ -448,7 +448,7 @@
   position: absolute;
   background: var(--c);
   clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
-  animation: se-twinkle var(--se-dur-pulse) ease-in-out infinite;
+  animation: se-twinkle var(--se-dur-pulse) var(--se-ease-inout) infinite;
 }
 
 .se-tst-spark:nth-child(1) { left: -10%; top: -10%; width: 25%; height: 25%; }
@@ -706,7 +706,7 @@
   height: 7px;
   border-radius: 50%;
   background: var(--c);
-  transition: opacity var(--se-dur) ease-out;
+  transition: opacity var(--se-dur) var(--se-ease);
 }
 
 .se-tst-x {
@@ -715,7 +715,7 @@
   height: 13px;
   color: var(--se-text-strong);
   opacity: 0;
-  transition: opacity var(--se-dur) ease-out;
+  transition: opacity var(--se-dur) var(--se-ease);
 }
 
 .se-tst-sweep:is(:hover, :focus-visible) .se-tst-kdot { opacity: 0; }
@@ -725,11 +725,16 @@
   from { stroke-dashoffset: 84.8; }
   to { stroke-dashoffset: 0; }
 }
-/* Hovering the tray pauses everything that counts down. */
+/* Hovering the tray pauses everything that counts down, as does the toast preview's Hold
+   (data-se-tst-hold, client/toasts/scan.js). */
 .se-tst-tray:hover .se-tst-layer[data-on] .se-tst-arc,
 .se-tst-tray:hover .se-tst-layer[data-on] .se-tst-lead,
 .se-tst-tray:hover .se-tst-layer[data-on] .se-tst-hero,
-.se-tst-tray:hover .se-tst-thumb[data-on]::after {
+.se-tst-tray:hover .se-tst-thumb[data-on]::after,
+html[data-se-tst-hold] .se-tst-layer[data-on] .se-tst-arc,
+html[data-se-tst-hold] .se-tst-layer[data-on] .se-tst-lead,
+html[data-se-tst-hold] .se-tst-layer[data-on] .se-tst-hero,
+html[data-se-tst-hold] .se-tst-thumb[data-on]::after {
   animation-play-state: paused;
 }
 

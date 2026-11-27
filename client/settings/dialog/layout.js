@@ -107,8 +107,12 @@
     }
   }
 
+  // Game Recording's Game-specific Settings: a row per game (and All Other Games, Add Game) that
+  // isn't a Field, joined into a card like the page's other rows
+  const REC_ROW = `.${C.BackgroundSettingRow}`;
+
   function cards(content) {
-    const sel = `${FIELD}.${FIELD_BG}, [data-se-seglabel], ${UPDATE_TIMING}, [data-se-sec]`;
+    const sel = `${FIELD}.${FIELD_BG}, [data-se-seglabel], ${UPDATE_TIMING}, ${REC_ROW}, [data-se-sec]`;
     const nodes = [...content.querySelectorAll(sel)].filter(
       (n) =>
         n.hasAttribute('data-se-sec') ||

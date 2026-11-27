@@ -189,6 +189,9 @@
       cancelPass();
       if (live.fitQueued) cancelAnimationFrame(live.fitQueued);
       clearTimeout(live.scrollTimer);
+      live.layoutWaits.forEach((wait) => wait.cancel());
+      live.layoutWaits.clear();
+      cancelAnimationFrame(live.resizeFrame);
       clearTimeout(live.shotRetry);
       document.removeEventListener('click', onEmoClick, true);
       document.removeEventListener('click', onCommentPill, true);

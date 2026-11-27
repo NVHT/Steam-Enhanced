@@ -87,7 +87,12 @@
   background: none;
   color: var(--se-text-muted);
   cursor: help;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
+  position: relative;
+  /* the ⓘ sits under Steam's title bar (TitleBar: 64 px, clear, z 2, the window's drag strip),
+     which takes the pointer: above it, out of the drag */
+  z-index: var(--se-z-over-steam);
+  -webkit-app-region: no-drag;
 }
 
 .se-wns-info::after {
@@ -102,6 +107,9 @@
 
 .se-wns-info:hover {
   background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text);
 }
 
@@ -110,14 +118,6 @@
  * after the pointer rests on it (--se-hover-delay) or at once on keyboard focus, Steam's
  * paragraphs kept apart
  */
-.se-wns-info {
-  position: relative;
-  /* the ⓘ sits under Steam's title bar (TitleBar: 64 px, clear, z 2, the window's drag strip),
-     which takes the pointer: above it, out of the drag */
-  z-index: var(--se-z-over-steam);
-  -webkit-app-region: no-drag;
-}
-
 .se-wns-tip {
   position: absolute;
   top: calc(100% + var(--se-space-2));
@@ -131,19 +131,19 @@
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity var(--se-dur) ease-out, visibility 0s linear var(--se-dur);
+  transition: opacity var(--se-dur) var(--se-ease), visibility 0s linear var(--se-dur);
 }
 
 .se-wns-info:hover .se-wns-tip {
   opacity: 1;
   visibility: visible;
-  transition: opacity var(--se-dur) ease-out var(--se-hover-delay), visibility 0s linear var(--se-hover-delay);
+  transition: opacity var(--se-dur) var(--se-ease) var(--se-hover-delay), visibility 0s linear var(--se-hover-delay);
 }
 
 .se-wns-info:focus-visible .se-wns-tip {
   opacity: 1;
   visibility: visible;
-  transition: opacity var(--se-dur) ease-out;
+  transition: opacity var(--se-dur) var(--se-ease);
 }
 
 .se-wns-info:focus-visible {
@@ -168,7 +168,7 @@
   flex-direction: column;
   gap: var(--se-space-1);
   min-width: 0;
-  transition: opacity var(--se-dur) ease-out;
+  transition: opacity var(--se-dur) var(--se-ease);
 }
 
 .se-wns-art {
@@ -382,7 +382,7 @@
   background: none !important;
   color: var(--se-text-muted);
   cursor: pointer;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
 ._2JKpGzeAiwmBdY73bfRXz- .VwcCoDMU0ROCpRAJ_cXTx ._3XBggeqHxK4fIrbu_ULi1y:hover {

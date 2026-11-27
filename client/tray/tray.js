@@ -1,12 +1,16 @@
 /*
  * The tray menu (Steam's icon in the Windows tray, its "jump list"), status first: you (avatar,
- * name, Online / Away / Invisible), the download in progress, your recent games with when you
- * last played them, Steam's pages as a row of icon tiles, its modes side by side, Exit Steam.
+ * name, Online / Away / Invisible), the download in progress (a click opens Downloads), your
+ * recent games with when you last played them, Steam's pages and modes as icon tiles, Exit Steam.
  *
  * Steam's rows stay (each runs its own steam:// URL or action) and are marked by the option they
- * run, read from their React props, never their localized text: data-se-tray = game, nav, mode,
- * exit or status (Steam's status rows, hidden: the header has the status). The header and the
- * download are the theme's, built before first paint. Styled by client/tray/tray.css.
+ * run, read from their React props, never their localized text: data-se-tray = game, nav (a page
+ * or a mode), exit or status (Steam's status rows, hidden: the header has the status). The
+ * header and the download are the theme's, built before first paint. Styled by
+ * client/tray/tray.css.
+ *
+ * The header offers the statuses Steam put rows in for (Settings › Interface › Taskbar
+ * Preferences turns each on), none when they're all off.
  *
  * Steam keeps this window (bRetainOnHide) and resizes it to the menu on every change inside
  * the menu, these included (tray.css says how the width follows).
@@ -18,13 +22,15 @@
   const KIND = {
     Store: 'nav', MyGames: 'nav', Community: 'nav', FriendActivity: 'nav', Friends: 'nav',
     Screenshots: 'nav', Servers: 'nav', Settings: 'nav',
-    BigPicture: 'mode', CloseBigPicture: 'mode', VR: 'mode', StopStreaming: 'mode', Console: 'mode',
+    // Modes are tiles too: with every page and mode on, two lines of five
+    BigPicture: 'nav', CloseBigPicture: 'nav', VR: 'nav', StopStreaming: 'nav', Console: 'nav',
     Exit: 'exit', AlwaysExit: 'exit',
     Online: 'status', Away: 'status', Invisible: 'status', Offline: 'status',
   };
-  // Persona states (EPersonaState) and the ones the header offers
+  // Persona states (EPersonaState) and the ones the header can offer (Offline signs out of
+  // friends: Steam's own row's URL, not a persona state)
   const STATE = { 0: 'offline', 1: 'online', 2: 'online', 3: 'away', 4: 'away', 5: 'online', 6: 'online', 7: 'invisible' };
-  const CHOICES = [['online', 1, 'Online'], ['away', 3, 'Away'], ['invisible', 7, 'Invisible']];
+  const CHOICES = [['online', 1, 'Online'], ['away', 3, 'Away'], ['invisible', 7, 'Invisible'], ['offline', null, 'Offline']];
   const LABEL = { online: 'Online', away: 'Away', invisible: 'Invisible', offline: 'Offline' };
 
   const friends = () => SE.global('g_FriendsUIApp', (app) => app.FriendStore)?.FriendStore || null;
@@ -75,9 +81,12 @@
     rows.forEach((row, i) => {
       if (kinds[i] === 'sep') attr(row, 'data-se-tray-hide', kept.has(row) ? null : '');
     });
-    // A mode alone on its line takes the whole line
-    const modes = rows.filter((row, i) => kinds[i] === 'mode');
-    modes.forEach((row, i) => attr(row, 'data-se-tray-wide', i === modes.length - 1 && modes.length % 2 ? '' : null));
+    // The header's choices: the statuses Steam made rows for
+    const offered = new Set(rows.filter((row, i) => kinds[i] === 'status').map((row) => optionOf(row)?.toLowerCase()));
+    const seg = root.querySelector('.se-tray-status');
+    if (!seg) return;
+    for (const button of seg.querySelectorAll('button')) button.hidden = !offered.has(button.dataset.state);
+    seg.hidden = !offered.size;
   }
 
   // A recent game: its name, then when you last played it (or that it is running)
@@ -98,12 +107,16 @@
 
   /* ---------- You ---------- */
 
-  // The chosen status is the group's one Tab stop (a roving tabindex), as in any radio group
+  const shownStatuses = (head) => [...head.querySelectorAll('.se-tray-status button:not([hidden])')];
+
+  // The chosen status is the group's one Tab stop (a roving tabindex), as in any radio group; the
+  // first shown one when yours isn't offered
   const checkStatus = (head, state) => {
+    const shown = shownStatuses(head);
+    const stop = shown.find((button) => button.dataset.state === state) || shown[0];
     for (const button of head.querySelectorAll('.se-tray-status button')) {
-      const on = button.dataset.state === state;
-      attr(button, 'aria-checked', String(on));
-      button.tabIndex = on ? 0 : -1;
+      attr(button, 'aria-checked', String(button.dataset.state === state));
+      button.tabIndex = button === stop ? 0 : -1;
     }
   };
 
@@ -153,6 +166,10 @@
   function buildDownload() {
     const box = el('div', 'se-tray-dl');
     box.hidden = true;
+    // A row of the menu: a click (Enter, Space) opens Steam's Downloads
+    box.setAttribute('role', 'button');
+    box.tabIndex = 0;
+    box.title = 'Open Downloads';
     const top = el('div', 'se-tray-dl-top');
     top.append(el('span', 'se-tray-dl-game'), el('span', 'se-tray-dl-pct'));
     const bar = el('div', 'se-tray-dl-bar');
@@ -172,6 +189,7 @@
     const paused = Boolean(overview.paused);
     setText(box.querySelector('.se-tray-dl-game'), `${paused ? 'Paused' : 'Downloading'} ${appName(appid) || `App ${appid}`}`);
     setText(box.querySelector('.se-tray-dl-pct'), `${Math.floor(percent)}%`);
+    attr(box, 'aria-label', `${box.querySelector('.se-tray-dl-game').textContent}, ${Math.floor(percent)}%. Open Downloads`);
     const bar = box.querySelector('.se-tray-dl-bar');
     attr(bar, 'aria-valuenow', Math.round(percent));
     attr(box, 'data-paused', paused ? '' : null);
@@ -197,9 +215,23 @@
 
     const refresh = () => {
       if (document.visibilityState === 'hidden') return;
+      markRows(root);
       renderHead(head);
       renderDownload(download, overview);
-      markRows(root);
+    };
+
+    // Downloads, then the menu closed as Steam's own rows close it (its instance's Hide; the
+    // main window coming forward blurs it shut otherwise)
+    const openDownloads = () => {
+      run(() => client().URL.ExecuteSteamURL('steam://open/downloads'));
+      const menu = SE.fromProps(root, 20, (p) => (typeof p.instance?.Hide === 'function' ? p.instance : undefined));
+      run(() => menu?.Hide());
+    };
+    const onDownloadKey = (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      event.stopPropagation();
+      openDownloads();
     };
 
     let reread = 0;
@@ -209,7 +241,7 @@
       event.stopPropagation();
       const choice = CHOICES.find(([state]) => state === button.dataset.state);
       const store = friends();
-      if (choice && store) run(() => store.SetUserPersonaState(choice[1]));
+      if (choice && store && choice[1] !== null) run(() => store.SetUserPersonaState(choice[1]));
       else if (choice) run(() => client().URL.ExecuteSteamURL(`steam://friends/status/${choice[0]}`));
       // The persona updates a moment later; the button shows the choice now
       checkStatus(head, button.dataset.state);
@@ -224,13 +256,15 @@
       if (!button || !STEP[event.key]) return;
       event.preventDefault();
       event.stopPropagation();
-      const buttons = [...head.querySelectorAll('.se-tray-status button')];
+      const buttons = shownStatuses(head);
       const next = buttons[(buttons.indexOf(button) + STEP[event.key] + buttons.length) % buttons.length];
       next.click();
       next.focus();
     };
     head.addEventListener('click', onStatus);
     head.addEventListener('keydown', onStatusKey);
+    download.addEventListener('click', openDownloads);
+    download.addEventListener('keydown', onDownloadKey);
     // Steam shows the kept window again on each open (and focuses it): read you and the rows anew
     document.addEventListener('visibilitychange', refresh);
     window.addEventListener('focus', refresh);
@@ -244,14 +278,16 @@
         clearTimeout(reread);
         head.removeEventListener('click', onStatus);
         head.removeEventListener('keydown', onStatusKey);
+        download.removeEventListener('click', openDownloads);
+        download.removeEventListener('keydown', onDownloadKey);
         document.removeEventListener('visibilitychange', refresh);
         window.removeEventListener('focus', refresh);
         run(() => feed.unregister());
         head.remove();
         download.remove();
         for (const node of root.querySelectorAll('.se-tray-when')) node.remove();
-        for (const node of root.querySelectorAll('[data-se-tray], [data-se-tray-hide], [data-se-tray-wide]')) {
-          for (const name of ['data-se-tray', 'data-se-tray-option', 'data-se-tray-hide', 'data-se-tray-wide', 'title', 'aria-label']) {
+        for (const node of root.querySelectorAll('[data-se-tray], [data-se-tray-hide]')) {
+          for (const name of ['data-se-tray', 'data-se-tray-option', 'data-se-tray-hide', 'title', 'aria-label']) {
             node.removeAttribute(name);
           }
         }

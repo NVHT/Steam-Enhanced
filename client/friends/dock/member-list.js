@@ -102,8 +102,10 @@
       return run(onlineBuckets, buckets, rendering) || buckets;
     };
     hook = { proto, original, wrappedRender, store, getList, wrappedList: store.GetGroupMemberList };
-    // The list already drawn renders through its own reactive render, not the class's
+    // The list already drawn renders through its own reactive render, not the class's; noted
+    // as trimmed now, so sync's check after this doesn't redraw it a second time
     wrapOwn(instance);
+    trimmed.add(instance);
     run(() => instance.forceUpdate());
   }
 

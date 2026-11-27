@@ -31,7 +31,8 @@
   --se-text: #e6e8eb;
   --se-text-muted: #a2acb7; /* 4.6:1 on --se-selected (AA text) */
   --se-text-dim: #b8c0c8;
-  --se-text-faint: #8994a2; /* 4.6:1 on --se-surface-2 (AA text) */
+  --se-text-faint: #8994a2; /* 4.6:1 on --se-surface-2 (AA text); a rule painting --se-hover or
+     --se-selected re-points it, --se-label-color and --se-offline to --se-text-muted (design-check) */
   --se-text-strong: #fff;
   --se-white: var(--se-text-strong);
   --se-bg-ink: #0f1115;
@@ -49,7 +50,8 @@
   --se-gold-surface: color-mix(in srgb, var(--se-gold) 16%, transparent);
   --se-running: #6cc24a;
   --se-online: #4cb4ff;
-  --se-offline: #848e99; /* 4.7:1 on --se-surface (AA text) */
+  --se-offline: #8e98a3; /* 4.5:1 on every preset's --se-surface-2 (AA text); on hover and selected,
+     muted (re-pointed where those paint, design-check) */
   /* Away (and snoozing): the status colour faded, as a solid ring, everywhere */
   --se-away: color-mix(in srgb, var(--se-online) 50%, transparent);
   --se-away-ingame: color-mix(in srgb, var(--se-running) 50%, transparent);
@@ -108,6 +110,7 @@
   --se-blur-glow: blur(28px) saturate(1.2); /* a small picture blown up into a soft glow (a game's capsule as its hero) */
   --se-blur-ambient: blur(48px); /* a picture blurred into its own backdrop (the Home stage's fill) */
   --se-blur-private: blur(4.5px); /* a private value hidden until clicked (System Information); not glass, so Glass effects Off keeps it */
+  --se-blur-mini: blur(1.5px) saturate(.8); /* a blurred picture drawn small (Theme settings' Startup background tiles: the Wall); not glass, so Glass effects Off keeps it */
   /* Glass round buttons on art ("•••" options, share): the dots, light at rest, ink on accent */
   --se-icon-dots-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Ccircle cx='6' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='18' cy='12' r='1.8'/%3E%3C/svg%3E");
   --se-icon-dots-ink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230f1115'%3E%3Ccircle cx='6' cy='12' r='1.8'/%3E%3Ccircle cx='12' cy='12' r='1.8'/%3E%3Ccircle cx='18' cy='12' r='1.8'/%3E%3C/svg%3E");
@@ -378,6 +381,7 @@
   --se-dur-drift: 6s;     /* art zooming in slowly while it shows (the DLC spotlight) */
   --se-dur-drift-long: 8s; /* the same over a larger picture (the front page hero) */
   /* Hover intent: how long the pointer rests before a card opens; tips wait as Steam's do */
+  --se-stagger: .08s; /* the step between items entering one after another (a toast's lines) */
   --se-hover-delay: .15s;
   --se-rail-hover-delay: var(--se-hover-delay); /* a rail menu's ("Hover delay", options/navigation/) */
   --se-friend-card-delay: var(--se-hover-delay); /* a friend's card ("Card delay", options/friends/) */

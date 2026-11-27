@@ -114,6 +114,8 @@
     history: () => history.slice(),
     // Why nothing (or something) is on the stage: the last scan, the shared queue and placement.
     why: () => ({ history: history.slice(), enabled: enabled(), lastScan: live.lastScan, stage: stageInfo(), skipped: skipped.size, pending: pendingKeys.size, placement: placement() }),
+    // The toast preview's Hold (dev/toast-preview.js): the countdown paused until let go
+    hold: (on) => ns.holdToasts(Boolean(on)),
     dump() {
       return [...byKey.values()].map(m => ({
         id: m.id,
@@ -140,7 +142,9 @@
       live.trayFollow?.disconnect();
       live.trayFollow = null;
       uninstallCentre();
-      if (live.spotHold?.early) run(() => live.spotHold.early.release());
+      // Handed back, not unwrapped: the loader's hold stays, so a toast code run again (a dev JS
+      // reload) takes Steam's moves over from it
+      if (live.spotHold?.early) run(() => live.spotHold.early.take(null));
       else if (live.spotHold && live.spotHold.W.MoveTo === live.spotHold.wrapped) run(() => { live.spotHold.W.MoveTo = live.spotHold.native; });
       root.removeAttribute(COMPACT_ATTR);
       for (const el of document.querySelectorAll(`.${EYEBROW}`)) el.remove();

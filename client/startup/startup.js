@@ -181,12 +181,13 @@
     return { name, avatar: img.currentSrc || img.src };
   };
 
+  // Steam's wall, as a full address: --se-startup-wall is read in the theme's stylesheets, served
+  // from Millennium's host, where a root-relative /images/ path finds nothing
   const resolveWallImage = (host) => {
     const computedBg = getComputedStyle(host).backgroundImage;
     if (computedBg && computedBg !== 'none') return computedBg;
-    return host.classList.contains(CLS.china)
-      ? 'url(/images/client_login_bg_grid_china.jpg)'
-      : 'url(/images/client_login_bg_grid.jpg)';
+    const file = host.classList.contains(CLS.china) ? 'client_login_bg_grid_china.jpg' : 'client_login_bg_grid.jpg';
+    return `url("${new URL(`/images/${file}`, location.href).href}")`;
   };
 
   const syncMosaicGrid = () => {

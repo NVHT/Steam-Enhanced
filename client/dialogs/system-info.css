@@ -99,10 +99,10 @@
   cursor: pointer;
   -webkit-app-region: no-drag;
   transition:
-    background-color var(--se-dur) ease-out,
-    box-shadow var(--se-dur) ease-out,
-    color var(--se-dur) ease-out,
-    opacity var(--se-dur) ease-out;
+    background-color var(--se-dur) var(--se-ease),
+    box-shadow var(--se-dur) var(--se-ease),
+    color var(--se-dur) var(--se-ease),
+    opacity var(--se-dur) var(--se-ease);
 }
 
 :is(.se-sysinfo, .se-sysreport) button:focus-visible,
@@ -372,7 +372,7 @@ button.se-sysinfo:focus-visible {
   color: var(--se-text-faint);
   cursor: text;
   -webkit-app-region: no-drag;
-  transition: box-shadow var(--se-dur) ease-out;
+  transition: box-shadow var(--se-dur) var(--se-ease);
 }
 
 .se-sysinfo-filter:focus-within,
@@ -568,6 +568,9 @@ button.se-sysinfo:focus-visible {
 
 .se-sysinfo-pill:hover {
   background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
 }
 
 .se-sysinfo-pill:not([data-copied]) > [data-icon="check"] {
@@ -729,6 +732,9 @@ button.se-sysinfo:focus-visible {
 
 .se-sysinfo-copyall:hover:not(:disabled) {
   background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
 }
 
 .se-sysinfo-copyall[data-copied] .se-sysinfo-icon {

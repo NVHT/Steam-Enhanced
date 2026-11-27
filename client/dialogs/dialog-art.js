@@ -1,6 +1,6 @@
 /*
  * The art behind a rebuilt dialog's top (.se-dialog-art) and its game capsules
- * (.se-dialog-capsules), styled in client/dialogs/dialogs.css: a game's art in the game and
+ * (.se-dialog-capsules), styled in client/dialogs/dialogs-rebuilt.css: a game's art in the game and
  * collection dialogs, a friend's or a group's in the friend and group dialogs; also used beyond
  * client/dialogs/ (the Settings window's pages, client/shared/mini-profile.js). Both work through a game's copies with Steam's own list first
  * (SE.heroURLs / SE.headerURLs, SE.art in core/runtime-art.js), so newer games' hashed art loads,
@@ -56,7 +56,7 @@
     const art = el('div', 'se-dialog-art');
     art.setAttribute('aria-hidden', 'true');
     host.append(art);
-    // No background, or it failed: their picture, blurred into a wash (dialogs.css)
+    // No background, or it failed: their picture, blurred into a wash (dialogs-rebuilt.css)
     const blurred = () => {
       if (!art.isConnected) return;
       art.replaceChildren();

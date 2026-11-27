@@ -22,6 +22,11 @@
  *   page one. Unofficial isn't paged (a short list of the user's own, with a second list under
  *   it): the page scrolls, and the row keeps only Refresh.
  *
+ * Its own settings page (Millennium › Plugins › Brew Hub, .bhd-wrap): the section heads are
+ * role="button" with no tabindex, so the keyboard never reached them; given one, Enter and Space
+ * press them. Each row's Copy (a role="button" div whose only sign of working was the "… copied"
+ * strip) gives way to the theme's copy button (SE.copyButton), copying the row's selector.
+ *
  * Classic script, listed after client/settings/millennium/ in client/loader.js: it reads the
  * icons and fillHeight from window.__seMillParts.
  */
@@ -344,9 +349,76 @@
 
   const views = SE.mount('Brew Hub', () => document.querySelectorAll(ROOT), create, { scope: '.MillenniumSettings' });
 
+  /* ---------- The plugin's settings page ---------- */
+
+  const SETTINGS = '.MillenniumSettings .bhd-wrap';
+  const HEAD = '.bhd-head[role="button"]';
+  const SWAPPED = 'data-se-bhd-copy'; // a plugin Copy with the theme's beside it (hidden, brew-hub-settings.css)
+
+  function createSettings(wrap) {
+    const heads = new Set(); // heads given a tabindex here
+    const copies = new Map(); // the theme's copy button → the plugin's Copy it stands in for
+
+    function sync() {
+      for (const head of wrap.querySelectorAll(`${HEAD}:not([tabindex])`)) {
+        head.tabIndex = 0;
+        heads.add(head);
+      }
+      // A button whose plugin Copy React replaced goes; the new Copy gets its own
+      for (const [button, copy] of copies) {
+        if (button.isConnected && copy.isConnected && button.previousElementSibling === copy) continue;
+        button.remove();
+        copy.removeAttribute(SWAPPED);
+        copies.delete(button);
+      }
+      if (typeof SE.copyButton !== 'function') return;
+      for (const copy of wrap.querySelectorAll(`.bhd-copy:not([${SWAPPED}])`)) {
+        const sel = copy.closest('.bhd-item')?.querySelector('.bhd-sel');
+        if (!sel) continue;
+        const button = SE.copyButton({ text: () => text(sel), label: 'Copy selector' });
+        button.setAttribute('data-tone', 'button');
+        button.setAttribute(OWN, '');
+        copy.setAttribute(SWAPPED, '');
+        copy.after(button);
+        copies.set(button, copy);
+      }
+    }
+
+    function onKey(e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const head = e.target.closest?.(HEAD);
+      if (!head || !wrap.contains(head)) return;
+      e.preventDefault();
+      head.click();
+    }
+
+    wrap.addEventListener('keydown', onKey);
+    const changes = SE.onChange(wrap, sync, { ignore: isOwn });
+    sync();
+
+    return {
+      destroy() {
+        changes.disconnect();
+        wrap.removeEventListener('keydown', onKey);
+        for (const head of heads) head.removeAttribute('tabindex');
+        for (const [button, copy] of copies) {
+          button.remove();
+          copy.removeAttribute(SWAPPED);
+        }
+        heads.clear();
+        copies.clear();
+      },
+    };
+  }
+
+  const settingsViews = SE.mount('Brew Hub settings', () => document.querySelectorAll(SETTINGS), createSettings, {
+    scope: '.MillenniumSettings',
+  });
+
   window[KEY] = {
     destroy() {
       views.destroy();
+      settingsViews.destroy();
       delete window[KEY];
     },
   };

@@ -69,7 +69,7 @@ html[data-se-startup] .se-startup-mosaic > span {
    * The drift repaints every tile's fixed wall, so it ticks at 10 fps (1-2 px a step at this
    * speed) instead of every frame; the tiles' glow is opacity and stays on the compositor.
    */
-  animation: se-startup-tile var(--se-tile-dur, 9s) ease-in-out var(--se-tile-delay, 0s) infinite, se-startup-drift 60s steps(600) infinite alternate;
+  animation: se-startup-tile var(--se-tile-dur, 9s) var(--se-ease-inout) var(--se-tile-delay, 0s) infinite, se-startup-drift 60s steps(600) infinite alternate;
 }
 
 @keyframes se-startup-tile {
@@ -103,7 +103,7 @@ html[data-se-startup] .se-startup-glow {
   height: 70vmax;
   border-radius: 50%;
   background: radial-gradient(closest-side, var(--se-glow), transparent);
-  animation: se-startup-glow 26s ease-in-out infinite alternate;
+  animation: se-startup-glow 26s var(--se-ease-inout) infinite alternate;
 }
 
 html[data-se-startup] .se-startup-glow:nth-child(1) {

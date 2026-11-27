@@ -8,7 +8,10 @@
  * pre-load, new to the library) in place of Steam's wide banner. The chips are nodes of their own:
  * Steam uses both of the box's pseudo-elements. Each has its setting (Status chips, Release chips);
  * off, Steam's own mark goes too. A click on a ready chip plays the game, on an install chip opens
- * Steam's install dialog; an updating chip passes the click to the cover.
+ * Steam's install dialog; an updating chip passes the click to the cover. With Dim uninstalled
+ * games on, a cover whose game isn't installed is marked data-se-uninstalled
+ * (options/library/dim-uninstalled.css draws it): Steam's own marks don't say it at rest
+ * everywhere (a collection shelf's Install button exists only while hovered).
  */
 ((SE) => {
   window.__seCoverState?.destroy();
@@ -20,6 +23,7 @@
   const CHIP = 'se-cover-chip';
   const RELEASE = 'se-cover-release';
   const HIDDEN = 'data-se-release-banner';
+  const UNINSTALLED = 'data-se-uninstalled';
   // Steam's display_status values (sp.js, its app display status enum): ReadyToPreload,
   // PresaleOnly (Coming soon)
   const PRELOAD = 10;
@@ -124,6 +128,7 @@
   // theme's, and none of Steam's either (Steam's buttons: options/library/cover-chips-off.css)
   const showStatus = () => SE.settings?.get('cover-chips') !== 'off';
   const showRelease = () => SE.settings?.get('release-chips') !== 'off';
+  const dimUninstalled = () => SE.settings?.get('dim-uninstalled') === 'on';
 
   const update = () => {
     for (const [box, cover] of covers) {
@@ -137,7 +142,9 @@
     const status = showStatus();
     const queue = status ? downloads() : null;
     const releases = showRelease();
+    const dim = dimUninstalled();
     for (const [box, cover] of covers) {
+      SE.attr(box, UNINSTALLED, dim && cover.app && !SE.isInstalled(cover.app) ? '' : null);
       if (!cover.app) continue;
       const release = releaseOf(cover.app);
       // A game still to come has nothing to play or install yet: no status chip
@@ -208,7 +215,10 @@
       unsubscribeSettings?.();
       unsubscribeFeed?.();
       watcher.disconnect();
-      for (const cover of covers.values()) drop(cover);
+      for (const [box, cover] of covers) {
+        drop(cover);
+        box.removeAttribute(UNINSTALLED);
+      }
       for (const deck of document.querySelectorAll(DECK)) {
         deck.removeAttribute('data-se-tip');
         deck.removeAttribute('data-se-tip-dir');

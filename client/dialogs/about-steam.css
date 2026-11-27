@@ -2,7 +2,7 @@
  * About Steam, as built by client/dialogs/about-steam.js: a centred stage with the theme credit,
  * Steam's version, the update status pill and four fact tiles, over a footer with Report an
  * issue, the latest patch notes, Copy all and Steam's own Close. Applies only once the script has built the
- * layout ([data-se-about]), normally on the dialog's first frame; until then dialogs.css gives
+ * layout ([data-se-about]), normally on the dialog's first frame; until then dialogs-rebuilt.css gives
  * the stock dialog the theme's type.
  *
  * Grid on DialogContent_InnerWidth (500 × 300 window):
@@ -109,9 +109,9 @@
   color: inherit;
   cursor: pointer;
   transition:
-    background-color var(--se-dur) ease-out,
-    box-shadow var(--se-dur) ease-out,
-    color var(--se-dur) ease-out;
+    background-color var(--se-dur) var(--se-ease),
+    box-shadow var(--se-dur) var(--se-ease),
+    color var(--se-dur) var(--se-ease);
 }
 
 /* Steam's title strip is a native drag region; every control here must still take clicks */
@@ -176,7 +176,7 @@ button.se-about,
   letter-spacing: .01em;
   font-variant-numeric: tabular-nums;
   text-shadow: 0 0 24px color-mix(in srgb, var(--se-accent) 25%, transparent);
-  transition: text-shadow var(--se-dur) ease-out;
+  transition: text-shadow var(--se-dur) var(--se-ease);
 }
 
 .se-about-hero:hover .se-about-hero-value {
@@ -390,6 +390,9 @@ button.se-about,
 
 .se-about-tool:hover {
   background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong);
 }
 
@@ -462,7 +465,7 @@ button.se-about,
   background: none;
   color: var(--se-text-dim);
   cursor: pointer;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
 .se-about-notes-back .se-about-icon {
@@ -630,6 +633,9 @@ button.se-about,
 
 .se-about-copyall:hover {
   background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
 }
 
 [data-se-about] .DialogFooter:not(#se-none) {

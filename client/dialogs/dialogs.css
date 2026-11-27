@@ -5,7 +5,9 @@
  * (CollectionDropDown, SortingDropDown, DialogDropDownMenu), desktop context
  * menus, the PartnerEvent news reader (What's New settings: whats-new-settings.css), and standard
  * confirmation / installation / EULA modals. Hover cards (game, friend) live in
- * client/shared/hover-cards.css.
+ * client/shared/hover-cards.css. What rebuilt dialogs share (About Steam until it's rebuilt, the
+ * modal frame, the hero art, eyebrow, game name and capsules) is in dialogs-rebuilt.css, listed
+ * right after.
  */
 :root ._2Sj4-UDM-dHSxtxwQ_Pwwz._2Sj4-UDM-dHSxtxwQ_Pwwz ._DialogInputContainer,
 :root ._1ZpBQtDqcKBbfIIv01Vs1R > div,
@@ -34,6 +36,9 @@
 :root ._1ZpBQtDqcKBbfIIv01Vs1R ._1ZtpSq62fy_8W-_0pMn5cu:is(:focus, :hover),
 :root ._2oAiZidGyUxL-hfupFDQ2m:is(:focus, :hover) {
   background: var(--se-selected) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong) !important;
   outline: none !important;
 }
@@ -153,6 +158,9 @@
 ._3ctGqQID5-8adtd7HlZ3YM .DialogButton:hover,
 ._3ctGqQID5-8adtd7HlZ3YM button:not(.se-none):hover {
   background: var(--se-hover) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong) !important;
 }
 
@@ -200,6 +208,9 @@
 ._1_vCR1dPfyJ7_yukwDqblf:hover,
 ._1t_97P9KMsEBaPq9y-6OUl:hover {
   background: var(--se-hover) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
 }
 
 ._1t_97P9KMsEBaPq9y-6OUl._2a5oSdTIcFV3c3ymUNsu6l img {
@@ -243,6 +254,9 @@
 .rHz7G5xZ3qXUYUcBW2bzX:hover,
 ._3ctGqQID5-8adtd7HlZ3YM > *:hover {
   background: var(--se-hover) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong) !important;
 }
 
@@ -359,6 +373,9 @@ body.ContextMenuPopupBody div:has(._2yAm5LY_eu-Vg_52l0HFlM) {
 :root ._1n7Wloe5jZ6fSuvV18NNWI:is(:hover, ._18z-3vkWndCBO5WJgFldRK) {
   /* Hover, active */
   background: var(--se-selected) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong) !important;
 }
 
@@ -449,6 +466,9 @@ body.ContextMenuPopupBody div:has(._2yAm5LY_eu-Vg_52l0HFlM) {
   border: 0 !important;
   border-radius: var(--se-radius-sm) !important;
   background: var(--se-hover) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text) !important;
   text-shadow: none !important;
   font: 500 var(--se-fs-base)/1.45 var(--se-font) !important;
@@ -497,11 +517,14 @@ body[data-se-tip-muted] ._3XGRklQrZMakU2xaYB0cLD,
   background: transparent !important;
   color: var(--se-text-dim) !important;
   font: 500 var(--se-fs-md) var(--se-font) !important;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
 .EDl_mzaY3WxkgmYVD8W4d ._1BAKXmqQdWRWmWX9_CbhuY:hover:not(._1MAuQug6YmX05JxGIy637e) {
   background: var(--se-selected) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong) !important;
 }
 
@@ -600,7 +623,7 @@ body[data-se-tip-muted] ._3XGRklQrZMakU2xaYB0cLD,
   box-shadow: var(--se-edge) !important;
   color: var(--se-text) !important;
   font: 400 var(--se-fs-md) var(--se-font) !important;
-  transition: box-shadow var(--se-dur) ease-out !important;
+  transition: box-shadow var(--se-dur) var(--se-ease) !important;
 }
 
 .DialogTextInputBase:not(#se-none):is(:hover, :focus, :focus-within) {
@@ -626,7 +649,7 @@ button.DialogButton:not(#se-none) {
   font: 600 var(--se-fs-base) var(--se-font) !important;
   text-shadow: none !important;
   box-shadow: none !important;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out !important;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease) !important;
 }
 
 button.DialogButton::before {
@@ -635,11 +658,17 @@ button.DialogButton::before {
 
 button.DialogButton:not(#se-none):is(:hover, .gpfocus):enabled {
   background: var(--se-hover) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong) !important;
 }
 
 button.DialogButton:not(#se-none):enabled:active {
   background: var(--se-selected) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   scale: 1 !important;
 }
 
@@ -709,7 +738,7 @@ div.DialogButton:not(.GamepadMode *):not(se-none):not(#se-none) {
   font: 600 var(--se-fs-base) var(--se-font) !important;
   text-shadow: none !important;
   color: var(--se-text) !important;
-  transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out !important;
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease) !important;
 }
 
 html[data-se-ov] div.DialogButton:not(#se-none)::before,
@@ -720,6 +749,9 @@ div.DialogButton:not(.GamepadMode *):not(se-none):not(#se-none)::before {
 html[data-se-ov] div.DialogButton:not(#se-none):is(:hover, .gpfocus):not(.Disabled),
 div.DialogButton:not(.GamepadMode *):not(se-none):not(#se-none):is(:hover, .gpfocus):not(.Disabled) {
   background: var(--se-hover) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong) !important;
 }
 
@@ -856,210 +888,4 @@ div.DialogButton:not(.GamepadMode *):not(se-none):not(#se-none):focus-visible {
 ._2bMOoAzbbOJ3mQGF4jDCvp {
   border-radius: var(--se-radius-lg) !important;
   overflow: hidden;
-}
-
-/*
- * About Steam, until about-steam.js rebuilds it (normally the first frame): labels muted,
- * values brighter, a little more line height.
- */
-.FFIKUQ7BGKw6vO1voazlr ._32eeZuly3nnz3cMXdSgyj9 {
-  color: var(--se-text) !important;
-  font: 400 var(--se-fs-md)/1.85 var(--se-font) !important;
-}
-
-.FFIKUQ7BGKw6vO1voazlr ._2yhBdvNsgdBGL_UjfmTDGH {
-  color: var(--se-text-muted) !important;
-  font-weight: 500;
-}
-
-.FFIKUQ7BGKw6vO1voazlr ._3QhXBKJwISpG-AmpbOQgLQ {
-  font: 700 var(--se-fs-3xl)/28px var(--se-font) !important;
-}
-
-/* Restore From Backup: field and Browse on one line, same height. */
-.YmQ9vcw08n7STkTEQLiYW .cBVQzUqhygc4rrsrAVaAf {
-  gap: var(--se-space-2);
-  align-items: center;
-}
-
-.YmQ9vcw08n7STkTEQLiYW .v71Rz05Rte4GxZMKzvwAO {
-  margin: 0 !important;
-}
-
-/*
- * Modal frame (Install and EULA live in client/dialogs/install.css and eula.css)
- * Steam's modals sit in ModalPosition_Content with a blue gradient line on top
- * (ModalPosition_TopBar): the theme's rounded card with a 1px divider instead.
- */
-div.ModalPosition_TopBar:not(#se-none) {
-  display: none !important;
-}
-
-.ModalPosition_Content:not(#se-none) {
-  border-radius: var(--se-radius-lg);
-  overflow: hidden;
-  box-shadow: var(--se-shadow-pop), inset 0 0 0 1px var(--se-white-07) !important;
-}
-
-.ModalPosition_Content .DialogContent:not(#se-none) {
-  border-radius: inherit;
-}
-
-/*
- * Hero art behind the top of a rebuilt dialog (Install, Uninstall, EULA, Mark as Private,
- * New Collection, Exit Game, CD Keys), under everything else. client/dialogs/dialog-art.js appends it; [data-ready] once loaded.
- */
-.DialogContent:has(> .se-dialog-art):not(#se-none) {
-  position: relative;
-  isolation: isolate;
-}
-
-.DialogContent:has(> .se-dialog-art) > :not(.se-dialog-art) {
-  position: relative;
-  z-index: var(--se-z-raised);
-}
-
-.se-dialog-art {
-  position: absolute;
-  inset: 0 0 auto;
-  height: var(--se-dialog-art-h);
-  overflow: hidden;
-  pointer-events: none;
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, var(--se-black-55) 55%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 0%, var(--se-black-55) 55%, transparent 100%);
-}
-
-.se-dialog-art img,
-.se-dialog-art video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 30%;
-  opacity: 0;
-  transform: scale(1.06);
-  filter: saturate(1.1);
-  transition: opacity var(--se-dur-slow) var(--se-ease), transform var(--se-dur-ambient) var(--se-ease);
-}
-
-.se-dialog-art[data-ready] img,
-.se-dialog-art[data-ready] video {
-  opacity: .5;
-  transform: scale(1.01);
-}
-
-/*
- * A small picture (SE.dialogArt.picture, or .friend() without a background): blurred into a
- * wash of its colours, at full strength and under a lighter shade than a game's art (the
- * darkening above would erase it)
- */
-.se-dialog-art[data-kind="avatar"] img {
-  filter: var(--se-blur-panel) saturate(1.5);
-  transform: scale(1.4);
-}
-
-.se-dialog-art[data-kind="avatar"][data-ready] img {
-  opacity: .9;
-  transform: scale(1.25);
-}
-
-.se-dialog-art[data-kind="avatar"]::after {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--se-bg) 25%, transparent) 0%, color-mix(in srgb, var(--se-surface) 60%, transparent) 55%, var(--se-surface) 100%);
-}
-
-/* Keeps the title readable on bright art */
-.se-dialog-art::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--se-bg) 70%, transparent) 0%, color-mix(in srgb, var(--se-bg) 15%, transparent) 70%),
-    linear-gradient(180deg, transparent 40%, var(--se-surface) 100%);
-}
-
-/*
- * A rebuilt dialog's title as an eyebrow over its game (Install, Uninstall, EULA, Mark as
- * Private, New Collection with games, Exit Game, CD Keys, Hardware Survey; a friend's Nickname
- * and Notifications; Invite to Group Chat): small, spaced capitals in the accent. !important: the
- * theme's DialogHeader above, itself !important against Steam's.
- */
-:is([data-se-inst], [data-se-uninst], [data-se-eula], [data-se-private], [data-se-newcoll-games], [data-se-exitgame], [data-se-cdkeys], [data-se-survey], [data-se-friend]) .DialogHeader:not(#se-none) {
-  margin: 0 0 var(--se-space-3) !important;
-  padding: 0 !important;
-  font: var(--se-eyebrow-font) !important;
-  letter-spacing: var(--se-eyebrow-spacing) !important;
-  text-transform: uppercase !important;
-  color: var(--se-eyebrow-color) !important;
-  text-shadow: var(--se-text-shadow-art);
-}
-
-/*
- * A rebuilt dialog's game name (or "N games") under its eyebrow: Uninstall, EULA, Mark as
- * Private, New Collection with games, Exit Game, CD Keys; the Hardware Survey's step titles. Each
- * dialog places it; this is its look.
- */
-.se-dialog-name {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  font: 800 var(--se-fs-2xl) / 1.2 var(--se-font);
-  color: var(--se-text-strong);
-  text-shadow: var(--se-text-shadow-art);
-}
-
-/*
- * A rebuilt dialog's game capsules (Uninstall, EULA, Mark as Private, New Collection; built by
- * client/dialogs/dialog-art.js): the first game's wide cover, the next two stepping out to its
- * right, smaller and dimmer, so several games read as several. The stack keeps room on its
- * right for them. A capsule is marked [data-ready] once loaded.
- */
-.se-dialog-capsules {
-  display: grid;
-  isolation: isolate;
-  width: 172px;
-  height: 80px;
-}
-
-/* Room for the covers behind: each reaches ~19 / ~31 px past the first */
-.se-dialog-capsules:has(> :nth-child(2)) {
-  margin-inline-end: var(--se-space-5);
-}
-
-.se-dialog-capsules:has(> :nth-child(3)) {
-  margin-inline-end: var(--se-space-6);
-}
-
-.se-dialog-capsule {
-  grid-area: 1 / 1;
-  width: 172px;
-  height: 80px;
-  overflow: hidden;
-  border-radius: var(--se-radius-md);
-  background: var(--se-surface-2);
-  box-shadow: var(--se-shadow-card), 0 0 0 1px var(--se-white-10);
-}
-
-.se-dialog-capsule:nth-child(2) {
-  z-index: var(--se-z-under);
-  transform: translateX(28px) scale(.9);
-  filter: brightness(.6);
-}
-
-.se-dialog-capsule:nth-child(3) {
-  z-index: var(--se-z-under-2);
-  transform: translateX(48px) scale(.8);
-  filter: brightness(.4);
-}
-
-.se-dialog-capsule img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity var(--se-dur) var(--se-ease);
-}
-
-.se-dialog-capsule[data-ready] img {
-  opacity: 1;
 }

@@ -224,7 +224,7 @@
    * A guard dismisses any toast the stage never finishes, so none can stay up forever.
    */
   const HOLD_MS = 10 * 60 * 1000;
-  // "How long toasts stay" (client/shared/settings.js): each toast's time on the stage, scaled
+  // "Time on screen" (client/shared/settings.js): each toast's time on the stage, scaled
   const PACE = { shorter: 0.6, steam: 1, longer: 1.75 };
   const paced = (ms) => (ms > 0 ? Math.round(ms * (PACE[SE.settings?.get('toast-time')] || 1)) : ms);
   const GUARD_MS = 60 * 1000;          // past Steam's own time, unless hovered

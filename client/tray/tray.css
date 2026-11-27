@@ -1,17 +1,17 @@
 /*
  * The tray menu (client/tray/tray.js marks html[data-se-tray] and Steam's rows): you and your
- * status, the download in progress, recent games on two lines, Steam's pages as icon tiles, its
- * modes side by side, Exit Steam. The panel and the rows' base look are every context menu's
+ * status, the download in progress, recent games on two lines, Steam's pages and modes as icon
+ * tiles, Exit Steam. The panel and the rows' base look are every context menu's
  * (client/dialogs/dialogs.css).
  *
  * The rows go on a ten-column grid: a game, the header, a separator and Exit span it, a page
- * tile takes two columns (five a line), a mode five (two a line).
+ * or mode tile takes two columns (five a line).
  *
  * Width: Steam sizes the window to the menu's box on every change inside it (PositionMenu, on
  * its own MutationObserver), and a box that fits the window can never ask for more than the
  * window already is. So the menu takes its content's own width (max-content, within bounds),
- * which the window then follows. Only the game names and the modes' labels set it: the header,
- * the download and the "Played…" lines set `contain: inline-size` and fit what those give.
+ * which the window then follows. Only the game names set it: the header, the download and the
+ * "Played…" lines set `contain: inline-size` and fit what those give.
  */
 html[data-se-tray] .contextMenu {
   width: max-content;
@@ -120,6 +120,12 @@ html[data-se-tray] [data-se-tray-hide] {
   grid-auto-columns: minmax(0, 1fr);
 }
 
+/* A status Taskbar Preferences leaves out (client/tray/tray.js), or all of them */
+.se-tray-status[hidden],
+.se-tray-status button[hidden] {
+  display: none;
+}
+
 .se-tray-status button {
   min-width: 0;
   padding: 0 var(--se-space-1);
@@ -137,10 +143,24 @@ html[data-se-tray] [data-se-tray-hide] {
   padding: var(--se-space-2) var(--se-space-3);
   border-radius: var(--se-radius-sm);
   background: var(--se-surface-2);
+  cursor: pointer; /* a click opens Downloads (tray.js) */
+  transition: background-color var(--se-dur) var(--se-ease);
 }
 
 .se-tray-dl[hidden] {
   display: none;
+}
+
+.se-tray-dl:hover {
+  background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
+}
+
+.se-tray-dl:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
 }
 
 .se-tray-dl-top {
@@ -236,7 +256,6 @@ html[data-se-tray] [data-se-tray="game"] .JumpListGameName {
 /* ---------- Pages, modes and Exit: a duotone glyph each ---------- */
 
 html[data-se-tray] [data-se-tray="nav"]::before,
-html[data-se-tray] [data-se-tray="mode"]::before,
 html[data-se-tray] [data-se-tray="exit"]::before,
 html[data-se-tray] [data-se-tray="other"]::before {
   content: '';
@@ -248,22 +267,9 @@ html[data-se-tray] [data-se-tray="other"]::before {
   mask: var(--se-tray-icon, var(--se-icon-external)) center / contain no-repeat;
 }
 
-[data-se-tray-option="Store"] { --se-tray-icon: var(--se-icon-store); }
-[data-se-tray-option="MyGames"] { --se-tray-icon: var(--se-icon-library); }
-[data-se-tray-option="Community"] { --se-tray-icon: var(--se-icon-community); }
-[data-se-tray-option="FriendActivity"] { --se-tray-icon: var(--se-icon-activity); }
-[data-se-tray-option="Friends"] { --se-tray-icon: var(--se-icon-friends); }
-[data-se-tray-option="Screenshots"] { --se-tray-icon: var(--se-icon-photo); }
-[data-se-tray-option="Servers"] { --se-tray-icon: var(--se-icon-globe); }
-[data-se-tray-option="Settings"] { --se-tray-icon: var(--se-icon-settings); }
-[data-se-tray-option$="BigPicture"] { --se-tray-icon: var(--se-icon-tv); }
-[data-se-tray-option="VR"] { --se-tray-icon: var(--se-icon-vr); }
-[data-se-tray-option="StopStreaming"] { --se-tray-icon: var(--se-icon-broadcast); }
-[data-se-tray-option="Console"] { --se-tray-icon: var(--se-icon-console); }
-[data-se-tray="exit"] { --se-tray-icon: var(--se-icon-power); }
+/* Each option's glyph (--se-tray-icon): core/icons-nav.css, shared with Settings › Interface */
 
 /* !important: dialogs.css gives every context-menu row its padding with !important */
-html[data-se-tray] [data-se-tray="mode"],
 html[data-se-tray] [data-se-tray="exit"],
 html[data-se-tray] [data-se-tray="other"] {
   display: flex;
@@ -273,7 +279,8 @@ html[data-se-tray] [data-se-tray="other"] {
   padding: var(--se-space-2) var(--se-space-3) !important;
 }
 
-html[data-se-tray] :is([data-se-tray="mode"], [data-se-tray="exit"], [data-se-tray="other"]) .JumpListItemText {
+html[data-se-tray] [data-se-tray="exit"] .JumpListItemText,
+html[data-se-tray] [data-se-tray="other"] .JumpListItemText {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -281,7 +288,7 @@ html[data-se-tray] :is([data-se-tray="mode"], [data-se-tray="exit"], [data-se-tr
   text-overflow: ellipsis;
 }
 
-/* A page: an icon tile, its name read out and shown on hover (title) */
+/* A page or a mode: an icon tile, its name read out and shown on hover (title) */
 html[data-se-tray] [data-se-tray="nav"] {
   position: relative;
   grid-column: span 2;
@@ -298,14 +305,6 @@ html[data-se-tray] [data-se-tray="nav"] .JumpListItemText {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
-}
-
-html[data-se-tray] [data-se-tray="mode"] {
-  grid-column: span 5;
-}
-
-html[data-se-tray] [data-se-tray="mode"][data-se-tray-wide] {
-  grid-column: 1 / -1;
 }
 
 /* Exit Steam: the danger tone */

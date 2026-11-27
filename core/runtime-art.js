@@ -1,5 +1,5 @@
 /*
- * The runtime, part 2 of 2 (core/runtime.js names the parts), listed right after it: games and
+ * The runtime, part 3 of 3 (core/runtime.js names the parts), listed after runtime-text.js: games and
  * their art (the app store, library art and its copies, SE.art's fallback chain) and
  * achievement rarity tiers, added to window.__se before any feature runs.
  */

@@ -36,7 +36,7 @@
   }
 
   /*
-   * Bottom centre for compact toasts (the Compact toast position setting at Centre, the default). Steam has no
+   * Bottom centre for compact toasts (the Compact position setting at Centre, the default). Steam has no
    * centre position: SharedJSContext stacks the toast windows in a corner (TopLeft, TopRight,
    * BottomLeft, BottomRight; in game the game picks it, with insets capped at a quarter of the
    * screen) and moves each one every frame it changes with this window's

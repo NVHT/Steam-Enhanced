@@ -393,6 +393,15 @@
     else console.warn('[Steam Enhanced] Element picker: theme folder not found from this window.');
   };
   const inClient = () => Boolean(window.__seClient && coreSrc);
+  // fn once dev/live-reload.json, read at each press, says {"enabled": true}
+  const whenDevReload = (fn) => {
+    fetch(new URL(`../dev/live-reload.json?t=${Date.now()}`, coreSrc), { cache: 'no-store' })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((config) => {
+        if (config?.enabled) fn();
+      })
+      .catch(() => {});
+  };
 
   // event.code → { alt: Alt allowed, ready: client-only gate, run }
   const HOTKEYS = new Map([
@@ -442,13 +451,17 @@
         ready: () => Boolean(window.__seClient?.devReload && coreSrc),
         run: (event) => {
           const scripts = event.altKey;
-          fetch(new URL(`../dev/live-reload.json?t=${Date.now()}`, coreSrc), { cache: 'no-store' })
-            .then((response) => (response.ok ? response.json() : null))
-            .then((config) => {
-              if (config?.enabled) window.__seClient.devReload(scripts);
-            })
-            .catch(() => {});
+          whenDevReload(() => window.__seClient.devReload(scripts));
         },
+      },
+    ],
+    // Reload one file (client/loader.js devPick): a list of this window's files, this window only;
+    // armed as dev reload is. Later presses close it
+    [
+      'KeyY',
+      {
+        ready: () => Boolean(window.__seClient?.devPick && coreSrc),
+        run: () => whenDevReload(() => window.__seClient.devPick()),
       },
     ],
   ]);

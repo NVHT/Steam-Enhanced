@@ -43,6 +43,10 @@
   let hot = null; // the cover under the pointer
   let peek = null; // { shelf, box, slid }: the shelf opened while the card shows
   let cardWidth = 0; // --se-hc-width, read once
+  // The hot cover's row, read as the pointer enters (setHot): { item, contents, options }. The
+  // watch pass that opens the shelf (sync) runs while Steam builds the card, where a style read
+  // paid its style pass
+  let hotRow = null;
 
   /*
    * The covers on the card's side slide away by its width: only those in the open cover's row
@@ -60,7 +64,8 @@
     return item.parentElement ? item : null;
   };
 
-  const movers = (item) => (getComputedStyle(item).display === 'contents' ? [...item.children] : [item]);
+  // A row's items are all one kind: a grid's cells (display: contents) or a carousel's items
+  const movers = (item, contents) => (contents ? [...item.children] : [item]);
 
   const timing = () => {
     const style = getComputedStyle(root);
@@ -71,11 +76,9 @@
     };
   };
 
-  const slide = (items, dx) => {
-    const options = { ...timing(), fill: 'forwards' };
-    return items.flatMap(movers).map((el) =>
+  const slide = (items, dx, { contents, options }) =>
+    items.flatMap((item) => movers(item, contents)).map((el) =>
       el.animate([{ translate: '0px 0px' }, { translate: `${dx}px 0px` }], options));
-  };
 
   // Back to place, then let go of the held end
   const slideBack = (animations) => {
@@ -100,13 +103,13 @@
     if (peek?.box === box) return;
     clearPeek();
     const shelf = box.closest(`.${C.Showcase}`);
-    const item = itemOf(box);
+    const row = box === hot ? hotRow : null;
     let slid = [];
-    if (item) {
-      const peers = [...item.parentElement.children];
-      const at = peers.indexOf(item);
+    if (row?.item.isConnected) {
+      const peers = [...row.item.parentElement.children];
+      const at = peers.indexOf(row.item);
       const after = root.getAttribute(HOT) === 'right';
-      slid = slide(after ? peers.slice(at + 1) : peers.slice(0, at), after ? cardWidth : -cardWidth);
+      slid = slide(after ? peers.slice(at + 1) : peers.slice(0, at), after ? cardWidth : -cardWidth, row);
     }
     shelf.setAttribute(PEEK, '');
     box.setAttribute(PEEKED, '');
@@ -116,6 +119,7 @@
   const releaseHot = () => {
     hot?.removeAttribute(STILL);
     hot = null;
+    hotRow = null;
   };
 
   const clearHot = () => {
@@ -135,6 +139,12 @@
     const shelf = cover.closest(`.${C.Showcase}`).getBoundingClientRect();
     const end = box.right + DISTANCE + cardWidth;
     const right = end - innerWidth <= ALLOWANCE && box.right + cardWidth <= shelf.right;
+    const item = itemOf(cover);
+    hotRow = item && {
+      item,
+      contents: getComputedStyle(item).display === 'contents',
+      options: { ...timing(), fill: 'forwards' },
+    };
     setPlace(right ? box.right : box.left - cardWidth, box.top, box.height);
     root.setAttribute(HOT, right ? 'right' : 'left');
   };

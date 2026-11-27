@@ -1,6 +1,6 @@
 /*
  * Brew Hub (github.com/madmaxgrey/BrewHub; Millennium Settings › Brew Hub, root .bh-root): the plugin's theme and plugin store,
- * paired with brew-hub.js. Laid out like the other Millennium pages, Themes above all.
+ * paired with brew-hub.js; Details' README in brew-hub-readme.css, listed right after. Laid out like the other Millennium pages, Themes above all.
  *
  * Browse: the page title and its sub-line (a .DialogHeader of the theme's, so it is every page's
  * title); the toolbar (Themes | Plugins | Unofficial as the segmented control, search, Sort, Tags); the pager
@@ -170,6 +170,9 @@
 
 .MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) .bh-tab.bh-on {
   background: var(--se-selected);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong);
 }
 
@@ -394,6 +397,9 @@
 .MillenniumSettings .se-bh-menu [role="option"]:hover,
 .MillenniumSettings .se-bh-menu [role="option"]:focus-visible {
   background: var(--se-hover);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong);
 }
 
@@ -402,6 +408,9 @@
   padding: var(--se-menu-item-pad);
   border-left: 0;
   background: var(--se-selected);
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong);
 }
 
@@ -574,6 +583,9 @@
 
 .MillenniumSettings .bh-root .bh-btn:hover:not(:disabled):not(#se-none):not(#se-p2):not(#se-p3) {
   background: var(--se-hover) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
   color: var(--se-text-strong) !important;
 }
 
@@ -938,184 +950,6 @@
 .MillenniumSettings .bh-root .bh-dactions .bh-act {
   flex: none;
   width: auto;
-}
-
-/* README */
-.MillenniumSettings .bh-root .bh-readme {
-  padding: var(--se-space-4) var(--se-space-5);
-  border-radius: var(--se-radius-lg);
-  background: var(--se-surface);
-  box-shadow: var(--se-edge);
-  color: var(--se-text-dim);
-  font: 400 var(--se-fs-base) / 1.6 var(--se-font);
-}
-
-.MillenniumSettings .bh-root[data-se-bh="detail"] .bh-readme {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.MillenniumSettings .bh-md h1,
-.MillenniumSettings .bh-md h2,
-.MillenniumSettings .bh-md h3,
-.MillenniumSettings .bh-md h4 {
-  margin: var(--se-space-5) 0 var(--se-space-2);
-  color: var(--se-text-strong);
-  font-weight: 700;
-  line-height: 1.3;
-}
-
-.MillenniumSettings .bh-md > :first-child,
-.MillenniumSettings .bh-md > :first-child > :first-child {
-  margin-top: 0;
-}
-
-.MillenniumSettings .bh-md h1 {
-  font-size: var(--se-fs-xl);
-}
-
-.MillenniumSettings .bh-md h2 {
-  font-size: var(--se-fs-lg);
-}
-
-.MillenniumSettings .bh-md h3,
-.MillenniumSettings .bh-md h4 {
-  font-size: var(--se-fs-md);
-}
-
-.MillenniumSettings .bh-md ul,
-.MillenniumSettings .bh-md ol {
-  margin: 0 0 var(--se-space-3);
-  padding-left: var(--se-space-5);
-}
-
-.MillenniumSettings .bh-md li + li {
-  margin-top: var(--se-space-1);
-}
-
-.MillenniumSettings .bh-md strong {
-  color: var(--se-text-strong);
-}
-
-.MillenniumSettings .bh-md .bh-link {
-  color: var(--se-link);
-  cursor: pointer;
-}
-
-.MillenniumSettings .bh-md .bh-link:hover {
-  text-decoration: underline;
-}
-
-.MillenniumSettings .bh-md hr {
-  margin: var(--se-space-4) 0;
-  border: 0;
-  border-top: 1px solid var(--se-divider);
-}
-
-.MillenniumSettings .bh-md .bh-mdimg {
-  max-width: 100%;
-  height: auto;
-  border-radius: var(--se-radius-sm);
-}
-
-.MillenniumSettings .bh-md code,
-.MillenniumSettings .bh-md pre {
-  border-radius: var(--se-radius-xs);
-  background: var(--se-field);
-  font-family: var(--se-font-mono);
-  font-size: var(--se-fs-sm);
-}
-
-.MillenniumSettings .bh-md code {
-  padding: 0 var(--se-space-1);
-}
-
-.MillenniumSettings .bh-md pre {
-  padding: var(--se-space-3);
-  overflow-x: auto;
-}
-
-/* border: the plugin's own 1px line, doubled with the theme's edge */
-.MillenniumSettings .bh-md details {
-  margin: 0 0 var(--se-space-3);
-  border: 0;
-  border-radius: var(--se-radius-md);
-  background: var(--se-surface-2);
-  box-shadow: var(--se-edge);
-}
-
-.MillenniumSettings .bh-md summary {
-  padding: var(--se-space-2) var(--se-space-3);
-  color: var(--se-text);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.MillenniumSettings .bh-md details[open] > summary {
-  border-bottom: 1px solid var(--se-divider);
-}
-
-.MillenniumSettings .bh-md details[open] > :not(summary) {
-  margin: 0 var(--se-space-3) var(--se-space-3);
-}
-
-.MillenniumSettings .bh-md details[open] > summary + * {
-  margin-top: var(--se-space-3);
-}
-
-.MillenniumSettings .bh-md table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.MillenniumSettings .bh-md th,
-.MillenniumSettings .bh-md td {
-  padding: var(--se-space-2);
-  border: 0;
-  border-bottom: 1px solid var(--se-divider);
-  text-align: left;
-  vertical-align: top;
-}
-
-/* A wide table scrolls inside its own box (the plugin's .bh-tablewrap), not the page */
-.MillenniumSettings .bh-md .bh-tablewrap {
-  margin: 0 0 var(--se-space-3);
-  overflow-x: auto;
-}
-
-.MillenniumSettings .bh-md kbd {
-  padding: 0 var(--se-space-1);
-  border: 0;
-  border-radius: var(--se-radius-xs);
-  background: var(--se-field);
-  box-shadow: var(--se-edge);
-  font-family: var(--se-font-mono);
-  font-size: var(--se-fs-sm);
-}
-
-.MillenniumSettings .bh-md blockquote {
-  margin: 0 0 var(--se-space-3);
-  padding: var(--se-space-1) var(--se-space-3);
-  border-left: 3px solid var(--se-divider);
-  border-radius: 0;
-  color: var(--se-text-muted);
-}
-
-/* A task list's box: read-only, in the accent */
-.MillenniumSettings .bh-md .bh-check {
-  margin: 0 var(--se-space-2) 0 0;
-  accent-color: var(--se-accent);
-  vertical-align: middle;
-}
-
-.MillenniumSettings .bh-md th {
-  background: transparent;
-  font: var(--se-label-font);
-  letter-spacing: var(--se-label-spacing);
-  text-transform: uppercase;
-  color: var(--se-label-color);
 }
 
 @media (prefers-reduced-motion: reduce) {

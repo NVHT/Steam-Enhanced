@@ -9,13 +9,43 @@
   if (!ns) return;
   const { attr: setAttr } = SE;
   const {
-    BY_NAME, GROUPS, ITEM, LIST, MILL_BY_NAME, MILL_GROUPS, MILL_PAGES, PAGES, SEP, TITLE, filter,
-    pageNameOf, text,
+    BY_NAME, GROUPS, ITEM, LIST, MILL_BY_KEY, MILL_BY_NAME, MILL_GROUPS, MILL_PAGES, PAGES, SEP, TITLE,
+    filter, pageNameOf, text,
   } = ns;
   const { live } = ns;
 
+  /*
+   * A Millennium sidebar item's route key: the last part of the route Millennium gives its page
+   * (/millennium/settings/plugins → 'plugins', a MILL_BY_KEY key), the same in any language and
+   * however many pages plugins add. Read off the item's fibers, else its place in the dialog's
+   * page list (separators left out).
+   */
+  const MILL_ROUTE = /\/millennium\/settings\/([\w-]+)/;
+  const routeKey = (...values) => {
+    for (const v of values) {
+      const m = typeof v === 'string' && MILL_ROUTE.exec(v);
+      if (m) return m[1];
+    }
+    return null;
+  };
+  function millRouteOf(item, items) {
+    for (let f = SE.fiber(item), depth = 0; f && depth < 30; f = f.return, depth++) {
+      const p = f.memoizedProps || {};
+      const own = routeKey(f.key, p.identifier, p.route, p.page?.identifier, p.page?.route);
+      if (own) return own;
+      if (Array.isArray(p.pages)) {
+        const entry = p.pages.filter((e) => e && typeof e === 'object')[items.indexOf(item)];
+        return routeKey(entry?.identifier, entry?.route);
+      }
+    }
+    return null;
+  }
+
+  // Its page by route, else by its English name, else by place when the sidebar holds
+  // Millennium's own pages only
   function millPageOf(item, items) {
     return (
+      MILL_BY_KEY.get(millRouteOf(item, items)) ||
       MILL_BY_NAME.get(pageNameOf(item).toLowerCase()) ||
       (items.length === MILL_PAGES.length ? MILL_PAGES[items.indexOf(item)] : null) ||
       null
