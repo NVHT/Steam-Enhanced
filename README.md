@@ -37,21 +37,21 @@
 
 <br>
 
-Steam grew one feature at a time, and it shows. Steam Enhanced redraws it as one application, built around the thing you open it for: your games.
+Steam grew one feature at a time, and it shows. Steam Enhanced redraws it as one application, built around the reason you open it: your games.
 
 <table>
   <tr>
     <td width="33%" valign="top">
       <b>Your games first</b><br>
-      <sub>Steam opens on a cinematic Home of your own games, not a storefront. Game pages, collections and downloads are built around them.</sub>
+      <sub>Steam opens on a Home of your own games, not a storefront. Game pages, covers, collections and downloads tell you what's ready to play.</sub>
     </td>
     <td width="33%" valign="top">
       <b>One design, every window</b><br>
-      <sub>The client, the overlay, Steam's Settings, the Store, Community and Support share the same cards, menus, buttons, type and colours.</sub>
+      <sub>The client, the overlay, Steam's Settings, toasts, the Store, Community and Support share the same cards, menus, buttons, type and colours.</sub>
     </td>
     <td width="33%" valign="top">
-      <b>Nothing to give up</b><br>
-      <sub>Steam runs as always underneath: your library, data and settings stay as they are, and every part of the theme can be turned back to Steam's own.</sub>
+      <b>Steam, only better</b><br>
+      <sub>Steam runs as always underneath: your library, data and settings stay as they are. The theme waits for Steam to finish drawing instead of interrupting it, and any part can go back to Steam's own.</sub>
     </td>
   </tr>
 </table>
@@ -76,7 +76,7 @@ Every screen, from the moment Steam starts to the moment you quit a game.
     <td width="33%" valign="top">
       <picture><source media="(prefers-color-scheme: light)" srcset="assets/readme/icon-home-light.svg"><img src="assets/readme/icon-home.svg" width="32" height="32" alt=""></picture><br>
       <h3>Library Home</h3>
-      <sub>A stage for your recent games, favourites, a collection or your newest additions, with their art, trailer or screenshots behind. Below it, a board of panels you arrange. It always fits the window, and Steam's own Home is one switch away.</sub>
+      <sub>A stage for your recent games, favourites, a collection or your newest additions, over their art, trailer or screenshots, with a board of panels below that you arrange. Prefer Steam's Home? Its shelves get an Arrange mode, a searchable picker per shelf and What's New cards that end level.</sub>
     </td>
     <td width="33%" valign="top">
       <picture><source media="(prefers-color-scheme: light)" srcset="assets/readme/icon-game-light.svg"><img src="assets/readme/icon-game.svg" width="32" height="32" alt=""></picture><br>
@@ -85,8 +85,8 @@ Every screen, from the moment Steam starts to the moment you quit a game.
     </td>
     <td width="33%" valign="top">
       <picture><source media="(prefers-color-scheme: light)" srcset="assets/readme/icon-collections-light.svg"><img src="assets/readme/icon-collections.svg" width="32" height="32" alt=""></picture><br>
-      <h3>Collections</h3>
-      <sub>A big library sorted in seconds: grid or list, a summary banner per collection, and drag and drop that shows where each game will land.</sub>
+      <h3>Library and collections</h3>
+      <sub>Each cover says if its game is ready, not installed or updating, with a chip that plays or installs it. Collections in a grid or list with a summary banner, and drag and drop that shows where each game will land.</sub>
     </td>
   </tr>
   <tr>
@@ -129,7 +129,7 @@ Every screen, from the moment Steam starts to the moment you quit a game.
 <summary><b>Throughout the client</b> &nbsp;<sub>navigation, menus, tray, dialogs, shortcuts</sub></summary>
 <br>
 
-- **Navigation rail:** icons only, labels if you want them. Store, Library, Community and Profile open their page, or with a right-click a menu of their pages. Notifications, Announcements, Games, Downloads and Settings sit at the foot, above your avatar.
+- **Navigation rail:** icons, with labels if you want them. Store, Library, Community and Profile open their page, or with a right-click a menu of their pages. Notifications, Announcements, Games, Downloads and Settings sit at the foot, above your avatar.
 - **Title bar:** Library search with a Filters panel (a row per section and a Clear action), the Home switch, Friends &amp; Chat, and your avatar with an account menu that says what each row does.
 - **Announcements and notifications:** Steam's news and your games' news in one feed, unread marked; notifications grouped by day.
 - **Menus:** one design for every menu, the friends list's and the tray's included. A game's right-click menu has no submenus: Play, Favorite, Files, Hide and Uninstall sit in a bar, and Collections opens a searchable list to add, rename, delete and create.
@@ -137,7 +137,7 @@ Every screen, from the moment Steam starts to the moment you quit a game.
 - **Dialogs:** install, uninstall, backup, product activation, Mark as Private, Exit Game, collections, Group Settings, a friend's nickname and notifications, all rebuilt around the game's art or the friend's picture.
 - **About Steam:** version and update status, build details that copy on click, the beta branch and Steam's latest patch notes.
 - **System Information and Report:** specification tiles and section cards with a filter; IP and MAC addresses and hardware IDs stay blurred until selected.
-- **Millennium Settings and Library Manager:** in the same design as the rest.
+- **Millennium Settings and Library Manager:** in the same design, Millennium's settings in a window, over the client or as a page.
 - **Keyboard shortcuts:** <kbd>Ctrl</kbd>+<kbd>`</kbd> Steam Settings, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd> Theme settings, <kbd>Ctrl</kbd>+<kbd>1</kbd> Millennium, <kbd>Ctrl</kbd>+<kbd>R</kbd> Reload UI, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> Restart Steam.
 
 </details>
@@ -162,7 +162,7 @@ The redesign carries on past the client. Store, Community, Support and Checkout 
 <br>
 
 - **Store front:** a full-width hero with game tabs, event art, ranked lists beside a spotlight card, and a navigation bar with picture menus.
-- **Game pages:** a title card over the hero art, one summary section with screenshots and features, the trailer as a card, and About This Game as a reading view.
+- **Game pages:** a title card over the hero art with Early Access, AI and mature content notes as chips, one summary section with screenshots and features, the trailer as a card, and About This Game as a reading view. Review quotes and promo sections wait behind Read more.
 - **Browse and search:** New &amp; Upcoming, Charts, Labs, DLC, Next Fest, the Steam Awards, Replay and sale pages. Search results as cards with release date, reviews and price in aligned columns.
 - **Wishlist, cart and checkout:** a filter column from your top tags and cards with review summaries, then one cart and checkout flow with the total always in view and Purchase the only primary button.
 - **Account and legal:** one settings page with a sidebar (purchase history, licenses, funds, Family View); agreements as documents with a table of contents.
@@ -212,7 +212,7 @@ Popular Millennium plugins work with Steam Enhanced and take on its look.
 | **[ProtonDB Library Badges](https://github.com/Yohlo/protondb-library-badges)** | ProtonDB ratings for Linux and Steam Deck | Game page · Library |
 | **[Achievement Manager](https://github.com/madmaxgrey/AchievementManager)** | Unlocking and locking achievements | Game page · Own window |
 | **[SteamGridDB](https://github.com/DevsNate/SteamGridDB-Millennium)** | Custom grids, heroes, logos and icons | Own window |
-| **[Brew Hub](https://github.com/madmaxgrey/BrewHub)** | A catalogue of community themes and plugins | Millennium Settings |
+| **[Brew Hub](https://github.com/madmaxgrey/BrewHub)** | Community themes and plugins, and plugins straight from GitHub | Millennium Settings |
 
 <br>
 
@@ -223,17 +223,17 @@ Popular Millennium plugins work with Steam Enhanced and take on its look.
   <img alt="Make it yours" src="assets/readme/h-make-it-yours.svg" width="100%">
 </picture>
 
-Every option lives in the theme's own settings window: **Theme settings** in the rail's Settings menu, the Steam menu or Millennium's Library Manager, or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd>. A tab per area, a search, and changes that apply at once, everywhere. Defaults are in bold.
+Every option lives in the theme's own settings window: **Theme settings** in the rail's Settings menu, the Steam menu or Millennium's Library Manager, or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>`</kbd>. A tab per area, a search, and changes that apply at once, everywhere; a setting that depends on another shows only while it applies. Defaults are in bold.
 
 <details>
-<summary><b>Appearance and navigation</b> &nbsp;<sub>colours, font, corners, the rail</sub></summary>
+<summary><b>Appearance and navigation</b> &nbsp;<sub>colours, font, corners, menus, the rail</sub></summary>
 <br>
 
 | Setting | Options | What it does |
 | --- | --- | --- |
 | Colours | **Enhanced**, Graphite, Nebula, Mono, Tonal, Ember, Forest, Abyss, Rosewood, Slate, Midnight, Sand, Void, Custom | A preset for the client and web pages. Custom sets each colour, with a contrast mark on each. |
 | Font | **SN Pro**, Xmind, Motiva Sans | The typeface everywhere, web pages too. |
-| Corners | **Default**, Sharp, Round | How rounded corners are. |
+| Corners | Square, Sharp, **Default**, Round | How rounded corners are. |
 | Glass effects | **On**, Off | The blur behind panels and bars. Off is lighter on slower PCs. |
 | Contrast | **Standard**, High | High brightens secondary text and strengthens lines. |
 | Animations | **Full**, Reduced | Reduced makes hovers and panels change at once; spinners still play. |
@@ -252,16 +252,17 @@ Every option lives in the theme's own settings window: **Theme settings** in the
 <summary><b>Home</b> &nbsp;<sub>the stage, its games, Steam's Home</sub></summary>
 <br>
 
-The same settings open from a right-click on the title bar's Home switch.
+The stage's settings also open from a right-click on the title bar's Home switch.
 
 | Setting | Options | What it does |
 | --- | --- | --- |
-| Home | **Stage**, Steam's | The theme's stage and panels, or Steam's own Home (What's New and the Add shelf row can each go). |
-| Games, How many | **Recent**, Favorites, Collection, Added · 4, **6**, 8, 10 | What the stage features, and how many games it cycles through. |
+| Home | **Stage**, Steam's | The theme's stage and panels, or Steam's own Home. |
+| Games, How many | **Recent**, Favorites, Collection, Added · 4, **6**, 8, 10 | What the stage features, and how many games it cycles through. Collection picks one from a searchable list. |
 | Details | all | Logo, developer, reviews, playing now, description, hours, achievements, last played. |
 | Game picker | **Thumbnails**, Dots, Hidden | How you move between the stage's games. |
 | Auto-switch | Off, 15 s, **9 s**, 5 s | How long each game stays before the next. |
 | Background | **Zoom**, Parallax, Screenshots, Trailer, Still | Behind the featured game. |
+| Steam's Home | | Which parts show (What's New, the Add shelf row); What's New with or without pictures, its summary on hover, and Auto, 6, 8 or 10 cards across. |
 
 Panels (Favorites, Collections, Recently added, Friend activity) are added, removed and reordered by dragging; each one's ⋯ menu sets its width and content. Without panels, the stage fills the window.
 
@@ -284,24 +285,39 @@ Windows keep the theme's background until they've loaded, so Steam's own look ne
 </details>
 
 <details>
-<summary><b>Library, Friends, Toasts, Overlay, Web pages</b></summary>
+<summary><b>Library and Friends</b> &nbsp;<sub>covers, game pages, the dock, chats</sub></summary>
 <br>
 
 | Setting | Options | What it does |
 | --- | --- | --- |
+| Status chips | **On**, Off | A chip in each cover's corner, on hover or always: ready, not installed or updating, with a progress ring. Click it to play or install. |
+| Release chips, Friends playing, Steam Deck badge | | Coming soon, pre-load and new to library; who's playing; the Deck badge on hover or always. |
+| Dim uninstalled games | **Off**, On | Covers of games that aren't installed fade back until you point at one. |
 | Game page sections | all | Which sections a game's page shows. |
 | Rarity tiers | **On**, Off | Achievements grouped from Legendary to Common, or the plain % of players. |
+| Logo place | **Centred**, Steam's | A game's logo above its play bar, or where Steam puts it, where Move and size the logo works. |
 | Game icons, Game list width | | Each game's icon in the list; a fixed list, or one whose edge you drag (double-click resets). |
 | Dock at startup | **As left**, Open, Folded | How the Friends dock starts. Its width is fixed or adjustable, like the game list's. |
 | Chats open in | **Dock**, Window | Beside the dock, or in Steam's chat window. |
+| Offline friends, Offline group members | **Hidden**, Shown | Offline friends in the dock, and offline members in a group chat's list. |
 | Friend cards | **On**, Off | A friend's card when you point at them, after a short, default or long delay. |
 | Profile backgrounds | **Video**, Still, Off | Friends' profile backgrounds in cards, dialogs and toasts. |
+
+</details>
+
+<details>
+<summary><b>Toasts, overlay, web pages and Millennium</b></summary>
+<br>
+
+| Setting | Options | What it does |
+| --- | --- | --- |
 | Restyle toasts | **On**, Off | Steam's toasts in the theme's design, in game too if you want. |
 | Toast style | **Stage**, Compact | Stage: one card at the bottom, top or corner, with game art or the achievement's icon and a queue behind. Compact: Steam's toasts restyled, at the centre or in the corner. Pause on hover and time on screen for both. |
 | Restyle the overlay | **On**, Off | The in-game overlay in the theme's design. |
-| Overlay | | Darkness, the view it opens on, the overview's panels, its views, the clock and play time. |
+| Overlay | | Darkness, the view it opens on, the tab Achievements opens on, the overview's panels, its views, the clock and play time. |
 | Themed sites | all | Store, Community, Support and Checkout; the rest as Steam draws them. |
 | Page width | **Default**, Comfortable, Edge to edge | How wide Store and Community pages run on a wide screen. |
+| Settings open in | **Window**, Overlay, Page | Millennium Settings in a window of its own, as a dialog over the client, or inside the main window. |
 
 </details>
 
@@ -347,7 +363,7 @@ Steam-Enhanced/
 ├── web/          Web pages: shared/ first, then store/, community/, help/ and checkout/, a folder per page
 ├── compat/       Plugin integrations, a folder per plugin
 ├── options/      A setting's stylesheets, a folder per settings tab
-├── dev/          Element picker, profiler, startup preview, dialog launcher, toast preview, class map tools, checks, README and brand art
+├── dev/          Element picker, profiler, previews, dialog launcher, dev reload, class map tools, checks, README and brand art
 └── assets/       Logo, Millennium header and splash, web loop, README art (readme/)
 ```
 

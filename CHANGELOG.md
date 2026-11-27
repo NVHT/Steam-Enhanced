@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.6.0**](#v1-6-0) | Nov 26, 2026 | A faster client and Store, the stage's collection in Theme settings |
 | [**1.5.7**](#v1-5-7) | Nov 26, 2026 | Cover chips, Home shelves and What's New redone, Brew Hub 1.2, a tidier Store game page |
 | [**1.5.6**](#v1-5-6) | Nov 26, 2026 | Offline friends in the dock, tip and header fixes |
 | [**1.5.5**](#v1-5-5) | Nov 26, 2026 | Fixes from your reports, logo and offline friends settings |
@@ -33,11 +34,45 @@
 
 <br>
 
+<a name="v1-6-0"></a>
+
+## 1.6.0 · Nov 26, 2026
+
+> A release for speed and care. The theme stops making Steam lay pages out again while it is still building them, so game pages, Downloads, Settings and the Store do a fraction of the work they did. About a thousand style rules are written so Chromium can look them up instead of testing every element. The code underneath is easier to keep right, and Theme settings can now pick the Home stage's collection.
+
+**Faster** (the theme's own work, measured with its profiler, 1.5.7 → 1.6.0)
+- **Store**: the front page 49 → 4 ms, a sale page 72 → 10 ms, a game's page 38 → 14 ms.
+- **Game page**: 24 → 16 ms to open, with almost no forced layout (9 → 1 ms).
+- **Library**: dragging a game into a collection 80 → 43 ms; four returns to Home 34 → 28 ms.
+- **Downloads**: 28 → 15 ms during a download, the speed graph redrawn only for a new sample; opening the page 10 → 8 ms.
+- **Settings**: six Steam Settings pages 6.4 → 3.6 ms.
+- **Styles**: selectors keyed by `:is()` written out across the client and web pages, nearly halving the cost of the theme's rules in each style pass.
+
+**Home**
+- **Featured games**: choosing Collection in Theme settings shows a Collection row to pick it, in the same searchable list as Home's shelves. The Games row has the stage's icon.
+
+**Fixes**
+- **What's New**: 6 cards across keeps three-line summaries on a wide window.
+- **Scroll to top**: on a Store or Community page that opens already scrolled, the button shows at once.
+- **Community**: avatar rings in a profile's small header use the theme's online and in-game colours.
+- **Support**: the error strip follows the colour preset.
+- **Store**: 1.5.0's cached game details are cleared from storage.
+- **Overlay notes**: links in notes open only web addresses.
+- **Live views** (downloads, the overlay, news): a refresh asked for right away is no longer put off until the next tick.
+
+**Under the hood**
+- Reads of size and position wait for layout or come from resize observers; the profiler times web pages too, arming a site and loading first on its next visit.
+- Duplicate animations share one set of keyframes; long procedures are split by what they do; every empty `catch` says why.
+- The class map is rebuilt from the installed client; the settings list lives in its own file; the dev reload loads on first use.
+- `dev/css-check.py` finds `:is()` keys Chromium can't index and writes them out (`--fix-is`); `dev/audit.py` flags timers, observers and catches without a reason.
+
+<br>
+
 <a name="v1-5-7"></a>
 
-## 1.5.7 · Nov 26, 2026
-
-> Library covers say at a glance what's ready to play, Home's shelves and What's New are easier to arrange and read, Brew Hub 1.2 looks native again, Millennium Settings can open as a window, an overlay or a page, and a Store game page keeps its long extras out of the way.
+<details>
+<summary><b>1.5.7</b> · Nov 26, 2026 · Library covers say at a glance what's ready to play, Home's shelves and What's New are easier to arrange and read, Brew Hub 1.2 looks native again, Millennium Settings can open as a window, an overlay or a page, and a Store game page keeps its long extras out of the way.</summary>
+<br>
 
 **Library**
 - **Covers**: one chip in each cover's corner says ready, not installed or updating, with a progress ring; click it to play or install. Coming soon, pre-load and new to library get a chip of their own.
@@ -66,6 +101,8 @@
 - **Friends dock**: over a Store or Community page, its menus open whole and no longer close at once under a friend's card.
 - **Game page**: opens and scrolls more smoothly, with no long pause while the logo is measured.
 - **Theme settings**: settings that don't apply are hidden until they do; opening Theme settings again brings its window to the front.
+
+</details>
 
 <br>
 
