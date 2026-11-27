@@ -753,6 +753,30 @@
     afterLayoutObserver.observe(el);
   };
 
+  /*
+   * fn runs right after this window's next layout (afterLayout on <html>, which always has a
+   * box), for timer-driven visibility and geometry reads: a timer lands mid-build as often as
+   * not, and its read paid the pending style pass. A window that draws no frame (occluded)
+   * runs fn after SETTLE_BACKSTOP_MS instead. Another window's document can't be observed from
+   * here: fn runs at once.
+   */
+  const SETTLE_BACKSTOP_MS = 1000;
+  const settled = (fn, doc = document) => {
+    if (doc !== document) {
+      run(fn);
+      return;
+    }
+    let done = false;
+    const once = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(backstop);
+      run(fn);
+    };
+    const backstop = setTimeout(once, SETTLE_BACKSTOP_MS);
+    afterLayout(document.documentElement, once);
+  };
+
   const poll = (fn, delay, opts = {}) => {
     const doc = opts.document || document;
     const win = doc.defaultView;
@@ -771,7 +795,26 @@
 
     const isDocumentVisible = () => !win?.closed && doc.visibilityState !== 'hidden';
 
-    const tick = () => {
+    // `active` usually asks visibility and fn often reads layout: both wait for the next
+    // layout (settled), where a timer landing mid-build no longer pays the style pass.
+    let settling = false;
+    const pass = (runFn) => {
+      settling = false;
+      if (stopped || !isDocumentVisible()) {
+        isActive = false;
+        return;
+      }
+      isActive = !opts.active || !!run(opts.active);
+      if (isActive && runFn) {
+        try {
+          fn();
+        } catch (err) {
+          console.warn('[Steam Enhanced]', err);
+        }
+      }
+      if (!stopped && timer === null) arm(isActive ? delay : idleInterval);
+    };
+    const tick = (runFn = true) => {
       if (timer !== null) {
         clearTimeout(timer);
         timer = null;
@@ -780,15 +823,9 @@
         isActive = false;
         return;
       }
-      isActive = !opts.active || !!run(opts.active);
-      if (isActive) {
-        try {
-          fn();
-        } catch (err) {
-          console.warn('[Steam Enhanced]', err);
-        }
-      }
-      if (!stopped && timer === null) arm(isActive ? delay : idleInterval);
+      if (settling) return;
+      settling = true;
+      settled(() => pass(runFn), doc);
     };
 
     const wake = () => {
@@ -805,10 +842,8 @@
     doc.addEventListener('visibilitychange', wake);
     for (const type of wakeEvents) win?.addEventListener?.(type, wake);
 
-    if (isDocumentVisible()) {
-      isActive = !opts.active || !!run(opts.active);
-      arm(isActive ? delay : idleInterval);
-    }
+    // The first pass only asks `active`, to pick the first delay: callers run fn themselves
+    tick(false);
 
     return {
       refresh: wake,
@@ -1004,6 +1039,7 @@
     watch,
     visible,
     afterLayout,
+    settled,
     poll,
     inside,
     attempt,
