@@ -27,7 +27,14 @@
 }
 
 /* Steam's nine-slice shadow images: the card has its own */
-.miniprofile_hover :is(.shadow_ul, .shadow_top, .shadow_ur, .shadow_left, .shadow_right, .shadow_bl, .shadow_bottom, .shadow_br) {
+.miniprofile_hover .shadow_ul,
+.miniprofile_hover .shadow_top,
+.miniprofile_hover .shadow_ur,
+.miniprofile_hover .shadow_left,
+.miniprofile_hover .shadow_right,
+.miniprofile_hover .shadow_bl,
+.miniprofile_hover .shadow_bottom,
+.miniprofile_hover .shadow_br {
   display: none !important;
 }
 
@@ -64,12 +71,15 @@
 }
 
 .miniprofile_hover :is(.miniprofile_container, .miniprofile_content) > .miniprofile_playersection { order: 1; }
-.miniprofile_hover :is(.miniprofile_container, .miniprofile_content) > :is(.miniprofile_gamesection, .miniprofile_ingamesection) { order: 2; }
+.miniprofile_hover :is(.miniprofile_container, .miniprofile_content) > .miniprofile_gamesection,
+.miniprofile_hover :is(.miniprofile_container, .miniprofile_content) > .miniprofile_ingamesection { order: 2; }
 .miniprofile_hover :is(.miniprofile_container, .miniprofile_content) > .miniprofile_playtimesection { order: 3; }
 .miniprofile_hover :is(.miniprofile_container, .miniprofile_content) > .miniprofile_detailssection { order: 4; }
 
 /* Banner: the profile background (video or image), else Steam's blurred avatar, fading into the card */
-.miniprofile_hover :is(.miniprofile_nameplatecontainer, .miniprofile_backgroundblur, .miniprofile_background):not(#se-none) {
+.miniprofile_hover .miniprofile_nameplatecontainer:not(#se-none),
+.miniprofile_hover .miniprofile_backgroundblur:not(#se-none),
+.miniprofile_hover .miniprofile_background:not(#se-none) {
   position: absolute !important;
   inset: 0 0 auto !important;
   z-index: 0;
@@ -82,7 +92,8 @@
   mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
 }
 
-.miniprofile_hover :is(.miniprofile_nameplatecontainer, .miniprofile_background) :is(video, img):not(#se-none) {
+.miniprofile_hover :is(.miniprofile_nameplatecontainer, .miniprofile_background) video:not(#se-none),
+.miniprofile_hover :is(.miniprofile_nameplatecontainer, .miniprofile_background) img:not(#se-none) {
   position: static !important;
   width: 100% !important;
   height: 100% !important;
@@ -170,7 +181,8 @@
  * In game, as the dock card: the game's art beside "IN-GAME", the game's name and rich presence,
  * on the card's surface (no tile)
  */
-.miniprofile_hover :is(.miniprofile_gamesection, .miniprofile_ingamesection):not(#se-none) {
+.miniprofile_hover .miniprofile_gamesection:not(#se-none),
+.miniprofile_hover .miniprofile_ingamesection:not(#se-none) {
   position: relative;
   z-index: var(--se-z-raised);
   display: grid;
@@ -186,12 +198,14 @@
 }
 
 /* Without art, the text takes the whole row */
-.miniprofile_hover :is(.miniprofile_gamesection, .miniprofile_ingamesection):not(:has(img)):not(#se-none) {
+.miniprofile_hover .miniprofile_gamesection:not(:has(img)):not(#se-none),
+.miniprofile_hover .miniprofile_ingamesection:not(:has(img)):not(#se-none) {
   grid-template-columns: minmax(0, 1fr);
 }
 
 /* Game art: the in-game section's and the playtime section's, one size */
-.miniprofile_hover :is(:is(.miniprofile_gamesection, .miniprofile_ingamesection) img, .miniprofile_playtimesection .gamelogo):not(#se-none) {
+.miniprofile_hover :is(.miniprofile_gamesection, .miniprofile_ingamesection) img:not(.se-none):not(#se-none),
+.miniprofile_hover .miniprofile_playtimesection .gamelogo:not(#se-none) {
   position: static !important;
   flex: none;
   width: 86px !important;
@@ -213,7 +227,10 @@
   color: var(--se-text-strong);
 }
 
-.miniprofile_hover :is(.miniprofile_game_name, .game_name, .rich_presence, .game_state):not(#se-none) {
+.miniprofile_hover .miniprofile_game_name:not(#se-none),
+.miniprofile_hover .game_name:not(#se-none),
+.miniprofile_hover .rich_presence:not(#se-none),
+.miniprofile_hover .game_state:not(#se-none) {
   grid-column: -2;
   position: static !important;
   min-width: 0;
@@ -231,7 +248,8 @@
   color: var(--se-running) !important;
 }
 
-.miniprofile_hover :is(.miniprofile_game_name, .game_name):not(#se-none) {
+.miniprofile_hover .miniprofile_game_name:not(#se-none),
+.miniprofile_hover .game_name:not(#se-none) {
   color: var(--se-text-strong) !important;
 }
 

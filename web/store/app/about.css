@@ -113,7 +113,9 @@ html.se-app-about-on [data-se-about] .gamehighlight_desktopcarousel video {
   background: var(--se-media-bg);
 }
 
-html.se-app-about-on [data-se-about] :is(.highlight_ctn, .highlight_overflow, .gamehighlight_desktopcarousel) {
+html.se-app-about-on [data-se-about] .highlight_ctn,
+html.se-app-about-on [data-se-about] .highlight_overflow,
+html.se-app-about-on [data-se-about] .gamehighlight_desktopcarousel {
   width: 100% !important;
   max-width: none !important;
   margin: 0 !important;
@@ -186,15 +188,23 @@ html.se-app-about-on [data-se-about] .se-app-about__title {
 }
 
 /* Keep headings with their text, figures whole, and no single lines stranded. */
-.se-app-about__body :is(h1, h2, h3, h4, .bb_tag) {
+.se-app-about__body h1:not(.se-none),
+.se-app-about__body h2:not(.se-none),
+.se-app-about__body h3:not(.se-none),
+.se-app-about__body h4:not(.se-none),
+.se-app-about__body .bb_tag {
   break-after: avoid;
 }
 
-.se-app-about__body :is(img, video, li, .bb_img_ctn) {
+.se-app-about__body img:not(.se-none),
+.se-app-about__body video:not(.se-none),
+.se-app-about__body li:not(.se-none),
+.se-app-about__body .bb_img_ctn {
   break-inside: avoid;
 }
 
-.se-app-about__body :is(p, .bb_paragraph) {
+.se-app-about__body p:not(.se-none),
+.se-app-about__body .bb_paragraph {
   orphans: 2;
   widows: 2;
 }
@@ -222,7 +232,11 @@ html.se-app-about-on [data-se-about] .se-app-about__title {
   line-height: 1.75;
 }
 
-.se-app-about__body :is(h1, h2, h3, h4, .bb_tag) {
+.se-app-about__body h1:not(.se-none),
+.se-app-about__body h2:not(.se-none),
+.se-app-about__body h3:not(.se-none),
+.se-app-about__body h4:not(.se-none),
+.se-app-about__body .bb_tag {
   float: none !important;
   margin: var(--se-space-5) 0 var(--se-space-2) !important;
   padding: 0 !important;
@@ -235,11 +249,13 @@ html.se-app-about-on [data-se-about] .se-app-about__title {
   text-transform: uppercase;
 }
 
-.se-app-about__body :is(p, .bb_paragraph) {
+.se-app-about__body p:not(.se-none),
+.se-app-about__body .bb_paragraph {
   margin: 0 0 var(--se-space-3);
 }
 
-.se-app-about__body :is(ul, ol) {
+.se-app-about__body ul,
+.se-app-about__body ol {
   margin: 0 0 var(--se-space-3);
   padding-left: var(--se-space-5);
 }
@@ -250,7 +266,8 @@ html.se-app-about-on [data-se-about] .se-app-about__title {
 
 /* Media never overflows its column (Steam sizes some with inline widths); banner art fills
    it (app/about.js marks it [data-se-wide] once its size is known). */
-.se-app-about__body :is(img, video) {
+.se-app-about__body img,
+.se-app-about__body video {
   display: block;
   max-width: 100% !important;
   height: auto !important;
@@ -293,7 +310,8 @@ html.se-app-about-on [data-se-about] .se-app-about__title {
   width: 100%;
 }
 
-.se-app-about__body .bb_img_ctn > :is(img, video) {
+.se-app-about__body .bb_img_ctn > img,
+.se-app-about__body .bb_img_ctn > video {
   margin: 0;
 }
 
@@ -304,7 +322,8 @@ html.se-app-about-on [data-se-about] .se-app-about__title {
   z-index: var(--se-z-raised);
 }
 
-.se-app-about__body :is(.bb_img_play_pause, .bb_img_expand) {
+.se-app-about__body .bb_img_play_pause,
+.se-app-about__body .bb_img_expand {
   width: 34px;
   height: 34px;
   padding: 0;
@@ -318,7 +337,8 @@ html.se-app-about-on [data-se-about] .se-app-about__title {
   transition: opacity var(--se-dur), background var(--se-dur);
 }
 
-.se-app-about__body :is(.bb_img_play_pause, .bb_img_expand):hover {
+.se-app-about__body .bb_img_play_pause:hover,
+.se-app-about__body .bb_img_expand:hover {
   background: var(--se-glass-btn-hover);
 }
 
@@ -326,7 +346,8 @@ html.se-app-about-on [data-se-about] .se-app-about__title {
   display: none !important;
 }
 
-.se-app-about__body :is(.bb_img_play_pause, .bb_img_expand)::before {
+.se-app-about__body .bb_img_play_pause::before,
+.se-app-about__body .bb_img_expand::before {
   content: "";
   width: 14px;
   height: 14px;
@@ -349,13 +370,15 @@ html.se-app-about-on [data-se-about] .se-app-about__title {
   --se-glyph: var(--se-icon-fullscreen);
 }
 
-.se-app-about__body :is(.bb_img_play_pause, .bb_img_expand):focus-visible {
+.se-app-about__body .bb_img_play_pause:focus-visible,
+.se-app-about__body .bb_img_expand:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
 }
 
 .se-app-about__body .game_area_description > :first-child:is(img, video),
-.se-app-about__body .game_area_description > :first-child :is(img, video):first-child {
+.se-app-about__body .game_area_description > :first-child img:first-child,
+.se-app-about__body .game_area_description > :first-child video:first-child {
   margin-top: 0;
 }
 

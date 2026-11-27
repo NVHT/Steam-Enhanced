@@ -505,7 +505,8 @@ html.se-app-hero-on [data-se-chip-source] {
 /* The same blocks before app/hero.js reaches them (Steam renders them late, in React): the
    panel that directly holds the achievements or Points Shop link. */
 /* !important: another rule in this file sets display with !important */
-html.se-app-hero-on .game_meta_data :is(div:has(> a[href*="steamcommunity.com/achievements/"]), div:has(> a[href*="/points/shop/app/"])) {
+html.se-app-hero-on .game_meta_data div:has(> a[href*="steamcommunity.com/achievements/"]),
+html.se-app-hero-on .game_meta_data div:has(> a[href*="/points/shop/app/"]) {
   display: none !important;
 }
 
@@ -600,7 +601,8 @@ html.se-app-hero-on .newmodal:has(.se-app-dialog) {
   white-space: nowrap;
 }
 
-.se-app-ea :is(.likely_stale, .leaving_early_access) {
+.se-app-ea .likely_stale,
+.se-app-ea .leaving_early_access {
   margin-top: var(--se-space-3);
   color: var(--se-gold);
 }
@@ -613,7 +615,8 @@ html.se-app-hero-on .newmodal:has(.se-app-dialog) {
  * text colours. Found by structure and Steam's stable names (ActiveTab, role="button").
  */
 /* !important: Steam's own rules (C6L1nUf2.css, js.css) set background at equal or higher weight */
-html.se-store .DeckVerifiedModalDialog :is(.ModalPosition_Content, .DialogContent):not(#se-none) {
+html.se-store .DeckVerifiedModalDialog .ModalPosition_Content:not(#se-none),
+html.se-store .DeckVerifiedModalDialog .DialogContent:not(#se-none) {
   background: var(--se-surface) !important;
 }
 

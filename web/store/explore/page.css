@@ -27,13 +27,16 @@ html.se-store-explore:not(#se-none) .game_page_background {
 }
 
 /* Steam's tinted section backdrops: the page colour shows through, like the front page. */
-html.se-store-explore:not(#se-none) :is(.home_ctn, .page_header_ctn, .top_capsules) {
+html.se-store-explore:not(#se-none) .home_ctn,
+html.se-store-explore:not(#se-none) .page_header_ctn,
+html.se-store-explore:not(#se-none) .top_capsules {
   background: none !important;
   box-shadow: none !important;
 }
 
 /* Section headings ("Your New Release Queue", "Under $10"...): the front page's 22px titles. */
-html.se-store-explore:not(#se-none) :is(.home_ctn, .page_content, .home_page_content) > :is(h2, .home_page_content_title):not([data-se-explore-title]) {
+html.se-store-explore:not(#se-none) :is(.home_ctn, .page_content, .home_page_content) > h2:not(.se-none):not([data-se-explore-title]),
+html.se-store-explore:not(#se-none) :is(.home_ctn, .page_content, .home_page_content) > .home_page_content_title:not([data-se-explore-title]) {
   margin: var(--se-space-7) 0 var(--se-space-4) !important;
 }
 
@@ -277,7 +280,8 @@ html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_item:not(.dq_sta
   display: none !important;
 }
 
-html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_item :is(img, .dq_item_cap) {
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_item img:not(.se-none),
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_item .dq_item_cap {
   display: block;
   width: 100% !important;
   height: 100% !important;
@@ -373,7 +377,8 @@ html.se-store-explore:not(#se-none) [data-se-explore-queue] .discovery_queue_ove
 }
 
 /* Signed-in "begin exploring" and "Start another queue": the same accent button. */
-html.se-store-explore:not(#se-none) [data-se-explore-queue] :is(.begin_exploring, .discover_queue_empty_refresh_btn) {
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .begin_exploring,
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discover_queue_empty_refresh_btn {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
@@ -407,7 +412,8 @@ html.se-store-explore:not(#se-none) [data-se-explore-queue] .begin_exploring::af
   display: none !important; /* Steam's rotated arrow block */
 }
 
-html.se-store-explore:not(#se-none) [data-se-explore-queue] :is(.begin_exploring, .discover_queue_empty_refresh_btn):hover {
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .begin_exploring:hover,
+html.se-store-explore:not(#se-none) [data-se-explore-queue] .discover_queue_empty_refresh_btn:hover {
   background: var(--se-btn-primary-bg-hover) !important;
 }
 
@@ -629,7 +635,8 @@ html.se-store-explore:not(#se-none) [data-se-explore-tabs] .store_horizontal_min
   overflow: visible !important;
 }
 
-html.se-store-explore:not(#se-none) [data-se-explore-tabs] .store_horizontal_minislider_ctn > :is(.slider_left, .slider_right) {
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .store_horizontal_minislider_ctn > .slider_left,
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .store_horizontal_minislider_ctn > .slider_right {
   display: none !important;
 }
 
@@ -731,7 +738,11 @@ html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item:hover::befo
 }
 
 /* Steam places the art and price absolutely and pads the text past them; all back in the row. */
-html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item :is(.tab_item_cap, .tab_item_discount, .tab_item_content, .release_date, .prepurchase_price_ctn) {
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .tab_item_cap,
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .tab_item_discount,
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .tab_item_content,
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .release_date,
+html.se-store-explore:not(#se-none) [data-se-explore-tabs] .tab_item .prepurchase_price_ctn {
   position: static !important;
   inset: auto !important;
 }
@@ -1066,7 +1077,8 @@ html.se-store-explore:not(#se-none) :is(.home_block_footer, .bucket > h2 .right,
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  html.se-store-explore:not(#se-none) [data-se-explore-queue] :is(.dq_static_pos_4, .dq_static_pos_5) {
+  html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_static_pos_4,
+  html.se-store-explore:not(#se-none) [data-se-explore-queue] .dq_static_pos_5 {
     display: none !important;
   }
 }

@@ -16,7 +16,8 @@ html.se-store-front {
 }
 
 /* Steam's backdrop around the whole section: gone, so it sits on the page colour like every other row. */
-html.se-store-front:not(#se-none) :is(.home_tab_section, .home_tab_bg_ctn):has([data-se-tabs]) {
+html.se-store-front:not(#se-none) .home_tab_section:has([data-se-tabs]),
+html.se-store-front:not(#se-none) .home_tab_bg_ctn:has([data-se-tabs]) {
   background: none !important;
   box-shadow: none !important;
   border: 0 !important;
@@ -169,7 +170,8 @@ html.se-store-front:not(#se-none) .se-tabs__more:is(:hover, :focus-visible) {
 
 
 /* The link moved up beside the tabs, so Steam's strip under the list goes. */
-html.se-store-front:not(#se-none) [data-se-tabs][data-se-tabs-more] .home_tab_content :is(.see_more_link, .tab_see_more) {
+html.se-store-front:not(#se-none) [data-se-tabs][data-se-tabs-more] .home_tab_content .see_more_link,
+html.se-store-front:not(#se-none) [data-se-tabs][data-se-tabs-more] .home_tab_content .tab_see_more {
   display: none !important;
 }
 
@@ -312,7 +314,8 @@ html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .tab_item_title {
 }
 
 /* Replaced by front/tabs.js's chips and date column. */
-html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item[data-se-tabs-row] :is(.tab_item_tags, .tab_item_release_date),
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item[data-se-tabs-row] .tab_item_tags,
+html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item[data-se-tabs-row] .tab_item_release_date,
 html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item .tab_item_capsule_purchase {
   display: none !important;
 }
@@ -677,13 +680,16 @@ html.se-store-front:not(#se-none) .se-tabs__view:is(:hover, :focus-visible) {
 
 
 /* No row focused yet (the preview builds on first hover): hide the overlays. */
-html.se-store-front:not(#se-none) #tab_preview_container[data-se-tabs-idle] ~ :is(.se-tabs__badge, .se-tabs__foot) {
+html.se-store-front:not(#se-none) #tab_preview_container[data-se-tabs-idle] ~ .se-tabs__badge,
+html.se-store-front:not(#se-none) #tab_preview_container[data-se-tabs-idle] ~ .se-tabs__foot {
   display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.se-store-front:not(#se-none) [data-se-tabs] :is(.tab_row_item, .home_tab_button),
-  html.se-store-front:not(#se-none) :is(.se-tabs__more, .se-tabs__view) {
+  html.se-store-front:not(#se-none) [data-se-tabs] .tab_row_item,
+  html.se-store-front:not(#se-none) [data-se-tabs] .home_tab_button,
+  html.se-store-front:not(#se-none) .se-tabs__more,
+  html.se-store-front:not(#se-none) .se-tabs__view {
     transition: none;
   }
 }

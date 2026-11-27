@@ -39,10 +39,15 @@ html.se-store:not(#se-none) .-hv44tztogk-,
 html.se-store-labs:not(#se-none) .labs-content .capsule,
 html.se-store-labs:not(#se-none) .labs-content .right-column-box,
 html.se-store-dlc:not(#se-none) .curator_featured > .focus,
-html.se-store-dlc:not(#se-none) :is(#filtertags_container, #client_filter),
+html.se-store-dlc:not(#se-none) #filtertags_container,
+html.se-store-dlc:not(#se-none) #client_filter,
 html.se-store-dlc:not(#se-none) #RecommendationsRows .recommendation,
-html.se-store-wishlist:not(#se-none) :is([data-se-wl="bar"], [data-se-wl="card"]),
-html.se-store-search:not(#se-none) :is(.searchbar, .search_results_filtered_warning, #search_resultsRows > .search_result_row, #additional_search_options > .block) {
+html.se-store-wishlist:not(#se-none) [data-se-wl="bar"],
+html.se-store-wishlist:not(#se-none) [data-se-wl="card"],
+html.se-store-search:not(#se-none) .searchbar:not(#se-none),
+html.se-store-search:not(#se-none) .search_results_filtered_warning:not(#se-none),
+html.se-store-search:not(#se-none) #search_resultsRows > .search_result_row,
+html.se-store-search:not(#se-none) #additional_search_options > .block {
   border-radius: var(--se-radius-card) !important;
   background: var(--se-card-bg) !important;
   box-shadow: var(--se-card-edge) !important;
@@ -56,15 +61,23 @@ html.se-store-search:not(#se-none) :is(.searchbar, .search_results_filtered_warn
 /* !important: the theme's shared rules (web/store/account/page.css, web/store/agecheck/page.css,
    web/store/charts/page.css) set background, border-radius, box-shadow with !important */
 html.se-store [data-se-nav="panel"] > div,
-html.se-store :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-),
+html.se-store .O2jUvAs3OiU-,
+html.se-store .SdFPqnbn0yI-,
 html.se-store [data-se-nav="sug-box"],
 html.se-store:not(#se-none) .game_hover_box,
-html.se-store:not(#se-none) :is(.store_tooltip, .community_tooltip, .oQJ4ZJN3E6g-, .b1ZLfKTPdqk-, .sT2QLMTaLYc-, .DfVfulWxy6w-),
+html.se-store:not(#se-none) .store_tooltip,
+html.se-store:not(#se-none) .community_tooltip,
+html.se-store:not(#se-none) .oQJ4ZJN3E6g-,
+html.se-store:not(#se-none) .b1ZLfKTPdqk-,
+html.se-store:not(#se-none) .sT2QLMTaLYc-,
+html.se-store:not(#se-none) .DfVfulWxy6w-,
 html:is(.se-store-rows, .se-store-dlc, .se-store-search):not(#se-none) .ds_options_tooltip,
 html.se-store:not(#se-none) .l39SV-qhMqE-,
 html.se-store-wishlist:not(#se-none) [data-se-wl="menu"],
-html.se-store-search:not(#se-none) :is(#sort_by_droplist, #term_options),
-html.se-store:not(#se-none) :is(.PFP2RDjCi0w-, [data-se-hcard]),
+html.se-store-search:not(#se-none) #sort_by_droplist,
+html.se-store-search:not(#se-none) #term_options,
+html.se-store:not(#se-none) .PFP2RDjCi0w-,
+html.se-store:not(#se-none) [data-se-hcard],
 html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) [role="menu"],
 html.se-store-charts:not(#se-none) [role="listbox"],
 html.se-store-charts:not(#se-none) body > :has(> div > .contextMenuItem .rdtPicker) {
@@ -80,9 +93,16 @@ html.se-store-charts:not(#se-none) body > :has(> div > .contextMenuItem .rdtPick
    Steam's border, caps and shadowed text cleared. */
 /* !important: another rule in this file sets border, color, font-family, font-size, font-weight,
    line-height, padding, text-shadow, text-transform with !important */
-html.se-store:not(#se-none) :is(.store_tooltip, .community_tooltip, .oQJ4ZJN3E6g-, .b1ZLfKTPdqk-, .sT2QLMTaLYc-, .DfVfulWxy6w-),
-html.se-store:not(#se-none) .b1ZLfKTPdqk- :is(.vtRYLIn3i-k-, .QGupySGO-1A-),
-html.se-store:not(#se-none) .DfVfulWxy6w- :is(.am1KoA5n2i8-, .HVVNV2EsOwg-) {
+html.se-store:not(#se-none) .store_tooltip,
+html.se-store:not(#se-none) .community_tooltip,
+html.se-store:not(#se-none) .oQJ4ZJN3E6g-,
+html.se-store:not(#se-none) .b1ZLfKTPdqk-,
+html.se-store:not(#se-none) .sT2QLMTaLYc-,
+html.se-store:not(#se-none) .DfVfulWxy6w-,
+html.se-store:not(#se-none) .b1ZLfKTPdqk- .vtRYLIn3i-k-,
+html.se-store:not(#se-none) .b1ZLfKTPdqk- .QGupySGO-1A-,
+html.se-store:not(#se-none) .DfVfulWxy6w- .am1KoA5n2i8-,
+html.se-store:not(#se-none) .DfVfulWxy6w- .HVVNV2EsOwg- {
   max-width: 20rem;
   padding: var(--se-space-2) var(--se-space-3) !important;
   border: 0 !important;
@@ -176,14 +196,17 @@ html.se-store-search:not(#se-none) #TagSuggest {
    higher weight; the theme's shared rules (web/store/account/funds/page.css, web/store/awards/results.css,
    web/store/charts/page.css) set background, border, color, font-family, font-size, font-weight,
    letter-spacing, line-height, padding, text-shadow, text-transform with !important */
-html.se-store-explore:not(#se-none) :is(.home_ctn, .page_content, .home_page_content) > :is(h2, .home_page_content_title):not([data-se-explore-title]),
+html.se-store-explore:not(#se-none) :is(.home_ctn, .page_content, .home_page_content) > h2:not(.se-none):not([data-se-explore-title]),
+html.se-store-explore:not(#se-none) :is(.home_ctn, .page_content, .home_page_content) > .home_page_content_title:not([data-se-explore-title]),
 html.se-store-front #module_discounts_and_events .txCSzBxQT1Q-,
 html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .IdjQXo6E9yc-,
 html.se-store-rows:not(#se-none) .mzAzU7-I6qg- .bKJhafR0h9g-,
-html.se-store-rows:not(#se-none) :is([data-se-shelf-title], .title_grid .home_section_title),
+html.se-store-rows:not(#se-none) [data-se-shelf-title]:not(.se-none),
+html.se-store-rows:not(#se-none) .title_grid .home_section_title,
 html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionHeader,
 html.se-store:not(#se-none) .SaleOuterContainer .social_share .mlr-XtYml6w-,
-html.se-store-charts:not(#se-none) :is(.GpbRWedhZd4-, .Kdj9Bbw3CHY-),
+html.se-store-charts:not(#se-none) .GpbRWedhZd4-,
+html.se-store-charts:not(#se-none) .Kdj9Bbw3CHY-,
 html.se-store-labs:not(#se-none) .labs-content h1 {
   padding: 0 !important;
   border: 0 !important;
@@ -209,7 +232,8 @@ html.se-store-labs:not(#se-none) .labs-content h1 {
    !important */
 html.se-store-explore:not(#se-none) #tab_preview_container .tags a,
 html.se-store-front:not(#se-none) #tab_preview_container .tab_preview .tags > a,
-html.se-store:not(#se-none) :is(.WidgetTag, .IX0d42JL3W4- ._5F2vJItlDB0-),
+html.se-store:not(#se-none) .WidgetTag:not(.se-none),
+html.se-store:not(#se-none) .IX0d42JL3W4- ._5F2vJItlDB0-,
 html.se-store:not(#se-none) .game_hover_box .hover_tag_row .app_tag,
 html.se-store:not(#se-none) .se-chip-tag,
 html.se-store-rows:not(#se-none) [data-se-tile] .deep_dive_tag,

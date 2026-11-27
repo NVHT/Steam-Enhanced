@@ -25,7 +25,8 @@ html.se-community-hub #AppHubCards .apphub_CardRow {
 }
 
 /* !important: display can come inline from Steam's markup or scripts */
-html.se-community-hub #AppHubCards :is(.apphub_CardClear, form) {
+html.se-community-hub #AppHubCards .apphub_CardClear,
+html.se-community-hub #AppHubCards form:not(.se-none) {
   display: none !important;
 }
 
@@ -65,7 +66,8 @@ html.se-community-hub #AppHubCards .apphub_Card.interactable:active {
 }
 
 /* !important: height can come inline from Steam's markup or scripts */
-html.se-community-hub #AppHubCards .apphub_Card :is(.apphub_CardContentClickable, .apphub_CardContentMain) {
+html.se-community-hub #AppHubCards .apphub_Card .apphub_CardContentClickable,
+html.se-community-hub #AppHubCards .apphub_Card .apphub_CardContentMain {
   position: relative;
   height: auto !important;
   background: none;
@@ -73,7 +75,11 @@ html.se-community-hub #AppHubCards .apphub_Card :is(.apphub_CardContentClickable
 
 /* Steam's art plates (workshop, guides, announcements), fades and speech corner */
 /* !important: display can come inline from Steam's markup or scripts */
-html.se-community-hub #AppHubCards :is(.apphub_CardBG, .apphub_CardAnnouncementBG, .apphub_CardContentNewsFade, .apphub_CardContentSpeechCorner, .UserReviewCardContent_Footer) {
+html.se-community-hub #AppHubCards .apphub_CardBG,
+html.se-community-hub #AppHubCards .apphub_CardAnnouncementBG,
+html.se-community-hub #AppHubCards .apphub_CardContentNewsFade,
+html.se-community-hub #AppHubCards .apphub_CardContentSpeechCorner,
+html.se-community-hub #AppHubCards .UserReviewCardContent_Footer {
   display: none !important;
 }
 
@@ -222,7 +228,8 @@ html.se-community-hub #AppHubCards .apphub_CardContentTitle {
 }
 
 /* !important: display can come inline from Steam's markup or scripts */
-html.se-community-hub #AppHubCards :is(.apphub_CardContentTitle, .apphub_CardControls):empty {
+html.se-community-hub #AppHubCards .apphub_CardContentTitle:empty,
+html.se-community-hub #AppHubCards .apphub_CardControls:empty {
   display: none !important;
 }
 
@@ -277,7 +284,9 @@ html.se-community-hub #AppHubCards .reward_btn_icon {
 
 /* Counts: rating, awards and comments, with drawn icons */
 /* !important: display, padding can come inline from Steam's markup or scripts */
-html.se-community-hub #AppHubCards :is(.apphub_CardRightData, .apphub_NewsCardStats, .apphub_UserReviewCardStats) {
+html.se-community-hub #AppHubCards .apphub_CardRightData,
+html.se-community-hub #AppHubCards .apphub_NewsCardStats,
+html.se-community-hub #AppHubCards .apphub_UserReviewCardStats {
   display: flex !important;
   align-items: center;
   gap: var(--se-space-3);
@@ -286,7 +295,9 @@ html.se-community-hub #AppHubCards :is(.apphub_CardRightData, .apphub_NewsCardSt
 }
 
 /* !important: display, margin, padding, position can come inline from Steam's markup or scripts */
-html.se-community-hub #AppHubCards :is(.apphub_CardRating, .apphub_CardCommentCount, .review_award_aggregated) {
+html.se-community-hub #AppHubCards .apphub_CardRating,
+html.se-community-hub #AppHubCards .apphub_CardCommentCount,
+html.se-community-hub #AppHubCards .review_award_aggregated {
   position: static !important;
   display: inline-flex !important;
   align-items: center;
@@ -306,7 +317,8 @@ html.se-community-hub #AppHubCards .apphub_CardRating:is(.notRated, .rateUpHide)
   display: none !important;
 }
 
-html.se-community-hub #AppHubCards :is(.apphub_CardRating.rateUp, .apphub_CardCommentCount)::before {
+html.se-community-hub #AppHubCards .apphub_CardRating.rateUp::before,
+html.se-community-hub #AppHubCards .apphub_CardCommentCount:not(.se-none)::before {
   content: "";
   width: var(--se-icon-sm);
   height: var(--se-icon-sm);

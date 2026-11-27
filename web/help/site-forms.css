@@ -2,10 +2,10 @@
 
 /* ---------- Forms ---------- */
 
-html.se-help :is(
-  input:is([type="text"], [type="email"], [type="password"], [type="tel"], [type="number"], [type="date"], [type="time"], [type="search"], [type="url"]),
-  input.text_input, textarea, select
-):not(.authcode_entry_input, .twofactorauthcode_entry_input, #twofactor_username, #help_search_support_input) {
+html.se-help input:is([type="text"], [type="email"], [type="password"], [type="tel"], [type="number"], [type="date"], [type="time"], [type="search"], [type="url"]):not(.authcode_entry_input, .twofactorauthcode_entry_input, #twofactor_username, #help_search_support_input),
+html.se-help input.text_input:not(.authcode_entry_input, .twofactorauthcode_entry_input, #twofactor_username, #help_search_support_input),
+html.se-help textarea:not(.se-none):not(.authcode_entry_input, .twofactorauthcode_entry_input, #twofactor_username, #help_search_support_input),
+html.se-help select:not(.se-none):not(.authcode_entry_input, .twofactorauthcode_entry_input, #twofactor_username, #help_search_support_input) {
   box-sizing: border-box;
   min-height: var(--se-ctl);
   padding: var(--se-space-2) var(--se-space-3) !important;
@@ -19,15 +19,16 @@ html.se-help :is(
   transition: box-shadow var(--se-dur);
 }
 
-html.se-help :is(
-  input:is([type="text"], [type="email"], [type="password"], [type="tel"], [type="number"], [type="date"], [type="time"], [type="search"], [type="url"]),
-  input.text_input, textarea, select
-):not(.authcode_entry_input, .twofactorauthcode_entry_input, #twofactor_username, #help_search_support_input):focus {
+html.se-help input:is([type="text"], [type="email"], [type="password"], [type="tel"], [type="number"], [type="date"], [type="time"], [type="search"], [type="url"]):not(.authcode_entry_input, .twofactorauthcode_entry_input, #twofactor_username, #help_search_support_input):focus,
+html.se-help input.text_input:not(.authcode_entry_input, .twofactorauthcode_entry_input, #twofactor_username, #help_search_support_input):focus,
+html.se-help textarea:not(.se-none):not(.authcode_entry_input, .twofactorauthcode_entry_input, #twofactor_username, #help_search_support_input):focus,
+html.se-help select:not(.se-none):not(.authcode_entry_input, .twofactorauthcode_entry_input, #twofactor_username, #help_search_support_input):focus {
   outline: 0 !important;
   box-shadow: var(--se-field-edge-focus) !important;
 }
 
-html.se-help :is(input, textarea)::placeholder {
+html.se-help input::placeholder,
+html.se-help textarea::placeholder {
   color: var(--se-text-faint) !important;
   font-style: normal !important;
   text-align: start !important;
@@ -82,7 +83,10 @@ html.se-help .dselect_container .dropcontainer ul li a.highlighted {
 /* ---------- Buttons ---------- */
 
 /* Submit buttons and help.css's own action buttons: the accent pill */
-html.se-help :is(input[type="submit"], .change_password_button, .help_game_request_refund_button, .self_lock_button) {
+html.se-help input[type="submit"],
+html.se-help .change_password_button:not(se-none),
+html.se-help .help_game_request_refund_button:not(se-none),
+html.se-help .self_lock_button:not(se-none) {
   height: var(--se-ctl);
   padding: 0 var(--se-space-5) !important;
   border: 0 !important;
@@ -95,13 +99,22 @@ html.se-help :is(input[type="submit"], .change_password_button, .help_game_reque
   transition: background-color var(--se-dur);
 }
 
-html.se-help :is(input[type="submit"], .change_password_button, .help_game_request_refund_button, .self_lock_button):hover {
+html.se-help input[type="submit"]:hover,
+html.se-help .change_password_button:not(se-none):hover,
+html.se-help .help_game_request_refund_button:not(se-none):hover,
+html.se-help .self_lock_button:not(se-none):hover {
   background: var(--se-btn-primary-bg-hover) !important;
   color: var(--se-on-accent) !important;
 }
 
 /* Steam's shared buttons (buttons.css): green / blue as the accent pill, the rest grey */
-html.se-help :is([class*="btn_green"], [class*="btn_blue"], [class*="btnv6_blue"], [class*="btnv6_green"], [class*="btn_grey"], [class*="btnv6_grey"], [class*="btnv6_lightblue"]):not(.btn_link) {
+html.se-help [class*="btn_green"]:not(.btn_link),
+html.se-help [class*="btn_blue"]:not(.btn_link),
+html.se-help [class*="btnv6_blue"]:not(.btn_link),
+html.se-help [class*="btnv6_green"]:not(.btn_link),
+html.se-help [class*="btn_grey"]:not(.btn_link),
+html.se-help [class*="btnv6_grey"]:not(.btn_link),
+html.se-help [class*="btnv6_lightblue"]:not(.btn_link) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -114,7 +127,10 @@ html.se-help :is([class*="btn_green"], [class*="btn_blue"], [class*="btnv6_blue"
   transition: background-color var(--se-dur), color var(--se-dur);
 }
 
-html.se-help :is([class*="btn_green"], [class*="btn_blue"], [class*="btnv6_blue"], [class*="btnv6_green"]):not(.btn_link) {
+html.se-help [class*="btn_green"]:not(.btn_link),
+html.se-help [class*="btn_blue"]:not(.btn_link),
+html.se-help [class*="btnv6_blue"]:not(.btn_link),
+html.se-help [class*="btnv6_green"]:not(.btn_link) {
   background: var(--se-btn-primary-bg) !important;
   box-shadow: none;
   color: var(--se-btn-primary-color) !important;
@@ -130,17 +146,23 @@ html.se-help :is([class*="btn_green"], [class*="btn_blue"], [class*="btnv6_blue"
   text-shadow: none !important;
 }
 
-html.se-help :is([class*="btn_grey"], [class*="btnv6_grey"], [class*="btnv6_lightblue"]):not(.btn_link):hover {
+html.se-help [class*="btn_grey"]:not(.btn_link):hover,
+html.se-help [class*="btnv6_grey"]:not(.btn_link):hover,
+html.se-help [class*="btnv6_lightblue"]:not(.btn_link):hover {
   background: var(--se-hover) !important;
   color: var(--se-white) !important;
 }
 
-html.se-help :is([class*="btn_green"], [class*="btn_blue"], [class*="btnv6_blue"], [class*="btnv6_green"]):not(.btn_link):hover {
+html.se-help [class*="btn_green"]:not(.btn_link):hover,
+html.se-help [class*="btn_blue"]:not(.btn_link):hover,
+html.se-help [class*="btnv6_blue"]:not(.btn_link):hover,
+html.se-help [class*="btnv6_green"]:not(.btn_link):hover {
   background: var(--se-btn-primary-bg-hover) !important;
 }
 
 html.se-help .btn_disabled,
-html.se-help :is(input[type="submit"], button):disabled {
+html.se-help input[type="submit"]:disabled,
+html.se-help button:not(.se-none):disabled {
   opacity: var(--se-btn-disabled-opacity);
   cursor: default;
   pointer-events: none;
@@ -171,7 +193,8 @@ html.se-help .lock_button_row .lock_button.selected {
 
 /* ---------- Tables and lists ---------- */
 
-html.se-help :is(.AccountDataTable, .fraud_refund_table) {
+html.se-help .AccountDataTable,
+html.se-help .fraud_refund_table {
   border-collapse: separate !important;
   border-spacing: 0 !important;
   overflow: hidden;
@@ -226,7 +249,8 @@ html.se-help .help_request_header {
   background: var(--se-surface-2) !important;
 }
 
-html.se-help :is(.help_request_header, .help_request_row) {
+html.se-help .help_request_header,
+html.se-help .help_request_row {
   border-bottom: 1px solid var(--se-divider) !important;
 }
 
@@ -327,6 +351,7 @@ html.se-help .market_image {
 }
 
 /* Sign-in pages and dark-page variants: the theme's page, no blue glow */
-html.se-help :is(.page_body_ctn.login, body.v6 .page_content_ctn.dark) {
+html.se-help .page_body_ctn.login:not(.se-none):not(se-none),
+html.se-help body.v6 .page_content_ctn.dark {
   background: none !important;
 }

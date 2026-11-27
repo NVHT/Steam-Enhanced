@@ -37,7 +37,9 @@ html.se-community-profile {
 
 /* ---------- Backdrop ---------- */
 
-html.se-community-profile :is(.responsive_page_frame, .responsive_page_content, .responsive_page_template_content) {
+html.se-community-profile .responsive_page_frame,
+html.se-community-profile .responsive_page_content,
+html.se-community-profile .responsive_page_template_content {
   background-color: transparent !important;
 }
 
@@ -70,12 +72,16 @@ html.se-community-profile div.profile_page[data-se-art]:not([data-se-art="none"]
   pointer-events: none;
 }
 
-html.se-community-profile :is(.profile_header_bg, .profile_header_bg_texture, .profile_content, .profile_content_inner) {
+html.se-community-profile .profile_header_bg,
+html.se-community-profile .profile_header_bg_texture,
+html.se-community-profile .profile_content,
+html.se-community-profile .profile_content_inner {
   background-color: transparent !important;
   background-image: none !important;
 }
 
-html.se-community-profile div.profile_page > :is(.profile_header_bg, .profile_content) {
+html.se-community-profile div.profile_page > .profile_header_bg,
+html.se-community-profile div.profile_page > .profile_content {
   position: relative;
   z-index: var(--se-z-raised);
 }
@@ -179,7 +185,9 @@ html.se-community-profile div.profile_page > :is(.profile_header_bg, .profile_co
   }
 
   /* Steam nests the persona, summary and actions: their children join the grid */
-  html.se-community-profile .profile_header_content :is(.profile_header_centered_col, .profile_header_badgeinfo, .profile_header_badgeinfo_badge_area) {
+  html.se-community-profile .profile_header_content .profile_header_centered_col,
+  html.se-community-profile .profile_header_content .profile_header_badgeinfo,
+  html.se-community-profile .profile_header_content .profile_header_badgeinfo_badge_area {
     display: contents !important;
   }
 
@@ -213,7 +221,8 @@ html.se-community-profile div.profile_page > :is(.profile_header_bg, .profile_co
     }
 
     /* The summary and the counts each take a full line, so neither opens with a hairline */
-    html.se-community-profile .se-profile-chips > :is(.se-profile-about, .se-profile-stack) {
+    html.se-community-profile .se-profile-chips > .se-profile-about,
+    html.se-community-profile .se-profile-chips > .se-profile-stack {
       flex-basis: 100%;
       padding-left: 0;
       border-left: 0;
@@ -249,19 +258,23 @@ html.se-community-profile .playerAvatar.profile_header_size .playerAvatarAutoSiz
   inset: auto !important;
 }
 
-html.se-community-profile .playerAvatar.profile_header_size :is(.playerAvatarAutoSizeInner, .playerAvatarAutoSizeInner > img, .playerAvatarAutoSizeInner > picture, .playerAvatarAutoSizeInner > picture img) {
+html.se-community-profile .playerAvatar.profile_header_size .playerAvatarAutoSizeInner:not(se-none):not(se-none),
+html.se-community-profile .playerAvatar.profile_header_size .playerAvatarAutoSizeInner > img:not(se-none),
+html.se-community-profile .playerAvatar.profile_header_size .playerAvatarAutoSizeInner > picture:not(se-none),
+html.se-community-profile .playerAvatar.profile_header_size .playerAvatarAutoSizeInner > picture img {
   display: block;
   width: 100% !important;
   height: 100% !important;
 }
 
-html.se-community-profile .playerAvatar.profile_header_size .playerAvatarAutoSizeInner :is(img) {
+html.se-community-profile .playerAvatar.profile_header_size .playerAvatarAutoSizeInner img {
   object-fit: cover;
   border-radius: calc(var(--se-radius-xl) - var(--se-radius-xs));
 }
 
 /* Persona: name and status, real name and place, ID chips */
-html.se-community-profile :is(.profile_header_centered_persona, .profile_header_centered_col) {
+html.se-community-profile .profile_header_centered_persona,
+html.se-community-profile .profile_header_centered_col {
   display: flex;
   flex-direction: column;
   gap: var(--se-space-2);
@@ -436,7 +449,9 @@ html.se-community-profile .se-profile-chips {
   min-width: 0;
 }
 
-html.se-community-profile :is(.se-profile-about, .se-profile-ids, .se-profile-stack) {
+html.se-community-profile .se-profile-about,
+html.se-community-profile .se-profile-ids,
+html.se-community-profile .se-profile-stack {
   min-width: 0;
   padding-left: var(--se-space-6);
   border-left: 1px solid var(--se-divider);
@@ -837,7 +852,8 @@ html.se-community-profile .se-level-card-title {
   font: var(--se-type-heading);
 }
 
-html.se-community-profile :is(.se-level-card-next, .se-level-card-xp) {
+html.se-community-profile .se-level-card-next,
+html.se-community-profile .se-level-card-xp {
   color: var(--se-text-muted);
   font: var(--se-type-caption);
 }

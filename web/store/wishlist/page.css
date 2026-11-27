@@ -157,7 +157,8 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="own-stat"][hidden] {
   display: none;
 }
 
-html.se-store-wishlist:not(#se-none) :is([data-se-wl="own-stat-value"], [data-se-wl="own-stat-value-sale"]) {
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-stat-value"],
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-stat-value-sale"] {
   color: var(--se-text-strong);
   font: 800 var(--se-fs-3xl)/1.2 var(--se-font); /* the mockup's figure */
   font-variant-numeric: tabular-nums;
@@ -180,7 +181,8 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="owner"] h2 {
 }
 
 /* Only the title on a friend's wishlist: centred beside the avatar. */
-html.se-store-wishlist:not(#se-none) [data-se-wl="page"]:not(:has([data-se-wl="share"])) [data-se-wl="owner"] :is(h2, [data-se-wl="own-heading"]) {
+html.se-store-wishlist:not(#se-none) [data-se-wl="page"]:not(:has([data-se-wl="share"])) [data-se-wl="owner"] h2:not(.se-none),
+html.se-store-wishlist:not(#se-none) [data-se-wl="page"]:not(:has([data-se-wl="share"])) [data-se-wl="owner"] [data-se-wl="own-heading"] {
   grid-row: 1 / span 2;
   align-self: center;
 }
@@ -200,7 +202,8 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="page"]:not(:has([data-se-wl="s
   display: none;
 }
 
-html.se-store-wishlist:not(#se-none) :is([data-se-wl="own-share"], [data-se-wl="own-notify"]) {
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-share"],
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-notify"] {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -225,16 +228,19 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="own-notify"] {
   padding: 0;
 }
 
-html.se-store-wishlist:not(#se-none) :is([data-se-wl="own-share"], [data-se-wl="own-notify"]):hover {
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-share"]:hover,
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-notify"]:hover {
   background: var(--se-btn-bg-hover);
   color: var(--se-btn-color-hover);
 }
 
-html.se-store-wishlist:not(#se-none) :is([data-se-wl="own-share"], [data-se-wl="own-notify"]):active {
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-share"]:active,
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-notify"]:active {
   transform: scale(var(--se-press-scale));
 }
 
-html.se-store-wishlist:not(#se-none) :is([data-se-wl="own-share"], [data-se-wl="own-notify"]):focus-visible {
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-share"]:focus-visible,
+html.se-store-wishlist:not(#se-none) [data-se-wl="own-notify"]:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
 }
@@ -677,7 +683,8 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="tag"] {
 }
 
 /* Labels the layout already says: kept for screen readers only. */
-html.se-store-wishlist:not(#se-none) :is([data-se-wl="tags-label"], [data-se-wl="remove-label"]) {
+html.se-store-wishlist:not(#se-none) [data-se-wl="tags-label"],
+html.se-store-wishlist:not(#se-none) [data-se-wl="remove-label"] {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -763,7 +770,8 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="buy"] {
 
 /* !important: Steam boxes the price and button together (background, edge, padding) from its
    own rules at higher weight */
-html.se-store-wishlist:not(#se-none) :is([data-se-wl="buy"], [data-se-wl="buy"] > div) {
+html.se-store-wishlist:not(#se-none) [data-se-wl="buy"]:not(se-none),
+html.se-store-wishlist:not(#se-none) [data-se-wl="buy"] > div {
   display: flex;
   align-items: center;
   gap: var(--se-space-2);
@@ -1022,7 +1030,8 @@ html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="ca
   white-space: nowrap;
 }
 
-html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] :is([data-se-wl="extras"], [data-se-wl="cats"]) {
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="extras"],
+html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] [data-se-wl="cats"] {
   display: none;
 }
 
@@ -1057,7 +1066,8 @@ html.se-store-wishlist:not(#se-none) [data-se-wl-view="compact"] :is([data-se-wl
     justify-self: start;
   }
 
-  html.se-store-wishlist:not(#se-none) :is([data-se-wl="cats"], [data-se-wl="extras"]) {
+  html.se-store-wishlist:not(#se-none) [data-se-wl="cats"],
+  html.se-store-wishlist:not(#se-none) [data-se-wl="extras"] {
     display: none;
   }
 }

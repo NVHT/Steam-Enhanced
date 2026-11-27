@@ -15,12 +15,10 @@
  * Page files keep only where the switch sits in its row.
  */
 
-:is(
-  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
-  html.se-store-parental .feature_row > input[type="checkbox"],
-  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
-  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
-) {
+html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
+html.se-store-parental .feature_row > input[type="checkbox"]:not(.se-none),
+html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
+html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"]):not(.se-none) {
   appearance: none;
   -webkit-appearance: none;
   position: relative;
@@ -38,12 +36,10 @@
 }
 
 /* The knob */
-:is(
-  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
-  html.se-store-parental .feature_row > input[type="checkbox"],
-  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
-  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
-)::after {
+html.se-store-account .se-account-card .account_settings_container input[type="checkbox"]::after,
+html.se-store-parental .feature_row > input[type="checkbox"]:not(.se-none)::after,
+html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"]::after,
+html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"]):not(.se-none)::after {
   content: "";
   position: absolute;
   top: calc((var(--se-switch-h) - var(--se-switch-knob)) / 2);
@@ -55,60 +51,48 @@
   transition: transform var(--se-dur) var(--se-ease), background-color var(--se-dur);
 }
 
-:is(
-  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
-  html.se-store-parental .feature_row > input[type="checkbox"],
-  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
-  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
-):hover:not(:checked, :disabled) {
+html.se-store-account .se-account-card .account_settings_container input[type="checkbox"]:hover:not(:checked, :disabled),
+html.se-store-parental .feature_row > input[type="checkbox"]:not(.se-none):hover:not(:checked, :disabled),
+html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"]:hover:not(:checked, :disabled),
+html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"]):not(.se-none):hover:not(:checked, :disabled) {
   box-shadow: var(--se-field-edge-hover);
 }
 
-:is(
-  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
-  html.se-store-parental .feature_row > input[type="checkbox"],
-  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
-  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
-):checked {
+html.se-store-account .se-account-card .account_settings_container input[type="checkbox"]:checked,
+html.se-store-parental .feature_row > input[type="checkbox"]:not(.se-none):checked,
+html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"]:checked,
+html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"]):not(.se-none):checked {
   background: var(--se-accent);
   box-shadow: none;
 }
 
-:is(
-  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
-  html.se-store-parental .feature_row > input[type="checkbox"],
-  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
-  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
-):checked:hover:not(:disabled) {
+html.se-store-account .se-account-card .account_settings_container input[type="checkbox"]:checked:hover:not(:disabled),
+html.se-store-parental .feature_row > input[type="checkbox"]:not(.se-none):checked:hover:not(:disabled),
+html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"]:checked:hover:not(:disabled),
+html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"]):not(.se-none):checked:hover:not(:disabled) {
   background: var(--se-accent-hover);
 }
 
-:is(
-  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
-  html.se-store-parental .feature_row > input[type="checkbox"],
-  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
-  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
-):checked::after {
+html.se-store-account .se-account-card .account_settings_container input[type="checkbox"]:checked::after,
+html.se-store-parental .feature_row > input[type="checkbox"]:not(.se-none):checked::after,
+html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"]:checked::after,
+html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"]):not(.se-none):checked::after {
   background: var(--se-on-accent);
   transform: translateX(calc(var(--se-switch-w) - var(--se-switch-h)));
 }
 
-:is(
-  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
-  html.se-store-parental .feature_row > input[type="checkbox"],
-  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
-  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
-):focus-visible {
+html.se-store-account .se-account-card .account_settings_container input[type="checkbox"]:focus-visible,
+html.se-store-parental .feature_row > input[type="checkbox"]:not(.se-none):focus-visible,
+html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"]:focus-visible,
+html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"]):not(.se-none):focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
 }
 
-:is(
-  html.se-store-account .se-account-card .account_settings_container input[type="checkbox"],
-  html.se-store-parental .feature_row > input[type="checkbox"],
-  html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"],
-  html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"])
-):disabled {
+html.se-store-account .se-account-card .account_settings_container input[type="checkbox"]:disabled,
+html.se-store-parental .feature_row > input[type="checkbox"]:not(.se-none):disabled,
+html.se-store .newmodal .dq_settings_checkrow > input[type="checkbox"]:disabled,
+html.se-community-activity-settings .permissionRadio input:is([type="checkbox"], [type="radio"]):not(.se-none):disabled {
   opacity: var(--se-btn-disabled-opacity);
   cursor: default;
 }

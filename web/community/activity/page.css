@@ -71,7 +71,9 @@ html.se-community-activity {
     grid-column: 1;
   }
 
-  html.se-community-activity :is(.blotter_day, .blotter_block, .blotter_status_entry) {
+  html.se-community-activity .blotter_day,
+  html.se-community-activity .blotter_block,
+  html.se-community-activity .blotter_status_entry {
     width: auto !important;
     max-width: none !important;
   }
@@ -203,7 +205,8 @@ html.se-community-activity .friend_activity_header_search {
    (web/shared/search-field.css; page.js tags it, Steam's image button is its magnifier). Steam
    floats and offsets the field and its button; the form holds the field alone instead.
    !important: Steam's markup or scripts set float, height, margin, padding and position inline */
-html.se-community-activity :is(#headerSearchForm, #profileFriendSearchField) {
+html.se-community-activity #headerSearchForm,
+html.se-community-activity #profileFriendSearchField {
   display: block !important;
   height: auto !important;
   margin: 0 !important;
@@ -212,7 +215,8 @@ html.se-community-activity :is(#headerSearchForm, #profileFriendSearchField) {
   background: none !important;
 }
 
-html.se-community-activity :is(#searchInputBoxNew, #profileFriendSearchInputBox) {
+html.se-community-activity #searchInputBoxNew,
+html.se-community-activity #profileFriendSearchInputBox {
   --se-search-h: var(--se-ctl);
   display: block;
   position: static !important;
@@ -303,7 +307,10 @@ html.se-community-activity .blotter_appselect_activeoption {
 }
 
 /* Steam paints the list and its wrappers light blue: everything inside sits on the panel */
-html.se-community-activity #blotter_appselect_app_options :is(div, ul, li, form) {
+html.se-community-activity #blotter_appselect_app_options div,
+html.se-community-activity #blotter_appselect_app_options ul,
+html.se-community-activity #blotter_appselect_app_options li,
+html.se-community-activity #blotter_appselect_app_options form {
   border: 0 !important;
   background-color: transparent !important;
   background-image: none !important;
@@ -385,14 +392,12 @@ html.se-community-activity .blotter_block {
 
 /* Steam's per-type wrappers (.blotter_workshopitempublished...) and inner panels */
 html.se-community-activity .blotter_block > [class^="blotter_"],
-html.se-community-activity .blotter_block :is(
-  .blotter_gamepurchase_content,
-  .blotter_userstatus_content,
-  .blotter_recommendation_content,
-  .blotter_screenshot_gallery,
-  .blotter_workshopitem,
-  .blotter_workshopitem_content
-) {
+html.se-community-activity .blotter_block .blotter_gamepurchase_content,
+html.se-community-activity .blotter_block .blotter_userstatus_content,
+html.se-community-activity .blotter_block .blotter_recommendation_content,
+html.se-community-activity .blotter_block .blotter_screenshot_gallery,
+html.se-community-activity .blotter_block .blotter_workshopitem,
+html.se-community-activity .blotter_block .blotter_workshopitem_content {
   width: auto !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -637,7 +642,8 @@ html.se-community-activity .blotter_control_container > * {
 }
 
 /* Quiet actions: the ghost button, no face until hovered */
-html.se-community-activity:not(#se-none) .blotter_control_container :is(.btn_grey_grey, .btn_grey_black) {
+html.se-community-activity:not(#se-none) .blotter_control_container .btn_grey_grey,
+html.se-community-activity:not(#se-none) .blotter_control_container .btn_grey_black {
   height: var(--se-ctl);
   padding: 0 var(--se-space-3) !important;
   background: var(--se-btn-ghost-bg) !important;
@@ -645,7 +651,8 @@ html.se-community-activity:not(#se-none) .blotter_control_container :is(.btn_gre
   color: var(--se-btn-ghost-color) !important;
 }
 
-html.se-community-activity:not(#se-none) .blotter_control_container :is(.btn_grey_grey, .btn_grey_black):hover {
+html.se-community-activity:not(#se-none) .blotter_control_container .btn_grey_grey:hover,
+html.se-community-activity:not(#se-none) .blotter_control_container .btn_grey_black:hover {
   background: var(--se-btn-ghost-bg-hover) !important;
   color: var(--se-btn-ghost-color-hover) !important;
 }
@@ -745,7 +752,10 @@ html.se-community-activity :is(.friends_launch_area, .se-activity-side) > a.noho
 }
 
 /* Cards */
-html.se-community-activity :is(.friends_launch_area, .se-activity-side) :is(.box, .friends_add_block, .blotter_eventsblock, .se-activity-friends) {
+html.se-community-activity :is(.friends_launch_area, .se-activity-side) .box,
+html.se-community-activity :is(.friends_launch_area, .se-activity-side) .friends_add_block,
+html.se-community-activity :is(.friends_launch_area, .se-activity-side) .blotter_eventsblock,
+html.se-community-activity :is(.friends_launch_area, .se-activity-side) .se-activity-friends {
   box-sizing: border-box;
   width: auto !important;
   height: auto !important;
@@ -794,7 +804,9 @@ html.se-community-activity .profile_link_block_text_friends {
 }
 
 /* Labels */
-html.se-community-activity :is(.profile_add_friends_title, .blotter_eventsblock > .blotter_eventsblock_title, .profile_friends_ingame) {
+html.se-community-activity .profile_add_friends_title:not(.se-none),
+html.se-community-activity .blotter_eventsblock > .blotter_eventsblock_title,
+html.se-community-activity .profile_friends_ingame:not(.se-none) {
   margin: 0 0 var(--se-space-3) !important;
   padding: 0 !important;
   border: 0 !important;
@@ -907,7 +919,8 @@ html.se-community-activity .groupBlockMedium {
   overflow: hidden;
 }
 
-html.se-community-activity .groupBlockMedium :is(.mediumHolder_default, .avatarMedium) {
+html.se-community-activity .groupBlockMedium .mediumHolder_default,
+html.se-community-activity .groupBlockMedium .avatarMedium {
   width: auto !important;
   background: none !important;
 }
@@ -999,7 +1012,8 @@ html.se-community-activity .hiliteTextRed {
 
 /* ---------- Rails (activity/page.js) ---------- */
 
-html.se-community-activity :is(.se-activity-rail, .se-activity-side) {
+html.se-community-activity .se-activity-rail,
+html.se-community-activity .se-activity-side {
   display: flex;
   flex-direction: column;
   gap: var(--se-space-3);

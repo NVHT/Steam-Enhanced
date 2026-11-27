@@ -11,17 +11,22 @@
 /* !important: the theme's shared rules (web/store/app/summary.css, web/store/front/sections.css,
    web/store/nextfest/page.css) set background, border-radius, box-shadow with !important */
 html.se-store:not(#se-none) .ds_flag,
-html.se-store-rows:not(#se-none) :is(.UcrgejVf5aA-, .-ql7Gy6zpYM-),
+html.se-store-rows:not(#se-none) .UcrgejVf5aA-,
+html.se-store-rows:not(#se-none) .-ql7Gy6zpYM-,
 html.se-store-rows:not(#se-none) [data-se-tile] .broadcast_live_stream_icon,
 html.se-store-front:not(#se-none) .se-tabs__badge,
 html.se-store-rows:not(#se-none) .nHdn-Ea4zSg- .maxz19gKOQc- .rsPEubiF9HI-,
 html.se-store-charts:not(#se-none) .cCE5WXLdwQ4- .Orilt6rfaTI-,
-html.se-store:not(#se-none) :is(.LCYi5cxHqgI-, :is(.trailercarousel, .contenthubmaincarousel) .-D61WKs-ZxQ-, :is(.trailercarousel, .contenthubmaincarousel) .rs5MCL6BI2A-),
+html.se-store:not(#se-none) .LCYi5cxHqgI-:not(.se-none),
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .-D61WKs-ZxQ-,
+html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .rs5MCL6BI2A-,
 html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .DialogCheckbox_Container,
 html.se-store:not(#se-none) :is(.PFP2RDjCi0w-, .K2PjXmYWvSg-, .UYfcYZDtfbs-) .KoUJweWUwjY-,
-html.se-store:not(#se-none) [data-se-hcard] :is(.WishlistButton, [data-se-hcard-wish]),
+html.se-store:not(#se-none) [data-se-hcard] .WishlistButton,
+html.se-store:not(#se-none) [data-se-hcard] [data-se-hcard-wish],
 html.se-store:not(#se-none) [data-se-dlc]::after,
-html.se-store-labs:not(#se-none) .labs-content :is(.shipped, .shelved) {
+html.se-store-labs:not(#se-none) .labs-content .shipped,
+html.se-store-labs:not(#se-none) .labs-content .shelved {
   border-radius: var(--se-radius-control) !important;
   background: var(--se-glass-chip) !important;
   backdrop-filter: var(--se-blur-chip);
@@ -68,7 +73,10 @@ html.se-store:not(#se-none) .ds_flag.ds_owned_flag {
  * (rows .UcrgejVf5aA-, sale tiles .LCYi5cxHqgI-) are flex chips with a gap, and only get one
  * where Steam draws none of its own.
  */
-html.se-store:not(#se-none) :is(.ds_flag.ds_wishlist_flag, .ds_flag.ds_owned_flag, .UcrgejVf5aA-.OferR7G18q8-:not(:has(> svg)), .LCYi5cxHqgI-.ZuMhm9DQqbw-:not(:has(svg, img)))::before {
+html.se-store:not(#se-none) .ds_flag.ds_wishlist_flag:not(se-none)::before,
+html.se-store:not(#se-none) .ds_flag.ds_owned_flag:not(se-none)::before,
+html.se-store:not(#se-none) .UcrgejVf5aA-.OferR7G18q8-:not(:has(> svg))::before,
+html.se-store:not(#se-none) .LCYi5cxHqgI-.ZuMhm9DQqbw-:not(:has(svg, img))::before {
   content: "";
   flex: none;
   display: inline-block;
@@ -91,12 +99,15 @@ html.se-store:not(#se-none) .ds_flag.ds_wishlist_flag::before {
   mask-image: var(--se-star-mask);
 }
 
-html.se-store:not(#se-none) :is(.ds_flag.ds_owned_flag, .UcrgejVf5aA-.OferR7G18q8-, .LCYi5cxHqgI-.ZuMhm9DQqbw-)::before {
+html.se-store:not(#se-none) .ds_flag.ds_owned_flag::before,
+html.se-store:not(#se-none) .UcrgejVf5aA-.OferR7G18q8-::before,
+html.se-store:not(#se-none) .LCYi5cxHqgI-.ZuMhm9DQqbw-::before {
   -webkit-mask-image: var(--se-check-mask);
   mask-image: var(--se-check-mask);
 }
 
-html.se-store:not(#se-none) :is(.ds_flag.ds_wishlist_flag, .ds_flag.ds_owned_flag)::before {
+html.se-store:not(#se-none) .ds_flag.ds_wishlist_flag::before,
+html.se-store:not(#se-none) .ds_flag.ds_owned_flag::before {
   margin-inline-end: .45em;
 }
 
@@ -112,7 +123,8 @@ html.se-store:not(#se-none) :is(.ds_flag.ds_wishlist_flag, .ds_flag.ds_owned_fla
    display, height, padding, width with !important */
 html.se-store-rows:not(#se-none) :is([data-se-arrow], :is(.CarouselBtnLeft, .CarouselBtnRight)),
 html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .VideoRow > button,
-html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel :is(.CarouselBtnLeft, .CarouselBtnRight),
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel .CarouselBtnLeft,
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel .CarouselBtnRight,
 html.se-store-charts:not(#se-none) .tynMzW2BivY- .n-IZj12HrBI- .CYLNhM6Qimg-,
 html.se-store-charts:not(#se-none) .YqWcdxOb1HQ- .lEUeKqj6qis- .V0nSJVwdJYU- {
   display: grid !important;
@@ -138,7 +150,8 @@ html.se-store-charts:not(#se-none) .YqWcdxOb1HQ- .lEUeKqj6qis- .V0nSJVwdJYU- {
    web/store/app/summary.css) set background with !important */
 html.se-store-rows:not(#se-none) :is([data-se-arrow], :is(.CarouselBtnLeft, .CarouselBtnRight)):hover,
 html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .VideoRow > button:not(:disabled):hover,
-html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel :is(.CarouselBtnLeft, .CarouselBtnRight):not(:disabled):hover,
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel .CarouselBtnLeft:not(:disabled):hover,
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel .CarouselBtnRight:not(:disabled):hover,
 html.se-store-charts:not(#se-none) .tynMzW2BivY- .n-IZj12HrBI-:not(._5lng8kFUn7U-) .CYLNhM6Qimg-:hover,
 html.se-store-charts:not(#se-none) .YqWcdxOb1HQ- .lEUeKqj6qis-:not(._4Hwybg0uOZA-) .V0nSJVwdJYU-:hover {
   background: var(--se-arrow-bg-hover, var(--se-glass-btn-hover)) !important;
@@ -156,7 +169,8 @@ html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel :is(.Carous
 /* The chevron: a right-pointing corner, nudged to look centred. */
 html.se-store-rows:not(#se-none) :is([data-se-arrow], :is(.CarouselBtnLeft, .CarouselBtnRight))::before,
 html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .VideoRow > button::before,
-html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel :is(.CarouselBtnLeft, .CarouselBtnRight)::before,
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel .CarouselBtnLeft::before,
+html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel .CarouselBtnRight::before,
 html.se-store-charts:not(#se-none) .tynMzW2BivY- .CYLNhM6Qimg-::before,
 html.se-store-charts:not(#se-none) .YqWcdxOb1HQ- .V0nSJVwdJYU-::before {
   content: "";
@@ -167,7 +181,8 @@ html.se-store-charts:not(#se-none) .YqWcdxOb1HQ- .V0nSJVwdJYU-::before {
   transform: translateX(-2px) rotate(45deg);
 }
 
-html.se-store-rows:not(#se-none) :is([data-se-arrow="prev"], .CarouselBtnLeft)::before,
+html.se-store-rows:not(#se-none) [data-se-arrow="prev"]::before,
+html.se-store-rows:not(#se-none) .CarouselBtnLeft::before,
 html.se-store:not(#se-none) :is(.trailercarousel, .contenthubmaincarousel) .VideoRow > button:first-child::before,
 html.se-store:not(#se-none) .SaleOuterContainer .SaleSectionCarousel .CarouselBtnLeft::before,
 html.se-store-charts:not(#se-none) .tynMzW2BivY- .CYLNhM6Qimg-:has(._08s9A9T59Mc-)::before,

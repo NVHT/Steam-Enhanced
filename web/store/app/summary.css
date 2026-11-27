@@ -155,7 +155,8 @@ html.se-app-summary-on [data-se-owned-part] hr {
 }
 
 /* Buttons (Play Now, Post review, Yes / No): the theme's pills. */
-html.se-app-summary-on [data-se-owned-part] :is([class*="btnv6_"], [class*="btn_"]):is(a, button, div, span):not([class*="btn_small_thin"]) {
+html.se-app-summary-on [data-se-owned-part] [class*="btnv6_"]:is(a, button, div, span):not([class*="btn_small_thin"]),
+html.se-app-summary-on [data-se-owned-part] [class*="btn_"]:is(a, button, div, span):not([class*="btn_small_thin"]) {
   border: 0 !important;
   border-radius: var(--se-radius-control) !important;
   background: var(--se-surface-2) !important;
@@ -170,12 +171,15 @@ html.se-app-summary-on [data-se-owned-part] :is([class*="btnv6_"], [class*="btn_
   color: inherit !important;
 }
 
-html.se-app-summary-on [data-se-owned-part] :is([class*="btnv6_"], [class*="btn_"]):is(a, button, div, span):hover {
+html.se-app-summary-on [data-se-owned-part] [class*="btnv6_"]:is(a, button, div, span):hover,
+html.se-app-summary-on [data-se-owned-part] [class*="btn_"]:is(a, button, div, span):hover {
   background: var(--se-hover) !important;
 }
 
 /* The review box and form fields: the theme's field style. */
-html.se-app-summary-on [data-se-owned-part] :is(textarea, input[type="text"], select) {
+html.se-app-summary-on [data-se-owned-part] textarea:not(.se-none),
+html.se-app-summary-on [data-se-owned-part] input[type="text"],
+html.se-app-summary-on [data-se-owned-part] select:not(.se-none) {
   box-sizing: border-box;
   border: 0 !important;
   border-radius: var(--se-radius-md) !important;
@@ -357,11 +361,13 @@ html.se-app-summary-on [data-se-highlights-source] {
   outline-offset: 4px;
 }
 
-a.se-app-highlight :is(.se-app-highlight__title, .se-app-highlight__quote) {
+a.se-app-highlight .se-app-highlight__title,
+a.se-app-highlight .se-app-highlight__quote {
   transition: color var(--se-dur);
 }
 
-a.se-app-highlight:hover :is(.se-app-highlight__title, .se-app-highlight__quote) {
+a.se-app-highlight:hover .se-app-highlight__title,
+a.se-app-highlight:hover .se-app-highlight__quote {
   color: var(--se-accent-hover);
 }
 

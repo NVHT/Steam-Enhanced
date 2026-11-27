@@ -35,7 +35,8 @@ html.se-store-redeem:not(#se-none) #main_content {
   padding: 0 !important;
 }
 
-html.se-store-redeem:not(#se-none) #main_content > :is(.leftcol, .rightcol) {
+html.se-store-redeem:not(#se-none) #main_content > .leftcol,
+html.se-store-redeem:not(#se-none) #main_content > .rightcol {
   width: auto !important;
   min-width: 0;
   margin: 0 !important;
@@ -63,7 +64,8 @@ html.se-store-redeem:not(#se-none) .wallet_code_content_box {
   font: var(--se-type-body-lg) !important;
 }
 
-html.se-store-redeem:not(#se-none) :is(.redeem_wallet_code_form, .wallet_code_ctn) {
+html.se-store-redeem:not(#se-none) .redeem_wallet_code_form,
+html.se-store-redeem:not(#se-none) .wallet_code_ctn {
   width: auto !important;
   height: auto !important;
   margin: 0 !important;
@@ -122,13 +124,15 @@ html.se-store-redeem:not(#se-none) input#wallet_code:focus-visible {
 
 /* Continue, and Steam's busy twin of it while the code is checked: shared/account.css's green
    button, the field's height */
-html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress) {
+html.se-store-redeem:not(#se-none) #validate_btn,
+html.se-store-redeem:not(#se-none) #validate_btn_in_progress {
   flex: none;
   height: var(--se-ctl-lg) !important;
 }
 
 /* Steam shows and hides these two with inline display; only the shown one becomes flex */
-html.se-store-redeem:not(#se-none) :is(#validate_btn, #validate_btn_in_progress):not([style*="none"]) {
+html.se-store-redeem:not(#se-none) #validate_btn:not([style*="none"]),
+html.se-store-redeem:not(#se-none) #validate_btn_in_progress:not([style*="none"]) {
   display: inline-flex !important;
 }
 
@@ -163,7 +167,8 @@ html.se-store-redeem:not(#se-none) #error_display.checkout_error:not([style*="no
 }
 
 /* Fields of the address step some codes need */
-html.se-store-redeem:not(#se-none) #address_form :is(input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), select) {
+html.se-store-redeem:not(#se-none) #address_form input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+html.se-store-redeem:not(#se-none) #address_form select:not(.se-none):not(.se-none):not(.se-none) {
   box-sizing: border-box;
   min-height: var(--se-ctl);
   padding: 0 var(--se-space-3);

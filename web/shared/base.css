@@ -52,7 +52,11 @@
 }
 
 /* One keyboard focus ring for every control, Steam's and the theme's (text fields keep their own). */
-html:is(.se-store, .se-community, .se-help, .se-checkout):not(#se-none) :is(a, button, select, [role="button"], [tabindex]):not(input, textarea):focus-visible {
+html:is(.se-store, .se-community, .se-help, .se-checkout):not(#se-none) a:not(.se-none):not(input, textarea):focus-visible,
+html:is(.se-store, .se-community, .se-help, .se-checkout):not(#se-none) button:not(.se-none):not(input, textarea):focus-visible,
+html:is(.se-store, .se-community, .se-help, .se-checkout):not(#se-none) select:not(.se-none):not(input, textarea):focus-visible,
+html:is(.se-store, .se-community, .se-help, .se-checkout):not(#se-none) [role="button"]:not(input, textarea):focus-visible,
+html:is(.se-store, .se-community, .se-help, .se-checkout):not(#se-none) [tabindex]:not(input, textarea):focus-visible {
   outline: var(--se-focus-outline) !important;
   outline-offset: var(--se-focus-offset);
 }
@@ -66,7 +70,8 @@ html:is(.se-store, .se-community, .se-help, .se-checkout):not(#se-none) :is(a, b
  * !important: Steam's own rules (store, community and help CSS) set color, font and
  * text-transform on the trail and its links, inline on some pages.
  */
-html:is(.se-store, .se-community, .se-help, .se-checkout):not(.se-app-hero-on, #se-none) :is(.breadcrumbs, .forum_breadcrumbs):not(.sharedfiles_item_page_header + .breadcrumbs) {
+html:is(.se-store, .se-community, .se-help, .se-checkout):not(.se-app-hero-on, #se-none) .breadcrumbs:not(.sharedfiles_item_page_header + .breadcrumbs),
+html:is(.se-store, .se-community, .se-help, .se-checkout):not(.se-app-hero-on, #se-none) .forum_breadcrumbs:not(.sharedfiles_item_page_header + .breadcrumbs) {
   color: var(--se-text-faint) !important;
   font: var(--se-type-small) !important;
   letter-spacing: .02em;

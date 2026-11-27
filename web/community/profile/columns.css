@@ -101,7 +101,8 @@ html.se-community-profile .se-profile-seg .se-duo {
 
   /* Steam clips these boxes (overflow), which makes them the side column's scroll container:
      its sticky top then offsets it inside the grid and it never sticks */
-  html.se-community-profile :is(.profile_content, .profile_content_inner) {
+  html.se-community-profile .profile_content,
+  html.se-community-profile .profile_content_inner {
     overflow: visible !important;
   }
 
@@ -116,7 +117,8 @@ html.se-community-profile .se-profile-seg .se-duo {
 
   /* Steam paints the side column as a dark box (profilev2.css: var(--se-black-30)); the cards
      in it are the surfaces here */
-  html.se-community-profile .profile_content_inner > :is(.profile_leftcol, .profile_rightcol) {
+  html.se-community-profile .profile_content_inner > .profile_leftcol,
+  html.se-community-profile .profile_content_inner > .profile_rightcol {
     float: none !important;
     width: auto !important;
     margin: 0 !important;
@@ -169,16 +171,14 @@ html.se-community-profile .se-profile-seg .se-duo {
 }
 
 /* Glass cards */
-html.se-community-profile :is(
-  .profile_customization,
-  .profile_comment_area,
-  .profile_in_game,
-  .profile_item_links,
-  .profile_badges,
-  .profile_awards,
-  .profile_group_links,
-  .profile_friend_links
-),
+html.se-community-profile .profile_customization,
+html.se-community-profile .profile_comment_area,
+html.se-community-profile .profile_in_game,
+html.se-community-profile .profile_item_links,
+html.se-community-profile .profile_badges,
+html.se-community-profile .profile_awards,
+html.se-community-profile .profile_group_links,
+html.se-community-profile .profile_friend_links,
 html.se-community-profile .se-profile-recent {
   box-sizing: border-box;
   margin: 0 !important;
@@ -262,7 +262,8 @@ html.se-community-profile .profile_customization_editlink_text {
   white-space: nowrap;
 }
 
-html.se-community-profile :is(.profile_customization_header, .profile_recentgame_header) {
+html.se-community-profile .profile_customization_header,
+html.se-community-profile .profile_recentgame_header {
   margin: 0 0 var(--se-space-4) !important;
   padding: 0 !important;
   border: 0 !important;
@@ -289,7 +290,8 @@ html.se-community-profile .profile_customization > :empty:not(.profile_customiza
   display: none !important;
 }
 
-html.se-community-profile :is(.profile_customization_block, .profile_customization)::after {
+html.se-community-profile .profile_customization_block::after,
+html.se-community-profile .profile_customization::after {
   content: none !important;
 }
 
@@ -304,7 +306,8 @@ html.se-community-profile .showcase_content_bg {
 }
 
 /* Stats rows and game grids carry their own tiles: no box behind them */
-html.se-community-profile :is(.showcase_content_bg.showcase_stats_row, .showcase_content_bg:has(> .showcase_gamecollector_games)) {
+html.se-community-profile .showcase_content_bg.showcase_stats_row,
+html.se-community-profile .showcase_content_bg:has(> .showcase_gamecollector_games) {
   padding: 0 !important;
   background: none !important;
 }

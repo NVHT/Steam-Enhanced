@@ -33,7 +33,8 @@ html.se-community-discussions {
     background: none !important;
   }
 
-  html.se-community-discussions .maincontent > :is(.leftcol, .rightcol) {
+  html.se-community-discussions .maincontent > .leftcol,
+  html.se-community-discussions .maincontent > .rightcol {
     float: none !important;
     width: auto !important;
     margin: 0 !important;
@@ -213,7 +214,8 @@ html.se-community-discussions .forum_topic_details > * {
   position: static !important;
 }
 
-html.se-community-discussions :is(.forum_topic_reply_count, .forum_topic_award_count) {
+html.se-community-discussions .forum_topic_reply_count,
+html.se-community-discussions .forum_topic_award_count {
   display: inline-flex !important;
   align-items: center;
   gap: var(--se-space-2);
@@ -233,7 +235,8 @@ html.se-community-discussions :is(.forum_topic_reply_count, .forum_topic_award_c
   display: none !important;
 }
 
-html.se-community-discussions :is(.forum_topic_reply_count, .forum_topic_award_count)::before {
+html.se-community-discussions .forum_topic_reply_count::before,
+html.se-community-discussions .forum_topic_award_count::before {
   content: "";
   flex: none;
   width: 14px;
@@ -296,7 +299,8 @@ html.se-community-discussions .forum_paging {
   background: none !important;
 }
 
-html.se-community-discussions :is(.forum_paging_summary, .forum_paging_header) {
+html.se-community-discussions .forum_paging_summary,
+html.se-community-discussions .forum_paging_header {
   float: none !important;
   color: var(--se-text-faint) !important;
   font: var(--se-type-small) !important;
@@ -370,7 +374,8 @@ html.se-community-discussions .forum_op .topic {
   overflow-wrap: anywhere;
 }
 
-html.se-community-discussions :is(.forum_op_header, .forum_op .authorline) {
+html.se-community-discussions .forum_op_header:not(.se-none),
+html.se-community-discussions .forum_op .authorline {
   display: flex !important;
   align-items: center;
   flex-wrap: wrap;
@@ -446,7 +451,10 @@ html.se-community-discussions .forumtopic_reply_entry {
 }
 
 /* Locked / pinned notices */
-html.se-community-discussions :is(.forum_topic_locked_notice, .forum_topic_pinned_notice, .forum_topic_deleted_notice, .topic_cannotreply_reason) {
+html.se-community-discussions .forum_topic_locked_notice,
+html.se-community-discussions .forum_topic_pinned_notice,
+html.se-community-discussions .forum_topic_deleted_notice,
+html.se-community-discussions .topic_cannotreply_reason {
   margin: 0 0 var(--se-space-4) !important;
   padding: var(--se-space-3) var(--se-space-4) !important;
   border: 0 !important;
@@ -470,7 +478,8 @@ html.se-community-discussions .rightbox {
   font: var(--se-type-body) !important;
 }
 
-html.se-community-discussions :is(.rightbox_list_header, .rightbox_content_header) {
+html.se-community-discussions .rightbox_list_header,
+html.se-community-discussions .rightbox_content_header {
   margin: 0 0 var(--se-space-2) !important;
   padding: 0 !important;
   border: 0 !important;
@@ -498,7 +507,8 @@ html.se-community-discussions .rightbox a:hover {
 
 /* Search: the shared search field (web/shared/search-field.css; page.js tags it, Steam's image
    button is its magnifier) */
-html.se-community-discussions :is(.discussionSearchTextContainer, .DiscussionSearchForm) {
+html.se-community-discussions .discussionSearchTextContainer,
+html.se-community-discussions .DiscussionSearchForm {
   border: 0 !important; /* Steam's own rules set it at equal or higher weight */
   background: none !important; /* Steam's own rules set it at equal or higher weight */
 }
@@ -523,25 +533,29 @@ html.se-community-discussions .discussionSearchText {
 }
 
 /* Start a New Discussion */
-html.se-community-discussions:not(#se-none) :is(.forum_newtopic_area, .forum_responsive_newtopic_action) :is([class*="btn_"], [class*="btnv6_"]) {
+html.se-community-discussions:not(#se-none) :is(.forum_newtopic_area, .forum_responsive_newtopic_action) [class*="btn_"],
+html.se-community-discussions:not(#se-none) :is(.forum_newtopic_area, .forum_responsive_newtopic_action) [class*="btnv6_"] {
   background: var(--se-btn-primary-bg) !important;
   box-shadow: none !important;
   color: var(--se-btn-primary-color) !important;
 }
 
-html.se-community-discussions:not(#se-none) :is(.forum_newtopic_area, .forum_responsive_newtopic_action) :is([class*="btn_"], [class*="btnv6_"]):hover {
+html.se-community-discussions:not(#se-none) :is(.forum_newtopic_area, .forum_responsive_newtopic_action) [class*="btn_"]:hover,
+html.se-community-discussions:not(#se-none) :is(.forum_newtopic_area, .forum_responsive_newtopic_action) [class*="btnv6_"]:hover {
   background: var(--se-btn-primary-bg-hover) !important;
 }
 
 /* New topic form */
-html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) {
+html.se-community-discussions .forum_newtopic_box,
+html.se-community-discussions .forum_formarea_box {
   border: 0 !important;
   border-radius: var(--se-card-radius);
   background: var(--se-card-bg) !important;
   box-shadow: var(--se-card-edge);
 }
 
-html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) :is(input[type="text"], textarea) {
+html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) input[type="text"],
+html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) textarea:not(.se-none) {
   box-sizing: border-box;
   padding: var(--se-space-3) var(--se-space-4) !important;
   border: 0 !important;
@@ -555,12 +569,14 @@ html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) :is(
 }
 
 /* !important: the rule above sets box-shadow with !important */
-html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) :is(input[type="text"], textarea):hover:not(:focus) {
+html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) input[type="text"]:hover:not(:focus),
+html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) textarea:not(.se-none):hover:not(:focus) {
   box-shadow: var(--se-field-edge-hover) !important;
 }
 
 /* !important: the rule above sets box-shadow with !important */
-html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) :is(input[type="text"], textarea):focus {
+html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) input[type="text"]:focus,
+html.se-community-discussions :is(.forum_newtopic_box, .forum_formarea_box) textarea:not(.se-none):focus {
   box-shadow: var(--se-field-edge-focus) !important;
 }
 
@@ -734,7 +750,9 @@ html.se-community-discussions .rightbox .weblink img {
  * "Posted by / Last post" lines follow): the theme's tooltip. Matched by its content, so the
  * wrapper's class doesn't matter; the ids are Steam's (aria-describedby="tooltip-N").
  */
-html.se-community-discussions :is(.forum_topic_tooltip, .community_tooltip, [id^="tooltip-"]):has(.topic_hover_text) {
+html.se-community-discussions .forum_topic_tooltip:has(.topic_hover_text),
+html.se-community-discussions .community_tooltip:has(.topic_hover_text),
+html.se-community-discussions [id^="tooltip-"]:has(.topic_hover_text) {
   max-width: 380px;
   padding: var(--se-space-3) var(--se-space-4) !important;
   border: 0 !important;
@@ -758,7 +776,10 @@ html.se-community-discussions .topic_hover_text {
   font: var(--se-type-body-lg) !important;
 }
 
-html.se-community-discussions :is(.forum_topic_tooltip, .community_tooltip, [id^="tooltip-"]):has(.topic_hover_text) :is(a, b, strong, .whiteLink) {
+html.se-community-discussions :is(.forum_topic_tooltip, .community_tooltip, [id^="tooltip-"]):has(.topic_hover_text) a:not(.se-none),
+html.se-community-discussions :is(.forum_topic_tooltip, .community_tooltip, [id^="tooltip-"]):has(.topic_hover_text) b:not(.se-none),
+html.se-community-discussions :is(.forum_topic_tooltip, .community_tooltip, [id^="tooltip-"]):has(.topic_hover_text) strong:not(.se-none),
+html.se-community-discussions :is(.forum_topic_tooltip, .community_tooltip, [id^="tooltip-"]):has(.topic_hover_text) .whiteLink {
   color: var(--se-text-dim) !important;
   font-weight: 600;
   text-decoration: none !important;

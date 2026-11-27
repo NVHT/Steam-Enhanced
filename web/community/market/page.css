@@ -62,7 +62,8 @@ html.se-community-market {
   }
 
   /* Steam's floats and wrappers: their children are placed in #BG_bottom's grid instead */
-  html.se-community-market:not(#se-none) :is(#mainContents, #sellListings) {
+  html.se-community-market:not(#se-none) #mainContents,
+  html.se-community-market:not(#se-none) #sellListings {
     display: contents !important;
   }
 
@@ -71,7 +72,8 @@ html.se-community-market {
    * adds no height of its own (contain: size), so the sidebar sets the row and the panel
    * fills it, scrolling inside.
    */
-  html.se-community-market:not(#se-none) :is(#myListings, #sellListings > .market_content_block) {
+  html.se-community-market:not(#se-none) #myListings:not(.se-none),
+  html.se-community-market:not(#se-none) #sellListings > .market_content_block {
     grid-area: panel;
     align-self: stretch;
     contain: size;
@@ -86,7 +88,9 @@ html.se-community-market {
    * from its own height up to a cap; past the panel, it scrolls. Steam hides the inactive
    * tables with an inline display: none, which still wins over this flex.
    */
-  html.se-community-market:not(#se-none) :is(#popularItemsTable, #sellListingsTable, #soldListingTable) {
+  html.se-community-market:not(#se-none) #popularItemsTable,
+  html.se-community-market:not(#se-none) #sellListingsTable,
+  html.se-community-market:not(#se-none) #soldListingTable {
     display: flex;
     flex-direction: column;
   }
@@ -101,19 +105,22 @@ html.se-community-market {
     min-height: min-content !important;
   }
 
-  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > [id$="Rows"] > :is(a.market_listing_row_link, .market_listing_row) {
+  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > [id$="Rows"] > a.market_listing_row_link,
+  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > [id$="Rows"] > .market_listing_row:not(se-none) {
     display: flex;
     flex: 1 1 0;
     min-height: calc(var(--se-mkt-tile) + 12px);
     max-height: 96px;
   }
 
-  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > :is(.market_listing_table_showmore, .market_listing_table_header) {
+  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > .market_listing_table_showmore,
+  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > .market_listing_table_header {
     flex: none;
   }
 
   /* Steam's empty spacers (clear divs, line breaks) would add height under "Find more" */
-  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > :is(div:empty, br) {
+  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > div:empty,
+  html.se-community-market :is(#popularItemsTable, #sellListingsTable, #soldListingTable) > br:not(.se-none) {
     display: none !important;
   }
 
@@ -128,7 +135,8 @@ html.se-community-market {
     flex-direction: column;
   }
 
-  html.se-community-market #myListings > :is(#tabContentsMyListings, #tabContentsMyMarketHistory) {
+  html.se-community-market #myListings > #tabContentsMyListings,
+  html.se-community-market #myListings > #tabContentsMyMarketHistory {
     flex: 1 0 auto;
   }
 

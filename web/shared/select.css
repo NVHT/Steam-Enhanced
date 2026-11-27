@@ -181,7 +181,8 @@ html:is(.se-store, .se-community) :is(div.filterselect, div.dayselect, #quicklis
 /* Steam's label inside the trigger takes the trigger's type */
 /* !important: Steam's own rules (apphub_home.css, workshop.css) set background, color, padding
    at equal or higher weight */
-html:is(.se-store, .se-community) :is(div.filterselect, div.dayselect) > :is(span, #dayselect_activeday) {
+html:is(.se-store, .se-community) :is(div.filterselect, div.dayselect) > span:not(#se-none),
+html:is(.se-store, .se-community) :is(div.filterselect, div.dayselect) > #dayselect_activeday {
   min-width: 0;
   overflow: hidden;
   padding: 0 !important;
@@ -208,7 +209,8 @@ html:is(.se-store, .se-community) :is(div.filterselect, div.dayselect, #quicklis
   transition: rotate var(--se-dur) var(--se-ease);
 }
 
-html:is(.se-store, .se-community) :is(div.dayselect.focus, .dselect_container.active button.trigger)::after {
+html:is(.se-store, .se-community) div.dayselect.focus:not(.se-none)::after,
+html:is(.se-store, .se-community) .dselect_container.active button.trigger::after {
   rotate: 180deg;
 }
 

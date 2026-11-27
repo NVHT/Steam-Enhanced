@@ -18,7 +18,9 @@ html.se-store-account:not(#se-none) .se-account-card .account_settings_container
 }
 
 /* Steam backs the open dropdown with a dark box and a black rule under the trigger */
-html.se-store-account:not(#se-none) .se-account-card .account_settings_container :is(.dselect_container, .dselect_container.active, .dselect_container .dropcontainer) {
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .dselect_container:not(.se-none),
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .dselect_container.active,
+html.se-store-account:not(#se-none) .se-account-card .account_settings_container .dselect_container .dropcontainer {
   border: 0 !important;
   background: none !important;
   box-shadow: none !important;
@@ -114,7 +116,8 @@ html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two
  * --se-account-icon), section headings over card bodies.
  */
 
-:is(html.se-store-account:not(#se-none) [data-se-account-modern="header"], html.se-store-account:not(#se-none) [data-se-account-modern="frame"]) {
+html.se-store-account:not(#se-none) [data-se-account-modern="header"],
+html.se-store-account:not(#se-none) [data-se-account-modern="frame"] {
   box-sizing: border-box;
   width: min(1760px, calc(100% - 64px)) !important;
   max-width: none !important;
@@ -176,16 +179,19 @@ html.se-store-account:not(#se-none) [data-se-account-modern="nav"] {
 
 /* Links, their hover and current fill, and the icon chip (::before) share page.css's sidebar
    rules (a.nav_item, .se-account-nav-icon); here the parts only these links need */
-:is(html.se-store-account:not(#se-none) [data-se-account-modern="link"], html.se-store-account:not(#se-none) [data-se-account-modern="link-active"]) {
+html.se-store-account:not(#se-none) [data-se-account-modern="link"],
+html.se-store-account:not(#se-none) [data-se-account-modern="link-active"] {
   position: relative;
   border-radius: var(--se-radius-sm) !important;
 }
 
-:is(html.se-store-account:not(#se-none) [data-se-account-modern="link"], html.se-store-account:not(#se-none) [data-se-account-modern="link-active"])::before {
+html.se-store-account:not(#se-none) [data-se-account-modern="link"]::before,
+html.se-store-account:not(#se-none) [data-se-account-modern="link-active"]::before {
   content: "";
 }
 
-:is(html.se-store-account:not(#se-none) [data-se-account-modern="link"], html.se-store-account:not(#se-none) [data-se-account-modern="link-active"])::after {
+html.se-store-account:not(#se-none) [data-se-account-modern="link"]::after,
+html.se-store-account:not(#se-none) [data-se-account-modern="link-active"]::after {
   content: "";
   position: absolute;
   left: 16px;

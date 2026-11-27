@@ -37,7 +37,10 @@ html.se-community-hub-guides #ig_bottom a {
   text-decoration: none;
 }
 
-html.se-community-hub-guides #ig_bottom :is(a, input, select, label):focus-visible {
+html.se-community-hub-guides #ig_bottom a:focus-visible,
+html.se-community-hub-guides #ig_bottom input:focus-visible,
+html.se-community-hub-guides #ig_bottom select:focus-visible,
+html.se-community-hub-guides #ig_bottom label:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
 }
@@ -122,7 +125,12 @@ html.se-community-hub-guides #ig_bottom #guides_content_ctn {
 /* !important: Steam's own rules set max-width, width at a weight the id-scoped rule doesn't
    beat */
 html.se-community-hub-guides #ig_bottom #guides_content_ctn > *,
-html.se-community-hub-guides #ig_bottom .apphub_ContentGuides :is(.detailBox, .guides_home_list_ctn, [data-se-guide-list], .category_blocks_ctn, .workshopItemCollectionContainer, a.workshopItemCollection) {
+html.se-community-hub-guides #ig_bottom .apphub_ContentGuides .detailBox:not(se-none),
+html.se-community-hub-guides #ig_bottom .apphub_ContentGuides .guides_home_list_ctn:not(se-none),
+html.se-community-hub-guides #ig_bottom .apphub_ContentGuides [data-se-guide-list]:not(se-none),
+html.se-community-hub-guides #ig_bottom .apphub_ContentGuides .category_blocks_ctn:not(se-none),
+html.se-community-hub-guides #ig_bottom .apphub_ContentGuides .workshopItemCollectionContainer:not(se-none),
+html.se-community-hub-guides #ig_bottom .apphub_ContentGuides a.workshopItemCollection {
   float: none;
   box-sizing: border-box;
   width: auto !important;
@@ -339,7 +347,8 @@ html.se-community-hub-guides #ig_bottom .guide_home_category_count {
 /* Two columns of guides once the column is wide enough for two readable cards: the home's
    sections, and a browse view's results (whatever box Steam puts them in: hub/guides.js marks
    it [data-se-guide-list]) */
-html.se-community-hub-guides #ig_bottom :is(.guides_home_list_ctn, [data-se-guide-list]) {
+html.se-community-hub-guides #ig_bottom .guides_home_list_ctn,
+html.se-community-hub-guides #ig_bottom [data-se-guide-list] {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr));
   align-items: stretch; /* cards side by side share a height */
@@ -351,11 +360,13 @@ html.se-community-hub-guides #ig_bottom :is(.guides_home_list_ctn, [data-se-guid
 
 /* A browse view's list is a section box (.detailBox), whose children span its row: the guides
    take one cell each instead, anything else (the paging) still spans */
-html.se-community-hub-guides #ig_bottom .detailBox[data-se-guide-list] > :is(.workshopItemCollectionContainer, a.workshopItemCollection) {
+html.se-community-hub-guides #ig_bottom .detailBox[data-se-guide-list] > .workshopItemCollectionContainer:not(se-none),
+html.se-community-hub-guides #ig_bottom .detailBox[data-se-guide-list] > a.workshopItemCollection {
   grid-column: auto;
 }
 
-html.se-community-hub-guides #ig_bottom :is(.workshopItemClear, .workshopItemCollectionContainer > .backgroundImg) {
+html.se-community-hub-guides #ig_bottom .workshopItemClear:not(.se-none),
+html.se-community-hub-guides #ig_bottom .workshopItemCollectionContainer > .backgroundImg {
   display: none;
 }
 
@@ -523,7 +534,22 @@ html.se-community-hub-guides #ig_bottom .workshopItemShortDesc * {
 }
 
 /* !important: the author's markup carries inline styles */
-html.se-community-hub-guides #ig_bottom .workshopItemShortDesc :is(input, button, select, textarea, progress, meter, audio, video, iframe, object, embed, canvas, svg, img, script, style) {
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc input,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc button,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc select,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc textarea,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc progress,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc meter,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc audio,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc video,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc iframe,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc object,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc embed,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc canvas,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc svg,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc img,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc script,
+html.se-community-hub-guides #ig_bottom .workshopItemShortDesc style {
   display: none !important;
 }
 
@@ -556,7 +582,8 @@ html.se-community-hub-guides #ig_bottom .workshopBrowsePagingControls {
 
 /* ---------- Side column ---------- */
 
-html.se-community-hub-guides #ig_bottom #rightContents :is(form, .sidebar) {
+html.se-community-hub-guides #ig_bottom #rightContents form:not(.se-none),
+html.se-community-hub-guides #ig_bottom #rightContents .sidebar {
   display: flex;
   flex-direction: column;
   gap: var(--se-space-4);
@@ -623,7 +650,9 @@ html.se-community-hub-guides #ig_bottom .rightSectionTopTitle {
   text-transform: uppercase;
 }
 
-html.se-community-hub-guides #ig_bottom :is(.rightDetailsBlock, .rightSectionHolder, #rightContents .panel > .content) {
+html.se-community-hub-guides #ig_bottom .rightDetailsBlock:not(#se-none):not(.se-none),
+html.se-community-hub-guides #ig_bottom .rightSectionHolder:not(#se-none):not(.se-none),
+html.se-community-hub-guides #ig_bottom #rightContents .panel > .content {
   width: auto;
   height: auto;
   margin: 0;
@@ -684,7 +713,8 @@ html.se-community-hub-guides #ig_bottom .browseOption .rightbox_list_option_cont
 }
 
 /* The link fills the row, so the whole row is the hit target */
-html.se-community-hub-guides #ig_bottom :is(.browseOption > a, .browseOption .rightbox_list_option_content > a) {
+html.se-community-hub-guides #ig_bottom .browseOption > a:not(.se-none),
+html.se-community-hub-guides #ig_bottom .browseOption .rightbox_list_option_content > a {
   display: flex;
   align-items: center;
   min-height: var(--se-hit);
@@ -1008,7 +1038,8 @@ html.se-community-hub-guides #ig_bottom #about_guides .guideInfo:hover .guideInf
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.se-community-hub-guides #ig_bottom :is(a.workshopItemCollection, a.guide_home_category_selection):hover {
+  html.se-community-hub-guides #ig_bottom a.workshopItemCollection:hover,
+  html.se-community-hub-guides #ig_bottom a.guide_home_category_selection:hover {
     translate: none;
   }
 }

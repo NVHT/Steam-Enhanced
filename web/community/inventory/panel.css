@@ -5,7 +5,8 @@
 
 /* ---------- Item panel ---------- */
 
-html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) {
+html.se-community-inventory .inventory_iteminfo:not(.se-none),
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"] {
   --se-q: var(--se-accent);
   position: relative !important;
   inset: auto !important;
@@ -123,19 +124,22 @@ html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id
 }
 
 /* Descriptions, owner notes and tags: one block each, divided by hairlines */
-html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_desc_descriptors, [id$="_item_tags"]) {
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_desc_descriptors,
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) [id$="_item_tags"] {
   margin: 0 !important;
   padding: var(--se-space-4) 0 0 !important;
   border-top: 1px solid var(--se-divider);
   color: var(--se-text-dim) !important;
 }
 
-html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_desc_descriptors, [id$="_item_tags"]):empty,
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_desc_descriptors:empty,
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) [id$="_item_tags"]:empty,
 html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_desc_descriptors, [id$="_item_tags"])[style*="display: none"] {
   display: none !important;
 }
 
-html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_desc_descriptors, [id$="_item_tags"]) + :is(.item_desc_descriptors, [id$="_item_tags"]) {
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_desc_descriptors, [id$="_item_tags"]) + .item_desc_descriptors,
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_desc_descriptors, [id$="_item_tags"]) + [id$="_item_tags"] {
   margin-top: var(--se-space-4) !important;
 }
 
@@ -160,7 +164,9 @@ html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id
 }
 
 /* Actions */
-html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_actions, .item_owner_actions, .item_scrap_actions) {
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_actions,
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_owner_actions,
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_scrap_actions {
   display: flex !important;
   flex-wrap: wrap;
   gap: var(--se-space-2);
@@ -168,7 +174,9 @@ html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id
   padding: 0 !important;
 }
 
-html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) :is(.item_actions, .item_owner_actions, .item_scrap_actions):empty {
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_actions:empty,
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_owner_actions:empty,
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_scrap_actions:empty {
   display: none !important;
 }
 
@@ -211,7 +219,8 @@ html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id
   filter: brightness(1.1);
 }
 
-html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_market_action_button :is(.item_market_action_button_edge, .item_market_action_button_preload) {
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_market_action_button .item_market_action_button_edge,
+html.se-community-inventory :is(.inventory_iteminfo, .inventory_page_right > [id^="iteminfo"]) .item_market_action_button .item_market_action_button_preload {
   display: none !important;
 }
 
@@ -337,7 +346,8 @@ html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.invent
   font: inherit !important;
 }
 
-html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) :is(span, div) {
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) span,
+html.se-community-inventory .inventory_page_right > [id^="iteminfo"]:not(.inventory_iteminfo) div {
   font-family: var(--se-font) !important;
 }
 

@@ -58,7 +58,8 @@ html.se-store-account-history[data-se-history-ready]:not(#se-none) #main_content
   order: 1;
 }
 
-html.se-store-account-history[data-se-history-ready]:not(#se-none) #main_content > :is(table.wallet_history_table, .se-table-empty) {
+html.se-store-account-history[data-se-history-ready]:not(#se-none) #main_content > table.wallet_history_table,
+html.se-store-account-history[data-se-history-ready]:not(#se-none) #main_content > .se-table-empty:not(se-none) {
   order: 2;
 }
 
@@ -77,7 +78,8 @@ html.se-store-account-history:not(#se-none) table.wallet_history_table tr.wallet
 }
 
 /* Money columns line up on the right */
-html.se-store-account-history:not(#se-none) table.wallet_history_table :is(th, td):is(.wht_base_price, .wht_baseprice, .wht_tax, .wht_shipping, .wht_total, .wht_wallet, .wht_wallet_change, .wht_wallet_balance) {
+html.se-store-account-history:not(#se-none) table.wallet_history_table th:is(.wht_base_price, .wht_baseprice, .wht_tax, .wht_shipping, .wht_total, .wht_wallet, .wht_wallet_change, .wht_wallet_balance),
+html.se-store-account-history:not(#se-none) table.wallet_history_table td:is(.wht_base_price, .wht_baseprice, .wht_tax, .wht_shipping, .wht_total, .wht_wallet, .wht_wallet_change, .wht_wallet_balance) {
   text-align: right !important;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
@@ -254,7 +256,8 @@ html.se-store-account-history:not(#se-none) #load_more_button {
 /* ---------- Narrow windows: tax, shipping and the wallet columns give way ---------- */
 
 @media (max-width: 1100px) {
-  html.se-store-account-history:not(#se-none) table.wallet_history_table :is(th, td):is(.wht_tax, .wht_shipping, .wht_wallet, .wht_wallet_change, .wht_wallet_balance) {
+  html.se-store-account-history:not(#se-none) table.wallet_history_table th:is(.wht_tax, .wht_shipping, .wht_wallet, .wht_wallet_change, .wht_wallet_balance),
+  html.se-store-account-history:not(#se-none) table.wallet_history_table td:is(.wht_tax, .wht_shipping, .wht_wallet, .wht_wallet_change, .wht_wallet_balance) {
     display: none;
   }
 }

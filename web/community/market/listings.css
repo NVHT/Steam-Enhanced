@@ -23,7 +23,8 @@ html.se-community-market #tabContentsMyListings[style*="display: none"] {
   display: none !important;
 }
 
-html.se-community-market:not(#se-none) :is(#myListings .my_listing_section, #tabContentsMyMarketHistory) {
+html.se-community-market:not(#se-none) #myListings .my_listing_section,
+html.se-community-market:not(#se-none) #tabContentsMyMarketHistory:not(.se-none) {
   box-sizing: border-box;
   min-width: 0;
   width: auto !important;
@@ -180,7 +181,9 @@ html.se-community-market:not(#se-none) .market_listing_table_header:not(:has(> d
 }
 
 /* Steam draws column separators and a brighter sorted column: one plain label colour, no lines */
-html.se-community-market:not(#se-none) .market_listing_table_header :is(div, span, a) {
+html.se-community-market:not(#se-none) .market_listing_table_header div,
+html.se-community-market:not(#se-none) .market_listing_table_header span,
+html.se-community-market:not(#se-none) .market_listing_table_header a {
   border: 0 !important;
   background: none !important;
   box-shadow: none !important;
@@ -191,8 +194,12 @@ html.se-community-market:not(#se-none) .market_listing_table_header :is(div, spa
   text-shadow: none !important;
 }
 
-html.se-community-market .market_listing_table_header :is(div, span, a)::before,
-html.se-community-market .market_listing_table_header :is(div, span, a)::after {
+html.se-community-market .market_listing_table_header div::before,
+html.se-community-market .market_listing_table_header span::before,
+html.se-community-market .market_listing_table_header a::before,
+html.se-community-market .market_listing_table_header div::after,
+html.se-community-market .market_listing_table_header span::after,
+html.se-community-market .market_listing_table_header a::after {
   display: none !important;
 }
 
@@ -224,7 +231,8 @@ html.se-community-market:not(#se-none) .market_listing_row {
   transition: background-color var(--se-dur);
 }
 
-html.se-community-market:not(#se-none) :is(a.market_listing_row_link:hover .market_listing_row, .market_listing_row:hover) {
+html.se-community-market:not(#se-none) a.market_listing_row_link:hover .market_listing_row,
+html.se-community-market:not(#se-none) .market_listing_row:hover:not(.se-none):not(se-none) {
   background: var(--se-hover) !important;
 }
 
@@ -292,7 +300,8 @@ html.se-community-market:not(#se-none) .market_listing_game_name {
 }
 
 /* Right-hand cells: Steam floats them in reverse; the theme orders them left to right */
-html.se-community-market:not(#se-none) :is(.market_listing_right_cell, .market_listing_price_listings_block) {
+html.se-community-market:not(#se-none) .market_listing_right_cell,
+html.se-community-market:not(#se-none) .market_listing_price_listings_block {
   float: none !important;
   height: auto !important;
   margin: 0 !important;
@@ -312,7 +321,9 @@ html.se-community-market .market_listing_listed_date { order: 2; }
 html.se-community-market .market_listing_num_listings { order: 0; }
 html.se-community-market .market_listing_their_price,
 html.se-community-market .market_listing_my_price { order: 4; }
-html.se-community-market :is(.market_listing_action_buttons, .market_listing_edit_buttons, .market_listing_cancel_button) { order: 5; flex: none; }
+html.se-community-market .market_listing_action_buttons,
+html.se-community-market .market_listing_edit_buttons,
+html.se-community-market .market_listing_cancel_button { order: 5; flex: none; }
 
 /* Buy Now column: one width in the header and the rows, so PRICE sits over the prices.
    Steam's column is 74px tall with side padding, and its button wrapper drops 25px with a
@@ -346,14 +357,16 @@ html.se-community-market:not(#se-none) .market_listing_num_listings {
   font-variant-numeric: tabular-nums;
 }
 
-html.se-community-market:not(#se-none) :is(.market_listing_their_price, .market_listing_my_price) {
+html.se-community-market:not(#se-none) .market_listing_their_price,
+html.se-community-market:not(#se-none) .market_listing_my_price {
   flex: none;
   width: var(--se-mkt-price-w) !important;
 }
 
 /* The price cell centres its price on the row: Steam's trailing line breaks (and the hidden
    fee prices around them) would otherwise sit under it and lift it above the Buy Now button */
-html.se-community-market:not(#se-none) .market_listing_row :is(.market_listing_their_price, .market_listing_my_price) {
+html.se-community-market:not(#se-none) .market_listing_row .market_listing_their_price,
+html.se-community-market:not(#se-none) .market_listing_row .market_listing_my_price {
   display: flex !important;
   flex-direction: column;
   justify-content: center;
@@ -363,7 +376,8 @@ html.se-community-market:not(#se-none) .market_listing_row :is(.market_listing_t
 
 /* Steam gives each value a 10px top and bottom margin and the cells a 73px line-height
    (.market_table_value, .market_home_main_listing_table .market_listing_right_cell) */
-html.se-community-market:not(#se-none) .market_listing_row :is(.market_listing_right_cell, .market_table_value) {
+html.se-community-market:not(#se-none) .market_listing_row .market_listing_right_cell,
+html.se-community-market:not(#se-none) .market_listing_row .market_table_value {
   line-height: normal !important;
 }
 
@@ -377,12 +391,16 @@ html.se-community-market .market_listing_row :is(.market_listing_their_price, .m
 }
 
 /* Steam left-aligns the recent listings' prices (.market_listing_price): right, under PRICE */
-html.se-community-market:not(#se-none) :is(.market_listing_their_price, .market_listing_my_price, .market_listing_num_listings),
-html.se-community-market:not(#se-none) :is(.market_listing_their_price, .market_listing_my_price) :is(.market_table_value, .market_listing_price) {
+html.se-community-market:not(#se-none) .market_listing_their_price,
+html.se-community-market:not(#se-none) .market_listing_my_price,
+html.se-community-market:not(#se-none) .market_listing_num_listings,
+html.se-community-market:not(#se-none) :is(.market_listing_their_price, .market_listing_my_price) .market_table_value,
+html.se-community-market:not(#se-none) :is(.market_listing_their_price, .market_listing_my_price) .market_listing_price {
   text-align: right !important;
 }
 
-html.se-community-market .market_listing_table_header :is(.market_listing_num_listings, .market_listing_their_price) {
+html.se-community-market .market_listing_table_header .market_listing_num_listings,
+html.se-community-market .market_listing_table_header .market_listing_their_price {
   color: inherit;
   font: inherit;
 }
@@ -400,7 +418,10 @@ html.se-community-market .market_listing_row .market_table_value > br {
 
 /* Newly Listed / Recently Sold, history and your listings show .market_listing_price; the
    fee variants Steam keeps beside it stay hidden as Steam has them (inline display: none) */
-html.se-community-market:not(#se-none) .market_listing_row .market_table_value > :is(.normal_price, .sale_price, span[title], .market_listing_price) {
+html.se-community-market:not(#se-none) .market_listing_row .market_table_value > .normal_price:not(se-none),
+html.se-community-market:not(#se-none) .market_listing_row .market_table_value > .sale_price:not(se-none),
+html.se-community-market:not(#se-none) .market_listing_row .market_table_value > span[title],
+html.se-community-market:not(#se-none) .market_listing_row .market_table_value > .market_listing_price:not(se-none) {
   display: block;
   color: var(--se-white) !important;
   font: 800 var(--se-fs-lg)/1.3 var(--se-font) !important;

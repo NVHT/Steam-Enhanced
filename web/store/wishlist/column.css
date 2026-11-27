@@ -43,12 +43,15 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="search"] {
  */
 /* !important: the panel is a closed popover="manual", which the browser's own popover rule
    hides */
-html.se-store-wishlist:not(#se-none) :is([data-se-wl="tools"], [data-se-wl="options"], [data-se-wl="options"] > form) {
+html.se-store-wishlist:not(#se-none) [data-se-wl="tools"]:not(se-none),
+html.se-store-wishlist:not(#se-none) [data-se-wl="options"]:not(se-none),
+html.se-store-wishlist:not(#se-none) [data-se-wl="options"] > form {
   display: contents !important;
 }
 
 /* Their own buttons: the column replaces Options, the header's Share replaces Steam's. */
-html.se-store-wishlist:not(#se-none) :is([data-se-wl="options-btn"], [data-se-wl="share"]) {
+html.se-store-wishlist:not(#se-none) [data-se-wl="options-btn"],
+html.se-store-wishlist:not(#se-none) [data-se-wl="share"] {
   display: none;
 }
 
@@ -139,7 +142,12 @@ html.se-store-wishlist:not(#se-none) :is([data-se-wl-opt="view"], [data-se-wl-op
 }
 
 /* The mockup's chip row: 10px sides, 6px apart, so Platform's three fit one line. */
-html.se-store-wishlist:not(#se-none) :is([data-se-wl-opt="discount"], [data-se-wl-opt="type"], [data-se-wl-opt="platform"], [data-se-wl-opt="deck"], [data-se-wl-opt="exclude"], [data-se-wl-opt="demo"]) {
+html.se-store-wishlist:not(#se-none) [data-se-wl-opt="discount"],
+html.se-store-wishlist:not(#se-none) [data-se-wl-opt="type"],
+html.se-store-wishlist:not(#se-none) [data-se-wl-opt="platform"],
+html.se-store-wishlist:not(#se-none) [data-se-wl-opt="deck"],
+html.se-store-wishlist:not(#se-none) [data-se-wl-opt="exclude"],
+html.se-store-wishlist:not(#se-none) [data-se-wl-opt="demo"] {
   column-gap: var(--se-space-2);
 }
 
@@ -494,7 +502,10 @@ html.se-store-wishlist:not(#se-none) [data-se-wl="own-reset"]:disabled {
  * text goes (font-size: 0) and the theme's is drawn after it. Steam's input names and values
  * are stable; their words are English like the rest of the theme.
  */
-html.se-store-wishlist:not(#se-none) :is([data-se-wl-opt="discount"] > label, [data-se-wl-opt="demo"] > label, [data-se-wl-opt="deck"] > h3, [data-se-wl-opt="exclude"] > h3) {
+html.se-store-wishlist:not(#se-none) [data-se-wl-opt="discount"] > label,
+html.se-store-wishlist:not(#se-none) [data-se-wl-opt="demo"] > label,
+html.se-store-wishlist:not(#se-none) [data-se-wl-opt="deck"] > h3,
+html.se-store-wishlist:not(#se-none) [data-se-wl-opt="exclude"] > h3 {
   font-size: 0;
 }
 

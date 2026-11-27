@@ -39,7 +39,8 @@ html.se-app-purchase-on [data-se-buy-grid] > .se-app-specs {
 }
 
 /* No specs: the buy rows and DLC take the width. */
-html.se-app-purchase-on [data-se-buy-grid]:not(:has(> .se-app-specs:not([hidden]))) > :is(.se-app-purchase, .se-app-dlc) {
+html.se-app-purchase-on [data-se-buy-grid]:not(:has(> .se-app-specs:not([hidden]))) > .se-app-purchase,
+html.se-app-purchase-on [data-se-buy-grid]:not(:has(> .se-app-specs:not([hidden]))) > .se-app-dlc {
   grid-column: 1 / -1;
 }
 
@@ -50,7 +51,9 @@ html.se-app-purchase-on [data-se-buy-source] {
 
 /* ---------- Headings (Steam styles every h2 in the column) ---------- */
 
-html.se-app-purchase-on :is(.se-app-purchase__title, .se-app-dlc__title, .se-app-specs__title) {
+html.se-app-purchase-on .se-app-purchase__title,
+html.se-app-purchase-on .se-app-dlc__title,
+html.se-app-purchase-on .se-app-specs__title {
   float: none !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -334,7 +337,9 @@ a.se-app-purchase__set-more:hover {
   background: var(--se-hover);
 }
 
-:is(.se-app-purchase__set-item, .se-app-purchase__set-more, .se-app-purchase__link):focus-visible {
+.se-app-purchase__set-item:focus-visible,
+.se-app-purchase__set-more:focus-visible,
+.se-app-purchase__link:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: 3px;
   border-radius: var(--se-radius-sm);
@@ -613,7 +618,9 @@ a.se-app-purchase__set-more:hover {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  html.se-app-purchase-on [data-se-buy-grid] > :is(.se-app-purchase, .se-app-dlc, .se-app-specs) {
+  html.se-app-purchase-on [data-se-buy-grid] > .se-app-purchase,
+  html.se-app-purchase-on [data-se-buy-grid] > .se-app-dlc,
+  html.se-app-purchase-on [data-se-buy-grid] > .se-app-specs {
     grid-column: 1;
     grid-row: auto;
   }

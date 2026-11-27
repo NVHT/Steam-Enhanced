@@ -42,7 +42,8 @@ html.se-store [data-se-nav="panel"] > div > div > div {
 
 /* Steam's own fixed-height menu body (Popover, main.css), by its current class too. */
 /* !important: height can come inline from Steam's markup or scripts */
-html.se-store [data-se-nav="band"] :is(.RZQWX-64UNU-, .LJ-XME3yAB0-) {
+html.se-store [data-se-nav="band"] .RZQWX-64UNU-,
+html.se-store [data-se-nav="band"] .LJ-XME3yAB0- {
   height: auto !important;
 }
 
@@ -116,7 +117,12 @@ html.se-store [data-se-p="link"]:is(:hover, :focus-visible) {
 /* Every tile: rounded, hairline ring, lifts on hover. */
 /* !important: another rule in this file sets box-shadow with !important; position can come inline
    from Steam's markup or scripts */
-html.se-store :is([data-se-p="art"], [data-se-p="stage"], [data-se-p="icon"], [data-se-p="row"], [data-se-p="button"], [data-se-p="mosaic"]) {
+html.se-store [data-se-p="art"],
+html.se-store [data-se-p="stage"],
+html.se-store [data-se-p="icon"],
+html.se-store [data-se-p="row"],
+html.se-store [data-se-p="button"],
+html.se-store [data-se-p="mosaic"] {
   position: relative !important;
   overflow: hidden;
   border: 0;
@@ -127,7 +133,11 @@ html.se-store :is([data-se-p="art"], [data-se-p="stage"], [data-se-p="icon"], [d
   transition: transform var(--se-dur-slow) var(--se-ease), box-shadow var(--se-dur-slow), background-color var(--se-dur);
 }
 
-html.se-store :is([data-se-p="art"], [data-se-p="stage"], [data-se-p="icon"], [data-se-p="button"], [data-se-p="mosaic"]):is(:hover, :focus-visible) {
+html.se-store [data-se-p="art"]:is(:hover, :focus-visible),
+html.se-store [data-se-p="stage"]:is(:hover, :focus-visible),
+html.se-store [data-se-p="icon"]:is(:hover, :focus-visible),
+html.se-store [data-se-p="button"]:is(:hover, :focus-visible),
+html.se-store [data-se-p="mosaic"]:is(:hover, :focus-visible) {
   transform: translateY(-2px);
   box-shadow: var(--se-menu-ring-hi), var(--se-shadow-md);
   outline: none;
@@ -220,7 +230,15 @@ html.se-store:not(#se-none) [data-se-p="icon"] svg {
   color: var(--se-text) !important; /* overrides Steam's glyph colour */
 }
 
-html.se-store:not(#se-none) [data-se-p="icon"] svg :is(g, path, circle, ellipse, rect, polygon, polyline, line, use) {
+html.se-store:not(#se-none) [data-se-p="icon"] svg g,
+html.se-store:not(#se-none) [data-se-p="icon"] svg path,
+html.se-store:not(#se-none) [data-se-p="icon"] svg circle,
+html.se-store:not(#se-none) [data-se-p="icon"] svg ellipse,
+html.se-store:not(#se-none) [data-se-p="icon"] svg rect,
+html.se-store:not(#se-none) [data-se-p="icon"] svg polygon,
+html.se-store:not(#se-none) [data-se-p="icon"] svg polyline,
+html.se-store:not(#se-none) [data-se-p="icon"] svg line,
+html.se-store:not(#se-none) [data-se-p="icon"] svg use {
   fill: currentColor !important; /* overrides Steam's per-shape fill */
 }
 
@@ -270,13 +288,15 @@ html.se-store [data-se-p="chip"]:is(:hover, :focus-visible) {
 }
 
 /* !important: another rule in this file sets background with !important */
-html.se-store :is([data-se-p="button"], [data-se-p="mosaic"]) {
+html.se-store [data-se-p="button"],
+html.se-store [data-se-p="mosaic"] {
   background: var(--se-surface-2) !important;
   background-image: none;
   color: var(--se-text);
 }
 
-html.se-store :is([data-se-p="button"], [data-se-p="mosaic"]):is(:hover, :focus-visible) {
+html.se-store [data-se-p="button"]:is(:hover, :focus-visible),
+html.se-store [data-se-p="mosaic"]:is(:hover, :focus-visible) {
   background: var(--se-hover);
 }
 
@@ -290,8 +310,12 @@ html.se-store :is([data-se-p="button"], [data-se-p="mosaic"]):is(:hover, :focus-
 html.se-store :is([data-se-p="link"], [data-se-p="button"], [data-se-p="mosaic"]) :not(img, svg, svg *, [data-se-p], [data-se-p] [data-se-p] *, [data-se-price], [data-se-price] *, :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-), :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-) *),
 html.se-store :is([data-se-p="link"], [data-se-p="button"], [data-se-p="mosaic"]) :not(img, svg, svg *, [data-se-p], [data-se-p] [data-se-p] *, [data-se-price], [data-se-price] *, :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-), :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-) *)::before,
 html.se-store :is([data-se-p="link"], [data-se-p="button"], [data-se-p="mosaic"]) :not(img, svg, svg *, [data-se-p], [data-se-p] [data-se-p] *, [data-se-price], [data-se-price] *, :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-), :is(.dkW-v-f4lTw-, .Cj7J5QHbL-0-) *)::after,
-html.se-store :is([data-se-p="link"], [data-se-p="button"], [data-se-p="mosaic"])::before,
-html.se-store :is([data-se-p="link"], [data-se-p="button"], [data-se-p="mosaic"])::after {
+html.se-store [data-se-p="link"]::before,
+html.se-store [data-se-p="button"]::before,
+html.se-store [data-se-p="mosaic"]::before,
+html.se-store [data-se-p="link"]::after,
+html.se-store [data-se-p="button"]::after,
+html.se-store [data-se-p="mosaic"]::after {
   background: none !important;
   box-shadow: none !important;
   border-color: transparent !important;
@@ -319,7 +343,8 @@ html.se-store [data-se-p="cta"] * {
 }
 
 /* !important: the theme's shared rules (web/store/charts/page.css) set fill with !important */
-html.se-store [data-se-p="cta"] svg :is(path, polygon) {
+html.se-store [data-se-p="cta"] svg path,
+html.se-store [data-se-p="cta"] svg polygon {
   fill: currentColor !important;
 }
 
@@ -338,16 +363,21 @@ html.se-store [data-se-p="was"] {
 }
 
 /* Panels: Steam's tinted washes and overlays give way to the theme's surfaces. */
-html.se-store [data-se-nav="panel"] :is(.dUvJZktS6bk-, .uQeikjci8I0-, .vQLqomCgKs4-, .q-DP3khZsgc-) {
+html.se-store [data-se-nav="panel"] .dUvJZktS6bk-,
+html.se-store [data-se-nav="panel"] .uQeikjci8I0-,
+html.se-store [data-se-nav="panel"] .vQLqomCgKs4-,
+html.se-store [data-se-nav="panel"] .q-DP3khZsgc- {
   background: none;
 }
 
 /* !important: Steam's own rules (Dz-B1WUw.css) set background at equal or higher weight */
-html.se-store [data-se-nav="panel"] :is(.YEIG5t1R8UY-, .awopm9AseKk-) {
+html.se-store [data-se-nav="panel"] .YEIG5t1R8UY-,
+html.se-store [data-se-nav="panel"] .awopm9AseKk- {
   background: linear-gradient(270deg, transparent 20%, var(--se-surface) 85%) !important;
 }
 
-html.se-store [data-se-nav="panel"] :is(.tlx2FXGxPBc-, .OQI7NrDyNQM-) {
+html.se-store [data-se-nav="panel"] .tlx2FXGxPBc-,
+html.se-store [data-se-nav="panel"] .OQI7NrDyNQM- {
   background: var(--se-menu-scrim);
 }
 
@@ -355,7 +385,8 @@ html.se-store [data-se-nav="panel"] :is(.tlx2FXGxPBc-, .OQI7NrDyNQM-) {
  * Category tiles: the row's width shared among its tiles. Steam fixes each tile's width and
  * spreads them apart (space-between); the art then fills the wider tile.
  */
-html.se-store:not(#se-none) [data-se-nav="panel"] :is(.eyLJRKegBn0-, ._-3FYAnbTP3c-) {
+html.se-store:not(#se-none) [data-se-nav="panel"] .eyLJRKegBn0-,
+html.se-store:not(#se-none) [data-se-nav="panel"] ._-3FYAnbTP3c- {
   justify-content: stretch;
   gap: var(--se-space-3);
 }
@@ -388,13 +419,15 @@ html.se-store:not(#se-none) [data-se-nav="panel"] :is(.eyLJRKegBn0-, ._-3FYAnbTP
  * spread the rows apart and cut off the last one.
  */
 /* !important: another rule in this file sets align-items with !important */
-html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) {
+html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) .QHiQcR8jG10-,
+html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) .cO0trRuLfzA- {
   align-items: center !important;
 }
 
 /* !important: another rule in this file sets align-items, display, flex, flex-direction, gap,
    justify-content, min-width with !important */
-html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) :is(.cchAfQhDUvE-, ._6iY2YwtsQR0-) {
+html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) .cchAfQhDUvE-,
+html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) ._6iY2YwtsQR0- {
   flex: 1 1 auto !important;
   min-width: 0 !important;
   display: flex !important;
@@ -405,7 +438,8 @@ html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPq
 }
 
 /* !important: another rule in this file sets display, line-height, white-space with !important */
-html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) :is(.-sYwJqKAVvw-, .kNeH7jZB5vg-) {
+html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) .-sYwJqKAVvw-,
+html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) .kNeH7jZB5vg- {
   min-width: 0;
   display: -webkit-box !important;
   -webkit-box-orient: vertical;
@@ -416,7 +450,8 @@ html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPq
 }
 
 /* !important: another rule in this file sets flex, margin with !important */
-html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) :is(.FY3FS-llgYw-, .qy5xFmO5xOU-) {
+html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) .FY3FS-llgYw-,
+html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPqnbn0yI-)) :is(.QHiQcR8jG10-, .cO0trRuLfzA-) .qy5xFmO5xOU- {
   flex: none !important;
   margin: 0 !important;
 }
@@ -426,14 +461,16 @@ html.se-store:not(#se-none) :is([data-se-nav="panel"], :is(.O2jUvAs3OiU-, .SdFPq
  * space-between, which leaves wide gaps. Rows share the box's height instead, with a
  * fixed gap, and the capsule fills its row.
  */
-html.se-store:not(#se-none) :is(.l8Ot6WpreQ8-, .qLQjwozYKNA-) {
+html.se-store:not(#se-none) .l8Ot6WpreQ8-,
+html.se-store:not(#se-none) .qLQjwozYKNA- {
   justify-content: flex-start;
   gap: var(--se-space-3);
 }
 
 /* !important: another rule in this file sets height with !important; min-height can come inline
    from Steam's markup or scripts */
-html.se-store:not(#se-none) :is(.l8Ot6WpreQ8-, .qLQjwozYKNA-) > :is(.QHiQcR8jG10-, .cO0trRuLfzA-) {
+html.se-store:not(#se-none) :is(.l8Ot6WpreQ8-, .qLQjwozYKNA-) > .QHiQcR8jG10-,
+html.se-store:not(#se-none) :is(.l8Ot6WpreQ8-, .qLQjwozYKNA-) > .cO0trRuLfzA- {
   flex: 1 1 0;
   height: auto !important;
   min-height: 56px !important;
@@ -442,7 +479,8 @@ html.se-store:not(#se-none) :is(.l8Ot6WpreQ8-, .qLQjwozYKNA-) > :is(.QHiQcR8jG10
 
 /* !important: another rule in this file sets width with !important; height can come inline from
    Steam's markup or scripts */
-html.se-store:not(#se-none) :is(.l8Ot6WpreQ8-, .qLQjwozYKNA-) > :is(.QHiQcR8jG10-, .cO0trRuLfzA-) :is(.Jhq3hD97Ms8-, .JImNxATJ1xc-) {
+html.se-store:not(#se-none) :is(.l8Ot6WpreQ8-, .qLQjwozYKNA-) > :is(.QHiQcR8jG10-, .cO0trRuLfzA-) .Jhq3hD97Ms8-,
+html.se-store:not(#se-none) :is(.l8Ot6WpreQ8-, .qLQjwozYKNA-) > :is(.QHiQcR8jG10-, .cO0trRuLfzA-) .JImNxATJ1xc- {
   flex: none;
   align-self: stretch;
   width: auto !important;

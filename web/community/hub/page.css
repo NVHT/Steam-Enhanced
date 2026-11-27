@@ -52,7 +52,8 @@
 
   /* The forum-style tabs' header sits outside .apphub_Content: it takes the same width itself */
   /* !important: max-width, width can come inline from Steam's markup or scripts */
-  html.se-community-hub :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader)) {
+  html.se-community-hub .game_title_area:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader)),
+  html.se-community-hub .sharedfiles_item_page_header:has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader)) {
     box-sizing: border-box;
     width: var(--se-community-width) !important;
     max-width: none !important;
@@ -167,7 +168,9 @@ html.se-community-hub .apphub_HomeHeaderContent:not(:has(.apphub_Stats, .apphub_
 
 /* !important: Steam's own rules (apphub.css, apphub_gamepad.css) set display at equal or higher
    weight */
-html.se-community-hub :is(.apphub_HeaderTop, .apphub_HeaderBottom, .apphub_HeaderStandardTop) {
+html.se-community-hub .apphub_HeaderTop,
+html.se-community-hub .apphub_HeaderBottom,
+html.se-community-hub .apphub_HeaderStandardTop {
   display: contents !important;
 }
 
@@ -262,7 +265,8 @@ html.se-community-hub .apphub_OtherSiteInfo > * {
 
 /* !important: Steam's own rules (buttons.css) set color with !important; another rule in this file
    sets background with !important */
-html.se-community-hub:not(#se-none) .apphub_OtherSiteInfo > :is([class*="btn_"], [class*="btnv6_"]):first-child {
+html.se-community-hub:not(#se-none) .apphub_OtherSiteInfo > [class*="btn_"]:first-child,
+html.se-community-hub:not(#se-none) .apphub_OtherSiteInfo > [class*="btnv6_"]:first-child {
   background: var(--se-btn-primary-bg) !important;
   box-shadow: none;
   color: var(--se-btn-primary-color) !important;
@@ -270,7 +274,8 @@ html.se-community-hub:not(#se-none) .apphub_OtherSiteInfo > :is([class*="btn_"],
 
 /* !important: Steam's own rules (buttons.css) set color with !important; another rule in this file
    sets background with !important */
-html.se-community-hub:not(#se-none) .apphub_OtherSiteInfo > :is([class*="btn_"], [class*="btnv6_"]):first-child:hover {
+html.se-community-hub:not(#se-none) .apphub_OtherSiteInfo > [class*="btn_"]:first-child:hover,
+html.se-community-hub:not(#se-none) .apphub_OtherSiteInfo > [class*="btnv6_"]:first-child:hover {
   background: var(--se-btn-primary-bg-hover) !important;
   color: var(--se-btn-primary-color) !important;
 }
@@ -547,7 +552,8 @@ html.se-community-hub a.apphub_more_friends_who_play:focus-visible {
    (.se-hub-sort, hub/page.js) are the same control */
 /* !important: Steam's own rules (community_gamepad.css) set display, margin, padding at equal or
    higher weight; height, width can come inline from Steam's markup or scripts */
-html.se-community-hub :is(.apphub_sectionTabs, .se-hub-sort) {
+html.se-community-hub .apphub_sectionTabs,
+html.se-community-hub .se-hub-sort {
   grid-area: tabs;
   justify-self: start;
   display: flex !important;
@@ -569,7 +575,8 @@ html.se-community-hub :is(.apphub_sectionTabs, .se-hub-sort) {
    font, height, margin, padding at equal or higher weight (apphub.css underlines the active tab on
    hover with a blue border-bottom); another rule in this file sets background, color with
    !important; display can come inline from Steam's markup or scripts */
-html.se-community-hub :is(.apphub_sectionTab, .se-hub-sort__chip) {
+html.se-community-hub .apphub_sectionTab,
+html.se-community-hub .se-hub-sort__chip {
   display: inline-flex !important;
   align-items: center;
   float: none !important;
@@ -605,14 +612,16 @@ html.se-community-hub .apphub_sectionTab.admin {
 }
 
 /* !important: another rule in this file sets color with !important */
-html.se-community-hub :is(.apphub_sectionTab, .se-hub-sort__chip):hover {
+html.se-community-hub .apphub_sectionTab:hover,
+html.se-community-hub .se-hub-sort__chip:hover {
   color: var(--se-white) !important;
 }
 
 /* !important: Steam's own rules (buttons.css, community_gamepad.css, friendsv2.css) set
    background, color at equal or higher weight; the theme's shared rules (web/community/shared/ui.css)
    set background, color with !important */
-html.se-community-hub :is(.apphub_sectionTab.active, .se-hub-sort__chip[aria-pressed="true"]) {
+html.se-community-hub .apphub_sectionTab.active,
+html.se-community-hub .se-hub-sort__chip[aria-pressed="true"] {
   background: var(--se-selected) !important;
   box-shadow: var(--se-shadow-sm);
   color: var(--se-white) !important;
@@ -631,7 +640,8 @@ html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles
   display: none;
 }
 
-html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > :is(.social_links, .se-hub-social) {
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > .social_links,
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > .se-hub-social {
   position: relative;
   z-index: var(--se-z-raised);
   grid-column: 1;
@@ -732,7 +742,8 @@ html.se-community-hub .apphub_AllContentText {
 
 /* The note and its "?" on one centred line, whether the "?" sits in the note or beside it (an
    inline glyph rode the text's baseline and sat low) */
-html.se-community-hub :is(.apphub_AllContentText, :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > div:has(> .apphub_AllContentText)) {
+html.se-community-hub .apphub_AllContentText:not(.se-none):not(.se-none):not(.se-none):not(se-none),
+html.se-community-hub :is(.apphub_HomeHeader, :is(.game_title_area, .sharedfiles_item_page_header):has(.apphub_HomeHeaderContent):not(:has(.apphub_HomeHeader))) > div:has(> .apphub_AllContentText) {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -787,6 +798,8 @@ html.se-community-hub .apphub_MostPopularLink:active {
 }
 
 /* !important: display can come inline from Steam's markup or scripts */
-html.se-community-hub :is(.apphub_HubDivider, .apphub_HubDividerShadow, .apphub_sectionTabsHR) {
+html.se-community-hub .apphub_HubDivider,
+html.se-community-hub .apphub_HubDividerShadow,
+html.se-community-hub .apphub_sectionTabsHR {
   display: none !important;
 }

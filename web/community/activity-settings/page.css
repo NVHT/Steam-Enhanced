@@ -35,7 +35,8 @@ html.se-community-activity-settings #subscriptions .maincontent {
   background: none !important;
 }
 
-html.se-community-activity-settings :is(.settingsBlock, .settingsRight) {
+html.se-community-activity-settings .settingsBlock,
+html.se-community-activity-settings .settingsRight {
   float: none !important;
   width: auto !important;
   height: auto !important;
@@ -97,7 +98,8 @@ html.se-community-activity-settings .settingsRight > [id="permissionsBlock"] {
 
 /* ---------- Rows ---------- */
 
-html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt) {
+html.se-community-activity-settings .permissionRow,
+html.se-community-activity-settings .permissionRowAlt {
   position: relative;
   display: flex !important;
   align-items: center;
@@ -113,7 +115,8 @@ html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt) {
   transition: background-color var(--se-dur);
 }
 
-html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt) + :is(.permissionRow, .permissionRowAlt)::before {
+html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt) + .permissionRow::before,
+html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt) + .permissionRowAlt::before {
   content: "";
   position: absolute;
   top: 0;
@@ -123,12 +126,15 @@ html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt) + :is
   background: var(--se-divider);
 }
 
-html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt):hover {
+html.se-community-activity-settings .permissionRow:hover,
+html.se-community-activity-settings .permissionRowAlt:hover {
   background: var(--se-hover) !important;
 }
 
-html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt):hover::before,
-html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt):hover + :is(.permissionRow, .permissionRowAlt)::before {
+html.se-community-activity-settings .permissionRow:hover::before,
+html.se-community-activity-settings .permissionRowAlt:hover::before,
+html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt):hover + .permissionRow::before,
+html.se-community-activity-settings :is(.permissionRow, .permissionRowAlt):hover + .permissionRowAlt::before {
   opacity: 0;
 }
 

@@ -148,7 +148,8 @@ html.se-store-dlc:not(#se-none) .browse_filters > div {
 }
 
 /* !important: height, padding, width can come inline from Steam's markup or scripts */
-html.se-store-dlc:not(#se-none) :is(#filtertags_container, #client_filter) {
+html.se-store-dlc:not(#se-none) #filtertags_container,
+html.se-store-dlc:not(#se-none) #client_filter {
   display: flex;
   flex-direction: column;
   gap: var(--se-space-half);
@@ -275,7 +276,9 @@ html.se-store-dlc:not(#se-none) #client_filter > a:is(.checked, .selected):hover
 
 /* Steam's own checkbox sprite in these rows gives way to the switch. */
 /* !important: display can come inline from Steam's markup or scripts */
-html.se-store-dlc:not(#se-none) #client_filter > a > :is(img, .checkbox, span:empty) {
+html.se-store-dlc:not(#se-none) #client_filter > a > img:not(.se-none),
+html.se-store-dlc:not(#se-none) #client_filter > a > .checkbox:not(se-none),
+html.se-store-dlc:not(#se-none) #client_filter > a > span:empty {
   display: none !important;
 }
 

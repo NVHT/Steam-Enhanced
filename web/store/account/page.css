@@ -30,7 +30,10 @@
 /* ---------- Page ---------- */
 
 html.se-store-account:not(#se-none) body,
-html.se-store-account:not(#se-none) :is(.responsive_page_frame, .responsive_page_content, .responsive_page_template_content, .page_content_ctn) {
+html.se-store-account:not(#se-none) .responsive_page_frame,
+html.se-store-account:not(#se-none) .responsive_page_content,
+html.se-store-account:not(#se-none) .responsive_page_template_content,
+html.se-store-account:not(#se-none) .page_content_ctn {
   background: var(--se-bg) !important;
 }
 
@@ -58,7 +61,8 @@ html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs {
 }
 
 /* The current page's name: a .pageheader span on some pages, which Steam sets as a title */
-html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs :is(.pageheader, .breadcrumb_current_page) {
+html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs .pageheader,
+html.se-store-account:not(#se-none) .page_header_ctn .breadcrumbs .breadcrumb_current_page {
   margin: 0 !important;
   padding: 0 !important;
   background: none !important;
@@ -208,7 +212,8 @@ html.se-store-account:not(#se-none) .page_content:has(> .two_column.left) > .two
 
 /* Sidebar links; the newer pages' (newer.css) the same, their icon chip drawn by pseudo-elements */
 html.se-store-account:not(#se-none) a.nav_item,
-html.se-store-account:not(#se-none) :is([data-se-account-modern="link"], [data-se-account-modern="link-active"]) {
+html.se-store-account:not(#se-none) [data-se-account-modern="link"],
+html.se-store-account:not(#se-none) [data-se-account-modern="link-active"] {
   display: flex !important;
   align-items: center;
   gap: var(--se-space-3);
@@ -256,7 +261,8 @@ html.se-store-account:not(#se-none) a.nav_item[data-se-account-nav] > img {
 }
 
 .se-account-nav-icon,
-html.se-store-account:not(#se-none) :is([data-se-account-modern="link"], [data-se-account-modern="link-active"])::before {
+html.se-store-account:not(#se-none) [data-se-account-modern="link"]::before,
+html.se-store-account:not(#se-none) [data-se-account-modern="link-active"]::before {
   flex: none;
   display: flex;
   align-items: center;
@@ -335,7 +341,8 @@ html.se-store-account:not(#se-none) .se-account-card .account_header_line img {
 }
 
 /* Block → a grid of tiles (Steam floats half-width columns) */
-html.se-store-account:not(#se-none) .se-account-card :is(.account_setting_block, .account_setting_block_short) {
+html.se-store-account:not(#se-none) .se-account-card .account_setting_block,
+html.se-store-account:not(#se-none) .se-account-card .account_setting_block_short {
   display: grid !important;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--se-space-3);
@@ -351,7 +358,8 @@ html.se-store-account:not(#se-none) .se-account-card .account_setting_block + .a
   margin-top: var(--se-space-3) !important;
 }
 
-html.se-store-account:not(#se-none) .se-account-card :is(.account_setting_sub_block, .account_setting_sub_block_long):not([data-se-account-hidden]) {
+html.se-store-account:not(#se-none) .se-account-card .account_setting_sub_block:not([data-se-account-hidden]),
+html.se-store-account:not(#se-none) .se-account-card .account_setting_sub_block_long:not([data-se-account-hidden]) {
   box-sizing: border-box;
   display: flex !important;
   flex-direction: column;
@@ -375,14 +383,16 @@ html.se-store-account:not(#se-none) .se-account-card .account_setting_sub_block 
   display: none;
 }
 
-html.se-store-account:not(#se-none) .se-account-card :is(p, .account_setting_sub_block > div) {
+html.se-store-account:not(#se-none) .se-account-card p:not(.se-none),
+html.se-store-account:not(#se-none) .se-account-card .account_setting_sub_block > div {
   margin: 0 !important;
   padding: 0;
   color: var(--se-text-dim);
   font: inherit;
 }
 
-html.se-store-account:not(#se-none) .se-account-card :is(b, strong) {
+html.se-store-account:not(#se-none) .se-account-card b,
+html.se-store-account:not(#se-none) .se-account-card strong {
   color: var(--se-text);
 }
 
