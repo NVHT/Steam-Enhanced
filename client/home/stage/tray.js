@@ -142,39 +142,41 @@
   }
 
   /*
-   * The panels' fits (paintBoard's [{ entry, grid, fit }]), each given its grid's size. A size
-   * is read once, then kept: the grid's own ResizeObserver says when it changed (a resize, a
-   * cell's new span or height) and refits it there, before the frame paints, so a pass reads no
-   * layout. A grid is sized by its cell (stage-shelves.css), never by the tiles a fit writes, so
-   * a fit can't feed back into the observer.
+   * The panels' fits (paintBoard's [{ entry, grid, fit }]), each given its grid's size. The size
+   * comes from the grid's own ResizeObserver, never a read: its first entry (a grid new to the
+   * board) and every change (a resize, a cell's new span or height) fit it there, before the
+   * frame paints; a pass refits with the kept size. Read in the pass or the callback, a size paid
+   * the style pass of the board just painted, or of Home being drawn again. A grid is sized by
+   * its cell (stage-shelves.css, no padding or border: its content box is its client box),
+   * never by the tiles a fit writes, so a fit can't feed back into the observer.
    */
-  const fitted = new Map(); // grid → { box, f }
+  const fitted = new Map(); // grid → { box, f }; box null until its first entry
   const readBox = (grid) => ({ W: grid.clientWidth, H: grid.clientHeight });
   const gridSizes = typeof ResizeObserver === 'function'
     ? new ResizeObserver((entries) => {
-      for (const { target } of entries) {
+      for (const { target, contentRect } of entries) {
         const kept = fitted.get(target);
         if (!kept) continue;
-        const box = readBox(target);
-        if (box.W === kept.box.W && box.H === kept.box.H) continue;
+        const box = { W: Math.round(contentRect.width), H: Math.round(contentRect.height) };
+        if (box.W === kept.box?.W && box.H === kept.box?.H) continue;
         kept.box = box;
         kept.f.fit(kept.f.entry, box);
       }
     })
     : null;
   function fitGrids(fits) {
-    // Reads first (only grids new to the board), then the writes
-    const boxes = fits.map((f) => {
-      if (!f.grid) return { W: 0, H: 0 };
-      return (gridSizes && fitted.get(f.grid)?.box) || readBox(f.grid);
-    });
-    fits.forEach((f, i) => {
-      if (f.grid && gridSizes) {
-        if (!fitted.has(f.grid)) gridSizes.observe(f.grid);
-        fitted.set(f.grid, { box: boxes[i], f });
+    for (const f of fits) {
+      if (!f.grid) {
+        f.fit(f.entry, { W: 0, H: 0 });
+      } else if (!gridSizes) {
+        f.fit(f.entry, readBox(f.grid));
+      } else {
+        const kept = fitted.get(f.grid);
+        if (!kept) gridSizes.observe(f.grid); // its first entry fits it
+        fitted.set(f.grid, { box: kept?.box ?? null, f });
+        if (kept?.box) f.fit(f.entry, kept.box);
       }
-      f.fit(f.entry, boxes[i]);
-    });
+    }
   }
   // A panel leaves the board: stop observing its grid (a spare one is read afresh when back)
   function forgetGrids(el) {

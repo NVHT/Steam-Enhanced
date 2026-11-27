@@ -152,7 +152,12 @@
 
   /* ---------- The games it features ---------- */
 
-  const playable = (a) => SE.isLibraryGame(a, collectionStore());
+  // A filter for games the library lists: the collection store looked up once per filter,
+  // not once per game (a pass over the whole library asked it thousands of times)
+  const playableGames = () => {
+    const store = collectionStore();
+    return (a) => SE.isLibraryGame(a, store);
+  };
 
   const appsCache = { at: 0, sig: '', list: [] };
 
@@ -163,14 +168,15 @@
     if (sig === appsCache.sig && Date.now() - appsCache.at < 5000) return appsCache.list;
     let list = [];
     if (s.source === 'added') {
+      const playable = playableGames();
       list = libraryGames()
         .filter((a) => playable(a) && a.rt_purchased_time > 0)
         .sort((a, b) => b.rt_purchased_time - a.rt_purchased_time)
         .slice(0, s.count);
     } else if (s.source === 'favorites') {
-      list = sorted((collectionApps('favorite') || []).filter(playable), 'az').slice(0, s.count);
+      list = sorted((collectionApps('favorite') || []).filter(playableGames()), 'az').slice(0, s.count);
     } else if (s.source === 'collection') {
-      list = sorted((collectionApps(s.collection) || []).filter(playable), 'recent').slice(0, s.count);
+      list = sorted((collectionApps(s.collection) || []).filter(playableGames()), 'recent').slice(0, s.count);
     }
     if (!list.length) list = ns.recentApps(s.count);
     Object.assign(appsCache, { at: Date.now(), sig, list });
@@ -424,6 +430,6 @@
   const stopStageSettings = () => offSettings?.();
 
   Object.assign(ns, {
-    applyStageLook, cycleSeconds, openStageMenu, playable, stageApps, stageSettings, stopStageSettings,
+    applyStageLook, cycleSeconds, openStageMenu, playableGames, stageApps, stageSettings, stopStageSettings,
   });
 })(window.__se);

@@ -507,6 +507,10 @@
     next.scrollIntoView({ block: 'nearest' });
   }
 
+  // Where each list was scrolled to, kept from its scroll events: read on a repaint, scrollTop
+  // paid the style pass of the board just built (each return to Home)
+  const listTops = new WeakMap();
+
   function paintActivity(cell) {
     const entry = ownPanel(cell, 'se-hs-factivity', (el) => {
       el.innerHTML =
@@ -521,7 +525,10 @@
       el.addEventListener('mouseout', onCardOut);
       const list = el.querySelector('.se-hs-list');
       list.addEventListener('keydown', onKey);
-      list.addEventListener('scroll', () => dropCards(true), { passive: true });
+      list.addEventListener('scroll', () => {
+        listTops.set(list, list.scrollTop);
+        dropCards(true);
+      }, { passive: true });
       el.addEventListener('mouseleave', () => dropCards(true));
       // An avatar hovered shows the friend's card, the Friends dock's (client/friends/dock/friend-card.js)
       const card = () => window.__seFriendsDockParts?.friendCard;
@@ -544,7 +551,7 @@
     if (entry.sig !== sig) {
       entry.sig = sig;
       // A repaint keeps where the list was scrolled to (and the row that had focus)
-      const top = list.scrollTop;
+      const top = listTops.get(list) || 0;
       const focused = list.contains(document.activeElement)
         ? document.activeElement.closest('.se-hs-item')?.querySelector('.se-hs-fmain')?.dataset.go
         : null;

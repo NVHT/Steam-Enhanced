@@ -6,7 +6,7 @@
 ((SE) => {
   const ns = window.__seHomeStageParts;
   if (!ns) return;
-  const { client, fitTiles, libraryGames, ownPanel, panelMenuButton, playable, tileHTML } = ns;
+  const { client, fitTiles, libraryGames, ownPanel, panelMenuButton, playableGames, tileHTML } = ns;
   const { isInstalled, navigate, run } = SE;
 
   const DAY = 86400;
@@ -14,7 +14,10 @@
   const now = () => Date.now() / 1000;
 
   // The library's games, hidden and non-game entries left out, installed ones only if asked
-  const pool = (games) => libraryGames().filter((a) => playable(a) && (games !== 'installed' || isInstalled(a)));
+  const pool = (games) => {
+    const playable = playableGames();
+    return libraryGames().filter((a) => playable(a) && (games !== 'installed' || isInstalled(a)));
+  };
 
   /**
    * A panel of capsules: heading, the grid, Play on installed games.

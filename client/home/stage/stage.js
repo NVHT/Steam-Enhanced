@@ -232,10 +232,11 @@
     geo = null;
   };
 
-  // Cards the strip shows (set by stage-hero.css container queries), capped to the games.
+  // Cards the strip shows (set by stage-hero.css container queries), capped to the games. Kept
+  // in geo by measureStage; read here only without one (stale geometry, or no strip then).
   function stripCount() {
     let cols = geo?.cols;
-    if (cols === undefined) {
+    if (!(cols > 0)) {
       const strip = live.stage?.querySelector('.se-hs-strip');
       cols = strip ? parseInt(getComputedStyle(strip).getPropertyValue('--se-hs-cols'), 10) : NaN;
       if (geo) geo.cols = cols;
@@ -255,15 +256,20 @@
     const seconds = cycleSeconds();
     if (!seconds || reducedMotion.matches) return;
     live.stage?.style.setProperty('--se-hs-cycle', `${seconds}s`);
-    cycleTimer = setInterval(() => {
-      if (!live.stage?.isConnected) return;
-      // Out of sight (another page over Home, or the window hidden): the art's push-in pauses too.
-      const idle = document.visibilityState !== 'visible' || !SE.visible(live.stage);
-      SE.attr(live.stage, 'data-se-hs-idle', idle ? '' : null);
-      const shown = stageSettings().nav === 'none' ? live.apps.length : stripCount();
-      if (idle || hovering || shown < 2) return;
-      select((live.selected + 1) % shown);
-    }, seconds * 1000);
+    // Its visibility and strip reads wait for the next layout (SE.settled): on the timer alone
+    // they landed mid-build and paid the style pass
+    const id = setInterval(() => SE.settled(() => cycleTurn(id)), seconds * 1000);
+    cycleTimer = id;
+  }
+
+  function cycleTurn(id) {
+    if (cycleTimer !== id || !live.stage?.isConnected) return;
+    // Out of sight (another page over Home, or the window hidden): the art's push-in pauses too.
+    const idle = document.visibilityState !== 'visible' || !SE.visible(live.stage);
+    SE.attr(live.stage, 'data-se-hs-idle', idle ? '' : null);
+    const shown = stageSettings().nav === 'none' ? live.apps.length : stripCount();
+    if (idle || hovering || shown < 2) return;
+    select((live.selected + 1) % shown);
   }
 
   let appliedVh = 0;
@@ -349,17 +355,20 @@
   // The most of the room under the header the board takes (the stage keeps at least the rest)
   const BOARD_SHARE = 0.32;
 
-  // Reads only: the room under the header, and the board's width.
+  // Reads only: the room under the header, the board's width and the strip's columns (read
+  // here with the rest: read later, after the pass's writes, it forced a style pass of its own)
   function measureStage() {
     const view = live.scroller?.clientHeight || innerHeight;
     const top =
       live.scope.getBoundingClientRect().top -
       (live.scroller?.getBoundingClientRect?.().top || 0) +
       (live.scroller?.scrollTop || 0);
+    const strip = live.stage?.querySelector('.se-hs-strip');
     return {
       view,
       measured: Math.max(420, Math.round(view - Math.max(0, top)) - HEADROOM),
       boardW: ns.boardWidth(),
+      cols: strip ? parseInt(getComputedStyle(strip).getPropertyValue('--se-hs-cols'), 10) : NaN,
     };
   }
 
@@ -423,10 +432,14 @@
       setOn(false);
       return;
     }
+    // A new Home (each return to it): its width is read with scrollerOf's reads, before this
+    // pass writes; read after the writes below, it forced a style pass of its own
+    let scopeW = null;
     if (live.scope !== home) {
       if (live.scope) teardown(true);
       live.scope = home;
       live.scroller = scrollerOf(home);
+      scopeW = home.clientWidth;
     }
     if (!live.stage) live.stage = buildStage();
     if (live.stage.parentElement !== live.scope) live.scope.prepend(live.stage);
@@ -449,7 +462,7 @@
       geoKey = key;
       geo = null;
     }
-    if (!geo) isNarrow = live.scope.clientWidth <= NARROW_AT;
+    if (!geo) isNarrow = (scopeW ?? live.scope.clientWidth) <= NARROW_AT;
     if (isNarrow) mark(live.scope, 'data-se-hs-narrow');
     else SE.unmark(live.scope, 'data-se-hs-narrow');
 

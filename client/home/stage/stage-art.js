@@ -193,9 +193,11 @@
     };
     next();
     if (imgs.length > 1) {
-      timer = setInterval(() => {
-        if (!idle()) next();
-      }, SHOT_SECONDS * 1000);
+      // idle() asks visibility: after the next layout (SE.settled), never mid-build
+      const id = setInterval(() => SE.settled(() => {
+        if (timer === id && !idle()) next();
+      }), SHOT_SECONDS * 1000);
+      timer = id;
     }
   }
 
