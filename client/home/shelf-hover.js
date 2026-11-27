@@ -205,6 +205,8 @@
   const SCROLL_QUIET_MS = 200;
   const SCROLLING = 'data-se-shelf-scrolling';
   let scrollTimer = 0;
+  // Cards hidden here, cleared by destroy() (a card Steam keeps would stay hidden)
+  const gone = new Set();
   const onScroll = () => {
     if (!scrollTimer) root.setAttribute(SCROLLING, '');
     clearTimeout(scrollTimer);
@@ -219,7 +221,11 @@
       enter(cover);
     }, SCROLL_QUIET_MS);
     if (!peek && !hot) return;
-    for (const card of document.querySelectorAll(`${HOVER} ${CARD}`)) card.setAttribute('data-se-gone', '');
+    for (const card of gone) if (!card.isConnected) gone.delete(card); // Steam removed it
+    for (const card of document.querySelectorAll(`${HOVER} ${CARD}`)) {
+      card.setAttribute('data-se-gone', '');
+      gone.add(card);
+    }
     clearPeek(true);
     clearHot();
   };
@@ -234,6 +240,8 @@
       document.removeEventListener('scroll', onScroll, { capture: true });
       clearTimeout(scrollTimer);
       root.removeAttribute(SCROLLING);
+      for (const card of gone) card.removeAttribute('data-se-gone');
+      gone.clear();
       removeEventListener('resize', onResize);
       clearHot();
       placeSheet.remove();
