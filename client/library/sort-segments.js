@@ -36,9 +36,9 @@
     if (!state) return;
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'se-sort-btn';
+    button.className = 'se-pick-btn';
     button.setAttribute('aria-haspopup', 'dialog');
-    button.innerHTML = '<span class="se-sort-btn-icon"></span><span class="se-sort-btn-value"></span>';
+    button.innerHTML = '<span class="se-pick-btn-icon"></span><span class="se-pick-btn-value"></span>';
     button.addEventListener('click', (event) => {
       event.stopPropagation();
       const now = readSortState(host);
@@ -65,12 +65,12 @@
     const state = readSortState(host);
     const option = state?.options[currentIndex(state)];
     const name = option?.label || '';
-    const value = button.querySelector('.se-sort-btn-value');
+    const value = button.querySelector('.se-pick-btn-value');
     if (value.textContent !== name) value.textContent = name;
     const icon = ICONS[option?.data] || 'sort-az';
     if (button.dataset.icon !== icon) {
       button.dataset.icon = icon;
-      button.style.setProperty('--se-sort-icon', `var(--se-icon-${icon})`);
+      button.style.setProperty('--se-pick-btn-icon', `var(--se-icon-${icon})`);
     }
     const label = `Sort by ${name}`;
     if (button.getAttribute('aria-label') !== label) button.setAttribute('aria-label', label);

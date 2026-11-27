@@ -45,7 +45,7 @@
 
   const valid = (item, value) => {
     if (item.type === 'multi') return Array.isArray(value) && value.every((v) => item.values.some((choice) => choice.v === v));
-    // A kept string with no choices (hidden: not drawn by the settings window), e.g. an id
+    // A kept string with no choices, e.g. an id
     if (item.type === 'text') return typeof value === 'string' && value.length <= 200;
     return item.values.some((choice) => choice.v === value);
   };

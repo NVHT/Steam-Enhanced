@@ -43,7 +43,7 @@
     'overlay-darkness': 'moon', 'click-opens': 'external', 'menu-hover': 'fold', shortcuts: 'key',
     'millennium-open': 'millennium',
     home: 'home', 'steam-home-parts': 'grid', 'whats-new-art': 'photo', 'whats-new-summary': 'news',
-    'whats-new-cards': 'view-compact', 'stage-source': 'heart', 'stage-count': 'list-ordered', 'stage-details': 'info',
+    'whats-new-cards': 'view-compact', 'stage-source': 'home-stage', 'stage-collection': 'folder', 'stage-count': 'list-ordered', 'stage-details': 'info',
     'stage-nav': 'view-compact', 'stage-cycle': 'restore', 'stage-motion': 'art-zoom',
     'hover-delay': 'snooze', 'avatar-name': 'user', 'game-count': 'chart', 'rail-buttons': 'list-ordered',
     'dock-start': 'power', 'offline-friends': 'eye-off', 'offline-members': 'group', 'chat-open': 'bubble', 'hover-cards': 'user', 'hover-card-delay': 'snooze',
@@ -71,6 +71,25 @@
     'web-sites': { store: 'store', community: 'community', help: 'help', checkout: 'cart' },
   };
 
+  /*
+   * Settings kept as an id and chosen in the theme's picker (the schema's `picker`): their
+   * choices as the picker's rows, the button's icon and its words with nothing chosen
+   */
+  const PICKERS = {
+    // The Home stage's collections, as its menu lists them (client/home/stage/tray.js)
+    collection: {
+      icon: 'folder', placeholder: 'Find a collection', none: 'Pick one', empty: 'No collections yet',
+      rows: () =>
+        (window.__seHomeStageParts?.userCollections?.() || []).map((c) => ({
+          id: String(c.id),
+          name: c.displayName || c.strName || String(c.id),
+          sub: (run(() => c.visibleApps.length) || 0).toLocaleString(),
+        })),
+    },
+  };
+  // The picker's stylesheets, from the main window's list: this window's loader doesn't take them
+  const PICKER_SHEETS = ['client/shared/menu.css', 'client/shared/picker.css'];
+
   // WCAG contrast of two #rrggbb colours (an rgba() line counts as no text colour)
   const luminance = (hex) => {
     const m = /^#([0-9a-f]{6})$/i.exec(hex);
@@ -95,6 +114,7 @@
     const doc = host.ownerDocument;
     const settings = SE.settings;
     if (!settings) return () => {};
+    SE.layer?.copyStyles(doc, (file) => PICKER_SHEETS.includes(file));
     const make = (tag, className, text) => {
       const node = doc.createElement(tag);
       if (className) node.className = className;
@@ -239,9 +259,47 @@
     };
 
     // Picking a palette's Custom brings back the colours kept, or starts from the palette in use
+    // Choosing a collection as the stage's games with none picked yet starts on the first, as the
+    // stage's menu does (client/home/stage/stage-settings.js)
     const pick = (item, value) => {
       if (item.key === 'palette' && value === 'custom' && !settings.customColors()) settings.setCustom();
-      else settings.set(item.key, value);
+      else {
+        if (item.key === 'stage-source' && value === 'collection' && !settings.get('stage-collection')) {
+          const first = PICKERS.collection.rows()[0];
+          if (first) settings.set('stage-collection', first.id);
+        }
+        settings.set(item.key, value);
+      }
+    };
+
+    // A setting kept as an id: a button naming the choice, opening the theme's picker
+    // (client/shared/picker.js), which draws in this window
+    const pickerButton = (item) => {
+      const source = PICKERS[item.picker];
+      const node = button('se-pick-btn');
+      node.setAttribute('aria-haspopup', 'dialog');
+      const icon = make('span', 'se-pick-btn-icon');
+      icon.style.setProperty('--se-pick-btn-icon', `var(--se-icon-${source.icon})`);
+      const value = make('span', 'se-pick-btn-value');
+      node.append(icon, value);
+      node.addEventListener('click', () => {
+        SE.picker?.open(node, {
+          title: item.label,
+          placeholder: source.placeholder,
+          empty: source.empty,
+          single: true,
+          current: () => settings.get(item.key),
+          items: (q) => [{ label: '', rows: source.rows().filter((r) => !q || r.name.toLowerCase().includes(q)) }],
+          onChoose: (id) => settings.set(item.key, id),
+        });
+      });
+      updates.push(() => {
+        const id = settings.get(item.key);
+        const name = source.rows().find((r) => r.id === id)?.name || source.none;
+        value.textContent = name;
+        node.setAttribute('aria-label', `${item.label}: ${name}`);
+      });
+      return node;
     };
 
     // A row: the setting's icon tile, its name and line, then its control
@@ -256,7 +314,8 @@
       text.append(make('div', 'se-ts-label', item.label), make('div', 'se-ts-hint', item.hint));
       // Chips, or more than four choices: the control goes under the text, which keeps its line
       if (item.type === 'multi' || item.visual || item.values.length > 4) node.classList.add('se-ts-row-wide');
-      const control = item.type === 'multi' ? toggles(item) : item.visual ? pictures(item) : segmented(item);
+      const control =
+        item.picker ? pickerButton(item) : item.type === 'multi' ? toggles(item) : item.visual ? pictures(item) : segmented(item);
       node.append(text, control);
       // A setting that applies only with others (requires) is hidden until they hold
       if (item.requires) {
@@ -486,13 +545,13 @@
       }
       let parts;
       if (words.length) {
-        const found = settings.schema.filter((item) => !item.hidden && matches(item));
+        const found = settings.schema.filter(matches);
         const rows = make('div', 'se-ts-rows');
         rows.append(...found.map((item) => row(item, true)));
         if (!found.length) rows.append(make('p', 'se-ts-empty', 'No settings match.'));
         parts = [header(`${found.length} ${found.length === 1 ? 'setting' : 'settings'}`), rows];
       } else {
-        const items = settings.schema.filter((item) => item.tab === tab && !item.hidden);
+        const items = settings.schema.filter((item) => item.tab === tab);
         const body = tab === 'Appearance' ? appearance(items) : sections(items);
         parts = [header(tab, TABS[tab]?.[1]), ...body];
       }

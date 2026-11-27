@@ -3,7 +3,7 @@
  * menu it was opened from, and the placement every such popup shares. Home's panels
  * (client/home/stage/picks.js) and the game menu's Collections (client/library/game-menu.js)
  * open it. Drawn in the settings menu's classes (client/shared/menu.css), placed and styled by
- * client/shared/picker.css.
+ * client/shared/picker.css. It draws in its button's window (the theme's settings window too).
  *   SE.picker  { open(anchor, opts), close(), place(), read(key), write(key, ids) }
  *   SE.placePop(el, button, side, opts)  places a popup by its button (the settings menu too);
  *                                        .gap, its distance from the button
@@ -30,6 +30,7 @@
    */
   function placePop(el, button, side, { cap = Infinity, keep = false, align = 'end' } = {}) {
     const r = button.getBoundingClientRect();
+    const { innerWidth, innerHeight } = button.ownerDocument.defaultView;
     const EDGE = 12;
     const room = {
       below: Math.max(0, innerHeight - r.bottom - GAP - EDGE),
@@ -80,6 +81,9 @@
   let pickMenu = null;
   let pickAnchor = null;
   let pickSide = null;
+  // The button's document and window, where the picker draws and listens
+  let pickDoc = document;
+  let pickWin = window;
   // One frame for a resize's re-place and a search's repaint (and re-place), however many come
   let pickFrame = 0;
   let pickRepaint = false;
@@ -96,12 +100,12 @@
     const { onClose } = pickOpts || {};
     pickOpts = null;
     pickSide = null;
-    cancelAnimationFrame(pickFrame);
+    pickWin.cancelAnimationFrame(pickFrame);
     pickFrame = 0;
     pickRepaint = false;
-    document.removeEventListener('pointerdown', onPickOutside, true);
-    document.removeEventListener('keydown', onPickKey, true);
-    removeEventListener('resize', onPickResize);
+    pickDoc.removeEventListener('pointerdown', onPickOutside, true);
+    pickDoc.removeEventListener('keydown', onPickKey, true);
+    pickWin.removeEventListener('resize', onPickResize);
     pickAnchor?.setAttribute('aria-expanded', 'false');
     pickAnchor = null;
     onClose?.();
@@ -144,7 +148,7 @@
   function pickSoon(repaint) {
     pickRepaint ||= repaint;
     if (pickFrame) return;
-    pickFrame = requestAnimationFrame(() => {
+    pickFrame = pickWin.requestAnimationFrame(() => {
       pickFrame = 0;
       const paint = pickRepaint;
       pickRepaint = false;
@@ -273,7 +277,7 @@
     if (!name) return;
     const opts = pickOpts;
     const old = name.textContent;
-    const field = document.createElement('input');
+    const field = pickDoc.createElement('input');
     field.type = 'text';
     field.className = 'se-pick-rename';
     field.value = old;
@@ -327,7 +331,7 @@
     const row = rowFor(id);
     const name = row?.querySelector('.se-mn-name')?.textContent;
     if (!row || name == null) return;
-    const ask = document.createElement('div');
+    const ask = pickDoc.createElement('div');
     ask.className = 'se-mn-row se-pick-row se-pick-ask';
     ask.setAttribute('role', 'group');
     ask.innerHTML =
@@ -501,8 +505,10 @@
     pickOpts = opts;
     pickAnchor = anchor;
     pickSide = opts.side || null;
+    pickDoc = anchor.ownerDocument;
+    pickWin = pickDoc.defaultView;
     anchor.setAttribute('aria-expanded', 'true');
-    pickEl = document.createElement('div');
+    pickEl = pickDoc.createElement('div');
     pickEl.className = 'se-placed se-mn se-pick';
     pickEl.setAttribute('role', 'dialog');
     pickEl.setAttribute('aria-label', opts.title);
@@ -518,11 +524,11 @@
     pickEl.addEventListener('change', onPickChange);
     pickEl.addEventListener('click', onPickClick);
 
-    document.body.appendChild(pickEl);
-    document.addEventListener('pointerdown', onPickOutside, true);
-    document.addEventListener('keydown', onPickKey, true);
+    pickDoc.body.appendChild(pickEl);
+    pickDoc.addEventListener('pointerdown', onPickOutside, true);
+    pickDoc.addEventListener('keydown', onPickKey, true);
     // Follows the window's size wherever it opened (Home's layout pass also calls SE.picker.place)
-    addEventListener('resize', onPickResize);
+    pickWin.addEventListener('resize', onPickResize);
     paintPick();
     placePick();
     (pickEl.querySelector('.se-pick-search') || pickEl.querySelector('input'))?.focus();

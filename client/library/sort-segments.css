@@ -1,7 +1,7 @@
 /*
  * The sort control of a Library shelf and a collection page (client/library/sort-segments.js):
  * one Sort button on Steam's sort bar ([data-se-sortseg]), naming the order and opening the
- * theme's picker. Steam's "SORT BY" label and its dropdown stay hidden, the dropdown the source of
+ * theme's picker (its button: client/shared/picker.css). Steam's "SORT BY" label and its dropdown stay hidden, the dropdown the source of
  * truth. Also formats shelf header title pickers and item counts (shelf reorder mode:
  * client/home/shelf-arrange.css). !important: Steam's sort bar and DialogDropDown rules
  * (steamui sp.css).
@@ -20,59 +20,6 @@
 [data-se-sortseg] .DialogDropDown {
   /* SortingDropDownLabel ("SORT BY") and Steam's dropdown */
   display: none !important;
-}
-
-.se-seg-btn {
-  min-width: 34px;
-}
-
-/* "<icon> Alphabetical ⌄": a 32 px button in the panel fill, the order's icon muted, its name in full */
-.se-sort-btn {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: var(--se-space-1);
-  box-sizing: border-box;
-  height: 32px;
-  margin: 0;
-  padding: 0 var(--se-space-2);
-  border: 0;
-  border-radius: var(--se-radius-sm);
-  background: var(--se-surface-2);
-  font: 600 var(--se-fs-base)/1 var(--se-font);
-  color: var(--se-text);
-  white-space: nowrap;
-  cursor: pointer;
-  transition: background-color var(--se-dur) ease-out;
-}
-
-.se-sort-btn:is(:hover, [aria-expanded="true"]) {
-  background: var(--se-hover);
-}
-
-.se-sort-btn:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: var(--se-focus-offset);
-}
-
-/* The current order's icon (client/library/sort-segments.js sets --se-sort-icon) */
-.se-sort-btn-icon {
-  flex: none;
-  width: 16px;
-  height: 16px;
-  background: var(--se-text-muted);
-  -webkit-mask: var(--se-sort-icon) center / contain no-repeat;
-  mask: var(--se-sort-icon) center / contain no-repeat;
-}
-
-.se-sort-btn::after {
-  content: "";
-  flex: none;
-  width: 14px;
-  height: 14px;
-  background: var(--se-text-muted);
-  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
-  mask: var(--se-icon-chevron) center / contain no-repeat;
 }
 
 /*

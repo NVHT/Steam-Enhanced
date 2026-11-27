@@ -23,7 +23,8 @@
    * visual: its choices drawn as pictures
    * (client/settings/theme/theme-settings.css); hide (multi): a selector, % standing for a
    * choice (or { choice: selector }, a Steam class through SE.C), whose matches go while that choice is off (client/loader.js applyOptions); type
-   * 'text' with hidden: a kept string, no choices, not drawn. scope says where its stylesheets
+   * 'text': a kept string, no choices, drawn as a button opening the theme's picker (picker: its
+   * choices, client/settings/theme/theme-settings.js PICKERS). scope says where its stylesheets
    * go: client windows (the default), web pages, or both. from: its name in Millennium's old
    * Conditions. The palette's choices are the presets and Custom (its colours under the key
    * 'palette-custom').
@@ -243,8 +244,7 @@
     },
     /*
      * Home: which Home shows, and the Home stage's own settings (client/home/stage/stage-settings.js,
-     * whose menu, a right click on the title bar's Home switch, edits the same values). The collection a stage features is kept as
-     * stage-collection (picked in that menu: hidden here).
+     * whose menu, a right click on the title bar's Home switch, edits the same values).
      */
     {
       key: 'home', section: 'Home', visual: true, tab: 'Home', label: 'Home',
@@ -280,10 +280,14 @@
     },
     {
       key: 'stage-source', section: 'Featured games', requires: [['home', 'theme']], tab: 'Home', label: 'Games',
-      hint: 'What the stage features. Pick a collection by right-clicking the Home button.',
+      hint: 'What the stage features.',
       values: [opt('recent', 'Recent'), opt('favorites', 'Favorites'), opt('collection', 'Collection'), opt('added', 'Added')],
     },
-    { key: 'stage-collection', tab: 'Home', type: 'text', hidden: true, label: 'Collection', values: [], def: '' },
+    {
+      key: 'stage-collection', section: 'Featured games', requires: [['home', 'theme'], ['stage-source', 'collection']],
+      tab: 'Home', type: 'text', picker: 'collection', label: 'Collection', hint: 'The collection the stage features.',
+      values: [], def: '',
+    },
     {
       key: 'stage-count', section: 'Featured games', requires: [['home', 'theme']], tab: 'Home', label: 'How many',
       hint: 'Games the stage cycles through.',

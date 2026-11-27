@@ -217,3 +217,63 @@
   background: var(--se-danger-surface);
   color: var(--se-danger-text);
 }
+
+/*
+ * A button opening the picker, "<icon> Alphabetical ⌄": 32 px in the panel fill, its icon muted
+ * (--se-pick-btn-icon, set by its script; none without), the choice's name in full. A Library sort
+ * bar's (client/library/sort-segments.js) and a Theme settings row's (theme-settings.js).
+ */
+.se-pick-btn {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--se-space-1);
+  box-sizing: border-box;
+  height: 32px;
+  margin: 0;
+  padding: 0 var(--se-space-2);
+  border: 0;
+  border-radius: var(--se-radius-sm);
+  background: var(--se-surface-2);
+  font: 600 var(--se-fs-base)/1 var(--se-font);
+  color: var(--se-text);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--se-dur) ease-out;
+}
+
+.se-pick-btn:is(:hover, [aria-expanded="true"]) {
+  background: var(--se-hover);
+}
+
+.se-pick-btn:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* A long name ends in an ellipsis where its holder caps the button's width */
+.se-pick-btn-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The current choice's icon */
+.se-pick-btn-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-pick-btn-icon) center / contain no-repeat;
+  mask: var(--se-pick-btn-icon) center / contain no-repeat;
+}
+
+.se-pick-btn::after {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: var(--se-text-muted);
+  -webkit-mask: var(--se-icon-chevron) center / contain no-repeat;
+  mask: var(--se-icon-chevron) center / contain no-repeat;
+}
