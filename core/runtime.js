@@ -107,7 +107,7 @@
       for (const rel of ['opener', 'parent']) {
         try {
           if (win[rel]) wins.add(win[rel]);
-        } catch {}
+        } catch { /* another origin's window throws when read: skipped */ }
       }
     }
     return wins;
@@ -135,7 +135,7 @@
       try {
         const instance = win.SteamUIStore?.WindowStore?.MainWindowInstance;
         if (instance) return instance;
-      } catch {}
+      } catch { /* a module or window that throws when read is skipped */ }
     }
     return null;
   };
@@ -168,7 +168,7 @@
       try {
         main.Navigate(route);
         return true;
-      } catch {}
+      } catch { /* Steam's navigator refused: the caller falls back */ }
     }
     return false;
   };
@@ -246,7 +246,7 @@
       try {
         const value = win[name];
         if (value && (!test || test(value))) return value;
-      } catch {}
+      } catch { /* another origin's window throws when read: skipped */ }
     }
     return null;
   };
@@ -882,7 +882,7 @@
     try {
       await win.navigator.clipboard.writeText(text);
       return true;
-    } catch {}
+    } catch { /* the clipboard refused: the caller says so */ }
     const doc = win.document;
     const area = doc.createElement('textarea');
     area.value = text;
@@ -893,7 +893,7 @@
     let copied = false;
     try {
       copied = doc.execCommand('copy');
-    } catch {}
+    } catch { /* the clipboard refused: the caller says so */ }
     area.remove();
     return copied;
   };

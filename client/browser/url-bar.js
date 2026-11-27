@@ -122,7 +122,7 @@
     const target = method(name);
     try {
       target?.[name]();
-    } catch {}
+    } catch { /* Steam's browser call refused: the view stays as it is */ }
   };
   /** The first non-empty value among the view's candidate fields. */
   const field = (...names) => {
@@ -387,7 +387,7 @@
       case 'external':
         try {
           openExternal(ui.url.textContent.trim());
-        } catch {}
+        } catch { /* no external browser: the address stays shown */ }
         break;
       case 'copy': {
         // Steam's URL div copies and shows "Copied!" at the click point; hand it the click.

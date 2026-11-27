@@ -28,7 +28,7 @@
           owner.location?.pathname ||
           '';
         if (/\/app\/\d+(?:\/|$)/.test(path)) return path;
-      } catch {}
+      } catch { /* a module or window that throws when read is skipped */ }
     }
     return '';
   };
@@ -135,7 +135,7 @@
               return candidate;
             }
           }
-        } catch {}
+        } catch { /* a module or window that throws when read is skipped */ }
       }
     }
     return null;
@@ -148,7 +148,7 @@
         if (typeof cm?.SendMsgAndAwaitResponse !== 'function') continue;
         const Message = resolveMessageType();
         if (Message) return { cm, Message };
-      } catch {}
+      } catch { /* a module or window that throws when read is skipped */ }
     }
     return null;
   };

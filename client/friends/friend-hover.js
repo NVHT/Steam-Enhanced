@@ -45,7 +45,7 @@
       const exp = [mod, mod?.default].find(e => typeof e?.FriendStatusHover === 'string');
       hover = firstClass(exp?.FriendStatusHover);
       row = firstClass(exp?.FriendStatusHoverRow);
-    } catch {}
+    } catch { /* a module or window that throws when read is skipped */ }
     hover ||= readHash(src, 'FriendStatusHover');
     row ||= readHash(src, 'FriendStatusHoverRow');
     if (!hover || !row) return null;

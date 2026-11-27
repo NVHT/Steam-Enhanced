@@ -56,7 +56,7 @@
         if (win.loginStore && typeof win.loginStore.loginState === 'number') {
           return win.loginStore;
         }
-      } catch {}
+      } catch { /* a module or window that throws when read is skipped */ }
     }
     return null;
   };

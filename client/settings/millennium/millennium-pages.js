@@ -167,7 +167,7 @@
       if (fn) {
         try {
           add(fn.constructor('return globalThis')());
-        } catch {}
+        } catch { /* a module or window that throws when read is skipped */ }
       }
     }
     for (const el of [watchToggle(), page]) {
@@ -189,7 +189,7 @@
         try {
           const n = w[k];
           if (n && n !== w) queue.push(n);
-        } catch {}
+        } catch { /* a module or window that throws when read is skipped */ }
       }
     }
     realmCache = { list: out, until: now + 5000 };

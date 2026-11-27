@@ -290,7 +290,7 @@
       deduplicateEventDates();
       applyShelfShifts(shifts);
       placeCoverButtons(plan);
-    } catch {}
+    } catch { /* one step failing (Steam's markup changed) leaves the others running */ }
   };
 
   const schedule = () => {

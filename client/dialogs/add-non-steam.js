@@ -298,7 +298,7 @@
     for (const win of SE.owners?.() ?? [window]) {
       try {
         if (win.appStore && win.SteamClient?.Apps) return win;
-      } catch {}
+      } catch { /* a window that throws when read is skipped */ }
     }
     return null;
   };

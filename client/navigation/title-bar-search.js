@@ -132,7 +132,7 @@
       searchInput.focus({ preventScroll: true });
       try {
         searchInput.setSelectionRange(caretPos, caretPos);
-      } catch {}
+      } catch { /* a field gone or not focusable: nothing to restore */ }
     };
 
     searchInput.addEventListener('input', () => {

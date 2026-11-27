@@ -36,7 +36,7 @@
     try {
       if (value == null) localStorage.removeItem(key);
       else localStorage.setItem(key, String(value));
-    } catch {}
+    } catch { /* storage refused (full or blocked): kept in memory only */ }
   };
 
   /**

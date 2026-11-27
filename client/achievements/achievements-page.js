@@ -45,7 +45,7 @@
     for (const el of document.querySelectorAll(ICON)) {
       try {
         decorate(el);
-      } catch {}
+      } catch { /* one step failing (Steam's markup changed) leaves the others running */ }
     }
   }
 

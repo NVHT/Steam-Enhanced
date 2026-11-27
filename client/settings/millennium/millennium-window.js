@@ -83,7 +83,7 @@
             return value;
           }
         }
-      } catch {}
+      } catch { /* a module or window that throws when read is skipped */ }
     }
     return null;
   }
@@ -164,10 +164,10 @@
     popupDocuments.delete(doc);
     try {
       dispose?.();
-    } catch {}
+    } catch { /* already gone with its window: nothing to undo */ }
     try {
       doc.removeEventListener('click', onPopupTabClick, true);
-    } catch {}
+    } catch { /* already gone with its window: nothing to undo */ }
   }
 
   // Walking the fibers for every realm is costly and ffi()/core() ask on each call, so the list
@@ -188,14 +188,14 @@
             const w = f.stateNode.containerInfo.ownerDocument?.defaultView;
             if (w && !out.includes(w)) out.push(w);
           }
-        } catch {}
+        } catch { /* a module or window that throws when read is skipped */ }
       }
       for (let i = 0; i < out.length && out.length < 16; i++) {
         for (const k of ['opener', 'parent', 'top']) {
           try {
             const n = out[i][k];
             if (n && !out.includes(n)) out.push(n);
-          } catch {}
+          } catch { /* a module or window that throws when read is skipped */ }
         }
       }
       windowCache = { list: out, until: now + 2000 };
@@ -212,7 +212,7 @@
           ) {
             return binder.call(0, 'core', name, args, undefined, true);
           }
-        } catch {}
+        } catch { /* a module or window that throws when read is skipped */ }
       }
       return Promise.reject(new Error('Millennium is not reachable'));
     },
@@ -232,7 +232,7 @@
               cancelable: true,
             })
           );
-        } catch {}
+        } catch { /* Millennium's shortcut gone: the page stays */ }
       }
       raiseMain();
       return true;
@@ -242,7 +242,7 @@
         try {
           const c = o.PLUGIN_LIST?.core;
           if (c) return c;
-        } catch {}
+        } catch { /* a module or window that throws when read is skipped */ }
       }
       return null;
     },
@@ -266,20 +266,20 @@
     stopOverlay();
     try {
       open.Close();
-    } catch {}
+    } catch { /* Steam's window API refused (window closed or call missing): nothing to do */ }
     return true;
   }
 
   function raiseMain() {
     try {
       window.focus();
-    } catch {}
+    } catch { /* a field gone or not focusable: nothing to restore */ }
     try {
       SE.mainWindow()?.BringToFront?.();
-    } catch {}
+    } catch { /* Steam's window API refused (window closed or call missing): nothing to do */ }
     try {
       window.SteamClient?.Window?.BringToFront?.();
-    } catch {}
+    } catch { /* Steam's window API refused (window closed or call missing): nothing to do */ }
   }
 
   function popupDialogParent() {
@@ -324,7 +324,7 @@
         }
         api.showModal = wrapped;
         if (api.showModal === wrapped) dialogHosts.set(api, { wrapped, descriptor });
-      } catch {}
+      } catch { /* a module or window that throws when read is skipped */ }
     }
   }
 
@@ -334,7 +334,7 @@
         if (api.showModal !== wrapped) continue;
         if (descriptor) Object.defineProperty(api, 'showModal', descriptor);
         else delete api.showModal;
-      } catch {}
+      } catch { /* a frozen or replaced object refuses the patch: Steam's own stays */ }
     }
     dialogHosts.clear();
   }
@@ -354,7 +354,7 @@
           }
           try {
             doc.defaultView.__seMillBridge = millBridge;
-          } catch {}
+          } catch { /* a closed window throws when touched: skipped */ }
           if (popupDocuments.has(doc)) continue;
           popupDocuments.add(doc);
           try {
@@ -364,7 +364,7 @@
           }
           doc.addEventListener('click', onPopupTabClick, true);
         }
-      } catch {}
+      } catch { /* a popup window that throws when read is skipped */ }
     }
     if (popupDocuments.size) {
       if (!dialogHosts.size) installDialogHosts();
@@ -461,7 +461,7 @@
           store.start_page = original;
           storage.removeItem('millennium-original-start-page');
         }
-      } catch {}
+      } catch { /* a module or window that throws when read is skipped */ }
     }
   }
 
@@ -480,7 +480,7 @@
         const entry = settingsRoutes(owner)?.get(SETTINGS_ROUTE);
         if (!isComponent(entry?.component)) continue;
         return { component: entry.component, real: guardedRoutes.get(entry) || null };
-      } catch {}
+      } catch { /* a window that throws when read is skipped */ }
     }
     return null;
   }
@@ -564,14 +564,14 @@
             lastReal = component;
           }
         }
-      } catch {}
+      } catch { /* a frozen route refuses the guard: Millennium's page stays */ }
       for (const getStore of [
         () => owner.SteamUIStore,
         () => owner.SteamUIStore?.WindowStore?.MainWindowInstance,
       ]) {
         try {
           guardNavigation(getStore());
-        } catch {}
+        } catch { /* the store isn't there yet: guarded on the next pass */ }
       }
     }
   }
@@ -580,14 +580,14 @@
     for (const [entry, component] of guardedRoutes) {
       try {
         if (entry.component === PopupOnlySettings) entry.component = component;
-      } catch {}
+      } catch { /* a frozen route keeps the guard: harmless once the theme is gone */ }
     }
     for (const [store, { wrapped, descriptor }] of guardedNavigation) {
       try {
         if (store.Navigate !== wrapped) continue;
         if (descriptor) Object.defineProperty(store, 'Navigate', descriptor);
         else delete store.Navigate;
-      } catch {}
+      } catch { /* a frozen or replaced object refuses the patch: Steam's own stays */ }
     }
     guardedRoutes.clear();
     guardedNavigation.clear();
@@ -831,7 +831,7 @@
         stopPopupTracking();
         try {
           stale.Close();
-        } catch {}
+        } catch { /* Steam's window API refused (window closed or call missing): nothing to do */ }
       }
     }
     if (popup) {
@@ -841,7 +841,7 @@
         try {
           doc.defaultView?.focus();
           break;
-        } catch {}
+        } catch { /* a field gone or not focusable: nothing to restore */ }
       }
       return true;
     }

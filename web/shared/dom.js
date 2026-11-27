@@ -101,7 +101,7 @@
     try {
       await navigator.clipboard.writeText(text);
       return true;
-    } catch {}
+    } catch { /* the clipboard refused: the caller says so */ }
     const field = Object.assign(document.createElement('textarea'), { value: text, readOnly: true });
     field.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
     document.body.append(field);
@@ -109,7 +109,7 @@
     let copied = false;
     try {
       copied = document.execCommand('copy');
-    } catch {}
+    } catch { /* the clipboard refused: the caller says so */ }
     field.remove();
     return copied;
   };

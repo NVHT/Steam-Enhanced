@@ -73,7 +73,7 @@
         } else if (r.own && current !== r.own) {
           r.native.set.call(r.map, window, r.own);
         }
-      } catch {}
+      } catch { /* a map that throws when read is left to Steam */ }
     }
   }
 
@@ -101,7 +101,7 @@
             } else if (value) {
               r.own = value;
             }
-          } catch {}
+          } catch { /* a map that throws when read is left to Steam */ }
         }
         return native.set.call(this, key, value);
       };
@@ -125,7 +125,7 @@
         if (r.map.set !== r.set) continue;
         if (r.saved) Object.defineProperty(r.map, 'set', r.saved);
         else delete r.map.set;
-      } catch {}
+      } catch { /* a frozen or replaced object refuses the patch: Steam's own stays */ }
     }
     libraryManagers = null;
   }
@@ -207,7 +207,7 @@
       if (state.chatContext) {
         try {
           state.chatContext.data.SetFriendsListSingleWindowMode(state.chatContext.previous);
-        } catch {}
+        } catch { /* Steam's friends app gone or changed: nothing to put back */ }
         state.chatContext = null;
       }
       delete ns.dock.dataset.chat;

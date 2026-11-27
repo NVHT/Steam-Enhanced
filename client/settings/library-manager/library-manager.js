@@ -300,7 +300,7 @@
           o.SteamClient.Browser.RestartJSContext();
           return;
         }
-      } catch {}
+      } catch { /* Steam's window API refused (window closed or call missing): nothing to do */ }
     }
   }
 

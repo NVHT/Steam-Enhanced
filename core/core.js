@@ -37,7 +37,7 @@
       if (!event.isTrusted || event.target !== window) return;
       try {
         window.SteamClient?.BrowserView?.PostMessageToParent('SteamEnhanced.ChatBrowserFocus', event.type);
-      } catch {}
+      } catch { /* Steam's window API refused (window closed or call missing): nothing to do */ }
     };
     addEventListener('focus', relay);
     addEventListener('blur', relay);
@@ -60,7 +60,7 @@
   let fresh = false;
   try {
     fresh = localStorage.getItem(LIVE_KEY) === '1';
-  } catch {}
+  } catch { /* storage unreadable: the default stands */ }
   const STAMP = Date.now().toString(36);
   /** The ?v= value for a build: its version, and this page load's stamp under live reload. */
   const tagOf = (version) => (version && fresh ? `${version}.${STAMP}` : version);
@@ -78,7 +78,7 @@
     let version = null;
     try {
       version = localStorage.getItem(VERSION_KEY);
-    } catch {}
+    } catch { /* storage unreadable: the default stands */ }
     let current = null;
     const apply = (saved) => {
       const files = (Array.isArray(saved.web) ? saved.web : []).filter((file) => OPTION_FILE.test(file));
@@ -120,15 +120,15 @@
         let saved = null;
         try {
           saved = JSON.parse(args);
-        } catch {}
+        } catch { /* a stored value that won't parse: the default stands */ }
         if (!saved || typeof saved !== 'object') return;
         try {
           localStorage.setItem(SETTINGS_KEY, JSON.stringify(saved));
-        } catch {}
+        } catch { /* storage refused (full or blocked): kept in memory only */ }
         apply(saved);
       });
       window.SteamClient?.BrowserView?.PostMessageToParent?.('SteamEnhanced.SettingsRequest', '');
-    } catch {}
+    } catch { /* storage refused (full or blocked): kept in memory only */ }
   }
 
   /*
@@ -171,7 +171,7 @@
   const tellStyled = () => {
     try {
       window.SteamClient?.BrowserView?.PostMessageToParent?.('SteamEnhanced.Styled', location.href);
-    } catch {}
+    } catch { /* Steam's window API refused (window closed or call missing): nothing to do */ }
   };
   if (root.hasAttribute('data-se-styled')) tellStyled();
   else {
@@ -210,7 +210,7 @@
     // everything the theme starts, as client/loader.js does in a client window
     try {
       if (localStorage.getItem('se-perf') === '1') add('../dev/perf.js').catch(() => {});
-    } catch {}
+    } catch { /* storage unreadable: the profiler stays off */ }
     Promise.all([add(SITE_LOADER), add(loader)])
       .then(() => window.__seWeb.start(site.global))
       .catch((error) => {
@@ -304,7 +304,7 @@
       try {
         const version = await readVersion();
         if (version && current && version !== current) swap(version);
-      } catch {}
+      } catch { /* skin.json unreadable this time: the next poll tries again */ }
     }
     setTimeout(poll, LIVE_MS);
   };
@@ -316,7 +316,7 @@
         try {
           if (config?.enabled) localStorage.setItem(LIVE_KEY, '1');
           else localStorage.removeItem(LIVE_KEY);
-        } catch {}
+        } catch { /* storage refused (full or blocked): kept in memory only */ }
         if (!config?.enabled) return;
         if (document.body) showBadge();
         else addEventListener('DOMContentLoaded', showBadge, { once: true });
@@ -333,11 +333,11 @@
   let seen = null;
   try {
     seen = localStorage.getItem(VERSION_KEY);
-  } catch {}
+  } catch { /* storage unreadable: the default stands */ }
   const remember = (version) => {
     try {
       if (version) localStorage.setItem(VERSION_KEY, version);
-    } catch {}
+    } catch { /* storage refused (full or blocked): kept in memory only */ }
   };
   // The first build's loader has run start() (its site global exists), or 5 s have passed
   const started = (since = performance.now()) =>
@@ -427,7 +427,7 @@
           if (!coreSrc) return;
           try {
             localStorage.setItem('se-perf', '1');
-          } catch {}
+          } catch { /* storage refused (full or blocked): kept in memory only */ }
           load('perf.js', true);
         },
       },

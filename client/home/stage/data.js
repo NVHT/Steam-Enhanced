@@ -77,7 +77,7 @@
   })();
   try {
     localStorage.removeItem('se-home-desc');
-  } catch {}
+  } catch { /* storage refused: the old entry stays, unused */ }
 
   const infoAsked = new Set();
   let langAsk = null;
@@ -138,7 +138,7 @@
         for (const k of keys.slice(60)) delete infoCache[k];
         try {
           localStorage.setItem(INFO_KEY, JSON.stringify(infoCache));
-        } catch {}
+        } catch { /* storage refused (full or blocked): kept in memory only */ }
         if (live.apps[live.selected]?.appid === id) paintGame();
       })
       .catch(() => {});

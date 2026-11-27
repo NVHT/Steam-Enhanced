@@ -76,7 +76,7 @@
   function run(step) {
     try {
       step();
-    } catch {}
+    } catch { /* one step failing (Steam's markup changed) leaves the others running */ }
   }
 
   function update() {

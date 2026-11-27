@@ -219,14 +219,14 @@
       try {
         const saved = JSON.parse(localStorage.getItem(TIMER_KEY));
         if (saved && typeof saved === 'object') return { start: Number(saved.start) || 0, acc: Number(saved.acc) || 0 };
-      } catch {}
+      } catch { /* storage unreadable: the default stands */ }
       return { start: 0, acc: 0 };
     };
     let state = read();
     const save = () => {
       try {
         localStorage.setItem(TIMER_KEY, JSON.stringify(state));
-      } catch {}
+      } catch { /* storage refused (full or blocked): kept in memory only */ }
       scheduleRender();
     };
     return {

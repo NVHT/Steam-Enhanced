@@ -206,7 +206,7 @@
         hero: hero.currentSrc,
         logo: logo && !logo.hasAttribute('data-se-art-wait') ? logo.currentSrc : '',
       }));
-    } catch {}
+    } catch { /* storage refused (full or blocked): kept in memory only */ }
   };
 
   // The games played, most recent first

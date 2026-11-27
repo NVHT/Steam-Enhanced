@@ -69,7 +69,7 @@
         const binder = owner[bindingName];
         if (typeof binder?.call === 'function' && typeof binder.__handleResponse === 'function') return binder;
         if (!binder) return createBinder(owner);
-      } catch {}
+      } catch { /* a module or window that throws when read is skipped */ }
     }
     throw new Error('Millennium backend bridge is unavailable');
   }

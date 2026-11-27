@@ -113,7 +113,7 @@
     write(value) {
       try {
         localStorage.setItem(CACHE_KEY, JSON.stringify(value));
-      } catch {}
+      } catch { /* storage refused (full or blocked): kept in memory only */ }
     },
   };
 
@@ -134,7 +134,7 @@
     let id = null;
     try {
       id = JSON.parse(document.getElementById('application_config')?.dataset.userinfo ?? 'null')?.steamid ?? null;
-    } catch {}
+    } catch { /* a stored value that won't parse: the default stands */ }
     if (!STEAM_ID.test(id ?? '') && Number(window.g_AccountID) > 0) id = String(STEAM_ID_BASE + BigInt(window.g_AccountID));
     if (!STEAM_ID.test(id ?? '') && STEAM_ID.test(String(window.g_steamID ?? ''))) id = String(window.g_steamID);
     // Steam's newer pages (Notification Settings, Playtests) carry neither: the ID this account's

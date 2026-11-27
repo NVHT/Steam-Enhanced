@@ -55,7 +55,7 @@
     try {
       const ids = [String(id), ...readRecent().filter((x) => x !== String(id))].slice(0, RECENT_ROWS);
       localStorage.setItem(RECENT_KEY, JSON.stringify(ids));
-    } catch {}
+    } catch { /* storage refused (full or blocked): kept in memory only */ }
   }
 
   /*

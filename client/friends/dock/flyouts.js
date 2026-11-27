@@ -324,7 +324,7 @@
     if (state.chatContext) {
       try {
         state.chatContext.data.SetFriendsListSingleWindowMode(state.chatContext.previous);
-      } catch {}
+      } catch { /* Steam's friends app gone or changed: nothing to put back */ }
       state.chatContext = null;
     }
     ns.place();

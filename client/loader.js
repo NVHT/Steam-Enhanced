@@ -392,7 +392,7 @@
     };
     try {
       W.MoveTo = early;
-    } catch {}
+    } catch { /* a MoveTo that can't be replaced: checked just below */ }
     if (W.MoveTo !== early) return null;
     return {
       native,
@@ -430,7 +430,7 @@
     let last = 0;
     try {
       last = Number(localStorage.getItem(SPLASH_KEY)) || 0;
-    } catch {}
+    } catch { /* storage unreadable: the default stands */ }
     if (rule === 'first') return !last;
     return new Date(last).toDateString() !== new Date().toDateString(); // daily
   };
@@ -438,7 +438,7 @@
   if (MAIN && entrance === 'splash') {
     try {
       localStorage.setItem(SPLASH_KEY, String(Date.now()));
-    } catch {}
+    } catch { /* storage refused (full or blocked): kept in memory only */ }
   }
 
   // The cover each entrance uses: the splash draws its own over a plain one
@@ -620,12 +620,12 @@
       localStorage.removeItem('se-toast-log-data');
       const keys = Object.keys(localStorage).filter((k) => k.startsWith(TOAST_LOG_PREFIX)).sort();
       for (const old of keys.slice(0, Math.max(0, keys.length - TOAST_LOG_MAX + 1))) localStorage.removeItem(old);
-    } catch {}
+    } catch { /* storage refused: old entries stay, unused */ }
     return (text) => {
       try {
         entry.steps.push([Math.round(performance.now() - started), text]);
         localStorage.setItem(key, JSON.stringify(entry));
-      } catch {}
+      } catch { /* storage refused (full or blocked): this window's steps go unrecorded */ }
     };
   })();
   if (toastLog) {
@@ -800,7 +800,7 @@
     // everything the theme starts
     try {
       if (!onWeb && localStorage.getItem('se-perf') === '1') addScript('dev/perf.js');
-    } catch {}
+    } catch { /* storage unreadable: the profiler stays off */ }
     for (const file of RUNTIME) {
       if (added.has(file)) continue;
       added.add(file);
@@ -851,7 +851,7 @@
     if (event.key !== RELOAD_KEY || !event.newValue) return;
     try {
       devReload(Boolean(JSON.parse(event.newValue).scripts));
-    } catch {}
+    } catch { /* a stored value that won't parse: the default stands */ }
   });
 
   window.__seClient = {
@@ -865,7 +865,7 @@
       devReload(scripts);
       try {
         localStorage.setItem(RELOAD_KEY, JSON.stringify({ at: Date.now(), scripts: Boolean(scripts) }));
-      } catch {}
+      } catch { /* storage refused (full or blocked): kept in memory only */ }
     },
   };
   load();

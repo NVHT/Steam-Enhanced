@@ -138,7 +138,7 @@
       for (const step of [tagSections, live.hltb?.place, placeSpans]) {
         try {
           step?.(c);
-        } catch {}
+        } catch { /* one step failing (Steam's markup changed) leaves the others running */ }
       }
     }
   }

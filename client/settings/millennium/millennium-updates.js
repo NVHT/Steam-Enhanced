@@ -168,7 +168,7 @@
     try {
       await ctx.fetchAvailableUpdates(true);
       checkedAt = Date.now();
-    } catch {}
+    } catch { /* a failed check keeps the last result */ }
     checking = false;
     parts.schedule?.();
   }

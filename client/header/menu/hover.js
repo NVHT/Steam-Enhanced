@@ -28,7 +28,7 @@
     for (const doc of hoverDocuments) {
       try {
         if (doc.body?.matches(':hover')) return true;
-      } catch {}
+      } catch { /* a closed window throws when touched: skipped */ }
     }
     return false;
   };

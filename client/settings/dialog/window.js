@@ -45,7 +45,7 @@
         const y = (s.availTop || 0) + Math.round((availH - h) / 2);
         win.MoveTo(x, y, window.devicePixelRatio || true);
       }
-    } catch {}
+    } catch { /* Steam's window API refused (window closed or call missing): nothing to do */ }
   }
   /*
    * The page fills its window. The in-game overlay's Settings window is sized by the overlay

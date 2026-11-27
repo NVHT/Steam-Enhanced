@@ -108,7 +108,7 @@
       let entries = {};
       try {
         entries = JSON.parse(localStorage.getItem(key) ?? '{}') ?? {};
-      } catch {}
+      } catch { /* storage unreadable: the default stands */ }
       const now = Date.now();
       for (const [appid, entry] of Object.entries(entries)) {
         if (!entry || now - entry.at > (isHit(entry) ? TTL_MS : MISS_TTL_MS)) delete entries[appid];
@@ -149,7 +149,7 @@
     // v2 had no type; its entries would keep a sale's slide drawn as a game for a week
     try {
       localStorage.removeItem(`se-store-details-v2-${pageLanguage}`);
-    } catch {}
+    } catch { /* storage refused: the old entry stays, unused */ }
 
     const fetchLibraryArt = async (appid) => {
       try {

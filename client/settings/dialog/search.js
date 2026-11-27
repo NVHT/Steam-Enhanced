@@ -190,7 +190,7 @@
     learned[name] = labels;
     try {
       localStorage.setItem(LEARNED_KEY, JSON.stringify(learned));
-    } catch {}
+    } catch { /* storage refused (full or blocked): kept in memory only */ }
   }
   Object.assign(ns, { filter, learn, norm, pageNameOf, revealHit });
 })(window.__se);

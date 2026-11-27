@@ -39,7 +39,7 @@
           const doc = popup.window?.document;
           if (!doc || doc.title !== 'Steam Root Menu') continue;
           bindMenuHoverDocument(doc);
-        } catch {}
+        } catch { /* a closed window throws when touched: skipped */ }
       }
     }
 

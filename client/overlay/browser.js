@@ -119,7 +119,7 @@
       const raw = localStorage.getItem(spec.storageKey);
       const value = raw === null ? NaN : Math.round(spec.fromStored(Number(raw)));
       if (value >= spec.min && value <= spec.max) return value;
-    } catch {}
+    } catch { /* storage unreadable: the default stands */ }
     return null;
   };
 
@@ -145,7 +145,7 @@
     applyBackdrop(key, value);
     try {
       localStorage.setItem(spec.storageKey, String(spec.toStored(value)));
-    } catch {}
+    } catch { /* storage refused (full or blocked): kept in memory only */ }
     scheduleRender();
   };
 

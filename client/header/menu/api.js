@@ -172,7 +172,7 @@
       try {
         const found = resolveFromKnown(req);
         if (found) return found;
-      } catch {}
+      } catch { /* a module or window that throws when read is skipped */ }
     }
     try {
       return resolveFromSource() || undefined;

@@ -163,7 +163,7 @@
     if (goLibrary(route)) return true;
     try {
       window.SteamClient?.URL?.ExecuteSteamURL('steam://nav/library');
-    } catch {}
+    } catch { /* Steam's window API refused (window closed or call missing): nothing to do */ }
     return false;
   }
 

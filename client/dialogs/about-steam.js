@@ -140,7 +140,7 @@
     for (const win of SE.owners?.() ?? [window]) {
       try {
         if (win.SteamUIStore && typeof win.fetch === 'function') return win.fetch.bind(win);
-      } catch {}
+      } catch { /* a module or window that throws when read is skipped */ }
     }
     return window.fetch.bind(window);
   };

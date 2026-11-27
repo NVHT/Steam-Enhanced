@@ -288,7 +288,7 @@
     try {
       const response = await fetch(source);
       if (response.ok) return await createImageBitmap(await response.blob(), size);
-    } catch {}
+    } catch { /* art that won't load: drawn uncropped */ }
     return createImageBitmap(img, size);
   }
 

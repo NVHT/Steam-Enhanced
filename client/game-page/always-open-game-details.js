@@ -57,7 +57,7 @@
       // Every later page now renders open by itself: watch only as a slow safety net, in case
       // Steam replaces the Set.
       watchPanels(2000);
-    } catch {}
+    } catch { /* a frozen or replaced object refuses the patch: Steam's own stays */ }
   };
 
   const panelOwner = (panel) => {

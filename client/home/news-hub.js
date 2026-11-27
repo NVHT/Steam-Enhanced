@@ -348,7 +348,7 @@
           owner = candidate;
           break;
         }
-      } catch {}
+      } catch { /* a module or window that throws when read is skipped */ }
     }
 
     eventStore = owner?.libraryEventStore;

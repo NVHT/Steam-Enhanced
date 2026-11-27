@@ -73,7 +73,7 @@
       const values = [exp];
       try {
         values.push(...Object.values(exp || {}));
-      } catch {}
+      } catch { /* a module or window that throws when read is skipped */ }
       for (const value of values) {
         if (typeof value?.createPortal === 'function') found.createPortal ||= value.createPortal;
         if (typeof value?.flushSync === 'function') found.flushSync ||= value.flushSync;
@@ -162,7 +162,7 @@
   try {
     const saved = JSON.parse(localStorage.getItem(OFFSET_KEY));
     if (Number.isFinite(saved?.x) && Number.isFinite(saved?.y)) Object.assign(offset, saved, { measured: true });
-  } catch {}
+  } catch { /* storage unreadable: the default stands */ }
 
   // Moves the offset by the error between where a window's content is and where it belongs.
   function correct(entry, contentX, contentY) {
@@ -178,7 +178,7 @@
     offset.y = clamp(offset.y + dy);
     try {
       localStorage.setItem(OFFSET_KEY, JSON.stringify({ x: offset.x, y: offset.y }));
-    } catch {}
+    } catch { /* storage refused (full or blocked): kept in memory only */ }
     // Through place(): its size signal makes Steam re-place the window from the anchor too.
     place(entry, entry.rect);
   }

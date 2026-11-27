@@ -92,7 +92,7 @@
         (s.availTop || 0) + Math.round((availH - h) / 2),
         window.devicePixelRatio || true
       );
-    } catch {}
+    } catch { /* Steam's window API refused (window closed or call missing): nothing to do */ }
   }
 
   /* ---------- Update ---------- */
