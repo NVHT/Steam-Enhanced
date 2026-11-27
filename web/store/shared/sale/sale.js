@@ -149,6 +149,11 @@
       }
     };
 
+    // Measured right after the next layout (dom.afterLayout), once for every change before it:
+    // in the observer's pass, its first read paid the style pass of the page React was drawing
+    const syncSoon = dom.afterLayout(syncCarousels);
+    life.add(syncSoon.cancel);
+
     /** Records that matter: new nodes anywhere (widgets), class changes on carousel slides. */
     const onChange = (records) => {
       let carousels = false;
@@ -166,16 +171,16 @@
         const widget = record.target.closest?.(PRICE);
         if (widget && !widget.closest(NAV)) tagPrice(widget);
       }
-      if (carousels) syncCarousels();
+      if (carousels) syncSoon();
     };
 
     tagContent(document);
-    syncCarousels();
+    syncSoon();
     life.observe(onChange, {
       attributes: ['class'],
       filter: (record) => record.type !== 'attributes' || record.target.classList?.contains('carousel__slide'),
     });
-    life.listen(window, 'resize', dom.perFrame(syncCarousels));
+    life.listen(window, 'resize', syncSoon);
 
     return () => {
       life.destroy();

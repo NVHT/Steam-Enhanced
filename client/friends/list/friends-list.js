@@ -105,7 +105,8 @@
   const ROWS = '.friendGroup, .quickAccessFriends, .FriendsListChatSection';
   const CONNECTION_TEXT = /^(?:disconnected|reconnecting|connecting|offline mode)\b/i;
   const BANNER_SKIP = '.statusHeaderGlow, .avatarHolder, .playerAvatar, .ContextMenuButton, [class^="se-"], [class*=" se-"]';
-  /* Debounced: a column drag or window resize settles before the scan reads anything */
+  /* Debounced: a column drag or window resize settles before the scan reads anything; then it
+     reads right after the next layout (SE.settled), not in the timer, which landed mid-build */
   const BANNER_SCAN_DELAY_MS = 150;
   let bannersDirty = true;
   let bannerTimer = 0;
@@ -118,7 +119,7 @@
     clearTimeout(bannerTimer);
     bannerTimer = setTimeout(() => {
       bannerTimer = 0;
-      scanAllBanners();
+      SE.settled(scanAllBanners);
     }, BANNER_SCAN_DELAY_MS);
   };
 
@@ -511,6 +512,7 @@
       timer?.disconnect();
       removeEventListener('resize', queueBannerScan);
       clearTimeout(bannerTimer);
+      bannersDirty = false; // a scan already waiting on layout finds nothing to do
       sizer.disconnect();
       sized.clear();
       lastSeenPlayers.clear();

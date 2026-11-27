@@ -144,8 +144,12 @@
     };
     // Now, before mount() sets html.se-takeover: its rules strip the takeover body's background
     collectArt();
-    for (const delay of PROBE_DELAYS_MS) life.timeout(probe, delay);
-    life.listen(window, 'load', probe, { once: true });
+    // Each probe right after the next layout (dom.afterLayout): off its timer or the load event,
+    // its reads paid the style pass of the page still being drawn
+    const probeSoon = web.dom.afterLayout(probe);
+    life.add(probeSoon.cancel);
+    for (const delay of PROBE_DELAYS_MS) life.timeout(probeSoon, delay);
+    life.listen(window, 'load', probeSoon, { once: true });
     life.add(() => {
       const marks = [TAKEOVER_ART, TAKEOVER_BG, TAKEOVER_FILL];
       for (const node of document.querySelectorAll(marks.map((name) => `[${name}]`).join(', '))) {

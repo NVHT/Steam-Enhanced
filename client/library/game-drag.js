@@ -116,18 +116,34 @@
     adoptAll(found);
   };
 
+  /*
+   * The observer only gathers what changed; the nodes are looked at (their sizes and dashed
+   * borders, layout reads) right after the next layout (SE.settled), all at once: read in the
+   * observer, as Steam drew its zones, each change paid the style pass of the list being drawn.
+   */
   const onMutations = (records) => {
     if (!session) return;
-    const found = [];
     for (const record of records) {
       const zone = record.target.nodeType === 1 ? record.target.closest(`[${ZONE}]`) : record.target.parentElement?.closest(`[${ZONE}]`);
       if (zone && session.zones.has(zone)) {
         session.stale.add(zone);
         continue;
       }
-      if (record.type === 'attributes') inspect(record.target, found);
-      else for (const node of record.addedNodes) inspect(node, found);
+      if (record.type === 'attributes') session.changed.add(record.target);
+      else for (const node of record.addedNodes) session.changed.add(node);
     }
+    if (session.inspecting) return;
+    session.inspecting = true;
+    const current = session;
+    SE.settled(() => inspectChanged(current));
+  };
+
+  const inspectChanged = (current) => {
+    if (session !== current) return;
+    session.inspecting = false;
+    const found = [];
+    for (const node of session.changed) if (node.isConnected) inspect(node, found);
+    session.changed.clear();
     adoptAll(found);
     for (const zone of session.zones.keys()) {
       if (!zone.isConnected) {
@@ -258,8 +274,9 @@
       .filter(([zone]) => zone.isConnected)
       .sort(([, a], [, b]) => (a.dataset.kind === 'remove' ? 0 : 1) - (b.dataset.kind === 'remove' ? 0 : 1))
       .map(([, card]) => card);
-    const box = measureList(session.list) || session.box;
-    if (box) session.box = box;
+    // The list's box, measured once a drag (its place doesn't move while one goes on): measured
+    // on every layout of the tray, it paid the style pass of the zones Steam was drawing
+    const box = session.box || (session.box = measureList(session.list));
     if (!cards.length || !box) {
       tray.hidden = true;
       return;
@@ -458,6 +475,8 @@
       tray,
       zones: new Map(),
       stale: new Set(),
+      changed: new Set(), // nodes the observer saw, looked at after the next layout
+      inspecting: false,
       over: null,
       // Own observers on purpose: they watch the drop zones only while a drag is live, with options the window-wide observer doesn't carry; both disconnect when the drag ends
       observer: new MutationObserver(onMutations),
@@ -491,7 +510,8 @@
     const { bodyObserver } = session;
     setTimeout(() => bodyObserver.disconnect(), GHOST_SEARCH_MS);
     /* Zones Steam drew in the same task as the dragstart, before the observer existed */
-    session.frame = requestAnimationFrame(() => session && scanAll(root));
+    const started = session;
+    session.frame = requestAnimationFrame(() => SE.settled(() => session === started && scanAll(root)));
     track(event.clientX, event.clientY);
   };
 
