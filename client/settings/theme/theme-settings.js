@@ -262,7 +262,10 @@
       if (item.requires) {
         let wasOff = null;
         updates.push(() => {
-          const off = !item.requires.every(([key, value]) => settings.get(key) === value);
+          const off = !item.requires.every(([key, value]) => {
+            const now = settings.get(key);
+            return Array.isArray(now) ? now.includes(value) : now === value;
+          });
           node.toggleAttribute('data-se-ts-off', off);
           shown(node, !off, wasOff === null ? null : !wasOff);
           wasOff = off;
