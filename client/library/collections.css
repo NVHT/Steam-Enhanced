@@ -503,10 +503,16 @@
   z-index: var(--se-z-raised-2);
 }
 
-/* One or two games: centered, or a pair */
+/* One or two games: centered and larger, or a pair; the lone game's art fills the tile behind it */
 ._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5._3R8nXajfnNy5rZnEzeV1MR ._2zbkblS0wKex2zlrf1kmkQ:nth-child(1):not(#se-none) {
-  left: 33.5%;
+  top: 8%;
+  left: 29%;
+  width: 42%;
   transform: none;
+}
+
+._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5._3R8nXajfnNy5rZnEzeV1MR .akZKnBQkmOCFmiD2JWwfo:not(#se-none) {
+  opacity: .7;
 }
 
 ._3IWn-2rn7x98o5fDd0rAxb ._2ERAQD94mxjbyV0G5P9ic5.Bd6i4gNn_kJb7zE-pfKSI ._2zbkblS0wKex2zlrf1kmkQ:nth-child(1):not(#se-none) {
@@ -525,6 +531,11 @@
 
 ._3IWn-2rn7x98o5fDd0rAxb:hover ._2ERAQD94mxjbyV0G5P9ic5 ._2zbkblS0wKex2zlrf1kmkQ:nth-child(3):not(#se-none) {
   transform: rotate(12deg) translateX(4%);
+}
+
+/* A lone cover has no fan to open: it stays square to the tile */
+._3IWn-2rn7x98o5fDd0rAxb:hover ._2ERAQD94mxjbyV0G5P9ic5._3R8nXajfnNy5rZnEzeV1MR ._2zbkblS0wKex2zlrf1kmkQ:nth-child(1):not(#se-none) {
+  transform: none;
 }
 
 ._3IWn-2rn7x98o5fDd0rAxb ._1Nb1zAXqh_mFJMZDAHu6L6 {
@@ -552,34 +563,50 @@
   color: var(--se-text);
 }
 
+/* The name on up to two lines before it's cut, the strip growing up over the fan's foot */
 ._3IWn-2rn7x98o5fDd0rAxb:not(._2_dwxMdH27kBf-gQ3Wrk7z) ._1J1LQ0vGtpM3n0xw7XwQM6 > div:first-child {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   min-width: 0;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
-._3IWn-2rn7x98o5fDd0rAxb:not(._2_dwxMdH27kBf-gQ3Wrk7z) ._1J1LQ0vGtpM3n0xw7XwQM6 > :not(:first-child) {
-  flex: none;
-  margin-left: auto;
-}
-
-._3IWn-2rn7x98o5fDd0rAxb ._36QQLBgXFUVTOhU9jMkCWD:not(#se-none) {
-  font: 700 var(--se-fs-sm)/1.3 var(--se-font), sans-serif;
+/*
+ * The count (CollectionLabelCount): a chip in the strip's faded top, over the covers' lower
+ * corner, so the name has the strip's whole width ("Assassin's Creed", not "Assassin's Cre…").
+ * Its number comes without Steam's brackets (data-se-count, client/library/game-list.js).
+ */
+._3IWn-2rn7x98o5fDd0rAxb:not(._2_dwxMdH27kBf-gQ3Wrk7z) ._36QQLBgXFUVTOhU9jMkCWD:not(#se-none) {
+  position: absolute;
+  top: var(--se-space-1);
+  inset-inline-end: var(--se-space-3);
+  padding: 0 var(--se-space-2);
+  border-radius: var(--se-radius-xs);
+  background: var(--se-chip-hover);
+  box-shadow: inset 0 0 0 1px var(--se-white-10);
+  font: var(--se-type-badge);
+  line-height: 20px;
   letter-spacing: 0;
   text-shadow: none;
-  color: var(--se-text-muted);
+  color: var(--se-text);
+}
+
+._3IWn-2rn7x98o5fDd0rAxb._3W8lKTPeGjQw_u3gHgyNWd ._36QQLBgXFUVTOhU9jMkCWD:not(#se-none) {
+  /* Small tiles: their strip's 24 px top and 8 px sides */
+  top: 2px;
+  inset-inline-end: var(--se-space-2);
 }
 
 ._3IWn-2rn7x98o5fDd0rAxb ._36QQLBgXFUVTOhU9jMkCWD[data-se-count] {
   font-size: 0 !important;
-  line-height: 0 !important;
 }
 
 ._3IWn-2rn7x98o5fDd0rAxb ._36QQLBgXFUVTOhU9jMkCWD[data-se-count]::after {
   content: attr(data-se-count);
-  font: 700 var(--se-fs-sm)/1.3 var(--se-font), sans-serif;
-  color: var(--se-text-muted);
+  font: var(--se-type-badge);
+  line-height: 20px;
 }
 
 ._3IWn-2rn7x98o5fDd0rAxb[data-se-coll="favorite"] ._1J1LQ0vGtpM3n0xw7XwQM6 > div:first-child::before {
