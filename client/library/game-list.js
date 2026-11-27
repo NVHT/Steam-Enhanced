@@ -2,7 +2,9 @@
  * Game list helpers: give every row one status icon (downloading, queued, running) at its end,
  * with Steam's own words as its tooltip (client/header/header-tooltips.js draws
  * [data-se-tip]), sync each downloading row's progress, and own the bracketed counts of the
- * library's headers ("(12)" → data-se-count="12"), drawn by the CSS without the brackets.
+ * library's headers ("(12)" → data-se-count="12"), drawn by the CSS without the brackets. One
+ * format wherever they show (shelves, the list's sections, collection tiles): grouped digits,
+ * and a filtered count as "3,760 of 3,973" ("(3760/3973)").
  * Styled in client/library/game-list.css.
  */
 ((SE) => {
@@ -87,9 +89,16 @@
     return icon;
   };
 
+  // "3760/3973" → "3,760 of 3,973"; one number as is, grouped
+  const formatCount = (raw) => {
+    const [shown, total] = raw.split('/').map((part) => Number(part.replace(/\D/g, '')));
+    const group = (n) => n.toLocaleString();
+    return total == null || shown === total ? group(total ?? shown) : `${group(shown)} of ${group(total)}`;
+  };
+
   const setCount = (el, match) => {
     if (match) {
-      SE.mark(el, 'data-se-count', match[1].trim().replace(/\s*\/\s*/, ' / '));
+      SE.mark(el, 'data-se-count', formatCount(match[1]));
       counted.add(el);
     } else if (counted.delete(el)) {
       SE.unmark(el, 'data-se-count');
