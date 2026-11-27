@@ -69,11 +69,12 @@
   const unsupportedTags = (bbcode) =>
     [...String(bbcode).matchAll(/\[\/?([a-z0-9*]+)/gi)].map(m => m[1].toLowerCase()).filter(tag => !(tag in NOTE_TAGS));
 
-  const escapeHtml = (text) => text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  // A note's links: web addresses only (a javascript: or steam: one stays plain text in its link)
+  const WEB_LINK = /^https?:\/\//i;
 
   const bbToHtml = (bbcode) => {
-    const html = escapeHtml(String(bbcode || ''))
-      .replace(/\[url=([^\]]+)\]/gi, (_, href) => `<a href="${href}">`)
+    const html = SE.esc(String(bbcode || ''))
+      .replace(/\[url=([^\]]+)\]/gi, (_, href) => (WEB_LINK.test(href) ? `<a href="${href}">` : '<a>'))
       .replace(/\[\/url\]/gi, '</a>')
       .replace(/\[(\/?)(p|b|i|u|strike|s|code)\]/gi, (_, close, tag) => `<${close}${NOTE_TAGS[tag.toLowerCase()]}>`);
     return /<p>/i.test(html) ? html : html.split('\n').map(line => `<p>${line}</p>`).join('');
