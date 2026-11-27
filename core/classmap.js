@@ -339,7 +339,6 @@
     NavTitle: 'uyoPtKbi4K01XGuYF5-C_',
     New: '_1vFy9XM83l2YQ2QjmWl1CK',
     NewCollection: '_2_dwxMdH27kBf-gQ3Wrk7z',
-    NewUpdates_EventTime: '_2rlKqvybYupc-uk64cdQ8D',
     NoBottomGap: 'kSXF93bSHe9G2fC96Bf8X',
     NoScreenshotFallbackWrapper: '_25nyFwRA-U4dFGgdVhK6y8',
     NoticeInstallFolder: 'WonjNtnAq8aOefGl_x2v4',

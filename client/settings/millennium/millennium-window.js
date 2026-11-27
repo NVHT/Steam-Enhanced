@@ -714,14 +714,17 @@
    * Steam's ModalPosition: the frame of every in-window dialog (the dim behind it, Esc and a
    * click outside through onEscKeypress). Millennium exports it, but finds it by a search that
    * can miss on a newer Steam (its ModalRoot already does), so Steam's modules are the fallback:
-   * the module that draws ModalPosition_Content, its component reading the frame from context.
+   * the module that draws ModalPosition's Content class, its component reading the frame from
+   * context. The class's name is joined at run time: written whole, dev/classmap.py maps it as
+   * a class this file uses.
    */
+  const FRAME_CONTENT = ['ModalPosition', 'Content'].join('_');
   function modalFrame() {
     const exported = window.MILLENNIUM_API?.ModalPosition;
     if (isComponent(exported)) return exported;
     return fromModules(
       'se-mill-modal-position',
-      (src) => src.includes('ModalPosition_Content') && src.includes('onEscKeypress'),
+      (src) => src.includes(FRAME_CONTENT) && src.includes('onEscKeypress'),
       (value) => typeof value === 'function' && String(value).includes('.ModalPosition')
     );
   }
