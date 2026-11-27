@@ -59,10 +59,44 @@
   }
 }
 
-/* Something arriving: a plain fade in (a Home stage cell, the drag tray) */
+/* Something arriving: a plain fade in (a Home stage cell, the drag tray). Web pages' copy:
+   web/shared/base.css */
 @keyframes se-fade-in {
   from {
     opacity: 0;
+  }
+}
+
+/* A countdown filling from its start edge, linear over its time (a toast's timer bar; set
+   transform-origin). Web pages' copy: web/shared/base.css */
+@keyframes se-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* The same countdown running out: full to empty (a code's lifetime, a compact toast's time) */
+@keyframes se-drain {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* Indeterminate progress: a bar crossing its track (a page loading, a preview's run) */
+@keyframes se-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+/* Something live, breathing at half strength (a game launching). Web pages' copy:
+   web/shared/base.css */
+@keyframes se-pulse {
+  50% {
+    opacity: .35;
   }
 }
 
