@@ -200,6 +200,7 @@
     DownloadsPage: '_1bq4x9pa4-9RLY-dXWUZTp',
     DownloadStatusContent: 'ip-YZhijAMZcuRoXBGiye',
     DownloadTimeRemaining: '_3nx-k9xXUVgejG1BIAc84r',
+    Draggable: '_1pwP4eeP1zQD7PEgmsep0W',
     DragInProgress_SortingDropDown: '_30PVtUudUBJBzac0vEncl_',
     DriveDropdownControl: '_18pPl6a2EhE7NRoba3yw7L',
     DriveUsage: '_1LvKJs5FKB30xbur_XL2DL',

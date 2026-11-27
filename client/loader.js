@@ -154,7 +154,7 @@
     ['main', 'client/friends/', ['playing-card.js']],
     ['main', 'client/library/', ['sort-segments.css', 'sort-segments.js']],
     // Library Home
-    ['main', 'client/home/', ['home-shelves.css', 'home-shelves.js', 'whats-new.css', 'shelf-arrange.css', 'shelf-arrange.js', 'shelf-picker.js', 'shelf-expand.js', 'shelf-hover.css', 'shelf-hover.js', 'shelf-spacing.js']],
+    ['main', 'client/home/', ['home-shelves.css', 'home-shelves.js', 'whats-new.css', 'shelf-arrange.css', 'shelf-arrange.js', 'shelf-picker.js', 'shelf-expand.js', 'shelf-hover.css', 'shelf-hover.js', 'shelf-spacing.js', 'sort-tags.js']],
     ['main', 'client/home/stage/', ['stage.css', 'stage-hero.css', 'stage-settings.css', 'stage-tray.css', 'stage-shelves.css', 'stage-panels.css', 'stage-narrow.css', 'util.js', 'tray.js', 'picks.js', 'stage-settings.js', 'panels-library.js', 'panels-community.js', 'board.js', 'home-mode.js', 'stage.js', 'stage-art.js', 'data.js', 'main.js']],
     // Menus, hover cards, notifications, dialogs
     ['all', 'client/dialogs/', ['dialogs.css', 'dialogs-rebuilt.css', 'confirm.css']],

@@ -121,6 +121,129 @@
 }
 
 /*
+ * On Home's shelves the label is a chip in the cover's top right corner, across from the release
+ * chip (client/library/cover-state.css: 32 px at 6 px in), of its family (the ink fill and edge),
+ * 24 px tall and centred on that chip's line, so it sits clear of the status chip and the friends
+ * playing at the foot. Draggable ._1pwP4eeP1zQD7PEgmsep0W holds the cover and its label: Steam's,
+ * or the theme's .se-sort-tag where Steam draws none. client/home/sort-tags.js writes the text
+ * for Hours, Achievements, Size and Steam Review (data-se-tag: "493 h", "22%", "108 GB", "94%"),
+ * a tone (muted; a review's good, mixed or bad) and an achievement's fill (--se-tag-fill, a 2 px
+ * line along the chip's foot). A long value ends in "…" short of the release chip, or of the left
+ * inset when there's none. A hovered cover rises over it (Steam's z 12), its hover card saying
+ * more; the shelf's other covers step back with their chips (shelf-hover.css). Scores (Metacritic,
+ * Steam Review): a coloured dot, not a coloured pill. !important: the label rules above.
+ */
+.V7RuDNUxhxoBRaiGWbk3B ._1pwP4eeP1zQD7PEgmsep0W:has(._1LJqx_qFOC8199RBQO5kU8),
+.V7RuDNUxhxoBRaiGWbk3B ._1pwP4eeP1zQD7PEgmsep0W:has(> .se-sort-tag) {
+  position: relative;
+}
+
+.V7RuDNUxhxoBRaiGWbk3B ._1LJqx_qFOC8199RBQO5kU8:not(#se-none),
+.V7RuDNUxhxoBRaiGWbk3B .se-sort-tag {
+  position: absolute;
+  top: 10px;
+  inset-inline-end: 6px;
+  z-index: var(--se-z-raised);
+  /* block, so a long value can end in "…" */
+  display: block !important;
+  box-sizing: border-box;
+  width: auto !important;
+  min-width: 0;
+  max-width: calc(100% - 50px);
+  height: 24px;
+  margin: 0 !important;
+  padding: 0 var(--se-space-2) !important;
+  overflow: hidden !important;
+  border-radius: var(--se-radius-sm) !important;
+  background:
+    linear-gradient(var(--se-accent), var(--se-accent)) left bottom / var(--se-tag-fill, 0%) 2px no-repeat,
+    color-mix(in srgb, var(--se-bg-ink) 80%, transparent) !important;
+  box-shadow: inset 0 0 0 1px var(--se-white-12) !important;
+  font: 700 var(--se-fs-xs)/24px var(--se-font) !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--se-text) !important;
+  pointer-events: none;
+  transition: opacity var(--se-dur-slow) var(--se-ease);
+}
+
+/* No release chip on the cover: the whole top edge, less the insets */
+.V7RuDNUxhxoBRaiGWbk3B ._1pwP4eeP1zQD7PEgmsep0W:not(:has(.se-cover-release)) ._1LJqx_qFOC8199RBQO5kU8:not(#se-none),
+.V7RuDNUxhxoBRaiGWbk3B ._1pwP4eeP1zQD7PEgmsep0W:not(:has(.se-cover-release)) > .se-sort-tag {
+  max-width: calc(100% - 12px);
+}
+
+/* The theme's text in Steam's label, its own words hidden */
+.V7RuDNUxhxoBRaiGWbk3B ._1LJqx_qFOC8199RBQO5kU8[data-se-tag]:not(#se-none) {
+  font-size: 0 !important;
+}
+
+.V7RuDNUxhxoBRaiGWbk3B ._1LJqx_qFOC8199RBQO5kU8[data-se-tag]::after,
+.V7RuDNUxhxoBRaiGWbk3B .se-sort-tag::after {
+  content: attr(data-se-tag);
+  font: 700 var(--se-fs-xs)/24px var(--se-font);
+}
+
+.V7RuDNUxhxoBRaiGWbk3B ._1LJqx_qFOC8199RBQO5kU8[data-se-tone="muted"]::after,
+.V7RuDNUxhxoBRaiGWbk3B .se-sort-tag[data-se-tone="muted"]::after {
+  color: var(--se-text-muted);
+}
+
+/* All achieved: gold beside Steam's medal, as the label's own rule */
+.V7RuDNUxhxoBRaiGWbk3B ._1LJqx_qFOC8199RBQO5kU8:has(svg, img):not(#se-none) {
+  display: flex !important;
+  align-items: center;
+  gap: var(--se-space-1) !important;
+  color: var(--se-gold-text) !important;
+}
+
+.V7RuDNUxhxoBRaiGWbk3B ._1LJqx_qFOC8199RBQO5kU8._1KR40mXc7Z4Dss99aBDbyN {
+  --se-tag-dot: var(--se-mc-good);
+}
+
+.V7RuDNUxhxoBRaiGWbk3B ._1LJqx_qFOC8199RBQO5kU8._1H3NRDhuiZh5xH5jZsiI38 {
+  --se-tag-dot: var(--se-mc-mixed);
+}
+
+.V7RuDNUxhxoBRaiGWbk3B ._1LJqx_qFOC8199RBQO5kU8._3lWVD8RYypVvbk60T5Vqcs {
+  --se-tag-dot: var(--se-mc-bad);
+}
+
+.V7RuDNUxhxoBRaiGWbk3B .se-sort-tag[data-se-tone="good"] {
+  --se-tag-dot: var(--se-review-positive);
+}
+
+.V7RuDNUxhxoBRaiGWbk3B .se-sort-tag[data-se-tone="mixed"] {
+  --se-tag-dot: var(--se-warning);
+}
+
+.V7RuDNUxhxoBRaiGWbk3B .se-sort-tag[data-se-tone="bad"] {
+  --se-tag-dot: var(--se-danger);
+}
+
+.V7RuDNUxhxoBRaiGWbk3B ._1LJqx_qFOC8199RBQO5kU8._1KR40mXc7Z4Dss99aBDbyN::before,
+.V7RuDNUxhxoBRaiGWbk3B ._1LJqx_qFOC8199RBQO5kU8._1H3NRDhuiZh5xH5jZsiI38::before,
+.V7RuDNUxhxoBRaiGWbk3B ._1LJqx_qFOC8199RBQO5kU8._3lWVD8RYypVvbk60T5Vqcs::before,
+.V7RuDNUxhxoBRaiGWbk3B .se-sort-tag[data-se-tone="good"]::before,
+.V7RuDNUxhxoBRaiGWbk3B .se-sort-tag[data-se-tone="mixed"]::before,
+.V7RuDNUxhxoBRaiGWbk3B .se-sort-tag[data-se-tone="bad"]::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-inline-end: var(--se-space-1);
+  vertical-align: 1px;
+  border-radius: 50%;
+  background: var(--se-tag-dot);
+}
+
+.V7RuDNUxhxoBRaiGWbk3B[data-se-peek] .WYgDg9NyCcMIVuMyZ_NBC:not([data-se-peeked]) ~ ._1LJqx_qFOC8199RBQO5kU8,
+.V7RuDNUxhxoBRaiGWbk3B[data-se-peek] .WYgDg9NyCcMIVuMyZ_NBC:not([data-se-peeked]) ~ * ._1LJqx_qFOC8199RBQO5kU8,
+.V7RuDNUxhxoBRaiGWbk3B[data-se-peek] .WYgDg9NyCcMIVuMyZ_NBC:not([data-se-peeked]) ~ .se-sort-tag {
+  opacity: var(--se-dim-others);
+}
+
+/*
  * The count badge beside "Favorites" sat below the name: Steam aligns that
  * row to the top (CollectionDropDown), so center it and let the badge box hug its pill.
  */
@@ -689,6 +812,17 @@
 ._3iXvgnyrIW0ldDNbrIhAyc {
   height: auto !important;
   padding-bottom: var(--se-space-4);
+}
+
+/*
+ * Their scrolling strip (BoxCarouselContents) clips at the covers' foot, cutting a hovered or
+ * focused cover's ring there: room under them inside it, given back by as much below, so nothing
+ * moves
+ */
+._1RLnyCu6_DW-NTlpHTBhig > ._3CJctA7pLVdwHzNF5JmORE,
+._3iXvgnyrIW0ldDNbrIhAyc > ._3CJctA7pLVdwHzNF5JmORE {
+  padding-bottom: var(--se-space-2);
+  margin-bottom: calc(-1 * var(--se-space-2));
 }
 
 /*
