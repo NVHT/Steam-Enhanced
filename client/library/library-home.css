@@ -221,11 +221,6 @@
   scrollbar-gutter: stable;
 }
 
-/* "Add shelf" row lines up too */
-._3SkuN_ykQuWGF94fclHdhJ {
-  padding-inline: 0 !important;
-}
-
 ._1-skwOMFU54o8vsHS7-ZDu {
   /* NewUpdates (the scrolling row) */
   margin-inline: 0 !important;
@@ -531,42 +526,49 @@
 }
 
 /*
- * Shelf tools: "Add shelf" (Steam's AddShowcase) drawn as a shelf's name, the picker's look
- * (20 px bold, a muted glyph after it where the picker's chevron sits, the same hover fill and
- * -8 px start: sort-segments.css), and the theme's "Arrange shelves" (client/home/
- * shelf-arrange.js, which opens Steam's reorder mode) a 32 px icon button at the end. Between
- * them, as in a shelf's header, the slim bar with its grip while the row is hovered (RuleRight,
- * drawn by library.css), only a picture here: nothing to drag. AddShowcaseRow's left rule goes.
+ * Shelf tools: Steam's "Add shelf" (AddShowcase) and the theme's "Arrange shelves"
+ * (client/home/shelf-arrange.js, which opens Steam's reorder mode), two 32 px buttons with a
+ * hairline after them. They take no row of their own: they sit in What's New's header line, before
+ * its settings button and arrows (3 × 32 px, 8 px apart), placed by Home's scroll box
+ * (InnerContainer, a containing block by its transform) at What's New's top padding and its
+ * header's 48 px height. Without that header (What's New off or still loading) they keep a short
+ * row at the shelves' top, at the end. AddShowcaseRow's rules go.
  */
 ._3SkuN_ykQuWGF94fclHdhJ {
   display: flex !important;
-  justify-content: flex-start !important;
+  justify-content: flex-end !important;
   align-items: center;
-  gap: var(--se-space-3);
-  margin: 0 0 var(--se-space-5) !important;
+  gap: var(--se-space-2);
+  margin: 0 0 var(--se-space-4) !important;
   padding: 0 !important;
 }
 
-._3SkuN_ykQuWGF94fclHdhJ > .XTpoZLWc4Qj5P6VF4s1_X {
-  /* RuleLeft */
-  display: none !important;
-}
-
-._3SkuN_ykQuWGF94fclHdhJ > ._1fD3LfL2EuzDHoKxB5ts7 {
-  /* RuleRight: the bar's place, after Add shelf and before Arrange shelves (Steam shows it only
-     while Add shelf is hovered; here, while the row is) */
-  flex: 1 1 auto !important;
-  opacity: 1;
-  order: 1;
-  min-width: var(--se-space-6);
+._2AUVZlzQq67qe3yhLZsPPB:has(._17uEBe5Ri8TMsnfELvs8-N ._1eFe5VbyACJE4RVGpOWKMC) ._3SkuN_ykQuWGF94fclHdhJ:not(#se-none) {
+  position: absolute;
+  top: var(--se-space-4);
+  inset-inline-end: calc(var(--se-space-5) - var(--se-scrollbar) + 3 * 32px + 3 * var(--se-space-2));
+  z-index: var(--se-z-raised);
+  height: 48px;
   margin: 0 !important;
-  cursor: default !important;
-  pointer-events: none;
 }
 
-._3SkuN_ykQuWGF94fclHdhJ:not(:hover) > ._1fD3LfL2EuzDHoKxB5ts7 {
-  /* no line at rest, as a shelf's header */
-  background: transparent !important;
+/* Steam's note with Undo after Show Less / Show More widens What's New's buttons for a while:
+   the tools step aside until it goes */
+._2AUVZlzQq67qe3yhLZsPPB:has(._17uEBe5Ri8TMsnfELvs8-N ._2Yry4I6mF5baTtagAVA_cr) ._3SkuN_ykQuWGF94fclHdhJ {
+  visibility: hidden;
+}
+
+._3SkuN_ykQuWGF94fclHdhJ::after {
+  content: "";
+  order: 3;
+  width: 1px;
+  height: 20px;
+  background: var(--se-hairline);
+}
+
+._3SkuN_ykQuWGF94fclHdhJ > ._1PhK8scyztOxjJwWUpkiLJ {
+  /* RuleLeft, RuleRight */
+  display: none !important;
 }
 
 .se-shelf-arrange {
@@ -580,44 +582,49 @@
   align-items: center;
   gap: var(--se-space-2);
   box-sizing: border-box;
-  height: 36px;
-  margin: 0 0 0 calc(-1 * var(--se-space-2)) !important;
-  padding: 0 var(--se-space-2) !important;
+  height: 32px;
+  margin: 0 !important;
+  padding: 0 var(--se-space-3) 0 var(--se-space-2) !important;
   border: 0 !important;
-  border-radius: var(--se-radius-md) !important;
-  background: none !important;
-  font: 700 var(--se-fs-2xl)/1 var(--se-font) !important;
-  letter-spacing: -.01em;
-  color: var(--se-text) !important;
+  border-radius: var(--se-radius-sm) !important;
+  background: var(--se-surface-2) !important;
+  font: 600 var(--se-fs-sm)/1 var(--se-font) !important;
+  letter-spacing: 0 !important;
+  color: var(--se-text-muted) !important;
   opacity: 1 !important;
   cursor: pointer;
-  transition: background-color var(--se-dur) var(--se-ease);
+  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
 ._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5:hover,
 ._3SkuN_ykQuWGF94fclHdhJ._3dQDoCmoAJqOiOK7oAJIKM ._2aw5aUUo3lrK6wxJb4_ms5 {
   /* ButtonHovered */
-  background: var(--se-surface-2) !important;
+  background: var(--se-hover) !important;
+  --se-text-faint: var(--se-text-muted);
+  --se-label-color: var(--se-text-muted);
+  --se-offline: var(--se-text-muted);
+  color: var(--se-text) !important;
 }
 
-/* Steam's ringed plus goes; the core plus after the words, muted as the picker's chevron */
+/* Reached by Tab (client/home/shelf-arrange.js makes it a button) */
+._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5:focus-visible {
+  outline: var(--se-focus-outline);
+  outline-offset: var(--se-focus-offset);
+}
+
+/* Steam's ringed plus goes; the core plus before the words */
 ._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5 svg {
   display: none !important;
 }
 
-._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5::after {
+._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5::before {
   content: "";
   flex: none;
   width: 14px;
   height: 14px;
-  background: var(--se-text-muted);
+  background: currentColor;
   -webkit-mask: var(--se-icon-plus) center / contain no-repeat;
   mask: var(--se-icon-plus) center / contain no-repeat;
-  transition: background-color var(--se-dur) var(--se-ease);
-}
-
-._3SkuN_ykQuWGF94fclHdhJ ._2aw5aUUo3lrK6wxJb4_ms5:hover::after {
-  background: var(--se-text);
 }
 
 .se-shelf-arrange {
@@ -672,6 +679,19 @@
 
 /* Recent Games and Play Next details */
 /*
+ * Their carousels (RecentGames, PlayNextSuggestions) take Steam's inline height, a cover's plus a
+ * fixed extra (CarouselExtraHeight, 58 and 75 px) of which the date over the covers uses 24: the
+ * rest lay empty under them (38 and 55 px), so the next shelf's title sat lower than under a
+ * collection shelf. They take their content's height and a collection shelf's room under it.
+ * !important: Steam's inline height (sp.js).
+ */
+._1RLnyCu6_DW-NTlpHTBhig,
+._3iXvgnyrIW0ldDNbrIhAyc {
+  height: auto !important;
+  padding-bottom: var(--se-space-4);
+}
+
+/*
  * Date labels over the cards ("Yesterday", "This week"): Steam's 1px divider-thin type
  * becomes the same small muted label as What's New's dates.
  */
@@ -683,6 +703,15 @@
   letter-spacing: 0 !important;
   text-transform: none !important;
   color: var(--se-text-muted) !important;
+}
+
+/* A game paged to the front inside a day carries its day (client/home/home-shelves.js): in
+   EmptyDate, Steam's blank slot, at AddedDate's size */
+._1esfEVxhqNfh8fzr_kEGKa ._33gR3fahL5J0_5r8o8YyOi[data-se-date]::after {
+  content: attr(data-se-date);
+  white-space: nowrap;
+  font: 600 var(--se-fs-sm)/14px var(--se-font);
+  color: var(--se-text-muted);
 }
 
 /* Play Next's line under its title */
@@ -771,6 +800,31 @@
 .WYgDg9NyCcMIVuMyZ_NBC.xp7A-08Y404Of3FBHqX32 {
   width: auto !important;
   aspect-ratio: 460 / 215;
+}
+
+/*
+ * The wide card as a cover, like the rest of its row: client/home/home-shelves.js lays the game's
+ * vertical cover over it (.se-lead-cover) and marks it data-se-portrait, the card then a cover's
+ * 2:3 shape, Steam's header art and its blurred copy hidden under it. A game without a cover
+ * keeps the wide card.
+ */
+.WYgDg9NyCcMIVuMyZ_NBC.xp7A-08Y404Of3FBHqX32[data-se-portrait] {
+  aspect-ratio: 2 / 3;
+}
+
+.WYgDg9NyCcMIVuMyZ_NBC.xp7A-08Y404Of3FBHqX32[data-se-portrait] ._2IYf7aM4eYQ2Oh-ntmzHbm,
+.WYgDg9NyCcMIVuMyZ_NBC.xp7A-08Y404Of3FBHqX32[data-se-portrait] ._2d1hSvdpY5L2-GN1EnUb9Z {
+  visibility: hidden;
+}
+
+.se-lead-cover {
+  position: absolute;
+  inset: 0;
+  z-index: var(--se-z-raised);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
 }
 
 /* PortraitImage.Landscape: the card's height (Steam pins it to the top only), above the backdrop */

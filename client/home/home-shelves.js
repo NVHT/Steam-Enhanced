@@ -7,15 +7,45 @@
   window.__seHomePolish?.destroy();
 
   const NEWS_SELECTOR = `.${C.UpdatesContainer}`;
-  // The basic layout's dates; the row's cards each show theirs (client/home/whats-new.css)
-  const DATE_SELECTOR = `.${C.BasicHomeUpdates_EventTime}`;
+  // The dates of What's New's basic layout and of its row's cards (client/home/whats-new.css): a
+  // day's first card shows it, as Recent Games does
+  const DATE_SELECTOR = `.${C.BasicHomeUpdates_EventTime}, .${C.PartnerEventRowCapsule} > .${C.ArrowWrapper_EventTime}`;
+  // A news card's kind, on its art (client/home/whats-new.css)
+  const KIND_SELECTOR = `.${C.PartnerEventRowCapsule} .${C.EventSummaryType}`;
+  /*
+   * Kinds Steam names at length from an event's tags (its GetCategoryAsString), shortened so the
+   * tag fits its card: [tag prefix, short name]
+   */
+  const SHORT_KINDS = [
+    ['steam_award_', 'Steam Awards'],
+    ['steam_game_festival_', 'Next Fest'],
+  ];
+  /*
+   * A paged row's dated items: What's New's cards and Recent Games' games show their day on its
+   * first item only, so a page starting inside a day showed none. The first item in view carries
+   * it: a card's hidden repeat shown (data-se-lead), a game's empty slot given its day's label
+   * (data-se-date, from the item that has it). Items watched in view below.
+   */
+  const ROW_DATE = `:scope > .${C.ArrowWrapper_EventTime}`;
+  const GAME_DATE = `.${C.EmptyDate_AddedDate}`;
+  const GAME_NO_DATE = `.${C.EmptyDate}`;
+  const DATED_ITEMS = `.${C.PartnerEventRowCapsule}, .${C.RecentGame}`;
   const SHELF_SELECTOR = `.${C.Showcase}`;
+  // Play Next's line under its header ("Players like you love…"), drawn in the header instead
+  const SUBHEAD_SELECTOR = `${SHELF_SELECTOR} .${C.PlayNextSubHead}`;
+  const SUBTITLE = 'se-shelf-sub';
+  // Recent Games' and Play Next's games, counted after their name as a collection shelf's are
+  const CAROUSEL_ITEMS = `.${C.RecentGame}, .${C.PlayNextSuggestion}`;
+  const COUNT = 'se-shelf-count';
   const COVERS_CONTAINER_SELECTOR = `.${C.ChildrenContainer}`;
   const COVER_BOX_SELECTOR = `.${C.LibraryItemBox}`;
   const ACTION_BTN_SELECTOR = `.${C.LibraryItemActionButton}`;
   const UNINSTALLED_ICON_SELECTOR = `.${C.UninstalledIcon}:not(.${C.ComingSoonIcon})`;
   const WIDE_CAPSULE_SELECTOR = `.${C.FeaturedCapsule}`;
   const LANDSCAPE_CLS = C.Landscape;
+  // The wide first card of Recent Games and Play Next, drawn as a cover like the rest
+  const LEAD_BOX = `${COVER_BOX_SELECTOR}${WIDE_CAPSULE_SELECTOR}`;
+  const LEAD_COVER = 'se-lead-cover';
 
   // Covers on screen (IntersectionObserver), so a long grid isn't measured off-screen.
   const onScreen = new Set();
@@ -277,6 +307,130 @@
     }
   };
 
+  // The short name for a card's kind, or null; read once per tag element (Steam redraws a card
+  // as a new one)
+  const shortKinds = new WeakMap();
+  const shortKindOf = (el) => {
+    if (shortKinds.has(el)) return shortKinds.get(el);
+    const tags = SE.fromProps(el, 16, (q) => (Array.isArray(q.event?.vecTags) ? q.event.vecTags : null)) || [];
+    const short = SHORT_KINDS.find(([prefix]) => tags.some((tag) => String(tag).startsWith(prefix)))?.[1] || null;
+    shortKinds.set(el, short);
+    return short;
+  };
+
+  const shortenEventKinds = () => {
+    for (const el of document.querySelectorAll(KIND_SELECTOR)) {
+      SE.attr(el, 'data-se-short', shortKindOf(el));
+    }
+  };
+
+  /*
+   * The line as the header's subtitle, a span of the theme's right after the shelf's name (the
+   * header's first child), Steam's own line hidden (data-se-moved, home-shelves.css). Written only
+   * when its place or text changed.
+   */
+  /*
+   * The count, a span of the theme's at the end of the name's display, where Steam puts a
+   * collection's "(12)": marked data-se-count, so the shelf counts' badge draws it ("· 12",
+   * library.css, sort-segments.css)
+   */
+  const syncCarouselCounts = () => {
+    for (const shelf of document.querySelectorAll(SHELF_SELECTOR)) {
+      const count = shelf.querySelectorAll(CAROUSEL_ITEMS).length;
+      const display = count && shelf.querySelector(`.${C.ShowcaseHeader} .DialogDropDown_CurrentDisplay`);
+      if (!display) continue;
+      let span = display.querySelector(`:scope > .${COUNT}`);
+      if (!span) {
+        span = document.createElement('span');
+        span.className = COUNT;
+        display.append(span);
+      }
+      SE.attr(span, 'data-se-count', count.toLocaleString());
+    }
+  };
+
+  /*
+   * The game's vertical cover over the wide card (Steam draws its header art there), the card
+   * cut to a cover's shape once it's there (data-se-portrait, library-home.css); a game with no
+   * cover keeps the wide card. Redrawn when Steam puts another game in the card.
+   */
+  const portraitLeads = () => {
+    for (const box of document.querySelectorAll(LEAD_BOX)) {
+      const appid = SE.appOf(box)?.appid;
+      let img = box.querySelector(`:scope > .${LEAD_COVER}`);
+      if (img && img.dataset.appid !== String(appid)) {
+        img.remove();
+        img = null;
+        box.removeAttribute('data-se-portrait');
+      }
+      if (img || !appid) continue;
+      img = SE.art.img(SE.coverURLs(SE.appOf(box)), LEAD_COVER, () => {
+        img.remove();
+        box.removeAttribute('data-se-portrait');
+      });
+      img.dataset.appid = String(appid);
+      box.append(img);
+      SE.mark(box, 'data-se-portrait');
+    }
+  };
+
+  const syncSubtitles = () => {
+    for (const sub of document.querySelectorAll(SUBHEAD_SELECTOR)) {
+      const name = sub.closest(SHELF_SELECTOR)?.querySelector(`.${C.ShowcaseHeader}`)?.firstElementChild;
+      if (!name) continue;
+      let span = name.parentElement.querySelector(`:scope > .${SUBTITLE}`);
+      if (!span) {
+        span = document.createElement('span');
+        span.className = SUBTITLE;
+      }
+      if (name.nextElementSibling !== span) name.after(span);
+      const text = sub.textContent.trim();
+      if (span.textContent !== text) span.textContent = text;
+      SE.mark(sub, 'data-se-moved');
+    }
+  };
+
+  // The items of paged rows more than half in view (clipped by their row: Steam pages it by
+  // scrolling)
+  const inView = new Set();
+  const watchedItems = new WeakSet();
+  const itemsIO =
+    typeof IntersectionObserver === 'function'
+      ? new IntersectionObserver(entries => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) inView.add(entry.target);
+            else inView.delete(entry.target);
+          }
+          schedule();
+        }, { threshold: 0.5 })
+      : null;
+
+  const leadDates = () => {
+    if (!itemsIO) return;
+    const rows = new Set();
+    for (const item of document.querySelectorAll(DATED_ITEMS)) {
+      if (!watchedItems.has(item)) {
+        watchedItems.add(item);
+        itemsIO.observe(item);
+      }
+      rows.add(item.parentElement);
+    }
+    for (const item of inView) if (!item.isConnected) inView.delete(item);
+    for (const row of rows) {
+      const items = [...row.children].filter((el) => el.matches(DATED_ITEMS));
+      const lead = items.find((el) => inView.has(el));
+      let day = null; // a game's day, from the last item that showed it
+      for (const item of items) {
+        const card = item.querySelector(ROW_DATE);
+        if (card) SE.attr(card, 'data-se-lead', item === lead && card.hasAttribute('data-se-repeat') ? '' : null);
+        const shown = item.querySelector(GAME_DATE);
+        if (shown) day = shown.textContent.trim();
+        const empty = item.querySelector(GAME_NO_DATE);
+        if (empty) SE.attr(empty, 'data-se-date', item === lead && day ? day : null);
+      }
+    }
+  };
+
   let frame = 0;
   let observer;
   let earlyObserver;
@@ -288,6 +442,11 @@
       const shifts = measureShelfShifts();
       const plan = measureCoverButtons();
       deduplicateEventDates();
+      shortenEventKinds();
+      syncSubtitles();
+      syncCarouselCounts();
+      portraitLeads();
+      leadDates();
       applyShelfShifts(shifts);
       placeCoverButtons(plan);
     } catch { /* one step failing (Steam's markup changed) leaves the others running */ }
@@ -333,6 +492,12 @@
       observer?.disconnect();
       earlyObserver?.disconnect();
       io?.disconnect();
+      itemsIO?.disconnect();
+      inView.clear();
+      for (const el of document.querySelectorAll(`.${C.PartnerEventRowCapsule} > [data-se-lead]`)) {
+        el.removeAttribute('data-se-lead');
+      }
+      for (const el of document.querySelectorAll(`.${C.RecentGame} [data-se-date]`)) el.removeAttribute('data-se-date');
       onScreen.clear();
       listeners.abort();
       removeEventListener('resize', onResize);
@@ -341,6 +506,15 @@
 
       for (const el of document.querySelectorAll('[data-se-repeat]')) {
         el.removeAttribute('data-se-repeat');
+      }
+      for (const el of document.querySelectorAll(`${KIND_SELECTOR}[data-se-short]`)) {
+        el.removeAttribute('data-se-short');
+      }
+      for (const el of document.querySelectorAll(`${SHELF_SELECTOR} :is(.${SUBTITLE}, .${COUNT})`)) el.remove();
+      for (const el of document.querySelectorAll(`${LEAD_BOX} > .${LEAD_COVER}`)) el.remove();
+      for (const el of document.querySelectorAll(`${LEAD_BOX}[data-se-portrait]`)) el.removeAttribute('data-se-portrait');
+      for (const el of document.querySelectorAll(`${SUBHEAD_SELECTOR}[data-se-moved]`)) {
+        el.removeAttribute('data-se-moved');
       }
       for (const el of document.querySelectorAll('[data-se-shifted]')) {
         el.style.removeProperty('--se-cover-shift');

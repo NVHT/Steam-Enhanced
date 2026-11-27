@@ -263,11 +263,8 @@
  * On hover Steam grows the rule into a 17 px slab and shows its drag handle at the
  * middle of the whole header, which lands off-center on the rule. Instead the rule
  * becomes a slim 10 px pill with a dotted grip at its own center; Steam's handle hides.
- * The Add shelf row's RuleRight wears it too while the row is hovered, as a picture
- * (library-home.css).
  */
-._23SnllqT_AqZ1C_QHcNQ4Z:not(._32LI4zWUnYi5k50-LHnhdN *):hover ._1PhK8scyztOxjJwWUpkiLJ,
-._3SkuN_ykQuWGF94fclHdhJ:hover > ._1fD3LfL2EuzDHoKxB5ts7 {
+._23SnllqT_AqZ1C_QHcNQ4Z:not(._32LI4zWUnYi5k50-LHnhdN *):hover ._1PhK8scyztOxjJwWUpkiLJ {
   height: 10px !important;
   position: relative;
   background: var(--se-surface-2) !important;
@@ -275,8 +272,7 @@
 }
 
 /* The grip: a mask in the muted text tone */
-._23SnllqT_AqZ1C_QHcNQ4Z:not(._32LI4zWUnYi5k50-LHnhdN *):hover ._1PhK8scyztOxjJwWUpkiLJ::after,
-._3SkuN_ykQuWGF94fclHdhJ:hover > ._1fD3LfL2EuzDHoKxB5ts7::after {
+._23SnllqT_AqZ1C_QHcNQ4Z:not(._32LI4zWUnYi5k50-LHnhdN *):hover ._1PhK8scyztOxjJwWUpkiLJ::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -429,11 +425,12 @@
 
 /* What's New */
 /*
- * UpdatesContainer: drop Steam's gray band and use the hero's 20 px sides, so What's
- * New lines up with the shelves below it.
+ * UpdatesContainer: drop Steam's gray band; What's New and the shelves below it keep 24 px on
+ * each side, the right one less the scrollbar's gutter that Home's scroll box keeps
+ * (library-home.css).
  */
 ._17uEBe5Ri8TMsnfELvs8-N {
-  padding-inline: var(--se-space-4) !important;
+  padding-inline: var(--se-space-5) calc(var(--se-space-5) - var(--se-scrollbar)) !important;
   /* Even spacing down the home page: the same gap between every section */
   padding-top: var(--se-space-4) !important;
   background: var(--se-bg) !important;
@@ -442,7 +439,7 @@
    * ends where it starts on the left (a little room is left above and below for the hover
    * lift and ring). The cards fill the row to that edge (client/home/whats-new.css).
    */
-  clip-path: inset(-12px var(--se-space-4) -12px -12px);
+  clip-path: inset(-12px calc(var(--se-space-5) - var(--se-scrollbar)) -12px -12px);
 }
 
 /* Center the initial What's New loader within the entire panel. */
@@ -462,8 +459,8 @@
 }
 
 ._3Sb2o_mQ30IDRh0C72QUUu {
-  /* LibraryHome: shelves on the same 20 px sides */
-  padding-inline: var(--se-space-4) !important;
+  /* LibraryHome: shelves on the same sides */
+  padding-inline: var(--se-space-5) calc(var(--se-space-5) - var(--se-scrollbar)) !important;
 }
 
 .SPz0ipLqfF1oAO7tdrkdY,

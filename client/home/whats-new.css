@@ -1,7 +1,9 @@
 /*
  * What's New on Steam's Home, its row of news cards (PartnerEventRowCapsule): the art with the
- * news's kind on it, a title that always takes two lines, and one line under it with the game
- * on the left and when it came out on the right, so every card ends level. On hover or focus
+ * news's kind on it, a title that always takes two lines, and the game under it, so every card
+ * ends level. When it came out sits over the art, on a day's first card only, and on the
+ * first card in view when the row is paged inside a day (as Recent Games' dates;
+ * client/home/home-shelves.js marks them). On hover or focus
  * (Steam marks keyboard and controller focus .gpfocus) the summary rises over the art's lower part and the art stays in view, instead of Steam's
  * blurred, blue-tinted picture. The header, arrows and ⋯ button: client/library/library-home.css.
  * !important: Steam's card rules (steamui sp.css: the capsule's parts and their :hover and
@@ -47,16 +49,16 @@
   }
 }
 
-/* The card: art, title, then the game and the time */
+/* The card: its day, art, title, then the game */
 ._3YO5BpDmZERh_G8kaWbaSJ {
   /* PartnerEventRowCapsule */
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
-    "art art"
-    "title title"
-    "game time";
-  column-gap: var(--se-space-2);
+    "time"
+    "art"
+    "title"
+    "game";
   align-items: center;
   /* Steam's 16 px between cards (margin-inline-end) counted in */
   width: calc((100cqw - var(--se-space-1) - (var(--se-wn-cards, 6) - 1) * 16px) / var(--se-wn-cards, 6)) !important;
@@ -159,6 +161,20 @@
 
 ._3YO5BpDmZERh_G8kaWbaSJ ._1vIlyxb5BAwKPUkOfO94qZ:empty {
   display: none;
+}
+
+/* Kinds Steam names at length ("Steam Award Nomination Request"), shortened by
+   client/home/home-shelves.js ("Steam Awards") */
+._3YO5BpDmZERh_G8kaWbaSJ ._1vIlyxb5BAwKPUkOfO94qZ[data-se-short] {
+  font-size: 0;
+}
+
+._3YO5BpDmZERh_G8kaWbaSJ ._1vIlyxb5BAwKPUkOfO94qZ[data-se-short]::after {
+  content: attr(data-se-short);
+  font: var(--se-label-font);
+  line-height: 28px;
+  /* in em: the tag's own size is 0 */
+  letter-spacing: var(--se-label-spacing);
 }
 
 /*
@@ -282,11 +298,20 @@
   color: var(--se-text-strong) !important;
 }
 
-/* EventTime: when it came out, on every card, at the line's end */
+/* EventTime: the day over the art, Recent Games' date label; a repeat keeps its line */
 ._3YO5BpDmZERh_G8kaWbaSJ ._2rlKqvybYupc-uk64cdQ8D {
   grid-area: time;
+  margin-bottom: var(--se-space-2);
   padding: 0 !important;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: var(--se-fs-sm) !important;
-  font-weight: 400 !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
   color: var(--se-text-muted) !important;
+}
+
+._3YO5BpDmZERh_G8kaWbaSJ ._2rlKqvybYupc-uk64cdQ8D[data-se-repeat]:not([data-se-lead]) {
+  visibility: hidden;
 }

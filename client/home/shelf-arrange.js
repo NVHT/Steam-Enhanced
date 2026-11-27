@@ -177,6 +177,18 @@
   const ROW = `.${C.AddShowcaseRow}`;
   // AddShowcaseRow → { button, list }: the shelf list found once, its state read on each pass
   const tools = new Map();
+  /*
+   * Steam's Add shelf is a plain div with a click handler: made a button the keyboard reaches
+   * (Tab, then Enter or Space clicks it), out of the order while Steam disables it (an empty
+   * shelf waiting to be set)
+   */
+  const ADD = `${ROW} .${C.AddShowcase}`;
+  const ADD_DISABLED = C.AddShowcase_Disabled;
+  const syncAdd = (add) => {
+    SE.attr(add, 'role', 'button');
+    SE.attr(add, 'tabindex', add.classList.contains(ADD_DISABLED) ? '-1' : '0');
+    SE.attr(add, 'aria-disabled', add.classList.contains(ADD_DISABLED) ? 'true' : null);
+  };
 
   const syncTools = () => {
     for (const [row, tool] of tools) {
@@ -203,6 +215,7 @@
       const few = (SE.run(() => tool.list.state.rgShowcases.length) || 0) < 2;
       if (tool.button.disabled !== few) tool.button.disabled = few;
     }
+    for (const add of document.querySelectorAll(ADD)) syncAdd(add);
   };
 
   const update = () => {
@@ -228,6 +241,11 @@
 
   // ↑ ↓ on a focused shelf: its new neighbours, read in the order Steam drew the shelves
   const onKeyDown = (event) => {
+    if (event.target instanceof Element && event.target.matches(ADD) && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      if (event.target.getAttribute('aria-disabled') !== 'true') event.target.click();
+      return;
+    }
     const header = event.target;
     if (!(header instanceof Element) || !header.matches('[data-se-arrange]')) return;
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
@@ -257,6 +275,9 @@
       views.clear();
       for (const tool of tools.values()) tool.button.remove();
       tools.clear();
+      for (const add of document.querySelectorAll(ADD)) {
+        for (const name of ['role', 'tabindex', 'aria-disabled']) add.removeAttribute(name);
+      }
       delete window.__seShelfArrange;
     },
   };
