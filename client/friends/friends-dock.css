@@ -64,7 +64,8 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
   cursor: pointer;
 }
 
-.se-fdock :is(button, [role=button]):focus-visible,
+.se-fdock button:not(.se-none):focus-visible,
+.se-fdock [role=button]:focus-visible,
 .se-fd-fly [role=button]:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
@@ -194,7 +195,8 @@ html body.se-header-actions-ready[data-se-fdock="rail"] ._1rDh5rXSFZJOqCa4UpnI4z
  * dock's own header keeps its tools under a "Friends" heading. Status is in the avatar's menu
  * there. (Steam's list in the dock hides its status row: .friendListHeaderContainer below.)
  */
-.se-fd-me > :is(.se-fd-av, .se-fd-status) {
+.se-fd-me > .se-fd-av,
+.se-fd-me > .se-fd-status {
   display: none;
 }
 
@@ -586,7 +588,8 @@ html .se-fd-me::before {
 }
 
 /* Hover: an accent ring around the face, outside a friend's status ring */
-.se-fd-railtile:hover > :is(.se-fd-gicon, .se-fd-gav),
+.se-fd-railtile:hover > .se-fd-gicon,
+.se-fd-railtile:hover > .se-fd-gav,
 .se-fd-railmore:hover > span {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
@@ -704,7 +707,8 @@ html .se-fd-me::before {
   max-height: min(var(--se-fd-fly-max), calc(var(--se-wrap-h, 100vh) - 2 * var(--se-space-2)));
 }
 
-.se-fd-fly > :is(.se-fd-flyhead, .se-fd-flysearch) {
+.se-fd-fly > .se-fd-flyhead,
+.se-fd-fly > .se-fd-flysearch {
   flex: none;
 }
 
@@ -817,13 +821,22 @@ html .se-fd-me::before {
  * FriendListInsetShadowTop / Bottom, hashed; SteamTracking sp.js). Rows keep their hover; the
  * open game group's count ring matches the fill it now sits on.
  */
-.se-fd-steam .friendlist:not(.GamepadMode) :is(.friendListHeaderContainer, .socialTabSearchContainer, .quickAccessFriends, .FriendsListContent, .friendlistListContainer, .listContentContainer, .FriendsListChatSection, .chatRoomListContainer) {
+.se-fd-steam .friendlist:not(.GamepadMode) .friendListHeaderContainer,
+.se-fd-steam .friendlist:not(.GamepadMode) .socialTabSearchContainer,
+.se-fd-steam .friendlist:not(.GamepadMode) .quickAccessFriends,
+.se-fd-steam .friendlist:not(.GamepadMode) .FriendsListContent,
+.se-fd-steam .friendlist:not(.GamepadMode) .friendlistListContainer,
+.se-fd-steam .friendlist:not(.GamepadMode) .listContentContainer,
+.se-fd-steam .friendlist:not(.GamepadMode) .FriendsListChatSection,
+.se-fd-steam .friendlist:not(.GamepadMode) .chatRoomListContainer {
   background: none !important;
   border: 0 !important;
   box-shadow: none !important;
 }
 
-.se-fd-steam :is(._1qeW35auMlJ5pJVNtBC-bF, ._1osHa9KHOmdCDNrA232z4N, ._2OoTJwlWvzvAysWOOEQaXS) {
+.se-fd-steam ._1qeW35auMlJ5pJVNtBC-bF,
+.se-fd-steam ._1osHa9KHOmdCDNrA232z4N,
+.se-fd-steam ._2OoTJwlWvzvAysWOOEQaXS {
   display: none !important;
 }
 
@@ -945,7 +958,9 @@ html .se-fd-me::before {
  * Steam's window buttons are matched by class too); the standalone window keeps them
  */
 .se-fd-steam [data-se-dock-stray],
-.se-fd-steam :is(.title-bar-actions, .title-area-icon, .windowControlButton) {
+.se-fd-steam .title-bar-actions,
+.se-fd-steam .title-area-icon,
+.se-fd-steam .windowControlButton {
   display: none !important;
 }
 

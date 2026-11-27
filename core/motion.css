@@ -106,7 +106,15 @@
  * web/shared/base.css): one ring, from the focus tokens. A control that draws focus another way
  * (a field's edge) sets its own rule; this is the floor for every other one.
  */
-:is(button, a, select, summary, [role="button"], [role="tab"], [role="menuitem"], [role="option"], [tabindex]):is([class^="se-"], [class*=" se-"], [data-se-own]):focus-visible {
+button:not(.se-none):is([class^="se-"], [class*=" se-"], [data-se-own]):focus-visible,
+a:not(.se-none):is([class^="se-"], [class*=" se-"], [data-se-own]):focus-visible,
+select:not(.se-none):is([class^="se-"], [class*=" se-"], [data-se-own]):focus-visible,
+summary:not(.se-none):is([class^="se-"], [class*=" se-"], [data-se-own]):focus-visible,
+[role="button"]:is([class^="se-"], [class*=" se-"], [data-se-own]):focus-visible,
+[role="tab"]:is([class^="se-"], [class*=" se-"], [data-se-own]):focus-visible,
+[role="menuitem"]:is([class^="se-"], [class*=" se-"], [data-se-own]):focus-visible,
+[role="option"]:is([class^="se-"], [class*=" se-"], [data-se-own]):focus-visible,
+[tabindex]:is([class^="se-"], [class*=" se-"], [data-se-own]):focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
 }

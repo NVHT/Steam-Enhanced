@@ -29,7 +29,8 @@ html[data-se-tray] .contextMenuContents > * {
   grid-column: 1 / -1;
 }
 
-html[data-se-tray] :is([data-se-tray="status"], [data-se-tray-hide]) {
+html[data-se-tray] [data-se-tray="status"],
+html[data-se-tray] [data-se-tray-hide] {
   display: none;
 }
 
@@ -234,7 +235,10 @@ html[data-se-tray] [data-se-tray="game"] .JumpListGameName {
 
 /* ---------- Pages, modes and Exit: a duotone glyph each ---------- */
 
-html[data-se-tray] :is([data-se-tray="nav"], [data-se-tray="mode"], [data-se-tray="exit"], [data-se-tray="other"])::before {
+html[data-se-tray] [data-se-tray="nav"]::before,
+html[data-se-tray] [data-se-tray="mode"]::before,
+html[data-se-tray] [data-se-tray="exit"]::before,
+html[data-se-tray] [data-se-tray="other"]::before {
   content: '';
   flex: none;
   width: var(--se-icon-glyph);
@@ -259,7 +263,9 @@ html[data-se-tray] :is([data-se-tray="nav"], [data-se-tray="mode"], [data-se-tra
 [data-se-tray="exit"] { --se-tray-icon: var(--se-icon-power); }
 
 /* !important: dialogs.css gives every context-menu row its padding with !important */
-html[data-se-tray] :is([data-se-tray="mode"], [data-se-tray="exit"], [data-se-tray="other"]) {
+html[data-se-tray] [data-se-tray="mode"],
+html[data-se-tray] [data-se-tray="exit"],
+html[data-se-tray] [data-se-tray="other"] {
   display: flex;
   align-items: center;
   gap: var(--se-space-2);

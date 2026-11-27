@@ -90,7 +90,13 @@ html.steamgriddb #sgdb-wrap.sgdbRoot:has(.sgdbApiKeySetup):not(#se-none) {
 }
 
 /* Footer pieces are placed against the card: nothing in between is a containing block. */
-#sgdb-wrap .sgdbApiKeySetup:not(#se-none) :is(.DialogBody, .DialogControlsSection, .Field, .FieldLeftColumn, .FieldRightColumn, .FieldChildrenWithIcon, .FieldChildrenInner) {
+#sgdb-wrap .sgdbApiKeySetup:not(#se-none) .DialogBody,
+#sgdb-wrap .sgdbApiKeySetup:not(#se-none) .DialogControlsSection,
+#sgdb-wrap .sgdbApiKeySetup:not(#se-none) .Field,
+#sgdb-wrap .sgdbApiKeySetup:not(#se-none) .FieldLeftColumn,
+#sgdb-wrap .sgdbApiKeySetup:not(#se-none) .FieldRightColumn,
+#sgdb-wrap .sgdbApiKeySetup:not(#se-none) .FieldChildrenWithIcon,
+#sgdb-wrap .sgdbApiKeySetup:not(#se-none) .FieldChildrenInner {
   position: static !important;
   /* Steam's focus highlight transforms rows, which would make each its own containing block */
   transform: none !important;
@@ -270,7 +276,9 @@ html.steamgriddb #sgdb-wrap.sgdbRoot:has(.sgdbApiKeySetup):not(#se-none) {
  * wrappers (ChildrenWidthFixed), which widened the action column: they step aside
  * (display: contents) and the button itself takes the row's third column.
  */
-#sgdb-wrap .sgdbApiKeySetup .Field[data-se-sgdb-step="1"] :is(.FieldRightColumn, .FieldChildrenWithIcon, .FieldChildrenInner):not(#se-none) {
+#sgdb-wrap .sgdbApiKeySetup .Field[data-se-sgdb-step="1"] .FieldRightColumn:not(#se-none),
+#sgdb-wrap .sgdbApiKeySetup .Field[data-se-sgdb-step="1"] .FieldChildrenWithIcon:not(#se-none),
+#sgdb-wrap .sgdbApiKeySetup .Field[data-se-sgdb-step="1"] .FieldChildrenInner:not(#se-none) {
   display: contents !important;
 }
 
@@ -315,7 +323,11 @@ html.steamgriddb #sgdb-wrap.sgdbRoot:has(.sgdbApiKeySetup):not(#se-none) {
 
 /* ---------- Step 2: the key field ---------- */
 
-#sgdb-wrap .sgdbApiKeySetup .Field[data-se-sgdb-step="2"] :is(.FieldChildrenWithIcon, .FieldChildrenInner, .Panel, .DialogInputLabelGroup, label):not(.DialogInput_Wrapper):not(#se-none) {
+#sgdb-wrap .sgdbApiKeySetup .Field[data-se-sgdb-step="2"] .FieldChildrenWithIcon:not(.DialogInput_Wrapper):not(#se-none),
+#sgdb-wrap .sgdbApiKeySetup .Field[data-se-sgdb-step="2"] .FieldChildrenInner:not(.DialogInput_Wrapper):not(#se-none),
+#sgdb-wrap .sgdbApiKeySetup .Field[data-se-sgdb-step="2"] .Panel:not(.DialogInput_Wrapper):not(#se-none),
+#sgdb-wrap .sgdbApiKeySetup .Field[data-se-sgdb-step="2"] .DialogInputLabelGroup:not(.DialogInput_Wrapper):not(#se-none),
+#sgdb-wrap .sgdbApiKeySetup .Field[data-se-sgdb-step="2"] label:not(.se-none):not(.DialogInput_Wrapper):not(#se-none) {
   display: block !important;
   width: 100% !important;
   margin: 0 !important;
@@ -465,7 +477,8 @@ html.steamgriddb #sgdb-wrap.sgdbRoot:has(.sgdbApiKeySetup):not(#se-none) {
 }
 
 /* Steam sizes the button's wrappers (ChildrenWidthFixed): they shrink to the button */
-#sgdb-wrap .sgdbApiKeySetup .Field[data-se-sgdb-step="3"] :is(.FieldChildrenWithIcon, .FieldChildrenInner):not(#se-none) {
+#sgdb-wrap .sgdbApiKeySetup .Field[data-se-sgdb-step="3"] .FieldChildrenWithIcon:not(#se-none),
+#sgdb-wrap .sgdbApiKeySetup .Field[data-se-sgdb-step="3"] .FieldChildrenInner:not(#se-none) {
   display: flex !important;
   justify-content: flex-end;
   width: auto !important;

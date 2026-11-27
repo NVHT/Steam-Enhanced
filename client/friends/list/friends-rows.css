@@ -138,7 +138,9 @@
   transition: height var(--se-dur-relaxed) var(--se-ease-inout), opacity var(--se-dur-relaxed) var(--se-ease-inout), padding var(--se-dur-relaxed) var(--se-ease-inout), margin var(--se-dur-relaxed) var(--se-ease-inout);
 }
 
-.friendlist:not(.GamepadMode) [data-se-folding] :is([class*="friend-anim-appear"], [class*="friend-anim-enter"], [class*="friend-anim-exit"]) {
+.friendlist:not(.GamepadMode) [data-se-folding] [class*="friend-anim-appear"],
+.friendlist:not(.GamepadMode) [data-se-folding] [class*="friend-anim-enter"],
+.friendlist:not(.GamepadMode) [data-se-folding] [class*="friend-anim-exit"] {
   opacity: 1 !important;
   margin-bottom: 0 !important;
   transition: none !important;
@@ -441,13 +443,15 @@
 }
 
 /* Away and snoozing: the faded status ring (--se-away), as everywhere. */
-.friendlist:not(.GamepadMode) :is(.friend, .currentUserContainer).awayOrSnooze .avatarHolder :is(img.avatar, .avatar) {
+.friendlist:not(.GamepadMode) :is(.friend, .currentUserContainer).awayOrSnooze .avatarHolder img.avatar,
+.friendlist:not(.GamepadMode) :is(.friend, .currentUserContainer).awayOrSnooze .avatarHolder .avatar:not(se-none) {
   box-shadow: none !important;
   outline: 2px solid var(--se-away) !important;
   outline-offset: 2px;
 }
 
-.friendlist:not(.GamepadMode) :is(.friend, .currentUserContainer).awayOrSnooze.ingame .avatarHolder :is(img.avatar, .avatar) {
+.friendlist:not(.GamepadMode) :is(.friend, .currentUserContainer).awayOrSnooze.ingame .avatarHolder img.avatar,
+.friendlist:not(.GamepadMode) :is(.friend, .currentUserContainer).awayOrSnooze.ingame .avatarHolder .avatar:not(se-none) {
   outline-color: var(--se-away-ingame) !important;
 }
 
@@ -580,11 +584,13 @@
   height: 24px !important;
 }
 
-.friendlist:not(.GamepadMode) .CompactFriendsList .friend .avatarHolder :is(img.avatar, .avatar) {
+.friendlist:not(.GamepadMode) .CompactFriendsList .friend .avatarHolder img.avatar,
+.friendlist:not(.GamepadMode) .CompactFriendsList .friend .avatarHolder .avatar:not(se-none) {
   box-shadow: 0 0 0 2px var(--se-sidebar), 0 0 0 3.5px var(--se-fd-ring) !important;
 }
 
-.friendlist:not(.GamepadMode) .CompactFriendsList .friend:is(.awayOrSnooze) .avatarHolder :is(img.avatar, .avatar) {
+.friendlist:not(.GamepadMode) .CompactFriendsList .friend:is(.awayOrSnooze) .avatarHolder img.avatar,
+.friendlist:not(.GamepadMode) .CompactFriendsList .friend:is(.awayOrSnooze) .avatarHolder .avatar:not(se-none) {
   box-shadow: none !important;
   outline-width: 1.5px !important;
 }

@@ -37,7 +37,8 @@
   transform: none !important;
 }
 
-.multiChatDialog[data-se-chat] .MemberListColumn .friend .avatarHolder :is(img.avatar, .avatar) {
+.multiChatDialog[data-se-chat] .MemberListColumn .friend .avatarHolder img.avatar,
+.multiChatDialog[data-se-chat] .MemberListColumn .friend .avatarHolder .avatar:not(se-none) {
   width: 100% !important;
   height: 100% !important;
   border: 0 !important;
@@ -51,16 +52,21 @@
 }
 
 /* Steam can combine the in-game and away classes on the same persona. */
-.multiChatDialog[data-se-chat] .awayOrSnooze .avatarHolder :is(img.avatar, .avatar),
-.multiChatDialog[data-se-chat] .avatarHolder.awayOrSnooze :is(img.avatar, .avatar) {
+.multiChatDialog[data-se-chat] .awayOrSnooze .avatarHolder img.avatar,
+.multiChatDialog[data-se-chat] .awayOrSnooze .avatarHolder .avatar:not(se-none),
+.multiChatDialog[data-se-chat] .avatarHolder.awayOrSnooze img.avatar,
+.multiChatDialog[data-se-chat] .avatarHolder.awayOrSnooze .avatar:not(se-none) {
   box-shadow: none !important;
   outline: 2px solid var(--se-away) !important;
   outline-offset: 2px;
 }
 
-.multiChatDialog[data-se-chat] :is(.awayOrSnooze.ingame, .ingame .awayOrSnooze, .awayOrSnooze .ingame) .avatarHolder :is(img.avatar, .avatar),
-.multiChatDialog[data-se-chat] .ingame .avatarHolder.awayOrSnooze :is(img.avatar, .avatar),
-.multiChatDialog[data-se-chat] .avatarHolder.awayOrSnooze.ingame :is(img.avatar, .avatar) {
+.multiChatDialog[data-se-chat] :is(.awayOrSnooze.ingame, .ingame .awayOrSnooze, .awayOrSnooze .ingame) .avatarHolder img.avatar,
+.multiChatDialog[data-se-chat] :is(.awayOrSnooze.ingame, .ingame .awayOrSnooze, .awayOrSnooze .ingame) .avatarHolder .avatar:not(se-none),
+.multiChatDialog[data-se-chat] .ingame .avatarHolder.awayOrSnooze img.avatar,
+.multiChatDialog[data-se-chat] .ingame .avatarHolder.awayOrSnooze .avatar:not(se-none),
+.multiChatDialog[data-se-chat] .avatarHolder.awayOrSnooze.ingame img.avatar,
+.multiChatDialog[data-se-chat] .avatarHolder.awayOrSnooze.ingame .avatar:not(se-none) {
   outline-color: var(--se-away-ingame) !important;
 }
 
@@ -150,13 +156,15 @@
 }
 
 /* Steam dims these to 50%; at full strength they match the other tiles */
-.multiChatDialog[data-se-chat] :is(.MemberListOption.ToggleMemberListView, .chatRoomGroupNavColumn:not(.chatRoomGroupNavCollapsed) .chatRoomGroupNavCollapseExpand) {
+.multiChatDialog[data-se-chat] .MemberListOption.ToggleMemberListView:not(.se-none),
+.multiChatDialog[data-se-chat] .chatRoomGroupNavColumn:not(.chatRoomGroupNavCollapsed) .chatRoomGroupNavCollapseExpand {
   opacity: 1 !important;
   transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease) !important;
 }
 
 /* Steam pads both by 4 px, which made them 38 px: exactly the 30 px tile like the rest */
-.multiChatDialog[data-se-chat] :is(.MemberListOption.ToggleMemberListView, .chatRoomGroupNavCollapseExpand) {
+.multiChatDialog[data-se-chat] .MemberListOption.ToggleMemberListView,
+.multiChatDialog[data-se-chat] .chatRoomGroupNavCollapseExpand:not(.se-none) {
   box-sizing: border-box !important;
   width: var(--se-tile-sm) !important;
   height: var(--se-tile-sm) !important;

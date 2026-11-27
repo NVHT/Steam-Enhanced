@@ -176,7 +176,8 @@
   color: var(--se-text-strong);
 }
 
-.se-fdock[data-chat="1"]:is(:has(.multiChatDialog .ChatTabs.OneTab), :has(.multiChatDialog[data-se-rail])) :is(.se-chat-actions, .chatWindow[data-se-flyout-group] .chatRoomOptions)::after {
+.se-fdock[data-chat="1"]:is(:has(.multiChatDialog .ChatTabs.OneTab), :has(.multiChatDialog[data-se-rail])) .se-chat-actions:not(.se-none):not(.se-none)::after,
+.se-fdock[data-chat="1"]:is(:has(.multiChatDialog .ChatTabs.OneTab), :has(.multiChatDialog[data-se-rail])) .chatWindow[data-se-flyout-group] .chatRoomOptions::after {
   content: '';
   align-self: center;
   width: 1px;
@@ -542,7 +543,11 @@
   gap: var(--se-space-half) !important;
 }
 
-.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] :is(.chatBody, .ChatRoomGroupDialog_contents, .chatHistoryAndMembers, .ChatRoomGroupDialog_history, .displayColumn.fullWidth) {
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .chatBody:not(.se-none),
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .ChatRoomGroupDialog_contents:not(.se-none),
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .chatHistoryAndMembers:not(.se-none),
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .ChatRoomGroupDialog_history:not(.se-none),
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .displayColumn.fullWidth {
   min-width: 0 !important;
   padding-inline-end: 0 !important;
 }

@@ -218,7 +218,7 @@
     ['all', 'core/', ['emoticon-picker.css', 'emoticon-picker.js']],
     // Settings, game properties, Millennium, storage
     ['desktop', 'client/settings/', [
-      'layout.css', 'controls.css', 'pages.css', 'pages-notifications.css', 'pages-interface.css',
+      'layout.css', 'controls.css', 'controls-rows.css', 'pages.css', 'pages-notifications.css', 'pages-interface.css',
       'pages-store.css', 'pages-library.css', 'pages-downloads.css', 'pages-cloud.css', 'pages-ingame.css',
       'pages-accessibility.css', 'pages-hero.css', 'pages-controller.css', 'pages-gamerecording.css',
       'pages-voice.css', 'pages-remoteplay.css', 'pages-broadcast.css', 'pages-music.css', 'storage.css',
@@ -241,7 +241,7 @@
       'millennium-pages.js',
     ]],
     // Brew Hub's page in Millennium Settings: after the Millennium files, whose icons and fillHeight it reads
-    ['desktop', 'compat/brew-hub/', ['brew-hub.css', 'brew-hub.js']],
+    ['desktop', 'compat/brew-hub/', ['brew-hub.css', 'brew-hub-settings.css', 'brew-hub.js']],
     ['main', 'client/settings/millennium/', ['millennium-window.js']],
     // The theme's own settings window: drawn from the main window into a Steam popup (its
     // popup runtime: millennium-window.js), styled in that popup

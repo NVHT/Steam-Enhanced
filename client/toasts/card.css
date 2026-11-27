@@ -726,7 +726,9 @@
   to { stroke-dashoffset: 0; }
 }
 /* Hovering the tray pauses everything that counts down. */
-.se-tst-tray:hover .se-tst-layer[data-on] :is(.se-tst-arc, .se-tst-lead, .se-tst-hero),
+.se-tst-tray:hover .se-tst-layer[data-on] .se-tst-arc,
+.se-tst-tray:hover .se-tst-layer[data-on] .se-tst-lead,
+.se-tst-tray:hover .se-tst-layer[data-on] .se-tst-hero,
 .se-tst-tray:hover .se-tst-thumb[data-on]::after {
   animation-play-state: paused;
 }
@@ -735,7 +737,11 @@
 
 /* !important: the moving parts' own rules, some more specific (a tier's sweep, the push-in) */
 .se-tst-sample[data-still] :is(.se-tst-tray, .se-tst-stage, .se-tst-layer, .se-tst-hero, .se-tst-spark, .se-tst-ct > *),
-.se-tst-sample[data-still] :is(.se-tst-wf-sel, .se-tst-wf-glow, .se-tst-wf-card, .se-tst-wf-fr, .se-tst-wf-light),
+.se-tst-sample[data-still] .se-tst-wf-sel,
+.se-tst-sample[data-still] .se-tst-wf-glow,
+.se-tst-sample[data-still] .se-tst-wf-card,
+.se-tst-sample[data-still] .se-tst-wf-fr,
+.se-tst-sample[data-still] .se-tst-wf-light,
 .se-tst-sample[data-still] .se-tst-layer::after,
 .se-tst-sample[data-still] .DesktopToastPopup::after {
   animation: none !important;
@@ -829,11 +835,13 @@
  * at some corners: they're made clear and follow the card's corner.
  */
 :is(html, .se-tst-sample)[data-se-tst-compact] .DesktopToastPopup > :not(.DesktopToastBackground),
-:is(html, .se-tst-sample)[data-se-tst-compact] .DesktopToastPopup :is(.StandardTemplateContainer, .DesktopToastTemplate):not(#se-none) {
+:is(html, .se-tst-sample)[data-se-tst-compact] .DesktopToastPopup .StandardTemplateContainer:not(#se-none),
+:is(html, .se-tst-sample)[data-se-tst-compact] .DesktopToastPopup .DesktopToastTemplate:not(#se-none) {
   border-radius: inherit !important;
 }
 
-:is(html, .se-tst-sample)[data-se-tst-compact] .DesktopToastPopup :is(.StandardTemplateContainer, .DesktopToastTemplate):not(#se-none) {
+:is(html, .se-tst-sample)[data-se-tst-compact] .DesktopToastPopup .StandardTemplateContainer:not(#se-none),
+:is(html, .se-tst-sample)[data-se-tst-compact] .DesktopToastPopup .DesktopToastTemplate:not(#se-none) {
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
@@ -887,22 +895,25 @@
  * drawn beside the tile (an empty AvatarStatus element, a pseudo-element) or inside an avatar
  * holder (the status elements library.css hides), and the tile's ring shows presence instead.
  */
-:is(html, .se-tst-sample)[data-se-tst-compact] :is(.StandardLogoDimensions, .DesktopToastTemplate)::before,
-:is(html, .se-tst-sample)[data-se-tst-compact] :is(.StandardLogoDimensions, .DesktopToastTemplate)::after,
-:is(html, .se-tst-sample)[data-se-tst-compact] .DesktopToastTemplate > :is(.AvatarStatus, ._1iutOH026zK2dbpsMFDmMm),
+:is(html, .se-tst-sample)[data-se-tst-compact] .StandardLogoDimensions::before,
+:is(html, .se-tst-sample)[data-se-tst-compact] .DesktopToastTemplate::before,
+:is(html, .se-tst-sample)[data-se-tst-compact] .StandardLogoDimensions::after,
+:is(html, .se-tst-sample)[data-se-tst-compact] .DesktopToastTemplate::after,
+:is(html, .se-tst-sample)[data-se-tst-compact] .DesktopToastTemplate > .AvatarStatus,
+:is(html, .se-tst-sample)[data-se-tst-compact] .DesktopToastTemplate > ._1iutOH026zK2dbpsMFDmMm,
 :is(html, .se-tst-sample)[data-se-tst-compact] .DesktopToastTemplate > :empty:not(img, .StandardLogoDimensions),
-:is(html, .se-tst-sample)[data-se-tst-compact] .StandardLogoDimensions :is(
-  .avatarStatus,
-  .AvatarStatus,
-  ._3pbKzT087jaL2EeQO1qsaR,
-  ._3xUpb5DWXPFNcHHIcv-9pe,
-  ._1_sHcxv9rQdANehiviVZR4 > div:empty,
-  .nibodjvvrm86uCfnnAn4g > div:empty
-):not(#se-none) {
+:is(html, .se-tst-sample)[data-se-tst-compact] .StandardLogoDimensions .avatarStatus:not(.se-none):not(se-none):not(#se-none),
+:is(html, .se-tst-sample)[data-se-tst-compact] .StandardLogoDimensions .AvatarStatus:not(.se-none):not(se-none):not(#se-none),
+:is(html, .se-tst-sample)[data-se-tst-compact] .StandardLogoDimensions ._3pbKzT087jaL2EeQO1qsaR:not(.se-none):not(se-none):not(#se-none),
+:is(html, .se-tst-sample)[data-se-tst-compact] .StandardLogoDimensions ._3xUpb5DWXPFNcHHIcv-9pe:not(.se-none):not(se-none):not(#se-none),
+:is(html, .se-tst-sample)[data-se-tst-compact] .StandardLogoDimensions ._1_sHcxv9rQdANehiviVZR4 > div:empty:not(#se-none),
+:is(html, .se-tst-sample)[data-se-tst-compact] .StandardLogoDimensions .nibodjvvrm86uCfnnAn4g > div:empty:not(#se-none) {
   display: none !important;
 }
 
-:is(html, .se-tst-sample)[data-se-tst-compact] .StandardLogoDimensions :is(.avatarHolder, .AvatarHolder, ._1_sHcxv9rQdANehiviVZR4):not(#se-none) {
+:is(html, .se-tst-sample)[data-se-tst-compact] .StandardLogoDimensions .avatarHolder:not(#se-none),
+:is(html, .se-tst-sample)[data-se-tst-compact] .StandardLogoDimensions .AvatarHolder:not(#se-none),
+:is(html, .se-tst-sample)[data-se-tst-compact] .StandardLogoDimensions ._1_sHcxv9rQdANehiviVZR4:not(#se-none) {
   padding: 0 !important;
   border: 0 !important;
   background: none !important;
@@ -946,7 +957,8 @@
   line-height: 14px !important;
 }
 
-:is(html, .se-tst-sample)[data-se-tst-compact] .Content :is(.Header, .Body) {
+:is(html, .se-tst-sample)[data-se-tst-compact] .Content .Header,
+:is(html, .se-tst-sample)[data-se-tst-compact] .Content .Body {
   margin: 0 !important;
   padding: 0 !important;
 }
@@ -976,18 +988,23 @@
 }
 
 /* Title and line; message toasts use their own Body (the friend's name, the message). */
-:is(html, .se-tst-sample)[data-se-tst-compact] :is(.Title, .GroupMessageUserName, .StandardNotificationDescription, .GroupMessageBody) {
+:is(html, .se-tst-sample)[data-se-tst-compact] .Title,
+:is(html, .se-tst-sample)[data-se-tst-compact] .GroupMessageUserName,
+:is(html, .se-tst-sample)[data-se-tst-compact] .StandardNotificationDescription,
+:is(html, .se-tst-sample)[data-se-tst-compact] .GroupMessageBody {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-:is(html, .se-tst-sample)[data-se-tst-compact] :is(.Title, .GroupMessageUserName) {
+:is(html, .se-tst-sample)[data-se-tst-compact] .Title,
+:is(html, .se-tst-sample)[data-se-tst-compact] .GroupMessageUserName {
   color: var(--se-text-strong) !important;
   font: 600 var(--se-fs-base)/16px var(--se-font) !important;
 }
 
-:is(html, .se-tst-sample)[data-se-tst-compact] :is(.StandardNotificationDescription, .GroupMessageBody) {
+:is(html, .se-tst-sample)[data-se-tst-compact] .StandardNotificationDescription,
+:is(html, .se-tst-sample)[data-se-tst-compact] .GroupMessageBody {
   margin: 0 !important;
   color: var(--se-text-dim) !important;
   font: 400 var(--se-fs-sm)/14px var(--se-font) !important;

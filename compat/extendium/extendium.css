@@ -241,7 +241,8 @@
   color: var(--se-text-dim);
 }
 
-.extendium-toolbar-manager-context-menu .FieldIcon:not(#se-none) > :is(img, svg) {
+.extendium-toolbar-manager-context-menu .FieldIcon:not(#se-none) > img,
+.extendium-toolbar-manager-context-menu .FieldIcon:not(#se-none) > svg {
   display: block;
   width: 16px !important;
   height: 16px !important;
@@ -433,7 +434,8 @@
  * narrower than Settings). The dialog's inner box and its form fill the dialog (already the
  * window, less its padding) instead.
  */
-:is(.DialogContent_InnerWidth, form):has(> .extension-manager-popup, > form > .extension-manager-popup):not(#se-none) {
+.DialogContent_InnerWidth:has(> .extension-manager-popup, > form > .extension-manager-popup):not(#se-none),
+form:not(.se-none):has(> .extension-manager-popup, > form > .extension-manager-popup):not(#se-none) {
   box-sizing: border-box !important;
   width: 100% !important;
   max-width: none !important;
@@ -702,7 +704,8 @@
 }
 
 /* Update / warning pills and the icon's update badge */
-.extension-card :is(.update-pill, .warn-pill):not(#se-none) {
+.extension-card .update-pill:not(#se-none),
+.extension-card .warn-pill:not(#se-none) {
   height: 20px;
   border-radius: var(--se-radius-pill);
   box-shadow: none;
@@ -923,7 +926,8 @@
 }
 
 /* Each setting a card */
-.extension-manager-popup > .DialogBody > :is(.Field, .ext-links-manager):not(#se-none) {
+.extension-manager-popup > .DialogBody > .Field:not(#se-none),
+.extension-manager-popup > .DialogBody > .ext-links-manager:not(#se-none) {
   box-sizing: border-box;
   margin: 0;
   padding: var(--se-space-4) var(--se-space-4) !important;
@@ -1016,7 +1020,9 @@
   box-shadow: var(--se-search-edge-focus);
 }
 
-.ext-links-manager:not(#se-none) :is(.ext-links-toggle, .ext-links-remove, .ext-links-add) {
+.ext-links-manager:not(#se-none) .ext-links-toggle,
+.ext-links-manager:not(#se-none) .ext-links-remove,
+.ext-links-manager:not(#se-none) .ext-links-add {
   height: var(--se-control-h-sm);
   padding: 0 var(--se-space-3);
   border: 0;
@@ -1028,7 +1034,9 @@
   transition: background-color var(--se-dur-fast), color var(--se-dur-fast);
 }
 
-.ext-links-manager:not(#se-none) :is(.ext-links-toggle, .ext-links-remove, .ext-links-add):hover {
+.ext-links-manager:not(#se-none) .ext-links-toggle:hover,
+.ext-links-manager:not(#se-none) .ext-links-remove:hover,
+.ext-links-manager:not(#se-none) .ext-links-add:hover {
   background: var(--se-hover);
   color: var(--se-text-strong);
 }
@@ -1069,7 +1077,8 @@
   color: var(--se-text);
 }
 
-.storage-manager:not(#se-none) :is(.storage-manager-row, .storage-manager-item:not(:has(> details[open]))) {
+.storage-manager:not(#se-none) .storage-manager-row:not(.se-none):not(se-none),
+.storage-manager:not(#se-none) .storage-manager-item:not(:has(> details[open])) {
   border-bottom-color: var(--se-hairline);
 }
 

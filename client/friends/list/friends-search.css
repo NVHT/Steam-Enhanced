@@ -22,7 +22,8 @@
  * data-se-favorites); searching stays on the magnifier. Steam's wrappers add no space of their
  * own, and its label's fades are undone so the type matches the headers below.
  */
-.friendlist:not(.GamepadMode) :is(.socialTabSearchContainer, .socialTabContainer) {
+.friendlist:not(.GamepadMode) .socialTabSearchContainer,
+.friendlist:not(.GamepadMode) .socialTabContainer {
   margin: 0 !important;
   padding: 0 !important;
   opacity: 1 !important;
@@ -78,18 +79,24 @@
  * The bar's buttons in the Group Chats button's size (friends-chats.css): 26 px with 18 px
  * icons, inside the 30 px row. The requests count is a small pill ringed in the fill.
  */
-.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton) {
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .friendListButton:not(.se-none),
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .friendRequestButton:not(.se-none),
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .TabSearchButton .searchIconButton {
   width: 26px !important;
   height: 26px !important;
 }
 
 /* No tiles: the row lights on hover and a button's icon brightens (as Group Chats' does); the
    requests button, while its view is open, shows it in the accent alone */
-.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton):is(:hover, .friendRequestViewActive) {
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .friendListButton:not(.se-none):is(:hover, .friendRequestViewActive),
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .friendRequestButton:not(.se-none):is(:hover, .friendRequestViewActive),
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .TabSearchButton .searchIconButton:is(:hover, .friendRequestViewActive) {
   background: none !important;
 }
 
-.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) :is(.friendListButton, .friendRequestButton, .TabSearchButton .searchIconButton)::before {
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .friendListButton:not(.se-none)::before,
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .friendRequestButton:not(.se-none)::before,
+.friendlist:not(.GamepadMode) .socialListTab:not(.TabSearchActive) .TabSearchButton .searchIconButton::before {
   width: 18px;
   height: 18px;
   -webkit-mask-size: 18px 18px;
@@ -429,7 +436,8 @@
  * the tile's foot; here it covers the tile and the dot sits from the centred avatar
  * (--se-fav-av, its size; its top is the tile's top padding).
  */
-.friendlist:not(.GamepadMode) .quickAccessFriends :is(.favoriteElement, .friend.quickAccessFriend) {
+.friendlist:not(.GamepadMode) .quickAccessFriends .favoriteElement:not(.se-none),
+.friendlist:not(.GamepadMode) .quickAccessFriends .friend.quickAccessFriend {
   position: relative;
 }
 
@@ -494,12 +502,14 @@
   transform: none !important;
 }
 
-.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess .friend .avatarHolder :is(img.avatar, .avatar) {
+.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess .friend .avatarHolder img.avatar,
+.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess .friend .avatarHolder .avatar:not(se-none) {
   width: 100% !important;
   box-shadow: 0 0 0 2px var(--se-sidebar), 0 0 0 3.5px var(--se-fd-ring) !important;
 }
 
-.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess .friend.awayOrSnooze .avatarHolder :is(img.avatar, .avatar) {
+.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess .friend.awayOrSnooze .avatarHolder img.avatar,
+.friendlist:not(.GamepadMode) .quickAccessFriends.compactQuickAccess .friend.awayOrSnooze .avatarHolder .avatar:not(se-none) {
   box-shadow: none !important;
   outline-width: 1.5px !important;
 }

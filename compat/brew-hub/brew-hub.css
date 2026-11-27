@@ -16,7 +16,8 @@
  * pager row ([data-se-bh-own]). The plugin styles itself from the <style> its frontend injects
  * (BrewHub's own, 1.1 and later: the bh- class prefix), whose buttons carry !important, and Steam draws its own ::before on
  * DialogButton (Steam's sp.js CSS module), so the button rules below need !important and three
- * ids to win (as millennium.css's page buttons do).
+ * ids to win (as millennium.css's page buttons do). Its part brew-hub-settings.css, listed right
+ * after it: the plugin's own settings page.
  */
 
 /*
@@ -65,7 +66,8 @@
   align-items: center;
 }
 
-.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) > :is(.bh-bar1, .bh-bar2) {
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) > .bh-bar1,
+.MillenniumSettings .bh-root:is([data-se-bh="grid"], [data-se-bh="unofficial"]) > .bh-bar2 {
   display: contents;
 }
 
@@ -520,7 +522,8 @@
 }
 
 /* A card keeps to name and one line of description, as Themes' cards; the rest is on Details */
-.MillenniumSettings .bh-root .bh-card :is(.bh-meta, .bh-tags) {
+.MillenniumSettings .bh-root .bh-card .bh-meta,
+.MillenniumSettings .bh-root .bh-card .bh-tags {
   display: none;
 }
 
@@ -713,7 +716,8 @@
 }
 
 /* The add field and a found plugin's Link field: the theme's field */
-.MillenniumSettings .bh-root :is(.bh-addinput, .bh-card .bh-input) {
+.MillenniumSettings .bh-root .bh-addinput:not(.se-none),
+.MillenniumSettings .bh-root .bh-card .bh-input {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
@@ -728,15 +732,18 @@
   transition: box-shadow var(--se-dur) var(--se-ease);
 }
 
-.MillenniumSettings .bh-root :is(.bh-addinput, .bh-card .bh-input)::placeholder {
+.MillenniumSettings .bh-root .bh-addinput:not(.se-none)::placeholder,
+.MillenniumSettings .bh-root .bh-card .bh-input::placeholder {
   color: var(--se-search-placeholder);
 }
 
-.MillenniumSettings .bh-root :is(.bh-addinput, .bh-card .bh-input):hover {
+.MillenniumSettings .bh-root .bh-addinput:not(.se-none):hover,
+.MillenniumSettings .bh-root .bh-card .bh-input:hover {
   box-shadow: var(--se-field-edge-hover);
 }
 
-.MillenniumSettings .bh-root :is(.bh-addinput, .bh-card .bh-input):focus {
+.MillenniumSettings .bh-root .bh-addinput:not(.se-none):focus,
+.MillenniumSettings .bh-root .bh-card .bh-input:focus {
   box-shadow: var(--se-field-edge-focus);
 }
 
@@ -950,7 +957,10 @@
   overscroll-behavior: contain;
 }
 
-.MillenniumSettings .bh-md :is(h1, h2, h3, h4) {
+.MillenniumSettings .bh-md h1,
+.MillenniumSettings .bh-md h2,
+.MillenniumSettings .bh-md h3,
+.MillenniumSettings .bh-md h4 {
   margin: var(--se-space-5) 0 var(--se-space-2);
   color: var(--se-text-strong);
   font-weight: 700;
@@ -970,11 +980,13 @@
   font-size: var(--se-fs-lg);
 }
 
-.MillenniumSettings .bh-md :is(h3, h4) {
+.MillenniumSettings .bh-md h3,
+.MillenniumSettings .bh-md h4 {
   font-size: var(--se-fs-md);
 }
 
-.MillenniumSettings .bh-md :is(ul, ol) {
+.MillenniumSettings .bh-md ul,
+.MillenniumSettings .bh-md ol {
   margin: 0 0 var(--se-space-3);
   padding-left: var(--se-space-5);
 }
@@ -1008,7 +1020,8 @@
   border-radius: var(--se-radius-sm);
 }
 
-.MillenniumSettings .bh-md :is(code, pre) {
+.MillenniumSettings .bh-md code,
+.MillenniumSettings .bh-md pre {
   border-radius: var(--se-radius-xs);
   background: var(--se-field);
   font-family: var(--se-font-mono);
@@ -1057,7 +1070,8 @@
   border-collapse: collapse;
 }
 
-.MillenniumSettings .bh-md :is(th, td) {
+.MillenniumSettings .bh-md th,
+.MillenniumSettings .bh-md td {
   padding: var(--se-space-2);
   border: 0;
   border-bottom: 1px solid var(--se-divider);
@@ -1112,179 +1126,4 @@
   .MillenniumSettings .se-bh-menu {
     transform: none;
   }
-}
-
-/* ---------- The plugin's own settings (Millennium › Plugins › Brew Hub) ---------- */
-
-/*
- * Its class name reference: sections as the theme's cards, the counts as chips, each selector as
- * code and Copy as a small button. Its rows are Steam's Field and DialogButton (already the
- * theme's); these are the parts the plugin draws itself (.bhd-*, its own <style>).
- */
-.MillenniumSettings .bhd-wrap {
-  --bhd-r: var(--se-radius-md);
-}
-
-.MillenniumSettings .bhd-wrap .bhd-sections {
-  margin-top: var(--se-space-4);
-}
-
-.MillenniumSettings .bhd-wrap .bhd-section {
-  margin: 0 0 var(--se-space-2);
-  border: 0;
-  border-radius: var(--se-card-radius);
-  background: var(--se-card-bg);
-  box-shadow: var(--se-card-edge);
-}
-
-.MillenniumSettings .bhd-wrap .bhd-head {
-  gap: var(--se-space-3);
-  padding: var(--se-space-3) var(--se-space-4);
-  transition: background-color var(--se-dur) var(--se-ease);
-}
-
-.MillenniumSettings .bhd-wrap .bhd-head:hover {
-  background: var(--se-hover);
-}
-
-/* Inside the card's edge, so the card's corners don't cut the ring */
-.MillenniumSettings .bhd-wrap .bhd-head:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: calc(-1 * var(--se-focus-offset));
-}
-
-.MillenniumSettings .bhd-wrap .bhd-chev {
-  color: var(--se-text-faint);
-  transition: transform var(--se-dur) var(--se-ease);
-}
-
-.MillenniumSettings .bhd-wrap .bhd-name {
-  font: 600 var(--se-fs-md) / 1.3 var(--se-font);
-  color: var(--se-text-strong);
-}
-
-.MillenniumSettings .bhd-wrap .bhd-blurb {
-  opacity: 1;
-  font: 500 var(--se-fs-xs) / 1.3 var(--se-font);
-  color: var(--se-text-faint);
-}
-
-.MillenniumSettings .bhd-wrap .bhd-pill {
-  display: inline-flex;
-  align-items: center;
-  height: var(--se-chip-h);
-  padding: var(--se-chip-pad);
-  border-radius: var(--se-radius-sm);
-  background: var(--se-chip-bg);
-  font: var(--se-chip-font);
-  color: var(--se-text-muted);
-}
-
-.MillenniumSettings .bhd-wrap .bhd-item {
-  gap: var(--se-space-3);
-  padding: var(--se-space-3) var(--se-space-4);
-  border-top: 1px solid var(--se-divider);
-}
-
-.MillenniumSettings .bhd-wrap .bhd-sel {
-  padding: var(--se-space-half) var(--se-space-2);
-  border-radius: var(--se-radius-xs);
-  background: var(--se-field);
-  font: 500 var(--se-fs-sm) / 1.4 var(--se-font-mono);
-  color: var(--se-text);
-  cursor: pointer;
-}
-
-.MillenniumSettings .bhd-wrap .bhd-desc {
-  opacity: 1;
-  font: 500 var(--se-fs-sm) / 1.45 var(--se-font);
-  color: var(--se-text-muted);
-}
-
-.MillenniumSettings .bhd-wrap .bhd-copy {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--se-hit);
-  padding: var(--se-btn-pad);
-  border: 0;
-  border-radius: var(--se-radius-control);
-  background: var(--se-btn-bg);
-  box-shadow: var(--se-btn-edge);
-  font: var(--se-btn-font);
-  color: var(--se-btn-color);
-  transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
-}
-
-.MillenniumSettings .bhd-wrap .bhd-copy:hover {
-  background: var(--se-btn-bg-hover);
-  color: var(--se-btn-color-hover);
-}
-
-.MillenniumSettings .bhd-wrap .bhd-copy:focus-visible {
-  outline: var(--se-focus-outline);
-  outline-offset: var(--se-focus-offset);
-}
-
-/* A narrow page (the plugin's .bhd-narrow, under 560 px): selector, description and Copy stack */
-.MillenniumSettings .bhd-wrap.bhd-narrow :is(.bhd-head, .bhd-item) {
-  padding: var(--se-space-3);
-}
-
-/*
- * "… copied", and the box with the text when Steam refused the clipboard: the plugin draws both
- * with inline styles (a black strip with green text, a black textarea), so they have no class;
- * told apart by their sticky position and their textarea. !important beats the inline styles.
- */
-.MillenniumSettings .bhd-wrap > div[style*="sticky"] {
-  margin: 0 0 var(--se-space-3) !important;
-  padding: var(--se-space-2) var(--se-space-3) !important;
-  border-radius: var(--se-radius-md);
-  background: var(--se-panel-bg) !important;
-  box-shadow: var(--se-panel-shadow);
-  -webkit-backdrop-filter: var(--se-blur-panel);
-  backdrop-filter: var(--se-blur-panel);
-  color: var(--se-text-strong) !important;
-  font: 600 var(--se-fs-sm) / 1.4 var(--se-font) !important;
-}
-
-.MillenniumSettings .bhd-wrap > div[style*="sticky"]::before {
-  content: "";
-  display: inline-block;
-  width: var(--se-icon-sm);
-  height: var(--se-icon-sm);
-  margin-right: var(--se-space-2);
-  vertical-align: -3px;
-  background: var(--se-success);
-  -webkit-mask: var(--se-icon-check) center / contain no-repeat;
-  mask: var(--se-icon-check) center / contain no-repeat;
-}
-
-.MillenniumSettings .bhd-wrap > div:has(> textarea) {
-  margin: 0 0 var(--se-space-3) !important;
-  padding: var(--se-space-3) !important;
-  border-radius: var(--se-card-radius);
-  background: var(--se-card-bg) !important;
-  box-shadow: var(--se-card-edge);
-  color: var(--se-text-muted);
-  font: 500 var(--se-fs-sm) / 1.45 var(--se-font);
-}
-
-.MillenniumSettings .bhd-wrap > div:has(> textarea) > div {
-  font-size: inherit !important;
-}
-
-.MillenniumSettings .bhd-wrap > div > textarea {
-  padding: var(--se-space-2) var(--se-space-3) !important;
-  border: 0 !important;
-  border-radius: var(--se-radius-md);
-  background: var(--se-field-bg) !important;
-  box-shadow: var(--se-field-edge);
-  color: var(--se-text) !important;
-  font: 500 var(--se-fs-sm) / 1.45 var(--se-font-mono) !important;
-  outline: none;
-  resize: vertical;
-}
-
-.MillenniumSettings .bhd-wrap > div > textarea:focus {
-  box-shadow: var(--se-field-edge-focus);
 }

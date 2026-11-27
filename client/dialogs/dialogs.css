@@ -131,9 +131,12 @@
   box-shadow: var(--se-edge);
 }
 
-._3Kelh1-_v6xHfRjF68n7NB :is(.DialogButton, button),
-._16xC0mtOWoLbvSQbmo_ycv :is(.DialogButton, button),
-._3ctGqQID5-8adtd7HlZ3YM :is(.DialogButton, button) {
+._3Kelh1-_v6xHfRjF68n7NB .DialogButton,
+._3Kelh1-_v6xHfRjF68n7NB button:not(.se-none),
+._16xC0mtOWoLbvSQbmo_ycv .DialogButton,
+._16xC0mtOWoLbvSQbmo_ycv button:not(.se-none),
+._3ctGqQID5-8adtd7HlZ3YM .DialogButton,
+._3ctGqQID5-8adtd7HlZ3YM button:not(.se-none) {
   min-width: 0 !important;
   margin: 0 !important;
   border: 0 !important;
@@ -143,9 +146,12 @@
   color: var(--se-text) !important;
 }
 
-._3Kelh1-_v6xHfRjF68n7NB :is(.DialogButton, button):hover,
-._16xC0mtOWoLbvSQbmo_ycv :is(.DialogButton, button):hover,
-._3ctGqQID5-8adtd7HlZ3YM :is(.DialogButton, button):hover {
+._3Kelh1-_v6xHfRjF68n7NB .DialogButton:hover,
+._3Kelh1-_v6xHfRjF68n7NB button:not(.se-none):hover,
+._16xC0mtOWoLbvSQbmo_ycv .DialogButton:hover,
+._16xC0mtOWoLbvSQbmo_ycv button:not(.se-none):hover,
+._3ctGqQID5-8adtd7HlZ3YM .DialogButton:hover,
+._3ctGqQID5-8adtd7HlZ3YM button:not(.se-none):hover {
   background: var(--se-hover) !important;
   color: var(--se-text-strong) !important;
 }
@@ -249,8 +255,10 @@
   fill: currentColor !important;
 }
 
-.rHz7G5xZ3qXUYUcBW2bzX :is(span, ._3P2XeK0HGdzGWS3fRQ4_vX),
-._3ctGqQID5-8adtd7HlZ3YM > * :is(span, ._3P2XeK0HGdzGWS3fRQ4_vX) {
+.rHz7G5xZ3qXUYUcBW2bzX span:not(.se-none),
+.rHz7G5xZ3qXUYUcBW2bzX ._3P2XeK0HGdzGWS3fRQ4_vX,
+._3ctGqQID5-8adtd7HlZ3YM > * span:not(.se-none),
+._3ctGqQID5-8adtd7HlZ3YM > * ._3P2XeK0HGdzGWS3fRQ4_vX {
   line-height: 1 !important;
 }
 
@@ -452,17 +460,18 @@ body.ContextMenuPopupBody div:has(._2yAm5LY_eu-Vg_52l0HFlM) {
  * still closing after it left one (client/header/header-tooltips.js sets the attributes).
  */
 /* !important: another rule in this file sets display with !important */
-body[data-se-tip-muted] :is(._2FxbHJzYoH024ko7zqcJOf, ._3XGRklQrZMakU2xaYB0cLD),
+body[data-se-tip-muted] ._2FxbHJzYoH024ko7zqcJOf,
+body[data-se-tip-muted] ._3XGRklQrZMakU2xaYB0cLD,
 :is(._2FxbHJzYoH024ko7zqcJOf, ._3XGRklQrZMakU2xaYB0cLD)[data-se-tip-muted] {
   display: none !important;
 }
 
-:is(._3XGRklQrZMakU2xaYB0cLD) :is(._1LhVfNukndDa_XWzq0vdg1) {
+:is(._3XGRklQrZMakU2xaYB0cLD) ._1LhVfNukndDa_XWzq0vdg1 {
   color: var(--se-text-strong) !important;
   font-weight: 600;
 }
 
-:is(._3XGRklQrZMakU2xaYB0cLD) :is(.i4LuYcvtfPgYKx3qqvKUq) {
+:is(._3XGRklQrZMakU2xaYB0cLD) .i4LuYcvtfPgYKx3qqvKUq {
   color: var(--se-text-muted) !important;
   margin: var(--se-space-1) var(--se-space-half) !important;
 }
@@ -580,7 +589,8 @@ body[data-se-tip-muted] :is(._2FxbHJzYoH024ko7zqcJOf, ._3XGRklQrZMakU2xaYB0cLD),
   color: var(--se-label-color) !important;
 }
 
-:is(.DialogTextInputBase, ._DialogInputContainer.DialogTextInputBase):not(#se-none) {
+.DialogTextInputBase:not(.se-none):not(#se-none),
+._DialogInputContainer.DialogTextInputBase:not(#se-none) {
   min-height: var(--se-control-h);
   box-sizing: border-box;
   border: 0 !important;
@@ -593,7 +603,7 @@ body[data-se-tip-muted] :is(._2FxbHJzYoH024ko7zqcJOf, ._3XGRklQrZMakU2xaYB0cLD),
   transition: box-shadow var(--se-dur) ease-out !important;
 }
 
-:is(.DialogTextInputBase):not(#se-none):is(:hover, :focus, :focus-within) {
+.DialogTextInputBase:not(#se-none):is(:hover, :focus, :focus-within) {
   background: var(--se-field) !important;
   box-shadow: var(--se-search-edge-focus) !important;
 }
@@ -679,12 +689,14 @@ button.DialogButton.Primary:not(#se-none):is(:disabled, .Disabled) {
  * the button.DialogButton skin above misses. Same skin and card here; Big Picture (.GamepadMode)
  * keeps Steam's look, the overlay (html[data-se-ov]) always takes the theme's.
  */
-:is(html[data-se-ov] .ModalPosition_Content, .ModalPosition_Content:not(.GamepadMode *)):has(div.DialogButton):not(#se-none),
+html[data-se-ov] .ModalPosition_Content:has(div.DialogButton):not(#se-none),
+.ModalPosition_Content:not(.GamepadMode *):not(se-none):has(div.DialogButton):not(#se-none),
 :is(html[data-se-ov] .ModalPosition_Content, .ModalPosition_Content:not(.GamepadMode *)):has(div.DialogButton) > :not(#se-none) {
   background: var(--se-surface) !important;
 }
 
-:is(html[data-se-ov] div.DialogButton, div.DialogButton:not(.GamepadMode *)):not(#se-none) {
+html[data-se-ov] div.DialogButton:not(#se-none),
+div.DialogButton:not(.GamepadMode *):not(se-none):not(#se-none) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -700,11 +712,13 @@ button.DialogButton.Primary:not(#se-none):is(:disabled, .Disabled) {
   transition: background-color var(--se-dur) ease-out, color var(--se-dur) ease-out !important;
 }
 
-:is(html[data-se-ov] div.DialogButton, div.DialogButton:not(.GamepadMode *)):not(#se-none)::before {
+html[data-se-ov] div.DialogButton:not(#se-none)::before,
+div.DialogButton:not(.GamepadMode *):not(se-none):not(#se-none)::before {
   display: none !important;
 }
 
-:is(html[data-se-ov] div.DialogButton, div.DialogButton:not(.GamepadMode *)):not(#se-none):is(:hover, .gpfocus):not(.Disabled) {
+html[data-se-ov] div.DialogButton:not(#se-none):is(:hover, .gpfocus):not(.Disabled),
+div.DialogButton:not(.GamepadMode *):not(se-none):not(#se-none):is(:hover, .gpfocus):not(.Disabled) {
   background: var(--se-hover) !important;
   color: var(--se-text-strong) !important;
 }
@@ -726,7 +740,8 @@ button.DialogButton.Primary:not(#se-none):is(:disabled, .Disabled) {
 
 /* Keyboard focus: the theme's ring on every control skinned in this file */
 button.DialogButton:not(#se-none):focus-visible,
-:is(html[data-se-ov] div.DialogButton, div.DialogButton:not(.GamepadMode *)):not(#se-none):focus-visible {
+html[data-se-ov] div.DialogButton:not(#se-none):focus-visible,
+div.DialogButton:not(.GamepadMode *):not(se-none):not(#se-none):focus-visible {
   outline: var(--se-focus-outline) !important;
   outline-offset: var(--se-focus-offset);
 }
@@ -802,7 +817,8 @@ button.DialogButton:not(#se-none):focus-visible,
   color: var(--se-text-faint) !important;
 }
 
-:is(._3b5iWfynCg_r6hD9d08oXV, .mzaiXpVN6CA3ShKkuc-Kp):is(._1zuuucB7YqhY_RMCWAJp6G, ._3-UE4mB4gOy3AWNuY8o1qm) {
+._3b5iWfynCg_r6hD9d08oXV:is(._1zuuucB7YqhY_RMCWAJp6G, ._3-UE4mB4gOy3AWNuY8o1qm),
+.mzaiXpVN6CA3ShKkuc-Kp:is(._1zuuucB7YqhY_RMCWAJp6G, ._3-UE4mB4gOy3AWNuY8o1qm) {
   color: var(--se-accent) !important;
 }
 
@@ -913,7 +929,8 @@ div.ModalPosition_TopBar:not(#se-none) {
   mask-image: linear-gradient(to bottom, #000 0%, var(--se-black-55) 55%, transparent 100%);
 }
 
-.se-dialog-art :is(img, video) {
+.se-dialog-art img,
+.se-dialog-art video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -924,7 +941,8 @@ div.ModalPosition_TopBar:not(#se-none) {
   transition: opacity var(--se-dur-slow) var(--se-ease), transform var(--se-dur-ambient) var(--se-ease);
 }
 
-.se-dialog-art[data-ready] :is(img, video) {
+.se-dialog-art[data-ready] img,
+.se-dialog-art[data-ready] video {
   opacity: .5;
   transform: scale(1.01);
 }

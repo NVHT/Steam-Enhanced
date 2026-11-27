@@ -17,7 +17,10 @@
  * library menus' 300 px floor (game-menu.css), else drawn in the page it stood wider than its
  * rows, an empty strip at their end.
  */
-:is([data-se-lib-menu='friend-category'], [data-se-lib-menu='friend-embed'], [data-se-lib-menu='friend-message'], [data-se-lib-menu='friend-voice']) {
+[data-se-lib-menu='friend-category'],
+[data-se-lib-menu='friend-embed'],
+[data-se-lib-menu='friend-message'],
+[data-se-lib-menu='friend-voice'] {
   min-width: 0;
 }
 
@@ -72,7 +75,8 @@
 }
 
 /* Steam's art box is a fixed 184 × 69 and fades out to the right (its friends CSS): the banner fills the row instead */
-[data-se-lib-menu='friend-game'] [data-se-gm='gametitle'] :is(.contextMenuGameTitleBlurCropContainer, .contextMenuGameHeader) {
+[data-se-lib-menu='friend-game'] [data-se-gm='gametitle'] .contextMenuGameTitleBlurCropContainer,
+[data-se-lib-menu='friend-game'] [data-se-gm='gametitle'] .contextMenuGameHeader {
   width: 100%;
   height: auto;
   margin: 0;
@@ -149,15 +153,23 @@
 
 /* ---------- Places ---------- */
 
-[data-se-lib-menu^='friend-'] :is([data-se-gm='launch'], [data-se-gm='join'], [data-se-gm='get'], [data-se-gm='openchat']) { order: 2; }
-[data-se-lib-menu^='friend-'] :is([data-se-gm='watch'], [data-se-gm='favorite'], [data-se-gm='unfavorite']) { order: 3; }
-[data-se-lib-menu^='friend-'] :is([data-se-gm='info'], [data-se-gm='leavechat']) { order: 4; }
+[data-se-lib-menu^='friend-'] [data-se-gm='launch'],
+[data-se-lib-menu^='friend-'] [data-se-gm='join'],
+[data-se-lib-menu^='friend-'] [data-se-gm='get'],
+[data-se-lib-menu^='friend-'] [data-se-gm='openchat'] { order: 2; }
+[data-se-lib-menu^='friend-'] [data-se-gm='watch'],
+[data-se-lib-menu^='friend-'] [data-se-gm='favorite'],
+[data-se-lib-menu^='friend-'] [data-se-gm='unfavorite'] { order: 3; }
+[data-se-lib-menu^='friend-'] [data-se-gm='info'],
+[data-se-lib-menu^='friend-'] [data-se-gm='leavechat'] { order: 4; }
 [data-se-lib-menu^='friend-'] [data-se-gm='store'] { order: 5; }
 [data-se-lib-menu^='friend-'] [data-se-gm='hub'] { order: 6; }
 [data-se-lib-menu^='friend-'] [data-se-gm='closetab'] { order: 12; }
 [data-se-lib-menu^='friend-'] [data-se-gm='groupprofile'] { order: 13; }
 [data-se-gm-list] > [data-se-gm-slot='playtogether'] { order: 14; }
-[data-se-lib-menu='friend-chat'] :is([data-se-gm='launch'], [data-se-gm='join'], [data-se-gm='get']) { order: 20; }
+[data-se-lib-menu='friend-chat'] [data-se-gm='launch'],
+[data-se-lib-menu='friend-chat'] [data-se-gm='join'],
+[data-se-lib-menu='friend-chat'] [data-se-gm='get'] { order: 20; }
 [data-se-lib-menu='friend-chat'] [data-se-gm='watch'] { order: 21; }
 [data-se-lib-menu='friend-chat'] [data-se-gm='info'] { order: 22; }
 [data-se-lib-menu='friend-chat'] [data-se-gm='store'] { order: 23; }
@@ -169,7 +181,8 @@
 
 /* ---------- Glyphs, by kind ---------- */
 
-:is([data-se-gm='launch'], [data-se-gm='join']) { --se-gm-icon: var(--se-icon-play); }
+[data-se-gm='launch'],
+[data-se-gm='join'] { --se-gm-icon: var(--se-icon-play); }
 [data-se-gm='get'] { --se-gm-icon: var(--se-icon-library); }
 [data-se-gm='watch'] { --se-gm-icon: var(--se-icon-tv); }
 [data-se-gm='info'] { --se-gm-icon: var(--se-icon-info); }

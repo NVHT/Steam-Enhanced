@@ -10,9 +10,21 @@
  */
 
 /* Every box sized border-box: the tags wireframe.js builds with */
-.se-wf :is(div, span, i, b, s),
-.se-wf :is(div, span, i, b, s)::before,
-.se-wf :is(div, span, i, b, s)::after {
+.se-wf div,
+.se-wf span,
+.se-wf i,
+.se-wf b,
+.se-wf s,
+.se-wf div::before,
+.se-wf span::before,
+.se-wf i::before,
+.se-wf b::before,
+.se-wf s::before,
+.se-wf div::after,
+.se-wf span::after,
+.se-wf i::after,
+.se-wf b::after,
+.se-wf s::after {
   box-sizing: border-box;
 }
 
@@ -949,7 +961,10 @@
  * by wireframe.js. Transform and opacity only, so nothing lays out: the columns once, then the
  * looping selection and friends on pseudo-elements.
  */
-.se-wf[data-alive] > :is(.se-wf-rail, .se-wf-list, .se-wf-home, .se-wf-friends) {
+.se-wf[data-alive] > .se-wf-rail,
+.se-wf[data-alive] > .se-wf-list,
+.se-wf[data-alive] > .se-wf-home,
+.se-wf[data-alive] > .se-wf-friends {
   animation: se-wf-in var(--se-dur-slower) var(--se-ease) both;
 }
 

@@ -27,7 +27,13 @@
  * controls (Showcase's Achievements / Stats tabs, Classic's sort): clicks there moved the window.
  * Controls opt out of it.
  */
-.amw-root :is(button, input, [role="button"], .DialogDropDown, .v8oJcDOQF6xmlVTw4VhOr, .amx-seg, .amw-tools) {
+.amw-root button:not(.se-none),
+.amw-root input:not(.se-none),
+.amw-root [role="button"],
+.amw-root .DialogDropDown,
+.amw-root .v8oJcDOQF6xmlVTw4VhOr,
+.amw-root .amx-seg,
+.amw-root .amw-tools {
   -webkit-app-region: no-drag;
 }
 
@@ -67,15 +73,19 @@
 }
 
 /* Status line: theme tones */
-.amw-root :is(.amw-status, .amx-status):not(#se-none) {
+.amw-root .amw-status:not(#se-none),
+.amw-root .amx-status:not(#se-none) {
   color: var(--se-text-muted);
   font: 500 var(--se-fs-sm)/18px var(--se-font);
   opacity: 1;
 }
 
-.amw-root :is(.amw-status.amw-ok, .amx-ok):not(#se-none) { color: var(--se-running); }
-.amw-root :is(.amw-status.amw-bad, .amx-bad):not(#se-none) { color: var(--se-danger-text); }
-.amw-root :is(.amw-status.amw-warn, .amx-warn):not(#se-none) { color: var(--se-warning); }
+.amw-root .amw-status.amw-ok:not(#se-none),
+.amw-root .amx-ok:not(.se-none):not(#se-none) { color: var(--se-running); }
+.amw-root .amw-status.amw-bad:not(#se-none),
+.amw-root .amx-bad:not(.se-none):not(#se-none) { color: var(--se-danger-text); }
+.amw-root .amw-status.amw-warn:not(#se-none),
+.amw-root .amx-warn:not(.se-none):not(#se-none) { color: var(--se-warning); }
 
 /*
  * Achievement icons as on the game page: rounded, a hairline edge, the tier's aura when unlocked,
@@ -148,7 +158,8 @@
  * Steam's dropdowns (sort, filter) and text fields as in the Settings window: the theme styles
  * them inside Settings pages only (client/settings/controls.css), so the same rules here.
  */
-.amw-root :is(.v8oJcDOQF6xmlVTw4VhOr, .DialogDropDown):not(#se-none):not(#se-dd) {
+.amw-root .v8oJcDOQF6xmlVTw4VhOr:not(#se-none):not(#se-dd),
+.amw-root .DialogDropDown:not(#se-none):not(#se-dd) {
   min-width: 150px !important;
   height: 34px !important;
   min-height: 34px !important;
@@ -164,7 +175,8 @@
   transition: background-color var(--se-dur-fast);
 }
 
-.amw-root :is(.v8oJcDOQF6xmlVTw4VhOr, .DialogDropDown):not(#se-none):not(#se-dd):hover {
+.amw-root .v8oJcDOQF6xmlVTw4VhOr:not(#se-none):not(#se-dd):hover,
+.amw-root .DialogDropDown:not(#se-none):not(#se-dd):hover {
   background: var(--se-hover) !important;
 }
 
@@ -193,7 +205,8 @@
   fill: currentColor;
 }
 
-.amw-root :is(.DialogTextInputBase, ._3ZR32BdxJUNwAA6Fu6n00p):not(#se-none) {
+.amw-root .DialogTextInputBase:not(#se-none),
+.amw-root ._3ZR32BdxJUNwAA6Fu6n00p:not(#se-none) {
   height: 34px !important;
   padding: 0 var(--se-space-3) !important;
   box-sizing: border-box !important;
@@ -253,7 +266,8 @@
  * No search: a game's list is short enough to scan, and the filters and sort cover the rest. The
  * row it sat in keeps the sort (Classic) or the filters (the others), or goes when that was all.
  */
-.amw-root :is(.amw-search, .amx-search):not(#se-none) {
+.amw-root .amw-search:not(#se-none),
+.amw-root .amx-search:not(#se-none) {
   display: none !important;
 }
 
@@ -287,7 +301,8 @@
   padding-right: 248px;
 }
 
-.amw-root :is(.amw-tools, .amx-row):not(:has(> :not(.amw-search, .amx-search))):not(#se-none) {
+.amw-root .amw-tools:not(:has(> :not(.amw-search, .amx-search))):not(#se-none),
+.amw-root .amx-row:not(:has(> :not(.amw-search, .amx-search))):not(#se-none) {
   display: none !important;
 }
 

@@ -155,7 +155,8 @@
 }
 
 /* Web throbbers have no size of their own once their bars are hidden. */
-html:is(.se-store, .se-community, .se-help, .se-checkout) :is(.LoadingThrobber, .throbber):not(#se-none) {
+html:is(.se-store, .se-community, .se-help, .se-checkout) .LoadingThrobber:not(#se-none),
+html:is(.se-store, .se-community, .se-help, .se-checkout) .throbber:not(#se-none) {
   width: var(--se-spinner-size, 48px) !important;
   height: var(--se-spinner-size, 48px) !important;
   margin-inline: auto !important;
@@ -234,12 +235,18 @@ img:is([src*="steam_spinner.png"], [src*="throbber"]):not(#se-none) {
 /* Reduced motion slows the turn rather than stopping it (a still spinner says nothing is
    happening) and holds the mark. Outranks web/shared/base.css, which stops every animation. */
 @media (prefers-reduced-motion: reduce) {
-  html:not(#se-none) :is(.SteamLogoThrobber, ._3CN5DkgNMvdtT9fJhNOj_v, .LoadingThrobber, .throbber)::before,
+  html:not(#se-none) .SteamLogoThrobber::before,
+  html:not(#se-none) ._3CN5DkgNMvdtT9fJhNOj_v::before,
+  html:not(#se-none) .LoadingThrobber::before,
+  html:not(#se-none) .throbber::before,
   html:not(#se-none) .se-spin-arc {
     animation-duration: var(--se-dur-reduced) !important;
     animation-iteration-count: infinite !important;
   }
-  html:not(#se-none) :is(.SteamLogoThrobber, ._3CN5DkgNMvdtT9fJhNOj_v, .LoadingThrobber, .throbber)::after {
+  html:not(#se-none) .SteamLogoThrobber::after,
+  html:not(#se-none) ._3CN5DkgNMvdtT9fJhNOj_v::after,
+  html:not(#se-none) .LoadingThrobber::after,
+  html:not(#se-none) .throbber::after {
     animation: none !important;
   }
 }

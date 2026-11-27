@@ -27,11 +27,24 @@
   --se-chat-ico-react: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle fill='%23000' fill-opacity='.32' stroke='none' cx='11' cy='13' r='8'/%3E%3Ccircle cx='11' cy='13' r='8'/%3E%3Cpath d='M7.8 15.2a4.2 4.2 0 0 0 6.4 0'/%3E%3Cpath d='M8.8 11h.01M13.2 11h.01' stroke-width='2.4'/%3E%3Cpath d='M19 2.5v5M16.5 5h5'/%3E%3C/svg%3E");
 }
 
-.multiChatDialog[data-se-chat] :is( .chatHeader .chatRoomButton, .MemberListOption.ToggleMemberListView, .chatTabOpenFriendsList, .chatTabSelector, .chatRoomGroupNavCollapseExpand, .chatRoomTextChannelIcon, .chatRoomVoiceChannelIcon, .ChatRoomAddRoomBtn, .VoiceToggle, .VoiceToggleIconCtn, .VoiceControlPanelButton, .OneOnOneVoiceClose, .inviteAnotherFriendButton ) :is(svg, .invitePlus) {
+.multiChatDialog[data-se-chat] :is( .chatHeader .chatRoomButton, .MemberListOption.ToggleMemberListView, .chatTabOpenFriendsList, .chatTabSelector, .chatRoomGroupNavCollapseExpand, .chatRoomTextChannelIcon, .chatRoomVoiceChannelIcon, .ChatRoomAddRoomBtn, .VoiceToggle, .VoiceToggleIconCtn, .VoiceControlPanelButton, .OneOnOneVoiceClose, .inviteAnotherFriendButton ) svg:not(.se-none),
+.multiChatDialog[data-se-chat] :is( .chatHeader .chatRoomButton, .MemberListOption.ToggleMemberListView, .chatTabOpenFriendsList, .chatTabSelector, .chatRoomGroupNavCollapseExpand, .chatRoomTextChannelIcon, .chatRoomVoiceChannelIcon, .ChatRoomAddRoomBtn, .VoiceToggle, .VoiceToggleIconCtn, .VoiceControlPanelButton, .OneOnOneVoiceClose, .inviteAnotherFriendButton ) .invitePlus {
   display: none !important;
 }
 
-.multiChatDialog[data-se-chat] :is( .chatHeader .chatRoomButton, .MemberListOption.ToggleMemberListView, .chatTabOpenFriendsList, .chatTabSelector, .chatRoomGroupNavCollapseExpand, .chatRoomTextChannelIcon, .chatRoomVoiceChannelIcon, .ChatRoomAddRoomBtn, .VoiceToggle, .VoiceToggleIconCtn, .VoiceControlPanelButton, .OneOnOneVoiceClose, .inviteAnotherFriendButton )::before {
+.multiChatDialog[data-se-chat] .chatHeader .chatRoomButton::before,
+.multiChatDialog[data-se-chat] .MemberListOption.ToggleMemberListView::before,
+.multiChatDialog[data-se-chat] .chatTabOpenFriendsList:not(.se-none)::before,
+.multiChatDialog[data-se-chat] .chatTabSelector:not(.se-none)::before,
+.multiChatDialog[data-se-chat] .chatRoomGroupNavCollapseExpand:not(.se-none)::before,
+.multiChatDialog[data-se-chat] .chatRoomTextChannelIcon:not(.se-none)::before,
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannelIcon:not(.se-none)::before,
+.multiChatDialog[data-se-chat] .ChatRoomAddRoomBtn:not(.se-none)::before,
+.multiChatDialog[data-se-chat] .VoiceToggle:not(.se-none)::before,
+.multiChatDialog[data-se-chat] .VoiceToggleIconCtn:not(.se-none)::before,
+.multiChatDialog[data-se-chat] .VoiceControlPanelButton:not(.se-none)::before,
+.multiChatDialog[data-se-chat] .OneOnOneVoiceClose:not(.se-none)::before,
+.multiChatDialog[data-se-chat] .inviteAnotherFriendButton:not(.se-none)::before {
   content: "";
   flex: none;
   display: block;
@@ -125,7 +138,8 @@
   color: var(--se-danger) !important;
 }
 
-.multiChatDialog[data-se-chat] :is(.VoiceControlPanelButton.chatEndVoiceChat, .OneOnOneVoiceClose) {
+.multiChatDialog[data-se-chat] .VoiceControlPanelButton.chatEndVoiceChat,
+.multiChatDialog[data-se-chat] .OneOnOneVoiceClose:not(.se-none) {
   --se-chat-ico: var(--se-chat-ico-hangup);
 }
 

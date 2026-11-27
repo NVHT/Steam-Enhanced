@@ -93,8 +93,10 @@
   display: none !important;
 }
 
-.friendlist:not(.GamepadMode) .activeVoiceButtons :is(button, .VoiceControlPanelButton),
-.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons :is(button, .VoiceControlPanelButton) {
+.friendlist:not(.GamepadMode) .activeVoiceButtons button:not(.se-none),
+.friendlist:not(.GamepadMode) .activeVoiceButtons .VoiceControlPanelButton,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons button:not(.se-none),
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons .VoiceControlPanelButton {
   box-sizing: border-box !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -115,14 +117,18 @@
   transition: background-color var(--se-dur) var(--se-ease), color var(--se-dur) var(--se-ease);
 }
 
-.friendlist:not(.GamepadMode) .activeVoiceButtons :is(button, .VoiceControlPanelButton):hover,
-.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons :is(button, .VoiceControlPanelButton):hover {
+.friendlist:not(.GamepadMode) .activeVoiceButtons button:not(.se-none):hover,
+.friendlist:not(.GamepadMode) .activeVoiceButtons .VoiceControlPanelButton:hover,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons button:not(.se-none):hover,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons .VoiceControlPanelButton:hover {
   background: color-mix(in srgb, var(--se-running) 14%, transparent) !important;
   color: var(--se-text-strong) !important;
 }
 
-.friendlist:not(.GamepadMode) .activeVoiceButtons :is(button, .VoiceControlPanelButton) :is(svg, .SVGIcon_Shadow),
-.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons :is(button, .VoiceControlPanelButton) :is(svg, .SVGIcon_Shadow) {
+.friendlist:not(.GamepadMode) .activeVoiceButtons :is(button, .VoiceControlPanelButton) svg:not(.se-none),
+.friendlist:not(.GamepadMode) .activeVoiceButtons :is(button, .VoiceControlPanelButton) .SVGIcon_Shadow,
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons :is(button, .VoiceControlPanelButton) svg:not(.se-none),
+.CloseActiveVoiceWindowConfirmation:not(.GamepadMode *) .activeVoiceButtons :is(button, .VoiceControlPanelButton) .SVGIcon_Shadow {
   display: none !important;
 }
 
@@ -260,7 +266,8 @@ a.connectionStatus:not(.GamepadMode *) {
   fill: currentColor !important;
 }
 
-.multiChatDialog[data-se-chat] .voicestatusIcon .SVGIcon_Button :is(line, .MicStrike) {
+.multiChatDialog[data-se-chat] .voicestatusIcon .SVGIcon_Button line:not(.se-none),
+.multiChatDialog[data-se-chat] .voicestatusIcon .SVGIcon_Button .MicStrike {
   stroke: currentColor !important;
 }
 
@@ -426,7 +433,8 @@ a.connectionStatus:not(.GamepadMode *) {
 }
 
 /* The friend who hasn't joined yet: an empty, dashed ring */
-.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers .friend.emptyFriend .avatarHolder :is(img.avatar, .avatar) {
+.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers .friend.emptyFriend .avatarHolder img.avatar,
+.multiChatDialog[data-se-chat] .OneOnOneVoiceMembers .friend.emptyFriend .avatarHolder .avatar:not(se-none) {
   opacity: 0;
   box-shadow: none !important;
 }
@@ -701,7 +709,8 @@ a.connectionStatus:not(.GamepadMode *) {
   border: 0 !important;
 }
 
-.multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupHeader :is(.ChatRoomGroupAvatar, .ChatRoomMultiFriendAvatar) {
+.multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupHeader .ChatRoomGroupAvatar,
+.multiChatDialog[data-se-chat] .chatHeader .chatRoomGroupHeader .ChatRoomMultiFriendAvatar {
   flex: none;
   width: 36px !important;
   height: 36px !important;
@@ -765,8 +774,14 @@ a.connectionStatus:not(.GamepadMode *) {
 }
 
 /* Section labels (Text channels, Voice channels, Online…) */
-.multiChatDialog[data-se-chat] .chatRoomGroupNavColumn :is(.ChannelTypeTitle, .ChannelTypeLabel, .chatRoomChannelGroups .chatSectionTitle, .groupName),
-.multiChatDialog[data-se-chat] .MemberListColumn :is(.ChannelTypeTitle, .ChannelTypeLabel, .chatRoomChannelGroups .chatSectionTitle, .groupName) {
+.multiChatDialog[data-se-chat] .chatRoomGroupNavColumn .ChannelTypeTitle:not(.se-none),
+.multiChatDialog[data-se-chat] .chatRoomGroupNavColumn .ChannelTypeLabel:not(.se-none),
+.multiChatDialog[data-se-chat] .chatRoomGroupNavColumn .chatRoomChannelGroups .chatSectionTitle,
+.multiChatDialog[data-se-chat] .chatRoomGroupNavColumn .groupName:not(.se-none),
+.multiChatDialog[data-se-chat] .MemberListColumn .ChannelTypeTitle:not(.se-none),
+.multiChatDialog[data-se-chat] .MemberListColumn .ChannelTypeLabel:not(.se-none),
+.multiChatDialog[data-se-chat] .MemberListColumn .chatRoomChannelGroups .chatSectionTitle,
+.multiChatDialog[data-se-chat] .MemberListColumn .groupName:not(.se-none) {
   font: var(--se-label-font) !important;
   letter-spacing: var(--se-label-spacing) !important;
   text-transform: uppercase;
@@ -867,7 +882,8 @@ a.connectionStatus:not(.GamepadMode *) {
   overflow: visible !important;
 }
 
-.multiChatDialog[data-se-chat] .chatRoomVoiceChannel .friend .avatarHolder :is(img.avatar, .avatar) {
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannel .friend .avatarHolder img.avatar,
+.multiChatDialog[data-se-chat] .chatRoomVoiceChannel .friend .avatarHolder .avatar:not(se-none) {
   border-radius: var(--se-avatar-radius) !important;
   box-shadow: 0 0 0 2px var(--se-sidebar), 0 0 0 4px var(--se-running) !important;
 }

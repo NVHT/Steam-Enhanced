@@ -169,7 +169,8 @@
  * thinner gap and ring), the name in the menu's weight, the game line under it. The rows keep
  * Steam's 36 px slots (its list is virtualized).
  */
-.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="members"] .MemberListColumn .friend .avatarHolder :is(img.avatar, .avatar) {
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="members"] .MemberListColumn .friend .avatarHolder img.avatar,
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="members"] .MemberListColumn .friend .avatarHolder .avatar:not(se-none) {
   box-shadow: 0 0 0 1.5px var(--se-panel-bg), 0 0 0 3px var(--se-chat-ring, var(--se-border-strong)) !important;
 }
 
@@ -205,7 +206,8 @@
   color: var(--se-text-muted) !important;
 }
 
-.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="members"] .MemberListColumn.MemberListViewCompact .groupName :is(.groupLabelsContainer, .groupIcon > svg) {
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="members"] .MemberListColumn.MemberListViewCompact .groupName .groupLabelsContainer:not(se-none),
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="members"] .MemberListColumn.MemberListViewCompact .groupName .groupIcon > svg {
   display: none;
 }
 
@@ -252,7 +254,13 @@
 }
 
 .se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .chatRoomGroupNavCollapseExpand,
-.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .chatRoomGroupNavColumn :is(.activeVoiceControls, .chatRoomVoiceChannelIconGlow, .VoiceChannelParticipants, .emptyChannelNotice, .chatPinRoom, .ScratchPadConnect, .chatRoomVoiceChannel .chatRoomTextChannel) {
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .chatRoomGroupNavColumn .activeVoiceControls:not(.se-none),
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .chatRoomGroupNavColumn .chatRoomVoiceChannelIconGlow:not(.se-none),
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .chatRoomGroupNavColumn .VoiceChannelParticipants:not(.se-none),
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .chatRoomGroupNavColumn .emptyChannelNotice:not(.se-none),
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .chatRoomGroupNavColumn .chatPinRoom:not(.se-none),
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .chatRoomGroupNavColumn .ScratchPadConnect:not(.se-none),
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group] .chatRoomGroupNavColumn .chatRoomVoiceChannel .chatRoomTextChannel {
   display: none !important;
 }
 
@@ -273,7 +281,8 @@
   backdrop-filter: var(--se-blur-panel);
 }
 
-.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] :is(.chatRoomTextChannelsGroup, .chatRoomVoiceChannelsGroup) {
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomTextChannelsGroup,
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomVoiceChannelsGroup {
   display: flex;
   flex-direction: column;
   gap: var(--se-space-half);
@@ -338,7 +347,8 @@
  * flow. Steam places the names absolutely, a text channel's 42 px in and a voice channel's 24
  * (sp.css), and sizes the text row itself, so the two rows drifted apart.
  */
-.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] :is(.chatRoomTextChannel, .chatRoomVoiceChannel) {
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomTextChannel,
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomVoiceChannel {
   position: relative !important;
   inset: auto !important;
   box-sizing: border-box;
@@ -352,13 +362,15 @@
   transform: none !important;
 }
 
-.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] :is(.chatRoomTextChannel, .chatRoomVoiceChannelNameContainer) {
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomTextChannel,
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomVoiceChannelNameContainer {
   display: flex !important;
   align-items: center !important;
   gap: var(--se-space-3);
 }
 
-.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] :is(.chatRoomTextChannelIcon, .chatRoomVoiceChannelIcon) {
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomTextChannelIcon,
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomVoiceChannelIcon {
   flex: none;
   width: 20px !important;
   height: 20px !important;
@@ -376,7 +388,8 @@
   padding: 0 !important;
 }
 
-.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] :is(.chatRoomTextChannelName, .chatRoomVoiceChannelName) {
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomTextChannelName,
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomVoiceChannelName {
   font: 500 var(--se-fs-md) / 1.3 var(--se-font) !important;
   color: var(--se-text) !important;
   position: static !important;
@@ -396,11 +409,13 @@
   color: var(--se-text-strong) !important;
 }
 
-.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomVoiceChannel.ActiveVoiceChannel :is(.chatRoomVoiceChannelName, .chatRoomVoiceChannelIcon) {
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomVoiceChannel.ActiveVoiceChannel .chatRoomVoiceChannelName,
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomVoiceChannel.ActiveVoiceChannel .chatRoomVoiceChannelIcon {
   color: var(--se-running) !important;
 }
 
-.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] :is(.chatRoomTextChannel, .chatRoomVoiceChannel):hover {
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomTextChannel:hover,
+.se-fdock[data-chat="1"] .chatWindow.MultiUserChat[data-se-flyout-group][data-se-group-panel="channels"] .chatRoomVoiceChannel:hover {
   background: var(--se-hover) !important;
 }
 

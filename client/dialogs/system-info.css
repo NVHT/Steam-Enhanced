@@ -105,21 +105,25 @@
     opacity var(--se-dur) ease-out;
 }
 
-:is(.se-sysinfo, .se-sysreport) :is(button, input, summary):focus-visible,
+:is(.se-sysinfo, .se-sysreport) button:focus-visible,
+:is(.se-sysinfo, .se-sysreport) input:focus-visible,
+:is(.se-sysinfo, .se-sysreport) summary:focus-visible,
 button.se-sysinfo:focus-visible {
   outline: var(--se-focus-outline);
   outline-offset: var(--se-focus-offset);
 }
 
 /* The copied check (an eye on a hidden identifier): hidden until [data-copied] */
-:is(.se-sysinfo, .se-sysreport) :is(.se-sysinfo-spec, .se-sysinfo-row, .se-sysinfo-pill, .se-sysreport-spec, .se-sysreport-row) > :is([data-icon="check"], [data-icon="eye"]) {
+:is(.se-sysinfo, .se-sysreport) :is(.se-sysinfo-spec, .se-sysinfo-row, .se-sysinfo-pill, .se-sysreport-spec, .se-sysreport-row) > [data-icon="check"],
+:is(.se-sysinfo, .se-sysreport) :is(.se-sysinfo-spec, .se-sysinfo-row, .se-sysinfo-pill, .se-sysreport-spec, .se-sysreport-row) > [data-icon="eye"] {
   width: 13px;
   height: 13px;
   color: var(--se-text-strong);
   opacity: 0;
 }
 
-:is(.se-sysinfo, .se-sysreport) [data-copied] > :is([data-icon="check"], [data-icon="eye"]) {
+:is(.se-sysinfo, .se-sysreport) [data-copied] > [data-icon="check"],
+:is(.se-sysinfo, .se-sysreport) [data-copied] > [data-icon="eye"] {
   opacity: 1;
 }
 
@@ -422,7 +426,8 @@ button.se-sysinfo:focus-visible {
   visibility: hidden;
 }
 
-:is(.se-sysinfo-filter, .se-sysreport-filter)[data-filled] :is(.se-sysinfo-filter-clear, .se-sysreport-filter-clear) {
+:is(.se-sysinfo-filter, .se-sysreport-filter)[data-filled] .se-sysinfo-filter-clear,
+:is(.se-sysinfo-filter, .se-sysreport-filter)[data-filled] .se-sysreport-filter-clear {
   visibility: visible;
 }
 
@@ -533,7 +538,8 @@ button.se-sysinfo:focus-visible {
 
 .se-sysinfo-card:hover .se-sysinfo-card-copy,
 .se-sysreport-card:hover .se-sysreport-card-copy,
-:is(.se-sysinfo-card-copy, .se-sysreport-card-copy):is(:focus-visible, [data-copied]) {
+.se-sysinfo-card-copy:is(:focus-visible, [data-copied]),
+.se-sysreport-card-copy:is(:focus-visible, [data-copied]) {
   opacity: 1;
 }
 
@@ -618,7 +624,8 @@ button.se-sysinfo:focus-visible {
   opacity: 0;
 }
 
-:is(.se-sysinfo-row, .se-sysreport-row) > :is([data-icon="check"], [data-icon="eye"]) {
+:is(.se-sysinfo-row, .se-sysreport-row) > [data-icon="check"],
+:is(.se-sysinfo-row, .se-sysreport-row) > [data-icon="eye"] {
   align-self: center;
 }
 

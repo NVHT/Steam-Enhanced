@@ -35,7 +35,9 @@ html.Account_Menu ._2EstNjFIIZm_WUSKm5Wt7n[data-se-closing]:not(#se-none) {
 }
 
 /* Steam's separators go: the headings divide the groups */
-[data-se-avatar-menu] :is(.WUOrULWKkGLl3ZUQdDXg8, .IjIBR_wDDi2N77Oz4KAT4, hr) {
+[data-se-avatar-menu] .WUOrULWKkGLl3ZUQdDXg8,
+[data-se-avatar-menu] .IjIBR_wDDi2N77Oz4KAT4,
+[data-se-avatar-menu] hr:not(.se-none) {
   display: none !important;
 }
 
@@ -69,11 +71,13 @@ html.Account_Menu ._2EstNjFIIZm_WUSKm5Wt7n[data-se-closing]:not(#se-none) {
 
 /* Keyboard focus (Steam's arrow keys, or a focused row) is the hover highlight, as in the
    Settings menu: no ring. */
-:root [data-se-avatar-menu] :is([data-se-acct-icon], .se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI):is(:focus, :focus-visible) {
+:root [data-se-avatar-menu] [data-se-acct-icon]:not(.se-none):is(:focus, :focus-visible),
+:root [data-se-avatar-menu] .se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI:is(:focus, :focus-visible) {
   outline: none !important;
 }
 
-:root [data-se-avatar-menu] :is([data-se-acct-icon], .se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI):is(:focus-visible, .gpfocus) {
+:root [data-se-avatar-menu] [data-se-acct-icon]:not(.se-none):is(:focus-visible, .gpfocus),
+:root [data-se-avatar-menu] .se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI:is(:focus-visible, .gpfocus) {
   background: var(--se-selected) !important;
   color: var(--se-text-strong) !important;
   box-shadow: none !important;
@@ -158,7 +162,8 @@ html.Account_Menu ._2EstNjFIIZm_WUSKm5Wt7n[data-se-closing]:not(#se-none) {
 [data-se-acct-icon="signout"] { --se-acct-mask: var(--se-icon-sign-out); }
 [data-se-acct-icon="dnd"] { --se-acct-mask: var(--se-icon-moon); }
 
-:root [data-se-avatar-menu] :is([data-se-acct-icon="dnd"], [data-se-acct-icon="edit"]) {
+:root [data-se-avatar-menu] [data-se-acct-icon="dnd"],
+:root [data-se-avatar-menu] [data-se-acct-icon="edit"] {
   min-height: 38px;
   padding: var(--se-space-1) var(--se-space-2) !important;
 }
@@ -243,7 +248,8 @@ html.Account_Menu ._2EstNjFIIZm_WUSKm5Wt7n[data-se-closing]:not(#se-none) {
 .se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI::before,
 .se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI::after,
 .se-acct-seg ._1GNJUJrGs0xUpASde60jQh > ._32b_aVF7OElQOPG70LjdrJ,
-.se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI :is(svg, img) {
+.se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI svg,
+.se-acct-seg ._1n7Wloe5jZ6fSuvV18NNWI img {
   display: none !important;
 }
 

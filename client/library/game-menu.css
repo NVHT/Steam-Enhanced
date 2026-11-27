@@ -35,7 +35,9 @@
 }
 
 /* Steam's separators go: the theme's dividers place themselves. !important: dialogs.css's separator rule. */
-[data-se-lib-menu] :is(.WUOrULWKkGLl3ZUQdDXg8, .IjIBR_wDDi2N77Oz4KAT4, hr) {
+[data-se-lib-menu] .WUOrULWKkGLl3ZUQdDXg8,
+[data-se-lib-menu] .IjIBR_wDDi2N77Oz4KAT4,
+[data-se-lib-menu] hr:not(.se-none) {
   display: none !important;
 }
 
@@ -68,7 +70,8 @@
   order: 1;
 }
 
-[data-se-gm-list] > :is([data-se-gm-slot='favorite'], [data-se-gm-slot='unfavorite']) {
+[data-se-gm-list] > [data-se-gm-slot='favorite'],
+[data-se-gm-list] > [data-se-gm-slot='unfavorite'] {
   order: 2;
 }
 
@@ -76,7 +79,8 @@
   order: 3;
 }
 
-[data-se-gm-list] > :is([data-se-gm-slot='hide'], [data-se-gm-slot='unhide']) {
+[data-se-gm-list] > [data-se-gm-slot='hide'],
+[data-se-gm-list] > [data-se-gm-slot='unhide'] {
   order: 4;
 }
 
@@ -92,7 +96,8 @@
   order: 20;
 }
 
-[data-se-gm-list] > :is([data-se-gm-slot='shortcut'], [data-se-gm-slot='unlist']) {
+[data-se-gm-list] > [data-se-gm-slot='shortcut'],
+[data-se-gm-list] > [data-se-gm-slot='unlist'] {
   order: 21;
 }
 
@@ -161,7 +166,8 @@
  * Add to › and Remove from › go: the Collections row does both. :root…:not(#se-none) and after
  * the row rule above, which would otherwise draw them (its display: grid).
  */
-:root [data-se-lib-menu] :is([data-se-gm='add'], [data-se-gm='remove']):not(#se-none) {
+:root [data-se-lib-menu] [data-se-gm='add']:not(#se-none),
+:root [data-se-lib-menu] [data-se-gm='remove']:not(#se-none) {
   display: none !important;
 }
 
@@ -191,7 +197,8 @@
 }
 
 /* Rows the theme has no glyph for (a plugin's, Family's) keep the icon's room, empty */
-[data-se-lib-menu] :is([data-se-gm='other'], [data-se-gm='sub'])::before {
+[data-se-lib-menu] [data-se-gm='other']::before,
+[data-se-lib-menu] [data-se-gm='sub']::before {
   background: none;
 }
 
