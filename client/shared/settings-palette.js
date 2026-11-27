@@ -1,7 +1,7 @@
 /*
- * The theme's settings, part 1 of 2 (client/shared/settings.js names what they do), listed just
- * before it: the colour palette's base tokens, the presets that set them, and a Custom palette
- * filled from a base. Shared with settings.js on window.__seSettingsPaletteParts.
+ * The theme's settings, part 1 of 3 (client/shared/settings.js names what they do), listed first:
+ * the colour palette's base tokens, the presets that set them, and a Custom palette filled from a
+ * base. Shared with settings-schema.js and settings.js on window.__seSettingsPaletteParts.
  */
 (() => {
   const COLOUR = /^(?:#[0-9a-f]{6}|rgba\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*(?:0|1|0?\.\d+)\s*\))$/i;

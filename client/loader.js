@@ -67,7 +67,7 @@
     ['all', 'core/', ['font.css', 'tokens.css', 'icons-nav.css', 'icons-ui.css', 'icons-ui-settings.css', 'motion.css', 'images.css', 'images.js', 'levels.css']],
     ['all', 'client/shared/', ['popup-layer.css', 'search-field.css', 'segmented.css']],
     // The theme's settings, kept in step in every window (their stylesheets: applyOptions below)
-    ['all', 'client/shared/', ['settings-palette.js', 'settings.js']],
+    ['all', 'client/shared/', ['settings-palette.js', 'settings-schema.js', 'settings.js']],
     // A friend's profile background and Steam's "?" picture (toasts, tray, chat, friend dialogs)
     ['content', 'client/shared/', ['mini-profile.js']],
     ['toasts', 'client/shared/', ['mini-profile.js']],
