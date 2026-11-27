@@ -70,7 +70,7 @@
     try {
       if (ids) localStorage.setItem(key, JSON.stringify(ids));
       else localStorage.removeItem(key);
-    } catch {}
+    } catch { /* storage refused (full or blocked): kept in memory only */ }
   }
 
   let pickEl = null;
@@ -304,7 +304,7 @@
       saving = true;
       try {
         await opts.manage.rename(id, next);
-      } catch {}
+      } catch { /* Steam refused it: the repaint shows the old name */ }
       if (pickOpts === opts && pickEl) paintPick();
     };
     field.addEventListener('keydown', (e) => {
@@ -343,7 +343,7 @@
     const opts = pickOpts;
     try {
       await opts.manage.remove(id);
-    } catch {}
+    } catch { /* already gone with its window: nothing to undo */ }
     if (pickOpts === opts && pickEl) paintPick();
   }
 
@@ -352,7 +352,7 @@
     const opts = pickOpts;
     try {
       await opts.create.run(name);
-    } catch {}
+    } catch { /* Steam refused it: the repaint shows no new row */ }
     if (pickOpts !== opts || !pickEl) return;
     const search = pickEl.querySelector('.se-pick-search');
     if (search) search.value = '';
@@ -390,6 +390,86 @@
     `<span class="se-mn-icon" style="--se-mn-icon: var(--se-icon-${iconName})"></span>` +
     `<span class="se-mn-name">${name}</span></button>`;
 
+  // The picker's frame: header, search box, an empty list, and the footer its options call for
+  const pickMarkup = (opts) =>
+    '<div class="se-mn-sum">' +
+    (opts.back ? '<button type="button" class="se-pick-back" data-pk-back aria-label="Back"></button>' : '') +
+    `<span class="se-mn-title">${SE.esc(opts.title)}</span>${opts.single ? '' : '<span class="se-pick-count"></span>'}</div>` +
+    (opts.placeholder
+      ? '<label class="se-pick-find"><span class="se-pick-glass"></span>' +
+        `<input type="search" class="se-pick-search" placeholder="${SE.esc(opts.placeholder)}" aria-label="${SE.esc(opts.placeholder)}"></label>`
+      : '') +
+    '<div class="se-mn-body se-pick-list"></div>' +
+    (opts.create?.newLabel
+      ? '<div class="se-mn-foot se-pick-foot">' + pickRow('data-pk-new', 'folder-plus', SE.esc(opts.create.newLabel)) + '</div>'
+      : opts.single || opts.onToggle
+      ? ''
+      : '<div class="se-mn-foot se-pick-foot">' +
+        (opts.clearable
+          ? pickRow('data-pk-clear', 'restore', 'Clear')
+          : pickRow('data-pk-all', 'list', 'Show all') + pickRow('data-pk-none', 'eye-off', 'Show none')) +
+        '</div>');
+
+  // A row's tick: to the owner's onToggle, else saved as the picker's choice
+  function onPickChange(e) {
+    const box = e.target.closest('input[type="checkbox"][data-id]');
+    if (!box) return;
+    if (pickOpts.onToggle) {
+      pickOpts.onToggle(box.dataset.id, box.checked);
+      paintPickFoot();
+      return;
+    }
+    const ids = pickedNow().filter((id) => id !== box.dataset.id);
+    if (box.checked) ids.push(box.dataset.id);
+    writePick(pickOpts.key, pickOpts.clearable && !ids.length ? null : ids);
+    paintPickFoot();
+    pickOpts.onChange?.();
+  }
+
+  // The picker's buttons: back, the delete ask, create and new, a single choice, the footer's
+  function onPickClick(e) {
+    if (e.target.closest('[data-pk-back]')) {
+      backPick();
+      return;
+    }
+    if (e.target.closest('[data-pk-keep]')) {
+      paintPick();
+      return;
+    }
+    const del = e.target.closest('[data-pk-delete]');
+    if (del) {
+      deleteRow(del.dataset.pkDelete);
+      return;
+    }
+    if (e.target.closest('[data-pk-new]')) {
+      newFromFooter(e);
+      return;
+    }
+    const make = e.target.closest('[data-pk-create]');
+    if (make) {
+      createFromSearch(make.dataset.pkCreate);
+      return;
+    }
+    const one = e.target.closest('[data-one]');
+    if (one) {
+      pickOpts.onChoose(one.dataset.one);
+      backPick();
+      return;
+    }
+    if (e.target.closest('[data-pk-clear]')) {
+      writePick(pickOpts.key, null);
+      paintPick();
+      pickOpts.onChange?.();
+      return;
+    }
+    const all = e.target.closest('[data-pk-all]');
+    if (all || e.target.closest('[data-pk-none]')) {
+      writePick(pickOpts.key, all ? null : []);
+      paintPick();
+      pickOpts.onChange?.();
+    }
+  }
+
   /*
    * A list to tick, drawn as the settings menu is (client/shared/menu.js): a header (‹ back to the menu it
    * came from, the title, how many are chosen), a search box, the rows, Show all and Show
@@ -426,24 +506,7 @@
     pickEl.className = 'se-placed se-mn se-pick';
     pickEl.setAttribute('role', 'dialog');
     pickEl.setAttribute('aria-label', opts.title);
-    pickEl.innerHTML =
-      '<div class="se-mn-sum">' +
-      (opts.back ? '<button type="button" class="se-pick-back" data-pk-back aria-label="Back"></button>' : '') +
-      `<span class="se-mn-title">${SE.esc(opts.title)}</span>${opts.single ? '' : '<span class="se-pick-count"></span>'}</div>` +
-      (opts.placeholder
-        ? '<label class="se-pick-find"><span class="se-pick-glass"></span>' +
-          `<input type="search" class="se-pick-search" placeholder="${SE.esc(opts.placeholder)}" aria-label="${SE.esc(opts.placeholder)}"></label>`
-        : '') +
-      '<div class="se-mn-body se-pick-list"></div>' +
-      (opts.create?.newLabel
-        ? '<div class="se-mn-foot se-pick-foot">' + pickRow('data-pk-new', 'folder-plus', SE.esc(opts.create.newLabel)) + '</div>'
-        : opts.single || opts.onToggle
-        ? ''
-        : '<div class="se-mn-foot se-pick-foot">' +
-          (opts.clearable
-            ? pickRow('data-pk-clear', 'restore', 'Clear')
-            : pickRow('data-pk-all', 'list', 'Show all') + pickRow('data-pk-none', 'eye-off', 'Show none')) +
-          '</div>');
+    pickEl.innerHTML = pickMarkup(opts);
 
     pickEl.addEventListener('error', SE.art.onError, true);
     pickEl.addEventListener('load', SE.art.onLoad, true);
@@ -452,62 +515,8 @@
     });
     pickEl.addEventListener('keydown', onPickEnter);
     pickEl.addEventListener('contextmenu', onPickContext);
-    pickEl.addEventListener('change', (e) => {
-      const box = e.target.closest('input[type="checkbox"][data-id]');
-      if (!box) return;
-      if (pickOpts.onToggle) {
-        pickOpts.onToggle(box.dataset.id, box.checked);
-        paintPickFoot();
-        return;
-      }
-      const ids = pickedNow().filter((id) => id !== box.dataset.id);
-      if (box.checked) ids.push(box.dataset.id);
-      writePick(pickOpts.key, pickOpts.clearable && !ids.length ? null : ids);
-      paintPickFoot();
-      pickOpts.onChange?.();
-    });
-    pickEl.addEventListener('click', (e) => {
-      if (e.target.closest('[data-pk-back]')) {
-        backPick();
-        return;
-      }
-      if (e.target.closest('[data-pk-keep]')) {
-        paintPick();
-        return;
-      }
-      const del = e.target.closest('[data-pk-delete]');
-      if (del) {
-        deleteRow(del.dataset.pkDelete);
-        return;
-      }
-      if (e.target.closest('[data-pk-new]')) {
-        newFromFooter(e);
-        return;
-      }
-      const make = e.target.closest('[data-pk-create]');
-      if (make) {
-        createFromSearch(make.dataset.pkCreate);
-        return;
-      }
-      const one = e.target.closest('[data-one]');
-      if (one) {
-        pickOpts.onChoose(one.dataset.one);
-        backPick();
-        return;
-      }
-      if (e.target.closest('[data-pk-clear]')) {
-        writePick(pickOpts.key, null);
-        paintPick();
-        pickOpts.onChange?.();
-        return;
-      }
-      const all = e.target.closest('[data-pk-all]');
-      if (all || e.target.closest('[data-pk-none]')) {
-        writePick(pickOpts.key, all ? null : []);
-        paintPick();
-        pickOpts.onChange?.();
-      }
-    });
+    pickEl.addEventListener('change', onPickChange);
+    pickEl.addEventListener('click', onPickClick);
 
     document.body.appendChild(pickEl);
     document.addEventListener('pointerdown', onPickOutside, true);

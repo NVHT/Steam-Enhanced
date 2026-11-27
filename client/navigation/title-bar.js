@@ -81,7 +81,7 @@
     listHidden = !listHidden;
     try {
       localStorage.setItem(HIDE_KEY, listHidden ? '1' : '0');
-    } catch {}
+    } catch { /* storage refused (full or blocked): kept in memory only */ }
   };
 
   // The list's width is --se-list-w in CSS; only its edges are tracked here. Its resize handle
@@ -219,13 +219,8 @@
     SE.attr(account, 'data-se-name', persona?.m_strPlayerName || null);
   }
 
-  function syncGameList() {
-    const hidden = isListHidden();
-    document.body.classList.toggle('se-list-hidden', hidden);
-
-    const downloadsList = window.__seDownloads?.library;
-    const list = downloadsList || document.querySelector(LIST_SELECTOR);
-    const topBar = document.querySelector(`.${C.TopBar}`);
+  // The list's rect, re-read only when the geometry key or a watched size says it moved
+  function readListGeometry(hidden, downloadsList, list, topBar) {
     watchSize(list);
     watchSize(topBar?.querySelector(`.${C.FocusNavigationRoot_TitleBarControls}`));
 
@@ -241,12 +236,11 @@
     if (isVisible) {
       listRight = Math.round(rect.right);
     }
+    return { measure, isVisible };
+  }
 
-    syncListHandle(list, isVisible);
-    if (isVisible !== document.body.hasAttribute('data-se-list')) {
-      document.body.toggleAttribute('data-se-list', isVisible);
-    }
-
+  // The view's game count on the list header's picker; returns the lockup's stat text
+  function syncListCount(list, isVisible, downloadsList) {
     const picker = list?.querySelector(`.${C.MenuHeader}`);
     let statText = '';
     if (picker) {
@@ -260,7 +254,7 @@
         try {
           const cached = localStorage.getItem(VIEW_COUNT_KEY);
           if (cached) lastViewCount = Number(cached);
-        } catch {}
+        } catch { /* storage unreadable: the default stands */ }
       }
       if (count === null) count = lastViewCount;
       if (count === null && viewLabel && viewLabel === gamesViewName()) {
@@ -271,8 +265,10 @@
         statText = count.toLocaleString('en');
       }
     }
+    return statText;
+  }
 
-    const onLibraryRoute = /^\/library/.test(ns.currentRoutePath()) || !!list;
+  function placeListToggle(topBar) {
     if (!listToggleBtn) {
       listToggleBtn = document.createElement('button');
       listToggleBtn.type = 'button';
@@ -292,7 +288,9 @@
     } else {
       listToggleBtn.remove();
     }
+  }
 
+  function placeTopButton(topBar, onLibraryRoute, isVisible) {
     if (!topBtn) {
       topBtn = document.createElement('button');
       topBtn.type = 'button';
@@ -311,6 +309,27 @@
     } else {
       topBtn.remove();
     }
+  }
+
+  function syncGameList() {
+    const hidden = isListHidden();
+    document.body.classList.toggle('se-list-hidden', hidden);
+
+    const downloadsList = window.__seDownloads?.library;
+    const list = downloadsList || document.querySelector(LIST_SELECTOR);
+    const topBar = document.querySelector(`.${C.TopBar}`);
+    const { measure, isVisible } = readListGeometry(hidden, downloadsList, list, topBar);
+
+    syncListHandle(list, isVisible);
+    if (isVisible !== document.body.hasAttribute('data-se-list')) {
+      document.body.toggleAttribute('data-se-list', isVisible);
+    }
+
+    const statText = syncListCount(list, isVisible, downloadsList);
+
+    const onLibraryRoute = /^\/library/.test(ns.currentRoutePath()) || !!list;
+    placeListToggle(topBar);
+    placeTopButton(topBar, onLibraryRoute, isVisible);
 
     SE.mark(listToggleBtn, 'aria-label', hidden ? 'Show game list' : 'Hide game list');
     SE.mark(listToggleBtn, 'aria-pressed', String(hidden));
@@ -386,7 +405,7 @@
     lastViewCount = total;
     try {
       localStorage.setItem(VIEW_COUNT_KEY, String(total));
-    } catch {}
+    } catch { /* storage refused (full or blocked): kept in memory only */ }
     ns.schedule();
   }
 

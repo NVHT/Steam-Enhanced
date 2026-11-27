@@ -357,12 +357,80 @@
     return pages.length ? pages : [[]];
   }
 
-  function placeShotComments(wrap) {
+  // Clicks Steam's "more comments", at most once a second, so every comment is in the page
+  function loadMoreComments(wrap) {
     const more = wrap.querySelector(MORE_COMMENTS);
     if (more && Date.now() - (wrap.__seMoreAt || 0) > 1000) {
       wrap.__seMoreAt = Date.now();
       more.click();
     }
+  }
+
+  // The comments' title and page tabs; a tab picks its page and pages again
+  function makeCommentsHead(wrap) {
+    const head = own('div', 'se-cm-head');
+    head.innerHTML = '<span class="se-cm-title"></span><div class="se-cm-tabs"></div>';
+    head.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b || b.disabled) return;
+      e.stopPropagation();
+      wrap.__sePage =
+        b.dataset.page !== undefined ? Number(b.dataset.page) : (wrap.__sePage || 0) + Number(b.dataset.dir);
+      wrap.__seCmKey = '';
+      placeShotComments(wrap);
+    });
+    return head;
+  }
+
+  // The one ResizeObserver for every comment box and comment (live.cmSizer)
+  function commentSizer() {
+    return new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const node = entry.target;
+        // Removed (a removed box reports one last resize): let go, so old comments aren't kept
+        if (!node.isConnected) {
+          live.cmSizer.unobserve(node);
+          continue;
+        }
+        const h = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height;
+        // Layout is clean inside the callback: this read costs nothing
+        if (node.__seCmBox) node.__seRoom = node.clientHeight;
+        else if (h > 0) node.__seH = h;
+        if (node.__seCmWrap) node.__seCmWrap.__seCmKey = '';
+      }
+      schedule();
+    });
+  }
+
+  // Hands a new comment list to cmSizer, letting go of the comments that left it
+  function watchCommentSizes(wrap, box, list, known) {
+    wrap.__seCmList = list;
+    live.cmSizer ??= commentSizer();
+    // Comments that left the list (still in the page, now hidden or moved) are let go too
+    if (known) {
+      const now = new Set(list);
+      for (const c of known) if (!now.has(c)) live.cmSizer.unobserve(c);
+    }
+    box.__seCmBox = true;
+    for (const node of [box, ...list]) {
+      node.__seCmWrap = wrap;
+      live.cmSizer.observe(node);
+    }
+  }
+
+  // The tabs' markup: none for one page, a button per page up to MAX_TABS, else arrows and "2 / 9"
+  function commentTabsHtml(pages, page) {
+    return pages.length < 2
+      ? ''
+      : pages.length <= MAX_TABS
+        ? pages
+            .map((_, i) => `<button type="button" data-page="${i}"${i === page ? ' data-on' : ''}>${i + 1}</button>`)
+            .join('')
+        : `<button type="button" data-dir="-1" aria-label="Previous"${page === 0 ? ' disabled' : ''}>${SVG_CHEV('M15 5l-7 7 7 7')}</button><span>${page + 1} / ${pages.length}</span><button type="button" data-dir="1" aria-label="Next"${page === pages.length - 1 ? ' disabled' : ''}>${SVG_CHEV('M9 5l7 7-7 7')}</button>`;
+  }
+
+  function placeShotComments(wrap) {
+    loadMoreComments(wrap);
     const list = [...wrap.querySelectorAll(COMMENT)];
     const box = list[0]?.parentElement;
     const inner = wrap.querySelector(RV_THREAD_IN);
@@ -374,19 +442,7 @@
     }
     mark(box, 'data-se-clist');
 
-    if (!head) {
-      head = own('div', 'se-cm-head');
-      head.innerHTML = '<span class="se-cm-title"></span><div class="se-cm-tabs"></div>';
-      head.addEventListener('click', (e) => {
-        const b = e.target.closest('button');
-        if (!b || b.disabled) return;
-        e.stopPropagation();
-        wrap.__sePage =
-          b.dataset.page !== undefined ? Number(b.dataset.page) : (wrap.__sePage || 0) + Number(b.dataset.dir);
-        wrap.__seCmKey = '';
-        placeShotComments(wrap);
-      });
-    }
+    if (!head) head = makeCommentsHead(wrap);
     if (head.parentElement !== inner || head.previousElementSibling !== rating) {
       rating.after(head);
     }
@@ -403,35 +459,7 @@
     const known = wrap.__seCmList;
     const sameList = known?.length === list.length && list.every((c, i) => c === known[i]);
     if (sameList && wrap.__seCmKey) return;
-    if (!sameList) {
-      wrap.__seCmList = list;
-      live.cmSizer ??= new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          const node = entry.target;
-          // Removed (a removed box reports one last resize): let go, so old comments aren't kept
-          if (!node.isConnected) {
-            live.cmSizer.unobserve(node);
-            continue;
-          }
-          const h = entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height;
-          // Layout is clean inside the callback: this read costs nothing
-          if (node.__seCmBox) node.__seRoom = node.clientHeight;
-          else if (h > 0) node.__seH = h;
-          if (node.__seCmWrap) node.__seCmWrap.__seCmKey = '';
-        }
-        schedule();
-      });
-      // Comments that left the list (still in the page, now hidden or moved) are let go too
-      if (known) {
-        const now = new Set(list);
-        for (const c of known) if (!now.has(c)) live.cmSizer.unobserve(c);
-      }
-      box.__seCmBox = true;
-      for (const node of [box, ...list]) {
-        node.__seCmWrap = wrap;
-        live.cmSizer.observe(node);
-      }
-    }
+    if (!sameList) watchCommentSizes(wrap, box, list, known);
     // Not measured yet: every comment shows, so cmSizer can measure it, and paging waits
     if (!box.__seRoom || list.some((c) => !c.__seH)) {
       for (const c of list) mark(c, 'data-se-pg', 'on');
@@ -446,14 +474,7 @@
     wrap.__seCmKey = 'paged';
 
     const tabs = head.querySelector('.se-cm-tabs');
-    const html =
-      pages.length < 2
-        ? ''
-        : pages.length <= MAX_TABS
-          ? pages
-              .map((_, i) => `<button type="button" data-page="${i}"${i === page ? ' data-on' : ''}>${i + 1}</button>`)
-              .join('')
-          : `<button type="button" data-dir="-1" aria-label="Previous"${page === 0 ? ' disabled' : ''}>${SVG_CHEV('M15 5l-7 7 7 7')}</button><span>${page + 1} / ${pages.length}</span><button type="button" data-dir="1" aria-label="Next"${page === pages.length - 1 ? ' disabled' : ''}>${SVG_CHEV('M9 5l7 7-7 7')}</button>`;
+    const html = commentTabsHtml(pages, page);
     if (tabs.__seHtml !== html) {
       tabs.__seHtml = html;
       tabs.innerHTML = html;
@@ -652,7 +673,7 @@
           // Steam fills the bar on hover; a stand-in event wakes it once without a real pointer.
           try {
             fn({ type: 'mouseenter', target: n, currentTarget: n, preventDefault() {}, stopPropagation() {} });
-          } catch {}
+          } catch { /* Steam's handler refused the stand-in event: the bar fills on a real hover */ }
           break;
         }
       }

@@ -229,7 +229,7 @@
   function setView(kind, v) {
     try {
       localStorage.setItem(viewKey(kind), v);
-    } catch {}
+    } catch { /* storage refused (full or blocked): kept in memory only */ }
     schedule();
   }
 
@@ -445,6 +445,81 @@
     }
   }
 
+  // The collection banner's stats: games, installed, hours, and friends playing when any are
+  function collectionStats(games, apps) {
+    const friends = games.reduce((n, g) => n + (g.friends || 0), 0);
+    const stats = [
+      [COPY.games, num(apps.length)],
+      [COPY.installed, num(apps.filter(isInstalled).length)],
+      [COPY.hours, num(Math.round(apps.reduce((n, a) => n + (a.minutes_playtime_forever || 0), 0) / 60))],
+    ];
+    if (friends) stats.push([COPY.friends, num(friends)]);
+    return stats;
+  }
+
+  // The List view's extra column heading for the sort order in force, null when it adds none
+  function sortColumnLabel(sort, games) {
+    return sortCell(sort, games[0] || { app: {} }) !== null && games.length
+      ? {
+          [SORT.achievements]: COPY.sAch,
+          [SORT.release]: COPY.sRelease,
+          [SORT.added]: COPY.sAdded,
+          [SORT.metacritic]: COPY.sMeta,
+          [SORT.friends]: COPY.sFriends,
+        }[sort]
+      : null;
+  }
+
+  function collectionGameRow(g, sort, extra) {
+    const { app, friends: fr } = g;
+    const inst = isInstalled(app);
+    const r = el('div', 'se-clist-row');
+    r.dataset.app = app.appid;
+    SE.mark(r, 'data-installed', String(inst));
+    const sub = fr ? COPY.friendsSub(fr) : inst ? COPY.installed : COPY.notInstalled;
+    r.append(
+      cell('thumb', coverImg(app, 'se-cl-cover')),
+      nameCell(app.display_name || '', sub, fr ? 'se-cl-friends' : '')
+    );
+    if (extra) r.append(cell('sort', sortCell(sort, g)));
+    r.append(
+      cell('hours', hoursText(app)),
+      cell('date', dateText(app.rt_last_time_played)),
+      cell('size', inst ? sizeText(app) : '—'),
+      cell(
+        'act',
+        inst
+          ? button('se-cl-play', 'play', COPY.play, { act: 'play', gameid: String(app.gameid || app.appid) })
+          : button('se-cl-install', 'dl', COPY.install, { act: 'install', appid: String(app.appid) })
+      )
+    );
+    return r;
+  }
+
+  // The List view's rows: a game's row each, a section's heading before its first game
+  function collectionGameRows(games, sort, extra) {
+    const rows = [];
+    let lastSection = null;
+    for (const g of games) {
+      if (g.section && g.section !== lastSection) {
+        rows.push(el('div', 'se-clist-group', g.section));
+      }
+      lastSection = g.section;
+      rows.push(collectionGameRow(g, sort, extra));
+    }
+    return rows;
+  }
+
+  function collectionColumns(extra) {
+    const cols = [
+      ['thumb', ''],
+      ['main', COPY.name],
+    ];
+    if (extra) cols.push(['sort', extra]);
+    cols.push(['hours', COPY.hours], ['date', COPY.lastPlayed], ['size', COPY.size], ['act', '']);
+    return cols;
+  }
+
   function updateCollection(page) {
     const header = page.querySelector(`:scope > .${HEADER}`);
     if (!header) return;
@@ -458,13 +533,7 @@
     SE.mark(page, 'data-se-cpage', 'collection');
     SE.mark(page, 'data-se-view', view);
 
-    const friends = games.reduce((n, g) => n + (g.friends || 0), 0);
-    const stats = [
-      [COPY.games, num(apps.length)],
-      [COPY.installed, num(apps.filter(isInstalled).length)],
-      [COPY.hours, num(Math.round(apps.reduce((n, a) => n + (a.minutes_playtime_forever || 0), 0) / 60))],
-    ];
-    if (friends) stats.push([COPY.friends, num(friends)]);
+    const stats = collectionStats(games, apps);
 
     const ctrl = banner(header, 'collection', {
       eyebrow: coll?.bIsDynamic ? COPY.dynamic : COPY.collection,
@@ -486,60 +555,14 @@
       return;
     }
 
-    const extra =
-      sortCell(sort, games[0] || { app: {} }) !== null && games.length
-        ? {
-            [SORT.achievements]: COPY.sAch,
-            [SORT.release]: COPY.sRelease,
-            [SORT.added]: COPY.sAdded,
-            [SORT.metacritic]: COPY.sMeta,
-            [SORT.friends]: COPY.sFriends,
-          }[sort]
-        : null;
+    const extra = sortColumnLabel(sort, games);
 
     const sig = grid?.sig || signature(sort, games);
 
     if (existing && existing.dataset.sig === sig && existing.previousElementSibling === ctl) return;
 
-    const rows = [];
-    let lastSection = null;
-    for (const g of games) {
-      if (g.section && g.section !== lastSection) {
-        rows.push(el('div', 'se-clist-group', g.section));
-      }
-      lastSection = g.section;
-      const { app, friends: fr } = g;
-      const inst = isInstalled(app);
-      const r = el('div', 'se-clist-row');
-      r.dataset.app = app.appid;
-      SE.mark(r, 'data-installed', String(inst));
-      const sub = fr ? COPY.friendsSub(fr) : inst ? COPY.installed : COPY.notInstalled;
-      r.append(
-        cell('thumb', coverImg(app, 'se-cl-cover')),
-        nameCell(app.display_name || '', sub, fr ? 'se-cl-friends' : '')
-      );
-      if (extra) r.append(cell('sort', sortCell(sort, g)));
-      r.append(
-        cell('hours', hoursText(app)),
-        cell('date', dateText(app.rt_last_time_played)),
-        cell('size', inst ? sizeText(app) : '—'),
-        cell(
-          'act',
-          inst
-            ? button('se-cl-play', 'play', COPY.play, { act: 'play', gameid: String(app.gameid || app.appid) })
-            : button('se-cl-install', 'dl', COPY.install, { act: 'install', appid: String(app.appid) })
-        )
-      );
-      rows.push(r);
-    }
-
-    const cols = [
-      ['thumb', ''],
-      ['main', COPY.name],
-    ];
-    if (extra) cols.push(['sort', extra]);
-    cols.push(['hours', COPY.hours], ['date', COPY.lastPlayed], ['size', COPY.size], ['act', '']);
-    table(ctl, 'collection', cols, rows, sig);
+    const rows = collectionGameRows(games, sort, extra);
+    table(ctl, 'collection', collectionColumns(extra), rows, sig);
   }
 
   const allState = { sort: 'az', filter: '' };
@@ -598,44 +621,25 @@
     setText(add.lastChild, COPY.newColl);
   }
 
-  function updateAll(scroll) {
-    const header = scroll.querySelector(`:scope > .${ALLHEADER}`);
-    if (!header) return;
-    const view = getView('collections');
-    SE.mark(scroll, 'data-se-cpage', 'all');
-    SE.mark(scroll, 'data-se-view', view);
-
-    const colls = userCollections();
+  // Every game in the collections, once each
+  function libraryApps(colls) {
     const seen = new Map();
     for (const c of colls) {
       for (const a of c.visibleApps || []) seen.set(a.appid, a);
     }
-    const apps = [...seen.values()];
+    return [...seen.values()];
+  }
 
-    const ctrl = banner(header, 'all', {
-      eyebrow: COPY.library,
-      iconName: 'grid',
-      stats: [
-        [COPY.collections, num(colls.length)],
-        [COPY.games, num(apps.length)],
-        [COPY.installed, num(apps.filter(isInstalled).length)],
-      ],
-      artApps: mostPlayed(apps, 8),
-    });
-    buildAllControls(ctrl);
-
+  // Each collection tile marked with its collection's id
+  function markCollectionTiles(scroll) {
     for (const tile of scroll.querySelectorAll(`.${TILE}:not(.${NEWTILE})`)) {
       const c = SE.fromProps(tile, 6, (q) => (q.collection?.id ? q.collection : null));
       if (c) SE.mark(tile, 'data-se-coll', c.id);
     }
+  }
 
-    const grid = [...scroll.children].reverse().find((e) => e !== header && !e.classList.contains('se-clist'));
-    const existing = scroll.querySelector(':scope > .se-clist');
-    if (view !== 'list' || !grid) {
-      existing?.remove();
-      return;
-    }
-
+  // The collections the filter matches, with their counts, in the chosen order (Favorites first)
+  function collectionInfo(colls) {
     const q = allState.filter.trim().toLowerCase();
     const info = colls
       .filter((c) => !q || (c.displayName || '').toLowerCase().includes(q))
@@ -656,31 +660,68 @@
       recent: (a, b) => b.last - a.last,
     }[allState.sort];
     info.sort((a, b) => (b.c.id === 'favorite') - (a.c.id === 'favorite') || cmp(a, b));
+    return info;
+  }
+
+  function collectionSummaryRow({ c, games, installed, last, top }) {
+    const r = el('div', 'se-clist-row');
+    r.dataset.coll = c.id;
+    const stack = el('div', 'se-cl-stack');
+    for (const app of top.slice().reverse()) {
+      stack.appendChild(coverImg(app, 'se-cl-cover'));
+    }
+    const name = nameCell(c.displayName || '', c.bIsDynamic ? COPY.dynamic : COPY.gamesSub(games));
+    if (c.id === 'favorite') {
+      name.firstChild.insertAdjacentHTML('afterbegin', `<span class="se-cl-fav">${icon('heart', 14)}</span>`);
+    }
+    r.append(
+      cell('thumb', stack),
+      name,
+      cell('games', num(games)),
+      cell('inst', num(installed)),
+      cell('date', dateText(last)),
+      cell('act', button('se-cl-open', 'chev', COPY.open, {}))
+    );
+    return r;
+  }
+
+  function updateAll(scroll) {
+    const header = scroll.querySelector(`:scope > .${ALLHEADER}`);
+    if (!header) return;
+    const view = getView('collections');
+    SE.mark(scroll, 'data-se-cpage', 'all');
+    SE.mark(scroll, 'data-se-view', view);
+
+    const colls = userCollections();
+    const apps = libraryApps(colls);
+
+    const ctrl = banner(header, 'all', {
+      eyebrow: COPY.library,
+      iconName: 'grid',
+      stats: [
+        [COPY.collections, num(colls.length)],
+        [COPY.games, num(apps.length)],
+        [COPY.installed, num(apps.filter(isInstalled).length)],
+      ],
+      artApps: mostPlayed(apps, 8),
+    });
+    buildAllControls(ctrl);
+
+    markCollectionTiles(scroll);
+
+    const grid = [...scroll.children].reverse().find((e) => e !== header && !e.classList.contains('se-clist'));
+    const existing = scroll.querySelector(':scope > .se-clist');
+    if (view !== 'list' || !grid) {
+      existing?.remove();
+      return;
+    }
+
+    const info = collectionInfo(colls);
 
     const sig = info.map((i) => `${i.c.id}:${i.games}:${i.installed}:${i.last}`).join(',');
     if (existing && existing.dataset.sig === sig && existing.previousElementSibling === grid) return;
 
-    const rows = info.map(({ c, games, installed, last, top }) => {
-      const r = el('div', 'se-clist-row');
-      r.dataset.coll = c.id;
-      const stack = el('div', 'se-cl-stack');
-      for (const app of top.slice().reverse()) {
-        stack.appendChild(coverImg(app, 'se-cl-cover'));
-      }
-      const name = nameCell(c.displayName || '', c.bIsDynamic ? COPY.dynamic : COPY.gamesSub(games));
-      if (c.id === 'favorite') {
-        name.firstChild.insertAdjacentHTML('afterbegin', `<span class="se-cl-fav">${icon('heart', 14)}</span>`);
-      }
-      r.append(
-        cell('thumb', stack),
-        name,
-        cell('games', num(games)),
-        cell('inst', num(installed)),
-        cell('date', dateText(last)),
-        cell('act', button('se-cl-open', 'chev', COPY.open, {}))
-      );
-      return r;
-    });
+    const rows = info.map(collectionSummaryRow);
 
     table(
       grid,

@@ -97,25 +97,18 @@
    */
   const OPENING_MS = 600;
 
-  function patchInstance(instance) {
-    if (!instance || patched.has(instance)) return;
-    const steam = isSteam(instance);
-    const button = steam ? live.steamButton : sidebarAnchor(instance);
-    if (!steam && !button) return;
-
-    const own = Object.getOwnPropertyDescriptor(instance, 'ReactElement');
-    if (own && !own.configurable) return;
-
+  // The ReactElement descriptor: the instance's own, else the nearest prototype's
+  function findReactElementGetter(instance, own) {
     let proto = instance;
     let descriptor = own;
     while (!descriptor && (proto = Object.getPrototypeOf(proto))) {
       descriptor = Object.getOwnPropertyDescriptor(proto, 'ReactElement');
     }
-    if (!descriptor?.get) return;
+    return descriptor;
+  }
 
-    const getter = buildPatchedGetter(descriptor.get, steam, button);
-    Object.defineProperty(instance, 'ReactElement', { configurable: true, get: getter });
-
+  // The button's placement written into the menu's options, what it replaced kept for unpatch
+  function overridePlacement(instance, button) {
     const placement = placementFor(button);
     const savedPlacement = new Map();
     for (const [key, value] of Object.entries(placement)) {
@@ -125,15 +118,10 @@
       });
       instance.options[key] = value;
     }
+    return { placement, savedPlacement };
+  }
 
-    const position = instance.position;
-    const originalAnchor = position?.element;
-    const anchor = position && button ? menuAnchor(button) : null;
-    if (anchor) position.element = anchor;
-
-    // Closing plays the menus' animation first; a menu shown again meanwhile stays (shared.js)
-    const closer = ns.animateClose(instance, menuPanel);
-
+  function wrapShow(instance, closer) {
     const ownShow = Object.getOwnPropertyDescriptor(instance, 'Show');
     const originalShow = instance.Show;
     const show = function (...args) {
@@ -148,7 +136,10 @@
       return result;
     };
     instance.Show = show;
+    return { ownShow, show };
+  }
 
+  function wrapTakeFocus(instance) {
     const ownTakeFocus = Object.getOwnPropertyDescriptor(instance, 'TakeFocus');
     const originalTakeFocus = instance.TakeFocus;
     const takeFocus = function (...args) {
@@ -158,17 +149,20 @@
       return result;
     };
     instance.TakeFocus = takeFocus;
+    return { ownTakeFocus, takeFocus };
+  }
 
-    /*
-     * Steam cancels a menu that loses focus (its OnBlur). Closing one of the submenus the theme
-     * nests in the Steam menu can hand focus to the main window instead of back to the menu, which
-     * cancelled the menu under the pointer. While the pointer is on the menu and the focus is still
-     * Steam's (focusInMenus), it stays open and takes focus back; focus gone to another window (one a row
-     * opened: About Steam, System Information) cancels it as Steam would, since taking focus back
-     * (Steam's TakeFocus brings the menu's window to the front) pulled Steam over that window.
-     * The blur comes before the new window has the focus, so the choice waits a tick. A click
-     * elsewhere (pointer off the menu) still cancels it, and Escape hides it through Hide().
-     */
+  /*
+   * Steam cancels a menu that loses focus (its OnBlur). Closing one of the submenus the theme
+   * nests in the Steam menu can hand focus to the main window instead of back to the menu, which
+   * cancelled the menu under the pointer. While the pointer is on the menu and the focus is still
+   * Steam's (focusInMenus), it stays open and takes focus back; focus gone to another window (one a row
+   * opened: About Steam, System Information) cancels it as Steam would, since taking focus back
+   * (Steam's TakeFocus brings the menu's window to the front) pulled Steam over that window.
+   * The blur comes before the new window has the focus, so the choice waits a tick. A click
+   * elsewhere (pointer off the menu) still cancels it, and Escape hides it through Hide().
+   */
+  function wrapCancel(instance) {
     const ownCancel = Object.getOwnPropertyDescriptor(instance, 'OnCancel');
     const originalCancel = instance.OnCancel;
     const cancel = function (...args) {
@@ -188,6 +182,37 @@
       return undefined;
     };
     instance.OnCancel = cancel;
+    return { ownCancel, cancel };
+  }
+
+  function patchInstance(instance) {
+    if (!instance || patched.has(instance)) return;
+    const steam = isSteam(instance);
+    const button = steam ? live.steamButton : sidebarAnchor(instance);
+    if (!steam && !button) return;
+
+    const own = Object.getOwnPropertyDescriptor(instance, 'ReactElement');
+    if (own && !own.configurable) return;
+
+    const descriptor = findReactElementGetter(instance, own);
+    if (!descriptor?.get) return;
+
+    const getter = buildPatchedGetter(descriptor.get, steam, button);
+    Object.defineProperty(instance, 'ReactElement', { configurable: true, get: getter });
+
+    const { placement, savedPlacement } = overridePlacement(instance, button);
+
+    const position = instance.position;
+    const originalAnchor = position?.element;
+    const anchor = position && button ? menuAnchor(button) : null;
+    if (anchor) position.element = anchor;
+
+    // Closing plays the menus' animation first; a menu shown again meanwhile stays (shared.js)
+    const closer = ns.animateClose(instance, menuPanel);
+
+    const { ownShow, show } = wrapShow(instance, closer);
+    const { ownTakeFocus, takeFocus } = wrapTakeFocus(instance);
+    const { ownCancel, cancel } = wrapCancel(instance);
 
     patched.set(instance, {
       own,

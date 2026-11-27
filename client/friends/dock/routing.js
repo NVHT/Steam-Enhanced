@@ -445,7 +445,7 @@
         if (p.target[p.name] !== p.wrapper) continue;
         if (p.own) Object.defineProperty(p.target, p.name, p.own);
         else delete p.target[p.name];
-      } catch {}
+      } catch { /* a frozen or replaced object refuses the patch: Steam's own stays */ }
     }
     routingPatches.length = 0;
     routingApp = null;
@@ -454,41 +454,39 @@
     nativeInteractionUntil = 0;
   }
 
-  function installChatRouting() {
-    const a = app();
-    if (!a || routingApp === a) return;
-    restoreChatRouting();
-    routingApp = a;
-
-    const patch = (target, name, route) => {
-      if (typeof target?.[name] !== 'function') return;
-      const ownDesc = Object.getOwnPropertyDescriptor(target, name);
-      const original = target[name];
-      if (ownDesc && !ownDesc.configurable) return;
-      const wrapper = function (...args) {
-        return route.call(this, original, args);
-      };
-      try {
-        Object.defineProperty(target, name, { configurable: true, writable: true, value: wrapper });
-        routingPatches.push({ target, name, own: ownDesc, wrapper });
-      } catch {}
+  // Wraps target[name] so `route` runs with Steam's original; restoreChatRouting puts it back
+  function patch(target, name, route) {
+    if (typeof target?.[name] !== 'function') return;
+    const ownDesc = Object.getOwnPropertyDescriptor(target, name);
+    const original = target[name];
+    if (ownDesc && !ownDesc.configurable) return;
+    const wrapper = function (...args) {
+      return route.call(this, original, args);
     };
+    try {
+      Object.defineProperty(target, name, { configurable: true, writable: true, value: wrapper });
+      routingPatches.push({ target, name, own: ownDesc, wrapper });
+    } catch { /* a frozen or replaced object refuses the patch: Steam's own stays */ }
+  }
 
-    const navigateWithChat = function (original, args) {
-      const kind = this === mainWindow() ? 'route' : 'url';
-      ns.beginChatNavigation(kind, args[0]);
-      try {
-        return original.apply(this, args);
-      } finally {
-        schedule();
-      }
-    };
+  function navigateWithChat(original, args) {
+    const kind = this === mainWindow() ? 'route' : 'url';
+    ns.beginChatNavigation(kind, args[0]);
+    try {
+      return original.apply(this, args);
+    } finally {
+      schedule();
+    }
+  }
 
+  function patchNavigation() {
     patch(mainWindow(), 'Navigate', navigateWithChat);
     for (const owner of SE.owners()) {
       patch(run(() => owner.MainWindowBrowserManager), 'ShowURL', navigateWithChat);
     }
+  }
 
+  function patchFriendAndGroupChats(a) {
     const routeFriend = function (original, args) {
       if (state.openingDockChat || bypassingDockChat || syncingChat) return original.apply(this, args);
       const [browser, id, show = true, activate = show] = args;
@@ -542,7 +540,10 @@
       }
       return runBypassedChat(this, original, args, groupUniqueId(group), true);
     });
+  }
 
+  // Steam's generic openers: a chat object, or a tab's unique id ("f123", "cg…")
+  function patchChatActivation(a) {
     patch(a.UIStore, 'ShowAndOrActivateChat', function (original, args) {
       if (state.openingDockChat || bypassingDockChat || syncingChat) return original.apply(this, args);
       const [browser, chat, activate] = args;
@@ -581,7 +582,9 @@
       }
       return runBypassedChat(this, original, args, chatTab ? id : '', activate);
     });
+  }
 
+  function patchNotifications(a) {
     patch(a.NotificationManager, 'DisplayNotification', function (original, args) {
       const [notice] = args;
       const tag = typeof notice?.tag === 'string' ? notice.tag : '';
@@ -606,7 +609,9 @@
       }
       return result;
     });
+  }
 
+  function patchVoiceChats(a) {
     for (const voice of new Set([a.VoiceStore, a.ChatStore?.VoiceChat].filter(Boolean))) {
       for (const name of [
         'InitiateFriendChat',
@@ -629,7 +634,10 @@
         });
       }
     }
+  }
 
+  // The saved popup state: single-window mode off while the dock holds it, flyout tabs left out
+  function patchPopupState(a) {
     patch(a.UIStore, 'SerializePopupStateToObject', function (original, args) {
       const popup = original.apply(this, args);
       if (!popup || typeof popup !== 'object') return popup;
@@ -657,7 +665,10 @@
           : undefined,
       };
     });
+  }
 
+  // Tabs opened and closed across browser contexts (desktop and overlay)
+  function patchTabBroadcasts(a) {
     patch(a.UIStore, 'BroadcastNewTabToAllBrowserContexts', function (original, args) {
       if (state.openingDockChat || syncingChat || backgroundChat) return undefined;
       // A native overlay activation is handed off when the desktop regains focus.
@@ -700,7 +711,9 @@
         bypassingDockChat--;
       }
     });
+  }
 
+  function patchTabFocus(a) {
     patch(a.UIStore, 'ShowAndOrActivateChatForTabset', function (original, args) {
       const result = original.apply(this, args);
       const [tabs, chat, activate] = args;
@@ -734,7 +747,9 @@
       }
       return original.apply(this, args);
     });
+  }
 
+  function patchPopupFriendsList(a) {
     const routePopup = function (original, args) {
       if (
         bypassingDockChat ||
@@ -750,6 +765,23 @@
     };
     patch(a, 'ShowPopupFriendsList', routePopup);
     patch(a.m_DesktopApp, 'ShowPopupFriendsList', routePopup);
+  }
+
+  function installChatRouting() {
+    const a = app();
+    if (!a || routingApp === a) return;
+    restoreChatRouting();
+    routingApp = a;
+
+    patchNavigation();
+    patchFriendAndGroupChats(a);
+    patchChatActivation(a);
+    patchNotifications(a);
+    patchVoiceChats(a);
+    patchPopupState(a);
+    patchTabBroadcasts(a);
+    patchTabFocus(a);
+    patchPopupFriendsList(a);
   }
 
   function markDesktopInteraction() {
@@ -773,11 +805,8 @@
 
   const interactionEvents = ['pointerdown', 'mousedown', 'mouseup', 'click', 'dblclick', 'keydown'];
 
-  function openDockChat(id, browserOverride, chatOverride, room, mirror = true, activate = true) {
-    const a = app();
-    if (!a || state.view !== 'steam') return false;
-    state.allowNativeWindow = false;
-
+  // The chat openDockChat was asked for: its group (null for a friend) and its tab's unique id
+  function resolveDockChat(a, id, chatOverride) {
     const group =
       findGroup(chatOverride) ||
       (typeof id === 'object' || String(id ?? '').startsWith('cg') ? findGroup(id) : null) ||
@@ -795,6 +824,119 @@
     const uniqueId = group
       ? groupUniqueId(group)
       : String(run(() => chat?.unique_id) || (friendAccountId ? `f${friendAccountId}` : id || ''));
+    return { group, uniqueId };
+  }
+
+  // Whether this Steam has every chat-data and tab-set method the embed calls
+  function canEmbedChat(perContext, tabs, uniqueId) {
+    return !(
+      !perContext ||
+      !tabs ||
+      !uniqueId ||
+      typeof perContext.SetFriendsListSingleWindowMode !== 'function' ||
+      typeof perContext.IsFriendsListSingleWindow !== 'function' ||
+      typeof tabs.GetTabByUniqueID !== 'function' ||
+      typeof tabs.ActivateTab !== 'function' ||
+      typeof tabs.CloseAllTabs !== 'function'
+    );
+  }
+
+  // Single-window mode on in this context, the previous mode kept for when the dock lets go
+  function claimChatContext(perContext) {
+    if (state.chatContext && state.chatContext.data !== perContext) {
+      run(() => state.chatContext.data.SetFriendsListSingleWindowMode(state.chatContext.previous));
+      state.chatContext = null;
+    }
+    if (!state.chatContext) {
+      state.chatContext = { data: perContext, previous: perContext.IsFriendsListSingleWindow() };
+    }
+    perContext.SetFriendsListSingleWindowMode(true);
+  }
+
+  // Finds or makes the chat's tab and selects it (and its room); returns the tab's real unique id
+  function openEmbeddedTab(ui, browser, tabs, group, uniqueId, room, preserveSelection) {
+    state.openingDockChat++;
+    let realUid = uniqueId;
+    try {
+      const existing =
+        run(() => tabs.GetTabByUniqueID(uniqueId)) || (group && findGroupTab(tabs, group));
+      if (!existing) flyoutOwnedTabs.set(uniqueId, tabs);
+      let tab =
+        existing ||
+        (typeof ui.CreateNewTabFromUniqueID === 'function'
+          ? run(() => ui.CreateNewTabFromUniqueID(tabs, uniqueId, false))
+          : null);
+      if (!tab && group) {
+        if (typeof tabs.AddChatRoomGroupTab === 'function') {
+          tab = run(() => tabs.AddChatRoomGroupTab(group, !preserveSelection));
+        }
+        if (!tab && typeof ui.ShowAndOrActivateChatRoomGroup === 'function') {
+          run(() => ui.ShowAndOrActivateChatRoomGroup(browser, group, !preserveSelection));
+        }
+        tab =
+          tab ||
+          run(() => tabs.GetTabByUniqueID(uniqueId)) ||
+          findGroupTab(tabs, group) ||
+          (run(() => tabs.activeTab?.GetChatRoomGroup?.()) === group ? tabs.activeTab : null);
+      }
+      if (!tab) {
+        flyoutOwnedTabs.delete(uniqueId);
+        throw new Error('Unable to create embedded chat tab');
+      }
+      realUid = String(run(() => tab.GetUniqueID?.()) || run(() => tab.unique_id) || uniqueId);
+      if (!existing && realUid !== uniqueId) {
+        flyoutOwnedTabs.delete(uniqueId);
+        flyoutOwnedTabs.set(realUid, tabs);
+      }
+      if (!preserveSelection) tabs.ActivateTab(tab);
+      if (!preserveSelection && group && room != null) {
+        const view = run(() => tab.GetChatView?.());
+        if (typeof view?.SelectChat === 'function') run(() => view.SelectChat(room));
+        else run(() => group.SelectChatRoom?.(room));
+      }
+    } finally {
+      state.openingDockChat--;
+    }
+    return realUid;
+  }
+
+  function showEmbeddedChat(ui, tabs, realUid, room, preserveSelection, mirror) {
+    state.dockTabs = tabs;
+    ns.dock.dataset.chat = '1';
+    if (!preserveSelection) {
+      state.activeChatFriend = realUid;
+      ns.resetMinimized();
+      ns.chatBack.hidden = false;
+      if (live.chatNavigation) live.chatNavigation.minimized = false;
+    } else {
+      ns.updateChatChip();
+    }
+    run(() => ui.SerializePopupState?.());
+    chatError.hidden = true;
+    revealDock();
+    ns.syncGroupFlyouts();
+    if (mirror) syncWithOverlay(realUid, room);
+  }
+
+  // A failed embed: the dock's chat state cleared and the context's single-window mode put back
+  function resetEmbeddedChat() {
+    delete ns.dock.dataset.chat;
+    ns.resetMinimized();
+    ns.chatBack.hidden = true;
+    state.activeChatFriend = null;
+    state.dockTabs = null;
+    if (state.chatContext) {
+      run(() => state.chatContext.data.SetFriendsListSingleWindowMode(state.chatContext.previous));
+      state.chatContext = null;
+    }
+  }
+
+  function openDockChat(id, browserOverride, chatOverride, room, mirror = true, activate = true) {
+    const a = app();
+    if (!a || state.view !== 'steam') return false;
+    state.allowNativeWindow = false;
+
+    const { group, uniqueId } = resolveDockChat(a, id, chatOverride);
 
     if (!state.steamMounted) ns.showSteam();
     if (!state.steamMounted) return false;
@@ -805,101 +947,18 @@
     const perContext = run(() => ui.GetPerContextChatData(browser));
     const tabs = run(() => ui.GetDefaultTabSetForContext(browser));
 
-    if (
-      !perContext ||
-      !tabs ||
-      !uniqueId ||
-      typeof perContext.SetFriendsListSingleWindowMode !== 'function' ||
-      typeof perContext.IsFriendsListSingleWindow !== 'function' ||
-      typeof tabs.GetTabByUniqueID !== 'function' ||
-      typeof tabs.ActivateTab !== 'function' ||
-      typeof tabs.CloseAllTabs !== 'function'
-    ) {
-      return false;
-    }
+    if (!canEmbedChat(perContext, tabs, uniqueId)) return false;
 
     const preserveSelection = !activate && ns.dock.dataset.chat === '1' && tabs === state.dockTabs && Boolean(tabs.activeTab);
     try {
-      if (state.chatContext && state.chatContext.data !== perContext) {
-        run(() => state.chatContext.data.SetFriendsListSingleWindowMode(state.chatContext.previous));
-        state.chatContext = null;
-      }
-      if (!state.chatContext) {
-        state.chatContext = { data: perContext, previous: perContext.IsFriendsListSingleWindow() };
-      }
-      perContext.SetFriendsListSingleWindowMode(true);
-
-      state.openingDockChat++;
-      let realUid = uniqueId;
-      try {
-        const existing =
-          run(() => tabs.GetTabByUniqueID(uniqueId)) || (group && findGroupTab(tabs, group));
-        if (!existing) flyoutOwnedTabs.set(uniqueId, tabs);
-        let tab =
-          existing ||
-          (typeof ui.CreateNewTabFromUniqueID === 'function'
-            ? run(() => ui.CreateNewTabFromUniqueID(tabs, uniqueId, false))
-            : null);
-        if (!tab && group) {
-          if (typeof tabs.AddChatRoomGroupTab === 'function') {
-            tab = run(() => tabs.AddChatRoomGroupTab(group, !preserveSelection));
-          }
-          if (!tab && typeof ui.ShowAndOrActivateChatRoomGroup === 'function') {
-            run(() => ui.ShowAndOrActivateChatRoomGroup(browser, group, !preserveSelection));
-          }
-          tab =
-            tab ||
-            run(() => tabs.GetTabByUniqueID(uniqueId)) ||
-            findGroupTab(tabs, group) ||
-            (run(() => tabs.activeTab?.GetChatRoomGroup?.()) === group ? tabs.activeTab : null);
-        }
-        if (!tab) {
-          flyoutOwnedTabs.delete(uniqueId);
-          throw new Error('Unable to create embedded chat tab');
-        }
-        realUid = String(run(() => tab.GetUniqueID?.()) || run(() => tab.unique_id) || uniqueId);
-        if (!existing && realUid !== uniqueId) {
-          flyoutOwnedTabs.delete(uniqueId);
-          flyoutOwnedTabs.set(realUid, tabs);
-        }
-        if (!preserveSelection) tabs.ActivateTab(tab);
-        if (!preserveSelection && group && room != null) {
-          const view = run(() => tab.GetChatView?.());
-          if (typeof view?.SelectChat === 'function') run(() => view.SelectChat(room));
-          else run(() => group.SelectChatRoom?.(room));
-        }
-      } finally {
-        state.openingDockChat--;
-      }
-
-      state.dockTabs = tabs;
-      ns.dock.dataset.chat = '1';
-      if (!preserveSelection) {
-        state.activeChatFriend = realUid;
-        ns.resetMinimized();
-        ns.chatBack.hidden = false;
-        if (live.chatNavigation) live.chatNavigation.minimized = false;
-      } else {
-        ns.updateChatChip();
-      }
-      run(() => ui.SerializePopupState?.());
-      chatError.hidden = true;
-      revealDock();
-      ns.syncGroupFlyouts();
-      if (mirror) syncWithOverlay(realUid, room);
+      claimChatContext(perContext);
+      const realUid = openEmbeddedTab(ui, browser, tabs, group, uniqueId, room, preserveSelection);
+      showEmbeddedChat(ui, tabs, realUid, room, preserveSelection, mirror);
       return true;
     } catch (error) {
       console.warn('[Steam Enhanced] embedded chat', error);
       if (preserveSelection) return false;
-      delete ns.dock.dataset.chat;
-      ns.resetMinimized();
-      ns.chatBack.hidden = true;
-      state.activeChatFriend = null;
-      state.dockTabs = null;
-      if (state.chatContext) {
-        run(() => state.chatContext.data.SetFriendsListSingleWindowMode(state.chatContext.previous));
-        state.chatContext = null;
-      }
+      resetEmbeddedChat();
       return false;
     }
   }

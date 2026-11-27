@@ -262,7 +262,7 @@
     let layout = 'list';
     try {
       if (localStorage.getItem(LAYOUT_KEY) === 'grid') layout = 'grid';
-    } catch {}
+    } catch { /* storage unreadable: the default stands */ }
     const grid = web.parts.wishlistGrid?.create(dom, () => ({
       form: options?.querySelector('form') ?? null,
       query: searchBox()?.value ?? '',
@@ -416,61 +416,52 @@
       layout = button.dataset.seWlLayoutOption;
       try {
         localStorage.setItem(LAYOUT_KEY, layout);
-      } catch {}
+      } catch { /* storage refused (full or blocked): kept in memory only */ }
       syncLayout();
       settle();
     });
 
-    const tag = () => {
-      const writes = [];
-      for (const [part, selector] of PAGE) {
-        for (const node of document.querySelectorAll(selector)) writes.push([node, part]);
+    /** Steam's page wrapper, its art wash, the owner, gift card link and filter row, onto writes. */
+    const readPageParts = (writes) => {
+      // Steam's page wrapper and the art wash it paints behind the column.
+      const stage = page.parentElement;
+      writes.push([stage, 'stage']);
+      for (const child of stage.children) if (child !== page && !child.childElementCount) writes.push([child, 'wash']);
+      for (const owner of page.querySelectorAll(SEL.owner)) readOwner(owner, writes);
+      // A friend's wishlist: Steam's "Send a Gift Card" link beside the owner.
+      const pageHead = page.querySelector(SEL.head);
+      if (pageHead && !pageHead.querySelector(SEL.giftcard)) {
+        for (const link of pageHead.querySelectorAll(':scope > a')) writes.push([link, 'giftcard']);
       }
+      // The active filter chips' row.
+      const filter = page.querySelector(SEL.filter);
+      if (filter && filter.parentElement !== page) writes.push([filter.parentElement, 'filters']);
+    };
 
-      // The search field: the shared search field, its magnifier drawn on the column
-      const search = document.querySelector(SEL.search);
-      $.search(search, search?.parentElement);
-
-      page = document.querySelector(SEL.page);
-      options = document.querySelector(SEL.options) ?? document.querySelector(`${SEL.tools} > [popover]:has(> form)`);
-      const menu = document.querySelector(SEL.menu);
-      if (options) writes.push([options, 'options']);
-
-      if (page) {
-        // Steam's page wrapper and the art wash it paints behind the column.
-        const stage = page.parentElement;
-        writes.push([stage, 'stage']);
-        for (const child of stage.children) if (child !== page && !child.childElementCount) writes.push([child, 'wash']);
-        for (const owner of page.querySelectorAll(SEL.owner)) readOwner(owner, writes);
-        // A friend's wishlist: Steam's "Send a Gift Card" link beside the owner.
-        const pageHead = page.querySelector(SEL.head);
-        if (pageHead && !pageHead.querySelector(SEL.giftcard)) {
-          for (const link of pageHead.querySelectorAll(':scope > a')) writes.push([link, 'giftcard']);
-        }
-        // The active filter chips' row.
-        const filter = page.querySelector(SEL.filter);
-        if (filter && filter.parentElement !== page) writes.push([filter.parentElement, 'filters']);
-      }
-      const tools = document.querySelector(SEL.tools);
-      if (tools) readTools(tools, options, menu, writes);
-
-      // Each Options section, by what it sets.
+    /** Each Options section with its key; also points the theme's notify link at Steam's. */
+    const readSections = () => {
       const sections = [];
-      if (options) {
-        for (const section of options.querySelectorAll('form > section')) {
-          const key = optionKey(section);
-          if (key) sections.push([section, key]);
-        }
-        const link = options.querySelector(NOTIFY);
-        if (link && notify.href !== link.href) notify.href = link.href;
+      for (const section of options.querySelectorAll('form > section')) {
+        const key = optionKey(section);
+        if (key) sections.push([section, key]);
       }
+      const link = options.querySelector(NOTIFY);
+      if (link && notify.href !== link.href) notify.href = link.href;
+      return sections;
+    };
 
+    /** Reads every card onto writes; returns their prices. */
+    const readPrices = (writes) => {
       const prices = [];
       for (const card of cardsIn(document)) {
         readCard(card, writes);
         prices.push(...card.querySelectorAll(PRICE));
       }
+      return prices;
+    };
 
+    /** Writes the roles, section keys and prices read, forgetting the ones no longer in the page. */
+    const applyMarks = (writes, sections, prices) => {
       for (const [node, part] of writes) dom.mark(node, ROLE, part);
       for (const [section, key] of sections) {
         dom.mark(section, OPT, key);
@@ -482,27 +473,38 @@
         priced.add(price);
       }
       for (const price of priced) if (!price.isConnected) priced.delete(price);
-      // The Sort menu's row for the order in force.
+    };
+
+    /** The Sort menu's row for the order in force. */
+    const markSortRow = (menu) => {
       const sortText = dom.squash(page?.querySelector(SEL['sort-value'])?.textContent).toLowerCase();
       for (const item of menu?.querySelectorAll(':scope > button') ?? []) {
         if (sortText && dom.squash(item.textContent).toLowerCase() === sortText) dom.mark(item, ON);
         else dom.unmark(item, ON);
       }
-      // How the reviews lean, from Steam's summary words: the fact's icon and colour follow.
+    };
+
+    /** How the reviews lean, from Steam's summary words: the fact's icon and colour follow. */
+    const markReviewLeans = () => {
       for (const value of document.querySelectorAll(`[${ROLE}="fact-value"]`)) {
         const fact = value.closest(`[${ROLE}="fact"]`);
         const lean = reviewLean(value.textContent);
         if (fact && lean) dom.mark(fact, REVIEW, lean);
         else if (fact) dom.unmark(fact, REVIEW);
       }
-      // "Added on Dec 10, 2020": the date alone, for the card's "Added Dec 10, 2020".
+    };
+
+    /** "Added on Dec 10, 2020": the date alone, for the card's "Added Dec 10, 2020". */
+    const markAddedDates = () => {
       for (const added of document.querySelectorAll(`[${ROLE}="added-date"]`)) {
         const date = added.textContent.match(/^\s*Added on\s+(.+?)\s*$/i)?.[1];
         if (date) dom.mark(added, DATE, date);
         else dom.unmark(added, DATE);
       }
+    };
 
-      // The theme's own parts, put back if Steam re-rendered their parents.
+    /** The theme's own parts, put back if Steam re-rendered their parents. */
+    const restoreOwnParts = () => {
       const owner = page?.querySelector(SEL.owner);
       if (owner && heading && heading.parentNode !== owner) owner.append(heading);
       if (owner && meta.parentNode !== owner) owner.append(meta);
@@ -522,6 +524,37 @@
       if (bar && sortLabel.parentNode !== bar) bar.append(sortLabel);
       if (bar && head.parentNode !== bar) bar.append(head);
       if (bar && tags.parentNode !== bar) bar.append(tags);
+    };
+
+    const tag = () => {
+      const writes = [];
+      for (const [part, selector] of PAGE) {
+        for (const node of document.querySelectorAll(selector)) writes.push([node, part]);
+      }
+
+      // The search field: the shared search field, its magnifier drawn on the column
+      const search = document.querySelector(SEL.search);
+      $.search(search, search?.parentElement);
+
+      page = document.querySelector(SEL.page);
+      options = document.querySelector(SEL.options) ?? document.querySelector(`${SEL.tools} > [popover]:has(> form)`);
+      const menu = document.querySelector(SEL.menu);
+      if (options) writes.push([options, 'options']);
+
+      if (page) readPageParts(writes);
+      const tools = document.querySelector(SEL.tools);
+      if (tools) readTools(tools, options, menu, writes);
+
+      // Each Options section, by what it sets.
+      const sections = options ? readSections() : [];
+      const prices = readPrices(writes);
+
+      applyMarks(writes, sections, prices);
+      markSortRow(menu);
+      markReviewLeans();
+      markAddedDates();
+
+      restoreOwnParts();
 
       load();
       sync();

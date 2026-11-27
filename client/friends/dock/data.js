@@ -79,16 +79,19 @@
     return n;
   };
 
-  function read() {
-    const a = app();
-    if (!a) return null;
+  const byName = (x, y) => x.name.localeCompare(y.name, undefined, { sensitivity: 'base' });
+
+  function readSelf(a) {
     const self = run(() => a.FriendStore.self);
-    const me = self && {
+    return self && {
       name: run(() => self.display_name) || run(() => self.persona.m_strPlayerName) || '',
       avatar: run(() => self.persona.avatar_url_medium) || '',
       state: STATE[run(() => self.persona.m_ePersonaState)] || 'online',
     };
+  }
 
+  // Every friend as a list item, sorted into the game they play, online or offline
+  function readFriends(a) {
     const games = new Map();
     const online = [];
     const offline = [];
@@ -128,13 +131,19 @@
         offline.push(item);
       }
     }
+    return { games, online, offline, byId };
+  }
 
-    const byName = (x, y) => x.name.localeCompare(y.name, undefined, { sensitivity: 'base' });
+  // Sorts online and offline in place; returns the games, most friends first
+  function sortFriends(games, online, offline) {
     const list = [...games.values()].sort((x, y) => y.friends.length - x.friends.length || x.name.localeCompare(y.name));
     for (const g of list) g.friends.sort(byName);
     online.sort((x, y) => (x.state !== 'online') - (y.state !== 'online') || byName(x, y));
     offline.sort((x, y) => (y.last || 0) - (x.last || 0));
+    return list;
+  }
 
+  function readGroups(a) {
     const groupById = new Map();
     const groups = groupsOf(a)
       .map((g) => {
@@ -150,17 +159,22 @@
       })
       .filter((g) => g.id)
       .sort(byName);
+    return { groups, groupById };
+  }
 
-    // Steam's favorites in its order (a friend or a chat group; a clan has no chat to open here)
-    const favorites = (run(() => a.FriendStore.FavoritesStore.favorites) || [])
+  // Steam's favorites in its order (a friend or a chat group; a clan has no chat to open here)
+  function readFavorites(a, byId, groupById) {
+    return (run(() => a.FriendStore.FavoritesStore.favorites) || [])
       .map((fav) =>
         fav?.friend
           ? byId.get(run(() => fav.friend.accountid))
           : fav?.chat && groupById.get(String(run(() => fav.chat.GetGroupID()) ?? ''))
       )
       .filter(Boolean);
+  }
 
-    // Unread conversations, newest first: friends' (blocked ones aside), then group chats'
+  // Unread conversations, newest first: friends' (blocked ones aside), then group chats'
+  function readChats(a, byId, groups) {
     const friendChats = (run(() => a.ChatStore.FriendChatStore.m_rgFriendChats) || [])
       .map((c) => {
         const unread = run(() => (c.is_blocked_friend ? 0 : c.unread_message_count)) || 0;
@@ -169,14 +183,28 @@
       })
       .filter(Boolean)
       .sort((x, y) => y.at - x.at);
-    const chats = [...friendChats, ...groups.filter((g) => g.unread)];
+    return [...friendChats, ...groups.filter((g) => g.unread)];
+  }
 
+  // Steam's compact Favorites and Friends list settings
+  function readCompact(a) {
     const settings = run(() => a.SettingsStore.FriendsSettings);
-    const compact = {
+    return {
       favorites: Boolean(run(() => settings.bCompactQuickAccess)),
       list: Boolean(run(() => settings.bCompactFriendsList)),
     };
+  }
 
+  function read() {
+    const a = app();
+    if (!a) return null;
+    const me = readSelf(a);
+    const { games, online, offline, byId } = readFriends(a);
+    const list = sortFriends(games, online, offline);
+    const { groups, groupById } = readGroups(a);
+    const favorites = readFavorites(a, byId, groupById);
+    const chats = readChats(a, byId, groups);
+    const compact = readCompact(a);
     return { me, games: list, online, offline, groups, favorites, chats, compact };
   }
 
@@ -191,7 +219,7 @@
     set: (k, v) => {
       try {
         localStorage.setItem(k, v);
-      } catch {}
+      } catch { /* storage refused (full or blocked): kept in memory only */ }
     },
   };
 
