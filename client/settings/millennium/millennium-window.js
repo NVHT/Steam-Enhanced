@@ -392,6 +392,7 @@
     const doc = SE.run(() => win?.document);
     if (!doc || doc === document || popupWatchers.has(doc) || popupDocuments.has(doc)) return;
     let queued = false;
+    // Own observer on purpose: another window's document (the shared observer sees this one only)
     const observer = new win.MutationObserver(() => {
       if (queued) return;
       queued = true;

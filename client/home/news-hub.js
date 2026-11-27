@@ -36,6 +36,7 @@
   let partnerStore;
   let initPoll;
   let refreshTimer;
+  const REFRESH_MS = 10 * 60 * 1000;
   let observer;
   let nativeHost;
   let nativeComponent;
@@ -391,15 +392,20 @@
       document.addEventListener(type, onUserActivity, true);
     }
 
-    refreshTimer = setInterval(() => {
-      if (!homeScope()) return; // nothing to refresh off Home; the next visit rebuilds anyway
+    // Steam's news has no change event: a refresh every 10 minutes while Home shows (SE.poll:
+    // paused while the window is hidden). A poll also runs on its return, or Home's: only once
+    // the 10 minutes are up. Off Home the next visit rebuilds anyway.
+    let refreshedAt = performance.now();
+    refreshTimer = SE.poll(() => {
+      if (!homeScope() || performance.now() - refreshedAt < REFRESH_MS - 1000) return;
+      refreshedAt = performance.now();
       notifyEventStore();
       patchNativeCap();
       const area = findScrollArea();
       if (!state.busy && !isUserActive() && (!area || Math.abs(area.scrollLeft) < 1)) {
         resetFeeds();
       }
-    }, 10 * 60 * 1000);
+    }, REFRESH_MS);
 
     resetFeeds();
   }
@@ -407,7 +413,7 @@
   state.destroy = () => {
     state.stopped = true;
     initPoll?.disconnect();
-    clearInterval(refreshTimer);
+    refreshTimer?.disconnect();
     clearTimeout(emptyTimer);
     observer?.disconnect();
     for (const type of ['scroll', 'wheel', 'keydown']) {

@@ -158,7 +158,8 @@
       line.setAttribute('data-se-nf-parsed', '');
       line.after(state.heading, state.countdown.node);
       tick();
-      // Aligned to the second, so the seconds tile turns over with the clock. One id for the
+      // Aligned to the second, so the seconds tile turns over with the clock (a clock: no change
+      // event to wait on, and a hidden page's timers are slowed by Chromium already). One id for the
       // lead-in and the interval (they share a pool), so stopTimer() stops either.
       timer = setTimeout(() => {
         tick();

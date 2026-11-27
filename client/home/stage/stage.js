@@ -256,8 +256,10 @@
     const seconds = cycleSeconds();
     if (!seconds || reducedMotion.matches) return;
     live.stage?.style.setProperty('--se-hs-cycle', `${seconds}s`);
-    // Its visibility and strip reads wait for the next layout (SE.settled): on the timer alone
-    // they landed mid-build and paid the style pass
+    // A fixed beat, not SE.poll: it keeps time with the thumbnail's progress bar (--se-hs-cycle),
+    // which a poll's re-arming after each run would drift from; a hidden stage skips its turn
+    // (cycleTurn). Its visibility and strip reads wait for the next layout (SE.settled): on the
+    // timer alone they landed mid-build and paid the style pass
     const id = setInterval(() => SE.settled(() => cycleTurn(id)), seconds * 1000);
     cycleTimer = id;
   }

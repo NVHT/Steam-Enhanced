@@ -193,6 +193,7 @@
     };
     next();
     if (imgs.length > 1) {
+      // A fixed beat, as the stage's cycle (stage.js restartCycle), skipped while idle (hidden);
       // idle() asks visibility: after the next layout (SE.settled), never mid-build
       const id = setInterval(() => SE.settled(() => {
         if (timer === id && !idle()) next();

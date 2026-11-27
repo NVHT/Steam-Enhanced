@@ -125,10 +125,10 @@
   sync();
   // No Steam event covers the overlay's game stats, play time or toolbar state: 1 s while it's
   // shown, paused when hidden. Window centring needs 100 ms (the overlay can move its widgets
-  // without a resize), and the prefetch is a fixed 20 s cache refresh.
+  // without a resize), and the prefetch is a 20 s cache refresh, none while the overlay is shut.
   const loop = SE.poll(sync, TICK_MS);
   const windowLoop = SE.poll(() => enabled() && centerWidgets(), WINDOW_TICK_MS);
-  const prefetchTimer = setInterval(() => SE.run(prefetch), PREFETCH_MS);
+  const prefetchLoop = SE.poll(prefetch, PREFETCH_MS);
   SE.run(prefetch);
 
   // Method and field names of the stores the next views would use.
@@ -217,7 +217,7 @@
     destroy() {
       loop.disconnect();
       windowLoop.disconnect();
-      clearInterval(prefetchTimer);
+      prefetchLoop.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);
       removeEventListener('resize', scheduleRender);
       offSettings?.();

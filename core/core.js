@@ -175,6 +175,8 @@
   };
   if (root.hasAttribute('data-se-styled')) tellStyled();
   else {
+    // Own observer on purpose: one attribute on <html>, on a page whose shared observer (dom.js)
+    // may not have loaded yet; disconnects once it's set
     const styled = new MutationObserver(() => {
       if (!root.hasAttribute('data-se-styled')) return;
       styled.disconnect();
