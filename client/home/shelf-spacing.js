@@ -23,7 +23,9 @@
     if (!a || !b) return;
     const first = a.getBoundingClientRect();
     const second = b.getBoundingClientRect();
-    if (Math.abs(first.top - second.top) > 1) return;
+    // Not drawn (Steam's Home hidden under the theme's Home stage): every cover 0 wide, a gap of
+    // 0 that stayed once Steam's Home came back. Measured again when the grid gets its width.
+    if (!first.width || Math.abs(first.top - second.top) > 1) return;
     const next = observed.closest('.LibraryHome') || document.documentElement;
     if (host && host !== next) host.style.removeProperty('--se-shelf-gap');
     host = next;
