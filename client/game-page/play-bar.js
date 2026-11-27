@@ -21,17 +21,42 @@
     ['info', (el) => holds(el, `.${C.GameInfoButton}, .${C.DotDotDot}`)],
   ];
 
-  // Read once per element: measuring every control on each page pass forced a layout each time
+  /*
+   * A control Steam gives no class (a plugin's) is a button by its size: icon-sized, holding an
+   * icon. Its size comes from a ResizeObserver's entry, never a read: measured in the page's
+   * pass, the first read paid the style pass of a page still being drawn, and Steam's own
+   * ResizeObserver callbacks dirty it again before any after-layout read. Until its entry
+   * arrives a control counts as a wrapper (walked into); the entry marks the bar again.
+   */
   const buttonLike = new WeakMap();
+  const sized = new WeakSet();
+  const { live } = ns;
+  live.iconSizer = undefined;
   function isButton(el) {
     if (el.matches(UNIT)) return true;
-    let known = buttonLike.get(el);
-    if (known === undefined) {
-      const r = el.getBoundingClientRect();
-      known = r.width >= 20 && r.width <= 64 && r.height >= 20 && r.height <= 64 && Boolean(el.querySelector('svg, img'));
-      if (r.width) buttonLike.set(el, known);
+    const known = buttonLike.get(el);
+    if (known !== undefined) return known;
+    if (!sized.has(el)) {
+      sized.add(el);
+      live.iconSizer ??= new ResizeObserver(onIconSizes);
+      live.iconSizer.observe(el);
     }
-    return known;
+    return false;
+  }
+
+  function onIconSizes(entries) {
+    let found = false;
+    for (const { target, borderBoxSize } of entries) {
+      const { inlineSize: w, blockSize: h } = borderBoxSize?.[0] ?? {};
+      // Not drawn yet: its next size comes as another entry. Removed: let it go.
+      if (!w && target.isConnected) continue;
+      live.iconSizer.unobserve(target);
+      if (!w) continue;
+      const known = w >= 20 && w <= 64 && h >= 20 && h <= 64 && Boolean(target.querySelector('svg, img'));
+      buttonLike.set(target, known);
+      found ||= known;
+    }
+    if (found) placePlayBarIcons();
   }
 
   function markIcon(el) {

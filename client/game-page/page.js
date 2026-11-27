@@ -4,7 +4,7 @@
 ((SE) => {
   const ns = window.__seGamePageParts;
   if (!ns) return;
-  const { drop, own, topChecked } = ns;
+  const { drop, own } = ns;
   const { live } = ns;
 
   const { C, mark, cssVar: setVar, unmark } = SE;
@@ -12,13 +12,17 @@
   const TOP_BTN = `:is(.${C.ScrollToTopButton}, .ScrollToTopButton)`;
 
   /*
-   * A button's place follows its scroller's box, so it is measured when that moves: a window
-   * resize, or the scroller resizing (topSizer); a scroll only moves its ring. The page's pass, which runs on any
-   * class change in the window, only places a button not yet placed for its scroller: measuring
-   * every button on every pass forced a layout each time, on every page.
+   * Steam shows the button only once its scroller is scrolled, so it is placed from scrolls,
+   * never from the page's pass: there, the first read paid the style pass of a page still being
+   * drawn. A scroller's first scroll places it at once (after that layout), later ones once they
+   * settle; a window resize places every button. A scroller resizing (topSizer) places it again
+   * once that settles too, and only while scrolled (the button may show): a page being built
+   * resizes its scroller over and over.
    */
   live.topSizer = undefined;
   const placedFor = new WeakMap();
+  const topChecked = new WeakSet(); // wrappers checked by anchorWrap; per instance, so a reload re-checks
+  const lastProgress = new WeakMap(); // btn → its scroller's last progress (0 to 1)
 
   // A button serves one scroller: the one it served before is let go, and so is a scroller Steam
   // removed (a removed box reports one last resize), so replaced pages aren't kept alive
@@ -30,7 +34,11 @@
           continue;
         }
         const btn = topFor.get(entry.target);
-        if (btn?.__seSc === entry.target) placeTop(btn);
+        if (btn?.__seSc !== entry.target) continue;
+        placedFor.delete(btn);
+        // Scrolled (the button may show): placed once things settle, as after a scroll. Not
+        // here: leaving a scrolled page resizes the scroller while the next one is drawn.
+        if (lastProgress.get(btn) > 0) settleLater(entry.target);
       }
     });
     const old = btn.__seSc;
@@ -41,8 +49,23 @@
   }
 
   // How far down its scroller is, as the button's ring shows it (0 to 1)
-  const setProgress = (btn, top, max) =>
-    setVar(btn, '--se-scroll', String(max > 0 ? Math.min(1, Math.max(0, top / max)).toFixed(3) : 0));
+  const setProgress = (btn, top, max) => {
+    const at = max > 0 ? Math.min(1, Math.max(0, top / max)) : 0;
+    lastProgress.set(btn, at);
+    setVar(btn, '--se-scroll', at.toFixed(3));
+  };
+
+  // A wrapper that isn't Steam's position box holds the button: it anchors it (one read each)
+  function anchorWrap(wrap) {
+    if (topChecked.has(wrap)) return;
+    topChecked.add(wrap);
+    if (
+      !wrap.matches(`:is(.${C.ScrollToTopButtonPosition}, .ScrollToTopButtonPosition)`) &&
+      getComputedStyle(wrap).position === 'static'
+    ) {
+      mark(wrap, 'data-se-top-host');
+    }
+  }
 
   function placeTop(btn) {
     const sc = btn.__seSc;
@@ -56,6 +79,7 @@
     setProgress(btn, sc.scrollTop, sc.scrollHeight - sc.clientHeight);
     const wrap = btn.parentElement;
     if (!wrap) return;
+    anchorWrap(wrap);
     const o = wrap.getBoundingClientRect();
     const r = sc.getBoundingClientRect();
     const bar = sc.offsetWidth - sc.clientWidth;
@@ -79,22 +103,36 @@
   }
 
   /*
-   * The button follows a scroll once it settles (SCROLL_SETTLE_MS after the last event), its reads
-   * taken right after the next layout (SE.afterLayout), where they cost nothing. Read in the
-   * event, its frame or after its paint, each cost a style pass and a layout while the page was
-   * still being drawn (a game page building, a virtualized grid redrawing under the scroll: Home's
-   * Uncategorized). A scroll doesn't move the scroller's box or the button's place: those are
-   * measured when a button first serves a scroller, and when either resizes (topSizer,
-   * onResizeTop).
+   * The ring follows a scroll once it settles (SCROLL_SETTLE_MS after the last event), its reads
+   * taken right after the next layout (SE.afterLayout). Read in the event, its frame or after its
+   * paint, each cost a style pass and a layout while the page was still being drawn (a virtualized
+   * grid redrawing under the scroll: Home's Uncategorized). A scroll doesn't move the scroller's
+   * box or the button's place: those are measured on a scroller's first scroll, and when either
+   * resizes (topSizer, onResizeTop).
    */
   const SCROLL_SETTLE_MS = 120;
   let scrolled = null;
   live.scrollTimer = 0;
   const topFor = new WeakMap();
 
+  // Scrollers already scrolled once
+  const tried = new WeakSet();
+
   function onAnyScroll(e) {
-    scrolled = e.target === document ? document.scrollingElement : e.target;
-    // Debounced: placed once the scroll has settled
+    const t = e.target === document ? document.scrollingElement : e.target;
+    // A scroller's first scroll places its button now, before Steam shows it. Later ones wait to
+    // settle: leaving a scrolled page scrolls its scroller back while the next page is drawn, and
+    // a button placed before keeps that place meanwhile.
+    if (t instanceof Element && !tried.has(t)) {
+      tried.add(t);
+      SE.afterLayout(t, () => placeScrolled(t));
+    }
+    // Then debounced: the ring follows once the scroll has settled
+    settleLater(t);
+  }
+
+  function settleLater(t) {
+    scrolled = t;
     clearTimeout(live.scrollTimer);
     live.scrollTimer = setTimeout(() => {
       live.scrollTimer = 0;
@@ -107,6 +145,7 @@
   function placeScrolled(t) {
     if (!t.isConnected || t.closest(SE.SIDE)) return;
     const known = topFor.get(t);
+    if (known && !known.isConnected) topFor.delete(t);
     if (known?.isConnected && known.__seSc === t && placedFor.get(known) === t) {
       setProgress(known, t.scrollTop, t.scrollHeight - t.clientHeight);
       return;
@@ -136,23 +175,6 @@
 
   function onResizeTop() {
     for (const btn of document.querySelectorAll(TOP_BTN)) placeTop(btn);
-  }
-
-  function placeScrollTop() {
-    for (const btn of document.querySelectorAll(TOP_BTN)) {
-      const w = btn.parentElement;
-      // One computed-style read per wrapper, not one per pass.
-      if (w && !topChecked.has(w)) {
-        topChecked.add(w);
-        if (
-          !w.matches(`:is(.${C.ScrollToTopButtonPosition}, .ScrollToTopButtonPosition)`) &&
-          getComputedStyle(w).position === 'static'
-        ) {
-          mark(w, 'data-se-top-host');
-        }
-      }
-      if (btn.__seSc && placedFor.get(btn) !== btn.__seSc) placeTop(btn);
-    }
   }
 
   const RV_BOX = `.${C.ReviewContainer}`;
@@ -218,5 +240,5 @@
     }
   }
 
-  Object.assign(ns, { onAnyScroll, onResizeTop, placeReviewPrompt, placeScrollTop });
+  Object.assign(ns, { onAnyScroll, onResizeTop, placeReviewPrompt });
 })(window.__se);

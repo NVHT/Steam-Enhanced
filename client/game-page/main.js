@@ -25,7 +25,7 @@
     placeAchFeatured, placeAchIcons, placeAchRings, placeBadge, placeDlcAll, placeEmoDot,
     placeFeedAchAll, placeFeedEvents, placeFeedShots, placeFriends, placeHeadingLinks,
     placeHideCommunity, placeLabels, placeLeftCards, placeMoreNames, placeNewsLink,
-    placePlayAction, placePlayBarIcons, placeRatings, placeReviewPrompt, placeScrollTop, placeStatKinds, placeStatus,
+    placePlayAction, placePlayBarIcons, placeRatings, placeReviewPrompt, placeStatKinds, placeStatus,
     RIGHT_CONTROLS, schedule, setPass, sized, sizeLogos, stopLogos, tipHosts, unbindTips,
   } = ns;
   const { live } = ns;
@@ -57,7 +57,6 @@
     [placeHideCommunity],
     [placeEmoDot, FEED],
     [placeRatings],
-    [placeScrollTop],
     [placeFeedAchAll, FEED],
     [placeFeedShots, FEED],
     [placeFeedEvents, FEED],
@@ -85,10 +84,7 @@
     const onPage = Boolean(document.querySelector(ON_PAGE));
     const cleanup = wasOnPage;
     wasOnPage = onPage;
-    if (!onPage && !cleanup) {
-      run(placeScrollTop);
-      return;
-    }
+    if (!onPage && !cleanup) return;
     let present = null;
     for (const [step, secs, holds] of STEPS) {
       if (secs && onPage) {
@@ -186,6 +182,7 @@
       live.sizer?.disconnect();
       live.achSizer?.disconnect();
       live.topSizer?.disconnect();
+      live.iconSizer?.disconnect();
       live.cmSizer?.disconnect();
       if (live.muteAll) document.removeEventListener('pointerout', live.muteAll, true);
       unbindTips();

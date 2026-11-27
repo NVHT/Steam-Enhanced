@@ -160,7 +160,6 @@
    * may reuse the same nodes for the next game).
    */
   const appIds = new WeakMap();
-  const topChecked = new WeakSet(); // per instance, so a hot reload re-checks every wrapper
   const appIdOf = (el) => {
     const route = location.href;
     const routeId = +(route.match(/\/app\/(\d+)/) || [])[1] || 0;
@@ -728,6 +727,6 @@
   Object.assign(ns, {
     unbindTips,
     achRows, appIdOf, banners, placeAchBanner, placeAchFeatured, placeAchIcons, placeAchRings,
-    placeFeedAchAll, tipHosts, topChecked,
+    placeFeedAchAll, tipHosts,
   });
 })(window.__se);

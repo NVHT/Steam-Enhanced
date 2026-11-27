@@ -265,8 +265,10 @@
       return;
     }
     if (activeRequest?.id === id) return;
-    // Only a request asks whether the badge shows (a style pass): this runs on every page pass
-    if (!SE.visible(badge)) return;
+    // Only a request asks whether the badge shows, after the next layout (SE.settled): asked
+    // here, right after the page pass mounted it, the read paid the page's style pass
+    const shown = await new Promise((done) => SE.settled(() => done(!!badge && SE.visible(badge))));
+    if (!shown || destroyed || currentAppId !== id || !badge?.isConnected || activeRequest?.id === id) return;
 
     abortActiveRequest();
     const job = { id, controller: new AbortController(), timeout: null, timedOut: false };
