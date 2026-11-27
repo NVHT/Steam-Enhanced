@@ -38,11 +38,9 @@
   let searchBar;
   let searchInput;
   let filtersBtn;
-  let viewsSlot;
   let viewsResizeObserver;
   let viewsWatchedNode = null;
   let viewsWidth = -1;
-  let viewsX = null;
 
   /*
    * Runs `callback` once the library's list is mounted, navigating there first if needed.
@@ -126,7 +124,6 @@
 
     searchInput = searchBar.querySelector('input');
     filtersBtn = searchBar.querySelector('.se-title-filters');
-    viewsSlot = searchBar.querySelector('.se-title-views');
     let lastTypedAt = 0;
 
     const retainSearchFocus = () => {
@@ -234,33 +231,36 @@
 
   /*
    * The view toggles (Recent, Ready to play, then Steam's Linux toggle and plugin toggles) sit
-   * fixed inside the title-bar search, just before Filters. The field
-   * reserves the group's measured width in its views slot; the group then takes the slot's
-   * place (--se-title-views-x on <body>). Each value is written only when it changes.
+   * fixed inside the title-bar search, just before Filters. The field reserves the group's
+   * width in its views slot (--se-title-views-w on <body>), and the group's place follows from
+   * the field's own (title-bar.css, from --se-title-search-x and -w). Nothing is read: the
+   * width comes with the group's ResizeObserver entries, written there before the frame paints;
+   * measured in the title bar's pass, it and the slot's place each paid the style pass of the
+   * page Steam was drawing.
    */
-  // `measure`: the title bar's geometry may have moved (client/navigation/title-bar.js); else
-  // the last reads stand unless the group itself changed
-  function syncSearchViews(group, measure = true) {
-    if (!searchBar) return;
-    if (!measure && group === viewsWatchedNode) return;
-    if (group !== viewsWatchedNode && window.ResizeObserver) {
-      viewsResizeObserver ??= new ResizeObserver(() => ns.titleBar.markGeometry());
-      if (viewsWatchedNode) viewsResizeObserver.unobserve(viewsWatchedNode);
-      if (group) viewsResizeObserver.observe(group);
-      viewsWatchedNode = group;
+  function setViewsWidth(width) {
+    if (width === viewsWidth) return;
+    viewsWidth = width;
+    searchBar?.classList.toggle('se-has-views', width > 0);
+    SE.cssVar(document.body, '--se-title-views-w', width > 0 ? `${width}px` : null);
+    SE.attr(document.body, 'data-se-title-views', width > 0 && searchBar?.isConnected ? '' : null);
+  }
+
+  function onViewsSize(entries) {
+    for (const { target, borderBoxSize } of entries) {
+      if (target !== viewsWatchedNode) continue;
+      setViewsWidth(Math.ceil(borderBoxSize?.[0]?.inlineSize || 0));
     }
-    const width = group ? Math.ceil(group.getBoundingClientRect().width) : 0;
-    if (width !== viewsWidth) {
-      viewsWidth = width;
-      searchBar.classList.toggle('se-has-views', width > 0);
-      SE.cssVar(searchBar, '--se-title-views-w', width > 0 ? `${width}px` : null);
-    }
-    const x = width > 0 && searchBar.isConnected
-      ? `${Math.round(viewsSlot.getBoundingClientRect().left)}px`
-      : null;
-    if (x === viewsX) return;
-    viewsX = x;
-    SE.cssVar(document.body, '--se-title-views-x', x);
+  }
+
+  function syncSearchViews(group) {
+    if (!searchBar || group === viewsWatchedNode) return;
+    viewsResizeObserver ??= new ResizeObserver(onViewsSize);
+    if (viewsWatchedNode) viewsResizeObserver.unobserve(viewsWatchedNode);
+    viewsWatchedNode = group;
+    // A group's width comes with its first entry
+    if (group) viewsResizeObserver.observe(group);
+    else setViewsWidth(0);
   }
 
   function cleanup() {

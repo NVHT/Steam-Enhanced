@@ -128,8 +128,8 @@ html body.se-header-actions-ready .se-title-search:focus-within {
  * tile. In the title-bar search: the native view toggles (Recent, Ready to play, Linux, plugin
  * toggles) at its end, before Filters. They are native controls, only positioned (fixed), so
  * their menus and state are unchanged. client/navigation/title-bar.js measures the list column
- * (--se-list-right); title-bar-search.js the toggles (--se-title-views-w, placed at
- * --se-title-views-x).
+ * (--se-list-right); title-bar-search.js gives the toggles' width (--se-title-views-w), and
+ * their place follows the search's.
  */
 /* The Steam button's bar; its left and width follow the lockup (.se-list-brand, below) */
 html body.se-header-actions-ready ._3Z7VQ1IMk4E3HsHvrkLNgo ._3s0lkohH8wU2do0K1il28Y:not(#se-none) {
@@ -280,18 +280,28 @@ html body.se-header-actions-ready[data-se-list] .se-sidebar-icons ._2WgQEFvIzJw_
 /*
  * View toggles inside the search field, before Filters: Recent, Ready to play, then any more
  * (Steam's Linux-games toggle, ProtonDB Library Badges' dots toggle), one icon tile each at
- * the field's tool height. The field reserves their measured width (--se-title-views-w) and
- * title-bar-search.js places them over that slot (--se-title-views-x).
+ * the field's tool height. The field reserves their width (--se-title-views-w, from
+ * title-bar-search.js) in its views slot, and they sit over it: the slot ends at the field's
+ * end, less its end inset, Filters and the tools' gap (the slot's margin and the field's gap
+ * add up to --se-space-1, below). Off screen until there's a slot (data-se-title-views).
  */
 html body.se-header-actions-ready[data-se-list] .se-sidebar-icons ._36r2az6roul_Oej7D4BMI6 {
   position: fixed !important;
   top: calc((var(--se-rail-bar) - var(--se-title-tool-h)) / 2) !important;
-  left: var(--se-title-views-x, -9999px) !important;
+  left: -9999px !important;
   right: auto !important;
   width: auto !important;
   height: var(--se-title-tool-h) !important;
   z-index: calc(var(--se-z-sticky) + 4);
   -webkit-app-region: no-drag;
+}
+
+/* !important: over the off-screen place above, itself over Steam's own (sp.css) */
+html body.se-header-actions-ready[data-se-list][data-se-title-views] .se-sidebar-icons ._36r2az6roul_Oej7D4BMI6 {
+  left: calc(
+    var(--se-title-search-x) + var(--se-title-search-w) - 2 * var(--se-space-1) - var(--se-title-tool-h) -
+      var(--se-title-views-w, 0px)
+  ) !important;
 }
 
 /*

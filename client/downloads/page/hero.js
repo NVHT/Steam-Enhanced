@@ -153,6 +153,8 @@
     return found ? top : box.bottom;
   }
 
+  const GRAPH_SAMPLE_MS = 900; // under Steam's one-second graph tick
+
   // Steam's graph, sampled into 0–1000 × 0–100 (y down): network from its bars, disk from
   // its dashed line
   function readSeries(graph) {
@@ -291,7 +293,14 @@
     // The whole source row is searched: some builds put Pause beside the transfer block.
     const data = readTransfer(item);
     data.button ||= findPause(row);
-    const series = readSeries(data.graph);
+    // Steam's graph moves once a second; a pass comes several times a second (every change on
+    // the page), and each sample measured every bar: sampled again only when due
+    if (data.graph !== refs.graph || performance.now() - refs.sampledAt >= GRAPH_SAMPLE_MS) {
+      refs.graph = data.graph;
+      refs.sampledAt = performance.now();
+      refs.series = readSeries(data.graph);
+    }
+    const series = refs.series;
     const canPause = !!(data.button || ns.steamDownloads() || ns.findPauseHandler(row));
 
     if (refs.hero.parentElement !== scroller || scroller.firstElementChild !== refs.hero) {
@@ -333,7 +342,11 @@
     }
 
     renderStats(refs, data.stats);
-    renderGraph(refs, series);
+    // Redrawn only for a new sample: the same one drew the same paths
+    if (series !== refs.drawnSeries) {
+      refs.drawnSeries = series;
+      renderGraph(refs, series);
+    }
     renderLinks(refs, data.links);
   }
 

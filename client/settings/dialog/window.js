@@ -67,10 +67,19 @@
     }
   }
 
+  /*
+   * Whether the dialog falls short of its window is the same for every page at one window
+   * width: measured once per width, not on each page switch, where the read paid the style pass
+   * of the page Steam was drawing. A page met later at that width is filled or left as it said.
+   */
+  let verdict = null; // { width, fill }
+
   function fillWindow(content) {
-    if (!content || document.title === 'Steam') return;
-    const gap = innerWidth - content.getBoundingClientRect().right;
-    if (gap <= FILL_SLACK || content.hasAttribute(FILL)) return;
+    if (!content || document.title === 'Steam' || content.hasAttribute(FILL)) return;
+    if (verdict?.width !== innerWidth) {
+      verdict = { width: innerWidth, fill: innerWidth - content.getBoundingClientRect().right > FILL_SLACK };
+    }
+    if (!verdict.fill) return;
     for (let el = content; el && el !== document.body; el = el.parentElement) {
       el.setAttribute(FILL, '');
       for (const sib of el.parentElement?.children || []) {

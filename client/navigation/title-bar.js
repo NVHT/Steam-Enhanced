@@ -325,7 +325,7 @@
     syncTitleBar(metrics, isVisible);
     // After the search's place is set: the toggles line up with its views slot
     const views = list?.querySelector(`.${C.CheckboxWithImage}`)?.parentElement?.parentElement;
-    ns.search.syncViews(isVisible && !downloadsList ? views : null, measure || restated);
+    ns.search.syncViews(isVisible && !downloadsList ? views : null);
     geometryDirty = false;
   }
 
