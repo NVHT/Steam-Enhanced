@@ -2,6 +2,7 @@
 
     python dev/css-check.py            flags only; exit code 1 if anything is flagged
     python dev/css-check.py --report   also lists !important and :not(#se-none) counts per file
+    python dev/css-check.py --fix-is   writes out each flagged :is() key (below), then checks again
 
 Flags a raw value equal to a token, so it doesn't creep back:
   - a font-size, or a font shorthand's size, in px up to 30: every text size is a --se-fs-*
@@ -23,6 +24,10 @@ On the web pages (everything under web/), which share one component set
   - the hairline edge or an elevation written out (--se-edge, --se-elevation-*)
   - a focus ring other than --se-focus-outline
 
+Everywhere, a selector keyed only by a multi-argument `:is()` that could be written out with its
+weight kept (dev/css_selectors.py): Chromium can't index the rule, so it tests it on every
+element in every style pass.
+
 The report is the !important budget: how many each file spends. Most beat Steam's own rules
 and inline styles; the ones that only beat the theme's own rules are the ones to remove.
 Skips core/tokens.css, core/font.css and core/images.css (self-contained), web/store/replay (its
@@ -31,6 +36,9 @@ own palette), vendor files and comments.
 import os
 import re
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import css_selectors  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKIP = {'core/tokens.css', 'core/font.css', 'core/images.css', 'web/store/replay/page.css'}
@@ -124,8 +132,39 @@ def web_hint(prop, value, types, selector_focus):
     return None
 
 
+def is_keys(raw, fix=False):
+    """(line, selector) of each :is() key that could be written out; with fix, the file's text
+    with every one written out (one selector per line, at the rule's indent)."""
+    found, out, pos = [], [], 0
+    nl = '\r\n' if '\r\n' in raw else '\n'
+    for start, end, clean in css_selectors.rules(raw):
+        parts = css_selectors.selector_list(clean)
+        written = []
+        for part in parts:
+            try:
+                e = css_selectors.write_out(part) if part else None
+            except ValueError:
+                e = None
+            if e:
+                found.append((raw.count('\n', 0, start) + 1, part))
+            written.extend(e or [part])
+        if fix and len(written) != len(parts):
+            line_start = raw.rfind('\n', 0, start) + 1
+            indent = raw[line_start:start] if not raw[line_start:start].strip() else ''
+            out += [raw[pos:start], (',' + nl + indent).join(written)]
+            pos = end
+    return found, (''.join(out) + raw[pos:]) if fix and out else None
+
+
 def main():
     report = '--report' in sys.argv
+    if '--fix-is' in sys.argv:
+        for rel, path in sorted(css_files()):
+            raw = open(path, encoding='utf-8', newline='').read()
+            found, fixed = is_keys(raw, fix=True)
+            if fixed:
+                open(path, 'w', encoding='utf-8', newline='').write(fixed)
+                print(f'{rel}: {len(found)} :is() keys written out')
     defs = tokens()
     sizes = unique(defs, '--se-fs-')
     radii = unique(defs, '--se-radius-')
@@ -139,6 +178,9 @@ def main():
         text = COMMENT.sub(lambda m: '\n' * m.group(0).count('\n'), raw)
         budget.append((text.count('!important'), text.count('#se-none'), rel))
         web = rel.startswith(WEB)
+        for line, part in is_keys(raw)[0]:
+            flagged += 1
+            print(f'{rel}:{line}: {part[:120]} -> write the :is() out (--fix-is)')
         for match in DECL.finditer(text):
             prop, value = match.group(1), match.group(2).strip()
             line = text.count('\n', 0, match.start()) + 1

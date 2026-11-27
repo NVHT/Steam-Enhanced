@@ -13,6 +13,9 @@ Flags (each one is a fix before the release):
   - scrollbar-width or scrollbar-color other than none/auto (it drops core/scrollbars.css for
     Chromium's native bar)
   - a vendor file without its license beside it, or without a row in the README's Licenses
+  - runtime rules (CLAUDE.md, JS) with no comment saying why: a `setInterval` (SE.poll pauses
+    while hidden), a `new MutationObserver` outside core/runtime.js and web/shared/dom.js (one
+    shared observer per window), an empty `catch`
 
 Notes (look, then decide; names can be built at runtime, sizes can be fine):
   - theme classes (.se-*) a stylesheet styles that no script or other stylesheet names
@@ -315,6 +318,33 @@ def unnamed_classes(files):
 WHOLE_FILES = {'client/settings/theme/spinner-previews.css', 'client/loader.js'}
 
 
+WHY_LINES = 3  # how far above a call its why may sit
+SHARED_OBSERVERS = {'core/runtime.js', 'web/shared/dom.js'}
+
+
+def runtime_rules(files):
+    """Timers, own observers and empty catches, each needing a comment that says why."""
+    flags = []
+    for f in files:
+        if not f.endswith('.js') or 'vendor/' in f or f.split('/')[0] not in THEME_DIRS:
+            continue
+        lines = read(os.path.join(ROOT, f)).split('\n')
+
+        def explained(i):
+            near = lines[max(0, i - WHY_LINES):i + 1]
+            return any(re.search(r'//|/\*|^\s*\*', line) for line in near)
+
+        for i, line in enumerate(lines):
+            code = re.sub(r'//.*$', '', line)
+            if re.search(r'\bsetInterval\(', code) and not explained(i):
+                flags.append(f'setInterval: {f}:{i + 1}: a timer with no why (SE.poll pauses while hidden)')
+            if re.search(r'\bnew\s+(?:\w+\.)*MutationObserver\(', code) and f not in SHARED_OBSERVERS and not explained(i):
+                flags.append(f'observer: {f}:{i + 1}: an own MutationObserver with no why (SE.watch, or web observe)')
+            if re.search(r'\bcatch\s*(?:\([^)]*\))?\s*\{\s*\}', line) and not re.search(r'\}\s*(//|/\*)', line):
+                flags.append(f'catch: {f}:{i + 1}: an empty catch with no why (catch {{ /* why */ }})')
+    return flags
+
+
 def big_files(files):
     notes = []
     for f in files:
@@ -341,7 +371,7 @@ def version():
 
 def main():
     files = sorted(walk())
-    flags = loading(files) + unused_tokens(files) + dead_exports(files) + leftovers(files) + vendor(files)
+    flags = loading(files) + unused_tokens(files) + dead_exports(files) + leftovers(files) + vendor(files) + runtime_rules(files)
     notes = unnamed_classes(files) + big_files(files) + version()
     for line in flags:
         print(line)
