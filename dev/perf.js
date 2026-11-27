@@ -7,6 +7,9 @@
  *
  * What it times, per registration site (file:line of the theme code that registered it):
  *   watch / mount / onChange / poll   the runtime's subscribers (window.__se, wrapped on publish)
+ *   observe / perFrame / afterLayout  a web page's (window.__seWeb.dom); on a web page it arms
+ *                                     its site, and loads first from the next page load
+ *                                     (core/core.js)
  *   timeout / interval / frame / idle setTimeout, setInterval, requestAnimationFrame, requestIdleCallback
  *   observer                          MutationObserver, ResizeObserver, IntersectionObserver callbacks
  *   event:<type>                      addEventListener handlers
@@ -287,6 +290,58 @@
     SE.__perf = true;
     return SE;
   };
+  /*
+   * A web page's subscribers (window.__seWeb.dom, web/shared/dom.js): observe() (its own and a
+   * scope's), perFrame() and afterLayout() callbacks, timed per feature (else all of them show
+   * as dom.js's own frames).
+   */
+  const wrapWebDom = (dom) => {
+    if (!dom || dom.__perf) return dom;
+    const { observe, perFrame, afterLayout, scope } = dom;
+    if (observe) dom.observe = (fn, opts) => observe(timed('observe', caller(), fn), opts);
+    // A feature's scope subscribes through dom.js's own observe(): its callbacks are timed here
+    if (scope) {
+      dom.scope = () => {
+        const life = scope();
+        const own = life.observe;
+        life.observe = (fn, opts) => own.call(life, timed('observe', caller(), fn), opts);
+        const listen = life.listen;
+        life.listen = (target, type, fn, options) => listen.call(life, target, type, timed(`event:${type}`, caller(), fn), options);
+        const timeout = life.timeout;
+        life.timeout = (fn, ms) => timeout.call(life, timed('timeout', caller(), fn), ms);
+        return life;
+      };
+    }
+    if (perFrame) dom.perFrame = (fn) => perFrame(timed('perFrame', caller(), fn));
+    if (afterLayout) dom.afterLayout = (fn) => afterLayout(timed('afterLayout', caller(), fn));
+    dom.__perf = true;
+    return dom;
+  };
+  const wrapWeb = (web) => {
+    if (!web || typeof web !== 'object') return web;
+    let dom = wrapWebDom(web.dom);
+    Object.defineProperty(web, 'dom', {
+      configurable: true,
+      enumerable: true,
+      get: () => dom,
+      set: (value) => {
+        dom = wrapWebDom(value);
+      },
+    });
+    return web;
+  };
+  if (window.__seWeb) wrapWeb(window.__seWeb);
+  else if (!window.__se) {
+    let publishedWeb;
+    Object.defineProperty(window, '__seWeb', {
+      configurable: true,
+      get: () => publishedWeb,
+      set: (value) => {
+        publishedWeb = wrapWeb(value);
+      },
+    });
+  }
+
   if (window.__se) wrapRuntime(window.__se);
   else {
     let published;

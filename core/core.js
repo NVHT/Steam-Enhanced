@@ -204,6 +204,11 @@
         script.addEventListener('error', reject, { once: true });
         head.append(script);
       });
+    // The profiler, once armed on this site (Ctrl+Shift+P, dev/perf.js): first, so it times
+    // everything the theme starts, as client/loader.js does in a client window
+    try {
+      if (localStorage.getItem('se-perf') === '1') add('../dev/perf.js').catch(() => {});
+    } catch {}
     Promise.all([add(SITE_LOADER), add(loader)])
       .then(() => window.__seWeb.start(site.global))
       .catch((error) => {
@@ -409,8 +414,9 @@
         run: () => (window.__seToastPreview ? window.__seToastPreview.toggle() : load('toast-preview.js')),
       },
     ],
-    // Profiler (perf.js): arms it in every client window (localStorage "se-perf"; client/loader.js
-    // then loads it before the runtime) and opens its panel here
+    // Profiler (perf.js): arms it in every client window, or on a web page its site (localStorage
+    // "se-perf"; client/loader.js, or the web boot above, then loads it before the theme's
+    // scripts) and opens its panel here
     [
       'KeyP',
       {
