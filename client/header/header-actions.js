@@ -117,6 +117,17 @@
     return null;
   }
 
+  /*
+   * A Steam button's words, one entry per text block: Steam splits its status line into blocks
+   * ("Downloading 1 of 2", "21%"), which textContent runs together ("1 of 221%").
+   */
+  function textBlocks(source) {
+    const leaves = source.firstElementChild
+      ? [...source.querySelectorAll('*')].filter((node) => !node.firstElementChild)
+      : [source];
+    return leaves.map((node) => node.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean);
+  }
+
   function footerDownloadPercent(source) {
     const progress = source.querySelector('[role="progressbar"], progress');
     if (progress && (progress.hasAttribute('aria-valuenow') || progress.hasAttribute('value'))) {
@@ -124,7 +135,11 @@
       const maximum = Number(progress.getAttribute('aria-valuemax') ?? progress.getAttribute('max') ?? 100);
       if (Number.isFinite(value) && maximum > 0) return clampPercent((value / maximum) * 100);
     }
-    return parsePercent(source.textContent);
+    for (const text of textBlocks(source)) {
+      const value = parsePercent(text);
+      if (value !== null) return value;
+    }
+    return null;
   }
 
   function readDownloadProgress(source) {
@@ -470,7 +485,7 @@
     entry.source = source;
     const icon =
       source.querySelector('svg') || (action.key === 'downloads' ? null : source.querySelector('img'));
-    const label = source.textContent.replace(/\s+/g, ' ').trim() || action.label;
+    const label = textBlocks(source).join(' · ') || action.label;
     const signature = `${label}|${icon?.outerHTML || ''}|${source.className}`;
 
     if (signature !== entry.signature) {
