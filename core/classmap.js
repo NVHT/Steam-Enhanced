@@ -306,6 +306,7 @@
     InstallRequestModal: '_3wtPUBfilFITcl1s4u6A7T',
     ItemLists: '_1ugNiylO2vKXhirsGocAxa',
     ItemWrapper: '_2H_ytAwp5tfeou0kdWjLl4',
+    KBShortcut: '_2EuLvYoO3iAtbpE0XEao8d',
     Label: '_1vYL2q-91QLy-FBzntE7E5',
     Landscape: '_3VOR2AeYATx3qSE0I-Pm-5',
     LeftColumn: '_1sZgBDTw5NH-yuVDZK1SUU',

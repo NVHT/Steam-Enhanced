@@ -59,6 +59,8 @@
     timeStats: `.${C.AchievementContent_TopSection} .${C.TimeStats}`,
     logo: `.${C.TopSectionMiddle}.${C.ShowGameLogo} img`,
     backToGame: `.${C.AchievementContent_TopSection} .${C.BackToGameBtn}`,
+    // Steam's "(Shift+Tab)" beside it, written from its overlay shortcut setting (hidden)
+    backKey: `.${C.AchievementContent_TopSection} .${C.KBShortcut}`,
     // Steam's Exit game button in the time stats column (hidden; the rail's clicks it).
     exitGame: `.${C.AchievementContent_TopSection} .${C.TimeStats} .${C.ExitGameBtn}`,
     toolbarButton: `.${C.ToolbarContainer} .${C.ToolbarButton}`,

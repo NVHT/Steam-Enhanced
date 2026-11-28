@@ -30,6 +30,15 @@
     updateScrollHint(wrap);
   };
 
+  // The overlay shortcut as Steam's hidden Back to game shows it ("(Shift+Tab)"), so a change in
+  // Settings › In Game shows here too; Shift+Tab stays until Steam has drawn its own
+  const renderBackKey = ({ back, backKey }) => {
+    const key = document.querySelector(SEL.backKey)?.textContent.replace(/[()]/g, '').trim();
+    if (!key || key === 'undefined') return; // Steam writes "(undefined)" before the setting loads
+    setText(backKey, key);
+    SE.attr(back, 'aria-keyshortcuts', key);
+  };
+
   const render = () => {
     const host = document.querySelector(SEL.timeStats);
     if (!host) return;
@@ -55,6 +64,7 @@
     setStat(live.ui.stats.total, stats.total);
     setStat(live.ui.stats.recent, stats.recent);
     renderTime(live.ui.time);
+    renderBackKey(live.ui.tabs);
 
     renderOverview(live.ui.overview, stats.appid);
     syncToolbar();

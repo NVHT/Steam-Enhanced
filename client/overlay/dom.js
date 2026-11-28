@@ -133,7 +133,7 @@
 
   // The rail of view tabs, the drawer head naming the open view, and the
   // footer under them: Exit game under the rail, Back to game (labelled, with
-  // its shortcut) under the drawer. Icon-only buttons name themselves in a
+  // its shortcut, Steam's own text once render() has read it) under the drawer. Icon-only buttons name themselves in a
   // flyout (`data-tip`, drawn by CSS) instead of the slow native tooltip.
   const buildTabs = () => {
     const rail = el('nav', 'se-ov-rail');
@@ -158,7 +158,8 @@
     const back = button('se-ov-back');
     back.setAttribute('aria-keyshortcuts', 'Shift+Tab');
     back.innerHTML = ICON.play;
-    back.append(el('span', 'se-ov-back-label', 'Back to game'), el('kbd', 'se-ov-back-key', 'Shift+Tab'));
+    const backKey = el('kbd', 'se-ov-back-key', 'Shift+Tab');
+    back.append(el('span', 'se-ov-back-label', 'Back to game'), backKey);
     back.addEventListener('click', () => document.querySelector(SEL.backToGame)?.click());
     const exit = button('se-ov-exit', { tip: 'Exit game' });
     exit.setAttribute('aria-label', 'Exit game');
@@ -169,7 +170,7 @@
     const title = el('h2', 'se-ov-tabs-title');
     const note = el('span', 'se-ov-tabs-note');
     head.append(title, note);
-    return { rail, tabs, head, title, note, back, exit };
+    return { rail, tabs, head, title, note, back, backKey, exit };
   };
 
   // The time cell: today's time; click to start the timer (it then shows the
