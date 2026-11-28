@@ -9,6 +9,7 @@
 
 | Version | Date | In short |
 | --- | --- | --- |
+| [**1.6.2**](#v1-6-2) | Nov 27, 2026 | Fixes from your reports, a tidier Library Home, an overlay that clicks |
 | [**1.6.1**](#v1-6-1) | Nov 27, 2026 | Taskbar Preferences, readable hover rows, the dock's full friend menu |
 | [**1.6.0**](#v1-6-0) | Nov 26, 2026 | A faster client and Store, the stage's collection in Theme settings |
 | [**1.5.7**](#v1-5-7) | Nov 26, 2026 | Cover chips, Home shelves and What's New redone, Brew Hub 1.2, a tidier Store game page |
@@ -35,11 +36,42 @@
 
 <br>
 
+<a name="v1-6-2"></a>
+
+## 1.6.2 · Nov 27, 2026
+
+> Fixes for the five bugs you reported this week, an in-game overlay whose buttons all answer the mouse, and a calmer Library Home: even spacing, sort labels written from the game, and counts that read the same everywhere.
+
+**Overlay**
+- **Clicks**: Back to game, Exit game and the foot of the column answer the mouse again; Steam's empty toolbar area no longer lies over them.
+- **Game Recording**: the timeline sits beside the theme's column instead of over it, and no longer fills the middle of the overlay with a grey box.
+- **Settings**: Steam's settings window keeps its size instead of growing while open.
+- **Back to game**: shows the overlay shortcut you set in Steam, not always Shift+Tab.
+- **Exit game?**: no black corners around the dialog.
+
+**Library Home**
+- **Spacing**: even sides and even room above every shelf; Add shelf moves beside Arrange shelves in What's New's header.
+- **Sort labels**: a sorted shelf's label is a corner chip written from the game ("493 h", "Not played", a review's score).
+- **Collections**: a tile's count is a chip and names take two lines; a one-game collection shows its cover larger.
+- **Counts**: one format everywhere, "3,760 of 3,973" when filtered.
+- **Hover cards**: no zero play time ("Not played yet"), names on two lines over a deeper fade.
+- **Sort picker**: only the chosen row is marked; picking no longer pops a cover's card.
+- **Shelves**: Recent Games and Play Next keep their gaps after the Home stage.
+
+**Fixes**
+- **Store search**: hidden, ignored and wishlisted games stay hidden when you filter them out (#15).
+- **Store trailers**: the quality list opens upward, all its choices in view (#16).
+- **Profiles**: a long Steam ID or profile link stays in the card, cut with an ellipsis (#17).
+- **Downloads**: the button reads "Downloading 1 of 2 · 21%", not "1 of 221%" (#18).
+- **Friend Activity**: a daily summary's picture no longer covers the friend's name, and its chip sits at the line's end (#19).
+
+<br>
+
 <a name="v1-6-1"></a>
 
-## 1.6.1 · Nov 27, 2026
-
-> Steam's Taskbar Preferences now shows the tray menu its switches build, and the tray follows them. Text on a hovered or selected row is easier to read everywhere, and the dock's right-click opens Steam's full friend menu.
+<details>
+<summary><b>1.6.1</b> · Nov 27, 2026 · Steam's Taskbar Preferences now shows the tray menu its switches build, and the tray follows them. Text on a hovered or selected row is easier to read everywhere, and the dock's right-click opens Steam's full friend menu.</summary>
+<br>
 
 **Settings**
 - **Taskbar Preferences**: beside the switches, the tray menu they build; hovering a switch lights what it changes.
@@ -65,7 +97,7 @@
 - Motion uses the theme's easing tokens everywhere; files near 40 KB are split by section; timers and observers that could run after a feature stopped are cancelled.
 - Dev tools: the dialog launcher, element picker, profiler, dev reload and toast preview each do more.
 
-<br>
+</details>
 
 <a name="v1-6-0"></a>
 
