@@ -9,7 +9,8 @@
  *     responsive menu finds its box intact.
  *   - Type chips: each event card gets one ("Purchase", "Review", "Workshop"...). Steam wraps
  *     each event in a per-type panel (.blotter_workshopitempublished...); matched by class
- *     prefix, first match wins, unlisted types get none.
+ *     prefix, first match wins, unlisted types get none. It closes the author row, or a daily
+ *     roll-up's first line.
  *   - Wide art: workshop previews are sized for Steam's 200px thumbnail (?imw=200&imh=150...).
  *     Shown full-width here, they're asked for at feed width instead. Restored on destroy.
  *   - "+N" tiles: the "+2" Steam ends a long purchase with gets [data-se-more] (found by its
@@ -116,7 +117,8 @@
         mark(block, 'data-se-kind', kind?.[1] ?? '');
         if (!kind) continue;
         const chip = el('span', { class: 'se-activity-kind', 'data-se-kind': kind[1], text: kind[2] });
-        const author = block.querySelector('.blotter_author_block');
+        // The author row, or a daily roll-up's first line (it has no author row)
+        const author = block.querySelector('.blotter_author_block, .blotter_daily_rollup_line');
         if (author) author.append(chip);
         else block.prepend(chip);
         chips.add(chip);

@@ -618,6 +618,21 @@ html.se-community-activity .blotter_daily_rollup_line > * {
   margin: 0 !important;
 }
 
+/* The friend's picture: Steam places it absolutely in the line's 40px left padding
+   (profile_friendactivity.css .blotter_rollup_avatar), which the rows above drop: here it
+   leads the row instead */
+html.se-community-activity .blotter_daily_rollup_line > .blotter_rollup_avatar {
+  position: static;
+  flex: none;
+  order: -1;
+}
+
+/* The type chip closes the first line (activity/page.js); the line's margin reset above
+   outweighs the chip's own push */
+html.se-community-activity .blotter_daily_rollup_line > .se-activity-kind {
+  margin-left: auto !important; /* beats .blotter_daily_rollup_line > * margin: 0 !important, above */
+}
+
 /* Actions row: Rate up / down, Share, then who rated */
 html.se-community-activity .blotter_control_container {
   position: static !important;

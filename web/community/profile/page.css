@@ -462,8 +462,9 @@ html.se-community-profile .se-profile-medal:empty + .se-profile-about {
   border-left: 0;
 }
 
+/* The summary gives way first (a high shrink), the ID column only once it's gone */
 html.se-community-profile .se-profile-about {
-  flex: 1 1 320px;
+  flex: 1 100 320px;
 }
 
 html.se-community-profile .se-profile-about:empty {
@@ -485,10 +486,11 @@ html.se-community-profile .se-profile-stack {
 }
 
 /* In the info row, the ID and link are quiet: a small label over the value, the copy button
-   after the value, one above the other */
+   after the value, one above the other. The column gives way before it leaves the card: a long
+   value ends in an ellipsis (the chip copies it whole, its title names it). */
 html.se-community-profile .se-profile-ids {
   display: flex;
-  flex: none;
+  flex: 0 1 auto;
   flex-direction: column;
   justify-content: center;
   gap: var(--se-space-3);
@@ -496,6 +498,7 @@ html.se-community-profile .se-profile-ids {
 
 html.se-community-profile .se-profile-ids .se-profile-chip {
   display: grid;
+  max-width: 100%;
   border: 0;
   border-radius: var(--se-radius-xs);
   text-align: left;
@@ -503,6 +506,7 @@ html.se-community-profile .se-profile-ids .se-profile-chip {
   grid-template-areas:
     "label"
     "value";
+  grid-template-columns: minmax(0, auto);
   justify-content: start;
   align-items: center;
   gap: var(--se-space-1) var(--se-space-2);
@@ -514,6 +518,9 @@ html.se-community-profile .se-profile-ids .se-profile-chip {
 
 html.se-community-profile .se-profile-ids .se-profile-chip-value {
   grid-area: value;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--se-text);
   transition: color var(--se-dur);
   font: var(--se-type-body-lg);
