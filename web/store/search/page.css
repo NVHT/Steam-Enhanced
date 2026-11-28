@@ -233,6 +233,16 @@ html.se-store-search:not(#se-none) #search_resultsRows > .search_result_row {
   text-decoration: none;
 }
 
+/* The preference filters (Hide items in my library, ignored, on my wishlist): Steam hides the
+   flagged rows (search.css .search_results.hide_owned .ds_owned...), which the row rule above
+   outweighs. */
+html.se-store-search:not(#se-none) .search_results.hide_owned #search_resultsRows > .search_result_row.ds_owned,
+html.se-store-search:not(#se-none) .search_results.hide_ignored #search_resultsRows > .search_result_row.ds_ignored,
+html.se-store-search:not(#se-none) .search_results.hide_ignored #search_resultsRows > .search_result_row.ds_excluded_by_preferences,
+html.se-store-search:not(#se-none) .search_results.hide_wishlist #search_resultsRows > .search_result_row.ds_wishlist {
+  display: none;
+}
+
 /* Hover: a light wash over the card, faded in. */
 html.se-store-search:not(#se-none) #search_resultsRows > .search_result_row::before {
   content: "";

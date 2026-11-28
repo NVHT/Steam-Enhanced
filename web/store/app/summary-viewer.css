@@ -227,6 +227,7 @@ html.se-viewer-open {
   --se-player-bar: color-mix(in srgb, var(--se-bg-ink) 78%, transparent);
 
   position: relative;
+  container-type: inline-size; /* the quality list's height follows the player's (below) */
   aspect-ratio: 16 / 9;
   border-radius: var(--se-radius-md);
   overflow: hidden;
@@ -498,6 +499,13 @@ html.se-viewer-open {
 .se-player__row .se-select {
   flex: none;
   margin-right: var(--se-space-1);
+}
+
+/* The bar sits at the player's foot and the player clips: the list opens upward, right-aligned
+   under the button's end, no taller than the player above the bar (56.25cqi: its 16:9 height) */
+.se-player__row .se-select__list {
+  inset: auto 0 calc(100% + var(--se-space-1)) auto;
+  max-height: min(var(--se-menu-max-h), calc(56.25cqi - 96px));
 }
 
 /*
