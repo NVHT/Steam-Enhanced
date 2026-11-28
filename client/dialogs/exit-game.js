@@ -19,6 +19,8 @@
 
   const OURS = 'se-exitgame';
   const ROOT = 'data-se-exitgame';
+  // The overlay's Exit game? is a popup window of its own, the dialog's size
+  const WINDOW = 'data-se-exitgame-window';
   // The dialog sits under Steam's modal layers (position, focus, portal): its props are far up
   const MAX_DEPTH = 40;
 
@@ -49,13 +51,17 @@
     const cancel = root.querySelector('.DialogFooter .DialogButton:not(.Primary)');
     SE.attr(ok, 'aria-label', 'Exit game');
     SE.attr(cancel, 'aria-label', 'Keep playing');
-    // From the overlay it opens in its own window, sized to Steam's smaller dialog
+    // From the overlay it opens in its own window, sized to Steam's smaller dialog; that window's
+    // body clears so the card's rounded corners show the overlay (exit-game.css)
     const unfit = SE.dialogArt.fitWindow(root);
+    const html = document.documentElement;
+    if (html.classList.contains('ModalDialogPopup')) SE.attr(html, WINDOW, '');
 
     return {
       root,
       destroy() {
         unfit();
+        SE.attr(html, WINDOW, null);
         for (const node of nodes) node?.remove();
         SE.unmark(root, ROOT);
         SE.unmark(ok, 'aria-label');
