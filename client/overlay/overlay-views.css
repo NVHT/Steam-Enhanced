@@ -7,8 +7,13 @@
 
 /* Body: the rail beside the drawer, filling the height under the header, and
    the footer row under them: Exit game under the rail, Back to game across
-   the drawer's width. */
+   the drawer's width. It runs past Steam's top section (capped at 100% - 130px)
+   into the toolbar holder below, a positioned box later in the page that would
+   take its hover and clicks (sp.css ToolbarMaxWidthContainer: position:
+   relative): raised over it. */
 html[data-se-ov] .se-ov-body {
+  position: relative;
+  z-index: var(--se-z-raised);
   order: 5;
   flex: 1 0 100%;
   height: var(--se-ov-body-h, auto);
