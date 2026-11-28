@@ -74,10 +74,10 @@
 
   /* ---------- Widget windows ---------- */
 
-  // Every widget window (Browser, Settings, Guides, Screenshots, ...) opens
-  // centred on the overlay at one fixed size. Steam restores each widget's
-  // last spot, so it's moved right after it shows, then left alone, so it
-  // can still be dragged.
+  // Every widget window (Browser, Guides, Screenshots, ...) opens centred on
+  // the overlay at one fixed size (Settings and Timer at their own). Steam
+  // restores each widget's last spot, so it's moved right after it shows,
+  // then left alone, so it can still be dragged.
   const WINDOW_W = 1120;
   const WINDOW_H = 720;
   const WINDOW_MARGIN = 0.9; // at most this share of the overlay
@@ -96,11 +96,20 @@
     return ids;
   };
 
-  // Widget windows carry Steam's OverlayPopupBody class on <body>.
+  // Widget windows carry Steam's OverlayPopupBody class on <body>. The Game Recording timeline
+  // is one too, but Steam sizes it to the whole screen, the bar at its top (see-through below):
+  // never placed.
   const OVERLAY_POPUP_BODY = SE.C.OverlayPopupBody;
   const isWindow = (value) => !!SE.run(() => value && typeof value.moveTo === 'function' && !!value.document);
   const isWidgetWindow = (win) =>
-    isWindow(win) && win !== window && !!SE.run(() => win.document.body.classList.contains(OVERLAY_POPUP_BODY));
+    isWindow(win) &&
+    win !== window &&
+    !!SE.run(() => win.document.body.classList.contains(OVERLAY_POPUP_BODY) && !win.document.querySelector('.OverlayTimeline'));
+  // Settings, Timer...: Steam sizes these windows to their content (its fit-to-content flag: a plain,
+  // unhashed class on the popup, joined here so the class map leaves it be); resizing one makes
+  // it grow again. They are only centred.
+  const FITS_CONTENT = `.${['Fit', 'To', 'Content'].join('')}`;
+  const fitsContent = (win) => !!SE.run(() => win.document.querySelector(FITS_CONTENT));
 
   // The Window inside one of Steam's popup objects, whichever field holds it.
   const windowOf = (popup) => {
@@ -149,10 +158,11 @@
     return [...found].filter(win => !SE.run(() => win.closed));
   };
 
-  // Target in this window's CSS pixels (it spans the screen).
-  const windowTarget = () => {
-    const w = Math.round(Math.min(WINDOW_W, window.innerWidth * WINDOW_MARGIN));
-    const h = Math.round(Math.min(WINDOW_H, window.innerHeight * WINDOW_MARGIN));
+  // Target in this window's CSS pixels (it spans the screen); a window that fits its content
+  // keeps its size (`size`).
+  const windowTarget = (size) => {
+    const w = size?.w ?? Math.round(Math.min(WINDOW_W, window.innerWidth * WINDOW_MARGIN));
+    const h = size?.h ?? Math.round(Math.min(WINDOW_H, window.innerHeight * WINDOW_MARGIN));
     const x = Math.round(window.screenX + (window.innerWidth - w) / 2);
     const y = Math.round(window.screenY + (window.innerHeight - h) / 2);
     return { x, y, w, h };
@@ -166,8 +176,8 @@
   // popup's devicePixelRatio only reflects Steam's UI zoom, so it isn't used.
   // The DOM calls are a fallback for windows without that API.
   const placeWindow = (win) => {
-    const target = windowTarget();
     const at = windowRect(win);
+    const target = windowTarget(at && fitsContent(win) ? at : null);
     const near = (a, b) => Number.isFinite(a) && Math.abs(a - b) <= WINDOW_SLACK;
     const sized = !!at && near(at.w, target.w) && near(at.h, target.h);
     const moved = !!at && near(at.x, target.x) && near(at.y, target.y);

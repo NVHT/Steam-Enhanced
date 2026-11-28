@@ -424,7 +424,7 @@
     {
       key: 'overlay', section: 'Look', visual: true, tab: 'Overlay', label: 'Restyle the overlay', from: 'In-game overlay restyle',
       hint: "The in-game overlay in the theme's design, from its next opening.",
-      values: [ON, off()],
+      values: [ON, off('options/overlay/restyle-off.css')],
     },
     {
       key: 'overlay-darkness', section: 'Look', visual: true, requires: [['overlay', 'on']], tab: 'Overlay', label: 'Overlay darkness', from: 'Overlay darkness',

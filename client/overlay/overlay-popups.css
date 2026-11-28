@@ -5,21 +5,31 @@
  * Each widget is a separate popup whose body carries Steam's OverlayPopupBody
  * class, so every rule is scoped to it and inert in other windows. Windows
  * keep Steam's resize grip; widgets.js opens each one centred at a fixed size.
- * Pinned views keep Steam's transparent presentation.
+ * The frame paints the window, never the body: pinned views and the Game Recording timeline
+ * (.OverlayTimeline, its window the overlay's size, the timeline at its top) keep Steam's
+ * transparent presentation (sp.css: no background on either).
  */
 body._1UJDmU3N-pkv7oTJ_Zf9nK {
-  background: var(--se-bg) !important;
   color: var(--se-text) !important;
+}
+
+/* ---------- Game Recording timeline ---------- */
+
+/* Steam centres the bar at the top of its screen-wide window (GameOverlayPlayer, sp.css), over
+   the theme's column; it's centred in the space right of the column instead, at Steam's own
+   width (80% of that space, measured in the overlay's top section). */
+body._1UJDmU3N-pkv7oTJ_Zf9nK .OverlayTimeline ._16TMUpH1mBB-W9-O8DLyCO {
+  padding-inline: var(--se-ov-beside-start) var(--se-ov-beside-end);
 }
 
 /* ---------- Window chrome ---------- */
 
-body._1UJDmU3N-pkv7oTJ_Zf9nK .C9tvuqqEXGcrkcAtHrQ_R:not(._2OoAjT3o0Ieng7ycuy86vZ) {
+body._1UJDmU3N-pkv7oTJ_Zf9nK .C9tvuqqEXGcrkcAtHrQ_R:not(._2OoAjT3o0Ieng7ycuy86vZ, .OverlayTimeline) {
   background: var(--se-bg) !important;
   box-shadow: var(--se-edge) !important;
 }
 
-body._1UJDmU3N-pkv7oTJ_Zf9nK .C9tvuqqEXGcrkcAtHrQ_R:not(._2OoAjT3o0Ieng7ycuy86vZ) ._2O7tjQ9VWj5nhZ0y-pdpX2 {
+body._1UJDmU3N-pkv7oTJ_Zf9nK .C9tvuqqEXGcrkcAtHrQ_R:not(._2OoAjT3o0Ieng7ycuy86vZ, .OverlayTimeline) ._2O7tjQ9VWj5nhZ0y-pdpX2 {
   background: var(--se-sidebar) !important;
   box-shadow: var(--se-rule-bottom) !important;
 }

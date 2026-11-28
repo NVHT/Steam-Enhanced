@@ -12,7 +12,7 @@
     ACTIVE, BY_NAME, CONTENT, ITEM, LIST, MILL_BY_KEY, OWN, PRE_FOR, PROPS_ROOT, PROPS_SIZE, SIZE,
     TITLE, cards, isSteamSettings, learn, millPageOf, norm, pageNameOf, pickers,
     preLabels, propsPage, propsSidebar, resetProps, revealHit, rows, scheduleScan, sections,
-    sidebar, fillWindow, sizeWindow, unfillWindow, activeContent,
+    sidebar, sizeWindow, activeContent,
   } = ns;
   const { live } = ns;
 
@@ -117,7 +117,6 @@
       }
     }
     if (content) page(content, list, steam, mill);
-    fillWindow(content);
     if (content && steam) {
       try {
         learn(content, list);
@@ -164,7 +163,6 @@
   }
 
   function onResize() {
-    unfillWindow();
     schedule();
   }
 
@@ -223,7 +221,6 @@
       resetProps();
       document.querySelectorAll(`[${OWN}="settings"]`).forEach((el) => el.remove());
       unmarkAll();
-      unfillWindow();
       document.removeEventListener('visibilitychange', onVisibility);
       removeEventListener('resize', onResize);
       delete window.__seSettings;

@@ -30,9 +30,15 @@
     return steam;
   }
 
+  /*
+   * A desktop Settings or Properties window opens at the theme's size, centred. The in-game
+   * overlay's Settings is left alone: Steam fits that window to its content (its fit-to-content flag) and
+   * the overlay places it (client/overlay/widgets.js).
+   */
   function sizeWindow(size = SIZE) {
     const win = window.SteamClient?.Window;
     if (!win?.ResizeTo || document.visibilityState !== 'visible') return;
+    if (document.body?.classList.contains(SE.C.OverlayPopupBody)) return;
     const s = window.screen;
     const availW = s.availWidth || size.w;
     const availH = s.availHeight || size.h;
@@ -47,46 +53,6 @@
       }
     } catch { /* Steam's window API refused (window closed or call missing): nothing to do */ }
   }
-  /*
-   * The page fills its window. The in-game overlay's Settings window is sized by the overlay
-   * (client/overlay/widgets.js), wider than Steam lays its dialog out, which left a blank column
-   * at the right. Every box from the page up to <body> stretches (`data-se-fill`), and empty
-   * boxes beside that chain step aside (`data-se-fill-spare`). Desktop windows already fill
-   * theirs, so nothing is marked there.
-   */
-  const FILL = 'data-se-fill';
-  const SPARE = 'data-se-fill-spare';
-  const FILL_SLACK = 16;
-  const isSpare = (el) =>
-    !el.textContent.trim() && !el.querySelector('button, svg, img, input, [role="button"], [tabindex]');
 
-  function unfillWindow() {
-    for (const el of document.querySelectorAll(`[${FILL}], [${SPARE}]`)) {
-      el.removeAttribute(FILL);
-      el.removeAttribute(SPARE);
-    }
-  }
-
-  /*
-   * Whether the dialog falls short of its window is the same for every page at one window
-   * width: measured once per width, not on each page switch, where the read paid the style pass
-   * of the page Steam was drawing. A page met later at that width is filled or left as it said.
-   */
-  let verdict = null; // { width, fill }
-
-  function fillWindow(content) {
-    if (!content || document.title === 'Steam' || content.hasAttribute(FILL)) return;
-    if (verdict?.width !== innerWidth) {
-      verdict = { width: innerWidth, fill: innerWidth - content.getBoundingClientRect().right > FILL_SLACK };
-    }
-    if (!verdict.fill) return;
-    for (let el = content; el && el !== document.body; el = el.parentElement) {
-      el.setAttribute(FILL, '');
-      for (const sib of el.parentElement?.children || []) {
-        if (sib !== el && !sib.hasAttribute(SPARE) && isSpare(sib)) sib.setAttribute(SPARE, '');
-      }
-    }
-  }
-
-  Object.assign(ns, { fillWindow, isSteamSettings, sizeWindow, unfillWindow });
+  Object.assign(ns, { isSteamSettings, sizeWindow });
 })(window.__se);
